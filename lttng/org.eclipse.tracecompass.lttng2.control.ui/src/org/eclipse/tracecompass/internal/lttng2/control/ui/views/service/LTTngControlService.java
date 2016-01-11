@@ -994,21 +994,6 @@ public class LTTngControlService implements ILttngControlService {
     }
 
     @Override
-    public void calibrate(boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
-        ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_CALIBRATE);
-
-        if (isKernel) {
-            command.add(LTTngControlServiceConstants.OPTION_KERNEL);
-        } else {
-            command.add(LTTngControlServiceConstants.OPTION_UST);
-        }
-
-        command.add(LTTngControlServiceConstants.OPTION_FUNCTION_PROBE);
-
-        executeCommand(command, monitor);
-    }
-
-    @Override
     public void recordSnapshot(String sessionName, IProgressMonitor monitor)
             throws ExecutionException {
         ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_SNAPSHOT, LTTngControlServiceConstants.COMMAND_RECORD_SNAPSHOT);

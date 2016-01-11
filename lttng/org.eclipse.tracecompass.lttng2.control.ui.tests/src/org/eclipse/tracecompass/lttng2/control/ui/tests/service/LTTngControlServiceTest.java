@@ -105,7 +105,6 @@ public class LTTngControlServiceTest {
     private static final String SCEN_EVENT_HANDLING = "EventHandling";
     private static final String SCEN_CONTEXT_HANDLING = "ContextHandling";
     private static final String SCEN_CONTEXT_ERROR_HANDLING = "ContextErrorHandling";
-    private static final String SCEN_CALIBRATE_HANDLING = "CalibrateHandling";
     private static final String SCEN_CREATE_SESSION_2_1 = "CreateSessionLttng2.1";
     private static final String SCEN_CREATE_SESSION_VERBOSE_2_1 = "CreateSessionLttngVerbose2.1";
     private static final String SCEN_CREATE_SNAPSHOT_SESSION = "CreateSessionSnapshot";
@@ -1255,28 +1254,6 @@ public class LTTngControlServiceTest {
         try {
             // 1) session name, channel = null, event name, loglevel-only, TRACE_DEBUG
             fService.addContexts(sessionName, channelName, eventName, false, contexts, new NullProgressMonitor());
-            fail("No exeption generated");
-        } catch (ExecutionException e) {
-            // success
-        }
-    }
-
-    @Test
-    public void testCalibrate() {
-        try {
-            fShell.setScenario(SCEN_CALIBRATE_HANDLING);
-            fService.calibrate(true, new NullProgressMonitor());
-
-        } catch (ExecutionException e) {
-            fail(e.toString());
-        }
-    }
-
-    @Test
-    public void testCalibrateFailure() {
-        try {
-            fShell.setScenario(SCEN_CALIBRATE_HANDLING);
-            fService.calibrate(false, new NullProgressMonitor());
             fail("No exeption generated");
         } catch (ExecutionException e) {
             // success

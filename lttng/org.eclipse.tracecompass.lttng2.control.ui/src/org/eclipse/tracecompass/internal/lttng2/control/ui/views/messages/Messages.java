@@ -108,9 +108,6 @@ public final class Messages extends NLS {
     public static String TraceControl_AddContextJob;
     public static String TraceControl_AddContextFailure;
 
-    public static String TraceControl_AddCalibrateJob;
-    public static String TraceControl_AddCalibrateFailure;
-
     public static String TraceControl_RecordSnapshotJob;
     public static String TraceControl_RecordSnapshotFailure;
 

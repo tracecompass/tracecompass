@@ -193,13 +193,6 @@
 
       <command
             categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
-            description="%commands.control.calibrate.description"
-            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.calibrate"
-            name="%commands.control.calibrate">
-      </command>
-
-      <command
-            categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
             description="%commands.control.snapshot.description"
             id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.snapshot"
             name="%commands.control.snapshot">
@@ -828,29 +821,6 @@
                </with>
             </visibleWhen>
          </command>
-         <command
-               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.calibrate"
-               icon="icons/elcl16/calibrate.gif"
-               label="%commands.control.calibrate"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="activeMenuSelection">
-                  <and>
-                     <iterate
-                           operator="or">
-                        <instanceof
-                              value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
-                        </instanceof>
-                     </iterate>
-                     <count
-                           value="1">
-                     </count>
-                  </and>
-               </with>
-            </visibleWhen>
-         </command>
 
          <command
                commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.snapshot"
@@ -1261,22 +1231,6 @@
       <handler
             class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.AddContextOnDomainHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.addContextOnDomain">
-         <activeWhen>
-            <with
-                  variable="selection">
-               <iterate
-                     operator="or">
-                  <instanceof
-                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
-                  </instanceof>
-               </iterate>
-            </with>
-         </activeWhen>
-      </handler>
-
-      <handler
-            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.CalibrateHandler"
-            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.calibrate">
          <activeWhen>
             <with
                   variable="selection">

@@ -1430,15 +1430,6 @@ To refresh the remote host information, select any node in the tree of the Contr
 
 Upon successful operation, the tree in the Control View will be refreshed with the remote host configuration.
 
-=== Quantifing LTTng overhead (Calibrate) ===
-
-The LTTng calibrate command can be used to find out the combined average overhead of the LTTng tracer and the instrumentation mechanisms used. For now, the only calibration implemented is that of the kernel function
-instrumentation (kretprobes). To run the calibrate command, select the a domain (e.g. '''Kernel'''), click the right mouse button on the domain tree node. A context-sensitive menu will show. Select the '''Calibrate''' menu item.
-
-[[Image:images/LTTng2CalibrateAction.png]]
-
-Upon successful operation, the calibrate command is executed and relevant information is stored in the trace. Note: that the trace has to be active so that to command as any effect.
-
 === Importing Session Traces to a Tracing Project ===
 
 To import traces from a tracing session, select the relevant session and click on the '''Import''' Button. Alternatively, click the right mouse button on the session tree node and select the menu item '''Import...''' from the context-sensitive menu.
