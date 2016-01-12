@@ -60,10 +60,13 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
@@ -191,6 +194,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     /** The tree column label array, or null if combo is not used */
     private String[] fColumns;
 
+    private Comparator<ITimeGraphEntry>[] fColumnComparators;
+
+    /** The sort direction */
+    private int fDirection = SWT.DOWN;
+
     /** The tree label provider, or null if combo is not used */
     private TreeLabelProvider fLabelProvider = null;
 
@@ -216,6 +224,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     /** The list of color resources created by this view */
     private final List<Color> fColors = new ArrayList<>();
+
+    /** The default column index for sorting */
+    private int fInitialSortColumn = 0;
+
+    /** Flag to indicate to reveal selection */
+    private volatile boolean fIsRevealSelection = false;
 
     // ------------------------------------------------------------------------
     // Classes
@@ -785,8 +799,28 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *            The array of tree column labels
      */
     protected void setTreeColumns(final String[] columns) {
+        setTreeColumns(columns, null, 0);
+    }
+
+    /**
+     * Sets the tree column labels.
+     * <p>
+     * This should be called from the constructor.
+     *
+     * @param columns
+     *            The array of tree column labels
+     * @param comparators
+     *            An array of column comparators for sorting of columns when
+     *            clicking on column header
+     * @param initialSortColumn
+     *            Index of column to sort initially
+     * @since 2.0
+     */
+    protected void setTreeColumns(final String[] columns, final Comparator<ITimeGraphEntry>[] comparators, int initialSortColumn) {
         checkPartNotCreated();
         fColumns = columns;
+        fColumnComparators = comparators;
+        fInitialSortColumn = initialSortColumn;
     }
 
     /**
@@ -1091,6 +1125,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             combo.setTreeContentProvider(fTimeGraphContentProvider);
             combo.setTreeLabelProvider(fLabelProvider);
             combo.setTreeColumns(fColumns);
+            if (fColumnComparators != null) {
+                createColumnSelectionListener(combo.getTreeViewer());
+            }
         }
         fTimeGraphWrapper.setTimeGraphContentProvider(fTimeGraphContentProvider);
         fTimeGraphWrapper.setFilterContentProvider(fFilterContentProvider != null ? fFilterContentProvider : fTimeGraphContentProvider);
@@ -1253,6 +1290,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
         return bookmarks;
     }
+
+
 
     // ------------------------------------------------------------------------
     // Signal handlers
@@ -1642,6 +1681,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     fTimeGraphWrapper.getTimeGraphViewer().setBookmarks(refreshBookmarks(fEditorFile));
                     fTimeGraphWrapper.getTimeGraphViewer().setMarkerCategories(getMarkerCategories());
                     fTimeGraphWrapper.getTimeGraphViewer().setMarkers(null);
+                    resetColumnSorting();
                 } else {
                     fTimeGraphWrapper.refresh();
                 }
@@ -1672,9 +1712,17 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     }
                 }
 
+                // reveal selection
+                if (fIsRevealSelection && fTimeGraphWrapper instanceof TimeGraphComboWrapper) {
+                    fIsRevealSelection = false;
+                    ITimeGraphEntry entry1 = fTimeGraphWrapper.getTimeGraphViewer().getSelection();
+                    fTimeGraphWrapper.getTimeGraphViewer().setSelection(entry1);
+                }
+
                 if (!zoomThread) {
                     startZoomThread(startTime, endTime);
                 }
+
             }
         });
     }
@@ -1711,7 +1759,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         });
     }
 
-    private static void sortChildren(ITimeGraphEntry entry, Comparator<ITimeGraphEntry> comparator) {
+    private void sortChildren(ITimeGraphEntry entry, Comparator<ITimeGraphEntry> comparator) {
         if (entry instanceof TimeGraphEntry) {
             ((TimeGraphEntry) entry).sortChildren(comparator);
         }
@@ -1867,4 +1915,54 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         return fDirty.get() != 0 || fZoomThread.getZoomStartTime() != fTimeGraphWrapper.getTimeGraphViewer().getTime0() || fZoomThread.getZoomEndTime() != fTimeGraphWrapper.getTimeGraphViewer().getTime1();
     }
 
+    private void createColumnSelectionListener(TreeViewer treeViewer) {
+        for (int i = 0; i < fColumnComparators.length; i++) {
+            final Comparator<ITimeGraphEntry> comp = fColumnComparators[i];
+            final Tree tree = treeViewer.getTree();
+            final TreeColumn column = tree.getColumn(i);
+
+            if (comp != null) {
+                column.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        TreeColumn prevSortcolumn = tree.getSortColumn();
+                        if (prevSortcolumn == column) {
+                            fDirection = (fDirection == SWT.DOWN) ? SWT.UP : SWT.DOWN;
+                        } else {
+                            fDirection = SWT.DOWN;
+                        }
+                        tree.setSortColumn(column);
+                        tree.setSortDirection(fDirection);
+                        Comparator<ITimeGraphEntry> comparator = comp;
+                        if (comparator instanceof ITimeGraphEntryComparator) {
+                            ((ITimeGraphEntryComparator) comparator).setDirection(fDirection);
+                        }
+                        if (fDirection != SWT.DOWN) {
+                            comparator = checkNotNull(Collections.reverseOrder(comparator));
+                        }
+                        setEntryComparator(comparator);
+                        fIsRevealSelection = true;
+                        if (fTimeGraphWrapper instanceof TimeGraphComboWrapper) {
+                            ((TimeGraphComboWrapper) fTimeGraphWrapper).getTreeViewer().getControl().setFocus();
+                        }
+                        refresh();
+                    }
+                });
+            }
+        }
+    }
+
+    private void resetColumnSorting() {
+        if ((fTimeGraphWrapper instanceof TimeGraphComboWrapper) && (fColumnComparators != null)) {
+            TreeViewer treeViewer = ((TimeGraphComboWrapper) fTimeGraphWrapper).getTreeViewer();
+            fDirection = SWT.DOWN;
+            if ((fInitialSortColumn < fColumnComparators.length) && (fColumnComparators[fInitialSortColumn] != null)) {
+                setEntryComparator(fColumnComparators[fInitialSortColumn]);
+            }
+            final Tree tree = treeViewer.getTree();
+            final TreeColumn column = tree.getColumn(fInitialSortColumn);
+            tree.setSortDirection(fDirection);
+            tree.setSortColumn(column);
+        }
+    }
 }

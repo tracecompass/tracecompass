@@ -1,0 +1,112 @@
+/*******************************************************************************
+ * Copyright (c) 2016 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
+package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow;
+
+import java.util.Comparator;
+
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.ui.views.controlflow.ControlFlowEntry;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+
+/**
+ * ControlFlowEntry comparators. These do not allow for null arguments.
+ *
+ * @author Bernd Hufmann
+ * @noimplement This interface only contains static definitions.
+ */
+public interface IControlFlowEntryComparator {
+
+    /**
+     * Process Name Comparator
+     */
+    Comparator<ITimeGraphEntry> PROCESS_NAME_COMPARATOR = new Comparator<ITimeGraphEntry>() {
+        @Override
+        public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
+            if (o1 == null || o2 == null || o1.getName() == null || o2.getName() == null) {
+                throw new IllegalArgumentException();
+            }
+            return o1.getName().compareTo(o2.getName());
+        }
+    };
+
+    /**
+     * TreadID Comparator
+     */
+    Comparator<ITimeGraphEntry> TID_COMPARATOR = new Comparator<ITimeGraphEntry>() {
+        @Override
+        public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
+            if (o1 == null || o2 == null) {
+                throw new IllegalArgumentException();
+            }
+            int result = 0;
+            if ((o1 instanceof ControlFlowEntry) && (o2 instanceof ControlFlowEntry)) {
+                ControlFlowEntry entry1 = (ControlFlowEntry) o1;
+                ControlFlowEntry entry2 = (ControlFlowEntry) o2;
+                result = Integer.compare(entry1.getThreadId(), entry2.getThreadId());
+            }
+            return result;
+        }
+    };
+
+    /**
+     * Parent ThreadID Comparator
+     */
+    Comparator<ITimeGraphEntry> PTID_COMPARATOR = new Comparator<ITimeGraphEntry>() {
+        @Override
+        public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
+            if (o1 == null || o2 == null) {
+                throw new IllegalArgumentException();
+            }
+            int result = 0;
+            if ((o1 instanceof ControlFlowEntry) && (o2 instanceof ControlFlowEntry)) {
+                ControlFlowEntry entry1 = (ControlFlowEntry) o1;
+                ControlFlowEntry entry2 = (ControlFlowEntry) o2;
+                result = Integer.compare(entry1.getParentThreadId(), entry2.getParentThreadId());
+            }
+            return result;
+        }
+    };
+
+    /**
+     * Birth time Comparator
+     */
+    Comparator<ITimeGraphEntry> BIRTH_TIME_COMPARATOR = new Comparator<ITimeGraphEntry>() {
+        @Override
+        public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
+            if (o1 == null || o2 == null) {
+                throw new IllegalArgumentException();
+            }
+            return Long.compare(o1.getStartTime(), o2.getStartTime());
+        }
+    };
+
+    /**
+     * Trace Comparator (uses trace start time and name)
+     */
+    Comparator<ITimeGraphEntry> TRACE_COMPARATOR = new Comparator<ITimeGraphEntry>() {
+        @Override
+        public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
+            if (o1 == null || o2 == null) {
+                throw new IllegalArgumentException();
+            }
+            int result = 0;
+            if ((o1 instanceof ControlFlowEntry) && (o2 instanceof ControlFlowEntry)) {
+                ITmfTrace trace1 = ((ControlFlowEntry) o1).getTrace();
+                ITmfTrace trace2 = ((ControlFlowEntry) o2).getTrace();
+                result = trace1.getStartTime().compareTo(trace2.getStartTime());
+                if (result == 0) {
+                    result = trace1.getName().compareTo(trace2.getName());
+                }
+            }
+            return result;
+        }
+    };
+
+}

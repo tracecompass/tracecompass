@@ -31,6 +31,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.Attributes
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
+import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.ControlFlowColumnComparators;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -53,6 +54,8 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 
+import com.google.common.collect.ImmutableList;
+
 /**
  * The Control Flow view main object
  *
@@ -62,7 +65,6 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-
     /**
      * View ID.
      */
@@ -90,6 +92,19 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
     // Timeout between updates in the build thread in ms
     private static final long BUILD_UPDATE_TIMEOUT = 500;
 
+    private static final Comparator<ITimeGraphEntry>[] COLUMN_COMPARATORS;
+
+    static {
+        ImmutableList.Builder<Comparator<ITimeGraphEntry>> builder = ImmutableList.builder();
+        builder.add(ControlFlowColumnComparators.PROCESS_NAME_COLUMN_COMPARATOR)
+               .add(ControlFlowColumnComparators.TID_COLUMN_COMPARATOR)
+               .add(ControlFlowColumnComparators.PTID_COLUMN_COMPARATOR)
+               .add(ControlFlowColumnComparators.BIRTH_TIME_COLUMN_COMPARATOR)
+               .add(ControlFlowColumnComparators.TRACE_COLUMN_COMPARATOR);
+        List<Comparator<ITimeGraphEntry>> l = builder.build();
+        COLUMN_COMPARATORS = l.toArray(new Comparator[l.size()]);
+    }
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -99,11 +114,11 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
      */
     public ControlFlowView() {
         super(ID, new ControlFlowPresentationProvider());
-        setTreeColumns(COLUMN_NAMES);
+        setTreeColumns(COLUMN_NAMES, COLUMN_COMPARATORS, 3);
         setTreeLabelProvider(new ControlFlowTreeLabelProvider());
         setFilterColumns(FILTER_COLUMN_NAMES);
         setFilterLabelProvider(new ControlFlowFilterLabelProvider());
-        setEntryComparator(new ControlFlowEntryComparator());
+        setEntryComparator(ControlFlowColumnComparators.BIRTH_TIME_COLUMN_COMPARATOR);
     }
 
     @Override
@@ -158,43 +173,6 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
     @Override
     protected String getPrevTooltip() {
         return Messages.ControlFlowView_previousProcessActionToolTipText;
-    }
-
-    private static class ControlFlowEntryComparator implements Comparator<ITimeGraphEntry> {
-
-        @Override
-        public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
-
-            if (o1.getParent() != null || o2.getParent() != null) {
-                /* Sort all child processes according to birth time. */
-                return Long.compare(o1.getStartTime(), o2.getStartTime());
-            }
-
-            int result = 0;
-
-            if ((o1 instanceof ControlFlowEntry) && (o2 instanceof ControlFlowEntry)) {
-                /*
-                 * Sort root processes according to their trace's start time,
-                 * then by trace name, then by the process thread id.
-                 */
-                ControlFlowEntry entry1 = (ControlFlowEntry) o1;
-                ControlFlowEntry entry2 = (ControlFlowEntry) o2;
-                result = entry1.getTrace().getStartTime().compareTo(entry2.getTrace().getStartTime());
-                if (result == 0) {
-                    result = entry1.getTrace().getName().compareTo(entry2.getTrace().getName());
-                }
-                if (result == 0) {
-                    result = Integer.compare(entry1.getThreadId(), entry2.getThreadId());
-                }
-            }
-
-            if (result == 0) {
-                /* Sort root processes with reused thread id by birth time. */
-                result = Long.compare(o1.getStartTime(), o2.getStartTime());
-            }
-
-            return result;
-        }
     }
 
     /**

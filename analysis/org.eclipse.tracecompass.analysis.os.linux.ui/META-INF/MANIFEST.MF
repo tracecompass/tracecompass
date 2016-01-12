@@ -26,6 +26,7 @@ Export-Package: org.eclipse.tracecompass.analysis.os.linux.ui.views.controlflow,
  org.eclipse.tracecompass.analysis.os.linux.ui.views.cpuusage,
  org.eclipse.tracecompass.analysis.os.linux.ui.views.resources,
  org.eclipse.tracecompass.internal.analysis.os.linux.ui;x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests",
+ org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow;x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency;x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics;x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources;x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests"
