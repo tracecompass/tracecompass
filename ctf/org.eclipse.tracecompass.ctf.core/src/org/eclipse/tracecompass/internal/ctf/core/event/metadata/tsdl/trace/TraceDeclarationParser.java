@@ -274,7 +274,7 @@ public final class TraceDeclarationParser extends AbstractScopedCommonTreeParser
                             decl.isSigned(), decl.getBase(), byteOrder,
                             decl.getEncoding(), decl.getClock(),
                             decl.getAlignment());
-                    sd.getFields().put(s, newI);
+                    sd.addField(s, newI);
                 }
             }
         }

@@ -93,15 +93,6 @@ public class StructDeclaration extends Declaration {
     }
 
     /**
-     * Get the fields of the struct as a map.
-     *
-     * @return a Map of the fields (key is the name)
-     */
-    public Map<String, IDeclaration> getFields() {
-        return fFieldMap;
-    }
-
-    /**
      * Get the field declaration corresponding to a field name.
      *
      * @param fieldName

@@ -127,7 +127,7 @@ public final class TypeSpecifierListParser extends AbstractScopedCommonTreeParse
         case CTFParser.STRUCT:
             declaration = StructParser.INSTANCE.parse(firstChild, new StructParser.Param(trace, identifier, scope));
             StructDeclaration structDeclaration = (StructDeclaration) declaration;
-            IDeclaration idEnumDecl = structDeclaration.getFields().get("id"); //$NON-NLS-1$
+            IDeclaration idEnumDecl = structDeclaration.getField("id"); //$NON-NLS-1$
             if (idEnumDecl instanceof EnumDeclaration) {
                 EnumDeclaration enumDeclaration = (EnumDeclaration) idEnumDecl;
                 ByteOrder bo = enumDeclaration.getContainerType().getByteOrder();
