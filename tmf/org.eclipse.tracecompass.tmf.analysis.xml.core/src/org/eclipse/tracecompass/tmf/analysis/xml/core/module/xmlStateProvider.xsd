@@ -20,15 +20,19 @@
 			<xs:element maxOccurs="1" minOccurs="0" name="head" type="headProvider" >
 				<xs:annotation>
 					<xs:documentation>Provide meta-information on this state provider, like labels and applicable trace types.</xs:documentation></xs:annotation></xs:element>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="definedValue" type="definedValue" >
-				<xs:annotation>
-					<xs:documentation>Define a value that maps a string used in the state provider to a numbered value.</xs:documentation></xs:annotation></xs:element>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="location" type="location" >
-				<xs:annotation>
-					<xs:documentation>Declare shortcuts to frequently used attribute/data locations. For instance, if a path to an often-used attribute is CPUs/{event.some_field}/Threads/Status, it may be a good idea to put this path in a location and then use the location name in the event handlers.</xs:documentation></xs:annotation></xs:element>
-			<xs:element maxOccurs="unbounded" minOccurs="1" name="eventHandler" type="eventHandler" >
-				<xs:annotation>
-					<xs:documentation>Define how a given event will modify the state system being built. For each event in the trace that causes a state change, a event handler should be defined.</xs:documentation></xs:annotation></xs:element>
+			<xs:sequence maxOccurs="unbounded" minOccurs="1">
+				<xs:choice maxOccurs="unbounded" minOccurs="0">
+					<xs:element maxOccurs="unbounded" minOccurs="0" name="definedValue" type="definedValue" >
+						<xs:annotation>
+							<xs:documentation>Define a value that maps a string used in the state provider to a numbered value.</xs:documentation></xs:annotation></xs:element>
+					<xs:element maxOccurs="unbounded" minOccurs="0" name="location" type="location" >
+						<xs:annotation>
+							<xs:documentation>Declare shortcuts to frequently used attribute/data locations. For instance, if a path to an often-used attribute is CPUs/{event.some_field}/Threads/Status, it may be a good idea to put this path in a location and then use the location name in the event handlers.</xs:documentation></xs:annotation></xs:element>
+				</xs:choice>
+				<xs:element maxOccurs="unbounded" minOccurs="1" name="eventHandler" type="eventHandler" >
+					<xs:annotation>
+						<xs:documentation>Define how a given event will modify the state system being built. For each event in the trace that causes a state change, a event handler should be defined.</xs:documentation></xs:annotation></xs:element>
+			</xs:sequence>
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:string" use="required" >
 			<xs:annotation>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ***************************************************************************
+* Copyright (c) 2016 École Polytechnique de Montréal
+*
+* All rights reserved. This program and the accompanying materials are
+* made available under the terms of the Eclipse Public License v1.0 which
+* accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*************************************************************************** -->
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+	
+	<stateProvider id="test.element.placement" version="1">
+		
+		<location id="CurrentWorker">
+            <stateAttribute type="constant" value="Worker" />
+            <stateAttribute type="eventField" value="workerno" />
+        </location>
+        
+		<!-- StateValues -->
+		<definedValue name="WORKING" value="3" />
+		<eventHandler eventName="start">
+			<stateChange>
+				<stateAttribute type="location" value="CurrentWorker" />
+				<stateValue type="int" value="$WORKING" />
+			</stateChange>
+		</eventHandler>
+		
+		<definedValue name="NO_FOLLOWING_EVENT_HANDLER" value="5" />
+		<location id="NoFollowingEventHandler">
+            <stateAttribute type="constant" value="Wrong" />
+            <stateAttribute type="eventField" value="place" />
+        </location>
+	</stateProvider>
+</tmfxml>
