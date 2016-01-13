@@ -58,15 +58,18 @@ public final class SubSecondTimeWithUnitFormat extends Format {
                 return appender == null ? new StringBuffer() : NonNullUtils.checkNotNull(appender.append("---")); //$NON-NLS-1$
             }
             String unit = NANOSECONDS;
-            if (formattedTime > NANOS_PER_SEC) {
+            if (formattedTime >= NANOS_PER_SEC) {
                 unit = SECONDS;
                 formattedTime /= NANOS_PER_SEC;
-            } else if (formattedTime > NANOS_PER_MILLI) {
+            } else if (formattedTime >= NANOS_PER_MILLI) {
                 unit = MILLISECONDS;
                 formattedTime /= NANOS_PER_MILLI;
-            } else if (formattedTime > NANOS_PER_MICRO) {
+            } else if (formattedTime >= NANOS_PER_MICRO) {
                 unit = MICROSECONDS;
                 formattedTime /= NANOS_PER_MICRO;
+            }
+            if (formattedTime == 0) {
+                return appender == null ? new StringBuffer() : NonNullUtils.checkNotNull(appender.append(0));
             }
             String timeString = unit.equals(NANOSECONDS) ? Long.toString((long) formattedTime) : fDecimalFormat.format(formattedTime);
             return appender == null ? new StringBuffer() : NonNullUtils.checkNotNull(appender.append(timeString).append(' ').append(unit));
