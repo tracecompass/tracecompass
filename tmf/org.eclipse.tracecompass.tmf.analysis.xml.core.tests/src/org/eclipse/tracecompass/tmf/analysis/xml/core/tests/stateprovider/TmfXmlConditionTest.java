@@ -55,7 +55,7 @@ public class TmfXmlConditionTest {
             assertNotNull(ss);
 
             List<Integer> quarks = ss.getQuarks("*");
-            assertEquals(4, quarks.size());
+            assertEquals(5, quarks.size());
 
             for (Integer quark : quarks) {
                 String name = ss.getAttributeName(quark);
@@ -78,10 +78,16 @@ public class TmfXmlConditionTest {
                     XmlUtilsTest.verifyStateIntervals("checkpoint", ss, quark, expectedStarts, expectedValues);
                 }
                     break;
-                case "or_three_operands": {
+                case "and_three_operands": {
                     final int[] expectedStarts = { 1, 5, 7, 7 };
                     ITmfStateValue[] expectedValues = { TmfStateValue.newValueLong(1), TmfStateValue.newValueLong(0), TmfStateValue.newValueLong(1) };
-                    XmlUtilsTest.verifyStateIntervals("or_three_operands", ss, quark, expectedStarts, expectedValues);
+                    XmlUtilsTest.verifyStateIntervals("and_three_operands", ss, quark, expectedStarts, expectedValues);
+                }
+                    break;
+                case "not_operand": {
+                    final int[] expectedStarts = { 1, 5, 7, 7 };
+                    ITmfStateValue[] expectedValues = { TmfStateValue.newValueLong(0), TmfStateValue.newValueLong(1), TmfStateValue.newValueLong(0) };
+                    XmlUtilsTest.verifyStateIntervals("not_operand", ss, quark, expectedStarts, expectedValues);
                 }
                     break;
                 default:

@@ -90,7 +90,6 @@ public class TmfXmlCondition {
         Element rootNode = node;
         /* Process the conditions: in each case, only process Element nodes */
         List<@Nullable Element> childElements = XmlUtils.getChildElements(rootNode);
-        final Element firstElement = NonNullUtils.checkNotNull(childElements.get(0));
 
         /*
          * If the node is an if, take the child as the root condition
@@ -101,7 +100,7 @@ public class TmfXmlCondition {
             if (childElements.isEmpty()) {
                 throw new IllegalArgumentException("TmfXmlCondition constructor: IF node with no child element"); //$NON-NLS-1$
             }
-            rootNode = firstElement;
+            rootNode = NonNullUtils.checkNotNull(childElements.get(0));
             childElements = XmlUtils.getChildElements(rootNode);
         }
 
@@ -123,7 +122,7 @@ public class TmfXmlCondition {
             fStateValues = new ArrayList<>();
             fOperator = LogicalOperator.NOT;
             fConditionOperator = ConditionOperator.NONE;
-            Element element = firstElement;
+            Element element = NonNullUtils.checkNotNull(childElements.get(0));
             fConditions.add(modelFactory.createCondition(element, fContainer));
             break;
         case TmfXmlStrings.AND:
