@@ -35,14 +35,17 @@ public final class VirtualMachineViewEntry extends TimeGraphEntry {
 
         @Override
         public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
-
-            int result = 0;
-
-            if ((o1 instanceof VirtualMachineViewEntry) && (o2 instanceof VirtualMachineViewEntry)) {
-                VirtualMachineViewEntry entry1 = (VirtualMachineViewEntry) o1;
-                VirtualMachineViewEntry entry2 = (VirtualMachineViewEntry) o2;
-                result = entry1.getType().compareTo(entry2.getType());
-                if (result == 0) {
+            if (!((o1 instanceof VirtualMachineViewEntry) && (o2 instanceof VirtualMachineViewEntry))) {
+                return 0;
+            }
+            VirtualMachineViewEntry entry1 = (VirtualMachineViewEntry) o1;
+            VirtualMachineViewEntry entry2 = (VirtualMachineViewEntry) o2;
+            int result = entry1.getType().compareTo(entry2.getType());
+            if (result == 0) {
+                /* If there is a numeric ID, use it instead */
+                if (entry1.getNumericId() != -1) {
+                    result = entry1.getNumericId().compareTo(entry2.getNumericId());
+                } else {
                     result = entry1.getId().compareTo(entry2.getId());
                 }
             }
@@ -196,7 +199,7 @@ public final class VirtualMachineViewEntry extends TimeGraphEntry {
          * @return A new {@link VirtualMachineViewEntry} object
          */
         public VirtualMachineViewEntry build() {
-            switch(fbType) {
+            switch (fbType) {
             case VCPU:
                 fbEntryName = Messages.VmView_VCpu + ' ' + fbEntryName;
                 break;
@@ -296,7 +299,8 @@ public final class VirtualMachineViewEntry extends TimeGraphEntry {
 
     /**
      * Set the intervals for the threads of the corresponding virtual machine.
-     * This should be called only if the type of this entry is {@link Type#VM}.
+     * This should be called only if the type of this entry is
+     * {@link Type#VM}.
      *
      * @param threadIntervals
      *            The map of intervals for each thread ID
@@ -305,4 +309,12 @@ public final class VirtualMachineViewEntry extends TimeGraphEntry {
         fThreadIntervals = threadIntervals;
     }
 
+    /**
+     * Get the default implementation of virtual machine entry comparator
+     *
+     * @return A virtual machine entry comparator
+     */
+    public static Comparator<ITimeGraphEntry> getComparator() {
+        return COMPARATOR;
+    }
 }

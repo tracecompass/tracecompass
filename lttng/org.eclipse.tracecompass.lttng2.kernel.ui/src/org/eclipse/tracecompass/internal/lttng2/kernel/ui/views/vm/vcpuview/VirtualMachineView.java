@@ -70,22 +70,7 @@ public class VirtualMachineView extends AbstractTimeGraphView {
     private static final long BUILD_UPDATE_TIMEOUT = 500;
     private static final int[] DEFAULT_WEIGHT = { 1, 3 };
 
-    private Comparator<ITimeGraphEntry> fComparator = new Comparator<ITimeGraphEntry>() {
-        @Override
-        public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
-            if (!((o1 instanceof VirtualMachineViewEntry) && (o2 instanceof VirtualMachineViewEntry))) {
-                return 0;
-            }
-            VirtualMachineViewEntry entry1 = (VirtualMachineViewEntry) o1;
-            VirtualMachineViewEntry entry2 = (VirtualMachineViewEntry) o2;
-            int cmp = entry1.getType().compareTo(entry2.getType());
-            /* FIXME: Threads should be ordered by their thread IDs instead */
-            if (cmp == 0) {
-                cmp = entry1.getName().compareTo(entry2.getName());
-            }
-            return cmp;
-        }
-    };
+    private Comparator<ITimeGraphEntry> fComparator = VirtualMachineViewEntry.getComparator();
 
     // ------------------------------------------------------------------------
     // Constructors
