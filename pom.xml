@@ -57,7 +57,7 @@
     <sonar.java.source>1.8</sonar.java.source>
     <sonar.exclusions>**/tests/**,**/test/**,**/stubs/**,**/Messages*,**/alltests/**</sonar.exclusions>
     <sonar.skippedModules>org.eclipse.tracecompass.ctf.parser,org.eclipse.tracecompass.examples</sonar.skippedModules>
-    <sonar.issue.ignore.multicriteria>e1,e2,e3,e4,e5,e6</sonar.issue.ignore.multicriteria>
+    <sonar.issue.ignore.multicriteria>e1,e2,e3,e4,e5,e6,e7,e8</sonar.issue.ignore.multicriteria>
     <sonar.issue.ignore.multicriteria.e1.ruleKey>findbugs:NP_STORE_INTO_NONNULL_FIELD</sonar.issue.ignore.multicriteria.e1.ruleKey>
     <sonar.issue.ignore.multicriteria.e1.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e1.resourceKey>
     <sonar.issue.ignore.multicriteria.e2.ruleKey>findbugs:RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE</sonar.issue.ignore.multicriteria.e2.ruleKey>
@@ -70,6 +70,10 @@
     <sonar.issue.ignore.multicriteria.e5.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e5.resourceKey>
     <sonar.issue.ignore.multicriteria.e6.ruleKey>findbugs:NP_NONNULL_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR</sonar.issue.ignore.multicriteria.e6.ruleKey>
     <sonar.issue.ignore.multicriteria.e6.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e6.resourceKey>
+    <sonar.issue.ignore.multicriteria.e7.ruleKey>findbugs:NP_NULL_PARAM_DEREF</sonar.issue.ignore.multicriteria.e7.ruleKey>
+    <sonar.issue.ignore.multicriteria.e7.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e7.resourceKey>
+    <sonar.issue.ignore.multicriteria.e8.ruleKey>findbugs:RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE</sonar.issue.ignore.multicriteria.e8.ruleKey>
+    <sonar.issue.ignore.multicriteria.e8.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e8.resourceKey>
   </properties>
 
   <pluginRepositories>
