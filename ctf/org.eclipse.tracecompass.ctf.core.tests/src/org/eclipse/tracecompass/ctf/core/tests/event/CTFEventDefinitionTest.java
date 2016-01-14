@@ -20,7 +20,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
+import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
 import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
@@ -30,6 +30,7 @@ import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.internal.ctf.core.event.EventDeclaration;
+import org.eclipse.tracecompass.internal.ctf.core.event.EventDefinition;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -78,7 +79,7 @@ public class CTFEventDefinitionTest {
         StructDefinition pContext = new StructDefinition(pContextDec, null, ILexicalScope.FIELDS.getPath(), new Definition[0]);
         StructDefinition fields = new StructDefinition(fDec, null, ILexicalScope.FIELDS.getPath(), fDefs);
 
-        int cpu = EventDefinition.UNKNOWN_CPU;
+        int cpu = IEventDefinition.UNKNOWN_CPU;
 
         fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, null, null, null, null, null));
         fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, null, null, null, fields, null));

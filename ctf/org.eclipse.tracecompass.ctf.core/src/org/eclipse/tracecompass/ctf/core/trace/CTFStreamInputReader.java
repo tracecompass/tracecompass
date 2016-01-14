@@ -24,8 +24,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.ctf.core.CTFException;
-import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
@@ -73,7 +73,7 @@ public class CTFStreamInputReader implements AutoCloseable {
      * Reference to the current event of this trace file (iow, the last on that
      * was read, the next one to be returned)
      */
-    private @Nullable EventDefinition fCurrentEvent = null;
+    private @Nullable IEventDefinition fCurrentEvent = null;
 
     private int fId;
 
@@ -195,8 +195,9 @@ public class CTFStreamInputReader implements AutoCloseable {
      *
      * @return the current event in the stream, null if the stream is
      *         finished/empty/malformed
+     * @since 2.0
      */
-    public @Nullable EventDefinition getCurrentEvent() {
+    public @Nullable IEventDefinition getCurrentEvent() {
         return fCurrentEvent;
     }
 
@@ -390,7 +391,7 @@ public class CTFStreamInputReader implements AutoCloseable {
          * timestamp.
          */
         readNextEvent();
-        EventDefinition currentEvent = getCurrentEvent();
+        IEventDefinition currentEvent = getCurrentEvent();
         while (currentEvent != null && (currentEvent.getTimestamp() < timestamp)) {
             readNextEvent();
             currentEvent = getCurrentEvent();
@@ -465,15 +466,15 @@ public class CTFStreamInputReader implements AutoCloseable {
         /*
          * Go until the end of that packet
          */
-        EventDefinition prevEvent = null;
+        IEventDefinition prevEvent = null;
         while (fCurrentEvent != null) {
             prevEvent = fCurrentEvent;
-            this.readNextEvent();
+            readNextEvent();
         }
         /*
          * Go back to the previous event
          */
-        this.setCurrentEvent(prevEvent);
+        setCurrentEvent(prevEvent);
     }
 
     /**
@@ -481,8 +482,9 @@ public class CTFStreamInputReader implements AutoCloseable {
      *
      * @param currentEvent
      *            the event to set
+     * @since 2.0
      */
-    public void setCurrentEvent(@Nullable EventDefinition currentEvent) {
+    public void setCurrentEvent(@Nullable IEventDefinition currentEvent) {
         fCurrentEvent = currentEvent;
     }
 

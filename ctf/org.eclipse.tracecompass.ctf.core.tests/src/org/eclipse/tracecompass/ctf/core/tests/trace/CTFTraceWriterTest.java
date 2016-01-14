@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.tracecompass.ctf.core.CTFException;
-import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
+import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTraceUtils;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
@@ -186,7 +186,7 @@ public class CTFTraceWriterTest {
                 try (CTFTraceReader reader = new CTFTraceReader(outTrace)) {
                     while(reader.hasMoreEvents()) {
                         count++;
-                        EventDefinition def = reader.getCurrentEventDef();
+                        IEventDefinition def = reader.getCurrentEventDef();
                         end = def.getTimestamp();
                         if (start == null) {
                             start = outTrace.getClock().getClockOffset() + reader.getStartTime();

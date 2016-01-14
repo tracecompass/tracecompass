@@ -19,7 +19,7 @@ import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.tracecompass.ctf.core.CTFException;
-import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
+import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTraceUtils;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
@@ -70,7 +70,7 @@ public class TraceReadBenchmark {
                 try (CTFTraceReader traceReader = new CTFTraceReader(trace);) {
 
                     while (traceReader.hasMoreEvents()) {
-                        EventDefinition ed = traceReader.getCurrentEventDef();
+                        IEventDefinition ed = traceReader.getCurrentEventDef();
                         /* Do something with the event */
                         ed.getCPU();
                         traceReader.advance();

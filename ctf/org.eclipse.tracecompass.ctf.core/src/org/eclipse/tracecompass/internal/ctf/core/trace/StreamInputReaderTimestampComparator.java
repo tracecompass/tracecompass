@@ -17,7 +17,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
+import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInputReader;
 
 /**
@@ -45,8 +45,8 @@ public class StreamInputReaderTimestampComparator implements
      */
     @Override
     public int compare(CTFStreamInputReader a, CTFStreamInputReader b) {
-        EventDefinition eventA = checkNotNull(a.getCurrentEvent());
-        EventDefinition eventB = checkNotNull(b.getCurrentEvent());
+        IEventDefinition eventA = checkNotNull(a.getCurrentEvent());
+        IEventDefinition eventB = checkNotNull(b.getCurrentEvent());
 
         long ta = eventA.getTimestamp();
         long tb = eventB.getTimestamp();

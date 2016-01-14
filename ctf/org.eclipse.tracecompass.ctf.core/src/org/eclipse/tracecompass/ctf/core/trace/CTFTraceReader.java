@@ -24,8 +24,8 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
-import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
 import org.eclipse.tracecompass.internal.ctf.core.Activator;
 import org.eclipse.tracecompass.internal.ctf.core.trace.StreamInputReaderTimestampComparator;
 
@@ -329,8 +329,9 @@ public class CTFTraceReader implements AutoCloseable {
      *
      * @return An event definition, or null of the trace reader reached the end
      *         of the trace.
+     * @since 2.0
      */
-    public EventDefinition getCurrentEventDef() {
+    public IEventDefinition getCurrentEventDef() {
         CTFStreamInputReader top = getTopStream();
         return (top != null) ? top.getCurrentEvent() : null;
     }
@@ -367,7 +368,7 @@ public class CTFTraceReader implements AutoCloseable {
              * We're in OK, there's a guaranteed top#getCurrentEvent() unless another
              * thread does something bad.
              */
-            EventDefinition currentEvent = checkNotNull(top.getCurrentEvent());
+            IEventDefinition currentEvent = checkNotNull(top.getCurrentEvent());
             final long topEnd = fTrace.timestampCyclesToNanos(currentEvent.getTimestamp());
             setEndTime(Math.max(topEnd, getEndTime()));
             fEventCountPerTraceFile[top.getName()]++;

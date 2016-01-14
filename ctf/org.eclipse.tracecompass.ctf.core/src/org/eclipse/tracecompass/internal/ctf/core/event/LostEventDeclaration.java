@@ -9,13 +9,14 @@
  * Contributors: Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.ctf.core.event;
+package org.eclipse.tracecompass.internal.ctf.core.event;
 
 import java.util.Collections;
 import java.util.Set;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
+import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;

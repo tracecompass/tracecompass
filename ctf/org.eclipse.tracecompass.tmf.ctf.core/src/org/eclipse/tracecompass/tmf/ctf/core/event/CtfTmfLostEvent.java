@@ -16,8 +16,8 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
 import org.eclipse.tracecompass.tmf.core.event.ITmfLostEvent;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -63,7 +63,7 @@ public class CtfTmfLostEvent extends CtfTmfEvent implements ITmfLostEvent {
             IEventDeclaration declaration,
             TmfTimeRange timeRange,
             long nbLost,
-            EventDefinition def) {
+            IEventDefinition def) {
         /*
          * Only the factory should call this method, the cast to
          * (TmfNanoTimestamp) should be safe.

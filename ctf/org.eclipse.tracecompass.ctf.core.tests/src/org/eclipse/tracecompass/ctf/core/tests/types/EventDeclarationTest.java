@@ -18,14 +18,15 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
-import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
-import org.eclipse.tracecompass.ctf.core.event.LostEventDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
+import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTraceUtils;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
 import org.eclipse.tracecompass.internal.ctf.core.event.EventDeclaration;
+import org.eclipse.tracecompass.internal.ctf.core.event.LostEventDeclaration;
 import org.eclipse.tracecompass.internal.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.junit.Before;
@@ -317,22 +318,23 @@ public class EventDeclarationTest {
     @Test
     public void testEventDefinition() throws CTFException {
         CTFTrace trace = CtfTestTraceUtils.getTrace(testTrace);
-        EventDefinition ed = null;
+        IEventDefinition ed = null;
         try (CTFTraceReader tr = new CTFTraceReader(trace);) {
             tr.advance();
             ed = tr.getCurrentEventDef();
         }
-
+        assertTrue(ed instanceof IDefinitionScope);
+        IDefinitionScope ds = (IDefinitionScope)ed;
         assertNotNull(ed);
-        assertNotNull(ed.getScopePath());
+        assertNotNull(ds.getScopePath());
         assertNotNull(ed.getDeclaration());
         assertNotNull(ed.getFields());
         assertNull(ed.getContext());
         assertNotNull(ed.getPacketContext());
         assertNotNull(ed.getCPU());
-        assertNull(ed.lookupDefinition("context"));
-        assertNotNull(ed.lookupDefinition("fields"));
-        assertNull(ed.lookupDefinition("other"));
+        assertNull(ds.lookupDefinition("context"));
+        assertNotNull(ds.lookupDefinition("fields"));
+        assertNull(ds.lookupDefinition("other"));
         assertNotNull(ed.toString());
     }
 

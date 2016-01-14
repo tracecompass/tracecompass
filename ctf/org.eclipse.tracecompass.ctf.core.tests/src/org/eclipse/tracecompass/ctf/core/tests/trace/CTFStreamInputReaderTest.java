@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
-import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
+import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
 import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
 import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
@@ -34,6 +34,7 @@ import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInputReader;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.ICTFStream;
 import org.eclipse.tracecompass.internal.ctf.core.event.EventDeclaration;
+import org.eclipse.tracecompass.internal.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.internal.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.junit.Before;
@@ -43,8 +44,7 @@ import org.junit.Test;
  * The class <code>StreamInputReaderTest</code> contains tests for the class
  * <code>{@link CTFStreamInputReader}</code>.
  *
- * @author ematkho
- * @version $Revision: 1.0 $
+ * @author Matthew Khouzam
  */
 @SuppressWarnings("javadoc")
 public class CTFStreamInputReaderTest {
@@ -128,8 +128,7 @@ public class CTFStreamInputReaderTest {
      */
     @Test
     public void testGetCurrentEvent() {
-        EventDefinition result = fixture.getCurrentEvent();
-        assertNotNull(result);
+        assertNotNull(fixture.getCurrentEvent());
     }
 
     /**
@@ -137,7 +136,7 @@ public class CTFStreamInputReaderTest {
      */
     @Test
     public void testGetCurrentPacketContext() {
-        EventDefinition currentEvent = fixture.getCurrentEvent();
+        IEventDefinition currentEvent = fixture.getCurrentEvent();
         assertNotNull(currentEvent);
         ICompositeDefinition result = currentEvent.getPacketContext();
         assertNotNull(result);
@@ -175,7 +174,7 @@ public class CTFStreamInputReaderTest {
     public void testGoToLastEvent2() throws CTFException {
         long timestamp = -1;
         while (fixture.readNextEvent().equals(CTFResponse.OK)) {
-            EventDefinition currentEvent = fixture.getCurrentEvent();
+            IEventDefinition currentEvent = fixture.getCurrentEvent();
             assertNotNull(currentEvent);
             timestamp = currentEvent.getTimestamp();
         }
@@ -185,7 +184,7 @@ public class CTFStreamInputReaderTest {
 
     private long goToEnd() throws CTFException {
         fixture.goToLastEvent();
-        EventDefinition currentEvent = fixture.getCurrentEvent();
+        IEventDefinition currentEvent = fixture.getCurrentEvent();
         assertNotNull(currentEvent);
         return currentEvent.getTimestamp();
     }

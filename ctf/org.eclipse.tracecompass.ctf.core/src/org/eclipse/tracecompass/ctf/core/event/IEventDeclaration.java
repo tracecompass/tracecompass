@@ -37,20 +37,23 @@ public interface IEventDeclaration {
     public static final long UNSET_EVENT_ID = -2L;
 
     /**
-     * Creates an instance of EventDefinition corresponding to this declaration.
+     * Creates an instance of {@link IEventDefinition} corresponding to this
+     * declaration.
      *
      * @param streamInputReader
-     *            The StreamInputReader for which this definition is created.
+     *            The {@link CTFStreamInputReader} for which this definition is
+     *            created.
      * @param input
-     *            the bitbuffer input source
+     *            the {@link BitBuffer} input source
      * @param timestamp
      *            The timestamp when the event was taken
-     * @return A new EventDefinition.
+     * @return A new {@link IEventDefinition}
      * @throws CTFException
      *             As a bitbuffer is used to read, it could have wrapped
      *             IOExceptions.
+     * @since 2.0
      */
-    EventDefinition createDefinition(CTFStreamInputReader streamInputReader, @NonNull BitBuffer input, long timestamp) throws CTFException;
+    IEventDefinition createDefinition(CTFStreamInputReader streamInputReader, @NonNull BitBuffer input, long timestamp) throws CTFException;
 
     /**
      * Gets the name of an event declaration

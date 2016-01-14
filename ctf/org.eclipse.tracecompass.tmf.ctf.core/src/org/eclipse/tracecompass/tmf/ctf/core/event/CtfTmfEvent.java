@@ -25,8 +25,8 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
 import org.eclipse.tracecompass.ctf.core.trace.ICTFStream;
@@ -64,7 +64,7 @@ public class CtfTmfEvent extends TmfEvent
     // ------------------------------------------------------------------------
 
     private final @Nullable IEventDeclaration fEventDeclaration;
-    private final EventDefinition fEvent;
+    private final IEventDefinition fEvent;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -121,7 +121,7 @@ public class CtfTmfEvent extends TmfEvent
             String channel,
             int cpu,
             IEventDeclaration declaration,
-            EventDefinition eventDefinition) {
+            IEventDefinition eventDefinition) {
         super(trace,
                 rank,
                 timestamp,
@@ -165,7 +165,7 @@ public class CtfTmfEvent extends TmfEvent
         fSourceCpu = -1;
         fEventName = EMPTY_CTF_EVENT_NAME;
         fEventDeclaration = null;
-        fEvent = EventDefinition.NULL_EVENT;
+        fEvent = NullEventDefinition.INSTANCE;
         fChannel = ""; //$NON-NLS-1$
         fStream = null;
         fPacketAttributes = Collections.EMPTY_MAP;
@@ -184,7 +184,7 @@ public class CtfTmfEvent extends TmfEvent
         fSourceCpu = -1;
         fEventName = EMPTY_CTF_EVENT_NAME;
         fEventDeclaration = null;
-        fEvent = EventDefinition.NULL_EVENT;
+        fEvent = NullEventDefinition.INSTANCE;
         fChannel = ""; //$NON-NLS-1$
         fStream = null;
         fPacketAttributes = Collections.EMPTY_MAP;
@@ -287,7 +287,7 @@ public class CtfTmfEvent extends TmfEvent
      * Extract the field information from the structDefinition haze-inducing
      * mess, and put them into something ITmfEventField can cope with.
      */
-    private static CtfTmfEventField[] parseFields(EventDefinition eventDef) {
+    private static CtfTmfEventField[] parseFields(IEventDefinition eventDef) {
         List<CtfTmfEventField> fields = new ArrayList<>();
 
         ICompositeDefinition structFields = eventDef.getFields();
@@ -340,10 +340,10 @@ public class CtfTmfEvent extends TmfEvent
     }
 
     /**
-     * Gets the packet attributes. The result is an instance of one of
-     * the following classes: <code>Entry<String, Long></code>, <code>Long</code>,
-     * <code>String</code> or <code>Double</code>. The map contains pairs of key and
-     * values where the key and value can never be null.
+     * Gets the packet attributes. The result is an instance of one of the
+     * following classes: <code>Entry<String, Long></code>, <code>Long</code>,
+     * <code>String</code> or <code>Double</code>. The map contains pairs of key
+     * and values where the key and value can never be null.
      *
      * @return gets the packet attributes
      * @since 2.0

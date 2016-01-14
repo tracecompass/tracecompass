@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
-import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
+import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
 import org.eclipse.tracecompass.ctf.core.tests.shared.LttngKernelTraceGenerator;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
@@ -115,7 +115,7 @@ public class CTFTraceGrowingTest {
             fixture.addStreamFile(stream);
             reader.update();
             assertTrue(reader.advance());
-            EventDefinition currentEventDef = reader.getCurrentEventDef();
+            IEventDefinition currentEventDef = reader.getCurrentEventDef();
             assertNotNull(reader.getCurrentEventDef());
             assertEquals(16518l, currentEventDef.getTimestamp());
         }
@@ -138,7 +138,7 @@ public class CTFTraceGrowingTest {
             fixture.addStreamFile(stream);
             reader.update();
             assertTrue(reader.advance());
-            EventDefinition currentEventDef = reader.getCurrentEventDef();
+            IEventDefinition currentEventDef = reader.getCurrentEventDef();
             assertNotNull(currentEventDef);
             assertEquals(223007L, currentEventDef.getTimestamp());
         }
@@ -166,7 +166,7 @@ public class CTFTraceGrowingTest {
             reader.update();
             reader.update();
             assertTrue(reader.advance());
-            EventDefinition currentEventDef = reader.getCurrentEventDef();
+            IEventDefinition currentEventDef = reader.getCurrentEventDef();
             assertNotNull(currentEventDef);
             assertEquals(223007L, currentEventDef.getTimestamp());
         }

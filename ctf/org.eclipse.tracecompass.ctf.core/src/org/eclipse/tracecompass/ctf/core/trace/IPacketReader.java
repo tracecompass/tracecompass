@@ -13,7 +13,7 @@
 package org.eclipse.tracecompass.ctf.core.trace;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
-import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
+import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
 
 /**
@@ -61,7 +61,7 @@ public interface IPacketReader {
      * @throws CTFException
      *             If there was a problem reading the trace
      */
-    EventDefinition readNextEvent() throws CTFException;
+    IEventDefinition readNextEvent() throws CTFException;
 
     /**
      * Get the packet being read
