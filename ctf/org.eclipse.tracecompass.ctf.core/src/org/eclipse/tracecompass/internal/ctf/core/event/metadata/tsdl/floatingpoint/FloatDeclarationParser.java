@@ -56,7 +56,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.UnaryInteg
  * @auttor Efficios - Description
  *
  */
-public class FloatDeclarationParser implements ICommonTreeParser {
+public final class FloatDeclarationParser implements ICommonTreeParser {
 
     private static final String FLOAT_UNKNOWN_ATTRIBUTE = "Float: unknown attribute "; //$NON-NLS-1$
     private static final String FLOAT_MISSING_SIZE_ATTRIBUTE = "Float: missing size attribute"; //$NON-NLS-1$

@@ -18,7 +18,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ICommonTreePars
  *
  * @author Matthew Khouzam - Initial API and implementation
  */
-public class PointerListStringParser implements ICommonTreeParser {
+public final class PointerListStringParser implements ICommonTreeParser {
 
     /**
      * Instance

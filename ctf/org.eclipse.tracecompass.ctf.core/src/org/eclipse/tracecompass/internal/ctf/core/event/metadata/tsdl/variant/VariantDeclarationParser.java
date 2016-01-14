@@ -25,10 +25,8 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.TypeDeclar
  * This parses the (sub)declarations located IN a variant declaration.
  *
  * @author Matthew Khouzam
- * @author Efficios - Javadoc
- *
  */
-public class VariantDeclarationParser extends AbstractScopedCommonTreeParser {
+public final class VariantDeclarationParser extends AbstractScopedCommonTreeParser {
 
     /**
      * Parameter Object

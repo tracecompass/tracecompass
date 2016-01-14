@@ -19,7 +19,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ICommonTreePars
  * @author Matthew Khouzam
  *
  */
-public class ClockMapParser implements ICommonTreeParser {
+public final class ClockMapParser implements ICommonTreeParser {
 
     private static final @NonNull String EMPTY_STRING = ""; //$NON-NLS-1$
 

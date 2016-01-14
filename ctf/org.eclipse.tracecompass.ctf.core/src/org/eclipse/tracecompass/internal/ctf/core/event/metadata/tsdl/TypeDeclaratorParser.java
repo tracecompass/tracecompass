@@ -39,7 +39,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.types.SequenceDeclaratio
  * @author Matthew Khouzam
  *
  */
-public class TypeDeclaratorParser extends AbstractScopedCommonTreeParser {
+public final class TypeDeclaratorParser extends AbstractScopedCommonTreeParser {
 
     /**
      * The parameter object for type declarator parsers

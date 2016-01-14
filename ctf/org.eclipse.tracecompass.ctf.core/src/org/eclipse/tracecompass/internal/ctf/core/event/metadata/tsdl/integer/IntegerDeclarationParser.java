@@ -67,7 +67,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.string.Enc
  * @author Efficios - javadoc preamble
  *
  */
-public class IntegerDeclarationParser implements ICommonTreeParser {
+public final class IntegerDeclarationParser implements ICommonTreeParser {
 
     /**
      * Parameter Object with a trace

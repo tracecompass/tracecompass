@@ -104,7 +104,7 @@ stream {
  * @author Efficios (documentation)
  *
  */
-public class ClockParser implements ICommonTreeParser {
+public final class ClockParser implements ICommonTreeParser {
 
     /**
      * Instance

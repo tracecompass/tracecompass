@@ -29,7 +29,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ParseException;
  * @author Matthew Khouzam
  * @author Efficios - javadoc preamble.
  */
-public class SizeParser implements ICommonTreeParser {
+public final class SizeParser implements ICommonTreeParser {
     private static final String INVALID_VALUE_FOR_SIZE = "Invalid value for size"; //$NON-NLS-1$
 
     /**

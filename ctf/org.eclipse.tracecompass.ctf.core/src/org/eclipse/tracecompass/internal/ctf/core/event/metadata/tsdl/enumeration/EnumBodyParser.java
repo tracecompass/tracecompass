@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ParseException;
  * @author Matthew Khouzam
  *
  */
-public class EnumBodyParser implements ICommonTreeParser {
+public final class EnumBodyParser implements ICommonTreeParser {
 
     /**
      * Enum declaration parameter object

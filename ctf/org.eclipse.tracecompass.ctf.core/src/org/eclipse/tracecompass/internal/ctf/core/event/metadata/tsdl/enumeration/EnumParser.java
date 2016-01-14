@@ -89,7 +89,7 @@ enum{
  * @author Efficios - Description
  *
  */
-public class EnumParser extends AbstractScopedCommonTreeParser {
+public final class EnumParser extends AbstractScopedCommonTreeParser {
 
     /**
      * Parameter Object

@@ -47,7 +47,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ParseException;
  * @author Efficios - Javadoc Preable
  *
  */
-public class StringDeclarationParser implements ICommonTreeParser {
+public final class StringDeclarationParser implements ICommonTreeParser {
 
     /**
      * Instance

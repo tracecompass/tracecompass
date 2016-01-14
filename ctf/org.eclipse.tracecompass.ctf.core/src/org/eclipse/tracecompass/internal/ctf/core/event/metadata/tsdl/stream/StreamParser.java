@@ -32,7 +32,7 @@ import org.eclipse.tracecompass.internal.ctf.core.trace.CTFStream;
  * @author Matthew Khouzam
  *
  */
-public class StreamParser extends AbstractScopedCommonTreeParser {
+public final class StreamParser extends AbstractScopedCommonTreeParser {
 
     /**
      * Parameter Object with a trace and scope

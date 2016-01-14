@@ -33,7 +33,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ParseException;
  * @author Efficios - Documentation
  *
  */
-public class TypeAliasParser extends AbstractScopedCommonTreeParser {
+public final class TypeAliasParser extends AbstractScopedCommonTreeParser {
 
     /**
      * Parameters for the typealias parser

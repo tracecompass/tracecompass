@@ -184,7 +184,7 @@ struct {
  *
  *
  */
-public class VariantParser extends AbstractScopedCommonTreeParser {
+public final class VariantParser extends AbstractScopedCommonTreeParser {
 
     /**
      * Parameter object with a trace and current scope

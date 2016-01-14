@@ -41,7 +41,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.types.composite.EventHea
  * @author Matthew Khouzam
  *
  */
-public class TypeSpecifierListParser extends AbstractScopedCommonTreeParser {
+public final class TypeSpecifierListParser extends AbstractScopedCommonTreeParser {
 
     /**
      * Parameter Object

@@ -25,7 +25,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.TypeSpecif
  * @author Matthew Khouzam - Initial implementation and API
  *
  */
-public class EnumContainerParser extends AbstractScopedCommonTreeParser {
+public final class EnumContainerParser extends AbstractScopedCommonTreeParser {
 
     /**
      * Parameter object with a trace and scope

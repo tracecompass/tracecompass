@@ -25,7 +25,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.UnaryInteg
  *
  * @author Matthew Khouzam
  */
-public class SignedParser implements ICommonTreeParser {
+public final class SignedParser implements ICommonTreeParser {
     /**
      * Instance
      */

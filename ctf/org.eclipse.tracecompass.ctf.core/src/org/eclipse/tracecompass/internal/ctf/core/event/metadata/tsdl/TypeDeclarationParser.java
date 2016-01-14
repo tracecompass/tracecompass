@@ -24,7 +24,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ParseException;
  * @author Matthew Khouzam
  *
  */
-public class TypeDeclarationParser extends AbstractScopedCommonTreeParser {
+public final class TypeDeclarationParser extends AbstractScopedCommonTreeParser {
 
     /**
      * Parameter object with a current scope and a list of pointers

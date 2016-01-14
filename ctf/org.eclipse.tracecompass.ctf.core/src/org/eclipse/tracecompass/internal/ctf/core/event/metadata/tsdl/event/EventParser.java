@@ -43,7 +43,7 @@ import org.eclipse.tracecompass.internal.ctf.core.trace.CTFStream;
  * @author Efficios - Documentation
  *
  */
-public class EventParser extends AbstractScopedCommonTreeParser {
+public final class EventParser extends AbstractScopedCommonTreeParser {
 
     /**
      * Parameter object with trace and scope

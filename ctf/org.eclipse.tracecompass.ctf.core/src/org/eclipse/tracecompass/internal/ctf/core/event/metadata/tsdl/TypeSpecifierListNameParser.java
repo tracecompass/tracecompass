@@ -21,7 +21,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ParseException;
  * @author Matthew Khouzam
  *
  */
-public class TypeSpecifierListNameParser implements ICommonTreeParser {
+public final class TypeSpecifierListNameParser implements ICommonTreeParser {
 
     /**
      * Instance

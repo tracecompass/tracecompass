@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ParseException;
  *
  * @author Matthew Khouzam
  */
-public class EncodingParser implements ICommonTreeParser {
+public final class EncodingParser implements ICommonTreeParser {
 
     /**
      * Instance

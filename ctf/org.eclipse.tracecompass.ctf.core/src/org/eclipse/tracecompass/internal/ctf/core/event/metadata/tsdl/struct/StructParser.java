@@ -84,7 +84,7 @@ struct {
  * @author Matthew Khouzam
  * @author Efficios - Javadoc preamble
  */
-public class StructParser extends AbstractScopedCommonTreeParser {
+public final class StructParser extends AbstractScopedCommonTreeParser {
 
     /**
      * Parameter object

@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.TypeDeclar
  * @author Matthew Khouzam
  *
  */
-public class StructDeclarationParser extends AbstractScopedCommonTreeParser {
+public final class StructDeclarationParser extends AbstractScopedCommonTreeParser {
 
     /**
      * Parameter object

@@ -35,7 +35,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.TypedefPar
  * @author Matthew Khouzam
  *
  */
-public class VariantBodyParser extends AbstractScopedCommonTreeParser {
+public final class VariantBodyParser extends AbstractScopedCommonTreeParser {
 
     /**
      * Parameter object

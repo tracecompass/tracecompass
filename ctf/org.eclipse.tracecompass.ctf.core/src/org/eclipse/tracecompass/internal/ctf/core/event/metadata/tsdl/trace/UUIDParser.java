@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.UnaryStrin
  * @author Matthew Khouzam
  *
  */
-public class UUIDParser implements ICommonTreeParser {
+public final class UUIDParser implements ICommonTreeParser {
 
     private static final String INVALID_FORMAT_FOR_UUID = "Invalid format for UUID"; //$NON-NLS-1$
     private static final String INVALID_VALUE_FOR_UUID = "Invalid value for UUID"; //$NON-NLS-1$

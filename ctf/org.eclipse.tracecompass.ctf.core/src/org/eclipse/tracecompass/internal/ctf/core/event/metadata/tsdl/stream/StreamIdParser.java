@@ -25,7 +25,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.UnaryInteg
  * @author Efficios - Javadoc
  *
  */
-public class StreamIdParser implements ICommonTreeParser {
+public final class StreamIdParser implements ICommonTreeParser {
 
     /** Instance */
     public static final StreamIdParser INSTANCE = new StreamIdParser();
