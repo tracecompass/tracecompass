@@ -359,7 +359,7 @@ public class Metadata {
     private String getMetadataPath() {
         /* Path of metadata file = trace directory path + metadata filename */
         if (fTrace.getTraceDirectory() == null) {
-            return new String();
+            return ""; //$NON-NLS-1$
         }
         return fTrace.getTraceDirectory().getPath()
                 + Utils.SEPARATOR + METADATA_FILENAME;
