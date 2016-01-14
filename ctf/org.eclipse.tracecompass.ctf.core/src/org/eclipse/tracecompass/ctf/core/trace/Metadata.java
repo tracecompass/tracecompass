@@ -59,6 +59,9 @@ public class Metadata {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
+
+    private static final Charset ASCII_CHARSET = Charset.forName("ASCII"); //$NON-NLS-1$
+
     private static final String TEXT_ONLY_METADATA_HEADER_PREFIX = "/* CTF"; //$NON-NLS-1$
 
     private static final int PREVALIDATION_SIZE = 8;
@@ -155,7 +158,7 @@ public class Metadata {
         try (FileInputStream fis = new FileInputStream(getMetadataPath());
                 FileChannel metadataFileChannel = fis.getChannel();
                 /* Check if metadata is packet-based, if not it is text based */
-                Reader metadataTextInput = (isPacketBased(metadataFileChannel) ? readBinaryMetaData(metadataFileChannel) : new FileReader(getMetadataPath()));) {
+                Reader metadataTextInput = (isPacketBased(metadataFileChannel) ? readBinaryMetaData(metadataFileChannel) : new FileReader(fis.getFD()));) {
 
             readMetaDataText(metadataTextInput);
 
@@ -221,10 +224,9 @@ public class Metadata {
                     return true;
                 }
                 bb.position(0);
-                Charset forName = Charset.forName("ASCII"); //$NON-NLS-1$
                 byte bytes[] = new byte[PREVALIDATION_SIZE];
                 bb.get(bytes);
-                String text = new String(bytes, forName);
+                String text = new String(bytes, ASCII_CHARSET);
                 return text.startsWith(TEXT_ONLY_METADATA_HEADER_PREFIX);
             } catch (IOException e) {
                 throw new CTFException(e.getMessage(), e);
@@ -442,7 +444,7 @@ public class Metadata {
         payloadByteBuffer.get(payloadByteArray, 0, payloadSize);
 
         /* Convert the byte array to a String */
-        String str = new String(payloadByteArray, 0, payloadSize);
+        String str = new String(payloadByteArray, 0, payloadSize, ASCII_CHARSET);
 
         /* Append it to the existing metadata */
         metadataText.append(str);
