@@ -60,7 +60,7 @@ public final class VariantDeclarationParser extends AbstractScopedCommonTreePars
     /**
      * Instance
      */
-    public final static VariantDeclarationParser INSTANCE = new VariantDeclarationParser();
+    public static final VariantDeclarationParser INSTANCE = new VariantDeclarationParser();
 
     private VariantDeclarationParser() {
     }

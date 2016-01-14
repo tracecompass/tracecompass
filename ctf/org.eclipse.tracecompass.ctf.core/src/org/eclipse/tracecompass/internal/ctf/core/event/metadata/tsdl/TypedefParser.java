@@ -58,7 +58,7 @@ public final class TypedefParser extends AbstractScopedCommonTreeParser {
     /**
      * The instance
      */
-    public final static TypedefParser INSTANCE = new TypedefParser();
+    public static final TypedefParser INSTANCE = new TypedefParser();
 
     private TypedefParser() {
     }

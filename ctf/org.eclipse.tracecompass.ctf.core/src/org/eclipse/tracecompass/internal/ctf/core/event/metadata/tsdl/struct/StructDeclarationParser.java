@@ -61,7 +61,7 @@ public final class StructDeclarationParser extends AbstractScopedCommonTreeParse
     /**
      * The instance
      */
-    public final static StructDeclarationParser INSTANCE = new StructDeclarationParser();
+    public static final StructDeclarationParser INSTANCE = new StructDeclarationParser();
 
     private StructDeclarationParser() {
     }

@@ -79,7 +79,7 @@ public final class TypeSpecifierListParser extends AbstractScopedCommonTreeParse
     /**
      * The instance
      */
-    public final static TypeSpecifierListParser INSTANCE = new TypeSpecifierListParser();
+    public static final TypeSpecifierListParser INSTANCE = new TypeSpecifierListParser();
 
     private TypeSpecifierListParser() {
     }

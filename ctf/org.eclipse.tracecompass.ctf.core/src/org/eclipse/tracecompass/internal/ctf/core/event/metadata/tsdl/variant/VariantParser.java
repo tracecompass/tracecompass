@@ -214,7 +214,7 @@ public final class VariantParser extends AbstractScopedCommonTreeParser {
     /**
      * The instance
      */
-    public final static VariantParser INSTANCE = new VariantParser();
+    public static final VariantParser INSTANCE = new VariantParser();
 
     private VariantParser() {
     }

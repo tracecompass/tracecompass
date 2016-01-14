@@ -73,7 +73,7 @@ public final class VariantBodyParser extends AbstractScopedCommonTreeParser {
     /**
      * The instance
      */
-    public final static VariantBodyParser INSTANCE = new VariantBodyParser();
+    public static final VariantBodyParser INSTANCE = new VariantBodyParser();
 
     private VariantBodyParser() {
     }

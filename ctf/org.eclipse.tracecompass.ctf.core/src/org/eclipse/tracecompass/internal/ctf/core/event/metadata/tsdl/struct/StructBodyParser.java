@@ -101,7 +101,7 @@ public final class StructBodyParser extends AbstractScopedCommonTreeParser {
     /**
      * The instance
      */
-    public final static StructBodyParser INSTANCE = new StructBodyParser();
+    public static final StructBodyParser INSTANCE = new StructBodyParser();
 
     private StructBodyParser() {
     }

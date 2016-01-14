@@ -59,7 +59,7 @@ public final class TypeAliasTargetParser extends AbstractScopedCommonTreeParser 
     /**
      * The instance
      */
-    public final static TypeAliasTargetParser INSTANCE = new TypeAliasTargetParser();
+    public static final TypeAliasTargetParser INSTANCE = new TypeAliasTargetParser();
 
     private TypeAliasTargetParser() {
     }

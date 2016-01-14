@@ -54,7 +54,7 @@ public final class TypeDeclarationParser extends AbstractScopedCommonTreeParser 
     /**
      * Instance
      */
-    public final static TypeDeclarationParser INSTANCE = new TypeDeclarationParser();
+    public static final TypeDeclarationParser INSTANCE = new TypeDeclarationParser();
 
     private TypeDeclarationParser() {
     }
