@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -27,10 +27,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.treemap.TreeMapStore;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
-import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
-import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -49,8 +46,6 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
     private final ListenerList fListeners = new ListenerList(ListenerList.IDENTITY);
 
     private @Nullable ISegmentStore<ISegment> fSegmentStore;
-
-    private @Nullable ITmfEventRequest fOngoingRequest = null;
 
     @Override
     public void addListener(IAnalysisProgressListener listener) {
@@ -92,15 +87,6 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
     }
 
     /**
-     * Returns the analysis request for creating the segment store
-     *
-     * @param segmentStore
-     *            a segment store to fill
-     * @return the segment store analysis request implementation
-     */
-    protected abstract AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> segmentStore);
-
-    /**
      * Read an object from the ObjectInputStream.
      *
      * @param ois
@@ -113,17 +99,25 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
      */
     protected abstract Object[] readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException;
 
+    /**
+     * Fills the segment store. This is the main method that children classes
+     * need to implement to build the segment store. For example, if the
+     * segments are found by parsing the events of a trace, the event request
+     * would be done in this method.
+     *
+     * @param segmentStore
+     *            The segment store to fill
+     * @param monitor
+     *            Progress monitor
+     * @return Whether the segments was resolved successfully or not
+     * @throws TmfAnalysisException
+     *             Method may throw an analysis exception
+     */
+    protected abstract boolean buildAnalysisSegments(ISegmentStore<ISegment> segmentStore, IProgressMonitor monitor) throws TmfAnalysisException;
+
     @Override
     public @Nullable ISegmentStore<ISegment> getSegmentStore() {
         return fSegmentStore;
-    }
-
-    @Override
-    protected void canceling() {
-        ITmfEventRequest req = fOngoingRequest;
-        if ((req != null) && (!req.isCompleted())) {
-            req.cancel();
-        }
     }
 
     @Override
@@ -173,30 +167,12 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
                 }
             }
         }
+
         ISegmentStore<ISegment> segmentStore = new TreeMapStore<>();
-
-        /* Cancel an ongoing request */
-        ITmfEventRequest req = fOngoingRequest;
-        if ((req != null) && (!req.isCompleted())) {
-            req.cancel();
-        }
-
-        /* Create a new request */
-        req = createAnalysisRequest(segmentStore);
-        fOngoingRequest = req;
-        trace.sendRequest(req);
-
-        try {
-            req.waitForCompletion();
-        } catch (InterruptedException e) {
-        }
-
-        /* Do not process the results if the request was cancelled */
-        if (req.isCancelled() || req.isFailed()) {
+        boolean completed = buildAnalysisSegments(segmentStore, monitor);
+        if (!completed) {
             return false;
         }
-
-        /* The request will fill 'syscalls' */
         fSegmentStore = segmentStore;
 
         if (dataFileName != null) {
@@ -219,37 +195,5 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
         }
 
         return true;
-    }
-
-    /**
-     * Abstract event request to fill a a segment store
-     */
-    protected static abstract class AbstractSegmentStoreAnalysisRequest extends TmfEventRequest {
-
-        private final ISegmentStore<ISegment> fFullLatencyStore;
-
-        /**
-         * Constructor
-         *
-         * @param latencyStore
-         *            a latency segment store to fill
-         */
-        public AbstractSegmentStoreAnalysisRequest(ISegmentStore<ISegment> latencyStore) {
-            super(ITmfEvent.class, 0, ITmfEventRequest.ALL_DATA, ExecutionType.BACKGROUND);
-            /*
-             * We do NOT make a copy here! We want to modify the list that was
-             * passed in parameter.
-             */
-            fFullLatencyStore = latencyStore;
-        }
-
-        /**
-         * Returns the segment store
-         *
-         * @return the segment store
-         */
-        public ISegmentStore<ISegment> getSegmentStore() {
-            return fFullLatencyStore;
-        }
     }
 }

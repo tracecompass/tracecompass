@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 EfficiOS Inc., Ericsson
+ * Copyright (c) 2015, 2016 EfficiOS Inc., Ericsson
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -25,7 +25,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelTidAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
-import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisModule;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisEventBasedModule;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -37,7 +37,7 @@ import com.google.common.collect.ImmutableList;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisModule {
+public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEventBasedModule {
 
     /**
      * The ID of this analysis
