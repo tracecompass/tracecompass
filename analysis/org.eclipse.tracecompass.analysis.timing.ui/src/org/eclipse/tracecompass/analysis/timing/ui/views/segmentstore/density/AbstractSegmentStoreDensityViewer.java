@@ -95,8 +95,8 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
         fChart.getTitle().setVisible(false);
         fChart.getAxisSet().getXAxis(0).getTitle().setText(nullToEmptyString(Messages.AbstractSegmentStoreDensityViewer_TimeAxisLabel));
         fChart.getAxisSet().getYAxis(0).getTitle().setText(nullToEmptyString(Messages.AbstractSegmentStoreDensityViewer_CountAxisLabel));
-        fChart.getAxisSet().getXAxis(0).getGrid().setStyle(LineStyle.NONE);
-        fChart.getAxisSet().getYAxis(0).getGrid().setStyle(LineStyle.NONE);
+        fChart.getAxisSet().getXAxis(0).getGrid().setStyle(LineStyle.DOT);
+        fChart.getAxisSet().getYAxis(0).getGrid().setStyle(LineStyle.DOT);
 
         fDragZoomProvider = new MouseDragZoomProvider(this);
         fDragZoomProvider.register();
