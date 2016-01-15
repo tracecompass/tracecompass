@@ -12,6 +12,7 @@
 package org.eclipse.tracecompass.ctf.core.tests.types;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -75,9 +76,85 @@ public class EnumDeclarationTest {
         long high = 1L;
         String label = "";
 
-        boolean result = fixture.add(low, high, label);
+        assertTrue(fixture.add(low, high, label));
+        assertEquals("", fixture.query(1));
+    }
 
-        assertTrue(result);
+    /**
+     * Run the boolean add(long,long,String) method test several times out of
+     * order.
+     */
+    @Test
+    public void testAddMany() {
+        assertTrue(fixture.add(00, 01, "fork"));
+        assertTrue(fixture.add(02, 03, "tork"));
+        assertTrue(fixture.add(04, 07, "mork"));
+        assertTrue(fixture.add(10, 20, "zork"));
+        assertTrue(fixture.add(22, 27, "york"));
+        assertTrue(fixture.add(21, 21, "bork"));
+        assertTrue(fixture.add(28, 50, "dork"));
+        assertEquals("fork", fixture.query(0));
+        assertEquals("fork", fixture.query(1));
+        assertEquals("tork", fixture.query(2));
+        assertEquals("tork", fixture.query(3));
+        assertEquals("mork", fixture.query(4));
+        assertEquals("mork", fixture.query(5));
+        assertEquals("mork", fixture.query(6));
+        assertEquals("zork", fixture.query(10));
+        assertEquals("zork", fixture.query(19));
+        assertEquals("bork", fixture.query(21));
+        assertEquals("york", fixture.query(22));
+    }
+
+    /**
+     * Tests adding two of the same elements, this is allowed in the ctf spec
+     */
+    @Test
+    public void testDubs() {
+        assertTrue(fixture.add(00, 01, "fork"));
+        assertTrue(fixture.add(02, 03, "fork"));
+        assertNull(fixture.query(-1));
+        assertEquals("fork", fixture.query(0));
+        assertEquals("fork", fixture.query(1));
+        assertEquals("fork", fixture.query(2));
+        assertEquals("fork", fixture.query(3));
+        assertNull(fixture.query(5));
+    }
+
+    /**
+     * Tests adding two of the same elements
+     */
+    @Test
+    public void testOverlap1() {
+        assertTrue(fixture.add(00, 01, "fork"));
+        assertFalse(fixture.add(01, 03, "zork"));
+    }
+
+    /**
+     * Tests adding two of the same elements
+     */
+    @Test
+    public void testOverlap2() {
+        assertTrue(fixture.add(00, 02, "fork"));
+        assertFalse(fixture.add(01, 03, "zork"));
+    }
+
+    /**
+     * Tests adding two of the same elements
+     */
+    @Test
+    public void testOverlap3() {
+        assertTrue(fixture.add(00, 03, "fork"));
+        assertFalse(fixture.add(01, 02, "zork"));
+    }
+
+    /**
+     * Tests adding two of the same elements
+     */
+    @Test
+    public void testOverlap4() {
+        assertTrue(fixture.add(01, 03, "fork"));
+        assertFalse(fixture.add(00, 02, "zork"));
     }
 
     /**
@@ -135,7 +212,6 @@ public class EnumDeclarationTest {
         b.add(0, 1, "hello");
         b.add(2, 3, "kitty");
         assertEquals(fixture.hashCode(), b.hashCode());
-
     }
 
     /**
@@ -167,6 +243,37 @@ public class EnumDeclarationTest {
         d.add(2, 22, "hi");
         assertNotEquals(a, d);
         assertNotEquals(d, a);
+    }
+
+    /**
+     * Test the isBinaryEquivalent
+     */
+    @Test
+    public void binaryEquivalentTest() {
+        EnumDeclaration a = new EnumDeclaration(IntegerDeclaration.INT_8_DECL);
+        EnumDeclaration b = new EnumDeclaration(IntegerDeclaration.INT_8_DECL);
+        b.add(2, 19, "hi");
+        EnumDeclaration c = new EnumDeclaration(IntegerDeclaration.INT_32B_DECL);
+        EnumDeclaration d = new EnumDeclaration(IntegerDeclaration.INT_8_DECL);
+        assertFalse(a.isBinaryEquivalent(null));
+        assertFalse(a.isBinaryEquivalent(IntegerDeclaration.INT_32B_DECL));
+        assertFalse(a.isBinaryEquivalent(b));
+        assertFalse(a.isBinaryEquivalent(c));
+        assertFalse(b.isBinaryEquivalent(c));
+        assertTrue(a.isBinaryEquivalent(d));
+        assertFalse(b.isBinaryEquivalent(a));
+        assertFalse(c.isBinaryEquivalent(a));
+        assertFalse(c.isBinaryEquivalent(b));
+        assertTrue(d.isBinaryEquivalent(a));
+        a.add(2, 19, "hi");
+        assertTrue(a.isBinaryEquivalent(a));
+        assertTrue(a.isBinaryEquivalent(b));
+        assertTrue(b.isBinaryEquivalent(a));
+        assertFalse(a.isBinaryEquivalent(d));
+        assertFalse(d.isBinaryEquivalent(a));
+        d.add(2, 22, "hi");
+        assertFalse(a.isBinaryEquivalent(d));
+        assertFalse(d.isBinaryEquivalent(a));
     }
 
 }
