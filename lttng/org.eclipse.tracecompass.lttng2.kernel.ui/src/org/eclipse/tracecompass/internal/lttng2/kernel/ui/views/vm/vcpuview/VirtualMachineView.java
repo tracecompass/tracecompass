@@ -150,9 +150,6 @@ public class VirtualMachineView extends AbstractTimeGraphView {
         setStartTime(Long.MAX_VALUE);
         setEndTime(Long.MIN_VALUE);
 
-        if (monitor.isCanceled()) {
-            return;
-        }
         if (!(parentTrace instanceof VirtualMachineExperiment)) {
             return;
         }
@@ -167,7 +164,9 @@ public class VirtualMachineView extends AbstractTimeGraphView {
         Map<String, VirtualMachineViewEntry> entryMap = new HashMap<>();
 
         boolean complete = false;
-        VirtualMachineViewEntry groupEntry = null;
+        VirtualMachineViewEntry groupEntry = new VirtualMachineViewEntry.VmEntryBuilder(vmExperiment.getName(), startTime, startTime, vmExperiment).build();
+        entryList.add(groupEntry);
+        putEntryList(parentTrace, new ArrayList<TimeGraphEntry>(entryList));
 
         while (!complete) {
             if (monitor.isCanceled()) {
@@ -179,17 +178,7 @@ public class VirtualMachineView extends AbstractTimeGraphView {
             }
 
             long endTime = ssq.getCurrentEndTime() + 1;
-            if (groupEntry == null) {
-                groupEntry = new VirtualMachineViewEntry.VmEntryBuilder(vmExperiment.getName(), startTime, endTime, vmExperiment).build();
-                /*
-                 * There is only one root entry for this view, so we can put it
-                 * right away
-                 */
-                entryList.add(groupEntry);
-                putEntryList(parentTrace, new ArrayList<TimeGraphEntry>(entryList));
-            } else {
-                groupEntry.updateEndTime(endTime);
-            }
+            groupEntry.updateEndTime(endTime);
 
             setStartTime(Math.min(getStartTime(), startTime));
             setEndTime(Math.max(getEndTime(), endTime));
@@ -204,12 +193,8 @@ public class VirtualMachineView extends AbstractTimeGraphView {
                 refresh();
             }
 
-            for (VirtualMachineViewEntry entry : entryList) {
-                if (monitor.isCanceled()) {
-                    return;
-                }
-                buildEntryEventList(entry, ssq, startTime, endTime, monitor);
-            }
+            /* Build event lists for each entry */
+            buildEntryEventLists(entryList, ssq, startTime, endTime, monitor);
         }
     }
 
@@ -254,52 +239,8 @@ public class VirtualMachineView extends AbstractTimeGraphView {
 
                 }
 
-                /*
-                 * Get the LTTng Kernel analysis module from the corresponding
-                 * trace
-                 */
-                KernelAnalysisModule kernelModule = TmfExperimentUtils.getAnalysisModuleOfClassForHost(vmExperiment, vmHostId, KernelAnalysisModule.class);
-                if (kernelModule == null) {
-                    continue;
-                }
-
-                VirtualMachineViewEntry threadEntry = entryMap.get(vmHostId + NonNullUtils.nullToEmptyString(Messages.VmView_threads));
-                if (threadEntry == null) {
-                    threadEntry = new VirtualMachineViewEntry.VmEntryBuilder(NonNullUtils.nullToEmptyString(Messages.VmView_threads), startTime, endTime, vmExperiment).build();
-                    entryMap.put(vmHostId + NonNullUtils.nullToEmptyString(Messages.VmView_threads), threadEntry);
-                    vmEntry.addChild(threadEntry);
-                } else {
-                    threadEntry.updateEndTime(endTime);
-                }
-
-                /*
-                 * Display an entry for each thread.
-                 *
-                 * For each interval that is in a running status, intersect with
-                 * the status of the virtual CPU it is currently running on
-                 */
-                Collection<Integer> threadIds = KernelThreadInformationProvider.getThreadIds(kernelModule);
-                for (Integer threadId : threadIds) {
-                    if (threadId == -1) {
-                        continue;
-                    }
-                    VirtualMachineViewEntry oneThreadEntry = entryMap.get(vmHostId + ':' + threadId);
-                    if (oneThreadEntry != null) {
-                        oneThreadEntry.updateEndTime(endTime);
-                        continue;
-                    }
-                    /*
-                     * FIXME: Only add threads that are active during the trace
-                     */
-                    String threadName = KernelThreadInformationProvider.getExecutableName(kernelModule, threadId);
-                    String tidString = NonNullUtils.checkNotNull(threadId.toString());
-                    threadName = (threadName != null) ? tidString + ':' + ' ' + threadName : tidString;
-                    oneThreadEntry = new VirtualMachineViewEntry.VmEntryBuilder(threadName, startTime, endTime, vmExperiment).setId(threadName).setVmName(vmName).setNumericId(threadId).setType(Type.THREAD).build();
-
-                    threadEntry.addChild(oneThreadEntry);
-                    entryMap.put(vmHostId + ':' + threadId, oneThreadEntry);
-                }
-
+                /* Add the entries for the threads */
+                buildThreadEntries(vmEntry, entryMap, startTime, endTime);
             }
         } catch (AttributeNotFoundException e) {
             /*
@@ -308,6 +249,71 @@ public class VirtualMachineView extends AbstractTimeGraphView {
              */
         } catch (TimeRangeException | StateValueTypeException e) {
             Activator.getDefault().logError("VirtualMachineView: error building event list", e); //$NON-NLS-1$
+        }
+    }
+
+    private static void buildThreadEntries(VirtualMachineViewEntry vmEntry, Map<String, VirtualMachineViewEntry> entryMap, long startTime, long endTime) {
+        String vmHostId = vmEntry.getId();
+        VirtualMachineExperiment vmExperiment = vmEntry.getExperiment();
+
+        /*
+         * Get the LTTng Kernel analysis module from the corresponding trace
+         */
+        KernelAnalysisModule kernelModule = TmfExperimentUtils.getAnalysisModuleOfClassForHost(vmExperiment, vmHostId, KernelAnalysisModule.class);
+        if (kernelModule == null) {
+            return;
+        }
+
+        VirtualMachineViewEntry threadEntry = entryMap.get(vmHostId + NonNullUtils.nullToEmptyString(Messages.VmView_threads));
+        if (threadEntry == null) {
+            threadEntry = new VirtualMachineViewEntry.VmEntryBuilder(NonNullUtils.nullToEmptyString(Messages.VmView_threads), startTime, endTime, vmExperiment).build();
+            entryMap.put(vmHostId + NonNullUtils.nullToEmptyString(Messages.VmView_threads), threadEntry);
+            vmEntry.addChild(threadEntry);
+        } else {
+            threadEntry.updateEndTime(endTime);
+        }
+
+        String vmName = vmEntry.getVmName();
+        if (vmName == null) {
+            return;
+        }
+
+        /*
+         * Display an entry for each thread.
+         *
+         * For each interval that is in a running status, intersect with the
+         * status of the virtual CPU it is currently running on
+         */
+        Collection<Integer> threadIds = KernelThreadInformationProvider.getThreadIds(kernelModule);
+        for (Integer threadId : threadIds) {
+            if (threadId == -1) {
+                continue;
+            }
+            VirtualMachineViewEntry oneThreadEntry = entryMap.get(vmHostId + ':' + threadId);
+            if (oneThreadEntry != null) {
+                oneThreadEntry.updateEndTime(endTime);
+                continue;
+            }
+            /*
+             * FIXME: Only add threads that are active during the trace
+             */
+            String threadName = KernelThreadInformationProvider.getExecutableName(kernelModule, threadId);
+            String tidString = NonNullUtils.checkNotNull(threadId.toString());
+            threadName = (threadName != null) ? tidString + ':' + ' ' + threadName : tidString;
+            oneThreadEntry = new VirtualMachineViewEntry.VmEntryBuilder(threadName, startTime, endTime, vmExperiment).setId(threadName).setVmName(vmName).setNumericId(threadId).setType(Type.THREAD).build();
+
+            threadEntry.addChild(oneThreadEntry);
+            entryMap.put(vmHostId + ':' + threadId, oneThreadEntry);
+        }
+
+    }
+
+    private void buildEntryEventLists(ArrayList<@NonNull VirtualMachineViewEntry> entryList, ITmfStateSystem ssq, long startTime, long endTime, IProgressMonitor monitor) {
+        for (VirtualMachineViewEntry entry : entryList) {
+            if (monitor.isCanceled()) {
+                return;
+            }
+            buildEntryEventList(entry, ssq, startTime, endTime, monitor);
         }
     }
 
@@ -347,18 +353,14 @@ public class VirtualMachineView extends AbstractTimeGraphView {
 
         switch (vmEntry.getType()) {
         case THREAD: {
-            return getThreadEventList(entry, vmEntry, monitor);
+            return getThreadEventList(vmEntry, endTime, monitor);
         }
         case VCPU: {
-            return getVcpuEventList(entry, vmEntry, startTime, endTime, resolution, monitor);
+            return getVcpuEventList(vmEntry, startTime, endTime, resolution, monitor);
         }
         case VM: {
             VirtualMachineExperiment experiment = vmEntry.getExperiment();
-            VirtualMachineCpuAnalysis vmAnalysis = null;
-            for (VirtualMachineCpuAnalysis module : TmfTraceUtils.getAnalysisModulesOfClass(experiment, VirtualMachineCpuAnalysis.class)) {
-                vmAnalysis = module;
-                break;
-            }
+            VirtualMachineCpuAnalysis vmAnalysis = TmfTraceUtils.getAnalysisModuleOfClass(experiment, VirtualMachineCpuAnalysis.class, VirtualMachineCpuAnalysis.ID);
             if (vmAnalysis == null) {
                 break;
             }
@@ -376,7 +378,7 @@ public class VirtualMachineView extends AbstractTimeGraphView {
         return null;
     }
 
-    private static @Nullable List<@NonNull ITimeEvent> getVcpuEventList(TimeGraphEntry entry, VirtualMachineViewEntry vmEntry, long startTime, long endTime, long resolution, IProgressMonitor monitor) {
+    private static @Nullable List<@NonNull ITimeEvent> getVcpuEventList(VirtualMachineViewEntry vmEntry, long startTime, long endTime, long resolution, IProgressMonitor monitor) {
         List<ITimeEvent> eventList = null;
         try {
             int quark = vmEntry.getNumericId();
@@ -392,27 +394,8 @@ public class VirtualMachineView extends AbstractTimeGraphView {
             }
             quark = ssq.getQuarkRelative(quark, VmAttributes.STATUS);
             List<ITmfStateInterval> statusIntervals = StateSystemUtils.queryHistoryRange(ssq, quark, realStart, realEnd - 1, resolution, monitor);
-            eventList = new ArrayList<>(statusIntervals.size());
-            long lastEndTime = -1;
-            for (ITmfStateInterval statusInterval : statusIntervals) {
-                if (monitor.isCanceled()) {
-                    return null;
-                }
 
-                long time = statusInterval.getStartTime();
-                long duration = statusInterval.getEndTime() - time + 1;
-                if (!statusInterval.getStateValue().isNull()) {
-                    int status = statusInterval.getStateValue().unboxInt();
-                    if (lastEndTime != time && lastEndTime != -1) {
-                        eventList.add(new TimeEvent(entry, lastEndTime, time - lastEndTime));
-                    }
-                    eventList.add(new TimeEvent(entry, time, duration, status));
-                } else if (lastEndTime == -1 || time + duration >= endTime) {
-                    // add null event if it intersects the start or end time
-                    eventList.add(new NullTimeEvent(entry, time, duration));
-                }
-                lastEndTime = time + duration;
-            }
+            eventList = parseIntervalsForEvents(vmEntry, statusIntervals, endTime, monitor);
         } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException e) {
             Activator.getDefault().logError("Error getting event list", e); //$NON-NLS-1$
         } catch (StateSystemDisposedException e) {
@@ -421,13 +404,82 @@ public class VirtualMachineView extends AbstractTimeGraphView {
         return eventList;
     }
 
-    private static @Nullable List<@NonNull ITimeEvent> getThreadEventList(TimeGraphEntry entry, VirtualMachineViewEntry vmEntry, IProgressMonitor monitor) {
+    private static @Nullable List<@NonNull ITimeEvent> getThreadEventList(VirtualMachineViewEntry vmEntry, long endTime, IProgressMonitor monitor) {
         List<ITimeEvent> eventList = null;
-        /*
-         * The parent VM entry will contain the thread intervals for all thread.
-         * Just take the list from there
-         */
+        Collection<ITmfStateInterval> threadIntervals = getThreadIntervalsForEntry(vmEntry);
+
+        if (threadIntervals != null) {
+            /*
+             * FIXME: I think the key for the alpha bug when alpha overlaps
+             * multiple events is around here
+             *
+             * Hint by Patrick: "The problem is that the thread intervals
+             * are sorted by start time, and drawn in that order.
+             *
+             * Given the intervals: Blue [0,10] Alpha [5,15] Red [10,20]
+             *
+             * Blue is drawn, then Alpha makes DarkBlue from [5,10] and
+             * DarkBackground from [10,15], then Red is drawn over [10,20],
+             * overwriting the DarkBackground. There is no DarkRed.
+             *
+             * For this to work you would have to draw all real states
+             * first, then all alpha states second.
+             *
+             * I think this would also have the side-effect that the find
+             * item used for tool tips would always find the real event and
+             * never the alpha event. This might be what we want. Right now
+             * the tool tip has State: (multiple).
+             *
+             * But using the Next Event button, we would skip to the next
+             * real event and not at the preemption event. Maybe not what we
+             * want.
+             *
+             * Maybe what we need is separate thread interval events:
+             *
+             * Blue [0,5] Preempted Blue [5,10] Preempted Red [10,15] Red
+             * [15,20]...
+             *
+             * The preempted events would have the real state value, but
+             * with a flag for alpha to be used in the postDrawEvent."
+             */
+            eventList = parseIntervalsForEvents(vmEntry, threadIntervals, endTime, monitor);
+        }
+        return eventList;
+    }
+
+    private static @Nullable List<@NonNull ITimeEvent> parseIntervalsForEvents(VirtualMachineViewEntry vmEntry, Collection<@NonNull ITmfStateInterval> intervals, long endTime, IProgressMonitor monitor) {
+        List<ITimeEvent> eventList = new ArrayList<>(intervals.size());
+        long lastEndTime = -1;
+        for (ITmfStateInterval interval : intervals) {
+            if (monitor.isCanceled()) {
+                return null;
+            }
+
+            long time = interval.getStartTime();
+            long duration = interval.getEndTime() - time + 1;
+            if (!interval.getStateValue().isNull()) {
+                int status = interval.getStateValue().unboxInt();
+                if (lastEndTime != time && lastEndTime != -1) {
+                    eventList.add(new TimeEvent(vmEntry, lastEndTime, time - lastEndTime));
+                }
+                eventList.add(new TimeEvent(vmEntry, time, duration, status));
+            } else if (lastEndTime == -1 || time + duration >= endTime) {
+                /* add null event if it intersects the start or end time */
+                eventList.add(new NullTimeEvent(vmEntry, time, duration));
+            }
+            lastEndTime = time + duration;
+        }
+
+        return eventList;
+    }
+
+    private static @Nullable Collection<@NonNull ITmfStateInterval> getThreadIntervalsForEntry(VirtualMachineViewEntry vmEntry) {
         Collection<ITmfStateInterval> threadIntervals = null;
+
+        /*
+         * The parent VM entry will contain the thread intervals for all
+         * threads. Just take the list from there
+         */
         ITimeGraphEntry parent = vmEntry.getParent();
         while (threadIntervals == null && parent != null) {
             if (parent instanceof VirtualMachineViewEntry) {
@@ -437,64 +489,7 @@ public class VirtualMachineView extends AbstractTimeGraphView {
                 parent = ((TimeGraphEntry) parent).getParent();
             }
         }
-        if (threadIntervals != null) {
-            eventList = new ArrayList<>(threadIntervals.size());
-            long lastEndTime = -1;
-            for (ITmfStateInterval interval : threadIntervals) {
-                if (monitor.isCanceled()) {
-                    return null;
-                }
-                long time = interval.getStartTime();
-                long duration = interval.getEndTime() - time + 1;
-                /*
-                 * FIXME: I think the key for the alpha bug when alpha overlaps
-                 * multiple events is around here
-                 *
-                 * Hint by Patrick: "The problem is that the thread intervals
-                 * are sorted by start time, and drawn in that order.
-                 *
-                 * Given the intervals: Blue [0,10] Alpha [5,15] Red [10,20]
-                 *
-                 * Blue is drawn, then Alpha makes DarkBlue from [5,10] and
-                 * DarkBackground from [10,15], then Red is drawn over [10,20],
-                 * overwriting the DarkBackground. There is no DarkRed.
-                 *
-                 * For this to work you would have to draw all real states
-                 * first, then all alpha states second.
-                 *
-                 * I think this would also have the side-effect that the find
-                 * item used for tool tips would always find the real event and
-                 * never the alpha event. This might be what we want. Right now
-                 * the tool tip has State: (multiple).
-                 *
-                 * But using the Next Event button, we would skip to the next
-                 * real event and not at the preemption event. Maybe not what we
-                 * want.
-                 *
-                 * Maybe what we need is separate thread interval events:
-                 *
-                 * Blue [0,5] Preempted Blue [5,10] Preempted Red [10,15] Red
-                 * [15,20]...
-                 *
-                 * The preempted events would have the real state value, but
-                 * with a flag for alpha to be used in the postDrawEvent."
-                 */
-                if (!interval.getStateValue().isNull()) {
-                    int status = interval.getStateValue().unboxInt();
-                    if (lastEndTime < time && lastEndTime != -1) {
-                        /*
-                         * Add a time event to fill the blanks between intervals
-                         */
-                        eventList.add(new TimeEvent(entry, lastEndTime, time - lastEndTime));
-                    }
-                    eventList.add(new TimeEvent(entry, time, duration, status));
-                } else if (lastEndTime == -1) {
-                    eventList.add(new NullTimeEvent(entry, time, duration));
-                }
-                lastEndTime = time + duration;
-            }
-        }
-        return eventList;
+        return threadIntervals;
     }
 
     @Override
