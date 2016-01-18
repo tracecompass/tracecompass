@@ -2586,6 +2586,34 @@ The following screenshot shows the result of the preceding example on a LTTng Ke
 
 [[Image:images/XML_xy_chart.png| XML XY chart]]
 
+= Latency Analyses =
+
+Trace Compass offers a feature called Latency analysis. This allows an analysis to return intervals and these intervals will be displayed in four different views. An example analysis is provided with kernel system call latencies being provided. The available views are: 
+
+* System Call Latencies 
+A '''table''' of the raw latencies. This view is useful to inspect individual latencies.
+
+ [[Image:images/LatenciesTable.png| Latency Table example - System Call Latencies]]
+
+
+* System Call Latency vs Time
+A time aligned '''scatter chart''' of the latencies with respect to the current window range. This view is useful to see the overall form of the latencies as they arrive. 
+
+[[Image:images/LatenciesScatter.png| Latency Scatter Chart example - System Call Latency vs Time]]
+
+
+* System Call Latency Statistics
+A view of the total '''statistics''' of the latencies. These show the ''minimum'', ''maximum'', ''average'' and ''standard deviation'' of the latencies when applicable. This tool is useful for finding the outliers on a per-category basis. 
+
+[[Image:images/LatenciesStatistics.png| Latency Statistics example - System Call Latency Statistics]]
+
+
+* System Call Density 
+A '''density''' view, analyzing the current time range. This is useful to find global outliers.
+
+[[Image:images/LatenciesDensity.png| Latency Densities example - System Call Density]]
+
+
 = Limitations =
 
 * When parsing text traces, the timestamps are assumed to be in the local time zone. This means that when combining it to CTF binary traces, there could be offsets by a few hours depending on where the traces were taken and where they were read.
