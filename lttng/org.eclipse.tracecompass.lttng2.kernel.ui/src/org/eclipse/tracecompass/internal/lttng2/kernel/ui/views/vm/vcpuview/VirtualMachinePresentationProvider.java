@@ -33,6 +33,8 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
  */
 public class VirtualMachinePresentationProvider extends TimeGraphPresentationProvider {
 
+    private static final int ALPHA = 70;
+
     /*
      * TODO: Some of it is copy-pasted from the control flow presentation
      * provider because it actually is the same data as from the control flow
@@ -51,10 +53,10 @@ public class VirtualMachinePresentationProvider extends TimeGraphPresentationPro
         THREAD_SYSCALL(new RGB(0, 0, 200)),
         THREAD_INTERRUPTED(new RGB(200, 0, 100));
 
-        public final RGB rgb;
+        private final RGB fRgb;
 
         private State(RGB rgb) {
-            this.rgb = rgb;
+            fRgb = rgb;
         }
     }
 
@@ -141,7 +143,7 @@ public class VirtualMachinePresentationProvider extends TimeGraphPresentationPro
         StateItem[] stateTable = new StateItem[states.length];
         for (int i = 0; i < stateTable.length; i++) {
             State state = states[i];
-            stateTable[i] = new StateItem(state.rgb, state.toString());
+            stateTable[i] = new StateItem(state.fRgb, state.toString());
         }
         return stateTable;
     }
@@ -163,14 +165,11 @@ public class VirtualMachinePresentationProvider extends TimeGraphPresentationPro
 
     @Override
     public void postDrawEvent(@Nullable ITimeEvent event, @Nullable Rectangle bounds, @Nullable GC gc) {
-        if (bounds == null || gc == null) {
+        if (bounds == null || gc == null || !(event instanceof TimeEvent)) {
             return;
         }
         boolean visible = bounds.width == 0 ? false : true;
         if (!visible) {
-            return;
-        }
-        if (!(event instanceof TimeEvent)) {
             return;
         }
         TimeEvent ev = (TimeEvent) event;
@@ -195,7 +194,7 @@ public class VirtualMachinePresentationProvider extends TimeGraphPresentationPro
                     Color background = gc.getBackground();
                     // fill all rect area
                     gc.setBackground(alphaColor);
-                    gc.setAlpha(70);
+                    gc.setAlpha(ALPHA);
                     gc.fillRectangle(bounds);
 
                     gc.setBackground(background);
