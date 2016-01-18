@@ -29,7 +29,7 @@ import com.google.common.collect.Multimap;
  *
  * @author Mohamad Gebai
  */
-public class VirtualMachineViewEntry extends TimeGraphEntry {
+public final class VirtualMachineViewEntry extends TimeGraphEntry {
 
     private static final Comparator<ITimeGraphEntry> COMPARATOR = new Comparator<ITimeGraphEntry>() {
 
