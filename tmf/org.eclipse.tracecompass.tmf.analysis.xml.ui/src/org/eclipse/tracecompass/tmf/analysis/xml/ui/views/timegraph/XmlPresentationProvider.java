@@ -141,16 +141,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
                 return;
             }
 
-            RGB colorRGB = new RGB(255, 0, 0);
-            if (color.startsWith(TmfXmlStrings.COLOR_PREFIX)) {
-                Integer hex = Integer.parseInt(color.substring(1), 16);
-                int hex1 = hex.intValue() % 256;
-                int hex2 = (hex.intValue() / 256) % 256;
-                int hex3 = (hex.intValue() / (256 * 256)) % 256;
-                colorRGB = new RGB(hex3, hex2, hex1);
-            } else {
-                colorRGB = calcColor(value);
-            }
+            final RGB colorRGB = (color.startsWith(TmfXmlStrings.COLOR_PREFIX)) ? parseColor(color) : calcColor(value);
 
             StateItem item = new StateItem(colorRGB, name);
 
@@ -170,6 +161,16 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
                 fireColorSettingsChanged();
             }
         });
+    }
+
+    private static RGB parseColor(String color) {
+        RGB colorRGB;
+        Integer hex = Integer.parseInt(color.substring(1), 16);
+        int hex1 = hex.intValue() % 256;
+        int hex2 = (hex.intValue() / 256) % 256;
+        int hex3 = (hex.intValue() / (256 * 256)) % 256;
+        colorRGB = new RGB(hex3, hex2, hex1);
+        return colorRGB;
     }
 
     private static RGB calcColor(int value) {
