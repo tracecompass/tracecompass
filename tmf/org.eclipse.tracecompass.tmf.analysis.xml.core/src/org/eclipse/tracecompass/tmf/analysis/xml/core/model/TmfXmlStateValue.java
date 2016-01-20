@@ -404,7 +404,14 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
 
     @Override
     public String toString() {
-        return "TmfXmlStateValue: " + fStateValue; //$NON-NLS-1$
+        StringBuilder builder = new StringBuilder("TmfXmlStateValue: "); //$NON-NLS-1$
+        if (fEventField != null) {
+            builder.append("Field=").append(fEventField).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+        } else if (!fPath.isEmpty()) {
+            builder.append("Path=").append(fPath).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        builder.append(fStateValue);
+        return builder.toString();
     }
 
     /**
@@ -501,6 +508,10 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
             return TmfStateValue.nullValue();
         }
 
+        @Override
+        public String toString() {
+            return "NULL"; //$NON-NLS-1$
+        }
     }
 
 }

@@ -113,6 +113,8 @@ public class TmfXmlCondition {
                 fConditionOperator = getConditionOperator(rootNode);
                 getStateValuesForXmlCondition(modelFactory, NonNullUtils.checkNotNull(childElements));
             } else {
+                // No need to test if the childElements size is actually 2. The
+                // XSD validation do this check already.
                 fConditionOperator = ConditionOperator.EQ;
                 fStateValues.add(modelFactory.createStateValue(NonNullUtils.checkNotNull(childElements.get(0)), fContainer, new ArrayList<ITmfXmlStateAttribute>()));
                 fStateValues.add(modelFactory.createStateValue(NonNullUtils.checkNotNull(childElements.get(1)), fContainer, new ArrayList<ITmfXmlStateAttribute>()));
@@ -285,7 +287,17 @@ public class TmfXmlCondition {
 
     @Override
     public String toString() {
-        return "TmfXmlCondition: " + fOperator + " on " + fConditions; //$NON-NLS-1$ //$NON-NLS-2$
+        StringBuilder output = new StringBuilder("TmfXmlCondition: "); //$NON-NLS-1$
+        if (fOperator != LogicalOperator.NONE) {
+            output.append(fOperator).append(" on ").append(fConditions); //$NON-NLS-1$
+        } else {
+            output.append(fConditionOperator).append(" {").append(fStateValues.get(0)); //$NON-NLS-1$
+            if (fStateValues.size() == 2) {
+                output.append(", ").append(fStateValues.get(1)); //$NON-NLS-1$
+            }
+            output.append("}"); //$NON-NLS-1$
+        }
+        return output.toString();
     }
 
     /**

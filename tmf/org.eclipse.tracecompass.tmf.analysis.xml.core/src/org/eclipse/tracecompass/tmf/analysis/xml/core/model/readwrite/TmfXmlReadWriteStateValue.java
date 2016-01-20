@@ -257,6 +257,11 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
             }
         }
 
+        @Override
+        public String toString() {
+            return "Value=" + fValue; //$NON-NLS-1$
+        }
+
     }
 
     /* The state value uses the value of an event field */
@@ -291,6 +296,11 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
                 Activator.logWarning(String.format("TmfXmlStateValue: The event field increment %s is not a number type but a %s", fFieldName, incrementValue.getType())); //$NON-NLS-1$
             }
         }
+
+        @Override
+        public String toString() {
+            return "Event Field=" + fFieldName; //$NON-NLS-1$
+        }
     }
 
     /* The state value is the event name */
@@ -303,6 +313,11 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
                 return TmfStateValue.nullValue();
             }
             return TmfStateValue.newValueString(event.getName());
+        }
+
+        @Override
+        public String toString() {
+            return "Event name"; //$NON-NLS-1$
         }
 
     }
@@ -325,6 +340,10 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
             builder.removeAttribute(timestamp, quark);
         }
 
+        @Override
+        public String toString() {
+            return "Delete"; //$NON-NLS-1$
+        }
     }
 
     /* The state value uses the result of a query */
@@ -380,6 +399,11 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
             } else {
                 Activator.logWarning("TmfXmlStateValue: The query result increment is not a number type"); //$NON-NLS-1$
             }
+        }
+
+        @Override
+        public String toString() {
+            return "Query=" + fQueryValue; //$NON-NLS-1$
         }
     }
 
