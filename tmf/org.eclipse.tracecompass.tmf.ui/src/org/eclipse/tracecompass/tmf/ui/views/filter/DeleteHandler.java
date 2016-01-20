@@ -44,7 +44,7 @@ public class DeleteHandler extends AbstractHandler {
             Object o = selection.getFirstElement();
             if (o instanceof ITmfFilterTreeNode) {
                 ITmfFilterTreeNode node = (ITmfFilterTreeNode) o;
-                node = node.remove();
+                node.remove();
                 part.refresh();
             }
         }
