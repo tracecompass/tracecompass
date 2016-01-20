@@ -384,7 +384,6 @@ public class TmfAlignmentSynchronizer {
                 if (isCandidateForReferenceView((TmfView) view, alignmentInfo, lowestTimeAxisOffset)) {
                     referenceView = (ITmfTimeAligned) view;
                     lowestTimeAxisOffset = getClampedTimeAxisOffset(referenceView.getTimeViewAlignmentInfo());
-                    break;
                 }
             }
         }
