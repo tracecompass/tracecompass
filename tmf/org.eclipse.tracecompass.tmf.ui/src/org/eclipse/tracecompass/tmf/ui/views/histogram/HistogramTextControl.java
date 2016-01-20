@@ -112,6 +112,7 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
         fLabel = new Label(fComposite, SWT.NONE);
         fLabel.setText(label);
         fLabel.setFont(fFont);
+        fLabel.setLayoutData(gridData);
 
         // Text control
         gridData = new GridData(SWT.CENTER, SWT.CENTER, false, false);
