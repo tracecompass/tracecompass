@@ -77,6 +77,7 @@ public final class SWTBotUtils {
 
     private static final String WINDOW_MENU = "Window";
     private static final String PREFERENCES_MENU_ITEM = "Preferences";
+    private static boolean fPrintedEnvironment = false;
 
     private SWTBotUtils() {
     }
@@ -263,6 +264,7 @@ public final class SWTBotUtils {
 
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
         UIThreadRunnable.syncExec(() -> {
+            printEnvironment();
 
             // There seems to be problems on some system where the main shell is
             // not in focus initially. This was seen using Xvfb and Xephyr on some occasions.
@@ -275,6 +277,35 @@ public final class SWTBotUtils {
                 makeShellFullyVisible(shell);
             }
         });
+    }
+
+    private static void printEnvironment() {
+        if (fPrintedEnvironment) {
+            return;
+        }
+
+        // Print some information about the environment that could affect test outcome
+        Rectangle bounds = Display.getDefault().getBounds();
+        System.out.println("Display size: " + bounds.width + "x" + bounds.height);
+
+        String osVersion = System.getProperty("os.version");
+        if (osVersion != null) {
+            System.out.println("OS version=" + osVersion);
+        }
+        String gtkVersion = System.getProperty("org.eclipse.swt.internal.gtk.version");
+        if (gtkVersion != null) {
+            System.out.println("GTK version=" + gtkVersion);
+            String overlayScrollbar = System.getenv("LIBOVERLAY_SCROLLBAR");
+            if (overlayScrollbar != null) {
+                System.out.println("LIBOVERLAY_SCROLLBAR=" + overlayScrollbar);
+            }
+            String ubuntuMenuProxy = System.getenv("UBUNTU_MENUPROXY");
+            if (ubuntuMenuProxy != null) {
+                System.out.println("UBUNTU_MENUPROXY=" + ubuntuMenuProxy);
+            }
+        }
+
+        fPrintedEnvironment = true;
     }
 
     /**
