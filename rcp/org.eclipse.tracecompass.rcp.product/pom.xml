@@ -120,6 +120,25 @@
         </plugins>
       </build>
     </profile>
-  </profiles>
-
+    <profile>
+      <id>build-one-rcp</id>
+        <build>
+          <plugins>
+            <plugin>
+              <groupId>org.eclipse.tycho</groupId>
+              <artifactId>target-platform-configuration</artifactId>
+              <configuration>
+                <environments>
+                  <environment>
+                    <os>linux</os>
+                    <ws>gtk</ws>
+                    <arch>x86_64</arch>
+                  </environment>
+                </environments>
+              </configuration>
+            </plugin>
+         </plugins>
+        </build>
+      </profile>
+    </profiles>
 </project>
