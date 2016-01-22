@@ -15,6 +15,12 @@
             name="%command.xml.import"
             description="%command.xml.import.description">
       </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
+            description="%command.manager.xml.description"
+            id="org.eclipse.tracecompass.tmf.analysis.xml.ui.managexmlanalyses"
+            name="%command.manager.xml">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -51,6 +57,37 @@
                </with>
             </visibleWhen>
          </command>
+         <command
+               commandId="org.eclipse.tracecompass.tmf.analysis.xml.ui.managexmlanalyses"
+               label="%command.manager.xml"
+               mnemonic="%command.manager.xml.mnemonic"
+               style="push"
+               tooltip="%command.manager.xml.description">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <or>
+                        <instanceof
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
+                        </instanceof>
+                        <instanceof
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder">
+                        </instanceof>
+                        <instanceof
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement">
+                        </instanceof>
+                     </or>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
       </menuContribution>
    </extension>
    <extension
@@ -80,6 +117,10 @@
                </iterate>
             </and>
          </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.handler.ManageXMLAnalysisCommandHandler"
+            commandId="org.eclipse.tracecompass.tmf.analysis.xml.ui.managexmlanalyses">
       </handler>
    </extension>
    <extension

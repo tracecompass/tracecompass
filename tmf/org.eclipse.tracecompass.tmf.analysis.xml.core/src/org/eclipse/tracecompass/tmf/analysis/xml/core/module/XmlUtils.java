@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2016 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.module;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,7 +21,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -60,6 +65,12 @@ public class XmlUtils {
 
     /** Name of the XSD schema file */
     private static final String XSD = "xmlDefinition.xsd"; //$NON-NLS-1$
+
+    /**
+     * Extension for XML files
+     * @since 2.0
+     */
+    public static final String XML_EXTENSION = ".xml"; //$NON-NLS-1$
 
     /** Make this class non-instantiable */
     private XmlUtils() {
@@ -130,6 +141,67 @@ public class XmlUtils {
         /* Copy file to path */
         File toFile = getXmlFilesPath().addTrailingSeparator().append(fromFile.getName()).toFile();
 
+        return copyXmlFile(fromFile, toFile);
+    }
+
+    /**
+     * List all files under the XML analysis files path. It returns a map where
+     * the key is the file name.
+     *
+     * @return A map with all the XML analysis files
+     * @since 2.0
+     */
+    public static synchronized Map<String, File> listFile() {
+        Map<String, File> files = new HashMap<>();
+        File[] listOfFiles = getXmlFilesPath().toFile().listFiles();
+        for (File file : listOfFiles) {
+            files.put(file.getName(), file);
+        }
+        return Collections.unmodifiableMap(files);
+    }
+
+    /**
+     * Delete an XML analysis file
+     *
+     * @param name
+     *            The XML file to delete
+     * @since 2.0
+     */
+    public static void deleteFile(String name) {
+        Map<String, File> files = listFile();
+        File file = files.get(name);
+        if (file == null) {
+            return;
+        }
+        file.delete();
+    }
+
+    /**
+     * Export an XML analysis file to an external path
+     *
+     * @param from
+     *            The name of the file to export
+     * @param to
+     *            The full path of the file to write to
+     * @return Whether the file was successfully exported
+     * @since 2.0
+     */
+    public static IStatus exportXmlFile(String from, String to) {
+
+        /* Copy file to path */
+        File fromFile = getXmlFilesPath().addTrailingSeparator().append(from).toFile();
+
+        if (!fromFile.exists()) {
+            Activator.logError("Failed to find XML analysis file " + fromFile.getName()); //$NON-NLS-1$
+            return Status.CANCEL_STATUS;
+        }
+
+        File toFile = new File(to);
+
+        return copyXmlFile(fromFile, toFile);
+    }
+
+    private static IStatus copyXmlFile(File fromFile, File toFile) {
         try {
             if (!toFile.exists()) {
                 toFile.createNewFile();
@@ -151,6 +223,38 @@ public class XmlUtils {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, error, e);
         }
         return Status.OK_STATUS;
+    }
+
+    /**
+     * Get the IDs of all the analysis described in a single file
+     *
+     * @param fileName
+     *            The file name
+     * @return The list of IDs
+     * @since 2.0
+     */
+    public static List<String> getAnalysisIdsFromFile(String fileName) {
+        List<String> ids = new ArrayList<>();
+        File file = getXmlFilesPath().addTrailingSeparator().append(fileName).toFile();
+        if (file.exists()) {
+            try {
+                /* Load the XML File */
+                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder dBuilder;
+                dBuilder = dbFactory.newDocumentBuilder();
+                Document doc = dBuilder.parse(file);
+                doc.getDocumentElement().normalize();
+
+                /* get State Providers modules */
+                NodeList stateproviderNodes = doc.getElementsByTagName(TmfXmlStrings.STATE_PROVIDER);
+                for (int i = 0; i < stateproviderNodes.getLength(); i++) {
+                    ids.add(nullToEmptyString(((Element) stateproviderNodes.item(i)).getAttribute(TmfXmlStrings.ID)));
+                }
+            } catch (ParserConfigurationException | SAXException | IOException e) {
+                Activator.logError("Failed to get analyses IDs from " + fileName); //$NON-NLS-1$
+            }
+        }
+        return ids;
     }
 
     /**
@@ -249,5 +353,4 @@ public class XmlUtils {
         }
 
     }
-
 }
