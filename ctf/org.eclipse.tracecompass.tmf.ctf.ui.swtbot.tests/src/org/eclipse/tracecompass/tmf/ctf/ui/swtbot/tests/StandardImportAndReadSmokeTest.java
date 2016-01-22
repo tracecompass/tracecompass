@@ -22,6 +22,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -66,6 +68,8 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -92,6 +96,18 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
     private static final String URI_JAR_FILE_SCHEME = "jar:file:";
     private static final boolean IS_WIN32 = System.getProperty("os.name").startsWith("Windows");  //$NON-NLS-1$//$NON-NLS-2$
     private static final String URI_DEVICE_SEPARATOR = IS_WIN32 ? URI_SEPARATOR : "";
+
+    /** Test Class setup */
+    @BeforeClass
+    public static void beforeClass() {
+        createProject(TRACE_PROJECT_NAME);
+    }
+
+    /** Test Class tear down */
+    @AfterClass
+    public static void afterClass() {
+        SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
+    }
 
     /**
      * Test import from directory
@@ -190,7 +206,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
      */
     @Test
     public void testExtractArchivesFromDirectory() throws Exception {
-        testImportAndExtractArchives(ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES, false);
+        testImportAndExtractArchives(ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES, false, false);
     }
 
     /**
@@ -199,7 +215,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
      */
     @Test
     public void testExtractArchivesFromDirectoryLinks() throws Exception {
-        testImportAndExtractArchives(ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE | ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES, false);
+        testImportAndExtractArchives(ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE | ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES, false, false);
     }
 
     /**
@@ -208,7 +224,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
      */
     @Test
     public void testExtractArchivesFromDirectoryLinksPreserveStruture() throws Exception {
-        testImportAndExtractArchives(ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE | ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES | ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE, false);
+        testImportAndExtractArchives(ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE | ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES | ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE, true, false);
     }
 
     /**
@@ -219,7 +235,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
      */
     @Test
     public void testExtractArchivesFromArchive() throws Exception {
-        testImportAndExtractArchives(ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES, true);
+        testImportAndExtractArchives(ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES, false, true);
     }
 
     /**
@@ -230,7 +246,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
      */
     @Test
     public void testExtractArchivesFromArchivePreserveFolder() throws Exception {
-        testImportAndExtractArchives(ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES | ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE, true);
+        testImportAndExtractArchives(ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES | ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE, false, true);
     }
 
     /**
@@ -241,7 +257,6 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
      */
     @Test
     public void testEmptyArchive() throws Exception {
-        createProject();
         String testArchivePath = createEmptyArchive();
 
         openImportWizard();
@@ -252,7 +267,8 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
 
         assertNoTraces();
 
-        SWTBotUtils.deleteProject(getProjectName(), fBot);
+        SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
+        Files.delete(Paths.get(testArchivePath));
     }
 
     /**
@@ -263,8 +279,8 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
      */
     @Test
     public void testEmptyDirectory() throws Exception {
-        createProject();
-        String testDirectoryPath = createEmptyDirectory().getLocation().toOSString();
+        IFolder emptyDirectory = createEmptyDirectory();
+        String testDirectoryPath = emptyDirectory.getLocation().toOSString();
 
         openImportWizard();
         selectImportFromDirectory(testDirectoryPath);
@@ -274,7 +290,9 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
 
         assertNoTraces();
 
-        SWTBotUtils.deleteProject(getProjectName(), fBot);
+        Files.delete(Paths.get(testDirectoryPath));
+        emptyDirectory.delete(true, null);
+        SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
     }
 
     /**
@@ -285,7 +303,6 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
      */
     @Test
     public void testEmptyFile() throws Exception {
-        createProject();
         IFolder folder = createEmptyDirectory();
         createEmptyFile(folder);
         String testDirectoryPath = folder.getLocation().toOSString();
@@ -297,7 +314,8 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
 
         assertNoTraces();
 
-        SWTBotUtils.deleteProject(getProjectName(), fBot);
+        SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
+        folder.delete(true, null);
     }
 
     /**
@@ -308,18 +326,18 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
      */
     @Test
     public void testDirectoryWithEmptyArchive() throws Exception {
-        createProject();
-        createEmptyArchive();
+        String testArchivePath = createEmptyArchive();
 
         openImportWizard();
         selectImportFromDirectory(getProjectResource().getLocation().toOSString());
-        selectFile(GENERATED_ARCHIVE_NAME, getProjectName());
+        selectFile(GENERATED_ARCHIVE_NAME, TRACE_PROJECT_NAME);
         setOptions(0, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
         importFinish();
 
         assertNoTraces();
 
-        SWTBotUtils.deleteProject(getProjectName(), fBot);
+        SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
+        Files.delete(Paths.get(testArchivePath));
     }
 
     /**
@@ -330,7 +348,6 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
      */
     @Test
     public void testNestedEmptyArchive() throws Exception {
-        createProject();
         IProject project = getProjectResource();
 
         // Create the empty archive from an empty folder
@@ -346,6 +363,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         IFile renamedArchiveFile = archiveFile.getWorkspace().getRoot().getFile(dest);
 
         createArchive(renamedArchiveFile);
+        renamedArchiveFile.delete(true, null);
 
         openImportWizard();
         selectImportFromArchive(testArchivePath);
@@ -355,10 +373,11 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
 
         assertNoTraces();
 
-        SWTBotUtils.deleteProject(getProjectName(), fBot);
+        SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
+        Files.delete(Paths.get(testArchivePath));
     }
 
-    private void assertNoTraces() {
+    private static void assertNoTraces() {
         TmfProjectElement tmfProject = TmfProjectRegistry.getProject(getProjectResource(), true);
         assertNotNull(tmfProject);
         TmfTraceFolder tracesFolder = tmfProject.getTracesFolder();
@@ -368,7 +387,6 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
     }
 
     private void testImport(int options, boolean testViews, boolean fromArchive) throws Exception {
-        createProject();
         String expectedSourceLocation = null;
         openImportWizard();
         if (fromArchive) {
@@ -393,23 +411,22 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         }
 
         checkOptions(options, expectedSourceLocation, expectedElementPath);
-        TmfEventsEditor tmfEd = SWTBotUtils.openEditor(fBot, getProjectName(), expectedElementPath);
+        TmfEventsEditor tmfEd = SWTBotUtils.openEditor(fBot, TRACE_PROJECT_NAME, expectedElementPath);
         if (testViews) {
             testViews(tmfEd);
         }
 
         fBot.closeAllEditors();
 
-        SWTBotUtils.deleteProject(getProjectName(), fBot);
+        SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
     }
 
-    private void testImportAndExtractArchives(int options, boolean fromArchive) throws Exception {
-        createProject();
-
+    private void testImportAndExtractArchives(int options, boolean testViews, boolean fromArchive) throws Exception {
         String expectedSourceLocation;
         IPath expectedElementPath;
+        String testArchivePath = null;
         if (fromArchive) {
-            String testArchivePath = createNestedArchive();
+            testArchivePath = createNestedArchive();
             openImportWizard();
             selectImportFromArchive(testArchivePath);
             selectFile(ARCHIVE_FILE_NAME, ARCHIVE_ROOT_ELEMENT_NAME, TRACE_PROJECT_NAME, TRACE_FOLDER_PARENT_NAME);
@@ -436,16 +453,21 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         checkOptions(expectedOptions, expectedSourceLocation, expectedElementPath);
 
         TmfEventsEditor editor = SWTBotUtils.openEditor(fBot, TRACE_PROJECT_NAME, expectedElementPath);
-        testViews(editor);
+        if (testViews) {
+            testViews(editor);
+        }
 
-        SWTBotUtils.deleteProject(getProjectName(), fBot);
+        SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
+        if (testArchivePath != null) {
+            Files.delete(Paths.get(testArchivePath));
+        }
     }
 
     /**
      * Create a temporary archive containing a nested archive. For example,
      * testtraces.zip/synctraces.tar.gz can be used to test a nested archive.
      */
-    private String createNestedArchive() throws IOException, CoreException, URISyntaxException {
+    private static String createNestedArchive() throws IOException, CoreException, URISyntaxException {
         // Link to the test traces folder. We use a link so that we can safely
         // delete the entire project when we are done.
         IProject project = getProjectResource();
@@ -453,17 +475,22 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         IFolder folder = project.getFolder(TRACE_FOLDER_PARENT_NAME);
         folder.createLink(new Path(canonicalPath), IResource.REPLACE, null);
         IFile file = folder.getFile(ARCHIVE_FILE_NAME);
-        return createArchive(file);
+        String archivePath = createArchive(file);
+        folder.delete(true, null);
+        return archivePath;
     }
 
     /**
      * Create the empty archive from an empty folder
      */
-    private String createEmptyArchive() throws CoreException, URISyntaxException {
-        return createArchive(createEmptyDirectory());
+    private static String createEmptyArchive() throws CoreException, URISyntaxException {
+        IFolder tempEmptyDirectory = createEmptyDirectory();
+        String archivePath = createArchive(tempEmptyDirectory);
+        tempEmptyDirectory.delete(true, null);
+        return archivePath;
     }
 
-    private IFolder createEmptyDirectory() throws CoreException {
+    private static IFolder createEmptyDirectory() throws CoreException {
         IProject project = getProjectResource();
         IFolder folder = project.getFolder(EMPTY_ARCHIVE_FOLDER);
         folder.create(true, true, null);
@@ -625,7 +652,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         }
     }
 
-    private void checkOptions(int optionFlags, String expectedSourceLocation, IPath expectedElementPath) throws CoreException {
+    private static void checkOptions(int optionFlags, String expectedSourceLocation, IPath expectedElementPath) throws CoreException {
         IProject project = getProjectResource();
         assertTrue(project.exists());
         TmfProjectElement tmfProject = TmfProjectRegistry.getProject(project, true);
@@ -655,12 +682,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         assertEquals(expectedSourceLocation, sourceLocation);
     }
 
-    @Override
-    protected String getProjectName() {
-        return TRACE_PROJECT_NAME;
-    }
-
-    private IProject getProjectResource() {
-        return ResourcesPlugin.getWorkspace().getRoot().getProject(getProjectName());
+    private static IProject getProjectResource() {
+        return ResourcesPlugin.getWorkspace().getRoot().getProject(TRACE_PROJECT_NAME);
     }
 }

@@ -18,8 +18,10 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -55,7 +57,9 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers.ProjectElementHasChild;
@@ -489,6 +493,55 @@ public final class SWTBotUtils {
         SWTBotTreeItem tracesFolderItem = getTraceProjectItem(bot, projectTreeItem, TmfTracesFolder.TRACES_FOLDER_NAME);
         tracesFolderItem.select();
         return tracesFolderItem;
+    }
+
+    /**
+     * Clear the traces folder
+     *
+     * @param bot
+     *            a given workbench bot
+     * @param projectName
+     *            the name of the project (needs to exist)
+     */
+    public static void clearTracesFolder(SWTWorkbenchBot bot, String projectName) {
+        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+        TmfProjectElement tmfProject = TmfProjectRegistry.getProject(project, false);
+        TmfTraceFolder tracesFolder = tmfProject.getTracesFolder();
+        try {
+            for (TmfTraceElement traceElement : tracesFolder.getTraces()) {
+                traceElement.delete(null);
+            }
+
+            final IFolder resource = tracesFolder.getResource();
+            resource.accept(new IResourceVisitor() {
+                @Override
+                public boolean visit(IResource visitedResource) throws CoreException {
+                    if (visitedResource != resource) {
+                        visitedResource.delete(true, null);
+                    }
+                    return true;
+                }
+            }, IResource.DEPTH_ONE, 0);
+        } catch (CoreException e) {
+            fail(e.getMessage());
+        }
+
+        bot.waitUntil(new DefaultCondition() {
+            private int fTraceNb = 0;
+
+            @Override
+            public boolean test() throws Exception {
+                List<TmfTraceElement> traces = tracesFolder.getTraces();
+                fTraceNb = traces.size();
+                return fTraceNb == 0;
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return "Traces Folder not empty (" + fTraceNb + ")";
+            }
+        });
+
     }
 
     /**

@@ -108,8 +108,11 @@ public abstract class AbstractImportAndReadSmokeTest {
 
     /**
      * Creates a tracing projects
+     *
+     * @param traceProjectName
+     *            the name of the test project
      */
-    protected void createProject() {
+    protected static void createProject(String traceProjectName) {
         SWTBotUtils.focusMainWindow(fBot.shells());
         fBot.menu("File").menu("New").menu("Project...").click();
 
@@ -135,7 +138,7 @@ public abstract class AbstractImportAndReadSmokeTest {
         fBot.shell("Tracing Project").setFocus();
 
         final SWTBotText text = fBot.text();
-        text.setText(getProjectName());
+        text.setText(traceProjectName);
 
         fBot.button("Finish").click();
         SWTBotUtils.waitForJobs();
@@ -151,13 +154,6 @@ public abstract class AbstractImportAndReadSmokeTest {
         fBot.waitUntil(Conditions.shellCloses(shell));
         SWTBotUtils.waitForJobs();
     }
-
-    /**
-     * Gets the project Name
-     *
-     * @return the project name
-     */
-    protected abstract String getProjectName();
 
     // ---------------------------------------------
     // Helpers for testing views
