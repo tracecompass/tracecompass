@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -21,12 +21,15 @@ import java.util.List;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.BoolResult;
+import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.tracecompass.ctf.core.tests.shared.LttngKernelTraceGenerator;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
@@ -46,9 +49,12 @@ import org.junit.runner.RunWith;
 @RunWith(SWTBotJunit4ClassRunner.class)
 public abstract class KernelTestBase {
 
-    private static final String TRACE_TYPE = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
-    private static final String KERNEL_PERSPECTIVE_ID = "org.eclipse.linuxtools.lttng2.kernel.ui.perspective";
-    private static final String TRACE_PROJECT_NAME = "test";
+    /** LTTng kernel trace type */
+    protected static final String KERNEL_TRACE_TYPE = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
+    /** LTTng kernel perspective */
+    protected static final String KERNEL_PERSPECTIVE_ID = "org.eclipse.linuxtools.lttng2.kernel.ui.perspective";
+    /** Default project name */
+    protected static final String TRACE_PROJECT_NAME = "test";
 
     /** The workbench bot */
     protected static SWTWorkbenchBot fBot;
@@ -119,7 +125,7 @@ public abstract class KernelTestBase {
      */
     @Before
     public void before() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, LttngKernelTraceGenerator.getPath(), TRACE_TYPE);
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, LttngKernelTraceGenerator.getPath(), KERNEL_TRACE_TYPE);
         SWTBotUtils.activateEditor(fBot, LttngKernelTraceGenerator.getName());
     }
 
@@ -129,5 +135,36 @@ public abstract class KernelTestBase {
     @After
     public void after() {
         fBot.closeAllEditors();
+    }
+
+    /**
+     * Class to check number of checked items
+     */
+    static final class TreeCheckedCounter implements Result<Integer> {
+        private final SWTBotTree fTreeBot;
+
+        TreeCheckedCounter(SWTBotTree treeBot) {
+            fTreeBot = treeBot;
+        }
+
+        @Override
+        public Integer run() {
+            int checked = 0;
+            for (TreeItem item : fTreeBot.widget.getItems()) {
+                checked += getChecked(item);
+            }
+            return checked;
+        }
+
+        private int getChecked(TreeItem item) {
+            int total = 0;
+            if (item.getChecked()) {
+                total++;
+            }
+            for (TreeItem child : item.getItems()) {
+                total += getChecked(child);
+            }
+            return total;
+        }
     }
 }

@@ -18,7 +18,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
@@ -27,7 +26,6 @@ import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
 import org.eclipse.swtbot.swt.finder.keyboard.KeyboardFactory;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
-import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
@@ -64,33 +62,6 @@ public class ControlFlowViewTest extends KernelTestBase {
     private static final String UNCHECK_SUBTREE = "Uncheck subtree";
     private static final String UNCHECK_INACTIVE = "Uncheck Inactive";
 
-    private static final class TreeCheckedCounter implements Result<Integer> {
-        private final SWTBotTree fTreeBot;
-
-        private TreeCheckedCounter(SWTBotTree treeBot) {
-            fTreeBot = treeBot;
-        }
-
-        @Override
-        public Integer run() {
-            int checked = 0;
-            for (TreeItem item : fTreeBot.widget.getItems()) {
-                checked += getChecked(item);
-            }
-            return checked;
-        }
-
-        private int getChecked(TreeItem item) {
-            int total = 0;
-            if (item.getChecked()) {
-                total++;
-            }
-            for (TreeItem child : item.getItems()) {
-                total += getChecked(child);
-            }
-            return total;
-        }
-    }
 
     private static final String FOLLOW_CPU_BACKWARD = "Follow CPU Backward";
     private static final String FOLLOW_CPU_FORWARD = "Follow CPU Forward";
