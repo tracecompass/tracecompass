@@ -39,7 +39,8 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -164,8 +165,8 @@ public class TestInvalidCtfTrace {
     /**
      * Initialization
      */
-    @Before
-    public void init() {
+    @BeforeClass
+    public static void beforeClass() {
         SWTBotUtils.initialize();
         Thread.currentThread().setName("SWTBot Thread"); // for the debugger
         /* set up for swtbot */
@@ -184,10 +185,18 @@ public class TestInvalidCtfTrace {
     }
 
     /**
-     * Delete file
+     * Delete traces
      */
     @After
-    public void cleanup() {
+    public void teardown() {
+        SWTBotUtils.clearTracesFolder(fBot, PROJET_NAME);
+    }
+
+    /**
+     * Delete project
+     */
+    @AfterClass
+    public static void afterClass() {
         SWTBotUtils.deleteProject(PROJET_NAME, fBot);
         fLogger.removeAllAppenders();
     }
@@ -198,7 +207,7 @@ public class TestInvalidCtfTrace {
     @Test
     public void testOpen() {
         SWTBotUtils.selectTracesFolder(fBot, PROJET_NAME);
-        SWTBotUtils.openTrace(PROJET_NAME, fLocation.getAbsolutePath(), "org.eclipse.linuxtools.tmf.ui.type.ctf");
+        SWTBotUtils.openTrace(PROJET_NAME, fLocation.getAbsolutePath(), "org.eclipse.linuxtools.tmf.ui.type.ctf", false);
         fBot.waitUntil(Conditions.shellIsActive("Open Trace"));
         final SWTBotShell shell = fBot.activeShell();
         final SWTBot dialogBot = shell.bot();
