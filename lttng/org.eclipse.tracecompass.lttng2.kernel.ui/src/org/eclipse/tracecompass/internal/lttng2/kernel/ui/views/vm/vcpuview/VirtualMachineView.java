@@ -293,7 +293,7 @@ public class VirtualMachineView extends AbstractTimeGraphView {
 
     }
 
-    private void buildEntryEventLists(ArrayList<@NonNull VirtualMachineViewEntry> entryList, ITmfStateSystem ssq, long startTime, long endTime, IProgressMonitor monitor) {
+    private void buildEntryEventLists(List<@NonNull VirtualMachineViewEntry> entryList, ITmfStateSystem ssq, long startTime, long endTime, IProgressMonitor monitor) {
         for (VirtualMachineViewEntry entry : entryList) {
             if (monitor.isCanceled()) {
                 return;
