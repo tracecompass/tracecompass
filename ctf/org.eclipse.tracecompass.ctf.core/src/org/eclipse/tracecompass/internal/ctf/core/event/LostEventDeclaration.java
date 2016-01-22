@@ -29,7 +29,7 @@ import org.eclipse.tracecompass.ctf.core.trace.ICTFStream;
  * @author Matthew Khouzam
  * @since 1.0
  */
-public class LostEventDeclaration implements IEventDeclaration {
+public final class LostEventDeclaration implements IEventDeclaration {
 
     /**
      * Id of lost events
