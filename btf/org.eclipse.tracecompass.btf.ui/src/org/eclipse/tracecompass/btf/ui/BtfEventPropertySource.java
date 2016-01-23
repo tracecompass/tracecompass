@@ -71,7 +71,7 @@ public class BtfEventPropertySource extends TmfEventPropertySource {
         return DESCRIPTORS;
     }
 
-    private class EntityPropertySource implements IPropertySource {
+    private static class EntityPropertySource implements IPropertySource {
         private final String fName;
         private final String fInstance;
 
@@ -115,7 +115,7 @@ public class BtfEventPropertySource extends TmfEventPropertySource {
 
     }
 
-    private class TypePropertySource implements IPropertySource {
+    private static class TypePropertySource implements IPropertySource {
         private final String fType;
         private final String fDescr;
 
@@ -158,7 +158,7 @@ public class BtfEventPropertySource extends TmfEventPropertySource {
         }
     }
 
-    private class EventPropertySource implements IPropertySource {
+    private static class EventPropertySource implements IPropertySource {
         private final ITmfEventField fEventField;
 
         public EventPropertySource(ITmfEventField eventField) {

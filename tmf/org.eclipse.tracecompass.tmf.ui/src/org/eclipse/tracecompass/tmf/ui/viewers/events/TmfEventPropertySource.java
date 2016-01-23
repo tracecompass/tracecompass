@@ -52,7 +52,7 @@ public class TmfEventPropertySource implements IPropertySource {
 
     private ITmfEvent fEvent;
 
-    private class TimestampPropertySource implements IPropertySource {
+    private static class TimestampPropertySource implements IPropertySource {
         private static final String ID_TIMESTAMP_VALUE = "timestamp_value"; //$NON-NLS-1$
         private static final String ID_TIMESTAMP_SCALE = "timestamp_scale"; //$NON-NLS-1$
         private static final String NAME_TIMESTAMP_VALUE = "value"; //$NON-NLS-1$
@@ -101,7 +101,7 @@ public class TmfEventPropertySource implements IPropertySource {
         }
     }
 
-    private class ContentPropertySource implements IPropertySource {
+    private static class ContentPropertySource implements IPropertySource {
         private ITmfEventField fContent;
 
         public ContentPropertySource(ITmfEventField content) {
@@ -147,7 +147,7 @@ public class TmfEventPropertySource implements IPropertySource {
         }
     }
 
-    private class SourceLookupPropertySource implements IPropertySource {
+    private static class SourceLookupPropertySource implements IPropertySource {
 
         private static final String ID_FILE_NAME = "callsite_file"; //$NON-NLS-1$
         private static final String ID_FUNCTION_NAME = "callsite_function"; //$NON-NLS-1$

@@ -182,7 +182,7 @@ public class CallStackView extends AbstractTimeGraphView {
     // Classes
     // ------------------------------------------------------------------------
 
-    private class TraceEntry extends TimeGraphEntry {
+    private static class TraceEntry extends TimeGraphEntry {
         public TraceEntry(String name, long startTime, long endTime) {
             super(name, startTime, endTime);
         }
@@ -193,7 +193,7 @@ public class CallStackView extends AbstractTimeGraphView {
         }
     }
 
-    private class ThreadEntry extends TimeGraphEntry {
+    private static class ThreadEntry extends TimeGraphEntry {
         // The call stack quark
         private final int fCallStackQuark;
         // The state system from which this entry comes
@@ -237,7 +237,7 @@ public class CallStackView extends AbstractTimeGraphView {
         }
     }
 
-    private class ThreadNameComparator implements Comparator<ITimeGraphEntry> {
+    private static class ThreadNameComparator implements Comparator<ITimeGraphEntry> {
         private boolean reverse;
 
         public ThreadNameComparator(boolean reverse) {
@@ -251,7 +251,7 @@ public class CallStackView extends AbstractTimeGraphView {
         }
     }
 
-    private class ThreadIdComparator implements Comparator<ITimeGraphEntry> {
+    private static class ThreadIdComparator implements Comparator<ITimeGraphEntry> {
         private boolean reverse;
 
         public ThreadIdComparator(boolean reverse) {
@@ -267,7 +267,7 @@ public class CallStackView extends AbstractTimeGraphView {
         }
     }
 
-    private class ThreadTimeComparator implements Comparator<ITimeGraphEntry> {
+    private static class ThreadTimeComparator implements Comparator<ITimeGraphEntry> {
         private boolean reverse;
 
         public ThreadTimeComparator(boolean reverse) {
@@ -281,7 +281,7 @@ public class CallStackView extends AbstractTimeGraphView {
         }
     }
 
-    private class CallStackTreeLabelProvider extends TreeLabelProvider {
+    private static class CallStackTreeLabelProvider extends TreeLabelProvider {
 
         @Override
         public Image getColumnImage(Object element, int columnIndex) {

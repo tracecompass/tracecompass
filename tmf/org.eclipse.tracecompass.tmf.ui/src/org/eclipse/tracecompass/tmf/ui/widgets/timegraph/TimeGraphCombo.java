@@ -242,7 +242,7 @@ public class TimeGraphCombo extends Composite {
      * The TreeLabelProviderWrapper is used to intercept the filler items
      * from the calls to the tree's real label provider.
      */
-    private class TreeLabelProviderWrapper implements ITableLabelProvider {
+    private static class TreeLabelProviderWrapper implements ITableLabelProvider {
         private final ITableLabelProvider labelProvider;
 
         public TreeLabelProviderWrapper(ITableLabelProvider labelProvider) {
@@ -334,7 +334,7 @@ public class TimeGraphCombo extends Composite {
      * the time graph combo's real ViewerFilters. These filler items should
      * always be visible.
      */
-    private class ViewerFilterWrapper extends ViewerFilter {
+    private static class ViewerFilterWrapper extends ViewerFilter {
 
         private ViewerFilter fWrappedFilter;
 

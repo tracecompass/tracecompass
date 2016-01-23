@@ -417,7 +417,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         }
     }
 
-    private final class PainItemListener implements Listener {
+    private static final class PainItemListener implements Listener {
         @Override
         public void handleEvent(Event event) {
             TableItem item = (TableItem) event.item;
@@ -451,7 +451,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         }
     }
 
-    private final class EraseItemListener implements Listener {
+    private static final class EraseItemListener implements Listener {
         @Override
         public void handleEvent(Event event) {
             TableItem item = (TableItem) event.item;
