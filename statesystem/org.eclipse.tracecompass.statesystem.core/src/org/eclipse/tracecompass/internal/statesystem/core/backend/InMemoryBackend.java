@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NavigableSet;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -75,7 +76,7 @@ public class InMemoryBackend implements IStateHistoryBackend {
             };
 
     private final @NonNull String ssid;
-    private final TreeSet<ITmfStateInterval> intervals;
+    private final NavigableSet<ITmfStateInterval> intervals;
     private final long startTime;
 
     private volatile long latestTime;
@@ -143,7 +144,7 @@ public class InMemoryBackend implements IStateHistoryBackend {
          * the first possible interval, then only compare their start times.
          */
         synchronized (intervals) {
-            Iterator<ITmfStateInterval> iter = serachforEndTime(intervals, t);
+            Iterator<ITmfStateInterval> iter = searchforEndTime(intervals, t);
             for (int modCount = 0; iter.hasNext() && modCount < currentStateInfo.size();) {
                 ITmfStateInterval entry = iter.next();
                 final long entryStartTime = entry.getStartTime();
@@ -168,7 +169,7 @@ public class InMemoryBackend implements IStateHistoryBackend {
          * the first possible interval, then only compare their start times.
          */
         synchronized (intervals) {
-            Iterator<ITmfStateInterval> iter = serachforEndTime(intervals, t);
+            Iterator<ITmfStateInterval> iter = searchforEndTime(intervals, t);
             while (iter.hasNext()) {
                 ITmfStateInterval entry = iter.next();
                 final boolean attributeMatches = (entry.getAttribute() == attributeQuark);
@@ -231,7 +232,7 @@ public class InMemoryBackend implements IStateHistoryBackend {
         }
     }
 
-    private static Iterator<ITmfStateInterval> serachforEndTime(TreeSet<ITmfStateInterval> tree, long time) {
+    private static Iterator<ITmfStateInterval> searchforEndTime(NavigableSet<ITmfStateInterval> tree, long time) {
         ITmfStateInterval dummyInterval = new TmfStateInterval(-1, time, -1, TmfStateValue.nullValue());
         ITmfStateInterval myInterval = tree.lower(dummyInterval);
         if (myInterval == null) {
