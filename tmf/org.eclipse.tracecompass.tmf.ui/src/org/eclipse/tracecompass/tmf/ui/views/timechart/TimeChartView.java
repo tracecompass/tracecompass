@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.ui.views.timechart;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
@@ -79,9 +80,9 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
 
     private final int fDisplayWidth;
     private TimeGraphViewer fViewer;
-    private final ArrayList<TimeChartAnalysisEntry> fTimeAnalysisEntries = new ArrayList<>();
+    private final List<TimeChartAnalysisEntry> fTimeAnalysisEntries = new ArrayList<>();
     private final Map<ITmfTrace, TimeChartDecorationProvider> fDecorationProviders = new HashMap<>();
-    private final ArrayList<DecorateThread> fDecorateThreads = new ArrayList<>();
+    private final List<DecorateThread> fDecorateThreads = new ArrayList<>();
     private long fStartTime = 0;
     private long fStopTime = Long.MAX_VALUE;
     private boolean fRefreshBusy = false;
