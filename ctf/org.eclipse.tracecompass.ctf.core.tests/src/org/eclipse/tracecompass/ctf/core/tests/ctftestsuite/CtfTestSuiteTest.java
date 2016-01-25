@@ -59,7 +59,6 @@ public class CtfTestSuiteTest {
      */
     private static final Path[] IGNORED_TESTS = {
             BASE_PATH.resolve(Paths.get("regression", "metadata", "pass", "sequence-typedef-length")),
-            BASE_PATH.resolve(Paths.get("regression", "metadata", "pass", "array-of-struct")),
             BASE_PATH.resolve(Paths.get("regression", "stream", "pass", "integer-large-size")),
     };
 
