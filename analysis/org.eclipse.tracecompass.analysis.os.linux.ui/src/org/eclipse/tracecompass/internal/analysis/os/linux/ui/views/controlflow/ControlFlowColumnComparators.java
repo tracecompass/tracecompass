@@ -29,10 +29,15 @@ import com.google.common.collect.ImmutableList;
 public final class ControlFlowColumnComparators {
 
     /**
+     * Default constructor
+     */
+    private ControlFlowColumnComparators() {}
+
+    /**
      * Process Name comparator. This compares first the trace, then the process name, then the
      * birth time, then the TID finally the parent TID.
      */
-    public static ITimeGraphEntryComparator PROCESS_NAME_COLUMN_COMPARATOR = new ITimeGraphEntryComparator() {
+    public static final ITimeGraphEntryComparator PROCESS_NAME_COLUMN_COMPARATOR = new ITimeGraphEntryComparator() {
         private final List<Comparator<ITimeGraphEntry>> SECONDARY_COMPARATORS = init();
         private int fDirection = SWT.DOWN;
 
@@ -66,7 +71,7 @@ public final class ControlFlowColumnComparators {
      * Process TID comparator. This compares first the trace, then the process TID, then the
      * birth time, then the process name finally the parent TID.
      */
-    public static ITimeGraphEntryComparator TID_COLUMN_COMPARATOR = new ITimeGraphEntryComparator() {
+    public static final ITimeGraphEntryComparator TID_COLUMN_COMPARATOR = new ITimeGraphEntryComparator() {
 
         private final List<Comparator<ITimeGraphEntry>> SECONDARY_COMPARATORS = init();
         private int fDirection = SWT.DOWN;
@@ -102,7 +107,7 @@ public final class ControlFlowColumnComparators {
      * Process PTID comparator. This compares first the trace, then the process
      * parent TID, then the birth time, then the process name finally the TID.
      */
-    public static ITimeGraphEntryComparator PTID_COLUMN_COMPARATOR = new ITimeGraphEntryComparator() {
+    public static final ITimeGraphEntryComparator PTID_COLUMN_COMPARATOR = new ITimeGraphEntryComparator() {
 
         private final List<Comparator<ITimeGraphEntry>> SECONDARY_COMPARATORS = init();
         private int fDirection = SWT.DOWN;
@@ -136,7 +141,7 @@ public final class ControlFlowColumnComparators {
      * Process birth time comparator. This compares first the trace, then the
      * birth time, then the process name, then the TID finally the parent TID.
      */
-    public static ITimeGraphEntryComparator BIRTH_TIME_COLUMN_COMPARATOR = new ITimeGraphEntryComparator() {
+    public static final ITimeGraphEntryComparator BIRTH_TIME_COLUMN_COMPARATOR = new ITimeGraphEntryComparator() {
         private final List<Comparator<ITimeGraphEntry>> SECONDARY_COMPARATORS = init();
         private int fDirection = SWT.DOWN;
 
@@ -171,7 +176,7 @@ public final class ControlFlowColumnComparators {
      * time, the process name, the process TID and finally the process's parent
      * TID.
      */
-    public static ITimeGraphEntryComparator TRACE_COLUMN_COMPARATOR = new ITimeGraphEntryComparator() {
+    public static final ITimeGraphEntryComparator TRACE_COLUMN_COMPARATOR = new ITimeGraphEntryComparator() {
         private final List<Comparator<ITimeGraphEntry>> SECONDARY_COMPARATORS = init();
         private int fDirection = SWT.DOWN;
 

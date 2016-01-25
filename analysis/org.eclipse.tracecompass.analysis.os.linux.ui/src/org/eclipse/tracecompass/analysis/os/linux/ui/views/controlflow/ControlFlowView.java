@@ -94,6 +94,8 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
 
     private static final Comparator<ITimeGraphEntry>[] COLUMN_COMPARATORS;
 
+    private static final int INITIAL_SORT_COLUMN_INDEX = 3;
+
     static {
         ImmutableList.Builder<Comparator<ITimeGraphEntry>> builder = ImmutableList.builder();
         builder.add(ControlFlowColumnComparators.PROCESS_NAME_COLUMN_COMPARATOR)
@@ -114,7 +116,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
      */
     public ControlFlowView() {
         super(ID, new ControlFlowPresentationProvider());
-        setTreeColumns(COLUMN_NAMES, COLUMN_COMPARATORS, 3);
+        setTreeColumns(COLUMN_NAMES, COLUMN_COMPARATORS, INITIAL_SORT_COLUMN_INDEX);
         setTreeLabelProvider(new ControlFlowTreeLabelProvider());
         setFilterColumns(FILTER_COLUMN_NAMES);
         setFilterLabelProvider(new ControlFlowFilterLabelProvider());
