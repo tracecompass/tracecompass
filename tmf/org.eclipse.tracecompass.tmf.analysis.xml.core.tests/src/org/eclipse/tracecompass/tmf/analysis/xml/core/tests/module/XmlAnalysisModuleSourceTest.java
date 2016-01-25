@@ -10,7 +10,7 @@
  *   Geneviève Bastien - Initial implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.analysis.xml.ui.tests.module;
+package org.eclipse.tracecompass.tmf.analysis.xml.core.tests.module;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -18,9 +18,9 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlAnalysisModuleSource;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
-import org.eclipse.tracecompass.tmf.analysis.xml.ui.module.XmlAnalysisModuleSource;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.junit.After;

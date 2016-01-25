@@ -3,9 +3,6 @@
 <plugin>
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
-      <source
-            class="org.eclipse.tracecompass.tmf.analysis.xml.ui.module.XmlAnalysisModuleSource">
-      </source>
       <listener
             class="org.eclipse.tracecompass.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource">
       </listener>

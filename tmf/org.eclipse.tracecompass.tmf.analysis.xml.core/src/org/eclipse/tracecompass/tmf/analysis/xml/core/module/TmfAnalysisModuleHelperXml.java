@@ -1,16 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2016 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.analysis.xml.ui.module;
+package org.eclipse.tracecompass.tmf.analysis.xml.core.module;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
@@ -20,8 +17,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
@@ -39,6 +35,7 @@ import org.w3c.dom.Element;
  * Analysis module helpers for modules provided by XML files
  *
  * @author Geneviève Bastien
+ * @since 2.0
  */
 public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
 

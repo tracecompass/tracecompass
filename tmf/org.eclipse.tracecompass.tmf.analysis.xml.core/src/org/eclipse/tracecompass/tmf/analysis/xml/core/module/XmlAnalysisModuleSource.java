@@ -1,17 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 École Polytechnique de Montréal and others
+ * Copyright (c) 2014, 2016 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *   Geneviève Bastien - Initial API and implementation
- *   Bernd Hufmann - Ensure backwards compatibility to Linux Tools
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.analysis.xml.ui.module;
+package org.eclipse.tracecompass.tmf.analysis.xml.core.module;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,11 +30,9 @@ import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.Messages;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfAnalysisModuleHelperXml.XmlAnalysisModuleType;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
-import org.eclipse.tracecompass.tmf.analysis.xml.ui.module.TmfAnalysisModuleHelperXml.XmlAnalysisModuleType;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleSource;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
@@ -53,6 +47,7 @@ import org.xml.sax.SAXException;
  * in the imported XML files
  *
  * @author Geneviève Bastien
+ * @since 2.0
  */
 public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
 
