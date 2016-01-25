@@ -189,13 +189,13 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
         }
     }
 
-    private boolean isSyscallEntry(@Nullable String eventName) {
-        return (eventName != null) && (eventName.startsWith(fLayout.eventSyscallEntryPrefix())
+    private boolean isSyscallEntry(String eventName) {
+        return (eventName.startsWith(fLayout.eventSyscallEntryPrefix())
                 || eventName.startsWith(fLayout.eventCompatSyscallEntryPrefix()));
     }
 
-    private boolean isSyscallExit(@Nullable String eventName) {
-        return (eventName != null) && (eventName.startsWith(fLayout.eventSyscallExitPrefix()));
+    private boolean isSyscallExit(String eventName) {
+        return (eventName.startsWith(fLayout.eventSyscallExitPrefix()));
     }
 
 }
