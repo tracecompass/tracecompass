@@ -86,31 +86,39 @@ public class SchedSwitchHandler extends KernelEventHandler {
     private static void setOldProcessStatus(ITmfStateSystemBuilder ss, Long prevState, Integer formerThreadNode, long timestamp) throws AttributeNotFoundException {
         ITmfStateValue value;
         /*
-         * Empirical observations and look into the linux code have
-         * shown that the TASK_STATE_MAX flag is used internally and
-         * |'ed with other states, most often the running state, so it
-         * is ignored from the prevState value.
+         * Empirical observations and look into the linux code have shown that
+         * the TASK_STATE_MAX flag is used internally and |'ed with other
+         * states, most often the running state, so it is ignored from the
+         * prevState value.
          */
         int state = (int) (prevState & ~(LinuxValues.TASK_STATE_MAX));
 
-        switch (state) {
-        case LinuxValues.TASK_STATE_RUNNING:
+        if (isRunning(state)) {
             value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
-            break;
-        case LinuxValues.TASK_INTERRUPTIBLE:
-        case LinuxValues.TASK_UNINTERRUPTIBLE:
+        } else if (isWaiting(state)) {
             value = StateValues.PROCESS_STATUS_WAIT_BLOCKED_VALUE;
-            break;
-        case LinuxValues.TASK_DEAD:
+        } else if (isDead(state)) {
             value = TmfStateValue.nullValue();
-            break;
-        default:
+        } else {
             value = StateValues.PROCESS_STATUS_WAIT_UNKNOWN_VALUE;
-            break;
         }
         int quark = ss.getQuarkRelativeAndAdd(formerThreadNode, Attributes.STATUS);
         ss.modifyAttribute(timestamp, value, quark);
 
+    }
+
+    private static boolean isDead(int state) {
+        return (state & LinuxValues.TASK_DEAD) != 0;
+    }
+
+    private static boolean isWaiting(int state) {
+        return (state & (LinuxValues.TASK_INTERRUPTIBLE | LinuxValues.TASK_UNINTERRUPTIBLE)) != 0;
+    }
+
+    private static boolean isRunning(int state) {
+        // special case, this means ALL STATES ARE 0
+        // this is effectively an anti-state
+        return state == 0;
     }
 
     private static void setCpuStatus(ITmfStateSystemBuilder ss, Integer nextTid, Integer newCurrentThreadNode, long timestamp, int currentCPUNode) throws AttributeNotFoundException {
