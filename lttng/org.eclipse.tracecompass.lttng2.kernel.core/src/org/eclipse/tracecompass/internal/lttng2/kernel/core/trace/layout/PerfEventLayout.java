@@ -125,6 +125,11 @@ public class PerfEventLayout implements IKernelAnalysisEventLayout {
     }
 
     @Override
+    public String eventCompatSyscallExitPrefix() {
+        return eventSyscallExitPrefix();
+    }
+
+    @Override
     public String eventSchedProcessExec() {
         return "sched:sched_process_exec"; //$NON-NLS-1$
     }

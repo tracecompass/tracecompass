@@ -185,6 +185,15 @@ public interface IKernelAnalysisEventLayout {
     String eventSyscallExitPrefix();
 
     /**
+     * System call compatibility layer exit prefix, something like
+     * "compat_syscall_exit".
+     *
+     * @return the event name
+     * @since 2.0
+     */
+    String eventCompatSyscallExitPrefix();
+
+    /**
      * The scheduler replaced the current process image with a new one. The
      * process should also be renamed at this point. In windows, this is part of
      * the spawn process as well as fork.

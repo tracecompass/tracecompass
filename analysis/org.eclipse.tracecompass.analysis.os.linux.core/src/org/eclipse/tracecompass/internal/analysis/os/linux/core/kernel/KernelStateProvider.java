@@ -61,7 +61,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
      * Version number of this state provider. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
-    private static final int VERSION = 10;
+    private static final int VERSION = 11;
 
     // ------------------------------------------------------------------------
     // Fields
@@ -195,7 +195,8 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
     }
 
     private boolean isSyscallExit(String eventName) {
-        return (eventName.startsWith(fLayout.eventSyscallExitPrefix()));
+        return (eventName.startsWith(fLayout.eventSyscallExitPrefix()) ||
+                eventName.startsWith(fLayout.eventCompatSyscallExitPrefix()));
     }
 
 }

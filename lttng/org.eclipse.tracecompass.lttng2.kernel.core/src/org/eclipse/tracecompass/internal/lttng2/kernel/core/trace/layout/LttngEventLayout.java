@@ -185,6 +185,15 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
         return SYSCALL_EXIT_PREFIX;
     }
 
+    @Override
+    public String eventCompatSyscallExitPrefix() {
+        /*
+         * In LTTng < 2.6, the same generic event name is used for both standard
+         * and compat syscalls.
+         */
+        return SYSCALL_EXIT_PREFIX;
+    }
+
     // ------------------------------------------------------------------------
     // Event field names
     // ------------------------------------------------------------------------

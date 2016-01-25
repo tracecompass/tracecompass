@@ -49,4 +49,9 @@ public class Lttng26EventLayout extends LttngEventLayout {
     public String eventSyscallExitPrefix() {
         return "syscall_exit_"; //$NON-NLS-1$
     }
+
+    @Override
+    public String eventCompatSyscallExitPrefix() {
+        return "compat_syscall_exit_"; //$NON-NLS-1$
+    }
 }

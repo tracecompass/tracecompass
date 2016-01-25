@@ -181,6 +181,12 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
         return SYSCALL_EXIT_PREFIX;
     }
 
+    /** @since 2.0 */
+    @Override
+    public String eventCompatSyscallExitPrefix() {
+        return SYSCALL_EXIT_PREFIX;
+    }
+
     // ------------------------------------------------------------------------
     // Event field names
     // ------------------------------------------------------------------------
