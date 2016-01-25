@@ -22,6 +22,7 @@
             <element ref="source"/>
             <element ref="output"/>
             <element ref="parameterProvider"/>
+            <element ref="listener"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -100,7 +101,7 @@
          <attribute name="applies_experiment" type="boolean">
             <annotation>
                <documentation>
-                  If true, indicate that an instance of this analysis will also be added to an experiment containing one or more trace(s) it applies to. In this case, the analysis will be run on the full experiment and the result is more than just the aggregation of each trace's analysis (default false).
+                  If true, indicate that an instance of this analysis will also be added to an experiment containing one or more trace(s) it applies to. In this case, the analysis will be run on the full experiment and the result is more than just the aggregation of each trace&apos;s analysis (default false).
                </documentation>
             </annotation>
          </attribute>
@@ -266,6 +267,21 @@
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="listener">
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Specify a class that will listen to new modules created. This listener will listen to the creation of any module.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.tracecompass.tmf.core.analysis.ITmfNewAnalysisModuleListener"/>
                </appinfo>
             </annotation>
          </attribute>

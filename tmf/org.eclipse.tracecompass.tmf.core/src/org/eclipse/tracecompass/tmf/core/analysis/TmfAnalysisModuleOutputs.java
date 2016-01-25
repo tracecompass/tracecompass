@@ -55,6 +55,9 @@ public class TmfAnalysisModuleOutputs {
      */
     public static final String MODULE_CLASS_ELEM = "analysisModuleClass"; //$NON-NLS-1$
 
+    /** Extension point element 'listener' */
+    private static final String LISTENER_ELEM = "listener"; //$NON-NLS-1$
+
     private TmfAnalysisModuleOutputs() {
 
     }
@@ -71,29 +74,48 @@ public class TmfAnalysisModuleOutputs {
         IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(TMF_ANALYSIS_TYPE_ID);
         for (IConfigurationElement ce : config) {
             String elementName = ce.getName();
+            ITmfNewAnalysisModuleListener listener = null;
             if (elementName.equals(OUTPUT_ELEM)) {
-                try {
-                    IAnalysisOutput output = (IAnalysisOutput) ce.createExecutableExtension(CLASS_ATTR);
-                    if (output == null) {
-                        Activator.logWarning("An output could not be created"); //$NON-NLS-1$
-                        continue;
-                    }
-                    ITmfNewAnalysisModuleListener listener = null;
-                    for (IConfigurationElement childCe : ce.getChildren()) {
-                        if (childCe.getName().equals(ANALYSIS_ID_ELEM)) {
-                            listener = new TmfNewAnalysisOutputListener(output, childCe.getAttribute(ID_ATTR), null);
-                        } else if (childCe.getName().equals(MODULE_CLASS_ELEM)) {
-                            listener = new TmfNewAnalysisOutputListener(output, null, childCe.createExecutableExtension(CLASS_ATTR).getClass().asSubclass(IAnalysisModule.class));
-                        }
-                    }
-                    if (listener != null) {
-                        newModuleListeners.add(listener);
-                    }
-                } catch (InvalidRegistryObjectException | CoreException e) {
-                    Activator.logError("Error creating module output listener", e); //$NON-NLS-1$
-                }
+                listener = getListenerFromOutputElement(ce);
+            } else if (elementName.equals(LISTENER_ELEM)) {
+                listener = getListenerFromListenerElement(ce);
+            }
+            if (listener != null) {
+                newModuleListeners.add(listener);
             }
         }
         return newModuleListeners;
     }
+
+    private static ITmfNewAnalysisModuleListener getListenerFromOutputElement(IConfigurationElement ce) {
+        ITmfNewAnalysisModuleListener listener = null;
+        try {
+            IAnalysisOutput output = (IAnalysisOutput) ce.createExecutableExtension(CLASS_ATTR);
+            if (output == null) {
+                Activator.logWarning("An output could not be created"); //$NON-NLS-1$
+                return listener;
+            }
+            for (IConfigurationElement childCe : ce.getChildren()) {
+                if (childCe.getName().equals(ANALYSIS_ID_ELEM)) {
+                    listener = new TmfNewAnalysisOutputListener(output, childCe.getAttribute(ID_ATTR), null);
+                } else if (childCe.getName().equals(MODULE_CLASS_ELEM)) {
+                    listener = new TmfNewAnalysisOutputListener(output, null, childCe.createExecutableExtension(CLASS_ATTR).getClass().asSubclass(IAnalysisModule.class));
+                }
+            }
+        } catch (InvalidRegistryObjectException | CoreException e) {
+            Activator.logError("Error creating module output listener", e); //$NON-NLS-1$
+        }
+        return listener;
+    }
+
+    private static ITmfNewAnalysisModuleListener getListenerFromListenerElement(IConfigurationElement ce) {
+        ITmfNewAnalysisModuleListener listener = null;
+        try {
+            listener = (ITmfNewAnalysisModuleListener) ce.createExecutableExtension(CLASS_ATTR);
+        } catch (CoreException e) {
+            Activator.logError("Error creating new module listener", e); //$NON-NLS-1$
+        }
+        return listener;
+    }
+
 }

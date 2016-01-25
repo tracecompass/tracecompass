@@ -44,8 +44,8 @@ public final class TmfAnalysisModuleSources {
     }
 
     /**
-     * Return the analysis module sources advertised in the extension
-     * point, in iterable format.
+     * Return the analysis module sources advertised in the extension point, in
+     * iterable format.
      *
      * @return List of {@link IAnalysisModuleSource}
      */
@@ -71,4 +71,5 @@ public final class TmfAnalysisModuleSources {
         }
         return sources;
     }
+
 }
