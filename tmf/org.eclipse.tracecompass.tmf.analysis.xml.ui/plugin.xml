@@ -6,6 +6,9 @@
       <source
             class="org.eclipse.tracecompass.tmf.analysis.xml.ui.module.XmlAnalysisModuleSource">
       </source>
+      <listener
+            class="org.eclipse.tracecompass.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource">
+      </listener>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
