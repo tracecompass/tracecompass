@@ -193,6 +193,11 @@ public class TraceControlSnapshotSessionTests {
         assertEquals(TraceSessionState.INACTIVE, session.getSessionState());
 
         // ------------------------------------------------------------------------
+        // Record snapshot in inactive mode
+        // ------------------------------------------------------------------------
+        fFacility.executeCommand(session, "snapshot");
+
+        // ------------------------------------------------------------------------
         // Destroy session
         // ------------------------------------------------------------------------
         fFacility.destroySession(session);
