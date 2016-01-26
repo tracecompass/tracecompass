@@ -55,7 +55,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
      * Version number of this state provider. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
-    private static final int VERSION = 9;
+    private static final int VERSION = 10;
 
     private static final int IRQ_HANDLER_ENTRY_INDEX = 1;
     private static final int IRQ_HANDLER_EXIT_INDEX = 2;
@@ -541,7 +541,8 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
                     value = StateValues.CPU_STATUS_RUN_SYSCALL_VALUE;
                     ss.modifyAttribute(ts, value, quark);
 
-                } else if (eventName.startsWith(fLayout.eventSyscallExitPrefix())) {
+                } else if ((eventName.startsWith(fLayout.eventSyscallExitPrefix())
+                        || eventName.startsWith("compat_syscall_exit_"))) { //$NON-NLS-1$
 
                     /* Clear the current system call on the process */
                     quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
