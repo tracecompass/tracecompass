@@ -830,18 +830,13 @@
             <visibleWhen
                   checkEnabled="false">
                <with
-                     variable="activeMenuSelection">
-                  <and>
-                     <iterate
-                           operator="or">
-                        <instanceof
-                              value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
-                        </instanceof>
-                     </iterate>
-                     <count
-                           value="1">
-                     </count>
-                  </and>
+                  variable="activeMenuSelection">
+                  <iterate
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                     </instanceof>
+                  </iterate>
                </with>
             </visibleWhen>
          </command>
