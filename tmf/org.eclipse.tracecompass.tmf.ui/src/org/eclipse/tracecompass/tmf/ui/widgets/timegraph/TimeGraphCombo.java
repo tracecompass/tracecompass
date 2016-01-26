@@ -1230,6 +1230,7 @@ public class TimeGraphCombo extends Composite {
     }
 
     private void alignTreeItems(boolean refreshExpandedItems) {
+
         // align the tree top item with the time graph top item
         Tree tree = fTreeViewer.getTree();
         List<TreeItem> treeItems = getVisibleExpandedItems(tree, refreshExpandedItems);
@@ -1239,7 +1240,6 @@ public class TimeGraphCombo extends Composite {
         }
         TreeItem item = treeItems.get(topIndex);
         tree.setTopItem(item);
-
         /*
          * In GTK3, the bounds of the tree items are only sure to be correct
          * after the tree has been painted.
@@ -1255,9 +1255,9 @@ public class TimeGraphCombo extends Composite {
                  * when the 'tree view' is dirty. Set it again once it is clean.
                  */
                 if (SWT.getPlatform().equals("gtk")) { //$NON-NLS-1$
-                    TreeItem topItem = tree.getTopItem();
                     tree.getDisplay().asyncExec(() -> {
-                        if (!tree.isDisposed() && !topItem.isDisposed()) {
+                        TreeItem topItem = tree.getTopItem();
+                        if (!tree.isDisposed() && topItem != null && !topItem.isDisposed()) {
                             tree.setTopItem(topItem);
                         }
                     });

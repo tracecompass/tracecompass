@@ -155,6 +155,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     /** The trace to filters hash map */
     private final Map<ITmfTrace, @NonNull ViewerFilter[]> fFiltersMap = new HashMap<>();
 
+    /** The trace to view context hash map */
+    private final Map<ITmfTrace, ViewContext> fViewContext = new HashMap<>();
+
     /** The trace to marker event sources hash map */
     private final Map<ITmfTrace, List<IMarkerEventSource>> fMarkerEventSourcesMap = new HashMap<>();
 
@@ -196,9 +199,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     private Comparator<ITimeGraphEntry>[] fColumnComparators;
 
-    /** The sort direction */
-    private int fDirection = SWT.DOWN;
-
     /** The tree label provider, or null if combo is not used */
     private TreeLabelProvider fLabelProvider = null;
 
@@ -227,6 +227,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     /** The default column index for sorting */
     private int fInitialSortColumn = 0;
+
+    /** The default column index for sorting */
+    private int fCurrentSortColumn = 0;
+
+    /** The current sort direction */
+    private int fSortDirection = SWT.DOWN;
 
     /** Flag to indicate to reveal selection */
     private volatile boolean fIsRevealSelection = false;
@@ -280,6 +286,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         TmfTimeViewAlignmentInfo getTimeViewAlignmentInfo();
 
         int getAvailableWidth(int requestedOffset);
+
+        ITimeGraphEntry getSelection();
+
+        void setSelection(ITimeGraphEntry selection);
     }
 
     private class TimeGraphViewerWrapper implements ITimeGraphWrapper {
@@ -397,6 +407,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         @Override
         public int getAvailableWidth(int requestedOffset) {
             return viewer.getAvailableWidth(requestedOffset);
+        }
+
+        @Override
+        public ITimeGraphEntry getSelection() {
+            return viewer.getSelection();
+        }
+
+        @Override
+        public void setSelection(ITimeGraphEntry selection) {
+            viewer.setSelection(selection);
         }
     }
 
@@ -523,6 +543,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         @Override
         public int getAvailableWidth(int requestedOffset) {
             return combo.getAvailableWidth(requestedOffset);
+        }
+
+        @Override
+        public ITimeGraphEntry getSelection() {
+            return combo.getTimeGraphViewer().getSelection();
+        }
+
+        @Override
+        public void setSelection(ITimeGraphEntry selection) {
+            combo.setSelection(selection);
         }
     }
 
@@ -1343,6 +1373,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             fEntryListMap.remove(signal.getTrace());
         }
         fFiltersMap.remove(signal.getTrace());
+        fViewContext.remove(signal.getTrace());
         if (signal.getTrace() == fTrace) {
             fTrace = null;
             fEditorFile = null;
@@ -1436,8 +1467,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         if (fTrace != null) {
             /* save the filters of the previous trace */
             fFiltersMap.put(fTrace, fTimeGraphWrapper.getFilters());
+            fViewContext.put(fTrace, new ViewContext(fCurrentSortColumn, fSortDirection, fTimeGraphWrapper.getSelection()));
         }
         fTrace = trace;
+        restoreViewContext();
         fEditorFile = TmfTraceManager.getInstance().getTraceEditorFile(trace);
         synchronized (fEntryListMap) {
             fEntryList = fEntryListMap.get(fTrace);
@@ -1674,14 +1707,27 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 }
                 boolean inputChanged = fEntryList != fTimeGraphWrapper.getInput();
                 if (inputChanged) {
-                    fTimeGraphWrapper.setInput(fEntryList);
-                    /* restore the previously saved filters, if any */
-                    fTimeGraphWrapper.setFilters(fFiltersMap.get(fTrace));
-                    fTimeGraphWrapper.getTimeGraphViewer().setLinks(null);
-                    fTimeGraphWrapper.getTimeGraphViewer().setBookmarks(refreshBookmarks(fEditorFile));
-                    fTimeGraphWrapper.getTimeGraphViewer().setMarkerCategories(getMarkerCategories());
-                    fTimeGraphWrapper.getTimeGraphViewer().setMarkers(null);
-                    resetColumnSorting();
+                    TimeGraphCombo combo = getTimeGraphCombo();
+                    try {
+                        // Set redraw to false to only draw once
+                        if (combo != null) {
+                            combo.getTreeViewer().getTree().setRedraw(false);
+                        }
+                        getTimeGraphViewer().getTimeGraphControl().setRedraw(false);
+                        fTimeGraphWrapper.setInput(fEntryList);
+                        /* restore the previously saved filters, if any */
+                        fTimeGraphWrapper.setFilters(fFiltersMap.get(fTrace));
+                        fTimeGraphWrapper.getTimeGraphViewer().setLinks(null);
+                        fTimeGraphWrapper.getTimeGraphViewer().setBookmarks(refreshBookmarks(fEditorFile));
+                        fTimeGraphWrapper.getTimeGraphViewer().setMarkerCategories(getMarkerCategories());
+                        fTimeGraphWrapper.getTimeGraphViewer().setMarkers(null);
+                        applyViewContext();
+                    } finally {
+                        if (combo != null) {
+                            combo.getTreeViewer().getTree().setRedraw(true);
+                        }
+                        getTimeGraphViewer().getTimeGraphControl().setRedraw(true);
+                    }
                 } else {
                     fTimeGraphWrapper.refresh();
                 }
@@ -1713,10 +1759,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 }
 
                 // reveal selection
-                if (fIsRevealSelection && fTimeGraphWrapper instanceof TimeGraphComboWrapper) {
+                if (fIsRevealSelection) {
                     fIsRevealSelection = false;
-                    ITimeGraphEntry entry1 = fTimeGraphWrapper.getTimeGraphViewer().getSelection();
-                    fTimeGraphWrapper.getTimeGraphViewer().setSelection(entry1);
+                    ITimeGraphEntry entry1 = fTimeGraphWrapper.getSelection();
+                    fTimeGraphWrapper.setSelection(entry1);
                 }
 
                 if (!zoomThread) {
@@ -1917,7 +1963,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     private void createColumnSelectionListener(TreeViewer treeViewer) {
         for (int i = 0; i < fColumnComparators.length; i++) {
-            final Comparator<ITimeGraphEntry> comp = fColumnComparators[i];
+            final int index = i;
+            final Comparator<ITimeGraphEntry> comp = fColumnComparators[index];
             final Tree tree = treeViewer.getTree();
             final TreeColumn column = tree.getColumn(i);
 
@@ -1926,18 +1973,22 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     @Override
                     public void widgetSelected(SelectionEvent e) {
                         TreeColumn prevSortcolumn = tree.getSortColumn();
+                        int direction = tree.getSortDirection();
                         if (prevSortcolumn == column) {
-                            fDirection = (fDirection == SWT.DOWN) ? SWT.UP : SWT.DOWN;
+                            direction = (direction == SWT.DOWN) ? SWT.UP : SWT.DOWN;
                         } else {
-                            fDirection = SWT.DOWN;
+                            direction = SWT.DOWN;
                         }
                         tree.setSortColumn(column);
-                        tree.setSortDirection(fDirection);
+                        tree.setSortDirection(direction);
+                        fSortDirection = direction;
+                        fCurrentSortColumn = index;
                         Comparator<ITimeGraphEntry> comparator = comp;
+
                         if (comparator instanceof ITimeGraphEntryComparator) {
-                            ((ITimeGraphEntryComparator) comparator).setDirection(fDirection);
+                            ((ITimeGraphEntryComparator) comparator).setDirection(direction);
                         }
-                        if (fDirection != SWT.DOWN) {
+                        if (direction != SWT.DOWN) {
                             comparator = checkNotNull(Collections.reverseOrder(comparator));
                         }
                         setEntryComparator(comparator);
@@ -1952,17 +2003,77 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
     }
 
-    private void resetColumnSorting() {
-        if ((fTimeGraphWrapper instanceof TimeGraphComboWrapper) && (fColumnComparators != null)) {
-            TreeViewer treeViewer = ((TimeGraphComboWrapper) fTimeGraphWrapper).getTreeViewer();
-            fDirection = SWT.DOWN;
-            if ((fInitialSortColumn < fColumnComparators.length) && (fColumnComparators[fInitialSortColumn] != null)) {
-                setEntryComparator(fColumnComparators[fInitialSortColumn]);
+    private void restoreViewContext() {
+        TimeGraphCombo combo = getTimeGraphCombo();
+        ViewContext viewContext = fViewContext.get(fTrace);
+        if (combo != null) {
+            if (fColumnComparators != null) {
+                // restore sort settings
+                fSortDirection = SWT.DOWN;
+                fCurrentSortColumn = fInitialSortColumn;
+                if (viewContext != null) {
+                    fSortDirection = viewContext.getSortDirection();
+                    fCurrentSortColumn = viewContext.getSortColumn();
+                }
+                if ((fCurrentSortColumn < fColumnComparators.length) && (fColumnComparators[fCurrentSortColumn] != null)) {
+                    Comparator<ITimeGraphEntry> comparator = fColumnComparators[fCurrentSortColumn];
+                    if (comparator instanceof ITimeGraphEntryComparator) {
+                        ((ITimeGraphEntryComparator) comparator).setDirection(fSortDirection);
+                    }
+                    if (fSortDirection != SWT.DOWN) {
+                        comparator = checkNotNull(Collections.reverseOrder(comparator));
+                    }
+                    setEntryComparator(comparator);
+                }
             }
+        }
+    }
+
+    private void applyViewContext() {
+        TimeGraphCombo combo = getTimeGraphCombo();
+        ViewContext viewContext = fViewContext.get(fTrace);
+        if (combo != null) {
+            TreeViewer treeViewer = combo.getTreeViewer();
             final Tree tree = treeViewer.getTree();
-            final TreeColumn column = tree.getColumn(fInitialSortColumn);
-            tree.setSortDirection(fDirection);
+            final TreeColumn column = tree.getColumn(fCurrentSortColumn);
+            tree.setSortDirection(fSortDirection);
             tree.setSortColumn(column);
+            combo.getTreeViewer().getControl().setFocus();
+        }
+        // restore and reveal selection
+        if ((viewContext != null) && (viewContext.getSelection() != null)) {
+            fTimeGraphWrapper.setSelection(viewContext.getSelection());
+        }
+        fViewContext.remove(fTrace);
+    }
+
+    private static class ViewContext {
+        private int fSortColumnIndex;
+        private int fSortDirection;
+        private @Nullable ITimeGraphEntry fSelection;
+
+        ViewContext(int sortColunm, int sortDirection, ITimeGraphEntry selection) {
+            fSortColumnIndex = sortColunm;
+            fSortDirection = sortDirection;
+            fSelection = selection;
+        }
+        /**
+         * @return the sortColumn
+         */
+        public int getSortColumn() {
+            return fSortColumnIndex;
+        }
+        /**
+         * @return the sortDirection
+         */
+        public int getSortDirection() {
+            return fSortDirection;
+        }
+        /**
+         * @return the selection
+         */
+        public ITimeGraphEntry getSelection() {
+            return fSelection;
         }
     }
 }
