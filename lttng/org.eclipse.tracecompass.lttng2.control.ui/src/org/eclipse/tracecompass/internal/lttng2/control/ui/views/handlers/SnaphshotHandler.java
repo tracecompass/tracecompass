@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
@@ -108,9 +107,7 @@ public class SnaphshotHandler extends BaseControlViewHandler {
                 if (element instanceof TraceSessionComponent) {
                     // Add only if corresponding TraceSessionComponent is an active snapshot session and not destroyed
                     TraceSessionComponent session = (TraceSessionComponent) element;
-                    if(session.isSnapshotSession() &&
-                            session.getSessionState() == TraceSessionState.ACTIVE &&
-                            !session.isDestroyed()) {
+                    if(session.isSnapshotSession() && !session.isDestroyed()) {
                         sessions.add(session);
                     }
                 }
