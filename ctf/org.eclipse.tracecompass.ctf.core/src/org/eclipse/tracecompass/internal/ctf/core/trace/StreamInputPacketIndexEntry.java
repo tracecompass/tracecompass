@@ -173,6 +173,33 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
         fLostEvents = computeLostEvents(lostSoFar);
     }
 
+    /**
+     * Copy constructor that updates the timestamp end
+     *
+     * @param entryToAdd
+     *            the original {@link StreamInputPacketIndexEntry}
+     * @param newTimestampEnd
+     *            the new timestamp end
+     */
+    public StreamInputPacketIndexEntry(ICTFPacketDescriptor entryToAdd, long newTimestampEnd) {
+        fEndPacketHeaderBits = entryToAdd.getPayloadStartBits();
+        fAttributes = entryToAdd.getAttributes();
+        fContentSizeBits = entryToAdd.getContentSizeBits();
+        fPacketSizeBits = entryToAdd.getPacketSizeBits();
+        fTimestampBegin = entryToAdd.getTimestampBegin();
+        fTimestampEnd = newTimestampEnd;
+        fOffsetBits = entryToAdd.getOffsetBits();
+        fOffsetBytes = entryToAdd.getOffsetBits();
+
+        // LTTng Specific
+        fTarget = entryToAdd.getTarget();
+        fTargetID = entryToAdd.getTargetId();
+        Target target = new Target();
+        target.number = fTargetID;
+        target.string = fTarget;
+        fLostEvents = entryToAdd.getLostEvents();
+    }
+
     private static @NonNull Map<String, Object> computeAttributeMap(StructDefinition streamPacketContextDef) {
         Builder<String, Object> attributeBuilder = ImmutableMap.<String, Object> builder();
         for (String field : streamPacketContextDef.getDeclaration().getFieldsList()) {

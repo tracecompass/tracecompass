@@ -24,9 +24,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.trace.ICTFPacketDescriptor;
+import org.eclipse.tracecompass.internal.ctf.core.Activator;
 
 /**
  * <b><u>StreamInputPacketIndex</u></b>
@@ -75,12 +76,8 @@ public class StreamInputPacketIndex {
      *
      * @param preParsedIndex
      *            the pre-parsed index file
-     *
-     * @throws CTFException
-     *             If there was a problem reading the entry
      */
-    public void appendAll(Collection<ICTFPacketDescriptor> preParsedIndex)
-            throws CTFException {
+    public void appendAll(Collection<ICTFPacketDescriptor> preParsedIndex) {
         for (ICTFPacketDescriptor sipie : preParsedIndex) {
             append(checkNotNull(sipie));
         }
@@ -92,26 +89,25 @@ public class StreamInputPacketIndex {
      * @param entry
      *            element to be appended to this index, cannot be null
      * @return {@code true} (as specified by {@link Collection#add})
-     * @throws CTFException
-     *             If there was a problem reading the entry
      */
-    public synchronized boolean append(@NonNull ICTFPacketDescriptor entry)
-            throws CTFException {
-
+    public synchronized boolean append(@NonNull ICTFPacketDescriptor entry) {
+        ICTFPacketDescriptor entryToAdd = entry;
         /* Validate consistent entry. */
-        if (entry.getTimestampBegin() > entry.getTimestampEnd()) {
-            throw new CTFException("Packet begin timestamp is after end timestamp"); //$NON-NLS-1$
+        if (entryToAdd.getTimestampBegin() > entryToAdd.getTimestampEnd()) {
+            Activator.log(IStatus.WARNING, "Packet at offset " + entryToAdd.getOffsetBytes() + //$NON-NLS-1$
+                          " begin timestamp is after end timestamp"); //$NON-NLS-1$
+            entryToAdd = new StreamInputPacketIndexEntry(entryToAdd, Long.MAX_VALUE);
         }
 
         /*
          * Validate entries are inserted in monotonic increasing timestamp
          * order.
          */
-        if (!fEntries.isEmpty() && (entry.getTimestampBegin() < lastElement().getTimestampBegin())) {
+        if (!fEntries.isEmpty() && (entryToAdd.getTimestampBegin() < lastElement().getTimestampBegin())) {
             return false;
         }
 
-        fEntries.add(entry);
+        fEntries.add(entryToAdd);
         return true;
     }
 
@@ -127,9 +123,9 @@ public class StreamInputPacketIndex {
         /*
          * Search using binary search.
          *
-         * As the entries in fEntries are IndexEntries, the key to search for needs to be one too.
-         * We are looking for a timestamp though, so we use the dataOffset which is a long and use
-         * it as a timestamp holder.
+         * As the entries in fEntries are IndexEntries, the key to search for
+         * needs to be one too. We are looking for a timestamp though, so we use
+         * the dataOffset which is a long and use it as a timestamp holder.
          */
         int index = Collections.binarySearch(fEntries, new StreamInputPacketIndexEntry(timestamp, 0), new FindTimestamp());
         if (index < 0) {
@@ -177,12 +173,12 @@ public class StreamInputPacketIndex {
      *         contain the element
      * @throws ClassCastException
      *             if the type of the specified element is incompatible with
-     *             this data structure (<a
-     *             href="Collection.html#optional-restrictions">optional</a>)
+     *             this data structure (
+     *             <a href="Collection.html#optional-restrictions">optional</a>)
      * @throws NullPointerException
      *             if the specified element is null and this data structure does
-     *             not permit null elements (<a
-     *             href="Collection.html#optional-restrictions">optional</a>)
+     *             not permit null elements (
+     *             <a href="Collection.html#optional-restrictions">optional</a>)
      */
     public int indexOf(ICTFPacketDescriptor element) {
         int indexOf = -1;
@@ -235,11 +231,12 @@ public class StreamInputPacketIndex {
         @Override
         public int compare(ICTFPacketDescriptor value, ICTFPacketDescriptor key) {
             /*
-             * It is assumed that the second packet descriptor is the key, a wrapped timestamp in a
-             * PacketDescriptor. So we need to extract the timestamp. Then we have 3 choices, the
-             * if the timestamp is in the interval, we return 0 or found. If the timestamp is
-             * before or after, we just need to compare it to a value in the segment (like start) to
-             * know if it is greater or lesser to the current packet.
+             * It is assumed that the second packet descriptor is the key, a
+             * wrapped timestamp in a PacketDescriptor. So we need to extract
+             * the timestamp. Then we have 3 choices, the if the timestamp is in
+             * the interval, we return 0 or found. If the timestamp is before or
+             * after, we just need to compare it to a value in the segment (like
+             * start) to know if it is greater or lesser to the current packet.
              */
             long ts = key.getOffsetBits();
             if (value.includes(ts)) {

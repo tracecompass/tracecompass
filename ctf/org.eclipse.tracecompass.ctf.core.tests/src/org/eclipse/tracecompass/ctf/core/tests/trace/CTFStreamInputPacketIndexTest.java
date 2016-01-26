@@ -23,8 +23,7 @@ import org.junit.Test;
  * The class <code>StreamInputPacketIndexTest</code> contains tests for the
  * class <code>{@link StreamInputPacketIndex}</code>.
  *
- * @author ematkho
- * @version $Revision: 1.0 $
+ * @author Matthew Khouzam
  */
 @SuppressWarnings("javadoc")
 public class CTFStreamInputPacketIndexTest {
@@ -37,7 +36,7 @@ public class CTFStreamInputPacketIndexTest {
      * @throws CTFException
      */
     @Before
-    public void setUp() throws CTFException {
+    public void setUp() {
         fixture = new StreamInputPacketIndex();
         fixture.append(new StreamInputPacketIndexEntry(1L,0L));
     }
