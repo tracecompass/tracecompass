@@ -12,10 +12,12 @@
 
 package org.eclipse.tracecompass.tmf.core.tests.statesystem;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -94,6 +96,21 @@ public class StateSystemAnalysisModuleTest {
 
         module.waitForInitialization();
         assertNotNull(module.getStateSystem());
+    }
+
+    /**
+     * Test that helper returns the right properties
+     */
+    @Test
+    public void testProperties() {
+
+        TmfStateSystemAnalysisModule mod = module;
+        assertNotNull(mod);
+
+        /* The stub state system has in mem backend so only 1 property */
+        Map<String, String> properties = mod.getProperties();
+        assertEquals(1, properties.size());
+
     }
 
 }

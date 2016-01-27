@@ -26,6 +26,7 @@
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.antlr.runtime" version="3.2.0.v201101311130"/>
 <unit id="org.antlr.runtime.source" version="3.2.0.v201101311130"/>
+<unit id="org.apache.commons.io" version="0.0.0"/>
 <unit id="org.swtchart" version="0.0.0"/>
 <unit id="com.google.guava" version="15.0.0.v201403281430"/>
 <unit id="org.json" version="0.0.0"/>

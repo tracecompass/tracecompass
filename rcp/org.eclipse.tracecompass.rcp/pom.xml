@@ -73,6 +73,7 @@
                 <plugin id="org.sat4j.pb"/>
                 <plugin id="org.swtchart"/>
                 <plugin id="com.google.guava"/>
+                <plugin id="org.apache.commons.io"/>
               </excludes>
             </configuration>
           </execution>

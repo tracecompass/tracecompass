@@ -18,12 +18,17 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial.PartialHistoryBackend;
 import org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial.PartialStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -34,6 +39,7 @@ import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFact
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -57,7 +63,7 @@ import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
  * @author Geneviève Bastien
  */
 public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisModule
-        implements ITmfAnalysisModuleWithStateSystems {
+        implements ITmfAnalysisModuleWithStateSystems, ITmfPropertiesProvider {
 
     private static final String EXTENSION = ".ht"; //$NON-NLS-1$
 
@@ -171,6 +177,16 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     // TmfAbstractAnalysisModule
     // ------------------------------------------------------------------------
 
+    private @Nullable File getSsFile() {
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            return null;
+        }
+        String directory = TmfTraceManager.getSupplementaryFileDir(trace);
+        File htFile = new File(directory + getSsFileName());
+        return htFile;
+    }
+
     @Override
     protected boolean executeAnalysis(@Nullable final  IProgressMonitor monitor) {
         IProgressMonitor mon = (monitor == null ? new NullProgressMonitor() : monitor);
@@ -182,8 +198,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         try {
             /* Get the state system according to backend */
             StateSystemBackendType backend = getBackendType();
-            String directory;
-            File htFile;
+
 
             ITmfTrace trace = getTrace();
             if (trace == null) {
@@ -192,15 +207,21 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                 return false;
             }
             switch (backend) {
-            case FULL:
-                directory = TmfTraceManager.getSupplementaryFileDir(trace);
-                htFile = new File(directory + getSsFileName());
+            case FULL: {
+                File htFile = getSsFile();
+                if (htFile == null) {
+                    return false;
+                }
                 createFullHistory(id, provider, htFile);
+            }
                 break;
-            case PARTIAL:
-                directory = TmfTraceManager.getSupplementaryFileDir(trace);
-                htFile = new File(directory + getSsFileName());
+            case PARTIAL: {
+                File htFile = getSsFile();
+                if (htFile == null) {
+                    return false;
+                }
                 createPartialHistory(id, provider, htFile);
+            }
                 break;
             case INMEM:
                 createInMemoryHistory(id, provider);
@@ -559,5 +580,39 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
 
     private static boolean isCompleteTrace(ITmfTrace trace) {
         return !(trace instanceof ITmfTraceCompleteness) || ((ITmfTraceCompleteness) trace).isComplete();
+    }
+
+    // ------------------------------------------------------------------------
+    // ITmfPropertiesProvider
+    // ------------------------------------------------------------------------
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public @NonNull Map<@NonNull String, @NonNull String> getProperties() {
+        Map<@NonNull String, @NonNull String> properties = new HashMap<>();
+
+        StateSystemBackendType backend = getBackendType();
+        properties.put(NonNullUtils.checkNotNull(Messages.TmfStateSystemAnalysisModule_PropertiesBackend), NonNullUtils.checkNotNull(backend.name()));
+        switch (backend) {
+        case FULL:
+        case PARTIAL:
+            File htFile = getSsFile();
+            if (htFile != null) {
+                if (htFile.exists()) {
+                    properties.put(NonNullUtils.checkNotNull(Messages.TmfStateSystemAnalysisModule_PropertiesFileSize), FileUtils.byteCountToDisplaySize(htFile.length()));
+                } else {
+                    properties.put(NonNullUtils.checkNotNull(Messages.TmfStateSystemAnalysisModule_PropertiesFileSize), NonNullUtils.checkNotNull(Messages.TmfStateSystemAnalysisModule_PropertiesAnalysisNotExecuted));
+                }
+            }
+            break;
+        case INMEM:
+        case NULL:
+        default:
+            break;
+
+        }
+        return properties;
     }
 }
