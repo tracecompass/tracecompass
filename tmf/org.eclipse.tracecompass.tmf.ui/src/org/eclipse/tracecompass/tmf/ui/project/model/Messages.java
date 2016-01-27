@@ -24,6 +24,20 @@ public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.tmf.ui.project.model.messages"; //$NON-NLS-1$
 
+    /**
+     * The category of the analysis helper properties
+     *
+     * @since 2.0
+     */
+    public static String TmfAnalysisElement_HelperProperties;
+
+    /**
+     * The category of the analysis properties
+     *
+     * @since 2.0
+     */
+    public static String TmfAnalysisElement_AnalysisProperties;
+
     /** Instantiate analysis message box title */
     public static String TmfAnalysisElement_InstantiateAnalysis;
 

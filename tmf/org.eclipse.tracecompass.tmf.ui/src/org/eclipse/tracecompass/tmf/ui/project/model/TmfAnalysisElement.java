@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,15 +29,20 @@ import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisOutput;
+import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
+import org.eclipse.ui.views.properties.IPropertyDescriptor;
+import org.eclipse.ui.views.properties.IPropertySource2;
 import org.osgi.framework.Bundle;
 
 /**
  * Class for project elements of type analysis modules
  *
  * @author Geneviève Bastien
+ * @since 2.0
  */
-public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfStyledProjectModelElement {
+public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfStyledProjectModelElement, IPropertySource2 {
 
     private static final Styler ANALYSIS_CANT_EXECUTE_STYLER = new Styler() {
         @Override
@@ -47,6 +53,9 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
 
     private final @NonNull IAnalysisModuleHelper fAnalysisHelper;
     private boolean fCanExecute = true;
+
+    private static final String ANALYSIS_PROPERTIES_CATEGORY = Messages.TmfAnalysisElement_AnalysisProperties;
+    private static final String HELPER_PROPERTIES_CATEGORY = Messages.TmfAnalysisElement_HelperProperties;
 
     /**
      * Constructor
@@ -230,6 +239,130 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
             TmfTraceElement traceElement = (TmfTraceElement) parent;
             TmfOpenTraceHelper.openTraceFromElement(traceElement);
         }
+    }
+
+    // ------------------------------------------------------------------------
+    // IPropertySource2
+    // ------------------------------------------------------------------------
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Object getEditableValue() {
+        return null;
+    }
+
+    /**
+     * Get the analysis properties of this analysisElement if the corresponding
+     * analysis exists for the current trace
+     *
+     * @return a map with the names and values of the trace properties
+     *         respectively as keys and values
+     */
+    private Map<String, String> getAnalysisProperties() {
+        ITmfProjectModelElement parent = getParent();
+
+        if (parent instanceof TmfCommonProjectElement) {
+            ITmfTrace trace = ((TmfCommonProjectElement) parent).getTrace();
+            if (trace == null) {
+                return Collections.EMPTY_MAP;
+            }
+            IAnalysisModule module = trace.getAnalysisModule(fAnalysisHelper.getId());
+            if (module instanceof ITmfPropertiesProvider) {
+                return ((ITmfPropertiesProvider) module).getProperties();
+            }
+        }
+
+        return Collections.EMPTY_MAP;
+    }
+
+    private Map<String, String> getAnalysisHelperProperties() {
+        if (fAnalysisHelper instanceof ITmfPropertiesProvider) {
+            ITmfPropertiesProvider analysisProperties = (ITmfPropertiesProvider) fAnalysisHelper;
+            return analysisProperties.getProperties();
+        }
+        return Collections.EMPTY_MAP;
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public IPropertyDescriptor[] getPropertyDescriptors() {
+        Map<String, String> helperProperties = getAnalysisHelperProperties();
+        Map<String, String> analysisProperties = getAnalysisProperties();
+        if (!analysisProperties.isEmpty() || !helperProperties.isEmpty()) {
+            List<IPropertyDescriptor> propertyDescriptorArray = new ArrayList<>(analysisProperties.size() + helperProperties.size());
+            for (Map.Entry<String, String> varName : helperProperties.entrySet()) {
+                ReadOnlyTextPropertyDescriptor descriptor = new ReadOnlyTextPropertyDescriptor(this.getName() + '_' + varName.getKey(), varName.getKey());
+                descriptor.setCategory(HELPER_PROPERTIES_CATEGORY);
+                propertyDescriptorArray.add(descriptor);
+            }
+            for (Map.Entry<String, String> varName : analysisProperties.entrySet()) {
+                ReadOnlyTextPropertyDescriptor descriptor = new ReadOnlyTextPropertyDescriptor(this.getName() + '_' + varName.getKey(), varName.getKey());
+                descriptor.setCategory(ANALYSIS_PROPERTIES_CATEGORY);
+                propertyDescriptorArray.add(descriptor);
+            }
+            return propertyDescriptorArray.toArray(new IPropertyDescriptor[analysisProperties.size() + helperProperties.size()]);
+        }
+        return new IPropertyDescriptor[0];
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Object getPropertyValue(Object id) {
+        if (id == null) {
+            return null;
+        }
+        Map<String, String> properties = getAnalysisHelperProperties();
+        String key = (String) id;
+        /* Remove name from key */
+        key = key.substring(this.getName().length() + 1);
+        if (properties.containsKey(key)) {
+            String value = properties.get(key);
+            return value;
+        }
+
+        properties = getAnalysisProperties();
+        if (properties.containsKey(key)) {
+            String value = properties.get(key);
+            return value;
+        }
+
+        return null;
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public final void resetPropertyValue(Object id) {
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public final void setPropertyValue(Object id, Object value) {
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public final boolean isPropertyResettable(Object id) {
+        return false;
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public final boolean isPropertySet(Object id) {
+        return false;
     }
 
 }
