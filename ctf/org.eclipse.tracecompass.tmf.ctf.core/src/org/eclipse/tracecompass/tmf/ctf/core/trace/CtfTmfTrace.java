@@ -47,11 +47,11 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceProperties;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
@@ -81,7 +81,7 @@ import com.google.common.collect.ImmutableSet;
  * @author Matthew khouzam
  */
 public class CtfTmfTrace extends TmfTrace
-        implements ITmfTraceProperties, ITmfPersistentlyIndexable,
+        implements ITmfPropertiesProvider, ITmfPersistentlyIndexable,
         ITmfTraceWithPreDefinedEvents {
 
     // -------------------------------------------
@@ -431,11 +431,14 @@ public class CtfTmfTrace extends TmfTrace
     }
 
     // -------------------------------------------
-    // ITmfTraceProperties
+    // ITmfPropertiesProvider
     // -------------------------------------------
 
+    /**
+     * @since 2.0
+     */
     @Override
-    public Map<String, String> getTraceProperties() {
+    public Map<String, String> getProperties() {
         Map<String, String> properties = new HashMap<>();
         properties.putAll(fTrace.getEnvironment());
         properties.put(CLOCK_OFFSET, Long.toUnsignedString(fTrace.getOffset()));

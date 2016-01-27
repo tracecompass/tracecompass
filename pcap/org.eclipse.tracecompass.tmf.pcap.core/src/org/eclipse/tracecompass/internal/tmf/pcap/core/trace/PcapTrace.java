@@ -45,8 +45,8 @@ import org.eclipse.tracecompass.internal.tmf.pcap.core.util.PcapEventFactory;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceProperties;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
@@ -64,7 +64,7 @@ import com.google.common.collect.ImmutableMap;
  *
  * @author Vincent Perot
  */
-public class PcapTrace extends TmfTrace implements ITmfTraceProperties {
+public class PcapTrace extends TmfTrace implements ITmfPropertiesProvider {
 
     /** pcap trace type id as defined in plugin.xml */
     public static final String TRACE_TYPE_ID = "org.eclipse.linuxtools.tmf.pcap.core.pcaptrace"; //$NON-NLS-1$
@@ -244,7 +244,7 @@ public class PcapTrace extends TmfTrace implements ITmfTraceProperties {
     }
 
     @Override
-    public synchronized Map<String, String> getTraceProperties() {
+    public synchronized Map<String, String> getProperties() {
         PcapFile pcap = fPcapFile;
         if (pcap == null) {
             return Collections.emptyMap();

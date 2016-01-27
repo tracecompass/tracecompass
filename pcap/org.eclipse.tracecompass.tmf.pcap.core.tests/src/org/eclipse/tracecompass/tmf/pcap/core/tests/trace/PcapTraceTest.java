@@ -190,7 +190,7 @@ public class PcapTraceTest {
      */
     @Test
     public void testGetTraceProperties() {
-        int result = fFixture.getTraceProperties().size();
+        int result = fFixture.getProperties().size();
         assertEquals(6, result);
     }
 

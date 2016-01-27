@@ -49,12 +49,12 @@ import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlEvent;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
+import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceProperties;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
@@ -430,9 +430,9 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         for (ITmfTrace openedTrace : TmfTraceManager.getInstance().getOpenedTraces()) {
             for (ITmfTrace singleTrace : TmfTraceManager.getTraceSet(openedTrace)) {
                 if (getElementUnderTraceFolder().getResource().equals(singleTrace.getResource())) {
-                    if (singleTrace instanceof ITmfTraceProperties) {
-                        ITmfTraceProperties traceProperties = (ITmfTraceProperties) singleTrace;
-                        return traceProperties.getTraceProperties();
+                    if (singleTrace instanceof ITmfPropertiesProvider) {
+                        ITmfPropertiesProvider traceProperties = (ITmfPropertiesProvider) singleTrace;
+                        return traceProperties.getProperties();
                     }
                 }
             }

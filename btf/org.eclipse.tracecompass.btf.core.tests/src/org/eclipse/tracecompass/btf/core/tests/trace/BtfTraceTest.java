@@ -116,7 +116,7 @@ public class BtfTraceTest {
      */
     @Test
     public void testReadProperties() {
-        Map<String, String> data = fixture.getTraceProperties();
+        Map<String, String> data = fixture.getProperties();
         assertNotNull(data);
         assertEquals("ns", data.get("#timeScale"));
         assertEquals("2.1.0", data.get("#version"));

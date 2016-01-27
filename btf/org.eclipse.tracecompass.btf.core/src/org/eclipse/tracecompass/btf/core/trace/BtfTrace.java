@@ -39,11 +39,11 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceContext;
+import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceProperties;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -63,7 +63,7 @@ import com.google.common.collect.ImmutableMap;
  *
  * @author Matthew Khouzam
  */
-public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITmfTraceProperties {
+public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITmfPropertiesProvider {
 
     private static final int MAX_FIELDS = 7;
 
@@ -471,8 +471,11 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
         return new TmfBTreeTraceIndexer(this, interval);
     }
 
+    /**
+     * @since 2.0
+     */
     @Override
-    public Map<String, String> getTraceProperties() {
+    public Map<String, String> getProperties() {
         return ImmutableMap.copyOf(fProperties);
     }
 

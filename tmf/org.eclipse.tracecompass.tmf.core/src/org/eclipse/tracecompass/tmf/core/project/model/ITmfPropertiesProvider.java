@@ -1,37 +1,35 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *   Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.core.trace;
+package org.eclipse.tracecompass.tmf.core.project.model;
 
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * Interface for trace types to implement when they can provide additional
- * trace-wide properties.
+ * Interface for classes to implement when they can provide additional
+ * properties.
  *
- * This information will be displayed in the trace's Properties View, among
- * other things.
+ * This information will be displayed in the Properties View, among other
+ * things.
  *
  * @author Alexandre Montplaisir
+ * @since 2.0
  */
 @NonNullByDefault
-public interface ITmfTraceProperties {
+public interface ITmfPropertiesProvider {
 
     /**
-     * Get the properties related to this trace.
+     * Get the properties related to this class.
      *
      * @return The map of properties, <name, value>
      */
-    public Map<String, String> getTraceProperties();
+    public Map<String, String> getProperties();
 }

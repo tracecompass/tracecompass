@@ -181,7 +181,7 @@ public class CtfTmfTraceTest {
     @Test
     public void testGetEnvValue() {
         String key = "tracer_name";
-        String result = fixture.getTraceProperties().get(key);
+        String result = fixture.getProperties().get(key);
         assertEquals("\"lttng-modules\"", result);
     }
 
@@ -240,9 +240,9 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testGetTraceProperties() {
-        int result = fixture.getTraceProperties().size();
+        int result = fixture.getProperties().size();
         assertEquals(10, result);
-        assertEquals(String.valueOf(1332166405241713987L), fixture.getTraceProperties().get("clock_offset"));
+        assertEquals(String.valueOf(1332166405241713987L), fixture.getProperties().get("clock_offset"));
     }
 
     /**
