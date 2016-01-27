@@ -12,17 +12,23 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.tests.module;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.util.Map;
+import java.util.stream.StreamSupport;
 
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfAnalysisModuleHelperXml.XmlAnalysisModuleType;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlAnalysisModuleSource;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
+import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -132,4 +138,36 @@ public class XmlAnalysisModuleSourceTest {
         assertTrue(findModule(modules.values(), SS_MODULE));
         assertTrue(findModule(modules.values(), BUILTIN_MODULE));
     }
+
+    /**
+     * Test that helper returns the right properties
+     */
+    @Test
+    public void testProperties() {
+
+        /* Get the helper for the builtin module */
+        XmlAnalysisModuleSource module = new XmlAnalysisModuleSource();
+
+        Iterable<IAnalysisModuleHelper> modules = module.getAnalysisModules();
+
+        IAnalysisModuleHelper helper = StreamSupport.stream(modules.spliterator(), false)
+                .filter(h -> h.getId().equals(BUILTIN_MODULE))
+                .findFirst()
+                .get();
+        assertNotNull(helper);
+
+        /* Verify the helper is a properties provider */
+        assertTrue(helper instanceof ITmfPropertiesProvider);
+        ITmfPropertiesProvider provider = (ITmfPropertiesProvider) helper;
+        Map<String, String> properties = provider.getProperties();
+        assertEquals(2, properties.size());
+
+        /*
+         * The text is externalized, so we're not sure about the property key,
+         * but we know the values that should be present
+         */
+        assertTrue(properties.containsValue(XmlAnalysisModuleType.STATE_SYSTEM.name()));
+        assertTrue(properties.containsValue("test_builtin.xml"));
+    }
+
 }

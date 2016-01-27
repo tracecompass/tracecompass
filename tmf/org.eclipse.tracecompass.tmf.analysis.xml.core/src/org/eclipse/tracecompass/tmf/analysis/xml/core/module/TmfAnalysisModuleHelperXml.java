@@ -13,10 +13,13 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
@@ -25,6 +28,7 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
+import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -37,7 +41,7 @@ import org.w3c.dom.Element;
  * @author Geneviève Bastien
  * @since 2.0
  */
-public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
+public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPropertiesProvider {
 
     /**
      * The types of analysis that can be XML-defined
@@ -196,6 +200,18 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
         }
 
         return module;
+    }
+
+    // ------------------------------------------------------------------------
+    // ITmfPropertiesProvider
+    // ------------------------------------------------------------------------
+
+    @Override
+    public @NonNull Map<@NonNull String, @NonNull String> getProperties() {
+        Map<@NonNull String, @NonNull String> properties = new HashMap<>();
+        properties.put(NonNullUtils.checkNotNull(Messages.XmlModuleHelper_PropertyFile), fSourceFile.getName());
+        properties.put(NonNullUtils.checkNotNull(Messages.XmlModuleHelper_PropertyType), fType.name());
+        return properties;
     }
 
 }

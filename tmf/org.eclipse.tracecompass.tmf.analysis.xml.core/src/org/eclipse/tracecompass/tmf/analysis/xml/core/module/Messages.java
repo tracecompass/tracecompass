@@ -22,6 +22,16 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.tmf.analysis.xml.core.module.messages"; //$NON-NLS-1$
 
+    /** Property name for file
+     * @since 2.0
+     */
+    public static String XmlModuleHelper_PropertyFile;
+
+    /** Property name for type
+     * @since 2.0
+     */
+    public static String XmlModuleHelper_PropertyType;
+
     /** Error copying XML file to workspace folder */
     public static String XmlUtils_ErrorCopyingFile;
     /** XML parse error */
