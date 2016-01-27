@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.statesystem.core.tests;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,9 +22,9 @@ import java.io.IOException;
 
 import org.eclipse.tracecompass.internal.statesystem.core.AttributeTree;
 import org.eclipse.tracecompass.internal.statesystem.core.StateSystem;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.junit.Test;
 
 /**
@@ -92,11 +93,9 @@ public class AttributeTreeTest {
      *
      * @throws IOException
      *             if there is an error accessing the test file
-     * @throws AttributeNotFoundException
-     *             if the test fails
      */
     @Test
-    public void testAttributeTreeFileStorage() throws IOException, AttributeNotFoundException {
+    public void testAttributeTreeFileStorage() throws IOException {
         File file = File.createTempFile("AttributeTreeTest", ".ht");
         IStateHistoryBackend backend1 = StateHistoryBackendFactory.createNullBackend("test");
         StateSystem ss1 = new StateSystem(backend1);
@@ -114,7 +113,8 @@ public class AttributeTreeTest {
             AttributeTree attributeTree2 = new AttributeTree(ss2, fis);
             for (String name : NAMES) {
                 String[] path = new String[] { THREADS, name, STATUS };
-                int quark = attributeTree2.getQuarkDontAdd(-1, path);
+                int quark = attributeTree2.getQuarkDontAdd(ITmfStateSystem.ROOT_ATTRIBUTE, path);
+                assertNotEquals(ITmfStateSystem.INVALID_ATTRIBUTE, quark);
                 assertArrayEquals(path, attributeTree2.getFullAttributePathArray(quark));
                 assertEquals(name, attributeTree2.getAttributeName(attributeTree2.getParentAttributeQuark(quark)));
             }

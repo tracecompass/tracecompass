@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson and others.
+ * Copyright (c) 2012, 2016 Ericsson and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -31,6 +31,13 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
  *              interface.
  */
 public interface ITmfStateSystem {
+
+    /** Root attribute quark
+     * @since 2.0*/
+    int ROOT_ATTRIBUTE = -1;
+    /** Invalid attribute quark
+     * @since 2.0*/
+    int INVALID_ATTRIBUTE = -2;
 
     /**
      * Get the ID of this state system.
@@ -120,9 +127,12 @@ public interface ITmfStateSystem {
     /**
      * Basic quark-retrieving method. Pass an attribute in parameter as an array
      * of strings, the matching quark will be returned.
-     *
+     * <p>
      * This version will NOT create any new attributes. If an invalid attribute
      * is requested, an exception will be thrown.
+     * <p>
+     * If it is expected that the requested attribute might be absent, it is
+     * recommended to use {@link #optQuarkAbsolute(String...)} instead.
      *
      * @param attribute
      *            Attribute given as its full path in the Attribute Tree
@@ -135,16 +145,35 @@ public interface ITmfStateSystem {
             throws AttributeNotFoundException;
 
     /**
+     * Quark-retrieving method for an optional attribute that may or may not be
+     * present. Pass an attribute in parameter as an array of strings, if it
+     * exists, the matching quark will be returned.
+     * <p>
+     * This version will NOT create any new attributes. If an attribute that
+     * does not exist is requested, {@link #INVALID_ATTRIBUTE} will be returned.
+     *
+     * @param attribute
+     *            Attribute given as its full path in the Attribute Tree
+     * @return The quark of the requested attribute, or
+     *         {@link #INVALID_ATTRIBUTE} if it does not exist.
+     * @since 2.0
+     */
+    int optQuarkAbsolute(String... attribute);
+
+    /**
      * "Relative path" quark-getting method. Instead of specifying a full path,
      * if you know the path is relative to another attribute for which you
      * already have the quark, use this for better performance.
-     *
+     * <p>
      * This is useful for cases where a lot of modifications or queries will
      * originate from the same branch of the attribute tree : the common part of
      * the path won't have to be re-hashed for every access.
-     *
+     * <p>
      * This version will NOT create any new attributes. If an invalid attribute
      * is requested, an exception will be thrown.
+     * <p>
+     * If it is expected that the requested sub-attribute might be absent, it is
+     * recommended to use {@link #optQuarkRelative(int, String...)} instead.
      *
      * @param startingNodeQuark
      *            The quark of the attribute from which 'subPath' originates.
@@ -160,11 +189,36 @@ public interface ITmfStateSystem {
             throws AttributeNotFoundException;
 
     /**
+     * "Relative path" quark-getting method for an optional attribute that may
+     * or may not be present. Instead of specifying a full path, if you know the
+     * path is relative to another attribute for which you already have the
+     * quark, use this for better performance.
+     * <p>
+     * This is useful for cases where a lot of modifications or queries will
+     * originate from the same branch of the attribute tree : the common part of
+     * the path won't have to be re-hashed for every access.
+     * <p>
+     * This version will NOT create any new attributes. If a sub-attribute that
+     * does not exist is requested, {@link #INVALID_ATTRIBUTE} will be returned.
+     *
+     * @param startingNodeQuark
+     *            The quark of the attribute from which 'subPath' originates.
+     * @param subPath
+     *            "Rest" of the path to get to the final attribute
+     * @return The quark of the requested sub-attribute, or
+     *         {@link #INVALID_ATTRIBUTE} if it does not exist.
+     * @throws IndexOutOfBoundsException
+     *             If the starting node quark is out of range
+     * @since 2.0
+     */
+    int optQuarkRelative(int startingNodeQuark, String... subPath);
+
+    /**
      * Return the sub-attributes of the target attribute, as a List of quarks.
      *
      * @param quark
      *            The attribute of which you want to sub-attributes. You can use
-     *            "-1" here to specify the root node.
+     *            {@link #ROOT_ATTRIBUTE} here to specify the root node.
      * @param recursive
      *            True if you want all recursive sub-attributes, false if you
      *            only want the first level.
@@ -182,7 +236,7 @@ public interface ITmfStateSystem {
      *
      * @param quark
      *            The attribute of which you want to sub-attributes. You can use
-     *            "-1" here to specify the root node.
+     *            {@link #ROOT_ATTRIBUTE} here to specify the root node.
      * @param recursive
      *            True if you want all recursive sub-attributes, false if you
      *            only want the first level. Note that the returned value will
@@ -266,8 +320,8 @@ public interface ITmfStateSystem {
      *
      * @param attributeQuark
      *            The quark of the attribute
-     * @return Quark of the parent attribute or <code>-1</code> if root quark or
-     *         no parent.
+     * @return Quark of the parent attribute or {@link #ROOT_ATTRIBUTE} if root
+     *         quark or no parent.
      * @throws IndexOutOfBoundsException
      *             If the attribute quark is out of range
      */

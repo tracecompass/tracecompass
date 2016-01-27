@@ -15,6 +15,7 @@
 package org.eclipse.tracecompass.internal.statesystem.core;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import static org.eclipse.tracecompass.statesystem.core.ITmfStateSystem.INVALID_ATTRIBUTE;
 
 import java.io.PrintWriter;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 
 import com.google.common.collect.ImmutableList;
 
@@ -99,7 +101,8 @@ public final class Attribute {
      *
      * @param path
      *            The path we are looking for, *relative to this node*.
-     * @return The matching quark, or -1 if that attribute does not exist.
+     * @return The matching quark, or {@link ITmfStateSystem#INVALID_ATTRIBUTE}
+     *         if that attribute does not exist.
      */
     public int getSubAttributeQuark(String... path) {
         return this.getSubAttributeQuark(path, 0);
@@ -129,7 +132,7 @@ public final class Attribute {
     private int getSubAttributeQuark(String[] path, int index) {
         Attribute targetNode = this.getSubAttributeNode(path, index);
         if (targetNode == null) {
-            return -1;
+            return INVALID_ATTRIBUTE;
         }
         return targetNode.getQuark();
     }

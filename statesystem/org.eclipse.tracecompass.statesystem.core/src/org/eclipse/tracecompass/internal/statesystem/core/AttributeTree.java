@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson
+ * Copyright (c) 2012, 2016 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
  *
@@ -16,6 +16,8 @@
 package org.eclipse.tracecompass.internal.statesystem.core;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import static org.eclipse.tracecompass.statesystem.core.ITmfStateSystem.INVALID_ATTRIBUTE;
+import static org.eclipse.tracecompass.statesystem.core.ITmfStateSystem.ROOT_ATTRIBUTE;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -27,10 +29,10 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 
 /**
@@ -59,7 +61,7 @@ public final class AttributeTree {
     public AttributeTree(StateSystem ss) {
         this.ss = ss;
         this.attributeList = new ArrayList<>();
-        this.attributeTreeRoot = new Attribute(null, "root", -1); //$NON-NLS-1$
+        this.attributeTreeRoot = new Attribute(null, "root", ROOT_ATTRIBUTE); //$NON-NLS-1$
     }
 
     /**
@@ -99,7 +101,7 @@ public final class AttributeTree {
          * the attributes. Simply create attributes the normal way from them.
          */
         for (String[] attrib : attribList) {
-            this.getQuarkAndAdd(-1, attrib);
+            this.getQuarkAndAdd(ROOT_ATTRIBUTE, attrib);
         }
     }
 
@@ -146,20 +148,21 @@ public final class AttributeTree {
 
     /**
      * Get the quark for a given attribute path. No new attribute will be
-     * created : if the specified path does not exist, throw an error.
+     * created : if the specified path does not exist, return
+     * {@link ITmfStateSystem#INVALID_ATTRIBUTE}.
      *
      * @param startingNodeQuark
      *            The quark of the attribute from which relative queries will
-     *            start. Use '-1' to start at the root node.
+     *            start. Use {@link ITmfStateSystem#ROOT_ATTRIBUTE} to start at
+     *            the root node.
      * @param subPath
      *            The path to the attribute, relative to the starting node.
-     * @return The quark of the specified attribute
-     * @throws AttributeNotFoundException
-     *             If the specified path was not found
+     * @return The quark of the specified attribute, or
+     *         {@link ITmfStateSystem#INVALID_ATTRIBUTE} if that attribute does
+     *         not exist.
      */
-    public synchronized int getQuarkDontAdd(int startingNodeQuark, String... subPath)
-            throws AttributeNotFoundException {
-        assert (startingNodeQuark >= -1);
+    public synchronized int getQuarkDontAdd(int startingNodeQuark, String... subPath) {
+        assert (startingNodeQuark >= ROOT_ATTRIBUTE);
 
         Attribute prevNode;
 
@@ -169,25 +172,13 @@ public final class AttributeTree {
         }
 
         /* Get the "starting node" */
-        if (startingNodeQuark == -1) {
+        if (startingNodeQuark == ROOT_ATTRIBUTE) {
             prevNode = attributeTreeRoot;
         } else {
             prevNode = attributeList.get(startingNodeQuark);
         }
 
-        int knownQuark = prevNode.getSubAttributeQuark(subPath);
-        if (knownQuark == -1) {
-            /*
-             * The attribute doesn't exist, but we have been specified to NOT
-             * add any new attributes.
-             */
-            throw new AttributeNotFoundException(ss.getSSID() + " Quark:" + startingNodeQuark + ", SubPath:" + Arrays.toString(subPath)); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        /*
-         * The attribute was already existing, return the quark of that
-         * attribute
-         */
-        return knownQuark;
+        return prevNode.getSubAttributeQuark(subPath);
     }
 
     /**
@@ -197,7 +188,8 @@ public final class AttributeTree {
      *
      * @param startingNodeQuark
      *            The quark of the attribute from which relative queries will
-     *            start. Use '-1' to start at the root node.
+     *            start. Use {@link ITmfStateSystem#ROOT_ATTRIBUTE} to start at
+     *            the root node.
      * @param subPath
      *            The path to the attribute, relative to the starting node.
      * @return The quark of the attribute represented by the path
@@ -206,20 +198,20 @@ public final class AttributeTree {
         // FIXME synchronized here is probably quite costly... maybe only locking
         // the "for" would be enough?
         assert (subPath != null && subPath.length > 0);
-        assert (startingNodeQuark >= -1);
+        assert (startingNodeQuark >= ROOT_ATTRIBUTE);
 
         Attribute nextNode = null;
         Attribute prevNode;
 
         /* Get the "starting node" */
-        if (startingNodeQuark == -1) {
+        if (startingNodeQuark == ROOT_ATTRIBUTE) {
             prevNode = attributeTreeRoot;
         } else {
             prevNode = attributeList.get(startingNodeQuark);
         }
 
         int knownQuark = prevNode.getSubAttributeQuark(subPath);
-        if (knownQuark == -1) {
+        if (knownQuark == INVALID_ATTRIBUTE) {
             /*
              * The attribute was not in the table previously, and we want to add
              * it
@@ -255,7 +247,7 @@ public final class AttributeTree {
      *            be returned (depth-first search)
      * @return The list of quarks representing the children attributes
      * @throws AttributeNotFoundException
-     *             If 'attributeQuark' is invalid, or if there is no attrbiute
+     *             If 'attributeQuark' is invalid, or if there is no attribute
      *             associated to it.
      */
     public synchronized @NonNull List<@NonNull Integer> getSubAttributes(int attributeQuark, boolean recursive)
@@ -264,12 +256,12 @@ public final class AttributeTree {
         Attribute startingAttribute;
 
         /* Check if the quark is valid */
-        if (attributeQuark < -1 || attributeQuark >= attributeList.size()) {
+        if (attributeQuark < ROOT_ATTRIBUTE || attributeQuark >= attributeList.size()) {
             throw new AttributeNotFoundException(ss.getSSID() + " Quark:" + attributeQuark); //$NON-NLS-1$
         }
 
         /* Set up the node from which we'll start the search */
-        if (attributeQuark == -1) {
+        if (attributeQuark == ROOT_ATTRIBUTE) {
             startingAttribute = attributeTreeRoot;
         } else {
             startingAttribute = attributeList.get(attributeQuark);
@@ -283,15 +275,15 @@ public final class AttributeTree {
 
     /**
      * Returns the parent quark of the attribute. The root attribute has no
-     * parent and will return <code>-1</code>
+     * parent and will return {@link ITmfStateSystem#ROOT_ATTRIBUTE}.
      *
      * @param quark
      *            The quark of the attribute
-     * @return Quark of the parent attribute or <code>-1</code> for the root
-     *         attribute
+     * @return Quark of the parent attribute or
+     *         {@link ITmfStateSystem#ROOT_ATTRIBUTE} for the root attribute
      */
     public synchronized int getParentAttributeQuark(int quark) {
-        if (quark == -1) {
+        if (quark == ROOT_ATTRIBUTE) {
             return quark;
         }
         return attributeList.get(quark).getParentAttributeQuark();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson
+ * Copyright (c) 2012, 2016 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
  *
@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -235,17 +236,35 @@ public class StateSystem implements ITmfStateSystemBuilder {
     @Override
     public int getQuarkAbsolute(String... attribute)
             throws AttributeNotFoundException {
-        return getAttributeTree().getQuarkDontAdd(-1, attribute);
+        int quark = getAttributeTree().getQuarkDontAdd(ROOT_ATTRIBUTE, attribute);
+        if (quark == INVALID_ATTRIBUTE) {
+            throw new AttributeNotFoundException(getSSID() + " Path:" + Arrays.toString(attribute)); //$NON-NLS-1$
+        }
+        return quark;
+    }
+
+    @Override
+    public int optQuarkAbsolute(String... attribute) {
+        return getAttributeTree().getQuarkDontAdd(ROOT_ATTRIBUTE, attribute);
     }
 
     @Override
     public int getQuarkAbsoluteAndAdd(String... attribute) {
-        return getAttributeTree().getQuarkAndAdd(-1, attribute);
+        return getAttributeTree().getQuarkAndAdd(ROOT_ATTRIBUTE, attribute);
     }
 
     @Override
     public int getQuarkRelative(int startingNodeQuark, String... subPath)
             throws AttributeNotFoundException {
+        int quark = getAttributeTree().getQuarkDontAdd(startingNodeQuark, subPath);
+        if (quark == INVALID_ATTRIBUTE) {
+            throw new AttributeNotFoundException(getSSID() + " Quark:" + startingNodeQuark + ", SubPath:" + Arrays.toString(subPath)); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        return quark;
+    }
+
+    @Override
+    public int optQuarkRelative(int startingNodeQuark, String... subPath) {
         return getAttributeTree().getQuarkDontAdd(startingNodeQuark, subPath);
     }
 
@@ -330,20 +349,24 @@ public class StateSystem implements ITmfStateSystemBuilder {
             return quarks;
         }
 
-        try {
-            if (prefix.size() == 0) {
-                /*
-                 * If 'prefix' is empty, this means the wildcard was the first
-                 * element. Look for the root node's sub-attributes.
-                 */
-                startingAttribute = -1;
-            } else {
-                startingAttribute = getQuarkAbsolute(prefixStr);
+        if (prefix.isEmpty()) {
+            /*
+             * If 'prefix' is empty, this means the wildcard was the first
+             * element. Look for the root node's sub-attributes.
+             */
+            startingAttribute = ROOT_ATTRIBUTE;
+        } else {
+            startingAttribute = optQuarkAbsolute(prefixStr);
+            if (startingAttribute == INVALID_ATTRIBUTE) {
+                /* That attribute path did not exist, return the empty array */
+                return quarks;
             }
+        }
+        try {
             directChildren = getSubAttributes(startingAttribute, false);
         } catch (AttributeNotFoundException e) {
-            /* That attribute path did not exist, return the empty array */
-            return quarks;
+            /* Should not happen, starting attribute is a valid quark */
+            throw new IllegalStateException();
         }
 
         /*
@@ -351,13 +374,10 @@ public class StateSystem implements ITmfStateSystemBuilder {
          * 'suffix' part of the initial pattern.
          */
         for (int childQuark : directChildren) {
-            int matchingQuark;
-            try {
-                matchingQuark = getQuarkRelative(childQuark, suffixStr);
-            } catch (AttributeNotFoundException e) {
-                continue;
+            int matchingQuark = optQuarkRelative(childQuark, suffixStr);
+            if (matchingQuark != INVALID_ATTRIBUTE) {
+                quarks.add(matchingQuark);
             }
-            quarks.add(matchingQuark);
         }
 
         return quarks;

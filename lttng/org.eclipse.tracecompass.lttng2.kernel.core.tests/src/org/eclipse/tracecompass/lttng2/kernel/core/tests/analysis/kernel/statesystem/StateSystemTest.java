@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson
+ * Copyright (c) 2012, 2016 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
  *
@@ -12,7 +12,10 @@
 
 package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.kernel.statesystem;
 
+import static org.eclipse.tracecompass.statesystem.core.ITmfStateSystem.INVALID_ATTRIBUTE;
+import static org.eclipse.tracecompass.statesystem.core.ITmfStateSystem.ROOT_ATTRIBUTE;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -327,6 +330,49 @@ public abstract class StateSystemTest {
     }
 
     @Test
+    public void testOptQuarkAbsolute() {
+        int quark = fixture.optQuarkAbsolute();
+        assertEquals(ROOT_ATTRIBUTE, quark);
+
+        quark = fixture.optQuarkAbsolute(Attributes.THREADS, "1432", Attributes.EXEC_NAME);
+        assertNotEquals(INVALID_ATTRIBUTE, quark);
+        assertEquals(Attributes.EXEC_NAME, fixture.getAttributeName(quark));
+
+        quark = fixture.optQuarkAbsolute(Attributes.THREADS, "1432", "absent");
+        assertEquals(INVALID_ATTRIBUTE, quark);
+
+        quark = fixture.optQuarkAbsolute(Attributes.THREADS, "absent", Attributes.EXEC_NAME);
+        assertEquals(INVALID_ATTRIBUTE, quark);
+
+        quark = fixture.optQuarkAbsolute("absent", "1432", Attributes.EXEC_NAME);
+        assertEquals(INVALID_ATTRIBUTE, quark);
+    }
+
+    @Test
+    public void testOptQuarkRelative() {
+        int threadsQuark = INVALID_ATTRIBUTE;
+        try {
+            threadsQuark = fixture.getQuarkAbsolute(Attributes.THREADS);
+        } catch (AttributeNotFoundException e) {
+            fail();
+        }
+        assertNotEquals(INVALID_ATTRIBUTE, threadsQuark);
+
+        int quark = fixture.optQuarkRelative(threadsQuark);
+        assertEquals(threadsQuark, quark);
+
+        quark = fixture.optQuarkRelative(threadsQuark, "1432", Attributes.EXEC_NAME);
+        assertNotEquals(INVALID_ATTRIBUTE, quark);
+        assertEquals(Attributes.EXEC_NAME, fixture.getAttributeName(quark));
+
+        quark = fixture.optQuarkRelative(threadsQuark, "1432", "absent");
+        assertEquals(INVALID_ATTRIBUTE, quark);
+
+        quark = fixture.optQuarkRelative(threadsQuark, "absent", Attributes.EXEC_NAME);
+        assertEquals(INVALID_ATTRIBUTE, quark);
+    }
+
+    @Test
     public void testFullAttributeName() {
         try {
             int quark = fixture.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
@@ -359,6 +405,21 @@ public abstract class StateSystemTest {
 
         /* There should be 5 sub-attributes for each Thread node */
         assertEquals(5, list.size());
+    }
+
+    @Test
+    public void testGetQuarksNoMatch() {
+        List<Integer> list = fixture.getQuarks("invalid");
+        assertEquals(0, list.size());
+
+        list = fixture.getQuarks("*", "invalid");
+        assertEquals(0, list.size());
+
+        list = fixture.getQuarks("invalid", "*");
+        assertEquals(0, list.size());
+
+        list = fixture.getQuarks(Attributes.THREADS, "*", "invalid");
+        assertEquals(0, list.size());
     }
 
     // ------------------------------------------------------------------------
@@ -424,9 +485,9 @@ public abstract class StateSystemTest {
                 assertEquals(path[i], name);
                 q = fixture.getParentAttributeQuark(q);
             }
-            assertEquals(-1, q);
+            assertEquals(ROOT_ATTRIBUTE, q);
             q = fixture.getParentAttributeQuark(q);
-            assertEquals(-1, q);
+            assertEquals(ROOT_ATTRIBUTE, q);
         } catch (AttributeNotFoundException e) {
             fail();
         }
