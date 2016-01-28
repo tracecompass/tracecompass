@@ -230,7 +230,7 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
         }
 
         /* Initialize the data */
-        Map<String, Long> cpuUsageMap = fModule.getCpuUsageInRange(Math.max(start, getStartTime()), Math.min(end, getEndTime()));
+        Map<String, Long> cpuUsageMap = fModule.getCpuUsageInRange(Collections.EMPTY_SET, Math.max(start, getStartTime()), Math.min(end, getEndTime()));
 
         TmfTreeViewerEntry root = new TmfTreeViewerEntry(""); //$NON-NLS-1$
         List<ITmfTreeViewerEntry> entryList = root.getChildren();

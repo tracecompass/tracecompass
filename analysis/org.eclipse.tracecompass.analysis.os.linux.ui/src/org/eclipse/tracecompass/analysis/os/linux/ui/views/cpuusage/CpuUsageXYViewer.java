@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.analysis.os.linux.ui.views.cpuusage;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -117,7 +118,7 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
                 currentEnd = ss.getCurrentEndTime();
 
                 /* Initialize the data */
-                Map<String, Long> cpuUsageMap = fModule.getCpuUsageInRange(Math.max(start, traceStart), Math.min(end, traceEnd));
+                Map<String, Long> cpuUsageMap = fModule.getCpuUsageInRange(Collections.EMPTY_SET, Math.max(start, traceStart), Math.min(end, traceEnd));
                 Map<String, String> totalEntries = new HashMap<>();
                 fYValues.clear();
                 fYValues.put(Messages.CpuUsageXYViewer_Total, zeroFill(xvalues.length));
@@ -171,7 +172,7 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
                         prevTime = time - 1;
                     }
 
-                    cpuUsageMap = fModule.getCpuUsageInRange(prevTime, time);
+                    cpuUsageMap = fModule.getCpuUsageInRange(Collections.EMPTY_SET, prevTime, time);
 
                     /*
                      * Calculate the sum of all total entries, and add a data

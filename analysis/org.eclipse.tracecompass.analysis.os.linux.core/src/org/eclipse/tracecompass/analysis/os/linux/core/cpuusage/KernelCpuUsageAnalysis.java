@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.Attributes;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
@@ -98,15 +99,45 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
     }
 
     /**
+     * Gets the maximum number of cores detected
+     *
+     * @return the number of cores
+     * @since 2.0
+     */
+    public int getNumberOfCores() {
+
+        ITmfStateSystem cpuSs = getStateSystem();
+        if (cpuSs != null) {
+            try {
+                int cpusNode = cpuSs.getQuarkAbsolute(Attributes.CPUS);
+                final @NonNull List<@NonNull Integer> subAttributes = cpuSs.getSubAttributes(cpusNode, false);
+                int cpus = Integer.MIN_VALUE;
+                for (Integer quark : subAttributes) {
+                    cpus = Math.max(Integer.parseInt(cpuSs.getAttributeName(quark)), cpus);
+                }
+                return Math.max(subAttributes.size(), cpus);
+            } catch (AttributeNotFoundException e) {
+                Activator.getDefault().logError(e.getMessage(), e);
+            }
+        }
+        return -1;
+
+    }
+
+    /**
      * Get a map of time spent on CPU by various threads during a time range.
      *
+     * @param cpus
+     *            A set of the desired CPUs to get. An empty set gets all the
+     *            cores
      * @param start
      *            Start time of requested range
      * @param end
      *            End time of requested range
      * @return A map of TID -> time spent on CPU in the [start, end] interval
+     * @since 2.0
      */
-    public Map<String, Long> getCpuUsageInRange(long start, long end) {
+    public Map<String, Long> getCpuUsageInRange(Set<@NonNull Integer> cpus, long start, long end) {
         Map<String, Long> map = new HashMap<>();
         Map<String, Long> totalMap = new HashMap<>();
 
@@ -138,7 +169,10 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
             int cpusNode = cpuSs.getQuarkAbsolute(Attributes.CPUS);
             Map<Integer, List<Integer>> tidsPerCpu = new HashMap<>();
             for (int cpuNode : cpuSs.getSubAttributes(cpusNode, false)) {
-                tidsPerCpu.put(cpuNode, cpuSs.getSubAttributes(cpuNode, false));
+                final @NonNull List<@NonNull Integer> cpuSubAttributes = cpuSs.getSubAttributes(cpuNode, false);
+                if (cpus.isEmpty() || cpus.contains(Integer.parseInt(cpuSs.getAttributeName(cpuNode)))) {
+                    tidsPerCpu.put(cpuNode, cpuSubAttributes);
+                }
             }
 
             /* Query full states at start and end times */

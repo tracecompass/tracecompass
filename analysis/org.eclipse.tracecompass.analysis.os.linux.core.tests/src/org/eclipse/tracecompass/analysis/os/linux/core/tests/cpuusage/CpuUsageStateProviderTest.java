@@ -20,6 +20,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,8 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Test suite for the {@link KernelCpuUsageAnalysis} class
@@ -200,8 +203,11 @@ public class CpuUsageStateProviderTest {
     }
 
     /**
-     * Test the {@link KernelCpuUsageAnalysis#getCpuUsageInRange(long, long)}
+     * Test the
+     * {@link KernelCpuUsageAnalysis#getCpuUsageInRange(java.util.Set, long, long)}
      * method.
+     * <p>
+     * TODO: extend!
      */
     @Test
     public void testUsageInRange() {
@@ -223,7 +229,7 @@ public class CpuUsageStateProviderTest {
         expected.put("total/4", 13L);
         expected.put("0", 24L);
         expected.put("1", 24L);
-        Map<String, Long> resultMap = fModule.getCpuUsageInRange(0L, 30L);
+        Map<String, Long> resultMap = fModule.getCpuUsageInRange(Collections.EMPTY_SET, 0L, 30L);
         assertEquals(expected, resultMap);
 
         /* Verify a range when a process runs at the start */
@@ -241,7 +247,7 @@ public class CpuUsageStateProviderTest {
         expected.put("total/4", 3L);
         expected.put("0", 3L);
         expected.put("1", 3L);
-        resultMap = fModule.getCpuUsageInRange(22L, 25L);
+        resultMap = fModule.getCpuUsageInRange(Collections.EMPTY_SET, 22L, 25L);
         assertEquals(expected, resultMap);
 
         /* Verify a range when a process runs at the end */
@@ -259,7 +265,7 @@ public class CpuUsageStateProviderTest {
         expected.put("total/4", 2L);
         expected.put("0", 3L);
         expected.put("1", 3L);
-        resultMap = fModule.getCpuUsageInRange(1L, 4L);
+        resultMap = fModule.getCpuUsageInRange(Collections.EMPTY_SET, 1L, 4L);
         assertEquals(expected, resultMap);
 
         /* Verify a range when a process runs at start and at the end */
@@ -277,7 +283,43 @@ public class CpuUsageStateProviderTest {
         expected.put("total/4", 4L);
         expected.put("0", 9L);
         expected.put("1", 9L);
-        resultMap = fModule.getCpuUsageInRange(4L, 13L);
+        resultMap = fModule.getCpuUsageInRange(Collections.EMPTY_SET, 4L, 13L);
+        assertEquals(expected, resultMap);
+    }
+
+    /**
+     * Tests the cpu usage for a cpu subset within a range
+     */
+    @Test
+    public void testInRangeWithCpuSubset() {
+
+        fModule.schedule();
+        fModule.waitForCompletion();
+
+        /* Verify a range when a process runs at start and at the end */
+        Map<String, Long> expected = new HashMap<>();
+        expected.put("0/1", 0L);
+        expected.put("0/2", 9L);
+        expected.put("0/3", 0L);
+        expected.put("total/1", 0L);
+        expected.put("total/2", 9L);
+        expected.put("total/3", 0L);
+        expected.put("0", 9L);
+        expected.put("total", 9L);
+        Map<String, Long> resultMap = fModule.getCpuUsageInRange(Collections.<@NonNull Integer> singleton(0), 4L, 13L);
+        assertEquals(expected, resultMap);
+
+        /* Verify a range when a process runs at start and at the end */
+        expected.clear();
+        expected.put("1/1", 0L);
+        expected.put("1/3", 5L);
+        expected.put("1/4", 4L);
+        expected.put("total/1", 0L);
+        expected.put("total/3", 5L);
+        expected.put("total/4", 4L);
+        expected.put("1", 9L);
+        expected.put("total", 9L);
+        resultMap = fModule.getCpuUsageInRange(ImmutableSet.of(1,2), 4L, 13L);
         assertEquals(expected, resultMap);
 
     }
