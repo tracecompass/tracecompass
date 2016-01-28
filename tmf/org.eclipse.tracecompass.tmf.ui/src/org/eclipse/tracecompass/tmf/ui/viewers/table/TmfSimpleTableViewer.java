@@ -68,15 +68,18 @@ public class TmfSimpleTableViewer extends TmfViewer {
      * Viewer comparator that ignores the element label strings and uses the
      * given comparator to compare the elements directly.
      */
-    private static class ElementComparator extends ViewerComparator {
+    private static class ElementComparator<T> extends ViewerComparator {
 
-        public ElementComparator(Comparator<?> comparator) {
-            super(comparator);
+        private Comparator<T> elementComparator;
+
+        public ElementComparator(Comparator<T> comparator) {
+            elementComparator = comparator;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
-            return getComparator().compare(e1, e2);
+            return elementComparator.compare((T) e1, (T) e2);
         }
     }
 
@@ -107,11 +110,11 @@ public class TmfSimpleTableViewer extends TmfViewer {
         }
     }
 
-    private final class ColumnSorter extends SelectionAdapter {
+    private final class ColumnSorter<T> extends SelectionAdapter {
         private final @NonNull TableColumn fColumn;
-        private final @NonNull Comparator<?> fComparator;
+        private final @NonNull Comparator<T> fComparator;
 
-        private ColumnSorter(@NonNull TableColumn column, @NonNull Comparator<?> comparator) {
+        private ColumnSorter(@NonNull TableColumn column, @NonNull Comparator<T> comparator) {
             fColumn = column;
             fComparator = comparator;
         }
@@ -125,7 +128,7 @@ public class TmfSimpleTableViewer extends TmfViewer {
             }
             table.setSortDirection(fDirection);
             table.setSortColumn(fColumn);
-            Comparator<?> comparator;
+            Comparator<T> comparator;
             if (fDirection == SWT.DOWN) {
                 comparator = fComparator;
             } else {
@@ -139,7 +142,7 @@ public class TmfSimpleTableViewer extends TmfViewer {
                 ISortingLazyContentProvider sortingLazyContentProvider = (ISortingLazyContentProvider) contentProvider;
                 sortingLazyContentProvider.setSortOrder(comparator);
             } else {
-                fTableViewer.setComparator(new ElementComparator(comparator));
+                fTableViewer.setComparator(new ElementComparator<>(comparator));
             }
         }
     }
@@ -227,7 +230,7 @@ public class TmfSimpleTableViewer extends TmfViewer {
      * @return the column that was created
      * @since 2.0
      */
-    public final TableColumn createColumn(String name, ColumnLabelProvider provider, @Nullable Comparator<?> comparator) {
+    public final <T> TableColumn createColumn(String name, ColumnLabelProvider provider, @Nullable Comparator<T> comparator) {
         TableViewerColumn col = new TableViewerColumn(fTableViewer, SWT.NONE);
         col.setLabelProvider(provider);
         final TableColumn column = col.getColumn();
@@ -236,9 +239,9 @@ public class TmfSimpleTableViewer extends TmfViewer {
         column.setResizable(true);
         column.setMoveable(true);
         if (comparator == null) {
-            column.addSelectionListener(new ColumnSorter(column, new ColumnLabelComparator(provider)));
+            column.addSelectionListener(new ColumnSorter<>(column, new ColumnLabelComparator(provider)));
         } else {
-            column.addSelectionListener(new ColumnSorter(column, comparator));
+            column.addSelectionListener(new ColumnSorter<>(column, comparator));
         }
         return column;
     }
