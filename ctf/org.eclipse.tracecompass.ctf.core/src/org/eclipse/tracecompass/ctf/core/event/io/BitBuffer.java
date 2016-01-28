@@ -598,8 +598,10 @@ public final class BitBuffer {
      *            The order of the buffer.
      */
     public void setByteOrder(ByteOrder order) {
-        fByteOrder = order;
-        fBuffer.order(order);
+        if (!order.equals(fByteOrder)) {
+            fByteOrder = order;
+            fBuffer.order(order);
+        }
     }
 
     /**
