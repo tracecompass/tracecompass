@@ -241,7 +241,8 @@ public class CtfTmfTraceTest {
     @Test
     public void testGetTraceProperties() {
         int result = fixture.getTraceProperties().size();
-        assertEquals(9, result);
+        assertEquals(10, result);
+        assertEquals(String.valueOf(1332166405241713987L), fixture.getTraceProperties().get("clock_offset"));
     }
 
     /**

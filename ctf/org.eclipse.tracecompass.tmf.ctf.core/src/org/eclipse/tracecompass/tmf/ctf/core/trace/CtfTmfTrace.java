@@ -89,6 +89,12 @@ public class CtfTmfTrace extends TmfTrace
     // -------------------------------------------
 
     /**
+     * Clock offset property
+     * @since 2.0
+     */
+    public static final String CLOCK_OFFSET = "clock_offset"; //$NON-NLS-1$
+
+    /**
      * Default cache size for CTF traces
      */
     protected static final int DEFAULT_CACHE_SIZE = 50000;
@@ -432,6 +438,7 @@ public class CtfTmfTrace extends TmfTrace
     public Map<String, String> getTraceProperties() {
         Map<String, String> properties = new HashMap<>();
         properties.putAll(fTrace.getEnvironment());
+        properties.put(CLOCK_OFFSET, Long.toUnsignedString(fTrace.getOffset()));
         properties.put(Messages.CtfTmfTrace_HostID, getHostId());
         return properties;
     }
