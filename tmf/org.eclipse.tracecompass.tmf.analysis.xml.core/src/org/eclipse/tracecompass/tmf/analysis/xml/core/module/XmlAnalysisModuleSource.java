@@ -126,7 +126,7 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
                 SafeRunner.run(new ISafeRunnable() {
 
                     @Override
-                    public void run() throws Exception {
+                    public void run() throws IOException {
                         if (name != null) {
                             Bundle bundle = Platform.getBundle(name);
                             if (bundle != null) {
