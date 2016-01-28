@@ -330,6 +330,9 @@ If the wizard was opened using the File menu, the destination project has to be 
 
 When Finish is clicked, the trace is imported in the target folder. The folder structure from the trace package is restored in the target folder.
 
+=== Refreshing of Trace and Trace Folder ===
+Traces and trace folders in the workspace might be updated on the media. To refresh the content, right-click the trace or trace folder and select menu item '''Refresh'''. Alternatively, select the trace or trace folder and press key '''F5'''.
+
 === Remote Fetching ===
 
 It is possible to import traces automatically from one or more remote hosts according to a predefined remote profile by using the '''Fetch Remote Traces''' wizard.
@@ -657,6 +660,9 @@ If an EMF model URI is available in the trace for the selected event, the item '
 It is possible to export the content of the trace to a text file based on the columns displayed in the events table. If a filter (see '''[[#Filtering| Filtering]]''') was defined prior exporting only events that match the filter will be exported to the file. To export the trace to text, press the right mouse button on the events table. A context-sensitive menu will show. Select the '''Export To Text...''' menu option. A file locater dialog will open. Fill in the file name and location and then press on '''OK'''. A window with a progress bar will open till the export is finished.
 
 ''Note'':  The columns in the text file are separated by tabs.
+
+=== Refreshing of Trace ===
+It's possible to refresh the content of the trace and resume indexing in case the current open trace was updated on the media. To refresh the trace, right-click into the table and select menu item '''Refresh'''. Alternatively, press key '''F5'''.
 
 === Collapsing of Repetitive Events ===
 
@@ -1715,7 +1721,7 @@ The Control Flow View '''toolbar''', located at the top right of the view, has s
 |-
 | [[Image:images/filter_items.gif]]
 | Show View Filter
-| Opens the process filter dialog
+| Opens the process filter dialog. Filter settings will be preserved when switching traces.
 |-
 | [[Image:images/show_legend.gif]]
 | Show Legend
@@ -1807,6 +1813,10 @@ The Resources View '''toolbar''', located at the top right of the view, has shor
 | [[Image:images/link.gif]]
 | Align Views
 | Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the this view will disable this feature across all the views because it's a workspace preference
+|-
+| [[Image:images/filter_items.gif]]
+| Show View Filter
+| Opens the resources filter dialog. Filter settings will be preserved when switching traces.
 |-
 | [[Image:images/show_legend.gif]]
 | Show Legend
