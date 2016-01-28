@@ -184,7 +184,7 @@ public class StructDeclaration extends Declaration {
      * @param declaration
      *            the declaration of the field
      */
-    public void addField(@NonNull String name, IDeclaration declaration) {
+    public void addField(@NonNull String name, @NonNull IDeclaration declaration) {
         fFieldMap.put(name, declaration);
         fMaxAlign = Math.max(fMaxAlign, declaration.getAlignment());
     }
