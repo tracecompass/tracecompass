@@ -151,17 +151,17 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
 
     private static void populateAnalysisModules() {
         IPath pathToFiles = XmlUtils.getXmlFilesPath();
-        File fFolder = pathToFiles.toFile();
-        if (!(fFolder.isDirectory() && fFolder.exists())) {
+        File folder = pathToFiles.toFile();
+        if (!(folder.isDirectory() && folder.exists())) {
             return;
         }
-
         /*
          * Transfer files from Linux Tools directory.
          */
-        File fOldFolder = XML_DIRECTORY_LEGACY.toFile();
-        if ((fOldFolder.isDirectory() && fOldFolder.exists())) {
-            for (File fromFile : fOldFolder.listFiles()) {
+        File oldFolder = XML_DIRECTORY_LEGACY.toFile();
+        final File[] oldAnalysisFiles = oldFolder.listFiles();
+        if (oldAnalysisFiles != null) {
+            for (File fromFile : oldAnalysisFiles) {
                 File toFile = pathToFiles.append(fromFile.getName()).toFile();
                 if (!toFile.exists() && !fromFile.isDirectory()) {
                     try (FileInputStream fis = new FileInputStream(fromFile);
@@ -176,9 +176,11 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
                 }
             }
         }
-
-        for (File xmlFile : fFolder.listFiles()) {
-            processFile(xmlFile);
+        final File[] analysisFiles = folder.listFiles();
+        if (analysisFiles != null) {
+            for (File xmlFile : analysisFiles) {
+                processFile(xmlFile);
+            }
         }
     }
 
