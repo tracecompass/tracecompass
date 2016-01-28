@@ -188,7 +188,7 @@ public class TmfOpenTraceHelper {
             final IPath rawLocation = candidate.getRawLocation();
             File file = rawLocation.toFile();
             try {
-                file = traceFile.getCanonicalFile();
+                file = file.getCanonicalFile();
             } catch (IOException e) {
                 /* just use original file path */
             }
