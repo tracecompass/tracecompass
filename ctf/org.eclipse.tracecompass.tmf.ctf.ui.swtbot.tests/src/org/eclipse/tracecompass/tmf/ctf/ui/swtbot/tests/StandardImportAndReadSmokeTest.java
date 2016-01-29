@@ -40,6 +40,7 @@ import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
@@ -519,6 +520,11 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         treeItem.select();
         fBot.button("Next >").click();
         fBot.button("&Deselect All").click();
+        try {
+            fBot.checkBox("Resolve and export linked resources").select();
+        } catch (WidgetNotFoundException e) {
+            // Ignore, doesn't exist pre-4.6M5
+        }
 
         if (sourceResource instanceof IFile) {
             String[] folderPath = exportedPath.removeLastSegments(1).segments();
