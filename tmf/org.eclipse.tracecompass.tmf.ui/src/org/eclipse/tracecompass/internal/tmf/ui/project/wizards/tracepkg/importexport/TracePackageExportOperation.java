@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.import
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -293,6 +294,13 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
     private IStatus exportToArchive(IProgressMonitor monitor, int totalWork) throws InvocationTargetException, InterruptedException {
         ArchiveFileExportOperation op = new ArchiveFileExportOperation(new ArrayList<>(fResources), getFileName());
         op.setCreateLeadupStructure(false);
+        //FIXME: Remove use of reflection when support for Eclipse 4.5 is dropped
+        try {
+            Method method = op.getClass().getMethod("setIncludeLinkedResources", boolean.class); //$NON-NLS-1$
+            method.invoke(op, true);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException e) {
+            // Ignored, setIncludeLinkedResources doesn't exist in Eclipse < 4.6
+        }
         op.setUseCompression(fUseCompression);
         op.setUseTarFormat(fUseTar);
         op.run(SubMonitor.convert(monitor).newChild(totalWork / 2));
