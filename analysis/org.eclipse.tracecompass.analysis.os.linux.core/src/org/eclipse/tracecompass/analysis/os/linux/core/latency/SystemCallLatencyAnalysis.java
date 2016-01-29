@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelTidAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
@@ -59,7 +60,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisModul
     }
 
     @Override
-    public String getDataFileName() {
+    public @NonNull String getDataFileName() {
         return DATA_FILENAME;
     }
 

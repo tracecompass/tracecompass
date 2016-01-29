@@ -76,6 +76,7 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
 
     /**
      * Returns all the listeners
+     *
      * @return latency listeners
      */
     protected Iterable<IAnalysisProgressListener> getListeners() {
@@ -92,6 +93,7 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
      * Return the pre-defined set of segment aspects exposed by this analysis.
      *
      * It should not be null, but could be empty.
+     *
      * @return The segment aspects for this analysis
      */
     public Iterable<ISegmentAspect> getSegmentAspects() {
@@ -101,14 +103,18 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
 
     /**
      * Returns the file name for storing segment store
-     * @return segment store fine name
+     *
+     * @return segment store fine name, or null if you don't want a file
      */
-    protected abstract String getDataFileName();
+    protected @Nullable String getDataFileName() {
+        return null;
+    }
 
     /**
      * Returns the analysis request for creating the segment store
+     *
      * @param segmentStore
-     *                a segment store to fill
+     *            a segment store to fill
      * @return the segment store analysis request implementation
      */
     protected abstract AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> segmentStore);
@@ -128,6 +134,7 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
 
     /**
      * Returns the result in a from the analysis in a ISegmentStore
+     *
      * @return Results from the analysis in a ISegmentStore
      */
     public @Nullable ISegmentStore<ISegment> getResults() {
@@ -155,39 +162,41 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
     protected boolean executeAnalysis(IProgressMonitor monitor) throws TmfAnalysisException {
         ITmfTrace trace = checkNotNull(getTrace());
 
-        /* See if the data file already exists on disk */
-        String dir = TmfTraceManager.getSupplementaryFileDir(trace);
-        final Path file = Paths.get(dir, getDataFileName());
+        final @Nullable String dataFileName = getDataFileName();
+        if (dataFileName != null) {
+            /* See if the data file already exists on disk */
+            String dir = TmfTraceManager.getSupplementaryFileDir(trace);
+            final Path file = Paths.get(dir, dataFileName);
 
-        if (Files.exists(file)) {
-            /* Attempt to read the existing file */
-            try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(file))) {
-                Object[] segmentArray = readObject(ois);
-                final ISegmentStore<ISegment> store = new TreeMapStore<>();
-                for (Object element : segmentArray) {
-                    if (element instanceof ISegment) {
-                        ISegment segment = (ISegment) element;
-                        store.add(segment);
+            if (Files.exists(file)) {
+                /* Attempt to read the existing file */
+                try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(file))) {
+                    Object[] segmentArray = readObject(ois);
+                    final ISegmentStore<ISegment> store = new TreeMapStore<>();
+                    for (Object element : segmentArray) {
+                        if (element instanceof ISegment) {
+                            ISegment segment = (ISegment) element;
+                            store.add(segment);
+                        }
                     }
-                }
-                fSegmentStore = store;
-                for (IAnalysisProgressListener listener : getListeners()) {
-                    listener.onComplete(this, store);
-                }
-                return true;
-            } catch (IOException | ClassNotFoundException | ClassCastException e) {
-                /*
-                 * We did not manage to read the file successfully, we will just
-                 * fall-through to rebuild a new one.
-                 */
-                try {
-                    Files.delete(file);
-                } catch (IOException e1) {
+                    fSegmentStore = store;
+                    for (IAnalysisProgressListener listener : getListeners()) {
+                        listener.onComplete(this, store);
+                    }
+                    return true;
+                } catch (IOException | ClassNotFoundException | ClassCastException e) {
+                    /*
+                     * We did not manage to read the file successfully, we will
+                     * just fall-through to rebuild a new one.
+                     */
+                    try {
+                        Files.delete(file);
+                    } catch (IOException e1) {
+                    }
                 }
             }
         }
-
-        ISegmentStore<ISegment> syscalls = new TreeMapStore<>();
+        ISegmentStore<ISegment> segmentStore = new TreeMapStore<>();
 
         /* Cancel an ongoing request */
         ITmfEventRequest req = fOngoingRequest;
@@ -196,7 +205,7 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
         }
 
         /* Create a new request */
-        req = createAnalysisRequest(syscalls);
+        req = createAnalysisRequest(segmentStore);
         fOngoingRequest = req;
         trace.sendRequest(req);
 
@@ -211,17 +220,25 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
         }
 
         /* The request will fill 'syscalls' */
-        fSegmentStore = syscalls;
+        fSegmentStore = segmentStore;
 
-        /* Serialize the collections to disk for future usage */
-        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(file))) {
-            oos.writeObject(syscalls.toArray());
-        } catch (IOException e) {
-            /* Didn't work, oh well. We will just re-read the trace next time */
+        if (dataFileName != null) {
+            String dir = TmfTraceManager.getSupplementaryFileDir(trace);
+            final Path file = Paths.get(dir, dataFileName);
+
+            /* Serialize the collections to disk for future usage */
+            try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(file))) {
+                oos.writeObject(segmentStore.toArray());
+            } catch (IOException e) {
+                /*
+                 * Didn't work, oh well. We will just re-read the trace next
+                 * time
+                 */
+            }
         }
 
         for (IAnalysisProgressListener listener : getListeners()) {
-            listener.onComplete(this, syscalls);
+            listener.onComplete(this, segmentStore);
         }
 
         return true;
@@ -251,6 +268,7 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
 
         /**
          * Returns the segment store
+         *
          * @return the segment store
          */
         public ISegmentStore<ISegment> getSegmentStore() {
