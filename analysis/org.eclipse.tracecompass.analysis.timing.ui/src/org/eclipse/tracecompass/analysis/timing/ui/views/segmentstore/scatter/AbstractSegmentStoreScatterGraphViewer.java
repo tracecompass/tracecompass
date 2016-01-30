@@ -28,8 +28,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisModule;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
@@ -38,6 +38,7 @@ import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.s
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
+import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
@@ -62,7 +63,7 @@ import org.swtchart.LineStyle;
 import org.swtchart.Range;
 
 /**
- * Displays the segment store analysis data in a scatter graph
+ * Displays the segment store provider data in a scatter graph
  *
  * @author France Lapointe Nguyen
  * @author Matthew Khouzam - reduced memory usage
@@ -88,20 +89,20 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
                 return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Monitor is null"); //$NON-NLS-1$
             }
 
-            AbstractSegmentStoreAnalysisModule module = getAnalysisModule();
+            ISegmentStoreProvider segmentProvider = getSegmentProvider();
             final long startTimeInNanos = fCurrentRange.getStartTime().toNanos();
             final long endTimeInNanos = fCurrentRange.getEndTime().toNanos();
-            if (module == null) {
+            if (segmentProvider == null) {
                 setWindowRange(startTimeInNanos, endTimeInNanos);
                 redraw(statusMonitor, startTimeInNanos, startTimeInNanos, Collections.EMPTY_LIST);
-                return new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Analysis module not available"); //$NON-NLS-1$
+                return new Status(IStatus.WARNING, Activator.PLUGIN_ID, "segment provider not available"); //$NON-NLS-1$
             }
 
-            final ISegmentStore<ISegment> segStore = module.getSegmentStore();
+            final ISegmentStore<ISegment> segStore = segmentProvider.getSegmentStore();
             if (segStore == null) {
                 setWindowRange(startTimeInNanos, endTimeInNanos);
                 redraw(statusMonitor, startTimeInNanos, startTimeInNanos, Collections.EMPTY_LIST);
-                return new Status(IStatus.INFO, Activator.PLUGIN_ID, "Analysis module does not have results"); //$NON-NLS-1$
+                return new Status(IStatus.INFO, Activator.PLUGIN_ID, "Segment provider does not have segments"); //$NON-NLS-1$
             }
 
             final long startTime = fCurrentRange.getStartTime().getValue();
@@ -191,16 +192,16 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
     // ------------------------------------------------------------------------
 
     /**
-     * Listener to update the model with the semgent store analysis results
-     * once the analysis is fully completed
+     * Listener to update the model with the segment store provider results once
+     * its segment store is fully completed
      */
-    private final class AnalysisProgressListener implements IAnalysisProgressListener {
+    private final class SegmentStoreProviderProgressListener implements IAnalysisProgressListener {
 
         @Override
-        public void onComplete(AbstractSegmentStoreAnalysisModule activeAnalysis, ISegmentStore<ISegment> results) {
+        public void onComplete(ISegmentStoreProvider segmentProvider, ISegmentStore<ISegment> segmentStore) {
             // Only update the model if trace that was analyzed is active trace
-            if (activeAnalysis.equals(getAnalysisModule())) {
-                updateModel(results);
+            if (segmentProvider.equals(getSegmentProvider())) {
+                updateModel(segmentStore);
                 updateRange(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange());
             }
         }
@@ -215,14 +216,14 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
     private Collection<ISegment> fDisplayData = Collections.EMPTY_LIST;
 
     /**
-     * Analysis completion listener
+     * Provider completion listener
      */
-    private AnalysisProgressListener fListener;
+    private SegmentStoreProviderProgressListener fListener;
 
     /**
-     * Current analysis module
+     * Current segment provider
      */
-    private @Nullable AbstractSegmentStoreAnalysisModule fAnalysisModule;
+    private @Nullable ISegmentStoreProvider fSegmentProvider;
 
     private @Nullable Job fCompactingJob;
 
@@ -245,19 +246,19 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
     public AbstractSegmentStoreScatterGraphViewer(Composite parent, String title, String xLabel, String yLabel) {
         super(parent, title, xLabel, yLabel);
         setTooltipProvider(new SegmentStoreScatterGraphTooltipProvider(this));
-        fListener = new AnalysisProgressListener();
+        fListener = new SegmentStoreProviderProgressListener();
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
-        initializeModule(trace);
+        initializeProvider(trace);
         getSwtChart().getLegend().setVisible(false);
         getSwtChart().getAxisSet().getYAxis(0).getTick().setFormat(FORMAT);
     }
 
-    private final void initializeModule(@Nullable ITmfTrace trace) {
+    private final void initializeProvider(@Nullable ITmfTrace trace) {
         if (trace != null) {
-            final AbstractSegmentStoreAnalysisModule analysisModuleOfClass = getSegmentStoreAnalysisModule(trace);
-            if (analysisModuleOfClass != null) {
-                analysisModuleOfClass.addListener(fListener);
-                setData(analysisModuleOfClass);
+            final ISegmentStoreProvider segmentStoreProvider = getSegmentStoreProvider(trace);
+            if (segmentStoreProvider != null) {
+                segmentStoreProvider.addListener(fListener);
+                setData(segmentStoreProvider);
                 updateRange(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange());
             }
         }
@@ -303,9 +304,9 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
     @Override
     protected void initializeDataSource() {
         ITmfTrace trace = getTrace();
-        initializeModule(trace);
+        initializeProvider(trace);
         if (trace != null) {
-            setData(getSegmentStoreAnalysisModule(trace));
+            setData(getSegmentStoreProvider(trace));
         }
     }
 
@@ -388,39 +389,42 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
     }
 
     /**
-     * Set the data into the viewer. Will update model is analysis is completed
-     * or run analysis if not completed
+     * Set the data into the viewer. If the provider is an analysis, it will
+     * update the model if the analysis is completed or run the analysis if not
+     * completed
      *
-     * @param analysis
-     *            Segment store analysis module
+     * @param provider
+     *            Segment store provider
      */
-    public void setData(@Nullable AbstractSegmentStoreAnalysisModule analysis) {
-        if (analysis == null) {
+    public void setData(@Nullable ISegmentStoreProvider provider) {
+        if (provider == null) {
             updateModel(null);
             return;
         }
-        ISegmentStore<ISegment> segStore = analysis.getSegmentStore();
-        // If results are not null, then analysis is completed and model can be
-        // updated
+        ISegmentStore<ISegment> segStore = provider.getSegmentStore();
+        // If results are not null, then segment store is completed and model
+        // can be updated
         if (segStore != null) {
             updateModel(segStore);
-            setAnalysisModule(analysis);
+            setSegmentProvider(provider);
             return;
         }
         updateModel(null);
-        analysis.addListener(fListener);
-        analysis.schedule();
-        setAnalysisModule(analysis);
+        provider.addListener(fListener);
+        if (provider instanceof IAnalysisModule) {
+            ((IAnalysisModule) provider).schedule();
+        }
+        setSegmentProvider(provider);
     }
 
     /**
-     * Returns the segment store analysis module
+     * Returns the segment store provider
      *
      * @param trace
      *            The trace to consider
-     * @return the analysis module
+     * @return the segment store provider
      */
-    protected @Nullable abstract AbstractSegmentStoreAnalysisModule getSegmentStoreAnalysisModule(ITmfTrace trace);
+    protected @Nullable abstract ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace);
 
     // ------------------------------------------------------------------------
     // Signal handlers
@@ -444,7 +448,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             setWindowRange(
                     timeRange.getStartTime().toNanos(),
                     timeRange.getEndTime().toNanos());
-            setData(getSegmentStoreAnalysisModule(trace));
+            setData(getSegmentStoreProvider(trace));
             updateRange(timeRange);
         }
     }
@@ -464,12 +468,12 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
         setTrace(trace);
         if (trace != null) {
 
-            final AbstractSegmentStoreAnalysisModule analysisModuleOfClass = getSegmentStoreAnalysisModule(trace);
+            final ISegmentStoreProvider segmentStoreProvider = getSegmentStoreProvider(trace);
             final TmfTimeRange timeRange = TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange();
             setWindowRange(
                     timeRange.getStartTime().toNanos(),
                     timeRange.getEndTime().toNanos());
-            setData(analysisModuleOfClass);
+            setData(segmentStoreProvider);
         }
 
     }
@@ -495,9 +499,9 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
         if (signal != null) {
             // Check if there is no more opened trace
             if (TmfTraceManager.getInstance().getActiveTrace() == null) {
-                AbstractSegmentStoreAnalysisModule analysis = getAnalysisModule();
-                if (analysis != null) {
-                    analysis.removeListener(fListener);
+                ISegmentStoreProvider provider = getSegmentProvider();
+                if (provider != null) {
+                    provider.removeListener(fListener);
                 }
                 clearContent();
             }
@@ -524,11 +528,11 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
         }
     }
 
-    private @Nullable AbstractSegmentStoreAnalysisModule getAnalysisModule() {
-        return fAnalysisModule;
+    private @Nullable ISegmentStoreProvider getSegmentProvider() {
+        return fSegmentProvider;
     }
 
-    private void setAnalysisModule(AbstractSegmentStoreAnalysisModule analysisModule) {
-        fAnalysisModule = analysisModule;
+    private void setSegmentProvider(ISegmentStoreProvider provider) {
+        fSegmentProvider = provider;
     }
 }

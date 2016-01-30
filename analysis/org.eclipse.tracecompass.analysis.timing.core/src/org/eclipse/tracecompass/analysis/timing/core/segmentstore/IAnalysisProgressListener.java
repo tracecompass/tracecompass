@@ -20,14 +20,14 @@ import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 public interface IAnalysisProgressListener {
 
     /**
-     * Called at the end of the analysis
+     * Called at the end of the segment store construction
      *
-     * @param activeAnalysis
+     * @param segmentProvider
      *            analysis that is running
      *
      * @param data
      *            segment store of the latency analysis
      */
-    void onComplete(AbstractSegmentStoreAnalysisModule activeAnalysis, ISegmentStore<ISegment> data);
+    void onComplete(ISegmentStoreProvider segmentProvider, ISegmentStore<ISegment> data);
 
 }

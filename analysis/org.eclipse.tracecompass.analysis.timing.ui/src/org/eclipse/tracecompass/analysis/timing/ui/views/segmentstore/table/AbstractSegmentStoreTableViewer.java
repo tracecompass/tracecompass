@@ -28,14 +28,15 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisModule;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.table.Messages;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.table.SegmentStoreContentProvider;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
+import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -51,7 +52,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.table.TmfSimpleTableViewer;
 
 /**
- * Displays the segment store analysis data in a column table
+ * Displays the segment store provider data in a column table
  *
  * @author France Lapointe Nguyen
  * @since 2.0
@@ -64,7 +65,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
 
     /**
      * Abstract class for the column label provider for the segment store
-     * analysis table viewer
+     * provider table viewer
      */
     private abstract class SegmentStoreTableColumnLabelProvider extends ColumnLabelProvider {
 
@@ -81,15 +82,15 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     }
 
     /**
-     * Listener to update the model with the segment store analysis results
-     * once the analysis is fully completed
+     * Listener to update the model with the segment store provider results once
+     * its store is fully completed
      */
-    private final class AnalysisProgressListener implements IAnalysisProgressListener {
+    private final class SegmentStoreProviderProgressListener implements IAnalysisProgressListener {
         @Override
-        public void onComplete(AbstractSegmentStoreAnalysisModule activeAnalysis, ISegmentStore<ISegment> data) {
-            // Check if the active trace was changed while the analysis was
-            // running
-            if (activeAnalysis.equals(fAnalysisModule)) {
+        public void onComplete(ISegmentStoreProvider activeProvider, ISegmentStore<ISegment> data) {
+            // Check if the active trace was changed while the provider was
+            // building its segment store
+            if (activeProvider.equals(fSegmentProvider)) {
                 updateModel(data);
             }
         }
@@ -110,14 +111,14 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     }
 
     /**
-     * Current segment store analysis module
+     * Current segment store provider
      */
-    private @Nullable AbstractSegmentStoreAnalysisModule fAnalysisModule = null;
+    private @Nullable ISegmentStoreProvider fSegmentProvider = null;
 
     /**
-     * Analysis progress listener
+     * provider progress listener
      */
-    private AnalysisProgressListener fListener;
+    private SegmentStoreProviderProgressListener fListener;
 
     /**
      * Flag to create columns once
@@ -140,12 +141,12 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         getTableViewer().setContentProvider(new SegmentStoreContentProvider());
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         if (trace != null) {
-            fAnalysisModule = getSegmentStoreAnalysisModule(trace);
+            fSegmentProvider = getSegmentStoreProvider(trace);
         }
         createColumns();
         getTableViewer().getTable().addSelectionListener(new TableSelectionListener());
         addPackListener();
-        fListener = new AnalysisProgressListener();
+        fListener = new SegmentStoreProviderProgressListener();
     }
 
     // ------------------------------------------------------------------------
@@ -179,20 +180,20 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     }
 
     /**
-     * Create columns specific to the analysis
+     * Create columns specific to the provider
      */
-    protected void createAnalysisColumns() {
+    protected void createProviderColumns() {
         if (!fColumnsCreated) {
-            AbstractSegmentStoreAnalysisModule analysis = getAnalysisModule();
-            if (analysis != null) {
-                for (final ISegmentAspect aspect : analysis.getSegmentAspects()) {
+            ISegmentStoreProvider provider = getSegmentProvider();
+            if (provider != null) {
+                for (final ISegmentAspect aspect : provider.getSegmentAspects()) {
                     createColumn(aspect.getName(), new SegmentStoreTableColumnLabelProvider() {
                         @Override
                         public String getTextForSegment(ISegment input) {
                             return NonNullUtils.nullToEmptyString(aspect.resolve(input));
                         }
                     },
-                    aspect.getComparator());
+                            aspect.getComparator());
                 }
             }
             fColumnsCreated = true;
@@ -230,42 +231,46 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     }
 
     /**
-     * Set the data into the viewer. Will update model is analysis is completed
-     * or run analysis if not completed
+     * Set the data into the viewer. It will update the model. If the provider
+     * is an analysis, the analysis will be scheduled.
      *
-     * @param analysis
-     *            segment store analysis module
+     * @param provider
+     *            segment store provider
      */
-    public void setData(@Nullable AbstractSegmentStoreAnalysisModule analysis) {
-        // Set the current segment store analysis module
-        fAnalysisModule = analysis;
-        if (analysis == null) {
+    public void setData(@Nullable ISegmentStoreProvider provider) {
+        // Set the current segment store provider
+        fSegmentProvider = provider;
+        if (provider == null) {
             updateModel(null);
             return;
         }
 
-        createAnalysisColumns();
+        createProviderColumns();
 
-        ISegmentStore<ISegment> segStore = analysis.getSegmentStore();
-        // If results are not null, then analysis is completed and model can be
-        // updated
+        ISegmentStore<ISegment> segStore = provider.getSegmentStore();
+        // If results are not null, then the segment of the provider is ready
+        // and model can be updated
         if (segStore != null) {
             updateModel(segStore);
             return;
         }
-        // If results are null, then add completion listener and run analysis
+        // If results are null, then add completion listener and if the provider
+        // is an analysis, run the analysis
         updateModel(null);
-        analysis.addListener(fListener);
-        analysis.schedule();
+        provider.addListener(fListener);
+        if (provider instanceof IAnalysisModule) {
+            ((IAnalysisModule) provider).schedule();
+        }
     }
 
     /**
-     * Returns the segment store analysis module
+     * Returns the segment store provider
+     *
      * @param trace
      *            The trace to consider
-     * @return the segment store analysis module
+     * @return the segment store provider
      */
-    protected @Nullable abstract AbstractSegmentStoreAnalysisModule getSegmentStoreAnalysisModule(ITmfTrace trace);
+    protected @Nullable abstract ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace);
 
     @Override
     protected void appendToTablePopupMenu(IMenuManager manager, IStructuredSelection sel) {
@@ -295,12 +300,12 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     // ------------------------------------------------------------------------
 
     /**
-     * Get current segment store analysis module
+     * Get current segment store provider
      *
-     * @return current segment store analysis module
+     * @return current segment store provider
      */
-    public @Nullable AbstractSegmentStoreAnalysisModule getAnalysisModule() {
-        return fAnalysisModule;
+    public @Nullable ISegmentStoreProvider getSegmentProvider() {
+        return fSegmentProvider;
     }
 
     // ------------------------------------------------------------------------
@@ -318,7 +323,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     public void traceSelected(TmfTraceSelectedSignal signal) {
         ITmfTrace trace = signal.getTrace();
         if (trace != null) {
-            setData(getSegmentStoreAnalysisModule(trace));
+            setData(getSegmentStoreProvider(trace));
         }
     }
 
@@ -333,7 +338,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     public void traceOpened(TmfTraceOpenedSignal signal) {
         ITmfTrace trace = signal.getTrace();
         if (trace != null) {
-            setData(getSegmentStoreAnalysisModule(trace));
+            setData(getSegmentStoreProvider(trace));
         }
     }
 
@@ -353,9 +358,9 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
                 refresh();
             }
 
-            AbstractSegmentStoreAnalysisModule analysis = getAnalysisModule();
-            if ((analysis != null)) {
-                analysis.removeListener(fListener);
+            ISegmentStoreProvider provider = getSegmentProvider();
+            if ((provider != null)) {
+                provider.removeListener(fListener);
             }
         }
     }

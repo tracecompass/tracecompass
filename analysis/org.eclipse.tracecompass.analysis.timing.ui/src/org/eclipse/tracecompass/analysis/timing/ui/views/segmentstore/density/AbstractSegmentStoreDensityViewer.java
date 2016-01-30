@@ -25,8 +25,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisModule;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density.MouseDragZoomProvider;
@@ -35,6 +35,7 @@ import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.d
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
+import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -59,7 +60,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
 /**
- * Displays the segment store analysis data in a density chart.
+ * Displays the segment store provider data in a density chart.
  *
  * @author Matthew Khouzam
  * @author Marc-Andre Laperle
@@ -77,7 +78,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
 
     private @Nullable ITmfTrace fTrace;
     private @Nullable IAnalysisProgressListener fListener;
-    private @Nullable AbstractSegmentStoreAnalysisModule fAnalysisModule;
+    private @Nullable ISegmentStoreProvider fSegmentStoreProvider;
     private TmfTimeRange fCurrentTimeRange = TmfTimeRange.NULL_RANGE;
     private List<ISegmentStoreDensityViewerDataListener> fListeners;
 
@@ -107,13 +108,13 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
     }
 
     /**
-     * Returns the segment store analysis module
+     * Returns the segment store provider
      *
      * @param trace
      *            The trace to consider
-     * @return the analysis module
+     * @return the
      */
-    protected @Nullable abstract AbstractSegmentStoreAnalysisModule getSegmentStoreAnalysisModule(ITmfTrace trace);
+    protected @Nullable abstract ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace);
 
     @Nullable
     private static ITmfTrace getTrace() {
@@ -206,11 +207,11 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
     }
 
     private @Nullable List<ISegment> computeData(final TmfTimeRange timeRange, final Range durationRange) {
-        final AbstractSegmentStoreAnalysisModule analysisModule = fAnalysisModule;
-        if (analysisModule == null) {
+        final ISegmentStoreProvider segmentProvider = fSegmentStoreProvider;
+        if (segmentProvider == null) {
             return null;
         }
-        final ISegmentStore<ISegment> segStore = analysisModule.getSegmentStore();
+        final ISegmentStore<ISegment> segStore = segmentProvider.getSegmentStore();
         if (segStore == null) {
             return null;
         }
@@ -255,7 +256,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
         if (trace == null) {
             return;
         }
-        fAnalysisModule = getSegmentStoreAnalysisModule(trace);
+        fSegmentStoreProvider = getSegmentStoreProvider(trace);
         fCurrentTimeRange = NonNullUtils.checkNotNull(signal.getCurrentRange());
         updateWithRange(fCurrentTimeRange);
     }
@@ -271,8 +272,8 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
 
     @Override
     public void dispose() {
-        if (fAnalysisModule != null && fListener != null) {
-            fAnalysisModule.removeListener(fListener);
+        if (fSegmentStoreProvider != null && fListener != null) {
+            fSegmentStoreProvider.removeListener(fListener);
         }
         fDragZoomProvider.deregister();
         fTooltipProvider.deregister();
@@ -338,12 +339,14 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
         fCurrentTimeRange = windowRange;
 
         if (trace != null) {
-            fAnalysisModule = getSegmentStoreAnalysisModule(trace);
-            final AbstractSegmentStoreAnalysisModule module = fAnalysisModule;
-            if (module != null) {
-                fListener = (activeAnalysis, data) -> updateWithRange(windowRange);
-                module.addListener(fListener);
-                module.schedule();
+            fSegmentStoreProvider = getSegmentStoreProvider(trace);
+            final ISegmentStoreProvider provider = fSegmentStoreProvider;
+            if (provider != null) {
+                fListener = (segmentProvider, data) -> updateWithRange(windowRange);
+                provider.addListener(fListener);
+                if( provider instanceof IAnalysisModule) {
+                    ((IAnalysisModule) provider).schedule();
+                }
             }
         }
         zoom(new Range(0, Long.MAX_VALUE));

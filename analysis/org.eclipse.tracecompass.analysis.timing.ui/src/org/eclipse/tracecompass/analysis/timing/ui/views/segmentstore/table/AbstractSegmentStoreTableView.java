@@ -100,7 +100,7 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
      */
     private void setInitialData() {
         if (fSegmentStoreViewer != null) {
-            fSegmentStoreViewer.setData(fSegmentStoreViewer.getAnalysisModule());
+            fSegmentStoreViewer.setData(fSegmentStoreViewer.getSegmentProvider());
         }
     }
 }

@@ -150,7 +150,6 @@ public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<
         }
     }
 
-
     @Override
     public boolean containsAll(@Nullable Collection<?> c) {
         fLock.readLock().lock();
@@ -218,7 +217,14 @@ public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<
 
     @Override
     public void clear() {
-        throw new UnsupportedOperationException();
+        fLock.writeLock().lock();
+        try {
+            fSize = 0;
+            fEndTimesIndex.clear();
+            fStartTimesIndex.clear();
+        } finally {
+            fLock.writeLock().unlock();
+        }
     }
 
     // ------------------------------------------------------------------------
