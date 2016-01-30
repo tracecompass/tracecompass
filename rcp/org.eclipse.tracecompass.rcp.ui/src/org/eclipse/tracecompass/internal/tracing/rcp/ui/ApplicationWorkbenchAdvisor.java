@@ -19,6 +19,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -60,8 +61,9 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     private static final String PATH_ETOOL = ICONS_PATH + "etool16/"; //$NON-NLS-1$
     private static final String PATH_DTOOL = ICONS_PATH + "dtool16/"; //$NON-NLS-1$
     private static final String PATH_OBJECT = ICONS_PATH + "obj16/"; //$NON-NLS-1$
-    private static final String PATH_WIZBAN = ICONS_PATH + "wizban/";//$NON-NLS-1$
+    private static final String PATH_WIZBAN = ICONS_PATH + "wizban/"; //$NON-NLS-1$
 
+    private static final String IMAGE_FILE_EXT = "png"; //$NON-NLS-1$
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -233,6 +235,15 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
      */
     private void declareWorkbenchImage(Bundle ideBundle, String symbolicName, String path, boolean shared) {
         URL url = FileLocator.find(ideBundle, new Path(path), null);
+        /*
+         *  Files where changed to *.png in Eclipse 4.6. The following will make sure that it
+         *  also works with Eclipse 4.6.
+         */
+        if (url == null) {
+            IPath newName = new Path(path);
+            newName = newName.removeFileExtension().addFileExtension(IMAGE_FILE_EXT);
+            url = FileLocator.find(ideBundle, newName, null);
+        }
         ImageDescriptor desc = ImageDescriptor.createFromURL(url);
         getWorkbenchConfigurer().declareImage(symbolicName, desc, shared);
     }
