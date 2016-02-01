@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2014 Intel Corporation, Ericsson
+ * Copyright (c) 2007, 2016 Intel Corporation, Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -58,6 +58,8 @@ public class TimeGraphTooltipHandler {
     private static final int MAX_RATIO = 10;
 
     private static final int OFFSET = 16;
+
+    private static final int HOVER_MAX_DIST = 10;
 
     private Shell fTipShell;
     private Composite fTipComposite;
@@ -181,6 +183,34 @@ public class TimeGraphTooltipHandler {
                             (nextEvent != null && nextEvent.getTime() < nextPixelTime)) {
                         currEvent = nextEvent;
                         currPixelTime = nextEvent.getTime();
+                    }
+
+                    /*
+                     * if there is still no current event, use the closest
+                     * between the next and previous event, as long as they are
+                     * within a distance threshold
+                     */
+                    if (currEvent == null || currEvent instanceof NullTimeEvent) {
+                        int nextDelta = Integer.MAX_VALUE;
+                        int prevDelta = Integer.MAX_VALUE;
+                        long nextTime = 0;
+                        long prevTime = 0;
+                        if (nextEvent != null && !(nextEvent instanceof NullTimeEvent)) {
+                            nextTime = nextEvent.getTime();
+                            nextDelta = Math.abs(timeGraphControl.getXForTime(nextTime) - pt.x);
+                        }
+                        ITimeEvent prevEvent = Utils.findEvent(entry, currPixelTime, -1);
+                        if (prevEvent != null && !(prevEvent instanceof NullTimeEvent)) {
+                            prevTime = prevEvent.getTime() + prevEvent.getDuration() - 1;
+                            prevDelta = Math.abs(pt.x - timeGraphControl.getXForTime(prevTime));
+                        }
+                        if (nextDelta < HOVER_MAX_DIST && nextDelta <= prevDelta) {
+                            currEvent = nextEvent;
+                            currPixelTime = nextTime;
+                        } else if (prevDelta < HOVER_MAX_DIST) {
+                            currEvent = prevEvent;
+                            currPixelTime = prevTime;
+                        }
                     }
 
                     // state name
