@@ -43,6 +43,7 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -176,6 +177,18 @@ public class TimeGraphCombo extends Composite {
                 @Override
                 public void resetVerticalZoom() {
                     TimeGraphCombo.this.resetVerticalZoom();
+                }
+
+                @Override
+                public void setElementPosition(ITimeGraphEntry entry, int y) {
+                    /*
+                     * Queue the update to make sure the time graph combo has finished
+                     * updating the item heights.
+                     */
+                    getDisplay().asyncExec(() -> {
+                        super.setElementPosition(entry, y);
+                        alignTreeItems(false);
+                    });
                 }
             };
         }
@@ -563,11 +576,14 @@ public class TimeGraphCombo extends Composite {
                     fTimeGraphViewer.setSelection((ITimeGraphEntry) treeItems.get(treeItems.size() - 1).getData());
                     event.doit = false;
                 } else if ((event.character == '+' || event.character == '=') && ((event.stateMask & SWT.CTRL) != 0)) {
-                    verticalZoom(true);
+                    fTimeGraphViewer.getTimeGraphControl().keyPressed(new KeyEvent(event));
+                    return;
                 } else if (event.character == '-' && ((event.stateMask & SWT.CTRL) != 0)) {
-                    verticalZoom(false);
+                    fTimeGraphViewer.getTimeGraphControl().keyPressed(new KeyEvent(event));
+                    return;
                 } else if (event.character == '0' && ((event.stateMask & SWT.CTRL) != 0)) {
-                    resetVerticalZoom();
+                    fTimeGraphViewer.getTimeGraphControl().keyPressed(new KeyEvent(event));
+                    return;
                 } else {
                     return;
                 }

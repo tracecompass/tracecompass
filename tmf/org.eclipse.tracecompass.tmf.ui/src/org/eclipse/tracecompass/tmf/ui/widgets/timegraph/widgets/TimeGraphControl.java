@@ -20,6 +20,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,6 +29,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.IStatusLineManager;
@@ -126,6 +128,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private static final int PPI = 72; // points per inch
     private static final int DPI = Display.getDefault().getDPI().y;
 
+    private static final int VERTICAL_ZOOM_DELAY = 400;
+
     /** Resource manager */
     private LocalResourceManager fResourceManager = new LocalResourceManager(JFaceResources.getResources());
 
@@ -173,7 +177,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private Color fGridLineColor = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
     private boolean fHideArrows = false;
     private int fAutoExpandLevel = ALL_LEVELS;
-
+    private Entry<ITimeGraphEntry, Integer> fVerticalZoomAlignEntry = null;
+    private long fVerticalZoomAlignTime = 0;
     private int fBorderWidth = 0;
     private int fHeaderHeight = 0;
 
@@ -481,6 +486,36 @@ public class TimeGraphControl extends TimeGraphBaseControl
         index = Math.max(0,  index);
         fTopIndex = index;
         redraw();
+    }
+
+    /**
+     * Set the top index so that the requested element is at the specified
+     * position.
+     *
+     * @param entry
+     *            the time graph entry to be positioned
+     * @param y
+     *            the requested y-coordinate
+     * @since 2.0
+     */
+    public void setElementPosition(ITimeGraphEntry entry, int y) {
+        Item item = fItemData.fItemMap.get(entry);
+        if (item == null || item.fExpandedIndex == -1) {
+            return;
+        }
+        int index = item.fExpandedIndex;
+        Rectangle itemRect = getItemRect(getClientArea(), index);
+        int delta = itemRect.y + itemRect.height - y;
+        int topIndex = getItemIndexAtY(delta);
+        if (topIndex != -1) {
+            setTopIndex(topIndex);
+        } else {
+            if (delta < 0) {
+                setTopIndex(0);
+            } else {
+                setTopIndex(getExpandedElementCount());
+            }
+        }
     }
 
     /**
@@ -1211,14 +1246,20 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @return the index of the item at the given location, of -1 if none.
      */
     protected int getItemIndexAtY(int y) {
-        if (y < 0) {
-            return -1;
-        }
         int ySum = 0;
-        for (int idx = fTopIndex; idx < fItemData.fExpandedItems.length; idx++) {
-            ySum += fItemData.fExpandedItems[idx].fItemHeight;
-            if (y < ySum) {
-                return idx;
+        if (y < 0) {
+            for (int idx = fTopIndex - 1; idx >= 0; idx--) {
+                ySum -= fItemData.fExpandedItems[idx].fItemHeight;
+                if (y >= ySum) {
+                    return idx;
+                }
+            }
+        } else {
+            for (int idx = fTopIndex; idx < fItemData.fExpandedItems.length; idx++) {
+                ySum += fItemData.fExpandedItems[idx].fItemHeight;
+                if (y < ySum) {
+                    return idx;
+                }
             }
         }
         return -1;
@@ -1408,6 +1449,21 @@ public class TimeGraphControl extends TimeGraphBaseControl
             elements.add(item.fEntry);
         }
         return elements.toArray(new ITimeGraphEntry[0]);
+    }
+
+    /**
+     * Get the expanded (visible) element at the specified index.
+     *
+     * @param index
+     *            the element index
+     * @return The expanded (visible) element or null if out of range
+     * @since 2.0
+     */
+    public ITimeGraphEntry getExpandedElement(int index) {
+        if (index < 0 || index >= fItemData.fExpandedItems.length) {
+            return null;
+        }
+        return fItemData.fExpandedItems[index].fEntry;
     }
 
     Rectangle getNameRect(Rectangle bounds, int idx, int nameWidth) {
@@ -2222,11 +2278,23 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
             idx = -1;
         } else if ((e.character == '+' || e.character == '=') && ((e.stateMask & SWT.CTRL) != 0)) {
+            fVerticalZoomAlignEntry = getVerticalZoomAlignSelection();
             verticalZoom(true);
+            if (fVerticalZoomAlignEntry != null) {
+                setElementPosition(fVerticalZoomAlignEntry.getKey(), fVerticalZoomAlignEntry.getValue());
+            }
         } else if (e.character == '-' && ((e.stateMask & SWT.CTRL) != 0)) {
+            fVerticalZoomAlignEntry = getVerticalZoomAlignSelection();
             verticalZoom(false);
+            if (fVerticalZoomAlignEntry != null) {
+                setElementPosition(fVerticalZoomAlignEntry.getKey(), fVerticalZoomAlignEntry.getValue());
+            }
         } else if (e.character == '0' && ((e.stateMask & SWT.CTRL) != 0)) {
+            fVerticalZoomAlignEntry = getVerticalZoomAlignSelection();
             resetVerticalZoom();
+            if (fVerticalZoomAlignEntry != null) {
+                setElementPosition(fVerticalZoomAlignEntry.getKey(), fVerticalZoomAlignEntry.getValue());
+            }
         }
         if (idx >= 0) {
             selectItem(idx, false);
@@ -2672,10 +2740,14 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
         }
         if (verticalZoom) {
+            fVerticalZoomAlignEntry = getVerticalZoomAlignCursor(e.y);
             if (e.count > 0) {
                 verticalZoom(true);
             } else if (e.count < 0) {
                 verticalZoom(false);
+            }
+            if (fVerticalZoomAlignEntry != null) {
+                setElementPosition(fVerticalZoomAlignEntry.getKey(), fVerticalZoomAlignEntry.getValue());
             }
         } else if (horizontalZoom && fTimeProvider.getTime0() != fTimeProvider.getTime1()) {
             if (e.count > 0) {
@@ -2688,6 +2760,77 @@ public class TimeGraphControl extends TimeGraphBaseControl
         } else {
             setTopIndex(getTopIndex() - e.count);
         }
+    }
+
+    /**
+     * Get the vertical zoom alignment entry and position based on the current
+     * selection. If there is no selection or if the selection is not visible,
+     * return an alignment entry with a null time graph entry.
+     *
+     * @return a map entry where the key is the selection's time graph entry and
+     *         the value is the center y-coordinate of that entry, or null
+     */
+    private Entry<ITimeGraphEntry, Integer> getVerticalZoomAlignSelection() {
+        Entry<ITimeGraphEntry, Integer> alignEntry = getVerticalZoomAlignOngoing();
+        if (alignEntry != null) {
+            return alignEntry;
+        }
+        int index = getSelectedIndex();
+        if (index == -1 || index >= getExpandedElementCount()) {
+            return new SimpleEntry<>(null, 0);
+        }
+        Rectangle bounds = getClientArea();
+        Rectangle itemRect = getItemRect(bounds, index);
+        if (itemRect.y < bounds.y || itemRect.y > bounds.y + bounds.height) {
+            /* selection is not visible */
+            return new SimpleEntry<>(null, 0);
+        }
+        ITimeGraphEntry entry = getExpandedElement(index);
+        int y = itemRect.y + itemRect.height / 2;
+        return new SimpleEntry<>(entry, y);
+    }
+
+    /**
+     * Get the vertical zoom alignment entry and position at the specified
+     * cursor position.
+     *
+     * @param y
+     *            the cursor y-coordinate
+     * @return a map entry where the key is the time graph entry under the
+     *         cursor and the value is the cursor y-coordinate
+     */
+    private Entry<ITimeGraphEntry, Integer> getVerticalZoomAlignCursor(int y) {
+        Entry<ITimeGraphEntry, Integer> alignEntry = getVerticalZoomAlignOngoing();
+        if (alignEntry != null) {
+            return alignEntry;
+        }
+        int index = getItemIndexAtY(y);
+        if (index == -1) {
+            index = getExpandedElementCount() - 1;
+        }
+        ITimeGraphEntry entry = getExpandedElement(index);
+        return new SimpleEntry<>(entry, y);
+    }
+
+    /**
+     * Get the vertical zoom alignment entry and position if there is an ongoing
+     * one and we are within the vertical zoom delay, or otherwise return null.
+     *
+     * @return a map entry where the key is a time graph entry and the value is
+     *         a y-coordinate, or null
+     */
+    private Entry<ITimeGraphEntry, Integer> getVerticalZoomAlignOngoing() {
+        long currentTimeMillis = System.currentTimeMillis();
+        if (currentTimeMillis < fVerticalZoomAlignTime + VERTICAL_ZOOM_DELAY) {
+            /*
+             * If the vertical zoom is triggered repeatedly in a short amount of
+             * time, use the initial event's entry and position.
+             */
+            fVerticalZoomAlignTime = currentTimeMillis;
+            return fVerticalZoomAlignEntry;
+        }
+        fVerticalZoomAlignTime = currentTimeMillis;
+        return null;
     }
 
     @Override
