@@ -66,6 +66,7 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
     /**
      * Wait until the analyses/state systems underneath are ready to be queried.
      */
+    @Override
     public void waitForInitialization() {
         try {
             fInitialized.await();

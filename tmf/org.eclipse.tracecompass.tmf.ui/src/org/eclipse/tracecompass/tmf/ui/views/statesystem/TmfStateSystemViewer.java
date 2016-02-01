@@ -37,7 +37,6 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
-import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -212,10 +211,7 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
         for (ITmfAnalysisModuleWithStateSystems module : modules) {
             /* Just schedule the module, the data will be filled when available */
             module.schedule();
-            if (module instanceof TmfStateSystemAnalysisModule) {
-                // TODO: add this method to ITmfAnalysisModuleWithStateSystems
-                ((TmfStateSystemAnalysisModule) module).waitForInitialization();
-            }
+            module.waitForInitialization();
             for (ITmfStateSystem ss : module.getStateSystems()) {
                 traceEntry.addChild(new StateSystemEntry(ss));
             }

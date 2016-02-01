@@ -162,11 +162,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         return fStateSystem;
     }
 
-    /**
-     * Block the calling thread until the analysis module has been initialized.
-     * After this method returns, {@link #getStateSystem()} should not return
-     * null anymore.
-     */
+    @Override
     public void waitForInitialization() {
         try {
             fInitialized.await();
