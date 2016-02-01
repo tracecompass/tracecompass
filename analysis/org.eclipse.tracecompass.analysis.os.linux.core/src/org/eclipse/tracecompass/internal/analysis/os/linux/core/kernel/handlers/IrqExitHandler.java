@@ -36,13 +36,13 @@ public class IrqExitHandler extends KernelEventHandler {
     @Override
     public void handleEvent(ITmfStateSystemBuilder ss, ITmfEvent event) throws AttributeNotFoundException {
         Integer cpu = KernelEventHandlerUtils.getCpu(event);
-        if( cpu == null ) {
+        if (cpu == null) {
             return;
         }
         int currentThreadNode = KernelEventHandlerUtils.getCurrentThreadNode(cpu, ss);
         Integer irqId = ((Long) event.getContent().getField(getLayout().fieldIrq()).getValue()).intValue();
         /* Put this IRQ back to inactive in the resource tree */
-        int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeIRQs(ss), irqId.toString());
+        int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeIRQs(cpu, ss), irqId.toString());
         TmfStateValue value = TmfStateValue.nullValue();
         long timestamp = KernelEventHandlerUtils.getTimestamp(event);
         ss.modifyAttribute(timestamp, value, quark);

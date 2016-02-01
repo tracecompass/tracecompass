@@ -30,7 +30,8 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  */
 public final class KernelEventHandlerUtils {
 
-    private KernelEventHandlerUtils() {}
+    private KernelEventHandlerUtils() {
+    }
 
     /**
      * Get CPU
@@ -62,7 +63,6 @@ public final class KernelEventHandlerUtils {
     public static int getCurrentCPUNode(Integer cpuNumber, ITmfStateSystemBuilder ss) {
         return ss.getQuarkRelativeAndAdd(getNodeCPUs(ss), cpuNumber.toString());
     }
-
 
     /**
      * Get the timestamp of the event
@@ -139,12 +139,14 @@ public final class KernelEventHandlerUtils {
     /**
      * Get the IRQs node
      *
+     * @param cpuNumber
+     *            the cpu core
      * @param ss
      *            the state system
      * @return the IRQ node quark
      */
-    public static int getNodeIRQs(ITmfStateSystemBuilder ss) {
-        return ss.getQuarkAbsoluteAndAdd(Attributes.RESOURCES, Attributes.IRQS);
+    public static int getNodeIRQs(int cpuNumber, ITmfStateSystemBuilder ss) {
+        return ss.getQuarkAbsoluteAndAdd(Attributes.CPUS, Integer.toString(cpuNumber), Attributes.IRQS);
     }
 
     /**
@@ -161,12 +163,14 @@ public final class KernelEventHandlerUtils {
     /**
      * Get the Soft IRQs node
      *
+     * @param cpuNumber
+     *            the cpu core
      * @param ss
      *            the state system
      * @return the Soft IRQ node quark
      */
-    public static int getNodeSoftIRQs(ITmfStateSystemBuilder ss) {
-        return ss.getQuarkAbsoluteAndAdd(Attributes.RESOURCES, Attributes.SOFT_IRQS);
+    public static int getNodeSoftIRQs(int cpuNumber, ITmfStateSystemBuilder ss) {
+        return ss.getQuarkAbsoluteAndAdd(Attributes.CPUS, Integer.toString(cpuNumber), Attributes.SOFT_IRQS);
     }
 
     /**

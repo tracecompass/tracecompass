@@ -49,7 +49,7 @@ public class IrqEntryHandler extends KernelEventHandler {
          * Mark this IRQ as active in the resource tree. The state value = the
          * CPU on which this IRQ is sitting
          */
-        int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeIRQs(ss), irqId.toString());
+        int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeIRQs(cpu, ss), irqId.toString());
 
         ITmfStateValue value = TmfStateValue.newValueInt(cpu.intValue());
         long timestamp = KernelEventHandlerUtils.getTimestamp(event);

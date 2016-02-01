@@ -24,7 +24,8 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
  * @author Alexandre Montplaisir
  */
 interface TestValues {
-    int size = 1032;
+
+    int size = 1036;
 
     long[] startTimes = {
         1331668247314038062L,
@@ -62,12 +63,13 @@ interface TestValues {
         1331668248014184526L,
         1331668248014130616L,
         1331668247314038062L,
-        1331668247314038062L,
-        1331668248011125682L,
+        1331668248011090056L,
         1331668247314038062L,
         1331668247931793142L,
         1331668247930941981L,
-        1331668247959041965L,
+        1331668247314038062L,
+        1331668248011125682L,
+        1331668247959024716L,
         1331668248011129576L,
         1331668247314038062L,
         1331668247314038062L,
@@ -110,6 +112,7 @@ interface TestValues {
         1331668247999327778L,
         1331668247318631139L,
         1331668247314038062L,
+        1331668247959041965L,
         1331668247960265258L,
         1331668247314038062L,
         1331668247903884233L,
@@ -135,6 +138,7 @@ interface TestValues {
         1331668247314038062L,
         1331668247330548245L,
         1331668247314038062L,
+        1331668247919182446L,
         1331668247340039213L,
         1331668247340083580L,
         1331668247966976915L,
@@ -263,6 +267,7 @@ interface TestValues {
         1331668247925622863L,
         1331668247926367737L,
         1331668247423543945L,
+        1331668247314038062L,
         1331668247314038062L,
         1331668247619316825L,
         1331668247619491008L,
@@ -1097,12 +1102,13 @@ interface TestValues {
         1331668248014548923L,
         1331668248014188534L,
         1331668259054285979L,
-        1331668259054285979L,
         1331668248015040151L,
         1331668259054285979L,
         1331668248482983146L,
         1331668248482983146L,
-        1331668248015041609L,
+        1331668259054285979L,
+        1331668248015170799L,
+        1331668248015172434L,
         1331668248015176320L,
         1331668259054285979L,
         1331668259054285979L,
@@ -1145,6 +1151,7 @@ interface TestValues {
         1331668248016645047L,
         1331668252843104826L,
         1331668259054285979L,
+        1331668248015041609L,
         1331668248486545657L,
         1331668259054285979L,
         1331668248502954816L,
@@ -1170,6 +1177,7 @@ interface TestValues {
         1331668259054285979L,
         1331668259054285979L,
         1331668259054285979L,
+        1331668248019005964L,
         1331668257323835062L,
         1331668257323879563L,
         1331668248021867385L,
@@ -1297,6 +1305,7 @@ interface TestValues {
         1331668248424325503L,
         1331668248424325503L,
         1331668248424394073L,
+        1331668259054285979L,
         1331668259054285979L,
         1331668259054285979L,
         1331668248140683324L,
@@ -2134,9 +2143,10 @@ interface TestValues {
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
-        TmfStateValue.nullValue(),
         TmfStateValue.newValueInt(1),
         TmfStateValue.newValueInt(20),
+        TmfStateValue.nullValue(),
+        TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
@@ -2182,6 +2192,7 @@ interface TestValues {
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
+        TmfStateValue.nullValue(),
         TmfStateValue.newValueInt(1),
         TmfStateValue.newValueInt(20),
         TmfStateValue.newValueString("sys_poll"),
@@ -2204,6 +2215,7 @@ interface TestValues {
         TmfStateValue.newValueInt(20),
         TmfStateValue.nullValue(),
         TmfStateValue.newValueString("kworker/0:1"),
+        TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
@@ -2333,6 +2345,7 @@ interface TestValues {
         TmfStateValue.newValueInt(20),
         TmfStateValue.newValueString("sys_poll"),
         TmfStateValue.newValueString("gdbus"),
+        TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
@@ -3130,6 +3143,5 @@ interface TestValues {
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
     };
-
 }
 

@@ -189,7 +189,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
                         try {
                             List<ITmfStateInterval> fullState = ss.queryFullState(event.getTime());
-                            List<Integer> irqQuarks = ss.getQuarks(Attributes.RESOURCES, Attributes.IRQS, "*"); //$NON-NLS-1$
+                            List<Integer> irqQuarks = ss.getQuarks(Attributes.CPUS, Integer.toString(cpu), Attributes.IRQS, "*"); //$NON-NLS-1$
 
                             for (int irqQuark : irqQuarks) {
                                 if (fullState.get(irqQuark).getStateValue().unboxInt() == cpu) {
@@ -212,7 +212,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
                         try {
                             List<ITmfStateInterval> fullState = ss.queryFullState(event.getTime());
-                            List<Integer> softIrqQuarks = ss.getQuarks(Attributes.RESOURCES, Attributes.SOFT_IRQS, "*"); //$NON-NLS-1$
+                            List<Integer> softIrqQuarks = ss.getQuarks(Attributes.CPUS, Integer.toString(cpu), Attributes.SOFT_IRQS, "*"); //$NON-NLS-1$
 
                             for (int softIrqQuark : softIrqQuarks) {
                                 if (fullState.get(softIrqQuark).getStateValue().unboxInt() == cpu) {

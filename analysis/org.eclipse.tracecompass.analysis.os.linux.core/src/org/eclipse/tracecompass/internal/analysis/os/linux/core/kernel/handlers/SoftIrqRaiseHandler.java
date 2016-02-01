@@ -26,7 +26,9 @@ public class SoftIrqRaiseHandler extends KernelEventHandler {
 
     /**
      * Constructor
-     * @param layout event layout
+     *
+     * @param layout
+     *            event layout
      */
     public SoftIrqRaiseHandler(IKernelAnalysisEventLayout layout) {
         super(layout);
@@ -35,11 +37,14 @@ public class SoftIrqRaiseHandler extends KernelEventHandler {
     @Override
     public void handleEvent(ITmfStateSystemBuilder ss, ITmfEvent event) throws AttributeNotFoundException {
         Integer softIrqId = ((Long) event.getContent().getField(getLayout().fieldVec()).getValue()).intValue();
-
+        Integer cpu = KernelEventHandlerUtils.getCpu(event);
+        if (cpu == null) {
+            return;
+        }
         /*
          * Mark this SoftIRQ as *raised* in the resource tree. State value = -2
          */
-        int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeSoftIRQs(ss), softIrqId.toString());
+        int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeSoftIRQs(cpu, ss), softIrqId.toString());
         ITmfStateValue value = StateValues.SOFT_IRQ_RAISED_VALUE;
         ss.modifyAttribute(KernelEventHandlerUtils.getTimestamp(event), value, quark);
     }

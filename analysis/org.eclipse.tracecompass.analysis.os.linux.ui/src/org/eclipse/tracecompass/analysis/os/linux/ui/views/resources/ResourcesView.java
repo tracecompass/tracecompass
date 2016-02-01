@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.Attributes;
@@ -68,6 +70,7 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
         setFilterColumns(FILTER_COLUMN_NAMES);
         setFilterLabelProvider(new ResourcesFilterLabelProvider());
         setEntryComparator(new ResourcesEntryComparator());
+        setAutoExpandLevel(1);
     }
 
     private static class ResourcesEntryComparator implements Comparator<ITimeGraphEntry> {
@@ -143,7 +146,8 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
                 return;
             }
             long end = ssq.getCurrentEndTime();
-            if (start == end && !complete) { // when complete execute one last time regardless of end time
+            if (start == end && !complete) {
+                // when complete execute one last time regardless of end time
                 continue;
             }
             long endTime = end + 1;
@@ -156,44 +160,8 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
             } else {
                 traceEntry.updateEndTime(endTime);
             }
-
             List<Integer> cpuQuarks = ssq.getQuarks(Attributes.CPUS, "*"); //$NON-NLS-1$
-            for (Integer cpuQuark : cpuQuarks) {
-                int cpu = Integer.parseInt(ssq.getAttributeName(cpuQuark));
-                ResourcesEntry entry = entryMap.get(cpuQuark);
-                if (entry == null) {
-                    entry = new ResourcesEntry(cpuQuark, trace, startTime, endTime, Type.CPU, cpu);
-                    entryMap.put(cpuQuark, entry);
-                    traceEntry.addChild(entry);
-                } else {
-                    entry.updateEndTime(endTime);
-                }
-            }
-            List<Integer> irqQuarks = ssq.getQuarks(Attributes.RESOURCES, Attributes.IRQS, "*"); //$NON-NLS-1$
-            for (Integer irqQuark : irqQuarks) {
-                int irq = Integer.parseInt(ssq.getAttributeName(irqQuark));
-                ResourcesEntry entry = entryMap.get(irqQuark);
-                if (entry == null) {
-                    entry = new ResourcesEntry(irqQuark, trace, startTime, endTime, Type.IRQ, irq);
-                    entryMap.put(irqQuark, entry);
-                    traceEntry.addChild(entry);
-                } else {
-                    entry.updateEndTime(endTime);
-                }
-            }
-            List<Integer> softIrqQuarks = ssq.getQuarks(Attributes.RESOURCES, Attributes.SOFT_IRQS, "*"); //$NON-NLS-1$
-            for (Integer softIrqQuark : softIrqQuarks) {
-                int softIrq = Integer.parseInt(ssq.getAttributeName(softIrqQuark));
-                ResourcesEntry entry = entryMap.get(softIrqQuark);
-                if (entry == null) {
-                    entry = new ResourcesEntry(softIrqQuark, trace, startTime, endTime, Type.SOFT_IRQ, softIrq);
-                    entryMap.put(softIrqQuark, entry);
-                    traceEntry.addChild(entry);
-                } else {
-                    entry.updateEndTime(endTime);
-                }
-            }
-
+            createCpuEntriesWithQuark(trace, ssq, entryMap, traceEntry, startTime, endTime, cpuQuarks);
             if (parentTrace.equals(getTrace())) {
                 refresh();
             }
@@ -205,23 +173,117 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
                 @Override
                 public void handle(List<List<ITmfStateInterval>> fullStates, List<ITmfStateInterval> prevFullState) {
                     for (ITimeGraphEntry child : traceEntryChildren) {
-                        if (monitor.isCanceled()) {
+                        if (!populateEventsRecursively(fullStates, prevFullState, child).isOK()) {
                             return;
                         }
-                        if (child instanceof TimeGraphEntry) {
-                            TimeGraphEntry entry = (TimeGraphEntry) child;
-                            List<ITimeEvent> eventList = getEventList(entry, ssq, fullStates, prevFullState, monitor);
-                            if (eventList != null) {
-                                for (ITimeEvent event : eventList) {
-                                    entry.addEvent(event);
-                                }
+                    }
+                }
+
+                private IStatus populateEventsRecursively(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState, ITimeGraphEntry entry) {
+                    if (monitor.isCanceled()) {
+                        return Status.CANCEL_STATUS;
+                    }
+                    if (entry instanceof TimeGraphEntry) {
+                        TimeGraphEntry timeGraphEntry = (TimeGraphEntry) entry;
+                        List<ITimeEvent> eventList = getEventList(timeGraphEntry, ssq, fullStates, prevFullState, monitor);
+                        if (eventList != null) {
+                            for (ITimeEvent event : eventList) {
+                                timeGraphEntry.addEvent(event);
                             }
                         }
                     }
+                    for (ITimeGraphEntry child : entry.getChildren()) {
+                        IStatus status = populateEventsRecursively(fullStates, prevFullState, child);
+                        if (!status.isOK()) {
+                            return status;
+                        }
+                    }
+                    return Status.OK_STATUS;
                 }
             });
 
             start = end;
+        }
+
+    }
+
+    private static void createCpuEntriesWithQuark(@NonNull ITmfTrace trace, final ITmfStateSystem ssq, Map<Integer, ResourcesEntry> entryMap, TimeGraphEntry traceEntry, long startTime, long endTime, List<Integer> cpuQuarks) {
+        for (Integer cpuQuark : cpuQuarks) {
+            final @NonNull String cpuName = ssq.getAttributeName(cpuQuark);
+            int cpu = Integer.parseInt(cpuName);
+            ResourcesEntry cpuEntry = entryMap.get(cpuQuark);
+            if (cpuEntry == null) {
+                cpuEntry = new ResourcesEntry(cpuQuark, trace, startTime, endTime, Type.CPU, cpu);
+                entryMap.put(cpuQuark, cpuEntry);
+                traceEntry.addChild(cpuEntry);
+            } else {
+                cpuEntry.updateEndTime(endTime);
+            }
+            List<Integer> irqQuarks = ssq.getQuarks(Attributes.CPUS, cpuName, Attributes.IRQS, "*"); //$NON-NLS-1$
+            createCpuInterruptEntryWithQuark(trace, ssq, entryMap, startTime, endTime, traceEntry, cpuEntry, irqQuarks, Type.IRQ);
+            List<Integer> softIrqQuarks = ssq.getQuarks(Attributes.CPUS, cpuName, Attributes.SOFT_IRQS, "*"); //$NON-NLS-1$
+            createCpuInterruptEntryWithQuark(trace, ssq, entryMap, startTime, endTime, traceEntry, cpuEntry, softIrqQuarks, Type.SOFT_IRQ);
+        }
+    }
+
+    /**
+     * Create and add execution contexts to a cpu entry. Also creates an
+     * aggregate entry in the root trace entry. The execution context is
+     * basically what the cpu is doing in its execution stack. It can be in an
+     * IRQ, Soft IRQ. MCEs, NMIs, Userland and Kernel execution is not yet
+     * supported.
+     *
+     * @param trace
+     *            the trace
+     * @param ssq
+     *            the state system
+     * @param entryMap
+     *            the entry map
+     * @param startTime
+     *            the start time in nanoseconds
+     * @param endTime
+     *            the end time in nanoseconds
+     * @param traceEntry
+     *            the trace timegraph entry
+     * @param cpuEntry
+     *            the cpu timegraph entry (the entry under the trace entry
+     * @param childrenQuarks
+     *            the quarks to add to cpu entry
+     * @param type
+     *            the type of entry being added
+     */
+    private static void createCpuInterruptEntryWithQuark(@NonNull ITmfTrace trace,
+            final ITmfStateSystem ssq, Map<Integer, ResourcesEntry> entryMap,
+            long startTime, long endTime,
+            TimeGraphEntry traceEntry, ResourcesEntry cpuEntry,
+            List<Integer> childrenQuarks, Type type) {
+        for (Integer quark : childrenQuarks) {
+            final @NonNull String resourceName = ssq.getAttributeName(quark);
+            int resourceId = Integer.parseInt(resourceName);
+            ResourcesEntry interruptEntry = entryMap.get(quark);
+            if (interruptEntry == null) {
+                interruptEntry = new ResourcesEntry(quark, trace, startTime, endTime, type, resourceId);
+                entryMap.put(quark, interruptEntry);
+                cpuEntry.addChild(interruptEntry);
+                boolean found = false;
+                for (ITimeGraphEntry rootElem : traceEntry.getChildren()) {
+                    if (rootElem instanceof AggregateResourcesEntry) {
+                        AggregateResourcesEntry aggregateInterruptEntry = (AggregateResourcesEntry) rootElem;
+                        if (aggregateInterruptEntry.getId() == resourceId && aggregateInterruptEntry.getType().equals(type)) {
+                            found = true;
+                            aggregateInterruptEntry.addContributor(interruptEntry);
+                            break;
+                        }
+                    }
+                }
+                if (!found) {
+                    AggregateResourcesEntry aggregateInterruptEntry = new AggregateResourcesEntry(trace, startTime, endTime, type, resourceId);
+                    aggregateInterruptEntry.addContributor(interruptEntry);
+                    traceEntry.addChild(aggregateInterruptEntry);
+                }
+            } else {
+                interruptEntry.updateEndTime(endTime);
+            }
         }
     }
 
@@ -229,87 +291,102 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
     protected @Nullable List<ITimeEvent> getEventList(@NonNull TimeGraphEntry entry, ITmfStateSystem ssq,
             @NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState, @NonNull IProgressMonitor monitor) {
         ResourcesEntry resourcesEntry = (ResourcesEntry) entry;
-        List<ITimeEvent> eventList = null;
         int quark = resourcesEntry.getQuark();
 
         if (resourcesEntry.getType().equals(Type.CPU)) {
-            int statusQuark;
-            try {
-                statusQuark = ssq.getQuarkRelative(quark, Attributes.STATUS);
-            } catch (AttributeNotFoundException e) {
-                /*
-                 * The sub-attribute "status" is not available. May happen
-                 * if the trace does not have sched_switch events enabled.
-                 */
-                return null;
-            }
-            eventList = new ArrayList<>(fullStates.size());
-            ITmfStateInterval lastInterval = prevFullState == null || statusQuark >= prevFullState.size() ? null : prevFullState.get(statusQuark);
-            long lastStartTime = lastInterval == null ? -1 : lastInterval.getStartTime();
-            long lastEndTime = lastInterval == null ? -1 : lastInterval.getEndTime() + 1;
-            for (List<ITmfStateInterval> fullState : fullStates) {
-                if (monitor.isCanceled()) {
-                    return null;
-                }
-                if (statusQuark >= fullState.size()) {
-                    /* No information on this CPU (yet?), skip it for now */
-                    continue;
-                }
-                ITmfStateInterval statusInterval = fullState.get(statusQuark);
-                int status = statusInterval.getStateValue().unboxInt();
-                long time = statusInterval.getStartTime();
-                long duration = statusInterval.getEndTime() - time + 1;
-                if (time == lastStartTime) {
-                    continue;
-                }
-                if (!statusInterval.getStateValue().isNull()) {
-                    if (lastEndTime != time && lastEndTime != -1) {
-                        eventList.add(new TimeEvent(entry, lastEndTime, time - lastEndTime));
-                    }
-                    eventList.add(new TimeEvent(entry, time, duration, status));
-                } else {
-                    eventList.add(new NullTimeEvent(entry, time, duration));
-                }
-                lastStartTime = time;
-                lastEndTime = time + duration;
-            }
-        } else if (resourcesEntry.getType().equals(Type.IRQ) || resourcesEntry.getType().equals(Type.SOFT_IRQ)) {
-            eventList = new ArrayList<>(fullStates.size());
-            ITmfStateInterval lastInterval = prevFullState == null || quark >= prevFullState.size() ? null : prevFullState.get(quark);
-            long lastStartTime = lastInterval == null ? -1 : lastInterval.getStartTime();
-            long lastEndTime = lastInterval == null ? -1 : lastInterval.getEndTime() + 1;
-            boolean lastIsNull = lastInterval == null ? false : lastInterval.getStateValue().isNull();
-            for (List<ITmfStateInterval> fullState : fullStates) {
-                if (monitor.isCanceled()) {
-                    return null;
-                }
-                if (quark >= fullState.size()) {
-                    /* No information on this IRQ (yet?), skip it for now */
-                    continue;
-                }
-                ITmfStateInterval irqInterval = fullState.get(quark);
-                long time = irqInterval.getStartTime();
-                long duration = irqInterval.getEndTime() - time + 1;
-                if (time == lastStartTime) {
-                    continue;
-                }
-                if (!irqInterval.getStateValue().isNull()) {
-                    int cpu = irqInterval.getStateValue().unboxInt();
-                    eventList.add(new TimeEvent(entry, time, duration, cpu));
-                    lastIsNull = false;
-                } else {
-                    if (lastEndTime != time && lastIsNull) {
-                        /* This is a special case where we want to show IRQ_ACTIVE state but we don't know the CPU (it is between two null samples) */
-                        eventList.add(new TimeEvent(entry, lastEndTime, time - lastEndTime, -1));
-                    }
-                    eventList.add(new NullTimeEvent(entry, time, duration));
-                    lastIsNull = true;
-                }
-                lastStartTime = time;
-                lastEndTime = time + duration;
-            }
+            return createCpuEventsList(entry, ssq, fullStates, prevFullState, monitor, quark);
+        } else if ((resourcesEntry.getType().equals(Type.IRQ) || resourcesEntry.getType().equals(Type.SOFT_IRQ)) && (quark >= 0)) {
+            return createIrqEventsList(entry, fullStates, prevFullState, monitor, quark);
         }
 
+        return null;
+    }
+
+    private static List<ITimeEvent> createCpuEventsList(TimeGraphEntry entry, ITmfStateSystem ssq, List<List<ITmfStateInterval>> fullStates, List<ITmfStateInterval> prevFullState, IProgressMonitor monitor, int quark) {
+        List<ITimeEvent> eventList;
+        int statusQuark;
+        try {
+            statusQuark = ssq.getQuarkRelative(quark, Attributes.STATUS);
+        } catch (AttributeNotFoundException e) {
+            /*
+             * The sub-attribute "status" is not available. May happen if the
+             * trace does not have sched_switch events enabled.
+             */
+            return null;
+        }
+        eventList = new ArrayList<>(fullStates.size());
+        ITmfStateInterval lastInterval = prevFullState == null || statusQuark >= prevFullState.size() ? null : prevFullState.get(statusQuark);
+        long lastStartTime = lastInterval == null ? -1 : lastInterval.getStartTime();
+        long lastEndTime = lastInterval == null ? -1 : lastInterval.getEndTime() + 1;
+        for (List<ITmfStateInterval> fullState : fullStates) {
+            if (monitor.isCanceled()) {
+                return null;
+            }
+            if (statusQuark >= fullState.size()) {
+                /* No information on this CPU (yet?), skip it for now */
+                continue;
+            }
+            ITmfStateInterval statusInterval = fullState.get(statusQuark);
+            int status = statusInterval.getStateValue().unboxInt();
+            long time = statusInterval.getStartTime();
+            long duration = statusInterval.getEndTime() - time + 1;
+            if (time == lastStartTime) {
+                continue;
+            }
+            if (!statusInterval.getStateValue().isNull()) {
+                if (lastEndTime != time && lastEndTime != -1) {
+                    eventList.add(new TimeEvent(entry, lastEndTime, time - lastEndTime));
+                }
+                eventList.add(new TimeEvent(entry, time, duration, status));
+            } else {
+                eventList.add(new NullTimeEvent(entry, time, duration));
+            }
+            lastStartTime = time;
+            lastEndTime = time + duration;
+        }
+        return eventList;
+    }
+
+    private static List<ITimeEvent> createIrqEventsList(TimeGraphEntry entry, List<List<ITmfStateInterval>> fullStates, List<ITmfStateInterval> prevFullState, IProgressMonitor monitor, int quark) {
+        List<ITimeEvent> eventList;
+        eventList = new ArrayList<>(fullStates.size());
+        ITmfStateInterval lastInterval = prevFullState == null || quark >= prevFullState.size() ? null : prevFullState.get(quark);
+        long lastStartTime = lastInterval == null ? -1 : lastInterval.getStartTime();
+        long lastEndTime = lastInterval == null ? -1 : lastInterval.getEndTime() + 1;
+        boolean lastIsNull = lastInterval == null ? false : lastInterval.getStateValue().isNull();
+        for (List<ITmfStateInterval> fullState : fullStates) {
+            if (monitor.isCanceled()) {
+                return null;
+            }
+            if (quark >= fullState.size()) {
+                /* No information on this IRQ (yet?), skip it for now */
+                continue;
+            }
+            ITmfStateInterval irqInterval = fullState.get(quark);
+            long time = irqInterval.getStartTime();
+            long duration = irqInterval.getEndTime() - time + 1;
+            if (time == lastStartTime) {
+                continue;
+            }
+            if (!irqInterval.getStateValue().isNull()) {
+                int cpu = irqInterval.getStateValue().unboxInt();
+                eventList.add(new TimeEvent(entry, time, duration, cpu));
+                lastIsNull = false;
+            } else {
+                if (lastEndTime != time && lastIsNull) {
+                    /*
+                     * This is a special case where we want to show IRQ_ACTIVE
+                     * state but we don't know the CPU (it is between two null
+                     * samples)
+                     */
+                    eventList.add(new TimeEvent(entry, lastEndTime, time - lastEndTime, -1));
+                }
+                eventList.add(new NullTimeEvent(entry, time, duration));
+                lastIsNull = true;
+            }
+            lastStartTime = time;
+            lastEndTime = time + duration;
+        }
         return eventList;
     }
 

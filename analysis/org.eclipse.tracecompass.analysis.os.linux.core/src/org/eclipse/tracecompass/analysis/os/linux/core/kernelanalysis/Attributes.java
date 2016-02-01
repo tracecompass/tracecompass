@@ -30,11 +30,12 @@ public interface Attributes {
     /* First-level attributes */
     String CPUS = "CPUs";
     String THREADS = "Threads";
-    String RESOURCES = "Resources";
 
     /* Sub-attributes of the CPU nodes */
     String CURRENT_THREAD = "Current_thread";
     String STATUS = "Status";
+    String SOFT_IRQS = "Soft_IRQs";
+    String IRQS = "IRQs";
 
     /* Sub-attributes of the Thread nodes */
     String PPID = "PPID";
@@ -44,10 +45,6 @@ public interface Attributes {
     /** @since 1.0 */
     String PRIO = "Prio";
     String SYSTEM_CALL = "System_call";
-
-    /* Attributes under "Resources" */
-    String IRQS = "IRQs";
-    String SOFT_IRQS = "Soft_IRQs";
 
     /* Misc stuff */
     String UNKNOWN = "Unknown";

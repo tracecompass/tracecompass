@@ -163,7 +163,7 @@ public abstract class StateSystemTest {
         assertNotNull(ss);
 
         try {
-            int quark = ss.getQuarkAbsolute(Attributes.RESOURCES, Attributes.IRQS, "1");
+            int quark = ss.getQuarkAbsolute(Attributes.CPUS, Integer.toString(0), Attributes.IRQS, "1");
             long ts1 = ss.getStartTime(); /* start of the trace */
             long ts2 = startTime + 20L * NANOSECS_PER_SEC; /* invalid, but ignored */
 

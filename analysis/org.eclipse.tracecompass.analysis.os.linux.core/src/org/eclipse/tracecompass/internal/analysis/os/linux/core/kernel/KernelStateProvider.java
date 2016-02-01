@@ -44,10 +44,8 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * This is the state change input plugin for TMF's state system which handles
- * the LTTng 2.0 kernel traces in CTF format.
- *
- * It uses the reference handler defined in CTFKernelHandler.java.
+ * This is the state change input plugin for the state system which handles the
+ * kernel traces.
  *
  * @author Alexandre Montplaisir
  */
@@ -61,7 +59,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
      * Version number of this state provider. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
-    private static final int VERSION = 11;
+    private static final int VERSION = 12;
 
     // ------------------------------------------------------------------------
     // Fields

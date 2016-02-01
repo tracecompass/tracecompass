@@ -44,7 +44,7 @@ public class SoftIrqExitHandler extends KernelEventHandler {
         Integer softIrqId = ((Long) event.getContent().getField(getLayout().fieldVec()).getValue()).intValue();
         int currentThreadNode = KernelEventHandlerUtils.getCurrentThreadNode(cpu, ss);
         /* Put this SoftIRQ back to inactive (= -1) in the resource tree */
-        int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeSoftIRQs(ss), softIrqId.toString());
+        int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeSoftIRQs(cpu, ss), softIrqId.toString());
         ITmfStateValue value = TmfStateValue.nullValue();
         long timestamp = KernelEventHandlerUtils.getTimestamp(event);
 

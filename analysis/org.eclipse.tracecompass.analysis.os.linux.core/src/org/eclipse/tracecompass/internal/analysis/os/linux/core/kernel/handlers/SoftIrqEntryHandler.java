@@ -52,7 +52,7 @@ public class SoftIrqEntryHandler extends KernelEventHandler {
          * Mark this SoftIRQ as active in the resource tree. The state value =
          * the CPU on which this SoftIRQ is processed
          */
-        int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeSoftIRQs(ss), softIrqId.toString());
+        int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeSoftIRQs(cpu, ss), softIrqId.toString());
         ITmfStateValue value = TmfStateValue.newValueInt(cpu.intValue());
         ss.modifyAttribute(timestamp, value, quark);
 

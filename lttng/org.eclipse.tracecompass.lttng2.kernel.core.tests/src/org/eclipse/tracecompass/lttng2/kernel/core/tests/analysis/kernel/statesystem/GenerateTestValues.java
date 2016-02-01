@@ -26,13 +26,14 @@ import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
+import org.junit.Test;
 
 /**
  * Small program to regenerate the values used in "TestValues.java" from the
  * current LTTng-kernel state provider.
  *
- * It will write its output the a file called 'TestValues<something>.java' in your
- * temporary files directory.
+ * It will write its output the a file called 'TestValues<something>.java' in
+ * your temporary files directory.
  *
  * @author Alexandre Montplaisir
  */
@@ -41,6 +42,17 @@ public class GenerateTestValues {
     private static @NonNull CtfTestTrace testTrace = CtfTestTrace.TRACE2;
     private static final long targetTimestamp = 18670067372290L + 1331649577946812237L;
     private static final String INDENT = "    ";
+
+    /**
+     * Test wrapper to run main properly
+     *
+     * @throws Exception
+     *             we're messing with exception
+     */
+    @Test
+    public void test() throws Exception {
+        main(null);
+    }
 
     /**
      * Run the program
