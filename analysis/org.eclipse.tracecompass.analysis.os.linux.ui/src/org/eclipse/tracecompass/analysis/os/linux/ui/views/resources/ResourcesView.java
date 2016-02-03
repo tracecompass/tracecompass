@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2016 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -67,6 +67,21 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
         super(ID, new ResourcesPresentationProvider());
         setFilterColumns(FILTER_COLUMN_NAMES);
         setFilterLabelProvider(new ResourcesFilterLabelProvider());
+        setEntryComparator(new ResourcesEntryComparator());
+    }
+
+    private static class ResourcesEntryComparator implements Comparator<ITimeGraphEntry> {
+        @Override
+        public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
+            ResourcesEntry entry1 = (ResourcesEntry) o1;
+            ResourcesEntry entry2 = (ResourcesEntry) o2;
+            if (entry1.getType() == Type.NULL && entry2.getType() == Type.NULL) {
+                /* sort trace entries alphabetically */
+                return entry1.getName().compareTo(entry2.getName());
+            }
+            /* sort resource entries by their defined order */
+            return entry1.compareTo(entry2);
+        }
     }
 
     private static class ResourcesFilterLabelProvider extends TreeLabelProvider {
@@ -111,12 +126,6 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
         if (ssq == null) {
             return;
         }
-        Comparator<ITimeGraphEntry> comparator = new Comparator<ITimeGraphEntry>() {
-            @Override
-            public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
-                return ((ResourcesEntry) o1).compareTo(o2);
-            }
-        };
 
         Map<Integer, ResourcesEntry> entryMap = new HashMap<>();
         TimeGraphEntry traceEntry = null;
@@ -142,7 +151,6 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
 
             if (traceEntry == null) {
                 traceEntry = new ResourcesEntry(trace, trace.getName(), startTime, endTime, 0);
-                traceEntry.sortChildren(comparator);
                 List<TimeGraphEntry> entryList = Collections.singletonList(traceEntry);
                 addToEntryList(parentTrace, ssq, entryList);
             } else {
