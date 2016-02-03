@@ -13,7 +13,6 @@
 
 package org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests;
 
-import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withLabel;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -41,6 +40,7 @@ import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
@@ -54,7 +54,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportTraceWizard;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportTraceWizardPage;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.Messages;
@@ -522,10 +521,8 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         fBot.button("Next >").click();
         fBot.button("&Deselect All").click();
         try {
-            String resolveLinkedResLabel = "Resolve and export linked resources";
-            fBot.waitUntil(Conditions.waitForWidget(withLabel(resolveLinkedResLabel)), 100);
-            fBot.checkBox(resolveLinkedResLabel).select();
-        } catch (TimeoutException e) {
+            fBot.checkBox("Resolve and export linked resources").select();
+        } catch (WidgetNotFoundException e) {
             // Ignore, doesn't exist pre-4.6M5
         }
 
