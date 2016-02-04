@@ -45,9 +45,9 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class CtfTestSuiteTest {
 
-    /** Time-out tests after 10 seconds. */
+    /** Time-out tests after 1 minute. */
     @Rule
-    public TestRule globalTimeout = new Timeout(10, TimeUnit.SECONDS);
+    public TestRule globalTimeout = new Timeout(1, TimeUnit.MINUTES);
 
     private static final Path BASE_PATH = Paths.get("traces", "ctf-testsuite", "tests", "1.8");
 
