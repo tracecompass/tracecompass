@@ -165,8 +165,10 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
     // ------------------------------------------------------------------------
     @Override
     public void mouseMove(@Nullable MouseEvent e) {
-        fIsHighlight = false;
-        getChart().redraw();
+        if (fIsHighlight) {
+            fIsHighlight = false;
+            getChart().redraw();
+        }
     }
 
     // ------------------------------------------------------------------------
