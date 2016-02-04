@@ -40,7 +40,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <tycho.testArgLine></tycho.testArgLine>
+    <testArgLine></testArgLine>
 
     <tycho-version>0.24.0</tycho-version>
     <tycho-extras-version>0.24.0</tycho-extras-version>
@@ -154,6 +154,9 @@
           <name>!skip-jacoco</name>
         </property>
       </activation>
+      <properties>
+        <testArgLine>${tycho.testArgLine}</testArgLine>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -482,7 +485,7 @@
                </dependency>
             </dependencies>
             <product>org.eclipse.platform.ide</product>
-            <argLine>${tycho.testArgLine} ${base.ui.test.vmargs} -Xms512m -Xmx1024m</argLine>
+            <argLine>${testArgLine} ${base.ui.test.vmargs} -Xms512m -Xmx1024m</argLine>
           </configuration>
         </plugin>
 
