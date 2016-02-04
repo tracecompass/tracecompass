@@ -61,7 +61,6 @@ import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.TmfCheckpointI
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Multimap;
 
 /**
  * Abstract implementation of ITmfTrace.
@@ -288,7 +287,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
         MultiStatus status = new MultiStatus(Activator.PLUGIN_ID, IStatus.OK, null, null);
 
         /* First modules are initialized */
-        Multimap<String, IAnalysisModuleHelper> modules = TmfAnalysisManager.getAnalysisModules();
+        Map<String, IAnalysisModuleHelper> modules = TmfAnalysisManager.getAnalysisModules(this.getClass());
         for (IAnalysisModuleHelper helper : modules.values()) {
             try {
                 IAnalysisModule module = helper.newModule(this);
