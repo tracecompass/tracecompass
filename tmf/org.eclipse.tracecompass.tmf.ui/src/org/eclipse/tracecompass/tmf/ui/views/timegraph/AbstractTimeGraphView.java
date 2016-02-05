@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2016 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -62,8 +62,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
@@ -221,9 +221,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private TreeLabelProvider fFilterLabelProvider;
 
     private int fAutoExpandLevel = ALL_LEVELS;
-
-    /** The list of color resources created by this view */
-    private final List<Color> fColors = new ArrayList<>();
 
     /** The default column index for sorting */
     private int fInitialSortColumn = 0;
@@ -1209,7 +1206,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                                         NLS.bind(org.eclipse.tracecompass.internal.tmf.ui.Messages.TmfMarker_LocationTime,
                                                 new TmfNanoTimestamp(bookmark.getTime())));
                             }
-                            marker.setAttribute(ITmfMarker.MARKER_COLOR, bookmark.getColor().getRGBA().toString());
+                            marker.setAttribute(ITmfMarker.MARKER_COLOR, bookmark.getColor().toString());
                         }
                     }, null);
                 } catch (CoreException e) {
@@ -1226,7 +1223,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                         if (bookmark.getLabel().equals(marker.getAttribute(IMarker.MESSAGE)) &&
                                 Long.toString(bookmark.getTime()).equals(marker.getAttribute(ITmfMarker.MARKER_TIME, (String) null)) &&
                                 Long.toString(bookmark.getDuration()).equals(marker.getAttribute(ITmfMarker.MARKER_DURATION, Long.toString(0))) &&
-                                bookmark.getColor().getRGBA().toString().equals(marker.getAttribute(ITmfMarker.MARKER_COLOR))) {
+                                bookmark.getColor().toString().equals(marker.getAttribute(ITmfMarker.MARKER_COLOR))) {
                             marker.delete();
                             break;
                         }
@@ -1282,12 +1279,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
     }
 
-    private List<IMarkerEvent> refreshBookmarks(final IFile editorFile) {
+    private static List<IMarkerEvent> refreshBookmarks(final IFile editorFile) {
         List<IMarkerEvent> bookmarks = new ArrayList<>();
-        for (Color color : fColors) {
-            color.dispose();
-        }
-        fColors.clear();
         if (editorFile == null || !editorFile.exists()) {
             return bookmarks;
         }
@@ -1306,8 +1299,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                             int green = Integer.valueOf(matcher.group(2));
                             int blue = Integer.valueOf(matcher.group(3));
                             int alpha = Integer.valueOf(matcher.group(4));
-                            Color color = new Color(Display.getDefault(), red, green, blue, alpha);
-                            fColors.add(color);
+                            RGBA color = new RGBA(red, green, blue, alpha);
                             bookmarks.add(new MarkerEvent(null, Long.valueOf(time), Long.valueOf(duration), IMarkerEvent.BOOKMARKS, color, label, true));
                         } catch (NumberFormatException e) {
                             Activator.getDefault().logError(e.getMessage());

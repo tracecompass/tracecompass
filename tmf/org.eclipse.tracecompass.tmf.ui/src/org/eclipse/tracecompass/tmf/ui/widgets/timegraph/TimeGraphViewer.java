@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2015 Intel Corporation, Ericsson, others
+ * Copyright (c) 2007, 2016 Intel Corporation, Ericsson, others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,7 +52,6 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -184,9 +183,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
     /** The list of markers */
     private final List<IMarkerEvent> fMarkers = new ArrayList<>();
-
-    /** The list of color resources created by this viewer */
-    private final List<Color> fColors = new ArrayList<>();
 
     private ListenerNotifier fListenerNotifier;
 
@@ -469,9 +465,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         fDataViewer.addDisposeListener(new DisposeListener() {
             @Override
             public void widgetDisposed(DisposeEvent e) {
-                for (Color color : fColors) {
-                    color.dispose();
-                }
                 if (fMarkersMenu != null) {
                     fMarkersMenu.dispose();
                 }
@@ -1243,9 +1236,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @since 2.0
      */
     public void setBookmarks(List<IMarkerEvent> bookmarks) {
-        for (IMarkerEvent bookmark : fBookmarks) {
-            checkDisposeColor(bookmark.getColor());
-        }
         fBookmarks.clear();
         if (bookmarks != null) {
             fBookmarks.addAll(bookmarks);
@@ -1304,23 +1294,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      */
     public List<IMarkerEvent> getMarkers() {
         return Collections.unmodifiableList(fMarkers);
-    }
-
-    /**
-     * Dispose the color resource if and only if it was created by this viewer.
-     *
-     * @param color
-     *            the color
-     */
-    private void checkDisposeColor(Color color) {
-        for (int i = 0; i < fColors.size(); i++) {
-            /* check for identity, not equality */
-            if (fColors.get(i) == color) {
-                color.dispose();
-                fColors.remove(i);
-                break;
-            }
-        }
     }
 
     /**
@@ -2080,9 +2053,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                         if (dialog.open() == Window.OK) {
                             final String label = dialog.getValue();
                             final RGBA rgba = dialog.getColorValue();
-                            Color color = new Color(Display.getDefault(), rgba.rgb.red, rgba.rgb.green, rgba.rgb.blue, rgba.alpha);
-                            fColors.add(color);
-                            IMarkerEvent bookmark = new MarkerEvent(null, time, duration, IMarkerEvent.BOOKMARKS, color, label, true);
+                            IMarkerEvent bookmark = new MarkerEvent(null, time, duration, IMarkerEvent.BOOKMARKS, rgba, label, true);
                             fBookmarks.add(bookmark);
                             updateMarkerList();
                             updateMarkerActions();
@@ -2090,7 +2061,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                             fireBookmarkAdded(bookmark);
                         }
                     } else {
-                        checkDisposeColor(selectedBookmark.getColor());
                         fBookmarks.remove(selectedBookmark);
                         updateMarkerList();
                         updateMarkerActions();

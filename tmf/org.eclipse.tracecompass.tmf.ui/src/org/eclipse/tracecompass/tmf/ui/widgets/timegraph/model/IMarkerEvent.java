@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 
 /**
@@ -48,7 +48,7 @@ public interface IMarkerEvent extends ITimeEvent {
      *
      * @return The color
      */
-    Color getColor();
+    RGBA getColor();
 
     /**
      * Returns true if the marker is drawn in foreground, and false otherwise.

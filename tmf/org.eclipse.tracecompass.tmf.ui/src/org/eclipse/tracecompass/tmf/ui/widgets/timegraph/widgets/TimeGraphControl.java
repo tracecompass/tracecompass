@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2015 Intel Corporation and others
+ * Copyright (c) 2007, 2016 Intel Corporation and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -1734,14 +1734,15 @@ public class TimeGraphControl extends TimeGraphBaseControl
         rect.x = Math.max(nameSpace, Math.min(bounds.width, x0));
         rect.width = Math.max(1, Math.min(bounds.width, x1) - rect.x);
 
-        gc.setBackground(marker.getColor());
-        gc.setAlpha(marker.getColor().getAlpha());
+        Color color = getColorScheme().getColor(marker.getColor());
+        gc.setBackground(color);
+        gc.setAlpha(color.getAlpha());
         gc.fillRectangle(rect);
         gc.setAlpha(255);
         String label = marker.getLabel();
         if (label != null && marker.getEntry() != null) {
             label = label.substring(0, Math.min(label.indexOf('\n') != -1 ? label.indexOf('\n') : label.length(), MAX_LABEL_LENGTH));
-            gc.setForeground(marker.getColor());
+            gc.setForeground(color);
             Utils.drawText(gc, label, rect.x - gc.textExtent(label).x, rect.y, true);
         }
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,7 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
-import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGBA;
 
 /**
  * TimeEvent implementation for marker events
@@ -22,7 +22,7 @@ import org.eclipse.swt.graphics.Color;
 public class MarkerEvent extends TimeEvent implements IMarkerEvent {
 
     private final String fCategory;
-    private final Color fColor;
+    private final RGBA fColor;
     private final String fLabel;
     private final boolean fForeground;
 
@@ -44,7 +44,7 @@ public class MarkerEvent extends TimeEvent implements IMarkerEvent {
      * @param foreground
      *            true if the marker is drawn in foreground, and false otherwise
      */
-    public MarkerEvent(ITimeGraphEntry entry, long time, long duration, String category, Color color, String label, boolean foreground) {
+    public MarkerEvent(ITimeGraphEntry entry, long time, long duration, String category, RGBA color, String label, boolean foreground) {
         super(entry, time, duration);
         fCategory = category;
         fColor = color;
@@ -72,7 +72,7 @@ public class MarkerEvent extends TimeEvent implements IMarkerEvent {
      * @param value
      *            The value of the marker
      */
-    public MarkerEvent(ITimeGraphEntry entry, long time, long duration, String category, Color color, String label, boolean foreground, int value) {
+    public MarkerEvent(ITimeGraphEntry entry, long time, long duration, String category, RGBA color, String label, boolean foreground, int value) {
         super(entry, time, duration, value);
         fCategory = category;
         fColor = color;
@@ -86,7 +86,7 @@ public class MarkerEvent extends TimeEvent implements IMarkerEvent {
     }
 
     @Override
-    public Color getColor() {
+    public RGBA getColor() {
         return fColor;
     }
 

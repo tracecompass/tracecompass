@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -21,9 +21,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGBA;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
@@ -46,7 +44,7 @@ public class LostEventsMarkerEventSource implements IMarkerEventSource {
 
     private static final String LOST_EVENTS = Messages.MarkerEvent_LostEvents;
 
-    private static final Color COLOR = new Color(Display.getDefault(), new RGBA(255, 0, 0, 50));
+    private static final RGBA COLOR = new RGBA(255, 0, 0, 50);
 
     private final @NonNull ITmfTrace fTrace;
     private long[] fLastRequest;

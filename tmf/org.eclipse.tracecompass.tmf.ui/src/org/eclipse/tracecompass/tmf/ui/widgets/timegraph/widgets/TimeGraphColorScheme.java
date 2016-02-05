@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2008, 2014 Intel Corporation, Ericsson
+ * Copyright (c) 2008, 2016 Intel Corporation, Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,8 +14,13 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGBA;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Color theme used by the timegraph view
@@ -300,13 +305,17 @@ public class TimeGraphColorScheme {
         new Mix(new SysCol(SWT.COLOR_GRAY), new SysCol(SWT.COLOR_WIDGET_BACKGROUND), 1, 6), // BACKGROUND_NAME_SEL_NOFOCUS
     };
 
+    /** Fixed scheme colors */
     private final Color fColors[];
+    /** Dynamic RGBA to Color map */
+    private final Map<RGBA, Color> fColorMap;
 
     /**
      * Default constructor
      */
     public TimeGraphColorScheme() {
         fColors = new Color[PROVIDERS_MAP.length];
+        fColorMap = new HashMap<>();
     }
 
     /**
@@ -316,6 +325,9 @@ public class TimeGraphColorScheme {
         for (int i = 0; i < fColors.length; i++) {
             Utils.dispose(fColors[i]);
             fColors[i] = null;
+        }
+        for (Color color : fColorMap.values()) {
+            color.dispose();
         }
     }
 
@@ -425,4 +437,22 @@ public class TimeGraphColorScheme {
         }
         return getColor(GR_FOREGROUND);
     }
+
+    /**
+     * Get a color resource for the specified RGBA color descriptor
+     *
+     * @param rgba
+     *            the color descriptor
+     * @return a color resource
+     * @since 2.0
+     */
+    public Color getColor(RGBA rgba) {
+        Color color = fColorMap.get(rgba);
+        if (color == null) {
+            color = new Color(Display.getDefault(), rgba);
+            fColorMap.put(rgba, color);
+        }
+        return color;
+    }
+
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2015 Intel Corporation, Ericsson
+ * Copyright (c) 2007, 2016 Intel Corporation, Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,6 +28,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -477,7 +478,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         }
     }
 
-    private static void drawMarkerLabels(List<IMarkerEvent> markerEvents, Rectangle rect, GC gc, long time0, int leftSpace, double pixelsPerNanoSec) {
+    private void drawMarkerLabels(List<IMarkerEvent> markerEvents, Rectangle rect, GC gc, long time0, int leftSpace, double pixelsPerNanoSec) {
         if (markerEvents == null) {
             return;
         }
@@ -487,7 +488,8 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
                 label = label.substring(0, Math.min(label.indexOf('\n') != -1 ? label.indexOf('\n') : label.length(), MAX_LABEL_LENGTH));
                 int x = rect.x + leftSpace + (int) (Math.floor((markerEvent.getTime() - time0) * pixelsPerNanoSec));
                 int y = rect.y + rect.height - gc.stringExtent(" ").y + 2; //$NON-NLS-1$
-                gc.setForeground(markerEvent.getColor());
+                Color color = getColorScheme().getColor(markerEvent.getColor());
+                gc.setForeground(color);
                 Utils.drawText(gc, label, x, y, true);
             }
         }
