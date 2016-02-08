@@ -159,20 +159,19 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
         assertEquals("default", 0, checked.intValue());
 
         // select root nodes and their children
-        checkTreeItem(bot, treeBot, SYSTEMD_PROCESS_NAME, 54);
-        checkTreeItem(bot, treeBot, KTHREAD_PROCESS_NAME, 88);
-        checkTreeItem(bot, treeBot, LTTNG_CONSUMER_PROCESS_NAME, 89);
+        checkFilterTreeItems(bot, treeBot, SYSTEMD_PROCESS_NAME);
+        checkFilterTreeItems(bot, treeBot, KTHREAD_PROCESS_NAME);
+        checkFilterTreeItems(bot, treeBot, LTTNG_CONSUMER_PROCESS_NAME);
 
         bot.button(OK_BUTTON).click();
     }
 
-    private static void checkTreeItem(SWTBot bot, SWTBotTree treeBot, String process, int nbChecked) {
+    private static void checkFilterTreeItems(SWTBot bot, SWTBotTree treeBot, String process) {
         SWTBotTreeItem item = SWTBotUtils.getTreeItem(bot, treeBot, process);
         item.select();
         bot.button(CHECK_SUBTREE).click();
         TreeCheckedCounter treeCheckCounter = new TreeCheckedCounter(treeBot);
-        Integer checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(process, nbChecked, checked.intValue());
+        UIThreadRunnable.syncExec(treeCheckCounter);
     }
 
     private static void testProcessSorting(final SWTBotTree tree) {
