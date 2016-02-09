@@ -70,7 +70,7 @@ public class XmlUtils {
      * Extension for XML files
      * @since 2.0
      */
-    public static final String XML_EXTENSION = ".xml"; //$NON-NLS-1$
+    public static final String XML_EXTENSION = "xml"; //$NON-NLS-1$
 
     /** Make this class non-instantiable */
     private XmlUtils() {
@@ -151,13 +151,21 @@ public class XmlUtils {
      * @return A map with all the XML analysis files
      * @since 2.0
      */
-    public static synchronized Map<String, File> listFile() {
-        Map<String, File> files = new HashMap<>();
-        File[] listOfFiles = getXmlFilesPath().toFile().listFiles();
-        for (File file : listOfFiles) {
-            files.put(file.getName(), file);
+    public static synchronized @NonNull Map<String, File> listFiles() {
+        IPath pathToFiles = XmlUtils.getXmlFilesPath();
+        File folder = pathToFiles.toFile();
+
+        Map<String, File> fileMap = new HashMap<>();
+        if ((folder.isDirectory() && folder.exists())) {
+            File[] listOfFiles = getXmlFilesPath().toFile().listFiles();
+            for (File file : listOfFiles) {
+                IPath path = new Path(file.getName());
+                if (path.getFileExtension().equals(XML_EXTENSION)) {
+                    fileMap.put(file.getName(), file);
+                }
+            }
         }
-        return Collections.unmodifiableMap(files);
+        return Collections.unmodifiableMap(fileMap);
     }
 
     /**
@@ -168,7 +176,7 @@ public class XmlUtils {
      * @since 2.0
      */
     public static void deleteFile(String name) {
-        Map<String, File> files = listFile();
+        Map<String, File> files = listFiles();
         File file = files.get(name);
         if (file == null) {
             return;

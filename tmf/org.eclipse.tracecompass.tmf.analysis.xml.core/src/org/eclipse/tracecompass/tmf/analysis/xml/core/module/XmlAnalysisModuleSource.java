@@ -18,6 +18,7 @@ import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -176,11 +177,9 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
                 }
             }
         }
-        final File[] analysisFiles = folder.listFiles();
-        if (analysisFiles != null) {
-            for (File xmlFile : analysisFiles) {
-                processFile(xmlFile);
-            }
+        Map<String, File> files = XmlUtils.listFiles();
+        for (File xmlFile : files.values()) {
+            processFile(xmlFile);
         }
     }
 

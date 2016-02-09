@@ -15,12 +15,12 @@ package org.eclipse.tracecompass.tmf.analysis.xml.ui.module;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
@@ -86,12 +86,8 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
 
     @Override
     public void moduleCreated(IAnalysisModule module) {
-        IPath pathToFiles = XmlUtils.getXmlFilesPath();
-        File fFolder = pathToFiles.toFile();
-        if (!(fFolder.isDirectory() && fFolder.exists())) {
-            return;
-        }
-        for (File xmlFile : fFolder.listFiles()) {
+        Map<String, File> files = XmlUtils.listFiles();
+        for (File xmlFile : files.values()) {
             if (!XmlUtils.xmlValidate(xmlFile).isOK()) {
                 continue;
             }

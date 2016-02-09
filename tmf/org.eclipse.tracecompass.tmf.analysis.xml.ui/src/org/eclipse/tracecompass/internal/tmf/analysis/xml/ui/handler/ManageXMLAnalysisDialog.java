@@ -16,7 +16,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -171,8 +173,8 @@ public class ManageXMLAnalysisDialog extends Dialog {
     }
 
     private void handleSelection(String[] selection) {
-        Map<String, File> files = XmlUtils.listFile();
-        File file = files.get(selection[0] + XmlUtils.XML_EXTENSION);
+        Map<String, File> files = XmlUtils.listFiles();
+        File file = files.get(createXmlFileString(selection[0]));
         if (file != null && XmlUtils.xmlValidate(file).isOK()) {
             fInvalidFileLabel.setVisible(false);
         } else {
@@ -180,12 +182,12 @@ public class ManageXMLAnalysisDialog extends Dialog {
         }
     }
 
-    private static void deleteSupplementaryFile(String selection) {
+    private static void deleteSupplementaryFile(String xmlFile) {
         // 1. Look for all traces that have this analysis
         // 2. Close them if they are opened.
         // 3. Delete the related supplementary files
         java.util.List<IResource> resourceToDelete = new ArrayList<>();
-        java.util.List<String> ids = XmlUtils.getAnalysisIdsFromFile(selection + XmlUtils.XML_EXTENSION);
+        java.util.List<String> ids = XmlUtils.getAnalysisIdsFromFile(xmlFile);
         IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects(0);
         for (IProject project : projects) {
             TmfProjectElement pElement = TmfProjectRegistry.getProject(project);
@@ -225,11 +227,12 @@ public class ManageXMLAnalysisDialog extends Dialog {
 
     private void fillAnalysesList() {
         fAnalysesList.removeAll();
-        Map<String, File> files = XmlUtils.listFile();
+        Map<String, File> files = XmlUtils.listFiles();
         for (String file : files.keySet()) {
             // Remove the extension from the file path. The extension is at the
             // end of the file path
-            fAnalysesList.add(file.substring(0, file.length() - XmlUtils.XML_EXTENSION.length()));
+            IPath path = new Path(file);
+            fAnalysesList.add(path.removeFileExtension().toString());
         }
         fDeleteButton.setEnabled(false);
         fExportButton.setEnabled(false);
@@ -271,12 +274,12 @@ public class ManageXMLAnalysisDialog extends Dialog {
         FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
         dialog.setText(NLS.bind(Messages.ManageXMLAnalysisDialog_SelectFileExport, fAnalysesList.getSelection()[0]));
         dialog.setFilterExtensions(new String[] { XML_FILTER_EXTENSION, "*" }); //$NON-NLS-1$
-        dialog.setFileName(fAnalysesList.getSelection()[0] + XmlUtils.XML_EXTENSION);
+        String selection = createXmlFileString(fAnalysesList.getSelection()[0]);
+        dialog.setFileName(selection);
         String path = dialog.open();
         if (path != null) {
-            String selection = fAnalysesList.getSelection()[0];
-            if (!XmlUtils.exportXmlFile(selection + XmlUtils.XML_EXTENSION, path).isOK()) {
-                Activator.logError(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToExport, selection + XmlUtils.XML_EXTENSION));
+            if (!XmlUtils.exportXmlFile(selection, path).isOK()) {
+                Activator.logError(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToExport, selection));
             }
         }
     }
@@ -287,9 +290,9 @@ public class ManageXMLAnalysisDialog extends Dialog {
                 Messages.ManageXMLAnalysisDialog_DeleteFile,
                 NLS.bind(Messages.ManageXMLAnalysisDialog_DeleteConfirmation, fAnalysesList.getSelection()[0]));
         if (confirm) {
-            String selection = fAnalysesList.getSelection()[0];
+            String selection = createXmlFileString(fAnalysesList.getSelection()[0]);
             deleteSupplementaryFile(selection);
-            XmlUtils.deleteFile(selection + XmlUtils.XML_EXTENSION);
+            XmlUtils.deleteFile(selection);
             fillAnalysesList();
             fInvalidFileLabel.setVisible(false);
             XmlAnalysisModuleSource.notifyModuleChange();
@@ -332,5 +335,10 @@ public class ManageXMLAnalysisDialog extends Dialog {
                 ((TmfProjectModelElement) element).getProject().refresh();
             }
         }
+    }
+
+    private static String createXmlFileString(String baseName) {
+        IPath path = new Path(baseName).addFileExtension(XmlUtils.XML_EXTENSION);
+        return path.toString();
     }
 }
