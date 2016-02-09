@@ -104,11 +104,7 @@ public class CTFStreamInput implements IDefinitionScope {
     public CTFStreamInput(ICTFStream stream, File file) {
         fStream = stream;
         fFile = file;
-        String name = fFile.getName();
-        if (name == null) {
-            throw new IllegalStateException("File cannot have a null name"); //$NON-NLS-1$
-        }
-        fFileName = name;
+        fFileName = fFile.getName();
 
         fIndex = new StreamInputPacketIndex();
         /*
