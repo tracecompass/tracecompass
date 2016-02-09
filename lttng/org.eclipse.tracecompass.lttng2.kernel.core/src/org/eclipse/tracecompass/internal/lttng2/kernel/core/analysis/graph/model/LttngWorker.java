@@ -9,10 +9,26 @@
 
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.graph.core.base.IGraphWorker;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.Attributes;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider.ProcessStatus;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
+import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 /**
  * This class represents the worker unit from the execution graph
@@ -51,10 +67,47 @@ public class LttngWorker implements IGraphWorker {
         return fHostTid.getHost();
     }
 
+    @SuppressWarnings("null")
+    @Override
+    public @NonNull Map<@NonNull String, @NonNull String> getWorkerInformation(long t) {
+
+        try {
+            int tid = fHostTid.getTid();
+            if (tid == -1) {
+                return Collections.EMPTY_MAP;
+            }
+            @Nullable KernelAnalysisModule kam = TmfTraceManager.getInstance().getActiveTraceSet().stream()
+                        .filter(trace -> trace.getHostId().equals(getHostId()))
+                        .map(trace -> TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelAnalysisModule.class, KernelAnalysisModule.ID))
+                        .filter(mod -> mod != null)
+                        .findFirst().get();
+            if (kam == null) {
+                return Collections.EMPTY_MAP;
+            }
+            ITmfStateSystem ss = kam.getStateSystem();
+            if (ss == null) {
+                return Collections.EMPTY_MAP;
+            }
+            int quark;
+            Map<String, String> info = new HashMap<>();
+            quark = ss.getQuarkAbsolute(Attributes.THREADS, Integer.toString(tid), Attributes.PRIO);
+            ITmfStateInterval interval = ss.querySingleState(t, quark);
+            ITmfStateValue stateValue = interval.getStateValue();
+            if (stateValue.getType().equals(ITmfStateValue.Type.INTEGER)) {
+                info.put(NonNullUtils.nullToEmptyString(Messages.LttngWorker_threadPriority), Integer.toString(stateValue.unboxInt()));
+            }
+            return info;
+        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
+            Activator.getDefault().logError(e.getMessage(), e);
+        }
+        return Collections.EMPTY_MAP;
+    }
+
     /**
      * Set the name of this worker
      *
-     * @param name The name of this worker
+     * @param name
+     *            The name of this worker
      */
     public void setName(String name) {
         fThreadName = name;
@@ -70,9 +123,11 @@ public class LttngWorker implements IGraphWorker {
     }
 
     /**
-     * Set the status, saving the old value that can still be accessed using {@link LttngWorker#getOldStatus()}
+     * Set the status, saving the old value that can still be accessed using
+     * {@link LttngWorker#getOldStatus()}
      *
-     * @param status The new status of this
+     * @param status
+     *            The new status of this
      */
     public void setStatus(ProcessStatus status) {
         fOldStatus = fStatus;
