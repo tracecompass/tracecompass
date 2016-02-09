@@ -9,12 +9,17 @@
 
 package org.eclipse.tracecompass.internal.analysis.graph.ui.criticalpath.view;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 
 /**
@@ -29,28 +34,28 @@ public class CriticalPathPresentationProvider extends TimeGraphPresentationProvi
      */
     public static enum State {
         /** Worker is running */
-        RUNNING         (new RGB(0x33, 0x99, 0x00)),
+        RUNNING(new RGB(0x33, 0x99, 0x00)),
         /** Worker is interrupted */
-        INTERRUPTED     (new RGB(0xff, 0xdc, 0x00)),
+        INTERRUPTED(new RGB(0xff, 0xdc, 0x00)),
         /** Worker has been preempted */
-        PREEMPTED       (new RGB(0xc8, 0x64, 0x00)),
+        PREEMPTED(new RGB(0xc8, 0x64, 0x00)),
         /** Worker waiting on a timer */
-        TIMER           (new RGB(0x33, 0x66, 0x99)),
+        TIMER(new RGB(0x33, 0x66, 0x99)),
         /** Worker is blocked, waiting on a device */
-        BLOCK_DEVICE    (new RGB(0x66, 0x00, 0xcc)),
+        BLOCK_DEVICE(new RGB(0x66, 0x00, 0xcc)),
         /** Worker is waiting for user input */
-        USER_INPUT      (new RGB(0x5a, 0x01, 0x01)),
+        USER_INPUT(new RGB(0x5a, 0x01, 0x01)),
         /** Worker is waiting on network */
-        NETWORK         (new RGB(0xff, 0x9b, 0xff)),
+        NETWORK(new RGB(0xff, 0x9b, 0xff)),
         /** Worker is waiting for an IPI */
-        IPI             (new RGB(0x66, 0x66, 0xcc)),
+        IPI(new RGB(0x66, 0x66, 0xcc)),
         /** Any other reason */
-        UNKNOWN         (new RGB(0x40, 0x3b, 0x33));
+        UNKNOWN(new RGB(0x40, 0x3b, 0x33));
 
         /** RGB color associated with a state */
         public final RGB rgb;
 
-        private State (RGB rgb) {
+        private State(RGB rgb) {
             this.rgb = rgb;
         }
     }
@@ -111,5 +116,20 @@ public class CriticalPathPresentationProvider extends TimeGraphPresentationProvi
         }
         return Messages.getMessage(Messages.CriticalFlowView_multipleStates);
     }
-}
 
+    @Override
+    @NonNullByDefault({})
+    public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime) {
+        Map<String, String> eventHoverToolTipInfo = super.getEventHoverToolTipInfo(event, hoverTime);
+        if (eventHoverToolTipInfo == null) {
+            eventHoverToolTipInfo = new LinkedHashMap<>();
+        }
+        ITimeGraphEntry entry = event.getEntry();
+        if (entry instanceof CriticalPathEntry) {
+            CriticalPathEntry criticalPathEntry = (CriticalPathEntry) entry;
+            Map<String, String> info = criticalPathEntry.getWorker().getWorkerInformation(hoverTime);
+            eventHoverToolTipInfo.putAll(info);
+        }
+        return eventHoverToolTipInfo;
+    }
+}
