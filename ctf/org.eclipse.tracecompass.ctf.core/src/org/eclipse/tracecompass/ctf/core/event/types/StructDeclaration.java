@@ -12,29 +12,32 @@
 
 package org.eclipse.tracecompass.ctf.core.event.types;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
+import org.eclipse.tracecompass.internal.ctf.core.Activator;
 
 /**
  * A CTF structure declaration.
  *
  * A structure is similar to a C structure, it is a compound data type that
- * contains other datatypes in fields. they are stored in an hashmap and indexed
- * by names which are strings.
+ * contains other datatypes in fields.
+ * <p>
+ * <strong>Note that this implementation is not synchronized.</strong> If
+ * multiple threads access an <tt>StructDeclaration</tt> instance concurrently,
+ * and at least one of the threads modifies the list structurally, by calling
+ * {@link #addField(String, IDeclaration)} it <i>must</i> be synchronized
+ * externally. This is typically not the case though as it would mean modifying
+ * the TSDL/Metadata while reading events.
+ * <p>
  *
  * @version 1.0
  * @author Matthew Khouzam
@@ -46,8 +49,10 @@ public class StructDeclaration extends Declaration {
     // Attributes
     // ------------------------------------------------------------------------
 
-    /** linked list of field names. So fieldName->fieldValue */
-    private final @NonNull Map<@NonNull String, IDeclaration> fFieldMap = new LinkedHashMap<>();
+    /** Field names */
+    private @NonNull String[] fFieldNames;
+    /** Field declarations */
+    private @NonNull IDeclaration[] fFields;
 
     /** maximum bit alignment */
     private long fMaxAlign;
@@ -66,6 +71,8 @@ public class StructDeclaration extends Declaration {
      */
     public StructDeclaration(long align) {
         fMaxAlign = Math.max(align, 1);
+        fFieldNames = new @NonNull String[0];
+        fFields = new @NonNull IDeclaration[0];
     }
 
     // ------------------------------------------------------------------------
@@ -89,7 +96,7 @@ public class StructDeclaration extends Declaration {
      * @return does the field exist?
      */
     public boolean hasField(String name) {
-        return fFieldMap.containsKey(name);
+        return Arrays.asList(fFieldNames).contains(name);
     }
 
     /**
@@ -101,17 +108,20 @@ public class StructDeclaration extends Declaration {
      */
     @Nullable
     public IDeclaration getField(String fieldName) {
-        return fFieldMap.get(fieldName);
+        final int indexOf = Arrays.asList(fFieldNames).indexOf(fieldName);
+        if (indexOf == -1) {
+            return null;
+        }
+        return fFields[indexOf];
     }
 
     /**
-     * Gets the field list. Very important since the map of fields does not
-     * retain the order of the fields.
+     * Gets the field list.
      *
      * @return the field list.
      */
     public @NonNull Iterable<@NonNull String> getFieldsList() {
-        return fFieldMap.keySet();
+        return Arrays.asList(fFieldNames);
     }
 
     @Override
@@ -121,11 +131,11 @@ public class StructDeclaration extends Declaration {
 
     @Override
     public int getMaximumSize() {
-        int maxSize = 0;
-        for (IDeclaration field : fFieldMap.values()) {
+        long maxSize = 0;
+        for (IDeclaration field : fFields) {
             maxSize += field.getMaximumSize();
         }
-        return Math.min(maxSize, Integer.MAX_VALUE);
+        return (int) Math.min(maxSize, Integer.MAX_VALUE);
     }
 
     // ------------------------------------------------------------------------
@@ -136,7 +146,7 @@ public class StructDeclaration extends Declaration {
     public StructDefinition createDefinition(IDefinitionScope definitionScope,
             String fieldName, BitBuffer input) throws CTFException {
         alignRead(input);
-        final Definition[] myFields = new Definition[fFieldMap.size()];
+        final Definition[] myFields = new Definition[fFields.length];
         StructDefinition structDefinition = null;
         if (definitionScope == null) {
             InternalDef localDefinitionScope = new InternalDef(null, null);
@@ -168,16 +178,16 @@ public class StructDeclaration extends Declaration {
     public StructDefinition createDefinition(IDefinitionScope definitionScope,
             ILexicalScope fieldScope, @NonNull BitBuffer input) throws CTFException {
         alignRead(input);
-        final Definition[] myFields = new Definition[fFieldMap.size()];
+        final Definition[] myFields = new Definition[fFields.length];
 
         StructDefinition structDefinition = new StructDefinition(this, definitionScope,
-                fieldScope, fieldScope.getName(), fFieldMap.keySet(), myFields);
+                fieldScope, fieldScope.getName(), Arrays.asList(fFieldNames), myFields);
         fillStruct(input, myFields, structDefinition);
         return structDefinition;
     }
 
     /**
-     * Add a field to the struct
+     * Add a field to the struct, will not add a field that is already declared
      *
      * @param name
      *            the name of the field, scopeless
@@ -185,17 +195,28 @@ public class StructDeclaration extends Declaration {
      *            the declaration of the field
      */
     public void addField(@NonNull String name, @NonNull IDeclaration declaration) {
-        fFieldMap.put(name, declaration);
+        if (hasField(name)) {
+            Activator.log(IStatus.WARNING, "Struct already contains a field named " + name); //$NON-NLS-1$
+            return;
+        }
+        /* extend by one */
+        final int length = fFieldNames.length;
+        @NonNull String[] names = Arrays.copyOf(fFieldNames, length + 1);
+        @NonNull IDeclaration[] fields = Arrays.copyOf(fFields, length + 1);
+        /* set the value */
+        names[length] = name;
+        fields[length] = declaration;
+        fFieldNames = names;
+        fFields = fields;
         fMaxAlign = Math.max(fMaxAlign, declaration.getAlignment());
     }
 
-    private void fillStruct(@NonNull BitBuffer input, final Definition[] myFields, StructDefinition structDefinition) throws CTFException {
-        Iterator<Map.Entry<String, IDeclaration>> iter = fFieldMap.entrySet().iterator();
-        for (int i = 0; i < fFieldMap.size(); i++) {
-            Map.Entry<String, IDeclaration> entry = iter.next();
+    private void fillStruct(@NonNull BitBuffer input, final IDefinition[] myFields, StructDefinition structDefinition) throws CTFException {
+        final @NonNull String[] fieldNames = fFieldNames;
+        final @NonNull IDeclaration[] fields = fFields;
+        for (int i = 0; i < fields.length; i++) {
             /* We should not have inserted null keys... */
-            String key = checkNotNull(entry.getKey());
-            myFields[i] = entry.getValue().createDefinition(structDefinition, key, input);
+            myFields[i] = fields[i].createDefinition(structDefinition, fieldNames[i], input);
         }
     }
 
@@ -217,13 +238,13 @@ public class StructDeclaration extends Declaration {
      */
     public StructDefinition createFieldDefinition(ICompositeDefinition eventHeaderDef, IDefinitionScope definitionScope, ILexicalScope fields, @NonNull BitBuffer input) throws CTFException {
         alignRead(input);
-        final Definition[] myFields = new Definition[fFieldMap.size()];
+        final Definition[] myFields = new Definition[fFields.length];
         IDefinitionScope merged = definitionScope;
         if (eventHeaderDef != null) {
             merged = new InternalDef(definitionScope, eventHeaderDef);
         }
         StructDefinition structDefinition = new StructDefinition(this, merged,
-                fields, fields.getName(), fFieldMap.keySet(), myFields);
+                fields, fields.getName(), Arrays.asList(fFieldNames), myFields);
         if (merged instanceof InternalDef) {
             InternalDef internalDef = (InternalDef) merged;
             internalDef.setDefinition(structDefinition);
@@ -308,8 +329,8 @@ public class StructDeclaration extends Declaration {
         /* Only used for debugging */
         StringBuilder sb = new StringBuilder();
         sb.append("[declaration] struct["); //$NON-NLS-1$
-        for (Entry<String, IDeclaration> field : fFieldMap.entrySet()) {
-            sb.append(field.getKey()).append(':').append(field.getValue());
+        for (int i = 0; i < fFields.length; i++) {
+            sb.append(fFieldNames[i]).append(':').append(fFields[i]);
         }
         sb.append(']');
         return sb.toString();
@@ -319,9 +340,9 @@ public class StructDeclaration extends Declaration {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        for (Entry<String, IDeclaration> field : fFieldMap.entrySet()) {
-            result = prime * result + field.getKey().hashCode();
-            result = prime * result + field.getValue().hashCode();
+        for (int i = 0; i < fFields.length; i++) {
+            result = prime * result + fFieldNames[i].hashCode();
+            result = prime * result + fFields[i].hashCode();
         }
         result = (prime * result) + (int) (fMaxAlign ^ (fMaxAlign >>> 32));
         return result;
@@ -339,24 +360,17 @@ public class StructDeclaration extends Declaration {
             return false;
         }
         StructDeclaration other = (StructDeclaration) obj;
-        if (fFieldMap.size() != other.fFieldMap.size()) {
+        if (fFields.length != other.fFields.length) {
             return false;
         }
 
-        List<String> localFieldNames = new ArrayList<>();
-        localFieldNames.addAll(fFieldMap.keySet());
-
-        List<IDeclaration> localDecs = new ArrayList<>();
-        localDecs.addAll(fFieldMap.values());
-
-        List<String> otherFieldNames = new ArrayList<>();
-        otherFieldNames.addAll(other.fFieldMap.keySet());
-
-        List<IDeclaration> otherDecs = new ArrayList<>();
-        otherDecs.addAll(other.fFieldMap.values());
+        List<String> localFieldNames = Arrays.asList(fFieldNames);
+        List<IDeclaration> localDecs = Arrays.asList(fFields);
+        List<String> otherFieldNames = Arrays.asList(other.fFieldNames);
+        List<IDeclaration> otherDecs = Arrays.asList(other.fFields);
 
         // check fields in order
-        for (int i = 0; i < fFieldMap.size(); i++) {
+        for (int i = 0; i < fFields.length; i++) {
             if ((!localFieldNames.get(i).equals(otherFieldNames.get(i))) ||
                     (!otherDecs.get(i).equals(localDecs.get(i)))) {
                 return false;
@@ -381,14 +395,12 @@ public class StructDeclaration extends Declaration {
             return false;
         }
         StructDeclaration other = (StructDeclaration) obj;
-        if (fFieldMap.size() != other.fFieldMap.size()) {
+        if (fFields.length != other.fFields.length) {
             return false;
         }
-        List<IDeclaration> localDecs = new ArrayList<>();
-        localDecs.addAll(fFieldMap.values());
-        List<IDeclaration> otherDecs = new ArrayList<>();
-        otherDecs.addAll(other.fFieldMap.values());
-        for (int i = 0; i < fFieldMap.size(); i++) {
+        List<IDeclaration> localDecs = Arrays.asList(fFields);
+        List<IDeclaration> otherDecs = Arrays.asList(other.fFields);
+        for (int i = 0; i < fFields.length; i++) {
             if (!otherDecs.get(i).isBinaryEquivalent(localDecs.get(i))) {
                 return false;
             }

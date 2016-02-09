@@ -24,6 +24,7 @@ import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.parser.CTFParser;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.AbstractScopedCommonTreeParser;
+import org.eclipse.tracecompass.internal.ctf.core.event.metadata.MetadataStrings;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ParseException;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.enumeration.EnumParser;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.floatingpoint.FloatDeclarationParser;
@@ -127,14 +128,16 @@ public final class TypeSpecifierListParser extends AbstractScopedCommonTreeParse
         case CTFParser.STRUCT:
             declaration = StructParser.INSTANCE.parse(firstChild, new StructParser.Param(trace, identifier, scope));
             StructDeclaration structDeclaration = (StructDeclaration) declaration;
-            IDeclaration idEnumDecl = structDeclaration.getField("id"); //$NON-NLS-1$
-            if (idEnumDecl instanceof EnumDeclaration) {
-                EnumDeclaration enumDeclaration = (EnumDeclaration) idEnumDecl;
-                ByteOrder bo = enumDeclaration.getContainerType().getByteOrder();
-                if (EventHeaderCompactDeclaration.getEventHeader(bo).isCompactEventHeader(structDeclaration)) {
-                    declaration = EventHeaderCompactDeclaration.getEventHeader(bo);
-                } else if (EventHeaderLargeDeclaration.getEventHeader(bo).isLargeEventHeader(structDeclaration)) {
-                    declaration = EventHeaderLargeDeclaration.getEventHeader(bo);
+            if (structDeclaration.hasField(MetadataStrings.ID)) {
+                IDeclaration idEnumDecl = structDeclaration.getField(MetadataStrings.ID);
+                if (idEnumDecl instanceof EnumDeclaration) {
+                    EnumDeclaration enumDeclaration = (EnumDeclaration) idEnumDecl;
+                    ByteOrder bo = enumDeclaration.getContainerType().getByteOrder();
+                    if (EventHeaderCompactDeclaration.getEventHeader(bo).isCompactEventHeader(structDeclaration)) {
+                        declaration = EventHeaderCompactDeclaration.getEventHeader(bo);
+                    } else if (EventHeaderLargeDeclaration.getEventHeader(bo).isLargeEventHeader(structDeclaration)) {
+                        declaration = EventHeaderLargeDeclaration.getEventHeader(bo);
+                    }
                 }
             }
             break;
