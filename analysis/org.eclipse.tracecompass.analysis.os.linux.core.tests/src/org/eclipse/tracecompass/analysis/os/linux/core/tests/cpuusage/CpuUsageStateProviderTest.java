@@ -19,20 +19,25 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.KernelCpuUsageAnalysis;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.Attributes;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.StateSystemTestUtils;
+import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.StateIntervalStub;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -151,44 +156,51 @@ public class CpuUsageStateProviderTest {
                 assertEquals(3, ss.getSubAttributes(cpuQuark, false).size());
             }
 
-            /* Proc 2 on CPU 0 should run from 1 to 20 seconds */
-            int proc2Quark = ss.getQuarkAbsolute(Attributes.CPUS, "0", "2");
-            ITmfStateInterval interval = ss.querySingleState(2L, proc2Quark);
-            assertEquals(1L, interval.getStartTime());
-            assertEquals(19L, interval.getEndTime());
+            /* Test the intervals of proc2 on CPU 0 */
+            List<@NonNull ITmfStateInterval> intervals = new ArrayList<>();
+            intervals.add(new StateIntervalStub(1, 19, TmfStateValue.nullValue()));
+            intervals.add(new StateIntervalStub(20, 25, TmfStateValue.newValueLong(19L)));
+            StateSystemTestUtils.testIntervalForAttributes(ss, intervals, Attributes.CPUS, "0", "2");
+
+            /* Test the intervals of proc 4 CPU 1 */
+            intervals.clear();
+            intervals.add(new StateIntervalStub(1, 4, TmfStateValue.nullValue()));
+            intervals.add(new StateIntervalStub(5, 14, TmfStateValue.newValueLong(3L)));
+            intervals.add(new StateIntervalStub(15, 25, TmfStateValue.newValueLong(8L)));
+            StateSystemTestUtils.testIntervalForAttributes(ss, intervals, Attributes.CPUS, "1", "4");
+
+            /* Test the intervals of proc 3 on both CPUs */
+            intervals.clear();
+            intervals.add(new StateIntervalStub(1, 24, TmfStateValue.nullValue()));
+            intervals.add(new StateIntervalStub(25, 25, TmfStateValue.newValueLong(5L)));
+            StateSystemTestUtils.testIntervalForAttributes(ss, intervals, Attributes.CPUS, "0", "3");
+
+            intervals.clear();
+            intervals.add(new StateIntervalStub(1, 1, TmfStateValue.nullValue()));
+            intervals.add(new StateIntervalStub(2, 9, TmfStateValue.newValueLong(1L)));
+            intervals.add(new StateIntervalStub(10, 25, TmfStateValue.newValueLong(6L)));
+            StateSystemTestUtils.testIntervalForAttributes(ss, intervals, Attributes.CPUS, "1", "3");
 
             /*
              * Query at the end and make sure all processes on all CPU have the
              * expected values
              */
-            List<ITmfStateInterval> state = ss.queryFullState(25L);
+            Map<@NonNull String @NonNull [], @NonNull ITmfStateValue> map = new HashMap<>();
+            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "0", "1"), TmfStateValue.newValueLong(0L));
+            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "0", "2"), TmfStateValue.newValueLong(19L));
+            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "0", "3"), TmfStateValue.newValueLong(5L));
+            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "1", "1"), TmfStateValue.newValueLong(5L));
+            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "1", "3"), TmfStateValue.newValueLong(6L));
+            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "1", "4"), TmfStateValue.newValueLong(8L));
+            StateSystemTestUtils.testValuesAtTime(ss, 25L, map);
 
-            int quark = ss.getQuarkAbsolute("CPUs", "0", "1");
-            assertEquals(0L, state.get(quark).getStateValue().unboxLong());
-
-            quark = ss.getQuarkAbsolute("CPUs", "0", "2");
-            assertEquals(19L, state.get(quark).getStateValue().unboxLong());
-
-            quark = ss.getQuarkAbsolute("CPUs", "0", "3");
-            assertEquals(5L, state.get(quark).getStateValue().unboxLong());
-
-            quark = ss.getQuarkAbsolute("CPUs", "1", "1");
-            assertEquals(5L, state.get(quark).getStateValue().unboxLong());
-
-            quark = ss.getQuarkAbsolute("CPUs", "1", "3");
-            assertEquals(6L, state.get(quark).getStateValue().unboxLong());
-
-            quark = ss.getQuarkAbsolute("CPUs", "1", "4");
-            assertEquals(8L, state.get(quark).getStateValue().unboxLong());
-
-        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
+        } catch (AttributeNotFoundException e) {
             fail(e.getMessage());
         }
     }
 
     /**
-     * Test the
-     * {@link KernelCpuUsageAnalysis#getCpuUsageInRange(long, long)}
+     * Test the {@link KernelCpuUsageAnalysis#getCpuUsageInRange(long, long)}
      * method.
      */
     @Test
