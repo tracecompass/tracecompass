@@ -157,12 +157,16 @@ public class XmlUtils {
 
         Map<String, File> fileMap = new HashMap<>();
         if ((folder.isDirectory() && folder.exists())) {
-            File[] listOfFiles = getXmlFilesPath().toFile().listFiles();
-            for (File file : listOfFiles) {
-                IPath path = new Path(file.getName());
-                if (path.getFileExtension().equals(XML_EXTENSION)) {
-                    fileMap.put(file.getName(), file);
+            File[] listOfFiles = folder.listFiles();
+            if (listOfFiles != null) {
+                for (File file : listOfFiles) {
+                    IPath path = new Path(file.getName());
+                    if (path.getFileExtension().equals(XML_EXTENSION)) {
+                        fileMap.put(file.getName(), file);
+                    }
                 }
+            } else {
+                Activator.logError("I/O error occured while accessing files in folder " + folder.getPath()); //$NON-NLS-1$
             }
         }
         return Collections.unmodifiableMap(fileMap);
