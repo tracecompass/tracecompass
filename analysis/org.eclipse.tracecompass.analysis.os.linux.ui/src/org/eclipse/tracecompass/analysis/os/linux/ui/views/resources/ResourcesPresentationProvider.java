@@ -111,7 +111,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             } else if (entry.getType() == Type.IRQ) {
                 return State.IRQ_ACTIVE;
             } else if (entry.getType() == Type.SOFT_IRQ) {
-                if (value == StateValues.SOFT_IRQ_RAISED) {
+                if (value == StateValues.CPU_STATUS_SOFT_IRQ_RAISED) {
                     return State.SOFT_IRQ_RAISED;
                 }
                 return State.SOFT_IRQ_ACTIVE;

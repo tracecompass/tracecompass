@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.StateValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -42,10 +43,20 @@ public class SoftIrqRaiseHandler extends KernelEventHandler {
             return;
         }
         /*
-         * Mark this SoftIRQ as *raised* in the resource tree. State value = -2
+         * Mark this SoftIRQ as *raised* in the resource tree.
          */
         int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeSoftIRQs(cpu, ss), softIrqId.toString());
-        ITmfStateValue value = StateValues.SOFT_IRQ_RAISED_VALUE;
+
+        ITmfStateValue value = (isInSoftirq(ss.queryOngoingState(quark)) ?
+                StateValues.SOFT_IRQ_RAISED_RUNNING_VALUE :
+                StateValues.SOFT_IRQ_RAISED_VALUE);
         ss.modifyAttribute(KernelEventHandlerUtils.getTimestamp(event), value, quark);
+
+    }
+
+    private static boolean isInSoftirq(@Nullable ITmfStateValue state) {
+        return (state != null &&
+                !state.isNull() &&
+                (state.unboxInt() & StateValues.CPU_STATUS_SOFTIRQ) == StateValues.CPU_STATUS_SOFTIRQ);
     }
 }

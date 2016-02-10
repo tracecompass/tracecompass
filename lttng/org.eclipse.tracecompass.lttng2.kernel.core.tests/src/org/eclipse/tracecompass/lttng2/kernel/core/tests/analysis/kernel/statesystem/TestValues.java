@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -2118,7 +2118,7 @@ interface TestValues {
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.newValueInt(1397),
-        TmfStateValue.newValueInt(1),
+        TmfStateValue.newValueInt(2),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
@@ -2139,7 +2139,7 @@ interface TestValues {
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.newValueInt(1432),
-        TmfStateValue.newValueInt(2),
+        TmfStateValue.newValueInt(4),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),

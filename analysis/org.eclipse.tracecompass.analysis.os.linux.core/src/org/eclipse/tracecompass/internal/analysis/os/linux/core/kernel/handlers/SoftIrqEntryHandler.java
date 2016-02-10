@@ -18,7 +18,6 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEven
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
@@ -46,14 +45,13 @@ public class SoftIrqEntryHandler extends KernelEventHandler {
         long timestamp = KernelEventHandlerUtils.getTimestamp(event);
         Integer softIrqId = ((Long) event.getContent().getField(getLayout().fieldVec()).getValue()).intValue();
         int currentCPUNode = KernelEventHandlerUtils.getCurrentCPUNode(cpu, ss);
-        int currentThreadNode = KernelEventHandlerUtils.getCurrentThreadNode(cpu,ss);
+        int currentThreadNode = KernelEventHandlerUtils.getCurrentThreadNode(cpu, ss);
 
         /*
-         * Mark this SoftIRQ as active in the resource tree. The state value =
-         * the CPU on which this SoftIRQ is processed
+         * Mark this SoftIRQ as active in the resource tree.
          */
         int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeSoftIRQs(cpu, ss), softIrqId.toString());
-        ITmfStateValue value = TmfStateValue.newValueInt(cpu.intValue());
+        ITmfStateValue value = StateValues.CPU_STATUS_SOFTIRQ_VALUE;
         ss.modifyAttribute(timestamp, value, quark);
 
         /* Change the status of the running process to interrupted */
