@@ -1698,14 +1698,14 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     hasEntries = !fEntryList.isEmpty();
                 }
                 boolean inputChanged = fEntryList != fTimeGraphWrapper.getInput();
-                if (inputChanged) {
-                    TimeGraphCombo combo = getTimeGraphCombo();
-                    try {
-                        // Set redraw to false to only draw once
-                        if (combo != null) {
-                            combo.getTreeViewer().getTree().setRedraw(false);
-                        }
-                        getTimeGraphViewer().getTimeGraphControl().setRedraw(false);
+                TimeGraphCombo combo = getTimeGraphCombo();
+                try {
+                    // Set redraw to false to only draw once
+                    if (combo != null) {
+                        combo.getTreeViewer().getTree().setRedraw(false);
+                    }
+                    getTimeGraphViewer().getTimeGraphControl().setRedraw(false);
+                    if (inputChanged) {
                         fTimeGraphWrapper.setInput(fEntryList);
                         /* restore the previously saved filters, if any */
                         fTimeGraphWrapper.setFilters(fFiltersMap.get(fTrace));
@@ -1714,14 +1714,20 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                         fTimeGraphWrapper.getTimeGraphViewer().setMarkerCategories(getMarkerCategories());
                         fTimeGraphWrapper.getTimeGraphViewer().setMarkers(null);
                         applyViewContext();
-                    } finally {
-                        if (combo != null) {
-                            combo.getTreeViewer().getTree().setRedraw(true);
-                        }
-                        getTimeGraphViewer().getTimeGraphControl().setRedraw(true);
+                    } else {
+                        fTimeGraphWrapper.refresh();
                     }
-                } else {
-                    fTimeGraphWrapper.refresh();
+                    // reveal selection
+                    if (fIsRevealSelection) {
+                        fIsRevealSelection = false;
+                        ITimeGraphEntry entry1 = fTimeGraphWrapper.getSelection();
+                        fTimeGraphWrapper.setSelection(entry1);
+                    }
+                } finally {
+                    if (combo != null) {
+                        combo.getTreeViewer().getTree().setRedraw(true);
+                    }
+                    getTimeGraphViewer().getTimeGraphControl().setRedraw(true);
                 }
                 long startBound = (fStartTime == Long.MAX_VALUE ? SWT.DEFAULT : fStartTime);
                 long endBound = (fEndTime == Long.MIN_VALUE ? SWT.DEFAULT : fEndTime);
@@ -1748,13 +1754,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     if (hasEntries) {
                         fPackDone = true;
                     }
-                }
-
-                // reveal selection
-                if (fIsRevealSelection) {
-                    fIsRevealSelection = false;
-                    ITimeGraphEntry entry1 = fTimeGraphWrapper.getSelection();
-                    fTimeGraphWrapper.setSelection(entry1);
                 }
 
                 if (!zoomThread) {
