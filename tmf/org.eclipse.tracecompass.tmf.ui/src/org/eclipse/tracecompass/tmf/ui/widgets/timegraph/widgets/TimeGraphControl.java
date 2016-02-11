@@ -1082,7 +1082,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      */
     public void setMarkers(List<IMarkerEvent> markers) {
         fMarkers = markers;
-        fTimeGraphScale.setMarkers(markers);
     }
 
     /**
@@ -1104,7 +1103,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      */
     public void setMarkersVisible(boolean visible) {
         fMarkersVisible = visible;
-        fTimeGraphScale.setMarkersVisible(visible);
     }
 
     /**
@@ -2718,12 +2716,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 // over the time scale
                 horizontalZoom = true;
             } else if (e.y >= getSize().y) {
-                // over the horizontal scroll bar
-                if ((e.stateMask & SWT.MODIFIER_MASK) == SWT.CTRL) {
-                    horizontalZoom = true;
-                } else {
-                    horizontalScroll = true;
-                }
+                // over the marker axis
+                horizontalZoom = true;
             } else {
                 if ((e.stateMask & SWT.MODIFIER_MASK) == (SWT.SHIFT | SWT.CTRL)) {
                     verticalZoom = true;

@@ -28,7 +28,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -39,7 +38,6 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 
@@ -115,8 +113,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     private static final int NO_BUTTON = 0;
     private static final int LEFT_BUTTON = 1;
 
-    private static final int MAX_LABEL_LENGTH = 256;
-
     private ITimeDataProvider fTimeProvider;
     private int fDragState = NO_BUTTON;
     private int fDragX0 = 0;
@@ -126,8 +122,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     private boolean fIsInUpdate;
     private int fHeight;
     private List<Integer> fTickList = new ArrayList<>();
-    private List<IMarkerEvent> fMarkers = null;
-    private boolean fMarkersVisible = true;
 
     /**
      * Standard constructor
@@ -217,28 +211,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
      */
     public List<Integer> getTickList() {
         return fTickList;
-    }
-
-    /**
-     * Set the markers list.
-     *
-     * @param markers
-     *            The markers list, or null
-     * @since 2.0
-     */
-    public void setMarkers(List<IMarkerEvent> markers) {
-        fMarkers = markers;
-    }
-
-    /**
-     * Set the markers visibility. The default is true.
-     *
-     * @param visible
-     *            true to show the markers, false otherwise
-     * @since 2.0
-     */
-    public void setMarkersVisible(boolean visible) {
-        fMarkersVisible = visible;
     }
 
     private long calcTimeDelta(int width, double pixelsPerNanoSec) {
@@ -471,28 +443,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
             }
         }
         fTickList = tickList;
-
-        // draw marker labels
-        if (fMarkersVisible) {
-            drawMarkerLabels(fMarkers, rect, gc, time0, leftSpace, pixelsPerNanoSec);
-        }
-    }
-
-    private void drawMarkerLabels(List<IMarkerEvent> markerEvents, Rectangle rect, GC gc, long time0, int leftSpace, double pixelsPerNanoSec) {
-        if (markerEvents == null) {
-            return;
-        }
-        for (IMarkerEvent markerEvent : markerEvents) {
-            String label = markerEvent.getLabel();
-            if (label != null && markerEvent.getEntry() == null) {
-                label = label.substring(0, Math.min(label.indexOf('\n') != -1 ? label.indexOf('\n') : label.length(), MAX_LABEL_LENGTH));
-                int x = rect.x + leftSpace + (int) (Math.floor((markerEvent.getTime() - time0) * pixelsPerNanoSec));
-                int y = rect.y + rect.height - gc.stringExtent(" ").y + 2; //$NON-NLS-1$
-                Color color = getColorScheme().getColor(markerEvent.getColor());
-                gc.setForeground(color);
-                Utils.drawText(gc, label, x, y, true);
-            }
-        }
     }
 
     private static void drawRangeDecorators(Rectangle rect, GC gc, int x1, int x2) {

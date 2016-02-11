@@ -81,6 +81,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvid
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeDataProviderCyclesConverter;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphMarkerAxis;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphScale;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphTooltipHandler;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
@@ -130,13 +131,14 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
     private TimeGraphControl fTimeGraphCtrl;
     private TimeGraphScale fTimeScaleCtrl;
+    private TimeGraphMarkerAxis fMarkerAxisCtrl;
     private Slider fHorizontalScrollBar;
     private Slider fVerticalScrollBar;
-    private TimeGraphColorScheme fColorScheme;
+    private @NonNull TimeGraphColorScheme fColorScheme = new TimeGraphColorScheme();
     private Object fInputElement;
     private ITimeGraphContentProvider fTimeGraphContentProvider;
     private ITimeGraphPresentationProvider fTimeGraphProvider;
-    private ITimeDataProvider fTimeDataProvider = this;
+    private @NonNull ITimeDataProvider fTimeDataProvider = this;
     private TimeGraphTooltipHandler fToolTipHandler;
 
     private List<ITimeGraphSelectionListener> fSelectionListeners = new ArrayList<>();
@@ -453,12 +455,12 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      */
     protected Control createDataViewer(Composite parent, int style) {
         loadOptions();
-        fColorScheme = new TimeGraphColorScheme();
         fDataViewer = new Composite(parent, style) {
             @Override
             public void redraw() {
                 fTimeScaleCtrl.redraw();
                 fTimeGraphCtrl.redraw();
+                fMarkerAxisCtrl.redraw();
                 super.redraw();
             }
         };
@@ -538,6 +540,15 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                     }
                 }
                 adjustVerticalScrollBar();
+            }
+        });
+
+        fMarkerAxisCtrl = createTimeGraphMarkerAxis(fTimeAlignedComposite, fColorScheme, this);
+        fMarkerAxisCtrl.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
+        fMarkerAxisCtrl.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseScrolled(MouseEvent e) {
+                fTimeGraphCtrl.zoom(e.count > 0);
             }
         });
 
@@ -623,6 +634,23 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     protected TimeGraphControl createTimeGraphControl(Composite parent,
             TimeGraphColorScheme colors) {
         return new TimeGraphControl(parent, colors);
+    }
+
+    /**
+     * Create a new time graph marker axis.
+     *
+     * @param parent
+     *            The parent composite object
+     * @param colorScheme
+     *            The color scheme to use
+     * @param timeProvider
+     *            The time data provider
+     * @return The new TimeGraphMarkerAxis
+     * @since 2.0
+     */
+    protected TimeGraphMarkerAxis createTimeGraphMarkerAxis(Composite parent,
+            @NonNull TimeGraphColorScheme colorScheme, @NonNull ITimeDataProvider timeProvider) {
+        return new TimeGraphMarkerAxis(parent, colorScheme, timeProvider);
     }
 
     /**
@@ -741,6 +769,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         }
         fTimeGraphCtrl.refreshData(traces);
         fTimeScaleCtrl.redraw();
+        fMarkerAxisCtrl.redraw();
         updateMarkerActions();
         adjustVerticalScrollBar();
     }
@@ -813,6 +842,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         }
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
+        fMarkerAxisCtrl.redraw();
+        /* force update the controls to keep them aligned */
+        fTimeScaleCtrl.update();
+        fMarkerAxisCtrl.update();
+        fTimeGraphCtrl.update();
     }
 
     @Override
@@ -894,6 +928,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         adjustHorizontalScrollBar();
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
+        fMarkerAxisCtrl.redraw();
+        /* force update the controls to keep them aligned */
+        fTimeScaleCtrl.update();
+        fMarkerAxisCtrl.update();
+        fTimeGraphCtrl.update();
     }
 
     @Override
@@ -955,6 +994,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
+        fMarkerAxisCtrl.redraw();
         updateMarkerActions();
 
         if ((time0 != fTime0) || (time1 != fTime1)) {
@@ -2337,7 +2377,8 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             markers.addAll(fBookmarks);
         }
         Collections.sort(markers, new MarkerComparator());
-        getTimeGraphControl().setMarkers(markers);
+        fTimeGraphCtrl.setMarkers(markers);
+        fMarkerAxisCtrl.setMarkers(markers);
     }
 
     private void adjustHorizontalScrollBar() {

@@ -53,6 +53,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -76,8 +77,10 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ITimeGraphEntry
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ShowFilterDialogAction;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphMarkerAxis;
 
 import com.google.common.collect.Iterables;
 
@@ -191,6 +194,83 @@ public class TimeGraphCombo extends Composite {
                     });
                 }
             };
+        }
+
+        private class TimeGraphMarkerAxisExtension extends TimeGraphMarkerAxis {
+            private int fMargin = 0;
+
+            public TimeGraphMarkerAxisExtension(Composite parent, @NonNull TimeGraphColorScheme colorScheme, @NonNull ITimeDataProvider timeProvider) {
+                super(parent, colorScheme, timeProvider);
+            }
+
+            @Override
+            public Point computeSize(int wHint, int hHint, boolean changed) {
+                Point size = super.computeSize(wHint, hHint, changed);
+                if (size.y > 0) {
+                    size.y += fMargin;
+                }
+                return size;
+            }
+
+            @Override
+            public void redraw() {
+                super.redraw();
+                fTreeViewer.getControl().redraw();
+            }
+
+            @Override
+            protected void drawMarkerAxis(Rectangle bounds, int nameSpace, GC gc) {
+                super.drawMarkerAxis(bounds, nameSpace, gc);
+            }
+
+            private Rectangle getAxisBounds() {
+                Tree tree = fTreeViewer.getTree();
+                Rectangle axisBounds = getBounds();
+                Rectangle treeClientArea = tree.getClientArea();
+                if (axisBounds.isEmpty()) {
+                    treeClientArea.y += treeClientArea.height;
+                    treeClientArea.height = 0;
+                    return treeClientArea;
+                }
+                Composite axisParent = getParent();
+                Point axisDisplayCoordinates = axisParent.toDisplay(axisBounds.x, axisBounds.y);
+                Point axisTreeCoordinates = tree.toControl(axisDisplayCoordinates);
+                int height = treeClientArea.y + treeClientArea.height - axisTreeCoordinates.y;
+                int margin = Math.max(0, axisBounds.height - height);
+                if (fMargin != margin) {
+                    fMargin = margin;
+                    getParent().layout();
+                    redraw();
+                    axisTreeCoordinates.y -= margin;
+                    height += margin;
+                }
+                return new Rectangle(treeClientArea.x, axisTreeCoordinates.y, treeClientArea.width, height);
+            }
+        }
+
+        @Override
+        protected TimeGraphMarkerAxis createTimeGraphMarkerAxis(Composite parent, @NonNull TimeGraphColorScheme colorScheme, @NonNull ITimeDataProvider timeProvider) {
+            TimeGraphMarkerAxisExtension timeGraphMarkerAxis = new TimeGraphMarkerAxisExtension(parent, colorScheme, timeProvider);
+            Tree tree = fTreeViewer.getTree();
+            tree.addPaintListener(new PaintListener() {
+                @Override
+                public void paintControl(PaintEvent e) {
+                    /*
+                     * Draw the marker axis over the tree. Only the name area
+                     * will be drawn, since the time area has zero width.
+                     */
+                    Rectangle bounds = timeGraphMarkerAxis.getAxisBounds();
+                    e.gc.setBackground(timeGraphMarkerAxis.getBackground());
+                    timeGraphMarkerAxis.drawMarkerAxis(bounds, bounds.width, e.gc);
+                }
+            });
+            tree.getHorizontalBar().addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    tree.redraw();
+                }
+            });
+            return timeGraphMarkerAxis;
         }
     }
 
