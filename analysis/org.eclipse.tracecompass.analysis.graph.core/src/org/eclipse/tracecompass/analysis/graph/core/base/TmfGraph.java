@@ -218,7 +218,8 @@ public class TmfGraph {
     }
 
     /**
-     * Returns the head node of the first object of the nodeMap
+     * Returns the head node of the object of the nodeMap that has the earliest
+     * head vertex time
      *
      * @return The head vertex
      */
@@ -226,7 +227,12 @@ public class TmfGraph {
         if (fNodeMap.isEmpty()) {
             return null;
         }
-        return getHead(NonNullUtils.checkNotNull(fNodeMap.keySet().iterator().next()));
+        IGraphWorker headWorker = fNodeMap.keySet().stream()
+                .filter(k -> !fNodeMap.get(k).isEmpty())
+                .sorted((k1, k2) -> fNodeMap.get(k1).get(0).compareTo(fNodeMap.get(k2).get(0)))
+                .findFirst()
+                .get();
+        return getHead(headWorker);
     }
 
     /**

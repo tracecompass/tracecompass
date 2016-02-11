@@ -238,11 +238,26 @@ public class TmfGraphTest {
      */
     @Test
     public void testHead() {
+        assertNull(fGraph.getHead());
         fGraph.append(WORKER1, fV0);
         fGraph.append(WORKER1, fV1);
         assertEquals(fV0, fGraph.getHead());
         assertEquals(fV0, fGraph.getHead(WORKER1));
         assertEquals(fV0, fGraph.getHead(fV1));
+        assertEquals(fV0, fGraph.getHead(fV0));
+    }
+
+    /**
+     * Test the {@link TmfGraph#getHead()} methods with 2 workers
+     */
+    @Test
+    public void testHead2() {
+        fGraph.append(WORKER1, fV1);
+        fGraph.append(WORKER2, fV0);
+        assertEquals(fV0, fGraph.getHead());
+        assertEquals(fV1, fGraph.getHead(WORKER1));
+        assertEquals(fV0, fGraph.getHead(WORKER2));
+        assertEquals(fV1, fGraph.getHead(fV1));
         assertEquals(fV0, fGraph.getHead(fV0));
     }
 
