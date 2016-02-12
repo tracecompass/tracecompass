@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,7 +30,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 
 import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
 /**
@@ -54,7 +54,7 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
 
     private @NonNull ITimeDataProvider fTimeProvider;
     private Multimap<String, IMarkerEvent> fMarkers = LinkedHashMultimap.create();
-    private List<String> fCategories = Collections.EMPTY_LIST;
+    private @NonNull List<String> fCategories = Collections.EMPTY_LIST;
 
     /**
      * Contructor
@@ -100,6 +100,20 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
     }
 
     /**
+     * Set the list of marker categories.
+     *
+     * @param categories
+     *            The list of marker categories, or null
+     */
+    public void setMarkerCategories(List<String> categories) {
+        if (categories == null) {
+            fCategories = Collections.EMPTY_LIST;
+        } else {
+            fCategories = categories;
+        }
+    }
+
+    /**
      * Set the markers list.
      *
      * @param markers
@@ -110,11 +124,8 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
         for (IMarkerEvent marker : markers) {
             map.put(marker.getCategory(), marker);
         }
-        List<String> categories = Lists.newArrayList(map.keySet());
-        Collections.sort(categories);
         Display.getDefault().asyncExec(() -> {
             fMarkers = map;
-            fCategories = categories;
             getParent().layout();
             redraw();
         });
@@ -140,7 +151,9 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
         gc.fillRectangle(bounds);
 
         Rectangle rect = new Rectangle(bounds.x, bounds.y + TOP_MARGIN, bounds.width, HEIGHT);
-        for (String category : fCategories) {
+        List<String> categories = new ArrayList<>(fCategories);
+        categories.retainAll(fMarkers.keySet());
+        for (String category : categories) {
             rect.x = bounds.x;
             rect.width = nameSpace;
             drawMarkerCategory(category, rect, gc);
@@ -256,7 +269,9 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
             (double) (timeSpace - RIGHT_MARGIN) / (time1 - time0);
 
         int categoryIndex = Math.max((event.y - TOP_MARGIN) / HEIGHT, 0);
-        String category = fCategories.get(categoryIndex);
+        List<String> categories = new ArrayList<>(fCategories);
+        categories.retainAll(fMarkers.keySet());
+        String category = categories.get(categoryIndex);
 
         IMarkerEvent marker = null;
         GC gc = new GC(Display.getDefault());

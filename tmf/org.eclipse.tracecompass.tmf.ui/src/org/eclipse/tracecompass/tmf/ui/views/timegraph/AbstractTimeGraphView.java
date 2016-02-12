@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1647,7 +1647,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @since 2.0
      */
     private @NonNull List<String> getMarkerCategories() {
-        Set<String> categories = new HashSet<>(getViewMarkerCategories());
+        Set<String> categories = new LinkedHashSet<>(getViewMarkerCategories());
         for (IMarkerEventSource markerEventSource : getMarkerEventSources(fTrace)) {
             categories.addAll(markerEventSource.getMarkerCategories());
         }

@@ -1303,11 +1303,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      */
     public void setMarkerCategories(List<String> categories) {
         fMarkerCategories.clear();
-        fMarkerCategories.add(IMarkerEvent.BOOKMARKS);
         if (categories != null) {
             fMarkerCategories.addAll(categories);
         }
-        Collections.sort(fMarkerCategories);
+        fMarkerCategories.add(IMarkerEvent.BOOKMARKS);
+        fMarkerAxisCtrl.setMarkerCategories(fMarkerCategories);
     }
 
     /**
