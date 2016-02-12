@@ -14,16 +14,12 @@
 
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -32,7 +28,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -42,14 +37,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTrace;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType.TraceElementType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsTable;
 import org.osgi.framework.Bundle;
 
@@ -93,47 +85,12 @@ public final class TmfTraceTypeUIUtils {
     private TmfTraceTypeUIUtils() {
     }
 
-    private static List<Pair<Integer, TraceTypeHelper>> reduce(List<Pair<Integer, TraceTypeHelper>> candidates) {
-        List<Pair<Integer, TraceTypeHelper>> retVal = new ArrayList<>();
-
-        // get all the tracetypes that are unique in that stage
-        for (Pair<Integer, TraceTypeHelper> candidatePair : candidates) {
-            TraceTypeHelper candidate = candidatePair.getSecond();
-            if (isUnique(candidate, candidates)) {
-                retVal.add(candidatePair);
-            }
-        }
-        return retVal;
-    }
-
-    /*
-     * Only return the leaves of the trace types. Ignore custom trace types.
-     */
-    private static boolean isUnique(TraceTypeHelper trace, List<Pair<Integer, TraceTypeHelper>> set) {
-        if (trace.getTraceClass().equals(CustomTxtTrace.class) ||
-                trace.getTraceClass().equals(CustomXmlTrace.class)) {
-            return true;
-        }
-        // check if the trace type is the leaf. we make an instance of the trace
-        // type and if it is only an instance of itself, it is a leaf
-        final ITmfTrace tmfTrace = trace.getTrace();
-        int count = -1;
-        for (Pair<Integer, TraceTypeHelper> child : set) {
-            final ITmfTrace traceCandidate = child.getSecond().getTrace();
-            if (tmfTrace.getClass().isInstance(traceCandidate)) {
-                count++;
-            }
-        }
-        return count == 0;
-    }
-
-    private static TraceTypeHelper getTraceTypeToSet(List<Pair<Integer, TraceTypeHelper>> candidates, Shell shell) {
+    private static TraceTypeHelper getTraceTypeToSet(List<TraceTypeHelper> candidates, Shell shell) {
         final Map<String, String> names = new HashMap<>();
         Shell shellToShow = new Shell(shell);
         shellToShow.setText(Messages.TmfTraceType_SelectTraceType);
         final String candidatesToSet[] = new String[1];
-        for (Pair<Integer, TraceTypeHelper> candidatePair : candidates) {
-            TraceTypeHelper candidate = candidatePair.getSecond();
+        for (TraceTypeHelper candidate : candidates) {
             Button b = new Button(shellToShow, SWT.RADIO);
             final String displayName = candidate.getCategoryName() + ':' + candidate.getName();
             b.setText(displayName);
@@ -168,93 +125,35 @@ public final class TmfTraceTypeUIUtils {
     }
 
     /**
-     * This member figures out the trace type of a given file. It will prompt
+     * This member figures out the trace type of a given trace. It will prompt
      * the user if it needs more information to properly pick the trace type.
      *
      * @param path
-     *            The path of file to import
+     *            The path of trace to import (file or directory for directory
+     *            traces)
      * @param shell
-     *            a shell to display the message to. If it is null, it is
-     *            assumed to be cancelled.
+     *            a shell to query user in case of multiple valid trace types.
+     *            If it is null, than the first one alphabetically is selected.
      * @param traceTypeHint
      *            the ID of a trace (like "o.e.l.specifictrace" )
-     * @return null if the request is cancelled or a TraceTypeHelper if it
-     *         passes.
+     * @return {@link TraceTypeHelper} for valid trace type or null if no valid
+     *         trace type was found in case of single file trace
      * @throws TmfTraceImportException
-     *             if the traces don't match or there are errors in the trace
-     *             file
+     *             if there are errors in the trace file or no trace type found
+     *             for a directory trace
      */
-    public static TraceTypeHelper selectTraceType(String path, Shell shell, String traceTypeHint) throws TmfTraceImportException {
+    public static @Nullable TraceTypeHelper selectTraceType(String path, Shell shell, String traceTypeHint) throws TmfTraceImportException {
+        List<TraceTypeHelper> candidates = TmfTraceType.selectTraceType(path, traceTypeHint);
 
-        Comparator<Pair<Integer, TraceTypeHelper>> comparator = new Comparator<Pair<Integer, TraceTypeHelper>>() {
-            @Override
-            public int compare(Pair<Integer, TraceTypeHelper> o1, Pair<Integer, TraceTypeHelper> o2) {
-                int res = -o1.getFirst().compareTo(o2.getFirst()); // invert so that highest confidence is first
-                if (res == 0) {
-                    res = o1.getSecond().getName().compareTo(o2.getSecond().getName());
-                }
-                return res;
-            }
-        };
-        TreeSet<Pair<Integer, TraceTypeHelper>> validCandidates = new TreeSet<>(comparator);
-        final Iterable<TraceTypeHelper> traceTypeHelpers = TmfTraceType.getTraceTypeHelpers();
-        for (TraceTypeHelper traceTypeHelper : traceTypeHelpers) {
-            if (traceTypeHelper.isExperimentType()) {
-                continue;
-            }
-            int confidence = traceTypeHelper.validateWithConfidence(path);
-            if (confidence >= 0) {
-                // insert in the tree map, ordered by confidence (highest confidence first) then name
-                Pair<Integer, TraceTypeHelper> element = new Pair<>(confidence, traceTypeHelper);
-                validCandidates.add(element);
-            }
+        if (candidates.isEmpty()) {
+            return null;
         }
 
-        TraceTypeHelper traceTypeToSet = null;
-        if (validCandidates.isEmpty()) {
-            File traceFile = new File(path);
-            if (traceFile.isFile()) {
-                return null;
-            }
-            final String errorMsg = NLS.bind(Messages.TmfOpenTraceHelper_NoTraceTypeMatch, path);
-            throw new TmfTraceImportException(errorMsg);
+        if ((candidates.size() == 1) || (shell == null)) {
+            return candidates.get(0);
         }
 
-        if (validCandidates.size() != 1) {
-            List<Pair<Integer, TraceTypeHelper>> candidates = new ArrayList<>(validCandidates);
-            List<Pair<Integer, TraceTypeHelper>> reducedCandidates = reduce(candidates);
-            for (Pair<Integer, TraceTypeHelper> candidatePair : reducedCandidates) {
-                TraceTypeHelper candidate = candidatePair.getSecond();
-                if (candidate.getTraceTypeId().equals(traceTypeHint)) {
-                    traceTypeToSet = candidate;
-                    break;
-                }
-            }
-            if (traceTypeToSet == null) {
-                if (reducedCandidates.size() == 0) {
-                    throw new TmfTraceImportException(Messages.TmfOpenTraceHelper_ReduceError);
-                } else if (reducedCandidates.size() == 1) {
-                    // Don't select the trace type if it has the lowest confidence
-                    if (reducedCandidates.get(0).getFirst() > 0) {
-                        traceTypeToSet = reducedCandidates.get(0).getSecond();
-                    }
-                } else if (shell == null) {
-                    Pair<Integer, TraceTypeHelper> candidate = reducedCandidates.get(0);
-                    // if the best match has lowest confidence, don't select it
-                    if (candidate.getFirst() > 0) {
-                        traceTypeToSet = candidate.getSecond();
-                    }
-                } else {
-                    traceTypeToSet = getTraceTypeToSet(reducedCandidates, shell);
-                }
-            }
-        } else {
-            // Don't select the trace type if it has the lowest confidence
-            if (validCandidates.first().getFirst() > 0) {
-                traceTypeToSet = validCandidates.first().getSecond();
-            }
-        }
-        return traceTypeToSet;
+        return getTraceTypeToSet(candidates, shell);
     }
 
     /**
@@ -272,20 +171,21 @@ public final class TmfTraceTypeUIUtils {
     public static IStatus setTraceType(IResource resource, TraceTypeHelper traceType) throws CoreException {
         return setTraceType(resource, traceType, true);
     }
-        /**
-         * Set the trace type of a {@link TraceTypeHelper}. Should only be
-         * used internally by this project.
-         *
-         * @param resource
-         *            the resource to set
-         * @param traceType
-         *            the {@link TraceTypeHelper} to set the trace type to.
-         * @param refresh
-         *            Flag for refreshing the project
-         * @return Status.OK_Status if successful, error is otherwise.
-         * @throws CoreException
-         *             An exception caused by accessing eclipse project items.
-         */
+
+    /**
+     * Set the trace type of a {@link TraceTypeHelper}. Should only be
+     * used internally by this project.
+     *
+     * @param resource
+     *            the resource to set
+     * @param traceType
+     *            the {@link TraceTypeHelper} to set the trace type to.
+     * @param refresh
+     *            Flag for refreshing the project
+     * @return Status.OK_Status if successful, error is otherwise.
+     * @throws CoreException
+     *             An exception caused by accessing eclipse project items.
+     */
     public static IStatus setTraceType(IResource resource, TraceTypeHelper traceType, boolean refresh) throws CoreException {
         String traceTypeId = traceType.getTraceTypeId();
 

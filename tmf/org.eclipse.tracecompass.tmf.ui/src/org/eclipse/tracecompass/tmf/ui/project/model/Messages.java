@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -109,12 +109,8 @@ public class Messages extends NLS {
     public static String TmfOpenTraceHelper_ErrorOpeningElement;
     /** Could not link trace */
     public static String TmfOpenTraceHelper_LinkFailed;
-    /** No trace type match */
-    public static String TmfOpenTraceHelper_NoTraceTypeMatch;
     /** Open trace or experiment */
     public static String TmfOpenTraceHelper_OpenElement;
-    /** Reduce was too efficient, no candidates found! */
-    public static String TmfOpenTraceHelper_ReduceError;
     /** No trace or experiment type */
     public static String TmfOpenTraceHelper_NoTraceOrExperimentType;
     /** No trace type */

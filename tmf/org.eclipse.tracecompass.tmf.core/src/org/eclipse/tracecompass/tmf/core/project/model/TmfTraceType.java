@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2011, 2016 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,6 +15,7 @@
 
 package org.eclipse.tracecompass.tmf.core.project.model;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,13 +25,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.core.project.model.Messages;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
@@ -38,6 +43,7 @@ import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.util.Pair;
 
 /**
  * Utility class for accessing TMF trace type extensions from the platform's
@@ -576,6 +582,124 @@ public final class TmfTraceType {
             return newTraceType;
         }
         return traceTypeId;
+    }
+
+    /**
+     * This method figures out the trace type of a given trace.
+     *
+     * @param path
+     *            The path of trace to import (file or directory for directory traces)
+     * @param traceTypeHint
+     *            the ID of a trace (like "o.e.l.specifictrace" )
+     * @return a list of {@link TraceTypeHelper} sorted by confidence (highest first)
+     *
+     * @throws TmfTraceImportException
+     *             if there are errors in the trace file or no trace type found
+     *             for a directory trace
+     * @since 2.0
+     */
+    public static @NonNull List<TraceTypeHelper> selectTraceType(String path, String traceTypeHint) throws TmfTraceImportException {
+
+        Comparator<Pair<Integer, TraceTypeHelper>> comparator = new Comparator<Pair<Integer, TraceTypeHelper>>() {
+            @Override
+            public int compare(Pair<Integer, TraceTypeHelper> o1, Pair<Integer, TraceTypeHelper> o2) {
+                int res = -o1.getFirst().compareTo(o2.getFirst()); // invert so that highest confidence is first
+                if (res == 0) {
+                    res = o1.getSecond().getName().compareTo(o2.getSecond().getName());
+                }
+                return res;
+            }
+        };
+
+        TreeSet<Pair<Integer, TraceTypeHelper>> validCandidates = new TreeSet<>(comparator);
+        final Iterable<TraceTypeHelper> traceTypeHelpers = TmfTraceType.getTraceTypeHelpers();
+        for (TraceTypeHelper traceTypeHelper : traceTypeHelpers) {
+            if (traceTypeHelper.isExperimentType()) {
+                continue;
+            }
+            int confidence = traceTypeHelper.validateWithConfidence(path);
+            if (confidence >= 0) {
+                // insert in the tree map, ordered by confidence (highest confidence first) then name
+                Pair<Integer, TraceTypeHelper> element = new Pair<>(confidence, traceTypeHelper);
+                validCandidates.add(element);
+            }
+        }
+
+        List<TraceTypeHelper> returned = new ArrayList<>();
+        if (validCandidates.isEmpty()) {
+            File traceFile = new File(path);
+            if (traceFile.isFile()) {
+                return returned;
+            }
+            final String errorMsg = NLS.bind(Messages.TmfOpenTraceHelper_NoTraceTypeMatch, path);
+            throw new TmfTraceImportException(errorMsg);
+        }
+
+        if (validCandidates.size() != 1) {
+            List<Pair<Integer, TraceTypeHelper>> candidates = new ArrayList<>(validCandidates);
+            List<Pair<Integer, TraceTypeHelper>> reducedCandidates = reduce(candidates);
+            for (Pair<Integer, TraceTypeHelper> candidatePair : reducedCandidates) {
+                TraceTypeHelper candidate = candidatePair.getSecond();
+                if (candidate.getTraceTypeId().equals(traceTypeHint)) {
+                    returned.add(candidate);
+                    break;
+                }
+            }
+            if (returned.size() == 0) {
+                if (reducedCandidates.size() == 0) {
+                    throw new TmfTraceImportException("Error reducing trace type candidates"); //$NON-NLS-1$
+                } else if (reducedCandidates.size() == 1) {
+                    // Don't select the trace type if it has the lowest confidence
+                    if (reducedCandidates.get(0).getFirst() > 0) {
+                        returned.add(reducedCandidates.get(0).getSecond());
+                    }
+                } else {
+                    for (Pair<Integer, TraceTypeHelper> candidatePair : reducedCandidates) {
+                        returned.add(candidatePair.getSecond());
+                    }
+                }
+            }
+        } else {
+            // Don't select the trace type if it has the lowest confidence
+            if (validCandidates.first().getFirst() > 0) {
+                returned.add(validCandidates.first().getSecond());
+            }
+        }
+        return returned;
+    }
+
+    private static List<Pair<Integer, TraceTypeHelper>> reduce(List<Pair<Integer, TraceTypeHelper>> candidates) {
+        List<Pair<Integer, TraceTypeHelper>> retVal = new ArrayList<>();
+
+        // get all the tracetypes that are unique in that stage
+        for (Pair<Integer, TraceTypeHelper> candidatePair : candidates) {
+            TraceTypeHelper candidate = candidatePair.getSecond();
+            if (isUnique(candidate, candidates)) {
+                retVal.add(candidatePair);
+            }
+        }
+        return retVal;
+    }
+
+    /*
+     * Only return the leaves of the trace types. Ignore custom trace types.
+     */
+    private static boolean isUnique(TraceTypeHelper trace, List<Pair<Integer, TraceTypeHelper>> set) {
+        if (trace.getTraceClass().equals(CustomTxtTrace.class) ||
+                trace.getTraceClass().equals(CustomXmlTrace.class)) {
+            return true;
+        }
+        // check if the trace type is the leaf. we make an instance of the trace
+        // type and if it is only an instance of itself, it is a leaf
+        final ITmfTrace tmfTrace = trace.getTrace();
+        int count = -1;
+        for (Pair<Integer, TraceTypeHelper> child : set) {
+            final ITmfTrace traceCandidate = child.getSecond().getTrace();
+            if (tmfTrace.getClass().isInstance(traceCandidate)) {
+                count++;
+            }
+        }
+        return count == 0;
     }
 
 }
