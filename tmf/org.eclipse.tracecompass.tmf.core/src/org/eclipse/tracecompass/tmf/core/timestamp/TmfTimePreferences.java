@@ -133,6 +133,7 @@ public final class TmfTimePreferences {
         prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.SSEC_DELIMITER, SSEC_DELIMITER_DEFAULT);
         prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.DATIME, DATIME_DEFAULT);
         prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.DATE_DELIMITER, DATE_DELIMITER_DEFAULT);
+        prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.TIME_ZONE, TIME_ZONE_DEFAULT);
         return prefsMap;
     }
 
