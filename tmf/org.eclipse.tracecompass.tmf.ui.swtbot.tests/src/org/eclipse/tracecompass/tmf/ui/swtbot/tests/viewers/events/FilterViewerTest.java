@@ -20,6 +20,8 @@ import java.io.IOException;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
@@ -30,7 +32,11 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimePreferencesConstants;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.filter.FilterView;
@@ -83,6 +89,10 @@ public class FilterViewerTest {
      */
     @BeforeClass
     public static void init() throws IOException {
+        IEclipsePreferences defaultPreferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+        defaultPreferences.put(ITmfTimePreferencesConstants.TIME_ZONE, "GMT-05:00");
+        TmfTimestampFormat.updateDefaultFormats();
+
         SWTBotUtils.initialize();
         Thread.currentThread().setName("SWTBot Thread"); // for the debugger
         /* set up for swtbot */
@@ -128,6 +138,10 @@ public class FilterViewerTest {
         SWTBotUtils.deleteProject(PROJECT_NAME, fBot);
         fLogger.removeAllAppenders();
         SWTBotUtils.closeViewById(FilterView.ID, fBot);
+
+        IEclipsePreferences defaultPreferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+        defaultPreferences.put(ITmfTimePreferencesConstants.TIME_ZONE, TmfTimePreferences.getDefaultPreferenceMap().get(ITmfTimePreferencesConstants.TIME_ZONE));
+        TmfTimestampFormat.updateDefaultFormats();
     }
 
     /**
@@ -251,6 +265,7 @@ public class FilterViewerTest {
 
         String ret = applyFilter(fBot, filterName);
         assertEquals("26/100", ret);
+//        filterNodeBot.contextMenu().menu("Delete").click();
     }
 
     /**
@@ -301,6 +316,7 @@ public class FilterViewerTest {
         viewBot.toolbarButton("Save filters").click();
 
         String ret = applyFilter(fBot, filterName);
+//        filterNodeBot.contextMenu().menu("Delete").click();
         assertEquals("50/100", ret);
     }
 

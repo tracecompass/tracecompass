@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.List;
+import java.util.TimeZone;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -307,6 +308,8 @@ public final class SWTBotUtils {
                 System.out.println("UBUNTU_MENUPROXY=" + ubuntuMenuProxy);
             }
         }
+
+        System.out.println("Time zone: " + TimeZone.getDefault().getDisplayName());
 
         fPrintedEnvironment = true;
     }

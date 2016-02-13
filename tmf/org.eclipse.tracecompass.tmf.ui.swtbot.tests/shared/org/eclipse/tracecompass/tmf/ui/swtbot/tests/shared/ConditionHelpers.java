@@ -414,6 +414,7 @@ public final class ConditionHelpers {
     private static class EventsTableSelectionCondition extends DefaultCondition {
         private long fSelectionTime;
         private SWTWorkbenchBot fBot;
+        private long fCurValue;
 
         private EventsTableSelectionCondition(SWTWorkbenchBot bot, long selectionTime) {
             fBot = bot;
@@ -426,12 +427,13 @@ public final class ConditionHelpers {
             if (eventsTableSelection.isEmpty()) {
                 return false;
             }
-            return ((ITmfEvent) eventsTableSelection.getFirstElement()).getTimestamp().getValue() == fSelectionTime;
+            fCurValue = ((ITmfEvent) eventsTableSelection.getFirstElement()).getTimestamp().getValue();
+            return fCurValue == fSelectionTime;
         }
 
         @Override
         public String getFailureMessage() {
-            return "The selection in the table was not an event with timestamp " + fSelectionTime;
+            return "The selection in the table was not an event with timestamp " + fSelectionTime + ". Actual is " + fCurValue;
         }
 
         private StructuredSelection getEventsTableSelection() {
