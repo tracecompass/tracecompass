@@ -24,6 +24,8 @@ import java.util.regex.Pattern;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
@@ -33,7 +35,10 @@ import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimePreferencesConstants;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.junit.After;
@@ -84,6 +89,10 @@ public class TestTraceOffsetting {
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout()));
         fBot = new SWTWorkbenchBot();
 
+        IEclipsePreferences defaultPreferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+        defaultPreferences.put(ITmfTimePreferencesConstants.TIME_ZONE, "GMT-05:00");
+        TmfTimestampFormat.updateDefaultFormats();
+
         SWTBotUtils.closeView("welcome", fBot);
 
         SWTBotUtils.switchToTracingPerspective();
@@ -106,6 +115,10 @@ public class TestTraceOffsetting {
     public void cleanup() {
         fLocation.delete();
         fLogger.removeAllAppenders();
+
+        IEclipsePreferences defaultPreferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+        defaultPreferences.put(ITmfTimePreferencesConstants.TIME_ZONE, "Local Time");
+        TmfTimestampFormat.updateDefaultFormats();
     }
 
     /**
