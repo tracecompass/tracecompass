@@ -122,6 +122,7 @@ public class SDViewTest {
      */
     @AfterClass
     public static void cleanUp() {
+        SWTBotUtils.closeViewById(UML2DVIEW_ID, fBot);
         fFileLocation.delete();
         fLogger.removeAllAppenders();
     }
