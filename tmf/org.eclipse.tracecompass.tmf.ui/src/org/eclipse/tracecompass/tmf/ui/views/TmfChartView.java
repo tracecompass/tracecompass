@@ -11,6 +11,7 @@
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.ui.views;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.PaintEvent;
@@ -27,6 +28,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
+import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 
 /**
@@ -49,6 +51,7 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
     private ITmfTrace fTrace;
     /** A composite that allows us to add margins */
     private Composite fXYViewerContainer;
+    private TmfViewer fTmfViewer;
     private SashForm fSashForm;
     private Listener fSashDragListener;
 
@@ -75,6 +78,20 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
      */
     protected TmfXYChartViewer getChartViewer() {
         return fChartViewer;
+    }
+
+    /**
+     * Create a {@link TmfViewer} instance to be added to the left composite
+     * of the sash. Default implementation provides an empty composite and
+     * don't overwrite this method if not needed.
+     *
+     * @param parent
+     *          the parent control
+     * @return a {@link TmfViewer} instance
+     * @since 2.0
+     */
+    protected @NonNull TmfViewer createLeftChildViewer(Composite parent) {
+        return new EmptyViewer(parent);
     }
 
     /**
@@ -114,7 +131,7 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
         fSashForm = new SashForm(parent, SWT.NONE);
-        new Composite(fSashForm, SWT.NONE);
+        fTmfViewer = createLeftChildViewer(fSashForm);
         fXYViewerContainer = new Composite(fSashForm, SWT.NONE);
         GridLayout layout = new GridLayout();
         layout.marginHeight = 0;
@@ -161,6 +178,10 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
     public void dispose() {
         if (fChartViewer != null) {
             fChartViewer.dispose();
+        }
+
+        if (fTmfViewer != null) {
+            fTmfViewer.dispose();
         }
     }
 
@@ -237,4 +258,26 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
         layout.marginRight = Math.max(0, marginSize);
         composite.layout();
     }
+
+    // ------------------------------------------------------------------------
+    // Helpers
+    // ------------------------------------------------------------------------
+    /**
+     * Empty @{link TmfViewer} class.
+     */
+    private class EmptyViewer extends TmfViewer {
+        private Composite fComposite;
+        public EmptyViewer(Composite parent) {
+            super(parent);
+            fComposite = new Composite(parent, SWT.NONE);
+        }
+        @Override
+        public void refresh() {
+        }
+        @Override
+        public Control getControl() {
+            return fComposite;
+        }
+    }
+
 }
