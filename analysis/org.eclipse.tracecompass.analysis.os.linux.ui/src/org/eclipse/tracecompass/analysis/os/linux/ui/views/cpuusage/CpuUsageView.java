@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2016 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,31 +12,20 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.ui.views.cpuusage;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Sash;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
-import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
-import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
-import org.eclipse.tracecompass.tmf.ui.views.TmfView;
+import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
 /**
  * CPU usage view. It contains 2 viewers: one tree viewer showing all the
@@ -46,20 +35,13 @@ import org.eclipse.tracecompass.tmf.ui.views.TmfView;
  *
  * @author Geneviève Bastien
  */
-public class CpuUsageView extends TmfView implements ITmfTimeAligned {
+public class CpuUsageView extends TmfChartView {
 
     /** ID string */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.views.cpuusage"; //$NON-NLS-1$
 
-    private static final int[] DEFAULT_WEIGHTS = {1, 3};
-
-    private CpuUsageComposite fTreeViewer = null;
-    private CpuUsageXYViewer fXYViewer = null;
-
-    private SashForm fSashForm;
-    private Listener fSashDragListener;
-    /** A composite that allows us to add margins */
-    private Composite fXYViewerContainer;
+    private @Nullable CpuUsageComposite fTreeViewer = null;
+    private @Nullable CpuUsageXYViewer fXYViewer = null;
 
     /**
      * Constructor
@@ -72,23 +54,33 @@ public class CpuUsageView extends TmfView implements ITmfTimeAligned {
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
 
-        fSashForm = new SashForm(parent, SWT.NONE);
+        /* Initialize the viewers with the currently selected trace */
+        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
+        if (trace != null) {
+            TmfTraceSelectedSignal signal = new TmfTraceSelectedSignal(this, trace);
+            if (fTreeViewer != null) {
+                fTreeViewer.traceSelected(signal);
+            }
+            if (fXYViewer != null) {
+                fXYViewer.traceSelected(signal);
+            }
+        }
+    }
 
-        fTreeViewer = new CpuUsageComposite(fSashForm);
+    @Override
+    protected TmfXYChartViewer createChartViewer(Composite parent) {
+        CpuUsageXYViewer viewer = new CpuUsageXYViewer(parent);
+        viewer.setSendTimeAlignSignals(true);
+        fXYViewer = viewer;
+        return viewer;
+    }
 
-        fXYViewerContainer = new Composite(fSashForm, SWT.NONE);
-        GridLayout layout = new GridLayout();
-        layout.marginHeight = 0;
-        layout.marginWidth = 0;
-        fXYViewerContainer.setLayout(layout);
-
-        /* Build the XY chart part of the view */
-        fXYViewer = new CpuUsageXYViewer(fXYViewerContainer);
-        fXYViewer.setSendTimeAlignSignals(true);
-        fXYViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    @Override
+    public TmfViewer createLeftChildViewer(Composite parent) {
+        final CpuUsageComposite viewer = new CpuUsageComposite(parent);
 
         /* Add selection listener to tree viewer */
-        fTreeViewer.addSelectionChangeListener(new ISelectionChangedListener() {
+        viewer.addSelectionChangeListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
                 ISelection selection = event.getSelection();
@@ -96,124 +88,33 @@ public class CpuUsageView extends TmfView implements ITmfTimeAligned {
                     Object structSelection = ((IStructuredSelection) selection).getFirstElement();
                     if (structSelection instanceof CpuUsageEntry) {
                         CpuUsageEntry entry = (CpuUsageEntry) structSelection;
-                        fTreeViewer.setSelectedThread(entry.getTid());
-                        fXYViewer.setSelectedThread(Long.valueOf(entry.getTid()));
-                    }
-                }
-            }
-        });
-
-        /* Initialize the viewers with the currently selected trace */
-        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
-        if (trace != null) {
-            TmfTraceSelectedSignal signal = new TmfTraceSelectedSignal(this, trace);
-            fTreeViewer.traceSelected(signal);
-            fXYViewer.traceSelected(signal);
-        }
-        fTreeViewer.getControl().addControlListener(new ControlAdapter() {
-            @Override
-            public void controlResized(ControlEvent e) {
-                super.controlResized(e);
-            }
-        });
-
-        fXYViewer.getControl().addPaintListener(new PaintListener() {
-            @Override
-            public void paintControl(PaintEvent e) {
-                // Sashes in a SashForm are being created on layout so add the
-                // drag listener here
-                if (fSashDragListener == null) {
-                    for (Control control : fSashForm.getChildren()) {
-                        if (control instanceof Sash) {
-                            fSashDragListener = new Listener() {
-
-                                @Override
-                                public void handleEvent(Event event) {
-                                    TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(fSashForm, getTimeViewAlignmentInfo()));
-                                }
-                            };
-                            control.removePaintListener(this);
-                            control.addListener(SWT.Selection, fSashDragListener);
-                            // There should be only one sash
-                            break;
+                        if (fTreeViewer != null) {
+                            fTreeViewer.setSelectedThread(entry.getTid());
+                        }
+                        if (fXYViewer != null) {
+                            fXYViewer.setSelectedThread(Long.valueOf(entry.getTid()));
                         }
                     }
                 }
             }
         });
 
-        fSashForm.setWeights(DEFAULT_WEIGHTS);
+        viewer.getControl().addControlListener(new ControlAdapter() {
+            @Override
+            public void controlResized(ControlEvent e) {
+                super.controlResized(e);
+            }
+        });
+
+        fTreeViewer = viewer;
+        return fTreeViewer;
     }
 
     @Override
     public void setFocus() {
-        fXYViewer.getControl().setFocus();
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        if (fTreeViewer != null) {
-            fTreeViewer.dispose();
-        }
         if (fXYViewer != null) {
-            fXYViewer.dispose();
+            fXYViewer.getControl().setFocus();
         }
     }
 
-    /**
-     * @since 1.0
-     */
-    @Override
-    public TmfTimeViewAlignmentInfo getTimeViewAlignmentInfo() {
-        if (fSashForm == null) {
-            return null;
-        }
-
-        return new TmfTimeViewAlignmentInfo(fSashForm.getShell(), fSashForm.toDisplay(0, 0), getTimeAxisOffset());
-    }
-
-    private int getTimeAxisOffset() {
-        return fTreeViewer.getControl().getSize().x + fSashForm.getSashWidth() + fXYViewer.getPointAreaOffset();
-    }
-
-    /**
-     * @since 1.0
-     */
-    @Override
-    public int getAvailableWidth(int requestedOffset) {
-        int pointAreaWidth = fXYViewer.getPointAreaWidth();
-        int curTimeAxisOffset = getTimeAxisOffset();
-        if (pointAreaWidth <= 0) {
-            pointAreaWidth = fSashForm.getBounds().width - curTimeAxisOffset;
-        }
-        int endOffset = curTimeAxisOffset + pointAreaWidth;
-        GridLayout layout = (GridLayout) fXYViewerContainer.getLayout();
-        int endOffsetWithoutMargin = endOffset + layout.marginRight;
-        int availableWidth = endOffsetWithoutMargin - requestedOffset;
-        availableWidth = Math.min(fSashForm.getBounds().width, Math.max(0, availableWidth));
-        return availableWidth;
-    }
-
-    /**
-     * @since 1.0
-     */
-    @Override
-    public void performAlign(int offset, int width) {
-        int total = fSashForm.getBounds().width;
-        int plotAreaOffset = fXYViewer.getPointAreaOffset();
-        int width1 = Math.max(0, offset - plotAreaOffset - fSashForm.getSashWidth());
-        int width2 = Math.max(0, total - width1 - fSashForm.getSashWidth());
-        if (width1 >= 0 && width2 > 0 || width1 > 0 && width2 >= 0) {
-            fSashForm.setWeights(new int[] { width1, width2 });
-            fSashForm.layout();
-        }
-
-        Composite composite = fXYViewerContainer;
-        GridLayout layout = (GridLayout) composite.getLayout();
-        int timeAxisWidth = getAvailableWidth(offset);
-        int marginSize = timeAxisWidth - width;
-        layout.marginRight = Math.max(0, marginSize);
-        composite.layout();
-    }
 }
