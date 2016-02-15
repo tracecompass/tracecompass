@@ -2618,15 +2618,17 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 updateCursor(e.x, e.stateMask);
             }
         } else if (3 == e.button) {
-            setCapture(true);
-            fDragX = Math.min(Math.max(e.x, fTimeProvider.getNameSpace()), getSize().x - RIGHT_MARGIN);
-            fDragX0 = fDragX;
-            fDragTime0 = getTimeAtX(fDragX0);
-            fDragState = DRAG_ZOOM;
-            fDragButton = e.button;
-            redraw();
-            updateCursor(e.x, e.stateMask);
-            fTimeGraphScale.setDragRange(fDragX0, fDragX);
+            if (e.x >= fTimeProvider.getNameSpace()) {
+                setCapture(true);
+                fDragX = Math.min(Math.max(e.x, fTimeProvider.getNameSpace()), getSize().x - RIGHT_MARGIN);
+                fDragX0 = fDragX;
+                fDragTime0 = getTimeAtX(fDragX0);
+                fDragState = DRAG_ZOOM;
+                fDragButton = e.button;
+                redraw();
+                updateCursor(e.x, e.stateMask);
+                fTimeGraphScale.setDragRange(fDragX0, fDragX);
+            }
         }
     }
 
