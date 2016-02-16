@@ -25,12 +25,21 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.Attributes;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
+import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.FollowThreadAction;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.ControlFlowColumnComparators;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -43,6 +52,7 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModul
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractStateSystemTimeGraphView;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphCombo;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
@@ -99,13 +109,15 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
     static {
         ImmutableList.Builder<Comparator<ITimeGraphEntry>> builder = ImmutableList.builder();
         builder.add(ControlFlowColumnComparators.PROCESS_NAME_COLUMN_COMPARATOR)
-               .add(ControlFlowColumnComparators.TID_COLUMN_COMPARATOR)
-               .add(ControlFlowColumnComparators.PTID_COLUMN_COMPARATOR)
-               .add(ControlFlowColumnComparators.BIRTH_TIME_COLUMN_COMPARATOR)
-               .add(ControlFlowColumnComparators.TRACE_COLUMN_COMPARATOR);
+            .add(ControlFlowColumnComparators.TID_COLUMN_COMPARATOR)
+            .add(ControlFlowColumnComparators.PTID_COLUMN_COMPARATOR)
+            .add(ControlFlowColumnComparators.BIRTH_TIME_COLUMN_COMPARATOR)
+            .add(ControlFlowColumnComparators.TRACE_COLUMN_COMPARATOR);
         List<Comparator<ITimeGraphEntry>> l = builder.build();
         COLUMN_COMPARATORS = l.toArray(new Comparator[l.size()]);
     }
+
+    private MenuManager fMenuMgr;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -132,6 +144,32 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
         // add "Uncheck inactive" Button to TimeGraphFilterDialog
         super.getTimeGraphCombo().addTimeGraphFilterUncheckInactiveButton(
                 new ControlFlowCheckActiveProvider(Messages.ControlFlowView_uncheckInactiveLabel, Messages.ControlFlowView_uncheckInactiveToolTip));
+        createContextMenu();
+    }
+
+    private void createContextMenu() {
+        fMenuMgr = new MenuManager();
+        final TimeGraphCombo timeGraphCombo = getTimeGraphCombo();
+        TreeViewer treeViewer = timeGraphCombo.getTreeViewer();
+        Control control = treeViewer.getControl();
+        Menu menu = fMenuMgr.createContextMenu(control);
+        control.setMenu(menu);
+        control.addMenuDetectListener(new MenuDetectListener() {
+            @Override
+            public void menuDetected(MenuDetectEvent event) {
+                fMenuMgr.removeAll();
+                Point point = control.toControl(event.x, event.y);
+                // this is super important, it makes zoom still work. Do not try
+                // to extend to the time graph area.
+                TreeItem item = treeViewer.getTree().getItem(point);
+
+                if (item.getData() instanceof ControlFlowEntry) {
+                    ControlFlowEntry entry = (ControlFlowEntry) item.getData();
+                    fMenuMgr.add(new FollowThreadAction(ControlFlowView.this, entry.getName(), entry.getThreadId(), entry.getTrace()));
+                }
+            }
+        });
+
     }
 
     @Override
