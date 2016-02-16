@@ -33,11 +33,10 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
  * @since 1.0
  */
 @NonNullByDefault
-public final class TmfTraceContext {
+public class TmfTraceContext implements ITraceContextSignalHandler {
 
-    static final TmfTraceContext NULL_CONTEXT =
-            new TmfTraceContext(new TmfTimeRange(TmfTimestamp.BIG_CRUNCH, TmfTimestamp.BIG_CRUNCH),
-                    TmfTimeRange.NULL_RANGE, null, null);
+    static final TmfTraceContext NULL_CONTEXT = new TmfTraceContext(new TmfTimeRange(TmfTimestamp.BIG_CRUNCH, TmfTimestamp.BIG_CRUNCH),
+            TmfTimeRange.NULL_RANGE, null, null);
 
     private final TmfTimeRange fSelection;
     private final TmfTimeRange fWindowRange;
@@ -82,7 +81,6 @@ public final class TmfTraceContext {
         return fWindowRange;
     }
 
-
     /**
      * Get the editor's file
      *
@@ -106,4 +104,5 @@ public final class TmfTraceContext {
         return getClass().getSimpleName() + "[fSelection=" + fSelection + //$NON-NLS-1$
                 ", fWindowRange=" + fWindowRange + ']'; //$NON-NLS-1$
     }
+
 }

@@ -9,7 +9,7 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.core.signals;
 
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceModelSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -18,10 +18,9 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * @author Matthew Khouzam
  * @since 2.0
  */
-public class TmfCpuSelectedSignal extends TmfSignal {
+public class TmfCpuSelectedSignal extends TmfTraceModelSignal {
 
     private final int fCore;
-    private final String fHostId;
 
     /**
      * Constructor
@@ -34,9 +33,8 @@ public class TmfCpuSelectedSignal extends TmfSignal {
      *            the current trace that the cpu belongs to
      */
     public TmfCpuSelectedSignal(Object source, int core, ITmfTrace trace) {
-        super(source);
+        super(source, 0, trace.getHostId());
         fCore = core;
-        fHostId = trace.getHostId();
     }
 
     /**
@@ -46,14 +44,5 @@ public class TmfCpuSelectedSignal extends TmfSignal {
      */
     public int getCore() {
         return fCore;
-    }
-
-    /**
-     * Get the trace host id
-     *
-     * @return the trace host id
-     */
-    public String getHostId() {
-        return fHostId;
     }
 }

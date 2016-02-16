@@ -16,6 +16,7 @@
 
 package org.eclipse.tracecompass.tmf.core.trace;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
@@ -26,6 +27,7 @@ import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -428,4 +430,21 @@ public interface ITmfTrace extends ITmfEventProvider {
      */
     @NonNull ITmfTimestamp createTimestamp(long ts);
 
+    /**
+     * Build a new trace context.
+     *
+     * @param selection
+     *            The selected time range
+     * @param windowRange
+     *            The visible window's time range
+     * @param editorFile
+     *            The file representing the selected editor
+     * @param filter
+     *            The currently applied filter. 'null' for none.
+     * @return The newly created context
+     * @since 2.0
+     */
+    default TmfTraceContext createTraceContext(@NonNull TmfTimeRange selection, @NonNull TmfTimeRange windowRange, @Nullable IFile editorFile, @Nullable ITmfFilter filter) {
+        return new TmfTraceContext(selection, windowRange, editorFile, filter);
+    }
 }

@@ -37,6 +37,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventFilterAppliedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceModelSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -286,13 +287,24 @@ public final class TmfTraceManager {
         final TmfTimeRange selectionRange = new TmfTimeRange(startTs, startTs);
         final TmfTimeRange windowRange = new TmfTimeRange(startTs, new TmfTimestamp(endTime, ITmfTimestamp.NANOSECOND_SCALE));
 
-        final TmfTraceContext startCtx = new TmfTraceContext(selectionRange, windowRange, editorFile, null);
+        final TmfTraceContext startCtx = trace.createTraceContext(selectionRange, windowRange, editorFile, null);
 
         fTraces.put(trace, startCtx);
 
         /* We also want to set the newly-opened trace as the active trace */
         fCurrentTrace = trace;
     }
+
+    /**
+     * Signal propagator
+     * @param signal any signal
+     * @since 2.0
+     */
+    @TmfSignalHandler
+    public synchronized void signalReceived(final TmfTraceModelSignal signal) {
+        fTraces.forEach((t, u) -> u.receive(signal));
+    }
+
 
     /**
      * Handler for the TmfTraceSelectedSignal.
@@ -322,7 +334,7 @@ public final class TmfTraceManager {
         if (context == null) {
             throw new RuntimeException();
         }
-        fTraces.put(newTrace, new TmfTraceContext(context.getSelectionRange(),
+        fTraces.put(newTrace, newTrace.createTraceContext(context.getSelectionRange(),
                 context.getWindowRange(),
                 context.getEditorFile(),
                 signal.getEventFilter()));
@@ -371,7 +383,7 @@ public final class TmfTraceManager {
                  * else the same as the previous trace context.
                  */
                 TmfTimeRange newSelectionRange = new TmfTimeRange(beginTs, endTs);
-                TmfTraceContext newCtx = new TmfTraceContext(newSelectionRange,
+                TmfTraceContext newCtx = trace.createTraceContext(newSelectionRange,
                         prevCtx.getWindowRange(),
                         prevCtx.getEditorFile(),
                         prevCtx.getFilter());
@@ -406,7 +418,7 @@ public final class TmfTraceManager {
             TmfTimeRange newWindowTr = (targetTr == null ? prevCtx.getWindowRange() : targetTr);
 
             /* Keep the values from the old context, except for the window range */
-            TmfTraceContext newCtx = new TmfTraceContext(prevCtx.getSelectionRange(),
+            TmfTraceContext newCtx = trace.createTraceContext(prevCtx.getSelectionRange(),
                     newWindowTr, prevCtx.getEditorFile(), prevCtx.getFilter());
             entry.setValue(newCtx);
         }

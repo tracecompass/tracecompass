@@ -10,7 +10,7 @@
 package org.eclipse.tracecompass.analysis.os.linux.core.signals;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceModelSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -19,7 +19,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * @author Matthew Khouzam
  * @since 2.0
  */
-public class TmfThreadSelectedSignal extends TmfSignal {
+public class TmfThreadSelectedSignal extends TmfTraceModelSignal {
 
     private final HostThread fHostThread;
 
@@ -34,7 +34,7 @@ public class TmfThreadSelectedSignal extends TmfSignal {
      *            the trace
      */
     public TmfThreadSelectedSignal(Object source, int threadId, ITmfTrace trace) {
-        super(source);
+        super(source, 0, trace.getHostId());
         fHostThread = new HostThread(trace.getHostId(), threadId);
     }
 
