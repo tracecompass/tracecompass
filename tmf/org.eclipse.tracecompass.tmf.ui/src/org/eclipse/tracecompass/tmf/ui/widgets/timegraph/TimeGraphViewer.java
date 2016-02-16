@@ -77,6 +77,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.MarkerEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.IMarkerAxisListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeDataProviderCyclesConverter;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
@@ -93,7 +94,7 @@ import org.eclipse.ui.PlatformUI;
  *
  * @author Patrick Tasse, and others
  */
-public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
+public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, SelectionListener {
 
     /** Constant indicating that all levels of the time graph should be expanded */
     public static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
@@ -545,6 +546,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
         fMarkerAxisCtrl = createTimeGraphMarkerAxis(fTimeAlignedComposite, fColorScheme, this);
         fMarkerAxisCtrl.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
+        fMarkerAxisCtrl.addMarkerAxisListener(this);
         fMarkerAxisCtrl.addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseScrolled(MouseEvent e) {
@@ -1308,6 +1310,24 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         }
         fMarkerCategories.add(IMarkerEvent.BOOKMARKS);
         fMarkerAxisCtrl.setMarkerCategories(fMarkerCategories);
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public void setMarkerCategoryVisible(String category, boolean visible) {
+        boolean changed = false;
+        if (visible) {
+            changed = fHiddenMarkerCategories.remove(category);
+        } else {
+            changed = fHiddenMarkerCategories.add(category);
+        }
+        if (changed) {
+            updateMarkerList();
+            updateMarkerActions();
+            getControl().redraw();
+        }
     }
 
     /**
@@ -2224,14 +2244,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                         final Action action = new Action(category, IAction.AS_CHECK_BOX) {
                             @Override
                             public void runWithEvent(Event event) {
-                                if (isChecked()) {
-                                    fHiddenMarkerCategories.remove(getText());
-                                } else {
-                                    fHiddenMarkerCategories.add(getText());
-                                }
-                                updateMarkerList();
-                                updateMarkerActions();
-                                getControl().redraw();
+                                setMarkerCategoryVisible(getText(), isChecked());
                             }
                         };
                         action.setChecked(!fHiddenMarkerCategories.contains(category));

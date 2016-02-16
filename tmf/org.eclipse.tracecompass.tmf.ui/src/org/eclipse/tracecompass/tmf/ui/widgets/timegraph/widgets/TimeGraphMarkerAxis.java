@@ -14,7 +14,9 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
@@ -23,10 +25,12 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 
 import com.google.common.collect.LinkedHashMultimap;
@@ -38,6 +42,11 @@ import com.google.common.collect.Multimap;
  * @since 2.0
  */
 public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
+
+    private static final Image COLLAPSED = Activator.getDefault().getImageFromPath("icons/ovr16/collapsed_ovr.gif"); //$NON-NLS-1$
+    private static final Image EXPANDED = Activator.getDefault().getImageFromPath("icons/ovr16/expanded_ovr.gif"); //$NON-NLS-1$
+    private static final Image HIDE = Activator.getDefault().getImageFromPath("icons/etool16/hide.gif"); //$NON-NLS-1$
+    private static final int HIDE_BORDER = 4; // transparent border of the hide icon
 
     private static final int HEIGHT;
     static {
@@ -53,8 +62,10 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
     private static final int X_LIMIT = Integer.MAX_VALUE / 256;
 
     private @NonNull ITimeDataProvider fTimeProvider;
+    private final Set<IMarkerAxisListener> fListeners = new LinkedHashSet<>();
     private Multimap<String, IMarkerEvent> fMarkers = LinkedHashMultimap.create();
     private @NonNull List<String> fCategories = Collections.EMPTY_LIST;
+    private boolean fCollapsed = false;
 
     /**
      * Contructor
@@ -72,10 +83,9 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDown(MouseEvent e) {
-                IMarkerEvent marker = getMarkerForEvent(e);
-                if (marker != null) {
-                    fTimeProvider.setSelectionRangeNotify(marker.getTime(), marker.getTime() + marker.getDuration(), false);
-                }
+                Point size = getSize();
+                Rectangle bounds = new Rectangle(0, 0, size.x, size.y);
+                TimeGraphMarkerAxis.this.mouseDown(e, bounds, fTimeProvider.getNameSpace());
             }
         });
     }
@@ -84,9 +94,33 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
     public Point computeSize(int wHint, int hHint, boolean changed) {
         int height = 0;
         if (!fMarkers.isEmpty() && fTimeProvider.getTime0() != fTimeProvider.getTime1()) {
-            height = TOP_MARGIN + fMarkers.keySet().size() * HEIGHT;
+            if (fCollapsed) {
+                height = COLLAPSED.getBounds().height;
+            } else {
+                height = TOP_MARGIN + fMarkers.keySet().size() * HEIGHT;
+            }
         }
         return super.computeSize(wHint, height, changed);
+    }
+
+    /**
+     * Add a marker axis listener.
+     *
+     * @param listener
+     *            the listener
+     */
+    public void addMarkerAxisListener(IMarkerAxisListener listener) {
+        fListeners.add(listener);
+    }
+
+    /**
+     * Remove a marker axis listener.
+     *
+     * @param listener
+     *            the listener
+     */
+    public void removeMarkerAxisListener(IMarkerAxisListener listener) {
+        fListeners.remove(listener);
     }
 
     /**
@@ -110,6 +144,41 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
             fCategories = Collections.EMPTY_LIST;
         } else {
             fCategories = categories;
+        }
+    }
+
+    /**
+     * Handle a mouseDown event.
+     *
+     * @param e
+     *            the mouse event
+     * @param bounds
+     *            the bounds of the marker axis in the mouse event's coordinates
+     * @param nameSpace
+     *            the width of the marker name area
+     */
+    public void mouseDown(MouseEvent e, Rectangle bounds, int nameSpace) {
+        if (bounds.isEmpty()) {
+            return;
+        }
+        if (fCollapsed || (e.x < bounds.x + Math.min(nameSpace, EXPANDED.getBounds().width))) {
+            fCollapsed = !fCollapsed;
+            getParent().layout();
+            redraw();
+            return;
+        }
+        if (e.x < bounds.x + nameSpace) {
+            String category = getHiddenCategoryForEvent(e, bounds);
+            if (category != null) {
+                for (IMarkerAxisListener listener : fListeners) {
+                    listener.setMarkerCategoryVisible(category, false);
+                }
+            }
+            return;
+        }
+        IMarkerEvent marker = getMarkerForEvent(e);
+        if (marker != null) {
+            fTimeProvider.setSelectionRangeNotify(marker.getTime(), marker.getTime() + marker.getDuration(), false);
         }
     }
 
@@ -147,21 +216,28 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
      *            the GC instance
      */
     protected void drawMarkerAxis(Rectangle bounds, int nameSpace, GC gc) {
+        if (bounds.isEmpty()) {
+            return;
+        }
         // draw background
         gc.fillRectangle(bounds);
 
-        Rectangle rect = new Rectangle(bounds.x, bounds.y + TOP_MARGIN, bounds.width, HEIGHT);
-        List<String> categories = new ArrayList<>(fCategories);
-        categories.retainAll(fMarkers.keySet());
-        for (String category : categories) {
-            rect.x = bounds.x;
-            rect.width = nameSpace;
-            drawMarkerCategory(category, rect, gc);
-            rect.x = nameSpace;
-            rect.width = bounds.width - nameSpace;
-            drawMarkerLabels(category, rect, gc);
-            rect.y += HEIGHT;
+        if (!fCollapsed) {
+            Rectangle rect = new Rectangle(bounds.x, bounds.y + TOP_MARGIN, bounds.width, HEIGHT);
+            for (String category : getVisibleCategories()) {
+                rect.x = bounds.x;
+                rect.width = nameSpace;
+                drawMarkerCategory(category, rect, gc);
+                rect.x = nameSpace;
+                rect.width = bounds.width - nameSpace;
+                drawMarkerLabels(category, rect, gc);
+                rect.y += HEIGHT;
+            }
         }
+
+        Rectangle rect = new Rectangle(bounds.x, bounds.y, nameSpace, bounds.height);
+        gc.setClipping(rect);
+        drawToolbar(rect, nameSpace, gc);
     }
 
     /**
@@ -182,7 +258,8 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
         gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
         gc.setClipping(rect);
         int width = gc.textExtent(category).x + TEXT_MARGIN;
-        gc.drawText(category, Math.max(rect.x, rect.x + rect.width - width), rect.y, true);
+        int x = rect.x + EXPANDED.getBounds().width + HIDE.getBounds().width;
+        gc.drawText(category, Math.max(x, rect.x + rect.width - width), rect.y, true);
     }
 
     /**
@@ -245,6 +322,32 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
         }
     }
 
+    /**
+     * Draw the toolbar
+     *
+     * @param bounds
+     *            the bounds of the marker axis
+     * @param nameSpace
+     *            the width of the marker name area
+     * @param gc
+     *            the GC instance
+     */
+    protected void drawToolbar(Rectangle bounds, int nameSpace, GC gc) {
+        if (bounds.isEmpty()) {
+            return;
+        }
+        if (fCollapsed) {
+            gc.drawImage(COLLAPSED, bounds.x, bounds.y);
+        } else {
+            gc.drawImage(EXPANDED, bounds.x, bounds.y);
+            int x = bounds.x + EXPANDED.getBounds().width;
+            for (int i = 0; i < fMarkers.keySet().size(); i++) {
+                int y = bounds.y + TOP_MARGIN + i * HEIGHT;
+                gc.drawImage(HIDE, x, y);
+            }
+        }
+    }
+
     private static String getTrimmedLabel(IMarkerEvent marker) {
         String label = marker.getLabel();
         if (label == null) {
@@ -269,9 +372,7 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
             (double) (timeSpace - RIGHT_MARGIN) / (time1 - time0);
 
         int categoryIndex = Math.max((event.y - TOP_MARGIN) / HEIGHT, 0);
-        List<String> categories = new ArrayList<>(fCategories);
-        categories.retainAll(fMarkers.keySet());
-        String category = categories.get(categoryIndex);
+        String category = getVisibleCategories().get(categoryIndex);
 
         IMarkerEvent marker = null;
         GC gc = new GC(Display.getDefault());
@@ -302,5 +403,27 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
         }
         gc.dispose();
         return marker;
+    }
+
+    private String getHiddenCategoryForEvent(MouseEvent e, Rectangle bounds) {
+        List<String> categories = getVisibleCategories();
+        Rectangle rect = HIDE.getBounds();
+        rect.x += bounds.x + EXPANDED.getBounds().width + HIDE_BORDER;
+        rect.y += bounds.y + TOP_MARGIN + HIDE_BORDER;
+        rect.width -= 2 * HIDE_BORDER;
+        rect.height -= 2 * HIDE_BORDER;
+        for (int i = 0; i < categories.size(); i++) {
+            if (rect.contains(e.x, e.y)) {
+                return categories.get(i);
+            }
+            rect.y += HEIGHT;
+        }
+        return null;
+    }
+
+    private List<String> getVisibleCategories() {
+        List<String> categories = new ArrayList<>(fCategories);
+        categories.retainAll(fMarkers.keySet());
+        return categories;
     }
 }

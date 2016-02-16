@@ -44,6 +44,7 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -262,6 +263,15 @@ public class TimeGraphCombo extends Composite {
                     Rectangle bounds = timeGraphMarkerAxis.getAxisBounds();
                     e.gc.setBackground(timeGraphMarkerAxis.getBackground());
                     timeGraphMarkerAxis.drawMarkerAxis(bounds, bounds.width, e.gc);
+                }
+            });
+            tree.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseDown(MouseEvent e) {
+                    Rectangle bounds = timeGraphMarkerAxis.getAxisBounds();
+                    if (bounds.contains(e.x, e.y)) {
+                        timeGraphMarkerAxis.mouseDown(e, bounds, bounds.width);
+                    }
                 }
             });
             tree.getHorizontalBar().addSelectionListener(new SelectionAdapter() {
