@@ -30,6 +30,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
+import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.model.TimeGraphLineEntry;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
@@ -149,6 +150,27 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
     private @NonNull ITmfTreeDataModel fModel;
     private long fStartTime;
     private long fEndTime;
+
+    /**
+     * Entry factory
+     *
+     * @param model
+     *            the model to build
+     * @param style
+     *            the style of the entry
+     * @return the entry
+     * @since 5.0
+     */
+    public static TimeGraphEntry create(TimeGraphEntryModel model, ITimeGraphEntry.DisplayStyle style) {
+        switch (style) {
+        case LINE:
+            return new TimeGraphLineEntry(model);
+        case STATE:
+            return new TimeGraphEntry(model);
+        default:
+            throw new IllegalStateException("Invalid style " + style.toString()); //$NON-NLS-1$
+        }
+    }
 
     /**
      * Constructor

@@ -29,6 +29,25 @@ import org.eclipse.jface.viewers.ISelection;
 public interface ITimeGraphEntry extends ISelection {
 
     /**
+     * An enumeration of the display style of the time graph entries
+     *
+     * @author Geneviève Bastien
+     * @since 5.0
+     */
+    public enum DisplayStyle {
+        /**
+         * Display states, ie rectangle representing a discrete state that has a
+         * beginning and an end
+         */
+        STATE,
+        /**
+         * Display XY lines for this entry, ie one or more continuous lines that change
+         * over time
+         */
+        LINE
+    }
+
+    /**
      * Returns the parent of this entry, or <code>null</code> if it has none.
      *
      * @return the parent element, or <code>null</code> if it has none
@@ -119,5 +138,15 @@ public interface ITimeGraphEntry extends ISelection {
     @Override
     default boolean isEmpty() {
         return false;
+    }
+
+    /**
+     * Get the style of entry this represents
+     *
+     * @return The style of the entry
+     * @since 5.0
+     */
+    default DisplayStyle getStyle() {
+        return DisplayStyle.STATE;
     }
 }

@@ -33,6 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 
@@ -92,6 +93,8 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.internal.tmf.ui.util.LineClipper;
 import org.eclipse.tracecompass.internal.tmf.ui.util.SymbolHelper;
+import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.model.TimeGraphLineEntry;
+import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.model.TimeLineEvent;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
@@ -2075,7 +2078,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             // draw the name space
             Rectangle nameRect = new Rectangle(itemRect.x, itemRect.y, nameSpace, itemRect.height);
             drawName(item, nameRect, gc);
-            if (fMidLinesVisible && item.fEntry.hasTimeEvents() && item.fItemHeight > MIN_MIDLINE_HEIGHT) {
+            if (fMidLinesVisible && item.fEntry.hasTimeEvents() && item.fItemHeight > MIN_MIDLINE_HEIGHT && !(item.fEntry instanceof TimeGraphLineEntry)) {
                 Rectangle rect = new Rectangle(nameSpace, itemRect.y, itemRect.width - nameSpace, itemRect.height);
                 drawMidLine(rect, gc);
             }
@@ -2297,7 +2300,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         // K pixels per second
         double pixelsPerNanoSec = (rect.width <= RIGHT_MARGIN) ? 0 : (double) (rect.width - RIGHT_MARGIN) / (time1 - time0);
 
-        if (item.fEntry.hasTimeEvents() && !(isFilterActive() && hasSavedFilters() && !((TimeGraphEntry) item.fEntry).hasZoomedEvents())) {
+        if (entry.hasTimeEvents() && !(isFilterActive() && hasSavedFilters() && !((TimeGraphEntry) item.fEntry).hasZoomedEvents())) {
             gc.setClipping(new Rectangle(nameSpace, 0, bounds.width - nameSpace, bounds.height));
             fillSpace(rect, gc, selected);
 
@@ -2311,36 +2314,132 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
             long maxDuration = (timeProvider.getTimeSpace() == 0) ? Long.MAX_VALUE : 1 * (time1 - time0) / timeProvider.getTimeSpace();
             Iterator<ITimeEvent> iterator = entry.getTimeEventsIterator(time0, time1, maxDuration);
-
-            int lastX = -1;
-            fLastTransparentX = -1;
-            while (iterator.hasNext()) {
-                ITimeEvent event = iterator.next();
-                int x = SaturatedArithmetic.add(rect.x, (int) ((event.getTime() - time0) * pixelsPerNanoSec));
-                int xEnd = SaturatedArithmetic.add(rect.x, (int) ((event.getTime() + event.getDuration() - time0) * pixelsPerNanoSec));
-                if (x >= rect.x + rect.width || xEnd < rect.x) {
-                    // event is out of bounds
-                    continue;
-                }
-                xEnd = Math.min(rect.x + rect.width, xEnd);
-                stateRect.x = Math.max(rect.x, x);
-                stateRect.width = Math.max(1, xEnd - stateRect.x + 1);
-                if (stateRect.x < lastX) {
-                    stateRect.width -= (lastX - stateRect.x);
-                    if (stateRect.width > 0) {
-                        stateRect.x = lastX;
-                    } else {
-                        stateRect.width = 0;
-                    }
-                }
-                boolean timeSelected = selectedTime >= event.getTime() && selectedTime < event.getTime() + event.getDuration();
-                if (drawState(getColorScheme(), event, stateRect, gc, selected, timeSelected)) {
-                    lastX = stateRect.x + stateRect.width;
-                }
+            switch (entry.getStyle()) {
+            case LINE:
+                drawLineGraphEntry(gc, time0, rect, pixelsPerNanoSec, iterator);
+                break;
+            case STATE:
+                drawTimeGraphEntry(gc, time0, selectedTime, rect, selected, pixelsPerNanoSec, stateRect, iterator);
+                break;
+            default:
+                break;
             }
             gc.setClipping((Rectangle) null);
         }
         fTimeGraphProvider.postDrawEntry(entry, rect, gc);
+    }
+
+    private static class LongPoint {
+        final int x;
+        final long y;
+
+        public LongPoint(int x, long y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, y);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof LongPoint) {
+                LongPoint longPoint = (LongPoint) obj;
+                return longPoint.x == x && longPoint.y == y;
+            }
+            return false;
+        }
+    }
+
+    private void drawLineGraphEntry(GC gc, long time0, Rectangle rect, double pixelsPerNanoSec, Iterator<ITimeEvent> iterator) {
+        // clamp 0 - max positive
+        long max = Long.MIN_VALUE;
+        long min = 0;
+        List<List<LongPoint>> seriesModel = new ArrayList<>();
+        ITimeGraphPresentationProvider timeGraphProvider = getTimeGraphProvider();
+        TimeLineEvent lastValid = null;
+        while (iterator.hasNext()) {
+            ITimeEvent event = iterator.next();
+            if (!(event instanceof TimeLineEvent)) {
+                continue;
+            }
+            int x = SaturatedArithmetic.add(rect.x, (int) ((event.getTime() - time0) * pixelsPerNanoSec));
+            if (x >= rect.x + rect.width) {
+                // event is out of bounds
+                continue;
+            }
+            TimeLineEvent timeEvent = (TimeLineEvent) event;
+            List<Long> values = timeEvent.getValues();
+            for (int i = 0; i < values.size(); i++) {
+                if (seriesModel.size() <= i) {
+                    seriesModel.add(new ArrayList<>());
+                }
+                Long val = values.get(i);
+                if (val != null) {
+                    // get max and min, this is a relative scale.
+                    max = Math.max(Math.abs(val), max);
+                    min = 0;
+                    lastValid = timeEvent;
+                    seriesModel.get(i).add(new LongPoint(x, val));
+                }
+            }
+        }
+        if (lastValid == null) {
+            return;
+        }
+        double scale = (max - min) == 0 ? 1.0 : (double) rect.height / (max - min);
+        Map<String, Object> eventStyle = timeGraphProvider.getEventStyle(lastValid);
+        int colorInt = (int) eventStyle.getOrDefault(ITimeEventStyleStrings.fillColor(), 0xff);
+        RGBA rgba = RGBAUtil.fromInt(colorInt);
+        COLOR_REGISTRY.put(rgba.toString(), rgba.rgb);
+        // TODO: Make color registry scheme
+        for (int i = 0; i < seriesModel.size(); i++) {
+            Color color = COLOR_REGISTRY.get(rgba.toString());
+            Color prev = gc.getForeground();
+            int prevAlpha = gc.getAlpha();
+            gc.setAlpha(rgba.alpha);
+            gc.setForeground(color);
+            List<LongPoint> series = seriesModel.get(i);
+            int[] points = new int[series.size() * 2];
+            for (int point = 0; point < series.size(); point++) {
+                LongPoint longPoint = series.get(point);
+                points[point * 2] = longPoint.x;
+                points[point * 2 + 1] = rect.height - (int) ((longPoint.y - min) * scale) + rect.y;
+            }
+            gc.drawPolyline(points);
+            gc.setForeground(prev);
+            gc.setAlpha(prevAlpha);
+        }
+    }
+
+    private void drawTimeGraphEntry(GC gc, long time0, long selectedTime, Rectangle rect, boolean selected, double pixelsPerNanoSec, Rectangle stateRect, Iterator<ITimeEvent> iterator) {
+        int lastX = -1;
+        fLastTransparentX = -1;
+        while (iterator.hasNext()) {
+            ITimeEvent event = iterator.next();
+            int x = SaturatedArithmetic.add(rect.x, (int) ((event.getTime() - time0) * pixelsPerNanoSec));
+            int xEnd = SaturatedArithmetic.add(rect.x, (int) ((event.getTime() + event.getDuration() - time0) * pixelsPerNanoSec));
+            if (x >= rect.x + rect.width || xEnd < rect.x) {
+                // event is out of bounds
+                continue;
+            }
+            xEnd = Math.min(rect.x + rect.width, xEnd);
+            stateRect.x = Math.max(rect.x, x);
+            stateRect.width = Math.max(1, xEnd - stateRect.x + 1);
+            if (stateRect.x < lastX) {
+                stateRect.width -= (lastX - stateRect.x);
+                if (stateRect.width > 0) {
+                    stateRect.x = lastX;
+                } else {
+                    stateRect.width = 0;
+                }
+            }
+            if (drawState(getColorScheme(), event, stateRect, gc, selected, selectedTime >= event.getTime() && selectedTime < event.getTime() + event.getDuration())) {
+                lastX = stateRect.x + stateRect.width;
+            }
+        }
     }
 
     /**
@@ -3299,16 +3398,18 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 fTime1bak = fTimeProvider.getTime1();
                 updateCursor(e.x, e.stateMask);
             }
-        } else if (3 == e.button && e.x >= fTimeProvider.getNameSpace()) {
-            setCapture(true);
-            fDragX = Math.min(Math.max(e.x, fTimeProvider.getNameSpace()), getSize().x - RIGHT_MARGIN);
-            fDragX0 = fDragX;
-            fDragTime0 = getTimeAtX(fDragX0);
-            fDragState = DRAG_ZOOM;
-            fDragButton = e.button;
-            redraw();
-            updateCursor(e.x, e.stateMask);
-            fTimeGraphScale.setDragRange(fDragX0, fDragX);
+        } else if (3 == e.button) {
+            if (e.x >= fTimeProvider.getNameSpace()) {
+                setCapture(true);
+                fDragX = Math.min(Math.max(e.x, fTimeProvider.getNameSpace()), getSize().x - RIGHT_MARGIN);
+                fDragX0 = fDragX;
+                fDragTime0 = getTimeAtX(fDragX0);
+                fDragState = DRAG_ZOOM;
+                fDragButton = e.button;
+                redraw();
+                updateCursor(e.x, e.stateMask);
+                fTimeGraphScale.setDragRange(fDragX0, fDragX);
+            }
         }
     }
 
