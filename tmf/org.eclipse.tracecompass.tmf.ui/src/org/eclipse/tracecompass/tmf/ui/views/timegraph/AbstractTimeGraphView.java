@@ -1680,6 +1680,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 if (fTimeGraphWrapper.isDisposed()) {
                     return;
                 }
+                fDirty.incrementAndGet();
+
                 boolean hasEntries = false;
                 synchronized (fEntryListMap) {
                     fEntryList = fEntryListMap.get(fTrace);
@@ -1758,7 +1760,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 if (!zoomThread) {
                     startZoomThread(startTime, endTime);
                 }
-
+                fDirty.decrementAndGet();
             }
         });
     }
@@ -1814,16 +1816,18 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @since 2.0
      */
     protected final void startZoomThread(long startTime, long endTime) {
+        long clampedStartTime = Math.min(Math.max(startTime, fStartTime), fEndTime);
+        long clampedEndTime = Math.max(Math.min(endTime, fEndTime), fStartTime);
         fDirty.incrementAndGet();
         boolean restart = false;
         if (fZoomThread != null) {
             fZoomThread.cancel();
-            if (fZoomThread.fZoomStartTime == startTime && fZoomThread.fZoomEndTime == endTime) {
+            if (fZoomThread.fZoomStartTime == clampedStartTime && fZoomThread.fZoomEndTime == clampedEndTime) {
                 restart = true;
             }
         }
-        long resolution = Math.max(1, (endTime - startTime) / fDisplayWidth);
-        fZoomThread = createZoomThread(startTime, endTime, resolution, restart);
+        long resolution = Math.max(1, (clampedEndTime - clampedStartTime) / fDisplayWidth);
+        fZoomThread = createZoomThread(clampedStartTime, clampedEndTime, resolution, restart);
         if (fZoomThread != null) {
             fZoomThread.start();
         } else {
@@ -1940,15 +1944,40 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * Returns whether or not the time graph view is dirty. The time graph view
      * is considered dirty if it has yet to completely update its model.
      *
+     * This method is meant to be used by tests in order to know when it is safe
+     * to proceed.
+     *
+     * Note: If a trace is smaller than the initial window range (see
+     * {@link ITmfTrace#getInitialRangeOffset}) this method will return true
+     * forever.
+     *
      * @return true if the time graph view has yet to completely update its
      *         model, false otherwise
      * @since 2.0
      */
     public boolean isDirty() {
-        if (fZoomThread == null) {
+        if (fTrace == null) {
             return false;
         }
-        return fDirty.get() != 0 || fZoomThread.getZoomStartTime() != fTimeGraphWrapper.getTimeGraphViewer().getTime0() || fZoomThread.getZoomEndTime() != fTimeGraphWrapper.getTimeGraphViewer().getTime1();
+
+        TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+        long startTime = ctx.getWindowRange().getStartTime().toNanos();
+        long endTime = ctx.getWindowRange().getEndTime().toNanos();
+
+        // If the time graph control hasn't updated all the way to the end of
+        // the window range then it's dirty. A refresh should happen later.
+        if (fTimeGraphWrapper.getTimeGraphViewer().getTime0() != startTime || fTimeGraphWrapper.getTimeGraphViewer().getTime1() != endTime) {
+            return true;
+        }
+
+        if (fZoomThread == null) {
+            // The zoom thread is null but we might be just about to create it (refresh called).
+            return fDirty.get() != 0;
+        }
+        // Dirty if the zoom thread is not done or if it hasn't zoomed all the
+        // way to the end of the window range. In the latter case, there should be
+        // a subsequent zoom thread that will be triggered.
+        return fDirty.get() != 0 || fZoomThread.getZoomStartTime() != startTime || fZoomThread.getZoomEndTime() != endTime;
     }
 
     private void createColumnSelectionListener(TreeViewer treeViewer) {

@@ -17,6 +17,7 @@ import java.io.IOException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
@@ -30,10 +31,15 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimePreferencesConstants;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers.SWTBotTestCondition;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
@@ -79,6 +85,8 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
     private static final String LTTNG_CONSUMER_PROCESS_NAME = "lttng-consumerd";
     private static final long LTTNG_CONSUMER_BIRTHTIME = 1361214078963717040L;
     private static final String LTTNG_CONSUMER_TID = "4034";
+
+    private static final @NonNull TmfTimestamp TRACE_START_TIME = new TmfTimestamp(1361214078963711320L, ITmfTimestamp.NANOSECOND_SCALE);
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -129,6 +137,8 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
      */
     @Test
     public void testColumnSorting() {
+        fBot.waitUntil(ConditionHelpers.timeGraphIsReadyCondition((AbstractTimeGraphView) fViewBot.getViewReference().getPart(false), new TmfTimeRange(TRACE_START_TIME, TRACE_START_TIME), TRACE_START_TIME));
+
         // Create a known state
         applyFilter();
         final SWTBotTree tree = fViewBot.bot().tree();

@@ -489,6 +489,7 @@ public final class ConditionHelpers {
         private @NonNull TmfTimeRange fSelectionRange;
         private @NonNull ITmfTimestamp fVisibleTime;
         private AbstractTimeGraphView fView;
+        private String fFailureMessage;
 
         private TimeGraphIsReadyCondition(AbstractTimeGraphView view, @NonNull TmfTimeRange selectionRange, @NonNull ITmfTimestamp visibleTime) {
             fView = view;
@@ -498,18 +499,28 @@ public final class ConditionHelpers {
 
         @Override
         public boolean test() throws Exception {
-            if (!ConditionHelpers.selectionRange(fSelectionRange).test()) {
+            ICondition selectionRangeCondition = ConditionHelpers.selectionRange(fSelectionRange);
+            if (!selectionRangeCondition.test()) {
+                fFailureMessage = selectionRangeCondition.getFailureMessage();
                 return false;
             }
-            if (!TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(fVisibleTime)) {
+            @NonNull TmfTimeRange curWindowRange = TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange();
+            if (!curWindowRange.contains(fVisibleTime)) {
+                fFailureMessage = "Current window range " + curWindowRange + " does not contain " + fVisibleTime;
                 return false;
             }
-            return !fView.isDirty();
+
+            if (fView.isDirty()) {
+                fFailureMessage = "Time graph is dirty";
+                return false;
+
+            }
+            return true;
         }
 
         @Override
         public String getFailureMessage() {
-            return "Time graph is not ready";
+            return fFailureMessage;
         }
     }
 

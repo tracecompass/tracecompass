@@ -243,7 +243,7 @@ public class ControlFlowViewTest extends KernelTestBase {
         /* change window range to 1 ms */
         TmfTimeRange range = new TmfTimeRange(START_TIME, START_TIME.normalize(1000000L, ITmfTimestamp.NANOSECOND_SCALE));
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, range));
-        fBot.waitUntil(ConditionHelpers.windowRange(range));
+        timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
 
         SWTBotToolbarButton filterButton = fViewBot.toolbarButton("Show View Filters");
         filterButton.click();
