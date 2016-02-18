@@ -110,6 +110,11 @@ public class Lttng27EventLayout extends Lttng26EventLayout {
     }
 
     @Override
+    public String eventSoftIrqRaise() {
+        return "irq_softirq_raise"; //$NON-NLS-1$
+    }
+
+    @Override
     public String eventSoftIrqEntry() {
         return "irq_softirq_entry"; //$NON-NLS-1$
     }
