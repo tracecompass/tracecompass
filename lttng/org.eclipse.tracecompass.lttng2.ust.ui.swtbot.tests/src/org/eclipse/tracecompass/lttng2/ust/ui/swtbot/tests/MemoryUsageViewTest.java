@@ -23,6 +23,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage.MemoryUsageView;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
@@ -44,6 +45,8 @@ import org.swtchart.ISeriesSet;
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class MemoryUsageViewTest {
+
+    private static final int EXPECTED_NUM_SERIES = 4;
 
     private static final String UST_ID = "org.eclipse.linuxtools.lttng2.ust.tracetype";
 
@@ -109,13 +112,31 @@ public class MemoryUsageViewTest {
         // Do some basic validation
         Matcher<Chart> matcher = WidgetOfType.widgetOfType(Chart.class);
         Chart chart = viewBot.bot().widget(matcher);
-        ISeriesSet seriesSet = chart.getSeriesSet();
-        assertNotNull(seriesSet);
-        ISeries[] series = seriesSet.getSeries();
-        assertNotNull(series);
 
         // Verify that the chart has 4 series
-        assertEquals(4, series.length);
+        fBot.waitUntil(new DefaultCondition() {
+            private String fFailureMessage;
+
+            @Override
+            public boolean test() throws Exception {
+                int length = chart.getSeriesSet().getSeries().length;
+                if (length != EXPECTED_NUM_SERIES){
+                    fFailureMessage = "Chart did not contain the expected number series. Actual " + length + ", expected " + EXPECTED_NUM_SERIES;
+                    return false;
+                }
+
+                return true;
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return fFailureMessage;
+            }
+        });
+
+        ISeriesSet seriesSet = chart.getSeriesSet();
+        ISeries[] series = seriesSet.getSeries();
+        assertEquals(EXPECTED_NUM_SERIES, series.length);
         // Verify that each series is a ILineSeries
         for (int i = 0; i < series.length; i++) {
             assertTrue(series[i] instanceof ILineSeries);
