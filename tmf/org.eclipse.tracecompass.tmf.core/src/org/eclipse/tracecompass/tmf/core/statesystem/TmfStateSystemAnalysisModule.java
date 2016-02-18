@@ -540,7 +540,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     }
 
     @Override
-    public Iterable<ITmfStateSystem> getStateSystems() {
+    public @NonNull Iterable<@NonNull ITmfStateSystem> getStateSystems() {
         ITmfStateSystemBuilder stateSystem = fStateSystem;
         if (stateSystem == null) {
             return Collections.EMPTY_SET;

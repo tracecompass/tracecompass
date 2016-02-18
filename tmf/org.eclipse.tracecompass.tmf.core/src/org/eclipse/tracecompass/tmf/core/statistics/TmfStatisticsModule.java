@@ -189,10 +189,16 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
     }
 
     @Override
-    public Iterable<ITmfStateSystem> getStateSystems() {
-        List<ITmfStateSystem> list = new LinkedList<>();
-        list.add(totalsModule.getStateSystem());
-        list.add(eventTypesModule.getStateSystem());
+    public @NonNull Iterable<@NonNull ITmfStateSystem> getStateSystems() {
+        List<@NonNull ITmfStateSystem> list = new LinkedList<>();
+        ITmfStateSystem totalsStateSystem = totalsModule.getStateSystem();
+        if (totalsStateSystem != null) {
+            list.add(totalsStateSystem);
+        }
+        ITmfStateSystem eventTypesStateSystem = eventTypesModule.getStateSystem();
+        if (eventTypesStateSystem != null) {
+            list.add(eventTypesStateSystem);
+        }
         return list;
     }
 }
