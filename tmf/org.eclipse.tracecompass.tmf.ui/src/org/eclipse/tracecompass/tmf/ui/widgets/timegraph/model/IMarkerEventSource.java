@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -29,7 +29,7 @@ public interface IMarkerEventSource {
      *
      * @return The list of marker categories
      */
-    @NonNull List<String> getMarkerCategories();
+    @NonNull List<@NonNull String> getMarkerCategories();
 
     /**
      * Gets the list of marker events of a specific category that intersect the
@@ -51,6 +51,6 @@ public interface IMarkerEventSource {
      *            The progress monitor object
      * @return The list of marker events
      */
-    @NonNull List<IMarkerEvent> getMarkerList(@NonNull String category, long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor);
+    @NonNull List<@NonNull IMarkerEvent> getMarkerList(@NonNull String category, long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor);
 
 }

@@ -42,13 +42,13 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.MarkerEvent;
  */
 public class LostEventsMarkerEventSource implements IMarkerEventSource {
 
-    private static final String LOST_EVENTS = Messages.MarkerEvent_LostEvents;
+    private static final @NonNull String LOST_EVENTS = checkNotNull(Messages.MarkerEvent_LostEvents);
 
     private static final RGBA COLOR = new RGBA(255, 0, 0, 50);
 
     private final @NonNull ITmfTrace fTrace;
     private long[] fLastRequest;
-    private @NonNull List<IMarkerEvent> fLastMarkers = Collections.emptyList();
+    private @NonNull List<@NonNull IMarkerEvent> fLastMarkers = Collections.emptyList();
 
     /**
      * Constructor.
@@ -61,12 +61,12 @@ public class LostEventsMarkerEventSource implements IMarkerEventSource {
     }
 
     @Override
-    public List<String> getMarkerCategories() {
+    public @NonNull List<@NonNull String> getMarkerCategories() {
         return Arrays.asList(LOST_EVENTS);
     }
 
     @Override
-    public synchronized List<IMarkerEvent> getMarkerList(String category, long startTime, long endTime, long resolution, IProgressMonitor monitor) {
+    public synchronized @NonNull List<@NonNull IMarkerEvent> getMarkerList(@NonNull String category, long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor) {
         if (!category.equals(LOST_EVENTS)) {
             return Collections.emptyList();
         }
@@ -82,7 +82,7 @@ public class LostEventsMarkerEventSource implements IMarkerEventSource {
         if (Arrays.equals(request, fLastRequest)) {
             return fLastMarkers;
         }
-        List<IMarkerEvent> markers = new ArrayList<>();
+        List<@NonNull IMarkerEvent> markers = new ArrayList<>();
         try {
             long start = Math.max(startTime, ss.getStartTime());
             long end = Math.min(endTime, ss.getCurrentEndTime());
