@@ -32,6 +32,10 @@ public class Messages extends NLS {
      * The error message when selecting of traces for an experiment fails.
      */
     public static String SelectTracesWizardPage_SelectionError;
+
+    /** The error message when an experiment could not be created */
+    public static String NewExperimentOperation_CreationError;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

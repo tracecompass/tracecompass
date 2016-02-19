@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2009, 2016 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,16 +19,13 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -43,8 +40,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
-import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
-import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
+import org.eclipse.tracecompass.internal.tmf.ui.project.operations.NewExperimentOperation;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.PlatformUI;
@@ -55,7 +51,6 @@ import org.eclipse.ui.dialogs.SelectionStatusDialog;
  * Implementation of new experiment dialog that creates the experiment element.
  * <p>
  *
- * @version 1.0
  * @author Francois Chouinard
  */
 public class NewExperimentDialog extends SelectionStatusDialog {
@@ -66,6 +61,7 @@ public class NewExperimentDialog extends SelectionStatusDialog {
 
     private Text fExperimentName;
     private final IContainer fExperimentFolder;
+    private final TmfExperimentFolder fExperimentFolderRoot;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -80,6 +76,7 @@ public class NewExperimentDialog extends SelectionStatusDialog {
      */
     public NewExperimentDialog(Shell shell, TmfExperimentFolder experimentFolder) {
         super(shell);
+        fExperimentFolderRoot = experimentFolder;
         fExperimentFolder = experimentFolder.getResource();
         setTitle(Messages.NewExperimentDialog_DialogTitle);
         setStatusLineAboveButtons(true);
@@ -167,7 +164,11 @@ public class NewExperimentDialog extends SelectionStatusDialog {
 
     @Override
     protected void okPressed() {
-        IFolder folder = createNewExperiment(fExperimentName.getText());
+        String experimentName = fExperimentName.getText();
+        if (experimentName == null) {
+            return;
+        }
+        IFolder folder = createNewExperiment(experimentName);
         if (folder == null) {
             return;
         }
@@ -175,37 +176,29 @@ public class NewExperimentDialog extends SelectionStatusDialog {
         super.okPressed();
     }
 
-    private IFolder createNewExperiment(String experimentName) {
-
-        final IFolder experimentFolder = createExperiment(experimentName);
-
+    private IFolder createNewExperiment(@NonNull String experimentName) {
+        final IFolder[] experimentFolders = new IFolder[1];
+        final TmfExperimentFolder root = fExperimentFolderRoot;
+        if (root == null) {
+            return null;
+        }
         WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
             @Override
-            public void execute(IProgressMonitor monitor) throws CoreException {
-                try {
-                    monitor.beginTask("", 1000); //$NON-NLS-1$
-                    if (monitor.isCanceled()) {
+            public void execute(IProgressMonitor monitor) throws InterruptedException, InvocationTargetException {
+                NewExperimentOperation createOperation = new NewExperimentOperation(root, experimentName);
+                createOperation.run(monitor);
+                IStatus status = createOperation.getStatus();
+                if (!status.isOK()) {
+                    if (status.getSeverity() == IStatus.CANCEL) {
                         throw new OperationCanceledException();
                     }
-                    experimentFolder.create(false, true, monitor);
-
-                    /*
-                     * Experiments can be set to the default experiment type. No
-                     * need to force user to select an experiment type
-                     */
-                    IConfigurationElement ce = TmfTraceType.getTraceAttributes(TmfTraceType.DEFAULT_EXPERIMENT_TYPE);
-                    if (ce != null) {
-                        try {
-                            experimentFolder.setPersistentProperty(TmfCommonConstants.TRACETYPE, ce.getAttribute(TmfTraceType.ID_ATTR));
-                        } catch (InvalidRegistryObjectException | CoreException e) {
-                        }
+                    Throwable exception = status.getException();
+                    if (exception != null) {
+                        throw new InvocationTargetException(exception);
                     }
-                    if (monitor.isCanceled()) {
-                        throw new OperationCanceledException();
-                    }
-                } finally {
-                    monitor.done();
+                    return;
                 }
+                experimentFolders[0] = createOperation.getExperimentFolder();
             }
         };
         try {
@@ -216,16 +209,7 @@ public class NewExperimentDialog extends SelectionStatusDialog {
             TraceUtils.displayErrorMsg("", NLS.bind("", exception.getTargetException().getMessage())); //$NON-NLS-1$ //$NON-NLS-2$
             return null;
         }
-
-        return experimentFolder;
-    }
-
-    private IFolder createExperiment(String experimentName) {
-        IWorkspaceRoot workspaceRoot = fExperimentFolder.getWorkspace().getRoot();
-        IPath folderPath = fExperimentFolder.getFullPath().append(experimentName);
-        IFolder folder = workspaceRoot.getFolder(folderPath);
-
-        return folder;
+        return experimentFolders[0];
     }
 
 }
