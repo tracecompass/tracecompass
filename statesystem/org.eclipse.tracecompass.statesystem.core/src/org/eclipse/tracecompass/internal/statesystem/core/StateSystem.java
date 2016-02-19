@@ -401,6 +401,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
         transState.processStateChange(t, value, attributeQuark);
     }
 
+    @Deprecated
     @Override
     public void incrementAttribute(long t, int attributeQuark)
             throws StateValueTypeException, TimeRangeException,

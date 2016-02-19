@@ -146,7 +146,11 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *             If the given timestamp is invalid
      * @throws AttributeNotFoundException
      *             If the quark is invalid
+     * @deprecated Use
+     *             {@link StateSystemBuilderUtils#incrementAttributeInt(ITmfStateSystemBuilder, long, int, Integer)}
+     *             instead
      */
+    @Deprecated
     void incrementAttribute(long t, int attributeQuark)
             throws AttributeNotFoundException, StateValueTypeException;
 

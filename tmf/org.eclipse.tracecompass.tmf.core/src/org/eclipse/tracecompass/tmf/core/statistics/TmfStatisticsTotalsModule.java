@@ -16,6 +16,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
+import org.eclipse.tracecompass.statesystem.core.StateSystemBuilderUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -123,7 +124,7 @@ public class TmfStatisticsTotalsModule extends TmfStateSystemAnalysisModule {
             try {
                 /* Total number of events */
                 int quark = ss.getQuarkAbsoluteAndAdd(Attributes.TOTAL);
-                ss.incrementAttribute(ts, quark);
+                StateSystemBuilderUtils.incrementAttributeInt(ss, ts, quark, 1);
 
             } catch (StateValueTypeException | TimeRangeException | AttributeNotFoundException e) {
                 e.printStackTrace();

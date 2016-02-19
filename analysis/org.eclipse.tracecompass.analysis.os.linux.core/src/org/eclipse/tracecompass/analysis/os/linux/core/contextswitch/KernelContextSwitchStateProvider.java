@@ -19,6 +19,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEven
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
+import org.eclipse.tracecompass.statesystem.core.StateSystemBuilderUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -90,7 +91,7 @@ public class KernelContextSwitchStateProvider extends AbstractTmfStateProvider {
             }
             int cpuQuark = stateSystemBuilder.getQuarkRelativeAndAdd(fCpuAttributeQuark, cpuObj.toString());
             try {
-                stateSystemBuilder.incrementAttribute(event.getTimestamp().getValue(), cpuQuark);
+                StateSystemBuilderUtils.incrementAttributeInt(stateSystemBuilder, event.getTimestamp().getValue(), cpuQuark, 1);
             } catch (StateValueTypeException | AttributeNotFoundException e) {
                 Activator.getDefault().logError(NonNullUtils.nullToEmptyString(e.getMessage()), e);
             }

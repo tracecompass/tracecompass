@@ -19,6 +19,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
+import org.eclipse.tracecompass.statesystem.core.StateSystemBuilderUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -200,7 +201,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
             if (ss == null) {
                 throw new IllegalStateException(ILLEGAL_STATE_EXCEPTION_MESSAGE);
             }
-            ss.incrementAttribute(timestamp, quark);
+            StateSystemBuilderUtils.incrementAttributeInt(ss, timestamp, quark, 1);
         }
     }
 

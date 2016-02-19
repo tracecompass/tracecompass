@@ -17,6 +17,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
+import org.eclipse.tracecompass.statesystem.core.StateSystemBuilderUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -162,7 +163,7 @@ public class TmfStatisticsEventTypesModule extends TmfStateSystemAnalysisModule 
 
                 /* Number of events of each type, globally */
                 quark = ss.getQuarkAbsoluteAndAdd(Attributes.EVENT_TYPES, eventName);
-                ss.incrementAttribute(ts, quark);
+                StateSystemBuilderUtils.incrementAttributeInt(ss, ts, quark, 1);
 
 //                /* Number of events per CPU */
 //                quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATISTICS, Attributes.EVENT_TYPES, eventName);
