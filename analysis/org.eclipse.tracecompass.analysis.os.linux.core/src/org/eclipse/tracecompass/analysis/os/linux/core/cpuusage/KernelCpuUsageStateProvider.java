@@ -23,9 +23,8 @@ import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.Attributes
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
+import org.eclipse.tracecompass.statesystem.core.StateSystemBuilderUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
@@ -126,21 +125,12 @@ public class KernelCpuUsageStateProvider extends AbstractTmfStateProvider {
                 }
 
                 /*
-                 * We add the time from startTime until now to the cumulative
-                 * time of the thread
-                 */
-                ITmfStateValue value = ss.queryOngoingState(cumulativeTimeQuark);
-
-                /*
                  * Modify cumulative time for this CPU/TID combo: The total time
                  * changes when the process is scheduled out. Nothing happens
                  * when the process is scheduled in.
                  */
-                long prevCumulativeTime = Math.max(0, value.unboxLong());
-                long newCumulativeTime = prevCumulativeTime + (ts - startTime);
+                StateSystemBuilderUtils.incrementAttributeLong(ss, ts, cumulativeTimeQuark, ts - startTime);
 
-                value = TmfStateValue.newValueLong(newCumulativeTime);
-                ss.modifyAttribute(ts, value, cumulativeTimeQuark);
                 fLastStartTimes.put(cpu, ts);
 
             } catch (AttributeNotFoundException e) {
