@@ -31,6 +31,8 @@ import org.junit.runners.Suite;
     org.eclipse.tracecompass.pcap.core.tests.perf.trace.PcapReadBenchmark.class,
     org.eclipse.tracecompass.pcap.core.tests.perf.trace.PcapSeekBenchmark.class,
 
+    org.eclipse.tracecompass.statesystem.core.tests.perf.historytree.HistoryTreeBackendBenchmark.class,
+
     org.eclipse.tracecompass.tmf.core.tests.perf.synchronization.TimestampTransformBenchmark.class,
 
     org.eclipse.tracecompass.tmf.ctf.core.tests.perf.experiment.ExperimentBenchmark.class
