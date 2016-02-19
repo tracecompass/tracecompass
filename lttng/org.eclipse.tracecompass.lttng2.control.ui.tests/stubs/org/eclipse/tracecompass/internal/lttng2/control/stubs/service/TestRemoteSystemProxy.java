@@ -31,6 +31,7 @@ public class TestRemoteSystemProxy extends RemoteSystemProxy {
     private LTTngToolsFileShell fShell = null;
     private String fTestFile = null;
     private String fScenario = null;
+    private String fSessionName = null;
 
     @Override
     public void connect(IProgressMonitor monitor) throws ExecutionException {
@@ -51,6 +52,7 @@ public class TestRemoteSystemProxy extends RemoteSystemProxy {
         if (shell == null) {
             shell = new LTTngToolsFileShell();
             if ((fTestFile != null) && (fScenario != null)) {
+                shell.setSessionName(fSessionName);
                 shell.loadScenarioFile(fTestFile);
                 shell.setScenario(fScenario);
                 fShell = shell;
@@ -75,6 +77,10 @@ public class TestRemoteSystemProxy extends RemoteSystemProxy {
         if (fShell != null) {
             fShell.setProfileName(profileName);
         }
+    }
+
+    public void setSessionName(String sessionName) {
+        fSessionName = sessionName;
     }
 
     public void deleteProfileFile() {

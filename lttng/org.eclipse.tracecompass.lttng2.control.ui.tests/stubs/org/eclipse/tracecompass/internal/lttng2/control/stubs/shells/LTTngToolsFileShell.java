@@ -63,6 +63,8 @@ public class LTTngToolsFileShell extends TestCommandShell {
 
     private final static String LTTNG_USER_HOME_PATTERN = "\\$\\{userhome\\}";
 
+    private final static String SESSION_NAME_PATTERN = "\\$\\{sessionname\\}";
+
     private final static String USER_HOME = System.getProperty("user.home");
 
     private final static Pattern LTTNG_SAVE_MI_PATTERN = Pattern.compile("lttng\\s+--mi xml\\s+save\\s+-f");
@@ -76,6 +78,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
     private String fScenario;
     private String fProfileName = null;
     private File fProfileFile = null;
+    private String fSessionName = null;
 
     private final Map<String, Map<String, ICommandResult>> fScenarioMap = new HashMap<>();
     private final Map<String, Integer> fSessionNameMap = new HashMap<>();
@@ -190,6 +193,11 @@ public class LTTngToolsFileShell extends TestCommandShell {
                             // Update
                             input = input.replaceAll(LTTNG_USER_HOME_PATTERN, USER_HOME);
 
+                            // Update session variable
+                            if (fSessionName != null) {
+                                input = input.replaceAll(SESSION_NAME_PATTERN, fSessionName);
+                            }
+
                             // Handle instances of 'lttng list
                             // <session"-command
                             Matcher matcher = LTTNG_LIST_SESSION_PATTERN.matcher(strLine);
@@ -234,6 +242,12 @@ public class LTTngToolsFileShell extends TestCommandShell {
                             while (isComment(strLine)) {
                                 strLine = br.readLine();
                             }
+
+                            // Update session variable
+                            if (fSessionName != null) {
+                                strLine = strLine.replaceAll(SESSION_NAME_PATTERN, fSessionName);
+                            }
+
                             // lines of output/error output
                             if (errorOutput != null && inErrorOutput) {
                                 errorOutput.add(strLine);
@@ -351,6 +365,10 @@ public class LTTngToolsFileShell extends TestCommandShell {
         if (fProfileFile != null && fProfileFile.exists()) {
             fProfileFile.delete();
         }
+    }
+
+    public void setSessionName(String sessionName) {
+        fSessionName = sessionName;
     }
 
 

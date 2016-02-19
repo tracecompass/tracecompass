@@ -38,7 +38,7 @@ public class ControlViewProfileTest extends ControlViewTest {
     private static final String TEST_STREAM = "Profile.cfg";
     private static final String CREATE_PROFILE_SCENARIO_NAME = "ProfileTest";
 
-    private static final String SESSION_NAME = "_control_view_test_profile";
+    private static final String SESSION_NAME = String.valueOf(System.nanoTime());
 
     @Override
     protected String getTestStream() {
@@ -57,6 +57,7 @@ public class ControlViewProfileTest extends ControlViewTest {
         // Save and load feature will only work on a Linux remote
         assumeTrue(IS_LINUX);
 
+        fProxy.setSessionName(getSessionName());
         fProxy.setTestFile(fTestFile);
         fProxy.setScenario(INIT_SCENARIO_NAME);
 
@@ -70,6 +71,7 @@ public class ControlViewProfileTest extends ControlViewTest {
         // Disable saving of profiles
         fProxy.setProfileName(null);
         fProxy.deleteProfileFile();
+        fProxy.setSessionName(null);
         testDisconnectFromNode();
     }
 
