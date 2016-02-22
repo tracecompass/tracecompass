@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.common.core;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -134,8 +135,8 @@ public abstract class TraceCompassActivator extends Plugin {
      * @param message
      *            A message to log
      */
-    public void logInfo(String message) {
-        getLog().log(new Status(IStatus.INFO, fPluginId, message));
+    public void logInfo(@Nullable String message) {
+        getLog().log(new Status(IStatus.INFO, fPluginId, nullToEmptyString(message)));
     }
 
     /**
@@ -147,8 +148,8 @@ public abstract class TraceCompassActivator extends Plugin {
      * @param exception
      *            A exception to log
      */
-    public void logInfo(String message, Throwable exception) {
-        getLog().log(new Status(IStatus.INFO, fPluginId, message, exception));
+    public void logInfo(@Nullable String message, Throwable exception) {
+        getLog().log(new Status(IStatus.INFO, fPluginId, nullToEmptyString(message), exception));
     }
 
     /**
@@ -158,8 +159,8 @@ public abstract class TraceCompassActivator extends Plugin {
      * @param message
      *            A message to log
      */
-    public void logWarning(String message) {
-        getLog().log(new Status(IStatus.WARNING, fPluginId, message));
+    public void logWarning(@Nullable String message) {
+        getLog().log(new Status(IStatus.WARNING, fPluginId, nullToEmptyString(message)));
     }
 
     /**
@@ -171,8 +172,8 @@ public abstract class TraceCompassActivator extends Plugin {
      * @param exception
      *            A exception to log
      */
-    public void logWarning(String message, Throwable exception) {
-        getLog().log(new Status(IStatus.WARNING, fPluginId, message, exception));
+    public void logWarning(@Nullable String message, Throwable exception) {
+        getLog().log(new Status(IStatus.WARNING, fPluginId, nullToEmptyString(message), exception));
     }
 
     /**
@@ -182,8 +183,8 @@ public abstract class TraceCompassActivator extends Plugin {
      * @param message
      *            A message to log
      */
-    public void logError(String message) {
-        getLog().log(new Status(IStatus.ERROR, fPluginId, message));
+    public void logError(@Nullable String message) {
+        getLog().log(new Status(IStatus.ERROR, fPluginId, nullToEmptyString(message)));
     }
 
     /**
@@ -195,8 +196,8 @@ public abstract class TraceCompassActivator extends Plugin {
      * @param exception
      *            A exception to log
      */
-    public void logError(String message, Throwable exception) {
-        getLog().log(new Status(IStatus.ERROR, fPluginId, message, exception));
+    public void logError(@Nullable String message, Throwable exception) {
+        getLog().log(new Status(IStatus.ERROR, fPluginId, nullToEmptyString(message), exception));
     }
 
 }
