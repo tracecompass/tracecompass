@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
@@ -84,7 +83,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
 
     @Override
     public long getStartTime() {
-        return fTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        return fTrace.getStartTime().toNanos();
     }
 
     @Override
@@ -210,7 +209,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         private void closeStateSystem() {
             ITmfEvent event = currentEvent;
             final long endTime = (event == null) ? 0 :
-                    event.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                    event.getTimestamp().toNanos();
 
             if (fSS != null) {
                 fSS.closeHistory(endTime);

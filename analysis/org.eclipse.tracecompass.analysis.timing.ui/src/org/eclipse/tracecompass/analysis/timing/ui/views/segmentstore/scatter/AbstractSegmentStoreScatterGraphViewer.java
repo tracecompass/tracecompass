@@ -44,7 +44,6 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -90,8 +89,8 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             }
 
             AbstractSegmentStoreAnalysisModule module = getAnalysisModule();
-            final long startTimeInNanos = getTimeInNanos(fCurrentRange.getStartTime());
-            final long endTimeInNanos = getTimeInNanos(fCurrentRange.getEndTime());
+            final long startTimeInNanos = fCurrentRange.getStartTime().toNanos();
+            final long endTimeInNanos = fCurrentRange.getEndTime().toNanos();
             if (module == null) {
                 setWindowRange(startTimeInNanos, endTimeInNanos);
                 redraw(statusMonitor, startTimeInNanos, startTimeInNanos, Collections.EMPTY_LIST);
@@ -277,8 +276,8 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
     public void updateModel(@Nullable ISegmentStore<ISegment> dataInput) {
         // Update new window range
         TmfTimeRange currentRange = TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange();
-        long currentStart = getTimeInNanos(currentRange.getStartTime());
-        long currentEnd = getTimeInNanos(currentRange.getEndTime());
+        long currentStart = currentRange.getStartTime().toNanos();
+        long currentEnd = currentRange.getEndTime().toNanos();
         if (dataInput == null) {
             if (!getDisplay().isDisposed()) {
                 Display.getDefault().syncExec(new Runnable() {
@@ -443,8 +442,8 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
         if (trace != null) {
             final TmfTimeRange timeRange = TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange();
             setWindowRange(
-                    timeRange.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue(),
-                    timeRange.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
+                    timeRange.getStartTime().toNanos(),
+                    timeRange.getEndTime().toNanos());
             setData(getSegmentStoreAnalysisModule(trace));
             updateRange(timeRange);
         }
@@ -468,8 +467,8 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             final AbstractSegmentStoreAnalysisModule analysisModuleOfClass = getSegmentStoreAnalysisModule(trace);
             final TmfTimeRange timeRange = TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange();
             setWindowRange(
-                    getTimeInNanos(timeRange.getStartTime()),
-                    getTimeInNanos(timeRange.getEndTime()));
+                    timeRange.getStartTime().toNanos(),
+                    timeRange.getEndTime().toNanos());
             setData(analysisModuleOfClass);
         }
 
@@ -531,9 +530,5 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
 
     private void setAnalysisModule(AbstractSegmentStoreAnalysisModule analysisModule) {
         fAnalysisModule = analysisModule;
-    }
-
-    private static long getTimeInNanos(final ITmfTimestamp currentTime) {
-        return currentTime.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
     }
 }

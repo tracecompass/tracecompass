@@ -77,7 +77,6 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -1391,8 +1390,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         if (signal.getSource() == this || fTrace == null) {
             return;
         }
-        final long beginTime = signal.getBeginTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        final long endTime = signal.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        final long beginTime = signal.getBeginTime().toNanos();
+        final long endTime = signal.getEndTime().toNanos();
 
         Display.getDefault().asyncExec(new Runnable() {
             @Override
@@ -1425,8 +1424,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         if (signal.getCurrentRange().getIntersection(fTrace.getTimeRange()) == null) {
             return;
         }
-        final long startTime = signal.getCurrentRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        final long endTime = signal.getCurrentRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        final long startTime = signal.getCurrentRange().getStartTime().toNanos();
+        final long endTime = signal.getCurrentRange().getEndTime().toNanos();
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -1469,8 +1468,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             if (fEntryList == null) {
                 rebuild();
             } else {
-                fStartTime = fTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-                fEndTime = fTrace.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                fStartTime = fTrace.getStartTime().toNanos();
+                fEndTime = fTrace.getEndTime().toNanos();
                 refresh();
             }
         }
@@ -1734,10 +1733,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 fTimeGraphWrapper.getTimeGraphViewer().setTimeBounds(startBound, endBound);
 
                 TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
-                long selectionBeginTime = fTrace == null ? SWT.DEFAULT : ctx.getSelectionRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-                long selectionEndTime = fTrace == null ? SWT.DEFAULT : ctx.getSelectionRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-                long startTime = fTrace == null ? SWT.DEFAULT : ctx.getWindowRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-                long endTime = fTrace == null ? SWT.DEFAULT : ctx.getWindowRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                long selectionBeginTime = fTrace == null ? SWT.DEFAULT : ctx.getSelectionRange().getStartTime().toNanos();
+                long selectionEndTime = fTrace == null ? SWT.DEFAULT : ctx.getSelectionRange().getEndTime().toNanos();
+                long startTime = fTrace == null ? SWT.DEFAULT : ctx.getWindowRange().getStartTime().toNanos();
+                long endTime = fTrace == null ? SWT.DEFAULT : ctx.getWindowRange().getEndTime().toNanos();
                 startTime = (fStartTime == Long.MAX_VALUE ? SWT.DEFAULT : Math.max(startTime, fStartTime));
                 endTime = (fEndTime == Long.MIN_VALUE ? SWT.DEFAULT : Math.min(endTime, fEndTime));
                 fTimeGraphWrapper.getTimeGraphViewer().setSelectionRange(selectionBeginTime, selectionEndTime, false);

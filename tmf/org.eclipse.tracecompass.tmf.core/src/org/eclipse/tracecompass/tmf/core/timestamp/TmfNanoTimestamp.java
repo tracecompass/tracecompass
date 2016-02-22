@@ -49,7 +49,7 @@ public class TmfNanoTimestamp extends TmfTimestamp {
      *            The timestamp to copy
      */
     public TmfNanoTimestamp(final ITmfTimestamp timestamp) {
-        super(timestamp.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue(), ITmfTimestamp.NANOSECOND_SCALE);
+        super(timestamp.toNanos(), ITmfTimestamp.NANOSECOND_SCALE);
     }
 
     // ------------------------------------------------------------------------

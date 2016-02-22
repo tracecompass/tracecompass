@@ -170,7 +170,7 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
             fSelection = start;
         } else {
             TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
-            fSelection = ctx.getSelectionRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+            fSelection = ctx.getSelectionRange().getStartTime().toNanos();
         }
 
         if (getTrace() == null) {

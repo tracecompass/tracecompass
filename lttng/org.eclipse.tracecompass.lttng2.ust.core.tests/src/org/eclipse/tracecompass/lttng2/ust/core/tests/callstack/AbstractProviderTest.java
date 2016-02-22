@@ -35,7 +35,6 @@ import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
@@ -156,7 +155,7 @@ public abstract class AbstractProviderTest {
             /* Make sure the generated state system exists, but is empty */
             ITmfStateSystem ss = module.getStateSystem();
             assertNotNull(ss);
-            assertTrue(ss.getStartTime() >= ustTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
+            assertTrue(ss.getStartTime() >= ustTrace.getStartTime().toNanos());
             assertEquals(0, ss.getNbAttributes());
         } finally {
             if (module != null) {

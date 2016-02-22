@@ -59,22 +59,21 @@ public class TmfTraceManagerTest {
 
     /** Time-out tests after 20 seconds */
     @Rule
-    public TestRule globalTimeout= new Timeout(20, TimeUnit.SECONDS);
+    public TestRule globalTimeout = new Timeout(20, TimeUnit.SECONDS);
 
     private static final int SCALE = ITmfTimestamp.NANOSECOND_SCALE;
 
     private static ITmfTrace trace1;
     private static final long t1start = 1331668247314038062L;
-    private static final long t1end =   1331668259054285979L;
+    private static final long t1end = 1331668259054285979L;
 
     private static ITmfTrace trace2;
     private static final long t2start = 1332170682440133097L;
-    private static final long t2end =   1332170692664579801L;
+    private static final long t2end = 1332170692664579801L;
 
     private static final long ONE_SECOND = 1000000000L;
 
     private TmfTraceManager tm;
-
 
     /**
      * Test class initialization
@@ -347,8 +346,8 @@ public class TmfTraceManagerTest {
     }
 
     /**
-     * Test selecting a range whose end time is after the trace's end time.
-     * The selected range should get clamped to the trace's range.
+     * Test selecting a range whose end time is after the trace's end time. The
+     * selected range should get clamped to the trace's range.
      */
     @Test
     public void testTraceTimeRangeClampingEnd() {
@@ -738,8 +737,8 @@ public class TmfTraceManagerTest {
      * Basically a "initial + offset" operation, but for ITmfTimetamp objects.
      */
     private static @NonNull ITmfTimestamp calculateOffset(ITmfTimestamp initialTs, ITmfTimestamp offsetTs) {
-        long start = initialTs.normalize(0, SCALE).getValue();
-        long offset = offsetTs.normalize(0, SCALE).getValue();
+        long start = initialTs.toNanos();
+        long offset = offsetTs.toNanos();
         return new TmfTimestamp(start + offset, SCALE);
     }
 }

@@ -454,8 +454,8 @@ public class CallStackView extends AbstractTimeGraphView {
         if (signal.getSource() == this || getTrace() == null || isPinned()) {
             return;
         }
-        final long beginTime = signal.getBeginTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        final long endTime = signal.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        final long beginTime = signal.getBeginTime().toNanos();
+        final long endTime = signal.getEndTime().toNanos();
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {

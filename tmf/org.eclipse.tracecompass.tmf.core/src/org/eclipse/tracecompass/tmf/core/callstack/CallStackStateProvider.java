@@ -25,7 +25,6 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -102,7 +101,7 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
             /* Check if the event is a function entry */
             String functionEntryName = functionEntry(event);
             if (functionEntryName != null) {
-                long timestamp = event.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                long timestamp = event.getTimestamp().toNanos();
                 String thread = getThreadName(event);
                 int threadQuark = ss.getQuarkAbsoluteAndAdd(THREADS, thread);
                 Long threadId = getThreadId(event);
@@ -118,7 +117,7 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
             /* Check if the event is a function exit */
             String functionExitName = functionExit(event);
             if (functionExitName != null) {
-                long timestamp = event.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                long timestamp = event.getTimestamp().toNanos();
                 String thread = getThreadName(event);
                 int quark = ss.getQuarkAbsoluteAndAdd(THREADS, thread, CALL_STACK);
                 ITmfStateValue poppedValue = ss.popAttribute(timestamp, quark);

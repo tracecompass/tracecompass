@@ -26,7 +26,6 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsEventTypesModule;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsModule;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
@@ -48,10 +47,6 @@ class StatisticsUpdateJob extends Job {
      */
     private static final long LIVE_UPDATE_DELAY = 1000;
 
-    /**
-     * Timestamp scale used for all statistics (nanosecond)
-     */
-    private static final byte TIME_SCALE = ITmfTimestamp.NANOSECOND_SCALE;
     private TmfTimeRange fTimerange;
 
     /**
@@ -122,8 +117,8 @@ class StatisticsUpdateJob extends Job {
              * The generic statistics are stored in nanoseconds, so we must make
              * sure the time range is scaled correctly.
              */
-            start = localtimeRange.getStartTime().normalize(0, TIME_SCALE).getValue();
-            end = localtimeRange.getEndTime().normalize(0, TIME_SCALE).getValue();
+            start = localtimeRange.getStartTime().toNanos();
+            end = localtimeRange.getEndTime().toNanos();
 
             Map<String, Long> map = stats.getEventTypesInRange(start, end);
             updateStats(map);

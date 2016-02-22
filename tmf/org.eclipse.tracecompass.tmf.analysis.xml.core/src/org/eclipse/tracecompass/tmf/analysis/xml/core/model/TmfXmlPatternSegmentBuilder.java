@@ -97,8 +97,8 @@ public class TmfXmlPatternSegmentBuilder {
      */
     public TmfXmlPatternSegment generatePatternSegment(ITmfEvent event, ITmfTimestamp start, ITmfTimestamp end) {
         int scale = event.getTimestamp().getScale();
-        long startValue = start.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        long endValue = end.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        long startValue = start.toNanos();
+        long endValue = end.toNanos();
         String segmentName = getPatternSegmentName(event);
         Map<String, ITmfStateValue> fields = new HashMap<>();
         setPatternSegmentContent(event, start, end, fields);

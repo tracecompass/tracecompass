@@ -25,7 +25,6 @@ import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStateStatistics.Attributes;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -119,7 +118,7 @@ public class TmfStatisticsTotalsModule extends TmfStateSystemAnalysisModule {
 
             /* Since this can be used for any trace types, normalize all the
              * timestamp values to nanoseconds. */
-            final long ts = event.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+            final long ts = event.getTimestamp().toNanos();
 
             try {
                 /* Total number of events */

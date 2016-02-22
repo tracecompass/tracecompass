@@ -29,8 +29,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
  */
 public class TimeChartEvent implements ITimeEvent {
 
-    private static final byte TIMESTAMP_SCALE = -9;
-
     private final TimeChartAnalysisEntry fParentEntry;
     private long fTime;
     private long fDuration;
@@ -60,7 +58,7 @@ public class TimeChartEvent implements ITimeEvent {
     public TimeChartEvent(TimeChartAnalysisEntry parentEntry, ITmfEvent event,
             long rank, TimeChartDecorationProvider decorationProvider) {
         fParentEntry = parentEntry;
-        fTime = event.getTimestamp().normalize(0, TIMESTAMP_SCALE).getValue();
+        fTime = event.getTimestamp().toNanos();
         fDuration = 0;
         fFirstRank = fLastRank = rank;
         fRankRangeList = new RankRangeList(rank);

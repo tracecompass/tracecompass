@@ -268,7 +268,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
         public void handleData(ITmfEvent event) {
             super.handleData(event);
             if (event.getTrace() == trace) {
-                long ts = event.getTimestamp().normalize(0, SCALE).getValue();
+                long ts = event.getTimestamp().toNanos();
                 Long key = results.floorKey(ts);
                 if (key != null) {
                     incrementValue(key);

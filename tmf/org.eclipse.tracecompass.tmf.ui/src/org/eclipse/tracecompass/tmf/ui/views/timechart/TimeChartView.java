@@ -159,8 +159,8 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
             TmfTimeRange range = TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange();
 
             updateTraceEntry(fTimeAnalysisEntry, Long.MAX_VALUE,
-                    range.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue(),
-                    range.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
+                    range.getStartTime().toNanos(),
+                    range.getEndTime().toNanos());
         }
     }
 
@@ -493,7 +493,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
                         if (event == null) {
                             break;
                         }
-                        long eventTime = event.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                        long eventTime = event.getTimestamp().toNanos();
                         if (eventTime >= timeChartEvent.getTime() && eventTime <= timeChartEvent.getTime() + timeChartEvent.getDuration()) {
                             priority = Math.min(priority, ColorSettingsManager.getColorSettingPriority(event));
                         }
@@ -650,8 +650,8 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
                 }
             }
             TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
-            long beginTime = ctx.getSelectionRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-            long endTime = ctx.getSelectionRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+            long beginTime = ctx.getSelectionRange().getStartTime().toNanos();
+            long endTime = ctx.getSelectionRange().getEndTime().toNanos();
             fViewer.setSelectionRange(beginTime, endTime, false);
         }
     }
@@ -683,8 +683,10 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
      */
     @TmfSignalHandler
     public void selectionRangeUpdated(TmfSelectionRangeUpdatedSignal signal) {
-        final long beginTime = signal.getBeginTime().normalize(0, TIMESTAMP_SCALE).getValue();
-        final long endTime = signal.getEndTime().normalize(0, TIMESTAMP_SCALE).getValue();
+        final long beginTime = signal.getBeginTime().toNanos();
+        final long endTime = signal.getEndTime().toNanos();
+
+
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -714,8 +716,8 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         if (signal.getSource() == this) {
             return;
         }
-        final long startTime = signal.getCurrentRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        final long endTime = signal.getCurrentRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        final long startTime = signal.getCurrentRange().getStartTime().toNanos();
+        final long endTime = signal.getCurrentRange().getEndTime().toNanos();
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {

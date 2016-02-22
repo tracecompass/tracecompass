@@ -69,7 +69,7 @@ class TmfMipmapStateProviderStub extends AbstractTmfMipmapStateProvider {
     @Override
     protected void eventHandle(ITmfEvent ev) {
         ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
-        final long ts = ev.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        final long ts = ev.getTimestamp().toNanos();
         try {
             int quark = ss.getQuarkAbsoluteAndAdd(TEST_ATTRIBUTE_NAME);
             ITmfStateValue value = (ITmfStateValue) ev.getContent().getValue();

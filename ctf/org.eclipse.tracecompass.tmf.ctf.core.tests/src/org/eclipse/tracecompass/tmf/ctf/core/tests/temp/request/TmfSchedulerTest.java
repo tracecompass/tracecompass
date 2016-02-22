@@ -79,8 +79,8 @@ public class TmfSchedulerTest {
     public void setUp() {
         fixture = CtfTmfTestTraceUtils.getTrace(testTrace);
         fixture.indexTrace(true);
-        fStartTime = fixture.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        fEndTime = fixture.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        fStartTime = fixture.getStartTime().toNanos();
+        fEndTime = fixture.getEndTime().toNanos();
 
         long foregroundStartTime = fStartTime + ((fEndTime - fStartTime) / 4);
         long foregroundEndTime = fStartTime + ((fEndTime - fStartTime) / 2);

@@ -15,7 +15,6 @@ import java.util.List;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -57,7 +56,7 @@ public abstract class AbstractTmfGraphProvider implements ITmfGraphProvider {
 
     @Override
     public long getStartTime() {
-        return fTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        return fTrace.getStartTime().toNanos();
     }
 
     @Override

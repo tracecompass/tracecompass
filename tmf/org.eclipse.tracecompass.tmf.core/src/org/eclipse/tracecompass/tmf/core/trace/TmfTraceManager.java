@@ -38,13 +38,13 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventFilterAppliedSignal;
-import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -282,12 +282,10 @@ public final class TmfTraceManager {
         final IFile editorFile = signal.getEditorFile();
         final ITmfTimestamp startTs = trace.getStartTime();
 
-        /* Calculate the initial time range */
-        final int SCALE = ITmfTimestamp.NANOSECOND_SCALE;
-        long offset = trace.getInitialRangeOffset().normalize(0, SCALE).getValue();
-        long endTime = startTs.normalize(0, SCALE).getValue() + offset;
+        long offset = trace.getInitialRangeOffset().toNanos();
+        long endTime = startTs.toNanos() + offset;
         final TmfTimeRange selectionRange = new TmfTimeRange(startTs, startTs);
-        final TmfTimeRange windowRange = new TmfTimeRange(startTs, new TmfTimestamp(endTime, SCALE));
+        final TmfTimeRange windowRange = new TmfTimeRange(startTs, new TmfTimestamp(endTime, ITmfTimestamp.NANOSECOND_SCALE));
 
         final TmfTraceContext startCtx = new TmfTraceContext(selectionRange, windowRange, editorFile, null);
 

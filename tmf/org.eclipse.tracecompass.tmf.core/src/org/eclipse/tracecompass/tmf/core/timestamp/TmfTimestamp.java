@@ -313,8 +313,7 @@ public class TmfTimestamp implements ITmfTimestamp {
     @Override
     public String toString(final TmfTimestampFormat format) {
         try {
-            ITmfTimestamp ts = normalize(0, ITmfTimestamp.NANOSECOND_SCALE);
-            return format.format(ts.getValue());
+            return format.format(toNanos());
         }
         catch (ArithmeticException e) {
             return format.format(0);

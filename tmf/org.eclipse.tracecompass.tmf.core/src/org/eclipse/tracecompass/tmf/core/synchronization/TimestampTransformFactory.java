@@ -96,7 +96,7 @@ public final class TimestampTransformFactory {
         if (factor == 1.0) {
             return createWithOffset(offset);
         }
-        return new TmfTimestampTransformLinearFast(factor, offset.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
+        return new TmfTimestampTransformLinearFast(factor, offset.toNanos());
     }
 
     /**

@@ -717,8 +717,8 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
 
         TmfTimeRange fullRange = signal.getRange();
 
-        fTraceStartTime = fullRange.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        fTraceEndTime = fullRange.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        fTraceStartTime = fullRange.getStartTime().toNanos();
+        fTraceEndTime = fullRange.getEndTime().toNanos();
 
         fFullTraceHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
         fTimeRangeHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
@@ -736,8 +736,8 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
             return;
         }
         TmfTimeRange fullRange = signal.getTrace().getTimeRange();
-        fTraceStartTime = fullRange.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        fTraceEndTime = fullRange.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        fTraceStartTime = fullRange.getStartTime().toNanos();
+        fTraceEndTime = fullRange.getEndTime().toNanos();
 
         fFullTraceHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
         fTimeRangeHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
@@ -772,9 +772,10 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
         }
 
         // Update the selected time range
-        ITmfTimestamp beginTime = signal.getBeginTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE);
-        ITmfTimestamp endTime = signal.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE);
-        updateDisplayedSelectionTime(beginTime.getValue(), endTime.getValue());
+        long beginTime = signal.getBeginTime().toNanos();
+        long endTime = signal.getEndTime().toNanos();
+
+        updateDisplayedSelectionTime(beginTime, endTime);
     }
 
     /**
@@ -809,8 +810,8 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
             }
 
             updateDisplayedTimeRange(
-                    range.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue(),
-                    range.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
+                    range.getStartTime().toNanos(),
+                    range.getEndTime().toNanos());
 
             // Send the event request to populate the small histogram
             sendTimeRangeRequest(fWindowStartTime, fWindowEndTime);
@@ -827,10 +828,10 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
         TmfTimeRange fullRange = updateTraceTimeRange();
 
         TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
-        long selectionBeginTime = ctx.getSelectionRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        long selectionEndTime = ctx.getSelectionRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        long startTime = ctx.getWindowRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        long duration = ctx.getWindowRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue() - startTime;
+        long selectionBeginTime = ctx.getSelectionRange().getStartTime().toNanos();
+        long selectionEndTime = ctx.getSelectionRange().getEndTime().toNanos();
+        long startTime = ctx.getWindowRange().getStartTime().toNanos();
+        long duration = ctx.getWindowRange().getEndTime().toNanos() - startTime;
 
         if ((fTimeRangeRequest != null) && !fTimeRangeRequest.isCompleted()) {
             fTimeRangeRequest.cancel();
@@ -926,8 +927,8 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
 
         TmfTimeRange timeRange = fTrace.getTimeRange();
         if (!timeRange.equals(TmfTimeRange.NULL_RANGE)) {
-            fTraceStartTime = timeRange.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-            fTraceEndTime = timeRange.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+            fTraceStartTime = timeRange.getStartTime().toNanos();
+            fTraceEndTime = timeRange.getEndTime().toNanos();
         }
         return timeRange;
     }

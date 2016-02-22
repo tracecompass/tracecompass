@@ -28,7 +28,6 @@ import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStateStatistics.Attributes;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -131,7 +130,7 @@ public class TmfStatisticsEventTypesModule extends TmfStateSystemAnalysisModule 
 
             /* Since this can be used for any trace types, normalize all the
              * timestamp values to nanoseconds. */
-            final long ts = event.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+            final long ts = event.getTimestamp().toNanos();
 
             final String eventName = event.getName();
 
@@ -149,8 +148,8 @@ public class TmfStatisticsEventTypesModule extends TmfStateSystemAnalysisModule 
                     ITmfStateValue value1 = TmfStateValue.newValueInt((int) (curVal + le.getNbLostEvents()));
                     ss.modifyAttribute(ts, value1, quark);
 
-                    long lostEventsStartTime = le.getTimeRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-                    long lostEventsEndTime = le.getTimeRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                    long lostEventsStartTime = le.getTimeRange().getStartTime().toNanos();
+                    long lostEventsEndTime = le.getTimeRange().getEndTime().toNanos();
                     int lostEventsQuark = ss.getQuarkAbsoluteAndAdd(Attributes.LOST_EVENTS);
                     ITmfStateValue currentLostEventsEndTime = ss.queryOngoingState(lostEventsQuark);
                     if (currentLostEventsEndTime.isNull() || currentLostEventsEndTime.unboxLong() < lostEventsStartTime) {

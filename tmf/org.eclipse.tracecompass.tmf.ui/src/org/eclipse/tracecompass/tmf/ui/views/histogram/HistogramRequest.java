@@ -21,7 +21,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfLostEvent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 
 /**
@@ -97,7 +96,7 @@ public class HistogramRequest extends TmfEventRequest {
                     fHistogram.countLostEvent(lostEvents.getTimeRange(), lostEvents.getNbLostEvents(), fFullRange);
 
                 } else { /* handle lost event */
-                    long timestamp = event.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                    long timestamp = event.getTimestamp().toNanos();
                     fHistogram.countEvent(getNbRead(), timestamp, event.getTrace());
                 }
             }

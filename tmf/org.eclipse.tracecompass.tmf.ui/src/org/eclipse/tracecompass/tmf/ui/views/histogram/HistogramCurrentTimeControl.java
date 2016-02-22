@@ -72,8 +72,8 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
             ITmfTrace trace = fParentView.getTrace();
             if (trace != null) {
                 TmfTimeRange range = trace.getTimeRange();
-                long startTime = range.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-                long endTime = range.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                long startTime = range.getStartTime().toNanos();
+                long endTime = range.getEndTime().toNanos();
                 if (value < startTime) {
                     value = startTime;
                 } else if (value > endTime) {

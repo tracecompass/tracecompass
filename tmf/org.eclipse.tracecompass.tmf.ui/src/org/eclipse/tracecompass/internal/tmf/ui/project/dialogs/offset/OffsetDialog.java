@@ -136,7 +136,7 @@ public class OffsetDialog extends Dialog {
                 } else {
                     try {
                         ITmfTimestamp refTime = map.get(element);
-                        long ref = refTime == null ? 0 : refTime.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                        long ref = refTime == null ? 0 : refTime.toNanos();
                         Long newVal = TIME_FORMAT.parseValue(string, ref);
                         map.put((TmfTraceElement) element, new TmfNanoTimestamp(newVal));
                     } catch (ParseException e) {
@@ -153,7 +153,7 @@ public class OffsetDialog extends Dialog {
             if (ts == null) {
                 return ""; //$NON-NLS-1$
             }
-            return TIME_FORMAT.format(ts.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
+            return TIME_FORMAT.format(ts.toNanos());
         }
     }
 
