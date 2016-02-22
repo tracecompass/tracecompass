@@ -32,7 +32,8 @@ public class TmfNanoTimestamp extends TmfTimestamp {
     /**
      * Full constructor
      *
-     * @param value the timestamp value
+     * @param value
+     *            the timestamp value
      */
     public TmfNanoTimestamp(final long value) {
         super(value, ITmfTimestamp.NANOSECOND_SCALE);
@@ -41,8 +42,8 @@ public class TmfNanoTimestamp extends TmfTimestamp {
     /**
      * Copy constructor.
      *
-     * If the parameter is not a TmfNanoTimestamp, the timestamp will be
-     * scaled to nanoseconds, and the precision will be discarded.
+     * If the parameter is not a TmfNanoTimestamp, the timestamp will be scaled
+     * to nanoseconds, and the precision will be discarded.
      *
      * @param timestamp
      *            The timestamp to copy
@@ -78,6 +79,14 @@ public class TmfNanoTimestamp extends TmfTimestamp {
             return new TmfTimestampDelta(getValue() - ts.getValue(), ITmfTimestamp.NANOSECOND_SCALE);
         }
         return super.getDelta(ts);
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public long toNanos(){
+        return getValue();
     }
 
     // ------------------------------------------------------------------------

@@ -77,6 +77,21 @@ public interface ITmfTimestamp extends Comparable<ITmfTimestamp> {
      */
     int getScale();
 
+    /**
+     * Gets the timestamp converted to nanoseconds, if the timestamp is larger
+     * than {@link Long#MAX_VALUE} or smaller than {@link Long#MIN_VALUE} it
+     * will be clamped to those values.
+     *
+     * @return the timestamp converted to a long value of nanoseconds
+     * @since 2.0
+     */
+    default long toNanos(){
+        if (getScale() == NANOSECOND_SCALE) {
+            return getValue();
+        }
+        return normalize(0L, NANOSECOND_SCALE).getValue();
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
