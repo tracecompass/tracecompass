@@ -156,7 +156,11 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
 
         @Override
         public void run() {
-            updateTraceEntry(fTimeAnalysisEntry, Long.MAX_VALUE, 0, Long.MAX_VALUE);
+            TmfTimeRange range = TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange();
+
+            updateTraceEntry(fTimeAnalysisEntry, Long.MAX_VALUE,
+                    range.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue(),
+                    range.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
         }
     }
 
@@ -548,8 +552,8 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
 
     @Override
     public void colorSettingsChanged(ColorSetting[] colorSettings) {
-        // Set presentation provider again to trigger re-creation of new color settings which are stored
-        // in the TimeGraphControl class
+        // Set presentation provider again to trigger re-creation of new color
+        // settings which are stored in the TimeGraphControl class
         fViewer.setTimeGraphProvider(fPresentationProvider);
         redecorate();
     }
