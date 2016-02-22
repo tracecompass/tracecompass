@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.mode
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -76,15 +77,15 @@ public class LttngWorker implements IGraphWorker {
             if (tid == -1) {
                 return Collections.EMPTY_MAP;
             }
-            @Nullable KernelAnalysisModule kam = TmfTraceManager.getInstance().getActiveTraceSet().stream()
+            Optional<KernelAnalysisModule> kam = TmfTraceManager.getInstance().getActiveTraceSet().stream()
                         .filter(trace -> trace.getHostId().equals(getHostId()))
                         .map(trace -> TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelAnalysisModule.class, KernelAnalysisModule.ID))
                         .filter(mod -> mod != null)
-                        .findFirst().get();
-            if (kam == null) {
+                        .findFirst();
+            if (!kam.isPresent()) {
                 return Collections.EMPTY_MAP;
             }
-            ITmfStateSystem ss = kam.getStateSystem();
+            ITmfStateSystem ss = kam.get().getStateSystem();
             if (ss == null) {
                 return Collections.EMPTY_MAP;
             }
