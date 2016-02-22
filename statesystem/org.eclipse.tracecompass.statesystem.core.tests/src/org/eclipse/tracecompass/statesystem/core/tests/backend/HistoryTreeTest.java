@@ -24,7 +24,7 @@ import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HT
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTNode;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HistoryTree;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
-import org.eclipse.tracecompasss.statesystem.core.tests.stubs.backend.HistoryTreeStub;
+import org.eclipse.tracecompass.statesystem.core.tests.stubs.backend.HistoryTreeStub;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -8,4 +8,4 @@
  *******************************************************************************/
 
 @org.eclipse.jdt.annotation.NonNullByDefault
-package org.eclipse.tracecompasss.statesystem.core.tests.stubs.backend;
+package org.eclipse.tracecompass.statesystem.core.tests.stubs.backend;
