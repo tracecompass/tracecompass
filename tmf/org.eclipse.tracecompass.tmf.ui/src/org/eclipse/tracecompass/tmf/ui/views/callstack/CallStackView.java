@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -42,6 +43,7 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -89,6 +91,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphSelection;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchActionConstants;
 
 /**
  * Main implementation for the Call Stack view
@@ -808,13 +811,17 @@ public class CallStackView extends AbstractTimeGraphView {
 
     private void createContextMenu() {
         final MenuManager contextMenu = new MenuManager();
+        contextMenu.add(new GroupMarker(IWorkbenchActionConstants.GROUP_REORGANIZE));
         contextMenu.add(getSortByNameAction());
         contextMenu.add(getSortByIdAction());
         contextMenu.add(getSortByTimeAction());
+        contextMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        Tree tree = getTimeGraphCombo().getTreeViewer().getTree();
+        TreeViewer treeViewer = getTimeGraphCombo().getTreeViewer();
+        Tree tree = treeViewer.getTree();
         Menu menu = contextMenu.createContextMenu(tree);
         tree.setMenu(menu);
+        getSite().registerContextMenu(contextMenu, treeViewer);
     }
 
     /**
