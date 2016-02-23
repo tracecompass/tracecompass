@@ -50,8 +50,7 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
     private static final ReadOnlyTextPropertyDescriptor PATH_DESCRIPTOR = new ReadOnlyTextPropertyDescriptor(PATH, PATH);
     private static final ReadOnlyTextPropertyDescriptor LOCATION_DESCRIPTOR = new ReadOnlyTextPropertyDescriptor(LOCATION, LOCATION);
 
-    private static final IPropertyDescriptor[] DESCRIPTORS = { NAME_DESCRIPTOR, PATH_DESCRIPTOR,
-            LOCATION_DESCRIPTOR };
+    private static final IPropertyDescriptor[] DESCRIPTORS = { NAME_DESCRIPTOR, PATH_DESCRIPTOR, LOCATION_DESCRIPTOR };
 
     static {
         NAME_DESCRIPTOR.setCategory(INFO_CATEGORY);
@@ -64,27 +63,31 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
     // ------------------------------------------------------------------------
 
     /**
-     * Constructor.
-     * Creates folder model element under the project.
-     * @param name The name of trace folder.
-     * @param resource The folder resource.
-     * @param parent The parent element (project).
+     * Constructor. Creates folder model element under the project.
+     *
+     * @param name
+     *            The name of trace folder.
+     * @param resource
+     *            The folder resource.
+     * @param parent
+     *            The parent element (project).
      */
     public TmfTraceFolder(String name, IFolder resource, TmfProjectElement parent) {
         super(name, resource, parent);
-        parent.addChild(this);
     }
 
     /**
-     * Constructor.
-     * Creates folder model element under another folder.
-     * @param name The name of trace folder.
-     * @param resource The folder resource.
-     * @param parent The parent element (folder).
+     * Constructor. Creates folder model element under another folder.
+     *
+     * @param name
+     *            The name of trace folder.
+     * @param resource
+     *            The folder resource.
+     * @param parent
+     *            The parent element (folder).
      */
     public TmfTraceFolder(String name, IFolder resource, TmfTraceFolder parent) {
         super(name, resource, parent);
-        parent.addChild(this);
     }
 
     // ------------------------------------------------------------------------
@@ -93,11 +96,14 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
 
     @Override
     public IFolder getResource() {
-        return (IFolder) fResource;
+        return (IFolder) super.getResource();
     }
 
+    /**
+     * @since 2.0
+     */
     @Override
-    void refreshChildren() {
+    protected void refreshChildren() {
         IFolder folder = getResource();
 
         // Get the children from the model
@@ -119,8 +125,10 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
                     } else {
                         element = new TmfTraceFolder(name, (IFolder) resource, this);
                     }
+                    addChild(element);
                 } else if (!isFolder && !(element instanceof TmfTraceElement)) {
                     element = new TmfTraceElement(name, resource, this);
+                    addChild(element);
                 } else {
                     childrenMap.remove(name);
                 }

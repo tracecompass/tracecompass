@@ -45,7 +45,6 @@ public class TmfAnalysisOutputElement extends TmfProjectModelElement {
     protected TmfAnalysisOutputElement(String name, IResource resource, ITmfProjectModelElement parent, IAnalysisOutput output) {
         super(name, resource, parent);
         fOutput = output;
-        parent.addChild(this);
     }
 
     /**
@@ -80,6 +79,11 @@ public class TmfAnalysisOutputElement extends TmfProjectModelElement {
             ((TmfAnalysisElement) parent).activateParent();
             fOutput.requestOutput();
         }
+    }
+
+    @Override
+    protected void refreshChildren() {
+        /* Nothing to do */
     }
 
 }

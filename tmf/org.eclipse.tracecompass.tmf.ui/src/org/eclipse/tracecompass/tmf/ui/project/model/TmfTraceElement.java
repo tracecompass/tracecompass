@@ -345,7 +345,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     @Override
     public IFile createBookmarksFile() throws CoreException {
         IFile file = getBookmarksFile();
-        if (fResource instanceof IFolder) {
+        if (getResource() instanceof IFolder) {
             return createBookmarksFile(getProject().getTracesFolder().getResource(), ITmfEventsEditorConstants.TRACE_EDITOR_INPUT_TYPE);
         }
         return file;
@@ -360,10 +360,11 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     @Override
     public IFile getBookmarksFile() {
         IFile file = null;
-        if (fResource instanceof IFile) {
-            file = (IFile) fResource;
-        } else if (fResource instanceof IFolder) {
-            final IFolder folder = (IFolder) fResource;
+        IResource resource = getResource();
+        if (resource instanceof IFile) {
+            file = (IFile) resource;
+        } else if (resource instanceof IFolder) {
+            final IFolder folder = (IFolder) resource;
             file = folder.getFile(getName() + '_');
         }
         return file;
@@ -665,7 +666,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
             }
         });
 
-        IPath path = fResource.getLocation();
+        IPath path = getResource().getLocation();
         if (path != null) {
             if (getParent() instanceof TmfTraceFolder) {
                 TmfExperimentFolder experimentFolder = getProject().getExperimentsFolder();
@@ -693,7 +694,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         }
 
         // Finally, delete the trace
-        fResource.delete(true, progressMonitor);
+        getResource().delete(true, progressMonitor);
     }
 
 }

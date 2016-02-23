@@ -32,56 +32,65 @@ public interface ITmfProjectModelElement {
 
     /**
      * Returns the name of the project model element.
+     *
      * @return the name of the project element.
      */
     String getName();
+
     /**
      * Returns the resource associated with the project model element.
+     *
      * @return the model resource.
      */
     IResource getResource();
+
     /**
      * Returns the path of the project model resource.
+     *
      * @return the resource path.
      */
     IPath getPath();
+
     /**
      * Returns the URI (location) of the resource.
+     *
      * @return the resource URI.
      */
     URI getLocation();
+
     /**
      * Returns the project model element.
+     *
      * @return the project model element.
      */
     TmfProjectElement getProject();
+
     /**
      * Returns the parent of this model element.
+     *
      * @return the parent of this model element.
      */
     ITmfProjectModelElement getParent();
-    /**
-     * Returns whether this model element has children or not.
-     * @return <code>true</code> if this model has children else <code>false</code>
-     */
-    boolean hasChildren();
+
     /**
      * Returns a list of children model elements.
+     *
      * @return a list of children model elements.
      */
     List<ITmfProjectModelElement> getChildren();
-    /**
-     * Method to add a child to the model element.
-     * @param child A child element to add.
-     */
-    void addChild(ITmfProjectModelElement child);
-    /**
-     * Method to remove a child from the model element.
-     * @param child A child element to remove
-     */
-    void removeChild(ITmfProjectModelElement child);
+
     /**
      * Method to request to refresh the project.
      */
     void refresh();
+
+    /**
+     * Returns whether this model element has children or not.
+     *
+     * @return <code>true</code> if this model element has children else
+     *         <code>false</code>
+     */
+    default boolean hasChildren() {
+        return !getChildren().isEmpty();
+    }
 }

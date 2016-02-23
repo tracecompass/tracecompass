@@ -37,13 +37,18 @@ public class TmfProjectElement extends TmfProjectModelElement {
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
+
     /**
      * Constructor.
      *
      * Creates the TMF project model element.
-     * @param name The name of the project.
-     * @param project The project reference.
-     * @param parent The parent element
+     *
+     * @param name
+     *            The name of the project.
+     * @param project
+     *            The project reference.
+     * @param parent
+     *            The parent element
      */
     public TmfProjectElement(String name, IProject project, ITmfProjectModelElement parent) {
         super(name, project, parent);
@@ -55,7 +60,7 @@ public class TmfProjectElement extends TmfProjectModelElement {
 
     @Override
     public IProject getResource() {
-        return (IProject) fResource;
+        return (IProject) super.getResource();
     }
 
     @Override
@@ -95,8 +100,11 @@ public class TmfProjectElement extends TmfProjectModelElement {
     // TmfProjectModelElement
     // ------------------------------------------------------------------------
 
+    /**
+     * @since 2.0
+     */
     @Override
-    void refreshChildren() {
+    protected void refreshChildren() {
         IProject project = getResource();
 
         // Get the children from the model
@@ -115,6 +123,7 @@ public class TmfProjectElement extends TmfProjectModelElement {
                 childrenMap.remove(name);
             } else {
                 element = new TmfTracesFolder(TmfTracesFolder.TRACES_FOLDER_NAME, folder, this);
+                addChild(element);
             }
             ((TmfTracesFolder) element).refreshChildren();
         }
@@ -129,6 +138,7 @@ public class TmfProjectElement extends TmfProjectModelElement {
                 childrenMap.remove(name);
             } else {
                 element = new TmfExperimentFolder(TmfExperimentFolder.EXPER_FOLDER_NAME, folder, this);
+                addChild(element);
             }
             ((TmfExperimentFolder) element).refreshChildren();
         }

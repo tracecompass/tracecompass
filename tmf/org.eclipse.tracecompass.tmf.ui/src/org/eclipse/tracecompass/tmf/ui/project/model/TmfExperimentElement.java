@@ -156,11 +156,14 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
 
     @Override
     public IFolder getResource() {
-        return (IFolder) fResource;
+        return (IFolder) super.getResource();
     }
 
+    /**
+     * @since 2.0
+     */
     @Override
-    void refreshChildren() {
+    protected void refreshChildren() {
         IFolder folder = getResource();
 
         /* Update the trace children of this experiment */
@@ -179,6 +182,7 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
                 childrenMap.remove(elementPath);
             } else {
                 element = new TmfTraceElement(name, resource, this);
+                addChild(element);
             }
         }
 
@@ -204,8 +208,9 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         }
         for (IAnalysisModuleHelper module : TmfAnalysisManager.getAnalysisModules().values()) {
             if (!analysisMap.containsKey(module.getId()) && module.appliesToExperiment() && (experiment.getAnalysisModule(module.getId()) != null)) {
-                IFolder newresource = ResourcesPlugin.getWorkspace().getRoot().getFolder(fResource.getFullPath().append(module.getId()));
+                IFolder newresource = ResourcesPlugin.getWorkspace().getRoot().getFolder(getResource().getFullPath().append(module.getId()));
                 TmfAnalysisElement analysis = new TmfAnalysisElement(module.getName(), newresource, this, module);
+                addChild(analysis);
                 analysis.refreshChildren();
                 analysisMap.put(module.getId(), analysis);
             }

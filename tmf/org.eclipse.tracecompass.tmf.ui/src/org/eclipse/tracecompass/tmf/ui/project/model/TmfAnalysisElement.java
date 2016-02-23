@@ -73,15 +73,17 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
     protected TmfAnalysisElement(String name, IResource resource, ITmfProjectModelElement parent, @NonNull IAnalysisModuleHelper module) {
         super(name, resource, parent);
         fAnalysisHelper = module;
-        parent.addChild(this);
     }
 
     // ------------------------------------------------------------------------
     // TmfProjectModelElement
     // ------------------------------------------------------------------------
 
+    /**
+     * @since 2.0
+     */
     @Override
-    void refreshChildren() {
+    protected void refreshChildren() {
         fCanExecute = true;
 
         /* Refresh the outputs of this analysis */
@@ -92,8 +94,9 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
 
         /** Get base path for resource */
         IPath path = getProject().getTracesFolder().getPath();
-        if (fResource instanceof IFolder) {
-            path = ((IFolder) fResource).getFullPath();
+        IResource resource = getResource();
+        if (resource instanceof IFolder) {
+            path = ((IFolder) resource).getFullPath();
         }
 
         /*
@@ -124,6 +127,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
                 if (outputElement == null) {
                     IFolder newresource = ResourcesPlugin.getWorkspace().getRoot().getFolder(path.append(output.getName()));
                     outputElement = new TmfAnalysisOutputElement(output.getName(), newresource, this, output);
+                    addChild(outputElement);
                 }
                 outputElement.refreshChildren();
             }

@@ -87,7 +87,6 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      */
     public TmfCommonProjectElement(String name, IResource resource, TmfProjectModelElement parent) {
         super(name, resource, parent);
-        parent.addChild(this);
         refreshTraceType();
         TmfSignalManager.register(this);
     }
@@ -96,8 +95,11 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
     // TmfProjectModelElement
     // ------------------------------------------------------------------------
 
+    /**
+     * @since 2.0
+     */
     @Override
-    void refreshChildren() {
+    protected void refreshChildren() {
 
         /* Refreshes the analysis under this trace */
         Map<String, TmfAnalysisElement> childrenMap = new HashMap<>();
@@ -122,7 +124,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
         }
 
         /** Get the base path to put the resource to */
-        IPath path = fResource.getFullPath();
+        IPath path = getResource().getFullPath();
 
         /* Add all new analysis modules or refresh outputs of existing ones */
         for (IAnalysisModuleHelper module : TmfAnalysisManager.getAnalysisModules(traceClass).values()) {
@@ -136,6 +138,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
                  */
                 IFolder newresource = ResourcesPlugin.getWorkspace().getRoot().getFolder(path.append(module.getId()));
                 analysis = new TmfAnalysisElement(module.getName(), newresource, this, module);
+                addChild(analysis);
             }
             analysis.refreshChildren();
         }
@@ -200,7 +203,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
         while (!(parent instanceof TmfTracesFolder || parent instanceof TmfExperimentElement || parent instanceof TmfExperimentFolder)) {
             parent = parent.getParent();
         }
-        IPath path = fResource.getFullPath().makeRelativeTo(parent.getPath());
+        IPath path = getResource().getFullPath().makeRelativeTo(parent.getPath());
         return path.toString();
     }
 
@@ -286,7 +289,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      * @return the bookmarks file
      */
     public IFile getBookmarksFile() {
-        final IFolder folder = (IFolder) fResource;
+        final IFolder folder = (IFolder) getResource();
         IFile file = folder.getFile(getName() + '_');
         return file;
     }
@@ -540,7 +543,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
         IFolder supplFolder = prepareTraceSupplementaryFolder(getSupplementaryFolderPath(), true);
 
         try {
-            fResource.setPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, supplFolder.getLocation().toOSString());
+            getResource().setPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, supplFolder.getLocation().toOSString());
         } catch (CoreException e) {
             Activator.getDefault().logError("Error setting persistant property " + TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, e); //$NON-NLS-1$
         }

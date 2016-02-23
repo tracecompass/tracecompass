@@ -79,7 +79,6 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
      */
     public TmfExperimentFolder(String name, IFolder folder, TmfProjectElement parent) {
         super(name, folder, parent);
-        parent.addChild(this);
     }
 
     // ------------------------------------------------------------------------
@@ -88,11 +87,14 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
 
     @Override
     public IFolder getResource() {
-        return (IFolder) fResource;
+        return (IFolder) super.getResource();
     }
 
+    /**
+     * @since 2.0
+     */
     @Override
-    void refreshChildren() {
+    protected void refreshChildren() {
         IFolder folder = getResource();
 
         // Get the children from the model
@@ -112,6 +114,7 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
                         childrenMap.remove(name);
                     } else {
                         element = new TmfExperimentElement(name, expFolder, this);
+                        addChild(element);
                     }
                     ((TmfExperimentElement) element).refreshChildren();
                 }

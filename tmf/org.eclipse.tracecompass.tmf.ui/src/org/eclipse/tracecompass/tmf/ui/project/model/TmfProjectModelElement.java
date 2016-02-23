@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
@@ -36,6 +37,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * The implementation of the base TMF project model element. It provides default implementation
@@ -51,34 +54,36 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
     // ------------------------------------------------------------------------
 
     private final String fName;
-    /**
-     * The project model element resource.
-     */
-    protected final IResource fResource;
-    /**
-     * The project model resource location (URI)
-     */
-    protected final URI fLocation;
-    /**
-     * The project model path of a resource.
-     */
-    protected final IPath fPath;
+
+    /** The project model element resource */
+    private final IResource fResource;
+
+    /** The project model resource location (URI) */
+    private final URI fLocation;
+
+    /** The project model path of a resource */
+    private final IPath fPath;
+
     private final ITmfProjectModelElement fParent;
-    /**
-     * The list of children elements.
-     */
-    protected final List<ITmfProjectModelElement> fChildren;
+
+    /** The list of children elements */
+    private final @NonNull List<ITmfProjectModelElement> fChildren;
 
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
+
     /**
      * Constructor.
      *
      * Creates a base project model element.
-     * @param name The name of the element.
-     * @param resource The element resource.
-     * @param parent The parent model element.
+     *
+     * @param name
+     *            The name of the element.
+     * @param resource
+     *            The element resource.
+     * @param parent
+     *            The parent model element.
      */
     protected TmfProjectModelElement(String name, IResource resource, ITmfProjectModelElement parent) {
         fName = name;
@@ -124,23 +129,8 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
     }
 
     @Override
-    public boolean hasChildren() {
-        return fChildren.size() > 0;
-    }
-
-    @Override
     public List<ITmfProjectModelElement> getChildren() {
-        return fChildren;
-    }
-
-    @Override
-    public void addChild(ITmfProjectModelElement child) {
-        fChildren.add(child);
-    }
-
-    @Override
-    public void removeChild(ITmfProjectModelElement child) {
-        fChildren.remove(child);
+        return ImmutableList.copyOf(fChildren);
     }
 
     @Override
@@ -211,9 +201,29 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
      * Refresh the children of this model element, adding new children and
      * removing dangling children as necessary. The remaining children should
      * also refresh their own children sub-tree.
+     *
+     * @since 2.0
      */
-    void refreshChildren() {
-        // Sub-classes may override this method as needed
+    protected abstract void refreshChildren();
+
+    /**
+     * Add a new child element to this element.
+     *
+     * @param child
+     *            The child to add
+     */
+    protected void addChild(ITmfProjectModelElement child) {
+        fChildren.add(child);
+    }
+
+    /**
+     * Remove an element from the current child elements.
+     *
+     * @param child
+     *            The child to remove
+     */
+    protected void removeChild(ITmfProjectModelElement child) {
+        fChildren.remove(child);
     }
 
     /**
