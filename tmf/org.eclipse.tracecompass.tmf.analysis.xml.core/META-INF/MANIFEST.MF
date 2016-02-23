@@ -13,6 +13,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.tmf.core,
  org.eclipse.tracecompass.segmentstore.core
 Export-Package: org.eclipse.tracecompass.internal.tmf.analysis.xml.core;x-friends:="org.eclipse.tracecompass.tmf.analysis.xml.core.tests",
+ org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider;x-internal:=true,
  org.eclipse.tracecompass.tmf.analysis.xml.core.model,
  org.eclipse.tracecompass.tmf.analysis.xml.core.model.readonly,
  org.eclipse.tracecompass.tmf.analysis.xml.core.model.readwrite,
