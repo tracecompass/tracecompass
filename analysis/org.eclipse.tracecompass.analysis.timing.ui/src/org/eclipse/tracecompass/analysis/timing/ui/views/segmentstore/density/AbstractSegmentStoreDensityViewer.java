@@ -201,7 +201,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
         computeDataAsync(fCurrentTimeRange, durationRange).thenAccept((data) -> applyData(data));
     }
 
-    private CompletableFuture<List<ISegment>> computeDataAsync(final TmfTimeRange timeRange, final Range durationRange) {
+    private CompletableFuture<@Nullable List<ISegment>> computeDataAsync(final TmfTimeRange timeRange, final Range durationRange) {
         return CompletableFuture.supplyAsync(() -> computeData(timeRange, durationRange));
     }
 
@@ -224,7 +224,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
                     return input != null && input.getLength() >= durationRange.lower && input.getLength() <= durationRange.upper;
                 }
             };
-            intersectingElements = Iterators.<ISegment> filter(intersectingElements, predicate);
+            intersectingElements = Iterators.filter(intersectingElements, predicate);
         }
 
         return Lists.newArrayList(intersectingElements);

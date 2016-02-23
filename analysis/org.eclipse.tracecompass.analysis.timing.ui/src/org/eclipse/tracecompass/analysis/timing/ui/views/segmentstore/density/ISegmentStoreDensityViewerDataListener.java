@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 
 /**
@@ -32,5 +33,5 @@ public interface ISegmentStoreDensityViewerDataListener {
      * @param newSelectionData
      *            the new selection of the data
      */
-    void dataSelectionChanged(List<ISegment> newSelectionData);
+    void dataSelectionChanged(@Nullable List<ISegment> newSelectionData);
 }

@@ -64,7 +64,7 @@ public abstract class AbstractSegmentStoreDensityView extends TmfView {
         }
 
         @Override
-        public void dataSelectionChanged(List<ISegment> data) {
+        public void dataSelectionChanged(@Nullable List<ISegment> data) {
             updateTableModel(data);
         }
     }
