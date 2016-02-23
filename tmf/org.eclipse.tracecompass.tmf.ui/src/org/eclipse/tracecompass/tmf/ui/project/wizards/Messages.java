@@ -56,14 +56,6 @@ public class Messages extends NLS {
      */
     public static String SelectTracesWizardPage_SelectionError;
     /**
-     * The task name for selecting of a trace for an experiment.
-     */
-    public static String SelectTracesWizardPage_TraceSelectionTask;
-    /**
-     * The task name for removing of a trace for an experiment.
-     */
-    public static String SelectTracesWizardPage_TraceRemovalTask;
-    /**
      * The cancel message for the trace selection operation.
      */
     public static String SelectTracesWizardPage_SelectionOperationCancelled;

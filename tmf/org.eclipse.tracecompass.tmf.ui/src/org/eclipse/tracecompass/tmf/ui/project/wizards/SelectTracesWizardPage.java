@@ -17,13 +17,11 @@ package org.eclipse.tracecompass.tmf.ui.project.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -31,11 +29,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -53,9 +49,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.project.operations.SelectTracesOperation;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
@@ -81,8 +77,8 @@ public class SelectTracesWizardPage extends WizardPage {
     // ------------------------------------------------------------------------
 
     private final TmfProjectElement fProject;
-    private final TmfExperimentElement fExperiment;
-    private Map<String, TmfTraceElement> fPreviousTraces;
+    private final @NonNull TmfExperimentElement fExperiment;
+    private @NonNull Map<String, TmfTraceElement> fPreviousTraces;
     private CheckboxTreeViewer fCheckboxTreeViewer;
     private TmfNavigatorContentProvider fContentProvider;
     private TmfNavigatorLabelProvider fLabelProvider;
@@ -101,12 +97,13 @@ public class SelectTracesWizardPage extends WizardPage {
      * @param experiment
      *            The experiment model experiment.
      */
-    protected SelectTracesWizardPage(TmfProjectElement project, TmfExperimentElement experiment) {
+    protected SelectTracesWizardPage(TmfProjectElement project, @NonNull TmfExperimentElement experiment) {
         super(""); //$NON-NLS-1$
         setTitle(Messages.SelectTracesWizardPage_WindowTitle);
         setDescription(Messages.SelectTracesWizardPage_Description);
         fProject = project;
         fExperiment = experiment;
+        fPreviousTraces = new HashMap<>();
     }
 
     // ------------------------------------------------------------------------
@@ -216,7 +213,7 @@ public class SelectTracesWizardPage extends WizardPage {
         });
 
         // Get the list of traces already part of the experiment
-        fPreviousTraces = new HashMap<>();
+        fPreviousTraces.clear();
         for (ITmfProjectModelElement child : fExperiment.getChildren()) {
             if (child instanceof TmfTraceElement) {
                 TmfTraceElement trace = (TmfTraceElement) child;
@@ -327,9 +324,7 @@ public class SelectTracesWizardPage extends WizardPage {
      */
     public boolean performFinish() {
 
-        IFolder experiment = fExperiment.getResource();
-
-        final SelectTracesOperation operation = new SelectTracesOperation(experiment, getSelection());
+        final SelectTracesOperation operation = new SelectTracesOperation(fExperiment, getSelection(), fPreviousTraces);
 
         IStatus status = Status.OK_STATUS;
         try {
@@ -379,89 +374,6 @@ public class SelectTracesWizardPage extends WizardPage {
         setErrorMessage(null);
 
         return true;
-    }
-
-    private class SelectTracesOperation {
-
-        IFolder experiment = null;
-        TmfTraceElement[] traces;
-        private IStatus fStatus;
-
-        public SelectTracesOperation(IFolder experiment, @NonNull TmfTraceElement[] traces) {
-            this.experiment = experiment;
-            this.traces = Arrays.copyOf(traces, traces.length);
-        }
-
-        public void run(IProgressMonitor progressMonitor) {
-
-            // Check if operation was cancelled.
-            boolean changed = false;
-
-            // Add the selected traces to the experiment
-            Set<String> keys = fPreviousTraces.keySet();
-            SubMonitor subMonitor = SubMonitor.convert(progressMonitor, traces.length + keys.size());
-            try {
-                for (TmfTraceElement trace : traces) {
-                    ModalContext.checkCanceled(progressMonitor);
-                    String name = trace.getElementPath();
-                    if (keys.contains(name)) {
-                        subMonitor.setTaskName(Messages.SelectTracesWizardPage_TraceRemovalTask + " " + trace.getElementPath()); //$NON-NLS-1$
-                        fPreviousTraces.remove(name);
-                    } else {
-                        subMonitor.setTaskName(Messages.SelectTracesWizardPage_TraceSelectionTask + " " + trace.getElementPath()); //$NON-NLS-1$
-                        fExperiment.addTrace(trace, false);
-                        changed = true;
-                    }
-                    subMonitor.worked(1);
-                }
-
-                // Remove traces that were unchecked (thus left in
-                // fPreviousTraces)
-                for (Map.Entry<String, TmfTraceElement> entry : fPreviousTraces.entrySet()) {
-                    ModalContext.checkCanceled(progressMonitor);
-                    TmfTraceElement trace = entry.getValue();
-                    subMonitor.setTaskName(Messages.SelectTracesWizardPage_TraceRemovalTask + " " + trace.getElementPath()); //$NON-NLS-1$
-
-                    try {
-                        fExperiment.removeTrace(trace);
-                    } catch (CoreException e) {
-                        Activator.getDefault().logError(Messages.SelectTracesWizardPage_SelectionError + " " + experiment.getName(), e); //$NON-NLS-1$
-                    }
-                    changed = true;
-                    subMonitor.worked(1);
-                }
-                if (changed) {
-                    Display.getDefault().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            fExperiment.closeEditors();
-                        }
-                    });
-                    fExperiment.deleteSupplementaryResources();
-                }
-                setStatus(Status.OK_STATUS);
-            } catch (InterruptedException e) {
-                setStatus(Status.CANCEL_STATUS);
-            } catch (Exception e) {
-                Activator.getDefault().logError(Messages.SelectTracesWizardPage_SelectionError, e);
-                setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.SelectTracesWizardPage_SelectionError, e));
-            }
-        }
-
-        /**
-         * Set the status for this operation
-         *
-         * @param status
-         *            the status
-         */
-        protected void setStatus(IStatus status) {
-            fStatus = status;
-        }
-
-        public IStatus getStatus() {
-            return fStatus;
-        }
-
     }
 
     /**

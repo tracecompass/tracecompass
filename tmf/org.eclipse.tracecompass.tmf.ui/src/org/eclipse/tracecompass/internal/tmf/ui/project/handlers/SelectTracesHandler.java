@@ -93,13 +93,15 @@ public class SelectTracesHandler extends AbstractHandler {
         // Fire the Select Traces Wizard
         IWorkbench workbench = PlatformUI.getWorkbench();
         Shell shell = workbench.getActiveWorkbenchWindow().getShell();
-
-        TmfExperimentFolder experiments = (TmfExperimentFolder) fExperiment.getParent();
-        TmfProjectElement project = (TmfProjectElement) experiments.getParent();
-        SelectTracesWizard wizard = new SelectTracesWizard(project, fExperiment);
-        wizard.init(PlatformUI.getWorkbench(), null);
-        WizardDialog dialog = new WizardDialog(shell, wizard);
-        dialog.open();
+        TmfExperimentElement experiment = fExperiment;
+        if (experiment != null) {
+            TmfExperimentFolder experiments = (TmfExperimentFolder) experiment.getParent();
+            TmfProjectElement project = (TmfProjectElement) experiments.getParent();
+            SelectTracesWizard wizard = new SelectTracesWizard(project, experiment);
+            wizard.init(PlatformUI.getWorkbench(), null);
+            WizardDialog dialog = new WizardDialog(shell, wizard);
+            dialog.open();
+        }
 
         return null;
     }

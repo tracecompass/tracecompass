@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.project.wizards;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
@@ -32,7 +33,7 @@ public class SelectTracesWizard extends Wizard implements IImportWizard {
     // ------------------------------------------------------------------------
 
     private final TmfProjectElement fProject;
-    private final TmfExperimentElement fExperiment;
+    private final @NonNull TmfExperimentElement fExperiment;
     private SelectTracesWizardPage fSelectTraceWizardPage;
 
     // ------------------------------------------------------------------------
@@ -44,7 +45,7 @@ public class SelectTracesWizard extends Wizard implements IImportWizard {
      * @param project The project model element
      * @param experiment The experiemnt model element
      */
-    public SelectTracesWizard(TmfProjectElement project, TmfExperimentElement experiment) {
+    public SelectTracesWizard(TmfProjectElement project, @NonNull TmfExperimentElement experiment) {
         fProject = project;
         fExperiment = experiment;
     }
