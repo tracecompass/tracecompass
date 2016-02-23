@@ -105,7 +105,7 @@ public class ProjectModelOutputTest {
         TmfAnalysisElement analysis = getTestAnalysisUi();
 
         /* To get the list of outputs the trace needs to be opened */
-        analysis.activateParent();
+        analysis.activateParentTrace();
         try {
             ProjectModelTestData.delayUntilTraceOpened(analysis.getParent());
         } catch (TimeoutException e) {
@@ -134,7 +134,7 @@ public class ProjectModelOutputTest {
     public void testOpenView() {
         TmfAnalysisElement analysis = getTestAnalysisUi();
 
-        analysis.activateParent();
+        analysis.activateParentTrace();
         try {
             ProjectModelTestData.delayUntilTraceOpened(analysis.getParent());
         } catch (TimeoutException e) {

@@ -15,9 +15,11 @@ package org.eclipse.tracecompass.tmf.ui.tests.project.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.runtime.CoreException;
@@ -26,6 +28,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfViewsElement;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.ProjectModelTestData;
 import org.eclipse.tracecompass.tmf.ui.tests.stubs.analysis.TestAnalysisUi;
 import org.junit.After;
@@ -108,23 +111,23 @@ public class ProjectModelAnalysisTest {
     public void testPopulate() {
         TmfTraceElement trace = getTraceElement();
 
-        /* Make sure the analysis list is not empty */
-        List<ITmfProjectModelElement> analysisList = trace.getChildren();
-        assertFalse(analysisList.isEmpty());
+        /* Make sure the list of views is there and not empty */
+        Optional<TmfViewsElement> possibleViewsElem = trace.getChildren()
+                .stream()
+                .filter(child -> child instanceof TmfViewsElement)
+                .map(elem -> (TmfViewsElement) elem)
+                .findFirst();
+        assertTrue(possibleViewsElem.isPresent());
+        TmfViewsElement viewsElem = possibleViewsElem.get();
 
         /* Make sure TestAnalysisUi is there */
-        TmfAnalysisElement analysis = null;
-        for (ITmfProjectModelElement element : analysisList) {
-            if (element instanceof TmfAnalysisElement) {
-                TmfAnalysisElement analysisElement = (TmfAnalysisElement) element;
-                if (analysisElement.getAnalysisId().equals(MODULE_UI)) {
-                    analysis = analysisElement;
-                }
-            }
-        }
-        assertNotNull(analysis);
-
-        assertEquals("Test analysis in UI", analysis.getName());
+        Optional<TmfAnalysisElement> possibleAnalysisElem = viewsElem.getChildren().stream()
+                .filter(child -> child instanceof TmfAnalysisElement)
+                .map(elem -> (TmfAnalysisElement) elem)
+                .filter(analysisElem -> analysisElem.getAnalysisId().equals(MODULE_UI))
+                .findFirst();
+        assertTrue(possibleAnalysisElem.isPresent());
+        assertEquals("Test analysis in UI", possibleAnalysisElem.get().getName());
     }
 
     /**
@@ -134,17 +137,13 @@ public class ProjectModelAnalysisTest {
     public void testInstantiate() {
         TmfTraceElement traceElement = getTraceElement();
 
-        TmfAnalysisElement analysis = null;
-        for (TmfAnalysisElement analysisElement : traceElement.getAvailableAnalysis()) {
-            if (analysisElement.getAnalysisId().equals(MODULE_UI)) {
-                analysis = analysisElement;
-            }
-        }
-        assertNotNull(analysis);
+        TmfAnalysisElement analysis = traceElement.getAvailableAnalysis().stream()
+                .filter(availableAnalysis -> availableAnalysis.getAnalysisId().equals(MODULE_UI))
+                .findFirst().get();
 
         /* Instantiate an analysis on a trace that is closed */
         traceElement.closeEditors();
-        analysis.activateParent();
+        analysis.activateParentTrace();
 
         try {
             ProjectModelTestData.delayUntilTraceOpened(traceElement);

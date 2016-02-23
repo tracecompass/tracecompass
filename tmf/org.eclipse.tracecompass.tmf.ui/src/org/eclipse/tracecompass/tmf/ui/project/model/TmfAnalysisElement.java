@@ -69,9 +69,10 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
      *            Parent of the analysis
      * @param module
      *            The analysis module helper
-     * @since 1.0
+     * @since 2.0
      */
-    protected TmfAnalysisElement(String name, IResource resource, ITmfProjectModelElement parent, @NonNull IAnalysisModuleHelper module) {
+    protected TmfAnalysisElement(String name, IResource resource,
+            TmfViewsElement parent, @NonNull IAnalysisModuleHelper module) {
         super(name, resource, parent);
         fAnalysisHelper = module;
     }
@@ -79,6 +80,15 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
     // ------------------------------------------------------------------------
     // TmfProjectModelElement
     // ------------------------------------------------------------------------
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public TmfViewsElement getParent() {
+        /* Type enforced at constructor */
+        return (TmfViewsElement) super.getParent();
+    }
 
     /**
      * @since 2.0
@@ -104,36 +114,35 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
          * We can get a list of available outputs once the analysis is
          * instantiated when the trace is opened
          */
-        ITmfProjectModelElement parent = getParent();
-        if (parent instanceof TmfCommonProjectElement) {
-            ITmfTrace trace = ((TmfCommonProjectElement) parent).getTrace();
-            if (trace == null) {
-                deleteOutputs();
-                return;
-            }
+        TmfCommonProjectElement parentTraceElement = getParent().getParent();
 
-            IAnalysisModule module = trace.getAnalysisModule(fAnalysisHelper.getId());
-            if (module == null) {
-                deleteOutputs();
-                /*
-                 * Trace is opened, but the analysis is null, so it does not
-                 * apply
-                 */
-                fCanExecute = false;
-                return;
-            }
-
-            for (IAnalysisOutput output : module.getOutputs()) {
-                TmfAnalysisOutputElement outputElement = childrenMap.remove(output.getName());
-                if (outputElement == null) {
-                    IFolder newresource = ResourcesPlugin.getWorkspace().getRoot().getFolder(path.append(output.getName()));
-                    outputElement = new TmfAnalysisOutputElement(output.getName(), newresource, this, output);
-                    addChild(outputElement);
-                }
-                outputElement.refreshChildren();
-            }
-
+        ITmfTrace trace = parentTraceElement.getTrace();
+        if (trace == null) {
+            deleteOutputs();
+            return;
         }
+
+        IAnalysisModule module = trace.getAnalysisModule(fAnalysisHelper.getId());
+        if (module == null) {
+            deleteOutputs();
+            /*
+             * Trace is opened, but the analysis is null, so it does not
+             * apply
+             */
+            fCanExecute = false;
+            return;
+        }
+
+        for (IAnalysisOutput output : module.getOutputs()) {
+            TmfAnalysisOutputElement outputElement = childrenMap.remove(output.getName());
+            if (outputElement == null) {
+                IFolder newresource = ResourcesPlugin.getWorkspace().getRoot().getFolder(path.append(output.getName()));
+                outputElement = new TmfAnalysisOutputElement(output.getName(), newresource, this, output);
+                addChild(outputElement);
+            }
+            outputElement.refreshChildren();
+        }
+
         /* Remove outputs that are not children of this analysis anymore */
         for (TmfAnalysisOutputElement output : childrenMap.values()) {
             removeChild(output);
@@ -205,11 +214,11 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
      * @return The help message
      */
     public String getHelpMessage() {
-        ITmfProjectModelElement parent = getParent();
+        TmfCommonProjectElement parentTrace = getParent().getParent();
 
         ITmfTrace trace = null;
-        if (parent instanceof TmfTraceElement) {
-            TmfTraceElement traceElement = (TmfTraceElement) parent;
+        if (parentTrace instanceof TmfTraceElement) {
+            TmfTraceElement traceElement = (TmfTraceElement) parentTrace;
             trace = traceElement.getTrace();
             if (trace != null) {
                 IAnalysisModule module = trace.getAnalysisModule(fAnalysisHelper.getId());
@@ -254,12 +263,13 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
     /**
      * Make sure the trace this analysis is associated to is the currently
      * selected one
+     * @since 2.0
      */
-    public void activateParent() {
-        ITmfProjectModelElement parent = getParent();
+    public void activateParentTrace() {
+        TmfCommonProjectElement parentTrace = getParent().getParent();
 
-        if (parent instanceof TmfTraceElement) {
-            TmfTraceElement traceElement = (TmfTraceElement) parent;
+        if (parentTrace instanceof TmfTraceElement) {
+            TmfTraceElement traceElement = (TmfTraceElement) parentTrace;
             TmfOpenTraceHelper.openTraceFromElement(traceElement);
         }
     }

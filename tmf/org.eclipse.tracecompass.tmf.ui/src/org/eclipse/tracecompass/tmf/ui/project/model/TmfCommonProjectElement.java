@@ -21,9 +21,8 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -42,10 +41,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
-import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
-import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
-import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType.TraceElementType;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -73,10 +69,12 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
     // Attributes
     // ------------------------------------------------------------------------
 
-    // This trace type ID as defined in plugin.xml
-    private String fTraceTypeId = null;
-
     private static final String BOOKMARKS_HIDDEN_FILE = ".bookmarks"; //$NON-NLS-1$
+
+    private TmfViewsElement fViewsElement = null;
+
+    /** This trace type ID as defined in plugin.xml */
+    private String fTraceTypeId = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -107,53 +105,16 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      */
     @Override
     protected void refreshChildren() {
+        /* Get the base path to put the resource to */
+        IPath tracePath = getResource().getFullPath();
 
-        /* Refreshes the analysis under this trace */
-        Map<String, TmfAnalysisElement> childrenMap = new HashMap<>();
-        for (TmfAnalysisElement analysis : getAvailableAnalysis()) {
-            childrenMap.put(analysis.getAnalysisId(), analysis);
+        if (fViewsElement == null) {
+            /* Add the "Views" node */
+            IFolder viewsNodeRes = ResourcesPlugin.getWorkspace().getRoot().getFolder(tracePath.append(TmfViewsElement.PATH_ELEMENT));
+            fViewsElement = new TmfViewsElement(viewsNodeRes, this);
+            addChild(fViewsElement);
         }
-
-        TraceTypeHelper helper = TmfTraceType.getTraceType(getTraceType());
-
-        Class<@NonNull ? extends ITmfTrace> traceClass = null;
-
-        if (helper != null) {
-            traceClass = helper.getTraceClass();
-        }
-
-        /* Remove all analysis and return */
-        if (traceClass == null) {
-            for (TmfAnalysisElement analysis : childrenMap.values()) {
-                removeChild(analysis);
-            }
-            return;
-        }
-
-        /** Get the base path to put the resource to */
-        IPath path = getResource().getFullPath();
-
-        /* Add all new analysis modules or refresh outputs of existing ones */
-        for (IAnalysisModuleHelper module : TmfAnalysisManager.getAnalysisModules(traceClass).values()) {
-
-            /* If the analysis is not a child of the trace, create it */
-            TmfAnalysisElement analysis = childrenMap.remove(module.getId());
-            if (analysis == null) {
-                /**
-                 * No need for the resource to exist, nothing will be done with
-                 * it
-                 */
-                IFolder newresource = ResourcesPlugin.getWorkspace().getRoot().getFolder(path.append(module.getId()));
-                analysis = new TmfAnalysisElement(module.getName(), newresource, this, module);
-                addChild(analysis);
-            }
-            analysis.refreshChildren();
-        }
-
-        /* Remove analysis that are not children of this trace anymore */
-        for (TmfAnalysisElement analysis : childrenMap.values()) {
-            removeChild(analysis);
-        }
+        fViewsElement.refreshChildren();
     }
 
     /**
@@ -192,6 +153,16 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+
+    /**
+     * Get the child element "Views". There should always be one.
+     *
+     * @return The child element
+     * @since 2.0
+     */
+    protected TmfViewsElement getChildElementViews() {
+        return fViewsElement;
+    }
 
     /**
      * Returns the trace type ID.
@@ -413,14 +384,9 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      * @return Array of analysis elements
      */
     public List<TmfAnalysisElement> getAvailableAnalysis() {
-        List<ITmfProjectModelElement> children = getChildren();
-        List<TmfAnalysisElement> analysis = new ArrayList<>();
-        for (ITmfProjectModelElement child : children) {
-            if (child instanceof TmfAnalysisElement) {
-                analysis.add((TmfAnalysisElement) child);
-            }
-        }
-        return analysis;
+        return getChildElementViews().getChildren().stream()
+            .map(elem -> (TmfAnalysisElement) elem)
+            .collect(Collectors.toList());
     }
 
     // ------------------------------------------------------------------------

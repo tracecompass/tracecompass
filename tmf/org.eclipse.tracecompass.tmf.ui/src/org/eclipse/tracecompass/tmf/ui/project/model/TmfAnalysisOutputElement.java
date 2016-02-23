@@ -41,8 +41,9 @@ public class TmfAnalysisOutputElement extends TmfProjectModelElement {
      *            Parent analysis of the view
      * @param output
      *            The output object
+     * @since 2.0
      */
-    protected TmfAnalysisOutputElement(String name, IResource resource, ITmfProjectModelElement parent, IAnalysisOutput output) {
+    protected TmfAnalysisOutputElement(String name, IResource resource, TmfAnalysisElement parent, IAnalysisOutput output) {
         super(name, resource, parent);
         fOutput = output;
     }
@@ -74,7 +75,7 @@ public class TmfAnalysisOutputElement extends TmfProjectModelElement {
     public void outputAnalysis() {
         ITmfProjectModelElement parent = getParent();
         if (parent instanceof TmfAnalysisElement) {
-            ((TmfAnalysisElement) parent).activateParent();
+            ((TmfAnalysisElement) parent).activateParentTrace();
             fOutput.requestOutput();
         }
     }

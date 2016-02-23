@@ -37,7 +37,9 @@ final class TmfProjectModelIcons {
     public static final @NonNull Image DEFAULT_EXPERIMENT_ICON;
     public static final @NonNull Image DEFAULT_ANALYSIS_ICON;
     public static final @NonNull Image DEFAULT_VIEW_ICON;
+
     public static final @NonNull Image FOLDER_ICON;
+    public static final @NonNull Image VIEWS_ICON;
 
     public static final WorkbenchLabelProvider WORKSPACE_LABEL_PROVIDER = new WorkbenchLabelProvider();
 
@@ -51,7 +53,9 @@ final class TmfProjectModelIcons {
     // ------------------------------------------------------------------------
 
     static {
-        FOLDER_ICON = checkNotNull(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER));
+        ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
+        FOLDER_ICON = checkNotNull(sharedImages.getImage(ISharedImages.IMG_OBJ_FOLDER));
+        VIEWS_ICON = checkNotNull(sharedImages.getImage(ISharedImages.IMG_OBJ_ELEMENT));
 
         Bundle bundle = Activator.getDefault().getBundle();
         DEFAULT_TRACE_ICON = checkNotNull(loadIcon(bundle, TRACE_ICON_FILE));

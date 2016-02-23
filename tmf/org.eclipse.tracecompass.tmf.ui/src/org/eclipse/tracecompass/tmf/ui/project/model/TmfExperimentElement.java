@@ -15,6 +15,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -204,6 +206,10 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         if (experiment == null) {
             return;
         }
+
+        /* super.refreshChildren() above should have set this */
+        TmfViewsElement viewsElement = checkNotNull(getChildElementViews());
+
         Map<String, TmfAnalysisElement> analysisMap = new HashMap<>();
         for (TmfAnalysisElement analysis : getAvailableAnalysis()) {
             analysisMap.put(analysis.getAnalysisId(), analysis);
@@ -211,8 +217,8 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         for (IAnalysisModuleHelper module : TmfAnalysisManager.getAnalysisModules().values()) {
             if (!analysisMap.containsKey(module.getId()) && module.appliesToExperiment() && (experiment.getAnalysisModule(module.getId()) != null)) {
                 IFolder newresource = ResourcesPlugin.getWorkspace().getRoot().getFolder(getResource().getFullPath().append(module.getId()));
-                TmfAnalysisElement analysis = new TmfAnalysisElement(module.getName(), newresource, this, module);
-                addChild(analysis);
+                TmfAnalysisElement analysis = new TmfAnalysisElement(module.getName(), newresource, viewsElement, module);
+                viewsElement.addChild(analysis);
                 analysis.refreshChildren();
                 analysisMap.put(module.getId(), analysis);
             }
