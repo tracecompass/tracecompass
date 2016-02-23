@@ -133,11 +133,11 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
     protected abstract Object[] readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException;
 
     /**
-     * Returns the result in a from the analysis in a ISegmentStore
+     * Returns the segment store built by this analysis
      *
-     * @return Results from the analysis in a ISegmentStore
+     * @return The segment store
      */
-    public @Nullable ISegmentStore<ISegment> getResults() {
+    public @Nullable ISegmentStore<ISegment> getSegmentStore() {
         return fSegmentStore;
     }
 

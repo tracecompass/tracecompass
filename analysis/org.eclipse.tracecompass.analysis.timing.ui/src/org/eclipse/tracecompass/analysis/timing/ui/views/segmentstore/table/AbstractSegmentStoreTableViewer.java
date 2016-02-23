@@ -246,11 +246,11 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
 
         createAnalysisColumns();
 
-        ISegmentStore<ISegment> results = analysis.getResults();
+        ISegmentStore<ISegment> segStore = analysis.getSegmentStore();
         // If results are not null, then analysis is completed and model can be
         // updated
-        if (results != null) {
-            updateModel(results);
+        if (segStore != null) {
+            updateModel(segStore);
             return;
         }
         // If results are null, then add completion listener and run analysis

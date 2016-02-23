@@ -70,17 +70,17 @@ public class SystemCallLatencyStatisticsAnalysisModule extends TmfAbstractAnalys
         }
         latency.waitForCompletion();
 
-        ISegmentStore<ISegment> store = latency.getResults();
+        ISegmentStore<ISegment> segStore = latency.getSegmentStore();
 
-        if (store != null) {
+        if (segStore != null) {
 
-            boolean result = calculateTotalManual(store, monitor);
+            boolean result = calculateTotalManual(segStore, monitor);
 
             if (!result) {
                 return false;
             }
 
-            result = calculateTotalPerSyscall(store, monitor);
+            result = calculateTotalPerSyscall(segStore, monitor);
             if (!result) {
                 return false;
             }

@@ -210,12 +210,12 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
         if (analysisModule == null) {
             return null;
         }
-        final ISegmentStore<ISegment> results = analysisModule.getResults();
-        if (results == null) {
+        final ISegmentStore<ISegment> segStore = analysisModule.getSegmentStore();
+        if (segStore == null) {
             return null;
         }
 
-        Iterator<ISegment> intersectingElements = results.getIntersectingElements(timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue()).iterator();
+        Iterator<ISegment> intersectingElements = segStore.getIntersectingElements(timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue()).iterator();
 
         if (durationRange.lower > Double.MIN_VALUE || durationRange.upper < Double.MAX_VALUE) {
             Predicate<? super ISegment> predicate = new Predicate<ISegment>() {

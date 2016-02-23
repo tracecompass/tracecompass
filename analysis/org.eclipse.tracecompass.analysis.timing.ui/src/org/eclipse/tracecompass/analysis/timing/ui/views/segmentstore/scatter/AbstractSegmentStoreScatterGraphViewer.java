@@ -97,8 +97,8 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
                 return new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Analysis module not available"); //$NON-NLS-1$
             }
 
-            final ISegmentStore<ISegment> results = module.getResults();
-            if (results == null) {
+            final ISegmentStore<ISegment> segStore = module.getSegmentStore();
+            if (segStore == null) {
                 setWindowRange(startTimeInNanos, endTimeInNanos);
                 redraw(statusMonitor, startTimeInNanos, startTimeInNanos, Collections.EMPTY_LIST);
                 return new Status(IStatus.INFO, Activator.PLUGIN_ID, "Analysis module does not have results"); //$NON-NLS-1$
@@ -108,7 +108,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             final long endTime = fCurrentRange.getEndTime().getValue();
             fPixelStart = startTime;
             fPixelSize = (endTime - startTime) / MAX_POINTS;
-            final Iterable<ISegment> intersectingElements = results.getIntersectingElements(startTime, endTime);
+            final Iterable<ISegment> intersectingElements = segStore.getIntersectingElements(startTime, endTime);
 
             final List<ISegment> list = convertIterableToList(intersectingElements, statusMonitor);
             final List<ISegment> displayData = (!list.isEmpty()) ? compactList(startTime, list, statusMonitor) : list;
@@ -399,11 +399,11 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             updateModel(null);
             return;
         }
-        ISegmentStore<ISegment> results = analysis.getResults();
+        ISegmentStore<ISegment> segStore = analysis.getSegmentStore();
         // If results are not null, then analysis is completed and model can be
         // updated
-        if (results != null) {
-            updateModel(results);
+        if (segStore != null) {
+            updateModel(segStore);
             setAnalysisModule(analysis);
             return;
         }
