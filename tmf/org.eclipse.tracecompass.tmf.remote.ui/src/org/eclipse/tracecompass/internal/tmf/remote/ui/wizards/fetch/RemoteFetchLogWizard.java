@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -47,6 +47,7 @@ public class RemoteFetchLogWizard extends Wizard implements IImportWizard {
     private RemoteFetchLogWizardRemotePage fFetchLogRemotePage;
 
     private @Nullable RemoteImportProfileElement fRemoteProfile = null;
+    private @Nullable String fExperimentName = null;
 
     // ------------------------------------------------------------------------
     // Constructor(s)
@@ -68,10 +69,14 @@ public class RemoteFetchLogWizard extends Wizard implements IImportWizard {
      * Create wizard with pre-defined remote profile
      * @param profile
      *              a remote profile
+     * @param experimentName
+     *          A name of an experiment to create and add traces to, or null
+     *          for no experiment
      */
-    public RemoteFetchLogWizard(@NonNull RemoteImportProfileElement profile) {
+    public RemoteFetchLogWizard(@NonNull RemoteImportProfileElement profile, @Nullable String experimentName) {
         this();
         fRemoteProfile = profile;
+        fExperimentName = experimentName;
     }
 
     // ------------------------------------------------------------------------
@@ -98,7 +103,7 @@ public class RemoteFetchLogWizard extends Wizard implements IImportWizard {
             fFetchLogWizardPage = new RemoteFetchLogWizardPage(RemoteMessages.RemoteFetchLogWizardPage_Title, fSelection);
             addPage(fFetchLogWizardPage);
         }
-        fFetchLogRemotePage = new RemoteFetchLogWizardRemotePage(RemoteMessages.RemoteFetchLogWizardRemotePage_Title, fSelection, fRemoteProfile);
+        fFetchLogRemotePage = new RemoteFetchLogWizardRemotePage(RemoteMessages.RemoteFetchLogWizardRemotePage_Title, fSelection, fRemoteProfile, fExperimentName);
         addPage(fFetchLogRemotePage);
     }
 

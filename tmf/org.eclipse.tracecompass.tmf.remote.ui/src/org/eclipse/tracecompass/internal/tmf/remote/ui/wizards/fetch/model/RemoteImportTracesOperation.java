@@ -92,6 +92,7 @@ public class RemoteImportTracesOperation extends TmfWorkspaceModifyOperation {
     private final TmfTraceFolder fDestination;
     private final Object[] fTraceElements;
     private final ImportConflictHandler fConflictHandler;
+    private final List<IResource> fImportedResources = new ArrayList<>();
 
     // ------------------------------------------------------------------------
     // Constructor(s)
@@ -249,6 +250,7 @@ public class RemoteImportTracesOperation extends TmfWorkspaceModifyOperation {
 
                     if (traceTypeHelper != null) {
                         TmfTraceTypeUIUtils.setTraceType(traceRes, traceTypeHelper);
+                        fImportedResources.add(traceRes);
                     }
 
                     // Set source location
@@ -432,5 +434,19 @@ public class RemoteImportTracesOperation extends TmfWorkspaceModifyOperation {
      */
     public IStatus getStatus() {
         return fStatus;
+    }
+
+    /**
+     * Get the list of resources that were imported by this operation. An
+     * example use case would be to use this to open traces that were imported
+     * by this operation.
+     *
+     * Note this includes only valid traces and doesn'tinclude unrecognized
+     * files.
+     *
+     * @return the trace resources that were imported
+     */
+    public List<IResource> getImportedResources() {
+        return fImportedResources;
     }
 }

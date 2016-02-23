@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -50,7 +50,18 @@ public class RemoteMessages extends NLS {
     public static String RemoteFetchLogWizardRemotePage_NoProjectSelectedError;
     /** Error string for invalid tracing project */
     public static String RemoteFetchLogWizardRemotePage_InvalidTracingProject;
-
+    /** Options group label */
+    public static String RemoteFetchLogWizardRemotePage_OptionsGroupName;
+    /** Create experiment button name */
+    public static String RemoteFetchLogWizardRemotePage_CreateExperimentName;
+    /** Error string when experiment already exists*/
+    public static String RemoteFetchLogWizardRemotePage_ErrorExperimentAlreadyExists;
+    /** The error message when a resource in experiment folder already exists */
+    public static String RemoteFetchLogWizardRemotePage_ErrorResourceAlreadyExists;
+    /** The error message when an experiment name is invalid */
+    public static String RemoteFetchLogWizardRemotePage_ErrorExperimentNameInvalid;
+    /** The error message when no experiment name was entered */
+    public static String RemoteFetchLogWizardRemotePage_ErrorEmptyExperimentName;
     /** Label of add button in remote preference page */
     public static String RemoteProfilesPreferencePage_AddButton;
     /** Label of browse button in remote preference page */

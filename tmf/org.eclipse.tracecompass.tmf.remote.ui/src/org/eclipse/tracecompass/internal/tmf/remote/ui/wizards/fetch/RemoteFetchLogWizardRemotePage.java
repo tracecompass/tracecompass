@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -23,6 +23,9 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -33,15 +36,20 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.tracecompass.internal.tmf.remote.ui.Activator;
@@ -50,6 +58,8 @@ import org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.model.Remot
 import org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.model.RemoteImportConnectionNodeElement;
 import org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.model.RemoteImportProfileElement;
 import org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.model.RemoteImportTracesOperation;
+import org.eclipse.tracecompass.internal.tmf.ui.project.operations.NewExperimentOperation;
+import org.eclipse.tracecompass.internal.tmf.ui.project.operations.SelectTracesOperation;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.AbstractTracePackageOperation;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.AbstractTracePackageWizardPage;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageElement;
@@ -58,6 +68,8 @@ import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePa
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageTraceElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.importexport.Messages;
 import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
@@ -98,7 +110,11 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
     private boolean fIsVisible = false;
     private String fDefaultProjectName = null;
     private CCombo fCombo;
+    private Button fCreateExperimentCheckbox;
+    private Text fExperimentNameText;
     private List<IProject> fProjects;
+    private @Nullable TmfExperimentFolder fExperimentFolderElement;
+    private @Nullable String fExperimentName;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -112,8 +128,11 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
      *          The current selection (trace folder element)
      * @param profile
      *          A profile to use or null
+     * @param experimentName
+     *          A name of an experiment to create and add traces to, or null
+     *          for no experiment
      */
-    protected RemoteFetchLogWizardRemotePage(String title, IStructuredSelection selection, @Nullable RemoteImportProfileElement profile) {
+    protected RemoteFetchLogWizardRemotePage(String title, IStructuredSelection selection, @Nullable RemoteImportProfileElement profile, @Nullable String experimentName) {
         super(PAGE_NAME, title, null, selection);
         setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID, ICON_PATH));
 
@@ -128,6 +147,7 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
         }
 
         fProfile = profile;
+        fExperimentName = experimentName;
         setDescription(RemoteMessages.RemoteFetchLogWizardRemotePage_Description);
     }
 
@@ -151,6 +171,8 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
 
         createProjectGroup(composite);
 
+        createOptionGroup(composite);
+
         restoreWidgetValues();
         updatePageCompletion();
 
@@ -159,7 +181,53 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
 
     @Override
     protected boolean determinePageCompletion() {
-        return getElementViewer().getCheckedElements().length > 0;
+         if (getElementViewer().getCheckedElements().length <= 0) {
+             return false;
+         }
+
+         validateProject();
+
+         if ((fExperimentName != null) && (fCreateExperimentCheckbox.getSelection())) {
+             String name = fExperimentNameText.getText().trim();
+             // verify if experiment name is empty
+             if (name.isEmpty()) {
+                 setMessage(null);
+                 setErrorMessage(RemoteMessages.RemoteFetchLogWizardRemotePage_ErrorEmptyExperimentName);
+                 return false;
+             }
+
+             // verify that name is a valid resource name
+             IWorkspace workspace = ResourcesPlugin.getWorkspace();
+             if ((workspace != null) && (!workspace.validateName(name, IResource.FILE).isOK())) {
+                 setMessage(null);
+                 setErrorMessage(NLS.bind(RemoteMessages.RemoteFetchLogWizardRemotePage_ErrorExperimentNameInvalid, name));
+                 return false;
+             }
+
+             TmfExperimentFolder experimentFolder = fExperimentFolderElement;
+             if (experimentFolder != null) {
+                 TmfExperimentElement element =
+                         experimentFolder.getExperiment(name);
+                 // verify if experiment already exists
+                 if (element != null) {
+                     setMessage(null);
+                     setErrorMessage(NLS.bind(RemoteMessages.RemoteFetchLogWizardRemotePage_ErrorExperimentAlreadyExists, name));
+                     return false;
+                 }
+
+                 // verify if a resource already exists in the experiment folder
+                 IFolder expResource = experimentFolder.getResource();
+                 IResource res = expResource.findMember(name);
+                 if (res != null) {
+                     setMessage(null);
+                     setErrorMessage(NLS.bind(RemoteMessages.RemoteFetchLogWizardRemotePage_ErrorResourceAlreadyExists, name));
+                     return false;
+                 }
+             }
+         }
+
+         return true;
+
     }
 
     @Override
@@ -269,6 +337,45 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
             fCombo.setItems(projectNames.toArray(new String[projectNames.size()]));
             int select = projectNames.indexOf(fDefaultProjectName);
             fCombo.select(select);
+        }
+    }
+
+    private void createOptionGroup(Composite parent) {
+        if (fExperimentName != null) {
+            Group comp = new Group(parent, SWT.SHADOW_NONE);
+            comp.setText(RemoteMessages.RemoteFetchLogWizardRemotePage_OptionsGroupName);
+            GridLayout layout = new GridLayout(2, false);
+            comp.setLayout(layout);
+            GridData data = new GridData(GridData.FILL, GridData.CENTER, true, false);
+            comp.setLayoutData(data);
+
+            fCreateExperimentCheckbox = new Button(comp, SWT.CHECK);
+            fCreateExperimentCheckbox.setFont(comp.getFont());
+            fCreateExperimentCheckbox.setText(RemoteMessages.RemoteFetchLogWizardRemotePage_CreateExperimentName);
+            fCreateExperimentCheckbox.setSelection(false);
+            data = new GridData(GridData.BEGINNING, GridData.CENTER, false, false);
+            fCreateExperimentCheckbox.setLayoutData(data);
+
+            fExperimentNameText = new Text(comp, SWT.BORDER);
+            data = new GridData(GridData.FILL, GridData.CENTER, true, false);
+            fExperimentNameText.setLayoutData(data);
+            fExperimentNameText.setText(fExperimentName);
+            fExperimentNameText.setEnabled(fCreateExperimentCheckbox.getSelection());
+
+            fExperimentNameText.addModifyListener(new ModifyListener() {
+                @Override
+                public void modifyText(ModifyEvent e) {
+                    updatePageCompletion();
+                }
+            });
+
+            fCreateExperimentCheckbox.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    fExperimentNameText.setEnabled(fCreateExperimentCheckbox.getSelection());
+                    updatePageCompletion();
+                }
+            });
         }
     }
 
@@ -385,14 +492,59 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
         Object[] elements = getElementViewer().getCheckedElements();
         final RemoteImportTracesOperation importOperation = new RemoteImportTracesOperation(getContainer().getShell(), fTmfTraceFolder, elements, fOverwriteAll);
 
+        final List<IResource> traceResources = new ArrayList<>();
         try {
             getContainer().run(true, true, new IRunnableWithProgress() {
                 @Override
                 public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                     importOperation.run(monitor);
+                    traceResources.addAll(importOperation.getImportedResources());
                     monitor.done();
                 }
             });
+
+            if ((fExperimentName != null) && (traceResources.size() > 0)) {
+                final IFolder[] experimentFolders = new IFolder[1];
+                final TmfExperimentFolder root = fExperimentFolderElement;
+                final IStatus[] operationStatus = new IStatus[1];
+                final String experimentName = fExperimentNameText.getText().trim();
+
+                // just safety guards
+                if ((root == null) || (experimentName == null)) {
+                    return true;
+                }
+                getContainer().run(true, true, new IRunnableWithProgress() {
+                    @Override
+                    public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                        operationStatus[0] = null;
+                        final NewExperimentOperation operation = new NewExperimentOperation(root, experimentName);
+                        operation.run(monitor);
+                        monitor.done();
+                        operationStatus[0] = operation.getStatus();
+                        experimentFolders[0] = operation.getExperimentFolder();
+                    }
+                });
+
+                final IFolder expFolder = experimentFolders[0];
+                final TmfTraceFolder parentTraceFolder = fTmfTraceFolder;
+                // just safety guards
+                if ((expFolder == null) || (parentTraceFolder == null)) {
+                    return true;
+                }
+
+                if ((operationStatus[0] != null) && (operationStatus[0].isOK())) {
+                    getContainer().run(true, true, new IRunnableWithProgress() {
+                        @Override
+                        public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                            operationStatus[0] = null;
+                            final SelectTracesOperation operation = new SelectTracesOperation(root, expFolder, parentTraceFolder, traceResources);
+                            operation.run(monitor);
+                            monitor.done();
+                            operationStatus[0] = operation.getStatus();
+                        }
+                    });
+                }
+            }
         } catch (InvocationTargetException e) {
             handleError(
                     Messages.TracePackageExtractManifestOperation_ErrorReadingManifest,
@@ -464,6 +616,7 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
                 if (project.hasNature(TmfProjectNature.ID)) {
                     TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
                     fTmfTraceFolder = projectElement.getTracesFolder();
+                    fExperimentFolderElement = projectElement.getExperimentsFolder();
                 }
             } catch (CoreException ex) {
                 handleError(RemoteMessages.RemoteFetchLogWizardRemotePage_InvalidTracingProject, ex);

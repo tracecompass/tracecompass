@@ -152,8 +152,8 @@ public class ImportHandler extends BaseControlViewHandler {
         }
 
         // Generate the profile
-        RemoteImportProfileElement profile = new RemoteImportProfileElement(null, "LTTng Remote Traces"); //$NON-NLS-1$
         TraceSessionComponent session = param.getSession();
+        RemoteImportProfileElement profile = new RemoteImportProfileElement(null, "LTTng Remote Traces"); //$NON-NLS-1$
         RemoteSystemProxy proxy = session.getTargetNode().getRemoteSystemProxy();
         IRemoteConnection rc = proxy.getRemoteConnection();
         String name = rc.getName();
@@ -182,7 +182,12 @@ public class ImportHandler extends BaseControlViewHandler {
         TracePackageElement element = new TracePackageTraceElement(group, "", "");  //$NON-NLS-1$//$NON-NLS-2$
         new TracePackageFilesElement(element, ".*"); //$NON-NLS-1$
 
-        RemoteFetchLogWizard wizard = new RemoteFetchLogWizard(profile);
+        String experimentName = path.lastSegment();
+        if (!experimentName.startsWith(session.getName())) {
+            experimentName = session.getName();
+        }
+
+        RemoteFetchLogWizard wizard = new RemoteFetchLogWizard(profile, experimentName);
         wizard.init(PlatformUI.getWorkbench(), StructuredSelection.EMPTY);
         WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
         dialog.open();
