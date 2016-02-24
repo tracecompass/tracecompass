@@ -118,8 +118,7 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
         ITmfTrace trace = getTrace();
         if (trace == null) {
             /* This analysis was cancelled in the meantime */
-            fInitializationSucceeded = false;
-            fInitialized.countDown();
+            analysisReady(false);
             return false;
         }
 
@@ -127,15 +126,13 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
         IStatus status2 = eventTypesModule.schedule();
         if (!(status1.isOK() && status2.isOK())) {
             cancelSubAnalyses();
-            fInitializationSucceeded = false;
-            fInitialized.countDown();
+            analysisReady(false);
             return false;
         }
 
         /* Wait until the two modules are initialized */
         if (!totalsModule.waitForInitialization() || !eventTypesModule.waitForInitialization()) {
-            fInitializationSucceeded = false;
-            fInitialized.countDown();
+            analysisReady(false);
             return false;
         }
 
@@ -144,16 +141,14 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
 
         if (totalsSS == null || eventTypesSS == null) {
             /* This analysis was cancelled in the meantime */
-            fInitializationSucceeded = false;
-            fInitialized.countDown();
+            analysisReady(false);
             throw new IllegalStateException("TmfStatisticsModule : Sub-modules initialization succeeded but there is a null state system."); //$NON-NLS-1$
         }
 
         fStatistics = new TmfStateStatistics(totalsSS, eventTypesSS);
 
         /* fStatistics is now set, consider this module initialized */
-        fInitializationSucceeded = true;
-        fInitialized.countDown();
+        analysisReady(true);
 
         /*
          * The rest of this "execute" will encompass the "execute" of the two
@@ -164,6 +159,19 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
             return false;
         }
         return true;
+    }
+
+    /**
+     * Make the module available and set whether the initialization went well or
+     * not. If not, no state system is available and
+     * {@link #waitForInitialization()} should return false.
+     *
+     * @param success
+     *            True if the initialization went well, false otherwise
+     */
+    private void analysisReady(boolean succeeded) {
+        fInitializationSucceeded = succeeded;
+        fInitialized.countDown();
     }
 
     @Override

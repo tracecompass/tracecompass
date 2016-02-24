@@ -206,8 +206,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             ITmfTrace trace = getTrace();
             if (trace == null) {
                 // Analysis was cancelled in the meantime
-                fInitializationSucceeded = false;
-                fInitialized.countDown();
+                analysisReady(false);
                 return false;
             }
             switch (backend) {
@@ -237,11 +236,23 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                 break;
             }
         } catch (TmfTraceException e) {
-            fInitializationSucceeded = false;
-            fInitialized.countDown();
+            analysisReady(false);
             return false;
         }
         return !mon.isCanceled();
+    }
+
+    /**
+     * Make the module available and set whether the initialization succeeded or
+     * not. If not, no state system is available and
+     * {@link #waitForInitialization()} should return false.
+     *
+     * @param success
+     *            True if the initialization succeeded, false otherwise
+     */
+    private void analysisReady(boolean succeeded) {
+        fInitializationSucceeded = succeeded;
+        fInitialized.countDown();
     }
 
     @Override
@@ -283,8 +294,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                         id, htFile, version);
                 fHtBackend = backend;
                 fStateSystem = StateSystemFactory.newStateSystem(backend, false);
-                fInitializationSucceeded = true;
-                fInitialized.countDown();
+                analysisReady(true);
                 return;
             } catch (IOException e) {
                 /*
@@ -449,8 +459,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
          * The state system object is now created, we can consider this module
          * "initialized" (components can retrieve it and start doing queries).
          */
-        fInitializationSucceeded = true;
-        fInitialized.countDown();
+        analysisReady(true);
 
         /*
          * Block the executeAnalysis() construction is complete (so that the
