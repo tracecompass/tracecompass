@@ -211,7 +211,9 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
         for (ITmfAnalysisModuleWithStateSystems module : modules) {
             /* Just schedule the module, the data will be filled when available */
             module.schedule();
-            module.waitForInitialization();
+            if (!module.waitForInitialization()) {
+                continue;
+            }
             for (ITmfStateSystem ss : module.getStateSystems()) {
                 traceEntry.addChild(new StateSystemEntry(ss));
             }

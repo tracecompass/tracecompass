@@ -77,6 +77,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     @Nullable private TmfTimeRange fTimeRange = null;
 
     private int fNbRead = 0;
+    private boolean fInitializationSucceeded;
 
     /**
      * State system backend types
@@ -105,7 +106,8 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      *            The trace for which you want the state system
      * @param moduleId
      *            The ID of the state system analysis module
-     * @return The state system, or null if there was no match
+     * @return The state system, or null if there was no match or the module was
+     *         not initialized correctly
      */
     public static @Nullable ITmfStateSystem getStateSystem(ITmfTrace trace, String moduleId) {
         TmfStateSystemAnalysisModule module =
@@ -117,8 +119,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             }
             IStatus status = module.schedule();
             if (status.isOK()) {
-                module.waitForInitialization();
-                return module.getStateSystem();
+                return module.waitForInitialization() ? module.getStateSystem() : null;
             }
         }
         return null;
@@ -162,11 +163,17 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         return fStateSystem;
     }
 
+    /**
+     * @since 2.0
+     */
     @Override
-    public void waitForInitialization() {
+    public boolean waitForInitialization() {
         try {
             fInitialized.await();
-        } catch (InterruptedException e) {}
+        } catch (InterruptedException e) {
+            return false;
+        }
+        return fInitializationSucceeded;
     }
 
     // ------------------------------------------------------------------------
@@ -199,6 +206,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             ITmfTrace trace = getTrace();
             if (trace == null) {
                 // Analysis was cancelled in the meantime
+                fInitializationSucceeded = false;
                 fInitialized.countDown();
                 return false;
             }
@@ -229,6 +237,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                 break;
             }
         } catch (TmfTraceException e) {
+            fInitializationSucceeded = false;
             fInitialized.countDown();
             return false;
         }
@@ -274,6 +283,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                         id, htFile, version);
                 fHtBackend = backend;
                 fStateSystem = StateSystemFactory.newStateSystem(backend, false);
+                fInitializationSucceeded = true;
                 fInitialized.countDown();
                 return;
             } catch (IOException e) {
@@ -439,6 +449,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
          * The state system object is now created, we can consider this module
          * "initialized" (components can retrieve it and start doing queries).
          */
+        fInitializationSucceeded = true;
         fInitialized.countDown();
 
         /*

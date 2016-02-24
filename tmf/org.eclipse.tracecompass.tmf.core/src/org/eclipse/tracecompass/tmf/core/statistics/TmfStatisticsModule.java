@@ -40,6 +40,7 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
 
     /** The trace's statistics */
     private ITmfStatistics fStatistics = null;
+    private boolean fInitializationSucceeded;
 
     private final TmfStateSystemAnalysisModule totalsModule = new TmfStatisticsTotalsModule();
     private final TmfStateSystemAnalysisModule eventTypesModule = new TmfStatisticsEventTypesModule();
@@ -65,12 +66,16 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
 
     /**
      * Wait until the analyses/state systems underneath are ready to be queried.
+     * @since 2.0
      */
     @Override
-    public void waitForInitialization() {
+    public boolean waitForInitialization() {
         try {
             fInitialized.await();
-        } catch (InterruptedException e) {}
+        } catch (InterruptedException e) {
+            return false;
+        }
+        return fInitializationSucceeded;
     }
 
     // ------------------------------------------------------------------------
@@ -113,6 +118,7 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
         ITmfTrace trace = getTrace();
         if (trace == null) {
             /* This analysis was cancelled in the meantime */
+            fInitializationSucceeded = false;
             fInitialized.countDown();
             return false;
         }
@@ -121,26 +127,32 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
         IStatus status2 = eventTypesModule.schedule();
         if (!(status1.isOK() && status2.isOK())) {
             cancelSubAnalyses();
+            fInitializationSucceeded = false;
             fInitialized.countDown();
             return false;
         }
 
         /* Wait until the two modules are initialized */
-        totalsModule.waitForInitialization();
-        eventTypesModule.waitForInitialization();
+        if (!totalsModule.waitForInitialization() || !eventTypesModule.waitForInitialization()) {
+            fInitializationSucceeded = false;
+            fInitialized.countDown();
+            return false;
+        }
 
         ITmfStateSystem totalsSS = totalsModule.getStateSystem();
         ITmfStateSystem eventTypesSS = eventTypesModule.getStateSystem();
 
         if (totalsSS == null || eventTypesSS == null) {
             /* This analysis was cancelled in the meantime */
+            fInitializationSucceeded = false;
             fInitialized.countDown();
-            return false;
+            throw new IllegalStateException("TmfStatisticsModule : Sub-modules initialization succeeded but there is a null state system."); //$NON-NLS-1$
         }
 
         fStatistics = new TmfStateStatistics(totalsSS, eventTypesSS);
 
         /* fStatistics is now set, consider this module initialized */
+        fInitializationSucceeded = true;
         fInitialized.countDown();
 
         /*

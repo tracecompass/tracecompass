@@ -77,7 +77,9 @@ class StatisticsUpdateJob extends Job {
     protected IStatus run(IProgressMonitor monitor) {
 
         /* Wait until the analysis is ready to be queried */
-        fStatsMod.waitForInitialization();
+        if (!fStatsMod.waitForInitialization()) {
+            return Status.CANCEL_STATUS;
+        }
         ITmfStatistics stats = fStatsMod.getStatistics();
         if (stats == null) {
             /* It should have worked, but didn't */

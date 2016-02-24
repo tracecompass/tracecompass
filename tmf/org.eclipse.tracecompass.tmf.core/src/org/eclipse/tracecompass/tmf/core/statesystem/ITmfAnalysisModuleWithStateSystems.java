@@ -43,10 +43,15 @@ public interface ITmfAnalysisModuleWithStateSystems extends IAnalysisModule {
 
     /**
      * Block the calling thread until the analysis module has been initialized.
-     * After this method returns, {@link #getStateSystem()} should not contain
-     * any null elements
+     * If the initialization succeeded, {@link #getStateSystems()} should return
+     * all state systems of this analysis and calling
+     * {@link #getStateSystem(String)} should not return a null value. If it
+     * returns false, it is not safe to assume the state systems will be
+     * present.
+     *
+     * @return True whether the initialization succeeded, false otherwise
      *
      * @since 2.0
      */
-    void waitForInitialization();
+    boolean waitForInitialization();
 }

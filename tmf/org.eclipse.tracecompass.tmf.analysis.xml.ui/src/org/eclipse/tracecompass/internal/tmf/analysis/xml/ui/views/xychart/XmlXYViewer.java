@@ -43,7 +43,6 @@ import org.eclipse.tracecompass.tmf.analysis.xml.core.module.IXmlStateSystemCont
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
-import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
@@ -362,8 +361,8 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
             if (!status.isOK()) {
                 return;
             }
-            if (module instanceof TmfStateSystemAnalysisModule) {
-                ((TmfStateSystemAnalysisModule) module).waitForInitialization();
+            if (!module.waitForInitialization()) {
+                return;
             }
             for (ITmfStateSystem ssq : module.getStateSystems()) {
                 ss = ssq;

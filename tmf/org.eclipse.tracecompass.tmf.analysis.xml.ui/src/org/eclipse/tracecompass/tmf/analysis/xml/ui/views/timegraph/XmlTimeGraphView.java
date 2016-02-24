@@ -51,7 +51,6 @@ import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.ui.views.timegraph.XmlEntry.EntryDisplayType;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
-import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -275,8 +274,8 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             if (!status.isOK()) {
                 return;
             }
-            if (module instanceof TmfStateSystemAnalysisModule) {
-                ((TmfStateSystemAnalysisModule) module).waitForInitialization();
+            if (!module.waitForInitialization()) {
+                return;
             }
             for (ITmfStateSystem ssq : module.getStateSystems()) {
                 ssq.waitUntilBuilt();

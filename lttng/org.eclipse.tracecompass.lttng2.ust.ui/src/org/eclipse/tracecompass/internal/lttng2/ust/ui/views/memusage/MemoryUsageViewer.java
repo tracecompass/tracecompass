@@ -82,7 +82,9 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
             if (getTrace() == null || fModule == null) {
                 return;
             }
-            fModule.waitForInitialization();
+            if (!fModule.waitForInitialization()) {
+                return;
+            }
             ITmfStateSystem ss = fModule.getStateSystem();
             /* Don't wait for the module completion, when it's ready, we'll know */
             if (ss == null) {

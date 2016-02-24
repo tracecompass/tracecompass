@@ -935,7 +935,10 @@ public class CallStackView extends AbstractTimeGraphView {
         AbstractCallStackAnalysis module = it.next();
         /* This analysis is not automatic, we need to schedule it on-demand */
         module.schedule();
-        module.waitForInitialization();
+        if (!module.waitForInitialization()) {
+            /* The initialization did not succeed */
+            return null;
+        }
         return module;
     }
 

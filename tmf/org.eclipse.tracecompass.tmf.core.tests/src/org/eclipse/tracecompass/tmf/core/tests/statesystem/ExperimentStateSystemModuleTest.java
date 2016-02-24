@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.core.tests.statesystem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.concurrent.TimeUnit;
@@ -106,7 +107,7 @@ public class ExperimentStateSystemModuleTest {
     }
 
     /**
-     * Make sure that the state system is initialized after calling 
+     * Make sure that the state system is initialized after calling
      * {@link TmfStateSystemAnalysisModule#waitForInitialization()}.
      */
     @Test
@@ -114,7 +115,7 @@ public class ExperimentStateSystemModuleTest {
         assertNull(fModule.getStateSystem());
         fModule.schedule();
 
-        fModule.waitForInitialization();
+        assertTrue("Initialization succeeded", fModule.waitForInitialization());
         assertNotNull(fModule.getStateSystem());
     }
 
