@@ -77,7 +77,7 @@ public class LttngWorker implements IGraphWorker {
             if (tid == -1) {
                 return Collections.EMPTY_MAP;
             }
-            Optional<KernelAnalysisModule> kam = TmfTraceManager.getInstance().getActiveTraceSet().stream()
+            Optional<@Nullable KernelAnalysisModule> kam = TmfTraceManager.getInstance().getActiveTraceSet().stream()
                         .filter(trace -> trace.getHostId().equals(getHostId()))
                         .map(trace -> TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelAnalysisModule.class, KernelAnalysisModule.ID))
                         .filter(mod -> mod != null)
