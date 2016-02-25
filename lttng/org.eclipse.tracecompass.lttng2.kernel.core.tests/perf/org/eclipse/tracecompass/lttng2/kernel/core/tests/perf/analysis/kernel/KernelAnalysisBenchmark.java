@@ -45,7 +45,10 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class KernelAnalysisBenchmark {
 
-    private static final String TEST_ID = "org.eclipse.linuxtools#LTTng kernel analysis#";
+    /**
+     * Test test ID for kernel analysis benchmarks
+     */
+    public static final String TEST_ID = "org.eclipse.linuxtools#LTTng kernel analysis#";
     private static final int LOOP_COUNT = 25;
 
     private final TestModule fTestModule;
@@ -106,6 +109,22 @@ public class KernelAnalysisBenchmark {
     @Test
     public void testTrace2() {
         runTest(CtfTestTrace.TRACE2, "Trace2", fTestModule);
+    }
+
+    /**
+     * Run the benchmark with "many thread"
+     */
+    @Test
+    public void testManyThreads() {
+        runTest(CtfTestTrace.MANY_THREADS, "Many Threads", fTestModule);
+    }
+
+    /**
+     * Run the benchmark with "django httpd"
+     */
+    @Test
+    public void testDjangoHttpd() {
+        runTest(CtfTestTrace.DJANGO_HTTPD, "Django httpd", fTestModule);
     }
 
     private static void runTest(@NonNull CtfTestTrace testTrace, String testName, TestModule testModule) {
