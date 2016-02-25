@@ -655,7 +655,10 @@ public final class TmfTraceType {
                     }
                 } else {
                     for (Pair<Integer, TraceTypeHelper> candidatePair : reducedCandidates) {
-                        returned.add(candidatePair.getSecond());
+                        // Don't select the trace type if it has the lowest confidence
+                        if (candidatePair.getFirst() > 0) {
+                            returned.add(candidatePair.getSecond());
+                        }
                     }
                 }
             }
