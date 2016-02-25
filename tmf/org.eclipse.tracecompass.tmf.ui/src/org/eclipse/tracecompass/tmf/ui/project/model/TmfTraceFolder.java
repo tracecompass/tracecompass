@@ -22,6 +22,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
@@ -155,6 +156,32 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
             }
         }
         return traces;
+    }
+
+    /**
+     * Gets the traces elements under this folder containing the given resources
+     *
+     * @param resources
+     *            resources to search for
+     * @return list of trace elements
+     * @since 2.0
+     */
+    public @NonNull List<TmfTraceElement> getTraceElements(@NonNull List<IResource> resources) {
+        List<TmfTraceElement> traceElements = new ArrayList<>();
+        List<TmfTraceElement> children = getTraces();
+        for (IResource resource : resources) {
+            TmfTraceElement el = children.stream()
+                    .filter(traceElement ->
+                    ((traceElement != null) &&
+                    traceElement.getResource().equals(resource)))
+                .findFirst()
+                .orElse(null);
+
+            if (el != null) {
+                traceElements.add(el);
+            }
+        }
+        return traceElements;
     }
 
     // ------------------------------------------------------------------------

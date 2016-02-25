@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Ericsson and others.
+ * Copyright (c) 2009, 2016 Ericsson and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -23,6 +23,7 @@ package org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +31,8 @@ import java.util.List;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -47,6 +50,7 @@ import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.FocusAdapter;
@@ -67,11 +71,16 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.project.operations.NewExperimentOperation;
+import org.eclipse.tracecompass.internal.tmf.ui.project.operations.SelectTracesOperation;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
@@ -108,11 +117,12 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     // Constants
     // ------------------------------------------------------------------------
     private static final String IMPORT_WIZARD_PAGE_NAME = "ImportTraceWizardPage"; //$NON-NLS-1$
-    private static final String IMPORT_WIZARD_ROOT_DIRECTORY_ID = ".import_root_directory_id"; //$NON-NLS-1$;
+    private static final String IMPORT_WIZARD_ROOT_DIRECTORY_ID = ".import_root_directory_id"; //$NON-NLS-1$ ;
     private static final String IMPORT_WIZARD_ARCHIVE_FILE_NAME_ID = ".import_archive_file_name_id"; //$NON-NLS-1$
     private static final String IMPORT_WIZARD_IMPORT_UNRECOGNIZED_ID = ".import_unrecognized_traces_id"; //$NON-NLS-1$
     private static final String IMPORT_WIZARD_PRESERVE_FOLDERS_ID = ".import_preserve_folders_id"; //$NON-NLS-1$
     private static final String IMPORT_WIZARD_IMPORT_FROM_DIRECTORY_ID = ".import_from_directory"; //$NON-NLS-1$
+    private static final String IMPORT_WIZARD_CREATE_EXPERIMENT_ID = ".create_experiment"; //$NON-NLS-1$
 
     // constant from WizardArchiveFileResourceImportPage1
     private static final String[] FILE_IMPORT_MASK = { "*.jar;*.zip;*.tar;*.tar.gz;*.tgz;*.gz", "*.*" }; //$NON-NLS-1$ //$NON-NLS-2$
@@ -140,6 +150,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
      * Overwrite existing resources without prompting.
      */
     public static final int OPTION_OVERWRITE_EXISTING_RESOURCES = 1 << 4;
+    /**
+     * Create an experiment with imported traces.
+     */
+    public static final int OPTION_CREATE_EXPERIMENT = 1 << 5;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -149,6 +163,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     private IFolder fTargetFolder;
     // Target Trace folder element
     private TmfTraceFolder fTraceFolderElement;
+    // The workspace experiment folder
+    private TmfExperimentFolder fExperimentFolderElement;
+    private  String fPreviousSource;
     // Flag to handle destination folder change event
     private Boolean fIsDestinationChanged = false;
     private final Object fSyncObject = new Object();
@@ -162,6 +179,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     private Button fCreateLinksInWorkspaceButton;
     // Button to preserve folder structure
     private Button fPreserveFolderStructureButton;
+    // Button to create an experiment
+    private Button fCreateExperimentCheckbox;
+    // Text box for experiment name
+    private Text fExperimentNameText;
     private boolean entryChanged = false;
     // The import from directory radio button
     private Button fImportFromDirectoryRadio;
@@ -238,6 +259,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             String path = traceFolder.getFullPath().toString();
             setContainerFieldValue(path);
         }
+
+        TmfProjectElement project = fTraceFolderElement.getProject();
+        fExperimentFolderElement = project.getExperimentsFolder();
     }
 
     /**
@@ -260,7 +284,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         // Just create with a dummy root.
         fSelectionGroup = new ResourceTreeAndListGroup(parent,
-                new FileSystemElement("Dummy", null, true),//$NON-NLS-1$
+                new FileSystemElement("Dummy", null, true), //$NON-NLS-1$
                 getFolderProvider(), new WorkbenchLabelProvider(),
                 getFileProvider(), new WorkbenchLabelProvider(), SWT.NONE,
                 DialogUtil.inRegularFontMode(parent));
@@ -354,8 +378,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         // import from directory radio button
         fImportFromDirectoryRadio = new Button(sourceGroup, SWT.RADIO);
-        fImportFromDirectoryRadio
-                .setText(Messages.ImportTraceWizard_DirectoryLocation);
+        fImportFromDirectoryRadio.setText(Messages.ImportTraceWizard_DirectoryLocation);
 
         // import location entry combo
         directoryNameField = createPathSelectionCombo(sourceGroup);
@@ -363,8 +386,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         // import from archive radio button
         fImportFromArchiveRadio = new Button(sourceGroup, SWT.RADIO);
-        fImportFromArchiveRadio
-                .setText(Messages.ImportTraceWizard_ArchiveLocation);
+        fImportFromArchiveRadio.setText(Messages.ImportTraceWizard_ArchiveLocation);
 
         // import location entry combo
         fArchiveNameField = createPathSelectionCombo(sourceGroup);
@@ -736,11 +758,23 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     // File Selection Group (forked WizardFileSystemResourceImportPage1)
     // ------------------------------------------------------------------------
     private void resetSelection() {
+
         if (fSelectionGroupRoot != null) {
             disposeSelectionGroupRoot();
         }
         fSelectionGroupRoot = getFileSystemTree();
         fSelectionGroup.setRoot(fSelectionGroupRoot);
+
+        if (fCreateExperimentCheckbox != null) {
+            File file = getSourceFile();
+            if (file != null) {
+                String previousName = fExperimentNameText.getText().trim();
+                if (((fPreviousSource != null) && (previousName.equals(fPreviousSource))) || previousName.isEmpty()) {
+                    fExperimentNameText.setText(file.getName());
+                }
+                fPreviousSource = file.getName();
+            }
+        }
     }
 
     private void disposeSelectionGroupRoot() {
@@ -850,6 +884,43 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         fPreserveFolderStructureButton.setText(Messages.ImportTraceWizard_PreserveFolderStructure);
         fPreserveFolderStructureButton.setSelection(true);
 
+        Composite comp = new Composite(optionsGroup, SWT.NONE);
+        GridLayout layout = new GridLayout(2, false);
+        layout.marginLeft = 0;
+        layout.marginRight = 0;
+        layout.marginBottom = 0;
+        layout.marginTop = 0;
+        layout.marginWidth = 0;
+        comp.setLayout(layout);
+        GridData data = new GridData(GridData.FILL, GridData.CENTER, true, false);
+        comp.setLayoutData(data);
+
+        fCreateExperimentCheckbox = new Button(comp, SWT.CHECK);
+        fCreateExperimentCheckbox.setFont(comp.getFont());
+        fCreateExperimentCheckbox.setText(Messages.ImportTraceWizard_CreateExperiment);
+        fCreateExperimentCheckbox.setSelection(false);
+        data = new GridData(GridData.BEGINNING, GridData.CENTER, false, false);
+        fCreateExperimentCheckbox.setLayoutData(data);
+
+        fExperimentNameText = new Text(comp, SWT.BORDER);
+        data = new GridData(GridData.FILL, GridData.CENTER, true, false);
+        fExperimentNameText.setLayoutData(data);
+
+        fExperimentNameText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                updateWidgetEnablements();
+            }
+        });
+
+        fCreateExperimentCheckbox.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                fExperimentNameText.setEnabled(fCreateExperimentCheckbox.getSelection());
+                updateWidgetEnablements();
+            }
+        });
+
         updateWidgetEnablements();
     }
 
@@ -872,7 +943,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             return false;
         }
 
-        if (!isImportFromDirectory() && !ArchiveUtil.ensureTarSourceIsValid(source.getAbsolutePath(), getContainer().getShell()) && !ArchiveUtil.ensureZipSourceIsValid(source.getAbsolutePath(), getContainer().getShell()) && !ArchiveUtil.ensureGzipSourceIsValid(source.getAbsolutePath())) {
+        if (!isImportFromDirectory() && !ArchiveUtil.ensureTarSourceIsValid(source.getAbsolutePath(), getContainer().getShell()) && !ArchiveUtil.ensureZipSourceIsValid(source.getAbsolutePath(), getContainer().getShell())
+                && !ArchiveUtil.ensureGzipSourceIsValid(source.getAbsolutePath())) {
             setMessage(null);
             setErrorMessage(Messages.ImportTraceWizard_BadArchiveFormat);
             return false;
@@ -897,7 +969,44 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 return false;
             }
         }
+        setErrorMessage(null);
+        return true;
+    }
 
+    @Override
+    protected boolean validateOptionsGroup() {
+        if (fCreateExperimentCheckbox != null && fCreateExperimentCheckbox.getSelection()) {
+            String name = fExperimentNameText.getText().trim();
+            // verify if experiment name is empty
+            if (name.isEmpty()) {
+                setMessage(null);
+                setErrorMessage(Messages.ImportTraceWizard_ErrorEmptyExperimentName);
+                return false;
+            }
+            // verify that name is a valid resource name
+            IWorkspace workspace = ResourcesPlugin.getWorkspace();
+            if ((workspace != null) && (!workspace.validateName(name, IResource.FILE).isOK())) {
+                setMessage(null);
+                setErrorMessage(NLS.bind(Messages.ImportTraceWizard_ErrorExperimentNameInvalid, name));
+                return false;
+            }
+            // verify if experiment already exists
+            if (fExperimentFolderElement != null) {
+                TmfExperimentElement element = fExperimentFolderElement.getExperiment(name);
+                if (element != null) {
+                    setMessage(null);
+                    setErrorMessage(NLS.bind(Messages.ImportTraceWizard_ErrorExperimentAlreadyExists, name));
+                    return false;
+                }
+                IFolder expResource = fExperimentFolderElement.getResource();
+                IResource res = expResource.findMember(name);
+                if (res != null) {
+                    setMessage(null);
+                    setErrorMessage(NLS.bind(Messages.ImportTraceWizard_ErrorResourceAlreadyExists, name));
+                    return false;
+                }
+            }
+        }
         setErrorMessage(null);
         return true;
     }
@@ -932,6 +1041,16 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 value = settings.getBoolean(getPageStoreKey(IMPORT_WIZARD_PRESERVE_FOLDERS_ID));
             }
             fPreserveFolderStructureButton.setSelection(value);
+        }
+
+        if (fCreateExperimentCheckbox != null) {
+            if (settings.get(getPageStoreKey(IMPORT_WIZARD_CREATE_EXPERIMENT_ID)) == null) {
+                value = false;
+            } else {
+                value = settings.getBoolean(getPageStoreKey(IMPORT_WIZARD_CREATE_EXPERIMENT_ID));
+            }
+            fCreateExperimentCheckbox.setSelection(value);
+            fExperimentNameText.setEnabled(fCreateExperimentCheckbox.getSelection());
         }
 
         if (settings.get(getPageStoreKey(IMPORT_WIZARD_IMPORT_FROM_DIRECTORY_ID)) == null) {
@@ -971,6 +1090,11 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         if (fPreserveFolderStructureButton != null) {
             settings.put(getPageStoreKey(IMPORT_WIZARD_PRESERVE_FOLDERS_ID), fPreserveFolderStructureButton.getSelection());
         }
+
+        if (fCreateExperimentCheckbox != null) {
+            settings.put(getPageStoreKey(IMPORT_WIZARD_CREATE_EXPERIMENT_ID), fCreateExperimentCheckbox.getSelection());
+        }
+
         settings.put(getPageStoreKey(IMPORT_WIZARD_IMPORT_FROM_DIRECTORY_ID), isImportFromDirectory());
 
         if (directoryNameField != null) {
@@ -1031,6 +1155,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         final IStatus[] operationStatus = new IStatus[1];
         operationStatus[0] = Status.OK_STATUS;
+        final List<IResource> traceResources = new ArrayList<>();
         try {
             getContainer().run(true, true, new IRunnableWithProgress() {
                 @Override
@@ -1062,9 +1187,53 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     operation.run(monitor);
                     monitor.done();
                     operationStatus[0] = operation.getStatus();
+                    traceResources.addAll(operation.getImportedResources());
                 }
             });
 
+            // Only create experiment when option is selected and
+            // if there has been at least one trace imported
+            if (((importOptionFlags & OPTION_CREATE_EXPERIMENT) != 0) && (traceResources.size() > 0)) {
+                final IFolder[] experimentFolders = new IFolder[1];
+                final TmfExperimentFolder root = fExperimentFolderElement;
+                final String experimentName = fExperimentNameText.getText().trim();
+                // just safety guards
+                if ((root == null) || (experimentName == null)) {
+                    return true;
+                }
+                if ((operationStatus[0] != null) && (operationStatus[0].isOK())) {
+                    getContainer().run(true, true, new IRunnableWithProgress() {
+                        @Override
+                        public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                            operationStatus[0] = null;
+                            final NewExperimentOperation operation = new NewExperimentOperation(root, experimentName);
+                            operation.run(monitor);
+                            monitor.done();
+                            operationStatus[0] = operation.getStatus();
+                            experimentFolders[0] = operation.getExperimentFolder();
+                        }
+                    });
+
+                    final IFolder expFolder = experimentFolders[0];
+                    final TmfTraceFolder parentTraceFolder = fTraceFolderElement;
+                    // just safety guards
+                    if ((expFolder == null) || (parentTraceFolder == null)) {
+                        return true;
+                    }
+                    if ((operationStatus[0] != null) && (operationStatus[0].isOK())) {
+                        getContainer().run(true, true, new IRunnableWithProgress() {
+                            @Override
+                            public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                                operationStatus[0] = null;
+                                final SelectTracesOperation operation = new SelectTracesOperation(root, expFolder, parentTraceFolder, traceResources);
+                                operation.run(monitor);
+                                monitor.done();
+                                operationStatus[0] = operation.getStatus();
+                            }
+                        });
+                    }
+                }
+            }
         } catch (InvocationTargetException e) {
             operationStatus[0] = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.ImportTraceWizard_ImportProblem, e.getTargetException());
         } catch (InterruptedException e) {
@@ -1109,6 +1278,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
      * @see #OPTION_IMPORT_UNRECOGNIZED_TRACES
      * @see #OPTION_OVERWRITE_EXISTING_RESOURCES
      * @see #OPTION_PRESERVE_FOLDER_STRUCTURE
+     * @see #OPTION_CREATE_EXPERIMENT
      */
     protected int getImportOptionFlags() {
         int flags = 0;
@@ -1123,6 +1293,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         }
         if (fPreserveFolderStructureButton != null && fPreserveFolderStructureButton.getSelection()) {
             flags |= OPTION_PRESERVE_FOLDER_STRUCTURE;
+        }
+        if (fCreateExperimentCheckbox != null && fCreateExperimentCheckbox.getSelection()) {
+            flags |= OPTION_CREATE_EXPERIMENT;
         }
         return flags;
     }

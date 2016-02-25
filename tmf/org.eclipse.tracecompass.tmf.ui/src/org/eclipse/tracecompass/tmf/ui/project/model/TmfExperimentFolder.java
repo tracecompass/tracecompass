@@ -22,6 +22,8 @@ import java.util.Map;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource2;
@@ -140,6 +142,40 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
             }
         }
         return traces;
+    }
+
+    /**
+     * Finds the experiment element for a given resource
+     *
+     * @param resource
+     *            the resource to search for
+     * @return the experiment element if found else null
+     * @since 2.0
+     */
+    public @Nullable TmfExperimentElement getExperiment(@NonNull IResource resource) {
+        String name = resource.getName();
+        if (name != null) {
+            return getExperiment(name);
+        }
+        return null;
+    }
+
+    /**
+     * Finds the experiment element for a given name
+     *
+     * @param name
+     *            the name of experiment to search for
+     * @return the experiment element if found else null
+     * @since 2.0
+     */
+    public @Nullable TmfExperimentElement getExperiment(@NonNull String name) {
+        return getExperiments()
+        .stream()
+        .filter(experiment ->
+            (experiment != null)
+            && (experiment.getName().equals(name)))
+        .findFirst()
+        .orElse(null);
     }
 
     // ------------------------------------------------------------------------

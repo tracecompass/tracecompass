@@ -12,10 +12,13 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -28,7 +31,9 @@ import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 
 /**
  * Operation to add traces to an experiment.
@@ -38,9 +43,27 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 public class SelectTracesOperation implements IRunnableWithProgress {
 
     private final @Nullable TmfExperimentElement fExperimentElement;
-    private final @NonNull List<TmfTraceElement> fTraceElements;
-    private final @NonNull Map<String, TmfTraceElement> fPreviousTraces;
+    private final @Nullable TmfTraceFolder fParentTraceFolder;
+    private final @Nullable List<TmfTraceElement> fTraceElements;
+    private final @Nullable List<IResource> fResources;
+    private final @Nullable Map<String, TmfTraceElement> fPreviousTraces;
     private @NonNull IStatus fStatus = checkNotNull(Status.OK_STATUS);
+
+    /**
+     * Constructor
+     *
+     * @param experimentFolderElement
+     *              workspace experiment folder containing the experiment
+     * @param experiment
+     *              experiment folder where to add traces
+     * @param parentTraceFolder
+     *              the parent trace folder containing the trace resources
+     * @param resources
+     *              the trace resources to add to the experiment
+     */
+    public SelectTracesOperation(@NonNull TmfExperimentFolder experimentFolderElement, @NonNull IFolder experiment, @NonNull TmfTraceFolder parentTraceFolder, @NonNull List<IResource> resources) {
+        this(experimentFolderElement.getExperiment(experiment), parentTraceFolder, null, resources, null);
+    }
 
     /**
      * Constructor. It will add traces to given experiment and remove traces
@@ -54,9 +77,20 @@ public class SelectTracesOperation implements IRunnableWithProgress {
      *              map of traces currently available in the experiment
      */
     public SelectTracesOperation(@NonNull TmfExperimentElement experimentElement, @NonNull TmfTraceElement[] traces, @NonNull Map<String, TmfTraceElement> previousTraces) {
+        this(experimentElement, null, traces, null, previousTraces);
+    }
+
+    // Full constructor for internal use only
+    private SelectTracesOperation(TmfExperimentElement experimentElement, TmfTraceFolder parentTraceFolder, TmfTraceElement[] traces, List<IResource> resources, Map<String, TmfTraceElement> previousTraces) {
         fExperimentElement = experimentElement;
-        fTraceElements = new ArrayList<>();
-        fTraceElements.addAll(Arrays.asList(traces));
+        fParentTraceFolder = parentTraceFolder;
+        if (traces == null) {
+            fTraceElements = null;
+        } else {
+            fTraceElements = new ArrayList<>();
+            fTraceElements.addAll(Arrays.asList(traces));
+        }
+        fResources = resources;
         fPreviousTraces = previousTraces;
     }
 
@@ -70,10 +104,21 @@ public class SelectTracesOperation implements IRunnableWithProgress {
         // Check if operation was cancelled.
         boolean changed = false;
 
+        Map<String, TmfTraceElement> previousTraces = new HashMap<>();
+        if (fPreviousTraces != null) {
+            previousTraces = fPreviousTraces;
+        }
 
         List<TmfTraceElement> elements = fTraceElements;
+        if (elements == null) {
+            if ((fParentTraceFolder != null) && (fResources != null)) {
+                elements = fParentTraceFolder.getTraceElements(fResources);
+            } else {
+                return;
+            }
+        }
 
-        Set<String> keys = fPreviousTraces.keySet();
+        Set<String> keys = previousTraces.keySet();
         SubMonitor subMonitor = SubMonitor.convert(progressMonitor, elements.size() + keys.size());
         // Add the selected traces to the experiment
         try {
@@ -92,7 +137,7 @@ public class SelectTracesOperation implements IRunnableWithProgress {
             }
 
             // Remove traces that were unchecked (thus left in fPreviousTraces)
-            for (Map.Entry<String, TmfTraceElement> entry : fPreviousTraces.entrySet()) {
+            for (Map.Entry<String, TmfTraceElement> entry : previousTraces.entrySet()) {
                 ModalContext.checkCanceled(progressMonitor);
                 TmfTraceElement trace = entry.getValue();
                 subMonitor.setTaskName(Messages.SelectTracesWizardPage_TraceRemovalTask + " " + trace.getElementPath()); //$NON-NLS-1$

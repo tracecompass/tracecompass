@@ -227,7 +227,10 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
      * example use case would be to use this to open traces that were imported
      * by this operation.
      *
-     * @return the resources that were imported
+     * Note this includes only valid traces and doesn'tinclude unrecognized
+     * files.
+     *
+     * @return the trace resources that were imported
      */
     public List<IResource> getImportedResources() {
         return fImportedResources;
