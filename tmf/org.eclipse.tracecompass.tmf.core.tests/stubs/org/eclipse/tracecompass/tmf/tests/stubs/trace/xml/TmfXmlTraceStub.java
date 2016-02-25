@@ -32,7 +32,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
@@ -213,10 +212,7 @@ public class TmfXmlTraceStub extends TmfTrace {
         } catch (IOException e) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind(org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.Messages.TmfDevelopmentTrace_IoError, path), e);
         }
-        @SuppressWarnings("null")
-        @NonNull
-        IStatus status = Status.OK_STATUS;
-        return status;
+        return Status.OK_STATUS;
     }
 
     private static String getStringValue(ITmfEventField content, String fieldName) {

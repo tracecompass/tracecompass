@@ -1,0 +1,7 @@
+class org/eclipse/core/runtime/Status
+CANCEL_STATUS
+ Lorg/eclipse/core/runtime/IStatus;
+ L1org/eclipse/core/runtime/IStatus;
+OK_STATUS
+ Lorg/eclipse/core/runtime/IStatus;
+ L1org/eclipse/core/runtime/IStatus;
