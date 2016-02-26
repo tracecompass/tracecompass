@@ -100,8 +100,7 @@ public class CallStackViewTest {
     /** Tooltips of the toolbar buttons */
 
     private static final @NonNull String ALIGN_VIEWS = "Align Views";
-    private static final @NonNull String IMPORT_BINARY = "Import a binary file containing debugging symbols";
-    private static final @NonNull String IMPORT_TEXT = "Import a text file containing the mapping between addresses and function names";
+    private static final @NonNull String CONFIGURE_SYMBOL_PROVIDERS = "Configure how the addresses are mapped to function names";
     // Separator
     private static final @NonNull String SORT_BY_NAME = "Sort threads by thread name";
     private static final @NonNull String SORT_BY_ID = "Sort threads by thread id";
@@ -124,7 +123,7 @@ public class CallStackViewTest {
     // Separator
     private static final String PIN_VIEW = "Pin View";
     private static final List<String> TOOLBAR_BUTTONS_TOOLTIPS = ImmutableList.of(
-            ALIGN_VIEWS, IMPORT_BINARY, IMPORT_TEXT,
+            ALIGN_VIEWS, CONFIGURE_SYMBOL_PROVIDERS,
             "",
             SORT_BY_NAME, SORT_BY_ID, SORT_BY_START,
             "",

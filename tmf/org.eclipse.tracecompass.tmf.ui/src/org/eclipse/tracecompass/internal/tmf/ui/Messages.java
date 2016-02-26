@@ -312,14 +312,9 @@ public class Messages extends NLS {
     public static String CallStackView_SortByThreadName;
     public static String CallStackView_SortByThreadId;
     public static String CallStackView_SortByThreadTime;
-    public static String CallStackView_ImportMappingButtonText;
-    public static String CallStackView_ImportMappingButtonTooltip;
-    public static String CallStackView_ImportMappingDialogTitle;
-    public static String CallStackView_ImportMappingJobName;
 
-    public static String CallStackView_ImportBinaryFileButtonText;
-    public static String CallStackView_ImportBinaryFileButtonTooltip;
-    public static String CallStackView_ImportBinaryFileDialogTitle;
+    public static String CallStackView_ConfigureSymbolProvidersText;
+    public static String CallStackView_ConfigureSymbolProvidersTooltip;
 
     public static String CopyToClipboardOperation_TaskName;
     public static String CopyToClipboardOperation_OutOfMemoryErrorTitle;
@@ -329,6 +324,20 @@ public class Messages extends NLS {
     public static String ExportToTextJob_Export_trace_to;
     public static String ExportToTextJob_Unable_to_export_trace;
 
+    public static String SymbolProviderConfigDialog_title;
+    public static String SymbolProviderConfigDialog_message;
+
+    public static String BasicSymbolProviderPrefPage_radioBinaryFile_text;
+    public static String BasicSymbolProviderPrefPage_radioBinaryFile_tooltip;
+    public static String BasicSymbolProviderPrefPage_radioMappingFile_text;
+    public static String BasicSymbolProviderPrefPage_radioMappingFile_tooltip;
+    public static String BasicSymbolProviderPrefPage_btnBrowse;
+    public static String BasicSymbolProviderPrefPage_description;
+    public static String BasicSymbolProviderPrefPage_ImportMappingDialogTitle;
+    public static String BasicSymbolProviderPrefPage_ImportBinaryFileDialogTitle;
+    public static String BasicSymbolProviderPrefPage_errorFileDoesNotExists;
+    public static String BasicSymbolProviderPrefPage_errorSpecifyFile;
+    public static String BasicSymbolProviderPrefPage_loadingConfigurations;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

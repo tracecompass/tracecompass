@@ -14,7 +14,6 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.callstack;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,9 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
@@ -35,6 +31,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -50,10 +47,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.tracecompass.internal.tmf.core.callstack.FunctionNameMapper;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
@@ -68,6 +63,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -78,6 +74,10 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampDelta;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor;
+import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
+import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
+import org.eclipse.tracecompass.tmf.ui.symbols.SymbolProviderConfigDialog;
+import org.eclipse.tracecompass.tmf.ui.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphContentProvider;
@@ -128,7 +128,6 @@ public class CallStackView extends AbstractTimeGraphView {
     private static final Image THREAD_IMAGE = Activator.getDefault().getImageFromPath("icons/obj16/thread_obj.gif"); //$NON-NLS-1$
     private static final Image STACKFRAME_IMAGE = Activator.getDefault().getImageFromPath("icons/obj16/stckframe_obj.gif"); //$NON-NLS-1$
 
-    private static final String IMPORT_MAPPING_ICON_PATH = "icons/etool16/import.gif"; //$NON-NLS-1$
     private static final String IMPORT_BINARY_ICON_PATH = "icons/obj16/binaries_obj.gif"; //$NON-NLS-1$
 
     private static final ImageDescriptor SORT_BY_NAME_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_alpha.gif"); //$NON-NLS-1$
@@ -153,8 +152,7 @@ public class CallStackView extends AbstractTimeGraphView {
     // Fields
     // ------------------------------------------------------------------------
 
-    /** The map to map function addresses to function names */
-    private Map<String, String> fNameMapping;
+    private final Map<ITmfTrace, ISymbolProvider> fSymbolProviders = new HashMap<>();
 
     // The next event action
     private Action fNextEventAction;
@@ -168,11 +166,8 @@ public class CallStackView extends AbstractTimeGraphView {
     // The previous item action
     private Action fPreviousItemAction;
 
-    // The action to import a function-name mapping file
-    private Action fImportMappingAction;
-
     // The action to import a binary file mapping */
-    private Action fImportBinaryFileMappingAction;
+    private Action fConfigureSymbolsAction;
 
     // The saved time sync. signal used when switching off the pinning of a view
     private TmfSelectionRangeUpdatedSignal fSavedTimeSyncSignal;
@@ -505,6 +500,26 @@ public class CallStackView extends AbstractTimeGraphView {
     // ------------------------------------------------------------------------
 
     @Override
+    @TmfSignalHandler
+    public void traceClosed(TmfTraceClosedSignal signal) {
+        super.traceClosed(signal);
+        synchronized(fSymbolProviders){
+            for(ITmfTrace trace : getTracesToBuild(signal.getTrace())){
+                fSymbolProviders.remove(trace);
+            }
+        }
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    protected void refresh() {
+        super.refresh();
+        updateConfigureSymbolsAction();
+    }
+
+    @Override
     protected void buildEventList(final ITmfTrace trace, final ITmfTrace parentTrace, final IProgressMonitor monitor) {
         if (monitor.isCanceled()) {
             return;
@@ -539,6 +554,16 @@ public class CallStackView extends AbstractTimeGraphView {
             if (start == end && !complete) { // when complete execute one last time regardless of end time
                 continue;
             }
+
+            ISymbolProvider provider = fSymbolProviders.get(trace);
+            if (provider == null) {
+                provider = SymbolProviderManager.getInstance().getSymbolProvider(trace);
+                provider.loadConfiguration(monitor);
+                fSymbolProviders.put(trace, provider);
+            }
+
+            getConfigureSymbolsAction().setEnabled(true);
+
             List<Integer> threadQuarks = ss.getQuarks(threadPaths);
             TraceEntry traceEntry = traceEntryMap.get(trace);
             if (traceEntry == null) {
@@ -717,21 +742,11 @@ public class CallStackView extends AbstractTimeGraphView {
                 }
                 for (ITimeGraphEntry child : threadEntry.getChildren()) {
                     CallStackEntry callStackEntry = (CallStackEntry) child;
+                    ITmfTrace trace = callStackEntry.getTrace();
                     try {
                         ITmfStateInterval stackLevelInterval = ss.querySingleState(time, callStackEntry.getQuark());
                         ITmfStateValue nameValue = stackLevelInterval.getStateValue();
-                        String name = ""; //$NON-NLS-1$
-                        try {
-                            if (nameValue.getType() == Type.STRING) {
-                                String address = nameValue.unboxStr();
-                                name = getFunctionName(address);
-                            } else if (nameValue.getType() == Type.INTEGER) {
-                                name = "0x" + Integer.toHexString(nameValue.unboxInt()); //$NON-NLS-1$
-                            } else if (nameValue.getType() == Type.LONG) {
-                                name = "0x" + Long.toHexString(nameValue.unboxLong()); //$NON-NLS-1$
-                            }
-                        } catch (StateValueTypeException e) {
-                        }
+                        String name = getFunctionName(trace, nameValue);
                         callStackEntry.setFunctionName(name);
                         if (name.length() > 0) {
                             callStackEntry.setFunctionEntryTime(stackLevelInterval.getStartTime());
@@ -748,6 +763,38 @@ public class CallStackView extends AbstractTimeGraphView {
         if (Display.getCurrent() != null) {
             getTimeGraphCombo().refresh();
         }
+    }
+
+    String getFunctionName(ITmfTrace trace, ITmfStateValue nameValue) {
+        long address = Long.MAX_VALUE;
+        String name = ""; //$NON-NLS-1$
+        try {
+            if (nameValue.getType() == Type.STRING) {
+                name = nameValue.unboxStr();
+                try {
+                    address = Long.parseLong(name, 16);
+                } catch (NumberFormatException e) {
+                    // ignore
+                }
+            } else if (nameValue.getType() == Type.INTEGER) {
+                name = "0x" + Integer.toHexString(nameValue.unboxInt()); //$NON-NLS-1$
+                address = nameValue.unboxInt();
+            } else if (nameValue.getType() == Type.LONG) {
+                name = "0x" + Long.toHexString(nameValue.unboxLong()); //$NON-NLS-1$
+                address = nameValue.unboxLong();
+            }
+        } catch (StateValueTypeException e) {
+        }
+        if (address != Long.MAX_VALUE) {
+            ISymbolProvider provider = fSymbolProviders.get(trace);
+            if (provider != null) {
+                String symbol = provider.getSymbolText(address);
+                if (symbol != null) {
+                    name = symbol;
+                }
+            }
+        }
+        return name;
     }
 
     private void makeActions() {
@@ -786,8 +833,7 @@ public class CallStackView extends AbstractTimeGraphView {
     @Override
     protected void fillLocalToolBar(IToolBarManager manager) {
         makeActions();
-        manager.add(getImportBinaryAction());
-        manager.add(getImportMappingAction());
+        manager.add(getConfigureSymbolsAction());
         manager.add(new Separator());
         manager.add(getSortByNameAction());
         manager.add(getSortByIdAction());
@@ -946,72 +992,6 @@ public class CallStackView extends AbstractTimeGraphView {
     // Methods related to function name mapping
     // ------------------------------------------------------------------------
 
-    /**
-     * Common code for all import file mapping actions
-     */
-    private abstract class AbstractImportFileMappingAction extends Action {
-        private final String fDialogTitle;
-
-        private AbstractImportFileMappingAction(String dialogTitle) {
-            fDialogTitle = dialogTitle;
-        }
-
-        @Override
-        public void run() {
-            FileDialog dialog = new FileDialog(getViewSite().getShell());
-            dialog.setText(fDialogTitle);
-            final String filePath = dialog.open();
-            if (filePath == null) {
-                /* No file was selected, don't change anything */
-                return;
-            }
-
-            /*
-             * Start the mapping import in a separate thread (we do not want to
-             * UI thread to do this).
-             */
-            Job job = new Job(Messages.CallStackView_ImportMappingJobName) {
-                @Override
-                public IStatus run(IProgressMonitor monitor) {
-                    fNameMapping = doMapping(new File(filePath));
-
-                    /* Refresh call stack entries and event labels */
-                    Display.getDefault().asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            synchingToTime(getTimeGraphViewer().getSelectionBegin());
-                        }
-                    });
-                    return Status.OK_STATUS;
-                }
-            };
-            job.schedule();
-        }
-
-        abstract Map<String, String> doMapping(File file);
-    }
-
-    /**
-     * Toolbar icon to import the function address-to-name mapping file.
-     */
-    private Action getImportMappingAction() {
-        if (fImportMappingAction != null) {
-            return fImportMappingAction;
-        }
-        fImportMappingAction = new AbstractImportFileMappingAction(Messages.CallStackView_ImportMappingDialogTitle) {
-            @Override
-            Map<String, String> doMapping(File file) {
-                return FunctionNameMapper.mapFromNmTextFile(file);
-            }
-        };
-
-        fImportMappingAction.setText(Messages.CallStackView_ImportMappingButtonText);
-        fImportMappingAction.setToolTipText(Messages.CallStackView_ImportMappingButtonTooltip);
-        fImportMappingAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(IMPORT_MAPPING_ICON_PATH));
-
-        return fImportMappingAction;
-    }
-
     private Action getSortByNameAction() {
         if (fSortByNameAction == null) {
             fSortByNameAction = new Action(Messages.CallStackView_SortByThreadName, IAction.AS_CHECK_BOX) {
@@ -1133,42 +1113,55 @@ public class CallStackView extends AbstractTimeGraphView {
         refresh();
     }
 
-    /**
-     * Toolbar icon to import the function address-to-name mapping binary file.
-     */
-    private Action getImportBinaryAction() {
-        if (fImportBinaryFileMappingAction != null) {
-            return fImportBinaryFileMappingAction;
+    private Action getConfigureSymbolsAction() {
+        if (fConfigureSymbolsAction != null) {
+            return fConfigureSymbolsAction;
         }
 
-        fImportBinaryFileMappingAction = new AbstractImportFileMappingAction(Messages.CallStackView_ImportBinaryFileDialogTitle) {
+        fConfigureSymbolsAction = new Action(Messages.CallStackView_ConfigureSymbolProvidersText) {
             @Override
-            Map<String, String> doMapping(File file) {
-                return FunctionNameMapper.mapFromBinaryFile(file);
+            public void run() {
+                SymbolProviderConfigDialog dialog = new SymbolProviderConfigDialog(getSite().getShell(), getProviderPages());
+                if (dialog.open() == IDialogConstants.OK_ID) {
+                    refresh();
+                }
             }
         };
 
-        fImportBinaryFileMappingAction.setText(Messages.CallStackView_ImportBinaryFileButtonText);
-        fImportBinaryFileMappingAction.setToolTipText(Messages.CallStackView_ImportBinaryFileButtonTooltip);
-        fImportBinaryFileMappingAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(IMPORT_BINARY_ICON_PATH));
+        fConfigureSymbolsAction.setToolTipText(Messages.CallStackView_ConfigureSymbolProvidersTooltip);
+        fConfigureSymbolsAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(IMPORT_BINARY_ICON_PATH));
+        fConfigureSymbolsAction.setEnabled(false);
 
-        return fImportBinaryFileMappingAction;
+        return fConfigureSymbolsAction;
     }
 
-    String getFunctionName(String address) {
-        if (fNameMapping == null) {
-            /* No mapping available, just print the addresses */
-            return address;
+    /**
+     * @return an array of {@link ISymbolProviderPreferencePage} that will
+     *         configure the current traces
+     */
+    private ISymbolProviderPreferencePage[] getProviderPages() {
+        List<ISymbolProviderPreferencePage> pages = new ArrayList<>();
+        ITmfTrace trace = getTrace();
+        if (trace != null) {
+            for (ITmfTrace subTrace : getTracesToBuild(trace)) {
+                ISymbolProvider provider = fSymbolProviders.get(subTrace);
+                if (provider != null) {
+                    ISymbolProviderPreferencePage page = provider.createPreferencePage();
+                    if (page != null) {
+                        pages.add(page);
+                    }
+                }
+            }
         }
-        String ret = fNameMapping.get(address);
-        if (ret == null) {
-            /*
-             * We didn't find this address in the mapping file, just use the
-             * address
-             */
-            return address;
-        }
-        return ret;
+        return pages.toArray(new ISymbolProviderPreferencePage[pages.size()]);
+    }
+
+    /**
+     * Update the enable status of the configure symbols action
+     */
+    private void updateConfigureSymbolsAction() {
+        ISymbolProviderPreferencePage[] providerPages = getProviderPages();
+        getConfigureSymbolsAction().setEnabled(providerPages.length > 0);
     }
 
 }
