@@ -37,10 +37,12 @@ public abstract class TmfStateValue implements ITmfStateValue {
     private static final int INT_CACHE_SIZE = 128;
     private static final int LONG_CACHE_SIZE = 128;
     private static final int DOUBLE_CACHE_SIZE = 128;
+    private static final int STRING_CACHE_SIZE = 512;
 
     private static final IntegerStateValue intCache[] = new IntegerStateValue[INT_CACHE_SIZE];
     private static final LongStateValue longCache[] = new LongStateValue[LONG_CACHE_SIZE];
     private static final DoubleStateValue doubleCache[] = new DoubleStateValue[DOUBLE_CACHE_SIZE];
+    private static final StringStateValue STRING_CACHE[] = new StringStateValue[STRING_CACHE_SIZE];
 
     // ------------------------------------------------------------------------
     // Factory methods to instantiate new state values
@@ -140,6 +142,11 @@ public abstract class TmfStateValue implements ITmfStateValue {
         if (strValue == null) {
             return nullValue();
         }
+        int offset = strValue.hashCode() & (LONG_CACHE_SIZE - 1);
+        StringStateValue cached = STRING_CACHE[offset];
+        if (cached != null && cached.unboxStr().equals(strValue)) {
+            return cached;
+        }
         /*
          * Make sure the String does not contain "weird" things, like ISO
          * control characters.
@@ -150,7 +157,9 @@ public abstract class TmfStateValue implements ITmfStateValue {
                 throw new IllegalArgumentException();
             }
         }
-        return new StringStateValue(strValue);
+        StringStateValue newValue = new StringStateValue(strValue);
+        STRING_CACHE[offset] = newValue;
+        return newValue;
     }
 
     // ------------------------------------------------------------------------
