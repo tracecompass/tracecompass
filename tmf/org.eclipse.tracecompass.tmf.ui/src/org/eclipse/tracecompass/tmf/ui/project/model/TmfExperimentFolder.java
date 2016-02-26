@@ -24,6 +24,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource2;
@@ -126,6 +127,22 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
         for (ITmfProjectModelElement danglingChild : childrenMap.values()) {
             removeChild(danglingChild);
         }
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Image getIcon() {
+        return TmfProjectModelIcons.FOLDER_ICON;
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public String getLabelText() {
+        return getName() + " [" + getChildren().size() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     // ------------------------------------------------------------------------

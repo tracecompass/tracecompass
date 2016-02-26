@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
@@ -143,6 +144,26 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
         for (ITmfProjectModelElement danglingChild : childrenMap.values()) {
             removeChild(danglingChild);
         }
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Image getIcon() {
+        return TmfProjectModelIcons.FOLDER_ICON;
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public String getLabelText() {
+        int nbTraces = getTraces().size();
+        if (nbTraces > 0) {
+            return (getName() + " [" + nbTraces + ']'); //$NON-NLS-1$
+        }
+        return getName();
     }
 
     // ------------------------------------------------------------------------

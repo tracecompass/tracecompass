@@ -44,4 +44,11 @@ public class TmfTracesFolder extends TmfTraceFolder {
         super(name, resource, parent);
     }
 
+    /**
+     * @since 2.0
+     */
+    @Override
+    public String getLabelText() {
+        return getName() + " [" + getTraces().size() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+    }
 }

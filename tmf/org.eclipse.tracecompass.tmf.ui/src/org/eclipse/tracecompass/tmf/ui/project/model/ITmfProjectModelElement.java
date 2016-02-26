@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * The TMF project model interface.
@@ -83,6 +84,24 @@ public interface ITmfProjectModelElement {
      * Method to request to refresh the project.
      */
     void refresh();
+
+    /**
+     * Returns the icon of this element.
+     *
+     * @return The icon
+     * @since 2.0
+     */
+    Image getIcon();
+
+    /**
+     * Returns the text of the label of this element.
+     *
+     * @return The label text
+     * @since 2.0
+     */
+    default String getLabelText() {
+        return getName();
+    }
 
     /**
      * Returns whether this model element has children or not.

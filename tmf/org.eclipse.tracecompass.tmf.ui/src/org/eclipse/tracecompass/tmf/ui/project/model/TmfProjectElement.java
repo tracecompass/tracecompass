@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * The implementation of TMF project model element.
@@ -152,5 +153,13 @@ public class TmfProjectElement extends TmfProjectModelElement {
     @Override
     public TmfProjectElement getProject() {
         return this;
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Image getIcon() {
+        return null;
     }
 }

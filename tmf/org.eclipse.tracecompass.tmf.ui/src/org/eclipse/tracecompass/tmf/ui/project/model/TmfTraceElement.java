@@ -37,7 +37,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
@@ -227,6 +229,26 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public @NonNull Image getIcon() {
+        Image icon = super.getIcon();
+        return (icon == null ? TmfProjectModelIcons.DEFAULT_TRACE_ICON : icon);
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public String getLabelText() {
+        if (getParent() instanceof TmfExperimentElement) {
+            return getElementPath();
+        }
+        return getName();
+    }
 
     /**
      * Instantiate a <code>ITmfTrace</code> object based on the trace type and

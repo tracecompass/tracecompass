@@ -16,6 +16,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -29,11 +31,14 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
@@ -41,6 +46,7 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
+import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType.TraceElementType;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -53,6 +59,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
+import org.osgi.framework.Bundle;
 
 /**
  * Base class for tracing project elements: it implements the common behavior of
@@ -149,6 +156,39 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
         }
     }
 
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Image getIcon() {
+        String traceType = getTraceType();
+        if (traceType == null || TmfTraceType.getTraceType(traceType) == null) {
+            // request the label to the Eclipse platform
+            Image icon = TmfProjectModelIcons.WORKSPACE_LABEL_PROVIDER.getImage(getResource());
+            return (icon == null ? TmfProjectModelIcons.DEFAULT_TRACE_ICON : icon);
+        }
+
+        IConfigurationElement traceUIAttributes = TmfTraceTypeUIUtils.getTraceUIAttributes(traceType,
+                (this instanceof TmfTraceElement) ? TraceElementType.TRACE : TraceElementType.EXPERIMENT);
+        if (traceUIAttributes != null) {
+            String iconAttr = traceUIAttributes.getAttribute(TmfTraceTypeUIUtils.ICON_ATTR);
+            if (iconAttr != null) {
+                String name = traceUIAttributes.getContributor().getName();
+                if (name != null) {
+                    Bundle bundle = Platform.getBundle(name);
+                    if (bundle != null) {
+                        Image image = TmfProjectModelIcons.loadIcon(bundle, iconAttr);
+                        if (image != null) {
+                            return image;
+                        }
+                    }
+                }
+            }
+        }
+        /* Let subclasses specify an icon */
+        return null;
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -198,13 +238,13 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      *
      * @return The element path
      */
-    public String getElementPath() {
+    public @NonNull String getElementPath() {
         ITmfProjectModelElement parent = getParent();
         while (!(parent instanceof TmfTracesFolder || parent instanceof TmfExperimentElement || parent instanceof TmfExperimentFolder)) {
             parent = parent.getParent();
         }
         IPath path = getResource().getFullPath().makeRelativeTo(parent.getPath());
-        return path.toString();
+        return checkNotNull(path.toString());
     }
 
     /**

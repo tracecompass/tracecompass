@@ -47,11 +47,7 @@ public class TmfAnalysisOutputElement extends TmfProjectModelElement {
         fOutput = output;
     }
 
-    /**
-     * Gets the icon of the view, if applicable
-     *
-     * @return The view icon or null if output is not a view
-     */
+    @Override
     public Image getIcon() {
         if (fOutput instanceof TmfAnalysisViewOutput) {
             IViewDescriptor descr = PlatformUI.getWorkbench().getViewRegistry().find(
@@ -64,10 +60,12 @@ public class TmfAnalysisOutputElement extends TmfProjectModelElement {
                     icon = descr.getImageDescriptor().createImage();
                     bundle.getImageRegistry().put(key, icon);
                 }
-                return icon;
+                if (icon != null) {
+                    return icon;
+                }
             }
         }
-        return null;
+        return TmfProjectModelIcons.DEFAULT_VIEW_ICON;
     }
 
     /**

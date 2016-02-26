@@ -25,6 +25,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
@@ -137,6 +138,24 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
         for (TmfAnalysisOutputElement output : childrenMap.values()) {
             removeChild(output);
         }
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Image getIcon() {
+        String iconFile = getIconFile();
+        if (iconFile != null) {
+            Bundle bundle = getBundle();
+            if (bundle != null) {
+                Image icon = TmfProjectModelIcons.loadIcon(bundle, iconFile);
+                if (icon != null) {
+                    return icon;
+                }
+            }
+        }
+        return TmfProjectModelIcons.DEFAULT_ANALYSIS_ICON;
     }
 
     // ------------------------------------------------------------------------

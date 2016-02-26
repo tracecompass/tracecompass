@@ -38,7 +38,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
@@ -240,6 +242,23 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         };
         Collections.sort(list, comparator);
         return list;
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public @NonNull Image getIcon() {
+        Image icon = super.getIcon();
+        return (icon == null ? TmfProjectModelIcons.DEFAULT_EXPERIMENT_ICON : icon);
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public String getLabelText() {
+        return getName() + " [" + getTraces().size() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     // ------------------------------------------------------------------------
