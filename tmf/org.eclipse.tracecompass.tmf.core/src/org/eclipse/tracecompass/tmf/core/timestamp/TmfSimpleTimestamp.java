@@ -59,8 +59,8 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
 
     @Override
     public ITmfTimestamp normalize(final long offset, final int scale) {
-        if (scale == 0) {
-            return new TmfSimpleTimestamp(getValue() + offset);
+        if (scale == ITmfTimestamp.SECOND_SCALE) {
+            return new TmfSimpleTimestamp(saturatedAdd(getValue(), offset));
         }
         return super.normalize(offset, scale);
     }

@@ -59,7 +59,7 @@ public class TmfNanoTimestamp extends TmfTimestamp {
     @Override
     public ITmfTimestamp normalize(final long offset, final int scale) {
         if (scale == ITmfTimestamp.NANOSECOND_SCALE) {
-            return new TmfNanoTimestamp(getValue() + offset);
+            return new TmfNanoTimestamp(saturatedAdd(getValue(), offset));
         }
         return super.normalize(offset, scale);
     }
@@ -85,7 +85,7 @@ public class TmfNanoTimestamp extends TmfTimestamp {
      * @since 2.0
      */
     @Override
-    public long toNanos(){
+    public long toNanos() {
         return getValue();
     }
 

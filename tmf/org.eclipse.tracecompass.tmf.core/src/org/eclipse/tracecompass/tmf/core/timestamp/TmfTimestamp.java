@@ -20,9 +20,8 @@ import java.nio.ByteBuffer;
 import org.eclipse.jdt.annotation.NonNull;
 
 /**
- * A generic timestamp implementation. The timestamp is represented by the
- * tuple { value, scale, precision }. By default, timestamps are scaled in
- * seconds.
+ * A generic timestamp implementation. The timestamp is represented by the tuple
+ * { value, scale, precision }. By default, timestamps are scaled in seconds.
  *
  * @author Francois Chouinard
  */
@@ -35,20 +34,17 @@ public class TmfTimestamp implements ITmfTimestamp {
     /**
      * The beginning of time
      */
-    public static final @NonNull ITmfTimestamp BIG_BANG =
-            new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE);
+    public static final @NonNull ITmfTimestamp BIG_BANG = new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE);
 
     /**
      * The end of time
      */
-    public static final @NonNull ITmfTimestamp BIG_CRUNCH =
-            new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE);
+    public static final @NonNull ITmfTimestamp BIG_CRUNCH = new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE);
 
     /**
      * Zero
      */
-    public static final @NonNull ITmfTimestamp ZERO =
-            new TmfTimestamp(0, 0);
+    public static final @NonNull ITmfTimestamp ZERO = new TmfTimestamp(0, 0);
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -153,63 +149,67 @@ public class TmfTimestamp implements ITmfTimestamp {
     }
 
     private static final long scalingFactors[] = new long[] {
-        1L,
-        10L,
-        100L,
-        1000L,
-        10000L,
-        100000L,
-        1000000L,
-        10000000L,
-        100000000L,
-        1000000000L,
-        10000000000L,
-        100000000000L,
-        1000000000000L,
-        10000000000000L,
-        100000000000000L,
-        1000000000000000L,
-        10000000000000000L,
-        100000000000000000L,
-        1000000000000000000L,
+            1L,
+            10L,
+            100L,
+            1000L,
+            10000L,
+            100000L,
+            1000000L,
+            10000000L,
+            100000000L,
+            1000000000L,
+            10000000000L,
+            100000000000L,
+            1000000000000L,
+            10000000000000L,
+            100000000000000L,
+            1000000000000000L,
+            10000000000000000L,
+            100000000000000000L,
+            1000000000000000000L,
     };
 
     @Override
     public ITmfTimestamp normalize(final long offset, final int scale) {
 
-        long value = fValue;
+        long value = getValue();
 
         // Handle the trivial case
-        if (fScale == scale && offset == 0) {
+        if (getScale() == scale && offset == 0) {
             return this;
         }
 
-        // In case of big bang and big crunch just return this (no need to normalize)
+        // In case of big bang and big crunch just return this (no need to
+        // normalize)
         if (this.equals(BIG_BANG) || this.equals(BIG_CRUNCH)) {
             return this;
         }
 
+        if (value == 0) {
+            return new TmfTimestamp(offset, scale);
+        }
+
         // First, scale the timestamp
-        if (fScale != scale) {
-            final int scaleDiff = Math.abs(fScale - scale);
+        if (getScale() != scale) {
+            final int scaleDiff = Math.abs(getScale() - scale);
             if (scaleDiff >= scalingFactors.length) {
-                throw new ArithmeticException("Scaling exception"); //$NON-NLS-1$
-            }
-
-            final long scalingFactor = scalingFactors[scaleDiff];
-            if (scale < fScale) {
-                value *= scalingFactor;
+                if (getScale() < scale) {
+                    value = 0;
+                } else {
+                    value = value > 0 ? Long.MAX_VALUE : Long.MIN_VALUE;
+                }
             } else {
-                value /= scalingFactor;
+                final long scalingFactor = scalingFactors[scaleDiff];
+                if (getScale() < scale) {
+                    value /= scalingFactor;
+                } else {
+                    value = saturatedMult(scalingFactor, value);
+                }
             }
         }
 
-        // Then, apply the offset
-        if (offset < 0) {
-            value = (value < Long.MIN_VALUE - offset) ? Long.MIN_VALUE : value + offset;
-        } else {
-            value = (value > Long.MAX_VALUE - offset) ? Long.MAX_VALUE : value + offset;
-        }
+        value = saturatedAdd(value, offset);
 
         return new TmfTimestamp(value, scale);
     }
@@ -236,7 +236,8 @@ public class TmfTimestamp implements ITmfTimestamp {
 
     @Override
     public int compareTo(final ITmfTimestamp ts) {
-        // Check the corner cases (we can't use equals() because it uses compareTo()...)
+        // Check the corner cases (we can't use equals() because it uses
+        // compareTo()...)
         if (ts == null) {
             return 1;
         }
@@ -249,13 +250,8 @@ public class TmfTimestamp implements ITmfTimestamp {
         if ((fValue == BIG_CRUNCH.getValue() && fScale == BIG_CRUNCH.getScale()) || (ts.getValue() == BIG_BANG.getValue() && ts.getScale() == BIG_BANG.getScale())) {
             return 1;
         }
-
-        try {
-            final ITmfTimestamp nts = ts.normalize(0, fScale);
-            final long delta = fValue - nts.getValue();
-            return Long.compare(delta, 0);
-        }
-        catch (final ArithmeticException e) {
+        final ITmfTimestamp nts = ts.normalize(0, fScale);
+        if ((nts.getValue() == 0 && ts.getValue() != 0) || (ts.getValue() != Long.MAX_VALUE && nts.getValue() == Long.MAX_VALUE) || (ts.getValue() != Long.MIN_VALUE && nts.getValue() == Long.MIN_VALUE)) {
             // Scaling error. We can figure it out nonetheless.
 
             // First, look at the sign of the mantissa
@@ -274,6 +270,58 @@ public class TmfTimestamp implements ITmfTimestamp {
             final int scale = ts.getScale();
             return (fScale > scale) ? (fValue >= 0) ? 1 : -1 : (fValue >= 0) ? -1 : 1;
         }
+        final long delta = fValue - nts.getValue();
+        return Long.compare(delta, 0);
+    }
+
+    /**
+     * Saturated multiplication. It will not overflow but instead clamp the
+     * result to {@link Long#MAX_VALUE} and {@link Long#MIN_VALUE}.
+     *
+     * @param left
+     *            The left long to multiply
+     * @param right
+     *            The right long to multiply
+     * @return The saturated multiplication result. The mathematical, not Java
+     *         version of Min(Max(MIN_VALUE, left*right), MAX_VALUE).
+     * @see <a href="http://en.wikipedia.org/wiki/Saturation_arithmetic">
+     *      Saturation arithmetic</a>
+     */
+    private static long saturatedMult(long left, long right) {
+        long retVal = left * right;
+        if ((left != 0) && ((retVal / left) != right)) {
+            return (sameSign(left, right) ? Long.MAX_VALUE : Long.MIN_VALUE);
+        }
+        return retVal;
+    }
+
+    /**
+     * Saturated addition. It will not overflow but instead clamp the result to
+     * {@link Long#MAX_VALUE} and {@link Long#MIN_VALUE}.
+     *
+     * @param left
+     *            The left long to add
+     * @param right
+     *            The right long to add
+     * @return The saturated addition result. The mathematical, not Java version
+     *         of Min(Max(MIN_VALUE, left+right), MAX_VALUE).
+     * @see <a href="http://en.wikipedia.org/wiki/Saturation_arithmetic">
+     *      Saturation arithmetic</a>
+     * @since 2.0
+     */
+    protected static final long saturatedAdd(final long left, final long right) {
+        long retVal = left + right;
+        if (sameSign(left, right) && !sameSign(left, retVal)) {
+            if (retVal > 0) {
+                return Long.MIN_VALUE;
+            }
+            return Long.MAX_VALUE;
+        }
+        return retVal;
+    }
+
+    private static boolean sameSign(final long left, final long right) {
+        return (left ^ right) >= 0;
     }
 
     // ------------------------------------------------------------------------
@@ -314,15 +362,16 @@ public class TmfTimestamp implements ITmfTimestamp {
     public String toString(final TmfTimestampFormat format) {
         try {
             return format.format(toNanos());
-        }
-        catch (ArithmeticException e) {
+        } catch (ArithmeticException e) {
             return format.format(0);
         }
     }
 
     /**
      * Write the time stamp to the ByteBuffer so that it can be saved to disk.
-     * @param bufferOut the buffer to write to
+     *
+     * @param bufferOut
+     *            the buffer to write to
      */
     public void serialize(ByteBuffer bufferOut) {
         bufferOut.putLong(fValue);
