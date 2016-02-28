@@ -100,6 +100,6 @@ public enum BtfTimestampFormat {
      * @return TmfTimestamp with proper scale
      */
     public @NonNull ITmfTimestamp createTimestamp(long timestamp) {
-        return new TmfTimestamp(timestamp, fScale);
+        return TmfTimestamp.create(timestamp, fScale);
     }
 }

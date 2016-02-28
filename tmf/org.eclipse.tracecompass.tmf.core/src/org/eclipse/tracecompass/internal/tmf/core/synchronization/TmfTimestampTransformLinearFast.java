@@ -169,7 +169,7 @@ public class TmfTimestampTransformLinearFast implements ITmfTimestampTransformIn
 
     @Override
     public ITmfTimestamp transform(ITmfTimestamp timestamp) {
-        return new TmfTimestamp(timestamp, transform(timestamp.getValue()));
+        return TmfTimestamp.create(transform(timestamp.getValue()), timestamp.getScale());
     }
 
     @Override

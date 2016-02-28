@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfConstantTra
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.junit.Test;
 
@@ -34,18 +33,18 @@ import org.junit.Test;
  */
 @NonNullByDefault
 public class TsTransformFactoryTest {
-    private final ITmfTimestamp t0 = new TmfTimestamp(0);
-    private final ITmfTimestamp t100 = new TmfTimestamp(100);
-    private final ITmfTimestamp t1e2 = new TmfTimestamp(1, 2);
-    private final ITmfTimestamp t1e3 = new TmfTimestamp(1, 3);
-    private final ITmfTimestamp tn0 = new TmfNanoTimestamp(0);
-    private final ITmfTimestamp tn100 = new TmfNanoTimestamp(100);
-    private final ITmfTimestamp tn1 = new TmfNanoTimestamp(1);
-    private final ITmfTimestampTransform identity1 = TimestampTransformFactory.createLinear(1.0, new TmfNanoTimestamp(0));
+    private final ITmfTimestamp t0 = TmfTimestamp.fromSeconds(0);
+    private final ITmfTimestamp t100 = TmfTimestamp.fromSeconds(100);
+    private final ITmfTimestamp t1e2 = TmfTimestamp.create(1, 2);
+    private final ITmfTimestamp t1e3 = TmfTimestamp.create(1, 3);
+    private final ITmfTimestamp tn0 = TmfTimestamp.fromNanos(0);
+    private final ITmfTimestamp tn100 = TmfTimestamp.fromNanos(100);
+    private final ITmfTimestamp tn1 = TmfTimestamp.fromNanos(1);
+    private final ITmfTimestampTransform identity1 = TimestampTransformFactory.createLinear(1.0, TmfTimestamp.fromNanos(0));
     private final ITmfTimestampTransform offset1 = TimestampTransformFactory.createWithOffset(100);
     private final ITmfTimestampTransform offset2 = TimestampTransformFactory.createLinear(NonNullUtils.checkNotNull(BigDecimal.ONE), NonNullUtils.checkNotNull(new BigDecimal(100)));
     private final ITmfTimestampTransform offset3 = TimestampTransformFactory.createLinear(1.0, 100);
-    private final ITmfTimestampTransform offset4 = TimestampTransformFactory.createLinear(1.0, new TmfNanoTimestamp(100));
+    private final ITmfTimestampTransform offset4 = TimestampTransformFactory.createLinear(1.0, TmfTimestamp.fromNanos(100));
 
     /**
      * Test with identity
@@ -79,7 +78,7 @@ public class TsTransformFactoryTest {
     @Test
     public void transformOffset() {
         final ITmfTimestampTransform offset = offset1;
-        final ITmfTimestampTransform compositeTransform = offset.composeWith(TimestampTransformFactory.createWithOffset(new TmfNanoTimestamp(-100)));
+        final ITmfTimestampTransform compositeTransform = offset.composeWith(TimestampTransformFactory.createWithOffset(TmfTimestamp.fromNanos(-100)));
         assertEquals(tn100, offset.transform(t0));
         assertEquals(tn100, offset.transform(tn0));
         assertEquals(tn0, compositeTransform.transform(tn0));
@@ -96,12 +95,12 @@ public class TsTransformFactoryTest {
     @Test
     public void transformSlope() {
         final ITmfTimestampTransform slope = TimestampTransformFactory.createLinear(10, 0);
-        final ITmfTimestampTransform slope1 = TimestampTransformFactory.createLinear(10.0, new TmfNanoTimestamp(0));
+        final ITmfTimestampTransform slope1 = TimestampTransformFactory.createLinear(10.0, TmfTimestamp.fromNanos(0));
         assertEquals(t1e3, slope.transform(t1e2));
-        assertEquals(tn100, slope.transform(new TmfNanoTimestamp(10)));
+        assertEquals(tn100, slope.transform(TmfTimestamp.fromNanos(10)));
         assertEquals(tn100, slope.transform(slope.transform(tn1)));
         assertEquals(tn100, slope.composeWith(slope).transform(tn1));
-        assertEquals(tn100, slope1.transform(new TmfNanoTimestamp(10)));
+        assertEquals(tn100, slope1.transform(TmfTimestamp.fromNanos(10)));
     }
 
     /**

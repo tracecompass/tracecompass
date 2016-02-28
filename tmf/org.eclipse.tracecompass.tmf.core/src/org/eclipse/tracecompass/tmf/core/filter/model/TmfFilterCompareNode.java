@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 
 /**
@@ -212,7 +212,7 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode {
             return (ITmfTimestamp) value;
         }
         try {
-            return new TmfNanoTimestamp(fTimestampFormat.parseValue(value.toString()));
+            return TmfTimestamp.fromNanos(fTimestampFormat.parseValue(value.toString()));
         } catch (ParseException e) {
         }
         return null;

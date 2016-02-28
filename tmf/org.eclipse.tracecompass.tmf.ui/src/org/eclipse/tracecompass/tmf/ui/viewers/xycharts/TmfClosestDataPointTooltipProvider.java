@@ -20,7 +20,6 @@ import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.swtchart.IAxis;
 import org.swtchart.ISeries;
@@ -58,7 +57,7 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
      * Constructor for a tool tip provider.
      *
      * @param tmfChartViewer
-     *                  - the parent chart viewer
+     *            - the parent chart viewer
      */
     public TmfClosestDataPointTooltipProvider(ITmfChartTimeProvider tmfChartViewer) {
         super(tmfChartViewer);
@@ -127,8 +126,8 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
                     double currentDistance = xs * xs + ys * ys;
 
                     /*
-                     * Check for smallest distance to mouse position and
-                     * only consider it if the mouse is close the data point.
+                     * Check for smallest distance to mouse position and only
+                     * consider it if the mouse is close the data point.
                      */
                     if ((currentDistance < smallestDistance) && (currentDistance < (HIGHLIGHT_RADIUS * HIGHLIGHT_RADIUS))) {
                         smallestDistance = currentDistance;
@@ -144,15 +143,15 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
             }
             String tooltip = null;
             if (param != null) {
-                 tooltip = createToolTipText(param);
+                tooltip = createToolTipText(param);
                 if (tooltip != null) {
                     fIsHighlight = true;
                     getChart().redraw();
                 }
             }
             /*
-             *  Note that tooltip might be null which will clear the
-             *  previous tooltip string. This is intentional.
+             * Note that tooltip might be null which will clear the previous
+             * tooltip string. This is intentional.
              */
             getChart().getPlotArea().setToolTipText(tooltip);
         }
@@ -202,7 +201,7 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
             if ((xS != null) && (yS != null) && (dataIndex < xS.length) && (dataIndex < yS.length)) {
                 StringBuffer buffer = new StringBuffer();
                 buffer.append("x="); //$NON-NLS-1$
-                buffer.append(new TmfTimestamp((long) xS[dataIndex] + getChartViewer().getTimeOffset(), ITmfTimestamp.NANOSECOND_SCALE).toString());
+                buffer.append(TmfTimestamp.fromNanos((long) xS[dataIndex] + getChartViewer().getTimeOffset()).toString());
                 buffer.append('\n');
                 buffer.append("y="); //$NON-NLS-1$
                 buffer.append((long) yS[dataIndex]);

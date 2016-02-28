@@ -72,11 +72,11 @@ public class PcapEventFactory {
         switch (scale) {
         case MICROSECOND:
             long us = trace.getTimestampTransform().transform(timestamp * 1000) / 1000;
-            tmfTimestamp = new TmfTimestamp(us, ITmfTimestamp.MICROSECOND_SCALE);
+            tmfTimestamp = TmfTimestamp.fromMicros(us);
             break;
         case NANOSECOND:
             long ns = trace.getTimestampTransform().transform(timestamp);
-            tmfTimestamp = new TmfTimestamp(ns, ITmfTimestamp.NANOSECOND_SCALE);
+            tmfTimestamp = TmfTimestamp.fromNanos(ns);
             break;
         default:
             throw new IllegalArgumentException("The timestamp precision is not valid!"); //$NON-NLS-1$

@@ -22,7 +22,7 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterRootNode;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,7 +39,7 @@ public class TmfFilterRootNodeTest extends TmfFilterTreeNodeTestBase {
     // ------------------------------------------------------------------------
 
     private ITmfEventField fContent = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, null, null);
-    private TmfEvent fEvent = new TmfEvent(TRACE, 0, new TmfNanoTimestamp(1), EVENT_TYPE, fContent);
+    private TmfEvent fEvent = new TmfEvent(TRACE, 0, TmfTimestamp.fromNanos(1), EVENT_TYPE, fContent);
     private TmfFilterRootNode fFilter;
 
     // ------------------------------------------------------------------------

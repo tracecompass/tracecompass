@@ -56,12 +56,12 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventSelectedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -80,8 +80,8 @@ import org.eclipse.ui.dialogs.PatternFilter;
 public class OffsetDialog extends Dialog {
 
     private static final int TREE_EDITOR_MIN_WIDTH = 50;
-    private static final String EDITOR_KEY = "$editor$";  //$NON-NLS-1$
-    private static final String WIDTH_KEY = "$width$";  //$NON-NLS-1$
+    private static final String EDITOR_KEY = "$editor$"; //$NON-NLS-1$
+    private static final String WIDTH_KEY = "$width$"; //$NON-NLS-1$
 
     private static final TmfTimestampFormat TIME_FORMAT = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss.SSS SSS SSS"); //$NON-NLS-1$
     private static final TmfTimestampFormat OFFSET_FORMAT = new TmfTimestampFormat("T.SSS SSS SSS"); //$NON-NLS-1$
@@ -138,7 +138,7 @@ public class OffsetDialog extends Dialog {
                         ITmfTimestamp refTime = map.get(element);
                         long ref = refTime == null ? 0 : refTime.toNanos();
                         Long newVal = TIME_FORMAT.parseValue(string, ref);
-                        map.put((TmfTraceElement) element, new TmfNanoTimestamp(newVal));
+                        map.put((TmfTraceElement) element, TmfTimestamp.fromNanos(newVal));
                     } catch (ParseException e) {
                         /* Ignore and reload previous value */
                     }
@@ -314,11 +314,11 @@ public class OffsetDialog extends Dialog {
         // Define the TableViewer
         fViewer = new FilteredTree(parent, SWT.MULTI | SWT.H_SCROLL
                 | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER, new PatternFilter() {
-            @Override
-            protected boolean isLeafMatch(Viewer viewer, Object element) {
-                return wordMatches(((TmfTraceElement) element).getElementPath());
-            }
-        }, true);
+                    @Override
+                    protected boolean isLeafMatch(Viewer viewer, Object element) {
+                        return wordMatches(((TmfTraceElement) element).getElementPath());
+                    }
+                }, true);
 
         // Make lines and make header visible
         final Tree tree = fViewer.getViewer().getTree();
@@ -421,8 +421,8 @@ public class OffsetDialog extends Dialog {
                     ITmfTimestamp targetTime = fTargetTimeMap.get(traceElement);
                     ITmfTimestamp refTime = fRefTimeMap.get(traceElement);
                     if (targetTime != null && refTime != null) {
-                        long offset = new TmfNanoTimestamp(targetTime).getValue() -
-                                new TmfNanoTimestamp(refTime).getValue();
+                        long offset = targetTime.toNanos() -
+                                refTime.toNanos();
                         fOffsetMap.put(traceElement, offset);
                         fViewer.getViewer().update(traceElement, null);
                     }
@@ -435,8 +435,8 @@ public class OffsetDialog extends Dialog {
         }
 
         /* put temporary values in maps to pack according to time formats */
-        fRefTimeMap.put(traces.get(0), new TmfNanoTimestamp());
-        fTargetTimeMap.put(traces.get(0), new TmfNanoTimestamp());
+        fRefTimeMap.put(traces.get(0), TmfTimestamp.fromNanos(0));
+        fTargetTimeMap.put(traces.get(0), TmfTimestamp.fromNanos(0));
         fViewer.getViewer().update(traces.get(0), null);
         for (final TreeColumn treeColumn : tree.getColumns()) {
             if (treeColumn.getResizable()) {
@@ -495,7 +495,7 @@ public class OffsetDialog extends Dialog {
         fRefTimeColumn.setWidth(0);
         fRefTimeColumn.setResizable(false);
         fButtonViewerColumn.getColumn().setWidth(0);
-        fAdvancedMessageLabel.setText("");  //$NON-NLS-1$
+        fAdvancedMessageLabel.setText(""); //$NON-NLS-1$
     }
 
     private void setAdvancedMode() {

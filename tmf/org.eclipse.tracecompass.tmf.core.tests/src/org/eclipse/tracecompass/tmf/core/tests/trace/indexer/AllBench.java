@@ -152,7 +152,7 @@ public class AllBench {
             long old = System.currentTimeMillis();
             bTree = new BTree(BTREE_DEGREE, file, fTrace);
             for (int i = 0; i < checkpointsNum; i++) {
-                TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(12345 + i), new TmfLongLocation(123456L + i), i);
+                TmfCheckpoint checkpoint = new TmfCheckpoint(TmfTimestamp.fromSeconds(12345 + i), new TmfLongLocation(123456L + i), i);
                 bTree.insert(checkpoint);
             }
 
@@ -177,7 +177,7 @@ public class AllBench {
             long old = System.currentTimeMillis();
             array = new FlatArray(file, fTrace);
             for (int i = 0; i < checkpointsNum; i++) {
-                TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(12345 + i), new TmfLongLocation(123456L + i), i);
+                TmfCheckpoint checkpoint = new TmfCheckpoint(TmfTimestamp.fromSeconds(12345 + i), new TmfLongLocation(123456L + i), i);
                 array.insert(checkpoint);
             }
 
@@ -205,7 +205,7 @@ public class AllBench {
             bTree = new BTree(BTREE_DEGREE, file, fTrace);
             for (int i = 0; i < checkpointsNum; i++) {
                 Integer randomCheckpoint = list.get(i);
-                TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(12345 + randomCheckpoint), new TmfLongLocation(123456L + randomCheckpoint), 0);
+                TmfCheckpoint checkpoint = new TmfCheckpoint(TmfTimestamp.fromSeconds(12345 + randomCheckpoint), new TmfLongLocation(123456L + randomCheckpoint), 0);
                 BTreeCheckpointVisitor treeVisitor = new BTreeCheckpointVisitor(checkpoint);
                 bTree.accept(treeVisitor);
                 assertEquals(randomCheckpoint.intValue(), treeVisitor.getCheckpoint().getCheckpointRank());
@@ -231,7 +231,7 @@ public class AllBench {
             array = new FlatArray(file, fTrace);
             for (int i = 0; i < checkpointsNum; i++) {
                 Integer randomCheckpoint = list.get(i);
-                TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(12345 + randomCheckpoint), new TmfLongLocation(123456L + randomCheckpoint), 0);
+                TmfCheckpoint checkpoint = new TmfCheckpoint(TmfTimestamp.fromSeconds(12345 + randomCheckpoint), new TmfLongLocation(123456L + randomCheckpoint), 0);
                 long found = array.binarySearch(checkpoint);
                 assertEquals(randomCheckpoint.intValue(), found);
             }

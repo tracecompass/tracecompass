@@ -29,6 +29,7 @@ import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.tests.trace.indexer.checkpoint.AbstractIndexTest.ITestIndexer;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
@@ -178,7 +179,7 @@ public class TmfCheckpointIndexTest2 {
 
         // Verify that the event at rank=99 is returned when seeking to ts=101 (first event with this timestamp)
         // and not the event at checkpoint boundary
-        TmfTimestamp seekTs = new TmfTimestamp(101, -3);
+        ITmfTimestamp seekTs = TmfTimestamp.create(101, -3);
         ITmfContext ctx = fTrace.seekEvent(seekTs);
         ITmfEvent event = fTrace.getNext(ctx);
 
@@ -198,7 +199,7 @@ public class TmfCheckpointIndexTest2 {
         // Trace has events with same timestamp (ts=102) for ranks 102..702 -> 2 checkpoints with same timestamp are created
         // Verify that the event at rank=102 is returned when seeking to ts=102 (first event with this timestamp)
         // and not the event at checkpoint boundary
-        seekTs = new TmfTimestamp(102, -3);
+        seekTs = TmfTimestamp.create(102, -3);
         ctx = fTrace.seekEvent(seekTs);
         event = fTrace.getNext(ctx);
 
@@ -206,7 +207,7 @@ public class TmfCheckpointIndexTest2 {
         assertEquals(0, seekTs.compareTo(event.getTimestamp()));
 
         // Verify seek to first checkpoint
-        seekTs = new TmfTimestamp(1, -3);
+        seekTs = TmfTimestamp.create(1, -3);
         ctx = fTrace.seekEvent(seekTs);
         event = fTrace.getNext(ctx);
 
@@ -214,15 +215,15 @@ public class TmfCheckpointIndexTest2 {
         assertEquals(0, seekTs.compareTo(event.getTimestamp()));
 
         // Verify seek to timestamp before first event
-        seekTs = new TmfTimestamp(0, -3);
+        seekTs = TmfTimestamp.create(0, -3);
         ctx = fTrace.seekEvent(seekTs);
         event = fTrace.getNext(ctx);
 
         assertEquals(1, ctx.getRank());
-        assertEquals(0, new TmfTimestamp(1, -3).compareTo(event.getTimestamp()));
+        assertEquals(0, TmfTimestamp.create(1, -3).compareTo(event.getTimestamp()));
 
         // Verify seek to timestamp between first and second checkpoint
-        seekTs = new TmfTimestamp(50, -3);
+        seekTs = TmfTimestamp.create(50, -3);
         ctx = fTrace.seekEvent(seekTs);
         event = fTrace.getNext(ctx);
 
@@ -230,7 +231,7 @@ public class TmfCheckpointIndexTest2 {
         assertEquals(0, seekTs.compareTo(event.getTimestamp()));
 
         // Verify seek to timestamp after last event in trace
-        seekTs = new TmfTimestamp(103, -3);
+        seekTs = TmfTimestamp.create(103, -3);
         ctx = fTrace.seekEvent(seekTs);
         event = fTrace.getNext(ctx);
 

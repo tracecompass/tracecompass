@@ -100,7 +100,7 @@ public class TmfUml2SDTestTrace implements ITmfEventParser {
             fields[2] = new TmfEventField("signal", signal, null);
 
             ITmfEventField tmfContent = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, content, fields);
-            ITmfEvent tmfEvent = new TmfEvent(fEventStream, ITmfContext.UNKNOWN_RANK, new TmfTimestamp(ts, -9), tmfEventType, tmfContent);
+            ITmfEvent tmfEvent = new TmfEvent(fEventStream, ITmfContext.UNKNOWN_RANK, TmfTimestamp.create(ts, -9), tmfEventType, tmfContent);
 
             return tmfEvent;
         } catch (final EOFException e) {

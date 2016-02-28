@@ -12,7 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.pcap.core.tests.event;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;

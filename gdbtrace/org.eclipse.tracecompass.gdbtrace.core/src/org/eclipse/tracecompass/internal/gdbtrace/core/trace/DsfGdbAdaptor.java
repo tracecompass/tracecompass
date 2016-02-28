@@ -102,7 +102,7 @@ import org.eclipse.ui.ide.IDE;
 
 /**
  * Adaptor to access GDB Tracepoint frames, previously collected and saved in a
- * file by GDB.  One instance of this maps to a single DSF-GDB session.
+ * file by GDB. One instance of this maps to a single DSF-GDB session.
  * <p>
  * This class offers the functions of starting a post-mortem GDB session with a
  * tracepoint data file, navigate the data frames and return the data contained
@@ -140,9 +140,9 @@ public class DsfGdbAdaptor {
     private String fTraceFile = ""; //$NON-NLS-1$
     private String sourceLocator = ""; //$NON-NLS-1$
 
-    // To save tracepoints detailed info.  The key is the rank of the
+    // To save tracepoints detailed info. The key is the rank of the
     // breakpoint (tracepoint is a kind of breakpoint)
-    private  Map<Integer, MIBreakpointDMData> fTpInfo = new HashMap<>();
+    private Map<Integer, MIBreakpointDMData> fTpInfo = new HashMap<>();
 
     private TmfEventType tmfEventType = new TmfEventType("GDB Tracepoint", TmfEventField.makeRoot(new String[] { "Content" })); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -157,10 +157,11 @@ public class DsfGdbAdaptor {
      * about the launchers or a change in debug context that we might need to
      * react-to.
      * <p>
+     *
      * @author Francois Chouinard
      */
     private class DsfGdbPlatformEventListener implements
-    ILaunchesListener2, IDebugContextListener {
+            ILaunchesListener2, IDebugContextListener {
 
         /**
          *
@@ -209,7 +210,7 @@ public class DsfGdbAdaptor {
                         IDMContext context = (IDMContext) contextObject;
                         if (context != null) {
                             String sessionId;
-                            synchronized(SESSION_LOCK) {
+                            synchronized (SESSION_LOCK) {
                                 sessionId = context.getSessionId();
                                 if (sessionId.equals(fCurrentSessionId)) {
                                     return;
@@ -226,7 +227,7 @@ public class DsfGdbAdaptor {
                                     final ICommandControlService commandControl = tracker.getService(ICommandControlService.class);
                                     if (traceControl != null && commandControl != null) {
                                         ITraceTargetDMContext traceContext = (ITraceTargetDMContext) commandControl.getContext();
-                                        traceControl.getCurrentTraceRecordContext(traceContext,    queryRm);
+                                        traceControl.getCurrentTraceRecordContext(traceContext, queryRm);
                                     } else {
                                         queryRm.done();
                                     }
@@ -368,23 +369,23 @@ public class DsfGdbAdaptor {
         return fNumberOfFrames;
     }
 
-
     /**
      * Wrapper around the selecting of a frame and the reading of its
      * information. this is a work-around for the potential problem of
-     * concurrent access to these functions by more than one thread,
-     * where two clients might interfere with each other.
+     * concurrent access to these functions by more than one thread, where two
+     * clients might interfere with each other.
      * <p>
-     * Note: We also try to get the tracepoint info here, if it's not
-     * already filled-in.
+     * Note: We also try to get the tracepoint info here, if it's not already
+     * filled-in.
      *
-     * @param  rank a long corresponding to the number of the frame to be
-     * selected and read
+     * @param rank
+     *            a long corresponding to the number of the frame to be selected
+     *            and read
      * @return A GdbTraceEvent object, or null in case of failure.
      */
     public synchronized GdbTraceEvent selectAndReadFrame(final long rank) {
         // lazy init of tracepoints info
-        if(fTpInfo.isEmpty()) {
+        if (fTpInfo.isEmpty()) {
             getTracepointInfo();
         }
         if (selectDataFrame(rank, false)) {
@@ -396,7 +397,6 @@ public class DsfGdbAdaptor {
         }
         return null;
     }
-
 
     /**
      * This class implements a best-effort look-up of the detailed tracepoint
@@ -568,11 +568,13 @@ public class DsfGdbAdaptor {
     }
 
     /**
-     * This method uses the DSF-GDB interface to select a given frame number
-     * in the current GDB tracepoint session.
+     * This method uses the DSF-GDB interface to select a given frame number in
+     * the current GDB tracepoint session.
      *
-     * @param rank the rank of the tracepoint frame to select.
-     * @param update true if visualization should be updated
+     * @param rank
+     *            the rank of the tracepoint frame to select.
+     * @param update
+     *            true if visualization should be updated
      * @return boolean true if select worked.
      */
     public boolean selectDataFrame(final long rank, final boolean update) {
@@ -728,11 +730,10 @@ public class DsfGdbAdaptor {
 
             // get corresponding TP data
             String tmfEventRef;
-            MIBreakpointDMData bp =  fTpInfo.get(Integer.valueOf(data.getTracepointNumber()));
+            MIBreakpointDMData bp = fTpInfo.get(Integer.valueOf(data.getTracepointNumber()));
             if (bp != null) {
                 tmfEventRef = bp.getFileName() + ":" + bp.getLineNumber() + " :: " + bp.getFunctionName(); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-            else {
+            } else {
                 tmfEventRef = tracedExecutable;
             }
 
@@ -742,7 +743,7 @@ public class DsfGdbAdaptor {
                     Integer.parseInt(data.getRecordId()));
 
             GdbTraceEvent ev = new GdbTraceEvent(fGdbTrace,
-                    new TmfTimestamp(Integer.parseInt(data.getRecordId())),
+                    TmfTimestamp.fromSeconds(Integer.parseInt(data.getRecordId())),
                     "Tracepoint: " + data.getTracepointNumber() + ", Frame: " + data.getRecordId(),  //$NON-NLS-1$ //$NON-NLS-2$
                     tmfEventType,
                     evContent,
@@ -769,20 +770,22 @@ public class DsfGdbAdaptor {
      * This is a helper method for getTraceFrameData, to create for it a
      * "best effort" GdbTraceEvent when a problem occurs during the reading.
      *
-     * @param rank long containing the number of the frame where the problem occurred
-     * @param message String containing a brief explanation of problem.
+     * @param rank
+     *            long containing the number of the frame where the problem
+     *            occurred
+     * @param message
+     *            String containing a brief explanation of problem.
      * @return a GdbTraceEvent object, filled as best as possible
      */
     private GdbTraceEvent createExceptionEvent(final long rank, final String message) {
         // get corresponding TP data
         String tmfEventRef;
         String tmfEventSrc;
-        MIBreakpointDMData bp =  fTpInfo.get(rank);
+        MIBreakpointDMData bp = fTpInfo.get(rank);
         if (bp != null) {
             tmfEventRef = bp.getFileName() + ":" + bp.getLineNumber() + " :: " + bp.getFunctionName(); //$NON-NLS-1$ //$NON-NLS-2$
             tmfEventSrc = bp.getFileName() + " :: " + bp.getFunctionName() + ", line: " + bp.getLineNumber(); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        else {
+        } else {
             tmfEventRef = tracedExecutable;
             tmfEventSrc = "Tracepoint: n/a"; //$NON-NLS-1$
         }
@@ -790,7 +793,7 @@ public class DsfGdbAdaptor {
         GdbTraceEventContent evContent = new GdbTraceEventContent("ERROR: " + message, 0, 0); //$NON-NLS-1$
 
         GdbTraceEvent ev = new GdbTraceEvent(fGdbTrace,
-                new TmfTimestamp(rank),
+                TmfTimestamp.fromSeconds(rank),
                 tmfEventSrc,
                 tmfEventType,
                 evContent,

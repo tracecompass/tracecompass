@@ -11,8 +11,8 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.loader;
 
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 
 /**
  *  Interface for testing signal handling within TmfUml2SD
@@ -83,12 +83,12 @@ public interface IUml2SdSignalValidator {
     /**
      * @return the expected current time.
      */
-    TmfTimestamp getCurrentTime();
+    ITmfTimestamp getCurrentTime();
     /**
      * Sets the expected current time
      * @param currentTime Time to set
      */
-    void setCurrentTime(TmfTimestamp currentTime);
+    void setCurrentTime(ITmfTimestamp currentTime);
 
     /**
      * @return the expected current time range.

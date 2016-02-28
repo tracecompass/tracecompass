@@ -11,7 +11,7 @@
 
 package org.eclipse.tracecompass.ctf.core.tests.types;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

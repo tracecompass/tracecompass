@@ -72,7 +72,7 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
     /**
      * The time when the message occurs
      */
-    private ITmfTimestamp fEventTime = new TmfTimestamp();
+    private ITmfTimestamp fEventTime = TmfTimestamp.fromSeconds(0);
     /**
      * Flag whether the message has time information available or not
      */

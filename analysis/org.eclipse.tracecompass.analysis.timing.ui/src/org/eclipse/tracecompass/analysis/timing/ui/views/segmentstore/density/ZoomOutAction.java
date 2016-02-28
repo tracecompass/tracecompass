@@ -13,8 +13,8 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.AnalysisTimingImageConstants;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.swtchart.Range;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
+import org.swtchart.Range;
 
 /**
  * Zoom action for the density view

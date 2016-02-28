@@ -70,11 +70,11 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
     /**
      * The time when the message begin
      */
-    private ITmfTimestamp fEndTime = new TmfTimestamp();
+    private ITmfTimestamp fEndTime = TmfTimestamp.fromSeconds(0);
     /**
      * The time when the message end
      */
-    private ITmfTimestamp fStartTime = new TmfTimestamp();
+    private ITmfTimestamp fStartTime = TmfTimestamp.fromSeconds(0);
     /**
      * The associated message.
      */

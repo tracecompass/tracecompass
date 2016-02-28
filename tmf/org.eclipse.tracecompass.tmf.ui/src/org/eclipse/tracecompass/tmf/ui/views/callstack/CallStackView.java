@@ -64,10 +64,9 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampDelta;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor;
@@ -303,10 +302,10 @@ public class CallStackView extends AbstractTimeGraphView {
                     int depth = entry.getStackLevel();
                     return Integer.toString(depth);
                 } else if (columnIndex == 2 && entry.getFunctionName().length() > 0) {
-                    ITmfTimestamp ts = new TmfTimestamp(entry.getFunctionEntryTime(), ITmfTimestamp.NANOSECOND_SCALE);
+                    ITmfTimestamp ts = TmfTimestamp.fromNanos(entry.getFunctionEntryTime());
                     return ts.toString();
                 } else if (columnIndex == 3 && entry.getFunctionName().length() > 0) {
-                    ITmfTimestamp ts = new TmfTimestamp(entry.getFunctionExitTime(), ITmfTimestamp.NANOSECOND_SCALE);
+                    ITmfTimestamp ts = TmfTimestamp.fromNanos(entry.getFunctionExitTime());
                     return ts.toString();
                 } else if (columnIndex == 4 && entry.getFunctionName().length() > 0) {
                     ITmfTimestamp ts = new TmfTimestampDelta(entry.getFunctionExitTime() - entry.getFunctionEntryTime(), ITmfTimestamp.NANOSECOND_SCALE);
@@ -385,7 +384,7 @@ public class CallStackView extends AbstractTimeGraphView {
                         long spacingTime = (long) ((exitTime - entryTime) * SPACING_RATIO);
                         entryTime -= spacingTime;
                         exitTime += spacingTime;
-                        TmfTimeRange range = new TmfTimeRange(new TmfNanoTimestamp(entryTime), new TmfNanoTimestamp(exitTime));
+                        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.fromNanos(entryTime), TmfTimestamp.fromNanos(exitTime));
                         broadcast(new TmfWindowRangeUpdatedSignal(CallStackView.this, range));
                         getTimeGraphViewer().setStartFinishTime(entryTime, exitTime);
                         startZoomThread(entryTime, exitTime);
@@ -408,7 +407,7 @@ public class CallStackView extends AbstractTimeGraphView {
                         long spacingTime = (long) ((endTime - startTime) * SPACING_RATIO);
                         startTime -= spacingTime;
                         endTime += spacingTime;
-                        TmfTimeRange range = new TmfTimeRange(new TmfNanoTimestamp(startTime), new TmfNanoTimestamp(endTime));
+                        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.fromNanos(startTime), TmfTimestamp.fromNanos(endTime));
                         broadcast(new TmfWindowRangeUpdatedSignal(CallStackView.this, range));
                         getTimeGraphViewer().setStartFinishTime(startTime, endTime);
                         startZoomThread(startTime, endTime);

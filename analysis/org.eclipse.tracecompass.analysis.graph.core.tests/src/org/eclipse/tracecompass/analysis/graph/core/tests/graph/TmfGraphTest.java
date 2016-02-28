@@ -284,14 +284,14 @@ public class TmfGraphTest {
             vertices[i] = v;
             fGraph.append(WORKER1, v);
         }
-        assertEquals(vertices[0], fGraph.getVertexAt(new TmfTimestamp(5), WORKER1));
-        assertEquals(vertices[0], fGraph.getVertexAt(new TmfTimestamp(0), WORKER1));
-        assertEquals(vertices[1], fGraph.getVertexAt(new TmfTimestamp(6), WORKER1));
-        assertEquals(vertices[3], fGraph.getVertexAt(new TmfTimestamp(19), WORKER1));
-        assertNull(fGraph.getVertexAt(new TmfTimestamp(19), WORKER2));
-        assertEquals(vertices[3], fGraph.getVertexAt(new TmfTimestamp(20), WORKER1));
-        assertEquals(vertices[4], fGraph.getVertexAt(new TmfTimestamp(21), WORKER1));
-        assertNull(fGraph.getVertexAt(new TmfTimestamp(26), WORKER1));
+        assertEquals(vertices[0], fGraph.getVertexAt(TmfTimestamp.fromSeconds(5), WORKER1));
+        assertEquals(vertices[0], fGraph.getVertexAt(TmfTimestamp.fromSeconds(0), WORKER1));
+        assertEquals(vertices[1], fGraph.getVertexAt(TmfTimestamp.fromSeconds(6), WORKER1));
+        assertEquals(vertices[3], fGraph.getVertexAt(TmfTimestamp.fromSeconds(19), WORKER1));
+        assertNull(fGraph.getVertexAt(TmfTimestamp.fromSeconds(19), WORKER2));
+        assertEquals(vertices[3], fGraph.getVertexAt(TmfTimestamp.fromSeconds(20), WORKER1));
+        assertEquals(vertices[4], fGraph.getVertexAt(TmfTimestamp.fromSeconds(21), WORKER1));
+        assertNull(fGraph.getVertexAt(TmfTimestamp.fromSeconds(26), WORKER1));
     }
 
     /**

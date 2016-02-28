@@ -1181,7 +1181,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         try {
             TmfTimeRange currentRange = TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange();
             long offset = fTrace == null ? 0 : currentRange.getEndTime().getDelta(currentRange.getStartTime()).toNanos();
-            TmfTimestamp initialEndOfWindow = new TmfTimestamp(startTime.getValue() + offset, startTime.getScale());
+            ITmfTimestamp initialEndOfWindow = TmfTimestamp.create(startTime.getValue() + offset, startTime.getScale());
             return new TmfTimeRange(startTime, initialEndOfWindow);
         }
         finally {

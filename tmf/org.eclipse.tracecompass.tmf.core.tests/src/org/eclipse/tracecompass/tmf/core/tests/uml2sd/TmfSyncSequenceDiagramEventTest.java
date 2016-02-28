@@ -23,6 +23,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.uml2sd.TmfSyncSequenceDiagramEvent;
@@ -38,7 +39,7 @@ public class TmfSyncSequenceDiagramEventTest {
     private final @NonNull String fLabel1  = "label2";
     private final String[] fLabels  = new String[] { fLabel0, fLabel1 };
 
-    private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2);
+    private final ITmfTimestamp fTimestamp1 = TmfTimestamp.create(12345, (byte) 2);
     private final TmfEventType fType       = new TmfEventType(fTypeId, TmfEventField.makeRoot(fLabels));
 
     private final ITmfEvent fEvent1;

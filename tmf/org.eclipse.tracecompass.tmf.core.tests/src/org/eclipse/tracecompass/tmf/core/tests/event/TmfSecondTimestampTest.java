@@ -16,30 +16,29 @@ package org.eclipse.tracecompass.tmf.core.tests.event;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfSimpleTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfSecondTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.junit.Test;
 
 /**
- * Test suite for the TmfSimpleTimestampTest class.
+ * Test suite for the {@link TmfSecondTimestamp} class.
  */
 @SuppressWarnings("javadoc")
-public class TmfSimpleTimestampTest {
+public class TmfSecondTimestampTest {
 
     // ------------------------------------------------------------------------
     // Variables
     // ------------------------------------------------------------------------
 
-    private final ITmfTimestamp ts0 = new TmfSimpleTimestamp();
-    private final ITmfTimestamp ts1 = new TmfSimpleTimestamp(12345);
-    private final ITmfTimestamp ts2 = new TmfSimpleTimestamp(-1234);
+    private final ITmfTimestamp ts0 = new TmfSecondTimestamp(0);
+    private final ITmfTimestamp ts1 = new TmfSecondTimestamp(12345);
+    private final ITmfTimestamp ts2 = new TmfSecondTimestamp(-1234);
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -57,77 +56,31 @@ public class TmfSimpleTimestampTest {
         assertEquals("getscale", 0, ts1.getScale());
     }
 
-    @Test
-    public void testCopyConstructor() {
-        final ITmfTimestamp copy = new TmfSimpleTimestamp(ts1);
-
-        assertEquals("getValue", ts1.getValue(), copy.getValue());
-        assertEquals("getscale", ts1.getScale(), copy.getScale());
-
-        assertEquals("getValue", 12345, copy.getValue());
-        assertEquals("getscale", 0, copy.getScale());
-    }
-
-    @Test
-    public void testCopyBadTimestamp() {
-        try {
-            new TmfSimpleTimestamp(null);
-            fail("TmfSimpleTimestamp: null argument");
-        } catch (final NullPointerException e) {
-        }
-    }
-
     // ------------------------------------------------------------------------
     // equals
     // ------------------------------------------------------------------------
 
     @Test
     public void testEqualsReflexivity() {
-        assertTrue("equals", ts0.equals(ts0));
-        assertTrue("equals", ts1.equals(ts1));
-        assertTrue("equals", ts2.equals(ts2));
+        assertEquals("equals", ts0, ts0);
+        assertEquals("equals", ts1, ts1);
+        assertEquals("equals", ts2, ts2);
 
-        assertTrue("equals", !ts0.equals(ts1));
-        assertTrue("equals", !ts0.equals(ts2));
+        assertFalse("different", ts0.equals(ts1));
+        assertFalse("different", ts0.equals(ts2));
 
-        assertTrue("equals", !ts1.equals(ts0));
-        assertTrue("equals", !ts1.equals(ts2));
+        assertFalse("different", ts1.equals(ts0));
+        assertFalse("different", ts1.equals(ts2));
 
-        assertTrue("equals", !ts2.equals(ts0));
-        assertTrue("equals", !ts2.equals(ts1));
-    }
-
-    @Test
-    public void testEqualsSymmetry() {
-        final ITmfTimestamp ts0copy = new TmfSimpleTimestamp(ts0);
-        assertTrue("equals", ts0.equals(ts0copy));
-        assertTrue("equals", ts0copy.equals(ts0));
-
-        final ITmfTimestamp ts1copy = new TmfSimpleTimestamp(ts1);
-        assertTrue("equals", ts1.equals(ts1copy));
-        assertTrue("equals", ts1copy.equals(ts1));
-    }
-
-    @Test
-    public void testEqualsTransivity() {
-        final ITmfTimestamp ts0copy1 = new TmfSimpleTimestamp(ts0);
-        final ITmfTimestamp ts0copy2 = new TmfSimpleTimestamp(ts0copy1);
-        assertTrue("equals", ts0.equals(ts0copy1));
-        assertTrue("equals", ts0copy1.equals(ts0copy2));
-        assertTrue("equals", ts0.equals(ts0copy2));
-
-        final ITmfTimestamp ts1copy1 = new TmfSimpleTimestamp(ts1);
-        final ITmfTimestamp ts1copy2 = new TmfSimpleTimestamp(ts1copy1);
-        assertTrue("equals", ts1.equals(ts1copy1));
-        assertTrue("equals", ts1copy1.equals(ts1copy2));
-        assertTrue("equals", ts1.equals(ts1copy2));
+        assertFalse("different", ts2.equals(ts0));
+        assertFalse("different", ts2.equals(ts1));
     }
 
     @Test
     public void testEqualsNull() {
-        assertTrue("equals", !ts0.equals(null));
-        assertTrue("equals", !ts1.equals(null));
-        assertTrue("equals", !ts2.equals(null));
+        assertTrue("different", !ts0.equals(null));
+        assertTrue("different", !ts1.equals(null));
+        assertTrue("different", !ts2.equals(null));
     }
 
     @Test
@@ -142,9 +95,9 @@ public class TmfSimpleTimestampTest {
     @Test
     public void testToString() {
         DateFormat df = new SimpleDateFormat("HH:mm:ss.SSS");
-        Date d0 = new Date(ts0.getValue()*1000);
-        Date d1 = new Date(ts1.getValue()*1000);
-        Date d2 = new Date(ts2.getValue()*1000);
+        Date d0 = new Date(ts0.getValue() * 1000);
+        Date d1 = new Date(ts1.getValue() * 1000);
+        Date d2 = new Date(ts2.getValue() * 1000);
         assertEquals("toString", df.format(d0) + " 000 000", ts0.toString());
         assertEquals("toString", df.format(d1) + " 000 000", ts1.toString());
         assertEquals("toString", df.format(d2) + " 000 000", ts2.toString());
@@ -156,15 +109,13 @@ public class TmfSimpleTimestampTest {
 
     @Test
     public void testHashCode() {
-        final ITmfTimestamp ts0copy = new TmfTimestamp(ts0);
-        final ITmfTimestamp ts1copy = new TmfTimestamp(ts1);
-        final ITmfTimestamp ts2copy = new TmfTimestamp(ts2);
+        final ITmfTimestamp ts0copy = TmfTimestamp.create(ts0.getValue(), ts0.getScale());
+        final ITmfTimestamp ts1copy = TmfTimestamp.create(ts1.getValue(), ts1.getScale());
+        final ITmfTimestamp ts2copy = TmfTimestamp.create(ts2.getValue(), ts2.getScale());
 
-        assertTrue("hashCode", ts0.hashCode() == ts0copy.hashCode());
-        assertTrue("hashCode", ts1.hashCode() == ts1copy.hashCode());
-        assertTrue("hashCode", ts2.hashCode() == ts2copy.hashCode());
-
-        assertTrue("hashCode", ts0.hashCode() != ts1.hashCode());
+        assertEquals("hashCode", ts0.hashCode(), ts0copy.hashCode());
+        assertEquals("hashCode", ts1.hashCode(), ts1copy.hashCode());
+        assertEquals("hashCode", ts2.hashCode(), ts2copy.hashCode());
     }
 
     // ------------------------------------------------------------------------
@@ -215,9 +166,9 @@ public class TmfSimpleTimestampTest {
 
     @Test
     public void testBasicCompareTo() {
-        final ITmfTimestamp tstamp1 = new TmfSimpleTimestamp(900);
-        final ITmfTimestamp tstamp2 = new TmfSimpleTimestamp(1000);
-        final ITmfTimestamp tstamp3 = new TmfSimpleTimestamp(1100);
+        final ITmfTimestamp tstamp1 = TmfTimestamp.fromSeconds(900);
+        final ITmfTimestamp tstamp2 = TmfTimestamp.fromSeconds(1000);
+        final ITmfTimestamp tstamp3 = TmfTimestamp.fromSeconds(1100);
 
         assertTrue(tstamp1.compareTo(tstamp1) == 0);
 
@@ -233,9 +184,9 @@ public class TmfSimpleTimestampTest {
 
     @Test
     public void testCompareTo() {
-        final ITmfTimestamp ts0a = new TmfTimestamp(0, 2);
-        final ITmfTimestamp ts1a = new TmfTimestamp(123450, -1);
-        final ITmfTimestamp ts2a = new TmfTimestamp(-12340, -1);
+        final ITmfTimestamp ts0a = TmfTimestamp.create(0, 2);
+        final ITmfTimestamp ts1a = TmfTimestamp.create(123450, -1);
+        final ITmfTimestamp ts2a = TmfTimestamp.create(-12340, -1);
 
         assertTrue(ts1.compareTo(ts1) == 0);
 
@@ -251,17 +202,17 @@ public class TmfSimpleTimestampTest {
     @Test
     public void testDelta() {
         // Delta for same scale and precision (delta > 0)
-        TmfTimestamp tstamp0 = new TmfSimpleTimestamp(10);
-        TmfTimestamp tstamp1 = new TmfSimpleTimestamp(5);
-        TmfTimestamp expectd = new TmfSimpleTimestamp(5);
+        ITmfTimestamp tstamp0 = TmfTimestamp.fromSeconds(10);
+        ITmfTimestamp tstamp1 = TmfTimestamp.fromSeconds(5);
+        ITmfTimestamp expectd = TmfTimestamp.fromSeconds(5);
 
         ITmfTimestamp delta = tstamp0.getDelta(tstamp1);
         assertEquals("getDelta", 0, delta.compareTo(expectd));
 
         // Delta for same scale and precision (delta < 0)
-        tstamp0 = new TmfTimestamp(5);
-        tstamp1 = new TmfTimestamp(10);
-        expectd = new TmfTimestamp(-5);
+        tstamp0 = TmfTimestamp.fromSeconds(5);
+        tstamp1 = TmfTimestamp.fromSeconds(10);
+        expectd = TmfTimestamp.fromSeconds(-5);
 
         delta = tstamp0.getDelta(tstamp1);
         assertEquals("getDelta", 0, delta.compareTo(expectd));
@@ -270,9 +221,9 @@ public class TmfSimpleTimestampTest {
     @Test
     public void testDelta2() {
         // Delta for different scale and same precision (delta > 0)
-        final TmfTimestamp tstamp0 = new TmfSimpleTimestamp(10);
-        final TmfTimestamp tstamp1 = new TmfTimestamp(1, 1);
-        final TmfTimestamp expectd = new TmfTimestamp(0, 0);
+        final ITmfTimestamp tstamp0 = TmfTimestamp.fromSeconds(10);
+        final ITmfTimestamp tstamp1 = TmfTimestamp.create(1, 1);
+        final ITmfTimestamp expectd = TmfTimestamp.create(0, 0);
 
         final ITmfTimestamp delta = tstamp0.getDelta(tstamp1);
         assertEquals("getDelta", 0, delta.compareTo(expectd));

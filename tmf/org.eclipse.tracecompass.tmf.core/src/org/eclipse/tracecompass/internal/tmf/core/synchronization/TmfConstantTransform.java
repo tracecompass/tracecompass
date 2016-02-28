@@ -16,7 +16,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 
 /**
  * Constant transform, just offset your timestamp with another.
@@ -56,7 +55,7 @@ public class TmfConstantTransform implements ITmfTimestampTransformInvertible {
      *            The offset of the linear transform
      */
     public TmfConstantTransform(@NonNull ITmfTimestamp offset) {
-        this(new TmfNanoTimestamp(offset).getValue());
+        this(offset.toNanos());
     }
 
     @Override

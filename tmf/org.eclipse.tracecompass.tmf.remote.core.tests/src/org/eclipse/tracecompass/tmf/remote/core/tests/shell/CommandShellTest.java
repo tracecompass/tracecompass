@@ -13,9 +13,9 @@
 package org.eclipse.tracecompass.tmf.remote.core.tests.shell;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-import static org.junit.Assume.assumeTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.Arrays;
 

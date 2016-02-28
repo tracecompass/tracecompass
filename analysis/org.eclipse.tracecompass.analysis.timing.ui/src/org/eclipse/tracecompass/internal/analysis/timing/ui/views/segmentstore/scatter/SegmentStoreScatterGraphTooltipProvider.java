@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.ITmfChartTimeProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfClosestDataPointTooltipProvider;
@@ -57,7 +56,7 @@ public class SegmentStoreScatterGraphTooltipProvider extends TmfClosestDataPoint
             if ((xS != null) && (yS != null) && (dataIndex < xS.length) && (dataIndex < yS.length)) {
                 StringBuffer buffer = new StringBuffer();
                 buffer.append(checkNotNull(Messages.SegmentStoreScatterGraphViewer_xAxis)).append('=');
-                buffer.append(new TmfTimestamp((long) xS[dataIndex] + getChartViewer().getTimeOffset(), ITmfTimestamp.NANOSECOND_SCALE).toString());
+                buffer.append(TmfTimestamp.fromNanos((long) xS[dataIndex] + getChartViewer().getTimeOffset()).toString());
                 buffer.append('\n');
                 buffer.append(Messages.SegmentStoreScatterGraphViewer_yAxis).append('=');
                 buffer.append((long) yS[dataIndex]);

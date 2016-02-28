@@ -152,8 +152,8 @@ public class MinMaxDialog extends Dialog {
             max = Long.parseLong(fMaxText.getText());
             scale = Integer.parseInt(fScaleText.getText());
 
-            fSdWidget.getFrame().setMax(new TmfTimestamp(max, scale));
-            fSdWidget.getFrame().setMin(new TmfTimestamp(min, scale));
+            fSdWidget.getFrame().setMax(TmfTimestamp.create(max, scale));
+            fSdWidget.getFrame().setMin(TmfTimestamp.create(min, scale));
 
             fSdWidget.redraw();
 

@@ -128,7 +128,7 @@ public class TextTraceTest {
         assertEquals("getName",      "", trace.getName());
         assertEquals("getCacheSize", 100, trace.getCacheSize());
 
-        TmfTimestamp initRange = new TmfTimestamp(60, ITmfTimestamp.SECOND_SCALE);
+        ITmfTimestamp initRange = TmfTimestamp.fromSeconds(60);
         assertEquals("getInitialRangeOffset", initRange, trace.getInitialRangeOffset());
     }
 
@@ -177,7 +177,7 @@ public class TextTraceTest {
     public void testTraceIndexing() {
         assertEquals("getNbEvents", 6, fTrace.getNbEvents());
 
-        TmfTimestamp initRange = new TmfTimestamp(60, ITmfTimestamp.SECOND_SCALE);
+        ITmfTimestamp initRange = TmfTimestamp.fromSeconds(60);
         assertEquals("getInitialRangeOffset", initRange, fTrace.getInitialRangeOffset());
     }
 

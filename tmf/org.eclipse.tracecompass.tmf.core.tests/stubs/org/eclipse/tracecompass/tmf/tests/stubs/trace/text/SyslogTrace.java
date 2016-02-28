@@ -105,7 +105,7 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
                 timestamp = createTimestamp(ns);
             }
         } catch (ParseException e) {
-            timestamp = new TmfTimestamp();
+            timestamp = TmfTimestamp.create(0, ITmfTimestamp.SECOND_SCALE);
         }
 
         TextTraceEventContent content = new TextTraceEventContent(5);
@@ -136,7 +136,7 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
 
     @Override
     public ITmfTimestamp getInitialRangeOffset() {
-        return new TmfTimestamp(60, ITmfTimestamp.SECOND_SCALE);
+        return TmfTimestamp.fromSeconds(60);
     }
 
     @Override

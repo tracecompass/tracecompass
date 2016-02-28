@@ -340,7 +340,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfPersistentlyIndexable 
 
     @Override
     public ITmfTimestamp createTimestamp(long ts) {
-        return new TmfTimestamp(getTimestampTransform().transform(ts) / 1000000L, ITmfTimestamp.MILLISECOND_SCALE);
+        return TmfTimestamp.fromMillis(getTimestampTransform().transform(ts) / 1000000L);
     }
 
     @Override
@@ -397,7 +397,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfPersistentlyIndexable 
     @Override
     public synchronized int getCheckpointSize() {
         if (fCheckpointSize == -1) {
-            TmfCheckpoint c = new TmfCheckpoint(new TmfTimestamp(0L), new TmfLongLocation(0L), 0);
+            TmfCheckpoint c = new TmfCheckpoint(TmfTimestamp.fromSeconds(0L), new TmfLongLocation(0L), 0);
             ByteBuffer b = ByteBuffer.allocate(ITmfCheckpoint.MAX_SERIALIZE_SIZE);
             b.clear();
             c.serialize(b);

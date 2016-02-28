@@ -18,7 +18,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
@@ -218,7 +217,7 @@ public class EventContextTest {
 
         public EventContextTestRequest(long timestamp) {
             super(CtfTmfEvent.class,
-                    new TmfTimeRange(new TmfNanoTimestamp(timestamp), TmfTimestamp.BIG_CRUNCH),
+                    new TmfTimeRange(TmfTimestamp.fromNanos(timestamp), TmfTimestamp.BIG_CRUNCH),
                     0, 1, ExecutionType.FOREGROUND);
         }
 

@@ -37,6 +37,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.tests.stubs.request.TmfEventRequestStub;
@@ -55,7 +56,7 @@ public class TmfCoalescedEventRequestTest {
     // ------------------------------------------------------------------------
 
     private final TmfTimeRange range1 = TmfTimeRange.ETERNITY;
-    private final TmfTimeRange range2 = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BIG_CRUNCH);
+    private final TmfTimeRange range2 = new TmfTimeRange(TmfTimestamp.create(0, ITmfTimestamp.SECOND_SCALE), TmfTimestamp.BIG_CRUNCH);
 
     private TmfCoalescedEventRequest fRequest1;
     private TmfCoalescedEventRequest fRequest2;
@@ -438,7 +439,7 @@ public class TmfCoalescedEventRequestTest {
      */
     @TmfSignalHandler
     public void trigger(final TmfTestTriggerSignal2 signal) {
-        TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(100, -3), TmfTimestamp.BIG_CRUNCH);
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.create(100, -3), TmfTimestamp.BIG_CRUNCH);
         requestedEvents1 = new Vector<>();
         request1 = new TmfEventRequest(ITmfEvent.class, range, 0, 1, ExecutionType.FOREGROUND) {
             @Override

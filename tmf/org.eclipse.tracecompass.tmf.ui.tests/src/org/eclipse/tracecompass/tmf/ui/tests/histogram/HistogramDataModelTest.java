@@ -19,7 +19,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -589,13 +588,13 @@ public class HistogramDataModelTest {
         countEventsInModel(nbEvents, model);
 
         final TmfTimeRange timeRange_0 = new TmfTimeRange(
-                new TmfTimestamp(5L, ITmfTimestamp.NANOSECOND_SCALE),
-                new TmfTimestamp(10L, ITmfTimestamp.NANOSECOND_SCALE));
+                TmfTimestamp.fromNanos(5L),
+                TmfTimestamp.fromNanos(10L));
         model.countLostEvent(timeRange_0, nbLostEvents_0, false);
 
         final TmfTimeRange timeRange_1 = new TmfTimeRange(
-                new TmfTimestamp(18L, ITmfTimestamp.NANOSECOND_SCALE),
-                new TmfTimestamp(27L, ITmfTimestamp.NANOSECOND_SCALE));
+                TmfTimestamp.fromNanos(18L),
+                TmfTimestamp.fromNanos(27L));
         model.countLostEvent(timeRange_1, nbLostEvents_1, false);
 
         HistogramScaledData result = model.scaleTo(nbBuckets, maxHeight, 1);
@@ -625,13 +624,13 @@ public class HistogramDataModelTest {
         countEventsInModel(nbEvents, model);
 
         final TmfTimeRange timeRange_0 = new TmfTimeRange(
-                new TmfTimestamp(5L, ITmfTimestamp.NANOSECOND_SCALE),
-                new TmfTimestamp(10L, ITmfTimestamp.NANOSECOND_SCALE));
+                TmfTimestamp.fromNanos(5L),
+                TmfTimestamp.fromNanos(10L));
         model.countLostEvent(timeRange_0, nbLostEvents_0, false);
 
         final TmfTimeRange timeRange_1 = new TmfTimeRange(
-                new TmfTimestamp(11L, ITmfTimestamp.NANOSECOND_SCALE),
-                new TmfTimestamp(18L, ITmfTimestamp.NANOSECOND_SCALE));
+                TmfTimestamp.fromNanos(11L),
+                TmfTimestamp.fromNanos(18L));
         model.countLostEvent(timeRange_1, nbLostEvents_1, false);
 
         HistogramScaledData result = model.scaleTo(nbBuckets, maxHeight, 1);
@@ -660,18 +659,18 @@ public class HistogramDataModelTest {
         countEventsInModel(nbEvents, model);
 
         final TmfTimeRange timeRange_0 = new TmfTimeRange(
-                new TmfTimestamp(18L, ITmfTimestamp.NANOSECOND_SCALE),
-                new TmfTimestamp(22L, ITmfTimestamp.NANOSECOND_SCALE));
+                TmfTimestamp.fromNanos(18L),
+                TmfTimestamp.fromNanos(22L));
         model.countLostEvent(timeRange_0, nbLostEvents_0, false);
 
         final TmfTimeRange timeRange_2 = new TmfTimeRange(
-                new TmfTimestamp(28L, ITmfTimestamp.NANOSECOND_SCALE),
-                new TmfTimestamp(29L, ITmfTimestamp.NANOSECOND_SCALE));
+                TmfTimestamp.fromNanos(28L),
+                TmfTimestamp.fromNanos(29L));
         model.countLostEvent(timeRange_2, nbLostEvents_2, false);
 
         final TmfTimeRange timeRange_1 = new TmfTimeRange(
-                new TmfTimestamp(11L, ITmfTimestamp.NANOSECOND_SCALE),
-                new TmfTimestamp(26L, ITmfTimestamp.NANOSECOND_SCALE));
+                TmfTimestamp.fromNanos(11L),
+                TmfTimestamp.fromNanos(26L));
         model.countLostEvent(timeRange_1, nbLostEvents_1, false);
 
         HistogramScaledData result = model.scaleTo(nbBuckets, maxHeight, 1);
@@ -698,8 +697,8 @@ public class HistogramDataModelTest {
         countEventsInModel(nbEvents, model);
 
         final TmfTimeRange timeRange_0 = new TmfTimeRange(
-                new TmfTimestamp(11L, ITmfTimestamp.NANOSECOND_SCALE),
-                new TmfTimestamp(26L, ITmfTimestamp.NANOSECOND_SCALE));
+                TmfTimestamp.fromNanos(11L),
+                TmfTimestamp.fromNanos(26L));
         model.countLostEvent(timeRange_0, nbLostEvents_0, false);
 
         HistogramScaledData result = model.scaleTo(nbBuckets, maxHeight, 1);
@@ -727,16 +726,16 @@ public class HistogramDataModelTest {
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
 
         final TmfTimeRange timeRange_0 = new TmfTimeRange(
-                new TmfTimestamp(5L, ITmfTimestamp.NANOSECOND_SCALE),
-                new TmfTimestamp(10L, ITmfTimestamp.NANOSECOND_SCALE));
+                TmfTimestamp.fromNanos(5L),
+                TmfTimestamp.fromNanos(10L));
         model.countLostEvent(timeRange_0, nbLostEvents_0, false);
 
         int firstNonLostEventTime = 6;
         countEventsInModel(nbEvents, model, 0, firstNonLostEventTime);
 
         final TmfTimeRange timeRange_1 = new TmfTimeRange(
-                new TmfTimestamp(18L, ITmfTimestamp.NANOSECOND_SCALE),
-                new TmfTimestamp(27L, ITmfTimestamp.NANOSECOND_SCALE));
+                TmfTimestamp.fromNanos(18L),
+                TmfTimestamp.fromNanos(27L));
         model.countLostEvent(timeRange_1, nbLostEvents_1, false);
 
         HistogramScaledData result = model.scaleTo(nbBuckets, maxHeight, 1);

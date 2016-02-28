@@ -379,7 +379,7 @@ public class TmfTraceTest {
         assertEquals("getStartTime",   1,         trace.getStartTime().getValue());
         assertEquals("getEndTime",     NB_EVENTS, trace.getEndTime().getValue());
 
-        trace.setTimeRange(new TmfTimeRange(new TmfTimestamp(100), new TmfTimestamp(200)));
+        trace.setTimeRange(new TmfTimeRange(TmfTimestamp.fromSeconds(100), TmfTimestamp.fromSeconds(200)));
         assertEquals("setTimeRange",   100, trace.getTimeRange().getStartTime().getValue());
         assertEquals("setTimeRange",   200, trace.getTimeRange().getEndTime().getValue());
         assertEquals("setTimeRange",   100, trace.getStartTime().getValue());
@@ -398,7 +398,7 @@ public class TmfTraceTest {
         assertEquals("getStartTime",   1,         trace.getStartTime().getValue());
         assertEquals("getEndTime",     NB_EVENTS, trace.getEndTime().getValue());
 
-        trace.setStartTime(new TmfTimestamp(100));
+        trace.setStartTime(TmfTimestamp.fromSeconds(100));
         assertEquals("setStartTime",   100,       trace.getTimeRange().getStartTime().getValue());
         assertEquals("setStartTime",   NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
         assertEquals("setStartTime",   100,       trace.getStartTime().getValue());
@@ -417,7 +417,7 @@ public class TmfTraceTest {
         assertEquals("getStartTime",   1,         trace.getStartTime().getValue());
         assertEquals("getEndTime",     NB_EVENTS, trace.getEndTime().getValue());
 
-        trace.setEndTime(new TmfTimestamp(100));
+        trace.setEndTime(TmfTimestamp.fromSeconds(100));
         assertEquals("setEndTime",     1,   trace.getTimeRange().getStartTime().getValue());
         assertEquals("setEndTime",     100, trace.getTimeRange().getEndTime().getValue());
         assertEquals("setEndTime",     1,   trace.getStartTime().getValue());
@@ -508,7 +508,7 @@ public class TmfTraceTest {
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
         // Position trace at event rank 1000
-        ITmfContext tmpContext = fTrace.seekEvent(new TmfTimestamp(1001, SCALE));
+        ITmfContext tmpContext = fTrace.seekEvent(TmfTimestamp.create(1001, SCALE));
         context = fTrace.seekEvent(tmpContext.getLocation());
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
@@ -521,7 +521,7 @@ public class TmfTraceTest {
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
         // Position trace at event rank 4000
-        tmpContext = fTrace.seekEvent(new TmfTimestamp(4001, SCALE));
+        tmpContext = fTrace.seekEvent(TmfTimestamp.create(4001, SCALE));
         context = fTrace.seekEvent(tmpContext.getLocation());
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
@@ -537,7 +537,7 @@ public class TmfTraceTest {
     @Test
     public void testSeekEventNotOnCacheBoundary() {
         // Position trace at event rank 9
-        ITmfContext tmpContext = fTrace.seekEvent(new TmfTimestamp(10, SCALE));
+        ITmfContext tmpContext = fTrace.seekEvent(TmfTimestamp.create(10, SCALE));
         TmfContext context = fTrace.seekEvent(tmpContext.getLocation());
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
@@ -550,7 +550,7 @@ public class TmfTraceTest {
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
         // Position trace at event rank 999
-        tmpContext = fTrace.seekEvent(new TmfTimestamp(1000, SCALE));
+        tmpContext = fTrace.seekEvent(TmfTimestamp.create(1000, SCALE));
         context = fTrace.seekEvent(tmpContext.getLocation());
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
@@ -563,7 +563,7 @@ public class TmfTraceTest {
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
         // Position trace at event rank 1001
-        tmpContext = fTrace.seekEvent(new TmfTimestamp(1002, SCALE));
+        tmpContext = fTrace.seekEvent(TmfTimestamp.create(1002, SCALE));
         context = fTrace.seekEvent(tmpContext.getLocation());
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
@@ -576,7 +576,7 @@ public class TmfTraceTest {
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
         // Position trace at event rank 4500
-        tmpContext = fTrace.seekEvent(new TmfTimestamp(4501, SCALE));
+        tmpContext = fTrace.seekEvent(TmfTimestamp.create(4501, SCALE));
         context = fTrace.seekEvent(tmpContext.getLocation());
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
@@ -605,7 +605,7 @@ public class TmfTraceTest {
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
         // Position trace at event passed the end
-        context = fTrace.seekEvent(new TmfTimestamp(NB_EVENTS + 1, SCALE));
+        context = fTrace.seekEvent(TmfTimestamp.create(NB_EVENTS + 1, SCALE));
         assertNull("Event timestamp", context.getLocation());
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
@@ -631,7 +631,7 @@ public class TmfTraceTest {
     @Test
     public void testSeekEventOnTimestampOnCacheBoundary() {
         // Position trace at event rank 0
-        ITmfContext context = fTrace.seekEvent(new TmfTimestamp(1, SCALE));
+        ITmfContext context = fTrace.seekEvent(TmfTimestamp.create(1, SCALE));
         assertEquals("Event rank", 0, context.getRank());
 
         ITmfEvent event = fTrace.parseEvent(context);
@@ -643,7 +643,7 @@ public class TmfTraceTest {
         assertEquals("Event rank", 1, context.getRank());
 
         // Position trace at event rank 1000
-        context = fTrace.seekEvent(new TmfTimestamp(1001, SCALE));
+        context = fTrace.seekEvent(TmfTimestamp.create(1001, SCALE));
         assertEquals("Event rank", 1000, context.getRank());
 
         event = fTrace.parseEvent(context);
@@ -655,7 +655,7 @@ public class TmfTraceTest {
         assertEquals("Event rank", 1001, context.getRank());
 
         // Position trace at event rank 4000
-        context = fTrace.seekEvent(new TmfTimestamp(4001, SCALE));
+        context = fTrace.seekEvent(TmfTimestamp.create(4001, SCALE));
         assertEquals("Event rank", 4000, context.getRank());
 
         event = fTrace.parseEvent(context);
@@ -670,7 +670,7 @@ public class TmfTraceTest {
     @Test
     public void testSeekEventOnTimestampNotOnCacheBoundary() {
         // Position trace at event rank 1
-        ITmfContext context = fTrace.seekEvent(new TmfTimestamp(2, SCALE));
+        ITmfContext context = fTrace.seekEvent(TmfTimestamp.create(2, SCALE));
         assertEquals("Event rank", 1, context.getRank());
 
         ITmfEvent event = fTrace.parseEvent(context);
@@ -682,7 +682,7 @@ public class TmfTraceTest {
         assertEquals("Event rank", 2, context.getRank());
 
         // Position trace at event rank 9
-        context = fTrace.seekEvent(new TmfTimestamp(10, SCALE));
+        context = fTrace.seekEvent(TmfTimestamp.create(10, SCALE));
         assertEquals("Event rank", 9, context.getRank());
 
         event = fTrace.parseEvent(context);
@@ -694,7 +694,7 @@ public class TmfTraceTest {
         assertEquals("Event rank", 10, context.getRank());
 
         // Position trace at event rank 999
-        context = fTrace.seekEvent(new TmfTimestamp(1000, SCALE));
+        context = fTrace.seekEvent(TmfTimestamp.create(1000, SCALE));
         assertEquals("Event rank", 999, context.getRank());
 
         event = fTrace.parseEvent(context);
@@ -706,7 +706,7 @@ public class TmfTraceTest {
         assertEquals("Event rank", 1000, context.getRank());
 
         // Position trace at event rank 1001
-        context = fTrace.seekEvent(new TmfTimestamp(1002, SCALE));
+        context = fTrace.seekEvent(TmfTimestamp.create(1002, SCALE));
         assertEquals("Event rank", 1001, context.getRank());
 
         event = fTrace.parseEvent(context);
@@ -718,7 +718,7 @@ public class TmfTraceTest {
         assertEquals("Event rank", 1002, context.getRank());
 
         // Position trace at event rank 4500
-        context = fTrace.seekEvent(new TmfTimestamp(4501, SCALE));
+        context = fTrace.seekEvent(TmfTimestamp.create(4501, SCALE));
         assertEquals("Event rank", 4500, context.getRank());
 
         event = fTrace.parseEvent(context);
@@ -733,7 +733,7 @@ public class TmfTraceTest {
     @Test
     public void testSeekEventOnTimestampOutOfScope() {
         // Position trace at beginning
-        ITmfContext context = fTrace.seekEvent(new TmfTimestamp(-1, SCALE));
+        ITmfContext context = fTrace.seekEvent(TmfTimestamp.create(-1, SCALE));
         assertEquals("Event rank", 0, context.getRank());
 
         ITmfEvent event = fTrace.parseEvent(context);
@@ -745,7 +745,7 @@ public class TmfTraceTest {
         assertEquals("Event rank", 1, context.getRank());
 
         // Position trace at event passed the end
-        context = fTrace.seekEvent(new TmfTimestamp(NB_EVENTS + 1, SCALE));
+        context = fTrace.seekEvent(TmfTimestamp.create(NB_EVENTS + 1, SCALE));
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
 
         event = fTrace.parseEvent(context);
@@ -898,7 +898,7 @@ public class TmfTraceTest {
         final int NB_READS = 20;
 
         // On lower bound, returns the first event (ts = 0)
-        final TmfContext context = (TmfContext) fTrace.seekEvent(new TmfTimestamp(0, SCALE));
+        final TmfContext context = (TmfContext) fTrace.seekEvent(TmfTimestamp.create(0, SCALE));
         TmfContext svContext = new TmfContext(context);
 
         ITmfEvent event = fTrace.parseEvent(context);
@@ -944,7 +944,7 @@ public class TmfTraceTest {
         final int NB_READS = 20;
 
         // On lower bound, returns the first event (ts = 1)
-        final ITmfContext context = fTrace.seekEvent(new TmfTimestamp(INITIAL_TS, SCALE));
+        final ITmfContext context = fTrace.seekEvent(TmfTimestamp.create(INITIAL_TS, SCALE));
 
         // Read NB_EVENTS
         ITmfEvent event;
@@ -966,7 +966,7 @@ public class TmfTraceTest {
         final int NB_READS = 20;
 
         // On lower bound, returns the first event (ts = 500)
-        final ITmfContext context = fTrace.seekEvent(new TmfTimestamp(INITIAL_TS, SCALE));
+        final ITmfContext context = fTrace.seekEvent(TmfTimestamp.create(INITIAL_TS, SCALE));
 
         // Read NB_EVENTS
         ITmfEvent event;
@@ -988,7 +988,7 @@ public class TmfTraceTest {
         final int NB_READS = 20;
 
         // On lower bound, returns the first event (ts = 500)
-        final ITmfContext context = fTrace.seekEvent(new TmfTimestamp(INITIAL_TS, SCALE));
+        final ITmfContext context = fTrace.seekEvent(TmfTimestamp.create(INITIAL_TS, SCALE));
 
         // Read NB_EVENTS
         ITmfEvent event;
@@ -1223,7 +1223,7 @@ public class TmfTraceTest {
         final int nbEvents  = 1000;
         final Vector<ITmfEvent> requestedEvents = new Vector<>();
 
-        final TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(startTime, SCALE), TmfTimestamp.BIG_CRUNCH);
+        final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.create(startTime, SCALE), TmfTimestamp.BIG_CRUNCH);
         final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class,
                 range, 0, nbEvents, ExecutionType.FOREGROUND) {
             @Override
@@ -1254,7 +1254,7 @@ public class TmfTraceTest {
         final int nbEvents  = 1000;
         final Vector<ITmfEvent> requestedEvents = new Vector<>();
 
-        final TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(startTime, SCALE), TmfTimestamp.BIG_CRUNCH);
+        final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.create(startTime, SCALE), TmfTimestamp.BIG_CRUNCH);
         final TmfEventRequest request = new TmfEventRequest(ITmfEvent.class,
                 range, startIndex, nbEvents, ExecutionType.FOREGROUND) {
             @Override
@@ -1381,12 +1381,12 @@ public class TmfTraceTest {
             testfile = new File(FileLocator.toFileURL(location).toURI());
             trace = new TmfTraceStub(testfile.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
             // verify initial values
-            TmfTimestamp defaultInitRange = new TmfTimestamp(DEFAULT_INITIAL_OFFSET_VALUE, ITmfTimestamp.NANOSECOND_SCALE);
+            ITmfTimestamp defaultInitRange = TmfTimestamp.fromNanos(DEFAULT_INITIAL_OFFSET_VALUE);
             assertEquals("getInitialRangeOffset", defaultInitRange, trace.getInitialRangeOffset());
-            trace.setInitialRangeOffset(new TmfTimestamp(5, ITmfTimestamp.MILLISECOND_SCALE));
+            trace.setInitialRangeOffset(TmfTimestamp.fromMillis(5));
             trace.indexTrace(true);
 
-            TmfTimestamp initRange = new TmfTimestamp(5, ITmfTimestamp.MILLISECOND_SCALE);
+            ITmfTimestamp initRange = TmfTimestamp.fromMillis(5);
             assertEquals("getInitialRangeOffset", initRange, trace.getInitialRangeOffset());
 
             trace.dispose();

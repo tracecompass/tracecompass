@@ -113,7 +113,7 @@ class BTreeNode {
             for (int i = 0; i < fNumEntries; ++i) {
 
                 ITmfLocation location = fTree.getTrace().restoreLocation(bb);
-                ITmfTimestamp timeStamp = new TmfTimestamp(bb);
+                ITmfTimestamp timeStamp = TmfTimestamp.create(bb);
                 TmfCheckpoint c = new TmfCheckpoint(timeStamp, location, bb);
                 fEntries[i] = c;
             }

@@ -37,7 +37,7 @@ public class TmfCheckpointTest {
     // Variables
     // ------------------------------------------------------------------------
 
-    private ITmfTimestamp fTimestamp1 = new TmfTimestamp();
+    private ITmfTimestamp fTimestamp1 = TmfTimestamp.fromSeconds(0);
     private ITmfTimestamp fTimestamp2 = TmfTimestamp.BIG_BANG;
     private ITmfTimestamp fTimestamp3 = TmfTimestamp.BIG_CRUNCH;
 
@@ -209,7 +209,7 @@ public class TmfCheckpointTest {
         assertFalse("equals", checkpoint1.equals(null));
 
         // Different types
-        assertFalse("equals", checkpoint1.equals(new TmfTimestamp()));
+        assertFalse("equals", checkpoint1.equals(TmfTimestamp.fromSeconds(0)));
 
         // Null locations/location
         assertFalse("equals", checkpoint1.equals(checkpoint4));

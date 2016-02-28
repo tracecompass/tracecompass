@@ -197,8 +197,7 @@ public class TmfCheckpoint implements ITmfCheckpoint {
         fLocation.serialize(bufferOut);
         // Always serialize as base TmfTimestamp, this should be sufficient for indexing.
         // If not, we can add API for the test to restore the time stamp, similarly to the location.
-        TmfTimestamp t = new TmfTimestamp(fTimestamp);
-        t.serialize(bufferOut);
+        TmfTimestamp.serialize(bufferOut, fTimestamp);
         bufferOut.putLong(fCheckpointRank);
     }
 

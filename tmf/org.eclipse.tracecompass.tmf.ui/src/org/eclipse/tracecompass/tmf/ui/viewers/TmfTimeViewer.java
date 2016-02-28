@@ -214,8 +214,8 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
         if (fTrace != null) {
             setSelectionRange(currentBeginTime, currentEndTime);
 
-            final ITmfTimestamp startTimestamp = new TmfTimestamp(getSelectionBeginTime(), ITmfTimestamp.NANOSECOND_SCALE);
-            final ITmfTimestamp endTimestamp = new TmfTimestamp(getSelectionEndTime(), ITmfTimestamp.NANOSECOND_SCALE);
+            final ITmfTimestamp startTimestamp = TmfTimestamp.fromNanos(getSelectionBeginTime());
+            final ITmfTimestamp endTimestamp = TmfTimestamp.fromNanos(getSelectionEndTime());
 
             TmfSelectionRangeUpdatedSignal signal = new TmfSelectionRangeUpdatedSignal(this, startTimestamp, endTimestamp);
             broadcast(signal);
@@ -229,8 +229,8 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
 
         // Build the new time range; keep the current time
         TmfTimeRange timeRange = new TmfTimeRange(
-                new TmfTimestamp(getWindowStartTime(), ITmfTimestamp.NANOSECOND_SCALE),
-                new TmfTimestamp(getWindowEndTime(), ITmfTimestamp.NANOSECOND_SCALE));
+                TmfTimestamp.fromNanos(getWindowStartTime()),
+                TmfTimestamp.fromNanos(getWindowEndTime()));
 
         // Send the signal
         TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, timeRange);

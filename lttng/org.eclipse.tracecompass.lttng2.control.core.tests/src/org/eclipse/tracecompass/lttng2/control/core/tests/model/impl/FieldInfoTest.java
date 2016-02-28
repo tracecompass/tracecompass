@@ -13,7 +13,11 @@
 
 package org.eclipse.tracecompass.lttng2.control.core.tests.model.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IFieldInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.FieldInfo;

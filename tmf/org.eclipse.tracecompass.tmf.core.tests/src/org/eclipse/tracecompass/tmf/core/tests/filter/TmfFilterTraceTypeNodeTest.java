@@ -40,7 +40,7 @@ import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlEventType;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlInputElement;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -79,9 +79,9 @@ public class TmfFilterTraceTypeNodeTest extends TmfFilterTreeNodeTestBase {
     private static TmfEventType fCustomTxtEventType = new CustomTxtEventType(fCustomTxtDefinition);
     private static TmfEventType fCustomXmlEventType = new CustomXmlEventType(fCustomXmlDefinition);
     private ITmfEventField fContent = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, null, null);
-    private TmfEvent fEvent1 = new TmfEvent(TRACE, 0, new TmfNanoTimestamp(1), EVENT_TYPE, fContent);
-    private TmfEvent fEvent2 = new CustomTxtEvent(fCustomTxtDefinition, fCustomTxtTrace, new TmfNanoTimestamp(2), fCustomTxtEventType);
-    private TmfEvent fEvent3 = new CustomXmlEvent(fCustomXmlDefinition, fCustomXmlTrace, new TmfNanoTimestamp(3), fCustomXmlEventType);
+    private TmfEvent fEvent1 = new TmfEvent(TRACE, 0, TmfTimestamp.fromNanos(1), EVENT_TYPE, fContent);
+    private TmfEvent fEvent2 = new CustomTxtEvent(fCustomTxtDefinition, fCustomTxtTrace, TmfTimestamp.fromNanos(2), fCustomTxtEventType);
+    private TmfEvent fEvent3 = new CustomXmlEvent(fCustomXmlDefinition, fCustomXmlTrace, TmfTimestamp.fromNanos(3), fCustomXmlEventType);
     private TmfFilterTraceTypeNode fFilter;
 
     @AfterClass

@@ -24,8 +24,8 @@ import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
@@ -131,8 +131,8 @@ public class CtfTmfLostEventsTest {
     public void testFirstLostEvent() {
         final long rank = 190;
         final long startTime = 1376592664828900165L;
-        final ITmfTimestamp start = new TmfNanoTimestamp(startTime);
-        final ITmfTimestamp end = new TmfNanoTimestamp(startTime + 502911L);
+        final ITmfTimestamp start = TmfTimestamp.fromNanos(startTime);
+        final ITmfTimestamp end = TmfTimestamp.fromNanos(startTime + 502911L);
         final long nbLost = 859;
 
         validateLostEvent(rank, start, end, nbLost);
@@ -145,8 +145,8 @@ public class CtfTmfLostEventsTest {
     public void testSecondLostEvent() {
         final long rank = 229;
         final long startTime = 1376592664829477058L;
-        final ITmfTimestamp start = new TmfNanoTimestamp(startTime);
-        final ITmfTimestamp end = new TmfNanoTimestamp(startTime + 347456L);
+        final ITmfTimestamp start = TmfTimestamp.fromNanos(startTime);
+        final ITmfTimestamp end = TmfTimestamp.fromNanos(startTime + 347456L);
         final long nbLost = 488;
 
         validateLostEvent(rank, start, end, nbLost);
@@ -174,7 +174,7 @@ public class CtfTmfLostEventsTest {
     @Test
     public void testNormalEvent() {
         final long rank = 200;
-        final ITmfTimestamp ts = new TmfNanoTimestamp(1376592664829425780L);
+        final ITmfTimestamp ts = TmfTimestamp.fromNanos(1376592664829425780L);
 
         final CtfTmfEvent event = getOneEventTime(ts);
         /* Make sure seeking by rank yields the same event */
@@ -196,8 +196,8 @@ public class CtfTmfLostEventsTest {
         trace.indexTrace(true);
 
         final long rank = 190;
-        final ITmfTimestamp start = new TmfNanoTimestamp(1376592664828900165L + offset);
-        final ITmfTimestamp end = new TmfNanoTimestamp(1376592664828900165L + 502911L + offset);
+        final ITmfTimestamp start = TmfTimestamp.fromNanos(1376592664828900165L + offset);
+        final ITmfTimestamp end = TmfTimestamp.fromNanos(1376592664828900165L + 502911L + offset);
         final long nbLost = 859;
 
         ITmfContext context = trace.seekEvent(rank);

@@ -30,7 +30,7 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.collapse.ITmfCollapsibleEvent;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.junit.After;
@@ -159,7 +159,7 @@ public class TmfCollapseFilterTest {
 
         @Override
         public ITmfTimestamp getTimestamp() {
-            return new TmfNanoTimestamp(100);
+            return TmfTimestamp.fromNanos(100);
         }
 
         @Override

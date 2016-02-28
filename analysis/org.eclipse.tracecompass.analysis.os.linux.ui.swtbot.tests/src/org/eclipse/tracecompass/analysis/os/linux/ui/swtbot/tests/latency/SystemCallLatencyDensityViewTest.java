@@ -13,7 +13,10 @@
 package org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests.latency;
 
 import static org.eclipse.swtbot.swt.finder.SWTBotAssert.assertVisible;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.lang.reflect.Field;

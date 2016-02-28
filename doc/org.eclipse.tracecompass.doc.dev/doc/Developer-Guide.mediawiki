@@ -2220,13 +2220,13 @@ To add time information in sequence diagram the timestamp has to be set for each
 <pre>
     private void createFrame() {
         //...
-        start.setTime(new TmfTimestamp(1000, -3));
-        syn1.setTime(new TmfTimestamp(1005, -3));
-        synReturn1.setTime(new TmfTimestamp(1050, -3));
-        asyn1.setStartTime(new TmfTimestamp(1060, -3));
-        asyn1.setEndTime(new TmfTimestamp(1070, -3));
-        asynReturn1.setStartTime(new TmfTimestamp(1060, -3));
-        asynReturn1.setEndTime(new TmfTimestamp(1070, -3));
+        start.setTime(TmfTimestamp.create(1000, -3));
+        syn1.setTime(TmfTimestamp.create(1005, -3));
+        synReturn1.setTime(TmfTimestamp.create(1050, -3));
+        asyn1.setStartTime(TmfTimestamp.create(1060, -3));
+        asyn1.setEndTime(TmfTimestamp.create(1070, -3));
+        asynReturn1.setStartTime(TmfTimestamp.create(1060, -3));
+        asynReturn1.setEndTime(TmfTimestamp.create(1070, -3));
         //...
     }
 </pre>

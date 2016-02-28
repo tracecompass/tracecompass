@@ -43,7 +43,7 @@ public class TmfMemoryIndexTest extends AbstractCheckpointCollectionTest {
     @Override
     @Test
     public void testInsert() {
-        TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(12345), new TmfLongLocation(123456L), 0);
+        TmfCheckpoint checkpoint = new TmfCheckpoint(TmfTimestamp.fromSeconds(12345), new TmfLongLocation(123456L), 0);
         fMemoryIndex.insert(checkpoint);
 
         ITmfCheckpoint indexCheckpoint = fMemoryIndex.get(0);
@@ -59,11 +59,11 @@ public class TmfMemoryIndexTest extends AbstractCheckpointCollectionTest {
     @Test
     public void testBinarySearch() {
         for (long i = 0; i < CHECKPOINTS_INSERT_NUM; i++) {
-            TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(i), new TmfLongLocation(i), 0);
+            TmfCheckpoint checkpoint = new TmfCheckpoint(TmfTimestamp.fromSeconds(i), new TmfLongLocation(i), 0);
             fMemoryIndex.insert(checkpoint);
         }
 
-        TmfCheckpoint expectedCheckpoint = new TmfCheckpoint(new TmfTimestamp(122), new TmfLongLocation(122L), 0);
+        TmfCheckpoint expectedCheckpoint = new TmfCheckpoint(TmfTimestamp.fromSeconds(122), new TmfLongLocation(122L), 0);
         int expectedRank = 122;
 
         long rank = fMemoryIndex.binarySearch(expectedCheckpoint);

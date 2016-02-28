@@ -26,7 +26,6 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
@@ -220,12 +219,12 @@ public class CustomEvent extends TmfEvent {
     private void processData() {
         String timestampString = fData.get(CustomTraceDefinition.TAG_TIMESTAMP);
         String timestampInputFormat = fData.get(TIMESTAMP_INPUT_FORMAT_KEY);
-        TmfTimestamp timestamp = null;
+        ITmfTimestamp timestamp = null;
         if (timestampInputFormat != null && timestampString != null) {
             TmfTimestampFormat timestampFormat = new TmfTimestampFormat(timestampInputFormat);
             try {
                 long time = timestampFormat.parseValue(timestampString);
-                timestamp = new TmfNanoTimestamp(getTrace().getTimestampTransform().transform(time));
+                timestamp = TmfTimestamp.fromNanos(getTrace().getTimestampTransform().transform(time));
                 setTimestamp(timestamp);
             } catch (ParseException e) {
                 setTimestamp(TmfTimestamp.ZERO);

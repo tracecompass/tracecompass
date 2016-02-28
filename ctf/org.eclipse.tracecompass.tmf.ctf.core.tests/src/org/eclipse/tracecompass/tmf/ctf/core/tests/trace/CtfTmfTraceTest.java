@@ -33,7 +33,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
@@ -161,7 +160,7 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testSeekEventLoc_timetamp() {
-        CtfLocation loc = new CtfLocation(new TmfNanoTimestamp(0L));
+        CtfLocation loc = new CtfLocation(TmfTimestamp.fromNanos(0L));
         fixture.seekEvent(loc);
         assertNotNull(fixture);
     }
@@ -361,7 +360,7 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testSeekEvent_timestamp() {
-        ITmfTimestamp timestamp = new TmfTimestamp();
+        ITmfTimestamp timestamp = TmfTimestamp.create(0, ITmfTimestamp.SECOND_SCALE);
         ITmfContext result = fixture.seekEvent(timestamp);
         assertNotNull(result);
         result.dispose();

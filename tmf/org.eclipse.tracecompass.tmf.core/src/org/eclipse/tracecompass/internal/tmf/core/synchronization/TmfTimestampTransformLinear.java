@@ -88,7 +88,7 @@ public class TmfTimestampTransformLinear implements ITmfTimestampTransformInvert
     @Override
     public ITmfTimestamp transform(ITmfTimestamp timestamp) {
         BigDecimal newvalue = BigDecimal.valueOf(timestamp.getValue()).multiply(fAlpha, fMc).add(fBeta);
-        return new TmfTimestamp(timestamp, newvalue.longValue());
+        return TmfTimestamp.create(newvalue.longValue(), timestamp.getScale());
     }
 
     @Override

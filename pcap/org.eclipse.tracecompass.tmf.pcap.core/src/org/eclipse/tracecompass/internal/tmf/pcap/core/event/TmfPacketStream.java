@@ -133,7 +133,7 @@ public class TmfPacketStream {
      * @return The start time.
      */
     public synchronized ITmfTimestamp getStartTime() {
-        return new TmfTimestamp(fPacketStream.getStartTime(), ITmfTimestamp.NANOSECOND_SCALE);
+        return TmfTimestamp.fromNanos(fPacketStream.getStartTime());
     }
 
     /**
@@ -142,7 +142,7 @@ public class TmfPacketStream {
      * @return The stop time.
      */
     public synchronized ITmfTimestamp getStopTime() {
-        return new TmfTimestamp(fPacketStream.getStopTime(), ITmfTimestamp.NANOSECOND_SCALE);
+        return TmfTimestamp.fromNanos(fPacketStream.getStopTime());
     }
 
     /**

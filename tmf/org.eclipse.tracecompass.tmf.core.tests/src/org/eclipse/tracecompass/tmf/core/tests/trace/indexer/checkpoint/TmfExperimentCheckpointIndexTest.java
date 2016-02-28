@@ -162,7 +162,7 @@ public class TmfExperimentCheckpointIndexTest {
         int pageSize = experiment.getCacheSize();
 
         // Build the first half of the index
-        TmfTimeRange range = new TmfTimeRange(new TmfTimestamp(1, -3), new TmfTimestamp(NB_EVENTS / 2 - 1, -3));
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.create(1, -3), TmfTimestamp.create(NB_EVENTS / 2 - 1, -3));
         experiment.getIndexer().buildIndex(0, range, true);
 
         // Validate that each checkpoint points to the right event

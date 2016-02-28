@@ -82,7 +82,7 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
             b.clear();
             fFileChannel.read(b);
             b.flip();
-            fTimeRange = new TmfTimeRange(new TmfTimestamp(b), new TmfTimestamp(b));
+            fTimeRange = new TmfTimeRange(TmfTimestamp.create(b), TmfTimestamp.create(b));
         }
 
         /**
@@ -112,8 +112,8 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
 
             ByteBuffer b = ByteBuffer.allocate(MAX_TIME_RANGE_SERIALIZE_SIZE);
             b.clear();
-            new TmfTimestamp(fTimeRange.getStartTime()).serialize(b);
-            new TmfTimestamp(fTimeRange.getEndTime()).serialize(b);
+            TmfTimestamp.serialize(b, fTimeRange.getStartTime());
+            TmfTimestamp.serialize(b, fTimeRange.getEndTime());
             b.rewind();
             fFileChannel.write(b);
         }

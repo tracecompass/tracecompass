@@ -78,7 +78,7 @@ public class HistogramTimeRangeControl extends HistogramTextControl {
     @Override
     public void setValue(long time) {
         if (time != Long.MIN_VALUE) {
-            ITmfTimestamp ts = new TmfTimestamp(time, ITmfTimestamp.NANOSECOND_SCALE);
+            ITmfTimestamp ts = TmfTimestamp.fromNanos(time);
             super.setValue(time, ts.toString(TmfTimestampFormat.getDefaulIntervalFormat()));
         } else {
             super.setValue(time, ""); //$NON-NLS-1$

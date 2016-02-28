@@ -32,6 +32,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.junit.Test;
@@ -54,8 +55,8 @@ public class TmfTreeContentProviderTest {
     private final String fLabel1 = "label2";
     private final String[] fLabels = new String[] { fLabel0, fLabel1 };
 
-    private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2);
-    private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, (byte) 2);
+    private final ITmfTimestamp fTimestamp1 = TmfTimestamp.create(12345, (byte) 2);
+    private final ITmfTimestamp fTimestamp2 = TmfTimestamp.create(12350, (byte) 2);
 
     private final TmfEventType fType1 = new TmfEventType(fTypeId1, TmfEventField.makeRoot(fLabels));
     private final TmfEventType fType2 = new TmfEventType(fTypeId2, TmfEventField.makeRoot(fLabels));

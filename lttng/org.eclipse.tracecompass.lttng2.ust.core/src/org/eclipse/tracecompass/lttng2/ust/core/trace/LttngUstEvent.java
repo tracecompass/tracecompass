@@ -16,7 +16,7 @@ import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoSourceAspect;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
@@ -56,7 +56,7 @@ public class LttngUstEvent extends CtfTmfEvent implements ITmfSourceLookup {
      * @param eventDefinition
      *            The event definition
      */
-    protected LttngUstEvent(CtfTmfTrace trace, long rank, TmfNanoTimestamp timestamp,
+    protected LttngUstEvent(CtfTmfTrace trace, long rank, ITmfTimestamp timestamp,
             String channel, int cpu, IEventDeclaration declaration, IEventDefinition eventDefinition) {
         super(trace, rank, timestamp, channel, cpu, declaration, eventDefinition);
     }

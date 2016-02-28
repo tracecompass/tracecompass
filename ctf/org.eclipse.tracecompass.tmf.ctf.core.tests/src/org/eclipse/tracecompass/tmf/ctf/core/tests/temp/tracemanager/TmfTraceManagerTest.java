@@ -61,8 +61,6 @@ public class TmfTraceManagerTest {
     @Rule
     public TestRule globalTimeout = new Timeout(1, TimeUnit.MINUTES);
 
-    private static final int SCALE = ITmfTimestamp.NANOSECOND_SCALE;
-
     private static ITmfTrace trace1;
     private static final long t1start = 1331668247314038062L;
     private static final long t1end = 1331668259054285979L;
@@ -275,7 +273,7 @@ public class TmfTraceManagerTest {
     @Test
     public void testNewTimestamp() {
         openTrace(trace2);
-        ITmfTimestamp ts = new TmfTimestamp(t2start + ONE_SECOND, SCALE);
+        ITmfTimestamp ts = TmfTimestamp.fromNanos(t2start + ONE_SECOND);
         selectTimestamp(ts);
 
         TmfTimeRange selection = tm.getCurrentTraceContext().getSelectionRange();
@@ -291,7 +289,7 @@ public class TmfTraceManagerTest {
     public void testTimestampBefore() {
         openTrace(trace2);
         TmfTimeRange beforeTr = tm.getCurrentTraceContext().getSelectionRange();
-        ITmfTimestamp ts = new TmfTimestamp(t2start - ONE_SECOND, SCALE);
+        ITmfTimestamp ts = TmfTimestamp.fromNanos(t2start - ONE_SECOND);
         selectTimestamp(ts);
 
         TmfTimeRange selection = tm.getCurrentTraceContext().getSelectionRange();
@@ -306,7 +304,7 @@ public class TmfTraceManagerTest {
     public void testTimestampAfter() {
         openTrace(trace2);
         TmfTimeRange beforeTr = tm.getCurrentTraceContext().getSelectionRange();
-        ITmfTimestamp ts = new TmfTimestamp(t2end + ONE_SECOND, SCALE);
+        ITmfTimestamp ts = TmfTimestamp.fromNanos(t2end + ONE_SECOND);
         selectTimestamp(ts);
 
         TmfTimeRange selection = tm.getCurrentTraceContext().getSelectionRange();
@@ -320,8 +318,8 @@ public class TmfTraceManagerTest {
     public void testTraceNewTimeRange() {
         openTrace(trace2);
         TmfTimeRange range = new TmfTimeRange(
-                new TmfTimestamp(t2start + ONE_SECOND, SCALE),
-                new TmfTimestamp(t2end - ONE_SECOND, SCALE));
+                TmfTimestamp.fromNanos(t2start + ONE_SECOND),
+                TmfTimestamp.fromNanos(t2end - ONE_SECOND));
         selectWindowRange(range);
 
         TmfTimeRange curRange = tm.getCurrentTraceContext().getWindowRange();
@@ -336,8 +334,8 @@ public class TmfTraceManagerTest {
     public void testTraceTimeRangeClampingStart() {
         openTrace(trace2);
         TmfTimeRange range = new TmfTimeRange(
-                new TmfTimestamp(t2start - ONE_SECOND, SCALE), // minus here
-                new TmfTimestamp(t2end - ONE_SECOND, SCALE));
+                TmfTimestamp.fromNanos(t2start - ONE_SECOND), // minus here
+                TmfTimestamp.fromNanos(t2end - ONE_SECOND));
         selectWindowRange(range);
 
         TmfTimeRange curRange = tm.getCurrentTraceContext().getWindowRange();
@@ -353,8 +351,8 @@ public class TmfTraceManagerTest {
     public void testTraceTimeRangeClampingEnd() {
         openTrace(trace2);
         TmfTimeRange range = new TmfTimeRange(
-                new TmfTimestamp(t2start + ONE_SECOND, SCALE),
-                new TmfTimestamp(t2end + ONE_SECOND, SCALE)); // plus here
+                TmfTimestamp.fromNanos(t2start + ONE_SECOND),
+                TmfTimestamp.fromNanos(t2end + ONE_SECOND)); // plus here
         selectWindowRange(range);
 
         TmfTimeRange curRange = tm.getCurrentTraceContext().getWindowRange();
@@ -371,8 +369,8 @@ public class TmfTraceManagerTest {
     public void testTraceTimeRangeClampingBoth() {
         openTrace(trace2);
         TmfTimeRange range = new TmfTimeRange(
-                new TmfTimestamp(t2start - ONE_SECOND, SCALE), // minus here
-                new TmfTimestamp(t2end + ONE_SECOND, SCALE)); // plus here
+                TmfTimestamp.fromNanos(t2start - ONE_SECOND), // minus here
+                TmfTimestamp.fromNanos(t2end + ONE_SECOND)); // plus here
         selectWindowRange(range);
 
         TmfTimeRange curRange = tm.getCurrentTraceContext().getWindowRange();
@@ -396,7 +394,7 @@ public class TmfTraceManagerTest {
         openTrace(trace1);
         openTrace(trace2);
         selectTrace(trace1);
-        TmfTimestamp ts = new TmfTimestamp(t1start + ONE_SECOND, SCALE);
+        ITmfTimestamp ts = TmfTimestamp.fromNanos(t1start + ONE_SECOND);
         selectTimestamp(ts);
 
         /* Timestamp of trace1 should have been updated */
@@ -423,7 +421,7 @@ public class TmfTraceManagerTest {
         openTrace(trace1);
         openTrace(trace2);
         selectTrace(trace1);
-        TmfTimestamp ts = new TmfTimestamp(t1end + ONE_SECOND, SCALE);
+        ITmfTimestamp ts = TmfTimestamp.fromNanos(t1end + ONE_SECOND);
         selectTimestamp(ts);
 
         /* Timestamp of trace1 should not have changed */
@@ -449,7 +447,7 @@ public class TmfTraceManagerTest {
         openTrace(trace1);
         openTrace(trace2);
         selectTrace(trace1);
-        TmfTimestamp ts = new TmfTimestamp(t2end + ONE_SECOND, SCALE);
+        ITmfTimestamp ts = TmfTimestamp.fromNanos(t2end + ONE_SECOND);
         selectTimestamp(ts);
 
         /* Timestamp of trace1 should not have changed */
@@ -475,8 +473,8 @@ public class TmfTraceManagerTest {
         openTrace(trace2);
         selectTrace(trace1);
         TmfTimeRange range = new TmfTimeRange(
-                new TmfTimestamp(t1start + ONE_SECOND, SCALE),
-                new TmfTimestamp(t1end - ONE_SECOND, SCALE));
+                TmfTimestamp.fromNanos(t1start + ONE_SECOND),
+                TmfTimestamp.fromNanos(t1end - ONE_SECOND));
         selectWindowRange(range);
 
         /* Range of trace1 should be equal to the requested one */
@@ -500,14 +498,14 @@ public class TmfTraceManagerTest {
         openTrace(trace2);
         selectTrace(trace1);
         TmfTimeRange range = new TmfTimeRange(
-                new TmfTimestamp(t1start + ONE_SECOND, SCALE),
-                new TmfTimestamp(t1end + ONE_SECOND, SCALE));
+                TmfTimestamp.fromNanos(t1start + ONE_SECOND),
+                TmfTimestamp.fromNanos(t1end + ONE_SECOND));
         selectWindowRange(range);
 
         /* Range of trace1 should get clamped to its end time */
         TmfTimeRange expectedRange = new TmfTimeRange(
-                new TmfTimestamp(t1start + ONE_SECOND, SCALE),
-                new TmfTimestamp(t1end, SCALE));
+                TmfTimestamp.fromNanos(t1start + ONE_SECOND),
+                TmfTimestamp.fromNanos(t1end));
         assertEquals(expectedRange, tm.getCurrentTraceContext().getWindowRange());
 
         /* Range of trace2 should not have changed */
@@ -527,21 +525,21 @@ public class TmfTraceManagerTest {
         openTrace(trace2);
         selectTrace(trace1);
         TmfTimeRange range = new TmfTimeRange(
-                new TmfTimestamp(t1end - ONE_SECOND, SCALE),
-                new TmfTimestamp(t2start + ONE_SECOND, SCALE));
+                TmfTimestamp.fromNanos(t1end - ONE_SECOND),
+                TmfTimestamp.fromNanos(t2start + ONE_SECOND));
         selectWindowRange(range);
 
         /* Range of trace1 should be clamped to its end time */
         TmfTimeRange expectedRange = new TmfTimeRange(
-                new TmfTimestamp(t1end - ONE_SECOND, SCALE),
-                new TmfTimestamp(t1end, SCALE));
+                TmfTimestamp.fromNanos(t1end - ONE_SECOND),
+                TmfTimestamp.fromNanos(t1end));
         assertEquals(expectedRange, tm.getCurrentTraceContext().getWindowRange());
 
         /* Range of trace2 should be clamped to its start time */
         selectTrace(trace2);
         expectedRange = new TmfTimeRange(
-                new TmfTimestamp(t2start, SCALE),
-                new TmfTimestamp(t2start + ONE_SECOND, SCALE));
+                TmfTimestamp.fromNanos(t2start),
+                TmfTimestamp.fromNanos(t2start + ONE_SECOND));
         assertEquals(expectedRange, tm.getCurrentTraceContext().getWindowRange());
     }
 
@@ -557,8 +555,8 @@ public class TmfTraceManagerTest {
         openTrace(trace2);
         selectTrace(trace1);
         TmfTimeRange range = new TmfTimeRange(
-                new TmfTimestamp(t1end + ONE_SECOND, SCALE),
-                new TmfTimestamp(t1end - ONE_SECOND, SCALE));
+                TmfTimestamp.fromNanos(t1end + ONE_SECOND),
+                TmfTimestamp.fromNanos(t1end - ONE_SECOND));
         selectWindowRange(range);
 
         /* Range of trace1 should not have changed */
@@ -589,7 +587,7 @@ public class TmfTraceManagerTest {
     public void testExperimentTimestampInTrace() {
         TmfExperiment exp = createExperiment(trace1, trace2);
         openTrace(exp);
-        TmfTimestamp ts = new TmfTimestamp(t1start + ONE_SECOND, SCALE);
+        ITmfTimestamp ts = TmfTimestamp.fromNanos(t1start + ONE_SECOND);
         selectTimestamp(ts);
 
         /* The experiment's current time should be updated. */
@@ -609,7 +607,7 @@ public class TmfTraceManagerTest {
     public void testExperimentTimestampInBetween() {
         TmfExperiment exp = createExperiment(trace1, trace2);
         openTrace(exp);
-        TmfTimestamp ts = new TmfTimestamp(t1end + ONE_SECOND, SCALE);
+        ITmfTimestamp ts = TmfTimestamp.fromNanos(t1end + ONE_SECOND);
         selectTimestamp(ts);
 
         /* The experiment's current time should be updated. */
@@ -628,7 +626,7 @@ public class TmfTraceManagerTest {
     public void testExperimentTimestampInvalid() {
         TmfExperiment exp = createExperiment(trace1, trace2);
         openTrace(exp);
-        TmfTimestamp ts = new TmfTimestamp(t2end + ONE_SECOND, SCALE);
+        ITmfTimestamp ts = TmfTimestamp.fromNanos(t2end + ONE_SECOND);
         selectTimestamp(ts);
 
         /* The experiment's current time should NOT be updated. */
@@ -664,8 +662,8 @@ public class TmfTraceManagerTest {
         openTrace(exp);
 
         final TmfTimeRange range = new TmfTimeRange(
-                new TmfTimestamp(t1start - ONE_SECOND, SCALE),
-                new TmfTimestamp(t1end - ONE_SECOND, SCALE));
+                TmfTimestamp.fromNanos(t1start - ONE_SECOND),
+                TmfTimestamp.fromNanos(t1end - ONE_SECOND));
         selectWindowRange(range);
 
         TmfTimeRange actualRange = tm.getCurrentTraceContext().getWindowRange();
@@ -684,8 +682,8 @@ public class TmfTraceManagerTest {
         openTrace(exp);
 
         final TmfTimeRange range = new TmfTimeRange(
-                new TmfTimestamp(t1start - ONE_SECOND, SCALE),
-                new TmfTimestamp(t2end + ONE_SECOND, SCALE));
+                TmfTimestamp.fromNanos(t1start - ONE_SECOND),
+                TmfTimestamp.fromNanos(t2end + ONE_SECOND));
         selectWindowRange(range);
 
         TmfTimeRange actualRange = tm.getCurrentTraceContext().getWindowRange();
@@ -704,8 +702,8 @@ public class TmfTraceManagerTest {
         openTrace(exp);
 
         final TmfTimeRange range = new TmfTimeRange(
-                new TmfTimestamp(t1end + ONE_SECOND, SCALE),
-                new TmfTimestamp(t2start - ONE_SECOND, SCALE));
+                TmfTimestamp.fromNanos(t1end + ONE_SECOND),
+                TmfTimestamp.fromNanos(t2start - ONE_SECOND));
         selectWindowRange(range);
 
         TmfTimeRange actualRange = tm.getCurrentTraceContext().getWindowRange();
@@ -739,6 +737,6 @@ public class TmfTraceManagerTest {
     private static @NonNull ITmfTimestamp calculateOffset(ITmfTimestamp initialTs, ITmfTimestamp offsetTs) {
         long start = initialTs.toNanos();
         long offset = offsetTs.toNanos();
-        return new TmfTimestamp(start + offset, SCALE);
+        return TmfTimestamp.fromNanos(start + offset);
     }
 }

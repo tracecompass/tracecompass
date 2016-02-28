@@ -1,31 +1,34 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.loader;
 
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+package org.eclipse.tracecompass.tmf.core.timestamp;
 
 /**
- * Timestamp implementation for UML2SD test cases.
+ * A timestamp with a user provided scale and value
  *
- * @author Bernd Hufmann
- *
+ * @author Matthew Khouzam
+ * @since 2.0
  */
-public class Uml2SDTestTimestamp extends TmfTimestamp {
+public class TmfRealTimestamp extends TmfTimestamp {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
+    /**
+     * The timestamp raw value (mantissa)
+     */
     private final long fValue;
+
+    /**
+     * The timestamp scale (magnitude)
+     */
     private final int fScale;
 
     // ------------------------------------------------------------------------
@@ -33,17 +36,17 @@ public class Uml2SDTestTimestamp extends TmfTimestamp {
     // ------------------------------------------------------------------------
 
     /**
-     * Constructor
-     * @param value time as long value (nanoseconds)
+     * Full constructor
+     *
+     * @param value
+     *            the timestamp value
+     * @param scale
+     *            the timestamp scale
      */
-    public Uml2SDTestTimestamp(long value) {
+    public TmfRealTimestamp(final long value, final int scale) {
         fValue = value;
-        fScale = IUml2SDTestConstants.TIME_SCALE;
+        fScale = scale;
     }
-
-    // ------------------------------------------------------------------------
-    // Operations
-    // ------------------------------------------------------------------------
 
     @Override
     public long getValue() {
@@ -54,5 +57,4 @@ public class Uml2SDTestTimestamp extends TmfTimestamp {
     public int getScale() {
         return fScale;
     }
-
 }

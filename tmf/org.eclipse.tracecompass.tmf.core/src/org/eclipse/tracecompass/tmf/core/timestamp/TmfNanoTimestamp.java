@@ -16,7 +16,9 @@ package org.eclipse.tracecompass.tmf.core.timestamp;
 /**
  * A simplified timestamp where scale is nanoseconds and precision is set to 0.
  */
-public class TmfNanoTimestamp extends TmfTimestamp {
+public final class TmfNanoTimestamp extends TmfTimestamp {
+
+    private final long fValue;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -36,20 +38,18 @@ public class TmfNanoTimestamp extends TmfTimestamp {
      *            the timestamp value
      */
     public TmfNanoTimestamp(final long value) {
-        super(value, ITmfTimestamp.NANOSECOND_SCALE);
+        fValue = value;
     }
 
-    /**
-     * Copy constructor.
-     *
-     * If the parameter is not a TmfNanoTimestamp, the timestamp will be scaled
-     * to nanoseconds, and the precision will be discarded.
-     *
-     * @param timestamp
-     *            The timestamp to copy
-     */
-    public TmfNanoTimestamp(final ITmfTimestamp timestamp) {
-        super(timestamp.toNanos(), ITmfTimestamp.NANOSECOND_SCALE);
+    @Override
+    public long getValue() {
+        return fValue;
+    }
+
+
+    @Override
+    public int getScale() {
+        return ITmfTimestamp.NANOSECOND_SCALE;
     }
 
     // ------------------------------------------------------------------------

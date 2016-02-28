@@ -11,7 +11,6 @@ package org.eclipse.tracecompass.lttng2.common.core.tests;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.eclipse.tracecompass.internal.lttng2.common.core.Activator;
 import org.junit.Test;
 
 /**

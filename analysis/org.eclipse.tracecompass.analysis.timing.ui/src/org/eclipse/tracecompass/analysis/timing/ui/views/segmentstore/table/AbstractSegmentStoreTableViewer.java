@@ -45,7 +45,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -104,8 +104,8 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         @Override
         public void widgetSelected(@Nullable SelectionEvent e) {
             ISegment selectedSegment = ((ISegment) NonNullUtils.checkNotNull(e).item.getData());
-            ITmfTimestamp start = new TmfNanoTimestamp(selectedSegment.getStart());
-            ITmfTimestamp end = new TmfNanoTimestamp(selectedSegment.getEnd());
+            ITmfTimestamp start = TmfTimestamp.fromNanos(selectedSegment.getStart());
+            ITmfTimestamp end = TmfTimestamp.fromNanos(selectedSegment.getEnd());
             TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreTableViewer.this, start, end));
         }
     }
@@ -279,14 +279,14 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
             IAction gotoStartTime = new Action(Messages.SegmentStoreTableViewer_goToStartEvent) {
                 @Override
                 public void run() {
-                    broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreTableViewer.this, new TmfNanoTimestamp(segment.getStart())));
+                    broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreTableViewer.this, TmfTimestamp.fromNanos(segment.getStart())));
                 }
             };
 
             IAction gotoEndTime = new Action(Messages.SegmentStoreTableViewer_goToEndEvent) {
                 @Override
                 public void run() {
-                    broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreTableViewer.this, new TmfNanoTimestamp(segment.getEnd())));
+                    broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreTableViewer.this, TmfTimestamp.fromNanos(segment.getEnd())));
                 }
             };
 

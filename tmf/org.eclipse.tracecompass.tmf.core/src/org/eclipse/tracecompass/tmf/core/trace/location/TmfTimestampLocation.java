@@ -49,7 +49,7 @@ public final class TmfTimestampLocation extends TmfLocation {
      *            the buffer to read from
      */
     public TmfTimestampLocation(ByteBuffer bufferIn) {
-        super(new TmfTimestamp(bufferIn));
+        super(TmfTimestamp.create(bufferIn));
     }
 
     @Override
@@ -59,7 +59,6 @@ public final class TmfTimestampLocation extends TmfLocation {
 
     @Override
     public void serialize(ByteBuffer bufferOut) {
-        TmfTimestamp t = new TmfTimestamp(getLocationInfo());
-        t.serialize(bufferOut);
+        TmfTimestamp.serialize(bufferOut, getLocationInfo());
     }
 }

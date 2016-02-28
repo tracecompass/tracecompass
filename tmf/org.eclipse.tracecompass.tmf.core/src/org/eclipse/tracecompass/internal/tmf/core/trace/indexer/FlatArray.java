@@ -94,7 +94,7 @@ public class FlatArray extends AbstractFileCheckpointCollection {
             fByteBuffer.clear();
             getRandomAccessFile().read(fByteBuffer.array());
             ITmfLocation location = getTrace().restoreLocation(fByteBuffer);
-            ITmfTimestamp timeStamp = new TmfTimestamp(fByteBuffer);
+            ITmfTimestamp timeStamp = TmfTimestamp.create(fByteBuffer);
             checkpoint = new TmfCheckpoint(timeStamp, location, fByteBuffer);
         } catch (IOException e) {
             Activator.logError(MessageFormat.format(Messages.FlatArray_IOErrorReading, getFile()), e);

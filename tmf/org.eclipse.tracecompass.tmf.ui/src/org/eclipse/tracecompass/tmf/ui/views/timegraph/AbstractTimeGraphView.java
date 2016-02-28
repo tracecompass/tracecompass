@@ -87,8 +87,9 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceAdapterManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
@@ -1276,7 +1277,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             public void timeRangeUpdated(TimeGraphRangeUpdateEvent event) {
                 final long startTime = event.getStartTime();
                 final long endTime = event.getEndTime();
-                TmfTimeRange range = new TmfTimeRange(new TmfNanoTimestamp(startTime), new TmfNanoTimestamp(endTime));
+                TmfTimeRange range = new TmfTimeRange(TmfTimestamp.fromNanos(startTime), TmfTimestamp.fromNanos(endTime));
                 broadcast(new TmfWindowRangeUpdatedSignal(AbstractTimeGraphView.this, range));
                 startZoomThread(startTime, endTime);
             }
@@ -1285,8 +1286,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         fTimeGraphWrapper.getTimeGraphViewer().addTimeListener(new ITimeGraphTimeListener() {
             @Override
             public void timeSelected(TimeGraphTimeEvent event) {
-                TmfNanoTimestamp startTime = new TmfNanoTimestamp(event.getBeginTime());
-                TmfNanoTimestamp endTime = new TmfNanoTimestamp(event.getEndTime());
+                ITmfTimestamp startTime = TmfTimestamp.fromNanos(event.getBeginTime());
+                ITmfTimestamp endTime = TmfTimestamp.fromNanos(event.getEndTime());
                 broadcast(new TmfSelectionRangeUpdatedSignal(AbstractTimeGraphView.this, startTime, endTime));
             }
         });
@@ -1306,12 +1307,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                                 marker.setAttribute(ITmfMarker.MARKER_DURATION, Long.toString(bookmark.getDuration()));
                                 marker.setAttribute(IMarker.LOCATION,
                                         NLS.bind(org.eclipse.tracecompass.internal.tmf.ui.Messages.TmfMarker_LocationTimeRange,
-                                                new TmfNanoTimestamp(bookmark.getTime()),
-                                                new TmfNanoTimestamp(bookmark.getTime() + bookmark.getDuration())));
+                                                TmfTimestamp.fromNanos(bookmark.getTime()),
+                                                TmfTimestamp.fromNanos(bookmark.getTime() + bookmark.getDuration())));
                             } else {
                                 marker.setAttribute(IMarker.LOCATION,
                                         NLS.bind(org.eclipse.tracecompass.internal.tmf.ui.Messages.TmfMarker_LocationTime,
-                                                new TmfNanoTimestamp(bookmark.getTime())));
+                                                TmfTimestamp.fromNanos(bookmark.getTime())));
                             }
                             marker.setAttribute(ITmfMarker.MARKER_COLOR, bookmark.getColor().toString());
                         }

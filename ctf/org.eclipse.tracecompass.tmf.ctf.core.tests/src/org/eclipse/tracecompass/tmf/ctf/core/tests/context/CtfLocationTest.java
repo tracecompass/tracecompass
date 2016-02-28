@@ -59,7 +59,7 @@ public class CtfLocationTest {
      */
     @Test
     public void testCtfLocation_timestamp() {
-        ITmfTimestamp timestamp = new TmfTimestamp();
+        ITmfTimestamp timestamp = TmfTimestamp.fromSeconds(0);
         CtfLocation result = new CtfLocation(timestamp);
 
         assertNotNull(result);

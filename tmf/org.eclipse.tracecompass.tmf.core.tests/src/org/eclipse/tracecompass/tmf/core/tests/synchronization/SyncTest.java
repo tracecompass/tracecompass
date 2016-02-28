@@ -195,8 +195,8 @@ public class SyncTest {
     private static void addSyncMatch(SynchronizationAlgorithm algo, ITmfTrace sender, long sendTs, ITmfTrace receiver, long receiveTs) {
         algo.addMatch(
                 new TmfEventDependency(
-                        new TmfSyncEventStub(sender, new TmfTimestamp(sendTs)),
-                        new TmfSyncEventStub(receiver, new TmfTimestamp(receiveTs))
+                        new TmfSyncEventStub(sender, TmfTimestamp.fromSeconds(sendTs)),
+                        new TmfSyncEventStub(receiver, TmfTimestamp.fromSeconds(receiveTs))
                 ));
     }
 

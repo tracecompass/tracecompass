@@ -285,7 +285,7 @@ public final class TmfTraceManager {
         long offset = trace.getInitialRangeOffset().toNanos();
         long endTime = startTs.toNanos() + offset;
         final TmfTimeRange selectionRange = new TmfTimeRange(startTs, startTs);
-        final TmfTimeRange windowRange = new TmfTimeRange(startTs, new TmfTimestamp(endTime, ITmfTimestamp.NANOSECOND_SCALE));
+        final TmfTimeRange windowRange = new TmfTimeRange(startTs, TmfTimestamp.fromNanos(endTime));
 
         final TmfTraceContext startCtx = trace.createTraceContext(selectionRange, windowRange, editorFile, null);
 

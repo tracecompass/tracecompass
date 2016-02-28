@@ -22,7 +22,7 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfContentFieldAspect;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEqualsNode;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,8 +42,8 @@ public class TmfFilterEqualsNodeTest extends TmfFilterTreeNodeTestBase {
     private ITmfEventField[] fFields2 = new ITmfEventField[] { new TmfEventField(FIELD, "value 2", null) };
     private ITmfEventField fContent1 = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, null, fFields1);
     private ITmfEventField fContent2 = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, null, fFields2);
-    private TmfEvent fEvent1 = new TmfEvent(TRACE, 0, new TmfNanoTimestamp(1), EVENT_TYPE, fContent1);
-    private TmfEvent fEvent2 = new TmfEvent(TRACE, 1, new TmfNanoTimestamp(2), EVENT_TYPE, fContent2);
+    private TmfEvent fEvent1 = new TmfEvent(TRACE, 0, TmfTimestamp.fromNanos(1), EVENT_TYPE, fContent1);
+    private TmfEvent fEvent2 = new TmfEvent(TRACE, 1, TmfTimestamp.fromNanos(2), EVENT_TYPE, fContent2);
     private TmfFilterEqualsNode fFilter;
 
     // ------------------------------------------------------------------------

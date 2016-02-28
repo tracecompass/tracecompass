@@ -37,7 +37,7 @@ import org.junit.Test;
 public class TsTransformTest {
 
     private static final long ts = 1361657893526374091L;
-    private static final @NonNull ITmfTimestamp oTs = new TmfTimestamp(ts);
+    private static final @NonNull ITmfTimestamp oTs = TmfTimestamp.fromSeconds(ts);
 
     /**
      * Test the linear transform

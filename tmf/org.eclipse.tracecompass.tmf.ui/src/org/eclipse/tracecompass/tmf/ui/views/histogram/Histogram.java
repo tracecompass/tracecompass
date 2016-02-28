@@ -48,8 +48,8 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampDelta;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
@@ -1046,8 +1046,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             buffer.append(newLine);
         }
         buffer.append(NLS.bind(Messages.Histogram_bucketRangeToolTip,
-                new TmfTimestamp(startTime, ITmfTimestamp.NANOSECOND_SCALE).toString(),
-                new TmfTimestamp(endTime, ITmfTimestamp.NANOSECOND_SCALE).toString()));
+                TmfTimestamp.fromNanos(startTime).toString(),
+                TmfTimestamp.fromNanos(endTime).toString()));
         buffer.append(newLine);
         buffer.append(NLS.bind(Messages.Histogram_eventCountToolTip, nbEvents));
         if (!HistogramScaledData.hideLostEvents) {

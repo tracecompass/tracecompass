@@ -51,7 +51,6 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
@@ -411,7 +410,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     @Override
     public ITmfTimestamp getInitialRangeOffset() {
         final long DEFAULT_INITIAL_OFFSET_VALUE = (1L * 100 * 1000 * 1000); // .1sec
-        return new TmfTimestamp(DEFAULT_INITIAL_OFFSET_VALUE, ITmfTimestamp.NANOSECOND_SCALE);
+        return TmfTimestamp.fromNanos(DEFAULT_INITIAL_OFFSET_VALUE);
     }
 
     @Override
@@ -725,7 +724,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
 
     @Override
     public @NonNull ITmfTimestamp createTimestamp(long ts) {
-        return new TmfNanoTimestamp(getTimestampTransform().transform(ts));
+        return TmfTimestamp.fromNanos(getTimestampTransform().transform(ts));
     }
 
     // ------------------------------------------------------------------------

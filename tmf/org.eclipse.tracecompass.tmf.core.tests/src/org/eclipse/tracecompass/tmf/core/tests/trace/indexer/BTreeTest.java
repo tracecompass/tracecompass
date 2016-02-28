@@ -54,11 +54,11 @@ public class BTreeTest extends AbstractCheckpointCollectionTest {
     @Test
     public void testAccept() {
         for (int i = 0; i < CHECKPOINTS_INSERT_NUM; i++) {
-            TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(i), new TmfLongLocation(i), 0);
+            TmfCheckpoint checkpoint = new TmfCheckpoint(TmfTimestamp.fromSeconds(i), new TmfLongLocation(i), 0);
             fBTree.insert(checkpoint);
         }
 
-        final TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(123), new TmfLongLocation(123L), 0);
+        final TmfCheckpoint checkpoint = new TmfCheckpoint(TmfTimestamp.fromSeconds(123), new TmfLongLocation(123L), 0);
 
         class TestVisitor implements IBTreeVisitor {
             public int fLastCompare = 0;
@@ -93,7 +93,7 @@ public class BTreeTest extends AbstractCheckpointCollectionTest {
 
         for (int i = 0; i < CHECKPOINTS_INSERT_NUM; i++) {
             Integer checkpointIndex = list.get(i);
-            TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(12345 + checkpointIndex), new TmfLongLocation(123456L + checkpointIndex), 0);
+            TmfCheckpoint checkpoint = new TmfCheckpoint(TmfTimestamp.fromSeconds(12345 + checkpointIndex), new TmfLongLocation(123456L + checkpointIndex), 0);
             BTreeCheckpointVisitor treeVisitor = new BTreeCheckpointVisitor(checkpoint);
             fBTree.accept(treeVisitor);
             assertEquals(checkpoint, treeVisitor.getCheckpoint());

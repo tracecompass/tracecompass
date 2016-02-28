@@ -151,7 +151,7 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
 //                else if (i == 6)
 //                    m3.setTime(new TmfTimestamp(i));
 //                else
-                    m3.setTime(new TmfTimestamp(i + 1));
+                    m3.setTime(TmfTimestamp.fromSeconds(i + 1));
             }
 
             for (int i = testFrame.lifeLinesCount() - 1; i > 0; i--) {
@@ -189,8 +189,8 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
             m.setEndLifeline(testFrame.getLifeline(3));
             m.setStartOccurrence(2);
             m.setEndOccurrence(6);
-            m.setStartTime(new TmfTimestamp(2));
-            m.setEndTime(new TmfTimestamp(6));
+            m.setStartTime(TmfTimestamp.fromSeconds(2));
+            m.setEndTime(TmfTimestamp.fromSeconds(6));
             m.setName("*******************Async TEST ****************");
             testFrame.addMessage(m);
             v.setFrame(testFrame);

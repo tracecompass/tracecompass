@@ -39,7 +39,6 @@ import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -240,8 +239,8 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
                  * caused by the event(s) happening exactly at 'checkpointTime',
                  * if any. We must not include those events in the query.
                  */
-                new TmfTimestamp(checkpointTime + 1, ITmfTimestamp.NANOSECOND_SCALE),
-                new TmfTimestamp(t, ITmfTimestamp.NANOSECOND_SCALE));
+                TmfTimestamp.fromNanos(checkpointTime + 1),
+                TmfTimestamp.fromNanos(t));
         ITmfEventRequest request = new PartialStateSystemRequest(fPartialInput, range);
         fPartialInput.getTrace().sendRequest(request);
 

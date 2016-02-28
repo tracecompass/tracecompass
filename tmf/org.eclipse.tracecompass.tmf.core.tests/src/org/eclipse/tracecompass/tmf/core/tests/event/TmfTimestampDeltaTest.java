@@ -71,19 +71,14 @@ public class TmfTimestampDeltaTest {
 
     @Test
     public void testCopyConstructor() {
-        final ITmfTimestamp ts = new TmfTimestamp(12345, 2);
-        final ITmfTimestamp copy = new TmfTimestamp(ts);
+        final ITmfTimestamp ts = TmfTimestamp.create(12345, 2);
+        final ITmfTimestamp copy = TmfTimestamp.create(12345, 2);
 
         assertEquals("getValue", ts.getValue(), copy.getValue());
         assertEquals("getscale", ts.getScale(), copy.getScale());
 
         assertEquals("getValue", 12345, copy.getValue());
         assertEquals("getscale", 2, copy.getScale());
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void testCopyNullConstructor() {
-        new TmfTimestamp((TmfTimestamp) null);
     }
 
     // ------------------------------------------------------------------------

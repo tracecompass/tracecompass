@@ -35,7 +35,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
@@ -287,7 +287,7 @@ public class CallStackViewTest {
     private static void goToTime(long timestamp) {
         SWTBotTable table = fBot.activeEditor().bot().table();
         table.setFocus();
-        TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(table.widget, new TmfNanoTimestamp(timestamp)));
+        TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(table.widget, TmfTimestamp.fromNanos(timestamp)));
         fBot.waitUntil(ConditionHelpers.selectionInEventsTable(fBot, timestamp));
     }
 

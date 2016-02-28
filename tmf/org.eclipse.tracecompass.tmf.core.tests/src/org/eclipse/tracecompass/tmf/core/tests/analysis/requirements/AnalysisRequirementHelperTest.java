@@ -21,8 +21,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.ValuePriorityLevel;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.IAnalysisRequirementProvider;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.ValuePriorityLevel;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirementHelper;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.AnalysisModuleTestHelper;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.AnalysisModuleTestHelper.moduleStubEnum;

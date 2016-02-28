@@ -17,8 +17,11 @@ package org.eclipse.tracecompass.tmf.core.timestamp;
  * A simplified timestamp where scale and precision are set to 0.
  *
  * @author Francois Chouinard
+ * @since 2.0
  */
-public class TmfSimpleTimestamp extends TmfTimestamp {
+public class TmfSecondTimestamp extends TmfTimestamp {
+
+    private final long fValue;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -27,30 +30,28 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
     /**
      * Default constructor (value = 0)
      */
-    public TmfSimpleTimestamp() {
+    public TmfSecondTimestamp() {
         this(0);
     }
 
     /**
      * Full constructor
      *
-     * @param value the timestamp value
+     * @param value
+     *            the timestamp value
      */
-    public TmfSimpleTimestamp(final long value) {
-        super(value, 0);
+    public TmfSecondTimestamp(final long value) {
+        fValue = value;
     }
 
-    /**
-     * Copy constructor.
-     *
-     * If the parameter is not a TmfSimpleTimestamp, the timestamp will be
-     * scaled to seconds, and the precision will be discarded.
-     *
-     * @param timestamp
-     *            The timestamp to copy
-     */
-    public TmfSimpleTimestamp(final ITmfTimestamp timestamp) {
-        super(timestamp.normalize(0, ITmfTimestamp.SECOND_SCALE).getValue(), 0);
+    @Override
+    public int getScale() {
+        return ITmfTimestamp.SECOND_SCALE;
+    }
+
+    @Override
+    public long getValue() {
+        return fValue;
     }
 
     // ------------------------------------------------------------------------
@@ -60,14 +61,14 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
     @Override
     public ITmfTimestamp normalize(final long offset, final int scale) {
         if (scale == ITmfTimestamp.SECOND_SCALE) {
-            return new TmfSimpleTimestamp(saturatedAdd(getValue(), offset));
+            return TmfTimestamp.fromSeconds(saturatedAdd(getValue(), offset));
         }
         return super.normalize(offset, scale);
     }
 
     @Override
     public int compareTo(final ITmfTimestamp ts) {
-        if (ts instanceof TmfSimpleTimestamp) {
+        if (ts instanceof TmfSecondTimestamp) {
             final long delta = getValue() - ts.getValue();
             return (delta == 0) ? 0 : (delta > 0) ? 1 : -1;
         }
@@ -76,7 +77,7 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
 
     @Override
     public ITmfTimestamp getDelta(final ITmfTimestamp ts) {
-        if (ts instanceof TmfSimpleTimestamp) {
+        if (ts instanceof TmfSecondTimestamp) {
             return new TmfTimestampDelta(getValue() - ts.getValue());
         }
         return super.getDelta(ts);
@@ -99,10 +100,10 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
         if (other == null) {
             return false;
         }
-        if (!(other instanceof TmfSimpleTimestamp)) {
+        if (!(other instanceof TmfSecondTimestamp)) {
             return super.equals(other);
         }
-        final TmfSimpleTimestamp ts = (TmfSimpleTimestamp) other;
+        final TmfSecondTimestamp ts = (TmfSecondTimestamp) other;
 
         return compareTo(ts) == 0;
     }

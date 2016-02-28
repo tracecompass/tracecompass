@@ -16,7 +16,6 @@ package org.eclipse.tracecompass.tmf.core.tests.event;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,7 +36,7 @@ public class TmfNanoTimestampTest {
     // Variables
     // ------------------------------------------------------------------------
 
-    private final ITmfTimestamp ts0 = new TmfNanoTimestamp();
+    private final ITmfTimestamp ts0 = new TmfNanoTimestamp(0);
     private final ITmfTimestamp ts1 = new TmfNanoTimestamp(12345);
     private final ITmfTimestamp ts2 = new TmfNanoTimestamp(-1234);
 
@@ -59,22 +58,12 @@ public class TmfNanoTimestampTest {
 
     @Test
     public void testCopyConstructor() {
-        final ITmfTimestamp copy = new TmfNanoTimestamp(ts1);
+        final long copy = ts1.toNanos();
 
-        assertEquals("getValue", ts1.getValue(), copy.getValue());
-        assertEquals("getscale", ts1.getScale(), copy.getScale());
+        assertEquals("getValue", ts1.getValue(), copy);
+        assertEquals("getscale", ts1.getScale(), -9);
 
-        assertEquals("getValue", 12345, copy.getValue());
-        assertEquals("getscale", -9, copy.getScale());
-    }
-
-    @Test
-    public void testCopyBadTimestamp() {
-        try {
-            new TmfNanoTimestamp(null);
-            fail("TmfNanoTimestamp: null argument");
-        } catch (final NullPointerException e) {
-        }
+        assertEquals("getValue", 12345, copy);
     }
 
     // ------------------------------------------------------------------------
@@ -99,25 +88,25 @@ public class TmfNanoTimestampTest {
 
     @Test
     public void testEqualsSymmetry() {
-        final ITmfTimestamp ts0copy = new TmfNanoTimestamp(ts0);
+        final ITmfTimestamp ts0copy = TmfTimestamp.fromNanos(ts0.toNanos());
         assertTrue("equals", ts0.equals(ts0copy));
         assertTrue("equals", ts0copy.equals(ts0));
 
-        final ITmfTimestamp ts1copy = new TmfNanoTimestamp(ts1);
+        final ITmfTimestamp ts1copy = TmfTimestamp.fromNanos(ts1.toNanos());
         assertTrue("equals", ts1.equals(ts1copy));
         assertTrue("equals", ts1copy.equals(ts1));
     }
 
     @Test
     public void testEqualsTransivity() {
-        final ITmfTimestamp ts0copy1 = new TmfNanoTimestamp(ts0);
-        final ITmfTimestamp ts0copy2 = new TmfNanoTimestamp(ts0copy1);
+        final ITmfTimestamp ts0copy1 = TmfTimestamp.fromNanos(ts0.toNanos());
+        final ITmfTimestamp ts0copy2 = TmfTimestamp.fromNanos(ts0copy1.toNanos());
         assertTrue("equals", ts0.equals(ts0copy1));
         assertTrue("equals", ts0copy1.equals(ts0copy2));
         assertTrue("equals", ts0.equals(ts0copy2));
 
-        final ITmfTimestamp ts1copy1 = new TmfNanoTimestamp(ts1);
-        final ITmfTimestamp ts1copy2 = new TmfNanoTimestamp(ts1copy1);
+        final ITmfTimestamp ts1copy1 = TmfTimestamp.fromNanos(ts1.toNanos());
+        final ITmfTimestamp ts1copy2 = TmfTimestamp.fromNanos(ts1copy1.toNanos());
         assertTrue("equals", ts1.equals(ts1copy1));
         assertTrue("equals", ts1copy1.equals(ts1copy2));
         assertTrue("equals", ts1.equals(ts1copy2));
@@ -156,13 +145,13 @@ public class TmfNanoTimestampTest {
 
     @Test
     public void testHashCode() {
-        final ITmfTimestamp ts0copy = new TmfTimestamp(ts0);
-        final ITmfTimestamp ts1copy = new TmfTimestamp(ts1);
-        final ITmfTimestamp ts2copy = new TmfTimestamp(ts2);
+        final ITmfTimestamp ts0copy = TmfTimestamp.create(ts0.getValue(), ts0.getScale());
+        final ITmfTimestamp ts1copy = TmfTimestamp.create(ts1.getValue(), ts1.getScale());
+        final ITmfTimestamp ts2copy = TmfTimestamp.create(ts2.getValue(), ts2.getScale());
 
-        assertTrue("hashCode", ts0.hashCode() == ts0copy.hashCode());
-        assertTrue("hashCode", ts1.hashCode() == ts1copy.hashCode());
-        assertTrue("hashCode", ts2.hashCode() == ts2copy.hashCode());
+        assertEquals("hashCode", ts0.hashCode(), ts0copy.hashCode());
+        assertEquals("hashCode", ts1.hashCode(), ts1copy.hashCode());
+        assertEquals("hashCode", ts2.hashCode(), ts2copy.hashCode());
 
         assertTrue("hashCode", ts0.hashCode() != ts1.hashCode());
     }
@@ -215,9 +204,9 @@ public class TmfNanoTimestampTest {
 
     @Test
     public void testBasicCompareTo() {
-        final ITmfTimestamp tstamp1 = new TmfNanoTimestamp(900);
-        final ITmfTimestamp tstamp2 = new TmfNanoTimestamp(1000);
-        final ITmfTimestamp tstamp3 = new TmfNanoTimestamp(1100);
+        final ITmfTimestamp tstamp1 = TmfTimestamp.fromNanos(900);
+        final ITmfTimestamp tstamp2 = TmfTimestamp.fromNanos(1000);
+        final ITmfTimestamp tstamp3 = TmfTimestamp.fromNanos(1100);
 
         assertTrue(tstamp1.compareTo(tstamp1) == 0);
 
@@ -233,9 +222,9 @@ public class TmfNanoTimestampTest {
 
     @Test
     public void testCompareTo() {
-        final ITmfTimestamp ts0a = new TmfTimestamp(0, 2);
-        final ITmfTimestamp ts1a = new TmfTimestamp(123450, -10);
-        final ITmfTimestamp ts2a = new TmfTimestamp(-12340, -10);
+        final ITmfTimestamp ts0a = TmfTimestamp.create(0, 2);
+        final ITmfTimestamp ts1a = TmfTimestamp.create(123450, -10);
+        final ITmfTimestamp ts2a = TmfTimestamp.create(-12340, -10);
 
         assertTrue(ts1.compareTo(ts1) == 0);
 
@@ -251,17 +240,17 @@ public class TmfNanoTimestampTest {
     @Test
     public void testDelta() {
         // Delta for same scale and precision (delta > 0)
-        TmfTimestamp tstamp0 = new TmfNanoTimestamp(10);
-        TmfTimestamp tstamp1 = new TmfNanoTimestamp(5);
-        TmfTimestamp expectd = new TmfNanoTimestamp(5);
+        ITmfTimestamp tstamp0 = TmfTimestamp.fromNanos(10);
+        ITmfTimestamp tstamp1 = TmfTimestamp.fromNanos(5);
+        ITmfTimestamp expectd = TmfTimestamp.fromNanos(5);
 
         ITmfTimestamp delta = tstamp0.getDelta(tstamp1);
         assertEquals("getDelta", 0, delta.compareTo(expectd));
 
         // Delta for same scale and precision (delta < 0)
-        tstamp0 = new TmfTimestamp(5);
-        tstamp1 = new TmfTimestamp(10);
-        expectd = new TmfTimestamp(-5);
+        tstamp0 = TmfTimestamp.fromSeconds(5);
+        tstamp1 = TmfTimestamp.fromSeconds(10);
+        expectd = TmfTimestamp.fromSeconds(-5);
 
         delta = tstamp0.getDelta(tstamp1);
         assertEquals("getDelta", 0, delta.compareTo(expectd));
@@ -270,9 +259,9 @@ public class TmfNanoTimestampTest {
     @Test
     public void testDelta2() {
         // Delta for different scale and same precision (delta > 0)
-        final TmfTimestamp tstamp0 = new TmfNanoTimestamp(10);
-        final TmfTimestamp tstamp1 = new TmfTimestamp(1, -8);
-        final TmfTimestamp expectd = new TmfTimestamp(0, 0);
+        final ITmfTimestamp tstamp0 = TmfTimestamp.fromNanos(10);
+        final ITmfTimestamp tstamp1 = TmfTimestamp.create(1, -8);
+        final ITmfTimestamp expectd = TmfTimestamp.create(0, 0);
 
         final ITmfTimestamp delta = tstamp0.getDelta(tstamp1);
         assertEquals("getDelta", 0, delta.compareTo(expectd));

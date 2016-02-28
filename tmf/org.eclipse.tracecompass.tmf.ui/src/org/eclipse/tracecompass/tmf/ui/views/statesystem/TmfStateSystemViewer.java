@@ -265,8 +265,8 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
                                 !interval.getStateValue().isNull();
                     stateEntry = new StateEntry(ss.getAttributeName(quark), quark, ss.getFullAttributePath(quark),
                             interval.getStateValue(),
-                            new TmfTimestamp(interval.getStartTime(), ITmfTimestamp.NANOSECOND_SCALE),
-                            new TmfTimestamp(interval.getEndTime(), ITmfTimestamp.NANOSECOND_SCALE),
+                            TmfTimestamp.fromNanos(interval.getStartTime()),
+                            TmfTimestamp.fromNanos(interval.getEndTime()),
                             modified);
 
                     // update children first to know if parent is really needed
@@ -283,8 +283,8 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
                     }
                 } else {
                     stateEntry.update(interval.getStateValue(),
-                            new TmfTimestamp(interval.getStartTime(), ITmfTimestamp.NANOSECOND_SCALE),
-                            new TmfTimestamp(interval.getEndTime(), ITmfTimestamp.NANOSECOND_SCALE));
+                            TmfTimestamp.fromNanos(interval.getStartTime()),
+                            TmfTimestamp.fromNanos(interval.getEndTime()));
 
                     // update children recursively
                     updateStateEntries(ss, fullState, stateEntry, quark, timestamp);
@@ -365,13 +365,13 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
 
         private final int fQuark;
         private final String fFullPath;
-        private @NonNull TmfTimestamp fStart;
-        private @NonNull TmfTimestamp fEnd;
+        private @NonNull ITmfTimestamp fStart;
+        private @NonNull ITmfTimestamp fEnd;
         private ITmfStateValue fValue;
         private boolean fModified;
         private boolean fOutOfRange = false;
 
-        public StateEntry(String name, int quark, String fullPath, ITmfStateValue value, @NonNull TmfTimestamp start, @NonNull TmfTimestamp end, boolean modified) {
+        public StateEntry(String name, int quark, String fullPath, ITmfStateValue value, @NonNull ITmfTimestamp start, @NonNull ITmfTimestamp end, boolean modified) {
             super(name);
             fQuark = quark;
             fFullPath = fullPath;
@@ -442,7 +442,7 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
             return fModified;
         }
 
-        public void update(ITmfStateValue value, @NonNull TmfTimestamp start, @NonNull TmfTimestamp end) {
+        public void update(ITmfStateValue value, @NonNull ITmfTimestamp start, @NonNull ITmfTimestamp end) {
             fModified = false;
             fOutOfRange = false;
             if (!start.equals(fStart)) {

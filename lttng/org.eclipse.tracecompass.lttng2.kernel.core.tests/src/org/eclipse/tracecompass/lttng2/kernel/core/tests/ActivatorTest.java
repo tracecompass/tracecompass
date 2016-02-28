@@ -12,13 +12,13 @@
 
 package org.eclipse.tracecompass.lttng2.kernel.core.tests;
 
-import junit.framework.TestCase;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import junit.framework.TestCase;
 
 /**
  * <b><u>ActivatorTest</u></b>

@@ -20,6 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
@@ -38,7 +39,7 @@ public class TmfContextTest {
     // ------------------------------------------------------------------------
 
     private final Long aLong = 12345L;
-    private final TmfTimestamp aTimestamp = new TmfTimestamp();
+    private final ITmfTimestamp aTimestamp = TmfTimestamp.fromSeconds(0);
 
     private final TmfLongLocation fLocation1 = new TmfLongLocation(aLong);
     private final TmfTimestampLocation fLocation2 = new TmfTimestampLocation(aTimestamp);

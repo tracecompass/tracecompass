@@ -19,7 +19,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
 import org.eclipse.tracecompass.tmf.core.event.ITmfLostEvent;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
@@ -68,7 +67,7 @@ public class CtfTmfLostEvent extends CtfTmfEvent implements ITmfLostEvent {
          * Only the factory should call this method, the cast to
          * (TmfNanoTimestamp) should be safe.
          */
-        super(trace, rank, (TmfNanoTimestamp) timeRange.getStartTime(), fileName, cpu, declaration, def);
+        super(trace, rank, timeRange.getStartTime(), fileName, cpu, declaration, def);
         fTimeRange = timeRange;
         fNbLost = nbLost;
     }

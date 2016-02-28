@@ -14,12 +14,12 @@ package org.eclipse.tracecompass.tmf.core.timestamp;
 import java.util.TimeZone;
 
 /**
- * A generic timestamp implementation for delta between timestamps.
- * The toString() method takes negative values into consideration.
+ * A generic timestamp implementation for delta between timestamps. The
+ * toString() method takes negative values into consideration.
  *
  * @author Bernd Hufmann
  */
-public class TmfTimestampDelta extends TmfTimestamp {
+public class TmfTimestampDelta extends TmfRealTimestamp {
 
     // ------------------------------------------------------------------------
     // Members
@@ -32,37 +32,40 @@ public class TmfTimestampDelta extends TmfTimestamp {
      * Default constructor
      */
     public TmfTimestampDelta() {
-        super();
+        super(0, ITmfTimestamp.SECOND_SCALE);
     }
 
     /**
      * Simple constructor (scale = precision = 0)
      *
-     * @param value the timestamp value
+     * @param value
+     *            the timestamp value
      */
 
     public TmfTimestampDelta(long value) {
-        super(value);
+        super(value, ITmfTimestamp.SECOND_SCALE);
     }
 
     /**
-     * Simple constructor (precision = 0)
+     * Constructor
      *
-     * @param value the timestamp value
-     * @param scale the timestamp scale
+     * @param value
+     *            the timestamp value
+     * @param scale
+     *            the timestamp scale
      */
     public TmfTimestampDelta(long value, int scale) {
         super(value, scale);
     }
 
-
     /**
      * Copy constructor
      *
-     * @param timestamp the timestamp to copy
+     * @param timestamp
+     *            the timestamp to copy
      */
     public TmfTimestampDelta(ITmfTimestamp timestamp) {
-        super(timestamp);
+        super(timestamp.getValue(), timestamp.getScale());
     }
 
     // ------------------------------------------------------------------------

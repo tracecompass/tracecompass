@@ -152,7 +152,6 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
@@ -233,8 +232,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
     private final class ColumnMovedListener extends ControlAdapter {
         /*
-         * Make sure that the margin column is always first and keep the
-         * column order variable up to date.
+         * Make sure that the margin column is always first and keep the column
+         * order variable up to date.
          */
         @Override
         public void controlMoved(ControlEvent e) {
@@ -460,13 +459,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             GC gc = event.gc;
             Color background = item.getBackground(event.index);
             /*
-             * Paint the background if it is not the default system color.
-             * In Windows, if you let the widget draw the background, it
-             * will not show the item's background color if the item is
-             * selected or hot. If there are no style ranges and the item
-             * background is the default system color, we do not want to
-             * paint it or otherwise we would override the platform theme
-             * (e.g. alternating colors).
+             * Paint the background if it is not the default system color. In
+             * Windows, if you let the widget draw the background, it will not
+             * show the item's background color if the item is selected or hot.
+             * If there are no style ranges and the item background is the
+             * default system color, we do not want to paint it or otherwise we
+             * would override the platform theme (e.g. alternating colors).
              */
             if (styleRanges != null || !background.equals(item.getParent().getBackground())) {
                 // we will paint the table item's background
@@ -479,9 +477,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
             /*
              * We will paint the table item's foreground. In Windows, if you
-             * paint the background but let the widget draw the foreground,
-             * it will override your background, unless the item is selected
-             * or hot.
+             * paint the background but let the widget draw the foreground, it
+             * will override your background, unless the item is selected or
+             * hot.
              */
             event.detail &= ~SWT.FOREGROUND;
 
@@ -556,8 +554,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 /*
                  * Bug in Linux. The coordinates of the event have an origin
                  * that excludes the table header but the method toDisplay()
-                 * expects coordinates relative to an origin that includes
-                 * the table header.
+                 * expects coordinates relative to an origin that includes the
+                 * table header.
                  */
                 int y = event.y;
                 if (IS_LINUX) {
@@ -590,8 +588,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * The events table search/filter/data keys
      *
      * @author Patrick Tasse
-     * @noimplement This interface only contains Event Table specific
-     *              static definitions.
+     * @noimplement This interface only contains Event Table specific static
+     *              definitions.
      */
     public interface Key {
 
@@ -1559,7 +1557,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         }
         item.setText(itemStrings);
         item.setData(tmfEvent);
-        item.setData(Key.TIMESTAMP, new TmfTimestamp(tmfEvent.getTimestamp()));
+        item.setData(Key.TIMESTAMP, tmfEvent.getTimestamp());
         item.setData(Key.RANK, rank);
 
         final Collection<Long> markerIds = fBookmarksMap.get(rank);
@@ -2614,8 +2612,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     /**
      * Returns true if the column is a visible event column.
      *
-     * @param column the column
-     * @return false if the column is the margin column or hidden, true otherwise
+     * @param column
+     *            the column
+     * @return false if the column is the margin column or hidden, true
+     *         otherwise
      */
     private static boolean isVisibleEventColumn(TableColumn column) {
         if (column.getData(Key.ASPECT) == TmfMarginColumn.MARGIN_ASPECT) {
@@ -2963,7 +2963,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                                 bookmark.setAttribute(IMarker.MESSAGE, message.toString());
                                 bookmark.setAttribute(IMarker.LOCATION, location);
                                 bookmark.setAttribute(ITmfMarker.MARKER_RANK, rank.toString());
-                                bookmark.setAttribute(ITmfMarker.MARKER_TIME, Long.toString(new TmfNanoTimestamp(timestamp).getValue()));
+                                bookmark.setAttribute(ITmfMarker.MARKER_TIME, Long.toString(timestamp.toNanos()));
                                 bookmark.setAttribute(ITmfMarker.MARKER_COLOR, dialog.getColorValue().toString());
                                 id[0] = bookmark.getId();
                             }
@@ -3088,10 +3088,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         try {
             String timeString = marker.getAttribute(ITmfMarker.MARKER_TIME, (String) null);
             long time = Long.parseLong(timeString);
-            tsBegin = new TmfNanoTimestamp(time);
+            tsBegin = TmfTimestamp.fromNanos(time);
             String durationString = marker.getAttribute(ITmfMarker.MARKER_DURATION, (String) null);
             long duration = Long.parseLong(durationString);
-            tsEnd = new TmfNanoTimestamp(time + duration);
+            tsEnd = TmfTimestamp.fromNanos(time + duration);
         } catch (NumberFormatException e) {
             /* ignored */
         }
@@ -3193,8 +3193,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             final TmfEventRequest subRequest = new TmfEventRequest(ITmfEvent.class,
                     TmfTimeRange.ETERNITY, 0, 1, ExecutionType.FOREGROUND) {
 
-                TmfTimestamp ts = new TmfTimestamp(signal.getBeginTime());
-                TmfTimestamp tf = new TmfTimestamp(signal.getEndTime());
+                ITmfTimestamp ts = signal.getBeginTime();
+                ITmfTimestamp tf = signal.getEndTime();
 
                 @Override
                 public void handleSuccess() {
@@ -3245,7 +3245,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         contextEnd = fTrace.seekEvent(te);
                         rankEnd = contextEnd.getRank();
                         contextEnd.dispose();
-                        /* To include all events at the begin time, seek at the next nanosecond and then use the previous rank */
+                        /*
+                         * To include all events at the begin time, seek at the
+                         * next nanosecond and then use the previous rank
+                         */
                         tb = timestampBegin.normalize(1, ITmfTimestamp.NANOSECOND_SCALE);
                         if (tb.compareTo(fTrace.getEndTime()) <= 0) {
                             contextBegin = fTrace.seekEvent(tb);
@@ -3255,14 +3258,20 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             rankBegin = ITmfContext.UNKNOWN_RANK;
                         }
                         rankBegin = (rankBegin == ITmfContext.UNKNOWN_RANK ? fTrace.getNbEvents() : rankBegin) - 1;
-                        /* If no events in selection range, select only the next event */
+                        /*
+                         * If no events in selection range, select only the next
+                         * event
+                         */
                         rankBegin = rankBegin >= rankEnd ? rankBegin : rankEnd;
                     } else {
                         tb = timestampBegin;
                         contextBegin = fTrace.seekEvent(tb);
                         rankBegin = contextBegin.getRank();
                         contextBegin.dispose();
-                        /* To include all events at the end time, seek at the next nanosecond and then use the previous rank */
+                        /*
+                         * To include all events at the end time, seek at the
+                         * next nanosecond and then use the previous rank
+                         */
                         te = timestampEnd.normalize(1, ITmfTimestamp.NANOSECOND_SCALE);
                         if (te.compareTo(fTrace.getEndTime()) <= 0) {
                             contextEnd = fTrace.seekEvent(te);
@@ -3272,7 +3281,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             rankEnd = ITmfContext.UNKNOWN_RANK;
                         }
                         rankEnd = (rankEnd == ITmfContext.UNKNOWN_RANK ? fTrace.getNbEvents() : rankEnd) - 1;
-                        /* If no events in selection range, select only the next event */
+                        /*
+                         * If no events in selection range, select only the next
+                         * event
+                         */
                         rankEnd = rankEnd >= rankBegin ? rankEnd : rankBegin;
                     }
                     return new Pair<>(Long.valueOf(rankBegin), Long.valueOf(rankEnd));

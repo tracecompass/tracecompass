@@ -52,7 +52,7 @@ import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
@@ -315,7 +315,7 @@ public class TmfXmlTraceStub extends TmfTrace {
          * original is in second and we need to convert it. We should do that at
          * the source when it is supported
          */
-        ITmfTimestamp timestamp = new TmfNanoTimestamp(event.getTimestamp().getValue() / SECONDS_TO_NS);
+        ITmfTimestamp timestamp = TmfTimestamp.fromNanos(event.getTimestamp().getValue() / SECONDS_TO_NS);
         TmfEvent newEvent = new TmfEvent(this, ITmfContext.UNKNOWN_RANK, timestamp, eventType, eventFields);
         updateAttributes(savedContext, event);
         return newEvent;

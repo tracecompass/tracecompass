@@ -50,7 +50,6 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
@@ -626,8 +625,8 @@ public class CtfTmfTrace extends TmfTrace
      * @since 1.0
      */
     @Override
-    public @NonNull TmfNanoTimestamp createTimestamp(long ts) {
-        return new TmfNanoTimestamp(getTimestampTransform().transform(ts));
+    public @NonNull ITmfTimestamp createTimestamp(long ts) {
+        return TmfTimestamp.fromNanos(getTimestampTransform().transform(ts));
     }
 
     private static int fCheckpointSize = -1;
@@ -635,7 +634,7 @@ public class CtfTmfTrace extends TmfTrace
     @Override
     public synchronized int getCheckpointSize() {
         if (fCheckpointSize == -1) {
-            TmfCheckpoint c = new TmfCheckpoint(new TmfNanoTimestamp(0), new CtfLocation(0, 0), 0);
+            TmfCheckpoint c = new TmfCheckpoint(TmfTimestamp.fromNanos(0), new CtfLocation(0, 0), 0);
             ByteBuffer b = ByteBuffer.allocate(ITmfCheckpoint.MAX_SERIALIZE_SIZE);
             b.clear();
             c.serialize(b);

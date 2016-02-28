@@ -18,7 +18,6 @@ import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.ITmfChartTimeProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfBaseProvider;
@@ -137,9 +136,9 @@ public class TmfHistogramTooltipProvider extends TmfBaseProvider implements Mous
             /* set tooltip of closest data point */
             StringBuffer buffer = new StringBuffer();
             buffer.append("Range=["); //$NON-NLS-1$
-            buffer.append(new TmfTimestamp((long) rangeStart + viewer.getTimeOffset(), ITmfTimestamp.NANOSECOND_SCALE).toString());
+            buffer.append(TmfTimestamp.fromNanos((long) rangeStart + viewer.getTimeOffset()).toString());
             buffer.append(',');
-            buffer.append(new TmfTimestamp((long) rangeEnd + viewer.getTimeOffset(), ITmfTimestamp.NANOSECOND_SCALE).toString());
+            buffer.append(TmfTimestamp.fromNanos((long) rangeEnd + viewer.getTimeOffset()).toString());
             buffer.append("]\n"); //$NON-NLS-1$
             buffer.append("y="); //$NON-NLS-1$
             buffer.append((long) y);

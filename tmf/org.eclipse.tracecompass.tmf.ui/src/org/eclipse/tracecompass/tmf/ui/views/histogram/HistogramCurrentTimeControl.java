@@ -20,7 +20,6 @@ import java.text.ParseException;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
@@ -102,7 +101,7 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
     @Override
     public void setValue(long time) {
         if (time != Long.MIN_VALUE) {
-            super.setValue(time, new TmfTimestamp(time, ITmfTimestamp.NANOSECOND_SCALE).toString());
+            super.setValue(time, TmfTimestamp.fromNanos(time).toString());
         } else {
             super.setValue(time, ""); //$NON-NLS-1$
         }

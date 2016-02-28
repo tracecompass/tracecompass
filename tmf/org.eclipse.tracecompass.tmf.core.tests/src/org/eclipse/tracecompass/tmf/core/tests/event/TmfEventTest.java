@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -61,7 +62,7 @@ public class TmfEventTest {
     private final ITmfEventField[] fFields1 = new ITmfEventField[] { fField1a, fField1b };
     private final @NonNull String fRawContent1 = fField1a.toString() + fField1b.toString();
     private final ITmfEventField fContent1 = new TmfEventField(fRawContent1, null, fFields1);
-    private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, 2);
+    private final ITmfTimestamp fTimestamp1 = TmfTimestamp.create(12345, 2);
     private final @NonNull ITmfEvent fEvent1 = new TmfEvent(fTrace, 0, fTimestamp1, fType, fContent1);
 
     private final Object fValue2a = "Another string";
@@ -71,7 +72,7 @@ public class TmfEventTest {
     private final ITmfEventField[] fFields2 = new ITmfEventField[] { fField2a, fField2b };
     private final @NonNull String fRawContent2 = fField2a.toString() + fField2b.toString();
     private final ITmfEventField fContent2 = new TmfEventField(fRawContent2, null, fFields2);
-    private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, 2);
+    private final ITmfTimestamp fTimestamp2 = TmfTimestamp.create(12350, 2);
     private final @NonNull ITmfEvent fEvent2 = new TmfEvent(fTrace, 1, fTimestamp2, fType, fContent2);
 
     // ------------------------------------------------------------------------

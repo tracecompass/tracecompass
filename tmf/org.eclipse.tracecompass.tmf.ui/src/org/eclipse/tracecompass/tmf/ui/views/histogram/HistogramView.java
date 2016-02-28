@@ -474,8 +474,8 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
      */
     public TmfTimeRange getTimeRange() {
         return new TmfTimeRange(
-                new TmfTimestamp(fWindowStartTime, ITmfTimestamp.NANOSECOND_SCALE),
-                new TmfTimestamp(fWindowEndTime, ITmfTimestamp.NANOSECOND_SCALE));
+                TmfTimestamp.fromNanos(fWindowStartTime),
+                TmfTimestamp.fromNanos(fWindowEndTime));
     }
 
     /**
@@ -539,8 +539,8 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
      */
     void updateSelectionTime(long beginTime, long endTime) {
         updateDisplayedSelectionTime(beginTime, endTime);
-        TmfTimestamp beginTs = new TmfTimestamp(beginTime, ITmfTimestamp.NANOSECOND_SCALE);
-        TmfTimestamp endTs = new TmfTimestamp(endTime, ITmfTimestamp.NANOSECOND_SCALE);
+        ITmfTimestamp beginTs = TmfTimestamp.fromNanos(beginTime);
+        ITmfTimestamp endTs = TmfTimestamp.fromNanos(endTime);
         TmfSelectionRangeUpdatedSignal signal = new TmfSelectionRangeUpdatedSignal(this, beginTs, endTs);
         fTimeSyncThrottle.queue(signal);
     }
@@ -578,8 +578,8 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
         if (fTrace != null) {
             // Build the new time range; keep the current time
             TmfTimeRange timeRange = new TmfTimeRange(
-                    new TmfTimestamp(startTime, ITmfTimestamp.NANOSECOND_SCALE),
-                    new TmfTimestamp(endTime, ITmfTimestamp.NANOSECOND_SCALE));
+                    TmfTimestamp.fromNanos(startTime),
+                    TmfTimestamp.fromNanos(endTime));
             fTimeSpanControl.setValue(endTime - startTime);
 
             updateDisplayedTimeRange(startTime, endTime);
@@ -937,8 +937,8 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
         if ((fTimeRangeRequest != null) && !fTimeRangeRequest.isCompleted()) {
             fTimeRangeRequest.cancel();
         }
-        TmfTimestamp startTS = new TmfTimestamp(startTime, ITmfTimestamp.NANOSECOND_SCALE);
-        TmfTimestamp endTS = new TmfTimestamp(endTime, ITmfTimestamp.NANOSECOND_SCALE);
+        ITmfTimestamp startTS = TmfTimestamp.fromNanos(startTime);
+        ITmfTimestamp endTS = TmfTimestamp.fromNanos(endTime);
         TmfTimeRange timeRange = new TmfTimeRange(startTS, endTS);
 
         fTimeRangeHistogram.clear();

@@ -24,10 +24,11 @@ import java.util.Vector;
 import org.eclipse.tracecompass.internal.tmf.core.component.TmfProviderManager;
 import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
+import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfStartSynchSignal;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.tests.stubs.component.TmfEventProviderStub;
@@ -303,8 +304,8 @@ public class TmfEventProviderTest {
      */
     @Test
     public void testGetSyntheticEvents_TimeRange() {
-        TmfTimestamp start = new TmfTimestamp(1, (byte) -3);
-        TmfTimestamp end = new TmfTimestamp(1000, (byte) -3);
+        ITmfTimestamp start = TmfTimestamp.create(1, (byte) -3);
+        ITmfTimestamp end = TmfTimestamp.create(1000, (byte) -3);
         TmfTimeRange range = new TmfTimeRange(start, end);
         try {
             getSyntheticData(range, -1);
@@ -315,7 +316,7 @@ public class TmfEventProviderTest {
 
 //    public void testGetSyntheticEvents_WeirdTimeRange1() {
 //        TmfTimestamp start = TmfTimestamp.BigBang;
-//        TmfTimestamp end = TmfTimestamp.Zero; // new TmfTimestamp(0, (byte) -3,
+//        TmfTimestamp end = TmfTimestamp.Zero; // TmfTimestamp.create(0, (byte) -3,
 //                                              // 0);
 //        TmfTimeRange range = new TmfTimeRange(start, end);
 //        try {
@@ -326,7 +327,7 @@ public class TmfEventProviderTest {
 //    }
 
 //    public void testGetSyntheticEvents_WeirdTimeRange2() {
-//        TmfTimestamp start = TmfTimestamp.Zero; // new TmfTimestamp(0, (byte)
+//        TmfTimestamp start = TmfTimestamp.Zero; // TmfTimestamp.create(0, (byte)
 //                                                // -3, 0);
 //        TmfTimestamp end = TmfTimestamp.BigCrunch;
 //        TmfTimeRange range = new TmfTimeRange(start, end);

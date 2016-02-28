@@ -21,11 +21,110 @@ import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * A generic timestamp implementation. The timestamp is represented by the tuple
- * { value, scale, precision }. By default, timestamps are scaled in seconds.
+ * { value, scale, precision }.
  *
  * @author Francois Chouinard
  */
-public class TmfTimestamp implements ITmfTimestamp {
+public abstract class TmfTimestamp implements ITmfTimestamp {
+    /**
+     * Create a timestamp.
+     *
+     * @param value
+     *            the value in nanoseconds
+     * @return the timestamp
+     * @since 2.0
+     */
+    public static @NonNull ITmfTimestamp fromNanos(long value) {
+        return new TmfNanoTimestamp(value);
+    }
+
+    /**
+     * Create a timestamp.
+     *
+     * @param value
+     *            the value in microseconds
+     * @return the timestamp
+     * @since 2.0
+     */
+    public static @NonNull ITmfTimestamp fromMicros(long value) {
+        return create(value, ITmfTimestamp.MICROSECOND_SCALE);
+    }
+
+    /**
+     * Create a timestamp.
+     *
+     * @param value
+     *            the value in milliseconds
+     * @return the timestamp
+     * @since 2.0
+     */
+    public static @NonNull ITmfTimestamp fromMillis(long value) {
+        return create(value, ITmfTimestamp.MILLISECOND_SCALE);
+    }
+
+    /**
+     * Create a timestamp.
+     *
+     * @param value
+     *            the value in seconds
+     * @return the timestamp
+     * @since 2.0
+     */
+    public static @NonNull ITmfTimestamp fromSeconds(long value) {
+        return new TmfSecondTimestamp(value);
+    }
+
+    /**
+     * Create a timestamp.
+     *
+     * @param bufferIn
+     *            the byte buffer to read the timestamp from.
+     * @return the timestamp
+     * @since 2.0
+     */
+    public static @NonNull ITmfTimestamp create(ByteBuffer bufferIn) {
+        return create(bufferIn.getLong(), bufferIn.getInt());
+    }
+
+    /**
+     * Create a timestamp.
+     *
+     * @param value
+     *            the value in time, the unit is specified by the scale
+     * @param scale
+     *            the scale of the timestamp with respect to seconds, so a
+     *            nanosecond would be -9 (10e-9) and a megasecond would be 6
+     *            (10e6)
+     * @return the timestamp
+     * @since 2.0
+     */
+    public static @NonNull ITmfTimestamp create(long value, int scale) {
+        if (scale == ITmfTimestamp.NANOSECOND_SCALE) {
+            return fromNanos(value);
+        }
+        if (scale == ITmfTimestamp.SECOND_SCALE) {
+            return fromSeconds(value);
+        }
+        return createOther(value, scale);
+    }
+
+    /**
+     * Write the time stamp to the ByteBuffer so that it can be saved to disk.
+     *
+     * @param bufferOut
+     *            the buffer to write to
+     * @param ts
+     *            the timestamp to write
+     * @since 2.0
+     */
+    public static void serialize(ByteBuffer bufferOut, ITmfTimestamp ts) {
+        bufferOut.putLong(ts.getValue());
+        bufferOut.putInt(ts.getScale());
+    }
+
+    private static @NonNull ITmfTimestamp createOther(long value, int scale) {
+        return new TmfRealTimestamp(value, scale);
+    }
 
     // ------------------------------------------------------------------------
     // Constants
@@ -34,121 +133,28 @@ public class TmfTimestamp implements ITmfTimestamp {
     /**
      * The beginning of time
      */
-    public static final @NonNull ITmfTimestamp BIG_BANG = new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE);
+    public static final @NonNull ITmfTimestamp BIG_BANG = new TmfRealTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE);
 
     /**
      * The end of time
      */
-    public static final @NonNull ITmfTimestamp BIG_CRUNCH = new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE);
+    public static final @NonNull ITmfTimestamp BIG_CRUNCH = new TmfRealTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE);
 
     /**
      * Zero
      */
-    public static final @NonNull ITmfTimestamp ZERO = new TmfTimestamp(0, 0);
-
-    // ------------------------------------------------------------------------
-    // Attributes
-    // ------------------------------------------------------------------------
-
-    /**
-     * The timestamp raw value (mantissa)
-     */
-    private final long fValue;
-
-    /**
-     * The timestamp scale (magnitude)
-     */
-    private final int fScale;
-
-    // ------------------------------------------------------------------------
-    // Constructors
-    // ------------------------------------------------------------------------
-
-    /**
-     * Default constructor
-     */
-    public TmfTimestamp() {
-        this(0, ITmfTimestamp.SECOND_SCALE);
-    }
-
-    /**
-     * Simple constructor (scale = 0)
-     *
-     * @param value
-     *            the timestamp value
-     */
-    public TmfTimestamp(final long value) {
-        this(value, ITmfTimestamp.SECOND_SCALE);
-    }
-
-    /**
-     * Full constructor
-     *
-     * @param value
-     *            the timestamp value
-     * @param scale
-     *            the timestamp scale
-     */
-    public TmfTimestamp(final long value, final int scale) {
-        fValue = value;
-        fScale = scale;
-    }
-
-    /**
-     * Copy constructor
-     *
-     * @param timestamp
-     *            the timestamp to copy
-     */
-    public TmfTimestamp(final ITmfTimestamp timestamp) {
-        if (timestamp == null) {
-            throw new IllegalArgumentException();
-        }
-        fValue = timestamp.getValue();
-        fScale = timestamp.getScale();
-    }
-
-    /**
-     * Copies a timestamp but with a new time value
-     *
-     * @param timestamp
-     *            The timestamp to copy
-     * @param newvalue
-     *            The value the new timestamp will have
-     */
-    public TmfTimestamp(ITmfTimestamp timestamp, long newvalue) {
-        if (timestamp == null) {
-            throw new IllegalArgumentException();
-        }
-        fValue = newvalue;
-        fScale = timestamp.getScale();
-    }
+    public static final @NonNull ITmfTimestamp ZERO = new TmfRealTimestamp(0, 0);
 
     // ------------------------------------------------------------------------
     // ITmfTimestamp
     // ------------------------------------------------------------------------
 
     /**
-     * Construct the timestamp from the ByteBuffer.
+     * Scaling factors to help scale
      *
-     * @param bufferIn
-     *            the buffer to read from
+     * @since 2.0
      */
-    public TmfTimestamp(ByteBuffer bufferIn) {
-        this(bufferIn.getLong(), bufferIn.getInt());
-    }
-
-    @Override
-    public long getValue() {
-        return fValue;
-    }
-
-    @Override
-    public int getScale() {
-        return fScale;
-    }
-
-    private static final long scalingFactors[] = new long[] {
+    protected static final long SCALING_FACTORS[] = new long[] {
             1L,
             10L,
             100L,
@@ -187,20 +193,20 @@ public class TmfTimestamp implements ITmfTimestamp {
         }
 
         if (value == 0) {
-            return new TmfTimestamp(offset, scale);
+            return create(offset, scale);
         }
 
         // First, scale the timestamp
         if (getScale() != scale) {
             final int scaleDiff = Math.abs(getScale() - scale);
-            if (scaleDiff >= scalingFactors.length) {
+            if (scaleDiff >= SCALING_FACTORS.length) {
                 if (getScale() < scale) {
                     value = 0;
                 } else {
                     value = value > 0 ? Long.MAX_VALUE : Long.MIN_VALUE;
                 }
             } else {
-                final long scalingFactor = scalingFactors[scaleDiff];
+                final long scalingFactor = SCALING_FACTORS[scaleDiff];
                 if (getScale() < scale) {
                     value /= scalingFactor;
                 } else {
@@ -211,14 +217,15 @@ public class TmfTimestamp implements ITmfTimestamp {
 
         value = saturatedAdd(value, offset);
 
-        return new TmfTimestamp(value, scale);
+        return create(value, scale);
     }
 
     @Override
     public ITmfTimestamp getDelta(final ITmfTimestamp ts) {
-        final ITmfTimestamp nts = ts.normalize(0, fScale);
-        final long value = fValue - nts.getValue();
-        return new TmfTimestampDelta(value, fScale);
+        final int scale = getScale();
+        final ITmfTimestamp nts = ts.normalize(0, scale);
+        final long value = getValue() - nts.getValue();
+        return new TmfTimestampDelta(value, scale);
     }
 
     @Override
@@ -236,41 +243,43 @@ public class TmfTimestamp implements ITmfTimestamp {
 
     @Override
     public int compareTo(final ITmfTimestamp ts) {
+        long value = getValue();
+        int scale = getScale();
         // Check the corner cases (we can't use equals() because it uses
         // compareTo()...)
         if (ts == null) {
             return 1;
         }
-        if (this == ts || (fValue == ts.getValue() && fScale == ts.getScale())) {
+        if (this == ts || (value == ts.getValue() && scale == ts.getScale())) {
             return 0;
         }
-        if ((fValue == BIG_BANG.getValue() && fScale == BIG_BANG.getScale()) || (ts.getValue() == BIG_CRUNCH.getValue() && ts.getScale() == BIG_CRUNCH.getScale())) {
+        if ((value == BIG_BANG.getValue() && scale == BIG_BANG.getScale()) || (ts.getValue() == BIG_CRUNCH.getValue() && ts.getScale() == BIG_CRUNCH.getScale())) {
             return -1;
         }
-        if ((fValue == BIG_CRUNCH.getValue() && fScale == BIG_CRUNCH.getScale()) || (ts.getValue() == BIG_BANG.getValue() && ts.getScale() == BIG_BANG.getScale())) {
+        if ((value == BIG_CRUNCH.getValue() && scale == BIG_CRUNCH.getScale()) || (ts.getValue() == BIG_BANG.getValue() && ts.getScale() == BIG_BANG.getScale())) {
             return 1;
         }
-        final ITmfTimestamp nts = ts.normalize(0, fScale);
+        final ITmfTimestamp nts = ts.normalize(0, scale);
         if ((nts.getValue() == 0 && ts.getValue() != 0) || (ts.getValue() != Long.MAX_VALUE && nts.getValue() == Long.MAX_VALUE) || (ts.getValue() != Long.MIN_VALUE && nts.getValue() == Long.MIN_VALUE)) {
             // Scaling error. We can figure it out nonetheless.
 
             // First, look at the sign of the mantissa
-            final long value = ts.getValue();
-            if (fValue == 0 && value == 0) {
+            final long otherValue = ts.getValue();
+            if (value == 0 && otherValue == 0) {
                 return 0;
             }
-            if (fValue < 0 && value >= 0) {
+            if (value < 0 && otherValue >= 0) {
                 return -1;
             }
-            if (fValue >= 0 && value < 0) {
+            if (value >= 0 && otherValue < 0) {
                 return 1;
             }
 
             // Otherwise, just compare the scales
-            final int scale = ts.getScale();
-            return (fScale > scale) ? (fValue >= 0) ? 1 : -1 : (fValue >= 0) ? -1 : 1;
+            final int otherScale = ts.getScale();
+            return (scale > otherScale) ? (otherValue >= 0) ? 1 : -1 : (otherValue >= 0) ? -1 : 1;
         }
-        final long delta = fValue - nts.getValue();
+        final long delta = value - nts.getValue();
         return Long.compare(delta, 0);
     }
 
@@ -332,8 +341,9 @@ public class TmfTimestamp implements ITmfTimestamp {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (int) (fValue ^ (fValue >>> 32));
-        result = prime * result + fScale;
+        final long value = getValue();
+        result = prime * result + (int) (value ^ (value >>> 32));
+        result = prime * result + getScale();
         return result;
     }
 
@@ -365,16 +375,5 @@ public class TmfTimestamp implements ITmfTimestamp {
         } catch (ArithmeticException e) {
             return format.format(0);
         }
-    }
-
-    /**
-     * Write the time stamp to the ByteBuffer so that it can be saved to disk.
-     *
-     * @param bufferOut
-     *            the buffer to write to
-     */
-    public void serialize(ByteBuffer bufferOut) {
-        bufferOut.putLong(fValue);
-        bufferOut.putInt(fScale);
     }
 }

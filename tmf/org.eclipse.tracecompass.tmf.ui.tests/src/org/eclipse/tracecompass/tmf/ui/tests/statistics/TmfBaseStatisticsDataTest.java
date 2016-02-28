@@ -34,6 +34,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.junit.Test;
@@ -57,9 +58,9 @@ public class TmfBaseStatisticsDataTest {
     private final String   fLabel2 = "label3";
     private final String[] fLabels = new String[] { fLabel0, fLabel1, fLabel2 };
 
-    private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2);
-    private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, (byte) 2);
-    private final TmfTimestamp fTimestamp3 = new TmfTimestamp(12355, (byte) 2);
+    private final ITmfTimestamp fTimestamp1 = TmfTimestamp.create(12345, (byte) 2);
+    private final ITmfTimestamp fTimestamp2 = TmfTimestamp.create(12350, (byte) 2);
+    private final ITmfTimestamp fTimestamp3 = TmfTimestamp.create(12355, (byte) 2);
 
     private final TmfEventType fType1 = new TmfEventType(fTypeId1, TmfEventField.makeRoot(fLabels));
     private final TmfEventType fType2 = new TmfEventType(fTypeId1, TmfEventField.makeRoot(fLabels));

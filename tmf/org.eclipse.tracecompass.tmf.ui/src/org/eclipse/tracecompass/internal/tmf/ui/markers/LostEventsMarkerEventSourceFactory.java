@@ -12,8 +12,8 @@
 
 package org.eclipse.tracecompass.internal.tmf.ui.markers;
 
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.AbstractTmfTraceAdapterFactory;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEventSource;
 
 /**

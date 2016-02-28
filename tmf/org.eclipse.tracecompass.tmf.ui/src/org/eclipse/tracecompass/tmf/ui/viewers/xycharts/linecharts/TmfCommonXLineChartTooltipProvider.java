@@ -18,7 +18,6 @@ import java.text.ParsePosition;
 
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.ITmfChartTimeProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfBaseProvider;
@@ -131,7 +130,7 @@ public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implemen
             }
             StringBuffer buffer = new StringBuffer();
             buffer.append("time="); //$NON-NLS-1$
-            buffer.append(new TmfTimestamp((long) xCoordinate + getChartViewer().getTimeOffset(), ITmfTimestamp.NANOSECOND_SCALE).toString());
+            buffer.append(TmfTimestamp.fromNanos((long) xCoordinate + getChartViewer().getTimeOffset()).toString());
             buffer.append('\n');
 
             /* For each series, get the value at the index */

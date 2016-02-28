@@ -77,7 +77,7 @@ public class TmfXmlPatternSegment implements ISegment {
      * @return The start timestamp
      */
     public @NonNull ITmfTimestamp getTimestampStart() {
-        return new TmfTimestamp(fStart, fScale);
+        return TmfTimestamp.create(fStart, fScale);
     }
 
     /**
@@ -86,7 +86,7 @@ public class TmfXmlPatternSegment implements ISegment {
      * @return The end timestamp
      */
     public @NonNull ITmfTimestamp getTimestampEnd() {
-        return new TmfTimestamp(fEnd, fScale);
+        return TmfTimestamp.create(fEnd, fScale);
     }
 
     /**

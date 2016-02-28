@@ -28,7 +28,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
@@ -48,7 +47,7 @@ public class TmfSchedulerTest {
 
     /** Time-out tests after 60 seconds */
     @Rule
-    public TestRule globalTimeout= new Timeout(1, TimeUnit.MINUTES);
+    public TestRule globalTimeout = new Timeout(1, TimeUnit.MINUTES);
 
     // ------------------------------------------------------------------------
     // Constants
@@ -84,8 +83,8 @@ public class TmfSchedulerTest {
 
         long foregroundStartTime = fStartTime + ((fEndTime - fStartTime) / 4);
         long foregroundEndTime = fStartTime + ((fEndTime - fStartTime) / 2);
-        fForegroundTimeRange = new TmfTimeRange(new TmfTimestamp(foregroundStartTime, ITmfTimestamp.NANOSECOND_SCALE),
-                new TmfTimestamp(foregroundEndTime, ITmfTimestamp.NANOSECOND_SCALE));
+        fForegroundTimeRange = new TmfTimeRange(TmfTimestamp.fromNanos(foregroundStartTime),
+                TmfTimestamp.fromNanos(foregroundEndTime));
     }
 
     /**
@@ -185,7 +184,7 @@ public class TmfSchedulerTest {
         ForegroundRequest foreground3 = new ForegroundRequest(TmfTimeRange.ETERNITY);
         fixture.sendRequest(foreground3);
 
-        TmfSelectionRangeUpdatedSignal signal3 = new TmfSelectionRangeUpdatedSignal(this, new TmfTimestamp(fForegroundTimeRange.getStartTime()));
+        TmfSelectionRangeUpdatedSignal signal3 = new TmfSelectionRangeUpdatedSignal(this, fForegroundTimeRange.getStartTime());
         fixture.broadcast(signal3);
 
         try {
@@ -205,7 +204,7 @@ public class TmfSchedulerTest {
     public void TestMultiRequest4() {
         ForegroundRequest foreground4 = new ForegroundRequest(fForegroundTimeRange);
         fixture.sendRequest(foreground4);
-        TmfSelectionRangeUpdatedSignal signal4 = new TmfSelectionRangeUpdatedSignal(this, new TmfTimestamp(fStartTime + ((fEndTime - fStartTime) / 8)));
+        TmfSelectionRangeUpdatedSignal signal4 = new TmfSelectionRangeUpdatedSignal(this, TmfTimestamp.fromSeconds(fStartTime + ((fEndTime - fStartTime) / 8)));
         fixture.broadcast(signal4);
 
         try {
@@ -225,7 +224,7 @@ public class TmfSchedulerTest {
     public void TestMultiRequest5() {
         ForegroundRequest foreground5 = new ForegroundRequest(fForegroundTimeRange);
         fixture.sendRequest(foreground5);
-        TmfSelectionRangeUpdatedSignal signal5 = new TmfSelectionRangeUpdatedSignal(this, new TmfTimestamp(fEndTime - ((fEndTime - fStartTime) / 4)));
+        TmfSelectionRangeUpdatedSignal signal5 = new TmfSelectionRangeUpdatedSignal(this, TmfTimestamp.fromSeconds(fEndTime - ((fEndTime - fStartTime) / 4)));
         fixture.broadcast(signal5);
 
         try {
@@ -249,7 +248,7 @@ public class TmfSchedulerTest {
         fixture.sendRequest(background6);
         fixture.sendRequest(foreground6);
 
-        TmfSelectionRangeUpdatedSignal signal6 = new TmfSelectionRangeUpdatedSignal(this, new TmfTimestamp(fStartTime + ((fEndTime - fStartTime) / 8)));
+        TmfSelectionRangeUpdatedSignal signal6 = new TmfSelectionRangeUpdatedSignal(this, TmfTimestamp.fromSeconds(fStartTime + ((fEndTime - fStartTime) / 8)));
         fixture.broadcast(signal6);
 
         try {
@@ -297,8 +296,8 @@ public class TmfSchedulerTest {
     @Test
     public void preemptedForegroundRequest() {
         ForegroundRequest foreground9 = new ForegroundRequest(TmfTimeRange.ETERNITY);
-        TmfTimeRange shortTimeRange = new TmfTimeRange(new TmfTimestamp(fStartTime, ITmfTimestamp.NANOSECOND_SCALE),
-                new TmfTimestamp(fStartTime + ((fEndTime - fStartTime) / 16), ITmfTimestamp.NANOSECOND_SCALE));
+        TmfTimeRange shortTimeRange = new TmfTimeRange(TmfTimestamp.fromNanos(fStartTime),
+                TmfTimestamp.fromNanos(fStartTime + ((fEndTime - fStartTime) / 16)));
         ForegroundRequest shortForeground = new ForegroundRequest(shortTimeRange);
         fixture.sendRequest(foreground9);
         try {

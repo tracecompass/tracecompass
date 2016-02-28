@@ -14,12 +14,12 @@ package org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.loader;
 
 import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEndSynchSignal;
-import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfStartSynchSignal;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 
 /**
  *  Class to implement that certain signals are sent as well as are sent with correct content.
@@ -39,7 +39,7 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
     private boolean fIsRangeError = false;
 
     private Object fSource = null;
-    private TmfTimestamp fCurrentTimestamp = null;
+    private ITmfTimestamp fCurrentTimestamp = null;
     private TmfTimeRange fCurrentTimeRange = null;
 
     // ------------------------------------------------------------------------
@@ -166,13 +166,13 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
     }
 
     @Override
-    public TmfTimestamp getCurrentTime() {
+    public ITmfTimestamp getCurrentTime() {
         return fCurrentTimestamp;
     }
 
     @Override
-    public void setCurrentTime(TmfTimestamp currentTime) {
-        fCurrentTimestamp = currentTime == null ? null : new TmfTimestamp(currentTime);
+    public void setCurrentTime(ITmfTimestamp currentTime) {
+        fCurrentTimestamp = currentTime;
     }
 
     @Override

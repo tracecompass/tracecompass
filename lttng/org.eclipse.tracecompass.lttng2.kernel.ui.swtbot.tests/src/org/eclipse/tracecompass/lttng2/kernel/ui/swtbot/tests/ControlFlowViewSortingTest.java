@@ -86,7 +86,7 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
     private static final long LTTNG_CONSUMER_BIRTHTIME = 1361214078963717040L;
     private static final String LTTNG_CONSUMER_TID = "4034";
 
-    private static final @NonNull TmfTimestamp TRACE_START_TIME = new TmfTimestamp(1361214078963711320L, ITmfTimestamp.NANOSECOND_SCALE);
+    private static final @NonNull ITmfTimestamp TRACE_START_TIME = TmfTimestamp.create(1361214078963711320L, ITmfTimestamp.NANOSECOND_SCALE);
 
     // ------------------------------------------------------------------------
     // Attributes

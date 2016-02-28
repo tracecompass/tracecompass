@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentLocation;
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfLocationArray;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.core.trace.location.TmfLocation;
@@ -42,7 +43,7 @@ public class TmfLocationTest {
     // ------------------------------------------------------------------------
 
     private Long aLong = 12345L;
-    private TmfTimestamp aTimestamp = new TmfTimestamp();
+    private ITmfTimestamp aTimestamp = TmfTimestamp.create(0, ITmfTimestamp.SECOND_SCALE);
     private TmfLocationArray aLocationArray;
 
     private TmfLongLocation fLocation1;
@@ -234,7 +235,7 @@ public class TmfLocationTest {
 
     @Test
     public void testToString() {
-        TmfTimestamp ts = new TmfTimestamp();
+        ITmfTimestamp ts = TmfTimestamp.create(0, ITmfTimestamp.SECOND_SCALE);
 
         TmfLongLocation location1 = new TmfLongLocation(aLong);
         TmfTimestampLocation location2 = new TmfTimestampLocation(ts);

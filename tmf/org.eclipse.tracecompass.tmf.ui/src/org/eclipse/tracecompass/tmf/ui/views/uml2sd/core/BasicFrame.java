@@ -46,11 +46,11 @@ public class BasicFrame extends GraphNode {
     /**
      * Contains the max elapsed time between two consecutive messages in the whole frame
      */
-    private ITmfTimestamp fMaxTime = new TmfTimestamp(0);
+    private ITmfTimestamp fMaxTime = TmfTimestamp.fromSeconds(0);
     /**
      * Contains the min elapsed time between two consecutive messages in the whole frame
      */
-    private ITmfTimestamp fMinTime = new TmfTimestamp(0);
+    private ITmfTimestamp fMinTime = TmfTimestamp.fromSeconds(0);
     /**
      * Indicate if the min and max elapsed time between two consecutive messages in the whole frame need to be computed
      */
@@ -99,11 +99,11 @@ public class BasicFrame extends GraphNode {
     /**
      * The minimum time between messages of the sequence diagram frame.
      */
-    private ITmfTimestamp fMinSDTime = new TmfTimestamp();
+    private ITmfTimestamp fMinSDTime = TmfTimestamp.fromSeconds(0);
     /**
      * The maximum time between messages of the sequence diagram frame.
      */
-    private ITmfTimestamp fMaxSDTime = new TmfTimestamp();
+    private ITmfTimestamp fMaxSDTime = TmfTimestamp.fromSeconds(0);
     /**
      * Flag to indicate that initial minimum has to be computed.
      */
@@ -526,7 +526,7 @@ public class BasicFrame extends GraphNode {
         if (fComputeMinMax) {
             fMinTime = delta;
             if (fMinTime.compareTo(TmfTimestamp.ZERO) < 0) {
-                fMinTime = new TmfTimestamp(0, m1.getTime().getScale());
+                fMinTime = TmfTimestamp.create(0, m1.getTime().getScale());
             }
             fMaxTime = fMinTime;
             setComputeMinMax(false);

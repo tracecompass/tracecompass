@@ -35,8 +35,8 @@ public class TmfTimeRangeTest {
 
     @Test
     public void testConstructor() {
-        final ITmfTimestamp ts1 = new TmfTimestamp(12345);
-        final ITmfTimestamp ts2 = new TmfTimestamp(12350);
+        final ITmfTimestamp ts1 = TmfTimestamp.fromSeconds(12345);
+        final ITmfTimestamp ts2 = TmfTimestamp.fromSeconds(12350);
         final TmfTimeRange range = new TmfTimeRange(ts1, ts2);
 
         assertEquals("startTime", ts1, range.getStartTime());
@@ -45,7 +45,7 @@ public class TmfTimeRangeTest {
 
     @Test
     public void testOpenRange1() {
-        final ITmfTimestamp ts2 = new TmfTimestamp(12350);
+        final ITmfTimestamp ts2 = TmfTimestamp.fromSeconds(12350);
         final TmfTimeRange range = new TmfTimeRange(TmfTimestamp.BIG_BANG, ts2);
 
         assertEquals("startTime", TmfTimestamp.BIG_BANG, range.getStartTime());
@@ -54,7 +54,7 @@ public class TmfTimeRangeTest {
 
     @Test
     public void testOpenRange2() {
-        final ITmfTimestamp ts1 = new TmfTimestamp(12345);
+        final ITmfTimestamp ts1 = TmfTimestamp.fromSeconds(12345);
         final TmfTimeRange range = new TmfTimeRange(ts1, TmfTimestamp.BIG_CRUNCH);
 
         assertEquals("startTime", ts1, range.getStartTime());
@@ -75,8 +75,8 @@ public class TmfTimeRangeTest {
 
     @Test
     public void testHashCode() {
-        final ITmfTimestamp ts1 = new TmfTimestamp(12345);
-        final ITmfTimestamp ts2 = new TmfTimestamp(12350);
+        final ITmfTimestamp ts1 = TmfTimestamp.fromSeconds(12345);
+        final ITmfTimestamp ts2 = TmfTimestamp.fromSeconds(12350);
         final TmfTimeRange range1 = new TmfTimeRange(ts1, ts2);
         final TmfTimeRange range1b =new TmfTimeRange(ts1, ts2);
         final TmfTimeRange range2 = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
@@ -94,8 +94,8 @@ public class TmfTimeRangeTest {
 
     @Test
     public void testEqualsReflexivity() {
-        final ITmfTimestamp ts1 = new TmfTimestamp(12345);
-        final ITmfTimestamp ts2 = new TmfTimestamp(12350);
+        final ITmfTimestamp ts1 = TmfTimestamp.fromSeconds(12345);
+        final ITmfTimestamp ts2 = TmfTimestamp.fromSeconds(12350);
         final TmfTimeRange range1 = new TmfTimeRange(ts1, ts2);
         final TmfTimeRange range2 = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
 
@@ -108,8 +108,8 @@ public class TmfTimeRangeTest {
 
     @Test
     public void testEqualsSymmetry() {
-        final ITmfTimestamp ts1 = new TmfTimestamp(12345);
-        final ITmfTimestamp ts2 = new TmfTimestamp(12350);
+        final ITmfTimestamp ts1 = TmfTimestamp.fromSeconds(12345);
+        final ITmfTimestamp ts2 = TmfTimestamp.fromSeconds(12350);
         final TmfTimeRange range1a = new TmfTimeRange(ts1, ts2);
         final TmfTimeRange range1b = new TmfTimeRange(ts1, ts2);
 
@@ -125,8 +125,8 @@ public class TmfTimeRangeTest {
 
     @Test
     public void testEqualsTransivity() {
-        final ITmfTimestamp ts1 = new TmfTimestamp(12345);
-        final ITmfTimestamp ts2 = new TmfTimestamp(12350);
+        final ITmfTimestamp ts1 = TmfTimestamp.fromSeconds(12345);
+        final ITmfTimestamp ts2 = TmfTimestamp.fromSeconds(12350);
         final TmfTimeRange range1a = new TmfTimeRange(ts1, ts2);
         final TmfTimeRange range1b = new TmfTimeRange(ts1, ts2);
         final TmfTimeRange range1c = new TmfTimeRange(ts1, ts2);
@@ -138,8 +138,8 @@ public class TmfTimeRangeTest {
 
     @Test
     public void testEqualsNull() {
-        final ITmfTimestamp ts1 = new TmfTimestamp(12345);
-        final ITmfTimestamp ts2 = new TmfTimestamp(12350);
+        final ITmfTimestamp ts1 = TmfTimestamp.fromSeconds(12345);
+        final ITmfTimestamp ts2 = TmfTimestamp.fromSeconds(12350);
         final TmfTimeRange range1 = new TmfTimeRange(ts1, ts2);
 
         assertTrue("equals", !range1.equals(null));
@@ -147,8 +147,8 @@ public class TmfTimeRangeTest {
 
     @Test
     public void testEqualsBadType() {
-        final ITmfTimestamp ts1 = new TmfTimestamp(12345);
-        final ITmfTimestamp ts2 = new TmfTimestamp(12350);
+        final ITmfTimestamp ts1 = TmfTimestamp.fromSeconds(12345);
+        final ITmfTimestamp ts2 = TmfTimestamp.fromSeconds(12350);
         final TmfTimeRange range1 = new TmfTimeRange(ts1, ts2);
 
         assertTrue("equals", !range1.equals(ts1));
@@ -156,9 +156,9 @@ public class TmfTimeRangeTest {
 
     @Test
     public void testEqualStartTime() {
-        final ITmfTimestamp ts1 = new TmfTimestamp(12345);
-        final ITmfTimestamp ts2 = new TmfTimestamp(12350);
-        final ITmfTimestamp ts3 = new TmfTimestamp(12355);
+        final ITmfTimestamp ts1 = TmfTimestamp.fromSeconds(12345);
+        final ITmfTimestamp ts2 = TmfTimestamp.fromSeconds(12350);
+        final ITmfTimestamp ts3 = TmfTimestamp.fromSeconds(12355);
 
         final TmfTimeRange range1 = new TmfTimeRange(ts1, ts3);
         final TmfTimeRange range2 = new TmfTimeRange(ts2, ts3);
@@ -170,9 +170,9 @@ public class TmfTimeRangeTest {
 
     @Test
     public void testEqualsEndTime() {
-        final ITmfTimestamp ts1 = new TmfTimestamp(12345);
-        final ITmfTimestamp ts2 = new TmfTimestamp(12350);
-        final ITmfTimestamp ts3 = new TmfTimestamp(12355);
+        final ITmfTimestamp ts1 = TmfTimestamp.fromSeconds(12345);
+        final ITmfTimestamp ts2 = TmfTimestamp.fromSeconds(12350);
+        final ITmfTimestamp ts3 = TmfTimestamp.fromSeconds(12355);
 
         final TmfTimeRange range1 = new TmfTimeRange(ts1, ts2);
         final TmfTimeRange range2 = new TmfTimeRange(ts1, ts3);
@@ -188,8 +188,8 @@ public class TmfTimeRangeTest {
 
     @Test
     public void testToString() {
-        final ITmfTimestamp ts1 = new TmfTimestamp(12345);
-        final ITmfTimestamp ts2 = new TmfTimestamp(12350);
+        final ITmfTimestamp ts1 = TmfTimestamp.fromSeconds(12345);
+        final ITmfTimestamp ts2 = TmfTimestamp.fromSeconds(12350);
         final TmfTimeRange range = new TmfTimeRange(ts1, ts2);
 
         final String expected = "TmfTimeRange [fStartTime=" + ts1 + ", fEndTime=" + ts2 + "]";
@@ -202,28 +202,28 @@ public class TmfTimeRangeTest {
 
     @Test
     public void testContainsTimestamp() {
-        final ITmfTimestamp ts1 = new TmfTimestamp(12345);
-        final ITmfTimestamp ts2 = new TmfTimestamp(12350);
+        final ITmfTimestamp ts1 = TmfTimestamp.fromSeconds(12345);
+        final ITmfTimestamp ts2 = TmfTimestamp.fromSeconds(12350);
         final TmfTimeRange range = new TmfTimeRange(ts1, ts2);
 
-        assertTrue("contains (lower bound)", range.contains(new TmfTimestamp(12345)));
-        assertTrue("contains (higher bound)", range.contains(new TmfTimestamp(12350)));
-        assertTrue("contains (within bounds)", range.contains(new TmfTimestamp(12346)));
+        assertTrue("contains (lower bound)", range.contains(TmfTimestamp.fromSeconds(12345)));
+        assertTrue("contains (higher bound)", range.contains(TmfTimestamp.fromSeconds(12350)));
+        assertTrue("contains (within bounds)", range.contains(TmfTimestamp.fromSeconds(12346)));
 
-        assertFalse("contains (low value)", range.contains(new TmfTimestamp(12340)));
-        assertFalse("contains (high value)", range.contains(new TmfTimestamp(12351)));
+        assertFalse("contains (low value)", range.contains(TmfTimestamp.fromSeconds(12340)));
+        assertFalse("contains (high value)", range.contains(TmfTimestamp.fromSeconds(12351)));
     }
 
     @Test
     public void testContainsRange() {
-        final ITmfTimestamp ts1 = new TmfTimestamp(10);
-        final ITmfTimestamp ts2 = new TmfTimestamp(20);
-        final ITmfTimestamp ts3 = new TmfTimestamp(30);
-        final ITmfTimestamp ts4 = new TmfTimestamp(40);
-        final ITmfTimestamp ts5 = new TmfTimestamp(50);
-        final ITmfTimestamp ts6 = new TmfTimestamp(60);
-        final ITmfTimestamp ts7 = new TmfTimestamp(70);
-        final ITmfTimestamp ts8 = new TmfTimestamp(80);
+        final ITmfTimestamp ts1 = TmfTimestamp.fromSeconds(10);
+        final ITmfTimestamp ts2 = TmfTimestamp.fromSeconds(20);
+        final ITmfTimestamp ts3 = TmfTimestamp.fromSeconds(30);
+        final ITmfTimestamp ts4 = TmfTimestamp.fromSeconds(40);
+        final ITmfTimestamp ts5 = TmfTimestamp.fromSeconds(50);
+        final ITmfTimestamp ts6 = TmfTimestamp.fromSeconds(60);
+        final ITmfTimestamp ts7 = TmfTimestamp.fromSeconds(70);
+        final ITmfTimestamp ts8 = TmfTimestamp.fromSeconds(80);
 
         // Reference range
         final TmfTimeRange range0 = new TmfTimeRange(ts3, ts6);
@@ -271,36 +271,36 @@ public class TmfTimeRangeTest {
     @Test
     public void testGetIntersection() {
 
-        final ITmfTimestamp ts1a = new TmfTimestamp(1000);
-        final ITmfTimestamp ts1b = new TmfTimestamp(2000);
+        final ITmfTimestamp ts1a = TmfTimestamp.fromSeconds(1000);
+        final ITmfTimestamp ts1b = TmfTimestamp.fromSeconds(2000);
         final TmfTimeRange range1 = new TmfTimeRange(ts1a, ts1b);
 
-        final ITmfTimestamp ts2a = new TmfTimestamp(2000);
-        final ITmfTimestamp ts2b = new TmfTimestamp(3000);
+        final ITmfTimestamp ts2a = TmfTimestamp.fromSeconds(2000);
+        final ITmfTimestamp ts2b = TmfTimestamp.fromSeconds(3000);
         final TmfTimeRange range2 = new TmfTimeRange(ts2a, ts2b);
 
-        final ITmfTimestamp ts3a = new TmfTimestamp(3000);
-        final ITmfTimestamp ts3b = new TmfTimestamp(4000);
+        final ITmfTimestamp ts3a = TmfTimestamp.fromSeconds(3000);
+        final ITmfTimestamp ts3b = TmfTimestamp.fromSeconds(4000);
         final TmfTimeRange range3 = new TmfTimeRange(ts3a, ts3b);
 
-        final ITmfTimestamp ts4a = new TmfTimestamp(1500);
-        final ITmfTimestamp ts4b = new TmfTimestamp(2500);
+        final ITmfTimestamp ts4a = TmfTimestamp.fromSeconds(1500);
+        final ITmfTimestamp ts4b = TmfTimestamp.fromSeconds(2500);
         final TmfTimeRange range4 = new TmfTimeRange(ts4a, ts4b);
 
-        final ITmfTimestamp ts5a = new TmfTimestamp(1500);
-        final ITmfTimestamp ts5b = new TmfTimestamp(2000);
+        final ITmfTimestamp ts5a = TmfTimestamp.fromSeconds(1500);
+        final ITmfTimestamp ts5b = TmfTimestamp.fromSeconds(2000);
         final TmfTimeRange range5 = new TmfTimeRange(ts5a, ts5b);
 
-        final ITmfTimestamp ts6a = new TmfTimestamp(2000);
-        final ITmfTimestamp ts6b = new TmfTimestamp(2500);
+        final ITmfTimestamp ts6a = TmfTimestamp.fromSeconds(2000);
+        final ITmfTimestamp ts6b = TmfTimestamp.fromSeconds(2500);
         final TmfTimeRange range6 = new TmfTimeRange(ts6a, ts6b);
 
-        final ITmfTimestamp ts7a = new TmfTimestamp(1500);
-        final ITmfTimestamp ts7b = new TmfTimestamp(3500);
+        final ITmfTimestamp ts7a = TmfTimestamp.fromSeconds(1500);
+        final ITmfTimestamp ts7b = TmfTimestamp.fromSeconds(3500);
         final TmfTimeRange range7 = new TmfTimeRange(ts7a, ts7b);
 
-        final ITmfTimestamp ts8a = new TmfTimestamp(2250);
-        final ITmfTimestamp ts8b = new TmfTimestamp(2750);
+        final ITmfTimestamp ts8a = TmfTimestamp.fromSeconds(2250);
+        final ITmfTimestamp ts8b = TmfTimestamp.fromSeconds(2750);
         final TmfTimeRange range8 = new TmfTimeRange(ts8a, ts8b);
 
         assertEquals("getIntersection (below - not contiguous)", null, range1.getIntersection(range3));

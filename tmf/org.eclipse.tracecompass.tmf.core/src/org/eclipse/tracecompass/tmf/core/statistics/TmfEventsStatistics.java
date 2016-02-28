@@ -114,8 +114,8 @@ public class TmfEventsStatistics implements ITmfStatistics {
 
     @Override
     public long getEventsInRange(long start, long end) {
-        ITmfTimestamp startTS = new TmfTimestamp(start, SCALE);
-        ITmfTimestamp endTS = new TmfTimestamp(end, SCALE);
+        ITmfTimestamp startTS = TmfTimestamp.create(start, SCALE);
+        ITmfTimestamp endTS = TmfTimestamp.create(end, SCALE);
         TmfTimeRange range = new TmfTimeRange(startTS, endTS);
 
         StatsTotalRequest request = new StatsTotalRequest(trace, range);
@@ -127,8 +127,8 @@ public class TmfEventsStatistics implements ITmfStatistics {
 
     @Override
     public Map<String, Long> getEventTypesInRange(long start, long end) {
-        ITmfTimestamp startTS = new TmfTimestamp(start, SCALE);
-        ITmfTimestamp endTS = new TmfTimestamp(end, SCALE);
+        ITmfTimestamp startTS = TmfTimestamp.create(start, SCALE);
+        ITmfTimestamp endTS = TmfTimestamp.create(end, SCALE);
         TmfTimeRange range = new TmfTimeRange(startTS, endTS);
 
         StatsPerTypeRequest request = new StatsPerTypeRequest(trace, range);
@@ -247,8 +247,8 @@ public class TmfEventsStatistics implements ITmfStatistics {
         public HistogramQueryRequest(long[] borders, long endTime) {
             super(trace.getEventType(),
                     new TmfTimeRange(
-                            new TmfTimestamp(borders[0], SCALE),
-                            new TmfTimestamp(endTime, SCALE)),
+                            TmfTimestamp.create(borders[0], SCALE),
+                            TmfTimestamp.create(endTime, SCALE)),
                     0,
                     ITmfEventRequest.ALL_DATA,
                     ITmfEventRequest.ExecutionType.BACKGROUND);

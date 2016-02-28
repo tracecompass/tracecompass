@@ -36,7 +36,8 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfModelLookup;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.ctf.core.CtfConstants;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
@@ -117,7 +118,7 @@ public class CtfTmfEvent extends TmfEvent
      */
     protected CtfTmfEvent(CtfTmfTrace trace,
             long rank,
-            TmfNanoTimestamp timestamp,
+            ITmfTimestamp timestamp,
             String channel,
             int cpu,
             IEventDeclaration declaration,
@@ -159,7 +160,7 @@ public class CtfTmfEvent extends TmfEvent
     CtfTmfEvent(CtfTmfTrace trace) {
         super(trace,
                 ITmfContext.UNKNOWN_RANK,
-                new TmfNanoTimestamp(-1),
+                TmfTimestamp.fromNanos(-1),
                 null,
                 new TmfEventField("", null, new CtfTmfEventField[0])); //$NON-NLS-1$
         fSourceCpu = -1;

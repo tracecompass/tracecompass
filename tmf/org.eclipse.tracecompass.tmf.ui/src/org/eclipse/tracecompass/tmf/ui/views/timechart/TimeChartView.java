@@ -76,8 +76,6 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
     /** TimeChartView's ID */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.timechart"; //$NON-NLS-1$
 
-    private static final int TIMESTAMP_SCALE = -9;
-
     private final int fDisplayWidth;
     private TimeGraphViewer fViewer;
     private final List<TimeChartAnalysisEntry> fTimeAnalysisEntries = new ArrayList<>();
@@ -526,8 +524,8 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         fStartTime = event.getStartTime();
         fStopTime = event.getEndTime();
         itemize(fStartTime, fStopTime);
-        final ITmfTimestamp startTimestamp = new TmfTimestamp(event.getStartTime(), ITmfTimestamp.NANOSECOND_SCALE);
-        final ITmfTimestamp endTimestamp = new TmfTimestamp(event.getEndTime(), ITmfTimestamp.NANOSECOND_SCALE);
+        final ITmfTimestamp startTimestamp = TmfTimestamp.fromNanos(event.getStartTime());
+        final ITmfTimestamp endTimestamp = TmfTimestamp.fromNanos(event.getEndTime());
         TmfTimeRange range = new TmfTimeRange(startTimestamp, endTimestamp);
         broadcast(new TmfWindowRangeUpdatedSignal(this, range));
     }
@@ -547,7 +545,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
 
     @Override
     public void timeSelected(TimeGraphTimeEvent event) {
-        broadcast(new TmfSelectionRangeUpdatedSignal(this, new TmfTimestamp(event.getBeginTime(), TIMESTAMP_SCALE), new TmfTimestamp(event.getEndTime(), TIMESTAMP_SCALE)));
+        broadcast(new TmfSelectionRangeUpdatedSignal(this, TmfTimestamp.fromNanos(event.getBeginTime()), TmfTimestamp.fromNanos(event.getEndTime())));
     }
 
     @Override
@@ -685,7 +683,6 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
     public void selectionRangeUpdated(TmfSelectionRangeUpdatedSignal signal) {
         final long beginTime = signal.getBeginTime().toNanos();
         final long endTime = signal.getEndTime().toNanos();
-
 
         Display.getDefault().asyncExec(new Runnable() {
             @Override

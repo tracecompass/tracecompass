@@ -19,7 +19,7 @@ import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
@@ -81,7 +81,7 @@ public class CtfTmfEventFactory {
         /* Prepare what to pass to CtfTmfEvent's constructor */
         final IEventDeclaration eventDecl = eventDef.getDeclaration();
         final long ts = eventDef.getTimestamp();
-        final TmfNanoTimestamp timestamp = trace.createTimestamp(trace.timestampCyclesToNanos(ts));
+        final ITmfTimestamp timestamp = trace.createTimestamp(trace.timestampCyclesToNanos(ts));
 
         int sourceCPU = eventDef.getCPU();
 
@@ -126,7 +126,7 @@ public class CtfTmfEventFactory {
             IEventDefinition eventDef,
             final IEventDeclaration eventDecl,
             final long ts,
-            final TmfNanoTimestamp timestamp,
+            final ITmfTimestamp timestamp,
             int sourceCPU,
             String fileName) {
 
@@ -142,7 +142,7 @@ public class CtfTmfEventFactory {
         }
         long nbLostEvents = ((IntegerDefinition) nbLostEventsDef).getValue();
         long duration = ((IntegerDefinition) durationDef).getValue();
-        TmfNanoTimestamp timestampEnd = trace.createTimestamp(
+        ITmfTimestamp timestampEnd = trace.createTimestamp(
                 trace.timestampCyclesToNanos(ts) + duration);
 
         CtfTmfLostEvent lostEvent = new CtfTmfLostEvent(trace,

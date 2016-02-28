@@ -93,11 +93,11 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
     /**
      * The minimum time delta.
      */
-    private ITmfTimestamp fMinTime = new TmfTimestamp();
+    private ITmfTimestamp fMinTime = TmfTimestamp.fromSeconds(0);
     /**
      * The maximum time delta.
      */
-    private ITmfTimestamp fMaxTime = new TmfTimestamp();
+    private ITmfTimestamp fMaxTime = TmfTimestamp.fromSeconds(0);
     /**
      * The current zoom value.
      */

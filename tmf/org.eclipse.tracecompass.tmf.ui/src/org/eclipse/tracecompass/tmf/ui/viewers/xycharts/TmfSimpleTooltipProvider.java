@@ -13,7 +13,6 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xycharts;
 
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.swtchart.IAxis;
 
@@ -87,7 +86,7 @@ public class TmfSimpleTooltipProvider extends TmfBaseProvider implements MouseTr
         /* set tooltip of current data point */
         StringBuffer buffer = new StringBuffer();
         buffer.append("x="); //$NON-NLS-1$
-        buffer.append(new TmfTimestamp((long) xCoordinate + viewer.getTimeOffset(), ITmfTimestamp.NANOSECOND_SCALE).toString());
+        buffer.append(TmfTimestamp.fromNanos((long) xCoordinate + viewer.getTimeOffset()).toString());
         buffer.append("\n"); //$NON-NLS-1$
         buffer.append("y="); //$NON-NLS-1$
         buffer.append((long) yCoordinate);

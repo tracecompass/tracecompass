@@ -44,11 +44,11 @@ public class PatternSegmentFactoryStub {
     /**
      * Start event for pattern segment TEST_2
      */
-    public static final @NonNull ITmfEvent TEST_2_START_EVENT = new TmfEvent(null, ITmfContext.UNKNOWN_RANK, new TmfTimestamp(1, ITmfTimestamp.NANOSECOND_SCALE), null, null);
+    public static final @NonNull ITmfEvent TEST_2_START_EVENT = new TmfEvent(null, ITmfContext.UNKNOWN_RANK, TmfTimestamp.fromNanos(1), null, null);
     /**
      * end event for pattern segment TEST_2
      */
-    public static final @NonNull ITmfEvent TEST_2_END_EVENT = new TmfEvent(null, ITmfContext.UNKNOWN_RANK, new TmfTimestamp(10, ITmfTimestamp.NANOSECOND_SCALE), null, null);
+    public static final @NonNull ITmfEvent TEST_2_END_EVENT = new TmfEvent(null, ITmfContext.UNKNOWN_RANK, TmfTimestamp.fromNanos(10), null, null);
 
     /**
      * The pattern segment TEST_2
