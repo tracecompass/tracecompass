@@ -2262,6 +2262,31 @@ You will be prompted to select the file. It will be validated before importing i
 
 Right now, there is no way to "unimport" analyses from within the application. A UI to manage the imported analyses is currently being worked on. In the meantime, you can navigate to your workspace directory, and delete the files in .metadata/.plugins/org.eclipse.tracecompass.tmf.analysis.xml.core/xml_files .
 
+== Managing XML files containing analyses ==
+
+The '''Manage XML Analyses''' dialog is used to manage the list of XML files containing analysis. To open the dialog:
+
+* Open the '''Project Explorer''' view.
+* Select '''Manage XML Analyses...''' from the '''Traces''' folder context menu.
+
+[[Image:images/ManageXMLAnalysis.png]]
+
+The list of currently defined XML analyses is displayed on the left side of the dialog.
+
+The following actions can be performed from this dialog:
+
+* Import
+
+Click the '''Import''' button and select a file from the opened file dialog to import an XML file containing an analysis. The file will be validated before importing it and if successful, the new analysis and views will be shown under the traces for which they apply. You will need to close any already opened traces and re-open them before the new analysis can be executed. If an invalid file is selected, an error message will be displayed to the user.
+
+* Export
+
+Select an XML file from the list, click the '''Export''' button and enter or select a file in the opened file dialog to export the XML analysis. Note that if an existing file containing an analysis is selected, its content will be replaced with the analysis to export.
+
+* Delete
+
+Select an XML file from the list and click the '''Delete''' button to remove the XML file. Deleting an XML file will close all the traces for which this analysis applies and remove the analysis.
+
 == Defining XML components ==
 
 To define XML components, you need to create a new XML file and use the XSD that comes with the XML plugin.
