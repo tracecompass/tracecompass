@@ -2252,16 +2252,6 @@ This will update all the displayed timestamps.
 
 It is possible to define custom trace analyses and a way to view them in an XML format. These kind of analyses allow doing more with the trace data than what the default analyses shipped with TMF offer. It can be customized to a specific problem, and fine-tuned to show exactly what you're looking for.
 
-== Importing an XML file containing analysis ==
-
-If you already have an XML file defining state providers and/or views, you can import it in your TMF workspace by right-clicking on the ''Traces'' or ''Experiments'' folder and selecting ''Import XML Analysis''.
-
-[[Image:images/import_XML_analysis.png| Import XML analysis menu]]
-
-You will be prompted to select the file. It will be validated before importing it and if successful, the new analysis and views will be shown under the traces for which they apply. You will need to close any already opened traces and re-open them before the new analysis can be executed.
-
-Right now, there is no way to "unimport" analyses from within the application. A UI to manage the imported analyses is currently being worked on. In the meantime, you can navigate to your workspace directory, and delete the files in .metadata/.plugins/org.eclipse.tracecompass.tmf.analysis.xml.core/xml_files .
-
 == Managing XML files containing analyses ==
 
 The '''Manage XML Analyses''' dialog is used to manage the list of XML files containing analysis. To open the dialog:
