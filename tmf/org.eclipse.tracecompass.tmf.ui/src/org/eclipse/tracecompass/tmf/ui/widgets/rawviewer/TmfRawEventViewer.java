@@ -1173,7 +1173,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
     @Override
     public void mouseScrolled(MouseEvent e) {
-        if (fLines.size() == 0) {
+        if (fLines.size() == 0 || e.count == 0) {
             return;
         }
         fHoldSelection++;

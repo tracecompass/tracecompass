@@ -169,7 +169,7 @@ public class TmfVirtualTable extends Composite {
         fTable.addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseScrolled(MouseEvent event) {
-                if (fTableItemCount <= fFullyVisibleRows) {
+                if (fTableItemCount <= fFullyVisibleRows || event.count == 0) {
                     return;
                 }
                 fTableTopEventRank -= event.count;

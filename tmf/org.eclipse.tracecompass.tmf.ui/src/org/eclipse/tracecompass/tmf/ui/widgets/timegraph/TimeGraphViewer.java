@@ -502,6 +502,9 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         fTimeScaleCtrl.addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseScrolled(MouseEvent e) {
+                if (e.count == 0) {
+                    return;
+                }
                 fTimeGraphCtrl.zoom(e.count > 0);
             }
         });
@@ -515,6 +518,9 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         fTimeGraphCtrl.addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseScrolled(MouseEvent e) {
+                if (e.count == 0) {
+                    return;
+                }
                 adjustVerticalScrollBar();
             }
         });
@@ -550,6 +556,9 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         fMarkerAxisCtrl.addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseScrolled(MouseEvent e) {
+                if (e.count == 0) {
+                    return;
+                }
                 fTimeGraphCtrl.zoom(e.count > 0);
             }
         });
@@ -568,13 +577,16 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         fHorizontalScrollBar.addListener(SWT.MouseWheel, new Listener() {
             @Override
             public void handleEvent(Event event) {
+                // don't handle the immediately following SWT.Selection event
+                event.doit = false;
+                if (event.count == 0) {
+                    return;
+                }
                 if ((event.stateMask & SWT.MODIFIER_MASK) == SWT.CTRL) {
                     getTimeGraphControl().zoom(event.count > 0);
                 } else {
                     getTimeGraphControl().horizontalScroll(event.count > 0);
                 }
-                // don't handle the immediately following SWT.Selection event
-                event.doit = false;
             }
         });
         fHorizontalScrollBar.addListener(SWT.Selection, new Listener() {

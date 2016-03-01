@@ -636,6 +636,9 @@ public class TimeGraphCombo extends Composite {
             @Override
             public void handleEvent(Event event) {
                 event.doit = false;
+                if (event.count == 0) {
+                    return;
+                }
                 Slider scrollBar = fTimeGraphViewer.getVerticalBar();
                 fTimeGraphViewer.setTopIndex(scrollBar.getSelection() - event.count);
                 alignTreeItems(false);
@@ -740,6 +743,9 @@ public class TimeGraphCombo extends Composite {
         fTimeGraphViewer.getTimeGraphControl().addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseScrolled(MouseEvent e) {
+                if (e.count == 0) {
+                    return;
+                }
                 alignTreeItems(false);
             }
         });

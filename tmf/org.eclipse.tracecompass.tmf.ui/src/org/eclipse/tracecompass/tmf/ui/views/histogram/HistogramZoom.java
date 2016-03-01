@@ -149,6 +149,9 @@ public class HistogramZoom implements MouseWheelListener, KeyListener {
 
     @Override
     public void mouseScrolled(MouseEvent event) {
+        if (event.count == 0) {
+            return;
+        }
         zoom(event.count);
     }
 

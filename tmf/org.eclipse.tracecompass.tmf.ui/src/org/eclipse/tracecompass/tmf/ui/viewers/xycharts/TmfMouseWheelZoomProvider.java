@@ -73,7 +73,7 @@ public class TmfMouseWheelZoomProvider extends TmfBaseProvider implements MouseW
 
         long oldDuration = viewer.getWindowDuration();
 
-        if (oldDuration == 0) {
+        if (oldDuration == 0 || event.count == 0) {
             return;
         }
 

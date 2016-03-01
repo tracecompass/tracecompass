@@ -2697,7 +2697,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     @Override
     public void mouseScrolled(MouseEvent e) {
-        if (fDragState != DRAG_NONE) {
+        if (fDragState != DRAG_NONE || e.count == 0) {
             return;
         }
         boolean horizontalZoom = false;
