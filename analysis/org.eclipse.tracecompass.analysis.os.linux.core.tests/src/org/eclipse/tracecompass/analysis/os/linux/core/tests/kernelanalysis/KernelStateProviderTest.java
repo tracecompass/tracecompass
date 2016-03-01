@@ -13,16 +13,20 @@
 package org.eclipse.tracecompass.analysis.os.linux.core.tests.kernelanalysis;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
+import org.eclipse.tracecompass.analysis.os.linux.core.tests.Activator;
+import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.KernelStateProvider;
-import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
+import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
-import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -32,28 +36,39 @@ import org.junit.Test;
  */
 public class KernelStateProviderTest {
 
-    private static final @NonNull CtfTestTrace testTrace = CtfTestTrace.TRACE2;
+    private static final @NonNull String LTTNG_KERNEL_FILE = "testfiles/lttng_kernel_analysis.xml";
 
-    private static CtfTmfTrace trace;
-    private static ITmfStateProvider input;
+    private IKernelTrace fTrace;
+    private ITmfStateProvider fInput;
 
     /**
      * Set-up.
      */
-    @BeforeClass
-    public static void initialize() {
-        CtfTmfTrace thetrace = CtfTmfTestTraceUtils.getTrace(testTrace);
-        trace = thetrace;
-        input = new KernelStateProvider(thetrace, IKernelAnalysisEventLayout.DEFAULT_LAYOUT);
+    @Before
+    public void initialize() {
+        IKernelTrace thetrace = new TmfXmlKernelTraceStub();
+        IPath filePath = Activator.getAbsoluteFilePath(LTTNG_KERNEL_FILE);
+        IStatus status = thetrace.validate(null, filePath.toOSString());
+        if (!status.isOK()) {
+            fail(status.getException().getMessage());
+        }
+        try {
+            thetrace.initTrace(null, filePath.toOSString(), TmfEvent.class);
+        } catch (TmfTraceException e) {
+            fail(e.getMessage());
+        }
+
+        fTrace = thetrace;
+        fInput = new KernelStateProvider(thetrace, thetrace.getKernelEventLayout());
     }
 
     /**
      * Class teardown
      */
-    @AfterClass
-    public static void classTeardown() {
-        if (trace != null) {
-            trace.dispose();
+    @After
+    public void classTeardown() {
+        if (fTrace != null) {
+            fTrace.dispose();
         }
     }
 
@@ -63,9 +78,9 @@ public class KernelStateProviderTest {
     @Test
     public void testOpening() {
         long testStartTime;
-        testStartTime = input.getStartTime();
-        /* Expected start time of "trace2" */
-        assertEquals(testStartTime, 1331668247314038062L);
+        testStartTime = fInput.getStartTime();
+        /* Expected start time of the trace */
+        assertEquals(testStartTime, 1L);
     }
 
 }

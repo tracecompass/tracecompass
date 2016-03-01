@@ -10,7 +10,7 @@
             name="CPU Usage Test Analysis">
          <tracetype
                applies="true"
-               class="org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub">
+               class="org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub">
          </tracetype>
       </module>
       <module
@@ -20,7 +20,7 @@
             name="Linux Kernel Test Analysis">
          <tracetype
                applies="true"
-               class="org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub">
+               class="org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub">
          </tracetype>
       </module>
       <module
@@ -29,9 +29,19 @@
             id="org.eclipse.tracecompass.analysis.os.linux.contextswitch"
             name="Context switch test">
          <tracetype
-               class="org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub">
+               class="org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub">
          </tracetype>
       </module>
    </extension>
-
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.tracetype">
+      <type
+            category="org.eclipse.linuxtools.tmf.core.tests.category"
+            event_type="org.eclipse.tracecompass.tmf.core.event.TmfEvent"
+            id="org.eclipse.tracecompass.analysis.os.linux.core.kernel.trace.stub"
+            isDirectory="false"
+            name="XML Kernel Trace Stub"
+            trace_type="org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub">
+      </type>
+   </extension> 
 </plugin>

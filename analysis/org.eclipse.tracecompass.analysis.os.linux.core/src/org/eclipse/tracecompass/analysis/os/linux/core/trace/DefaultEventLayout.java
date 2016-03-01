@@ -30,7 +30,7 @@ import com.google.common.collect.ImmutableList;
  * @author Alexandre Montplaisir
  * @since 1.0
  */
-public class DefaultEventLayout implements IKernelAnalysisEventLayout{
+public class DefaultEventLayout implements IKernelAnalysisEventLayout {
 
     /* Event names */
     private static final String IRQ_HANDLER_ENTRY = "irq_handler_entry"; //$NON-NLS-1$
@@ -87,8 +87,13 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
     private static final String NOW = "now"; //$NON-NLS-1$
     private static final String SOFT_EXPIRES = "softexpires"; //$NON-NLS-1$
 
-    /** All instances are the same. Only provide a static instance getter */
-    private DefaultEventLayout() {
+    /**
+     * Constructor, to be used by classes extending this one. To get an instance
+     * of this class, INSTANCE should be used.
+     *
+     * @since 2.0
+     */
+    protected DefaultEventLayout() {
     }
 
     /**

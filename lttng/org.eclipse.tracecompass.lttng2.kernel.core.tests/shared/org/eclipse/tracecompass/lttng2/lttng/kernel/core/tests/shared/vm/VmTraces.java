@@ -22,11 +22,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub;
 import org.eclipse.tracecompass.lttng2.kernel.core.tests.Activator;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub;
 
 /**
  * List the available virtual machine host and guest traces
@@ -71,7 +71,7 @@ public enum VmTraces {
      * @return A TmfXmlTraceStub reference to this trace
      */
     public @Nullable ITmfTrace getTrace() {
-        ITmfTrace trace = new TmfXmlTraceStub();
+        ITmfTrace trace = new TmfXmlKernelTraceStub();
         IStatus status = trace.validate(null, fPath.toOSString());
         if (!status.isOK()) {
             return null;
