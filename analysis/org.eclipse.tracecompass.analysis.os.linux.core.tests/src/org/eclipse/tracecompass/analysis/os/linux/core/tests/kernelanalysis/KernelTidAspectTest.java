@@ -5,9 +5,6 @@
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.tracecompass.analysis.os.linux.core.tests.kernelanalysis;
@@ -24,14 +21,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelTidAspect;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.ThreadPriorityAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.Activator;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
-import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
@@ -42,8 +36,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Test the {@link KernelTidAspect} class
@@ -57,23 +49,6 @@ public class KernelTidAspectTest {
     // ------------------------------------------------------------------------
     // Test trace class definition
     // ------------------------------------------------------------------------
-
-    private static class TmfXmlTraceStubWithTidAspects extends TmfXmlKernelTraceStub {
-
-        public TmfXmlTraceStubWithTidAspects() {
-            super();
-        }
-
-        @Override
-        public Iterable<ITmfEventAspect> getEventAspects() {
-            ImmutableSet.Builder<ITmfEventAspect> builder = ImmutableSet.builder();
-            builder.addAll(super.getEventAspects());
-            builder.add(KernelTidAspect.INSTANCE);
-            builder.add(ThreadPriorityAspect.INSTANCE);
-            return NonNullUtils.checkNotNull(builder.build());
-        }
-
-    }
 
     private ITmfTrace fTrace;
 
@@ -90,7 +65,7 @@ public class KernelTidAspectTest {
      */
     @Before
     public void setUp() {
-        ITmfTrace trace = new TmfXmlTraceStubWithTidAspects();
+        ITmfTrace trace = new TmfXmlKernelTraceStub();
         IPath filePath = Activator.getAbsoluteFilePath(LTTNG_KERNEL_FILE);
         IStatus status = trace.validate(null, filePath.toOSString());
         if (!status.isOK()) {
