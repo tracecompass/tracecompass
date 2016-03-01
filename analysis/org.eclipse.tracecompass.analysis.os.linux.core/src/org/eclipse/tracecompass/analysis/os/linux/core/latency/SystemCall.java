@@ -9,19 +9,14 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.core.latency;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.io.Serializable;
-import java.util.Comparator;
 import java.util.Map;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
-import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Ordering;
 
 /**
  * A linux kernel system call, represented as an {@link ISegment}.
@@ -32,12 +27,6 @@ import com.google.common.collect.Ordering;
 public class SystemCall implements ISegment {
 
     private static final long serialVersionUID = 1554494342105208730L;
-
-    private static final Comparator<ISegment> COMPARATOR = checkNotNull(Ordering
-            .from(SegmentComparators.INTERVAL_START_COMPARATOR)
-            .compound(SegmentComparators.INTERVAL_END_COMPARATOR)
-             /* Kind of lazy, but should work! */
-            .compound(Ordering.usingToString()));
 
     /**
      * The subset of information that is available from the syscall entry event.
@@ -127,11 +116,12 @@ public class SystemCall implements ISegment {
     }
 
     @Override
-    public int compareTo(@Nullable ISegment o) {
-        if (o == null) {
-            throw new IllegalArgumentException();
+    public int compareTo(@NonNull ISegment o) {
+        int ret = ISegment.super.compareTo(o);
+        if (ret != 0) {
+            return ret;
         }
-        return COMPARATOR.compare(this, o);
+        return toString().compareTo(o.toString());
     }
 
     @Override

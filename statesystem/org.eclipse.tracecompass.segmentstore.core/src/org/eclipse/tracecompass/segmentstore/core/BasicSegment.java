@@ -9,14 +9,6 @@
 
 package org.eclipse.tracecompass.segmentstore.core;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
-import java.util.Comparator;
-
-import org.eclipse.jdt.annotation.Nullable;
-
-import com.google.common.collect.Ordering;
-
 /**
  * Basic implementation of {@link ISegment}.
  *
@@ -25,16 +17,6 @@ import com.google.common.collect.Ordering;
 public class BasicSegment implements ISegment {
 
     private static final long serialVersionUID = -3257452887960883177L;
-
-    private static final Comparator<ISegment> COMPARATOR;
-    static {
-        /* checkNotNull() has to be called separately, or else it breaks the
-         * type inference. */
-        Comparator<ISegment> comp = Ordering
-                .from(SegmentComparators.INTERVAL_START_COMPARATOR)
-                .compound(SegmentComparators.INTERVAL_END_COMPARATOR);
-        COMPARATOR = checkNotNull(comp);
-    }
 
     private final long fStart;
     private final long fEnd;
@@ -65,14 +47,6 @@ public class BasicSegment implements ISegment {
     @Override
     public long getEnd() {
         return fEnd;
-    }
-
-    @Override
-    public int compareTo(@Nullable ISegment o) {
-        if (o == null) {
-            throw new IllegalArgumentException();
-        }
-        return COMPARATOR.compare(this, o);
     }
 
     @Override

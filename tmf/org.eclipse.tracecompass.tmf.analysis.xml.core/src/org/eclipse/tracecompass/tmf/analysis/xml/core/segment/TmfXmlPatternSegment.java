@@ -12,20 +12,15 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
-import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
-
-import com.google.common.collect.Ordering;
 
 /**
  * This class implements an XML Pattern Segment. This type of segment has
@@ -47,12 +42,6 @@ public class TmfXmlPatternSegment implements ISegment {
     private static final byte TYPE_INTEGER = 0;
     private static final byte TYPE_STRING = 1;
     private static final byte TYPE_LONG = 2;
-
-    private static final @NonNull Comparator<ISegment> COMPARATOR = Ordering
-            .from(SegmentComparators.INTERVAL_START_COMPARATOR)
-            .compound(SegmentComparators.INTERVAL_END_COMPARATOR)
-             /* Kind of lazy, but should work! */
-            .compound(Ordering.usingToString());
 
     private final int fScale;
     private final long fStart;
@@ -125,11 +114,12 @@ public class TmfXmlPatternSegment implements ISegment {
     }
 
     @Override
-    public int compareTo(@Nullable ISegment o) {
-        if (o == null) {
-            throw new IllegalArgumentException("Cannot compare to null"); //$NON-NLS-1$
+    public int compareTo(@NonNull ISegment o) {
+        int ret = ISegment.super.compareTo(o);
+        if (ret != 0) {
+            return ret;
         }
-        return COMPARATOR.compare(this, o);
+        return toString().compareTo(o.toString());
     }
 
     @Override

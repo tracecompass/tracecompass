@@ -14,13 +14,15 @@ package org.eclipse.tracecompass.segmentstore.core;
 
 import java.io.Serializable;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
  * Generic interface for any segment (like a time range) that can be used in the
  * segment store.
  *
  * @author Alexandre Montplaisir
  */
-public interface ISegment extends Serializable, Comparable<ISegment> {
+public interface ISegment extends Serializable, Comparable<@NonNull ISegment> {
 
     /**
      * The start position/time of the segment.
@@ -35,6 +37,13 @@ public interface ISegment extends Serializable, Comparable<ISegment> {
      * @return The end position
      */
     long getEnd();
+
+    @Override
+    default int compareTo(@NonNull ISegment arg0) {
+        return SegmentComparators.INTERVAL_START_COMPARATOR
+                .thenComparing(SegmentComparators.INTERVAL_END_COMPARATOR)
+                .compare(this, arg0);
+    }
 
     /**
      * The length/duration of the segment.
