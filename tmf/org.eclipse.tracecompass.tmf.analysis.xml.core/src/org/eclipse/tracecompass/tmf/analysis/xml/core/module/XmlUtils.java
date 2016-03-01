@@ -262,6 +262,12 @@ public class XmlUtils {
                 for (int i = 0; i < stateproviderNodes.getLength(); i++) {
                     ids.add(nullToEmptyString(((Element) stateproviderNodes.item(i)).getAttribute(TmfXmlStrings.ID)));
                 }
+
+                /* get patterns modules */
+                NodeList patternNodes = doc.getElementsByTagName(TmfXmlStrings.PATTERN);
+                for (int i = 0; i < patternNodes.getLength(); i++) {
+                    ids.add(nullToEmptyString(((Element) patternNodes.item(i)).getAttribute(TmfXmlStrings.ID)));
+                }
             } catch (ParserConfigurationException | SAXException | IOException e) {
                 Activator.logError("Failed to get analyses IDs from " + fileName); //$NON-NLS-1$
             }

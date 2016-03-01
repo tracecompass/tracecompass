@@ -108,6 +108,15 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
                 IAnalysisModuleHelper helper = new TmfAnalysisModuleHelperXml(xmlFile, node, XmlAnalysisModuleType.STATE_SYSTEM);
                 fModules.add(helper);
             }
+
+            /* get pattern modules */
+            NodeList patternNodes = doc.getElementsByTagName(TmfXmlStrings.PATTERN);
+            for (int i = 0; i < patternNodes.getLength(); i++) {
+                Element node = (Element) patternNodes.item(i);
+
+                IAnalysisModuleHelper helper = new TmfAnalysisModuleHelperXml(xmlFile, node, XmlAnalysisModuleType.PATTERN);
+                fModules.add(helper);
+            }
         } catch (ParserConfigurationException | SAXException | IOException e) {
             Activator.logError("Error opening XML file", e); //$NON-NLS-1$
         }

@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -102,7 +103,11 @@ public class TmfXmlPatternSegmentBuilder {
         String segmentName = getPatternSegmentName(event);
         Map<String, ITmfStateValue> fields = new HashMap<>();
         setPatternSegmentContent(event, start, end, fields);
-        return new TmfXmlPatternSegment(startValue, endValue, scale, segmentName, fields);
+        TmfXmlPatternSegment segment = new TmfXmlPatternSegment(startValue, endValue, scale, segmentName, fields);
+        if (fContainer instanceof XmlPatternStateProvider) {
+            ((XmlPatternStateProvider) fContainer).getListener().onNewSegment(segment);
+        }
+        return segment;
     }
 
     /**

@@ -151,9 +151,7 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
                         }
                     }
                     fSegmentStore = store;
-                    for (IAnalysisProgressListener listener : getListeners()) {
-                        listener.onComplete(this, store);
-                    }
+                    sendUpdate(store);
                     return true;
                 } catch (IOException | ClassNotFoundException | ClassCastException e) {
                     /*
@@ -190,10 +188,20 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
             }
         }
 
-        for (IAnalysisProgressListener listener : getListeners()) {
-            listener.onComplete(this, segmentStore);
-        }
+        sendUpdate(segmentStore);
 
         return true;
+    }
+
+    /**
+     * Send the segment store to all its listener
+     *
+     * @param store
+     *            The segment store to broadcast
+     */
+    protected void sendUpdate(final ISegmentStore<ISegment> store) {
+        for (IAnalysisProgressListener listener : getListeners()) {
+            listener.onComplete(this, store);
+        }
     }
 }
