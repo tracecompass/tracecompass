@@ -16,7 +16,6 @@ package org.eclipse.tracecompass.tmf.core.statesystem;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -37,7 +36,6 @@ import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFact
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -61,7 +59,7 @@ import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
  * @author Geneviève Bastien
  */
 public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisModule
-        implements ITmfAnalysisModuleWithStateSystems, ITmfPropertiesProvider {
+        implements ITmfAnalysisModuleWithStateSystems {
 
     private static final String EXTENSION = ".ht"; //$NON-NLS-1$
 
@@ -603,7 +601,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      */
     @Override
     public @NonNull Map<@NonNull String, @NonNull String> getProperties() {
-        Map<@NonNull String, @NonNull String> properties = new HashMap<>();
+        Map<@NonNull String, @NonNull String> properties = super.getProperties();
 
         StateSystemBackendType backend = getBackendType();
         properties.put(NonNullUtils.checkNotNull(Messages.TmfStateSystemAnalysisModule_PropertiesBackend), backend.name());

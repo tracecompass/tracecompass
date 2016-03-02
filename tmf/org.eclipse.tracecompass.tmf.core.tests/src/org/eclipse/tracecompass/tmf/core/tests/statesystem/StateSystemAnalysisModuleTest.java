@@ -24,8 +24,10 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.tracecompass.tmf.core.statesystem.Messages;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
+import org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestStateSystemModule;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
 import org.junit.After;
 import org.junit.Before;
@@ -105,13 +107,13 @@ public class StateSystemAnalysisModuleTest {
     @Test
     public void testProperties() {
 
-        TmfStateSystemAnalysisModule mod = module;
-        assertNotNull(mod);
+        assertTrue(module instanceof TestStateSystemModule);
+        TestStateSystemModule mod = (TestStateSystemModule) module;
 
-        /* The stub state system has in mem backend so only 1 property */
+        /* The stub state system has in mem backend 2 properties */
         Map<String, String> properties = mod.getProperties();
-        assertEquals(1, properties.size());
-
+        assertEquals(mod.getBackendName(), properties.get(Messages.TmfStateSystemAnalysisModule_PropertiesBackend));
+        assertEquals(mod.getId(), properties.get(org.eclipse.tracecompass.tmf.core.analysis.Messages.TmfAbstractAnalysisModule_LabelId));
     }
 
 }

@@ -42,6 +42,10 @@ public class Messages extends NLS {
     /** The trace to set was null */
     public static String TmfAbstractAnalysisModule_NullTrace;
 
+    /** The label for the ID property
+     * @since 2.0*/
+    public static String TmfAbstractAnalysisModule_LabelId;
+
     /** Additional information on a requirement */
     public static String TmfAnalysis_RequirementInformation;
 

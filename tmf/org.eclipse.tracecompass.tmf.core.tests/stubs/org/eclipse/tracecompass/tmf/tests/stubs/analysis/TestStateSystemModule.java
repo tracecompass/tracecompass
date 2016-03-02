@@ -36,4 +36,13 @@ public class TestStateSystemModule extends TmfStateSystemAnalysisModule {
         return StateSystemBackendType.INMEM;
     }
 
+    /**
+     * Get the name of the backend
+     *
+     * @return The name of the backend used
+     */
+    public String getBackendName() {
+        return StateSystemBackendType.INMEM.name();
+    }
+
 }

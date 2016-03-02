@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
@@ -38,6 +39,7 @@ import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement.ValuePriorityLevel;
 import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
+import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfStartAnalysisSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
@@ -52,7 +54,8 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
  * @author Geneviève Bastien
  */
 @NonNullByDefault
-public abstract class TmfAbstractAnalysisModule extends TmfComponent implements IAnalysisModule {
+public abstract class TmfAbstractAnalysisModule extends TmfComponent
+        implements IAnalysisModule, ITmfPropertiesProvider {
 
     private @Nullable String fId;
     private boolean fAutomatic = false, fStarted = false;
@@ -520,5 +523,21 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
     @Override
     public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
         return Collections.EMPTY_SET;
+    }
+
+    // ------------------------------------------------------------------------
+    // ITmfPropertiesProvider
+    // ------------------------------------------------------------------------
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public Map<@NonNull String, @NonNull String> getProperties() {
+        Map<@NonNull String, @NonNull String> properties = new HashMap<>();
+
+        properties.put(NonNullUtils.checkNotNull(Messages.TmfAbstractAnalysisModule_LabelId), getId());
+
+        return properties;
     }
 }
