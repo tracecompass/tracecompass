@@ -34,6 +34,9 @@ wiki page:
 Compiling manually
 ------------------
 
+The Maven project build requires version 3.3 or later. It can be downloaded from
+<http://maven.apache.org> or from the package management system of your distro.
+
 To build the project manually using Maven, simply run the following command from
 the top-level directory:
 
