@@ -2313,7 +2313,9 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
             if ((marker.getTime() > time ||
                     (marker.getTime() == time && marker.getDuration() > duration))
                     && !fSkippedMarkerCategories.contains(marker.getCategory())) {
-                setSelectionRangeNotify(marker.getTime(), marker.getTime() + marker.getDuration(), true);
+                setSelectionRangeNotify(marker.getTime(), marker.getTime() + marker.getDuration(), false);
+                ensureVisible(marker.getTime());
+                notifyRangeListeners();
                 fTimeGraphCtrl.updateStatusLine();
                 return;
             }
@@ -2336,7 +2338,9 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
             if ((marker.getTime() < time ||
                     (marker.getTime() == time && marker.getDuration() < duration))
                     && !fSkippedMarkerCategories.contains(marker.getCategory())) {
-                setSelectionRangeNotify(marker.getTime(), marker.getTime() + marker.getDuration(), true);
+                setSelectionRangeNotify(marker.getTime(), marker.getTime() + marker.getDuration(), false);
+                ensureVisible(marker.getTime());
+                notifyRangeListeners();
                 fTimeGraphCtrl.updateStatusLine();
                 return;
             }
