@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
@@ -32,6 +33,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceKnownSize;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 
@@ -347,27 +349,42 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
 
     private final class TmfIndexingJob extends Job {
         private Exception fException = null;
+        private final ITmfTraceKnownSize fTraceWithSize;
 
         private TmfIndexingJob(String name) {
             super(name);
+            fTraceWithSize = (fTrace instanceof ITmfTraceKnownSize) ? (ITmfTraceKnownSize) fTrace : null;
         }
 
         @Override
         protected IStatus run(final IProgressMonitor monitor) {
-            monitor.beginTask("", IProgressMonitor.UNKNOWN); //$NON-NLS-1$
+            int alreadyDone = 0;
+            SubMonitor subMonitor = SubMonitor.convert(monitor);
+            if (fTraceWithSize != null) {
+                subMonitor.beginTask("", fTraceWithSize.size()); //$NON-NLS-1$
+            } else {
+                subMonitor.beginTask("", IProgressMonitor.UNKNOWN); //$NON-NLS-1$
+            }
             while (!monitor.isCanceled()) {
                 try {
                     long prevNbEvents = fTrace.getNbEvents();
                     Thread.sleep(250);
                     long nbEvents = fTrace.getNbEvents();
+                    if (fTraceWithSize != null) {
+                        final int done = fTraceWithSize.progress();
+                        subMonitor.setWorkRemaining(fTraceWithSize.size() - done);
+                        subMonitor.worked(done - alreadyDone);
+                        alreadyDone = done;
+                    }
                     setName(Messages.TmfCheckpointIndexer_Indexing + ' ' + fTrace.getName() + " (" + String.format("%,d", nbEvents) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     // setName doesn't refresh the UI, setTaskName does
                     long rate = (nbEvents - prevNbEvents) * 4;
-                    monitor.setTaskName(String.format("%,d", rate) + " " + Messages.TmfCheckpointIndexer_EventsPerSecond); //$NON-NLS-1$ //$NON-NLS-2$
+                    subMonitor.setTaskName(String.format("%,d", rate) + " " + Messages.TmfCheckpointIndexer_EventsPerSecond); //$NON-NLS-1$ //$NON-NLS-2$
                 } catch (final InterruptedException e) {
                     return Status.OK_STATUS;
                 }
             }
+            subMonitor.done();
             monitor.done();
             return fException != null ? new Status(IStatus.ERROR, Activator.PLUGIN_ID, fException.getMessage(), fException) : Status.OK_STATUS;
         }

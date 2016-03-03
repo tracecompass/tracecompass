@@ -37,8 +37,10 @@ import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.CTFClock;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
+import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInput;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
+import org.eclipse.tracecompass.ctf.core.trace.ICTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.Metadata;
 import org.eclipse.tracecompass.internal.tmf.ctf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator.CtfIterator;
@@ -53,6 +55,7 @@ import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceKnownSize;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
@@ -83,7 +86,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class CtfTmfTrace extends TmfTrace
         implements ITmfPropertiesProvider, ITmfPersistentlyIndexable,
-        ITmfTraceWithPreDefinedEvents {
+        ITmfTraceWithPreDefinedEvents, ITmfTraceKnownSize {
 
     // -------------------------------------------
     // Constants
@@ -91,6 +94,7 @@ public class CtfTmfTrace extends TmfTrace
 
     /**
      * Clock offset property
+     *
      * @since 1.2
      */
     public static final String CLOCK_OFFSET = "clock_offset"; //$NON-NLS-1$
@@ -102,16 +106,15 @@ public class CtfTmfTrace extends TmfTrace
 
     /**
      * Event aspects available for all CTF traces
+     *
      * @since 1.0
      */
-    protected static final @NonNull Collection<@NonNull ITmfEventAspect<?>> CTF_ASPECTS =
-            ImmutableList.of(
-                    TmfBaseAspects.getTimestampAspect(),
-                    new CtfChannelAspect(),
-                    new CtfCpuAspect(),
-                    TmfBaseAspects.getEventTypeAspect(),
-                    TmfBaseAspects.getContentsAspect()
-                    );
+    protected static final @NonNull Collection<@NonNull ITmfEventAspect<?>> CTF_ASPECTS = ImmutableList.of(
+            TmfBaseAspects.getTimestampAspect(),
+            new CtfChannelAspect(),
+            new CtfCpuAspect(),
+            TmfBaseAspects.getEventTypeAspect(),
+            TmfBaseAspects.getContentsAspect());
 
     /**
      * The Ctf clock unique identifier field
@@ -120,12 +123,26 @@ public class CtfTmfTrace extends TmfTrace
     private static final int CONFIDENCE = 10;
     private static final int MIN_CONFIDENCE = 1;
 
+    /**
+     * This is a reduction factor to avoid overflows.
+     */
+    private static final long REDUCTION_FACTOR = 4096;
+
+    /**
+     * Average CTF event size, used to estimate the trace size. (Inspired by
+     * empirical observations with LTTng kernel traces, to avoid hanging at 100%
+     * for too long)
+     *
+     * TODO: Find a more suitable approximation, perhaps per concrete trace type
+     * or per trace directly with the metadata
+     */
+    private static final int CTF_AVG_EVENT_SIZE = 16;
+
     // -------------------------------------------
     // Fields
     // -------------------------------------------
 
-    private final Map<@NonNull String, @NonNull CtfTmfEventType> fContainedEventTypes =
-            Collections.synchronizedMap(new HashMap<>());
+    private final Map<@NonNull String, @NonNull CtfTmfEventType> fContainedEventTypes = Collections.synchronizedMap(new HashMap<>());
 
     private final CtfIteratorManager fIteratorManager = new CtfIteratorManager(this);
 
@@ -270,11 +287,11 @@ public class CtfTmfTrace extends TmfTrace
      * Firstly a weak validation of the metadata is done to determine if the
      * path is actually for a CTF trace. After that a full validation is done.
      *
-     * If the weak and full validation are successful the confidence is set
-     * to 10.
+     * If the weak and full validation are successful the confidence is set to
+     * 10.
      *
-     * If the weak validation was successful, but the full validation fails
-     * a TraceValidationStatus with severity warning and confidence of 1 is
+     * If the weak validation was successful, but the full validation fails a
+     * TraceValidationStatus with severity warning and confidence of 1 is
      * returned.
      *
      * If both weak and full validation fails an error status is returned.
@@ -300,12 +317,14 @@ public class CtfTmfTrace extends TmfTrace
                 }
 
                 // Validate using reader initialization
-                try (CTFTraceReader ctfTraceReader = new CTFTraceReader(trace)) {}
+                try (CTFTraceReader ctfTraceReader = new CTFTraceReader(trace)) {
+                    // do nothing
+                }
 
                 // Trace is validated, return with confidence
                 return new CtfTraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID, trace.getEnvironment());
 
-            } catch (final CTFException | BufferOverflowException e ) {
+            } catch (final CTFException | BufferOverflowException e) {
                 // return warning since it's a CTF trace but with errors in it
                 return new TraceValidationStatus(MIN_CONFIDENCE, IStatus.WARNING, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString(), e); //$NON-NLS-1$
             }
@@ -689,5 +708,33 @@ public class CtfTmfTrace extends TmfTrace
         } catch (CoreException e) {
             Activator.getDefault().logError(e.getMessage(), e);
         }
+    }
+
+    /**
+     * @return the number of estimated chunks of events read. This reads the
+     *         file size of the trace and divides it by a factor and the average
+     *         event size, this is not accurate but can give a ball park figure
+     *         of how much is done.
+     * @since 2.1
+     */
+    @Override
+    public int size() {
+        long size = 0;
+        Iterable<ICTFStream> streams = fTrace.getStreams();
+        for (ICTFStream stream : streams) {
+            for (CTFStreamInput si : stream.getStreamInputs()) {
+                size += si.getFile().length();
+            }
+        }
+        return (int) (size / REDUCTION_FACTOR / CTF_AVG_EVENT_SIZE);
+    }
+
+    /**
+     * @return the number of events divided a reduction factor. Is monotonic.
+     * @since 2.1
+     */
+    @Override
+    public int progress() {
+        return (int) (getNbEvents() / REDUCTION_FACTOR);
     }
 }
