@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.tmf.core.request;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -137,6 +138,12 @@ public interface ITmfEventRequest {
      */
     boolean isCancelled();
 
+    /**
+     * @return get the cause of failure, or null if not applicable
+     * @since 2.0
+     */
+    @Nullable Throwable getFailureCause();
+
     // ------------------------------------------------------------------------
     // Data handling
     // ------------------------------------------------------------------------
@@ -203,8 +210,12 @@ public interface ITmfEventRequest {
 
     /**
      * Put the request in the failed completed state
+     *
+     * @param e
+     *            the exception causing the failure, can be null
+     * @since 2.0
      */
-    void fail();
+    void fail(Exception e);
 
     /**
      * Put the request in the cancelled completed state

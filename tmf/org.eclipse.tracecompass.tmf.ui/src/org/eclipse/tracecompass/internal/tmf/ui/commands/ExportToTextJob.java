@@ -121,7 +121,7 @@ public class ExportToTextJob extends Job {
         if (request.isFailed()) {
             Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
                     MessageFormat.format(Messages.ExportToTextJob_Unable_to_export_trace, destination),
-                    request.getIOException());
+                    request.getFailureCause());
             return status;
         }
         return Status.OK_STATUS;

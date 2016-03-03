@@ -264,11 +264,11 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
     }
 
     @Override
-    public void fail() {
+    public void fail(Exception e) {
         for (ITmfEventRequest request : fRequests) {
-            request.fail();
+            request.fail(e);
         }
-        super.fail();
+        super.fail(e);
     }
 
     @Override

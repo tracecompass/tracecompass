@@ -34,7 +34,6 @@ public class ExportToTextRequest extends TmfEventRequest {
     private final Writer fWriter;
     private final ITmfFilter fFilter;
     private final List<TmfEventTableColumn> fColumns;
-    private IOException fIOException;
 
     /**
      * Constructor
@@ -50,14 +49,6 @@ public class ExportToTextRequest extends TmfEventRequest {
         this.fWriter = w;
         this.fFilter = filter;
         this.fColumns = columns;
-    }
-
-    /**
-     * Gets the IOException thrown by this export request, if any.
-     * @return the fIoException
-     */
-    public IOException getIOException() {
-        return fIOException;
     }
 
     @Override
@@ -91,8 +82,7 @@ public class ExportToTextRequest extends TmfEventRequest {
                 fWriter.write('\n');
             }
         } catch (IOException ex) {
-            fIOException = ex;
-            fail();
+            fail(ex);
         }
     }
 

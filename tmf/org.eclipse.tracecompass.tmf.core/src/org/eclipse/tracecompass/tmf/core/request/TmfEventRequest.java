@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.core.request;
 
 import java.util.concurrent.CountDownLatch;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
@@ -32,7 +33,8 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
  * <p>
  * Typical usage:
  *
- * <pre><code>
+ * <pre>
+ * <code>
  * TmfEventRequest request = new TmfEventRequest(DataType.class, range, startIndex, nbEvents, priority) {
  *
  *     public void handleData(ITmfEvent event) {
@@ -54,7 +56,8 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
  * };
  *
  * eventProvider.sendRequest(request);
- * </code></pre>
+ * </code>
+ * </pre>
  *
  *
  * TODO: Implement request failures (codes, etc...)
@@ -102,6 +105,8 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
     private ITmfFilter fEventFilter;
 
     private int fDependencyLevel;
+
+    private @Nullable Throwable fFailureCause;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -296,6 +301,14 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
         return fDependencyLevel;
     }
 
+    /**
+     * @since 2.0
+     */
+    @Override
+    public @Nullable Throwable getFailureCause() {
+        return fFailureCause;
+    }
+
     // ------------------------------------------------------------------------
     // Setters
     // ------------------------------------------------------------------------
@@ -419,11 +432,15 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
         }
     }
 
+    /**
+     * @since 2.0
+     */
     @Override
-    public void fail() {
+    public void fail(Exception e) {
         synchronized (this) {
             fRequestFailed = true;
         }
+        fFailureCause = e;
         done();
     }
 

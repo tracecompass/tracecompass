@@ -15,12 +15,14 @@ package org.eclipse.tracecompass.tmf.core.tests.request;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.IllformedLocaleException;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -287,11 +289,14 @@ public class TmfCoalescedEventRequestTest {
         request.addRequest(subRequest1);
         request.addRequest(subRequest2);
 
-        request.fail();
+        request.fail(new IllformedLocaleException("Hi"));
 
         // Validate the coalescing request
         assertTrue("isCompleted", request.isCompleted());
         assertTrue("isFailed", request.isFailed());
+        final Throwable failCause = request.getFailureCause();
+        assertNotNull("Cause of failure", failCause);
+        assertEquals("Cause of failure message", "Hi", failCause.getMessage());
         assertFalse("isCancelled", request.isCancelled());
 
         assertTrue("handleCompleted", crFlags[0]);

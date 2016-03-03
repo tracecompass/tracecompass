@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.core.tests.request;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -267,11 +268,14 @@ public class TmfEventRequestTest {
     public void testFail() {
         final boolean[] flags = new boolean[4];
         TmfEventRequest request = setupTestRequest(flags);
-        request.fail();
+        request.fail(new IllegalArgumentException("Bad argument"));
 
+        final Throwable failCause = request.getFailureCause();
         assertTrue("isCompleted", request.isCompleted());
         assertTrue("isFailed", request.isFailed());
         assertFalse("isCancelled", request.isCancelled());
+        assertNotNull("Cause of failure", failCause);
+        assertEquals("Cause of failure message", "Bad argument", failCause.getMessage());
 
         assertTrue("handleCompleted", flags[0]);
         assertFalse("handleSuccess", flags[1]);
