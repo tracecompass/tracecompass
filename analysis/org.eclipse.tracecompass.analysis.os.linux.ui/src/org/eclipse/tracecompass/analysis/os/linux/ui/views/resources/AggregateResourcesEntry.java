@@ -62,6 +62,26 @@ class AggregateResourcesEntry extends ResourcesEntry {
         super(ITmfStateSystem.INVALID_ATTRIBUTE, trace, startTime, endTime, type, id);
     }
 
+    /**
+     * Constructor
+     *
+     * @param trace
+     *            The trace on which we are working
+     * @param name
+     *            The exec_name of this entry
+     * @param startTime
+     *            The start time of this entry lifetime
+     * @param endTime
+     *            The end time of this entry
+     * @param type
+     *            The type of this entry
+     * @param id
+     *            The id of this entry
+     */
+    public AggregateResourcesEntry(@NonNull ITmfTrace trace, String name, long startTime, long endTime, Type type, int id) {
+        super(ITmfStateSystem.INVALID_ATTRIBUTE, trace, name, startTime, endTime, type, id);
+    }
+
     @Override
     public void addEvent(ITimeEvent event) {
     }

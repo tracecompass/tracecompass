@@ -272,6 +272,9 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
                         if (aggregateInterruptEntry.getId() == resourceId && aggregateInterruptEntry.getType().equals(type)) {
                             found = true;
                             aggregateInterruptEntry.addContributor(interruptEntry);
+                            final AggregateResourcesEntry irqCpuEntry = new AggregateResourcesEntry(trace, cpuEntry.getName(), startTime, endTime, type, cpuEntry.getId());
+                            irqCpuEntry.addContributor(interruptEntry);
+                            aggregateInterruptEntry.addChild(irqCpuEntry);
                             break;
                         }
                     }
@@ -279,6 +282,9 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
                 if (!found) {
                     AggregateResourcesEntry aggregateInterruptEntry = new AggregateResourcesEntry(trace, startTime, endTime, type, resourceId);
                     aggregateInterruptEntry.addContributor(interruptEntry);
+                    final AggregateResourcesEntry irqCpuEntry = new AggregateResourcesEntry(trace, cpuEntry.getName(), startTime, endTime, type, cpuEntry.getId());
+                    irqCpuEntry.addContributor(interruptEntry);
+                    aggregateInterruptEntry.addChild(irqCpuEntry);
                     traceEntry.addChild(aggregateInterruptEntry);
                 }
             } else {
