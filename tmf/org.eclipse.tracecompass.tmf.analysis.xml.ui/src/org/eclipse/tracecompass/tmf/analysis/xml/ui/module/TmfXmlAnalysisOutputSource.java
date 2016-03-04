@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.Messages;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternLatencyTableView;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternScatterGraphView;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.xychart.XmlXYView;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
@@ -98,7 +99,12 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
         /**
          * Latency Table View type
          */
-        LATENCY_TABLE(PatternLatencyTableView.ID, Messages.TmfXmlAnalysisOutputSource_LatencyTable);
+        LATENCY_TABLE(PatternLatencyTableView.ID, Messages.TmfXmlAnalysisOutputSource_LatencyTable),
+
+        /**
+         * Latency Scatter View type
+         */
+        SCATTER_GRAPH(PatternScatterGraphView.ID, Messages.TmfXmlAnalysisOutputSource_ScatterGraphTitle);
 
         private @NonNull String fLatencyViewId;
         private String fLatencyViewLabel;
@@ -169,7 +175,7 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
                     }
                 }
 
-                //Add the latency views for pattern analysis
+                // Add the latency views for pattern analysis
                 if (module instanceof XmlPatternAnalysis) {
                     for (LatencyViewType viewType : LatencyViewType.values()) {
                         IAnalysisOutput output = new TmfXmlLatencyViewOutput(viewType.getViewId(), viewType.getLabel());

@@ -6,22 +6,29 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module;
+package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency;
 
 import org.eclipse.osgi.util.NLS;
 
 /**
- * Message for the XML analysis output
+ * Message for XML analysis latency views
  *
  * @author Jean-Christian Kouame
  */
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.messages"; //$NON-NLS-1$
-    /** Latency table */
-    public static String TmfXmlAnalysisOutputSource_LatencyTable;
-    /** Scatter graph title */
-    public static String TmfXmlAnalysisOutputSource_ScatterGraphTitle;
-
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.messages"; //$NON-NLS-1$
+    /**
+     * Scatter graph title
+     */
+    public static String PatternLatencyViews_ScatterGraphTitle;
+    /**
+     * Scatter graph X label
+     */
+    public static String PatternLatencyViews_ScatterGraphXLabel;
+    /**
+     * Scatter graph Y label
+     */
+    public static String PatternLatencyViews_ScatterGraphYLabel;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

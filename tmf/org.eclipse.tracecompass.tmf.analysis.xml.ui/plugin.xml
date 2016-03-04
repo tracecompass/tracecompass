@@ -87,5 +87,14 @@
             name="%latency.view.name"
             restorable="true">
       </view>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternScatterGraphView"
+            icon="icons/eview16/scatter.png"
+            id="org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.scattergraph"
+            name="%latency.scatter.view.name"
+            restorable="true">
+      </view>
    </extension>
 </plugin>
