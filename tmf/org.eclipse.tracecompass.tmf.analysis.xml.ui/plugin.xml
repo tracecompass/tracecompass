@@ -96,5 +96,14 @@
             name="%latency.scatter.view.name"
             restorable="true">
       </view>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternDensityView"
+            icon="icons/eview16/density.png"
+            id="org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.density"
+            name="%latency.density.view.name"
+            restorable="true">
+      </view>
    </extension>
 </plugin>
