@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.Messages;
 import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.tracecompass.internal.tmf.core.trace.indexer.TmfMemoryIndex;
@@ -36,17 +37,17 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 
 /**
  * A simple indexer that manages the trace index as an array of trace
- * checkpoints. Checkpoints are stored in memory at fixed intervals (event rank) in
- * ascending timestamp order.
+ * checkpoints. Checkpoints are stored in memory at fixed intervals (event rank)
+ * in ascending timestamp order.
  * <p>
  * The goal being to access a random trace event reasonably fast from the user's
- * standpoint, picking the right interval value becomes a trade-off between speed
- * and memory usage (a shorter inter-event interval is faster but requires more
- * checkpoints).
+ * standpoint, picking the right interval value becomes a trade-off between
+ * speed and memory usage (a shorter inter-event interval is faster but requires
+ * more checkpoints).
  * <p>
  * Locating a specific checkpoint is trivial for both rank (rank % interval) and
- * timestamp (bsearch in the array).
- * *
+ * timestamp (bsearch in the array). *
+ *
  * @see ITmfTrace
  * @see ITmfEvent
  *
@@ -89,7 +90,8 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
      * Basic constructor that uses the default trace block size as checkpoints
      * intervals
      *
-     * @param trace the trace to index
+     * @param trace
+     *            the trace to index
      */
     public TmfCheckpointIndexer(final ITmfTrace trace) {
         this(trace, TmfEventProvider.DEFAULT_BLOCK_SIZE);
@@ -98,8 +100,10 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
     /**
      * Full trace indexer
      *
-     * @param trace the trace to index
-     * @param interval the checkpoints interval
+     * @param trace
+     *            the trace to index
+     * @param interval
+     *            the checkpoints interval
      */
     public TmfCheckpointIndexer(final ITmfTrace trace, final int interval) {
         fTrace = trace;
@@ -109,10 +113,11 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
     }
 
     /**
-     * Creates the index instance. Classes extending this class
-     * can override this to provide a different index implementation.
+     * Creates the index instance. Classes extending this class can override
+     * this to provide a different index implementation.
      *
-     * @param trace the trace to index
+     * @param trace
+     *            the trace to index
      * @return the index
      */
     protected ITmfCheckpointIndex createIndex(final ITmfTrace trace) {
@@ -168,27 +173,7 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
         TmfCoreTracer.traceIndexer("buildIndex. offset: " + indexingOffset + " (requested " + offset + ")" + " time range: " + range); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
         // The monitoring job
-        final Job job = new Job("Indexing " + fTrace.getName() + "...") { //$NON-NLS-1$ //$NON-NLS-2$
-            @Override
-            protected IStatus run(final IProgressMonitor monitor) {
-                monitor.beginTask("", IProgressMonitor.UNKNOWN); //$NON-NLS-1$
-                while (!monitor.isCanceled()) {
-                    try {
-                        long prevNbEvents = fTrace.getNbEvents();
-                        Thread.sleep(250);
-                        long nbEvents = fTrace.getNbEvents();
-                        setName(Messages.TmfCheckpointIndexer_Indexing + ' ' + fTrace.getName() + " (" + String.format("%,d", nbEvents) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                        // setName doesn't refresh the UI, setTaskName does
-                        long rate = (nbEvents - prevNbEvents) * 4;
-                        monitor.setTaskName(String.format("%,d", rate) + " " + Messages.TmfCheckpointIndexer_EventsPerSecond); //$NON-NLS-1$ //$NON-NLS-2$
-                    } catch (final InterruptedException e) {
-                        return Status.OK_STATUS;
-                    }
-                }
-                monitor.done();
-                return Status.OK_STATUS;
-            }
-        };
+        TmfIndexingJob job = new TmfIndexingJob("Indexing " + fTrace.getName() + "..."); //$NON-NLS-1$ //$NON-NLS-2$
         job.setSystem(fBuiltOnce);
         fBuiltOnce = true;
         job.schedule();
@@ -222,6 +207,12 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
                 TmfCoreTracer.traceIndexer("Build index request completed. nbEvents: " + fTraceIndex.getNbEvents() + " time range: " + fTraceIndex.getTimeRange()); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
+            @Override
+            public void fail(Exception e) {
+                super.fail(e);
+                job.setException(e);
+            }
+
             private void updateTraceStatus() {
                 if (fTrace.getNbEvents() > 0) {
                     signalNewTimeRange(fTrace.getStartTime(), fTrace.getEndTime());
@@ -242,8 +233,10 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
     /**
      * Notify the interested parties that the trace time range has changed
      *
-     * @param startTime the new start time
-     * @param endTime the new end time
+     * @param startTime
+     *            the new start time
+     * @param endTime
+     *            the new end time
      */
     private void signalNewTimeRange(final @NonNull ITmfTimestamp startTime, final @NonNull ITmfTimestamp endTime) {
         fTrace.broadcast(new TmfTraceUpdatedSignal(fTrace, fTrace, new TmfTimeRange(startTime, endTime), fTrace.getNbEvents()));
@@ -287,7 +280,8 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
         if (index < 0) {
             index = Math.max(0, -(index + 2));
         } else {
-            // If timestamp was in the list, use previous index to be able to find the
+            // If timestamp was in the list, use previous index to be able to
+            // find the
             // first event with the same timestamp before the checkpoint
             index = Math.max(0, index - 1);
         }
@@ -314,7 +308,8 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
     /**
      * Position the trace at the given checkpoint
      *
-     * @param checkpointIndex the checkpoint index
+     * @param checkpointIndex
+     *            the checkpoint index
      * @return the corresponding context
      */
     private ITmfContext restoreCheckpoint(final long checkpointIndex) {
@@ -345,5 +340,38 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
      */
     protected ITmfCheckpointIndex getTraceIndex() {
         return fTraceIndex;
+    }
+
+    private final class TmfIndexingJob extends Job {
+        private Exception fException = null;
+
+        private TmfIndexingJob(String name) {
+            super(name);
+        }
+
+        @Override
+        protected IStatus run(final IProgressMonitor monitor) {
+            monitor.beginTask("", IProgressMonitor.UNKNOWN); //$NON-NLS-1$
+            while (!monitor.isCanceled()) {
+                try {
+                    long prevNbEvents = fTrace.getNbEvents();
+                    Thread.sleep(250);
+                    long nbEvents = fTrace.getNbEvents();
+                    setName(Messages.TmfCheckpointIndexer_Indexing + ' ' + fTrace.getName() + " (" + String.format("%,d", nbEvents) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    // setName doesn't refresh the UI, setTaskName does
+                    long rate = (nbEvents - prevNbEvents) * 4;
+                    monitor.setTaskName(String.format("%,d", rate) + " " + Messages.TmfCheckpointIndexer_EventsPerSecond); //$NON-NLS-1$ //$NON-NLS-2$
+                } catch (final InterruptedException e) {
+                    return Status.OK_STATUS;
+                }
+            }
+            monitor.done();
+            return fException != null ? new Status(IStatus.ERROR, Activator.PLUGIN_ID, fException.getMessage(), fException) : Status.OK_STATUS;
+        }
+
+        public void setException(Exception e) {
+            fException = e;
+        }
+
     }
 }
