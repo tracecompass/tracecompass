@@ -43,4 +43,6 @@ public interface TmfXmlUiStrings {
     /* Generic strings for the XML module */
     static final String XML_OUTPUT_DATA = "xmlOutputData";
 
+    static final String XML_LATENCY_OUTPUT_DATA = "xmlLatencyOutputData";
+
 }

@@ -78,5 +78,14 @@
             name="%xmlxychart.view.name"
             restorable="true">
       </view>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternLatencyTableView"
+            icon="icons/eview16/latency.png"
+            id="org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latencytable"
+            name="%latency.view.name"
+            restorable="true">
+      </view>
    </extension>
 </plugin>

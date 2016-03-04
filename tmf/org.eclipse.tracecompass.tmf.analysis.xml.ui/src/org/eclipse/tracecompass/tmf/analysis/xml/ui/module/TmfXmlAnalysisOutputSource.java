@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2016 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -22,8 +22,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.Messages;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternLatencyTableView;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.xychart.XmlXYView;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
@@ -31,7 +34,7 @@ import org.eclipse.tracecompass.tmf.analysis.xml.ui.views.timegraph.XmlTimeGraph
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisOutput;
 import org.eclipse.tracecompass.tmf.core.analysis.ITmfNewAnalysisModuleListener;
-import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -83,6 +86,46 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
         }
     }
 
+    /**
+     * Enum for latency view type.
+     *
+     * @author Jean-Christian Kouame
+     * @since 2.0
+     *
+     */
+    public static enum LatencyViewType {
+
+        /**
+         * Latency Table View type
+         */
+        LATENCY_TABLE(PatternLatencyTableView.ID, Messages.TmfXmlAnalysisOutputSource_LatencyTable);
+
+        private @NonNull String fLatencyViewId;
+        private String fLatencyViewLabel;
+
+        private LatencyViewType(@NonNull String viewId, String label) {
+            fLatencyViewId = viewId;
+            fLatencyViewLabel = label;
+        }
+
+        /**
+         * Get the ID of the latency view
+         *
+         * @return The ID
+         */
+        public String getViewId() {
+            return fLatencyViewId;
+        }
+
+        /**
+         * Get the label of the view
+         *
+         * @return The label
+         */
+        public String getLabel() {
+            return fLatencyViewLabel;
+        }
+    }
 
     @Override
     public void moduleCreated(IAnalysisModule module) {
@@ -100,7 +143,7 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
                 doc.getDocumentElement().normalize();
 
                 /* get state provider views if the analysis has state systems */
-                if (module instanceof TmfStateSystemAnalysisModule) {
+                if (module instanceof ITmfAnalysisModuleWithStateSystems) {
                     for (ViewType viewType : ViewType.values()) {
                         NodeList ssViewNodes = doc.getElementsByTagName(viewType.getXmlElem());
                         for (int i = 0; i < ssViewNodes.getLength(); i++) {
@@ -125,6 +168,16 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
                         }
                     }
                 }
+
+                //Add the latency views for pattern analysis
+                if (module instanceof XmlPatternAnalysis) {
+                    for (LatencyViewType viewType : LatencyViewType.values()) {
+                        IAnalysisOutput output = new TmfXmlLatencyViewOutput(viewType.getViewId(), viewType.getLabel());
+                        output.setOutputProperty(TmfXmlUiStrings.XML_LATENCY_OUTPUT_DATA, module.getId() + DATA_SEPARATOR + viewType.getLabel(), false);
+                        module.registerOutput(output);
+                    }
+                }
+
             } catch (ParserConfigurationException | SAXException | IOException e) {
                 Activator.logError("Error opening XML file", e); //$NON-NLS-1$
             }

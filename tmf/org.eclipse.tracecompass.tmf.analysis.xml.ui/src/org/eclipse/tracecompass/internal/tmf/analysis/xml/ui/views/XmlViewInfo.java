@@ -19,7 +19,6 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource;
@@ -31,12 +30,12 @@ import org.w3c.dom.Element;
  * @author Geneviève Bastien
  */
 @NonNullByDefault
-public class XmlViewInfo {
+public class XmlViewInfo extends AbstractXmlViewInfo {
 
     private static final String XML_VIEW_ID_PROPERTY = "XmlViewId"; //$NON-NLS-1$
     private static final String XML_VIEW_FILE_PROPERTY = "XmlViewFile"; //$NON-NLS-1$
 
-    private final String fViewId;
+    /** This is the ID of the view described in the XML file */
     private @Nullable String fId = null;
     private @Nullable String fFilePath = null;
 
@@ -47,10 +46,9 @@ public class XmlViewInfo {
      *            The ID of the view
      */
     public XmlViewInfo(String viewId) {
-        fViewId = viewId;
+        super(viewId);
 
         IDialogSettings settings = getPersistentPropertyStore();
-
         fId = settings.get(XML_VIEW_ID_PROPERTY);
         fFilePath = settings.get(XML_VIEW_FILE_PROPERTY);
     }
@@ -64,6 +62,7 @@ public class XmlViewInfo {
      *            {@link TmfXmlAnalysisOutputSource#DATA_SEPARATOR} +
      *            "path of the file containing the XML element"
      */
+    @Override
     public void setViewData(String data) {
         String[] idFile = data.split(TmfXmlAnalysisOutputSource.DATA_SEPARATOR);
         fId = (idFile.length > 0) ? idFile[0] : null;
@@ -71,19 +70,8 @@ public class XmlViewInfo {
         savePersistentData();
     }
 
-    private IDialogSettings getPersistentPropertyStore() {
-        IDialogSettings settings = Activator.getDefault().getDialogSettings();
-        IDialogSettings section = settings.getSection(fViewId);
-        if (section == null) {
-            section = settings.addNewSection(fViewId);
-            if (section == null) {
-                throw new IllegalStateException();
-            }
-        }
-        return section;
-    }
-
-    private void savePersistentData() {
+    @Override
+    protected void savePersistentData() {
         IDialogSettings settings = getPersistentPropertyStore();
 
         settings.put(XML_VIEW_ID_PROPERTY, fId);
@@ -155,5 +143,4 @@ public class XmlViewInfo {
         }
         return analysisIds;
     }
-
 }
