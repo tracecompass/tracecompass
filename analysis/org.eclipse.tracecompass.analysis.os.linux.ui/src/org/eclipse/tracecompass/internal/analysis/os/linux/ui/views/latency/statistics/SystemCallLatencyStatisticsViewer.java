@@ -84,7 +84,7 @@ public class SystemCallLatencyStatisticsViewer extends AbstractSegmentStoreStati
             HiddenTreeViewerEntry syscalls = new HiddenTreeViewerEntry(SYSCALL_LEVEL);
             child.addChild(syscalls);
 
-            Map<String, SegmentStoreStatistics> perSyscallStats = module.getPerSyscallStats();
+            Map<String, SegmentStoreStatistics> perSyscallStats = module.getPerSegmentTypeStats();
             if (perSyscallStats != null) {
                 for (Entry<String, SegmentStoreStatistics> statsEntry : perSyscallStats.entrySet()) {
                     syscalls.addChild(new SegmentStoreStatisticsEntry(statsEntry.getKey(), statsEntry.getValue()));
