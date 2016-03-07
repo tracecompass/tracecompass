@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.statesystem.core.tests.backend;
+package org.eclipse.tracecompass.statesystem.core.tests.backend.historytree;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.util.List;
 
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTConfig;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTInterval;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTNode;
@@ -45,11 +45,11 @@ public class HistoryTreeTest {
 
     /* String with 23 characters, interval in file will be 25 bytes long */
     private static final String TEST_STRING = "abcdefghifklmnopqrstuvw";
-    private static final @NonNull TmfStateValue STRING_VALUE = TmfStateValue.newValueString(TEST_STRING);
-    private static final @NonNull TmfStateValue LONG_VALUE = TmfStateValue.newValueLong(10L);
-    private static final @NonNull TmfStateValue INT_VALUE = TmfStateValue.newValueInt(1);
+    private static final TmfStateValue STRING_VALUE = TmfStateValue.newValueString(TEST_STRING);
+    private static final TmfStateValue LONG_VALUE = TmfStateValue.newValueLong(10L);
+    private static final TmfStateValue INT_VALUE = TmfStateValue.newValueInt(1);
 
-    private File fTempFile;
+    private @Nullable File fTempFile;
 
     /**
      * Create the temporary file for this history tree
@@ -68,7 +68,9 @@ public class HistoryTreeTest {
      */
     @After
     public void cleanup() {
-        fTempFile.delete();
+        if (fTempFile != null) {
+            fTempFile.delete();
+        }
     }
 
     /**
@@ -105,7 +107,7 @@ public class HistoryTreeTest {
         return setupSmallTree(3);
     }
 
-    private static long fillValues(HistoryTree ht, @NonNull TmfStateValue value, int nbValues, long start) {
+    private static long fillValues(HistoryTree ht, TmfStateValue value, int nbValues, long start) {
         for (int i = 0; i < nbValues; i++) {
             ht.insertInterval(new HTInterval(start + i, start + i + 1, 1, value));
         }
