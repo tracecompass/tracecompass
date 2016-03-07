@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -111,6 +111,11 @@ public class TmfCollapseFilter implements ITmfFilterTreeNode {
     @Override
     public List<String> getValidChildren() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String toString() {
+        return COLLAPSE_NODE_NAME;
     }
 
     @Override

@@ -39,6 +39,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
+import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
@@ -243,42 +244,52 @@ public class FilterColorEditorTest {
      */
     @Test
     public void testSwitchToFilter() {
-        final Rectangle cellBounds = SWTBotUtils.getCellBounds(fTableBot.widget, ROW, TIMESTAMP_COLUMN);
+        Rectangle cellBounds = SWTBotUtils.getCellBounds(fTableBot.widget, ROW, TIMESTAMP_COLUMN);
         ImageHelper before = ImageHelper.grabImage(cellBounds);
-        // enter regex in message column
+        // enter regex in Timestamp column
         fTableBot.click(0, TIMESTAMP_COLUMN);
         fBot.text().typeText("00\n", 100);
         // make sure matching column is not selected
         fTableBot.select(ROW - 1);
-        ImageHelper after = ImageHelper.grabImage(cellBounds);
-        // toggle filter mode
+        ImageHelper afterSearch = ImageHelper.grabImage(cellBounds);
+        // click Add as Filter
         fTableBot.click(0, 0);
-        fBot.waitUntil(ConditionHelpers.isTableCellFilled(fTableBot, "<filter>", 0, 1));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(fTableBot, "<srch>", 0, TIMESTAMP_COLUMN));
         //TODO: We need a better way to make sure that the table is done updating
         SWTBotUtils.delay(2000);
+        // the bounds have changed after applying the filter
+        cellBounds = SWTBotUtils.getCellBounds(fTableBot.widget, ROW, TIMESTAMP_COLUMN);
         ImageHelper afterFilter = ImageHelper.grabImage(cellBounds);
+        // press DEL to clear highlighting
+        fTableBot.pressShortcut(Keystrokes.DELETE);
+        ImageHelper afterClear = ImageHelper.grabImage(cellBounds);
 
         List<RGB> beforeLine = before.getPixelRow(2);
-        List<RGB> afterLine = after.getPixelRow(2);
+        List<RGB> afterSearchLine = afterSearch.getPixelRow(2);
         List<RGB> afterFilterLine = afterFilter.getPixelRow(2);
+        List<RGB> afterClearLine = afterClear.getPixelRow(2);
 
-        assertEquals(beforeLine.size(), afterLine.size());
+        assertEquals(beforeLine.size(), afterSearchLine.size());
         assertEquals(beforeLine.size(), afterFilterLine.size());
+        assertEquals(beforeLine.size(), afterClearLine.size());
         for (int i = 0; i < beforeLine.size(); i++) {
-            RGB afterFilterPixel = afterFilterLine.get(i);
             RGB beforePixel = beforeLine.get(i);
-            RGB afterPixel = afterLine.get(i);
+            RGB afterSearchPixel = afterSearchLine.get(i);
+            RGB afterFilterPixel = afterFilterLine.get(i);
+            RGB afterClearPixel = afterClearLine.get(i);
 
-            assertEquals(beforePixel, afterFilterPixel);
-            if (!afterPixel.equals(fHighlight)) {
-                assertEquals(beforePixel, afterPixel);
+            assertEquals(afterSearchPixel, afterFilterPixel);
+            assertEquals(beforePixel, afterClearPixel);
+            if (!afterSearchPixel.equals(fHighlight)) {
+                assertEquals(beforePixel, afterSearchPixel);
             } else {
                 assertNotEquals(fHighlight, beforePixel);
             }
 
         }
-        assertEquals(beforeLine, afterFilterLine);
-        assertNotEquals(afterLine, beforeLine);
+        assertEquals(afterSearchLine, afterFilterLine);
+        assertEquals(beforeLine, afterClearLine);
+        assertNotEquals(afterSearchLine, beforeLine);
     }
 
     /**

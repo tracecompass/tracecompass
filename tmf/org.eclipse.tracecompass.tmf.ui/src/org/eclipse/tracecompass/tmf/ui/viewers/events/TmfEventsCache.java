@@ -130,6 +130,7 @@ public class TmfEventsCache {
     private final TmfEventsTable fTable;
     private ITmfFilter fFilter;
     private final List<Integer> fFilterIndex = new ArrayList<>(); // contains the event rank at each 'cache size' filtered events
+    private boolean fCollapseFilterEnabled = false;
 
     /**
      * Constructor for the event cache
@@ -176,9 +177,13 @@ public class TmfEventsCache {
      *
      * @param filter
      *            The ITmfFilter to apply.
+     * @param collapseFilterEnabled
+     *            true if the collapse filter is enabled
+     * @since 2.0
      */
-    public void applyFilter(ITmfFilter filter) {
+    public void applyFilter(ITmfFilter filter, boolean collapseFilterEnabled) {
         fFilter = filter;
+        fCollapseFilterEnabled = collapseFilterEnabled;
         clear();
     }
 
@@ -188,6 +193,7 @@ public class TmfEventsCache {
      */
     public void clearFilter() {
         fFilter = null;
+        fCollapseFilterEnabled = false;
         clear();
     }
 
@@ -309,6 +315,7 @@ public class TmfEventsCache {
 
         class DataRequest extends TmfEventRequest {
             ITmfFilter requestFilter;
+            TmfCollapseFilter requestCollapsedFilter;
             int requestRank;
             int requestIndex;
 
@@ -318,6 +325,7 @@ public class TmfEventsCache {
                 requestFilter = reqFilter;
                 requestRank = start;
                 requestIndex = index;
+                requestCollapsedFilter = fCollapseFilterEnabled ? new TmfCollapseFilter() : null;
             }
 
             @Override
@@ -332,7 +340,9 @@ public class TmfEventsCache {
                 }
                 requestRank++;
                 if (requestFilter.matches(event)) {
-                    requestIndex++;
+                    if (requestCollapsedFilter == null || requestCollapsedFilter.matches(event)) {
+                        requestIndex++;
+                    }
                 }
             }
 
@@ -411,6 +421,7 @@ public class TmfEventsCache {
                         TmfEventRequest.ExecutionType.FOREGROUND) {
                     private int count = 0;
                     private long rank = startIndex;
+                    private TmfCollapseFilter collapseFilter = fCollapseFilterEnabled ? new TmfCollapseFilter() : null;
                     @Override
                     public void handleData(ITmfEvent event) {
                         // If the job is canceled, cancel the request so waitForCompletion() will unlock
@@ -419,20 +430,22 @@ public class TmfEventsCache {
                             return;
                         }
                         super.handleData(event);
-                        if (((fFilter == null) || fFilter.matches(event)) && (skipCount-- <= 0)) {
-                            synchronized (TmfEventsCache.this) {
-                                if (monitor.isCanceled()) {
-                                    return;
+                        if ((fFilter == null) || fFilter.matches(event)) {
+                            if (collapseFilter == null || collapseFilter.matches(event)) {
+                                if (skipCount-- <= 0) {
+                                    synchronized (TmfEventsCache.this) {
+                                        if (monitor.isCanceled()) {
+                                            return;
+                                        }
+                                        fCache[count] = new CachedEvent(event, rank);
+                                        count++;
+                                        fCacheEndIndex++;
+                                    }
+                                    if (fFilter != null) {
+                                        fTable.cacheUpdated(false);
+                                    }
                                 }
-                                fCache[count] = new CachedEvent(event, rank);
-                                count++;
-                                fCacheEndIndex++;
-                            }
-                            if (fFilter != null) {
-                                fTable.cacheUpdated(false);
-                            }
-                        } else if (((fFilter != null) && !fFilter.matches(event)) && (skipCount <= 0)) { // TODO fix duplicated call to matches()
-                            if ((count > 0) && (fFilter instanceof TmfCollapseFilter)) {
+                            } else if ((count > 0) && (skipCount <= 0)) {
                                 fCache[count - 1].repeatCount++;
                             }
                         }

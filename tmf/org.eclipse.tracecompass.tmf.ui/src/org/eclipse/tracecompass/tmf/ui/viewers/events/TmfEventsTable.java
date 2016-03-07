@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson
+ * Copyright (c) 2010, 2016 Ericsson and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -138,9 +138,10 @@ import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfModelLookup;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
-import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterObjectNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterRootNode;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
@@ -161,6 +162,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsCache.CachedEvent;
+import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsTableHeader.IEventsTableHeaderListener;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSetting;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSettingsManager;
@@ -220,9 +222,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private static final Image SEARCH_MATCH_BOOKMARK_IMAGE = Activator.getDefault().getImageFromPath(
             "icons/elcl16/search_match_bookmark.gif"); //$NON-NLS-1$
     private static final Image FILTER_IMAGE = Activator.getDefault().getImageFromPath("icons/elcl16/filter_items.gif"); //$NON-NLS-1$
+    private static final Image FILTER_ADD_IMAGE = Activator.getDefault().getImageFromPath("icons/elcl16/filter_add.gif"); //$NON-NLS-1$
     private static final Image STOP_IMAGE = Activator.getDefault().getImageFromPath("icons/elcl16/stop.gif"); //$NON-NLS-1$
     private static final String SEARCH_HINT = Messages.TmfEventsTable_SearchHint;
-    private static final String FILTER_HINT = Messages.TmfEventsTable_FilterHint;
     private static final int MAX_CACHE_SIZE = 1000;
 
     private static final int MARGIN_COLUMN_INDEX = 0;
@@ -515,15 +517,25 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 if (item == null) {
                     return;
                 }
-                final Long rank = (Long) item.getData(Key.RANK);
-                if (rank == null) {
-                    return;
-                }
-                final String tooltipText = (String) item.getData(Key.BOOKMARK);
-                final Rectangle bounds = item.getImageBounds(0);
-                bounds.width = BOOKMARK_IMAGE.getBounds().width;
-                if (!bounds.contains(event.x, event.y)) {
-                    return;
+                String text;
+                if (fTable.indexOf(item) == 0) {
+                    if (fHeaderState == HeaderState.SEARCH && item.getBounds(0).contains(event.x, event.y)) {
+                        text = Messages.TmfEventsTable_AddAsFilterText;
+                    } else {
+                        return;
+                    }
+                } else {
+                    final Long rank = (Long) item.getData(Key.RANK);
+                    if (rank == null) {
+                        return;
+                    }
+                    final String tooltipText = (String) item.getData(Key.BOOKMARK);
+                    final Rectangle bounds = item.getImageBounds(0);
+                    bounds.width = BOOKMARK_IMAGE.getBounds().width;
+                    if (!bounds.contains(event.x, event.y)) {
+                        return;
+                    }
+                    text = rank.toString() + (tooltipText != null ? ": " + tooltipText : EMPTY_STRING); //$NON-NLS-1$
                 }
                 if ((tooltipShell != null) && !tooltipShell.isDisposed()) {
                     tooltipShell.dispose();
@@ -534,7 +546,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 layout.marginWidth = 2;
                 tooltipShell.setLayout(layout);
                 final Label label = new Label(tooltipShell, SWT.WRAP);
-                String text = rank.toString() + (tooltipText != null ? ": " + tooltipText : EMPTY_STRING); //$NON-NLS-1$
                 label.setForeground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
                 label.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
                 label.setText(text);
@@ -630,11 +641,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * @author Patrick Tasse
      */
     public static enum HeaderState {
-        /** A search is being run */
-        SEARCH,
+        /** No search filter is applied
+         * @since 2.0*/
+        NO_SEARCH,
 
-        /** A filter is applied */
-        FILTER
+        /** A search filter is applied */
+        SEARCH
     }
 
     interface Direction {
@@ -646,6 +658,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     // Table data
     // ------------------------------------------------------------------------
 
+    /** The header bar */
+    private TmfEventsTableHeader fHeaderBar;
+
     /** The virtual event table */
     protected TmfVirtualTable fTable;
 
@@ -654,7 +669,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private TmfRawEventViewer fRawViewer;
     private ITmfTrace fTrace;
     private volatile boolean fPackDone = false;
-    private HeaderState fHeaderState = HeaderState.SEARCH;
+    private HeaderState fHeaderState = HeaderState.NO_SEARCH;
     private long fSelectedRank = -1;
     private long fSelectedBeginRank = -1;
     private ITmfTimestamp fSelectedBeginTimestamp = null;
@@ -668,6 +683,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private final Object fFilterSyncObj = new Object();
     private SearchThread fSearchThread;
     private final Object fSearchSyncObj = new Object();
+    private boolean fCollapseFilterEnabled = false;
 
     /**
      * List of selection change listeners (element type:
@@ -788,7 +804,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         super("TmfEventsTable"); //$NON-NLS-1$
 
         fComposite = new Composite(parent, SWT.NONE);
-        final GridLayout gl = new GridLayout(1, false);
+        GridLayout gl = new GridLayout(1, false);
         gl.marginHeight = 0;
         gl.marginWidth = 0;
         gl.verticalSpacing = 0;
@@ -797,9 +813,45 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fSashForm = new SashForm(fComposite, SWT.HORIZONTAL);
         fSashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+        // Create a composite for the table and its header bar
+        Composite tableComposite = new Composite(fSashForm, SWT.NONE);
+        tableComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        gl = new GridLayout(1, false);
+        gl.marginHeight = 0;
+        gl.marginWidth = 0;
+        gl.verticalSpacing = 0;
+        tableComposite.setLayout(gl);
+
+        // Create an events table header bar
+        fHeaderBar = new TmfEventsTableHeader(tableComposite, SWT.NONE, new IEventsTableHeaderListener() {
+            @Override
+            public void filterSelected(ITmfFilter filter) {
+                if (filter instanceof TmfFilterMatchesNode) {
+                    TmfFilterMatchesNode matchFilter = (TmfFilterMatchesNode) filter;
+                    for (TableColumn col : fTable.getColumns()) {
+                        if (col.getData(Key.ASPECT) == matchFilter.getEventAspect()) {
+                            col.setData(Key.FILTER_TXT, matchFilter.getRegex());
+                        } else {
+                            col.setData(Key.FILTER_TXT, null);
+                        }
+                    }
+                    fTable.refresh();
+                    fTable.redraw();
+                }
+            }
+
+            @Override
+            public void filterRemoved(ITmfFilter filter) {
+                for (TableColumn col : fTable.getColumns()) {
+                    col.setData(Key.FILTER_TXT, null);
+                }
+                removeFilter(filter);
+            }
+        });
+
         // Create a virtual table
         final int style = SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI | SWT.FULL_SELECTION;
-        fTable = new TmfVirtualTable(fSashForm, style);
+        fTable = new TmfVirtualTable(tableComposite, style);
 
         // Set the table layout
         final GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -1213,21 +1265,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             }
         };
 
-        final IAction showSearchBarAction = new Action(Messages.TmfEventsTable_ShowSearchBarActionText) {
+        final IAction addAsFilterAction = new Action(Messages.TmfEventsTable_AddAsFilterText) {
             @Override
             public void run() {
-                fHeaderState = HeaderState.SEARCH;
-                fTable.refresh();
-                fTable.redraw();
-            }
-        };
-
-        final IAction showFilterBarAction = new Action(Messages.TmfEventsTable_ShowFilterBarActionText) {
-            @Override
-            public void run() {
-                fHeaderState = HeaderState.FILTER;
-                fTable.refresh();
-                fTable.redraw();
+                applySearchAsFilter();
             }
         };
 
@@ -1281,10 +1322,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             public void menuAboutToShow(final IMenuManager manager) {
                 if (fTable.getSelectionIndices().length == 1 && fTable.getSelectionIndices()[0] == 0) {
                     // Right-click on header row
-                    if (fHeaderState == HeaderState.FILTER) {
-                        fTablePopupMenuManager.add(showSearchBarAction);
-                    } else {
-                        fTablePopupMenuManager.add(showFilterBarAction);
+                    if (fHeaderState == HeaderState.SEARCH) {
+                        fTablePopupMenuManager.add(addAsFilterAction);
                     }
                     return;
                 }
@@ -1364,7 +1403,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     }
                 }
 
-                if (isCollapsible && !(fTable.getData(Key.FILTER_OBJ) instanceof TmfCollapseFilter)) {
+                if (isCollapsible && !fCollapseFilterEnabled) {
                     fTablePopupMenuManager.add(collapseAction);
                     fTablePopupMenuManager.add(new Separator());
                 }
@@ -1575,10 +1614,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         for (int index = 0; index < fTable.getColumns().length; index++) {
             TableColumn column = fTable.getColumns()[index];
             String regex = null;
-            if (fHeaderState == HeaderState.FILTER) {
+            if (fHeaderState == HeaderState.SEARCH) {
+                if (searchMatch) {
+                    regex = (String) column.getData(Key.SEARCH_TXT);
+                }
+            } else {
                 regex = (String) column.getData(Key.FILTER_TXT);
-            } else if (searchMatch) {
-                regex = (String) column.getData(Key.SEARCH_TXT);
             }
             if (regex != null) {
                 String text = item.getText(index);
@@ -1618,25 +1659,18 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      *            The item to use as table header
      */
     protected void setHeaderRowItemData(final TableItem item) {
-        String txtKey = null;
-        if (fHeaderState == HeaderState.SEARCH) {
+        if (fHeaderState == HeaderState.NO_SEARCH) {
             item.setImage(SEARCH_IMAGE);
-            txtKey = Key.SEARCH_TXT;
-        } else if (fHeaderState == HeaderState.FILTER) {
-            item.setImage(FILTER_IMAGE);
-            txtKey = Key.FILTER_TXT;
+        } else if (fHeaderState == HeaderState.SEARCH) {
+            item.setImage(FILTER_ADD_IMAGE);
         }
         item.setForeground(fGrayColor);
         // Ignore collapse and image column
         for (int i = EVENT_COLUMNS_START_INDEX; i < fTable.getColumns().length; i++) {
             final TableColumn column = fTable.getColumns()[i];
-            final String filter = (String) column.getData(txtKey);
+            final String filter = (String) column.getData(Key.SEARCH_TXT);
             if (filter == null) {
-                if (fHeaderState == HeaderState.SEARCH) {
-                    item.setText(i, SEARCH_HINT);
-                } else if (fHeaderState == HeaderState.FILTER) {
-                    item.setText(i, FILTER_HINT);
-                }
+                item.setText(i, SEARCH_HINT);
                 item.setForeground(i, fGrayColor);
                 item.setFont(i, fFont);
             } else {
@@ -1709,13 +1743,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     // Margin column selected
                     if (item.getBounds(0).contains(point)) {
                         if (fHeaderState == HeaderState.SEARCH) {
-                            fHeaderState = HeaderState.FILTER;
-                        } else if (fHeaderState == HeaderState.FILTER) {
-                            fHeaderState = HeaderState.SEARCH;
+                            applySearchAsFilter();
                         }
-                        fTable.setSelection(0);
-                        fTable.refresh();
-                        fTable.redraw();
                         return;
                     }
 
@@ -1735,19 +1764,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
                     column = fTable.getColumns()[columnIndex];
 
-                    String txtKey = null;
-                    if (fHeaderState == HeaderState.SEARCH) {
-                        txtKey = Key.SEARCH_TXT;
-                    } else if (fHeaderState == HeaderState.FILTER) {
-                        txtKey = Key.FILTER_TXT;
-                    }
-
                     /*
                      * The control that will be the editor must be a child of
                      * the Table
                      */
                     final Text newEditor = (Text) fTable.createTableEditorControl(Text.class);
-                    final String headerString = (String) column.getData(txtKey);
+                    final String headerString = (String) column.getData(Key.SEARCH_TXT);
                     if (headerString != null) {
                         newEditor.setText(headerString);
                     }
@@ -1766,12 +1788,15 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             if (e.character == SWT.CR) {
                                 updateHeader(newEditor.getText());
                                 applyHeader();
-
-                                /*
-                                 * Set focus on the table so that the next
-                                 * carriage return goes to the next result
-                                 */
-                                TmfEventsTable.this.getTable().setFocus();
+                                if ((e.stateMask & SWT.CTRL) != 0) {
+                                    applySearchAsFilter();
+                                } else {
+                                    /*
+                                     * Set focus on the table so that the next
+                                     * carriage return goes to the next result
+                                     */
+                                    TmfEventsTable.this.getTable().setFocus();
+                                }
                             } else if (e.character == SWT.ESC) {
                                 tableEditor.getEditor().dispose();
                             }
@@ -1787,19 +1812,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
              * returns true is value was changed
              */
             private boolean updateHeader(final String regex) {
-                String objKey = null;
-                String txtKey = null;
-                if (fHeaderState == HeaderState.SEARCH) {
-                    objKey = Key.SEARCH_OBJ;
-                    txtKey = Key.SEARCH_TXT;
-                } else if (fHeaderState == HeaderState.FILTER) {
-                    objKey = Key.FILTER_OBJ;
-                    txtKey = Key.FILTER_TXT;
-                }
                 if (regex.length() > 0) {
                     try {
                         Pattern.compile(regex);
-                        if (regex.equals(column.getData(txtKey))) {
+                        if (regex.equals(column.getData(Key.SEARCH_TXT))) {
                             tableEditor.getEditor().dispose();
                             return false;
                         }
@@ -1807,8 +1823,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         ITmfEventAspect aspect = (ITmfEventAspect) column.getData(Key.ASPECT);
                         filter.setEventAspect(aspect);
                         filter.setRegex(regex);
-                        column.setData(objKey, filter);
-                        column.setData(txtKey, regex);
+                        column.setData(Key.SEARCH_OBJ, filter);
+                        column.setData(Key.SEARCH_TXT, regex);
                     } catch (final PatternSyntaxException ex) {
                         tableEditor.getEditor().dispose();
                         MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
@@ -1816,49 +1832,36 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         return false;
                     }
                 } else {
-                    if (column.getData(txtKey) == null) {
+                    if (column.getData(Key.SEARCH_TXT) == null) {
                         tableEditor.getEditor().dispose();
                         return false;
                     }
-                    column.setData(objKey, null);
-                    column.setData(txtKey, null);
+                    column.setData(Key.SEARCH_OBJ, null);
+                    column.setData(Key.SEARCH_TXT, null);
                 }
                 return true;
             }
 
             private void applyHeader() {
-                if (fHeaderState == HeaderState.SEARCH) {
-                    stopSearchThread();
-                    final TmfFilterAndNode filter = new TmfFilterAndNode(null);
-                    for (final TableColumn col : fTable.getColumns()) {
-                        final Object filterObj = col.getData(Key.SEARCH_OBJ);
-                        if (filterObj instanceof ITmfFilterTreeNode) {
-                            filter.addChild((ITmfFilterTreeNode) filterObj);
-                        }
+                stopSearchThread();
+                final TmfFilterRootNode filter = new TmfFilterRootNode();
+                for (final TableColumn col : fTable.getColumns()) {
+                    final Object filterObj = col.getData(Key.SEARCH_OBJ);
+                    if (filterObj instanceof ITmfFilterTreeNode) {
+                        filter.addChild((ITmfFilterTreeNode) filterObj);
                     }
-                    if (filter.getChildrenCount() > 0) {
-                        fTable.setData(Key.SEARCH_OBJ, filter);
-                        fTable.refresh();
-                        searchNext();
-                        fireSearchApplied(filter);
-                    } else {
-                        fTable.setData(Key.SEARCH_OBJ, null);
-                        fTable.refresh();
-                        fireSearchApplied(null);
-                    }
-                } else if (fHeaderState == HeaderState.FILTER) {
-                    final TmfFilterAndNode filter = new TmfFilterAndNode(null);
-                    for (final TableColumn col : fTable.getColumns()) {
-                        final Object filterObj = col.getData(Key.FILTER_OBJ);
-                        if (filterObj instanceof ITmfFilterTreeNode) {
-                            filter.addChild((ITmfFilterTreeNode) filterObj);
-                        }
-                    }
-                    if (filter.getChildrenCount() > 0) {
-                        applyFilter(filter);
-                    } else {
-                        clearFilters();
-                    }
+                }
+                if (filter.getChildrenCount() > 0) {
+                    fHeaderState = HeaderState.SEARCH;
+                    fTable.setData(Key.SEARCH_OBJ, filter);
+                    fTable.refresh();
+                    searchNext();
+                    fireSearchApplied(filter);
+                } else {
+                    fHeaderState = HeaderState.NO_SEARCH;
+                    fTable.setData(Key.SEARCH_OBJ, null);
+                    fTable.refresh();
+                    fireSearchApplied(null);
                 }
 
                 tableEditor.getEditor().dispose();
@@ -1875,19 +1878,28 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     fTable.refresh();
                 } else if (e.character == SWT.DEL) {
                     if (fHeaderState == HeaderState.SEARCH) {
+                        fHeaderState = HeaderState.NO_SEARCH;
                         stopSearchThread();
                         for (final TableColumn column : fTable.getColumns()) {
                             column.setData(Key.SEARCH_OBJ, null);
                             column.setData(Key.SEARCH_TXT, null);
+                            column.setData(Key.FILTER_TXT, null);
                         }
                         fTable.setData(Key.SEARCH_OBJ, null);
                         fTable.refresh();
                         fireSearchApplied(null);
-                    } else if (fHeaderState == HeaderState.FILTER) {
-                        clearFilters();
+                    } else {
+                        for (final TableColumn column : fTable.getColumns()) {
+                            column.setData(Key.FILTER_TXT, null);
+                        }
+                        fTable.refresh();
                     }
                 } else if (e.character == SWT.CR) {
-                    if ((e.stateMask & SWT.SHIFT) == 0) {
+                    if ((e.stateMask & SWT.CTRL) != 0) {
+                        if (fHeaderState == HeaderState.SEARCH) {
+                            applySearchAsFilter();
+                        }
+                    } else if ((e.stateMask & SWT.SHIFT) == 0) {
                         searchNext();
                     } else {
                         searchPrevious();
@@ -1895,6 +1907,27 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 }
             }
         });
+    }
+
+    /**
+     * Apply the current search condition as a new filter.
+     *
+     * @since 2.0
+     */
+    protected void applySearchAsFilter() {
+        Object searchObj = fTable.getData(Key.SEARCH_OBJ);
+        if (searchObj instanceof ITmfFilter) {
+            ITmfFilter filter = (ITmfFilter) searchObj;
+            fTable.setData(Key.SEARCH_OBJ, null);
+            fireSearchApplied(null);
+            fHeaderState = HeaderState.NO_SEARCH;
+            for (final TableColumn col : fTable.getColumns()) {
+                col.setData(Key.FILTER_TXT, col.getData(Key.SEARCH_TXT));
+                col.setData(Key.SEARCH_TXT, null);
+                col.setData(Key.SEARCH_OBJ, null);
+            }
+            applyFilter(filter);
+        }
     }
 
     /**
@@ -1950,7 +1983,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     /**
-     * Apply a filter.
+     * Apply a filter. It is added to the existing filters.
      *
      * @param filter
      *            The filter to apply
@@ -1960,13 +1993,78 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         stopSearchThread();
         fFilterMatchCount = 0;
         fFilterCheckCount = 0;
-        fCache.applyFilter(filter);
+        ITmfFilterTreeNode rootFilter = (ITmfFilterTreeNode) fTable.getData(Key.FILTER_OBJ);
+        if (rootFilter == null) {
+            rootFilter = new TmfFilterRootNode();
+        }
+        if (filter instanceof TmfFilterRootNode) {
+            TmfFilterRootNode parentFilter = (TmfFilterRootNode) filter;
+            for (ITmfFilterTreeNode child : parentFilter.getChildren()) {
+                rootFilter.addChild(child);
+            }
+        } else if (filter instanceof TmfCollapseFilter) {
+            fCollapseFilterEnabled = true;
+        } else if (filter instanceof ITmfFilterTreeNode) {
+            rootFilter.addChild((ITmfFilterTreeNode) filter);
+        } else {
+            rootFilter.addChild(new TmfFilterObjectNode(filter));
+        }
+        fCache.applyFilter(rootFilter, fCollapseFilterEnabled);
+        fHeaderBar.addFilter(filter);
         fTable.clearAll();
-        fTable.setData(Key.FILTER_OBJ, filter);
+        fTable.setData(Key.FILTER_OBJ, rootFilter);
         /* +1 for header row, +2 for top and bottom filter status rows */
         fTable.setItemCount(3);
         startFilterThread();
-        fireFilterApplied(filter);
+        fireFilterApplied(rootFilter);
+    }
+
+    /**
+     * Remove a filter. Any other existing filters remain applied.
+     *
+     * @param filter
+     *            The filter to remove
+     * @since 2.0
+     */
+    protected void removeFilter(ITmfFilter filter) {
+        ITmfFilterTreeNode rootFilter = (ITmfFilterTreeNode) fTable.getData(Key.FILTER_OBJ);
+        if (rootFilter == null) {
+            return;
+        }
+        stopFilterThread();
+        stopSearchThread();
+        fFilterMatchCount = 0;
+        fFilterCheckCount = 0;
+        if (filter instanceof TmfCollapseFilter) {
+            fCollapseFilterEnabled = false;
+        } else if (filter instanceof ITmfFilterTreeNode) {
+            rootFilter.removeChild((ITmfFilterTreeNode) filter);
+        } else {
+            for (ITmfFilterTreeNode child : rootFilter.getChildren()) {
+                if (child instanceof TmfFilterObjectNode) {
+                    if (((TmfFilterObjectNode) child).getFilter().equals(filter)) {
+                        rootFilter.removeChild(child);
+                        break;
+                    }
+                }
+            }
+        }
+        if (!rootFilter.hasChildren() && !fCollapseFilterEnabled) {
+            clearFilters();
+            return;
+        }
+        fCache.applyFilter(rootFilter, fCollapseFilterEnabled);
+        fHeaderBar.removeFilter(filter);
+        fTable.clearAll();
+        fTable.setData(Key.FILTER_OBJ, rootFilter);
+        /* +1 for header row, +2 for top and bottom filter status rows */
+        fTable.setItemCount(3);
+        startFilterThread();
+        fireFilterApplied(rootFilter);
+
+        // Set original width
+        fTable.getColumns()[MARGIN_COLUMN_INDEX].setWidth(0);
+        packMarginColumn();
     }
 
     /**
@@ -1979,6 +2077,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         stopFilterThread();
         stopSearchThread();
         fCache.clearFilter();
+        fHeaderBar.clearFilters();
+        fCollapseFilterEnabled = false;
         fTable.clearAll();
         for (final TableColumn column : fTable.getColumns()) {
             column.setData(Key.FILTER_OBJ, null);
@@ -2013,6 +2113,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      */
     protected class FilterThread extends Thread {
         private final ITmfFilterTreeNode filter;
+        private TmfCollapseFilter collapseFilter = null;
         private TmfEventRequest request;
         private boolean refreshBusy = false;
         private boolean refreshPending = false;
@@ -2034,6 +2135,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             if (fTrace == null) {
                 return;
             }
+            if (fCollapseFilterEnabled) {
+                collapseFilter = new TmfCollapseFilter();
+            }
             final int nbRequested = (int) (fTrace.getNbEvents() - fFilterCheckCount);
             if (nbRequested <= 0) {
                 return;
@@ -2048,15 +2152,15 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     }
                     boolean refresh = false;
                     if (filter.matches(event)) {
-                        final long rank = fFilterCheckCount;
-                        final int index = (int) fFilterMatchCount;
-                        fFilterMatchCount++;
-                        fCache.storeEvent(event, rank, index);
-                        refresh = true;
-                    } else {
-                        if (filter instanceof TmfCollapseFilter) {
+                        if (collapseFilter == null || collapseFilter.matches(event)) {
+                            final long rank = fFilterCheckCount;
+                            final int index = (int) fFilterMatchCount;
+                            fFilterMatchCount++;
+                            fCache.storeEvent(event, rank, index);
+                        } else if (collapseFilter != null) {
                             fCache.updateCollapsedEvent((int) fFilterMatchCount - 1);
                         }
+                        refresh = true;
                     }
 
                     if (refresh || (fFilterCheckCount % 100) == 0) {
@@ -2394,7 +2498,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
         @Override
         protected void canceling() {
-            request.cancel();
+            if (request != null) {
+                request.cancel();
+            }
             synchronized (fSearchSyncObj) {
                 fSearchThread = null;
             }
@@ -2482,8 +2588,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
          * search/filter row in TableColumn.pack() after having executed
          * TableItem.setImage(null) for other rows than search/filter row.
          */
-        boolean isCollapseFilter = fTable.getData(Key.FILTER_OBJ) instanceof TmfCollapseFilter;
-        if (IS_LINUX && (i == 0) && isCollapseFilter) {
+        if (IS_LINUX && (i == 0) && fCollapseFilterEnabled) {
             column.setWidth(column.getWidth() + SEARCH_IMAGE.getBounds().width);
         }
 

@@ -41,6 +41,7 @@ public class Messages extends NLS {
     public static String MarkerEvent_Bookmarks;
     public static String MarkerEvent_LostEvents;
 
+    public static String TmfEventsTable_AddAsFilterText;
     public static String TmfEventsTable_AddBookmarkActionText;
     public static String TmfEventsTable_ApplyPresetFilterMenuName;
     public static String TmfEventsTable_ClearFiltersActionText;
@@ -48,7 +49,6 @@ public class Messages extends NLS {
     public static String TmfEventsTable_ContentColumnHeader;
     public static String TmfEventsTable_CopyToClipboardActionText;
     public static String TmfEventsTable_Export_to_text;
-    public static String TmfEventsTable_FilterHint;
     public static String TmfEventsTable_HideRawActionText;
     public static String TmfEventsTable_HideTableActionText;
     public static String TmfEventsTable_MultipleBookmarksToolTip;
@@ -62,9 +62,7 @@ public class Messages extends NLS {
     public static String TmfEventsTable_SearchHint;
     public static String TmfEventsTable_SearchingJobName;
     public static String TmfEventsTable_ShowAll;
-    public static String TmfEventsTable_ShowFilterBarActionText;
     public static String TmfEventsTable_ShowRawActionText;
-    public static String TmfEventsTable_ShowSearchBarActionText;
     public static String TmfEventsTable_ShowTableActionText;
     public static String TmfEventsTable_SourceColumnHeader;
     public static String TmfEventsTable_TimestampColumnHeader;
