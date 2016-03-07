@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HistoryTreeBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.junit.After;
@@ -36,7 +35,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class HistoryTreeBackendTest extends StateHistoryBackendTestBase {
 
     /** State system ID */
-    protected static final @NonNull String SSID = "test";
+    protected static final String SSID = "test";
     /** Provider version */
     protected static final int PROVIDER_VERSION = 0;
 

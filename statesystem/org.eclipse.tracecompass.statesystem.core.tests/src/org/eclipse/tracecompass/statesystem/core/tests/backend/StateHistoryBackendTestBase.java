@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.statesystem.core.tests.backend;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -75,7 +76,7 @@ public abstract class StateHistoryBackendTestBase {
      *            The intervals to insert in the history backend
      * @return The backend to be used for querying.
      */
-    protected final IStateHistoryBackend prepareBackend(long startTime, long endTime,
+    protected final @Nullable IStateHistoryBackend prepareBackend(long startTime, long endTime,
             List<ITmfStateInterval> intervals) {
 
         try {
@@ -128,6 +129,7 @@ public abstract class StateHistoryBackendTestBase {
     protected final IStateHistoryBackend buildAndQueryFullRange(long startTime, long endTime, int nbAttr, List<ITmfStateInterval> intervals, boolean allowNull) {
 
         final IStateHistoryBackend backend = prepareBackend(startTime, endTime, intervals);
+        assertNotNull(backend);
 
         try {
             /*
@@ -155,7 +157,6 @@ public abstract class StateHistoryBackendTestBase {
             assertEquals(endTime, backend.getEndTime());
         } catch (StateSystemDisposedException e) {
             fail(e.getMessage());
-            return null;
         }
         return backend;
     }
