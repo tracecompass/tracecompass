@@ -22,10 +22,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.DefaultEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.KernelEventLayoutRequirement;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -35,10 +38,16 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.ValuePriorityLevel;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.SetMultimap;
 
 /**
  * This analysis module computes the CPU usage of a system from a kernel trace.
@@ -58,9 +67,15 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
     /** Idle process thread ID */
     public static final String TID_ZERO = "0"; //$NON-NLS-1$
 
-    @Override
-    protected ITmfStateProvider createStateProvider() {
-        ITmfTrace trace = checkNotNull(getTrace());
+    /** The requirements as an immutable set */
+    private static final KernelEventLayoutRequirement LAYOUT_REQUIREMENT;
+    private static final SetMultimap<IKernelAnalysisEventLayout, TmfAnalysisRequirement> LAYOUT_REQ_MAP = NonNullUtils.checkNotNull(HashMultimap.create());
+
+    static {
+        LAYOUT_REQUIREMENT = new KernelEventLayoutRequirement(ImmutableSet.of((l) -> l.eventSchedSwitch()), ValuePriorityLevel.MANDATORY);
+    }
+
+    private static IKernelAnalysisEventLayout getLayout(@Nullable ITmfTrace trace) {
         IKernelAnalysisEventLayout layout;
 
         if (trace instanceof IKernelTrace) {
@@ -69,6 +84,13 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
             /* Fall-back to the base LttngEventLayout */
             layout = DefaultEventLayout.getInstance();
         }
+        return layout;
+    }
+
+    @Override
+    protected ITmfStateProvider createStateProvider() {
+        ITmfTrace trace = checkNotNull(getTrace());
+        IKernelAnalysisEventLayout layout = getLayout(trace);
 
         return new KernelCpuUsageStateProvider(trace, layout);
     }
@@ -308,6 +330,18 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
         } else {
             map.put(key, addTo + value);
         }
+    }
+
+    @Override
+    public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
+        ITmfTrace trace = getTrace();
+        IKernelAnalysisEventLayout layout = getLayout(trace);
+        Set<TmfAnalysisRequirement> reqs = LAYOUT_REQ_MAP.get(layout);
+        if (reqs.isEmpty()) {
+            reqs= ImmutableSet.of(LAYOUT_REQUIREMENT.instanciateRequirements(layout));
+            LAYOUT_REQ_MAP.putAll(layout, reqs);
+        }
+        return reqs;
     }
 
 }

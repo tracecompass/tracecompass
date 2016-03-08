@@ -24,6 +24,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -32,6 +35,8 @@ import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.KernelCpuUsageAn
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.Activator;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -64,7 +69,7 @@ public class CpuUsageStateProviderTest {
 
     private static final String CPU_USAGE_FILE = "testfiles/cpu_analysis.xml";
 
-    private ITmfTrace fTrace;
+    private IKernelTrace fTrace;
     private KernelCpuUsageAnalysis fModule;
 
     private static void deleteSuppFiles(ITmfTrace trace) {
@@ -80,7 +85,7 @@ public class CpuUsageStateProviderTest {
      */
     @Before
     public void setUp() {
-        ITmfTrace trace = new TmfXmlKernelTraceStub();
+        IKernelTrace trace = new TmfXmlKernelTraceStub();
         IPath filePath = Activator.getAbsoluteFilePath(CPU_USAGE_FILE);
         IStatus status = trace.validate(null, filePath.toOSString());
         if (!status.isOK()) {
@@ -319,8 +324,25 @@ public class CpuUsageStateProviderTest {
         expected.put("total/4", 4L);
         expected.put("1", 9L);
         expected.put("total", 9L);
-        resultMap = fModule.getCpuUsageInRange(ImmutableSet.of(1,2), 4L, 13L);
+        resultMap = fModule.getCpuUsageInRange(ImmutableSet.of(1, 2), 4L, 13L);
         assertEquals(expected, resultMap);
 
+    }
+
+    /**
+     * Test the requirements of the analysis module
+     */
+    @Test
+    public void testRequirements() {
+        IKernelTrace trace = fTrace;
+        assertNotNull(trace);
+        IKernelAnalysisEventLayout layout = trace.getKernelEventLayout();
+        Set<String> expected = ImmutableSet.of(layout.eventSchedSwitch());
+
+        Set<String> actual = StreamSupport.stream(fModule.getAnalysisRequirements().spliterator(), false)
+            .flatMap(req -> req.getValues().stream())
+            .collect(Collectors.toSet());
+
+        assertEquals(expected, actual);
     }
 }
