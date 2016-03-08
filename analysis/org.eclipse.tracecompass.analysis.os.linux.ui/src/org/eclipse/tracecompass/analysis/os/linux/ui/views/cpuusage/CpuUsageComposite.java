@@ -20,7 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
@@ -68,6 +71,8 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
 
     /* A map that saves the mapping of a thread ID to its executable name */
     private final Map<String, String> fProcessNameMap = new HashMap<>();
+
+    private final @NonNull Set<@NonNull Integer> fCpus = new TreeSet<>();
 
     /** Provides label for the CPU usage tree viewer cells */
     protected static class CpuLabelProvider extends TreeLabelProvider {
@@ -230,7 +235,7 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
         }
 
         /* Initialize the data */
-        Map<String, Long> cpuUsageMap = fModule.getCpuUsageInRange(Collections.EMPTY_SET, Math.max(start, getStartTime()), Math.min(end, getEndTime()));
+        Map<String, Long> cpuUsageMap = fModule.getCpuUsageInRange(fCpus, Math.max(start, getStartTime()), Math.min(end, getEndTime()));
 
         TmfTreeViewerEntry root = new TmfTreeViewerEntry(""); //$NON-NLS-1$
         List<ITmfTreeViewerEntry> entryList = root.getChildren();
@@ -289,7 +294,9 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
                         execNameQuark = kernelSs.getQuarkRelative(tidQuark, Attributes.EXEC_NAME);
                         execNameIntervals = StateSystemUtils.queryHistoryRange(kernelSs, execNameQuark, getStartTime(), getEndTime());
                     } catch (AttributeNotFoundException e) {
-                        /* No information on this thread (yet?), skip it for now */
+                        /*
+                         * No information on this thread (yet?), skip it for now
+                         */
                         continue;
                     } catch (StateSystemDisposedException e) {
                         /* State system is closing down, no point continuing */
@@ -321,6 +328,41 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
      */
     public void setSelectedThread(String tid) {
         fSelectedThread = tid;
+    }
+
+    /**
+     * Add a core
+     *
+     * @param core
+     *            the core to add
+     * @since 2.0
+     */
+    public void addCpu(int core) {
+        fCpus.add(core);
+        updateContent(getWindowStartTime(), getWindowEndTime(), false);
+    }
+
+    /**
+     * Remove a core
+     *
+     * @param core
+     *            the core to remove
+     * @since 2.0
+     */
+    public void removeCpu(int core) {
+        fCpus.remove(core);
+        updateContent(getWindowStartTime(), getWindowEndTime(), false);
+    }
+
+    /**
+     * Clears the cores
+     *
+     * @since 2.0
+     *
+     */
+    public void clearCpu() {
+        fCpus.clear();
+        updateContent(getWindowStartTime(), getWindowEndTime(), false);
     }
 
 }

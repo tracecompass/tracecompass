@@ -15,13 +15,15 @@ package org.eclipse.tracecompass.analysis.os.linux.ui.views.cpuusage;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.KernelCpuUsageAnalysis;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
@@ -30,6 +32,8 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
+
+import com.google.common.base.Joiner;
 
 /**
  * CPU usage viewer with XY line chart. It displays the total CPU usage and that
@@ -53,6 +57,8 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
     private static final long BUILD_UPDATE_TIMEOUT = 500;
 
     private long fSelectedThread = -1;
+
+    private final @NonNull Set<@NonNull Integer> fCpus = new TreeSet<>();
 
     /**
      * Constructor
@@ -118,7 +124,7 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
                 currentEnd = ss.getCurrentEndTime();
 
                 /* Initialize the data */
-                Map<String, Long> cpuUsageMap = fModule.getCpuUsageInRange(Collections.EMPTY_SET, Math.max(start, traceStart), Math.min(end, traceEnd));
+                Map<String, Long> cpuUsageMap = fModule.getCpuUsageInRange(fCpus, Math.max(start, traceStart), Math.min(end, traceEnd));
                 Map<String, String> totalEntries = new HashMap<>();
                 fYValues.clear();
                 fYValues.put(Messages.CpuUsageXYViewer_Total, zeroFill(xvalues.length));
@@ -172,7 +178,7 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
                         prevTime = time - 1;
                     }
 
-                    cpuUsageMap = fModule.getCpuUsageInRange(Collections.EMPTY_SET, prevTime, time);
+                    cpuUsageMap = fModule.getCpuUsageInRange(fCpus, prevTime, time);
 
                     /*
                      * Calculate the sum of all total entries, and add a data
@@ -220,6 +226,61 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
         deleteSeries(Long.toString(fSelectedThread));
         fSelectedThread = tid;
         updateContent();
+    }
+
+    /**
+     * Gets the analysis module
+     *
+     * @return the {@link KernelCpuUsageAnalysis}
+     *
+     * @since 2.0
+     */
+    public KernelCpuUsageAnalysis getModule() {
+        return fModule;
+    }
+
+    /**
+     * Add a core
+     *
+     * @param core
+     *            the core to add
+     * @since 2.0
+     */
+    public void addCpu(int core) {
+        fCpus.add(core);
+        cancelUpdate();
+        updateContent();
+        getSwtChart().getTitle().setText(Messages.CpuUsageView_Title + ' ' + getCpuList());
+    }
+
+    /**
+     * Remove a core
+     *
+     * @param core
+     *            the core to remove
+     * @since 2.0
+     */
+    public void removeCpu(int core) {
+        fCpus.remove(core);
+        cancelUpdate();
+        updateContent();
+        getSwtChart().getTitle().setText(Messages.CpuUsageView_Title + ' ' + getCpuList());
+    }
+
+    private String getCpuList() {
+        return Joiner.on(", ").join(fCpus); //$NON-NLS-1$
+    }
+
+    /**
+     * Clears the cores
+     *
+     * @since 2.0
+     */
+    public void clearCpu() {
+        fCpus.clear();
+        cancelUpdate();
+        updateContent();
+        getSwtChart().getTitle().setText(Messages.CpuUsageView_Title);
     }
 
 }

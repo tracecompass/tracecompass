@@ -20,6 +20,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.analysis.os.linux.core.signals.TmfCpuSelectedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -114,6 +116,29 @@ public class CpuUsageView extends TmfChartView {
     public void setFocus() {
         if (fXYViewer != null) {
             fXYViewer.getControl().setFocus();
+        }
+    }
+
+    /**
+     * Signal handler for when a cpu is selected
+     *
+     * @param signal
+     *            the cpu being selected
+     * @since 2.0
+     */
+    @TmfSignalHandler
+    public void cpuSelect(TmfCpuSelectedSignal signal) {
+        final @Nullable CpuUsageXYViewer xyViewer = fXYViewer;
+        final @Nullable CpuUsageComposite treeViewer = fTreeViewer;
+        if (xyViewer != null && treeViewer != null) {
+            int core = signal.getCore();
+            if (core >= 0) {
+                xyViewer.addCpu(core);
+                treeViewer.addCpu(core);
+            } else {
+                xyViewer.clearCpu();
+                treeViewer.clearCpu();
+            }
         }
     }
 
