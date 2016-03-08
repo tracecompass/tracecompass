@@ -11,18 +11,19 @@
  *   Mathieu Rail - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.core.tests.analysis;
+package org.eclipse.tracecompass.tmf.core.tests.analysis.requirements;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement;
-import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement.ValuePriorityLevel;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.ValuePriorityLevel;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -41,16 +42,16 @@ public class AnalysisRequirementTest {
     private TmfAnalysisRequirement fSubRequirement;
 
     /* Types of requirement type strings */
-    private static final String TYPE_A = "Test Type A";
-    private static final String TYPE_B = "Test Type B";
+    private static final @NonNull String TYPE_A = "Test Type A";
+    private static final @NonNull String TYPE_B = "Test Type B";
 
     /* Requirement value name strings */
-    private static final String VALUE_A = "Test Value A";
-    private static final String VALUE_B = "Test Value B";
-    private static final String VALUE_C = "Test Value C";
-    private static final String VALUE_D = "Test Value D";
-    private static final String VALUE_E = "Test Value E";
-    private static final String VALUE_F = "Test Value F";
+    private static final @NonNull String VALUE_A = "Test Value A";
+    private static final @NonNull String VALUE_B = "Test Value B";
+    private static final @NonNull String VALUE_C = "Test Value C";
+    private static final @NonNull String VALUE_D = "Test Value D";
+    private static final @NonNull String VALUE_E = "Test Value E";
+    private static final @NonNull String VALUE_F = "Test Value F";
 
     /* Requirement information strings */
     private static final @NonNull String INFO_A = "This is an information.";
@@ -87,7 +88,7 @@ public class AnalysisRequirementTest {
 
         assertEquals(0, fRequirement.getValues().size());
 
-        List<String> values = new ArrayList<>();
+        List<@NonNull String> values = new ArrayList<>();
         values.add(VALUE_A);
         values.add(VALUE_B);
         values.add(VALUE_C);
@@ -133,8 +134,10 @@ public class AnalysisRequirementTest {
     @Test
     public void testMergeMandatory() {
         initMergeRequirements(TYPE_A, TYPE_A);
+        TmfAnalysisRequirement subReq = fSubRequirement;
+        assertNotNull(subReq);
 
-        assertTrue(fRequirement.merge(fSubRequirement, ValuePriorityLevel.MANDATORY));
+        assertTrue(fRequirement.merge(subReq, ValuePriorityLevel.MANDATORY));
 
         assertEquals(fRequirement.getValues().size(), 6);
 
@@ -163,8 +166,10 @@ public class AnalysisRequirementTest {
     @Test
     public void testMergeOptional() {
         initMergeRequirements(TYPE_A, TYPE_A);
+        TmfAnalysisRequirement subReq = fSubRequirement;
+        assertNotNull(subReq);
 
-        assertTrue(fRequirement.merge(fSubRequirement, ValuePriorityLevel.OPTIONAL));
+        assertTrue(fRequirement.merge(subReq, ValuePriorityLevel.OPTIONAL));
 
         assertEquals(6, fRequirement.getValues().size());
 
@@ -193,8 +198,10 @@ public class AnalysisRequirementTest {
     @Test
     public void testMergeDifferentTypes() {
         initMergeRequirements(TYPE_A, TYPE_B);
+        TmfAnalysisRequirement subReq = fSubRequirement;
+        assertNotNull(subReq);
 
-        assertFalse(fRequirement.merge(fSubRequirement, ValuePriorityLevel.OPTIONAL));
+        assertFalse(fRequirement.merge(subReq, ValuePriorityLevel.OPTIONAL));
     }
 
     /**
@@ -216,7 +223,7 @@ public class AnalysisRequirementTest {
      * @param typeB
      *            The type of the second requirement
      */
-    private void initMergeRequirements(String typeA, String typeB) {
+    private void initMergeRequirements(@NonNull String typeA, @NonNull String typeB) {
         fRequirement = new TmfAnalysisRequirement(typeA);
         fRequirement.addValue(VALUE_A, ValuePriorityLevel.MANDATORY);
         fRequirement.addValue(VALUE_B, ValuePriorityLevel.MANDATORY);

@@ -11,9 +11,7 @@
  *   Mathieu Rail - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.core.analysis;
-
-import org.eclipse.jdt.annotation.NonNullByDefault;
+package org.eclipse.tracecompass.tmf.core.analysis.requirements;
 
 /**
  * Interface that provides the necessary methods for an analysis to define its
@@ -21,8 +19,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  *
  * @author Guilliano Molaire
  * @author Mathieu Rail
+ * @since 2.0
  */
-@NonNullByDefault
 public interface IAnalysisRequirementProvider {
 
     /**

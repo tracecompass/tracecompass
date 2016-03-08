@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.tmf.core.analysis;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.IAnalysisRequirementProvider;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.osgi.framework.Bundle;

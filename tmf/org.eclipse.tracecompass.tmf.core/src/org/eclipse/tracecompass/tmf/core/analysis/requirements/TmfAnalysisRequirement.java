@@ -11,7 +11,7 @@
  *   Guilliano Molaire - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.core.analysis;
+package org.eclipse.tracecompass.tmf.core.analysis.requirements;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
 import org.eclipse.tracecompass.tmf.core.trace.TmfEventTypeCollectionHelper;
@@ -43,6 +44,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfEventTypeCollectionHelper;
  *
  * @author Guilliano Molaire
  * @author Mathieu Rail
+ * @since 2.0
  */
 public class TmfAnalysisRequirement {
 
@@ -52,7 +54,7 @@ public class TmfAnalysisRequirement {
     public static final String TYPE_EVENT = "event"; //$NON-NLS-1$
 
     private final String fType;
-    private final Map<String, ValuePriorityLevel> fValues = new HashMap<>();
+    private final Map<String, @NonNull ValuePriorityLevel> fValues = new HashMap<>();
     private final Set<@NonNull String> fInformation = new HashSet<>();
 
     /**
@@ -119,7 +121,11 @@ public class TmfAnalysisRequirement {
              * values in the merge is the minimum value between
              * maxSubRequirementValueLevel and its true level.
              */
-            int minLevel = Math.min(subRequirement.getValueLevel(value).ordinal(), maxSubRequirementValueLevel.ordinal());
+            ValuePriorityLevel valueLevel = subRequirement.getValueLevel(value);
+            if (valueLevel == null) {
+                throw new NullPointerException();
+            }
+            int minLevel = Math.min(valueLevel.ordinal(), maxSubRequirementValueLevel.ordinal());
             ValuePriorityLevel subRequirementValueLevel = ValuePriorityLevel.values()[minLevel];
 
             if (fValues.containsKey(value)) {
@@ -130,6 +136,9 @@ public class TmfAnalysisRequirement {
                  * sub-requirement.
                  */
                 ValuePriorityLevel requirementValueLevel = getValueLevel(value);
+                if (requirementValueLevel == null) {
+                    throw new NullPointerException();
+                }
 
                 int newValueLevel = Math.max(requirementValueLevel.ordinal(), subRequirementValueLevel.ordinal());
                 ValuePriorityLevel highestLevel = ValuePriorityLevel.values()[newValueLevel];
@@ -182,7 +191,7 @@ public class TmfAnalysisRequirement {
      * @param information
      *            The information to be added
      */
-    public void addInformation(@NonNull String information) {
+    public void addInformation(String information) {
         fInformation.add(information);
     }
 
@@ -255,7 +264,7 @@ public class TmfAnalysisRequirement {
      *            The value
      * @return The level or null if the value does not exist
      */
-    public ValuePriorityLevel getValueLevel(String value) {
+    public @Nullable ValuePriorityLevel getValueLevel(String value) {
         synchronized (fValues) {
             return fValues.get(value);
         }
@@ -268,7 +277,7 @@ public class TmfAnalysisRequirement {
      *            The trace on which to check for this requirement
      * @return True if the trace has all mandatory values of this requirement
      */
-    public boolean isFulfilled(@NonNull ITmfTrace trace) {
+    public boolean isFulfilled(ITmfTrace trace) {
         switch (fType) {
         case TYPE_EVENT:
             if (trace instanceof ITmfTraceWithPreDefinedEvents) {

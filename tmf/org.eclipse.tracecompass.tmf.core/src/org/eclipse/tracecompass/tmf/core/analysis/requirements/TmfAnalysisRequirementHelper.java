@@ -11,12 +11,12 @@
  *   Mathieu Rail - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.core.analysis;
+package org.eclipse.tracecompass.tmf.core.analysis.requirements;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement.ValuePriorityLevel;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.ValuePriorityLevel;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -25,6 +25,7 @@ import com.google.common.collect.SetMultimap;
  * Helper class to simplify analysis requirement management.
  *
  * @author Guilliano Molaire
+ * @since 2.0
  */
 public final class TmfAnalysisRequirementHelper {
 

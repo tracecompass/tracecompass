@@ -30,6 +30,7 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.core;x-friends:="org.eclip
  org.eclipse.tracecompass.internal.tmf.core.trace.indexer;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.tmf.core,
  org.eclipse.tracecompass.tmf.core.analysis,
+ org.eclipse.tracecompass.tmf.core.analysis.requirements,
  org.eclipse.tracecompass.tmf.core.callstack,
  org.eclipse.tracecompass.tmf.core.component,
  org.eclipse.tracecompass.tmf.core.event,

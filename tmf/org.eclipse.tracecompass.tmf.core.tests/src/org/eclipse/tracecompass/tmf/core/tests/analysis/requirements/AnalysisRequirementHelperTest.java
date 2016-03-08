@@ -10,7 +10,7 @@
  *   Guilliano Molaire - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.core.tests.analysis;
+package org.eclipse.tracecompass.tmf.core.tests.analysis.requirements;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -20,13 +20,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisRequirementProvider;
-import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirementHelper;
-import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement.ValuePriorityLevel;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.ValuePriorityLevel;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.IAnalysisRequirementProvider;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirementHelper;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.AnalysisModuleTestHelper;
-import org.eclipse.tracecompass.tmf.tests.stubs.analysis.AnalysisRequirementFactory;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.AnalysisModuleTestHelper.moduleStubEnum;
-import org.junit.Before;
+import org.eclipse.tracecompass.tmf.tests.stubs.analysis.AnalysisRequirementFactory;
 import org.junit.Test;
 
 import com.google.common.collect.Multimap;
@@ -36,17 +36,8 @@ import com.google.common.collect.Multimap;
  */
 public class AnalysisRequirementHelperTest {
 
-    private AnalysisModuleTestHelper fTestModuleHelper;
-    private AnalysisModuleTestHelper fTestModuleHelper2;
-
-    /**
-     * Set up analysis modules
-     */
-    @Before
-    public void setUpTest() {
-        fTestModuleHelper = new AnalysisModuleTestHelper(moduleStubEnum.TEST);
-        fTestModuleHelper2 = new AnalysisModuleTestHelper(moduleStubEnum.TEST2);
-    }
+    private final @NonNull AnalysisModuleTestHelper fTestModuleHelper = new AnalysisModuleTestHelper(moduleStubEnum.TEST);
+    private final @NonNull AnalysisModuleTestHelper fTestModuleHelper2 = new AnalysisModuleTestHelper(moduleStubEnum.TEST2);
 
     /**
      * Test suite for the
@@ -95,7 +86,7 @@ public class AnalysisRequirementHelperTest {
      */
     @Test
     public void testGetRequirementValuesMap() {
-        Set<IAnalysisRequirementProvider> providers = new HashSet<>();
+        Set<@NonNull IAnalysisRequirementProvider> providers = new HashSet<>();
         providers.add(fTestModuleHelper2);
         providers.add(fTestModuleHelper);
 
@@ -134,7 +125,7 @@ public class AnalysisRequirementHelperTest {
      */
     @Test
     public void testGetRequirementValuesMapWithLevel() {
-        Set<IAnalysisRequirementProvider> providers = new HashSet<>();
+        Set<@NonNull IAnalysisRequirementProvider> providers = new HashSet<>();
         providers.add(fTestModuleHelper2);
         providers.add(fTestModuleHelper);
 
