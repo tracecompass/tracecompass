@@ -246,6 +246,8 @@ Note that traces of certain types (e.g. LTTng Kernel) are actually a composite o
 
 The option '''Preserve folder structure''' will create, if necessary, the structure of folders relative to (and excluding) the selected '''Root directory''' (or '''Archive file''') into the target trace folder.
 
+The option '''Create Experiment''' will create an experiment with all imported traces. By default, the experiment name is the '''Root directory''' name, when importing from directory, or the ''' Archive file''' name, when importing from archive. One can change the experiment name by typing a new name in the text box beside the option.
+
 [[Image:images/ProjectImportTraceDialog.png]]
 
 If a trace already exists with the same name in the target trace folder, the user can choose to rename the imported trace, overwrite the original trace or skip the trace. When rename is chosen, a number is appended to the trace name, for example smalltrace becomes smalltrace(2).
