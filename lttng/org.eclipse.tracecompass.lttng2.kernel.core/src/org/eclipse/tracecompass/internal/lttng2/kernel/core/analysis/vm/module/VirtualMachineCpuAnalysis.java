@@ -21,7 +21,6 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelThreadInformationProvider;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
@@ -113,41 +112,26 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
          * Create the multimap for threads with the appropriate comparator
          * objects for keys and values
          */
-        final Multimap<Integer, ITmfStateInterval> map = NonNullUtils.checkNotNull(TreeMultimap.<@NonNull Integer, @NonNull ITmfStateInterval> create(
-                new Comparator<Integer>() {
-                    @Override
-                    public int compare(@Nullable Integer arg0, @Nullable Integer arg1) {
+        final Multimap<Integer, ITmfStateInterval> map = TreeMultimap.create(
+                /* Key comparator. Keys do not have to be sorted, just use natural sorting*/
+                Comparator.naturalOrder(),
+
+                /* Value comparator */
+                (arg0, arg1) -> {
+                    if (arg1.getStateValue() == VCPU_PREEMPT_VALUE && arg0.getStateValue() != VCPU_PREEMPT_VALUE) {
                         /*
-                         * Keys do not have to be sorted, just use natural
-                         * sorting
+                         * For VCPU_PREEMPT state values, the state has to be
+                         * after any other state that it overlaps, because those
+                         * intervals usually decorate the other intervals.
                          */
-                        if (arg0 == null || arg1 == null) {
+                        if (((Long) arg0.getEndTime()).compareTo(arg1.getStartTime()) < 0) {
                             return -1;
                         }
-                        return arg0.compareTo(arg1);
+                        return ((Long) arg0.getStartTime()).compareTo(arg1.getEndTime());
                     }
-                }, new Comparator<ITmfStateInterval>() {
-                    @Override
-                    public int compare(@Nullable ITmfStateInterval arg0, @Nullable ITmfStateInterval arg1) {
-                        if (arg0 == null || arg1 == null) {
-                            return 0;
-                        }
-                        if (arg1.getStateValue() == VCPU_PREEMPT_VALUE && arg0.getStateValue() != VCPU_PREEMPT_VALUE) {
-                            /*
-                             * For VCPU_PREEMPT state values, the state has to
-                             * be after any other state that it overlaps,
-                             * because those intervals usually decorate the
-                             * other intervals.
-                             */
-                            if (((Long) arg0.getEndTime()).compareTo(arg1.getStartTime()) < 0) {
-                                return -1;
-                            }
-                            return ((Long) arg0.getStartTime()).compareTo(arg1.getEndTime());
-                        }
-                        /* Otherwise, we use ordering by start time */
-                        return (((Long) arg0.getStartTime()).compareTo(arg1.getStartTime()));
-                    }
-                }));
+                    /* Otherwise, we use ordering by start time */
+                    return (((Long) arg0.getStartTime()).compareTo(arg1.getStartTime()));
+                });
         return map;
     }
 

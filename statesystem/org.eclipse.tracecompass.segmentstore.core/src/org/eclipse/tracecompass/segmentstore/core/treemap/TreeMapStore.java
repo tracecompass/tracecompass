@@ -80,13 +80,13 @@ public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<
          * The same is done for the end times index, but swapping the first two
          * comparators instead.
          */
-        fStartTimesIndex = checkNotNull(TreeMultimap.create(
+        fStartTimesIndex = TreeMultimap.create(
                 SegmentComparators.LONG_COMPARATOR,
-                Ordering.from(SegmentComparators.INTERVAL_END_COMPARATOR).compound(Ordering.natural())));
+                Ordering.from(SegmentComparators.INTERVAL_END_COMPARATOR).compound(Ordering.natural()));
 
-        fEndTimesIndex = checkNotNull(TreeMultimap.create(
+        fEndTimesIndex = TreeMultimap.create(
                 SegmentComparators.LONG_COMPARATOR,
-                Ordering.from(SegmentComparators.INTERVAL_START_COMPARATOR).compound(Ordering.natural())));
+                Ordering.from(SegmentComparators.INTERVAL_START_COMPARATOR).compound(Ordering.natural()));
 
         fSize = 0;
     }
