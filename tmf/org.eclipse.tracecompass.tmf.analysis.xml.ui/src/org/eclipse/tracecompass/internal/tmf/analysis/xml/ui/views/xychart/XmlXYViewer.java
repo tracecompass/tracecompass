@@ -62,7 +62,7 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
     /** Timeout between updates in the updateData thread */
     private static final long BUILD_UPDATE_TIMEOUT = 500;
 
-    private static final Pattern WILDCARD_PATTERN = checkNotNull(Pattern.compile("\\*")); //$NON-NLS-1$
+    private static final Pattern WILDCARD_PATTERN = Pattern.compile("\\*"); //$NON-NLS-1$
 
     private final ITmfXmlModelFactory fFactory = TmfXmlReadOnlyModelFactory.getInstance();
     private final Map<Integer, SeriesData> fSeriesData = new HashMap<>();
