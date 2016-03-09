@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -153,6 +154,18 @@ public abstract class AbstractImportAndReadSmokeTest {
         finishButton.click();
         fBot.waitUntil(Conditions.shellCloses(shell));
         SWTBotUtils.waitForJobs();
+    }
+
+    /**
+     * Checks finish button enablement
+     *
+     * @param isEnabled
+     *            state to check against
+     *
+     */
+    protected void checkFinishButton(boolean isEnabled) {
+        final SWTBotButton finishButton = fBot.button("Finish");
+        assertTrue(finishButton.isEnabled() == isEnabled);
     }
 
     // ---------------------------------------------

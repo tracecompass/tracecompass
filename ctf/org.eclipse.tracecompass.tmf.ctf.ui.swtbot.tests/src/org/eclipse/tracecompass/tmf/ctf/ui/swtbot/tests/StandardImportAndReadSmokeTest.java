@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests;
 
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withMnemonic;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -38,6 +39,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -60,6 +62,8 @@ import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.Impo
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.Messages;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
@@ -134,6 +138,28 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
     }
 
     /**
+     * Test import from directory, create experiment
+     *
+     * @throws Exception
+     *             on error
+     */
+    @Test
+    public void testImportWithExperiment() throws Exception {
+        testImport(ImportTraceWizardPage.OPTION_CREATE_EXPERIMENT, false, false);
+    }
+
+    /**
+     * Test import from directory, create experiment (validate experiment name)
+     *
+     * @throws Exception
+     *             on error
+     */
+    @Test
+    public void testImportWithExperimentValidation() throws Exception {
+        testImport(ImportTraceWizardPage.OPTION_CREATE_EXPERIMENT, false, false, false);
+    }
+
+    /**
      * Test import from directory, preserve folder structure
      *
      * @throws Exception
@@ -177,6 +203,17 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
     @Test
     public void testImportFromArchive() throws Exception {
         testImport(ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE, true, true);
+    }
+
+    /**
+     * Test import from archive, create Experiment
+     *
+     * @throws Exception
+     *             on error
+     */
+    @Test
+    public void testImportFromArchiveWithExperiment() throws Exception {
+        testImport(ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE | ImportTraceWizardPage.OPTION_CREATE_EXPERIMENT, false, true);
     }
 
     /**
@@ -389,7 +426,23 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
     }
 
     private void testImport(int options, boolean testViews, boolean fromArchive) throws Exception {
+        testImport(options, testViews, fromArchive, true);
+    }
+
+    private void testImport(int options, boolean testViews, boolean fromArchive, boolean defaultExperiment) throws Exception {
         String expectedSourceLocation = null;
+
+        @NonNull String experimentName;
+        if (fromArchive) {
+            experimentName = checkNotNull(new Path(ARCHIVE_FILE_NAME).lastSegment());
+        } else {
+            experimentName = checkNotNull(new Path(TRACE_FOLDER_PARENT_PATH).lastSegment());
+        }
+
+        if (!defaultExperiment) {
+            SWTBotUtils.createExperiment(fBot, TRACE_PROJECT_NAME, experimentName);
+        }
+
         openImportWizard();
         if (fromArchive) {
             expectedSourceLocation = URI_JAR_FILE_SCHEME + URI_DEVICE_SEPARATOR + new Path(new File(TRACE_ARCHIVE_PATH).getCanonicalPath()) + "!" + URI_SEPARATOR + TRACE_FOLDER + URI_SEPARATOR + TRACE_NAME + URI_SEPARATOR;
@@ -405,6 +458,12 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         }
 
         setOptions(options, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
+
+        if (!defaultExperiment) {
+            experimentName = verifyExperimentNameHandling(experimentName);
+        }
+        checkFinishButton(true);
+
         importFinish();
 
         IPath expectedElementPath = new Path(TRACE_NAME);
@@ -412,7 +471,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
             expectedElementPath = new Path(TRACE_FOLDER).append(expectedElementPath);
         }
 
-        checkOptions(options, expectedSourceLocation, expectedElementPath);
+        checkOptions(options, expectedSourceLocation, expectedElementPath, experimentName);
         TmfEventsEditor tmfEd = SWTBotUtils.openEditor(fBot, TRACE_PROJECT_NAME, expectedElementPath);
         if (testViews) {
             testViews(tmfEd);
@@ -420,6 +479,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
 
         fBot.closeAllEditors();
 
+        SWTBotUtils.clearExperimentFolder(fBot, TRACE_PROJECT_NAME);
         SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
     }
 
@@ -458,6 +518,8 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         if (testViews) {
             testViews(editor);
         }
+
+        SWTBotUtils.clearExperimentFolder(fBot, TRACE_PROJECT_NAME);
 
         SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
         if (testArchivePath != null) {
@@ -653,6 +715,13 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
             checkBox.deselect();
         }
 
+        checkBox = fBot.checkBox(Messages.ImportTraceWizard_CreateExperiment);
+        if ((optionFlags & ImportTraceWizardPage.OPTION_CREATE_EXPERIMENT) != 0) {
+            checkBox.select();
+        } else {
+            checkBox.deselect();
+        }
+
         SWTBotCombo comboBox = fBot.comboBoxWithLabel(Messages.ImportTraceWizard_TraceType);
         if (traceTypeName != null && !traceTypeName.isEmpty()) {
             comboBox.setSelection(traceTypeName);
@@ -662,6 +731,10 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
     }
 
     private static void checkOptions(int optionFlags, String expectedSourceLocation, IPath expectedElementPath) throws CoreException {
+        checkOptions(optionFlags, expectedSourceLocation, expectedElementPath, null);
+    }
+
+    private static void checkOptions(int optionFlags, String expectedSourceLocation, IPath expectedElementPath, String experimentName) throws CoreException {
         IProject project = getProjectResource();
         assertTrue(project.exists());
         TmfProjectElement tmfProject = TmfProjectRegistry.getProject(project, true);
@@ -689,9 +762,44 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         String sourceLocation = traceResource.getPersistentProperty(TmfCommonConstants.SOURCE_LOCATION);
         assertNotNull(sourceLocation);
         assertEquals(expectedSourceLocation, sourceLocation);
+
+        TmfExperimentFolder expFolder = tmfProject.getExperimentsFolder();
+        assertNotNull(expFolder);
+        if ((optionFlags & ImportTraceWizardPage.OPTION_CREATE_EXPERIMENT) != 0) {
+            if (experimentName != null) {
+                TmfExperimentElement expElement = expFolder.getExperiment(experimentName);
+                assertNotNull(expElement);
+                assertEquals(2, expElement.getTraces().size());
+            }
+        } else {
+            assertTrue(expFolder.getExperiments().size() == 0);
+        }
     }
 
     private static IProject getProjectResource() {
         return ResourcesPlugin.getWorkspace().getRoot().getProject(TRACE_PROJECT_NAME);
     }
+
+    private @NonNull String verifyExperimentNameHandling(String aExperimentName) {
+        String experimentName = aExperimentName;
+
+        // experiment already exists
+        checkFinishButton(false);
+
+        SWTBotText expText = fBot.textInGroup("Options");
+
+        // Invalid experiment name (only whitespaces)
+        expText.setText(String.valueOf(' '));
+        checkFinishButton(false);
+
+        // Invalid experiment name
+        expText.setText(String.valueOf('/'));
+        checkFinishButton(false);
+
+        // Set valid experiment name
+        experimentName += '_';
+        expText.setText(experimentName);
+        return experimentName;
+    }
+
 }

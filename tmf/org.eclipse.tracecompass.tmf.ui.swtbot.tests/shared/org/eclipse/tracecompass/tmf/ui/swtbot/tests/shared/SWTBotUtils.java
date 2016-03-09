@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
@@ -56,7 +57,10 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+import org.eclipse.tracecompass.internal.tmf.ui.project.operations.NewExperimentOperation;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
@@ -78,6 +82,7 @@ import org.hamcrest.Matcher;
  *
  * @author Matthew Khouzam
  */
+@SuppressWarnings("restriction")
 public final class SWTBotUtils {
 
     private static final String WINDOW_MENU = "Window";
@@ -187,6 +192,39 @@ public final class SWTBotUtils {
     public static void deleteProject(String projectName, SWTWorkbenchBot bot) {
         deleteProject(projectName, true, bot);
     }
+
+    /**
+     * Creates an experiment
+     *
+     * @param bot
+     *            a given workbench bot
+     * @param projectName
+     *            the name of the project, creates the project if needed
+     * @param expName
+     *            the experiment name
+     */
+    public static void createExperiment(SWTWorkbenchBot bot, String projectName, final @NonNull String expName) {
+        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+        TmfProjectElement tmfProject = TmfProjectRegistry.getProject(project, true);
+        TmfExperimentFolder expFolder = tmfProject.getExperimentsFolder();
+        assertNotNull(expFolder);
+        NewExperimentOperation operation = new NewExperimentOperation(expFolder, expName);
+        operation.run(new NullProgressMonitor());
+
+        bot.waitUntil(new DefaultCondition() {
+            @Override
+            public boolean test() throws Exception {
+                TmfExperimentElement experiment = expFolder.getExperiment(expName);
+                return experiment != null;
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return "Experiment (" + expName + ") couldn't be created";
+            }
+        });
+    }
+
 
     /**
      * Focus on the main window
@@ -544,7 +582,53 @@ public final class SWTBotUtils {
                 return "Traces Folder not empty (" + fTraceNb + ")";
             }
         });
+    }
 
+    /**
+     * Clear the experiment folder
+     *
+     * @param bot
+     *            a given workbench bot
+     * @param projectName
+     *            the name of the project (needs to exist)
+     */
+    public static void clearExperimentFolder(SWTWorkbenchBot bot, String projectName) {
+        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+        TmfProjectElement tmfProject = TmfProjectRegistry.getProject(project, false);
+        TmfExperimentFolder expFolder = tmfProject.getExperimentsFolder();
+        expFolder.getExperiments().forEach(experiment -> {
+            IResource resource = experiment.getResource();
+            try {
+                // Close the experiment if open
+                experiment.closeEditors();
+
+                IPath path = resource.getLocation();
+                if (path != null) {
+                    // Delete supplementary files
+                    experiment.deleteSupplementaryFolder();
+                }
+                // Finally, delete the experiment
+                resource.delete(true, null);
+            } catch (CoreException e) {
+                fail(e.getMessage());
+            }
+        });
+
+        bot.waitUntil(new DefaultCondition() {
+            private int fExperimentNb = 0;
+
+            @Override
+            public boolean test() throws Exception {
+                List<TmfExperimentElement> experiments = expFolder.getExperiments();
+                fExperimentNb = experiments.size();
+                return fExperimentNb == 0;
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return "Experiment Folder not empty (" + fExperimentNb + ")";
+            }
+        });
     }
 
     /**
