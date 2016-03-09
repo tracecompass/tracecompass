@@ -171,7 +171,7 @@ public class StructDeclaration extends Declaration {
         final Definition[] myFields = new Definition[fFieldMap.size()];
 
         StructDefinition structDefinition = new StructDefinition(this, definitionScope,
-                fieldScope, fieldScope.getName(), checkNotNull(fFieldMap.keySet()), myFields);
+                fieldScope, fieldScope.getName(), fFieldMap.keySet(), myFields);
         fillStruct(input, myFields, structDefinition);
         return structDefinition;
     }
@@ -223,7 +223,7 @@ public class StructDeclaration extends Declaration {
             merged = new InternalDef(definitionScope, eventHeaderDef);
         }
         StructDefinition structDefinition = new StructDefinition(this, merged,
-                fields, fields.getName(), checkNotNull(fFieldMap.keySet()), myFields);
+                fields, fields.getName(), fFieldMap.keySet(), myFields);
         if (merged instanceof InternalDef) {
             InternalDef internalDef = (InternalDef) merged;
             internalDef.setDefinition(structDefinition);

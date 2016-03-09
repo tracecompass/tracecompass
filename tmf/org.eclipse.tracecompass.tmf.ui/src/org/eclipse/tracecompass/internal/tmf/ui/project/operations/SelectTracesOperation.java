@@ -8,8 +8,6 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.tmf.ui.project.operations;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -47,7 +45,7 @@ public class SelectTracesOperation implements IRunnableWithProgress {
     private final @Nullable List<TmfTraceElement> fTraceElements;
     private final @Nullable List<IResource> fResources;
     private final @Nullable Map<String, TmfTraceElement> fPreviousTraces;
-    private @NonNull IStatus fStatus = checkNotNull(Status.OK_STATUS);
+    private @NonNull IStatus fStatus = Status.OK_STATUS;
 
     /**
      * Constructor
@@ -159,9 +157,9 @@ public class SelectTracesOperation implements IRunnableWithProgress {
                 });
                 experimentElement.deleteSupplementaryResources();
             }
-            setStatus(checkNotNull(Status.OK_STATUS));
+            setStatus(Status.OK_STATUS);
         } catch (InterruptedException e) {
-            setStatus(checkNotNull(Status.CANCEL_STATUS));
+            setStatus(Status.CANCEL_STATUS);
         } catch (Exception e) {
             Activator.getDefault().logError(Messages.SelectTracesWizardPage_SelectionError, e);
             setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.SelectTracesWizardPage_SelectionError, e));

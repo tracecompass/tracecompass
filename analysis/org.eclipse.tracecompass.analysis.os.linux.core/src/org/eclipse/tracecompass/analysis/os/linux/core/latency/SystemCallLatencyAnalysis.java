@@ -47,7 +47,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisModul
     private static final String DATA_FILENAME = "latency-analysis.dat"; //$NON-NLS-1$
 
     private static final Collection<ISegmentAspect> BASE_ASPECTS =
-            checkNotNull(ImmutableList.of(SyscallNameAspect.INSTANCE));
+            ImmutableList.of(SyscallNameAspect.INSTANCE);
 
     @Override
     public String getId() {
@@ -88,7 +88,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisModul
             super.handleData(event);
             IKernelAnalysisEventLayout layout = fLayout;
             if (layout == null) {
-                IKernelTrace trace = checkNotNull((IKernelTrace) event.getTrace());
+                IKernelTrace trace = (IKernelTrace) event.getTrace();
                 layout = trace.getKernelEventLayout();
                 fLayout = layout;
             }

@@ -98,19 +98,19 @@ public class PcapFile implements Closeable {
 
         switch (magicNumber) {
         case PcapFileValues.MAGIC_BIG_ENDIAN_MICRO: // file is big endian
-            fByteOrder = checkNotNull(ByteOrder.BIG_ENDIAN);
+            fByteOrder = ByteOrder.BIG_ENDIAN;
             fTimestampPrecision = PcapTimestampScale.MICROSECOND;
             break;
         case PcapFileValues.MAGIC_LITTLE_ENDIAN_MICRO: // file is little endian
-            fByteOrder = checkNotNull(ByteOrder.LITTLE_ENDIAN);
+            fByteOrder = ByteOrder.LITTLE_ENDIAN;
             fTimestampPrecision = PcapTimestampScale.MICROSECOND;
             break;
         case PcapFileValues.MAGIC_BIG_ENDIAN_NANO: // file is big endian
-            fByteOrder = checkNotNull(ByteOrder.BIG_ENDIAN);
+            fByteOrder = ByteOrder.BIG_ENDIAN;
             fTimestampPrecision = PcapTimestampScale.NANOSECOND;
             break;
         case PcapFileValues.MAGIC_LITTLE_ENDIAN_NANO: // file is little endian
-            fByteOrder = checkNotNull(ByteOrder.LITTLE_ENDIAN);
+            fByteOrder = ByteOrder.LITTLE_ENDIAN;
             fTimestampPrecision = PcapTimestampScale.NANOSECOND;
             break;
         default:

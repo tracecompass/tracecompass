@@ -16,7 +16,6 @@ import java.util.Stack;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -95,7 +94,7 @@ public class LttngSystemModel {
      * @return The list of workers on the system
      */
     public Collection<LttngWorker> getWorkers() {
-        return NonNullUtils.checkNotNull(fWorkerMap.values());
+        return fWorkerMap.values();
     }
 
     /**

@@ -120,7 +120,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
             builder.put(eventSchedWakeup, new SchedWakeupHandler(layout));
         }
 
-        return NonNullUtils.checkNotNull(builder.build());
+        return builder.build();
     }
 
     // ------------------------------------------------------------------------

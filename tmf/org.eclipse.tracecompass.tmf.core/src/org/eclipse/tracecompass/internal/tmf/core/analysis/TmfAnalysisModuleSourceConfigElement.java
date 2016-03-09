@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.analysis;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -92,7 +90,7 @@ public final class TmfAnalysisModuleSourceConfigElement implements IAnalysisModu
                 typeElements.add(element);
             }
         }
-        return checkNotNull(typeElements.toArray(new @NonNull IConfigurationElement[typeElements.size()]));
+        return typeElements.toArray(new @NonNull IConfigurationElement[typeElements.size()]);
     }
 
     /**

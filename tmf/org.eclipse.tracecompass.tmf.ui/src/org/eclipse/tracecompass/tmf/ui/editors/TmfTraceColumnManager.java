@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.tmf.ui.editors;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.Arrays;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -27,7 +25,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
  */
 public class TmfTraceColumnManager {
 
-    private static final String ROOT_SECTION_NAME = checkNotNull(TmfTraceColumnManager.class.getSimpleName());
+    private static final String ROOT_SECTION_NAME = TmfTraceColumnManager.class.getSimpleName();
     private static final String COLUMN_ORDER_SECTION_NAME = "column.order"; //$NON-NLS-1$
 
     /**

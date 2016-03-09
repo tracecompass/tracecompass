@@ -267,7 +267,7 @@ public class PcapPacket extends Packet {
             builder.put("Capture Length", String.valueOf(fIncludedLength) + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$
             builder.put("Capture Time", ConversionHelper.toGMTTime(fTimestamp, getTimestampScale())); //$NON-NLS-1$
 
-            fFields = NonNullUtils.checkNotNull(builder.build());
+            fFields = builder.build();
             return fFields;
         }
         return map;

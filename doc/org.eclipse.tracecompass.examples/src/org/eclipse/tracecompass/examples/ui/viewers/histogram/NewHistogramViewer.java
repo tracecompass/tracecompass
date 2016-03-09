@@ -12,8 +12,6 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.examples.ui.viewers.histogram;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -76,7 +74,6 @@ public class NewHistogramViewer extends TmfBarChartViewer {
 
                     /* Add the values for each trace */
                     for (ITmfTrace trace : TmfTraceManager.getTraceSet(getTrace())) {
-                        trace = checkNotNull(trace);
                         /* Retrieve the statistics object */
                         final TmfStatisticsModule statsMod =
                                TmfTraceUtils.getAnalysisModuleOfClass(trace, TmfStatisticsModule.class, TmfStatisticsModule.ID);

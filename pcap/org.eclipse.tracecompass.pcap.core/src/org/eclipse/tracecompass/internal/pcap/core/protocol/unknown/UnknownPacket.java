@@ -143,7 +143,7 @@ public class UnknownPacket extends Packet {
             } catch (UnsupportedEncodingException e) {
                 // Do nothing. The string won't be added to the map anyway.
             }
-            fFields = checkNotNull(builder.build());
+            fFields = builder.build();
             return fFields;
         }
         return map;

@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.internal.pcap.core.protocol.tcp;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -451,7 +449,7 @@ public class TCPPacket extends Packet {
                 builder.put("Options", ConversionHelper.bytesToHex(options, true)); //$NON-NLS-1$
 
             }
-            fFields = checkNotNull(builder.build());
+            fFields = builder.build();
             return fFields;
         }
         return map;

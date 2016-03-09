@@ -33,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.common.core.collect.BufferedBlockingQueue;
 import org.junit.Before;
 import org.junit.Rule;
@@ -160,10 +159,10 @@ public class BufferedBlockingQueueTest {
              * fill it up here!
              */
             for (int j = 0; j < 50; j++) {
-                Integer testInt = NonNullUtils.checkNotNull(rnd.nextInt());
-                Long testLong = NonNullUtils.checkNotNull(rnd.nextLong());
-                Double testDouble = NonNullUtils.checkNotNull(rnd.nextDouble());
-                Double testGaussian = NonNullUtils.checkNotNull(rnd.nextGaussian());
+                Integer testInt = rnd.nextInt();
+                Long testLong = rnd.nextLong();
+                Double testDouble = rnd.nextDouble();
+                Double testGaussian = rnd.nextGaussian();
 
                 expectedValues.add(testInt);
                 expectedValues.add(testLong);

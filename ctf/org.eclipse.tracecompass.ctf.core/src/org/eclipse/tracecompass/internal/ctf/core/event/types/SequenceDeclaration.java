@@ -135,7 +135,7 @@ public class SequenceDeclaration extends CompoundDeclaration {
             String elemName = checkNotNull(paths.get(i));
             definitions.add(fElemType.createDefinition(definitionScope, elemName, input));
         }
-        List<@NonNull Definition> list = checkNotNull(definitions.build());
+        List<@NonNull Definition> list = definitions.build();
         return new ArrayDefinition(this, definitionScope, fieldName, list);
     }
 

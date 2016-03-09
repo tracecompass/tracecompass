@@ -212,7 +212,7 @@ public class UDPPacket extends Packet {
                     .put("Length", String.valueOf(fTotalLength) + " bytes") //$NON-NLS-1$ //$NON-NLS-2$
                     .put("Checksum", String.format("%s%04x", "0x", fChecksum)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-            fFields = NonNullUtils.checkNotNull(builder.build());
+            fFields = builder.build();
             return fFields;
         }
         return map;

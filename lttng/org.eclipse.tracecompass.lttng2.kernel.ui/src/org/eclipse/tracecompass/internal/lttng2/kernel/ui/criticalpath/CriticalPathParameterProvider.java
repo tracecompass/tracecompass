@@ -15,7 +15,6 @@ import org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathMod
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
 import org.eclipse.tracecompass.analysis.os.linux.ui.views.controlflow.ControlFlowEntry;
 import org.eclipse.tracecompass.analysis.os.linux.ui.views.controlflow.ControlFlowView;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.graph.ui.criticalpath.view.CriticalPathView;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngWorker;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
@@ -138,7 +137,7 @@ public class CriticalPathParameterProvider extends TmfAbstractAnalysisParamProvi
             /* Try to find the worker for the critical path */
             IAnalysisModule mod = getModule();
             if ((mod != null) && (mod instanceof CriticalPathModule)) {
-                Integer threadId = NonNullUtils.checkNotNull(fCurrentEntry.getThreadId());
+                Integer threadId = fCurrentEntry.getThreadId();
                 HostThread ht = new HostThread(fCurrentEntry.getTrace().getHostId(), threadId);
                 LttngWorker worker = new LttngWorker(ht, "", 0); //$NON-NLS-1$
                 return worker;

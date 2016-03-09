@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter.Messages;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.ITmfChartTimeProvider;

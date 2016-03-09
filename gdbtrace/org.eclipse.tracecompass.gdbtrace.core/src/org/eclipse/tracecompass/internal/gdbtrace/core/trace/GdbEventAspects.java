@@ -13,8 +13,6 @@
 
 package org.eclipse.tracecompass.internal.gdbtrace.core.trace;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.gdbtrace.core.event.GdbTraceEvent;
 import org.eclipse.tracecompass.internal.gdbtrace.core.event.GdbTraceEventContent;
@@ -34,12 +32,12 @@ public final class GdbEventAspects {
     private GdbEventAspects() {}
 
     private static final @NonNull Iterable<ITmfEventAspect> GDB_ASPECTS =
-            checkNotNull(ImmutableList.of(
+            ImmutableList.of(
                     new TmfContentFieldAspect(GdbTraceEventContent.TRACE_FRAME, GdbTraceEventContent.TRACE_FRAME),
                     new TmfContentFieldAspect(GdbTraceEventContent.TRACEPOINT, GdbTraceEventContent.TRACEPOINT),
                     new GdbFileAspect(),
                     ITmfEventAspect.BaseAspects.CONTENTS
-                    ));
+                    );
 
     private static class GdbFileAspect implements ITmfEventAspect {
 

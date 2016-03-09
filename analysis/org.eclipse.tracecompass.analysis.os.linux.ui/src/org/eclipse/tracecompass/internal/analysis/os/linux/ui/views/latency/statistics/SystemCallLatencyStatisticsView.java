@@ -11,8 +11,6 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentStoreStatisticsView;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentStoreStatisticsViewer;
@@ -30,7 +28,7 @@ public class SystemCallLatencyStatisticsView extends AbstractSegmentStoreStatist
 
     @Override
     protected AbstractSegmentStoreStatisticsViewer createSegmentStoreStatisticsViewer(Composite parent) {
-        return checkNotNull((AbstractSegmentStoreStatisticsViewer) new SystemCallLatencyStatisticsViewer(checkNotNull(parent)));
+        return new SystemCallLatencyStatisticsViewer(parent);
     }
 
 }

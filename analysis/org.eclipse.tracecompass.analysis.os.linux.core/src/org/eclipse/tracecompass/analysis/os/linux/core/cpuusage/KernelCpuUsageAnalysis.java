@@ -239,10 +239,10 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
 
                     long currentCount = countAtEnd - countAtStart;
                     if (currentCount < 0) {
-                        Activator.getDefault().logWarning(checkNotNull(String.format("Negative count: start %d, end %d", countAtStart, countAtEnd))); //$NON-NLS-1$
+                        Activator.getDefault().logWarning(String.format("Negative count: start %d, end %d", countAtStart, countAtEnd)); //$NON-NLS-1$
                         currentCount = 0;
                     } else if (currentCount > endTime - startTime) {
-                        Activator.getDefault().logWarning(checkNotNull(String.format("CPU Usage: Spent more time on CPU than allowed: %s spent %d when max should be %d", curTidName, currentCount, endTime - startTime))); //$NON-NLS-1$
+                        Activator.getDefault().logWarning(String.format("CPU Usage: Spent more time on CPU than allowed: %s spent %d when max should be %d", curTidName, currentCount, endTime - startTime)); //$NON-NLS-1$
                         currentCount = 0;
                     }
                     cpuTotal += currentCount;

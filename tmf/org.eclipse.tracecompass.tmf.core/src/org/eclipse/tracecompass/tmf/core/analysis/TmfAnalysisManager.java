@@ -149,7 +149,7 @@ public class TmfAnalysisManager {
                 map.put(module.getId(), module);
             }
         }
-        return checkNotNull(ImmutableMap.copyOf(map));
+        return ImmutableMap.copyOf(map);
     }
 
     /**
@@ -224,7 +224,7 @@ public class TmfAnalysisManager {
                 }
             }
         }
-        return NonNullUtils.checkNotNull(Collections.unmodifiableSet(providerSet));
+        return Collections.unmodifiableSet(providerSet);
     }
 
     /**

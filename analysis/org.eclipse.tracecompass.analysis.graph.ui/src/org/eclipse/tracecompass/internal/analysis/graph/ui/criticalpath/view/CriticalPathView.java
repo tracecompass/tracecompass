@@ -154,7 +154,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
             public void visit(TmfEdge link, boolean horizontal) {
                 if (horizontal) {
                     Object parent = fGraph.getParentOf(link.getVertexFrom());
-                    CriticalPathEntry entry = checkNotNull(fRootList.get(parent));
+                    CriticalPathEntry entry = fRootList.get(parent);
                     TimeEvent ev = new TimeEvent(entry, link.getVertexFrom().getTs(), link.getDuration(),
                             getMatchingState(link.getType()).ordinal());
                     entry.addEvent(ev);
@@ -270,7 +270,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
             }
 
             for (TimeGraphEntry entry : list) {
-                buildStatusEvents(trace, (CriticalPathEntry) NonNullUtils.checkNotNull(entry));
+                buildStatusEvents(trace, (CriticalPathEntry) entry);
             }
             workerEntries.put(worker, list);
         }
@@ -511,7 +511,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
         while (iterator.hasNext()) {
             ITimeEvent event = iterator.next();
             /* is event visible */
-            if (intersects(realStart, realEnd, NonNullUtils.checkNotNull(event))) {
+            if (intersects(realStart, realEnd, event)) {
                 eventList.add(event);
             }
         }

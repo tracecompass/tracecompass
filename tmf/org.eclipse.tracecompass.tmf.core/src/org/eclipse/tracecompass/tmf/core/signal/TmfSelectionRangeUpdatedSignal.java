@@ -13,8 +13,6 @@
 
 package org.eclipse.tracecompass.tmf.core.signal;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -93,7 +91,7 @@ public class TmfSelectionRangeUpdatedSignal extends TmfSignal {
             sb.append(fEndTime.toString());
         }
         sb.append("]"); //$NON-NLS-1$
-        return checkNotNull(sb.toString());
+        return sb.toString();
     }
 
 }

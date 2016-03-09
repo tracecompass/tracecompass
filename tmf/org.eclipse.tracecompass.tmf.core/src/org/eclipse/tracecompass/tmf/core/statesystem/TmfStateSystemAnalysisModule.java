@@ -13,8 +13,6 @@
 
 package org.eclipse.tracecompass.tmf.core.statesystem;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -485,9 +483,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                     ITmfEventRequest.ALL_DATA,
                     ITmfEventRequest.ExecutionType.BACKGROUND);
             this.sci = sp;
-
-            // sci.getTrace() will eventually return a @NonNull
-            trace = checkNotNull(sci.getTrace());
+            trace = sci.getTrace();
 
         }
 
@@ -610,7 +606,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         Map<@NonNull String, @NonNull String> properties = new HashMap<>();
 
         StateSystemBackendType backend = getBackendType();
-        properties.put(NonNullUtils.checkNotNull(Messages.TmfStateSystemAnalysisModule_PropertiesBackend), NonNullUtils.checkNotNull(backend.name()));
+        properties.put(NonNullUtils.checkNotNull(Messages.TmfStateSystemAnalysisModule_PropertiesBackend), backend.name());
         switch (backend) {
         case FULL:
         case PARTIAL:

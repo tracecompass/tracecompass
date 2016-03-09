@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.Collection;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -51,7 +49,7 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     private static final String SCHED_WAKEUP = "sched_wakeup";
     private static final String SCHED_WAKEUP_NEW = "sched_wakeup_new";
     private static final Collection<String> SCHED_WAKEUP_EVENTS =
-            checkNotNull(ImmutableList.of(SCHED_WAKEUP, SCHED_WAKEUP_NEW));
+            ImmutableList.of(SCHED_WAKEUP, SCHED_WAKEUP_NEW);
 
     private static final String SCHED_PROCESS_FORK = "sched_process_fork";
     private static final String SCHED_PROCESS_EXIT = "sched_process_exit";

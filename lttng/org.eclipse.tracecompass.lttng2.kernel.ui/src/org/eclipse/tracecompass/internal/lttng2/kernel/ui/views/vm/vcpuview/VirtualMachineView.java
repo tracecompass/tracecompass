@@ -191,7 +191,7 @@ public class VirtualMachineView extends AbstractTimeGraphView {
             for (Integer vmQuark : vmQuarks) {
 
                 /* Display an entry for the virtual machine */
-                String vmHostId = NonNullUtils.checkNotNull(ssq.getAttributeName(vmQuark));
+                String vmHostId = ssq.getAttributeName(vmQuark);
                 ITmfStateInterval vmNameInterval = StateSystemUtils.queryUntilNonNullValue(ssq, vmQuark, startTime, endTime);
                 String vmName = vmHostId;
                 if (vmNameInterval != null) {
@@ -283,7 +283,7 @@ public class VirtualMachineView extends AbstractTimeGraphView {
              * FIXME: Only add threads that are active during the trace
              */
             String threadName = KernelThreadInformationProvider.getExecutableName(kernelModule, threadId);
-            String tidString = NonNullUtils.checkNotNull(threadId.toString());
+            String tidString = threadId.toString();
             threadName = (threadName != null) ? tidString + ':' + ' ' + threadName : tidString;
             oneThreadEntry = new VirtualMachineViewEntry.VmEntryBuilder(threadName, startTime, endTime, vmExperiment).setId(threadName).setVmName(vmName).setNumericId(threadId).setType(Type.THREAD).build();
 
@@ -480,9 +480,9 @@ public class VirtualMachineView extends AbstractTimeGraphView {
     @Override
     protected Iterable<ITmfTrace> getTracesToBuild(@Nullable ITmfTrace trace) {
         if (trace == null) {
-            return NonNullUtils.checkNotNull(Collections.EMPTY_SET);
+            return Collections.EMPTY_SET;
         }
-        return NonNullUtils.checkNotNull(Collections.singleton(trace));
+        return Collections.singleton(trace);
     }
 
 }

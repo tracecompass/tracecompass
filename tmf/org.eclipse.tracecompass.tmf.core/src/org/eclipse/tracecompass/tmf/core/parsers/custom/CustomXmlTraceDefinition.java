@@ -13,8 +13,6 @@
 
 package org.eclipse.tracecompass.tmf.core.parsers.custom;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -522,7 +520,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             } else if (nodeName.equals(OUTPUT_COLUMN_ELEMENT)) {
                 Element outputColumnElement = (Element) node;
                 OutputColumn outputColumn = new OutputColumn();
-                outputColumn.name = checkNotNull(outputColumnElement.getAttribute(NAME_ATTRIBUTE));
+                outputColumn.name = outputColumnElement.getAttribute(NAME_ATTRIBUTE);
                 def.outputs.add(outputColumn);
             }
         }

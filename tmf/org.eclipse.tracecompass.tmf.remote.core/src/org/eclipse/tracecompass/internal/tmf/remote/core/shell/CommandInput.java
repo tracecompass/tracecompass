@@ -11,7 +11,6 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.tmf.remote.core.shell;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ public class CommandInput implements ICommandInput {
 
     @Override
     public List<String> getInput() {
-        return checkNotNull(ImmutableList.copyOf(fInput));
+        return ImmutableList.copyOf(fInput);
     }
 
     // ------------------------------------------------------------------------

@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.internal.tmf.pcap.core.event;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
@@ -222,7 +220,7 @@ public class PcapEvent extends TmfEvent {
             }
         }
 
-        fProtocols = checkNotNull(builder.build());
+        fProtocols = builder.build();
         return fProtocols;
     }
 

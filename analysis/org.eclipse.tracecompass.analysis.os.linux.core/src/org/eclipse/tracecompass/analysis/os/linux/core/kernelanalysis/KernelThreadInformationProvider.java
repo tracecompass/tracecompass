@@ -176,7 +176,7 @@ public final class KernelThreadInformationProvider {
                 execNameValue = interval.getStateValue();
                 switch (execNameValue.getType()) {
                 case STRING:
-                    execName = NonNullUtils.checkNotNull(execNameValue.unboxStr());
+                    execName = execNameValue.unboxStr();
                     break;
                 case DOUBLE:
                 case LONG:

@@ -79,7 +79,7 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
             } else if (element instanceof SegmentStoreStatisticsEntry) {
                 SegmentStoreStatisticsEntry entry = (SegmentStoreStatisticsEntry) element;
                 if (columnIndex == 0) {
-                    return checkNotNull(String.valueOf(entry.getName()));
+                    return String.valueOf(entry.getName());
                 }
                 if (entry.getEntry().getNbSegments() > 0) {
                     if (columnIndex == 1) {
@@ -243,7 +243,7 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
     protected static String toFormattedString(double value) {
         // The cast to long is needed because the formatter cannot truncate the
         // number.
-        String percentageString = checkNotNull(String.format("%s", FORMATTER.format(value))); //$NON-NLS-1$
+        String percentageString = String.format("%s", FORMATTER.format(value)); //$NON-NLS-1$
         return percentageString;
     }
 
@@ -274,7 +274,7 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
          * @return statistics object
          */
         public SegmentStoreStatistics getEntry() {
-            return checkNotNull(fEntry);
+            return fEntry;
         }
 
     }

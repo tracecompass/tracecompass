@@ -104,13 +104,13 @@ public class CtfTmfTrace extends TmfTrace
      * @since 1.0
      */
     protected static final @NonNull Collection<@NonNull ITmfEventAspect> CTF_ASPECTS =
-            checkNotNull(ImmutableList.of(
+            ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     new CtfChannelAspect(),
                     new CtfCpuAspect(),
                     ITmfEventAspect.BaseAspects.EVENT_TYPE,
                     ITmfEventAspect.BaseAspects.CONTENTS
-                    ));
+                    );
 
     /**
      * The Ctf clock unique identifier field

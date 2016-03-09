@@ -16,7 +16,6 @@ import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex.EdgeDirection;
 import org.eclipse.tracecompass.analysis.graph.core.criticalpath.ICriticalPathAlgorithm;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 
 /**
  * Abstract class for critical path algorithms
@@ -110,12 +109,12 @@ public abstract class AbstractCriticalPathAlgorithm implements ICriticalPathAlgo
 
     @Override
     public String getID() {
-        return NonNullUtils.checkNotNull(getClass().getName());
+        return getClass().getName();
     }
 
     @Override
     public String getDisplayName() {
-        return NonNullUtils.checkNotNull(getClass().getSimpleName());
+        return getClass().getSimpleName();
     }
 
 }

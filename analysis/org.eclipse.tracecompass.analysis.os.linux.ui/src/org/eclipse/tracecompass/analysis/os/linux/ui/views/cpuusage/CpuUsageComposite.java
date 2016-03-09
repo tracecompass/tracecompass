@@ -184,7 +184,7 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
             for (ITmfTreeViewerEntry entry : rootEntry.getChildren()) {
                 if (entry instanceof CpuUsageEntry) {
                     if (selectedThread.equals(((CpuUsageEntry) entry).getTid())) {
-                        List<ITmfTreeViewerEntry> list = checkNotNull(Collections.singletonList(entry));
+                        List<ITmfTreeViewerEntry> list = Collections.singletonList(entry);
                         super.setSelection(list);
                         return;
                     }

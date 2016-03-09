@@ -108,7 +108,7 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
         TmfAnalysisRequirement domainReq = new TmfAnalysisRequirement(SessionConfigStrings.CONFIG_ELEMENT_DOMAIN);
         domainReq.addValue(SessionConfigStrings.CONFIG_DOMAIN_TYPE_UST, ValuePriorityLevel.MANDATORY);
 
-        return checkNotNull(ImmutableSet.of(domainReq, eventsReq));
+        return ImmutableSet.of(domainReq, eventsReq);
     }
 
     @Override

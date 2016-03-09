@@ -12,7 +12,6 @@
 
 package org.eclipse.tracecompass.common.core;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import java.util.Collections;
@@ -38,7 +37,7 @@ public abstract class TraceCompassActivator extends Plugin {
 
     /** Map of all the registered activators, indexed by plugin ID */
     private static final Map<String, TraceCompassActivator> ACTIVATORS =
-            checkNotNull(Collections.synchronizedMap(new HashMap<String, TraceCompassActivator>()));
+            Collections.synchronizedMap(new HashMap<String, TraceCompassActivator>());
 
     /** This instance's plug-in ID */
     private final String fPluginId;

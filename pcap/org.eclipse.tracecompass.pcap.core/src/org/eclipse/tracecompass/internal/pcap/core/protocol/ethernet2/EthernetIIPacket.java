@@ -211,7 +211,7 @@ public class EthernetIIPacket extends Packet {
             builder.put("Destination MAC Address", ConversionHelper.toMacAddress(fDestinationMacAddress)); //$NON-NLS-1$
             builder.put("Ethertype", String.valueOf(EthertypeHelper.toEtherType(fType))); //$NON-NLS-1$
 
-            fFields = checkNotNull(builder.build());
+            fFields = builder.build();
             return fFields;
         }
         return map;

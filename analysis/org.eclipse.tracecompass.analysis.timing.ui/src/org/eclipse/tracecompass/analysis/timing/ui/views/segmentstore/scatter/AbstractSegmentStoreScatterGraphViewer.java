@@ -118,9 +118,9 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             redraw(statusMonitor, startTime, endTime, displayData);
 
             if (statusMonitor.isCanceled()) {
-                return NonNullUtils.checkNotNull(Status.CANCEL_STATUS);
+                return Status.CANCEL_STATUS;
             }
-            return NonNullUtils.checkNotNull(Status.OK_STATUS);
+            return Status.OK_STATUS;
 
         }
 

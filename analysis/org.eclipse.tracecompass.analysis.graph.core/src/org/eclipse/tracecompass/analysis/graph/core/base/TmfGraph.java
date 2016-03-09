@@ -265,7 +265,7 @@ public class TmfGraph {
      * @return The list of vertices for the object
      */
     public List<TmfVertex> getNodesOf(IGraphWorker obj) {
-        return NonNullUtils.checkNotNull(fNodeMap.get(obj));
+        return fNodeMap.get(obj);
     }
 
     /**
@@ -285,7 +285,7 @@ public class TmfGraph {
      * @return The vertex map
      */
     public Set<IGraphWorker> getWorkers() {
-        return NonNullUtils.checkNotNull(ImmutableSet.copyOf(fNodeMap.keySet()));
+        return ImmutableSet.copyOf(fNodeMap.keySet());
     }
 
     /**
@@ -345,7 +345,7 @@ public class TmfGraph {
         HashSet<TmfVertex> visited = new HashSet<>();
         stack.add(start);
         while (!stack.isEmpty()) {
-            TmfVertex curr = NonNullUtils.checkNotNull(stack.pop());
+            TmfVertex curr = stack.pop();
             if (visited.contains(curr)) {
                 continue;
             }

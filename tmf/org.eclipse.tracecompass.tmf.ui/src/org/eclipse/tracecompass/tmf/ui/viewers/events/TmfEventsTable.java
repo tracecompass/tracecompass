@@ -18,8 +18,6 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.events;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
@@ -767,7 +765,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 builder.add(new TmfContentFieldAspect(fieldName, fieldName));
             }
         }
-        return checkNotNull(builder.build());
+        return builder.build();
     }
 
     /**

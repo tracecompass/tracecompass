@@ -188,7 +188,7 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
         public List<Integer> getQuarks() {
             /* Get the list of quarks to process with this path */
             String[] paths = fPath.split(SPLIT_STRING);
-            List<Integer> quarks = checkNotNull(Collections.singletonList(IXmlStateSystemContainer.ROOT_QUARK));
+            List<Integer> quarks = Collections.singletonList(IXmlStateSystemContainer.ROOT_QUARK);
 
             try {
                 for (String path : paths) {
@@ -341,7 +341,6 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
             }
         } else {
             for (String moduleId : analysisIds) {
-                moduleId = checkNotNull(moduleId);
                 ITmfAnalysisModuleWithStateSystems module = TmfTraceUtils.getAnalysisModuleOfClass(trace, ITmfAnalysisModuleWithStateSystems.class, moduleId);
                 if (module != null) {
                     stateSystemModules.add(module);

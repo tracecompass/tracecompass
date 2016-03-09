@@ -184,7 +184,7 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
         /* Get the most probable base address from all the known ones */
         NavigableSet<Long> possibleBaddrs = possibleBaddrQuarks.stream()
             .map(quark -> {
-                String baddrStr = ss.getAttributeName(checkNotNull(quark).intValue());
+                String baddrStr = ss.getAttributeName(quark.intValue());
                 return checkNotNull(Long.valueOf(baddrStr));
             })
             .collect(Collectors.toCollection(TreeSet::new));
@@ -216,7 +216,7 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
             List<Integer> buildIds = ss.getSubAttributes(baddrQuark, false);
             Optional<Integer> potentialBuildIdQuark = buildIds.stream()
                 .filter(id -> {
-                    int quark = checkNotNull(id).intValue();
+                    int quark = id.intValue();
                     ITmfStateValue value = fullState.get(quark).getStateValue();
                     return (!value.isNull());
                 })

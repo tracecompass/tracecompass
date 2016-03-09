@@ -13,7 +13,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 
 import com.google.common.collect.ImmutableMap;
@@ -53,7 +52,7 @@ public class SystemCall implements ISegment {
                 Map<String, String> arguments) {
             fStartTime = startTime;
             fName = name;
-            fArgs = NonNullUtils.checkNotNull(ImmutableMap.copyOf(arguments));
+            fArgs = ImmutableMap.copyOf(arguments);
         }
     }
 

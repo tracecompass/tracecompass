@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.btf.core.trace;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.btf.core.event.BtfEvent;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfContentFieldAspect;
@@ -35,7 +34,7 @@ public final class BtfEventAspects {
     private BtfEventAspects() {}
 
     private static final Iterable<ITmfEventAspect> BTF_ASPECTS =
-            NonNullUtils.checkNotNull(ImmutableList.of(
+            ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     new BtfSourceAspect(),
                     new TmfContentFieldAspect(BtfColumnNames.SOURCE_INSTANCE.toString(), BtfColumnNames.SOURCE_INSTANCE.toString()),
@@ -44,7 +43,7 @@ public final class BtfEventAspects {
                     new TmfContentFieldAspect(BtfColumnNames.TARGET_INSTANCE.toString(), BtfColumnNames.TARGET_INSTANCE.toString()),
                     new TmfContentFieldAspect(BtfColumnNames.EVENT.toString(), BtfColumnNames.EVENT.toString()),
                     new TmfContentFieldAspect(BtfColumnNames.NOTES.toString(), BtfColumnNames.NOTES.toString())
-                    ));
+                    );
 
     /**
      * The "source" aspect, whose value comes from {@link ITmfEvent#getSource()}

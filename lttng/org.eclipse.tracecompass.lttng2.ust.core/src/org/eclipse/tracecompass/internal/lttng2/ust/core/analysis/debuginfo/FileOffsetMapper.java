@@ -9,8 +9,6 @@
 
 package org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -62,8 +60,8 @@ public final class FileOffsetMapper {
         List<TmfCallsite> callsites = new LinkedList<>();
 
         // FIXME Could eventually use CDT's Addr2line class once it imlements --inlines
-        List<String> output = getOutputFromCommand(checkNotNull(Arrays.asList(
-                ADDR2LINE_EXECUTABLE, "-i", "-e", file.toString(), "0x" + Long.toHexString(offset))));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+        List<String> output = getOutputFromCommand(Arrays.asList(
+                ADDR2LINE_EXECUTABLE, "-i", "-e", file.toString(), "0x" + Long.toHexString(offset)));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 
         if (output == null) {
             /* Command returned an error */

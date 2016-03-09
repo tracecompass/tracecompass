@@ -13,8 +13,6 @@
 
 package org.eclipse.tracecompass.internal.lttng2.ust.core.callstack;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -78,13 +76,13 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
             fLayout = LttngUst20EventLayout.getInstance();
         }
 
-        funcEntryEvents = checkNotNull(ImmutableSet.of(
+        funcEntryEvents = ImmutableSet.of(
                 fLayout.eventCygProfileFuncEntry(),
-                fLayout.eventCygProfileFastFuncEntry()));
+                fLayout.eventCygProfileFastFuncEntry());
 
-        funcExitEvents = checkNotNull(ImmutableSet.of(
+        funcExitEvents = ImmutableSet.of(
                 fLayout.eventCygProfileFuncExit(),
-                fLayout.eventCygProfileFastFuncExit()));
+                fLayout.eventCygProfileFastFuncExit());
     }
 
     // ------------------------------------------------------------------------

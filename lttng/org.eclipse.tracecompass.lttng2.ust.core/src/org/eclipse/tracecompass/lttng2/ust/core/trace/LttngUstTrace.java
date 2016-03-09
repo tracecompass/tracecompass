@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst20EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst27EventLayout;
@@ -65,7 +64,7 @@ public class LttngUstTrace extends CtfTmfTrace {
         builder.addAll(CtfTmfTrace.CTF_ASPECTS);
         builder.add(UstDebugInfoBinaryAspect.INSTANCE);
         builder.add(UstDebugInfoSourceAspect.INSTANCE);
-        LTTNG_UST_ASPECTS = NonNullUtils.checkNotNull(builder.build());
+        LTTNG_UST_ASPECTS = builder.build();
     }
 
     private @Nullable ILttngUstEventLayout fLayout = null;

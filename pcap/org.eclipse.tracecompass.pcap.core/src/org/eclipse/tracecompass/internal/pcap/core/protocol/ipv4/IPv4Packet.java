@@ -459,7 +459,7 @@ public class IPv4Packet extends Packet {
                 builder.put("Options", ConversionHelper.bytesToHex(options, true)); //$NON-NLS-1$
 
             }
-            fFields = checkNotNull(builder.build());
+            fFields = builder.build();
             return fFields;
         }
         return map;

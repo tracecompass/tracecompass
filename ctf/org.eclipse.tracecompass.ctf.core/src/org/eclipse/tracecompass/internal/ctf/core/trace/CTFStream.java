@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
@@ -195,7 +194,7 @@ public class CTFStream implements ICTFStream {
      */
     @Override
     public List<@Nullable IEventDeclaration> getEventDeclarations() {
-        return NonNullUtils.checkNotNull(Collections.unmodifiableList(fEvents));
+        return Collections.unmodifiableList(fEvents);
     }
 
     @Override

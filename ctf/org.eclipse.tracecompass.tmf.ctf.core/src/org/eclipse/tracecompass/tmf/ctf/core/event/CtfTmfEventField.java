@@ -189,8 +189,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
 
             List<ITmfEventField> list = new ArrayList<>();
             /* Recursively parse the fields */
-            for (String curFieldName : strDef.getFieldNames()) {
-                String fn = checkNotNull(curFieldName);
+            for (String fn : strDef.getFieldNames()) {
                 list.add(CtfTmfEventField.parseField((IDefinition) strDef.getDefinition(fn), fn));
             }
             field = new CTFStructField(fieldName, list.toArray(new CtfTmfEventField[list.size()]));

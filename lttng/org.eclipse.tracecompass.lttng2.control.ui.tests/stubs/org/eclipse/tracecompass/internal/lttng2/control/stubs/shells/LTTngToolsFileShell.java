@@ -239,8 +239,8 @@ public class LTTngToolsFileShell extends TestCommandShell {
                             // Save output/result in command map
                             if (output != null && errorOutput != null) {
                                 commandMap.put(input, createCommandResult(result,
-                                        checkNotNull(output.toArray(new @NonNull String[output.size()])),
-                                        checkNotNull(errorOutput.toArray(new @NonNull String[errorOutput.size()]))));
+                                        output.toArray(new @NonNull String[output.size()]),
+                                        errorOutput.toArray(new @NonNull String[errorOutput.size()])));
                             }
                             inOutput = false;
                         } else if (OUTPUT_KEY.equals(strLine)) {

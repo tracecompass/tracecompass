@@ -16,7 +16,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityView;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityViewer;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 
 /**
  * System Call Density view
@@ -50,7 +49,7 @@ public class SystemCallLatencyDensityView extends AbstractSegmentStoreDensityVie
 
     @Override
     protected AbstractSegmentStoreDensityViewer createSegmentStoreDensityViewer(Composite parent) {
-        return new SystemCallDensityViewer(NonNullUtils.checkNotNull(parent));
+        return new SystemCallDensityViewer(parent);
     }
 
 }

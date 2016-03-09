@@ -111,7 +111,7 @@ public class PcapEventFactory {
         while (localPacket != null) {
             subfieldList.clear();
             for (Map.Entry<String, String> entry : localPacket.getFields().entrySet()) {
-                String key = checkNotNull(entry.getKey());
+                String key = entry.getKey();
                 String value = entry.getValue();
                 subfieldList.add(new TmfEventField(key, value, null));
             }

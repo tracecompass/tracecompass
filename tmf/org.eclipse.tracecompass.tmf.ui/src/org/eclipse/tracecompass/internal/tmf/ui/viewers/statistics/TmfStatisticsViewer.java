@@ -15,8 +15,6 @@
 
 package org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -689,7 +687,6 @@ public class TmfStatisticsViewer extends TmfViewer {
         }
 
         for (ITmfTrace aTrace : TmfTraceManager.getTraceSet(trace)) {
-            aTrace = checkNotNull(aTrace);
             if (!isListeningTo(aTrace)) {
                 continue;
             }

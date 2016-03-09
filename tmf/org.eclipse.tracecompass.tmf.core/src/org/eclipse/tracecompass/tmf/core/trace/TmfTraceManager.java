@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventFilterAppliedSignal;
@@ -179,13 +178,13 @@ public final class TmfTraceManager {
      */
     public static @NonNull Collection<@NonNull ITmfTrace> getTraceSet(ITmfTrace trace) {
         if (trace == null) {
-            return NonNullUtils.checkNotNull(ImmutableSet.of());
+            return ImmutableSet.of();
         }
         List<@NonNull ITmfTrace> traces = trace.getChildren(ITmfTrace.class);
         if (traces.size() > 0) {
-            return NonNullUtils.checkNotNull(ImmutableSet.copyOf(traces));
+            return ImmutableSet.copyOf(traces);
         }
-        return NonNullUtils.checkNotNull(ImmutableSet.of(trace));
+        return ImmutableSet.of(trace);
     }
 
     /**
@@ -200,16 +199,16 @@ public final class TmfTraceManager {
      */
     public static @NonNull Collection<ITmfTrace> getTraceSetWithExperiment(ITmfTrace trace) {
         if (trace == null) {
-            return checkNotNull(ImmutableSet.<ITmfTrace> of());
+            return ImmutableSet.of();
         }
         if (trace instanceof TmfExperiment) {
             TmfExperiment exp = (TmfExperiment) trace;
             List<ITmfTrace> traces = exp.getTraces();
             Set<ITmfTrace> alltraces = new LinkedHashSet<>(traces);
             alltraces.add(exp);
-            return NonNullUtils.checkNotNull(ImmutableSet.copyOf(alltraces));
+            return ImmutableSet.copyOf(alltraces);
         }
-        return checkNotNull(Collections.singleton(trace));
+        return Collections.singleton(trace);
     }
 
     /**

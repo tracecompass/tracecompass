@@ -104,7 +104,7 @@ public class BaseHandler extends AbstractTraceEventHandler {
      * @return the graph provider
      */
     public LttngKernelExecGraphProvider getProvider() {
-        return NonNullUtils.checkNotNull(fProvider);
+        return fProvider;
     }
 
     /**

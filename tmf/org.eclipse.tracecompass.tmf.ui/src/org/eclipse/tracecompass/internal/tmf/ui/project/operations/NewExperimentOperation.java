@@ -9,8 +9,6 @@
 
 package org.eclipse.tracecompass.internal.tmf.ui.project.operations;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
@@ -41,7 +39,7 @@ public class NewExperimentOperation implements IRunnableWithProgress {
     private final @NonNull String fExperimentName;
     private final @NonNull TmfExperimentFolder fExperimentFolderRoot;
     private @Nullable IFolder fExperimentFolder = null;
-    private @NonNull IStatus fStatus = checkNotNull(Status.OK_STATUS);
+    private @NonNull IStatus fStatus = Status.OK_STATUS;
 
     /**
      * Constructor
@@ -73,9 +71,9 @@ public class NewExperimentOperation implements IRunnableWithProgress {
                 experimentFolder.setPersistentProperty(TmfCommonConstants.TRACETYPE, ce.getAttribute(TmfTraceType.ID_ATTR));
             }
             fExperimentFolder = experimentFolder;
-            setStatus(checkNotNull(Status.OK_STATUS));
+            setStatus(Status.OK_STATUS);
         } catch (InterruptedException e) {
-            setStatus(checkNotNull(Status.CANCEL_STATUS));
+            setStatus(Status.CANCEL_STATUS);
         } catch (InvalidRegistryObjectException | CoreException e) {
             String msg = NLS.bind(Messages.NewExperimentOperation_CreationError, fExperimentName);
             Activator.getDefault().logError(msg, e);

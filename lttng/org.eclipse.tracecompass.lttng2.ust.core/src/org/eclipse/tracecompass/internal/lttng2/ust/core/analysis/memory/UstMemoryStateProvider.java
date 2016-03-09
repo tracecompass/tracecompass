@@ -83,7 +83,7 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
         builder.put(layout.eventLibcRealloc(), REALLOC_INDEX);
         builder.put(layout.eventLibcMemalign(), MEMALIGN_INDEX);
         builder.put(layout.eventLibcPosixMemalign(), POSIX_MEMALIGN_INDEX);
-        return checkNotNull(builder.build());
+        return builder.build();
     }
 
     @Override

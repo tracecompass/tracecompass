@@ -101,7 +101,7 @@ public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<
         try {
             Iterable<E> lastSnapshot = fLastSnapshot;
             if (lastSnapshot == null) {
-                lastSnapshot = checkNotNull(ImmutableList.copyOf(fStartTimesIndex.values()));
+                lastSnapshot = ImmutableList.copyOf(fStartTimesIndex.values());
                 fLastSnapshot = lastSnapshot;
             }
             return checkNotNull(lastSnapshot.iterator());

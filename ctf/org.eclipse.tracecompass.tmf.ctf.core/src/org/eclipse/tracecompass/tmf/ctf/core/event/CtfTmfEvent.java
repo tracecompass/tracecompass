@@ -293,8 +293,7 @@ public class CtfTmfEvent extends TmfEvent
         ICompositeDefinition structFields = eventDef.getFields();
         if (structFields != null) {
             if (structFields.getFieldNames() != null) {
-                for (String curFieldName : structFields.getFieldNames()) {
-                    String fn = checkNotNull(curFieldName);
+                for (String fn : structFields.getFieldNames()) {
                     fields.add(CtfTmfEventField.parseField((IDefinition) structFields.getDefinition(fn), fn));
                 }
             }
@@ -309,7 +308,7 @@ public class CtfTmfEvent extends TmfEvent
             }
         }
 
-        return checkNotNull(fields.toArray(new @NonNull CtfTmfEventField[fields.size()]));
+        return fields.toArray(new @NonNull CtfTmfEventField[fields.size()]);
     }
 
     // ------------------------------------------------------------------------

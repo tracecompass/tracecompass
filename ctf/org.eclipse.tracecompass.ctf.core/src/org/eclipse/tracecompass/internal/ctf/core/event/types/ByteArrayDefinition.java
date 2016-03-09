@@ -12,14 +12,11 @@
 
 package org.eclipse.tracecompass.internal.ctf.core.event.types;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.types.AbstractArrayDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.CompoundDeclaration;
@@ -79,7 +76,7 @@ public final class ByteArrayDefinition extends AbstractArrayDefinition {
                 byte fieldValue = fContent[i];
                 builder.add(new IntegerDefinition(charDecl, getDefinitionScope(), fieldName, fieldValue));
             }
-            fDefs = NonNullUtils.checkNotNull(builder.build());
+            fDefs = builder.build();
             return fDefs;
         }
 
@@ -107,7 +104,7 @@ public final class ByteArrayDefinition extends AbstractArrayDefinition {
         b.append('[');
         Joiner.on(", ").appendTo(b, Arrays.asList(fContent)); //$NON-NLS-1$
         b.append(']');
-        return checkNotNull(b.toString());
+        return b.toString();
     }
 
     /**

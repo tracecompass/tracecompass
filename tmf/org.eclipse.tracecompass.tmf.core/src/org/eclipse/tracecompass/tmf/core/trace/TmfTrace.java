@@ -16,8 +16,6 @@
 
 package org.eclipse.tracecompass.tmf.core.trace;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
@@ -100,11 +98,11 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
      * Basic aspects that should be valid for all trace types.
      */
     public static final @NonNull Collection<@NonNull ITmfEventAspect> BASE_ASPECTS =
-            checkNotNull(ImmutableList.of(
+            ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     ITmfEventAspect.BaseAspects.EVENT_TYPE,
                     ITmfEventAspect.BaseAspects.CONTENTS
-                    ));
+                    );
 
     // ------------------------------------------------------------------------
     // Instance attributes

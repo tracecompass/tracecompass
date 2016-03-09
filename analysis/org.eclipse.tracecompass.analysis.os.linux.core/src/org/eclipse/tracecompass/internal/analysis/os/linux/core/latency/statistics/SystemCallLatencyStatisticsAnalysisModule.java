@@ -11,8 +11,6 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.statistics;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -52,10 +50,10 @@ public class SystemCallLatencyStatisticsAnalysisModule extends TmfAbstractAnalys
     protected Iterable<IAnalysisModule> getDependentAnalyses() {
         ITmfTrace trace = getTrace();
         if (trace != null) {
-            SystemCallLatencyAnalysis module = TmfTraceUtils.getAnalysisModuleOfClass(trace, SystemCallLatencyAnalysis.class, checkNotNull(SystemCallLatencyAnalysis.ID));
+            SystemCallLatencyAnalysis module = TmfTraceUtils.getAnalysisModuleOfClass(trace, SystemCallLatencyAnalysis.class, SystemCallLatencyAnalysis.ID);
             if (module != null) {
                 fLatencyModule = module;
-                return checkNotNull(ImmutableList.of((IAnalysisModule) module));
+                return ImmutableList.of((IAnalysisModule) module);
             }
         }
         return super.getDependentAnalyses();
@@ -96,7 +94,7 @@ public class SystemCallLatencyStatisticsAnalysisModule extends TmfAbstractAnalys
                 return false;
             }
             ISegment segment = iter.next();
-            total.update(checkNotNull(segment));
+            total.update(segment);
         }
         fTotalStats = total;
         return true;

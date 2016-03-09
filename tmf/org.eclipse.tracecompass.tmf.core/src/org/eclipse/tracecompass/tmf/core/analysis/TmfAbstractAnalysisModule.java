@@ -100,7 +100,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
                  * Some types, like anonymous classes, don't have a canonical
                  * name. Just use the default name instead.
                  */
-                id = checkNotNull(this.getClass().getName());
+                id = this.getClass().getName();
             }
             fId = id;
         }
@@ -374,7 +374,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
             execute(trace);
         }
 
-        return checkNotNull(Status.OK_STATUS);
+        return Status.OK_STATUS;
     }
 
     @Override
@@ -500,7 +500,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
                 }
             }
         }
-        return checkNotNull(builder.toString());
+        return builder.toString();
     }
 
     @Override

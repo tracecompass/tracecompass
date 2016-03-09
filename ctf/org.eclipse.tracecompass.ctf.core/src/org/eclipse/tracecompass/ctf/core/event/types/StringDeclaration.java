@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.ctf.core.event.types;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
@@ -138,7 +137,7 @@ public class StringDeclaration extends Declaration {
             sb.append(c);
             c = (char) input.get(BITS_PER_BYTE, false);
         }
-        return NonNullUtils.checkNotNull(sb.toString());
+        return sb.toString();
     }
 
     @Override

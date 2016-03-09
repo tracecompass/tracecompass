@@ -121,7 +121,7 @@ public class LostEventsMarkerEventSource implements IMarkerEventSource {
         if (module == null) {
             return null;
         }
-        return module.getStateSystem(checkNotNull(TmfStatisticsEventTypesModule.ID));
+        return module.getStateSystem(TmfStatisticsEventTypesModule.ID);
     }
 
     private static int getLostEventsQuark(ITmfStateSystem ss) {

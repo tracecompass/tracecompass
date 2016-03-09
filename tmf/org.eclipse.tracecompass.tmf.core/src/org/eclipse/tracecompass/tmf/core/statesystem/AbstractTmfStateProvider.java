@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.tmf.core.statesystem;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.collect.BufferedBlockingQueue;
@@ -190,17 +188,17 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
              * We never insert null in the queue. Cannot be checked at
              * compile-time until Java 8 annotations...
              */
-            @NonNull ITmfEvent event = checkNotNull(fEventsQueue.take());
+            @NonNull ITmfEvent event = fEventsQueue.take();
             /* This is a singleton, we want to do != instead of !x.equals */
             while (event != END_EVENT) {
                 if (event == EMPTY_QUEUE_EVENT) {
                     /* Synchronization event, should be ignored */
-                    event = checkNotNull(fEventsQueue.take());
+                    event = fEventsQueue.take();
                     continue;
                 }
                 currentEvent = event;
                 eventHandle(event);
-                event = checkNotNull(fEventsQueue.take());
+                event = fEventsQueue.take();
             }
             /* We've received the last event, clean up */
             closeStateSystem();

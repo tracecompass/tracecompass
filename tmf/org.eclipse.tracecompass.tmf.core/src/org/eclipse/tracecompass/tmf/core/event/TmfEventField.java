@@ -72,11 +72,11 @@ public class TmfEventField implements ITmfEventField {
         fValue = value;
 
         if (fields == null) {
-            fFields = checkNotNull(ImmutableMap.<String, ITmfEventField> of());
+            fFields = ImmutableMap.of();
         } else {
             ImmutableMap.Builder<String, ITmfEventField> mapBuilder = new ImmutableMap.Builder<>();
             Arrays.stream(fields).forEach(t -> mapBuilder.put(t.getName(), t));
-            fFields = checkNotNull(mapBuilder.build());
+            fFields = mapBuilder.build();
         }
     }
 
@@ -110,12 +110,12 @@ public class TmfEventField implements ITmfEventField {
 
     @Override
     public final Collection<String> getFieldNames() {
-        return checkNotNull(fFields.keySet());
+        return fFields.keySet();
     }
 
     @Override
     public final Collection<ITmfEventField> getFields() {
-        return checkNotNull(fFields.values());
+        return fFields.values();
     }
 
     @Override

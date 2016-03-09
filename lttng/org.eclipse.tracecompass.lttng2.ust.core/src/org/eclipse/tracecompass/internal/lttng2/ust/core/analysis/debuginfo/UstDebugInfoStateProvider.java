@@ -119,7 +119,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
         builder.put(layout.eventStatedumpSoInfo(), STATEDUMP_SOINFO_INDEX);
         builder.put(layout.eventStateDumpBuildId(), STATEDUMP_BUILD_ID_INDEX);
         builder.put(layout.eventStateDumpDebugLink(), STATEDUMP_DEBUG_LINK_INDEX);
-        return checkNotNull(builder.build());
+        return builder.build();
     }
 
     @Override

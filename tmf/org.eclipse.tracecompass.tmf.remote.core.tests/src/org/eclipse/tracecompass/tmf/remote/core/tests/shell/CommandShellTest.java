@@ -58,7 +58,7 @@ public class CommandShellTest {
         ICommandShell shell = LOCAL_PROXY.createCommandShell();
 
         ICommandInput command = shell.createCommand();
-        command.addAll(checkNotNull(Arrays.asList(CMD_INPUT_UNIX)));
+        command.addAll(Arrays.asList(CMD_INPUT_UNIX));
         ICommandResult result = shell.executeCommand(command, new NullProgressMonitor());
         assertEquals(0, result.getResult());
     }
@@ -76,7 +76,7 @@ public class CommandShellTest {
         ICommandShell shell = LOCAL_PROXY.createCommandShell();
 
         ICommandInput command = shell.createCommand();
-        command.addAll(checkNotNull(Arrays.asList(CMD_ERROR_INPUT_UNIX)));
+        command.addAll(Arrays.asList(CMD_ERROR_INPUT_UNIX));
         ICommandResult result = shell.executeCommand(command, new NullProgressMonitor());
         assertTrue(result.getResult() > 0);
     }
@@ -95,7 +95,7 @@ public class CommandShellTest {
         ICommandShell shell = LOCAL_PROXY.createCommandShell();
 
         ICommandInput command = shell.createCommand();
-        command.addAll(checkNotNull(Arrays.asList(CMD_UNKNOWN_COMMAND_UNIX)));
+        command.addAll(Arrays.asList(CMD_UNKNOWN_COMMAND_UNIX));
         ICommandResult result = shell.executeCommand(command, new NullProgressMonitor());
         assertTrue(result.getResult() > 0);
     }

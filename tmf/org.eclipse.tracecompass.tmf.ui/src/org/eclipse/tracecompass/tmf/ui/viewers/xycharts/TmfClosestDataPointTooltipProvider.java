@@ -11,8 +11,6 @@
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
@@ -203,7 +201,7 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
             double[] yS = serie.getYSeries();
             if ((xS != null) && (yS != null) && (dataIndex < xS.length) && (dataIndex < yS.length)) {
                 StringBuffer buffer = new StringBuffer();
-                buffer.append(checkNotNull("x=")); //$NON-NLS-1$
+                buffer.append("x="); //$NON-NLS-1$
                 buffer.append(new TmfTimestamp((long) xS[dataIndex] + getChartViewer().getTimeOffset(), ITmfTimestamp.NANOSECOND_SCALE).toString());
                 buffer.append('\n');
                 buffer.append("y="); //$NON-NLS-1$

@@ -70,14 +70,14 @@ public class PcapTrace extends TmfTrace implements ITmfPropertiesProvider {
     public static final String TRACE_TYPE_ID = "org.eclipse.linuxtools.tmf.pcap.core.pcaptrace"; //$NON-NLS-1$
 
     private static final Collection<ITmfEventAspect> PCAP_ASPECTS =
-            checkNotNull(ImmutableList.of(
+            ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     PcapSourceAspect.INSTANCE,
                     PcapDestinationAspect.INSTANCE,
                     PcapReferenceAspect.INSTANCE,
                     PcapProtocolAspect.INSTANCE,
                     ITmfEventAspect.BaseAspects.CONTENTS
-                    ));
+                    );
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
     private static final int CONFIDENCE = 50;

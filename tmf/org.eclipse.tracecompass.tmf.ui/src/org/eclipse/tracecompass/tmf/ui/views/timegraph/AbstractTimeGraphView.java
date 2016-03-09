@@ -1633,7 +1633,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 if (monitor.isCanceled()) {
                     break;
                 }
-                markers.addAll(markerEventSource.getMarkerList(checkNotNull(category), startTime, endTime, resolution, monitor));
+                markers.addAll(markerEventSource.getMarkerList(category, startTime, endTime, resolution, monitor));
             }
         }
         return markers;
@@ -1664,7 +1664,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private @NonNull List<IMarkerEventSource> getMarkerEventSources(ITmfTrace trace) {
         List<IMarkerEventSource> markerEventSources = fMarkerEventSourcesMap.get(trace);
         if (markerEventSources == null) {
-            markerEventSources = checkNotNull(Collections.<IMarkerEventSource>emptyList());
+            markerEventSources = Collections.emptyList();
         }
         return markerEventSources;
     }

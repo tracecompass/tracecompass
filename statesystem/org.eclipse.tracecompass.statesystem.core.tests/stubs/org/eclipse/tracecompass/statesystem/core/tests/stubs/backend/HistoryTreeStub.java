@@ -56,7 +56,7 @@ public class HistoryTreeStub extends HistoryTree {
      */
     public HTNode getLatestLeaf() {
         List<HTNode> latest = getLatestBranch();
-        return checkNotNull(Iterables.getLast(latest));
+        return Iterables.getLast(latest);
     }
 
     /**
@@ -69,7 +69,7 @@ public class HistoryTreeStub extends HistoryTree {
      */
     public HTNode getNodeAt(int pos) {
         List<HTNode> latest = getLatestBranch();
-        return checkNotNull(latest.get(pos));
+        return latest.get(pos);
     }
 
     /**

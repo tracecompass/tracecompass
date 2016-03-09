@@ -13,8 +13,6 @@
 
 package org.eclipse.tracecompass.tmf.tests.stubs.trace.text;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -67,14 +65,14 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
 
     /** The event aspects */
     public static final @NonNull Collection<ITmfEventAspect> ASPECTS =
-            checkNotNull(ImmutableList.of(
+            ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     new TmfContentFieldAspect(Field.HOST, Field.HOST),
                     new TmfContentFieldAspect(Field.LOGGER, Field.LOGGER),
                     new TmfContentFieldAspect(Field.FILE, Field.FILE),
                     new TmfContentFieldAspect(Field.LINE, Field.LINE),
                     new TmfContentFieldAspect(Field.MESSAGE, Field.MESSAGE)
-                    ));
+                    );
 
     /**
      * Constructor

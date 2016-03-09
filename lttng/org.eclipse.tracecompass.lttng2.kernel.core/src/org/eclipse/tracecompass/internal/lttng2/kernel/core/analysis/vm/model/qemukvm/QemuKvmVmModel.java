@@ -22,7 +22,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelThreadInformationProvider;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model.IVirtualMachineModel;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model.VirtualCPU;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model.VirtualMachine;
@@ -57,14 +56,14 @@ public class QemuKvmVmModel implements IVirtualMachineModel {
 
     private final TmfExperiment fExperiment;
 
-    static final ImmutableSet<String> REQUIRED_EVENTS = NonNullUtils.checkNotNull(ImmutableSet.of(
+    static final ImmutableSet<String> REQUIRED_EVENTS = ImmutableSet.of(
             QemuKvmStrings.KVM_ENTRY,
             QemuKvmStrings.KVM_EXIT,
             QemuKvmStrings.VMSYNC_GH_GUEST,
             QemuKvmStrings.VMSYNC_GH_HOST,
             QemuKvmStrings.VMSYNC_HG_GUEST,
             QemuKvmStrings.VMSYNC_HG_HOST
-            ));
+            );
 
     /**
      * Constructor

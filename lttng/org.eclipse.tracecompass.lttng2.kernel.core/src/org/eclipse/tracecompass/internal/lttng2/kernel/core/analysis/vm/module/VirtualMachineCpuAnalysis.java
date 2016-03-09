@@ -13,8 +13,6 @@
 
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.module;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +21,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelThreadInformationProvider;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.VcpuStateValues;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.VmAttributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -60,9 +57,9 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
     public static final String ID = "org.eclipse.tracecompass.lttng2.analysis.vm.core.VirtualMachineAnalysisModule"; //$NON-NLS-1$
 
     // TODO: Update with event layout when requirements are back */
-    static final Set<String> REQUIRED_EVENTS = NonNullUtils.checkNotNull(ImmutableSet.of(
+    static final Set<String> REQUIRED_EVENTS = ImmutableSet.of(
             // LttngStrings.SCHED_SWITCH
-            ));
+            );
 
     /* State value for a preempted virtual CPU */
     private static final ITmfStateValue VCPU_PREEMPT_VALUE = TmfStateValue.newValueInt(VcpuStateValues.VCPU_PREEMPT);
@@ -98,7 +95,6 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
         Set<IAnalysisModule> modules = new HashSet<>();
         /* Depends on the LTTng Kernel analysis modules */
         for (ITmfTrace trace : TmfTraceManager.getTraceSet(getTrace())) {
-            trace = checkNotNull(trace);
             for (KernelAnalysisModule module : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysisModule.class)) {
                 modules.add(module);
             }
@@ -171,7 +167,7 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
             return map;
         }
 
-        String vmHostId = NonNullUtils.checkNotNull(ss.getAttributeName(vmQuark));
+        String vmHostId = ss.getAttributeName(vmQuark);
         KernelAnalysisModule kernelModule = TmfExperimentUtils.getAnalysisModuleOfClassForHost((TmfExperiment) trace, vmHostId, KernelAnalysisModule.class);
         if (kernelModule == null) {
             return map;
@@ -224,7 +220,7 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
             }
         } catch (AttributeNotFoundException | StateSystemDisposedException e) {
         }
-        return NonNullUtils.checkNotNull(map);
+        return map;
     }
 
 }

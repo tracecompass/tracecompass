@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.internal.pcap.core.protocol.tcp;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.pcap.core.endpoint.ProtocolEndpoint;
 
@@ -87,7 +85,7 @@ public class TCPEndpoint extends ProtocolEndpoint {
     public String toString() {
         ProtocolEndpoint endpoint = getParentEndpoint();
         if (endpoint == null) {
-            return checkNotNull(String.valueOf(fPort));
+            return String.valueOf(fPort);
         }
         return endpoint.toString() + '/' + fPort;
     }
