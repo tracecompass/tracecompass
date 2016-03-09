@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.tmf.core.trace;
 
 import java.util.Set;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 
 /**
@@ -32,7 +32,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
  * @author Geneviève Bastien
  * @author Matthew Khouzam
  */
-@NonNullByDefault
 public interface ITmfTraceWithPreDefinedEvents {
 
     /**
@@ -55,6 +54,6 @@ public interface ITmfTraceWithPreDefinedEvents {
      *
      * @return The set of events that might be present in the trace
      */
-    Set<? extends ITmfEventType> getContainedEventTypes();
+    @NonNull Set<@NonNull ? extends ITmfEventType> getContainedEventTypes();
 
 }
