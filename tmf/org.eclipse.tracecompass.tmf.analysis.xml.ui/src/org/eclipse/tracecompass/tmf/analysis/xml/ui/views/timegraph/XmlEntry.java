@@ -158,7 +158,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
 
         ITmfXmlModelFactory factory = TmfXmlReadOnlyModelFactory.getInstance();
         ITmfXmlStateAttribute display = factory.createStateAttribute(stateAttribute, this);
-        int quark = display.getAttributeQuark(fBaseQuark);
+        int quark = display.getAttributeQuark(fBaseQuark, null);
         if (quark != IXmlStateSystemContainer.ERROR_QUARK) {
             ITmfStateInterval firstInterval = StateSystemUtils.queryUntilNonNullValue(fSs, quark, getStartTime(), getEndTime());
             if (firstInterval != null) {

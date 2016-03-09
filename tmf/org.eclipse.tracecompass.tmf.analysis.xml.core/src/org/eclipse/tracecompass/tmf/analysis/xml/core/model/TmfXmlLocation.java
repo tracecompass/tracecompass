@@ -85,16 +85,21 @@ public class TmfXmlLocation {
      *
      * @param event
      *            The event being handled
+     *
      * @param startQuark
      *            The starting quark for relative search, use
      *            {@link IXmlStateSystemContainer#ROOT_QUARK} for the root of
      *            the attribute tree
+     * @param scenarioInfo
+     *            The active scenario details. Or <code>null</code> if there is
+     *            no scenario.
      * @return The quark at the leaf of the path
+     * @since 2.0
      */
-    public int getLocationQuark(@Nullable ITmfEvent event, int startQuark) {
+    public int getLocationQuark(@Nullable ITmfEvent event, int startQuark, @Nullable TmfXmlScenarioInfo scenarioInfo) {
         int quark = startQuark;
         for (ITmfXmlStateAttribute attrib : fPath) {
-            quark = attrib.getAttributeQuark(event, quark);
+            quark = attrib.getAttributeQuark(event, quark, scenarioInfo);
             if (quark == IXmlStateSystemContainer.ERROR_QUARK) {
                 break;
             }
@@ -109,12 +114,16 @@ public class TmfXmlLocation {
      *            The starting quark for relative search, use
      *            {@link IXmlStateSystemContainer#ROOT_QUARK} for the root of
      *            the attribute tree
+     * @param scenarioInfo
+     *            The active scenario details. Or <code>null</code> if there is
+     *            no scenario.
      * @return The quark at the leaf of the path
+     * @since 2.0
      */
-    public int getLocationQuark(int startQuark) {
+    public int getLocationQuark(int startQuark, @Nullable TmfXmlScenarioInfo scenarioInfo) {
         int quark = startQuark;
         for (ITmfXmlStateAttribute attrib : fPath) {
-            quark = attrib.getAttributeQuark(quark);
+            quark = attrib.getAttributeQuark(quark, scenarioInfo);
             if (quark == IXmlStateSystemContainer.ERROR_QUARK) {
                 break;
             }

@@ -215,19 +215,11 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
     }
 
     /**
-     * Get the current {@link ITmfStateValue} of this state value for an event.
-     * It does not increment the value and does not any other processing of the
-     * value.
-     *
-     * @param event
-     *            The current event, or <code>null</code> if no event available.
-     * @return the {@link ITmfStateValue}
-     * @throws AttributeNotFoundException
-     *             May be thrown by the state system during the query
+     * @since 2.0
      */
     @Override
-    public ITmfStateValue getValue(@Nullable ITmfEvent event) throws AttributeNotFoundException {
-        return fStateValue.getValue(event);
+    public ITmfStateValue getValue(@Nullable ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException {
+        return fStateValue.getValue(event, scenarioInfo);
     }
 
     /**
@@ -375,24 +367,14 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
     }
 
     /**
-     * Handles an event, by setting the value of the attribute described by the
-     * state attribute path in the state system.
-     *
-     * @param event
-     *            The event to process
-     * @throws AttributeNotFoundException
-     *             Pass through the exception it received
-     * @throws TimeRangeException
-     *             Pass through the exception it received
-     * @throws StateValueTypeException
-     *             Pass through the exception it received
+     * @since 2.0
      */
     @Override
-    public void handleEvent(@NonNull ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException {
+    public void handleEvent(@NonNull ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException {
         int quark = IXmlStateSystemContainer.ROOT_QUARK;
 
         for (ITmfXmlStateAttribute attribute : fPath) {
-            quark = attribute.getAttributeQuark(event, quark);
+            quark = attribute.getAttributeQuark(event, quark, scenarioInfo);
             /* the query is not valid, we stop the state change */
             if (quark == IXmlStateSystemContainer.ERROR_QUARK) {
                 throw new AttributeNotFoundException("Not found XML attribute " + attribute); //$NON-NLS-1$
@@ -400,7 +382,7 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
         }
 
         long ts = event.getTimestamp().getValue();
-        fStateValue.handleEvent(event, quark, ts);
+        fStateValue.handleEvent(event, quark, ts, scenarioInfo);
     }
 
     @Override
@@ -428,11 +410,15 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
          *            The event which can be used to retrieve the value if
          *            necessary. The event can be <code>null</code> if no event
          *            is required.
+         * @param scenarioInfo
+         *            The active scenario details. The value should be null if
+         *            there no scenario.
          * @return The state value corresponding to this XML state value
          * @throws AttributeNotFoundException
          *             Pass through the exception it received
+         * @since 2.0
          */
-        public abstract ITmfStateValue getValue(@Nullable ITmfEvent event) throws AttributeNotFoundException;
+        public abstract ITmfStateValue getValue(@Nullable ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException;
 
         /**
          * Do something with the state value, possibly using an event
@@ -444,18 +430,22 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
          *            The quark for this value
          * @param timestamp
          *            The timestamp of the event
+         * @param scenarioInfo
+         *            The active scenario details. The value should be null if
+         *            there no scenario.
          * @throws StateValueTypeException
          *             Pass through the exception it received
          * @throws TimeRangeException
          *             Pass through the exception it received
          * @throws AttributeNotFoundException
          *             Pass through the exception it received
+         * @since 2.0
          */
-        public void handleEvent(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
+        public void handleEvent(ITmfEvent event, int quark, long timestamp, @Nullable TmfXmlScenarioInfo scenarioInfo) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             if (fIncrement) {
-                incrementValue(event, quark, timestamp);
+                incrementValue(event, quark, timestamp, scenarioInfo);
             } else {
-                ITmfStateValue value = getValue(event);
+                ITmfStateValue value = getValue(event, scenarioInfo);
                 processValue(quark, timestamp, value);
             }
         }
@@ -489,15 +479,19 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
          *            The quark for this value
          * @param timestamp
          *            The timestamp of the event
+         * @param scenarioInfo
+         *            The active scenario details. The value should be null if
+         *            there no scenario.
          * @throws StateValueTypeException
          *             Pass through the exception it received
          * @throws TimeRangeException
          *             Pass through the exception it received
          * @throws AttributeNotFoundException
          *             Pass through the exception it received
+         * @since 2.0
          */
         @SuppressWarnings("unused")
-        protected void incrementValue(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
+        protected void incrementValue(ITmfEvent event, int quark, long timestamp, @Nullable TmfXmlScenarioInfo scenarioInfo) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
         }
     }
 
@@ -505,7 +499,7 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
     private class TmfXmlStateValueNull extends TmfXmlStateValueBase {
 
         @Override
-        public ITmfStateValue getValue(@Nullable ITmfEvent event) throws AttributeNotFoundException {
+        public ITmfStateValue getValue(@Nullable ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException {
             return TmfStateValue.nullValue();
         }
 

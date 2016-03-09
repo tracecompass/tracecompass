@@ -207,21 +207,24 @@ public class TmfXmlCondition {
      *
      * @param event
      *            The event on which to test the condition
+     * @param scenarioInfo
+     *            The active scenario details. Or <code>null</code> if there is
+     *            no scenario.
      * @return Whether the condition is true or not
      * @throws AttributeNotFoundException
      *             The state attribute was not found
-     * @since 1.0
+     * @since 2.0
      */
-    public boolean testForEvent(ITmfEvent event) throws AttributeNotFoundException {
+    public boolean testForEvent(ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException {
         ITmfStateSystem ss = fContainer.getStateSystem();
         if (!fStateValues.isEmpty()) {
-            return testForEvent(event, NonNullUtils.checkNotNull(ss));
+            return testForEvent(event, NonNullUtils.checkNotNull(ss), scenarioInfo);
         } else if (!fConditions.isEmpty()) {
             /* Verify a condition tree */
             switch (fOperator) {
             case AND:
                 for (TmfXmlCondition childCondition : fConditions) {
-                    if (!childCondition.testForEvent(event)) {
+                    if (!childCondition.testForEvent(event, scenarioInfo)) {
                         return false;
                     }
                 }
@@ -229,10 +232,10 @@ public class TmfXmlCondition {
             case NONE:
                 break;
             case NOT:
-                return !fConditions.get(0).testForEvent(event);
+                return !fConditions.get(0).testForEvent(event, scenarioInfo);
             case OR:
                 for (TmfXmlCondition childCondition : fConditions) {
-                    if (childCondition.testForEvent(event)) {
+                    if (childCondition.testForEvent(event, scenarioInfo)) {
                         return true;
                     }
                 }
@@ -245,7 +248,7 @@ public class TmfXmlCondition {
         return true;
     }
 
-    private boolean testForEvent(ITmfEvent event, ITmfStateSystem ss) throws AttributeNotFoundException {
+    private boolean testForEvent(ITmfEvent event, ITmfStateSystem ss, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException {
         /*
          * The condition is either the equality check of a state value or a
          * boolean operation on other conditions
@@ -254,7 +257,7 @@ public class TmfXmlCondition {
             ITmfXmlStateValue filter = fStateValues.get(0);
             int quark = IXmlStateSystemContainer.ROOT_QUARK;
             for (ITmfXmlStateAttribute attribute : filter.getAttributes()) {
-                quark = attribute.getAttributeQuark(event, quark);
+                quark = attribute.getAttributeQuark(event, quark, scenarioInfo);
                 /*
                  * When verifying a condition, the state attribute must exist,
                  * if it does not, the query is not valid, we stop the condition
@@ -273,12 +276,12 @@ public class TmfXmlCondition {
 
             /* Get the value to compare to from the XML file */
             ITmfStateValue valueXML;
-            valueXML = filter.getValue(event);
+            valueXML = filter.getValue(event, scenarioInfo);
             return compare(valueState, valueXML, fConditionOperator);
         }
         /* Get the two values needed for the comparison */
-        ITmfStateValue valuesXML1 = fStateValues.get(0).getValue(event);
-        ITmfStateValue valuesXML2 = fStateValues.get(1).getValue(event);
+        ITmfStateValue valuesXML1 = fStateValues.get(0).getValue(event, scenarioInfo);
+        ITmfStateValue valuesXML2 = fStateValues.get(1).getValue(event, scenarioInfo);
         return valuesXML1.equals(valuesXML2);
     }
 

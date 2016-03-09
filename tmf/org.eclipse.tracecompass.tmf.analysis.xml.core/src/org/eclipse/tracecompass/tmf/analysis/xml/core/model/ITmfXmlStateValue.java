@@ -37,11 +37,15 @@ public interface ITmfXmlStateValue {
      * @param event
      *            The current event or <code>null</code> if no event is
      *            available.
+     * @param scenarioInfo
+     *            The active scenario details. Or <code>null</code> if there is
+     *            no scenario.
      * @return the {@link ITmfStateValue}
      * @throws AttributeNotFoundException
      *             May be thrown by the state system during the query
+     * @since 2.0
      */
-    ITmfStateValue getValue(@Nullable ITmfEvent event) throws AttributeNotFoundException;
+    ITmfStateValue getValue(@Nullable ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException;
 
     /**
      * Get the value of the event field that is the path of this state value
@@ -65,13 +69,17 @@ public interface ITmfXmlStateValue {
      *
      * @param event
      *            The event to process
+     * @param scenarioInfo
+     *            The active scenario details. Or <code>null</code> if there is
+     *            no scenario.
      * @throws AttributeNotFoundException
      *             Pass through the exception it received
      * @throws TimeRangeException
      *             Pass through the exception it received
      * @throws StateValueTypeException
      *             Pass through the exception it received
+     * @since 2.0
      */
-    void handleEvent(ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException;
+    void handleEvent(ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException;
 
 }

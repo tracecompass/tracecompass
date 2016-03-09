@@ -100,15 +100,19 @@ public class TmfXmlStateChange {
      *
      * @param event
      *            The event to process
+     * @param scenarioInfo
+     *            The active scenario details. The value should be null if there
+     *            no scenario.
      * @throws AttributeNotFoundException
      *             Pass through the exception it received
      * @throws TimeRangeException
      *             Pass through the exception it received
      * @throws StateValueTypeException
      *             Pass through the exception it received
+     * @since 2.0
      */
-    public void handleEvent(ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException {
-        fChange.handleEvent(event);
+    public void handleEvent(ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException {
+        fChange.handleEvent(event, scenarioInfo);
     }
 
     @Override
@@ -118,7 +122,7 @@ public class TmfXmlStateChange {
 
     /* Interface for both private classes to handle the event */
     private interface IXmlStateChange {
-        void handleEvent(ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException;
+        void handleEvent(ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException;
     }
 
     /**
@@ -154,10 +158,10 @@ public class TmfXmlStateChange {
         }
 
         @Override
-        public void handleEvent(@NonNull ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException {
+        public void handleEvent(@NonNull ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException {
             TmfXmlStateChange toExecute = fThenChange;
             try {
-                if (!fCondition.testForEvent(event)) {
+                if (!fCondition.testForEvent(event, scenarioInfo)) {
                     toExecute = fElseChange;
                 }
             } catch (AttributeNotFoundException e) {
@@ -171,7 +175,7 @@ public class TmfXmlStateChange {
             if (toExecute == null) {
                 return;
             }
-            toExecute.handleEvent(event);
+            toExecute.handleEvent(event, scenarioInfo);
         }
 
         @Override
@@ -212,8 +216,8 @@ public class TmfXmlStateChange {
         }
 
         @Override
-        public void handleEvent(@NonNull ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException {
-            fValue.handleEvent(event);
+        public void handleEvent(@NonNull ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException {
+            fValue.handleEvent(event, scenarioInfo);
         }
 
         @Override

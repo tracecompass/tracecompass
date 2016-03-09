@@ -95,7 +95,8 @@ public class TmfXmlPatternSegmentBuilderTest {
         //Create a pattern segment and test its content
         TmfXmlPatternSegment segment = builder.generatePatternSegment(PatternSegmentFactoryStub.TEST_2_END_EVENT,
                 PatternSegmentFactoryStub.TEST_2_START_EVENT.getTimestamp(),
-                PatternSegmentFactoryStub.TEST_2_END_EVENT.getTimestamp());
+                PatternSegmentFactoryStub.TEST_2_END_EVENT.getTimestamp(),
+                null);
         XmlUtilsTest.testPatternSegmentData(PatternSegmentFactoryStub.TEST_2, segment);
     }
 }

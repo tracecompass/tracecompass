@@ -31,12 +31,17 @@ public interface ITmfXmlStateAttribute {
      * builder mode.
      *
      * @param startQuark
-     *            root quark, use {@link IXmlStateSystemContainer#ROOT_QUARK} to search
-     *            the full attribute tree
+     *            root quark, use {@link IXmlStateSystemContainer#ROOT_QUARK} to
+     *            search the full attribute tree
+     * @param scenarioInfo
+     *            The active scenario details. Or <code>null</code> if there is
+     *            no scenario.
      * @return the quark described by attribute or
-     *         {@link IXmlStateSystemContainer#ERROR_QUARK} if quark cannot be found
+     *         {@link IXmlStateSystemContainer#ERROR_QUARK} if quark cannot be
+     *         found
+     * @since 2.0
      */
-    int getAttributeQuark(int startQuark);
+    int getAttributeQuark(int startQuark, @Nullable TmfXmlScenarioInfo scenarioInfo);
 
     /**
      * This method gets the quark for this state attribute in the State System.
@@ -48,10 +53,15 @@ public interface ITmfXmlStateAttribute {
      * @param event
      *            The current event being handled
      * @param startQuark
-     *            root quark, use {@link IXmlStateSystemContainer#ROOT_QUARK} to search
-     *            the full attribute tree
+     *            root quark, use {@link IXmlStateSystemContainer#ROOT_QUARK} to
+     *            search the full attribute tree
+     * @param scenarioInfo
+     *            The active scenario details. Or <code>null</code> if there is
+     *            no scenario.
      * @return the quark described by attribute or
-     *         {@link IXmlStateSystemContainer#ERROR_QUARK} if quark cannot be found
+     *         {@link IXmlStateSystemContainer#ERROR_QUARK} if quark cannot be
+     *         found
+     * @since 2.0
      */
-    int getAttributeQuark(@Nullable ITmfEvent event, int startQuark);
+    int getAttributeQuark(@Nullable ITmfEvent event, int startQuark, @Nullable TmfXmlScenarioInfo scenarioInfo);
 }

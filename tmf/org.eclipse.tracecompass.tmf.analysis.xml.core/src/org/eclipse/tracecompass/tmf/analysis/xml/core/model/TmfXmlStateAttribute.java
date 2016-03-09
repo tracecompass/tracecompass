@@ -16,6 +16,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -59,6 +62,10 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
         SELF,
         EVENTNAME
     }
+
+    private final String SCENARIO_NAME = "#scenarioName"; //$NON-NLS-1$
+
+    private final String CURRENT_STATE = "#currentState"; //$NON-NLS-1$
 
     /** Type of attribute */
     private final StateAttributeType fType;
@@ -127,22 +134,11 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
     }
 
     /**
-     * This method gets the quark for this state attribute in the State System.
-     *
-     * Unless this attribute is a location, in which case the quark must exist,
-     * the quark will be added to the state system if the state system is in
-     * builder mode.
-     *
-     * @param startQuark
-     *            root quark, use {@link IXmlStateSystemContainer#ROOT_QUARK} to
-     *            search the full attribute tree
-     * @return the quark described by attribute or
-     *         {@link IXmlStateSystemContainer#ERROR_QUARK} if quark cannot be
-     *         found
+     * @since 2.0
      */
     @Override
-    public int getAttributeQuark(int startQuark) {
-        return getAttributeQuark(null, startQuark);
+    public int getAttributeQuark(int startQuark, @Nullable TmfXmlScenarioInfo scenarioInfo) {
+        return getAttributeQuark(null, startQuark, scenarioInfo);
     }
 
     /**
@@ -188,37 +184,31 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
     }
 
     /**
-     * This method gets the quark for this state attribute in the State System.
-     *
-     * Unless this attribute is a location, in which case the quark must exist,
-     * the quark will be added to the state system if the state system is in
-     * builder mode.
-     *
-     * @param event
-     *            The current event being handled, or <code>null</code> if no
-     *            event available in the context
-     * @param startQuark
-     *            root quark, use {@link IXmlStateSystemContainer#ROOT_QUARK} to
-     *            search the full attribute tree
-     * @return the quark described by attribute or
-     *         {@link IXmlStateSystemContainer#ERROR_QUARK} if quark cannot be
-     *         found
+     * @since 2.0
      */
     @Override
-    public int getAttributeQuark(@Nullable ITmfEvent event, int startQuark) {
+    public int getAttributeQuark(@Nullable ITmfEvent event, int startQuark, @Nullable TmfXmlScenarioInfo scenarioInfo) {
         ITmfStateSystem ss = getStateSystem();
         if (ss == null) {
             throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
         }
+        String name = nullToEmptyString(fName);
+        if (name.length() > 0 && name.charAt(0) == '#' && scenarioInfo == null) {
+            throw new IllegalStateException("XML Attribute needs " + fName + " but the data is not available.");  //$NON-NLS-1$//$NON-NLS-2$
+        }
+        name = name.equals(SCENARIO_NAME) ? checkNotNull(scenarioInfo).getScenarioName() : name.equals(CURRENT_STATE) ? checkNotNull(scenarioInfo).getActiveState() : fName;
 
         try {
             switch (fType) {
             case CONSTANT: {
                 int quark;
+                if (name == null) {
+                    throw new IllegalStateException("Invalid attribute name"); //$NON-NLS-1$
+                }
                 if (startQuark == IXmlStateSystemContainer.ROOT_QUARK) {
-                    quark = getQuarkAbsoluteAndAdd(fName);
+                    quark = getQuarkAbsoluteAndAdd(name);
                 } else {
-                    quark = getQuarkRelativeAndAdd(startQuark, fName);
+                    quark = getQuarkRelativeAndAdd(startQuark, name);
                 }
                 return quark;
             }
@@ -228,10 +218,8 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                     Activator.logWarning("XML State attribute: looking for an event field, but event is null"); //$NON-NLS-1$
                     return quark;
                 }
-                /* special case if field is CPU which is not in the field */
-                String name = fName;
                 if (name == null) {
-                    throw new IllegalStateException();
+                    throw new IllegalStateException("Invalid attribute name"); //$NON-NLS-1$
                 }
                 if (name.equals(TmfXmlStrings.CPU)) {
                     /* See if the event advertises a CPU aspect */
@@ -243,11 +231,11 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                 } else {
                     final ITmfEventField content = event.getContent();
                     /* stop if the event field doesn't exist */
-                    if (content.getField(fName) == null) {
+                    if (content.getField(name) == null) {
                         return IXmlStateSystemContainer.ERROR_QUARK;
                     }
 
-                    Object field = content.getField(fName).getValue();
+                    Object field = content.getField(name).getValue();
 
                     if (field instanceof String) {
                         String fieldString = (String) field;
@@ -268,7 +256,7 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                 int quarkQuery = IXmlStateSystemContainer.ROOT_QUARK;
 
                 for (ITmfXmlStateAttribute attrib : fQueryList) {
-                    quarkQuery = attrib.getAttributeQuark(event, quarkQuery);
+                    quarkQuery = attrib.getAttributeQuark(event, quarkQuery, scenarioInfo);
                     if (quarkQuery == IXmlStateSystemContainer.ERROR_QUARK) {
                         break;
                     }
@@ -306,12 +294,12 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
             }
             case LOCATION: {
                 int quark = startQuark;
-                String idLocation = fName;
+                String idLocation = name;
 
                 /* TODO: Add a fContainer.getLocation(id) method */
                 for (TmfXmlLocation location : fContainer.getLocations()) {
                     if (location.getId().equals(idLocation)) {
-                        quark = location.getLocationQuark(event, quark);
+                        quark = location.getLocationQuark(event, quark, scenarioInfo);
                         if (quark == IXmlStateSystemContainer.ERROR_QUARK) {
                             break;
                         }

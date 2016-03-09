@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.model.readwrite;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -27,6 +28,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlScenarioInfo;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlStateValue;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
@@ -165,11 +167,11 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
     protected abstract class TmfXmlStateValueTypeReadWrite extends TmfXmlStateValueBase {
 
         @Override
-        public final void handleEvent(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
+        public final void handleEvent(ITmfEvent event, int quark, long timestamp, @Nullable TmfXmlScenarioInfo scenarioInfo) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             if (isIncrement()) {
-                incrementValue(event, quark, timestamp);
+                incrementValue(event, quark, timestamp, scenarioInfo);
             } else {
-                ITmfStateValue value = getValue(event);
+                ITmfStateValue value = getValue(event, scenarioInfo);
                 processValue(quark, timestamp, value);
             }
         }
@@ -196,7 +198,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         }
 
         @Override
-        protected void incrementValue(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
+        protected void incrementValue(ITmfEvent event, int quark, long timestamp, @Nullable TmfXmlScenarioInfo scenarioInfo) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             ITmfStateSystemBuilder ss = getStateSystem();
             if (ss == null) {
                 throw new IllegalStateException(ILLEGAL_STATE_EXCEPTION_MESSAGE);
@@ -240,12 +242,12 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         }
 
         @Override
-        public ITmfStateValue getValue(@Nullable ITmfEvent event) {
+        public ITmfStateValue getValue(@Nullable ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) {
             return fValue;
         }
 
         @Override
-        public void incrementValue(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
+        public void incrementValue(ITmfEvent event, int quark, long timestamp, @Nullable TmfXmlScenarioInfo scenarioInfo) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             ITmfStateSystem ss = getStateSystem();
             if (ss == null) {
                 throw new IllegalStateException(ILLEGAL_STATE_EXCEPTION_MESSAGE);
@@ -275,7 +277,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         }
 
         @Override
-        public ITmfStateValue getValue(@Nullable ITmfEvent event) {
+        public ITmfStateValue getValue(@Nullable ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) {
             if (event == null) {
                 Activator.logWarning("XML State value: requested an event field, but event is null"); //$NON-NLS-1$
                 return TmfStateValue.nullValue();
@@ -284,12 +286,12 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         }
 
         @Override
-        public void incrementValue(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
+        public void incrementValue(ITmfEvent event, int quark, long timestamp, @Nullable TmfXmlScenarioInfo scenarioInfo) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             ITmfStateSystem ss = getSsContainer().getStateSystem();
             if (ss == null) {
                 throw new IllegalStateException(ILLEGAL_STATE_EXCEPTION_MESSAGE);
             }
-            ITmfStateValue incrementValue = getValue(event);
+            ITmfStateValue incrementValue = getValue(event, scenarioInfo);
             ITmfStateValue value = incrementByType(quark, ss, incrementValue);
             if (value != null) {
                 processValue(quark, timestamp, value);
@@ -308,7 +310,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
     private class TmfXmlStateValueEventName extends TmfXmlStateValueTypeReadWrite {
 
         @Override
-        public ITmfStateValue getValue(@Nullable ITmfEvent event) {
+        public @NonNull ITmfStateValue getValue(@Nullable ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException {
             if (event == null) {
                 Activator.logWarning("XML State value: request event name, but event is null"); //$NON-NLS-1$
                 return TmfStateValue.nullValue();
@@ -320,14 +322,13 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         public String toString() {
             return "Event name"; //$NON-NLS-1$
         }
-
     }
 
     /* The state value deletes an attribute */
     private class TmfXmlStateValueDelete extends TmfXmlStateValueTypeReadWrite {
 
         @Override
-        public ITmfStateValue getValue(@Nullable ITmfEvent event) throws AttributeNotFoundException {
+        public @NonNull ITmfStateValue getValue(@Nullable ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException {
             return TmfStateValue.nullValue();
         }
 
@@ -357,7 +358,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         }
 
         @Override
-        public ITmfStateValue getValue(@Nullable ITmfEvent event) throws AttributeNotFoundException {
+        public ITmfStateValue getValue(@Nullable ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException {
             /* Query the state system for the value */
             ITmfStateValue value = TmfStateValue.nullValue();
             int quarkQuery = IXmlStateSystemContainer.ROOT_QUARK;
@@ -367,7 +368,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
             }
 
             for (ITmfXmlStateAttribute attribute : fQueryValue) {
-                quarkQuery = attribute.getAttributeQuark(event, quarkQuery);
+                quarkQuery = attribute.getAttributeQuark(event, quarkQuery, scenarioInfo);
                 if (quarkQuery == IXmlStateSystemContainer.ERROR_QUARK) {
                     /* the query is not valid, we stop the state change */
                     break;
@@ -384,13 +385,13 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         }
 
         @Override
-        public void incrementValue(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
+        public void incrementValue(ITmfEvent event, int quark, long timestamp, @Nullable TmfXmlScenarioInfo scenarioInfo) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             ITmfStateSystem ss = getStateSystem();
             if (ss == null) {
                 throw new IllegalStateException(ILLEGAL_STATE_EXCEPTION_MESSAGE);
             }
 
-            ITmfStateValue incrementValue = getValue(event);
+            ITmfStateValue incrementValue = getValue(event, scenarioInfo);
             ITmfStateValue value = incrementByType(quark, ss, incrementValue);
             if (value != null) {
                 processValue(quark, timestamp, value);

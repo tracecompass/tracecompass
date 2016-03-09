@@ -103,7 +103,7 @@ public class TmfXmlEventHandler {
         /* Process all state changes */
         for (TmfXmlStateChange stateChange : fStateChangeList) {
             try {
-                stateChange.handleEvent(event);
+                stateChange.handleEvent(event, null);
             } catch (AttributeNotFoundException ae) {
                 /*
                  * This would indicate a problem with the logic of the manager

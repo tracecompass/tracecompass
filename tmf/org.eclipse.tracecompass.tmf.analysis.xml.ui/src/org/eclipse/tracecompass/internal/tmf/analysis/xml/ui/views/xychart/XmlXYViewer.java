@@ -260,7 +260,7 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
                     if (seriesNameAttrib == null) {
                         seriesName = ss.getAttributeName(quark);
                     } else {
-                        int seriesNameQuark = seriesNameAttrib.getAttributeQuark(quark);
+                        int seriesNameQuark = seriesNameAttrib.getAttributeQuark(quark, null);
                         try {
                             ITmfStateValue seriesNameValue = ss.querySingleState(start, seriesNameQuark).getStateValue();
                             if (!seriesNameValue.isNull()) {
@@ -277,7 +277,7 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
                             seriesName = ss.getAttributeName(quark);
                         }
                     }
-                    fSeriesData.put(quark, new SeriesData(xvalues.length, display.getAttributeQuark(quark), seriesName, entry.getType()));
+                    fSeriesData.put(quark, new SeriesData(xvalues.length, display.getAttributeQuark(quark, null), seriesName, entry.getType()));
                 }
                 for (int i = 0; i < xvalues.length; i++) {
                     if (monitor != null && monitor.isCanceled()) {

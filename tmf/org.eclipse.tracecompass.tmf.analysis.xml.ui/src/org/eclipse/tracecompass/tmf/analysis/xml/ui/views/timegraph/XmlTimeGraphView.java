@@ -383,7 +383,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
          * attribute
          */
         ITmfXmlStateAttribute display = fFactory.createStateAttribute(displayEl, parentEntry);
-        int displayQuark = display.getAttributeQuark(quark);
+        int displayQuark = display.getAttributeQuark(quark, null);
         if (displayQuark == IXmlStateSystemContainer.ERROR_QUARK) {
             return new XmlEntry(quark, parentEntry.getTrace(),
                     String.format("Unknown display quark for %s", ss.getAttributeName(quark)), ss); //$NON-NLS-1$
