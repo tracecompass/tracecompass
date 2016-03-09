@@ -147,7 +147,7 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      * @throws AttributeNotFoundException
      *             If the quark is invalid
      * @deprecated Use
-     *             {@link StateSystemBuilderUtils#incrementAttributeInt(ITmfStateSystemBuilder, long, int, Integer)}
+     *             {@link StateSystemBuilderUtils#incrementAttributeInt(ITmfStateSystemBuilder, long, int, int)}
      *             instead
      */
     @Deprecated

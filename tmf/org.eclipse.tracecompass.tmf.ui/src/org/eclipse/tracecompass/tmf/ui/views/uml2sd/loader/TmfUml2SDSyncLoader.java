@@ -1343,10 +1343,21 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
         /**
          * Constructor
-         * @param range see {@link TmfEventRequest#TmfEventRequest(Class, TmfTimeRange, long, int, org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType) TmfEventRequest}
-         * @param nbRequested see {@link TmfEventRequest#TmfEventRequest(Class, TmfTimeRange, long, int, org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType) TmfEventRequest}
-         * @param priority {@link ExecutionType#FOREGROUND} or {@link ExecutionType#BACKGROUND}
-         * @param criteria The search criteria
+         *
+         * @param range
+         *            see
+         *            {@link TmfEventRequest#TmfEventRequest(Class, TmfTimeRange, long, int, org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType)
+         *            TmfEventRequest}
+         * @param nbRequested
+         *            see
+         *            {@link TmfEventRequest#TmfEventRequest(Class, TmfTimeRange, long, int, org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType)
+         *            TmfEventRequest}
+         * @param priority
+         *            {@link org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType#FOREGROUND}
+         *            or
+         *            {@link org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType#BACKGROUND}
+         * @param criteria
+         *            The search criteria
          */
         public SearchEventRequest(TmfTimeRange range, int nbRequested, ExecutionType priority, Criteria criteria) {
             this(range, nbRequested, priority, criteria, null);
@@ -1354,11 +1365,22 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
         /**
          * Constructor
-         * @param range see {@link TmfEventRequest#TmfEventRequest(Class, TmfTimeRange, long, int, org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType) TmfEventRequest}
-         * @param nbRequested see {@link TmfEventRequest#TmfEventRequest(Class, TmfTimeRange, long, int, org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType) TmfEventRequest}
-         * @param priority {@link ExecutionType#FOREGROUND} or {@link ExecutionType#BACKGROUND}
-         * @param criteria The search criteria
-         * @param monitor progress monitor
+         *
+         * @param range
+         *            see
+         *            {@link TmfEventRequest#TmfEventRequest(Class, TmfTimeRange, long, int, org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType)
+         *            TmfEventRequest}
+         * @param nbRequested
+         *            see
+         *            {@link TmfEventRequest#TmfEventRequest(Class, TmfTimeRange, long, int, org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType)
+         *            TmfEventRequest}
+         * @param priority
+         *            {@link org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType#FOREGROUND} or
+         *            {@link org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType#BACKGROUND}
+         * @param criteria
+         *            The search criteria
+         * @param monitor
+         *            progress monitor
          */
         public SearchEventRequest(TmfTimeRange range, int nbRequested, ExecutionType priority, Criteria criteria, IProgressMonitor monitor) {
             super(ITmfEvent.class, range, 0, nbRequested, priority);
