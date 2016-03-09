@@ -264,18 +264,18 @@ public class KernelThreadInformationProviderTest {
 
         /* Check different time ranges and resolutions */
         ITmfStateValue[] values = { TmfStateValue.nullValue(), StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE,
-                StateValues.PROCESS_STATUS_RUN_SYSCALL_VALUE, StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE,
-                StateValues.PROCESS_STATUS_RUN_SYSCALL_VALUE };
+                StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE, StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE,
+                StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 0, 70L, 3, monitor);
         testIntervals("tid 21 [0,70,3]", intervals, values);
 
-        ITmfStateValue[] values2 = { TmfStateValue.nullValue(), StateValues.PROCESS_STATUS_RUN_SYSCALL_VALUE,
-                StateValues.PROCESS_STATUS_RUN_SYSCALL_VALUE };
+        ITmfStateValue[] values2 = { TmfStateValue.nullValue(), StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE,
+                StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 1, 70L, 30, monitor);
         testIntervals("tid 21 [0,70,30]", intervals, values2);
 
         ITmfStateValue[] values3 = { StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE,
-                StateValues.PROCESS_STATUS_RUN_SYSCALL_VALUE };
+                StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 25, 50L, 3, monitor);
         testIntervals("tid 21 [25,50,3]", intervals, values3);
 

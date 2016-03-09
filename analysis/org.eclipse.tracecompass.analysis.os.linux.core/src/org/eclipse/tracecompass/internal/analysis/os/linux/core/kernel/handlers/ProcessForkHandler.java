@@ -67,14 +67,10 @@ public class ProcessForkHandler extends KernelEventHandler {
         /* Set the process' syscall name, to be the same as the parent's */
         quark = ss.getQuarkRelativeAndAdd(parentTidNode, Attributes.SYSTEM_CALL);
         value = ss.queryOngoingState(quark);
-        if (value.isNull()) {
-            /*
-             * Maybe we were missing info about the parent? At least we will set
-             * the child right. Let's suppose "sys_clone".
-             */
-            value = TmfStateValue.newValueString(getLayout().eventSyscallEntryPrefix() + IKernelAnalysisEventLayout.INITIAL_SYSCALL_NAME);
+        if (!value.isNull()) {
+            quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.SYSTEM_CALL);
+            ss.modifyAttribute(timestamp, value, quark);
         }
-        quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.SYSTEM_CALL);
-        ss.modifyAttribute(timestamp, value, quark);
+
     }
 }
