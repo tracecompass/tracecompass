@@ -48,7 +48,8 @@ public interface ITmfXmlStateAttribute {
      *
      * Unless this attribute is a location, in which case the quark must exist,
      * the quark will be added to the state system if the state system is in
-     * builder mode.
+     * builder mode. This state attribute path uses runtime data queried using
+     * the current event.
      *
      * @param event
      *            The current event being handled

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
@@ -146,6 +147,31 @@ public class TmfXmlPatternSegmentBuilder {
     private void setPatternSegmentContent(ITmfEvent event, ITmfTimestamp start, ITmfTimestamp end, Map<String, ITmfStateValue> fields, @Nullable TmfXmlScenarioInfo scenarioInfo) {
         for (TmfXmlPatternSegmentField field : fFields) {
             fields.put(field.getName(), field.getValue(event, scenarioInfo));
+        }
+        if (scenarioInfo != null) {
+            addStoredFieldsContent(event, fields, scenarioInfo);
+        }
+    }
+
+    /**
+     * Query the stored fields path and add them to the content of the pattern
+     * segment. This is specific to pattern analysis.
+     *
+     * @param event
+     *            The active event
+     * @param fields
+     *            The segment fields
+     * @param info
+     *            The active scenario details
+     */
+    protected void addStoredFieldsContent(ITmfEvent event, Map<String, ITmfStateValue> fields, final TmfXmlScenarioInfo info) {
+        if (fContainer instanceof XmlPatternStateProvider) {
+            for (Entry<String, String> entry : ((XmlPatternStateProvider) fContainer).getStoredFields().entrySet()) {
+                ITmfStateValue value = ((XmlPatternStateProvider) fContainer).getHistoryBuilder().getStoredFieldValue(fContainer, entry.getValue(), info, event);
+                if (!value.isNull()) {
+                    fields.put(entry.getValue(), value);
+                }
+            }
         }
     }
 

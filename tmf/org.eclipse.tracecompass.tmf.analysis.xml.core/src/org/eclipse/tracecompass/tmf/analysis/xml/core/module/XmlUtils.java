@@ -282,7 +282,7 @@ public class XmlUtils {
      *            The parent element to get children from
      * @return The list of children Element of the parent
      */
-    public static List<@Nullable Element> getChildElements(Element parent) {
+    public static @NonNull List<@Nullable Element> getChildElements(Element parent) {
         NodeList childNodes = parent.getChildNodes();
         List<@Nullable Element> childElements = new ArrayList<>();
         for (int index = 0; index < childNodes.getLength(); index++) {

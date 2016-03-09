@@ -14,14 +14,23 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.model.readwrite;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.ITmfXmlStateValue;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlAction;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlCondition;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlEventHandler;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlFsm;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlLocation;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlPatternEventHandler;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlPatternSegmentBuilder;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlState;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlStateChange;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlStateTransition;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlTransitionValidator;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlTimestampCondition;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.w3c.dom.Element;
 
@@ -65,7 +74,7 @@ public class TmfXmlReadWriteModelFactory implements ITmfXmlModelFactory {
 
     @Override
     public TmfXmlCondition createCondition(Element node, IXmlStateSystemContainer container) {
-        return new TmfXmlCondition(this, node, container);
+        return TmfXmlCondition.create(this, node, container);
     }
 
     @Override
@@ -83,4 +92,67 @@ public class TmfXmlReadWriteModelFactory implements ITmfXmlModelFactory {
         return new TmfXmlLocation(this, node, container);
     }
 
+    /**
+     * @since 2.0
+     */
+    @Override
+    public TmfXmlPatternEventHandler createPatternEventHandler(Element node, IXmlStateSystemContainer container) {
+        return new TmfXmlPatternEventHandler(this, node, container);
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public TmfXmlTransitionValidator createTransitionValidator(Element node, IXmlStateSystemContainer container) {
+        return new TmfXmlTransitionValidator(this, node, container);
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public TmfXmlAction createAction(Element node, IXmlStateSystemContainer container) {
+        return new TmfXmlAction(this, node, container);
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public TmfXmlFsm createFsm(Element node, IXmlStateSystemContainer container) {
+        return TmfXmlFsm.create(this, node, container);
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public @NonNull TmfXmlState createState(Element node, IXmlStateSystemContainer container, @Nullable TmfXmlState parent) {
+        return TmfXmlState.create(this, node, container, parent);
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public TmfXmlStateTransition createStateTransition(Element node, IXmlStateSystemContainer container) {
+        return new TmfXmlStateTransition(this, node, container);
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public TmfXmlTimestampCondition createTimestampsCondition(Element node, IXmlStateSystemContainer container) {
+        return new TmfXmlTimestampCondition(this, node, container);
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public TmfXmlPatternSegmentBuilder createPatternSegmentBuilder(Element node, IXmlStateSystemContainer container) {
+        return new TmfXmlPatternSegmentBuilder(this, node, container);
+    }
 }

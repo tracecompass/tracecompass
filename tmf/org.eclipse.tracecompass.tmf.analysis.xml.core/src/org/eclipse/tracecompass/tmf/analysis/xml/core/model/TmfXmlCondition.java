@@ -18,8 +18,10 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -49,19 +51,21 @@ import org.w3c.dom.Element;
  *
  * @author Florian Wininger
  */
-public class TmfXmlCondition {
+public class TmfXmlCondition implements ITmfXmlCondition {
 
     private final List<TmfXmlCondition> fConditions = new ArrayList<>();
     private final List<ITmfXmlStateValue> fStateValues;
     private final LogicalOperator fOperator;
     private final IXmlStateSystemContainer fContainer;
     private final ConditionOperator fConditionOperator;
+    private ConditionType fType;
+    private @Nullable TmfXmlTimestampCondition fTimeCondition;
 
     private enum LogicalOperator {
         NONE,
         NOT,
         AND,
-        OR,
+        OR
     }
 
     private enum ConditionOperator {
@@ -74,8 +78,16 @@ public class TmfXmlCondition {
         LT
     }
 
+    // TODO The XmlCondition needs to be split into several classes of condition
+    // instead of using an enum
+    private enum ConditionType {
+        DATA,
+        TIME,
+        NONE
+    }
+
     /**
-     * Constructor
+     * Factory to create {@link TmfXmlCondition}
      *
      * @param modelFactory
      *            The factory used to create XML model elements
@@ -83,10 +95,10 @@ public class TmfXmlCondition {
      *            The XML root of this condition
      * @param container
      *            The state system container this condition belongs to
+     * @return The new {@link TmfXmlCondition}
+     * @since 2.0
      */
-    public TmfXmlCondition(ITmfXmlModelFactory modelFactory, Element node, IXmlStateSystemContainer container) {
-        fContainer = container;
-
+    public static TmfXmlCondition create(ITmfXmlModelFactory modelFactory, Element node, IXmlStateSystemContainer container) {
         Element rootNode = node;
         /* Process the conditions: in each case, only process Element nodes */
         List<@Nullable Element> childElements = XmlUtils.getChildElements(rootNode);
@@ -104,57 +116,68 @@ public class TmfXmlCondition {
             childElements = XmlUtils.getChildElements(rootNode);
         }
 
+        List<@NonNull TmfXmlCondition> conditions = new ArrayList<>();
         switch (rootNode.getNodeName()) {
         case TmfXmlStrings.CONDITION:
-            int size = rootNode.getElementsByTagName(TmfXmlStrings.STATE_VALUE).getLength();
-            fStateValues = new ArrayList<>(size);
-            fOperator = LogicalOperator.NONE;
-            if (size == 1) {
-                fConditionOperator = getConditionOperator(rootNode);
-                getStateValuesForXmlCondition(modelFactory, NonNullUtils.checkNotNull(childElements));
-            } else {
-                // No need to test if the childElements size is actually 2. The
-                // XSD validation do this check already.
-                fConditionOperator = ConditionOperator.EQ;
-                fStateValues.add(modelFactory.createStateValue(NonNullUtils.checkNotNull(childElements.get(0)), fContainer, new ArrayList<ITmfXmlStateAttribute>()));
-                fStateValues.add(modelFactory.createStateValue(NonNullUtils.checkNotNull(childElements.get(1)), fContainer, new ArrayList<ITmfXmlStateAttribute>()));
-            }
-            break;
+            return createPatternCondition(modelFactory, container, rootNode, childElements);
         case TmfXmlStrings.NOT:
-            fStateValues = new ArrayList<>();
-            fOperator = LogicalOperator.NOT;
-            fConditionOperator = ConditionOperator.NONE;
-            Element element = NonNullUtils.checkNotNull(childElements.get(0));
-            fConditions.add(modelFactory.createCondition(element, fContainer));
-            break;
+            return createMultipleCondition(modelFactory, container, childElements, LogicalOperator.NOT, conditions);
         case TmfXmlStrings.AND:
-            fStateValues = new ArrayList<>();
-            fOperator = LogicalOperator.AND;
-            fConditionOperator = ConditionOperator.NONE;
-            for (Element condition : childElements) {
-                if (condition == null) {
-                    continue;
-                }
-                fConditions.add(modelFactory.createCondition(condition, fContainer));
-            }
-            break;
+            return createMultipleCondition(modelFactory, container, childElements, LogicalOperator.AND, conditions);
         case TmfXmlStrings.OR:
-            fStateValues = new ArrayList<>();
-            fOperator = LogicalOperator.OR;
-            fConditionOperator = ConditionOperator.NONE;
-            for (Element condition : childElements) {
-                if (condition == null) {
-                    continue;
-                }
-                fConditions.add(modelFactory.createCondition(condition, fContainer));
-            }
-            break;
+            return createMultipleCondition(modelFactory, container, childElements, LogicalOperator.OR, conditions);
         default:
-            throw new IllegalArgumentException("TmfXmlCondition constructor: XML node is of the wrong type"); //$NON-NLS-1$
+            throw new IllegalArgumentException("TmfXmlCondition constructor: XML node " + rootNode.getNodeName() + " is of the wrong type"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
-    private void getStateValuesForXmlCondition(ITmfXmlModelFactory modelFactory, List<@Nullable Element> childElements) {
+    private static TmfXmlCondition createPatternCondition(ITmfXmlModelFactory modelFactory, IXmlStateSystemContainer container, Element rootNode, List<@Nullable Element> childElements) {
+        ArrayList<ITmfXmlStateValue> stateValues;
+        ConditionOperator conditionOperator;
+        TmfXmlTimestampCondition timeCondition = null;
+        int size = rootNode.getElementsByTagName(TmfXmlStrings.STATE_VALUE).getLength();
+        if (size != 0) {
+            stateValues = new ArrayList<>(size);
+            if (size == 1) {
+                conditionOperator = getConditionOperator(rootNode);
+                getStateValuesForXmlCondition(modelFactory, NonNullUtils.checkNotNull(childElements), stateValues, container);
+            } else {
+                // No need to test if the childElements size is actually 2.
+                // The XSD validation do this check already.
+                conditionOperator = ConditionOperator.EQ;
+                stateValues.add(modelFactory.createStateValue(NonNullUtils.checkNotNull(childElements.get(0)), container, new ArrayList<ITmfXmlStateAttribute>()));
+                stateValues.add(modelFactory.createStateValue(NonNullUtils.checkNotNull(childElements.get(1)), container, new ArrayList<ITmfXmlStateAttribute>()));
+            }
+            return new TmfXmlCondition(ConditionType.DATA, stateValues, LogicalOperator.NONE, conditionOperator, null, new ArrayList<>(), container);
+        }
+        final Element firstElement = NonNullUtils.checkNotNull(childElements.get(0));
+        timeCondition = modelFactory.createTimestampsCondition(firstElement, container);
+        return new TmfXmlCondition(ConditionType.TIME, new ArrayList<>(), LogicalOperator.NONE, ConditionOperator.EQ, timeCondition, new ArrayList<>(), container);
+    }
+
+    private static TmfXmlCondition createMultipleCondition(ITmfXmlModelFactory modelFactory, IXmlStateSystemContainer container, List<@Nullable Element> childElements, LogicalOperator op,
+            List<@NonNull TmfXmlCondition> conditions) {
+        for (Element condition : childElements) {
+            if (condition == null) {
+                continue;
+            }
+            conditions.add(modelFactory.createCondition(condition, container));
+        }
+        return new TmfXmlCondition(ConditionType.NONE, new ArrayList<>(), op, ConditionOperator.NONE, null, conditions, container);
+    }
+
+    private TmfXmlCondition(ConditionType type, ArrayList<@NonNull ITmfXmlStateValue> stateValues, LogicalOperator operator, ConditionOperator conditionOperator, @Nullable TmfXmlTimestampCondition timeCondition, List<@NonNull TmfXmlCondition> conditions,
+            IXmlStateSystemContainer container) {
+        fType = type;
+        fStateValues = stateValues;
+        fOperator = operator;
+        fTimeCondition = timeCondition;
+        fContainer = container;
+        fConditions.addAll(conditions);
+        fConditionOperator = conditionOperator;
+    }
+
+    private static void getStateValuesForXmlCondition(ITmfXmlModelFactory modelFactory, List<@Nullable Element> childElements, List<ITmfXmlStateValue> stateValues, IXmlStateSystemContainer container) {
         Element stateValueElement = NonNullUtils.checkNotNull(childElements.remove(childElements.size() - 1));
         /*
          * A state value is either preceded by an eventField or a number of
@@ -163,7 +186,7 @@ public class TmfXmlCondition {
         final Element firstElement = NonNullUtils.checkNotNull(childElements.get(0));
         if (childElements.size() == 1 && firstElement.getNodeName().equals(TmfXmlStrings.ELEMENT_FIELD)) {
             String attribute = firstElement.getAttribute(TmfXmlStrings.NAME);
-            fStateValues.add(modelFactory.createStateValue(stateValueElement, fContainer, attribute));
+            stateValues.add(modelFactory.createStateValue(stateValueElement, container, attribute));
         } else {
             List<ITmfXmlStateAttribute> attributes = new ArrayList<>();
             for (Element element : childElements) {
@@ -173,10 +196,10 @@ public class TmfXmlCondition {
                 if (!element.getNodeName().equals(TmfXmlStrings.STATE_ATTRIBUTE)) {
                     throw new IllegalArgumentException("TmfXmlCondition: a condition either has a eventField element or a number of TmfXmlStateAttribute elements before the state value"); //$NON-NLS-1$
                 }
-                ITmfXmlStateAttribute attribute = modelFactory.createStateAttribute(element, fContainer);
+                ITmfXmlStateAttribute attribute = modelFactory.createStateAttribute(element, container);
                 attributes.add(attribute);
             }
-            fStateValues.add(modelFactory.createStateValue(stateValueElement, fContainer, attributes));
+            stateValues.add(modelFactory.createStateValue(stateValueElement, container, attributes));
         }
     }
 
@@ -203,28 +226,28 @@ public class TmfXmlCondition {
     }
 
     /**
-     * Test the result of the condition for an event
-     *
-     * @param event
-     *            The event on which to test the condition
-     * @param scenarioInfo
-     *            The active scenario details. Or <code>null</code> if there is
-     *            no scenario.
-     * @return Whether the condition is true or not
-     * @throws AttributeNotFoundException
-     *             The state attribute was not found
      * @since 2.0
      */
-    public boolean testForEvent(ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException {
+    @Override
+    public boolean test(ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) {
         ITmfStateSystem ss = fContainer.getStateSystem();
-        if (!fStateValues.isEmpty()) {
-            return testForEvent(event, NonNullUtils.checkNotNull(ss), scenarioInfo);
+        if (fType == ConditionType.DATA) {
+            try {
+                return testForEvent(event, NonNullUtils.checkNotNull(ss), scenarioInfo);
+            } catch (AttributeNotFoundException e) {
+                Activator.logError("Attribute not found", e); //$NON-NLS-1$
+                return false;
+            }
+        } else if (fType == ConditionType.TIME) {
+            if (fTimeCondition != null) {
+                return fTimeCondition.test(event, scenarioInfo);
+            }
         } else if (!fConditions.isEmpty()) {
             /* Verify a condition tree */
             switch (fOperator) {
             case AND:
-                for (TmfXmlCondition childCondition : fConditions) {
-                    if (!childCondition.testForEvent(event, scenarioInfo)) {
+                for (ITmfXmlCondition childCondition : fConditions) {
+                    if (!childCondition.test(event, scenarioInfo)) {
                         return false;
                     }
                 }
@@ -232,10 +255,10 @@ public class TmfXmlCondition {
             case NONE:
                 break;
             case NOT:
-                return !fConditions.get(0).testForEvent(event, scenarioInfo);
+                return !fConditions.get(0).test(event, scenarioInfo);
             case OR:
-                for (TmfXmlCondition childCondition : fConditions) {
-                    if (childCondition.testForEvent(event, scenarioInfo)) {
+                for (ITmfXmlCondition childCondition : fConditions) {
+                    if (childCondition.test(event, scenarioInfo)) {
                         return true;
                     }
                 }
@@ -313,7 +336,7 @@ public class TmfXmlCondition {
      */
     public boolean compare(ITmfStateValue source, ITmfStateValue dest, ConditionOperator comparisonOperator) {
         switch (comparisonOperator) {
-        //TODO The comparison operator should have a compareHelper that calls compare
+        // TODO The comparison operator should have a compareHelper that calls compare
         case EQ:
             return (source.compareTo(dest) == 0);
         case NE:

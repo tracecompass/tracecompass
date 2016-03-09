@@ -89,7 +89,7 @@
 				<xs:annotation>
 					<xs:documentation>Defines a finite state machine that will describe the behavior or a part of the behavior of a pattern. The FSM uses the transitions described to modify its behavior and can execute actions. Each pattern could have one or several FSMs to describe its behavior.</xs:documentation></xs:annotation></xs:element>
 		</xs:sequence>
-		<xs:attribute name="initial" type="xs:string" use="required">
+		<xs:attribute name="initial" type="xs:string" use="optional">
 			<xs:annotation>
 					<xs:documentation>Lists the state machines (FSMs) that will start directly at the beginning of the analysis. For instance, if the pattern need to start with both FSM A and B, the value of this attribute will be "A:B"</xs:documentation></xs:annotation></xs:attribute>
 	</xs:complexType>

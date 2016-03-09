@@ -63,9 +63,9 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
         EVENTNAME
     }
 
-    private final String SCENARIO_NAME = "#scenarioName"; //$NON-NLS-1$
-
     private final String CURRENT_STATE = "#currentState"; //$NON-NLS-1$
+
+    private final String CURRENT_SCENARIO = "#CurrentScenario"; //$NON-NLS-1$
 
     /** Type of attribute */
     private final StateAttributeType fType;
@@ -196,7 +196,8 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
         if (name.length() > 0 && name.charAt(0) == '#' && scenarioInfo == null) {
             throw new IllegalStateException("XML Attribute needs " + fName + " but the data is not available.");  //$NON-NLS-1$//$NON-NLS-2$
         }
-        name = name.equals(SCENARIO_NAME) ? checkNotNull(scenarioInfo).getScenarioName() : name.equals(CURRENT_STATE) ? checkNotNull(scenarioInfo).getActiveState() : fName;
+        name = name.equals(CURRENT_STATE) ? checkNotNull(scenarioInfo).getActiveState()
+                        : fName;
 
         try {
             switch (fType) {
@@ -204,6 +205,9 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                 int quark;
                 if (name == null) {
                     throw new IllegalStateException("Invalid attribute name"); //$NON-NLS-1$
+                }
+                if (name.equals(CURRENT_SCENARIO)) {
+                    return checkNotNull(scenarioInfo).getQuark();
                 }
                 if (startQuark == IXmlStateSystemContainer.ROOT_QUARK) {
                     quark = getQuarkAbsoluteAndAdd(name);

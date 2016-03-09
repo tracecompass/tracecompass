@@ -129,7 +129,7 @@ public class TmfXmlStateChange {
      * Conditional state change with a condition to verify
      */
     private class XmlConditionalChange implements IXmlStateChange {
-        private final TmfXmlCondition fCondition;
+        private final ITmfXmlCondition fCondition;
         private final TmfXmlStateChange fThenChange;
         private final @Nullable TmfXmlStateChange fElseChange;
 
@@ -160,16 +160,8 @@ public class TmfXmlStateChange {
         @Override
         public void handleEvent(@NonNull ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException {
             TmfXmlStateChange toExecute = fThenChange;
-            try {
-                if (!fCondition.testForEvent(event, scenarioInfo)) {
-                    toExecute = fElseChange;
-                }
-            } catch (AttributeNotFoundException e) {
-                /*
-                 * An attribute in the condition did not exist (yet), return
-                 * from the state change
-                 */
-                return;
+            if (!fCondition.test(event, scenarioInfo)) {
+                toExecute = fElseChange;
             }
 
             if (toExecute == null) {
