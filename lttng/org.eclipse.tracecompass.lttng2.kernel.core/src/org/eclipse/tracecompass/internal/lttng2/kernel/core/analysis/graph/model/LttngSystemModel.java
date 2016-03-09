@@ -34,8 +34,8 @@ import com.google.common.collect.Table;
  */
 public class LttngSystemModel {
 
-    private final Table<String, Integer, HostThread> fCurrentTids = NonNullUtils.checkNotNull(HashBasedTable.create());
-    private final Table<String, Integer, Stack<LttngInterruptContext>> fIntCtxStacks = NonNullUtils.checkNotNull(HashBasedTable.create());
+    private final Table<String, Integer, HostThread> fCurrentTids = HashBasedTable.create();
+    private final Table<String, Integer, Stack<LttngInterruptContext>> fIntCtxStacks = HashBasedTable.create();
     private final Map<HostThread, LttngWorker> fWorkerMap = new HashMap<>();
 
     /**

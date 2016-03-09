@@ -82,9 +82,9 @@ public class CriticalPathView extends AbstractTimeGraphView {
             COLUMN_PROCESS
     };
 
-    private final Table<ITmfTrace, Object, List<ILinkEvent>> fLinks = NonNullUtils.checkNotNull(HashBasedTable.create());
+    private final Table<ITmfTrace, Object, List<ILinkEvent>> fLinks = HashBasedTable.create();
     /** The trace to entry list hash map */
-    private final Table<ITmfTrace, Object, TmfGraphStatistics> fObjectStatistics = NonNullUtils.checkNotNull(HashBasedTable.create());
+    private final Table<ITmfTrace, Object, TmfGraphStatistics> fObjectStatistics = HashBasedTable.create();
 
     private final CriticalPathContentProvider fContentProvider = new CriticalPathContentProvider();
 

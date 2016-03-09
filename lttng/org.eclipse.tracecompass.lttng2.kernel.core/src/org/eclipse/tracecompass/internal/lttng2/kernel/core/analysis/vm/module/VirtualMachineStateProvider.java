@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnal
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelThreadInformationProvider;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.VcpuStateValues;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.VmAttributes;
@@ -100,7 +99,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
         super(experiment, "Virtual Machine State Provider"); //$NON-NLS-1$
 
         fModel = new QemuKvmVmModel(experiment);
-        Table<ITmfTrace, String, @Nullable Integer> table = NonNullUtils.checkNotNull(HashBasedTable.create());
+        Table<ITmfTrace, String, @Nullable Integer> table = HashBasedTable.create();
         fEventNames = table;
         fLayouts = new HashMap<>();
     }

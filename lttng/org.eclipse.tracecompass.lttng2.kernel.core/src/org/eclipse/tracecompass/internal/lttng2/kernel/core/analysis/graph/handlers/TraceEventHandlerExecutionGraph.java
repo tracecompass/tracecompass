@@ -74,7 +74,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
      */
     public TraceEventHandlerExecutionGraph(LttngKernelExecGraphProvider provider) {
         super(provider);
-        fKernel = NonNullUtils.checkNotNull(HashBasedTable.create());
+        fKernel = HashBasedTable.create();
 
         fTcpNodes = new HashMap<>();
         fMatchProcessing = new IMatchProcessingUnit() {
