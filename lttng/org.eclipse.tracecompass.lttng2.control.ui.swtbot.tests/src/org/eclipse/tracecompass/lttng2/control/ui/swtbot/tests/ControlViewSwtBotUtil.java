@@ -35,6 +35,7 @@ class ControlViewSwtBotUtil {
     public static final String ALL_EVENTS_NAME = "*";
     public static final String SCHED_SWITCH_EVENT_NAME = "sched_switch";
     public static final String PROFILE_SUFFIX = ".lttng";
+    public static final String KERNEL_TRACE_NAME = "kernel";
 
     // Menu strings
     public static final String CONNECT_MENU_ITEM = "Connect";
@@ -44,6 +45,7 @@ class ControlViewSwtBotUtil {
     public static final String ENABLE_EVENT_MENU_ITEM = "Enable Event...";
     public static final String START_MENU_ITEM = "Start";
     public static final String STOP_MENU_ITEM = "Stop";
+    public static final String IMPORT_MENU_ITEM = "Import...";
     public static final String DESTROY_MENU_ITEM = "Destroy Session...";
     public static final String DISCONNECT_MENU_ITEM = "Disconnect";
     public static final String SAVE_MENU_ITEM = "Save...";
@@ -72,6 +74,13 @@ class ControlViewSwtBotUtil {
     public static final String SAVE_DIALOG_TITLE = "Save Sessions";
     public static final String LOAD_DIALOG_TITLE = "Load Sessions";
     public static final String REMOTE_RADIO_BUTTON_LABEL = "Remote";
+
+    // Remote import strings
+    public static final String IMPORT_WIZARD_TITLE = "Fetch Remote Traces";
+    public static final String DEFAULT_REMOTE_PROJECT = "Remote";
+    public static final String FINISH_BUTTON = "Finish";
+    public static final String CANCEL_BUTTON = "Cancel";
+    public static final String OPTION_GROUP_NAME = "Options";
 
     private ControlViewSwtBotUtil() { }
 

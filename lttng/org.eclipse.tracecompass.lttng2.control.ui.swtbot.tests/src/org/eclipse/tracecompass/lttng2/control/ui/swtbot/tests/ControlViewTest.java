@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.lttng2.control.ui.swtbot.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URL;
@@ -18,19 +19,28 @@ import java.net.URL;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.tracecompass.ctf.core.tests.shared.LttngKernelTraceGenerator;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.stubs.service.TestRemoteSystemProxy;
@@ -39,6 +49,10 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceCon
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 import org.eclipse.tracecompass.tmf.remote.core.proxy.TmfRemoteConnectionFactory;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.ui.IViewPart;
@@ -50,7 +64,7 @@ import org.junit.runner.RunWith;
 import org.osgi.framework.FrameworkUtil;
 
 /**
- * Test for the Call Stack view in trace compass
+ * Test for the LTTng Control view in Trace Compass
  *
  * @author Bernd Hufmann
  */
@@ -87,7 +101,6 @@ public class ControlViewTest {
     protected ITraceControlComponent fRoot;
     /** The target node component */
     protected TargetNodeComponent fNode;
-
 
     /** The test file */
     protected String fTestFile;
@@ -199,6 +212,18 @@ public class ControlViewTest {
         testEnableUstEvents();
         testStartStopTracing(TraceSessionState.ACTIVE);
         testStartStopTracing(TraceSessionState.INACTIVE);
+        // Import without experiment creation
+        testImport(false, true);
+        SWTBotUtils.clearTracesFolder(fBot, ControlViewSwtBotUtil.DEFAULT_REMOTE_PROJECT);
+        // Import with experiment creation (default experiment name)
+        testImport(true, true);
+        SWTBotUtils.clearTracesFolder(fBot, ControlViewSwtBotUtil.DEFAULT_REMOTE_PROJECT);
+        /*
+         * Import with experiment creation, test experiment already exists and
+         * with experiment name validation
+         */
+        testImport(true, false);
+        SWTBotUtils.clearExperimentFolder(fBot, ControlViewSwtBotUtil.DEFAULT_REMOTE_PROJECT);
         testDestroySession();
         testDisconnectFromNode();
     }
@@ -395,7 +420,6 @@ public class ControlViewTest {
             SWTBotUtils.waitForJobs();
         }
         TraceSessionComponent sessionComp = ControlViewSwtBotUtil.getSessionComponent(fNode, getSessionName());
-        assertNotNull(sessionComp);
 
         fBot.waitUntil(ControlViewSwtBotUtil.isSessionStateChanged(sessionComp, state));
         assertEquals(state, sessionComp.getSessionState());
@@ -430,7 +454,6 @@ public class ControlViewTest {
      */
     protected void testDisconnectFromNode() {
         SWTBotTreeItem nodeItem = SWTBotUtils.getTreeItem(fBot, fTree, getNodeName());
-
         nodeItem.select();
         SWTBotMenu menuBot = nodeItem.contextMenu(ControlViewSwtBotUtil.DISCONNECT_MENU_ITEM);
         menuBot.click();
@@ -441,4 +464,137 @@ public class ControlViewTest {
         assertEquals(TargetNodeState.DISCONNECTED, fNode.getTargetNodeState());
         assertEquals(0, nodeItem.getNodes().size());
     }
+
+    /**
+     * Test import
+     *
+     * @param createExperiment
+     *            flag to indicate to create an experiment or not
+     * @param defaultExperiment
+     *            flag to indicate to use default experiment or not
+     */
+    protected void testImport(boolean createExperiment, boolean defaultExperiment) {
+        SWTBotTreeItem sessionItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
+                ControlViewSwtBotUtil.SESSION_GROUP_NAME,
+                getSessionName());
+        sessionItem.select();
+        TraceSessionComponent sessionComp = ControlViewSwtBotUtil.getSessionComponent(fNode, getSessionName());
+
+        String pathString = sessionComp.isSnapshotSession() ? sessionComp.getSnapshotInfo().getSnapshotPath() : sessionComp.getSessionPath();
+        IPath path = new Path(pathString);
+
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+
+        //get location of workspace (java.io.File)
+        File workspaceDirectory = workspace.getRoot().getLocation().toFile();
+        Path workspacePath = new Path(workspaceDirectory.toString());
+
+        // Only do tests if session path is in workspace
+        if (workspacePath.isPrefixOf(path)) {
+
+            generateTrace(path);
+
+            // Open import wizard
+            SWTBotMenu menuBot = sessionItem.contextMenu(ControlViewSwtBotUtil.IMPORT_MENU_ITEM);
+            menuBot.click();
+            SWTBotShell shell = fBot.shell(ControlViewSwtBotUtil.IMPORT_WIZARD_TITLE).activate();
+
+            // This will create the Remote project if needed
+            closeImportWizard(shell, ControlViewSwtBotUtil.CANCEL_BUTTON);
+
+            // Verify that remote project was created by import wizard
+            TmfProjectElement tmfProject = verifyRemoteProject();
+
+            // Re-open import wizard
+            menuBot = sessionItem.contextMenu(ControlViewSwtBotUtil.IMPORT_MENU_ITEM);
+            menuBot.click();
+            shell = fBot.shell(ControlViewSwtBotUtil.IMPORT_WIZARD_TITLE).activate();
+
+            // Prepare and verify experiment handling
+            String experimentName = prepareAndVerifyExperimentHandling(shell.bot(), createExperiment, defaultExperiment, path);
+
+            // Finish and import
+            closeImportWizard(shell, ControlViewSwtBotUtil.FINISH_BUTTON);
+
+            // Verify experiment folder
+            verifyExperimentFolder(createExperiment, tmfProject, experimentName);
+        }
+    }
+
+
+    private static TmfProjectElement verifyRemoteProject() {
+        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(ControlViewSwtBotUtil.DEFAULT_REMOTE_PROJECT);
+        // verify that project was created
+        assertTrue(project.exists());
+        TmfProjectElement tmfProject = TmfProjectRegistry.getProject(project, true);
+        return tmfProject;
+    }
+
+    private static void verifyExperimentFolder(boolean createExperiment, TmfProjectElement tmfProject, String experimentName) {
+        TmfExperimentFolder expFolder = tmfProject.getExperimentsFolder();
+        if (createExperiment) {
+            if (experimentName != null) {
+                TmfExperimentElement expElement = expFolder.getExperiment(experimentName);
+                assertNotNull(expElement);
+                assertEquals(1, expElement.getTraces().size());
+            }
+        } else {
+            assertTrue(expFolder.getExperiments().size() == 0);
+        }
+    }
+
+    private static void generateTrace(IPath path) {
+        File traceParent = path.toFile();
+        traceParent.mkdirs();
+        LttngKernelTraceGenerator.generateLttngKernelTrace(path.append(ControlViewSwtBotUtil.KERNEL_TRACE_NAME).toFile());
+    }
+
+    private static void closeImportWizard(SWTBotShell shell, String buttonName) {
+        SWTBotButton button = shell.bot().button(buttonName);
+        shell.bot().waitUntil(Conditions.widgetIsEnabled(button));
+        button.click();
+        fBot.waitUntil(Conditions.shellCloses(shell));
+        SWTBotUtils.waitForJobs();
+    }
+
+    private static String prepareAndVerifyExperimentHandling(SWTBot bot, boolean createExperiment, boolean defaultExperiment, IPath path) {
+        String experimentName = path.lastSegment();
+        if (createExperiment) {
+            SWTBotCheckBox checkBox = bot.checkBox();
+            checkBox.click();
+            if (!defaultExperiment) {
+                experimentName = verifyExperimentNameHandling(bot, experimentName);
+            }
+        }
+        return experimentName;
+    }
+
+    private static @NonNull String verifyExperimentNameHandling(SWTBot bot, String aExperimentName) {
+        String experimentName = aExperimentName;
+
+        // experiment already exists
+        checkFinishButton(bot, false);
+
+        SWTBotText expText = bot.textInGroup(ControlViewSwtBotUtil.OPTION_GROUP_NAME);
+
+        // Invalid experiment name (only whitespaces)
+        expText.setText(String.valueOf(' '));
+        checkFinishButton(bot, false);
+
+        // Invalid experiment name
+        expText.setText(String.valueOf('/'));
+        checkFinishButton(bot, false);
+
+        // Set valid experiment name
+        experimentName += '_';
+        expText.setText(experimentName);
+        return experimentName;
+    }
+
+    private static void checkFinishButton(SWTBot bot, boolean isEnabled) {
+        final SWTBotButton finishButton = bot.button(ControlViewSwtBotUtil.FINISH_BUTTON);
+        assertTrue(finishButton.isEnabled() == isEnabled);
+    }
+
 }

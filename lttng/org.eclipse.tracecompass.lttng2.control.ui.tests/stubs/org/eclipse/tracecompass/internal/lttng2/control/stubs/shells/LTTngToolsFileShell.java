@@ -31,6 +31,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.remote.core.stubs.shells.TestCommandShell;
@@ -62,14 +64,22 @@ public class LTTngToolsFileShell extends TestCommandShell {
     private final static String LTTNG_LIST_PROVIDER_MI_PATTERN = "lttng\\s+--mi xml\\s+list\\s+(-u|-k)";
 
     private final static String LTTNG_USER_HOME_PATTERN = "\\$\\{userhome\\}";
-
+    private final static String LTTNG_WORKSPACE_PATTERN = "\\$\\{workspace\\}";
     private final static String SESSION_NAME_PATTERN = "\\$\\{sessionname\\}";
 
     private final static String USER_HOME = System.getProperty("user.home");
+    private final static String WORKSPACE_HOME;
 
     private final static Pattern LTTNG_SAVE_MI_PATTERN = Pattern.compile("lttng\\s+--mi xml\\s+save\\s+-f");
 
     private final static String PROFILE_PATH_STRING = USER_HOME + '/' + ".lttng" + '/' + "sessions";
+
+    static {
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        //get location of workspace (java.io.File)
+        File workspaceDirectory = workspace.getRoot().getLocation().toFile();
+        WORKSPACE_HOME = workspaceDirectory.toString();
+    }
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -190,8 +200,11 @@ public class LTTngToolsFileShell extends TestCommandShell {
                             // Read command
                             input = strLine;
 
-                            // Update
+                            // Update userhome
                             input = input.replaceAll(LTTNG_USER_HOME_PATTERN, USER_HOME);
+
+                            // Update workspace
+                            input = input.replaceAll(LTTNG_WORKSPACE_PATTERN, WORKSPACE_HOME);
 
                             // Update session variable
                             if (fSessionName != null) {
@@ -242,6 +255,12 @@ public class LTTngToolsFileShell extends TestCommandShell {
                             while (isComment(strLine)) {
                                 strLine = br.readLine();
                             }
+
+                            // Update userhome
+                            strLine = strLine.replaceAll(LTTNG_USER_HOME_PATTERN, USER_HOME);
+
+                            // Update workspace
+                            strLine = strLine.replaceAll(LTTNG_WORKSPACE_PATTERN, WORKSPACE_HOME);
 
                             // Update session variable
                             if (fSessionName != null) {
