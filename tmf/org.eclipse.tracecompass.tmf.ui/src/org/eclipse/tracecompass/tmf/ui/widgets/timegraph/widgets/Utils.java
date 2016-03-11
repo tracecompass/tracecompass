@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
@@ -606,7 +607,7 @@ public class Utils {
         if (null == entry || ! entry.hasTimeEvents()) {
             return null;
         }
-        Iterator<? extends ITimeEvent> iterator = entry.getTimeEventsIterator();
+        Iterator<@NonNull ? extends ITimeEvent> iterator = entry.getTimeEventsIterator();
         if (iterator == null) {
             return null;
         }

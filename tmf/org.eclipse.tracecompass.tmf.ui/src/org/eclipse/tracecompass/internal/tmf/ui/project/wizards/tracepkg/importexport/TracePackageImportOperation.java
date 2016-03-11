@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.AbstractTracePackageOperation;
@@ -428,7 +429,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
 
     private IStatus importFiles(ArchiveFile archiveFile, List<Pair<String, String>> fileNameAndLabelPairs, IPath destinationContainerPath, IPath baseSourcePath, IProgressMonitor monitor) {
         List<ArchiveProviderElement> objects = new ArrayList<>();
-        Enumeration<?> entries = archiveFile.entries();
+        Enumeration<@NonNull ?> entries = archiveFile.entries();
         while (entries.hasMoreElements()) {
             ArchiveEntry entry = (ArchiveEntry) entries.nextElement();
             String entryName = entry.getName();

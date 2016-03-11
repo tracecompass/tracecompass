@@ -491,8 +491,9 @@ public class Frame extends BasicFrame {
      */
     public void reorder(List<?> list) {
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i) instanceof Lifeline[]) {
-                Lifeline temp[] = (Lifeline[]) list.get(i);
+            Object o = list.get(i);
+            if (o instanceof Lifeline[]) {
+                Lifeline temp[] = (Lifeline[]) o;
                 if (temp.length == 2) {
                     if (temp[1] == null) {
                         insertLifelineAfter(temp[0], getLifeline(lifeLinesCount() - 1));

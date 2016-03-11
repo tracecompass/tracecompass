@@ -21,6 +21,7 @@ import java.util.zip.ZipFile;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.ui.internal.wizards.datatransfer.TarEntry;
 import org.eclipse.ui.internal.wizards.datatransfer.TarException;
 import org.eclipse.ui.internal.wizards.datatransfer.TarFile;
@@ -196,7 +197,7 @@ public abstract class AbstractTracePackageOperation {
          *
          * @return enumeration of all files in the archive
          */
-        Enumeration<? extends ArchiveEntry> entries();
+        Enumeration<@NonNull ? extends ArchiveEntry> entries();
 
         /**
          * Close the file input stream.
@@ -235,8 +236,8 @@ public abstract class AbstractTracePackageOperation {
         }
 
         @Override
-        public Enumeration<? extends ArchiveEntry> entries() {
-            Vector<ArchiveEntry> v = new Vector<>();
+        public Enumeration<@NonNull ? extends ArchiveEntry> entries() {
+            Vector<@NonNull ArchiveEntry> v = new Vector<>();
             for (Enumeration<?> e = fTarFile.entries(); e.hasMoreElements();) {
                 v.add(new TarArchiveEntry((TarEntry) e.nextElement()));
             }
@@ -346,8 +347,8 @@ public abstract class AbstractTracePackageOperation {
         }
 
         @Override
-        public Enumeration<? extends ArchiveEntry> entries() {
-            Vector<ArchiveEntry> v = new Vector<>();
+        public Enumeration<@NonNull ? extends ArchiveEntry> entries() {
+            Vector<@NonNull ArchiveEntry> v = new Vector<>();
             for (Enumeration<?> e = fZipFile.entries(); e.hasMoreElements();) {
                 v.add(new ZipAchiveEntry((ZipEntry) e.nextElement()));
             }

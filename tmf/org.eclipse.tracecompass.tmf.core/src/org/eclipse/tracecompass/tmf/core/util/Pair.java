@@ -15,6 +15,7 @@
 package org.eclipse.tracecompass.tmf.core.util;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 
 /**
  * Pair utility class, encapsulates a pair of objects.
@@ -68,13 +69,18 @@ public class Pair<A, B> {
         return fSecond;
     }
 
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + fFirst.hashCode();
-        result = prime * result + fSecond.hashCode();
+        result = prime * result + hashFromNullable(fFirst);
+        result = prime * result + hashFromNullable(fSecond);
         return result;
+    }
+
+    private static int hashFromNullable(@Nullable Object o) {
+        return o == null ? 0 : o.hashCode();
     }
 
     @Override
@@ -82,21 +88,17 @@ public class Pair<A, B> {
         if (this == obj) {
             return true;
         }
-
         if (obj == null) {
             return false;
         }
-
         if (getClass() != obj.getClass()) {
             return false;
         }
-
         Pair<?, ?> other = (Pair<?, ?>) obj;
-
-        if (!fFirst.equals(other.fFirst)) {
+        if (!NonNullUtils.equalsNullable(other.fFirst, fFirst)) {
             return false;
         }
-        if (!fSecond.equals(other.fSecond)) {
+        if (!NonNullUtils.equalsNullable(other.fSecond, fSecond)) {
             return false;
         }
         return true;
@@ -106,5 +108,4 @@ public class Pair<A, B> {
     public String toString() {
         return "(" + fFirst + ", " + fSecond + ")";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
     }
-
 }

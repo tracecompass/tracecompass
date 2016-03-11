@@ -346,7 +346,7 @@ public class BufferedBlockingQueueTest {
      */
     @Test
     public void testConcurrentIteration() {
-        final BufferedBlockingQueue<String> queue = new BufferedBlockingQueue<>(15, 15);
+        final BufferedBlockingQueue<@NonNull String> queue = new BufferedBlockingQueue<>(15, 15);
         final String poisonPill = "That's all folks!";
 
         /*
@@ -388,7 +388,7 @@ public class BufferedBlockingQueueTest {
      *            Number of observer threads. It should be >= 0.
      * @return The consumed elements, as seen by each consumer thread.
      */
-    private static <T> Iterable<Iterable<T>> runConcurrencyTest(final BufferedBlockingQueue<T> queue,
+    private static <T> Iterable<Iterable<T>> runConcurrencyTest(final BufferedBlockingQueue<@NonNull T> queue,
             final List<T> testBuffer,
             final @NonNull T poisonPill,
             int nbProducerThreads,

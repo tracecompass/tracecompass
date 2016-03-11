@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.AbstractTracePackageOperation;
@@ -71,7 +72,7 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
                 return;
             }
 
-            Enumeration<?> entries = archiveFile.entries();
+            Enumeration<@NonNull ?> entries = archiveFile.entries();
 
             boolean found = false;
             while (entries.hasMoreElements()) {
@@ -118,7 +119,7 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
 
     private TracePackageElement[] generateElementsFromArchive() {
         ArchiveFile archiveFile = getSpecifiedArchiveFile();
-        Enumeration<?> entries = archiveFile.entries();
+        Enumeration<@NonNull ?> entries = archiveFile.entries();
         Set<String> traceFileNames = new HashSet<>();
         while (entries.hasMoreElements()) {
             ArchiveEntry entry = (ArchiveEntry) entries.nextElement();
