@@ -503,7 +503,7 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
                 }
             });
 
-            if ((fExperimentName != null) && fCreateExperimentCheckbox.getSelection() && (traceResources.size() > 0)) {
+            if ((fExperimentName != null) && fCreateExperimentCheckbox.getSelection() && (!traceResources.isEmpty())) {
                 final IFolder[] experimentFolders = new IFolder[1];
                 final TmfExperimentFolder root = fExperimentFolderElement;
                 final IStatus[] operationStatus = new IStatus[1];
