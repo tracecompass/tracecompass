@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.lttng2.ust.core.trace.layout;
 
+import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst20EventLayout;
+
 /**
  * This interface defines concepts exposed by liblttng-ust libraries and traces.
  * Actual implementations can differ between different versions of the tracer.
@@ -18,6 +20,9 @@ package org.eclipse.tracecompass.lttng2.ust.core.trace.layout;
  */
 @SuppressWarnings("javadoc")
 public interface ILttngUstEventLayout {
+
+    /** The standard layout */
+    ILttngUstEventLayout DEFAULT_LAYOUT = LttngUst20EventLayout.getInstance();
 
     // ------------------------------------------------------------------------
     // Event names
