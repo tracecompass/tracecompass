@@ -25,7 +25,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
  */
 interface TestValues {
 
-    int size = 1036;
+    int size = 1034;
 
     long[] startTimes = {
         1331668247314038062L,
@@ -68,6 +68,7 @@ interface TestValues {
         1331668247931793142L,
         1331668247930941981L,
         1331668247314038062L,
+        1331668247314038062L,
         1331668248011125682L,
         1331668247959024716L,
         1331668248011129576L,
@@ -87,12 +88,10 @@ interface TestValues {
         1331668247316120937L,
         1331668247335112802L,
         1331668247335112802L,
-        1331668247314038062L,
         1331668248004705322L,
         1331668247314038062L,
         1331668248004935409L,
         1331668248004770916L,
-        1331668247314038062L,
         1331668248004925240L,
         1331668247316553071L,
         1331668247314038062L,
@@ -267,7 +266,6 @@ interface TestValues {
         1331668247925622863L,
         1331668247926367737L,
         1331668247423543945L,
-        1331668247314038062L,
         1331668247314038062L,
         1331668247619316825L,
         1331668247619491008L,
@@ -1107,6 +1105,7 @@ interface TestValues {
         1331668248482983146L,
         1331668248482983146L,
         1331668259054285979L,
+        1331668259054285979L,
         1331668248015170799L,
         1331668248015172434L,
         1331668248015176320L,
@@ -1126,12 +1125,10 @@ interface TestValues {
         1331668259054285979L,
         1331668259054285979L,
         1331668259054285979L,
-        1331668259054285979L,
         1331668248015959980L,
         1331668259054285979L,
         1331668248016172023L,
         1331668248016172023L,
-        1331668259054285979L,
         1331668248016194935L,
         1331668259054285979L,
         1331668259054285979L,
@@ -1305,7 +1302,6 @@ interface TestValues {
         1331668248424325503L,
         1331668248424325503L,
         1331668248424394073L,
-        1331668259054285979L,
         1331668259054285979L,
         1331668259054285979L,
         1331668248140683324L,
@@ -2156,6 +2152,7 @@ interface TestValues {
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
+        TmfStateValue.nullValue(),
         TmfStateValue.newValueString("sys_poll"),
         TmfStateValue.newValueString("lttng-consumerd"),
         TmfStateValue.nullValue(),
@@ -2167,10 +2164,8 @@ interface TestValues {
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
-        TmfStateValue.nullValue(),
         TmfStateValue.newValueInt(1),
         TmfStateValue.newValueInt(-6),
-        TmfStateValue.nullValue(),
         TmfStateValue.newValueString("sys_ppoll"),
         TmfStateValue.newValueString("alsa-sink"),
         TmfStateValue.nullValue(),
@@ -2345,7 +2340,6 @@ interface TestValues {
         TmfStateValue.newValueInt(20),
         TmfStateValue.newValueString("sys_poll"),
         TmfStateValue.newValueString("gdbus"),
-        TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
@@ -3144,4 +3138,3 @@ interface TestValues {
         TmfStateValue.nullValue(),
     };
 }
-

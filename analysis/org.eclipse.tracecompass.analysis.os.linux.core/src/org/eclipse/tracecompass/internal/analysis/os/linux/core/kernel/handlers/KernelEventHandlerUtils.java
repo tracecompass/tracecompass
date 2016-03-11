@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers;
 
+import java.util.List;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
@@ -17,6 +19,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundExc
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -205,26 +208,75 @@ public final class KernelEventHandlerUtils {
             throws StateValueTypeException, AttributeNotFoundException,
             TimeRangeException {
         int quark;
-        ITmfStateValue value;
         int currentCPUNode = getCurrentCPUNode(cpuNumber, ssb);
 
-        quark = ssb.getQuarkRelativeAndAdd(currentCPUNode, Attributes.CURRENT_THREAD);
-        if (ssb.queryOngoingState(quark).unboxInt() > 0) {
-            /* There was a process on the CPU */
-            quark = ssb.getQuarkRelativeAndAdd(currentCPUNode, Attributes.SYSTEM_CALL);
-            if (ssb.queryOngoingState(quark).isNull()) {
-                /* That process was in user mode */
-                value = StateValues.CPU_STATUS_RUN_USERMODE_VALUE;
-            } else {
-                /* That process was in a system call */
-                value = StateValues.CPU_STATUS_RUN_SYSCALL_VALUE;
-            }
-        } else {
-            /* There was no real process scheduled, CPU was idle */
-            value = StateValues.CPU_STATUS_IDLE_VALUE;
-        }
         quark = ssb.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
+        ITmfStateValue value = getCpuStatus(ssb, currentCPUNode);
         ssb.modifyAttribute(timestamp, value, quark);
+    }
+
+    /**
+     * Get the ongoing Status state of a CPU.
+     *
+     * This will look through the states of the
+     *
+     * <ul>
+     * <li>IRQ</li>
+     * <li>Soft IRQ</li>
+     * <li>Process</li>
+     * </ul>
+     *
+     * under the CPU, giving priority to states higher in the list. If the state
+     * is a null value, we continue looking down the list.
+     *
+     * @param ssb
+     *            The state system
+     * @param cpuQuark
+     *            The *quark* of the CPU we are looking for. Careful, this is
+     *            NOT the CPU number (or attribute name)!
+     * @return The state value that represents the status of the given CPU
+     * @throws AttributeNotFoundException
+     */
+    private static ITmfStateValue getCpuStatus(ITmfStateSystemBuilder ssb, int cpuQuark)
+            throws AttributeNotFoundException {
+
+        /* Check if there is a IRQ running */
+        int irqQuarks = ssb.getQuarkRelativeAndAdd(cpuQuark, Attributes.IRQS);
+        List<Integer> irqs = ssb.getSubAttributes(irqQuarks, false);
+        for (Integer quark : irqs) {
+            final ITmfStateValue irqState = ssb.queryOngoingState(quark.intValue());
+            if (!irqState.isNull()) {
+                return irqState;
+            }
+        }
+
+        /* Check if there is a soft IRQ running */
+        int softIrqQuarks = ssb.getQuarkRelativeAndAdd(cpuQuark, Attributes.SOFT_IRQS);
+        List<Integer> softIrqs = ssb.getSubAttributes(softIrqQuarks, false);
+        for (Integer quark : softIrqs) {
+            final ITmfStateValue softIrqState = ssb.queryOngoingState(quark.intValue());
+            if (!softIrqState.isNull()) {
+                return softIrqState;
+            }
+        }
+
+        /*
+         * Check if there is a thread running. If not, report IDLE. If there is,
+         * report the running state of the thread (usermode or system call).
+         */
+        int currentThreadQuark = ssb.getQuarkRelativeAndAdd(cpuQuark, Attributes.CURRENT_THREAD);
+        ITmfStateValue currentThreadState = ssb.queryOngoingState(currentThreadQuark);
+        if (currentThreadState.isNull()) {
+            return TmfStateValue.nullValue();
+        }
+        int tid = currentThreadState.unboxInt();
+        if (tid == 0) {
+            return StateValues.CPU_STATUS_IDLE_VALUE;
+        }
+        int threadSystemCallQuark = ssb.getQuarkAbsoluteAndAdd(Attributes.THREADS, Integer.toString(tid), Attributes.SYSTEM_CALL);
+        return (ssb.queryOngoingState(threadSystemCallQuark).isNull() ?
+                StateValues.CPU_STATUS_RUN_USERMODE_VALUE :
+                StateValues.CPU_STATUS_RUN_SYSCALL_VALUE);
     }
 
 }

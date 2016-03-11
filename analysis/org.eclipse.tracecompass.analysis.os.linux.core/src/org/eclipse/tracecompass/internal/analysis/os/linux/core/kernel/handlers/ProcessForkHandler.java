@@ -45,8 +45,9 @@ public class ProcessForkHandler extends KernelEventHandler {
         Integer parentTid = ((Long) content.getField(getLayout().fieldParentTid()).getValue()).intValue();
         Integer childTid = ((Long) content.getField(getLayout().fieldChildTid()).getValue()).intValue();
 
-        Integer parentTidNode = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeThreads(ss), parentTid.toString());
-        Integer childTidNode = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeThreads(ss), childTid.toString());
+        final int threadsNode = KernelEventHandlerUtils.getNodeThreads(ss);
+        Integer parentTidNode = ss.getQuarkRelativeAndAdd(threadsNode, parentTid.toString());
+        Integer childTidNode = ss.getQuarkRelativeAndAdd(threadsNode, childTid.toString());
 
         /* Assign the PPID to the new process */
         int quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.PPID);
