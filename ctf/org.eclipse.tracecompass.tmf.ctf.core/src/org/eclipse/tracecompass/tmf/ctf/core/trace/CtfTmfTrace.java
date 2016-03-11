@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -204,16 +205,32 @@ public class CtfTmfTrace extends TmfTrace
              * register a trace to that type in the TmfEventTypeManager
              */
             try (CtfIterator iter = fIteratorManager.getIterator(ctx)) {
+                Set<@NonNull ITmfEventField> streamContextNames = new HashSet<>();
                 for (IEventDeclaration ied : iter.getEventDeclarations()) {
                     CtfTmfEventType ctfTmfEventType = fContainedEventTypes.get(ied.getName());
                     if (ctfTmfEventType == null) {
                         List<ITmfEventField> content = new ArrayList<>();
+
                         /* Should only return null the first time */
                         final StructDeclaration fields = ied.getFields();
                         if (fields != null) {
                             for (String fieldName : fields.getFieldsList()) {
                                 content.add(new TmfEventField(checkNotNull(fieldName), null, null));
                             }
+                        }
+
+                        /* Add stream contexts */
+                        final StructDeclaration streamContexts = ied.getStream().getEventContextDecl();
+                        if (streamContextNames.isEmpty()) {
+                            if (streamContexts != null) {
+                                for (String fieldName : streamContexts.getFieldsList()) {
+                                    streamContextNames.add(new TmfEventField(checkNotNull(CtfConstants.CONTEXT_FIELD_PREFIX + fieldName), null, null));
+                                }
+                            }
+                        }
+                        content.addAll(streamContextNames);
+
+                        if (!content.isEmpty()) {
                             ITmfEventField contentTree = new TmfEventField(
                                     ITmfEventField.ROOT_FIELD_ID,
                                     null,
