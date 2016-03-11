@@ -218,18 +218,19 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
 
     @Override
     public void initializeDataSource() {
-        /* Should not be called while trace is still null */
-        ITmfTrace trace = checkNotNull(getTrace());
-        TmfAbstractAnalysisModule module = createStatisticsAnalysiModule();
-        if (module == null) {
-            return;
-        }
-        try {
-            module.setTrace(trace);
-            module.schedule();
-            fModule = module;
-        } catch (TmfAnalysisException e) {
-            Activator.getDefault().logError("Error initializing statistics analysis module", e); //$NON-NLS-1$
+        ITmfTrace trace = getTrace();
+        if (trace != null) {
+            TmfAbstractAnalysisModule module = createStatisticsAnalysiModule();
+            if (module == null) {
+                return;
+            }
+            try {
+                module.setTrace(trace);
+                module.schedule();
+                fModule = module;
+            } catch (TmfAnalysisException e) {
+                Activator.getDefault().logError("Error initializing statistics analysis module", e); //$NON-NLS-1$
+            }
         }
     }
 
