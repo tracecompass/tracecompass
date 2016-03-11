@@ -153,7 +153,7 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
         long time = startTime;
         if (Math.round((Math.round((time - fReference.time) / fPeriod)) * fPeriod + fReference.time) >= time) {
             /* Subtract one period to ensure previous marker is included */
-            time -= fPeriod;
+            time -= Math.max(fPeriod, resolution);
         }
         while (true) {
             long index = Math.round((time - fReference.time) / fPeriod) + fReference.index;
