@@ -113,17 +113,23 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
                     fYValues.put(quark, new double[xvalues.length]);
                     fMemoryQuarks.put(quark, ss.getQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_MEMORY_ATTRIBUTE));
                     int procNameQuark = ss.getQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_PROCNAME_ATTRIBUTE);
+                    String oldSeriesName = fSeriesName.get(quark);
+                    String seriesName = null;
                     try {
                         ITmfStateValue procnameValue = ss.querySingleState(start, procNameQuark).getStateValue();
                         String procname = ""; //$NON-NLS-1$
                         if (!procnameValue.isNull()) {
                             procname = procnameValue.unboxStr();
                         }
-                        String seriesName = procname + ' ' + '(' + ss.getAttributeName(quark) + ')';
-                        fSeriesName.put(quark, seriesName.trim());
+                        seriesName = (procname + ' ' + '(' + ss.getAttributeName(quark) + ')').trim();
                     } catch (TimeRangeException e) {
-                        fSeriesName.put(quark, '(' + ss.getAttributeName(quark) + ')');
+                        seriesName = '(' + ss.getAttributeName(quark) + ')';
                     }
+
+                    if (oldSeriesName != null && !oldSeriesName.equals(seriesName)) {
+                        deleteSeries(oldSeriesName);
+                    }
+                    fSeriesName.put(quark, seriesName);
                 }
 
                 /*
