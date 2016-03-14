@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.analysis.TmfAnalysisModuleSources;
 import org.eclipse.tracecompass.internal.tmf.core.analysis.TmfAnalysisParameterProviders;
@@ -42,7 +41,7 @@ import com.google.common.collect.Multimap;
 @NonNullByDefault
 public class TmfAnalysisManager {
 
-    private static final Multimap<String, IAnalysisModuleHelper> fAnalysisModules = NonNullUtils.checkNotNull(HashMultimap.create());
+    private static final Multimap<String, IAnalysisModuleHelper> fAnalysisModules = HashMultimap.create();
     private static final Map<String, List<Class<? extends IAnalysisParameterProvider>>> fParameterProviders = new HashMap<>();
     private static final Map<Class<? extends IAnalysisParameterProvider>, IAnalysisParameterProvider> fParamProviderInstances = new HashMap<>();
     private static final List<IAnalysisModuleSource> fSources = new ArrayList<>();
