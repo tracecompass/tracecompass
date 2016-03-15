@@ -17,6 +17,7 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * @since 1.0
+ * @noreference Messages class
  */
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
@@ -26,6 +27,10 @@ public class Messages extends NLS {
     public static @Nullable String AspectName_Tid;
 
     public static @Nullable String AspectHelpText_Tid;
+
+    public static @Nullable String AspectName_Prio;
+
+    public static @Nullable String AspectHelpText_Prio;
 
     static {
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

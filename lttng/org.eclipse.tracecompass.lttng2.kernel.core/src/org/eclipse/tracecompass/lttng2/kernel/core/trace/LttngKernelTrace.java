@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelTidAspect;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.ThreadPriorityAspect;
+import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.ThreadPriorityAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;

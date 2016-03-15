@@ -189,34 +189,6 @@ public final class KernelThreadInformationProvider {
     }
 
     /**
-     * Get the priority of a thread running at a time ts.
-     *
-     * @param module
-     *            The kernel analysis instance to run this method on
-     * @param threadId
-     *            The thread ID of the target thread
-     * @param ts
-     *            The timestamp at which to get the priority
-     * @return The priority of this thread, or {@code null} if not found
-     */
-    public static @Nullable Integer getThreadPrio(KernelAnalysisModule module, Integer threadId, long ts) {
-        Integer execPrio = null;
-        ITmfStateSystem ss = module.getStateSystem();
-        if (ss == null) {
-            return execPrio;
-        }
-        try {
-            int execPrioQuark = ss.getQuarkAbsolute(Attributes.THREADS, threadId.toString(), Attributes.PRIO);
-            ITmfStateInterval interval = ss.querySingleState(ts, execPrioQuark);
-            ITmfStateValue prioValue = interval.getStateValue();
-            /* We know the prio must be an Integer */
-            execPrio = prioValue.unboxInt();
-        } catch (AttributeNotFoundException | StateSystemDisposedException | TimeRangeException e) {
-        }
-        return execPrio;
-    }
-
-    /**
      * Get the status intervals for a given thread with a resolution
      *
      * @param module
