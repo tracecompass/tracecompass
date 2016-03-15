@@ -1807,9 +1807,20 @@ View Menu
 {|
 |
 | Show Markers
-| A marker highlights a time interval. A marker can be used for instance to indicate a time range where lost event occurred or to bookmark an interesting interval for future reference. Selecting a category name will toggle the visibility of markers of that category.
+| A marker highlights a time interval. A marker can be used for instance to indicate a time range where lost events occurred or to bookmark an interesting interval for future reference. Selecting a category name will toggle the visibility of markers of that category.
 |}
 
+=== Marker Axis ===
+
+The marker axis is visible only when at least one marker category with markers for the current trace is shown.
+
+The marker axis displays one row per marker category. Each marker's time range and/or label (if applicable) are drawn on the marker axis.
+
+Clicking on any marker's time range or label will set the current time selection to the marker's time or time range.
+
+Clicking on the "X" icon to the left of the marker category name will hide this marker category from the time graph. It can be shown again using the corresponding '''Show Markers''' menu item in the view menu.
+
+The marker axis can be collapsed and expanded by clicking on the icon at the top left of the marker axis. The marker axis can be completely removed by hiding all available marker categories.
 
 == Resources View ==
 
@@ -1917,9 +1928,12 @@ View Menu
 {|
 |
 | Show Markers
-| A marker highlights a time interval. A marker can be used for instance to indicate a time range where lost event occurred or to bookmark an interesting interval for future reference. Selecting a category name will toggle the visibility of markers of that category.
+| A marker highlights a time interval. A marker can be used for instance to indicate a time range where lost events occurred or to bookmark an interesting interval for future reference. Selecting a category name will toggle the visibility of markers of that category.
 |}
 
+=== Marker Axis ===
+
+See Control Flow View's '''[[#Marker_Axis | Marker Axis]]'''.
 
 == LTTng CPU Usage View ==
 
@@ -2037,6 +2051,14 @@ If you followed the steps in the previous section, you should have a Callstack V
 (If you are dealing with C++ executables, you may want to use ''nm --demangle'' instead to get readable function names.)
 
 The view should now update to display the function names instead. Make sure the binary used for taking the trace is the one used for this step too (otherwise, there is a good chance of the addresses not being the same).
+
+=== Navigation ===
+
+See Control Flow View's '''[[#Using_the_mouse | Using the mouse]]''', '''[[#Using_the_keyboard | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
+
+=== Marker Axis ===
+
+See Control Flow View's '''[[#Marker_Axis | Marker Axis]]'''.
 
 == Memory Usage ==
 
