@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.common.core.tests.collect;
+package org.eclipse.tracecompass.common.core.tests;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.eclipse.tracecompass.common.core.collect.StreamFlattener;
+import org.eclipse.tracecompass.common.core.StreamUtils.StreamFlattener;
 import org.junit.Test;
 
 /**
