@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  ******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis;
+package org.eclipse.tracecompass.analysis.os.linux.core.kernel;
 
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
@@ -21,6 +21,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
  * history file.
  *
  * @author Alexandre Montplaisir
+ * @since 2.0
  */
 @SuppressWarnings("javadoc")
 public interface StateValues {
@@ -32,15 +33,9 @@ public interface StateValues {
     int PROCESS_STATUS_RUN_SYSCALL = 3;
     int PROCESS_STATUS_INTERRUPTED = 4;
     int PROCESS_STATUS_WAIT_FOR_CPU = 5;
-    /**
-     * @since 1.0
-     */
     int PROCESS_STATUS_WAIT_UNKNOWN = 6;
 
     ITmfStateValue PROCESS_STATUS_UNKNOWN_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_UNKNOWN);
-    /**
-     * @since 1.0
-     */
     ITmfStateValue PROCESS_STATUS_WAIT_UNKNOWN_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_WAIT_UNKNOWN);
     ITmfStateValue PROCESS_STATUS_WAIT_BLOCKED_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_WAIT_BLOCKED);
     ITmfStateValue PROCESS_STATUS_RUN_USERMODE_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_RUN_USERMODE);
@@ -53,8 +48,6 @@ public interface StateValues {
     /**
      * Soft IRQ raised, could happen in the CPU attribute but should not since
      * this means that the CPU went idle when a softirq was raised.
-     *
-     * @since 2.0
      */
     int CPU_STATUS_SOFT_IRQ_RAISED = (1 << 0);
     int CPU_STATUS_RUN_USERMODE = (1 << 1);
@@ -71,10 +64,6 @@ public interface StateValues {
     /** Soft IRQ is raised, CPU is in user mode */
     ITmfStateValue SOFT_IRQ_RAISED_VALUE = TmfStateValue.newValueInt(CPU_STATUS_SOFT_IRQ_RAISED);
 
-    /**
-     * If the softirq is running and another is raised at the same time.
-     *
-     * @since 2.0
-     */
+    /** If the softirq is running and another is raised at the same time. */
     ITmfStateValue SOFT_IRQ_RAISED_RUNNING_VALUE = TmfStateValue.newValueInt(CPU_STATUS_SOFT_IRQ_RAISED | CPU_STATUS_SOFTIRQ);
 }

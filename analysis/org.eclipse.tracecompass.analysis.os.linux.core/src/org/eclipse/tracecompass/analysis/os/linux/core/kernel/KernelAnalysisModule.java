@@ -11,7 +11,7 @@
  *   Mathieu Rail - Provide the requirements of the analysis
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis;
+package org.eclipse.tracecompass.analysis.os.linux.core.kernel;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
@@ -32,7 +32,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * State System Module for lttng kernel traces
  *
  * @author Geneviève Bastien
- * @since 1.0
+ * @since 2.0
  */
 public class KernelAnalysisModule extends TmfStateSystemAnalysisModule {
 

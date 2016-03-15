@@ -10,7 +10,7 @@
 package org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.analysis.kernel;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 
 /**
  * This class is an extension of {@link KernelAnalysisModule} that uses a null

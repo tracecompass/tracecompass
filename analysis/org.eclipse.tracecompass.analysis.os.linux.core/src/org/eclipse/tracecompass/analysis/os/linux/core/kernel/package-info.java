@@ -11,4 +11,4 @@
  *******************************************************************************/
 
 @org.eclipse.jdt.annotation.NonNullByDefault
-package org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis;
+package org.eclipse.tracecompass.analysis.os.linux.core.kernel;

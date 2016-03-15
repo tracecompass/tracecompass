@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <module
-            analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule"
+            analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule"
             automatic="true"
             id="org.eclipse.tracecompass.analysis.os.linux.kernel"
             name="%analysis.linuxkernel">

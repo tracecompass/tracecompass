@@ -10,7 +10,7 @@
  *   Christian Mansky - Initial implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis;
+package org.eclipse.tracecompass.analysis.os.linux.core.kernel;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  * the {@link KernelAnalysisModule}.
  *
  * @author Christian Mansky
- * @since 1.0
+ * @since 2.0
  */
 public final class ThreadPriorityAspect implements ITmfEventAspect {
 

@@ -10,7 +10,7 @@
  *
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.core.tests.kernelanalysis;
+package org.eclipse.tracecompass.analysis.os.linux.core.tests.kernel;
 
 import static org.junit.Assert.assertEquals;
 

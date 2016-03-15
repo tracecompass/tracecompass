@@ -10,7 +10,7 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis;
+package org.eclipse.tracecompass.analysis.os.linux.core.kernel;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -35,6 +35,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
  * from a Linux Kernel Analysis
  *
  * @author Geneviève Bastien
+ * @since 2.0
  */
 public final class KernelThreadInformationProvider {
 
@@ -55,7 +56,6 @@ public final class KernelThreadInformationProvider {
      *            The timestamp at which we want the running process
      * @return The TID of the thread running on CPU cpuId at time ts or
      *         {@code null} if either no thread is running or we do not know.
-     * @since 1.0
      */
     public static @Nullable Integer getThreadOnCpu(KernelAnalysisModule module, long cpuId, long ts) {
         ITmfStateSystem ss = module.getStateSystem();
@@ -87,7 +87,6 @@ public final class KernelThreadInformationProvider {
      * @param module
      *            The lttng kernel analysis instance to run this method on
      * @return The set of TIDs corresponding to the threads
-     * @since 1.0
      */
     public static Collection<Integer> getThreadIds(KernelAnalysisModule module) {
         ITmfStateSystem ss = module.getStateSystem();
@@ -117,7 +116,6 @@ public final class KernelThreadInformationProvider {
      * @param ts
      *            The timestamp at which to get the parent
      * @return The parent PID or {@code null} if the PPID is not found.
-     * @since 1.0
      */
     public static @Nullable Integer getParentPid(KernelAnalysisModule module, Integer threadId, long ts) {
         Integer ppid = null;
@@ -158,7 +156,6 @@ public final class KernelThreadInformationProvider {
      *            The thread ID of the process for which to get the name
      * @return The last executable name of this process, or {@code null} if not
      *         found
-     * @since 1.0
      */
     public static @Nullable String getExecutableName(KernelAnalysisModule module, Integer threadId) {
         String execName = null;
@@ -201,7 +198,6 @@ public final class KernelThreadInformationProvider {
      * @param ts
      *            The timestamp at which to get the priority
      * @return The priority of this thread, or {@code null} if not found
-     * @since 1.0
      */
     public static @Nullable Integer getThreadPrio(KernelAnalysisModule module, Integer threadId, long ts) {
         Integer execPrio = null;
@@ -240,7 +236,6 @@ public final class KernelThreadInformationProvider {
      * @return The list of status intervals for this thread, an empty list is
      *         returned if either the state system is {@code null} or the quark
      *         is not found
-     * @since 1.0
      */
     public static List<ITmfStateInterval> getStatusIntervalsForThread(KernelAnalysisModule module, Integer threadId, long start, long end, long resolution, IProgressMonitor monitor) {
         ITmfStateSystem ss = module.getStateSystem();

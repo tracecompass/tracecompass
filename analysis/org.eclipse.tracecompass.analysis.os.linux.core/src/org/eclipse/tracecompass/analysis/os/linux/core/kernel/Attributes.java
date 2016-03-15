@@ -5,12 +5,9 @@
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *   Alexandre Montplaisir - Initial API and implementation
  ******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis;
+package org.eclipse.tracecompass.analysis.os.linux.core.kernel;
 
 /**
  * This file defines all the attribute names used in the handler. Both the
@@ -21,8 +18,8 @@ package org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis;
  * compatible. If a view shows attribute names directly, the localization should
  * be done on the viewer side.
  *
- * @author alexmont
- *
+ * @author Alexandre Montplaisir
+ * @since 2.0
  */
 @SuppressWarnings({"nls", "javadoc"})
 public interface Attributes {
