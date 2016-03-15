@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -35,18 +34,6 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
 
     private static final String errMsg = "Invalid interval data. Maybe your file is corrupt?"; //$NON-NLS-1$
 
-    /**
-     * Size of an entry in the data section.
-     *
-     * <pre>
-     *   16  2 x Timevalue/long (interval start + end)
-     * +  4  int (key)
-     * +  1  byte (type)
-     * +  4  int (valueOffset)
-     * </pre>
-     */
-    public static final int DATA_ENTRY_SIZE = 25;
-
     /* 'Byte' equivalent for state values types */
     private static final byte TYPE_NULL = -1;
     private static final byte TYPE_INTEGER = 0;
@@ -54,21 +41,13 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
     private static final byte TYPE_LONG = 2;
     private static final byte TYPE_DOUBLE = 3;
 
-    /* String entry sizes of different state values */
-    private static final int NO_ENTRY_SIZE = 0;
-    private static final int LONG_ENTRY_SIZE = 8;
-    private static final int DOUBLE_ENTRY_SIZE = 8;
-    // sizes of string values depend on the string itself
-
     private final long start;
     private final long end;
     private final int attribute;
     private final @NonNull TmfStateValue sv;
 
-    /*
-     * Size of the strings section entry used by this interval (= 0 if not used)
-     */
-    private final int stringsEntrySize;
+    /** Number of bytes used by this interval when it is written to disk */
+    private final int fSizeOnDisk;
 
     /**
      * Standard constructor
@@ -95,7 +74,41 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
         this.end = intervalEnd;
         this.attribute = attribute;
         this.sv = value;
-        this.stringsEntrySize = computeStringsEntrySize();
+        this.fSizeOnDisk = computeSizeOnDisk(sv);
+    }
+
+    /**
+     * Compute how much space (in bytes) an interval will take in its serialized
+     * form on disk. This is dependent on its state value.
+     */
+    private static int computeSizeOnDisk(ITmfStateValue sv) {
+        /*
+         * Minimum size is 2x long (start and end), 1x int (attribute) and 1x
+         * byte (value type).
+         */
+        int minSize = Long.BYTES + Long.BYTES + Integer.BYTES + Byte.BYTES;
+
+        switch (sv.getType()) {
+        case NULL:
+            return minSize;
+        case INTEGER:
+            return (minSize + Integer.BYTES);
+        case LONG:
+            return (minSize + Long.BYTES);
+        case DOUBLE:
+            return (minSize + Double.BYTES);
+        case STRING:
+            /*
+             * String's length + 2 (1 byte for size, 1 byte for \0 at the end
+             */
+            return (minSize + sv.unboxStr().getBytes().length + 2);
+        default:
+            /*
+             * It's very important that we know how to write the state value in
+             * the file!!
+             */
+            throw new IllegalStateException();
+        }
     }
 
     /**
@@ -114,12 +127,23 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
         this.end = intervalEnd;
         this.attribute = attribute;
         this.sv = value;
-        this.stringsEntrySize = size;
+        this.fSizeOnDisk = size;
     }
 
     /**
      * Reader factory method. Builds the interval using an already-allocated
      * ByteBuffer, which normally comes from a NIO FileChannel.
+     *
+     * The interval is just a start, end, attribute and value, this is the
+     * layout of the HTInterval on disk
+     * <ul>
+     * <li>start (8 bytes)</li>
+     * <li>end (8 bytes)</li>
+     * <li>attribute (4 bytes)</li>
+     * <li>sv type (1 byte)</li>
+     * <li>sv ( 0 bytes for null, 4 for int , 8 for long and double, and the
+     * length of the string +2 for strings (it's variable))</li>
+     * </ul>
      *
      * @param buffer
      *            The ByteBuffer from which to read the information
@@ -132,10 +156,10 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
         long intervalStart, intervalEnd;
         int attribute;
         TmfStateValue value;
-        int valueOrOffset, valueSize, res;
         byte valueType;
         byte array[];
 
+        int posStart = buffer.position();
         /* Read the Data Section entry */
         intervalStart = buffer.getLong();
         intervalEnd = buffer.getLong();
@@ -143,77 +167,39 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
 
         /* Read the 'type' of the value, then react accordingly */
         valueType = buffer.get();
-        valueOrOffset = buffer.getInt();
         switch (valueType) {
 
         case TYPE_NULL:
             value = TmfStateValue.nullValue();
-            valueSize = NO_ENTRY_SIZE;
             break;
 
         case TYPE_INTEGER:
-            /* "ValueOrOffset" is the straight value */
-            value = TmfStateValue.newValueInt(valueOrOffset);
-            valueSize = NO_ENTRY_SIZE;
+            value = TmfStateValue.newValueInt(buffer.getInt());
             break;
 
         case TYPE_STRING:
-            /* Go read the matching entry in the Strings section of the block */
-            buffer.mark();
-            buffer.position(valueOrOffset);
-
             /* the first byte = the size to read */
-            valueSize = buffer.get();
+            int valueSize = buffer.get();
 
-            /*
-             * Careful though, 'valueSize' is the total size of the entry,
-             * including the 'size' byte at the start and end (0'ed) byte at the
-             * end. Here we want 'array' to only contain the real payload of the
-             * value.
-             */
-            array = new byte[valueSize - 2];
+            array = new byte[valueSize];
             buffer.get(array);
             value = TmfStateValue.newValueString(new String(array));
 
             /* Confirm the 0'ed byte at the end */
-            res = buffer.get();
+            byte res = buffer.get();
             if (res != 0) {
                 throw new IOException(errMsg);
             }
-
-            /*
-             * Restore the file pointer's position (so we can read the next
-             * interval)
-             */
-            buffer.reset();
             break;
 
         case TYPE_LONG:
             /* Go read the matching entry in the Strings section of the block */
-            buffer.mark();
-            buffer.position(valueOrOffset);
             value = TmfStateValue.newValueLong(buffer.getLong());
-            valueSize = LONG_ENTRY_SIZE;
-
-            /*
-             * Restore the file pointer's position (so we can read the next
-             * interval)
-             */
-            buffer.reset();
             break;
 
         case TYPE_DOUBLE:
             /* Go read the matching entry in the Strings section of the block */
-            buffer.mark();
-            buffer.position(valueOrOffset);
             value = TmfStateValue.newValueDouble(buffer.getDouble());
-            valueSize = DOUBLE_ENTRY_SIZE;
-
-            /*
-             * Restore the file pointer's position (so we can read the next
-             * interval)
-             */
-            buffer.reset();
             break;
 
         default:
@@ -222,7 +208,7 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
         }
 
         try {
-            interval = new HTInterval(intervalStart, intervalEnd, attribute, value, valueSize);
+            interval = new HTInterval(intervalStart, intervalEnd, attribute, value, buffer.position() - posStart);
         } catch (TimeRangeException e) {
             throw new IOException(errMsg);
         }
@@ -234,109 +220,59 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
      * corresponding to this interval in a ByteBuffer (mapped to a block in the
      * history-file, hopefully)
      *
+     * The interval is just a start, end, attribute and value, this is the
+     * layout of the HTInterval on disk
+     * <ul>
+     * <li>start (8 bytes)</li>
+     * <li>end (8 bytes)</li>
+     * <li>attribute (4 bytes)</li>
+     * <li>sv type (1 byte)</li>
+     * <li>sv ( 0 bytes for null, 4 for int , 8 for long and double, and the
+     * length of the string +2 for strings (it's variable))</li>
+     * </ul>
+     *
      * @param buffer
      *            The already-allocated ByteBuffer corresponding to a SHT Node
-     * @param endPosOfStringEntry
-     *            The initial (before calling this function for this interval)
-     *            position of the Strings Entry for this node. This will change
-     *            from one call to the other if we're writing String
-     *            StateValues.
-     * @return The size of the Strings Entry that was written, if any.
      */
-    public int writeInterval(ByteBuffer buffer, int endPosOfStringEntry) {
+    public void writeInterval(ByteBuffer buffer) {
+        final byte byteFromType = getByteFromType(sv.getType());
+
         buffer.putLong(start);
         buffer.putLong(end);
         buffer.putInt(attribute);
-        buffer.put(getByteFromType(sv.getType()));
+        buffer.put(byteFromType);
 
-        switch (getByteFromType(sv.getType())) {
-
+        switch (byteFromType) {
         case TYPE_NULL:
+            break;
         case TYPE_INTEGER:
-            /* We write the 'valueOffset' field as a straight value. */
-            try {
-                buffer.putInt(sv.unboxInt());
-            } catch (StateValueTypeException e) {
-                /*
-                 * This should not happen, since the value told us it was of
-                 * type Null or Integer (corrupted value?)
-                 */
-                e.printStackTrace();
-            }
+            buffer.putInt(sv.unboxInt());
             break;
 
         case TYPE_STRING:
-            byte[] byteArrayToWrite;
-            try {
-                byteArrayToWrite = sv.unboxStr().getBytes();
-            } catch (StateValueTypeException e1) {
-                /* Should not happen, we're in a switch/case for string type */
-                throw new RuntimeException();
-            }
-
-            /* we use the valueOffset as an offset. */
-            buffer.putInt(endPosOfStringEntry - stringsEntrySize);
-            buffer.mark();
-            buffer.position(endPosOfStringEntry - stringsEntrySize);
+            String string = sv.unboxStr();
+            byte[] strArray = string.getBytes();
 
             /*
-             * write the Strings entry (1st byte = size, then the bytes, then the 0)
+             * Write the Strings entry (1st byte = size, then the bytes, then
+             * the 0). We have checked the string length at the constructor.
              */
-            buffer.put((byte) stringsEntrySize);
-            buffer.put(byteArrayToWrite);
+            buffer.put((byte) strArray.length);
+            buffer.put(strArray);
             buffer.put((byte) 0);
-            assert (buffer.position() == endPosOfStringEntry);
-            buffer.reset();
             break;
 
         case TYPE_LONG:
-            /* we use the valueOffset as an offset. */
-            buffer.putInt(endPosOfStringEntry - stringsEntrySize);
-            buffer.mark();
-            buffer.position(endPosOfStringEntry - stringsEntrySize);
-
-            /*
-             * write the Long in the Strings section
-             */
-            try {
-                buffer.putLong(sv.unboxLong());
-            } catch (StateValueTypeException e) {
-                /*
-                 * This should not happen, since the value told us it was of
-                 * type Long (corrupted value?)
-                 */
-                e.printStackTrace();
-            }
-            assert (buffer.position() == endPosOfStringEntry);
-            buffer.reset();
+            buffer.putLong(sv.unboxLong());
             break;
 
         case TYPE_DOUBLE:
-            /* we use the valueOffset as an offset. */
-            buffer.putInt(endPosOfStringEntry - stringsEntrySize);
-            buffer.mark();
-            buffer.position(endPosOfStringEntry - stringsEntrySize);
-
-            /* Write the Double in the Strings section */
-            try {
-                buffer.putDouble(sv.unboxDouble());
-            } catch (StateValueTypeException e) {
-                /*
-                 * This should not happen, since the value told us it was of
-                 * type Double (corrupted value?)
-                 */
-                e.printStackTrace();
-            }
-            if (buffer.position() != endPosOfStringEntry) {
-                throw new IllegalStateException();
-            }
-            buffer.reset();
+            buffer.putDouble(sv.unboxDouble());
             break;
 
         default:
             break;
         }
-        return stringsEntrySize;
     }
 
     @Override
@@ -369,44 +305,13 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
         return false;
     }
 
-    int getStringsEntrySize() {
-        return stringsEntrySize;
-    }
-
     /**
      * Total serialized size of this interval
      *
      * @return The interval size
      */
-    public int getIntervalSize() {
-        return stringsEntrySize + DATA_ENTRY_SIZE;
-    }
-
-    private int computeStringsEntrySize() {
-        switch(sv.getType()) {
-        case NULL:
-        case INTEGER:
-            /* Those don't use the strings section at all */
-            return NO_ENTRY_SIZE;
-        case LONG:
-            /* The value's bytes are written directly into the strings section */
-            return LONG_ENTRY_SIZE;
-        case DOUBLE:
-            /* The value is also written directly into the strings section */
-            return DOUBLE_ENTRY_SIZE;
-        case STRING:
-            try {
-                /* String's length + 2 (1 byte for size, 1 byte for \0 at the end */
-                return sv.unboxStr().getBytes().length + 2;
-            } catch (StateValueTypeException e) {
-                /* We're inside a switch/case for the string type, can't happen */
-                throw new IllegalStateException(e);
-            }
-        default:
-            /* It's very important that we know how to write the state value in
-             * the file!! */
-            throw new IllegalStateException();
-        }
+    public int getSizeOnDisk() {
+        return fSizeOnDisk;
     }
 
     /**
@@ -458,11 +363,11 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
     }
 
     /**
-     * Here we determine how state values "types" are written in the 8-bit
-     * field that indicates the value type in the file.
+     * Here we determine how state values "types" are written in the 8-bit field
+     * that indicates the value type in the file.
      */
     private static byte getByteFromType(ITmfStateValue.Type type) {
-        switch(type) {
+        switch (type) {
         case NULL:
             return TYPE_NULL;
         case INTEGER:

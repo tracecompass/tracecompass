@@ -51,7 +51,7 @@ public class HistoryTree {
     private static final int HISTORY_FILE_MAGIC_NUMBER = 0x05FFA900;
 
     /** File format version. Increment when breaking compatibility. */
-    private static final int FILE_VERSION = 5;
+    private static final int FILE_VERSION = 6;
 
     // ------------------------------------------------------------------------
     // Tree-specific configuration
@@ -462,7 +462,7 @@ public class HistoryTree {
         HTNode targetNode = fLatestBranch.get(indexOfNode);
 
         /* Verify if there is enough room in this node to store this interval */
-        if (interval.getIntervalSize() > targetNode.getNodeFreeSpace()) {
+        if (interval.getSizeOnDisk() > targetNode.getNodeFreeSpace()) {
             /* Nope, not enough room. Insert in a new sibling instead. */
             addSiblingNode(indexOfNode);
             tryInsertAtNode(interval, fLatestBranch.size() - 1);

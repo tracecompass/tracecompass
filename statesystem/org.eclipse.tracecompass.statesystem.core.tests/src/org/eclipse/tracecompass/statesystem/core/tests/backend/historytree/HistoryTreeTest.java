@@ -36,18 +36,22 @@ import org.junit.Test;
  */
 public class HistoryTreeTest {
 
+
     /* Minimal allowed blocksize */
     private static final int BLOCK_SIZE = HistoryTree.TREE_HEADER_SIZE;
-    /* The extra size used by long and double values */
-    private static final int LONG_DOUBLE_SIZE = 8;
-    /* The number of extra characters to store a string interval */
-    private static final int STRING_PADDING = 2;
+
+    private static final HTInterval NULL_INTERVAL = new HTInterval(10, 20, 1, TmfStateValue.nullValue());
 
     /* String with 23 characters, interval in file will be 25 bytes long */
     private static final String TEST_STRING = "abcdefghifklmnopqrstuvw";
     private static final TmfStateValue STRING_VALUE = TmfStateValue.newValueString(TEST_STRING);
+    private static final HTInterval STRING_INTERVAL = new HTInterval(10, 20, 1, STRING_VALUE);
+
     private static final TmfStateValue LONG_VALUE = TmfStateValue.newValueLong(10L);
+    private static final HTInterval LONG_INTERVAL = new HTInterval(10, 20, 1, LONG_VALUE);
+
     private static final TmfStateValue INT_VALUE = TmfStateValue.newValueInt(1);
+    private static final HTInterval INT_INTERVAL = new HTInterval(10, 20, 1, INT_VALUE);
 
     private @Nullable File fTempFile;
 
@@ -132,8 +136,9 @@ public class HistoryTreeTest {
 
         /* Fill the following leaf node */
         HTNode node = ht.getLatestLeaf();
+        int intervalSize = STRING_INTERVAL.getSizeOnDisk();
         int nodeFreeSpace = node.getNodeFreeSpace();
-        int nbIntervals = nodeFreeSpace / (HTInterval.DATA_ENTRY_SIZE + TEST_STRING.length() + STRING_PADDING);
+        int nbIntervals = nodeFreeSpace / intervalSize;
         long ret = fillValues(ht, STRING_VALUE, nbIntervals, leafNodeStart);
 
         /* Make sure we haven't changed the depth or node count */
@@ -158,27 +163,31 @@ public class HistoryTreeTest {
 
         /* Add null intervals up to ~10% */
         int nodeFreeSpace = node.getNodeFreeSpace();
-        int nbIntervals = nodeFreeSpace / 10 / HTInterval.DATA_ENTRY_SIZE;
+        int intervalSize = NULL_INTERVAL.getSizeOnDisk();
+        int nbIntervals = nodeFreeSpace / 10 / intervalSize;
         long start = fillValues(ht, TmfStateValue.nullValue(), nbIntervals, 1);
-        assertEquals(nodeFreeSpace - nbIntervals * HTInterval.DATA_ENTRY_SIZE, node.getNodeFreeSpace());
+        assertEquals(nodeFreeSpace - nbIntervals * intervalSize , node.getNodeFreeSpace());
 
         /* Add integer intervals up to ~20% */
         nodeFreeSpace = node.getNodeFreeSpace();
-        nbIntervals = nodeFreeSpace / 10 / HTInterval.DATA_ENTRY_SIZE;
+        intervalSize = INT_INTERVAL.getSizeOnDisk();
+        nbIntervals = nodeFreeSpace / 10 / intervalSize;
         start = fillValues(ht, INT_VALUE, nbIntervals, start);
-        assertEquals(nodeFreeSpace - nbIntervals * HTInterval.DATA_ENTRY_SIZE, node.getNodeFreeSpace());
+        assertEquals(nodeFreeSpace - nbIntervals * intervalSize , node.getNodeFreeSpace());
 
         /* Add long intervals up to ~30% */
         nodeFreeSpace = node.getNodeFreeSpace();
-        nbIntervals = nodeFreeSpace / 10 / (HTInterval.DATA_ENTRY_SIZE + LONG_DOUBLE_SIZE);
+        intervalSize = LONG_INTERVAL.getSizeOnDisk();
+        nbIntervals = nodeFreeSpace / 10 / intervalSize;
         start = fillValues(ht, LONG_VALUE, nbIntervals, start);
-        assertEquals(nodeFreeSpace - nbIntervals * (HTInterval.DATA_ENTRY_SIZE + LONG_DOUBLE_SIZE), node.getNodeFreeSpace());
+        assertEquals(nodeFreeSpace - nbIntervals * intervalSize , node.getNodeFreeSpace());
 
         /* Add string intervals up to ~40% */
         nodeFreeSpace = node.getNodeFreeSpace();
-        nbIntervals = nodeFreeSpace / 10 / (HTInterval.DATA_ENTRY_SIZE + TEST_STRING.length() + STRING_PADDING);
+        intervalSize = STRING_INTERVAL.getSizeOnDisk();
+        nbIntervals = nodeFreeSpace / 10 / intervalSize;
         start = fillValues(ht, STRING_VALUE, nbIntervals, start);
-        assertEquals(nodeFreeSpace - nbIntervals * (HTInterval.DATA_ENTRY_SIZE + TEST_STRING.length() + STRING_PADDING), node.getNodeFreeSpace());
+        assertEquals(nodeFreeSpace - nbIntervals * intervalSize , node.getNodeFreeSpace());
 
     }
 
@@ -193,7 +202,7 @@ public class HistoryTreeTest {
         /* Fill a first node */
         HTNode node = ht.getLatestLeaf();
         int nodeFreeSpace = node.getNodeFreeSpace();
-        int nbIntervals = nodeFreeSpace / (HTInterval.DATA_ENTRY_SIZE + TEST_STRING.length() + STRING_PADDING);
+        int nbIntervals = nodeFreeSpace / (STRING_INTERVAL.getSizeOnDisk());
         long start = fillValues(ht, STRING_VALUE, nbIntervals, 1);
 
         /* Add intervals that should add a sibling to the node */
@@ -206,7 +215,7 @@ public class HistoryTreeTest {
         /* Fill the latest leaf node (2nd child) */
         node = ht.getLatestLeaf();
         nodeFreeSpace = node.getNodeFreeSpace();
-        nbIntervals = nodeFreeSpace / (HTInterval.DATA_ENTRY_SIZE + TEST_STRING.length() + STRING_PADDING);
+        nbIntervals = nodeFreeSpace / (STRING_INTERVAL.getSizeOnDisk());
         start = fillValues(ht, STRING_VALUE, nbIntervals, start);
 
         /*
@@ -219,7 +228,7 @@ public class HistoryTreeTest {
         /* Fill the latest leaf node (3rd and last child) */
         node = ht.getLatestLeaf();
         nodeFreeSpace = node.getNodeFreeSpace();
-        nbIntervals = nodeFreeSpace / (HTInterval.DATA_ENTRY_SIZE + TEST_STRING.length() + STRING_PADDING);
+        nbIntervals = nodeFreeSpace / (STRING_INTERVAL.getSizeOnDisk());
         start = fillValues(ht, STRING_VALUE, nbIntervals, start);
 
         /* The new node created here should generate a new branch */

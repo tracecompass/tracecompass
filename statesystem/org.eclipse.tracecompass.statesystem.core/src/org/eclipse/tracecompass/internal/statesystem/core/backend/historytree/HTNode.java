@@ -121,9 +121,6 @@ public abstract class HTNode {
     private final int fSequenceNumber;
     private int fParentSequenceNumber; /* = -1 if this node is the root node */
 
-    /* Where the Strings section begins (from the start of the node */
-    private int fStringSectionOffset;
-
     /* Sum of bytes of all intervals in the node */
     private int fSizeOfIntervalSection;
 
@@ -154,7 +151,6 @@ public abstract class HTNode {
         fSequenceNumber = seqNumber;
         fParentSequenceNumber = parentSeqNumber;
 
-        fStringSectionOffset = config.getBlockSize();
         fSizeOfIntervalSection = 0;
         fIsOnDisk = false;
         fIntervals = new ArrayList<>();
@@ -193,7 +189,6 @@ public abstract class HTNode {
         int seqNb = buffer.getInt();
         int parentSeqNb = buffer.getInt();
         int intervalCount = buffer.getInt();
-        int stringSectionOffset = buffer.getInt();
         buffer.get(); // TODO Used to be "isDone", to be removed from the header
 
         /* Now the rest of the header depends on the node type */
@@ -222,12 +217,11 @@ public abstract class HTNode {
         for (i = 0; i < intervalCount; i++) {
             HTInterval interval = HTInterval.readFrom(buffer);
             newNode.fIntervals.add(interval);
-            newNode.fSizeOfIntervalSection += HTInterval.DATA_ENTRY_SIZE;
+            newNode.fSizeOfIntervalSection += interval.getSizeOnDisk();
         }
 
         /* Assign the node's other information we have read previously */
         newNode.fNodeEnd = end;
-        newNode.fStringSectionOffset = stringSectionOffset;
         newNode.fIsOnDisk = true;
 
         return newNode;
@@ -250,7 +244,6 @@ public abstract class HTNode {
         fRwl.readLock().lock();
         try {
             final int blockSize = fConfig.getBlockSize();
-            int curStringsEntryEndPos = blockSize;
 
             ByteBuffer buffer = ByteBuffer.allocate(blockSize);
             buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -263,40 +256,22 @@ public abstract class HTNode {
             buffer.putInt(fSequenceNumber);
             buffer.putInt(fParentSequenceNumber);
             buffer.putInt(fIntervals.size());
-            buffer.putInt(fStringSectionOffset);
             buffer.put((byte) 1); // TODO Used to be "isDone", to be removed from header
 
             /* Now call the inner method to write the specific header part */
             writeSpecificHeader(buffer);
 
             /* Back to us, we write the intervals */
-            for (HTInterval interval : fIntervals) {
-                int size = interval.writeInterval(buffer, curStringsEntryEndPos);
-                curStringsEntryEndPos -= size;
-            }
+            fIntervals.forEach(i -> i.writeInterval(buffer));
 
             /*
-             * Write padding between the end of the Data section and the start
-             * of the Strings section (needed to fill the node in case there is
-             * no Strings section)
+             * Fill the rest with zeros
              */
-            while (buffer.position() < fStringSectionOffset) {
+            while (buffer.position() < blockSize) {
                 buffer.put((byte) 0);
             }
 
-            /*
-             * If the offsets were right, the size of the Strings section should
-             * be == to the expected size
-             */
-            if (curStringsEntryEndPos != fStringSectionOffset) {
-                throw new IllegalStateException("Wrong size of Strings section: Actual: " + curStringsEntryEndPos + ", Expected: " + fStringSectionOffset); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-
             /* Finally, write everything in the Buffer to disk */
-
-            // if we don't do this, flip() will lose what's after.
-            buffer.position(blockSize);
-
             buffer.flip();
             int res = fc.write(buffer);
             if (res != blockSize) {
@@ -391,7 +366,7 @@ public abstract class HTNode {
         fRwl.writeLock().lock();
         try {
             /* Just in case, should be checked before even calling this function */
-            assert (newInterval.getIntervalSize() <= getNodeFreeSpace());
+            assert (newInterval.getSizeOnDisk() <= getNodeFreeSpace());
 
             /* Find the insert position to keep the list sorted */
             int index = fIntervals.size();
@@ -400,10 +375,8 @@ public abstract class HTNode {
             }
 
             fIntervals.add(index, newInterval);
-            fSizeOfIntervalSection += HTInterval.DATA_ENTRY_SIZE;
+            fSizeOfIntervalSection += newInterval.getSizeOnDisk();
 
-            /* Update the in-node offset "pointer" */
-            fStringSectionOffset -= (newInterval.getStringsEntrySize());
         } finally {
             fRwl.writeLock().unlock();
         }
@@ -577,7 +550,7 @@ public abstract class HTNode {
      */
     public int getNodeFreeSpace() {
         fRwl.readLock().lock();
-        int ret = fStringSectionOffset - getDataSectionEndOffset();
+        int ret = fConfig.getBlockSize() - getDataSectionEndOffset();
         fRwl.readLock().unlock();
 
         return ret;
