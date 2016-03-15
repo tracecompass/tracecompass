@@ -1656,6 +1656,7 @@ The states flow is usable with the mouse. The following actions are set:
 * '''right-drag horizontally''': [[#Zoom region|zoom region]]
 * '''click on a colored bar''': the associated process node is selected and the current time indicator is moved where the click happened
 * '''mouse wheel up/down''': scroll up or down
+* '''Shift-mouse wheel up/down''': scroll left or right
 * '''Ctrl-mouse wheel up/down''': zoom in or out horizontally
 * '''Shift-Ctrl-mouse wheel up/down''': zoom in or out vertically
 * '''drag the time ruler horizontally''': zoom in or out with fixed start time

@@ -2700,61 +2700,53 @@ public class TimeGraphControl extends TimeGraphBaseControl
         if (fDragState != DRAG_NONE || e.count == 0) {
             return;
         }
+
+        /*
+         * On some platforms the mouse scroll event is sent to the
+         * control that has focus even if it is not under the cursor.
+         * Handle the event only if over the time graph control.
+         */
+        Point size = getSize();
+        Rectangle bounds = new Rectangle(0, 0, size.x, size.y);
+        if (!bounds.contains(e.x, e.y)) {
+            return;
+        }
+
         boolean horizontalZoom = false;
         boolean horizontalScroll = false;
         boolean verticalZoom = false;
-        Point p = getParent().toControl(getDisplay().getCursorLocation());
-        Point parentSize = getParent().getSize();
-        if (p.x >= 0 && p.x < parentSize.x && p.y >= 0 && p.y < parentSize.y) {
-            // over the parent control
-            if (e.x > getSize().x) {
-                // over the vertical scroll bar
-                if ((e.stateMask & SWT.MODIFIER_MASK) == (SWT.SHIFT | SWT.CTRL)) {
-                    verticalZoom = true;
-                }
-            } else if (e.y < 0) {
-                // over the time scale
+        boolean verticalScroll = false;
+
+        // over the time graph control
+        if ((e.stateMask & SWT.MODIFIER_MASK) == (SWT.SHIFT | SWT.CTRL)) {
+            verticalZoom = true;
+        } else if (e.x < fTimeProvider.getNameSpace()) {
+            // over the name space
+            verticalScroll = true;
+        } else {
+            // over the state area
+            if ((e.stateMask & SWT.MODIFIER_MASK) == SWT.CTRL) {
+                // over the state area, CTRL pressed
                 horizontalZoom = true;
-            } else if (e.y >= getSize().y) {
-                // over the marker axis
-                horizontalZoom = true;
+            } else if ((e.stateMask & SWT.MODIFIER_MASK) == SWT.SHIFT) {
+                // over the state area, SHIFT pressed
+                horizontalScroll = true;
             } else {
-                if ((e.stateMask & SWT.MODIFIER_MASK) == (SWT.SHIFT | SWT.CTRL)) {
-                    verticalZoom = true;
-                } else if (e.x < fTimeProvider.getNameSpace()) {
-                    // over the name space
-                    horizontalZoom = false;
-                } else {
-                    // over the state area
-                    if ((e.stateMask & SWT.MODIFIER_MASK) == SWT.CTRL) {
-                        // over the state area, CTRL pressed
-                        horizontalZoom = true;
-                    } else {
-                        // over the state area, CTRL not pressed
-                        horizontalZoom = false;
-                    }
-                }
+                // over the state area, no modifier pressed
+                verticalScroll = true;
             }
         }
         if (verticalZoom) {
             fVerticalZoomAlignEntry = getVerticalZoomAlignCursor(e.y);
-            if (e.count > 0) {
-                verticalZoom(true);
-            } else if (e.count < 0) {
-                verticalZoom(false);
-            }
+            verticalZoom(e.count > 0);
             if (fVerticalZoomAlignEntry != null) {
                 setElementPosition(fVerticalZoomAlignEntry.getKey(), fVerticalZoomAlignEntry.getValue());
             }
         } else if (horizontalZoom && fTimeProvider.getTime0() != fTimeProvider.getTime1()) {
-            if (e.count > 0) {
-                zoom(true);
-            } else if (e.count < 0) {
-                zoom(false);
-            }
+            zoom(e.count > 0);
         } else if (horizontalScroll) {
             horizontalScroll(e.count > 0);
-        } else {
+        } else if (verticalScroll){
             setTopIndex(getTopIndex() - e.count);
         }
     }

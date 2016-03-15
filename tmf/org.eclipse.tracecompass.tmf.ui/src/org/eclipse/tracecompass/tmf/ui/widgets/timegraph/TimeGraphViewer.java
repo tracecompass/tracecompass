@@ -52,6 +52,7 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -505,7 +506,11 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
                 if (e.count == 0) {
                     return;
                 }
-                fTimeGraphCtrl.zoom(e.count > 0);
+                if ((e.stateMask & SWT.CTRL) != 0) {
+                    fTimeGraphCtrl.zoom(e.count > 0);
+                } else {
+                    fTimeGraphCtrl.horizontalScroll(e.count > 0);
+                }
             }
         });
 
@@ -521,7 +526,28 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
                 if (e.count == 0) {
                     return;
                 }
-                adjustVerticalScrollBar();
+                /*
+                 * On some platforms the mouse scroll event is sent to the
+                 * control that has focus even if it is not under the cursor.
+                 * Handle the event only if not over the time graph control.
+                 */
+                Point ctrlParentCoords = fTimeAlignedComposite.toControl(fTimeGraphCtrl.toDisplay(e.x, e.y));
+                Point scrollBarParentCoords = fDataViewer.toControl(fTimeGraphCtrl.toDisplay(e.x, e.y));
+                if (fTimeGraphCtrl.getBounds().contains(ctrlParentCoords)) {
+                    /* the time graph control handles the event */
+                    adjustVerticalScrollBar();
+                } else if (fTimeScaleCtrl.getBounds().contains(ctrlParentCoords)
+                        || fMarkerAxisCtrl.getBounds().contains(ctrlParentCoords)
+                        || fHorizontalScrollBar.getBounds().contains(scrollBarParentCoords)) {
+                    if ((e.stateMask & SWT.CTRL) != 0) {
+                        fTimeGraphCtrl.zoom(e.count > 0);
+                    } else {
+                        fTimeGraphCtrl.horizontalScroll(e.count > 0);
+                    }
+                } else {
+                    /* over the vertical scroll bar or outside of the viewer */
+                    setTopIndex(getTopIndex() - e.count);
+                }
             }
         });
         fTimeGraphCtrl.addKeyListener(new KeyAdapter() {
@@ -559,7 +585,11 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
                 if (e.count == 0) {
                     return;
                 }
-                fTimeGraphCtrl.zoom(e.count > 0);
+                if ((e.stateMask & SWT.CTRL) != 0) {
+                    fTimeGraphCtrl.zoom(e.count > 0);
+                } else {
+                    fTimeGraphCtrl.horizontalScroll(e.count > 0);
+                }
             }
         });
 
@@ -582,10 +612,10 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
                 if (event.count == 0) {
                     return;
                 }
-                if ((event.stateMask & SWT.MODIFIER_MASK) == SWT.CTRL) {
-                    getTimeGraphControl().zoom(event.count > 0);
+                if ((event.stateMask & SWT.CTRL) != 0) {
+                    fTimeGraphCtrl.zoom(event.count > 0);
                 } else {
-                    getTimeGraphControl().horizontalScroll(event.count > 0);
+                    fTimeGraphCtrl.horizontalScroll(event.count > 0);
                 }
             }
         });
