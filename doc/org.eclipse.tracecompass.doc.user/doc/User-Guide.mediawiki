@@ -1961,6 +1961,7 @@ The view is divided into the following important sections: '''Process Informatio
 
 
 === Process Information ===
+
 The Process Information is displayed on the left side of the view and shows all threads that were executing on all available CPUs in the current time range. For each process, it shows in different columns the thread ID (TID), process name (Process), the average (%) execution time and the actual execution time (Time) during the current time range. It shows all threads that were executing on the CPUs in the current time range.
 
 
@@ -1999,6 +2000,54 @@ The CPU Usage View '''toolbar''', located at the top right of the view, has shor
 |}
 
 [[Image:images/LTTng_CpuUsageViewToolTip.png]]
+
+
+== Kernel Memory Usage ==
+
+The Kernel Memory Usage and view is specific to kernel traces. To open the view, double-click on the '''Kernel Memory Usage Analysis''' tree element under the '''Kernel''' tree element of the Project Explorer.
+
+[[Image:images/kernelMemoryUsage/OpenKernelMemoryUsageView.png]]
+
+Now, the Kernel memory usage view will show:
+
+[[Image:images/kernelMemoryUsage/KernelMemoryUsageView.png]]
+
+Where:
+
+* '''TID''': The ID of the thread this event belongs to
+* '''Process''': The process of the TID that belongs to it
+
+The view is divided into the following important sections: '''Process Information''' and the '''Relative Kernel Memory Usage'''. The time axis is aligned with other views that support automatic time axis alignment (see [[#Automatic Time Axis Alignment | Automatic Time Axis Alignment]]).
+
+
+=== Process Information ===
+
+The Process Information is displayed on the left side of the view and shows all threads that were executing on all available CPUs in the current time range. For each process, it shows in different columns the thread ID (TID) and the process name (Process).
+
+
+=== Relative Kernel Memory Chart ===
+
+The Relative Kernel Memory Chart on the right side of the view, plots the relative amount of memory that was allocated and deallocated during that period of time.
+
+
+==== Using the mouse ====
+
+The Relative Kernel Memory chart is usable with the mouse. The following actions are set:
+
+* '''left-click''': select a time or time range begin time
+* '''left-drag horizontally''': select a time range or change the time range begin or end time
+* '''middle-drag''': pan left or right
+* '''right-drag horizontally''': zoom region
+* '''mouse wheel up/down''': zoom in or out
+
+
+==== Tooltips ====
+
+Hover the cursor over a line of the chart and a tooltip will pop up with the following information:
+* '''time''': current time of mouse position
+* '''Total''': The total CPU usage
+
+[[Image:images/kernelMemoryUsage/KernelMemoryUsageChart.png]]
 
 == LTTng Kernel Events Editor ==
 
