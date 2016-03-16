@@ -44,9 +44,9 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class TraceReadAllTracesTest {
 
-    /** Time-out tests after 20 seconds. */
+    /** Time-out tests after 1 minute. */
     @Rule
-    public TestRule globalTimeout = new Timeout(20, TimeUnit.SECONDS);
+    public TestRule globalTimeout = new Timeout(1, TimeUnit.MINUTES);
 
     /**
      * Get the list of traces
