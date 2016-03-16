@@ -44,6 +44,8 @@ import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCLabel;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCanvas;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
@@ -336,6 +338,57 @@ public class FilterColorEditorTest {
 
         // reset the highlight color preference
         colorRegistry.put(HIGHLIGHT_COLOR_DEFINITION_ID, fHighlight);
+    }
+
+    /**
+     * Test the header bar
+     */
+    @Test
+    public void testHeaderBar() {
+        // Add search filter on Timestamp column
+        fTableBot.click(0, TIMESTAMP_COLUMN);
+        fBot.text().typeText("2");
+        fBot.text().pressShortcut(Keystrokes.CR);
+        // Add search filter on Message column and Add as Filter
+        fTableBot.click(0, MESSAGE_COLUMN);
+        fBot.text().typeText("F");
+        fBot.text().pressShortcut(Keystrokes.CTRL, Keystrokes.CR);
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(fTableBot, "2/22", 1, 1));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(fTableBot, "Message F", 3, MESSAGE_COLUMN));
+        fBot.clabel("Timestamp matches \"2\"");
+        fBot.clabel("Message matches \"F\"");
+        waitForHighlightState(3, TIMESTAMP_COLUMN, true);
+        waitForHighlightState(3, MESSAGE_COLUMN, true);
+        // Clear all filter highlighting
+        fTableBot.pressShortcut(Keystrokes.DELETE);
+        waitForHighlightState(3, TIMESTAMP_COLUMN, false);
+        waitForHighlightState(3, MESSAGE_COLUMN, false);
+        // Click filter label to set the filter highlighting on Message filter
+        SWTBotCLabel filterCLabel = fBot.clabel("Message matches \"F\"");
+        SWTBotCanvas filterCanvas = new SWTBotCanvas(filterCLabel.widget);
+        filterCanvas.click();
+        waitForHighlightState(3, TIMESTAMP_COLUMN, false);
+        waitForHighlightState(3, MESSAGE_COLUMN, true);
+        // Click filter icon to remove the Message filter
+        Rectangle imageBounds = filterCLabel.image().getBounds();
+        filterCanvas.click(filterCLabel.widget.getLeftMargin() + imageBounds.width / 2, filterCLabel.widget.getTopMargin() + imageBounds.height / 2);
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(fTableBot, "5/22", 1, 1));
+    }
+
+    private void waitForHighlightState(int row, int column, boolean highlight) {
+        fBot.waitUntil(new DefaultCondition() {
+            @Override
+            public boolean test() throws Exception {
+                Rectangle cellBounds = SWTBotUtils.getCellBounds(fTableBot.widget, row, column);
+                ImageHelper imageHelper = ImageHelper.grabImage(cellBounds);
+                return imageHelper.getHistogram().contains(fHighlight) == highlight;
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return String.format("Cell (%d, %d) did not have highlight state: %s", row, column, Boolean.toString(highlight));
+            }
+        });
     }
 
     private static ImageHelper waitForNewImage(Rectangle bounds, ImageHelper currentImage) {
