@@ -28,7 +28,7 @@ public class TmfCpuSelectedSignal extends TmfTraceModelSignal {
      * @param source
      *            the source
      * @param core
-     *            the core number
+     *            the core number, -1 for all
      * @param trace
      *            the current trace that the cpu belongs to
      */

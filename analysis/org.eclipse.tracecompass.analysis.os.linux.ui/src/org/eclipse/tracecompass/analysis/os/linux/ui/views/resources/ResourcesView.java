@@ -27,19 +27,31 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.tracecompass.analysis.os.linux.core.signals.TmfCpuSelectedSignal;
 import org.eclipse.tracecompass.analysis.os.linux.ui.views.resources.ResourcesEntry.Type;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
+import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.FollowCpuAction;
+import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.UnfollowCpuAction;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractStateSystemTimeGraphView;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 
 /**
  * Main implementation for the LTTng 2.0 kernel Resource view
@@ -54,6 +66,10 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
     private static final String[] FILTER_COLUMN_NAMES = new String[] {
             Messages.ResourcesView_stateTypeName
     };
+
+    private MenuManager fMenuMgr = new MenuManager();
+
+    private int fCurrentCpu = -1;
 
     // Timeout between updates in the build thread in ms
     private static final long BUILD_UPDATE_TIMEOUT = 500;
@@ -85,6 +101,43 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
             /* sort resource entries by their defined order */
             return entry1.compareTo(entry2);
         }
+    }
+
+    @Override
+    public void createPartControl(Composite parent) {
+        super.createPartControl(parent);
+        createContextMenu();
+    }
+
+    private void createContextMenu() {
+        fMenuMgr = new MenuManager();
+        final TimeGraphViewer timeGraphViewer = getTimeGraphViewer();
+        Menu menu = fMenuMgr.createContextMenu(timeGraphViewer.getTimeGraphControl());
+        timeGraphViewer.getTimeGraphControl().setMenu(menu);
+        getTimeGraphViewer().getTimeGraphControl().addMenuDetectListener(new MenuDetectListener() {
+            @Override
+            public void menuDetected(MenuDetectEvent event) {
+                fMenuMgr.removeAll();
+                final TimeGraphControl timeGraphControl = ResourcesView.this.getTimeGraphViewer().getTimeGraphControl();
+                Point point = timeGraphControl.toControl(event.x, event.y);
+                // this is super important, it makes zoom still work. Do not try
+                // to extend to the time graph area.
+                if (point.x < timeGraphViewer.getNameSpace()) {
+                    ITimeGraphEntry item = timeGraphControl.getEntry(point);
+
+                    if (item instanceof ResourcesEntry) {
+                        ResourcesEntry resourcesEntry = (ResourcesEntry) item;
+                        if (resourcesEntry.getType().equals(ResourcesEntry.Type.CPU)) {
+                            if (fCurrentCpu >= 0) {
+                                fMenuMgr.add(new UnfollowCpuAction(ResourcesView.this, resourcesEntry.getId(), resourcesEntry.getTrace()));
+                            } else {
+                                fMenuMgr.add(new FollowCpuAction(ResourcesView.this, resourcesEntry.getId(), resourcesEntry.getTrace()));
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private static class ResourcesFilterLabelProvider extends TreeLabelProvider {
@@ -394,6 +447,22 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
             lastEndTime = time + duration;
         }
         return eventList;
+    }
+
+    /**
+     * Signal handler for a cpu selected signal.
+     *
+     * @param signal
+     *            the cpu selected signal
+     * @since 2.0
+     */
+    @TmfSignalHandler
+    public void listenToCpu(TmfCpuSelectedSignal signal) {
+        if (signal.getCore() >= 0) {
+            fCurrentCpu = signal.getCore();
+        } else {
+            fCurrentCpu = -1;
+        }
     }
 
 }

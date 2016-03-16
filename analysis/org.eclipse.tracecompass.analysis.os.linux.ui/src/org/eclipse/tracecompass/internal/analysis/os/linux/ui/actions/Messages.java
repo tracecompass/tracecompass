@@ -22,6 +22,14 @@ public class Messages extends NLS {
      * Follow message
      */
     public static String FollowThreadAction_follow;
+    /**
+     * Follow CPU message
+     */
+    public static String CpuSelectionAction_followCpu;
+    /**
+     * Stop following CPU
+     */
+    public static String CpuSelectionAction_unfollowCpu;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

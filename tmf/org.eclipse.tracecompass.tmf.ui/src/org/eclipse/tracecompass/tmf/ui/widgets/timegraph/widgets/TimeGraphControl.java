@@ -1278,8 +1278,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *            a point in the widget
      * @return the {@link ITimeGraphEntry} at this point, or <code>null</code>
      *         if none.
+     * @since 2.0
      */
-    protected ITimeGraphEntry getEntry(Point pt) {
+    public ITimeGraphEntry getEntry(Point pt) {
         int idx = getItemIndexAtY(pt.y);
         return idx >= 0 ? fItemData.fExpandedItems[idx].fEntry : null;
     }
