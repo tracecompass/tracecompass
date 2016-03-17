@@ -12,17 +12,24 @@
 
 package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
 import org.eclipse.swtbot.swt.finder.keyboard.KeyboardFactory;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
+import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
+import org.eclipse.swtbot.swt.finder.results.Result;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCanvas;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
@@ -31,6 +38,8 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphMarkerAxis;
 import org.eclipse.ui.IWorkbenchPart;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -65,6 +74,9 @@ public class ResourcesViewTest extends KernelTestBase {
     private static final @NonNull ITmfTimestamp CPU0_TIME3 = new TmfNanoTimestamp(1368000272652067404L);
     private static final @NonNull ITmfTimestamp CPU0_TIME4 = new TmfNanoTimestamp(1368000272652282152L);
     private static final @NonNull ITmfTimestamp CPU0_TIME5 = new TmfNanoTimestamp(1368000272653141144L);
+    private static final int TOP_MARGIN = 1;
+    private static final Point TOGGLE_SIZE = new Point(7, 8);
+    private static final Point HIDE_SIZE = new Point(16, 16);
 
     private SWTBotView fViewBot;
 
@@ -148,8 +160,6 @@ public class ResourcesViewTest extends KernelTestBase {
     /**
      * Test "Show Markers" view menu
      */
-    /* SWTBot doesn't support dynamic view menus yet */
-    @Ignore
     @Test
     public void testShowMarkers() {
         /* set selection to trace start time */
@@ -274,8 +284,91 @@ public class ResourcesViewTest extends KernelTestBase {
         timeGraphIsReadyCondition(new TmfTimeRange(CPU0_TIME4, CPU0_TIME4), CPU0_TIME4);
     }
 
+    /**
+     * Test the marker axis
+     */
+    @Test
+    public void testMarkerAxis() {
+        /* center window range of first lost event range */
+        ITmfTimestamp startTime = LOST_EVENT_TIME1.normalize(-10000000L, ITmfTimestamp.NANOSECOND_SCALE);
+        ITmfTimestamp endTime = LOST_EVENT_END1.normalize(10000000L, ITmfTimestamp.NANOSECOND_SCALE);
+        TmfTimeRange range = new TmfTimeRange(startTime, endTime);
+        TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, range));
+        fBot.waitUntil(ConditionHelpers.windowRange(range));
+
+        /* set selection to window start time */
+        TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, startTime));
+        timeGraphIsReadyCondition(new TmfTimeRange(startTime, startTime), startTime);
+
+        /* get marker axis size with one category */
+        final TimeGraphMarkerAxis markerAxis = fViewBot.bot().widget(WidgetOfType.widgetOfType(TimeGraphMarkerAxis.class));
+        final Point size1 = getSize(markerAxis);
+
+        /* add bookmark at window start time */
+        fViewBot.toolbarButton(ADD_BOOKMARK).click();
+        SWTBot dialogBot = fBot.shell(ADD_BOOKMARK_DIALOG).bot();
+        dialogBot.text().setText("B");
+        dialogBot.button(OK).click();
+
+        /* get marker axis size with two categories */
+        final Point size2 = getSize(markerAxis);
+        final int rowHeight = size2.y - size1.y;
+
+        /* get the state area bounds, since we don't know the name space width */
+        final TimeGraphControl timeGraph = fViewBot.bot().widget(WidgetOfType.widgetOfType(TimeGraphControl.class));
+        int x0 = getXForTime(timeGraph, startTime.toNanos());
+        int x1 = getXForTime(timeGraph, endTime.toNanos());
+
+        /* click at the center of the marker axis width and first row height, it should be within the lost event range */
+        final SWTBotCanvas markerAxisCanvas = new SWTBotCanvas(markerAxis);
+        markerAxisCanvas.click((x0 + x1) / 2, TOP_MARGIN + rowHeight / 2);
+        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(LOST_EVENT_TIME1, LOST_EVENT_END1)));
+
+        /* click near the left of the marker axis width and center of second row height, it should be on the bookmark label */
+        markerAxisCanvas.click(x0 + 2, TOP_MARGIN + rowHeight + rowHeight / 2);
+        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(startTime, startTime)));
+
+        /* click "Remove Bookmark" */
+        fViewBot.toolbarButton(REMOVE_BOOKMARK).click();
+        assertEquals(size1, getSize(markerAxis));
+
+        /* click the 'expanded' icon to collapse */
+        markerAxisCanvas.click(TOGGLE_SIZE.x / 2, TOGGLE_SIZE.y / 2);
+        assertEquals(TOGGLE_SIZE.y, getSize(markerAxis).y);
+
+        /* click the 'collapsed' icon to expand */
+        markerAxisCanvas.click(TOGGLE_SIZE.x / 2, TOGGLE_SIZE.y / 2);
+        assertEquals(size1, getSize(markerAxis));
+
+        /* click on the 'X' icon to hide the 'Lost Events' marker category */
+        markerAxisCanvas.click(TOGGLE_SIZE.x + HIDE_SIZE.x / 2, TOP_MARGIN + HIDE_SIZE.y / 2);
+        assertEquals(0, getSize(markerAxis).y);
+
+        /* show Lost Events markers */
+        fViewBot.viewMenu(LOST_EVENTS).click();
+        assertEquals(size1, getSize(markerAxis));
+    }
+
     private void timeGraphIsReadyCondition(@NonNull TmfTimeRange selectionRange, @NonNull ITmfTimestamp visibleTime) {
         IWorkbenchPart part = fViewBot.getViewReference().getPart(false);
         fBot.waitUntil(ConditionHelpers.timeGraphIsReadyCondition((AbstractTimeGraphView) part, selectionRange, visibleTime));
+    }
+
+    private static int getXForTime(TimeGraphControl timeGraph, long time) {
+        return UIThreadRunnable.syncExec(new Result<Integer>() {
+            @Override
+            public Integer run() {
+                return timeGraph.getXForTime(time);
+            }
+        });
+    }
+
+    private static Point getSize(Control control) {
+        return UIThreadRunnable.syncExec(new Result<Point>() {
+            @Override
+            public Point run() {
+                return control.getSize();
+            }
+        });
     }
 }
