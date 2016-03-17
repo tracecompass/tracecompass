@@ -108,12 +108,31 @@ public class TraceSessionComponent extends TraceControlComponent {
     }
 
     private void copyLiveInfo(ISessionInfo sessionInfo) {
-        // Since we can't retrieve this information from the node, we copy it over
+        /*
+         * Since we can't retrieve this live port and URL from the node, we
+         * copy it over. Note that this information gets lost when the user
+         * presses the refresh button or restarts or Trace Compass.
+         */
         if (sessionInfo.getLivePort() != null) {
             fSessionInfo.setLivePort(sessionInfo.getLivePort());
         }
         if (sessionInfo.getLiveUrl() != null) {
             fSessionInfo.setLiveUrl(sessionInfo.getLiveUrl());
+        }
+
+        /*
+         * Live streaming has been added in 2.4.x. Since we can't retrieve
+         * whether a session is live or not from a 2.4.x node, we copy it over.
+         * Note that this information gets lost when the user presses the
+         * refresh button or restarts or Trace Compass.
+         *
+         * For LTTng 2.5.0 and later it's possible to retrieve this information.
+         * So we don't need to copy this over be set here. This will make sure
+         * that the session is recognized as live after a Trace Compass restart
+         * or a refresh.
+         */
+        if (!getTargetNode().isVersionSupported("2.5.0")) { //$NON-NLS-1$
+            fSessionInfo.setLive(sessionInfo.isLive());
         }
     }
 
