@@ -19,7 +19,7 @@
             analysis_module="org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsModule"
             automatic="true"
             id="org.eclipse.linuxtools.tmf.core.statistics.analysis"
-            name="Tmf Statistics Analysis">
+            name="Tmf Statistics">
          <tracetype
                applies="true"
                class="org.eclipse.tracecompass.tmf.core.trace.TmfTrace">
