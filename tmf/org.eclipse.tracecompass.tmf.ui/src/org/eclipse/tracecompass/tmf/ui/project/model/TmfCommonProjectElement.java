@@ -28,6 +28,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -71,7 +72,10 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
 
     private static final String BOOKMARKS_HIDDEN_FILE = ".bookmarks"; //$NON-NLS-1$
 
+    /* Direct child elements */
     private TmfViewsElement fViewsElement = null;
+    private TmfOnDemandAnalysesElement fOnDemandAnalysesElement = null;
+    private TmfReportsElement fReportsElement = null;
 
     /** This trace type ID as defined in plugin.xml */
     private String fTraceTypeId = null;
@@ -107,14 +111,31 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
     protected void refreshChildren() {
         /* Get the base path to put the resource to */
         IPath tracePath = getResource().getFullPath();
+        IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
         if (fViewsElement == null) {
             /* Add the "Views" node */
-            IFolder viewsNodeRes = ResourcesPlugin.getWorkspace().getRoot().getFolder(tracePath.append(TmfViewsElement.PATH_ELEMENT));
+            IFolder viewsNodeRes = root.getFolder(tracePath.append(TmfViewsElement.PATH_ELEMENT));
             fViewsElement = new TmfViewsElement(viewsNodeRes, this);
             addChild(fViewsElement);
         }
         fViewsElement.refreshChildren();
+
+        if (fOnDemandAnalysesElement == null) {
+            /* Add the "On-demand Analyses" node */
+            IFolder analysesNodeRes = root.getFolder(tracePath.append(TmfOnDemandAnalysesElement.PATH_ELEMENT));
+            fOnDemandAnalysesElement = new TmfOnDemandAnalysesElement(analysesNodeRes, this);
+            addChild(fOnDemandAnalysesElement);
+        }
+        fOnDemandAnalysesElement.refreshChildren();
+
+        if (fReportsElement == null) {
+            /* Add the "Reports" node */
+            IFolder reportsNodeRes = root.getFolder(tracePath.append(TmfReportsElement.PATH_ELEMENT));
+            fReportsElement = new TmfReportsElement(reportsNodeRes, this);
+            addChild(fReportsElement);
+        }
+        fReportsElement.refreshChildren();
     }
 
     /**

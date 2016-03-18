@@ -40,6 +40,8 @@ final class TmfProjectModelIcons {
 
     public static final @NonNull Image FOLDER_ICON;
     public static final @NonNull Image VIEWS_ICON;
+    public static final @NonNull Image ONDEMAND_ANALYSES_ICON;
+    public static final @NonNull Image REPORTS_ICON;
 
     public static final WorkbenchLabelProvider WORKSPACE_LABEL_PROVIDER = new WorkbenchLabelProvider();
 
@@ -47,6 +49,8 @@ final class TmfProjectModelIcons {
     private static final String EXPERIMENT_ICON_FILE = "icons/elcl16/experiment.gif"; //$NON-NLS-1$
     private static final String ANALYSIS_ICON_FILE = "icons/ovr16/experiment_folder_ovr.png"; //$NON-NLS-1$
     private static final String VIEW_ICON_FILE = "icons/obj16/node_obj.gif"; //$NON-NLS-1$
+    private static final String ONDEMAND_ANALYSES_ICON_FILE = "icons/obj16/debugt_obj.gif"; //$NON-NLS-1$
+    private static final String REPORTS_ICON_FILE = "icons/obj16/arraypartition_obj.gif"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Initialization
@@ -54,10 +58,13 @@ final class TmfProjectModelIcons {
 
     static {
         ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
+        Bundle bundle = Activator.getDefault().getBundle();
+
         FOLDER_ICON = checkNotNull(sharedImages.getImage(ISharedImages.IMG_OBJ_FOLDER));
         VIEWS_ICON = checkNotNull(sharedImages.getImage(ISharedImages.IMG_OBJ_ELEMENT));
+        ONDEMAND_ANALYSES_ICON = checkNotNull(loadIcon(bundle, ONDEMAND_ANALYSES_ICON_FILE));
+        REPORTS_ICON = checkNotNull(loadIcon(bundle, REPORTS_ICON_FILE));
 
-        Bundle bundle = Activator.getDefault().getBundle();
         DEFAULT_TRACE_ICON = checkNotNull(loadIcon(bundle, TRACE_ICON_FILE));
         DEFAULT_EXPERIMENT_ICON = checkNotNull(loadIcon(bundle, EXPERIMENT_ICON_FILE));
         DEFAULT_ANALYSIS_ICON = checkNotNull(loadIcon(bundle, ANALYSIS_ICON_FILE));
