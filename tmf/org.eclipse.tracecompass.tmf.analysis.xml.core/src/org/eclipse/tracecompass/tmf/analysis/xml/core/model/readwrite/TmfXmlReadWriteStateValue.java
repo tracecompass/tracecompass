@@ -379,9 +379,6 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
              */
             if (quarkQuery != IXmlStateSystemContainer.ERROR_QUARK) {
                 value = ss.queryOngoingState(quarkQuery);
-                if (value == null) {
-                    throw new IllegalStateException();
-                }
             }
             return value;
         }

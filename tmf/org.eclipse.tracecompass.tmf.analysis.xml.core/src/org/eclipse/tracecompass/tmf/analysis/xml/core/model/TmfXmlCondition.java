@@ -270,9 +270,6 @@ public class TmfXmlCondition {
              * found in the event
              */
             ITmfStateValue valueState = (quark != IXmlStateSystemContainer.ROOT_QUARK) ? ss.queryOngoingState(quark) : filter.getEventFieldValue(event);
-            if (valueState == null) {
-                throw new IllegalStateException("TmfXmlCondition : The state value does not exist in the state system"); //$NON-NLS-1$
-            }
 
             /* Get the value to compare to from the XML file */
             ITmfStateValue valueXML;

@@ -345,7 +345,7 @@ public interface ITmfStateSystem {
      * @throws AttributeNotFoundException
      *             If the requested attribute is invalid
      */
-    ITmfStateValue queryOngoingState(int attributeQuark)
+    @NonNull ITmfStateValue queryOngoingState(int attributeQuark)
             throws AttributeNotFoundException;
 
     /**
