@@ -173,6 +173,18 @@ public class CustomEvent extends TmfEvent {
     }
 
     /**
+     * Get this event's content value.
+     * <p>
+     * This does not process the payload data and is therefore safe to call in
+     * the middle of parsing an event.
+     *
+     * @return the event's content value.
+     */
+    Object getContentValue() {
+        return customEventContent.getValue();
+    }
+
+    /**
      * Set this event's type
      *
      * @param type

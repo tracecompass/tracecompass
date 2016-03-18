@@ -57,6 +57,10 @@ public class CustomTxtIndexTest extends AbstractCustomTraceIndexTest {
                 SimpleDateFormat f = new SimpleDateFormat(TIMESTAMP_FORMAT);
                 String eventStr = f.format(new Date(i)) + " hello world\n";
                 writer.write(eventStr);
+                int extra = i % 3;
+                for (int j = 0; j < extra; j++) {
+                    writer.write("extra line\n");
+                }
             }
         }
 
