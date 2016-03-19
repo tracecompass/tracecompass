@@ -88,6 +88,7 @@ import org.hamcrest.Matcher;
 @SuppressWarnings("restriction")
 public final class SWTBotUtils {
 
+    private static final long MAX_JOBS_WAIT_TIME = 300000;
     private static final String WINDOW_MENU = "Window";
     private static final String PREFERENCES_MENU_ITEM = "Preferences";
     private static boolean fPrintedEnvironment = false;
@@ -98,11 +99,63 @@ public final class SWTBotUtils {
     private static final String TRACING_PERSPECTIVE_ID = TracingPerspectiveFactory.ID;
 
     /**
-     * Waits for all Eclipse jobs to finish
+     * Waits for all Eclipse jobs to finish. Times out after
+     * SWTBotUtils#MAX_JOBS_WAIT_TIME by default.
+     *
+     * @throws TimeoutException
+     *             once the waiting time passes the default maximum value
      */
     public static void waitForJobs() {
+        waitForJobs(MAX_JOBS_WAIT_TIME);
+    }
+
+    /**
+     * Waits for all Eclipse jobs to finish
+     *
+     * @param maxWait
+     *            the maximum time to wait, in milliseconds. Once the waiting
+     *            time passes the maximum value, a TimeoutException is thrown
+     * @throws TimeoutException
+     *             once the waiting time passes the maximum value
+     */
+    public static void waitForJobs(long maxWait) {
+        long waitStart = System.currentTimeMillis();
         while (!Job.getJobManager().isIdle()) {
+            if (System.currentTimeMillis() - waitStart > maxWait) {
+                printJobs();
+                throw new TimeoutException("Timed out waiting for jobs to finish.");
+            }
+
             delay(100);
+        }
+    }
+
+    private static void printJobs() {
+        Job[] jobs = Job.getJobManager().find(null);
+        for (Job job : jobs) {
+            System.err.println(job.toString() + " state: " + jobStateToString(job.getState()));
+            Thread thread = job.getThread();
+            if (thread != null) {
+                for (StackTraceElement stractTraceElement : thread.getStackTrace()) {
+                    System.err.println("  " + stractTraceElement);
+                }
+            }
+            System.err.println();
+        }
+    }
+
+    private static String jobStateToString(int jobState) {
+        switch (jobState) {
+        case Job.RUNNING:
+            return "RUNNING";
+        case Job.WAITING:
+            return "WAITING";
+        case Job.SLEEPING:
+            return "SLEEPING";
+        case Job.NONE:
+            return "NONE";
+        default:
+            return "UNKNOWN";
         }
     }
 
