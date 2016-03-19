@@ -46,7 +46,7 @@
     <tycho-version>0.24.0</tycho-version>
     <tycho-extras-version>0.24.0</tycho-extras-version>
     <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/tracecompass/org.eclipse.tracecompass.git</tycho.scmUrl>
-    <target-platform>tracecompass-e4.5</target-platform>
+    <target-platform>tracecompass-e4.6</target-platform>
     <help-docs-eclipserun-repo>http://download.eclipse.org/eclipse/updates/4.5</help-docs-eclipserun-repo>
 
     <rcptt-version>2.1.0-SNAPSHOT</rcptt-version>
