@@ -219,6 +219,8 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
       <feature id="org.eclipse.ecf.core.feature"/>
       <feature id="org.eclipse.ecf.filetransfer.feature"/>
       <feature id="org.eclipse.remote"/>
+      <feature id="org.eclipse.remote.console"/>
+      <feature id="org.eclipse.tm.terminal.control.feature"/>
    </features>
 
    <configurations>

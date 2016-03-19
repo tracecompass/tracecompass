@@ -4,5 +4,6 @@
    </tocOrder>
    <hidden>
       <toc id="/org.eclipse.platform.doc.user/toc.xml"/>
+      <toc id="/org.eclipse.remote.doc.isv/toc.xml"/>
    </hidden>
 </extensions>
