@@ -85,7 +85,7 @@ public class CriticalPathModule extends TmfAbstractAnalysisModule {
             return false;
         }
         if (!(workerObj instanceof IGraphWorker)) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Worker parameter must be an IGraphWorker"); //$NON-NLS-1$
         }
         IGraphWorker worker = (IGraphWorker) workerObj;
 

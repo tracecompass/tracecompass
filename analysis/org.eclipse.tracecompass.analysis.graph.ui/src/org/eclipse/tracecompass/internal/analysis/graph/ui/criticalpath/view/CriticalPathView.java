@@ -280,7 +280,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
                     TmfTraceUtils.getAnalysisModulesOfClass(trace, CriticalPathModule.class),
                     null);
             if (module == null) {
-                throw new IllegalStateException();
+                throw new IllegalStateException("View requires an analysis module"); //$NON-NLS-1$
             }
 
             module.schedule();
@@ -311,7 +311,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
             CriticalPathModule module = Iterables.<@Nullable CriticalPathModule> getFirst(
                     TmfTraceUtils.getAnalysisModulesOfClass(trace, CriticalPathModule.class), null);
             if (module == null) {
-                throw new IllegalStateException();
+                throw new IllegalStateException("View requires an analysis module"); //$NON-NLS-1$
             }
 
             final TmfGraph graph = module.getCriticalPath();

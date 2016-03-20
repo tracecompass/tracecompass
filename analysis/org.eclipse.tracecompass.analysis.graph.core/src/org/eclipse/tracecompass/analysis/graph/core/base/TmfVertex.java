@@ -232,7 +232,7 @@ public class TmfVertex implements Comparable<TmfVertex> {
         case INCOMING_HORIZONTAL_EDGE:
             return fIncomingHorizontal;
         default:
-            throw new IllegalStateException();
+            throw new IllegalStateException("Unknown edge direction type : " + dir); //$NON-NLS-1$
         }
     }
 
@@ -258,7 +258,7 @@ public class TmfVertex implements Comparable<TmfVertex> {
             fIncomingHorizontal = null;
             break;
         default:
-            throw new IllegalStateException();
+            throw new IllegalStateException("Unknown edge direction type : " + dir); //$NON-NLS-1$
         }
     }
 
@@ -287,7 +287,7 @@ public class TmfVertex implements Comparable<TmfVertex> {
         case INCOMING_HORIZONTAL_EDGE:
             return edge.getVertexFrom();
         default:
-            throw new IllegalStateException();
+            throw new IllegalStateException("Unknown edge direction type : " + dir); //$NON-NLS-1$
         }
     }
 
