@@ -132,7 +132,7 @@ public final class ArrayDeclaration extends CompoundDeclaration {
         for (int i = 0; i < fLength; i++) {
             String name = elemNames.get(i);
             if (name == null) {
-                throw new IllegalStateException();
+                throw new IllegalStateException("Field " + fieldName + " has a nameless field");  //$NON-NLS-1$//$NON-NLS-2$
             }
             definitions.add(fElemType.createDefinition(definitionScope, name, input));
         }
