@@ -106,7 +106,7 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
 
         ITmfTrace trace = getTrace();
         if (trace == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Analysis requires a trace"); //$NON-NLS-1$
         }
         /*
          * This analysis depends on the LTTng kernel analysis, so it's added to
