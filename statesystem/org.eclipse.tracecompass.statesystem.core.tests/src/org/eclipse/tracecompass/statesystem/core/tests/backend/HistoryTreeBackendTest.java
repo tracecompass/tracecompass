@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson, EfficiOS Inc. and others
+ * Copyright (c) 2016 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -29,7 +29,6 @@ import org.junit.runners.Parameterized.Parameters;
  * Test the {@link HistoryTreeBackend} class.
  *
  * @author Patrick Tasse
- * @author Alexandre Montplaisir
  */
 @RunWith(Parameterized.class)
 public class HistoryTreeBackendTest extends StateHistoryBackendTestBase {

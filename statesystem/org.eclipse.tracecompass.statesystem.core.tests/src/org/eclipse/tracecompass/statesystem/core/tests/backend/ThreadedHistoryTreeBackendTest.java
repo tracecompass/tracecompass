@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson, EfficiOS Inc. and others
+ * Copyright (c) 2016 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,7 +19,6 @@ import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
  * Test the {@link ThreadedHistoryTreeBackend} class.
  *
  * @author Patrick Tasse
- * @author Alexandre Montplaisir
  */
 public class ThreadedHistoryTreeBackendTest extends HistoryTreeBackendTest {
 

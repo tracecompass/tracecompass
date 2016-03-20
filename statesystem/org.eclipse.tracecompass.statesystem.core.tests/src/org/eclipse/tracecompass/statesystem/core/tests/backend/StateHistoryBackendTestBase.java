@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson, EfficiOS Inc. and others
+ * Copyright (c) 2016 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -36,7 +36,6 @@ import com.google.common.collect.ImmutableList;
  * interface.
  *
  * @author Patrick Tasse
- * @author Alexandre Montplaisir
  * @author Geneviève Bastien
  */
 public abstract class StateHistoryBackendTestBase {
