@@ -226,6 +226,7 @@ public class ControlViewTest {
         SWTBotUtils.clearExperimentFolder(fBot, ControlViewSwtBotUtil.DEFAULT_REMOTE_PROJECT);
         testDestroySession();
         testDisconnectFromNode();
+        SWTBotUtils.deleteProject(ControlViewSwtBotUtil.DEFAULT_REMOTE_PROJECT, fBot);
     }
 
     /**
