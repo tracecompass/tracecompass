@@ -184,7 +184,7 @@ public class BufferedBlockingQueue<T> implements Iterable<T> {
             return element;
         } catch (InterruptedException e) {
             Activator.instance().logError("Buffered queue interrupted", e); //$NON-NLS-1$
-            throw new IllegalStateException();
+            throw new IllegalStateException(e);
         } finally {
             fOutputLock.unlock();
         }
@@ -219,7 +219,7 @@ public class BufferedBlockingQueue<T> implements Iterable<T> {
             return checkNotNull(fOutputBuffer.peek());
         } catch (InterruptedException e) {
             Activator.instance().logError("Buffered queue interrupted", e); //$NON-NLS-1$
-            throw new IllegalStateException();
+            throw new IllegalStateException(e);
         } finally {
             fOutputLock.unlock();
         }
