@@ -25,6 +25,9 @@
   <name>Trace Compass LTTng Support Parent</name>
 
   <modules>
+    <module>org.eclipse.tracecompass.lttng2.common.core</module>
+    <module>org.eclipse.tracecompass.lttng2.common.core.tests</module>
+
     <module>org.eclipse.tracecompass.lttng2.control</module>
     <module>org.eclipse.tracecompass.lttng2.control.core</module>
     <module>org.eclipse.tracecompass.lttng2.control.core.tests</module>
