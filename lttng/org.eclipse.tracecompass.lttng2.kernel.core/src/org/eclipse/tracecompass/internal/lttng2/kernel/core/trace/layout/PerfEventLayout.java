@@ -290,4 +290,34 @@ public class PerfEventLayout implements IKernelAnalysisEventLayout {
     public String fieldHRtimerNow() {
         return "now"; //$NON-NLS-1$
     }
+
+    // ------------------------------------------------------------------------
+    // I/O events and fields
+    // ------------------------------------------------------------------------
+
+    @Override
+    public String eventBlockRqInsert() {
+        return "block:block_rq_insert"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String eventBlockRqIssue() {
+        return "block:block_rq_issue"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String eventBlockRqComplete() {
+        return "block:block_rq_complete"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String eventBlockBioFrontmerge() {
+        return "block:block_bio_frontmerge"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String eventBlockBioBackmerge() {
+        return "block:block_bio_backmerge"; //$NON-NLS-1$
+    }
+
 }

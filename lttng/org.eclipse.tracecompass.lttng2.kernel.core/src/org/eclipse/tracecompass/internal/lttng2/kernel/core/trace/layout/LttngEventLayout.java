@@ -61,6 +61,14 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     private static final String COMPAT_SYSCALL_ENTRY_PREFIX = "compat_sys_";
     private static final String SYSCALL_EXIT_PREFIX = "exit_syscall";
 
+    private static final String BLOCK_RQ_INSERT= "block_rq_insert";
+    private static final String BLOCK_RQ_ISSUE= "block_rq_issue";
+    private static final String ELV_MERGE_REQUESTS= "addons_elv_merge_requests";
+    private static final String BLOCK_RQ_COMPLETE= "block_rq_complete";
+    private static final String LTTNG_STATEDUMP_BLOCK_DEVICE= "lttng_statedump_block_device";
+    private static final String BLOCK_BIO_FRONTMERGE = "block_bio_frontmerge";
+    private static final String BLOCK_BIO_BACKMERGE = "block_bio_backmerge";
+
     /* Field names */
     private static final String IRQ = "irq";
     private static final String TID = "tid";
@@ -87,6 +95,14 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     private static final String HRTIMER_SOFT_EXPIRES = "softexpires";
     private static final String KMEM_ALLOC = "mm_page_alloc";
     private static final String KMEM_FREE = "mm_page_free";
+    private static final String SYSCALL_RET = "ret";
+    private static final String RWBS="rwbs";
+    private static final String DISKNAME="diskname";
+    private static final String BLOCK_DEV="dev";
+    private static final String SECTOR="sector";
+    private static final String NR_SECTOR="nr_sector";
+    private static final String RQ_SECTOR= "rq_sector";
+    private static final String NEXTRQ_SECTOR= "nextrq_sector";
 
     /** All instances are the same. Only provide a static instance getter */
     protected LttngEventLayout() {
@@ -370,6 +386,85 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     @Override
     public String fieldHRtimerNow() {
         return HRTIMER_NOW;
+    }
+
+    @Override
+    public String fieldSyscallRet() {
+        return SYSCALL_RET;
+    }
+
+    // ------------------------------------------------------------------------
+    // I/O events and fields
+    // ------------------------------------------------------------------------
+
+    @Override
+    public String eventBlockRqInsert() {
+        return BLOCK_RQ_INSERT;
+    }
+
+    @Override
+    public String eventBlockRqIssue() {
+        return BLOCK_RQ_ISSUE;
+    }
+
+    @Override
+    public String eventBlockRqComplete() {
+        return BLOCK_RQ_COMPLETE;
+    }
+
+    @Override
+    public String eventBlockBioFrontmerge() {
+        return BLOCK_BIO_FRONTMERGE;
+    }
+
+    @Override
+    public String eventBlockBioBackmerge() {
+        return BLOCK_BIO_BACKMERGE;
+    }
+
+    @Override
+    public String eventBlockRqMerge() {
+        return ELV_MERGE_REQUESTS;
+    }
+
+    @Override
+    public @NonNull String eventStatedumpBlockDevice() {
+        return LTTNG_STATEDUMP_BLOCK_DEVICE;
+    }
+
+    @Override
+    public String fieldBlockDeviceId() {
+        return BLOCK_DEV;
+    }
+
+    @Override
+    public String fieldBlockSector() {
+        return SECTOR;
+    }
+
+    @Override
+    public String fieldBlockNrSector() {
+        return NR_SECTOR;
+    }
+
+    @Override
+    public String fieldBlockRwbs() {
+        return RWBS;
+    }
+
+    @Override
+    public String fieldBlockRqSector() {
+        return RQ_SECTOR;
+    }
+
+    @Override
+    public String fieldBlockNextRqSector() {
+        return NEXTRQ_SECTOR;
+    }
+
+    @Override
+    public String fieldDiskname() {
+        return DISKNAME;
     }
 
 }

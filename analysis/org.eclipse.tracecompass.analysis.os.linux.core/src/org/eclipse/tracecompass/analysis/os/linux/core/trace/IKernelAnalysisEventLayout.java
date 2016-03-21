@@ -547,4 +547,161 @@ public interface IKernelAnalysisEventLayout {
      */
     String fieldHRtimerNow();
 
+    /**
+     * The field containing the return value of a system call exit.
+     *
+     * @return The name of return field
+     * @since 2.0
+     */
+    default String fieldSyscallRet() {
+        return "ret"; //$NON-NLS-1$
+    }
+
+    // ------------------------------------------------------------------------
+    // I/O events and fields
+    // ------------------------------------------------------------------------
+
+    /**
+     * A request to a block IO has just been inserted in the waiting queue.
+     *
+     * @return The name of the event
+     * @since 2.0
+     */
+    default String eventBlockRqInsert() {
+        return "block_rq_insert"; //$NON-NLS-1$
+    }
+
+    /**
+     * A request to a block IO has just been issued and passed from the waiting
+     * queue to the driver queue. It is being served.
+     *
+     * @return The name of the event
+     * @since 2.0
+     */
+    default String eventBlockRqIssue() {
+        return "block_rq_issue"; //$NON-NLS-1$
+    }
+
+    /**
+     * A request to a block IO has just been completed.
+     *
+     * @return The name of the event
+     * @since 2.0
+     */
+    default String eventBlockRqComplete() {
+        return "block_rq_complete"; //$NON-NLS-1$
+    }
+
+    /**
+     * A BIO operation is being merged at the front of a waiting request
+     *
+     * @return The name of the event
+     * @since 2.0
+     */
+    default String eventBlockBioFrontmerge() {
+        return "block_bio_frontmerge"; //$NON-NLS-1$
+    }
+
+    /**
+     * A BIO operation is being merged at the back of a waiting request
+     *
+     * @return The name of the event
+     * @since 2.0
+     */
+    default String eventBlockBioBackmerge() {
+        return "block_bio_backmerge"; //$NON-NLS-1$
+    }
+
+    /**
+     * 2 requests previously inserted in the waiting queue are being merged
+     *
+     * @return The name of the event
+     * @since 2.0
+     */
+    default String eventBlockRqMerge() {
+        return "block_rq_merge"; //$NON-NLS-1$
+    }
+
+    /**
+     * Optional event used by some tracers to associate the name of the block
+     * device to a device ID
+     *
+     * @return The name of the event
+     * @since 2.0
+     */
+    default @Nullable String eventStatedumpBlockDevice() {
+        return null;
+    }
+
+    /**
+     * The field containing the device ID
+     *
+     * @return The name of the field
+     * @since 2.0
+     */
+    default String fieldBlockDeviceId() {
+        return "dev"; //$NON-NLS-1$
+    }
+
+    /**
+     * The field with the first sector of a block operation
+     *
+     * @return The name of the field
+     * @since 2.0
+     */
+    default String fieldBlockSector() {
+        return "sector"; //$NON-NLS-1$
+    }
+
+    /**
+     * The field with the number of sectors involved in a block operation
+     *
+     * @return The name of the field
+     * @since 2.0
+     */
+    default String fieldBlockNrSector() {
+        return "nr_sector"; //$NON-NLS-1$
+    }
+
+    /**
+     * The field containing the read/write flag of a block operation
+     *
+     * @return The name of the field
+     * @since 2.0
+     */
+    default String fieldBlockRwbs() {
+        return "rwbs"; //$NON-NLS-1$
+    }
+
+    /**
+     * The field with the first sector of a request in which another block
+     * operation is being merged
+     *
+     * @return The name of the field
+     * @since 2.0
+     */
+    default String fieldBlockRqSector() {
+        return "rq_sector"; //$NON-NLS-1$
+    }
+
+    /**
+     * The field with the sector of the request being merged in another one
+     *
+     * @return The name of the field
+     * @since 2.0
+     */
+    default String fieldBlockNextRqSector() {
+        return "nextrq_sector"; //$NON-NLS-1$
+    }
+
+    /**
+     * The field containing the name of the disk
+     *
+     * @return The name of the field
+     * @since 2.0
+     */
+    default String fieldDiskname() {
+        return "diskname"; //$NON-NLS-1$
+    }
+
 }
