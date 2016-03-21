@@ -40,6 +40,10 @@ public class TmfTestHelper {
      * completed and it returns the result of the method. It allows to execute
      * the analysis without requiring an Eclipse job and waiting for completion.
      *
+     * Note that executing an analysis using this method will not automatically
+     * execute the dependent analyses module. The execution of those modules is
+     * left to the caller.
+     *
      * @param module
      *            The analysis module to execute
      * @return The return value of the
