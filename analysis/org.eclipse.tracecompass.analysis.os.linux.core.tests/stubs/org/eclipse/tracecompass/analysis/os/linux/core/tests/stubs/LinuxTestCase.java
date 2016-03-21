@@ -45,7 +45,16 @@ public class LinuxTestCase {
         private final String[] fAttributePath;
         private final List<ITmfStateInterval> fIntervals;
 
-        IntervalInfo(List<ITmfStateInterval> intervals, String... attributePath) {
+        /**
+         * Constructor
+         *
+         * @param intervals
+         *            The list of intervals for the full time range of the
+         *            attribute
+         * @param attributePath
+         *            The attribute path
+         */
+        public IntervalInfo(List<ITmfStateInterval> intervals, String... attributePath) {
             fAttributePath = attributePath;
             fIntervals = intervals;
         }

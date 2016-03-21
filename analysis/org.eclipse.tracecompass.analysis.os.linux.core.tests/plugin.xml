@@ -39,7 +39,16 @@
             name="Kernel Memory Usage Test Analysis">
          <tracetype
                applies="true"
-               class="org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub">
+               class="org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub">
+         </tracetype>
+      </module>
+      <module
+            analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.InputOutputAnalysisModule"
+            automatic="false"
+            id="org.eclipse.tracecompass.analysis.os.linux.inputoutput"
+            name="IO Test Analysis">
+         <tracetype
+               class="org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub">
          </tracetype>
       </module>
    </extension>

@@ -1,0 +1,166 @@
+<trace>
+<set_aspects>
+<field name="cpu" value="1" type="int" />
+</set_aspects>
+<event timestamp="1" name="statedump_block_device">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="diskname" value="sda" type="string" />
+</event>
+<!-- missing the insert event -->
+<event timestamp="5" name="block_rq_issue">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="444" type="long" />
+<field name="nr_sector" value="8" type="long" />
+<field name="bytes" value="0" type="long" />
+<field name="tid" value="1" type="long" />
+<field name="rwbs" value="33" type="long" />
+</event>
+<event timestamp="10" name="block_rq_complete">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="444" type="long" />
+<field name="nr_sector" value="8" type="long" />
+<field name="errors" value="0" type="long" />
+<field name="rwbs" value="33" type="long" />
+</event>
+<!-- frontmerging with a request that was not inserted -->
+<event timestamp="15" name="block_bio_frontmerge">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="rq_sector" value="444" type="long" />
+<field name="sector" value="436" type="long" />
+<field name="nr_sector" value="8" type="long" />
+<field name="rwbs" value="33" type="long" />
+</event>
+<event timestamp="20" name="block_rq_issue">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="436" type="long" />
+<field name="nr_sector" value="16" type="long" />
+<field name="bytes" value="0" type="long" />
+<field name="tid" value="1" type="long" />
+<field name="rwbs" value="33" type="long" />
+</event>
+<event timestamp="25" name="block_rq_complete">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="436" type="long" />
+<field name="nr_sector" value="16" type="long" />
+<field name="errors" value="0" type="long" />
+<field name="rwbs" value="33" type="long" />
+</event>
+<!-- missing insert and issue events -->
+<event timestamp="30" name="block_rq_complete">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="333" type="long" />
+<field name="nr_sector" value="16" type="long" />
+<field name="errors" value="0" type="long" />
+<field name="rwbs" value="4" type="long" />
+</event>
+<!-- elv_merge after a request not inserted -->
+<event timestamp="35" name="block_rq_insert">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="292" type="long" />
+<field name="nr_sector" value="8" type="long" />
+<field name="bytes" value="0" type="long" />
+<field name="tid" value="1" type="long" />
+<field name="rwbs" value="4" type="long" />
+</event>
+<event timestamp="38" name="addons_elv_merge_requests">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="rq_sector" value="284" type="long" />
+<field name="nextrq_sector" value="292" type="long" />
+</event>
+<event timestamp="40" name="block_rq_issue">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="284" type="long" />
+<field name="nr_sector" value="40" type="long" />
+<field name="bytes" value="0" type="long" />
+<field name="tid" value="1" type="long" />
+<field name="rwbs" value="4" type="long" />
+</event>
+<event timestamp="45" name="block_rq_complete">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="284" type="long" />
+<field name="nr_sector" value="40" type="long" />
+<field name="errors" value="0" type="long" />
+<field name="rwbs" value="4" type="long" />
+</event>
+<!-- elv_merge before a request not inserted -->
+<event timestamp="50" name="block_rq_insert">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="284" type="long" />
+<field name="nr_sector" value="8" type="long" />
+<field name="bytes" value="0" type="long" />
+<field name="tid" value="1" type="long" />
+<field name="rwbs" value="4" type="long" />
+</event>
+<event timestamp="55" name="addons_elv_merge_requests">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="rq_sector" value="284" type="long" />
+<field name="nextrq_sector" value="292" type="long" />
+</event>
+<event timestamp="60" name="block_rq_issue">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="284" type="long" />
+<field name="nr_sector" value="40" type="long" />
+<field name="bytes" value="0" type="long" />
+<field name="tid" value="1" type="long" />
+<field name="rwbs" value="4" type="long" />
+</event>
+<event timestamp="65" name="block_rq_complete">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="284" type="long" />
+<field name="nr_sector" value="40" type="long" />
+<field name="errors" value="0" type="long" />
+<field name="rwbs" value="4" type="long" />
+</event>
+<!-- request never completed -->
+<event timestamp="80" name="block_rq_insert">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="444" type="long" />
+<field name="nr_sector" value="8" type="long" />
+<field name="bytes" value="0" type="long" />
+<field name="tid" value="1" type="long" />
+<field name="rwbs" value="33" type="long" />
+</event>
+<event timestamp="100" name="block_rq_issue">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="444" type="long" />
+<field name="nr_sector" value="8" type="long" />
+<field name="bytes" value="0" type="long" />
+<field name="tid" value="1" type="long" />
+<field name="rwbs" value="33" type="long" />
+</event>
+<!-- request not issued -->
+<event timestamp="120" name="block_rq_insert">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="333" type="long" />
+<field name="nr_sector" value="8" type="long" />
+<field name="bytes" value="0" type="long" />
+<field name="tid" value="1" type="long" />
+<field name="rwbs" value="33" type="long" />
+</event>
+<event timestamp="140" name="block_rq_complete">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="333" type="long" />
+<field name="nr_sector" value="8" type="long" />
+<field name="errors" value="0" type="long" />
+<field name="rwbs" value="33" type="long" />
+</event>
+</trace>

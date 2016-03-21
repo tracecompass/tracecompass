@@ -1,0 +1,95 @@
+<trace>
+<set_aspects>
+<field name="cpu" value="1" type="int" />
+</set_aspects>
+<event timestamp="1" name="statedump_block_device">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="diskname" value="sda" type="string" />
+</event>
+<event timestamp="3" name="sched_switch">
+<field name="cpu" value="0" type="int" />
+<field name="prev_comm" value="proc4" type="string" />
+<field name="prev_tid" value="4" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="0" type="long" />
+<field name="next_comm" value="proc2" type="string" />
+<field name="next_tid" value="2" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
+<event timestamp="3" name="sched_switch">
+<field name="cpu" value="1" type="int" />
+<field name="prev_comm" value="proc3" type="string" />
+<field name="prev_tid" value="3" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="0" type="long" />
+<field name="next_comm" value="proc5" type="string" />
+<field name="next_tid" value="5" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
+<event timestamp="5" name="syscall_entry_write">
+<field name="cpu" value="0" type="int" />
+<field name="fd" value="11" type="long" />
+<field name="buf" value="654654" type="long" />
+<field name="count" value="16" type="long" />
+</event>
+<event timestamp="10" name="syscall_exit_write">
+<field name="cpu" value="0" type="int" />
+<field name="ret" value="16" type="long" />
+</event>
+<event timestamp="15" name="syscall_entry_writev">
+<field name="cpu" value="1" type="int" />
+<field name="fd" value="11" type="long" />
+<field name="vec" value="123123" type="long" />
+<field name="vlen" value="1" type="long" />
+</event>
+<event timestamp="20" name="syscall_exit_writev">
+<field name="cpu" value="1" type="int" />
+<field name="ret" value="-11" type="long" />
+</event>
+<event timestamp="25" name="syscall_entry_writev">
+<field name="cpu" value="1" type="int" />
+<field name="fd" value="11" type="long" />
+<field name="vec" value="123123" type="long" />
+<field name="vlen" value="1" type="long" />
+</event>
+<event timestamp="26" name="syscall_entry_pwrite">
+<field name="cpu" value="0" type="int" />
+<field name="fd" value="11" type="long" />
+<field name="buf" value="654654" type="long" />
+<field name="count" value="10" type="long" />
+<field name="pos" value="10" type="long" />
+</event>
+<event timestamp="30" name="syscall_exit_writev">
+<field name="cpu" value="1" type="int" />
+<field name="ret" value="32" type="long" />
+<field name="vec" value="123123" type="long" />
+</event>
+<event timestamp="30" name="syscall_exit_pwrite">
+<field name="cpu" value="0" type="int" />
+<field name="ret" value="10" type="long" />
+</event>
+<event timestamp="35" name="syscall_entry_pwrite64">
+<field name="cpu" value="0" type="int" />
+<field name="fd" value="11" type="long" />
+<field name="buf" value="654654" type="long" />
+<field name="count" value="10" type="long" />
+<field name="pos" value="10" type="long" />
+</event>
+<event timestamp="40" name="syscall_exit_pwrite64">
+<field name="cpu" value="0" type="int" />
+<field name="ret" value="10" type="long" />
+</event>
+<event timestamp="45" name="syscall_entry_pwritev">
+<field name="cpu" value="1" type="int" />
+<field name="fd" value="11" type="long" />
+<field name="vec" value="123123" type="long" />
+<field name="vlen" value="3" type="long" />
+<field name="pos" value="15" type="long" />
+</event>
+<event timestamp="50" name="syscall_exit_pwritev">
+<field name="cpu" value="1" type="int" />
+<field name="ret" value="64" type="long" />
+<field name="vec" value="123123" type="long" />
+</event>
+</trace>
