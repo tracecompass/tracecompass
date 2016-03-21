@@ -18,6 +18,7 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -32,6 +33,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
@@ -679,11 +682,35 @@ public final class SWTBotUtils {
      *            the {@link SWTBotTable} table
      */
     public static void maximizeTable(SWTBotTable tableBot) {
+        final AtomicBoolean controlResized = new AtomicBoolean();
+        UIThreadRunnable.syncExec(new VoidResult() {
+            @Override
+            public void run() {
+                tableBot.widget.addControlListener(new ControlAdapter() {
+                    @Override
+                    public void controlResized(ControlEvent e) {
+                        tableBot.widget.removeControlListener(this);
+                        controlResized.set(true);
+                    }
+                });
+            }
+        });
         try {
             tableBot.pressShortcut(KeyStroke.getInstance(IKeyLookup.CTRL_NAME + "+"), KeyStroke.getInstance("M"));
         } catch (ParseException e) {
             fail();
         }
+        new SWTBot().waitUntil(new DefaultCondition() {
+            @Override
+            public boolean test() throws Exception {
+                return controlResized.get();
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return "Control was not resized";
+            }
+        });
     }
 
     /**

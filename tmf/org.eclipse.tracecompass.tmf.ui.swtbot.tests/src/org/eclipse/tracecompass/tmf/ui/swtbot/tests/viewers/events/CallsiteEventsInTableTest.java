@@ -169,6 +169,7 @@ public class CallsiteEventsInTableTest {
         final SWTBotEditor sourceEditorBot = fBot.editor(matcher);
         assertTrue(sourceEditorBot.isActive());
 
+        editorBot.show();
         SWTBotUtils.maximizeTable(tableBot);
 
         fBot.closeAllEditors();
