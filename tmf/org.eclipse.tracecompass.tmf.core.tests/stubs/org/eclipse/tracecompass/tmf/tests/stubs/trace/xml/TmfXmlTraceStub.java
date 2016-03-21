@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashSet;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
@@ -99,6 +100,7 @@ public class TmfXmlTraceStub extends TmfTrace {
     private CustomXmlTrace fTrace;
 
     private Collection<ITmfEventAspect> fAspects = TmfTrace.BASE_ASPECTS;
+    private final Collection<ITmfEventAspect> fAdditionalAspects = new HashSet<>();
 
     /**
      * Constructor. Constructs the custom XML trace with the appropriate
@@ -293,7 +295,10 @@ public class TmfXmlTraceStub extends TmfTrace {
             fieldsArray[i] = new TmfEventField(checkNotNull(fields[i]), val, null);
         }
 
-        /* Generate the aspects for this trace if it is the 'set_aspects' definition */
+        /*
+         * Generate the aspects for this trace if it is the 'set_aspects'
+         * definition
+         */
         if (fTrace.getDefinition() != fDefinition) {
             generateAspects(fieldsArray);
             return null;
@@ -345,12 +350,29 @@ public class TmfXmlTraceStub extends TmfTrace {
 
         /* Add the big content aspect */
         builder.add(ITmfEventAspect.BaseAspects.CONTENTS);
+        /* Add the additional aspects */
+        builder.addAll(fAdditionalAspects);
         fAspects = builder.build();
     }
 
     @Override
     public Iterable<ITmfEventAspect> getEventAspects() {
         return fAspects;
+    }
+
+    /**
+     * Adds a new event aspect to this type of trace. Since this trace type is
+     * used to build custom traces that mimic the behavior of real traces, the
+     * required aspects may be missing and this method allows to add them. This
+     * method should be called before calling
+     * {@link #initTrace(IResource, String, Class)} otherwise the additional
+     * aspects will not be picked up when generating the aspects.
+     *
+     * @param aspect
+     *            The aspect to have
+     */
+    public void addEventAspect(ITmfEventAspect aspect) {
+        fAdditionalAspects.add(aspect);
     }
 
 }
