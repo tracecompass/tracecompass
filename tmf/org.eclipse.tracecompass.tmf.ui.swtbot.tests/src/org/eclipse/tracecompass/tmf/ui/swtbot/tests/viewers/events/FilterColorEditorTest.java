@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -38,9 +38,12 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
+import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
+import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
@@ -169,13 +172,14 @@ public class FilterColorEditorTest {
     public void testHighlight() {
         final Rectangle cellBounds = SWTBotUtils.getCellBounds(fTableBot.widget, ROW, SOURCE_COLUMN);
 
-        Multiset<RGB> colorBefore = ImageHelper.grabImage(cellBounds).getHistogram();
+        ImageHelper before = ImageHelper.grabImage(cellBounds);
+        Multiset<RGB> colorBefore = before.getHistogram();
         // Select source column and enter regex
         fTableBot.click(0, SOURCE_COLUMN);
         fBot.text().typeText("HostF\n", 100);
         // make sure selected row is not matching row
         fTableBot.select(ROW - 1);
-        Multiset<RGB> colorAfter = ImageHelper.grabImage(cellBounds).getHistogram();
+        Multiset<RGB> colorAfter = waitForNewImage(cellBounds, before).getHistogram();
 
         assertTrue(colorBefore.contains(fBackground));
         assertTrue(colorBefore.contains(fForeground));
@@ -205,7 +209,7 @@ public class FilterColorEditorTest {
         fBot.text().typeText("e\n", 100);
         // make sure matching item is not selected
         fTableBot.select(ROW - 1);
-        ImageHelper after = ImageHelper.grabImage(cellBounds);
+        ImageHelper after = waitForNewImage(cellBounds, before);
 
         Multiset<RGB> colorBefore = before.getHistogram();
         Multiset<RGB> colorAfter = after.getHistogram();
@@ -246,23 +250,25 @@ public class FilterColorEditorTest {
     public void testSwitchToFilter() {
         Rectangle cellBounds = SWTBotUtils.getCellBounds(fTableBot.widget, ROW, TIMESTAMP_COLUMN);
         ImageHelper before = ImageHelper.grabImage(cellBounds);
+
         // enter regex in Timestamp column
         fTableBot.click(0, TIMESTAMP_COLUMN);
         fBot.text().typeText("00\n", 100);
         // make sure matching column is not selected
         fTableBot.select(ROW - 1);
-        ImageHelper afterSearch = ImageHelper.grabImage(cellBounds);
+        ImageHelper afterSearch = waitForNewImage(cellBounds, before);
+
         // click Add as Filter
         fTableBot.click(0, 0);
         fBot.waitUntil(ConditionHelpers.isTableCellFilled(fTableBot, "<srch>", 0, TIMESTAMP_COLUMN));
-        //TODO: We need a better way to make sure that the table is done updating
-        SWTBotUtils.delay(2000);
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(fTableBot, "22/22", 1, TIMESTAMP_COLUMN));
         // the bounds have changed after applying the filter
         cellBounds = SWTBotUtils.getCellBounds(fTableBot.widget, ROW, TIMESTAMP_COLUMN);
         ImageHelper afterFilter = ImageHelper.grabImage(cellBounds);
+
         // press DEL to clear highlighting
         fTableBot.pressShortcut(Keystrokes.DELETE);
-        ImageHelper afterClear = ImageHelper.grabImage(cellBounds);
+        ImageHelper afterClear = waitForNewImage(cellBounds, afterFilter);
 
         List<RGB> beforeLine = before.getPixelRow(2);
         List<RGB> afterSearchLine = afterSearch.getPixelRow(2);
@@ -303,13 +309,14 @@ public class FilterColorEditorTest {
 
         final Rectangle cellBounds = SWTBotUtils.getCellBounds(fTableBot.widget, ROW, SOURCE_COLUMN);
 
-        Multiset<RGB> colorBefore = ImageHelper.grabImage(cellBounds).getHistogram();
+        ImageHelper before = ImageHelper.grabImage(cellBounds);
+        Multiset<RGB> colorBefore = before.getHistogram();
         // Select source column and enter regex
         fTableBot.click(0, SOURCE_COLUMN);
         fBot.text().typeText("HostF\n", 100);
         // make sure selected row is not matching row
         fTableBot.select(ROW - 1);
-        Multiset<RGB> colorAfter = ImageHelper.grabImage(cellBounds).getHistogram();
+        Multiset<RGB> colorAfter = waitForNewImage(cellBounds, before).getHistogram();
 
         assertTrue(colorBefore.contains(fBackground));
         assertTrue(colorBefore.contains(fForeground));
@@ -329,5 +336,27 @@ public class FilterColorEditorTest {
 
         // reset the highlight color preference
         colorRegistry.put(HIGHLIGHT_COLOR_DEFINITION_ID, fHighlight);
+    }
+
+    private static ImageHelper waitForNewImage(Rectangle bounds, ImageHelper currentImage) {
+        ImageHelper[] newImage = new ImageHelper[1];
+        fBot.waitUntil(new DefaultCondition() {
+            @Override
+            public boolean test() throws Exception {
+                return UIThreadRunnable.syncExec(new Result<Boolean> () {
+                    @Override
+                    public Boolean run() {
+                        newImage[0] = ImageHelper.grabImage(bounds);
+                        return !newImage[0].equals(currentImage);
+                    }
+                });
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return "Image at bounds " + bounds + " did not change";
+            }
+        });
+        return newImage[0];
     }
 }
