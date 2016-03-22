@@ -37,10 +37,16 @@ public class PiSetprioHandler extends KernelEventHandler {
     @Override
     public void handleEvent(ITmfStateSystemBuilder ss, ITmfEvent event) throws AttributeNotFoundException {
         ITmfEventField content = event.getContent();
+        Integer cpu = KernelEventHandlerUtils.getCpu(event);
         Integer tid = ((Long) content.getField(getLayout().fieldTid()).getValue()).intValue();
         Integer prio = ((Long) content.getField(getLayout().fieldNewPrio()).getValue()).intValue();
 
-        Integer updateThreadNode = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeThreads(ss), tid.toString());
+        String threadAttributeName = KernelEventHandlerUtils.buildThreadAttributeName(tid, cpu);
+        if (threadAttributeName == null) {
+            return;
+        }
+
+        Integer updateThreadNode = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeThreads(ss), threadAttributeName);
 
         /* Set the current prio for the new process */
         int quark = ss.getQuarkRelativeAndAdd(updateThreadNode, Attributes.PRIO);

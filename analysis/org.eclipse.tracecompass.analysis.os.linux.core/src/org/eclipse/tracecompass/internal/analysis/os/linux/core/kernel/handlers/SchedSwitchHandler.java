@@ -54,9 +54,13 @@ public class SchedSwitchHandler extends KernelEventHandler {
         Integer nextTid = ((Long) content.getField(getLayout().fieldNextTid()).getValue()).intValue();
         Integer nextPrio = ((Long) content.getField(getLayout().fieldNextPrio()).getValue()).intValue();
 
+        /* Will never return null since "cpu" is null checked */
+        String formerThreadAttributeName = KernelEventHandlerUtils.buildThreadAttributeName(prevTid, cpu);
+        String currenThreadAttributeName = KernelEventHandlerUtils.buildThreadAttributeName(nextTid, cpu);
+
         int nodeThreads = KernelEventHandlerUtils.getNodeThreads(ss);
-        int formerThreadNode = ss.getQuarkRelativeAndAdd(nodeThreads, prevTid.toString());
-        int newCurrentThreadNode = ss.getQuarkRelativeAndAdd(nodeThreads, nextTid.toString());
+        int formerThreadNode = ss.getQuarkRelativeAndAdd(nodeThreads, formerThreadAttributeName);
+        int newCurrentThreadNode = ss.getQuarkRelativeAndAdd(nodeThreads, currenThreadAttributeName);
 
         long timestamp = KernelEventHandlerUtils.getTimestamp(event);
         /* Set the status of the process that got scheduled out. */

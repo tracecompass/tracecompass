@@ -253,7 +253,7 @@ public class ControlFlowViewTest extends KernelTestBase {
         TreeCheckedCounter treeCheckCounter = new TreeCheckedCounter(treeBot);
         // get how many items there are
         Integer checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals("default", 200, checked.intValue());
+        assertEquals("default", 225, checked.intValue());
         // test "uncheck all button"
         bot.button(UNCHECK_ALL).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
@@ -261,15 +261,15 @@ public class ControlFlowViewTest extends KernelTestBase {
         // test check active
         bot.button(CHECK_ACTIVE).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(CHECK_ACTIVE, 43, checked.intValue());
+        assertEquals(CHECK_ACTIVE, 68, checked.intValue());
         // test check all
         bot.button(CHECK_ALL).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(CHECK_ALL, 200, checked.intValue());
+        assertEquals(CHECK_ALL, 225, checked.intValue());
         // test uncheck inactive
         bot.button(UNCHECK_INACTIVE).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(UNCHECK_INACTIVE, 43, checked.intValue());
+        assertEquals(UNCHECK_INACTIVE, 68, checked.intValue());
         // test check selected
         treeBot.select(1);
         bot.button(UNCHECK_ALL).click();
@@ -285,12 +285,12 @@ public class ControlFlowViewTest extends KernelTestBase {
         bot.button(CHECK_ALL).click();
         bot.button(UNCHECK_SELECTED).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(UNCHECK_SELECTED, 199, checked.intValue());
+        assertEquals(UNCHECK_SELECTED, 224, checked.intValue());
         // test uncheck subtree
         bot.button(CHECK_ALL).click();
         bot.button(UNCHECK_SUBTREE).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(UNCHECK_SELECTED, 199, checked.intValue());
+        assertEquals(UNCHECK_SELECTED, 224, checked.intValue());
         // test filter
         bot.button(UNCHECK_ALL).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);

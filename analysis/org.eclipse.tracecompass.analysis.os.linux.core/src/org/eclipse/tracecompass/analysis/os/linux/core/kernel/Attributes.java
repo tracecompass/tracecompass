@@ -45,4 +45,6 @@ public interface Attributes {
 
     /* Misc stuff */
     String UNKNOWN = "Unknown";
+    String THREAD_0_PREFIX = "0_";
+    String THREAD_0_SEPARATOR = "_";
 }

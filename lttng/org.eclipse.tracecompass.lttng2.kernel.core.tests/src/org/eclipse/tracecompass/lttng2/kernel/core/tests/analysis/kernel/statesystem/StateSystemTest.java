@@ -396,7 +396,7 @@ public abstract class StateSystemTest {
         List<Integer> list = fixture.getQuarks(Attributes.THREADS, "*", Attributes.EXEC_NAME);
 
         /* Number of different kernel threads in the trace */
-        assertEquals(168, list.size());
+        assertEquals(169, list.size());
     }
 
     @Test

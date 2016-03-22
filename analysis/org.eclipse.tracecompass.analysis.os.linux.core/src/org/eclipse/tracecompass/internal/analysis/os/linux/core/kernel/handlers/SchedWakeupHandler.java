@@ -36,9 +36,16 @@ public class SchedWakeupHandler extends KernelEventHandler {
 
     @Override
     public void handleEvent(ITmfStateSystemBuilder ss, ITmfEvent event) throws AttributeNotFoundException {
+        Integer cpu = KernelEventHandlerUtils.getCpu(event);
         final int tid = ((Long) event.getContent().getField(getLayout().fieldTid()).getValue()).intValue();
         final int prio = ((Long) event.getContent().getField(getLayout().fieldPrio()).getValue()).intValue();
-        final int threadNode = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeThreads(ss), String.valueOf(tid));
+
+        String threadAttributeName = KernelEventHandlerUtils.buildThreadAttributeName(tid, cpu);
+        if (threadAttributeName == null) {
+            return;
+        }
+
+        final int threadNode = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeThreads(ss), threadAttributeName);
 
         /*
          * The process indicated in the event's payload is now ready to run.

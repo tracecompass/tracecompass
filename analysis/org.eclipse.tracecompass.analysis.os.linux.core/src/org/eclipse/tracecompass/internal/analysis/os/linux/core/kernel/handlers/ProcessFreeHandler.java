@@ -35,11 +35,18 @@ public class ProcessFreeHandler extends KernelEventHandler {
     @Override
     public void handleEvent(ITmfStateSystemBuilder ss, ITmfEvent event) throws AttributeNotFoundException {
 
+        Integer cpu = KernelEventHandlerUtils.getCpu(event);
         Integer tid = ((Long) event.getContent().getField(getLayout().fieldTid()).getValue()).intValue();
+
+        String threadAttributeName = KernelEventHandlerUtils.buildThreadAttributeName(tid, cpu);
+        if (threadAttributeName == null) {
+            return;
+        }
+
         /*
          * Remove the process and all its sub-attributes from the current state
          */
-        int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeThreads(ss), tid.toString());
+        int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeThreads(ss), threadAttributeName);
         ss.removeAttribute(KernelEventHandlerUtils.getTimestamp(event), quark);
     }
 }

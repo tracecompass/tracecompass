@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.KernelEventHandlerUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.FollowThreadAction;
@@ -51,6 +52,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractStateSystemTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphCombo;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
@@ -271,7 +273,8 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
         }
 
         final List<ControlFlowEntry> entryList = new ArrayList<>();
-        final Map<Integer, ControlFlowEntry> entryMap = new HashMap<>();
+        /** Map of view entries, key is a pair [threadId, cpuId] */
+        final Map<Pair<Integer, Integer>, ControlFlowEntry> entryMap = new HashMap<>();
 
         long start = ssq.getStartTime();
         setStartTime(Math.min(getStartTime(), start));
@@ -298,14 +301,12 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                 @Override
                 public void handle(List<List<ITmfStateInterval>> fullStates, List<ITmfStateInterval> prevFullState) {
                     for (int threadQuark : threadQuarks) {
-                        String threadName = ssq.getAttributeName(threadQuark);
-                        int threadId = -1;
-                        try {
-                            threadId = Integer.parseInt(threadName);
-                        } catch (NumberFormatException e1) {
-                            continue;
-                        }
-                        if (threadId <= 0) { // ignore the 'unknown' (-1) and swapper (0) threads
+                        String threadAttributeName = ssq.getAttributeName(threadQuark);
+
+                        Pair<Integer, Integer> entryKey = KernelEventHandlerUtils.parseThreadAttributeName(threadAttributeName);
+                        int threadId = entryKey.getFirst();
+
+                        if (threadId < 0) { // ignore the 'unknown' (-1) thread
                             continue;
                         }
 
@@ -358,11 +359,11 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                                     execNameInterval.getStateValue().getType() == ITmfStateValue.Type.STRING) {
                                 String execName = execNameInterval.getStateValue().unboxStr();
                                 int ppid = ppidInterval.getStateValue().unboxInt();
-                                ControlFlowEntry entry = entryMap.get(threadId);
+                                ControlFlowEntry entry = entryMap.get(entryKey);
                                 if (entry == null) {
                                     entry = new ControlFlowEntry(threadQuark, trace, execName, threadId, ppid, startTime, endTime);
                                     entryList.add(entry);
-                                    entryMap.put(threadId, entry);
+                                    entryMap.put(entryKey, entry);
                                 } else {
                                     /*
                                      * Update the name of the entry to the
@@ -375,7 +376,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                                 }
                             }
                             if (isNull) {
-                                entryMap.remove(threadId);
+                                entryMap.remove(entryKey);
                             }
                             lastExecNameStartTime = startTime;
                             lastExecNameEndTime = endTime;

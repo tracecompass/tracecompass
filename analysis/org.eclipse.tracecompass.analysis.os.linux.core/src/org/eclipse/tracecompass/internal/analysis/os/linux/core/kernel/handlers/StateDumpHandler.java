@@ -43,6 +43,7 @@ public class StateDumpHandler extends KernelEventHandler {
     @Override
     public void handleEvent(ITmfStateSystemBuilder ss, ITmfEvent event) throws AttributeNotFoundException {
         ITmfEventField content = event.getContent();
+        Integer cpu = KernelEventHandlerUtils.getCpu(event);
         int tid = ((Long) content.getField("tid").getValue()).intValue(); //$NON-NLS-1$
         int pid = ((Long) content.getField("pid").getValue()).intValue(); //$NON-NLS-1$
         int ppid = ((Long) content.getField("ppid").getValue()).intValue(); //$NON-NLS-1$
@@ -53,7 +54,12 @@ public class StateDumpHandler extends KernelEventHandler {
          * with anything relevant for now.
          */
 
-        int curThreadNode = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeThreads(ss), String.valueOf(tid));
+        String threadAttributeName = KernelEventHandlerUtils.buildThreadAttributeName(tid, cpu);
+        if (threadAttributeName == null) {
+            return;
+        }
+
+        int curThreadNode = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeThreads(ss), threadAttributeName);
         long timestamp = KernelEventHandlerUtils.getTimestamp(event);
         /* Set the process' name */
         setProcessName(ss, name, curThreadNode, timestamp);

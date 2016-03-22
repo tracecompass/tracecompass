@@ -40,14 +40,26 @@ public class ProcessForkHandler extends KernelEventHandler {
     @Override
     public void handleEvent(ITmfStateSystemBuilder ss, ITmfEvent event) throws AttributeNotFoundException {
         ITmfEventField content = event.getContent();
+        Integer cpu = KernelEventHandlerUtils.getCpu(event);
         String childProcessName = (String) content.getField(getLayout().fieldChildComm()).getValue();
 
         Integer parentTid = ((Long) content.getField(getLayout().fieldParentTid()).getValue()).intValue();
         Integer childTid = ((Long) content.getField(getLayout().fieldChildTid()).getValue()).intValue();
 
+        String parentThreadAttributeName = KernelEventHandlerUtils.buildThreadAttributeName(parentTid, cpu);
+        if (parentThreadAttributeName == null) {
+            return;
+        }
+
+        String childThreadAttributeName = KernelEventHandlerUtils.buildThreadAttributeName(childTid, cpu);
+        if (childThreadAttributeName == null) {
+            return;
+        }
+
         final int threadsNode = KernelEventHandlerUtils.getNodeThreads(ss);
-        Integer parentTidNode = ss.getQuarkRelativeAndAdd(threadsNode, parentTid.toString());
-        Integer childTidNode = ss.getQuarkRelativeAndAdd(threadsNode, childTid.toString());
+        Integer parentTidNode = ss.getQuarkRelativeAndAdd(threadsNode, parentThreadAttributeName);
+        Integer childTidNode = ss.getQuarkRelativeAndAdd(threadsNode, childThreadAttributeName);
+
 
         /* Assign the PPID to the new process */
         int quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.PPID);
