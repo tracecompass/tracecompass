@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2016 École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.tmf.analysis.xml.ui.views.timegraph;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
@@ -272,4 +273,14 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
         return super.getTimeEventsIterator();
     }
 
+    @Override
+    public boolean matches(@NonNull Pattern pattern) {
+        if (pattern.matcher(getName()).find()) {
+            return true;
+        }
+        if (pattern.matcher(fId).find()) {
+            return true;
+        }
+        return pattern.matcher(fParentId).find();
+    }
 }

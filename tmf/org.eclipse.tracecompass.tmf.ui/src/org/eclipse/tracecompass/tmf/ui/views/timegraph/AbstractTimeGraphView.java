@@ -53,6 +53,7 @@ import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.commands.ActionHandler;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -74,6 +75,7 @@ import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -118,7 +120,13 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.handlers.IHandlerActivation;
+import org.eclipse.ui.handlers.IHandlerService;
 
 /**
  * An abstract view all time graph views can inherit
@@ -250,6 +258,21 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     private final @NonNull MenuManager fEntryMenuManager = new MenuManager();
 
+    /** Time Graph View part listener */
+    private TimeGraphPartListener fPartListener;
+
+    /** Action for the find command. There is only one for all Time Graph views */
+    private static final ShowFindDialogAction FIND_ACTION = new ShowFindDialogAction();
+
+    /** The find action handler */
+    private static ActionHandler fFindActionHandler;
+
+    /** The find handler activation */
+    private static IHandlerActivation fFindHandlerActivation;
+
+    /** The find target to use */
+    private final FindTarget fFindTarget;
+
     // ------------------------------------------------------------------------
     // Classes
     // ------------------------------------------------------------------------
@@ -307,6 +330,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         ITimeGraphEntry getSelection();
 
         void setSelection(ITimeGraphEntry selection);
+
+        void selectAndReveal(@NonNull ITimeGraphEntry selection);
+
     }
 
     private class TimeGraphViewerWrapper implements ITimeGraphWrapper {
@@ -444,6 +470,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         @Override
         public void setSelection(ITimeGraphEntry selection) {
             viewer.setSelection(selection);
+        }
+
+        @Override
+        public void selectAndReveal(@NonNull ITimeGraphEntry selection) {
+            viewer.selectAndReveal(selection);
         }
     }
 
@@ -590,6 +621,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         @Override
         public void setSelection(ITimeGraphEntry selection) {
             combo.setSelection(selection);
+        }
+
+        @Override
+        public void selectAndReveal(@NonNull ITimeGraphEntry selection) {
+            combo.selectAndReveal(selection);
         }
     }
 
@@ -821,6 +857,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         super(id);
         fPresentation = pres;
         fDisplayWidth = Display.getDefault().getBounds().width;
+        fFindTarget = new FindTarget();
     }
 
     // ------------------------------------------------------------------------
@@ -1176,6 +1213,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         return Messages.AbstractTimeGraphView_PreviousTooltip;
     }
 
+
+    FindTarget getFindTarget() {
+        return fFindTarget;
+    }
+
     // ------------------------------------------------------------------------
     // ViewPart
     // ------------------------------------------------------------------------
@@ -1296,6 +1338,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
 
         createContextMenu();
+        fPartListener = new TimeGraphPartListener();
+        getSite().getPage().addPartListener(fPartListener);
     }
 
     @Override
@@ -1307,6 +1351,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     public void dispose() {
         super.dispose();
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+        getSite().getPage().removePartListener(fPartListener);
     }
 
     /**
@@ -2204,6 +2249,60 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @since 2.0
      */
     protected void fillTimeGraphEntryContextMenu (@NonNull IMenuManager menuManager) {
+    }
 
+    /*
+     * Inner classes used for searching
+     */
+    class FindTarget {
+        public ITimeGraphEntry getSelection() {
+            return fTimeGraphWrapper.getSelection();
+        }
+
+        public void selectAndReveal(@NonNull ITimeGraphEntry entry) {
+            fTimeGraphWrapper.selectAndReveal(entry);
+        }
+
+        public ITimeGraphEntry[] getEntries() {
+            TimeGraphViewer viewer = getTimeGraphViewer();
+            return viewer.getTimeGraphContentProvider().getElements(viewer.getInput());
+        }
+
+        public Shell getShell() {
+            return getSite().getShell();
+        }
+    }
+
+    class TimeGraphPartListener implements IPartListener {
+        @Override
+        public void partActivated(IWorkbenchPart part) {
+            if (part == AbstractTimeGraphView.this) {
+                synchronized (FIND_ACTION) {
+                    if (fFindActionHandler == null) {
+                        fFindActionHandler = new ActionHandler(FIND_ACTION);
+                    }
+                    final Object service = PlatformUI.getWorkbench().getService(IHandlerService.class);
+                    fFindHandlerActivation = ((IHandlerService) service).activateHandler(ActionFactory.FIND.getCommandId(), fFindActionHandler);
+                }
+            }
+            // Notify action for all parts
+            FIND_ACTION.partActivated(part);
+        }
+        @Override
+        public void partDeactivated(IWorkbenchPart part) {
+            if ((part == AbstractTimeGraphView.this) && (fFindHandlerActivation != null)) {
+                final Object service = PlatformUI.getWorkbench().getService(IHandlerService.class);
+                ((IHandlerService) service).deactivateHandler(fFindHandlerActivation);
+            }
+        }
+        @Override
+        public void partBroughtToTop(IWorkbenchPart part) {
+        }
+        @Override
+        public void partClosed(IWorkbenchPart part) {
+        }
+        @Override
+        public void partOpened(IWorkbenchPart part) {
+        }
     }
 }

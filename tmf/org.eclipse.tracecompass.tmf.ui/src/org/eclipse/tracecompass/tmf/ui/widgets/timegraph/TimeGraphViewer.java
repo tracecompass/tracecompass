@@ -1816,6 +1816,22 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
     }
 
     /**
+     * Select an entry and reveal it
+     *
+     * @param entry
+     *            The entry to select
+     * @since 2.0
+     */
+    public void selectAndReveal(@NonNull ITimeGraphEntry entry) {
+        final ITimeGraphEntry parent = entry.getParent();
+        if (parent != null) {
+            fTimeGraphCtrl.setExpandedState(parent, true);
+        }
+        setSelection(entry);
+        adjustVerticalScrollBar();
+    }
+
+    /**
      * Get the number of expanded (visible) time graph entries. This includes
      * leafs and does not include filtered-out entries.
      *

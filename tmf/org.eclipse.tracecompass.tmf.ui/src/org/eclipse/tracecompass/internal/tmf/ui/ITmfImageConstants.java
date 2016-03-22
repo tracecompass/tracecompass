@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2015 Ericsson and others.
+ * Copyright (c) 2011, 2016 Ericsson and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ public interface ITmfImageConstants {
     String IMG_UI_ZOOM_IN_MENU = ICONS_PATH + "elcl16/zoomin_nav.gif";
     String IMG_UI_ZOOM_OUT_MENU = ICONS_PATH + "elcl16/zoomout_nav.gif";
     String IMG_UI_FILTERS = ICONS_PATH + "elcl16/filter_items.gif";
+    String IMG_UI_SEARCH = ICONS_PATH + "elcl16/search.gif";
     String IMG_UI_SEARCH_SEQ = ICONS_PATH + "elcl16/search_seqdiag_menu.gif";
     String IMG_UI_NEXT_PAGE = ICONS_PATH + "elcl16/next_menu.gif";
     String IMG_UI_PREV_PAGE = ICONS_PATH + "elcl16/prev_menu.gif";

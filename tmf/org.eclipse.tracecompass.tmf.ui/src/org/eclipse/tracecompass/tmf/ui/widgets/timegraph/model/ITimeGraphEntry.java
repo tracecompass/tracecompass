@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
 
@@ -103,4 +104,14 @@ public interface ITimeGraphEntry {
      * @return the iterator
      */
     <T extends ITimeEvent> Iterator<@NonNull T> getTimeEventsIterator(long startTime, long stopTime, long visibleDuration);
+
+    /**
+     * Test if this time graph entry matches with this pattern
+     *
+     * @param pattern
+     *            The pattern to match
+     * @return True if it matches, false otherwise.
+     * @since 2.0
+     */
+    boolean matches(@NonNull Pattern pattern);
 }

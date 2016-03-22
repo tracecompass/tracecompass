@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2016 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,9 +13,14 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.ui.views.controlflow;
 
+import java.util.regex.Pattern;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 
 /**
  * An entry in the Control Flow view
@@ -98,6 +103,26 @@ public class ControlFlowEntry extends TimeGraphEntry {
      */
     public int getThreadQuark() {
         return fThreadQuark;
+    }
+
+    @Override
+    public boolean matches(@NonNull Pattern pattern) {
+        if (pattern.matcher(getName()).find()) {
+            return true;
+        }
+        if (pattern.matcher(Integer.toString(fThreadId)).find()) {
+            return true;
+        }
+        if (pattern.matcher(Integer.toString(fParentThreadId)).find()) {
+            return true;
+        }
+        if (pattern.matcher(Integer.toString(fThreadQuark)).find()) {
+            return true;
+        }
+        if (pattern.matcher(Utils.formatTime(getStartTime(), TimeFormat.CALENDAR, Resolution.NANOSEC)).find()) {
+            return true;
+        }
+        return pattern.matcher(fTrace.getName()).find();
     }
 
     @Override

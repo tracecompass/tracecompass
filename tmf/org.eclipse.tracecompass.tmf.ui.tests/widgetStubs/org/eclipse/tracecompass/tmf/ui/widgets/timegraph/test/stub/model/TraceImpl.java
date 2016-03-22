@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.test.stub.model;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -114,6 +115,11 @@ public class TraceImpl implements ITimeGraphEntry {
     @Override
     public boolean hasChildren() {
         return false;
+    }
+
+    @Override
+    public boolean matches(@NonNull  Pattern pattern) {
+        return pattern.matcher(name).find();
     }
 
 }

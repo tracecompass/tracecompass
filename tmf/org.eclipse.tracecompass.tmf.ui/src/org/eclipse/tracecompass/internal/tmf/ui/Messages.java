@@ -107,6 +107,9 @@ public class Messages extends NLS {
     public static String ShowFilterDialogAction_FilterActionNameText;
     public static String ShowFilterDialogAction_FilterActionToolTipText;
 
+    public static String ShowFindDialogAction_Search;
+    public static String ShowFindDialogAction_ShowSearchDialog;
+
     public static String TmfTimeGraphViewer_ResetScaleActionNameText;
     public static String TmfTimeGraphViewer_ResetScaleActionToolTipText;
     public static String TmfTimeGraphViewer_LegendActionNameText;
@@ -153,6 +156,21 @@ public class Messages extends NLS {
     public static String ColorsView_MoveUpActionToolTipText;
     public static String ColorsView_TickButtonText;
     public static String TickColorDialog_TickColorDialogTitle;
+
+    public static String TimeGraphFindDialog_BackwardRadioButtonLabel;
+    public static String TimeGraphFindDialog_CaseCheckBoxLabel;
+    public static String TimeGraphFindDialog_CloseButtonLabel;
+    public static String TimeGraphFindDialog_Direction;
+    public static String TimeGraphFindDialog_FindLabel;
+    public static String TimeGraphFindDialog_FindTitle;
+    public static String TimeGraphFindDialog_FindNextButtonLabel;
+    public static String TimeGraphFindDialog_ForwardRadioButtonLabel;
+    public static String TimeGraphFindDialog_Options;
+    public static String TimeGraphFindDialog_REgExCheckBoxLabel;
+    public static String TimeGraphFindDialog_StatusNoMatchLabel;
+    public static String TimeGraphFindDialog_StatusWrappedLabel;
+    public static String TimeGraphFindDialog_WholeWordCheckBoxLabel;
+    public static String TimeGraphFindDialog_WrapCheckBoxLabel;
 
     public static String CustomTxtParserInputWizardPage_addChildLine;
     public static String CustomTxtParserInputWizardPage_addGroup;

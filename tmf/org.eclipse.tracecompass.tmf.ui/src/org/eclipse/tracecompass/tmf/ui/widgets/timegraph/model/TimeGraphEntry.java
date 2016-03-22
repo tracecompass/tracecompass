@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
@@ -331,6 +332,15 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     @Override
     public String toString() {
         return getClass().getSimpleName() + '(' + fName + ')';
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public boolean matches(@NonNull Pattern pattern) {
+        // Default implementation
+        return pattern.matcher(fName).find();
     }
 
 }

@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.callstack;
 
+import java.util.regex.Pattern;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -180,6 +182,11 @@ public class CallStackEntry extends TimeGraphEntry {
      */
     public @NonNull ITmfStateSystem getStateSystem() {
         return fSS;
+    }
+
+    @Override
+    public boolean matches(@NonNull Pattern pattern) {
+        return pattern.matcher(fFunctionName).find();
     }
 
 }
