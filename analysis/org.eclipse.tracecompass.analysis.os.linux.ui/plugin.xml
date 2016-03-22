@@ -15,7 +15,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.tracecompass.analysis.os.linux.ui.views.resources.ResourcesView"
+            class="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources.ResourcesView"
             icon="icons/eview16/resources_view.gif"
             id="org.eclipse.tracecompass.analysis.os.linux.views.resources"
             name="%resources.view.name"

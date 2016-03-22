@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.ui.views.resources;
+package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
@@ -30,7 +30,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
  */
 public class AggregateEventIterator implements Iterator<@NonNull ITimeEvent> {
 
-    private final List<@NonNull CachingIterator> fIterators = new ArrayList<>();
+    private final List<org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources.CachingIterator> fIterators = new ArrayList<>();
 
     private final Comparator<ITimeEvent> fComparator;
 
@@ -81,7 +81,7 @@ public class AggregateEventIterator implements Iterator<@NonNull ITimeEvent> {
     @Override
     public @NonNull ITimeEvent next() {
 
-        final List<@NonNull CachingIterator> iterators = fIterators;
+        final List<org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources.CachingIterator> iterators = fIterators;
         if (iterators.isEmpty()) {
             throw new NoSuchElementException("Aggregate iterator is empty"); //$NON-NLS-1$
         }

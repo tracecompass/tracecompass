@@ -11,7 +11,7 @@
  *   Geneviève Bastien - Move code to provide base classes for time graph views
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.ui.views.resources;
+package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,11 +30,11 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.signals.TmfCpuSelectedSignal;
-import org.eclipse.tracecompass.analysis.os.linux.ui.views.resources.ResourcesEntry.Type;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.FollowCpuAction;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.UnfollowCpuAction;
+import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources.ResourcesEntry.Type;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;

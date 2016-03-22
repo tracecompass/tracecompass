@@ -11,12 +11,11 @@
  *   Geneviève Bastien - Move code to provide base classes for time graph view
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.ui.views.resources;
+package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources;
 
 import java.util.Iterator;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources.SoftIrqLabelProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;

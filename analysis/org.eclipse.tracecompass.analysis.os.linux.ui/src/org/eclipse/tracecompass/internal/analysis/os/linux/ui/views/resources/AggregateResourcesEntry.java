@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.ui.views.resources;
+package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources;
 
 import java.util.ArrayList;
 import java.util.Comparator;

@@ -11,7 +11,7 @@
  *   Geneviève Bastien - Move code to provide base classes for time graph view
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.ui.views.resources;
+package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,10 +26,10 @@ import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModu
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
-import org.eclipse.tracecompass.analysis.os.linux.ui.views.resources.ResourcesEntry.Type;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
+import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources.ResourcesEntry.Type;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
