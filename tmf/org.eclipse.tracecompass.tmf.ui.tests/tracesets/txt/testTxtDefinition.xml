@@ -7,6 +7,11 @@
 <RegEx>(\S*\s\S*) (.*\S)</RegEx>
 <InputData action="0" format="dd/MM/yyyy HH:mm:ss:SSS" name="Time Stamp"/>
 <InputData action="0" format="" name="Message"/>
+<InputLine>
+<Cardinality max="2147483647" min="0"/>
+<RegEx>(.*\S)</RegEx>
+<InputData action="2" name="Message"/>
+</InputLine>
 </InputLine>
 <OutputColumn name="Time Stamp"/>
 <OutputColumn name="Message"/>

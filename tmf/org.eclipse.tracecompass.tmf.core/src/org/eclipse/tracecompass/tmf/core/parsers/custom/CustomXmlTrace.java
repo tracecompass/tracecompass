@@ -277,7 +277,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
             final Element element = parseElementBuffer(elementBuffer);
 
             event = extractEvent(element, fRecordInputElement);
-            ((StringBuffer) event.getContent().getValue()).append(elementBuffer);
+            ((StringBuffer) event.getContentValue()).append(elementBuffer);
 
             long rawPos = fFile.getFilePointer();
             String line = fFile.getNextLine();

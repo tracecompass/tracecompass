@@ -378,7 +378,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexabl
                                 }
                             }
                         }
-                        ((StringBuffer) event.getContent().getValue()).append("\n").append(line); //$NON-NLS-1$
+                        ((StringBuffer) event.getContentValue()).append("\n").append(line); //$NON-NLS-1$
                     }
                 }
                 rawPos = fFile.getFilePointer();
