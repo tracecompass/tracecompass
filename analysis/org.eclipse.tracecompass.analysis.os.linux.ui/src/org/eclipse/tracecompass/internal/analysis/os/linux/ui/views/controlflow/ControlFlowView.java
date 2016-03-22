@@ -12,7 +12,7 @@
  *   Christian Mansky - Add check active / uncheck inactive buttons
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.ui.views.controlflow;
+package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,7 +35,6 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attribute
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.FollowThreadAction;
-import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.ControlFlowColumnComparators;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;

@@ -10,7 +10,7 @@
  *   Christian Mansky - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.ui.views.controlflow;
+package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
