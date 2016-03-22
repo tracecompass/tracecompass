@@ -10,7 +10,7 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.ui.views.cpuusage;
+package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.cpuusage;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -22,7 +22,7 @@ import org.eclipse.osgi.util.NLS;
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
 
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.analysis.os.linux.ui.views.cpuusage.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.cpuusage.messages"; //$NON-NLS-1$
 
     public static String CpuUsageComposite_ColumnPercent;
     public static String CpuUsageComposite_ColumnProcess;

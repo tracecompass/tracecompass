@@ -10,7 +10,7 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.ui.views.cpuusage;
+package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.cpuusage;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
