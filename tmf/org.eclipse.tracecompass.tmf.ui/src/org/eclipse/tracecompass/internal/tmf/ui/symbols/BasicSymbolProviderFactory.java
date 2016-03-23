@@ -10,6 +10,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.ui.symbols;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
@@ -26,7 +27,8 @@ import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderFactory;
 public class BasicSymbolProviderFactory implements ISymbolProviderFactory {
 
     @Override
-    public ISymbolProvider createProvider(ITmfTrace trace) {
+    public @NonNull ISymbolProvider createProvider(ITmfTrace trace) {
+        /* This provider can apply to any trace */
         return new BasicSymbolProvider(trace);
     }
 

@@ -145,4 +145,96 @@ public class LttngUstTrace extends CtfTmfTrace {
         }
         return status;
     }
+
+    // ------------------------------------------------------------------------
+    // Fields/methods bridging the Debug-info symbol provider
+    // ------------------------------------------------------------------------
+
+    /*
+     * FIXME Once the symbol provider is split in core/ui components, the
+     * UstDebugInfoSymbolProvider should be moved to the core plugin, and this
+     * here can be removed.
+     */
+
+    /**
+     * Configuration of the symbol provider.
+     *
+     * @since 2.0
+     */
+    public static class SymbolProviderConfig {
+
+        private final boolean fUseCustomRootDir;
+        private final @NonNull String fCustomRootDirPath;
+
+        /**
+         * Constructor
+         *
+         * Note that a path can be specified even if 'useCustomRootDir' is
+         * false. This will keep the setting in the text field even when it is
+         * grayed out.
+         *
+         * @param useCustomRootDir
+         *            Should a custom directory be used
+         * @param rootDirPath
+         *            Custom directory path
+         */
+        public SymbolProviderConfig(boolean useCustomRootDir, @NonNull String rootDirPath) {
+            fUseCustomRootDir = useCustomRootDir;
+            fCustomRootDirPath = rootDirPath;
+        }
+
+        /**
+         * @return Should a custom directory be used
+         */
+        public boolean useCustomRootDir() {
+            return fUseCustomRootDir;
+        }
+
+        /**
+         * @return The configured root directory
+         */
+        public String getCustomRootDirPath() {
+            return fCustomRootDirPath;
+        }
+
+        /**
+         * Return the "real" path to use for symbol resolution. This is a
+         * convenience method that avoids having to check the state of
+         * {@link #useCustomRootDir()} separately.
+         *
+         * @return The actual root directory to use
+         */
+        public String getActualRootDirPath() {
+            if (fUseCustomRootDir) {
+                return fCustomRootDirPath;
+            }
+            return ""; //$NON-NLS-1$
+        }
+    }
+
+    private @NonNull SymbolProviderConfig fCurrentProviderConfig =
+            /* Default settings for new traces */
+            new SymbolProviderConfig(false, ""); //$NON-NLS-1$
+
+
+    /**
+     * Get the current symbol provider configuration for this trace.
+     *
+     * @return The current symbol provider configuration
+     * @since 2.0
+     */
+    public @NonNull SymbolProviderConfig getSymbolProviderConfig() {
+        return fCurrentProviderConfig;
+    }
+
+    /**
+     * Set the symbol provider configuration for this trace.
+     *
+     * @param config
+     *            The new symbol provider configuration to use
+     * @since 2.0
+     */
+    public void setSymbolProviderConfig(@NonNull SymbolProviderConfig config) {
+        fCurrentProviderConfig = config;
+    }
 }

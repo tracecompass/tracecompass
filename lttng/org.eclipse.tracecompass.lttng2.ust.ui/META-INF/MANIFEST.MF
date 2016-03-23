@@ -18,6 +18,7 @@ Require-Bundle: org.eclipse.core.resources,
  org.eclipse.tracecompass.tmf.ctf.core
 Export-Package: org.eclipse.tracecompass.internal.lttng2.ust.ui;x-friends:="org.eclipse.tracecompass.lttng2.ust.ui.tests",
  org.eclipse.tracecompass.internal.lttng2.ust.ui.analysis.callstack;x-friends:="org.eclipse.tracecompass.lttng2.ust.ui.tests",
+ org.eclipse.tracecompass.internal.lttng2.ust.ui.analysis.debuginfo;x-internal:=true,
  org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage;x-friends:="org.eclipse.tracecompass.lttng2.ust.ui.tests,org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests",
  org.eclipse.tracecompass.lttng2.ust.ui.analysis.callstack
 Import-Package: com.google.common.base,

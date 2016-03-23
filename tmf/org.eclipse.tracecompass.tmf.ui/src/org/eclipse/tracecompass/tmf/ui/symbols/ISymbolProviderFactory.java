@@ -11,6 +11,7 @@
 package org.eclipse.tracecompass.tmf.ui.symbols;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -33,6 +34,6 @@ public interface ISymbolProviderFactory {
      * @return A newly created provider that can resolve symbols from the given
      *         trace or null if no such provider can be created by this factory
      */
-    ISymbolProvider createProvider(@NonNull ITmfTrace trace);
+    @Nullable ISymbolProvider createProvider(@NonNull ITmfTrace trace);
 
 }

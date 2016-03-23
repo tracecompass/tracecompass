@@ -52,6 +52,7 @@ public class UstDebugInfoSourceAspect implements ITmfEventAspect<TmfCallsite> {
         if (!(event.getTrace() instanceof LttngUstTrace)) {
             return null;
         }
+        LttngUstTrace trace = (LttngUstTrace) event.getTrace();
 
         /*
          * Resolve the binary callsite first, from there we can use the file's
@@ -62,6 +63,21 @@ public class UstDebugInfoSourceAspect implements ITmfEventAspect<TmfCallsite> {
             return null;
         }
 
+        return getSourceCallsite(trace, bc);
+    }
+
+    /**
+     * Get the source callsite (the full {@link TmfCallsite} information) from a
+     * binary callsite.
+     *
+     * @param trace
+     *            The trace, which may contain trace-specific configuration
+     * @param bc
+     *            The binary callsite
+     * @return The source callsite, which sould include file name, function name
+     *         and line number
+     */
+    public static @Nullable TmfCallsite getSourceCallsite(LttngUstTrace trace, BinaryCallsite bc) {
         Iterable<TmfCallsite> callsites = FileOffsetMapper.getCallsiteFromOffset(new File(bc.getBinaryFilePath()), bc.getOffset());
 
         if (callsites == null || Iterables.isEmpty(callsites)) {
@@ -72,6 +88,18 @@ public class UstDebugInfoSourceAspect implements ITmfEventAspect<TmfCallsite> {
          * We will take the "deepest" one in the stack, which should refer to
          * the initial, non-inlined location.
          */
-        return Iterables.getLast(callsites);
+        TmfCallsite callsite = Iterables.getLast(callsites);
+
+        /*
+         * Apply the path prefix again, this time on the path given from
+         * addr2line. If applicable.
+         */
+        String pathPrefix = trace.getSymbolProviderConfig().getActualRootDirPath();
+        if (pathPrefix.isEmpty()) {
+            return callsite;
+        }
+
+        String fullFileName = (pathPrefix + callsite.getFileName());
+        return new TmfCallsite(fullFileName, callsite.getFunctionName(), callsite.getLineNumber());
     }
 }
