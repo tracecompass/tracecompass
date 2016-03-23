@@ -67,7 +67,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
      */
     protected CtfTmfEventField(@NonNull String name, Object value, ITmfEventField[] fields) {
         super(/* Strip the underscore from the field name if there is one */
-                name.startsWith("_") ? checkNotNull(name.substring(1)) : name, //$NON-NLS-1$
+                name.startsWith("_") ? name.substring(1) : name, //$NON-NLS-1$
                 value,
                 fields);
     }
