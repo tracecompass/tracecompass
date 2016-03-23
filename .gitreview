@@ -1,0 +1,6 @@
+[gerrit]
+host=git.eclipse.org
+port=29418
+project=tracecompass/org.eclipse.tracecompass.git
+defaultbranch=master
+defaultremote=eclipse-review
