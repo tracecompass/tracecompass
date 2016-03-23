@@ -8,4 +8,4 @@
  *******************************************************************************/
 
 @org.eclipse.jdt.annotation.NonNullByDefault
-package org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.statistics;
+package org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics;

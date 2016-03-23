@@ -9,7 +9,7 @@
  * Contributors:
  *     Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics;
+package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
@@ -22,8 +22,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
-import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
@@ -253,7 +253,7 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
      */
     protected class SegmentStoreStatisticsEntry extends TmfTreeViewerEntry {
 
-        private SegmentStoreStatistics fEntry;
+        private final SegmentStoreStatistics fEntry;
 
         /**
          * Constructor

@@ -9,7 +9,7 @@
  * Contributors:
  *     Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics;
+package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;

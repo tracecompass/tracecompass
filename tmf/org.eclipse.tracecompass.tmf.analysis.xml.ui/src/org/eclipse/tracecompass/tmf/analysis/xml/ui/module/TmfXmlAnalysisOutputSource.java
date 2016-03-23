@@ -29,6 +29,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.Messages;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternDensityView;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternLatencyTableView;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternScatterGraphView;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternStatisticsView;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.xychart.XmlXYView;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
@@ -110,7 +111,12 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
         /**
          * Latency Density View type
          */
-        DENSITY_VIEW(PatternDensityView.ID, Messages.TmfXmlAnalysisOutputSource_DensityChartTitle);
+        DENSITY_VIEW(PatternDensityView.ID, Messages.TmfXmlAnalysisOutputSource_DensityChartTitle),
+
+        /**
+         * Latency Statistic View type
+         */
+        STATISTIC_VIEW(PatternStatisticsView.ID, Messages.TmfXmlAnalysisOutputSource_LatencyStatisticsTitle);
 
         private @NonNull String fLatencyViewId;
         private String fLatencyViewLabel;

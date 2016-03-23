@@ -19,6 +19,8 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.messages"; //$NON-NLS-1$
     /** Density chart title */
     public static String TmfXmlAnalysisOutputSource_DensityChartTitle;
+    /** Statistics Table Title */
+    public static String TmfXmlAnalysisOutputSource_LatencyStatisticsTitle;
     /** Latency table */
     public static String TmfXmlAnalysisOutputSource_LatencyTable;
     /** Scatter graph title */

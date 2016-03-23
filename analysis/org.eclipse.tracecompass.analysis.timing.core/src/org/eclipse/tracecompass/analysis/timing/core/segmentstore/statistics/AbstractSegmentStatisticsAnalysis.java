@@ -6,7 +6,7 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.statistics;
+package org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 

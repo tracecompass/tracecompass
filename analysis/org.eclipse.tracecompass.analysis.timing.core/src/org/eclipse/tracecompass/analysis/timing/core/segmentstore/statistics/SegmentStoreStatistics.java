@@ -9,7 +9,7 @@
  * Contributors:
  *     Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.statistics;
+package org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics;
 
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 

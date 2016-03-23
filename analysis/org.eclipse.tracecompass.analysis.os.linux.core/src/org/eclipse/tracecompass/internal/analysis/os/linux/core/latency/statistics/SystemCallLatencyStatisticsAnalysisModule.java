@@ -16,7 +16,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCall;
 import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
-import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;

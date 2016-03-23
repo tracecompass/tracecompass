@@ -19,7 +19,7 @@ import java.util.Random;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCall;
 import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCall.InitialInfo;
-import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.junit.Test;
 
