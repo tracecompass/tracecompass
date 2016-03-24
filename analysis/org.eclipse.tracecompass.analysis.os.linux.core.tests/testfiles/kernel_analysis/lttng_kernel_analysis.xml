@@ -148,4 +148,14 @@
 <field name="next_tid" value="20" type="long" />
 <field name="next_prio" value="20" type="long" />
 </event>
+<event timestamp="80" name="sched_switch">
+<field name="cpu" value="1" type="int" />
+<field name="prev_comm" value="proc20" type="string" />
+<field name="prev_tid" value="20" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="2048" type="long" />
+<field name="next_comm" value="proc21" type="string" />
+<field name="next_tid" value="21" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
 </trace>

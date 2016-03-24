@@ -86,12 +86,16 @@ public class SchedSwitchHandler extends KernelEventHandler {
     private static void setOldProcessStatus(ITmfStateSystemBuilder ss, Long prevState, Integer formerThreadNode, long timestamp) throws AttributeNotFoundException {
         ITmfStateValue value;
         /*
-         * Empirical observations and look into the linux code have shown that
-         * the TASK_STATE_MAX flag is used internally and |'ed with other
-         * states, most often the running state, so it is ignored from the
-         * prevState value.
+         * Empirical observations and look into the linux code have
+         * shown that the TASK_STATE_MAX flag is used internally and
+         * |'ed with other states, most often the running state, so it
+         * is ignored from the prevState value.
+         *
+         * Since Linux 4.1, the TASK_NOLOAD state was created and
+         * TASK_STATE_MAX is now 2048. We use TASK_NOLOAD as the new max
+         * because it does not modify the displayed state value.
          */
-        int state = (int) (prevState & ~(LinuxValues.TASK_STATE_MAX));
+        int state = (int) (prevState & (LinuxValues.TASK_NOLOAD - 1));
 
         if (isRunning(state)) {
             value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;

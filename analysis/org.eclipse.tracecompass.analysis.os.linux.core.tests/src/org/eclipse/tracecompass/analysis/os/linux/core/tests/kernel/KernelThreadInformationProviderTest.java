@@ -118,7 +118,7 @@ public class KernelThreadInformationProviderTest {
         Integer tid = KernelThreadInformationProvider.getThreadOnCpu(module, 0, -1);
         assertNull(tid);
 
-        tid = KernelThreadInformationProvider.getThreadOnCpu(module, 0, 80);
+        tid = KernelThreadInformationProvider.getThreadOnCpu(module, 0, 90);
         assertNull(tid);
 
         /* Check with invalid cpus */
@@ -171,7 +171,7 @@ public class KernelThreadInformationProviderTest {
         Integer ppid = KernelThreadInformationProvider.getParentPid(module, 11, -1);
         assertNull(ppid);
 
-        ppid = KernelThreadInformationProvider.getParentPid(module, 11, 80);
+        ppid = KernelThreadInformationProvider.getParentPid(module, 11, 90);
         assertNull(ppid);
 
         /* Check with invalid cpus */
@@ -252,7 +252,7 @@ public class KernelThreadInformationProviderTest {
         List<ITmfStateInterval> intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, -15, -5, 3, monitor);
         assertTrue(intervals.isEmpty());
 
-        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 80, 1500000000L, 50, monitor);
+        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 90, 1500000000L, 50, monitor);
         assertTrue(intervals.isEmpty());
 
         /* Check invalid quarks */
@@ -292,6 +292,10 @@ public class KernelThreadInformationProviderTest {
                 StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process20, 25, 50L, 3, monitor);
         testIntervals("tid 20 [25,50,3]", intervals, values6);
+
+        ITmfStateValue[] values7 = { StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE };
+        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process20, 80L, 85L, 3, monitor);
+        testIntervals("tid 20 [80,85,3]", intervals, values7);
 
     }
 

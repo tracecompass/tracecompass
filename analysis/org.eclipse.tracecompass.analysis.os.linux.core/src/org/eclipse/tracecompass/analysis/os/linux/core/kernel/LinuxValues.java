@@ -38,7 +38,8 @@ public interface LinuxValues {
      * #define TASK_WAKEKILL 128
      * #define TASK_WAKING 256
      * #define TASK_PARKED 512
-     * #define TASK_STATE_MAX 1024
+     * #define TASK_NOLOAD 1024
+     * #define TASK_STATE_MAX 2048
      * </pre>
      */
     /**
@@ -101,10 +102,15 @@ public interface LinuxValues {
     int TASK_PARK = 512;
 
     /**
+     * Task that do not contribute to load average (since Linux 4.1)
+     */
+    int TASK_NOLOAD = 1024;
+
+    /**
      * This is the maximum value + 1 that the task state can be. TASK_STATE_MAX
      * - 1 is useful to mask the task state.
      */
-    int TASK_STATE_MAX = 1024;
+    int TASK_STATE_MAX = 2048;
 
     /**
      * Process statuses, used in LTTng statedump events.
