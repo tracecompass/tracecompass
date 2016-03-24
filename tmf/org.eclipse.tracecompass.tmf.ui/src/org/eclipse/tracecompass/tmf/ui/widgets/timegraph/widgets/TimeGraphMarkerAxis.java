@@ -194,6 +194,9 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
             map.put(marker.getCategory(), marker);
         }
         Display.getDefault().asyncExec(() -> {
+            if (isDisposed()) {
+                return;
+            }
             fMarkers = map;
             getParent().layout();
             redraw();
