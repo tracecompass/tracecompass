@@ -36,6 +36,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.Ses
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.StreamResponse;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.ViewerCommand;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.impl.LttngRelaydConnectorFactory;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -87,6 +88,7 @@ public class LttngRelayd24TestApplication {
      *             network timeout?
      */
     @Test
+    @Ignore
     public void testViewerConnection() throws IOException {
         InetAddress addr = InetAddress.getByName(ADDRESS);
         try (Socket connection = new Socket(addr, PORT);

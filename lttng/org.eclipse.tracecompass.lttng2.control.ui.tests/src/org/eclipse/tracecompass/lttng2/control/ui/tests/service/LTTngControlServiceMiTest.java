@@ -36,6 +36,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.SessionI
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.ILttngControlService;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceConstants;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceMI;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -72,6 +73,7 @@ public class LTTngControlServiceMiTest extends LTTngControlServiceTest {
     }
 
     @Override
+    @Ignore
     public void testCreateLiveSession() throws ExecutionException {
         fShell.setScenario(SCEN_CREATE_LIVE_SESSION);
 

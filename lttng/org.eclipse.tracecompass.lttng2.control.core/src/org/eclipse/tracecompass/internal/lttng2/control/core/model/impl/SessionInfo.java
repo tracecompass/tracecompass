@@ -223,7 +223,8 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
 
     @Override
     public boolean isLive() {
-        return fIsLive;
+        // FIXME: Disable Live support until we have a better implementation
+        return fIsLive && false;
     }
 
     @Override

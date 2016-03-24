@@ -58,6 +58,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngCo
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.FrameworkUtil;
 
@@ -470,6 +471,7 @@ public class LTTngControlServiceTest {
     }
 
     @Test
+    @Ignore
     public void testGetSessionWithLive() {
         try {
             fShell.setScenario(SCEN_GET_SESSION_WITH_LIVE);
@@ -1505,6 +1507,7 @@ public class LTTngControlServiceTest {
     }
 
     @Test
+    @Ignore
     public void testCreateLiveSession() throws ExecutionException {
         fShell.setScenario(SCEN_CREATE_LIVE_SESSION);
 
@@ -1525,6 +1528,7 @@ public class LTTngControlServiceTest {
     }
 
     @Test
+    @Ignore
     public void testCreateLiveSessionErrors() {
         try {
             fShell.setScenario(SCEN_CREATE_LIVE_SESSION_ERRORS);

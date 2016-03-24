@@ -278,7 +278,9 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
      *
      */
     public boolean isLiveSupported() {
-        return getControlService().isVersionSupported("2.4.0"); //$NON-NLS-1$;
+        return false;
+        // FIXME: Disable Live support until we have a better implementation
+        //return getControlService().isVersionSupported("2.4.0"); //$NON-NLS-1$;
     }
     /**
      * Returns if node supports adding contexts on event
