@@ -29,7 +29,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
@@ -60,7 +59,7 @@ public class SymbolProviderConfigDialog extends TitleAreaDialog implements IPref
                 page.saveConfiguration();
             }
         });
-        monitor.beginTask(Messages.BasicSymbolProviderPrefPage_loadingConfigurations, fPreferencePages.length * 100);
+        monitor.beginTask(Messages.SymbolProviderConfigDialog_loadingConfigurations, fPreferencePages.length * 100);
         try {
             for (int i = 0; i < fPreferencePages.length; i++) {
                 ISymbolProviderPreferencePage page = fPreferencePages[i];

@@ -24,7 +24,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.internal.tmf.ui.symbols.BasicSymbolProvider.SourceKind;
 import org.eclipse.tracecompass.tmf.ui.symbols.AbstractSymbolProviderPreferencePage;
 
