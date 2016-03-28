@@ -139,6 +139,9 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
         case TmfXmlStrings.TYPE_LONG:
             fForcedType = ITmfStateValue.Type.LONG;
             break;
+        case TmfXmlStrings.TYPE_DOUBLE:
+            fForcedType = ITmfStateValue.Type.DOUBLE;
+            break;
         default:
             fForcedType = ITmfStateValue.Type.NULL;
         }

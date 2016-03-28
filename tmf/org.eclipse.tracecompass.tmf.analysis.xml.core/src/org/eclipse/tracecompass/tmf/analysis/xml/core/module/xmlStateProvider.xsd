@@ -314,6 +314,9 @@
 							<xs:documentation>The value should be a long</xs:documentation></xs:annotation></xs:enumeration>
 					<xs:enumeration value="string" >
 						<xs:annotation>
+							<xs:documentation>The value should be a string</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="double" >
+						<xs:annotation>
 							<xs:documentation>The value should be a double</xs:documentation></xs:annotation></xs:enumeration>
 				</xs:restriction>
 			</xs:simpleType>

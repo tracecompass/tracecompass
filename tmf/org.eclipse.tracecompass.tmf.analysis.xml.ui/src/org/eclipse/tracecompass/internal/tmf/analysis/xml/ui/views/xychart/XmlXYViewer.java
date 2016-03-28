@@ -279,7 +279,6 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
                     }
                     fSeriesData.put(quark, new SeriesData(xvalues.length, display.getAttributeQuark(quark), seriesName, entry.getType()));
                 }
-                double yvalue = 0.0;
                 for (int i = 0; i < xvalues.length; i++) {
                     if (monitor != null && monitor.isCanceled()) {
                         return;
@@ -292,9 +291,25 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
                     time = time > traceEnd ? traceEnd : time;
 
                     for (int quark : quarks) {
+                        double yvalue = 0.0;
                         SeriesData data = checkNotNull(fSeriesData.get(quark));
                         try {
-                            yvalue = ss.querySingleState(time, data.getDisplayQuark()).getStateValue().unboxLong();
+                            ITmfStateValue value = ss.querySingleState(time, data.getDisplayQuark()).getStateValue();
+                            switch (value.getType()) {
+                            case DOUBLE:
+                                yvalue = value.unboxDouble();
+                                break;
+                            case LONG:
+                                yvalue = value.unboxLong();
+                                break;
+                            case INTEGER:
+                                yvalue = value.unboxInt();
+                                break;
+                            case NULL:
+                            case STRING:
+                            default:
+                                break;
+                            }
                             data.setYValue(i, yvalue);
                         } catch (TimeRangeException e) {
                             data.setYValue(i, 0);

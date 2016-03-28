@@ -72,6 +72,8 @@ public interface TmfXmlStrings {
     String TYPE_SELF = "self";
     String TYPE_INT = "int";
     String TYPE_LONG = "long";
+    /** @since 2.0 */
+    String TYPE_DOUBLE = "double";
     String TYPE_STRING = "string";
     String TYPE_EVENT_NAME = "eventName";
     String TYPE_DELETE = "delete";
