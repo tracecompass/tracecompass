@@ -2553,10 +2553,16 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
     /**
      * Pack the columns.
+     *
+     * @return
+     *            Whether or not a pack was done in this call. Otherwise, it was already done by a
+     *            previous call
+     *
+     * @since 2.0
      */
-    protected void packColumns() {
+    protected boolean packColumns() {
         if (fPackDone) {
-            return;
+            return false;
         }
         fTable.setRedraw(false);
         try {
@@ -2571,6 +2577,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             fTable.setRedraw(true);
         }
         fPackDone = true;
+        return true;
     }
 
     private void packMarginColumn() {
