@@ -73,6 +73,14 @@
             name="%kernelmemoryusageview.view.name"
             restorable="true">
       </view>
+      <view
+            category="org.eclipse.linuxtools.lttng2.ui.views.category"
+            class="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.io.diskioactivity.DiskIOActivityView"
+            icon="icons/eview16/resources_view.gif"
+            id="org.eclipse.tracecompass.analysis.os.linux.views.diskioactivity"
+            name="%diskioactivity.view.name"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
@@ -130,6 +138,13 @@
             id="org.eclipse.tracecompass.analysis.os.linux.ui.kernelmemoryusageview">
          <analysisModuleClass
                class="org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage.KernelMemoryAnalysisModule">
+         </analysisModuleClass>
+      </output>
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.analysis.os.linux.views.diskioactivity">
+         <analysisModuleClass
+               class="org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.InputOutputAnalysisModule">
          </analysisModuleClass>
       </output>
    </extension>
