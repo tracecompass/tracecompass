@@ -91,6 +91,15 @@ public class TimeGraphEntry implements ITimeGraphEntry {
         return fChildren;
     }
 
+    /**
+     * Clear the children of the entry
+     *
+     * @since 2.0
+     */
+    public void clearChildren() {
+        fChildren.clear();
+    }
+
     @Override
     public String getName() {
         return fName;

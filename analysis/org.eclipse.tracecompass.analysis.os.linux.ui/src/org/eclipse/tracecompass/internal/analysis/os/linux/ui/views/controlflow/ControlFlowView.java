@@ -10,6 +10,7 @@
  *   Patrick Tasse - Initial API and implementation
  *   Geneviève Bastien - Move code to provide base classes for time graph view
  *   Christian Mansky - Add check active / uncheck inactive buttons
+ *   Mahdi Zolnouri & Samuel Gagnon - Add flat / hierarchical button
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow;
@@ -17,20 +18,27 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
+import org.eclipse.tracecompass.common.core.StreamUtils.StreamFlattener;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
@@ -42,6 +50,8 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -111,6 +121,12 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
         COLUMN_COMPARATORS = l.toArray(new Comparator[l.size()]);
     }
 
+    private final Set<ITmfTrace> fFlatTraces = new HashSet<>();
+
+    private IAction fFlatAction;
+
+    private IAction fHierarchicalAction;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -177,6 +193,59 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
     }
 
     @Override
+    protected void fillLocalMenu(IMenuManager manager) {
+        super.fillLocalMenu(manager);
+        final MenuManager item = new MenuManager(Messages.ControlFlowView_threadPresentation);
+        fFlatAction = createFlatAction();
+        item.add(fFlatAction);
+
+        fHierarchicalAction = createHierarchicalAction();
+        item.add(fHierarchicalAction);
+        manager.add(item);
+
+    }
+
+    private IAction createHierarchicalAction() {
+        IAction action = new Action(Messages.ControlFlowView_hierarchicalViewLabel, IAction.AS_RADIO_BUTTON) {
+            @Override
+            public void run() {
+                ITmfTrace parentTrace = getTrace();
+                synchronized (fFlatTraces) {
+                    fFlatTraces.remove(parentTrace);
+                    for (ITmfTrace trace : TmfTraceManager.getTraceSet(parentTrace)) {
+                        final ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
+                        List<ControlFlowEntry> currentRootList = getEntryList(ss).stream().filter(e -> e instanceof ControlFlowEntry).map(e -> (ControlFlowEntry) e).collect(Collectors.toList());
+                        addEntriesToHierarchicalTree(currentRootList, parentTrace, ss);
+                    }
+                }
+                refresh();
+            }
+        };
+        action.setChecked(true);
+        action.setToolTipText(Messages.ControlFlowView_hierarchicalViewToolTip);
+        return action;
+    }
+
+    private IAction createFlatAction() {
+        IAction action = new Action(Messages.ControlFlowView_flatViewLabel, IAction.AS_RADIO_BUTTON) {
+            @Override
+            public void run() {
+                ITmfTrace parentTrace = getTrace();
+                synchronized (fFlatTraces) {
+                    fFlatTraces.add(parentTrace);
+                    for (ITmfTrace trace : TmfTraceManager.getTraceSet(parentTrace)) {
+                        final ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
+                        hierarchicalToFlatTree(parentTrace, ss);
+                    }
+                }
+                refresh();
+            }
+        };
+        action.setToolTipText(Messages.ControlFlowView_flatViewToolTip);
+        return action;
+    }
+
+    @Override
     protected String getNextText() {
         return Messages.ControlFlowView_nextProcessActionNameText;
     }
@@ -238,6 +307,30 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
             return ""; //$NON-NLS-1$
         }
 
+    }
+
+    @TmfSignalHandler
+    @Override
+    public void traceClosed(org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal signal) {
+        super.traceClosed(signal);
+        synchronized (fFlatTraces) {
+            fFlatTraces.remove(signal.getTrace());
+        }
+    }
+
+    @TmfSignalHandler
+    @Override
+    public void traceSelected(TmfTraceSelectedSignal signal) {
+        super.traceSelected(signal);
+        synchronized (fFlatTraces) {
+            if (fFlatTraces.contains(signal.getTrace())) {
+                fHierarchicalAction.setChecked(false);
+                fFlatAction.setChecked(true);
+            } else {
+                fFlatAction.setChecked(false);
+                fHierarchicalAction.setChecked(true);
+            }
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -360,7 +453,13 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                             lastPpidStartTime = ppidInterval.getStartTime();
                         }
                     }
-                    updateTree(entryList, parentTrace, ssq);
+                    synchronized (fFlatTraces) {
+                        if (fFlatTraces.contains(parentTrace)) {
+                            addEntriesToFlatTree(entryList, parentTrace, ssq);
+                        } else {
+                            addEntriesToHierarchicalTree(entryList, parentTrace, ssq);
+                        }
+                    }
                 }
             });
 
@@ -384,8 +483,47 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
         }
     }
 
-    private void updateTree(List<ControlFlowEntry> entryList, ITmfTrace parentTrace, ITmfStateSystem ss) {
-        List<TimeGraphEntry> rootListToAdd = new ArrayList<>();
+    /**
+     * Add entries to the traces's entry list in a flat fashion (no hierarchy).
+     * If one entry has children, we do a depth first search to add each child
+     * to the trace's entry list and update the parent and child relations.
+     */
+    private void hierarchicalToFlatTree(ITmfTrace parentTrace, ITmfStateSystem ss) {
+        List<@NonNull TimeGraphEntry> rootList = getEntryList(ss);
+        // We visit the children of every entry to add
+        StreamFlattener<TimeGraphEntry> sf = new StreamFlattener<>(entry -> entry.getChildren().stream());
+        Stream<TimeGraphEntry> allEntries = rootList.stream().flatMap(entry -> sf.flatten(entry));
+
+        // We add every entry that is missing from the trace's entry list
+        List<@NonNull TimeGraphEntry> rootListToAdd = allEntries
+                .filter(entry -> !rootList.contains(entry))
+                .collect(Collectors.toList());
+        rootList.forEach(entry -> {
+            entry.clearChildren();
+        });
+        rootListToAdd.forEach(entry -> {
+            entry.setParent(null);
+            entry.clearChildren();
+        });
+        addToEntryList(parentTrace, ss, rootListToAdd);
+    }
+
+    /**
+     * Add entries to the traces's entry list in a flat fashion (no hierarchy).
+     */
+    private void addEntriesToFlatTree(List<@NonNull ControlFlowEntry> entryList, ITmfTrace parentTrace, ITmfStateSystem ss) {
+        List<TimeGraphEntry> rootList = getEntryList(ss);
+        List<@NonNull TimeGraphEntry> rootListToAdd = entryList.stream()
+                .filter(entry -> !rootList.contains(entry))
+                .collect(Collectors.toList());
+        addToEntryList(parentTrace, ss, rootListToAdd);
+    }
+
+    /**
+     * Add entries to the trace's entry list in a hierarchical fashion.
+     */
+    private void addEntriesToHierarchicalTree(List<ControlFlowEntry> entryList, ITmfTrace parentTrace, ITmfStateSystem ss) {
+        List<@NonNull TimeGraphEntry> rootListToAdd = new ArrayList<>();
         List<TimeGraphEntry> rootListToRemove = new ArrayList<>();
         List<TimeGraphEntry> rootList = getEntryList(ss);
 

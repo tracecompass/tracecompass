@@ -57,7 +57,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     // ------------------------------------------------------------------------
 
     /** The state system to entry list hash map */
-    private final Map<ITmfStateSystem, List<TimeGraphEntry>> fSSEntryListMap = new HashMap<>();
+    private final Map<ITmfStateSystem, List<@NonNull TimeGraphEntry>> fSSEntryListMap = new HashMap<>();
 
     /** The trace to state system multi map */
     private final Multimap<ITmfTrace, ITmfStateSystem> fTraceSSMap = HashMultimap.create();
@@ -232,7 +232,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
      *
      * @return the entry list map
      */
-    protected List<TimeGraphEntry> getEntryList(ITmfStateSystem ss) {
+    protected List<@NonNull TimeGraphEntry> getEntryList(ITmfStateSystem ss) {
         synchronized (fSSEntryListMap) {
             return fSSEntryListMap.get(ss);
         }
@@ -248,7 +248,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
      * @param list
      *            the list of time graph entries
      */
-    protected void putEntryList(ITmfTrace trace, ITmfStateSystem ss, List<TimeGraphEntry> list) {
+    protected void putEntryList(ITmfTrace trace, ITmfStateSystem ss, List<@NonNull TimeGraphEntry> list) {
         super.putEntryList(trace, list);
         synchronized (fSSEntryListMap) {
             fSSEntryListMap.put(ss, new CopyOnWriteArrayList<>(list));
@@ -266,10 +266,10 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
      * @param list
      *            the list of time graph entries to add
      */
-    protected void addToEntryList(ITmfTrace trace, ITmfStateSystem ss, List<TimeGraphEntry> list) {
+    protected void addToEntryList(ITmfTrace trace, ITmfStateSystem ss, List<@NonNull TimeGraphEntry> list) {
         super.addToEntryList(trace, list);
         synchronized (fSSEntryListMap) {
-            List<TimeGraphEntry> entryList = fSSEntryListMap.get(ss);
+            List<@NonNull TimeGraphEntry> entryList = fSSEntryListMap.get(ss);
             if (entryList == null) {
                 fSSEntryListMap.put(ss, new CopyOnWriteArrayList<>(list));
             } else {

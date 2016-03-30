@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Patrick Tassé - Initial API and implementation
+ *     Mahdi Zolnouri - Add new String for ControlFlowView
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui;
@@ -18,6 +19,8 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.ui.messages"; //$NON-NLS-1$
 
     public static String ControlFlowView_birthTimeColumn;
+    public static String ControlFlowView_threadPresentation;
+
     public static String ControlFlowView_tidColumn;
     public static String ControlFlowView_ptidColumn;
     public static String ControlFlowView_processColumn;
@@ -37,6 +40,10 @@ public class Messages extends NLS {
     public static String ControlFlowView_uncheckInactiveToolTip;
     public static String ControlFlowView_attributeSyscallName;
     public static String ControlFlowView_attributeCpuName;
+    public static String ControlFlowView_flatViewLabel;
+    public static String ControlFlowView_flatViewToolTip;
+    public static String ControlFlowView_hierarchicalViewLabel;
+    public static String ControlFlowView_hierarchicalViewToolTip;
 
     public static String ResourcesView_stateTypeName;
     public static String ResourcesView_multipleStates;
