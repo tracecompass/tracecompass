@@ -103,7 +103,7 @@ public class CtfTmfTrace extends TmfTrace
      * Event aspects available for all CTF traces
      * @since 1.0
      */
-    protected static final @NonNull Collection<@NonNull ITmfEventAspect> CTF_ASPECTS =
+    protected static final @NonNull Collection<@NonNull ITmfEventAspect<?>> CTF_ASPECTS =
             ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     new CtfChannelAspect(),
@@ -297,7 +297,7 @@ public class CtfTmfTrace extends TmfTrace
     }
 
     @Override
-    public Iterable<ITmfEventAspect> getEventAspects() {
+    public Iterable<ITmfEventAspect<?>> getEventAspects() {
         return CTF_ASPECTS;
     }
 

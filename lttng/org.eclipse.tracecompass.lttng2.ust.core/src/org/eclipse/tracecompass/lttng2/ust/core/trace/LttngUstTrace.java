@@ -57,10 +57,10 @@ public class LttngUstTrace extends CtfTmfTrace {
 
     private static final int CONFIDENCE = 100;
 
-    private static final @NonNull Collection<ITmfEventAspect> LTTNG_UST_ASPECTS;
+    private static final @NonNull Collection<ITmfEventAspect<?>> LTTNG_UST_ASPECTS;
 
     static {
-        ImmutableSet.Builder<ITmfEventAspect> builder = ImmutableSet.builder();
+        ImmutableSet.Builder<ITmfEventAspect<?>> builder = ImmutableSet.builder();
         builder.addAll(CtfTmfTrace.CTF_ASPECTS);
         builder.add(UstDebugInfoBinaryAspect.INSTANCE);
         builder.add(UstDebugInfoSourceAspect.INSTANCE);
@@ -121,7 +121,7 @@ public class LttngUstTrace extends CtfTmfTrace {
     }
 
     @Override
-    public Iterable<ITmfEventAspect> getEventAspects() {
+    public Iterable<ITmfEventAspect<?>> getEventAspects() {
         return LTTNG_UST_ASPECTS;
     }
 

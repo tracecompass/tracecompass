@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
  * @author Geneviève Bastien
  * @since 1.0
  */
-public abstract class LinuxTidAspect implements ITmfEventAspect {
+public abstract class LinuxTidAspect implements ITmfEventAspect<Integer> {
 
     @Override
     public final String getName() {

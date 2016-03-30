@@ -71,10 +71,10 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
     /**
      * Event aspects available for all Lttng Kernel traces
      */
-    private static final @NonNull Collection<ITmfEventAspect> LTTNG_KERNEL_ASPECTS;
+    private static final @NonNull Collection<ITmfEventAspect<?>> LTTNG_KERNEL_ASPECTS;
 
     static {
-        ImmutableSet.Builder<ITmfEventAspect> builder = ImmutableSet.builder();
+        ImmutableSet.Builder<ITmfEventAspect<?>> builder = ImmutableSet.builder();
         builder.addAll(CtfTmfTrace.CTF_ASPECTS);
         builder.add(KernelTidAspect.INSTANCE);
         builder.add(ThreadPriorityAspect.INSTANCE);
@@ -163,7 +163,7 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
     }
 
     @Override
-    public Iterable<ITmfEventAspect> getEventAspects() {
+    public Iterable<ITmfEventAspect<?>> getEventAspects() {
          return LTTNG_KERNEL_ASPECTS;
     }
 

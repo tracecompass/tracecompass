@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
  *
  * @author Alexandre Montplaisir
  */
-public class TmfContentFieldAspect implements ITmfEventAspect {
+public class TmfContentFieldAspect implements ITmfEventAspect<Object> {
 
     private final String fAspectName;
     private final String[] fFieldPath;

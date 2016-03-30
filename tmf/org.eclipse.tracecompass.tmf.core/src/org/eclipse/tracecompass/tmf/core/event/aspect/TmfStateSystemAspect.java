@@ -32,7 +32,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  *
  * @author Alexandre Montplaisir
  */
-public class TmfStateSystemAspect implements ITmfEventAspect {
+public class TmfStateSystemAspect implements ITmfEventAspect<String> {
 
     private final @Nullable String fName;
     private final ITmfStateSystem fSS;

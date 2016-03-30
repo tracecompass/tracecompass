@@ -101,10 +101,10 @@ public final class TmfTraceUtils {
      *         {@link ITmfEventAspect#resolve(ITmfEvent)} that returns non null
      *         for the event or {@code null} otherwise
      */
-    public static @Nullable <T extends ITmfEventAspect> Object resolveEventAspectOfClassForEvent(
+    public static @Nullable <T extends ITmfEventAspect<?>> Object resolveEventAspectOfClassForEvent(
             ITmfTrace trace, Class<T> aspectClass, ITmfEvent event) {
-        Iterable<ITmfEventAspect> aspects = trace.getEventAspects();
-        for (ITmfEventAspect aspect : aspects) {
+        Iterable<ITmfEventAspect<?>> aspects = trace.getEventAspects();
+        for (ITmfEventAspect<?> aspect : aspects) {
             if (aspectClass.isAssignableFrom(aspect.getClass())) {
                 Object obj = aspect.resolve(event);
                 if (obj != null) {
@@ -131,7 +131,7 @@ public final class TmfTraceUtils {
      *         for the event or {@code null} otherwise
      * @since 2.0
      */
-    public static @Nullable <T extends ITmfEventAspect> Integer resolveIntEventAspectOfClassForEvent(
+    public static @Nullable <T extends ITmfEventAspect<Integer>> Integer resolveIntEventAspectOfClassForEvent(
             ITmfTrace trace, Class<T> aspectClass, ITmfEvent event) {
         Object result = resolveEventAspectOfClassForEvent(trace, aspectClass, event);
         if (result instanceof Integer) {

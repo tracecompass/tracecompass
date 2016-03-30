@@ -49,12 +49,12 @@ public class TmfXmlKernelTraceStub extends TmfXmlTraceStub implements IKernelTra
     }
 
     @Override
-    public Iterable<ITmfEventAspect> getEventAspects() {
+    public Iterable<ITmfEventAspect<?>> getEventAspects() {
         /*
          * This method needs to fill the aspects dynamically because aspects in
          * the parent class are not all present at the beginning of the trace
          */
-        ImmutableSet.Builder<ITmfEventAspect> builder = ImmutableSet.builder();
+        ImmutableSet.Builder<ITmfEventAspect<?>> builder = ImmutableSet.builder();
         builder.addAll(super.getEventAspects());
         builder.add(KernelTidAspect.INSTANCE);
         builder.add(ThreadPriorityAspect.INSTANCE);

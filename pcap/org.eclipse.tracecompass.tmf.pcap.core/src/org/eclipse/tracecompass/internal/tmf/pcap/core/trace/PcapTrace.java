@@ -69,7 +69,7 @@ public class PcapTrace extends TmfTrace implements ITmfPropertiesProvider {
     /** pcap trace type id as defined in plugin.xml */
     public static final String TRACE_TYPE_ID = "org.eclipse.linuxtools.tmf.pcap.core.pcaptrace"; //$NON-NLS-1$
 
-    private static final Collection<ITmfEventAspect> PCAP_ASPECTS =
+    private static final Collection<ITmfEventAspect<?>> PCAP_ASPECTS =
             ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     PcapSourceAspect.INSTANCE,
@@ -128,7 +128,7 @@ public class PcapTrace extends TmfTrace implements ITmfPropertiesProvider {
     }
 
     @Override
-    public Iterable<ITmfEventAspect> getEventAspects() {
+    public Iterable<ITmfEventAspect<?>> getEventAspects() {
         return PCAP_ASPECTS;
     }
 

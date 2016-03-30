@@ -145,10 +145,10 @@ public class XmlStubTraceTest {
             fail(e1.getMessage());
         }
 
-        ITmfEventAspect cpuAspect = null;
-        ITmfEventAspect testAspect = null;
+        ITmfEventAspect<?> cpuAspect = null;
+        ITmfEventAspect<?> testAspect = null;
         int aspectCount = 0;
-        for (ITmfEventAspect aspect : trace.getEventAspects()) {
+        for (ITmfEventAspect<?> aspect : trace.getEventAspects()) {
             aspectCount++;
             if (aspect instanceof TmfCpuAspect) {
                 cpuAspect = aspect;

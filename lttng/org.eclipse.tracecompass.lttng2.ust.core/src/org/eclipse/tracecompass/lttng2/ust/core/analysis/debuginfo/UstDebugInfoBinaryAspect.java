@@ -30,7 +30,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-public class UstDebugInfoBinaryAspect implements ITmfEventAspect {
+public class UstDebugInfoBinaryAspect implements ITmfEventAspect<BinaryCallsite> {
 
     /** Singleton instance */
     public static final UstDebugInfoBinaryAspect INSTANCE = new UstDebugInfoBinaryAspect();

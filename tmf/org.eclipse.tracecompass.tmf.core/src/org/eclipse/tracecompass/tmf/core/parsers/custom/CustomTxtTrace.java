@@ -148,7 +148,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexabl
     }
 
     @Override
-    public Iterable<ITmfEventAspect> getEventAspects() {
+    public Iterable<ITmfEventAspect<?>> getEventAspects() {
         return CustomEventAspects.generateAspects(fDefinition);
     }
 

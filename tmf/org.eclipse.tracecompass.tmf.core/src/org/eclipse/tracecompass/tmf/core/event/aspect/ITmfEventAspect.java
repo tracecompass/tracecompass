@@ -34,8 +34,9 @@ import com.google.common.collect.ImmutableList;
  * on to only keep certain events, to plot XY charts, etc.
  *
  * @author Alexandre Montplaisir
+ * @param <T> Type of the return value of the {@link #resolve} method
  */
-public interface ITmfEventAspect {
+public interface ITmfEventAspect<T> {
 
     /**
      * Static definition of an empty string. You can use this instead of 'null'!
@@ -45,7 +46,7 @@ public interface ITmfEventAspect {
     /**
      * List of all common base aspects
      */
-    public static final List<ITmfEventAspect> BASE_ASPECTS =
+    public static final List<ITmfEventAspect<?>> BASE_ASPECTS =
             ImmutableList.of(
                     BaseAspects.TIMESTAMP,
                     BaseAspects.EVENT_TYPE,
@@ -61,7 +62,7 @@ public interface ITmfEventAspect {
         /**
          * Aspect for the event timestamp
          */
-        ITmfEventAspect TIMESTAMP = new ITmfEventAspect() {
+        ITmfEventAspect<ITmfTimestamp> TIMESTAMP = new ITmfEventAspect<ITmfTimestamp>() {
             @Override
             public String getName() {
                 return Messages.getMessage(Messages.AspectName_Timestamp);
@@ -81,7 +82,7 @@ public interface ITmfEventAspect {
         /**
          * Aspect for the event type
          */
-        ITmfEventAspect EVENT_TYPE = new ITmfEventAspect() {
+        ITmfEventAspect<String> EVENT_TYPE = new ITmfEventAspect<String>() {
             @Override
             public String getName() {
                 return Messages.getMessage(Messages.AspectName_EventType);
@@ -121,7 +122,7 @@ public interface ITmfEventAspect {
         /**
          * Aspect for the trace's name (for experiments with many traces)
          */
-        ITmfEventAspect TRACE_NAME = new ITmfEventAspect() {
+        ITmfEventAspect<String> TRACE_NAME = new ITmfEventAspect<String>() {
             @Override
             public String getName() {
                 return Messages.getMessage(Messages.AspectName_TraceName);
@@ -177,5 +178,5 @@ public interface ITmfEventAspect {
      *            The event to process
      * @return The resulting tidbit of information for this event.
      */
-    @Nullable Object resolve(ITmfEvent event);
+    @Nullable T resolve(ITmfEvent event);
 }

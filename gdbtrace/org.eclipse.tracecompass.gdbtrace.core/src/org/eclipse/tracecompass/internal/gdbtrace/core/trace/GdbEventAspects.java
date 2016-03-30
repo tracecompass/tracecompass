@@ -31,7 +31,7 @@ public final class GdbEventAspects {
 
     private GdbEventAspects() {}
 
-    private static final @NonNull Iterable<ITmfEventAspect> GDB_ASPECTS =
+    private static final @NonNull Iterable<ITmfEventAspect<?>> GDB_ASPECTS =
             ImmutableList.of(
                     new TmfContentFieldAspect(GdbTraceEventContent.TRACE_FRAME, GdbTraceEventContent.TRACE_FRAME),
                     new TmfContentFieldAspect(GdbTraceEventContent.TRACEPOINT, GdbTraceEventContent.TRACEPOINT),
@@ -39,7 +39,7 @@ public final class GdbEventAspects {
                     ITmfEventAspect.BaseAspects.CONTENTS
                     );
 
-    private static class GdbFileAspect implements ITmfEventAspect {
+    private static class GdbFileAspect implements ITmfEventAspect<String> {
 
         @Override
         public String getName() {
@@ -66,7 +66,7 @@ public final class GdbEventAspects {
      *
      * @return The set of aspects
      */
-    public static @NonNull Iterable<ITmfEventAspect> getAspects() {
+    public static @NonNull Iterable<ITmfEventAspect<?>> getAspects() {
         return GDB_ASPECTS;
     }
 }

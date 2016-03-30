@@ -480,7 +480,7 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
     }
 
     @Override
-    public Iterable<ITmfEventAspect> getEventAspects() {
+    public Iterable<ITmfEventAspect<?>> getEventAspects() {
         return BtfEventAspects.getAspects();
     }
 

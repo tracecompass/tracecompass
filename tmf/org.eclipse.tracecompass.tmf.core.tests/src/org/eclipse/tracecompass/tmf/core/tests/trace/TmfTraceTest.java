@@ -1415,8 +1415,8 @@ public class TmfTraceTest {
      */
     @Test
     public void testGetEventAspects() {
-        Iterable<ITmfEventAspect> aspects = fTrace.getEventAspects();
-        for (ITmfEventAspect aspect : aspects) {
+        Iterable<ITmfEventAspect<?>> aspects = fTrace.getEventAspects();
+        for (ITmfEventAspect<?> aspect : aspects) {
             assertTrue(TmfTrace.BASE_ASPECTS.contains(aspect));
         }
     }

@@ -33,7 +33,7 @@ public final class BtfEventAspects {
 
     private BtfEventAspects() {}
 
-    private static final Iterable<ITmfEventAspect> BTF_ASPECTS =
+    private static final Iterable<ITmfEventAspect<?>> BTF_ASPECTS =
             ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     new BtfSourceAspect(),
@@ -48,7 +48,7 @@ public final class BtfEventAspects {
     /**
      * The "source" aspect, whose value comes from {@link ITmfEvent#getSource()}
      */
-    private static class BtfSourceAspect implements ITmfEventAspect {
+    private static class BtfSourceAspect implements ITmfEventAspect<String> {
 
         @Override
         public String getName() {
@@ -74,7 +74,7 @@ public final class BtfEventAspects {
      * The "target" aspect, taking its value from
      * {@link ITmfEvent#getTarget()}.
      */
-    private static class BtfTargetAspect implements ITmfEventAspect {
+    private static class BtfTargetAspect implements ITmfEventAspect<String> {
 
         @Override
         public String getName() {
@@ -101,7 +101,7 @@ public final class BtfEventAspects {
      *
      * @return The aspects
      */
-    public static Iterable<ITmfEventAspect> getAspects() {
+    public static Iterable<ITmfEventAspect<?>> getAspects() {
         return BTF_ASPECTS;
     }
 }

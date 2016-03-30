@@ -64,7 +64,7 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
     }
 
     /** The event aspects */
-    public static final @NonNull Collection<ITmfEventAspect> ASPECTS =
+    public static final @NonNull Collection<ITmfEventAspect<?>> ASPECTS =
             ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     new TmfContentFieldAspect(Field.HOST, Field.HOST),
@@ -140,7 +140,7 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
     }
 
     @Override
-    public Iterable<ITmfEventAspect> getEventAspects() {
+    public Iterable<ITmfEventAspect<?>> getEventAspects() {
         return ASPECTS;
     }
 }

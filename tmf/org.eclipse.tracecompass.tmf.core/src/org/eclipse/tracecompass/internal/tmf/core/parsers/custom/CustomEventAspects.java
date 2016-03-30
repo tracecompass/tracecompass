@@ -42,7 +42,7 @@ public class CustomEventAspects {
      * Aspects for custom events, which use an integer ID to represent each
      * field.
      */
-    private static final class CustomEventFieldAspect implements ITmfEventAspect {
+    private static final class CustomEventFieldAspect implements ITmfEventAspect<String> {
 
         private final @NonNull String fName;
         private final int fIndex;
@@ -87,8 +87,8 @@ public class CustomEventAspects {
      *            want the aspects
      * @return The set of event aspects for the given trace
      */
-    public static @NonNull Iterable<ITmfEventAspect> generateAspects(CustomTraceDefinition definition) {
-        ImmutableList.Builder<ITmfEventAspect> builder = new ImmutableList.Builder<>();
+    public static @NonNull Iterable<ITmfEventAspect<?>> generateAspects(CustomTraceDefinition definition) {
+        ImmutableList.Builder<ITmfEventAspect<?>> builder = new ImmutableList.Builder<>();
         List<OutputColumn> outputs = definition.outputs;
         for (int i = 0; i < outputs.size(); i++) {
             String name = outputs.get(i).name;

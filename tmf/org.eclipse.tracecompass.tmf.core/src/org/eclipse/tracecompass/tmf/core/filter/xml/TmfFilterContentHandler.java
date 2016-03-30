@@ -232,7 +232,7 @@ public class TmfFilterContentHandler extends DefaultHandler {
         traceTypeId = TmfTraceType.buildCompatibilityTraceTypeId(traceTypeId);
         String name = atts.getValue(TmfFilterAspectNode.EVENT_ASPECT_ATTR);
         if (TmfFilterAspectNode.BASE_ASPECT_ID.equals(traceTypeId)) {
-            for (ITmfEventAspect eventAspect : ITmfEventAspect.BASE_ASPECTS) {
+            for (ITmfEventAspect<?> eventAspect : ITmfEventAspect.BASE_ASPECTS) {
                 if (eventAspect.getName().equals(name)) {
                     node.setEventAspect(eventAspect);
                     node.setTraceTypeId(traceTypeId);
@@ -248,7 +248,7 @@ public class TmfFilterContentHandler extends DefaultHandler {
         } else if (traceTypeId != null && name != null) {
             TraceTypeHelper helper = TmfTraceType.getTraceType(traceTypeId);
             if (helper != null) {
-                for (ITmfEventAspect eventAspect : helper.getTrace().getEventAspects()) {
+                for (ITmfEventAspect<?> eventAspect : helper.getTrace().getEventAspects()) {
                     if (eventAspect.getName().equals(name)) {
                         node.setEventAspect(eventAspect);
                         node.setTraceTypeId(traceTypeId);

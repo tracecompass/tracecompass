@@ -63,9 +63,9 @@ public class TmfTraceUtilsTest {
 
     private static class TmfTraceStubWithAspects extends TmfTraceStub {
 
-        private static final @NonNull Collection<ITmfEventAspect> EVENT_ASPECTS;
+        private static final @NonNull Collection<ITmfEventAspect<?>> EVENT_ASPECTS;
         static {
-            ImmutableList.Builder<ITmfEventAspect> builder = ImmutableList.builder();
+            ImmutableList.Builder<ITmfEventAspect<?>> builder = ImmutableList.builder();
             builder.add(new TmfCpuAspect() {
                 @Override
                 public Integer resolve(ITmfEvent event) {
@@ -81,7 +81,7 @@ public class TmfTraceUtilsTest {
         }
 
         @Override
-        public Iterable<ITmfEventAspect> getEventAspects() {
+        public Iterable<ITmfEventAspect<?>> getEventAspects() {
             return EVENT_ASPECTS;
         }
 

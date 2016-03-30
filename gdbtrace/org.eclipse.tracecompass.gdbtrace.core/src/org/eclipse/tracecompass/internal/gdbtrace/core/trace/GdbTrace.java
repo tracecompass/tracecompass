@@ -165,7 +165,7 @@ public class GdbTrace extends TmfTrace {
     // ------------------------------------------------------------------------
 
     @Override
-    public Iterable<ITmfEventAspect> getEventAspects() {
+    public Iterable<ITmfEventAspect<?>> getEventAspects() {
         return GdbEventAspects.getAspects();
     }
 

@@ -269,7 +269,7 @@ public interface ITmfTrace extends ITmfEventProvider {
      *
      * @return The event aspects for this trace
      */
-    @NonNull Iterable<@NonNull ITmfEventAspect> getEventAspects();
+    @NonNull Iterable<@NonNull ITmfEventAspect<?>> getEventAspects();
 
     // ------------------------------------------------------------------------
     // Trace characteristics getters

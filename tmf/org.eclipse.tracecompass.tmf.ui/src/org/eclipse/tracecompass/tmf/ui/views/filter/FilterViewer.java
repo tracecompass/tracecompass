@@ -95,14 +95,14 @@ class FilterViewer extends Composite {
 
     private static class AspectItem {
         public String label;
-        public ITmfEventAspect eventAspect;
+        public ITmfEventAspect<?> eventAspect;
         public String traceTypeId;
 
         public AspectItem(String label) {
             this.label = label;
         }
 
-        public AspectItem(String label, ITmfEventAspect eventAspect, String traceTypeId) {
+        public AspectItem(String label, ITmfEventAspect<?> eventAspect, String traceTypeId) {
             this.label = label;
             this.eventAspect = eventAspect;
             this.traceTypeId = traceTypeId;
@@ -626,7 +626,7 @@ class FilterViewer extends Composite {
             ArrayList<AspectItem> aspectList = new ArrayList<>();
 
             aspectList.add(new AspectItem(Messages.FilterViewer_CommonCategory));
-            for (ITmfEventAspect aspect : ITmfEventAspect.BASE_ASPECTS) {
+            for (ITmfEventAspect<?> aspect : ITmfEventAspect.BASE_ASPECTS) {
                 aspectList.add(new AspectItem(aspect.getName(), aspect, TmfFilterAspectNode.BASE_ASPECT_ID));
             }
 
@@ -634,7 +634,7 @@ class FilterViewer extends Composite {
             if (helper != null) {
                 aspectList.add(new AspectItem("")); //$NON-NLS-1$
                 aspectList.add(new AspectItem('[' + helper.getLabel() + ']'));
-                for (ITmfEventAspect aspect : helper.getTrace().getEventAspects()) {
+                for (ITmfEventAspect<?> aspect : helper.getTrace().getEventAspects()) {
                     for (AspectItem baseAspect : aspectList) {
                         if (aspect.equals(baseAspect.eventAspect)) {
                             aspectList.remove(baseAspect);

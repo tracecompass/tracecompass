@@ -38,7 +38,7 @@ public class TmfEventTableColumn {
     // Fields
     // ------------------------------------------------------------------------
 
-    private final ITmfEventAspect fAspect;
+    private final ITmfEventAspect<?> fAspect;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -51,7 +51,7 @@ public class TmfEventTableColumn {
      *            The {@link ITmfEventAspect} to be used to populate this
      *            column.
      */
-    public TmfEventTableColumn(ITmfEventAspect aspect) {
+    public TmfEventTableColumn(ITmfEventAspect<?> aspect) {
         fAspect = aspect;
     }
 
@@ -95,7 +95,7 @@ public class TmfEventTableColumn {
      *
      * @return The event aspect
      */
-    public ITmfEventAspect getEventAspect() {
+    public ITmfEventAspect<?> getEventAspect() {
         return fAspect;
     }
 

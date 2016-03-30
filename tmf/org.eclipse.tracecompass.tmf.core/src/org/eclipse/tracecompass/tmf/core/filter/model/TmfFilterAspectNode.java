@@ -32,7 +32,7 @@ public abstract class TmfFilterAspectNode extends TmfFilterTreeNode {
     public static final String BASE_ASPECT_ID = "BASE.ASPECT.ID"; //$NON-NLS-1$
 
     /** event aspect */
-    protected ITmfEventAspect fEventAspect;
+    protected ITmfEventAspect<?> fEventAspect;
 
     private String fTraceTypeId;
 
@@ -46,7 +46,7 @@ public abstract class TmfFilterAspectNode extends TmfFilterTreeNode {
     /**
      * @return The event aspect of this filter
      */
-    public ITmfEventAspect getEventAspect() {
+    public ITmfEventAspect<?> getEventAspect() {
         return fEventAspect;
     }
 
@@ -54,7 +54,7 @@ public abstract class TmfFilterAspectNode extends TmfFilterTreeNode {
      * @param aspect
      *            The event aspect to assign to this filter
      */
-    public void setEventAspect(ITmfEventAspect aspect) {
+    public void setEventAspect(ITmfEventAspect<?> aspect) {
         fEventAspect = aspect;
     }
 

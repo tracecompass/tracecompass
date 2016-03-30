@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
  *
  * @author Patrick Tasse
  */
-public class TmfEventFieldAspect implements ITmfEventAspect {
+public class TmfEventFieldAspect implements ITmfEventAspect<Object> {
 
     private static final char SLASH = '/';
     private static final char BACKSLASH = '\\';

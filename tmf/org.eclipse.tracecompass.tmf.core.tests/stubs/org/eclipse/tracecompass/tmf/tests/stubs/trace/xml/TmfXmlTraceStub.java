@@ -99,8 +99,8 @@ public class TmfXmlTraceStub extends TmfTrace {
     private final CustomXmlTraceDefinition fDefinition;
     private CustomXmlTrace fTrace;
 
-    private Collection<ITmfEventAspect> fAspects = TmfTrace.BASE_ASPECTS;
-    private final Collection<ITmfEventAspect> fAdditionalAspects = new HashSet<>();
+    private Collection<ITmfEventAspect<?>> fAspects = TmfTrace.BASE_ASPECTS;
+    private final Collection<ITmfEventAspect<?>> fAdditionalAspects = new HashSet<>();
 
     /**
      * Constructor. Constructs the custom XML trace with the appropriate
@@ -322,7 +322,7 @@ public class TmfXmlTraceStub extends TmfTrace {
     }
 
     private void generateAspects(ITmfEventField[] fieldsArray) {
-        ImmutableList.Builder<ITmfEventAspect> builder = new ImmutableList.Builder<>();
+        ImmutableList.Builder<ITmfEventAspect<?>> builder = new ImmutableList.Builder<>();
 
         /* Initialize the first default trace aspects */
         builder.add(ITmfEventAspect.BaseAspects.TIMESTAMP);
@@ -331,7 +331,7 @@ public class TmfXmlTraceStub extends TmfTrace {
         /* Add custom aspects in between */
         for (ITmfEventField field : fieldsArray) {
             String name = field.getName();
-            final ITmfEventAspect aspect = new TmfContentFieldAspect(name, name);
+            final ITmfEventAspect<?> aspect = new TmfContentFieldAspect(name, name);
             if (name.equals(ASPECT_CPU)) {
                 builder.add(new TmfCpuAspect() {
                     @Override
@@ -356,7 +356,7 @@ public class TmfXmlTraceStub extends TmfTrace {
     }
 
     @Override
-    public Iterable<ITmfEventAspect> getEventAspects() {
+    public Iterable<ITmfEventAspect<?>> getEventAspects() {
         return fAspects;
     }
 
@@ -371,7 +371,7 @@ public class TmfXmlTraceStub extends TmfTrace {
      * @param aspect
      *            The aspect to have
      */
-    public void addEventAspect(ITmfEventAspect aspect) {
+    public void addEventAspect(ITmfEventAspect<?> aspect) {
         fAdditionalAspects.add(aspect);
     }
 

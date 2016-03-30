@@ -21,7 +21,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
  *
  * @author Alexandre Montplaisir
  */
-public class CtfChannelAspect implements ITmfEventAspect {
+public class CtfChannelAspect implements ITmfEventAspect<String> {
 
     @Override
     public String getName() {

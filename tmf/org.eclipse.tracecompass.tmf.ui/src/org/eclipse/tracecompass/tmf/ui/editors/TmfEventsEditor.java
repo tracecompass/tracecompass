@@ -304,7 +304,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
          * Use the aspects defined by the trace type (or each trace type in an
          * experiment) to build a table consisting of these.
          */
-        Iterable<ITmfEventAspect> aspects = getTraceAspects(trace);
+        Iterable<ITmfEventAspect<?>> aspects = getTraceAspects(trace);
         if (Iterables.isEmpty(aspects)) {
             /* Couldn't find any event aspects, use a default table */
             return new TmfEventsTable(parent, cacheSize);
@@ -325,7 +325,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      *            The cache size to use
      * @return The event table for the trace
      */
-    private static @NonNull Iterable<ITmfEventAspect> getTraceAspects(ITmfTrace trace) {
+    private static @NonNull Iterable<ITmfEventAspect<?>> getTraceAspects(ITmfTrace trace) {
         if (trace instanceof TmfExperiment) {
             return getExperimentAspects((TmfExperiment) trace);
         }
@@ -345,10 +345,10 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      *            the event table cache size
      * @return An event table of the appropriate type
      */
-    private static @NonNull Iterable<ITmfEventAspect> getExperimentAspects(
+    private static @NonNull Iterable<ITmfEventAspect<?>> getExperimentAspects(
             final TmfExperiment experiment) {
         List<ITmfTrace> traces = experiment.getTraces();
-        ImmutableSet.Builder<ITmfEventAspect> builder = new ImmutableSet.Builder<>();
+        ImmutableSet.Builder<ITmfEventAspect<?>> builder = new ImmutableSet.Builder<>();
 
         /* For experiments, we'll add a "trace name" aspect/column */
         builder.add(ITmfEventAspect.BaseAspects.TRACE_NAME);
@@ -368,7 +368,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
              * trace types.
              */
             for (ITmfTrace trace : traces) {
-                Iterable<ITmfEventAspect> traceAspects = trace.getEventAspects();
+                Iterable<ITmfEventAspect<?>> traceAspects = trace.getEventAspects();
                 builder.addAll(traceAspects);
             }
         }

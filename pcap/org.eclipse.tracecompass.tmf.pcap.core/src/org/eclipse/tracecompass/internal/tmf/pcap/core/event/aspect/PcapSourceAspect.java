@@ -28,7 +28,7 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
  *
  * @author Alexandre Montplaisir
  */
-public class PcapSourceAspect implements ITmfEventAspect {
+public class PcapSourceAspect implements ITmfEventAspect<String> {
 
     /** Singleton instance */
     public static final PcapSourceAspect INSTANCE = new PcapSourceAspect();

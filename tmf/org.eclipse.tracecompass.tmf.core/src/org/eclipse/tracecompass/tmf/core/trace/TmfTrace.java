@@ -97,7 +97,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     /**
      * Basic aspects that should be valid for all trace types.
      */
-    public static final @NonNull Collection<@NonNull ITmfEventAspect> BASE_ASPECTS =
+    public static final @NonNull Collection<@NonNull ITmfEventAspect<?>> BASE_ASPECTS =
             ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     ITmfEventAspect.BaseAspects.EVENT_TYPE,
@@ -322,7 +322,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     }
 
     @Override
-    public Iterable<ITmfEventAspect> getEventAspects() {
+    public Iterable<ITmfEventAspect<?>> getEventAspects() {
         /* By default we provide only the base aspects valid for all trace types */
         return BASE_ASPECTS;
     }

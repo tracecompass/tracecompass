@@ -771,10 +771,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     @Deprecated
-    private static @NonNull Iterable<ITmfEventAspect> convertFromColumnData(
+    private static @NonNull Iterable<ITmfEventAspect<?>> convertFromColumnData(
             org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.ColumnData[] columnData) {
 
-        ImmutableList.Builder<ITmfEventAspect> builder = new ImmutableList.Builder<>();
+        ImmutableList.Builder<ITmfEventAspect<?>> builder = new ImmutableList.Builder<>();
         for (org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.ColumnData col : columnData) {
             String fieldName = col.header;
             if (fieldName != null) {
@@ -800,7 +800,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      *            </p>
      */
     public TmfEventsTable(final Composite parent, int cacheSize,
-            @NonNull Iterable<ITmfEventAspect> aspects) {
+            @NonNull Iterable<ITmfEventAspect<?>> aspects) {
         super("TmfEventsTable"); //$NON-NLS-1$
 
         fComposite = new Composite(parent, SWT.NONE);
@@ -862,7 +862,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fTable.setLinesVisible(true);
 
         // Setup the columns
-        for (ITmfEventAspect aspect : aspects) {
+        for (ITmfEventAspect<?> aspect : aspects) {
             if (aspect != null) {
                 fColumns.add(new TmfEventTableColumn(aspect));
             }
@@ -1827,7 +1827,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             return false;
                         }
                         final TmfFilterMatchesNode filter = new TmfFilterMatchesNode(null);
-                        ITmfEventAspect aspect = (ITmfEventAspect) column.getData(Key.ASPECT);
+                        ITmfEventAspect<?> aspect = (ITmfEventAspect<?>) column.getData(Key.ASPECT);
                         filter.setEventAspect(aspect);
                         filter.setRegex(regex);
                         column.setData(Key.SEARCH_OBJ, filter);
@@ -3342,7 +3342,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      */
     private static final class TmfMarginColumn extends TmfEventTableColumn {
 
-        private static final @NonNull ITmfEventAspect MARGIN_ASPECT = new ITmfEventAspect() {
+        private static final @NonNull ITmfEventAspect<String> MARGIN_ASPECT =
+                new ITmfEventAspect<String>() {
 
             @Override
             public String getName() {
