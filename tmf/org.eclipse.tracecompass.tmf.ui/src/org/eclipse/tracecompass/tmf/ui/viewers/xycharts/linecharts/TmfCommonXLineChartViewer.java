@@ -203,8 +203,9 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     /**
      * Convenience method to compute the values of the X axis for a given time
-     * range. This method will return nb values depending, equally separated
-     * from start to end.
+     * range. This method will return at most nb values, equally separated from
+     * start to end. The step between values will be at least 1.0, so the number
+     * of values returned can be lower than nb.
      *
      * The returned time values are in internal time, ie to get trace time, the
      * time offset needs to be added to those values.
@@ -214,17 +215,23 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      * @param end
      *            End time of the range
      * @param nb
-     *            The number of steps in the x axis.
+     *            The maximum number of steps in the x axis.
      * @return The time values (converted to double) to match every step.
      */
     protected static final double[] getXAxis(long start, long end, int nb) {
-
-        double timestamps[] = new double[nb];
         long steps = (end - start);
-        double step = steps / (double) nb;
+        int nbVals = nb;
+        if (steps < nb) {
+            nbVals = (int) steps;
+            if (nbVals <= 0) {
+                nbVals = 1;
+            }
+        }
+        double step = steps / (double) nbVals;
 
+        double timestamps[] = new double[nbVals];
         double curTime = 1;
-        for (int i = 0; i < nb; i++) {
+        for (int i = 0; i < nbVals; i++) {
             timestamps[i] = curTime;
             curTime += step;
         }
