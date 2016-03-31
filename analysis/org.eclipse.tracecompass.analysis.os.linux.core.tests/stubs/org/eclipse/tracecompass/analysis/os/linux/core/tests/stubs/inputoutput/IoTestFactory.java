@@ -10,18 +10,22 @@
 package org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.inputoutput;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.Attributes;
+import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.IoOperationType;
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.StateValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.LinuxTestCase;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.StateIntervalStub;
 import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.StateSystemTestUtils;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
-
-import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.StateIntervalStub;
+import com.google.common.collect.Multimap;
 
 /**
  * Factory of test for the input output analysis
@@ -48,7 +52,7 @@ public final class IoTestFactory {
      * - Read request inserted at 40L, issued at 50L and completed at 60L
      * </pre>
      */
-    public final static LinuxTestCase SIMPLE_REQUESTS = new LinuxTestCase("io_analysis.xml") {
+    public final static IoTestCase SIMPLE_REQUESTS = new IoTestCase("io_analysis.xml") {
 
         @Override
         public Set<IntervalInfo> getTestIntervals() {
@@ -232,6 +236,34 @@ public final class IoTestFactory {
             return info;
         }
 
+        @Override
+        public Multimap<Integer, SectorCountInfo> getSectorCount() {
+            Integer deviceId = Integer.parseInt(DEVICE_ID);
+            Multimap<Integer, SectorCountInfo> map = HashMultimap.create();
+            map.put(deviceId, new SectorCountInfo(5, IoOperationType.READ, 0));
+            map.put(deviceId, new SectorCountInfo(50, IoOperationType.READ, 0));
+            map.put(deviceId, new SectorCountInfo(55, IoOperationType.READ, 128));
+            map.put(deviceId, new SectorCountInfo(60, IoOperationType.READ, 256));
+            map.put(deviceId, new SectorCountInfo(5, IoOperationType.WRITE, 0));
+            map.put(deviceId, new SectorCountInfo(15, IoOperationType.WRITE, 4));
+            map.put(deviceId, new SectorCountInfo(20, IoOperationType.WRITE, 8));
+            map.put(deviceId, new SectorCountInfo(27, IoOperationType.WRITE, 8));
+            map.put(deviceId, new SectorCountInfo(28, IoOperationType.WRITE, 10));
+            map.put(deviceId, new SectorCountInfo(29, IoOperationType.WRITE, 13));
+            map.put(deviceId, new SectorCountInfo(30, IoOperationType.WRITE, 17));
+            map.put(deviceId, new SectorCountInfo(35, IoOperationType.WRITE, 24));
+            map.put(deviceId, new SectorCountInfo(60, IoOperationType.WRITE, 24));
+            return map;
+        }
+
+        @Override
+        public Map<Integer, DiskInfo> getDiskInfo() {
+            Map<Integer, DiskInfo> map = new TreeMap<>();
+            Integer deviceId = Integer.parseInt(DEVICE_ID);
+            map.put(deviceId, new DiskInfo("8,16", DEVICE_NAME, true));
+            return map;
+        }
+
     };
 
     /**
@@ -242,7 +274,7 @@ public final class IoTestFactory {
      * - Write Request inserted at 5L, issued at 10L and completed at 20L
      * </pre>
      */
-    public final static LinuxTestCase SIMPLE_NO_STATEDUMP = new LinuxTestCase("io_nostatedump.xml") {
+    public final static IoTestCase SIMPLE_NO_STATEDUMP = new IoTestCase("io_nostatedump.xml") {
 
         @Override
         public Set<IntervalInfo> getTestIntervals() {
@@ -264,6 +296,14 @@ public final class IoTestFactory {
         @Override
         public Set<PunctualInfo> getPunctualTestData() {
             return new HashSet<>();
+        }
+
+        @Override
+        public Map<Integer, DiskInfo> getDiskInfo() {
+            Map<Integer, DiskInfo> map = new TreeMap<>();
+            Integer deviceId = Integer.parseInt(DEVICE_ID);
+            map.put(deviceId, new DiskInfo("8,16", "8,16", true));
+            return map;
         }
     };
 
@@ -607,7 +647,7 @@ public final class IoTestFactory {
      * - read request on sdb inserted at 8L (before statedump), issued at 12L and completed at 18L
      * </pre>
      */
-    public final static LinuxTestCase TWO_DEVICES = new LinuxTestCase("io_two_devices.xml") {
+    public final static IoTestCase TWO_DEVICES = new IoTestCase("io_two_devices.xml") {
 
         @Override
         public Set<IntervalInfo> getTestIntervals() {
@@ -659,6 +699,17 @@ public final class IoTestFactory {
         @Override
         public Set<PunctualInfo> getPunctualTestData() {
             return new HashSet<>();
+        }
+
+        @Override
+        public Map<Integer, DiskInfo> getDiskInfo() {
+            Map<Integer, DiskInfo> map = new TreeMap<>();
+            Integer deviceId = Integer.parseInt(DEVICE_ID);
+            map.put(deviceId, new DiskInfo("8,16", DEVICE_NAME, true));
+            deviceId = Integer.parseInt(SECOND_DEVICE_ID);
+            map.put(deviceId, new DiskInfo("8,0", "sdb", true));
+            map.put(8388609, new DiskInfo("8,1", "sdb1", false));
+            return map;
         }
     };
 

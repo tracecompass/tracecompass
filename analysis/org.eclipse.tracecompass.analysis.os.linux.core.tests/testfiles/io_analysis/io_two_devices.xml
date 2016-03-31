@@ -7,6 +7,11 @@
 <field name="dev" value="8388624" type="long" />
 <field name="diskname" value="sda" type="string" />
 </event>
+<event timestamp="4" name="statedump_block_device">
+<field name="cpu" value="1" type="int" />
+<field name="dev" value="8388609" type="long" />
+<field name="diskname" value="sdb1" type="string" />
+</event>
 <event timestamp="5" name="block_rq_insert">
 <field name="cpu" value="0" type="int" />
 <field name="dev" value="8388624" type="long" />

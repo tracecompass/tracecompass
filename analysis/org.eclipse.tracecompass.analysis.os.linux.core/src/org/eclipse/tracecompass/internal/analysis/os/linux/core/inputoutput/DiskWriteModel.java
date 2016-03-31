@@ -14,9 +14,9 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.Attributes;
+import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.Disk;
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.IoOperationType;
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.StateValues;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -29,9 +29,6 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool.QueueType;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
-
 /**
  * Class that represents a disk on a system. This class provides operation to
  * save the analysis data in a state system.
@@ -39,18 +36,12 @@ import com.google.common.hash.Hashing;
  * @author Houssem Daoud
  * @since 2.0
  */
-public class DiskWriteModel {
-
-    private static final HashFunction HF = NonNullUtils.checkNotNull(Hashing.goodFastHash(32));
-
-    private final Integer fDev;
+public class DiskWriteModel extends Disk {
     private final Map<Long, Pair<Request, Integer>> fDriverQueue = new HashMap<>();
     private final Map<Long, Pair<Request, Integer>> fWaitingQueue = new HashMap<>();
     private final ITmfStateSystemBuilder fSs;
-    private final int fDiskQuark;
     private final TmfAttributePool fWaitingQueueAttrib;
     private final TmfAttributePool fDriverQueueAttrib;
-    private @Nullable String fDiskname = null;
 
     /**
      * Constructor
@@ -60,30 +51,26 @@ public class DiskWriteModel {
      * @param ss
      *            The state system this disk will be saved to
      */
-    public DiskWriteModel(Integer dev, ITmfStateSystemBuilder ss) {
-        fDev = dev;
+   public DiskWriteModel(Integer dev, ITmfStateSystemBuilder ss) {
+        super(dev, ss, ss.getQuarkAbsoluteAndAdd(Attributes.DISKS, String.valueOf(dev)));
         fSs = ss;
+        int diskQuark = getQuark();
         /* Initialize the state system for this disk */
-        fDiskQuark = fSs.getQuarkAbsoluteAndAdd(Attributes.DISKS, String.valueOf(dev));
-        fSs.getQuarkRelativeAndAdd(fDiskQuark, Attributes.SECTORS_WRITTEN);
-        fSs.getQuarkRelativeAndAdd(fDiskQuark, Attributes.SECTORS_READ);
-        int wqQuark = fSs.getQuarkRelativeAndAdd(fDiskQuark, Attributes.WAITING_QUEUE);
+        fSs.getQuarkRelativeAndAdd(diskQuark, Attributes.SECTORS_WRITTEN);
+        fSs.getQuarkRelativeAndAdd(diskQuark, Attributes.SECTORS_READ);
+        int wqQuark = fSs.getQuarkRelativeAndAdd(diskQuark, Attributes.WAITING_QUEUE);
         fWaitingQueueAttrib = new TmfAttributePool(fSs, wqQuark, QueueType.PRIORITY);
-        fSs.getQuarkRelativeAndAdd(fDiskQuark, Attributes.WAITING_QUEUE_LENGTH);
-        int dqQuark = fSs.getQuarkRelativeAndAdd(fDiskQuark, Attributes.DRIVER_QUEUE);
+        fSs.getQuarkRelativeAndAdd(diskQuark, Attributes.WAITING_QUEUE_LENGTH);
+        int dqQuark = fSs.getQuarkRelativeAndAdd(diskQuark, Attributes.DRIVER_QUEUE);
         fDriverQueueAttrib = new TmfAttributePool(fSs, dqQuark, QueueType.PRIORITY);
-        fSs.getQuarkRelativeAndAdd(fDiskQuark, Attributes.DRIVER_QUEUE_LENGTH);
+        fSs.getQuarkRelativeAndAdd(diskQuark, Attributes.DRIVER_QUEUE_LENGTH);
     }
 
-    /**
-     * Set the human readable disk name of this device
-     *
-     * @param diskname
-     *            The human readable name of the disk
-     */
+    @Override
     public void setDiskName(String diskname) {
+        super.setDiskName(diskname);
         try {
-            fSs.modifyAttribute(fSs.getCurrentEndTime(), TmfStateValue.newValueString(diskname), fDiskQuark);
+            fSs.modifyAttribute(fSs.getCurrentEndTime(), TmfStateValue.newValueString(diskname), getQuark());
         } catch (StateValueTypeException | AttributeNotFoundException e) {
             Activator.getDefault().logError("Cannot set the diskname for disk " + diskname, e); //$NON-NLS-1$
         }
@@ -312,11 +299,11 @@ public class DiskWriteModel {
         try {
             switch (request.getType()) {
             case READ:
-                int readQuark = fSs.getQuarkRelativeAndAdd(fDiskQuark, Attributes.SECTORS_READ);
+                int readQuark = fSs.getQuarkRelativeAndAdd(getQuark(), Attributes.SECTORS_READ);
                 StateSystemBuilderUtils.incrementAttributeInt(fSs, ts, readQuark, request.getNrSector());
                 break;
             case WRITE:
-                int writtenQuark = fSs.getQuarkRelativeAndAdd(fDiskQuark, Attributes.SECTORS_WRITTEN);
+                int writtenQuark = fSs.getQuarkRelativeAndAdd(getQuark(), Attributes.SECTORS_WRITTEN);
                 StateSystemBuilderUtils.incrementAttributeInt(fSs, ts, writtenQuark, request.getNrSector());
                 break;
             default:
@@ -370,49 +357,15 @@ public class DiskWriteModel {
         return fDriverQueue.size();
     }
 
-    /**
-     * Get the quark corresponding to this disk
-     *
-     * @return The quark in the state system of this disk
-     */
-    public int getDiskQuark() {
-        return fDiskQuark;
-    }
-
     private void updateQueuesLength(long ts) {
         try {
-            int fDriverQueueLength = fSs.getQuarkRelativeAndAdd(fDiskQuark, Attributes.DRIVER_QUEUE_LENGTH);
+            int fDriverQueueLength = fSs.getQuarkRelativeAndAdd(getQuark(), Attributes.DRIVER_QUEUE_LENGTH);
             fSs.modifyAttribute(ts, TmfStateValue.newValueInt(getDriverQueueSize()), fDriverQueueLength);
-            int fWaitinQueueLength = fSs.getQuarkRelativeAndAdd(fDiskQuark, Attributes.WAITING_QUEUE_LENGTH);
+            int fWaitinQueueLength = fSs.getQuarkRelativeAndAdd(getQuark(), Attributes.WAITING_QUEUE_LENGTH);
             fSs.modifyAttribute(ts, TmfStateValue.newValueInt(getWaitingQueueSize()), fWaitinQueueLength);
         } catch (StateValueTypeException | AttributeNotFoundException e) {
             Activator.getDefault().logError("Error updating queues lengths", e); //$NON-NLS-1$
         }
-    }
-
-    // ----------------------------------------------------
-    // Object methods
-    // ----------------------------------------------------
-
-    @Override
-    public int hashCode() {
-        return HF.newHasher().putInt(fDev).hash().asInt();
-    }
-
-    @Override
-    public boolean equals(@Nullable Object o) {
-        if (o instanceof DiskWriteModel) {
-            DiskWriteModel disk = (DiskWriteModel) o;
-            if (fDev.equals(disk.fDev)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return "Disk: [" + fDev + ',' + fDiskname + ']'; //$NON-NLS-1$
     }
 
 }
