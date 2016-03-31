@@ -41,6 +41,8 @@ public enum TmfXmlTestFiles {
     ATTRIBUTE_FILE("test_xml_files/test_valid/test_attributes.xml"),
     /** A valid file for conditions tests */
     CONDITION_FILE("test_xml_files/test_valid/test_conditions.xml"),
+    /** A valid file for doubles tests */
+    DOUBLES_FILE("test_xml_files/test_valid/test_doubles.xml"),
     /** A valid file for pattern tests */
     VALID_PATTERN_FILE("test_xml_files/test_valid/test_valid_pattern.xml"),
     /** A valid pattern file to test the pattern segment **/
