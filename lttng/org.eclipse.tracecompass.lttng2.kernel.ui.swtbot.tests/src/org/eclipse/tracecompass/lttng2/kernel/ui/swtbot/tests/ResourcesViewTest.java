@@ -164,14 +164,14 @@ public class ResourcesViewTest extends KernelTestBase {
         assertTrue(fViewBot.toolbarButton(PREVIOUS_MARKER).isEnabled());
 
         /* disable Lost Events markers */
-        fViewBot.menu(LOST_EVENTS).click();
+        fViewBot.viewMenu(LOST_EVENTS).click();
 
         /* check that "Next Marker" and "Previous Marker" are disabled */
         assertFalse(fViewBot.toolbarButton(NEXT_MARKER).isEnabled());
         assertFalse(fViewBot.toolbarButton(PREVIOUS_MARKER).isEnabled());
 
         /* enable Lost Events markers */
-        fViewBot.menu(LOST_EVENTS).click();
+        fViewBot.viewMenu(LOST_EVENTS).click();
 
         /* check that "Next Marker" and "Previous Marker" are enabled */
         assertTrue(fViewBot.toolbarButton(NEXT_MARKER).isEnabled());
