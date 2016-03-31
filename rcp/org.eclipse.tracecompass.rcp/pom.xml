@@ -75,6 +75,8 @@
                 <plugin id="com.google.guava"/>
                 <plugin id="org.apache.commons.io"/>
                 <plugin id="org.eclipse.remote.core"/>
+                <plugin id="org.eclipse.remote.jsch.core"/>
+                <plugin id="org.eclipse.remote.jsch.ui"/>
                 <plugin id="org.eclipse.remote.ui"/>
                 <plugin id="org.eclipse.remote.console"/>
               </excludes>
