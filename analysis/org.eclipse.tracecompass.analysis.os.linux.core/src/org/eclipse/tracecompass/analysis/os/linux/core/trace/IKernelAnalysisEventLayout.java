@@ -290,6 +290,27 @@ public interface IKernelAnalysisEventLayout {
      */
     String eventHRTimerExpireExit();
 
+    /**
+     * The kernel just allocated a page of memory.
+     * <p>
+     * In Linux, this typically means a user space application just got a page of
+     * ram.
+     *
+     * @return the event name
+     * @since 2.0
+     */
+    String eventKmemPageAlloc();
+
+    /**
+     * The kernel just deallocated a page of memory.
+     * <p>
+     * In Linux, this typically means a page of ram was just freed
+     *
+     * @return the event name
+     * @since 2.0
+     */
+    String eventKmemPageFree();
+
     // ------------------------------------------------------------------------
     // Event field names
     // ------------------------------------------------------------------------

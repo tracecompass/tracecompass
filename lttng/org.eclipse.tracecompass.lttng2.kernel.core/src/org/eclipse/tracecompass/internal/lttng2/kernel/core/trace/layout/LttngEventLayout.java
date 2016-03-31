@@ -85,6 +85,8 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     private static final String HRTIMER_EXPIRES = "expires";
     private static final String HRTIMER_NOW = "now";
     private static final String HRTIMER_SOFT_EXPIRES = "softexpires";
+    private static final String KMEM_ALLOC = "mm_page_alloc";
+    private static final String KMEM_FREE = "mm_page_free";
 
     /** All instances are the same. Only provide a static instance getter */
     protected LttngEventLayout() {
@@ -190,6 +192,22 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
          * and compat syscalls.
          */
         return SYSCALL_EXIT_PREFIX;
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public String eventKmemPageAlloc() {
+        return KMEM_ALLOC;
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public String eventKmemPageFree() {
+        return KMEM_FREE;
     }
 
     // ------------------------------------------------------------------------

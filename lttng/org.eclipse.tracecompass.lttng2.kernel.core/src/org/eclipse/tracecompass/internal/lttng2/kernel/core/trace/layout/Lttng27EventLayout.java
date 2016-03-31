@@ -124,6 +124,16 @@ public class Lttng27EventLayout extends Lttng26EventLayout {
         return "irq_softirq_exit"; //$NON-NLS-1$
     }
 
+    @Override
+    public String eventKmemPageAlloc() {
+        return "kmem_mm_page_alloc"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String eventKmemPageFree() {
+        return "kmem_mm_page_free"; //$NON-NLS-1$
+    }
+
     public String x86IrqVectorsLocalTimerEntry() {
         return X86_IRQ_VECTORS_LOCAL_TIMER_ENTRY;
     }
