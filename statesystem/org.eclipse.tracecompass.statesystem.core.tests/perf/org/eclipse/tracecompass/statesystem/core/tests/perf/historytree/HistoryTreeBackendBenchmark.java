@@ -70,6 +70,7 @@ public class HistoryTreeBackendBenchmark {
 
     private File fTempFile;
     private final String fName;
+    private final String fShortName;
     private final int fNbAttrib;
     private final int fNbAvgIntervals;
     private final int fNbLoops;
@@ -81,6 +82,9 @@ public class HistoryTreeBackendBenchmark {
      *
      * @param name
      *            The name of the test
+     * @param shortName
+     *            A short name for this scenario (at most 40 characters,
+     *            otherwise it will be truncated in the DB)
      * @param nbAttrib
      *            The number of attributes
      * @param nbAvgIntervals
@@ -94,8 +98,9 @@ public class HistoryTreeBackendBenchmark {
      *            A distribution method that will return the next interval
      *            duration according to an algorithm
      */
-    public HistoryTreeBackendBenchmark(String name, int nbAttrib, int nbAvgIntervals, int nbLoops, HTBValues values, IIntervalDistribution distributionMethod) {
+    public HistoryTreeBackendBenchmark(String name, String shortName, int nbAttrib, int nbAvgIntervals, int nbLoops, HTBValues values, IIntervalDistribution distributionMethod) {
         fName = name;
+        fShortName = shortName;
         fNbAttrib = nbAttrib;
         fNbAvgIntervals = nbAvgIntervals;
         fNbLoops = nbLoops;
@@ -171,14 +176,14 @@ public class HistoryTreeBackendBenchmark {
     @Parameters(name = "{index}: {0}")
     public static Iterable<Object[]> getParameters() {
         return Arrays.asList(new Object[][] {
-                { "Average case: 1500 attributes, integers, interval duration random around limit l with 75% within [0.5l, 1.5l]", DEFAULT_NB_ATTRIB, DEFAULT_NB_INTERVALS, DEFAULT_LOOP_COUNT, HTBValues.INTEGERS, CLOSER_TO_LIMIT },
-                { "Vertical scaling (more attributes)", 3500, DEFAULT_NB_INTERVALS, 5, HTBValues.INTEGERS, CLOSER_TO_LIMIT },
-                { "Horizontal scaling (more intervals/attribute)", DEFAULT_NB_ATTRIB, 20000, 10, HTBValues.INTEGERS, CLOSER_TO_LIMIT },
-                { "Interval durations uniformly distributed within [1, 2l]", DEFAULT_NB_ATTRIB, DEFAULT_NB_INTERVALS, DEFAULT_LOOP_COUNT, HTBValues.INTEGERS, UNIFORM },
-                { "Interval durations with 10% outliers > 2l", DEFAULT_NB_ATTRIB, DEFAULT_NB_INTERVALS, DEFAULT_LOOP_COUNT, HTBValues.INTEGERS, CLOSER_TO_LIMIT_10_PERCENT_OUTLIERS },
-                { "Data type: strings", DEFAULT_NB_ATTRIB, DEFAULT_NB_INTERVALS, DEFAULT_LOOP_COUNT, HTBValues.STRINGS, CLOSER_TO_LIMIT },
-                { "Data type: longs", DEFAULT_NB_ATTRIB, DEFAULT_NB_INTERVALS, DEFAULT_LOOP_COUNT, HTBValues.LONGS, CLOSER_TO_LIMIT },
-                { "Data type: doubles", DEFAULT_NB_ATTRIB, DEFAULT_NB_INTERVALS, DEFAULT_LOOP_COUNT, HTBValues.DOUBLES, CLOSER_TO_LIMIT },
+                { "Average case: 1500 attributes, integers, interval duration random around limit l with 75 percent within [0.5l, 1.5l]", "Average case", DEFAULT_NB_ATTRIB, DEFAULT_NB_INTERVALS, DEFAULT_LOOP_COUNT, HTBValues.INTEGERS, CLOSER_TO_LIMIT },
+                { "Vertical scaling (more attributes)", "Vertical scaling", 3500, DEFAULT_NB_INTERVALS, 5, HTBValues.INTEGERS, CLOSER_TO_LIMIT },
+                { "Horizontal scaling (more intervals/attribute)", "Horizontal scaling", DEFAULT_NB_ATTRIB, 20000, 10, HTBValues.INTEGERS, CLOSER_TO_LIMIT },
+                { "Interval durations uniformly distributed within [1, 2l]", "Uniform distribution of intervals", DEFAULT_NB_ATTRIB, DEFAULT_NB_INTERVALS, DEFAULT_LOOP_COUNT, HTBValues.INTEGERS, UNIFORM },
+                { "Interval durations with 10 percent outliers > 2l", "Distribution with outliers", DEFAULT_NB_ATTRIB, DEFAULT_NB_INTERVALS, DEFAULT_LOOP_COUNT, HTBValues.INTEGERS, CLOSER_TO_LIMIT_10_PERCENT_OUTLIERS },
+                { "Data type: strings", "Data type: strings", DEFAULT_NB_ATTRIB, DEFAULT_NB_INTERVALS, DEFAULT_LOOP_COUNT, HTBValues.STRINGS, CLOSER_TO_LIMIT },
+                { "Data type: longs", "Data type: longs", DEFAULT_NB_ATTRIB, DEFAULT_NB_INTERVALS, DEFAULT_LOOP_COUNT, HTBValues.LONGS, CLOSER_TO_LIMIT },
+                { "Data type: doubles", "Data type: doubles", DEFAULT_NB_ATTRIB, DEFAULT_NB_INTERVALS, DEFAULT_LOOP_COUNT, HTBValues.DOUBLES, CLOSER_TO_LIMIT },
         });
     }
 
@@ -252,16 +257,16 @@ public class HistoryTreeBackendBenchmark {
 
         Performance perf = Performance.getDefault();
         PerformanceMeter pmBuild = perf.createPerformanceMeter(TEST_PREFIX + TEST_BUILDING_ID + fName);
-        perf.tagAsSummary(pmBuild, TEST_BUILDING_ID + fName, Dimension.CPU_TIME);
+        perf.tagAsSummary(pmBuild, TEST_BUILDING_ID + fShortName, Dimension.CPU_TIME);
 
         PerformanceMeter pmSingleQuery = perf.createPerformanceMeter(TEST_PREFIX + TEST_SINGLE_QUERY_ID + fName);
-        perf.tagAsSummary(pmSingleQuery, TEST_SINGLE_QUERY_ID + fName, Dimension.CPU_TIME);
+        perf.tagAsSummary(pmSingleQuery, TEST_SINGLE_QUERY_ID + fShortName, Dimension.CPU_TIME);
 
         PerformanceMeter pmFullQuery = perf.createPerformanceMeter(TEST_PREFIX + TEST_FULL_QUERY_ID + fName);
-        perf.tagAsSummary(pmFullQuery, TEST_FULL_QUERY_ID + fName, Dimension.CPU_TIME);
+        perf.tagAsSummary(pmFullQuery, TEST_FULL_QUERY_ID + fShortName, Dimension.CPU_TIME);
 
         PerformanceMeter pmRangeQuery = perf.createPerformanceMeter(TEST_PREFIX + TEST_QUERY_RANGE_ID + fName);
-        perf.tagAsSummary(pmRangeQuery, TEST_QUERY_RANGE_ID + fName, Dimension.CPU_TIME);
+        perf.tagAsSummary(pmRangeQuery, TEST_QUERY_RANGE_ID + fShortName, Dimension.CPU_TIME);
 
         for (int i = 0; i < fNbLoops; i++) {
             try {
