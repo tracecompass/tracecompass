@@ -99,8 +99,8 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      * @param trace
      *            The trace to run the analysis on
      * @return {@code true} if the trace was successfully set on the module,
-     *         {@code false} if the analysis cannot be applied to the trace,
-     *         for instance if the trace does not have the right requirements
+     *         {@code false} if the analysis cannot be applied to the trace, for
+     *         instance if the trace does not have the right requirements
      * @throws TmfAnalysisException
      *             This exception should be thrown if the trace is set more than
      *             once
@@ -202,6 +202,30 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      *         availability of the output(s) and results is not guaranteed.
      */
     boolean waitForCompletion(@NonNull IProgressMonitor monitor);
+
+    /**
+     * Return whether the analysis is ready to be queried at a given time.
+     *
+     * A return value of <code>false</code> means that the caller can wait and
+     * this will eventually return <code>true</code>.
+     *
+     * Note to implementers: If the analysis is not started or completed, even
+     * though the timestamp was not part of it, or cancelled, this should return
+     * <code>true</code> so the caller does not end up waiting for something
+     * that will never happen. Calling this method can however trigger the
+     * scheduling of the analysis. In this case, it may return
+     * <code>false</code> until the timestamp is covered.
+     *
+     * @param ts
+     *            The timestamp to validate
+     * @return Whether the analysis is ready to be queried at the timestamp. A
+     *         value of <code>false</code> means the caller may wait until the
+     *         analysis has reached the desired time.
+     * @since 2.0
+     */
+    default boolean isQueryable(long ts) {
+        return true;
+    }
 
     /**
      * Cancels the current analysis
