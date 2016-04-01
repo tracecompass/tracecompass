@@ -201,15 +201,17 @@ public class TraceDomainComponent extends TraceControlComponent {
      *
      * @param eventNames
      *            - a list of event names to enabled.
+     * @param filterExpression
+     *            - a filter expression
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
-    public void enableEvents(List<String> eventNames, IProgressMonitor monitor)
+    public void enableEvents(List<String> eventNames, String filterExpression,  IProgressMonitor monitor)
             throws ExecutionException {
         getControlService().enableEvents(getSessionName(), null, eventNames,
-                isKernel(), null, monitor);
+                isKernel(), filterExpression, monitor);
     }
 
     /**
