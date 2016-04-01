@@ -32,6 +32,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceCon
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceProviderGroup;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.ILttngControlService;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
@@ -50,7 +51,8 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
     /**
      * The command execution parameter.
      */
-    @Nullable protected CommandParameter fParam = null;
+    @Nullable
+    protected CommandParameter fParam = null;
 
     // ------------------------------------------------------------------------
     // Operations
@@ -158,7 +160,7 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
         List<ITraceControlComponent> providers = node.getChildren(TraceProviderGroup.class);
 
         final IEnableEventsDialog dialog = TraceControlDialogFactory.getInstance().getEnableEventsDialog();
-        dialog.setTraceProviderGroup((TraceProviderGroup)providers.get(0));
+        dialog.setTraceProviderGroup((TraceProviderGroup) providers.get(0));
         dialog.setTraceDomainComponent(getDomain(param));
 
         if (dialog.open() != Window.OK) {
@@ -172,9 +174,10 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
 
                 try {
                     String filter = dialog.getFilterExpression();
-
-                    // Enable tracepoint events
-                    if (dialog.isTracepoints()) {
+                    if (dialog.isAllEvents()) {
+                        enableEvents(param, ILttngControlService.ALL_EVENTS, dialog.isKernel(), filter, monitor);
+                    } else if (dialog.isTracepoints()) {
+                        // Enable tracepoint events
                         if (dialog.isAllTracePoints()) {
                             enableEvents(param, null, dialog.isKernel(), filter, monitor);
                         } else {

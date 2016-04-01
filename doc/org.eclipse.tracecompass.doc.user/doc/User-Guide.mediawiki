@@ -1341,6 +1341,12 @@ A dialog box will open for entering information about events to be enabled.
 
 By default the domain '''Kernel''' is selected and the kernel specific data sections are created. From this dialog box kernel '''Tracepoint''' events, '''System calls (Syscall)''', a '''Dynamic Probe''' or a '''Dynamic Function entry/return''' probe can be enabled. Note that events of one of these types at a time can be enabled.
 
+To enable all '''Tracepoints''' and all '''System calls (Syscall)''', select the button '''Select''' of section '''All Tracepoint Events and Syscalls''' and press '''Ok'''.
+
+[[Image:images/LTTng2EnableAllEventsDialog.png]]
+
+Upon successful operation, the domain '''Kernel''' will be created in the tree (if neccessary), the default channel with name "channel0" will be added under the domain (if necessary) as well as all a wildcard event '''*''' of type  '''TRACEPOINT''' under the channel and a wildcard event '''*''' of type '''SYSCALL''' . The channel and events will be '''ENABLED'''.
+
 To enable '''Tracepoint''' events, first select the corresponding '''Select''' button, then select either all tracepoins (select '''All''') or select selectively one or more tracepoints in the displayed tree of tracepoints and finally press '''Ok'''.
 
 [[Image:images/LTTng2TracepointEventsDialog.png]]

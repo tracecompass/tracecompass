@@ -31,6 +31,7 @@ public class EnableEventsDialogStub implements IEnableEventsDialog {
     // ------------------------------------------------------------------------
     private boolean fIsKernel;
     private boolean fIsTracePoints;
+    private boolean fIsAllEvents;
     private boolean fIsAllTracePoints;
     private boolean fIsSysCalls;
     private boolean fIsDynamicProbe;
@@ -53,6 +54,10 @@ public class EnableEventsDialogStub implements IEnableEventsDialog {
     // ------------------------------------------------------------------------
     public void setIsKernel(boolean isKernel) {
         fIsKernel = isKernel;
+    }
+
+    public void setIsAllEvents(boolean isAllEvents) {
+        fIsAllEvents = isAllEvents;
     }
 
     public void setIsTracePoints(boolean isTracePoints) {
@@ -121,6 +126,11 @@ public class EnableEventsDialogStub implements IEnableEventsDialog {
 
     public void setFilterExpression(String filter) {
         fFilter = filter;
+    }
+
+    @Override
+    public boolean isAllEvents() {
+        return fIsAllEvents;
     }
 
     @Override

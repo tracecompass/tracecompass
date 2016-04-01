@@ -58,6 +58,8 @@ class ControlViewSwtBotUtil {
     public static final String CONFIRM_DIALOG_OK_BUTTON = "OK";
     public static final String ENABLE_EVENT_DIALOG_TITLE = "Enable Events";
     public static final String ALL_TREE_NODE = "All";
+    public static final String ALL_EVENT_GROUP_NAME = "All Tracepoint Events and Syscalls";
+    public static final String TRACEPOINTS_GROUP_NAME = "Tracepoint Events";
     public static final String SYSCALL_GROUP_NAME = "All Syscalls";
     public static final String GROUP_SELECT_NAME = "Select";
     public static final String ENABLE_CHANNEL_DIALOG_TITLE = "Enable Channel";

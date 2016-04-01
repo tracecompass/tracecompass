@@ -201,6 +201,8 @@ public final class Messages extends NLS {
     public static String TraceControl_EnableEventsNoChannelError;
 
     public static String TraceControl_EnableGroupSelectionName;
+    public static String TraceControl_EnableEventsAllEventsLabel;
+    public static String TraceControl_EnableEventsAllEventsTooltip;
     public static String TraceControl_EnableEventsTracepointGroupName;
     public static String TraceControl_EnableEventsTracepointTreeTooltip;
     public static String TraceControl_EnableEventsTracepointTreeAllLabel;

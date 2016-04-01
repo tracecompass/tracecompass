@@ -293,6 +293,8 @@ public class ControlViewTest {
 
         SWTBotShell shell = fBot.shell(ControlViewSwtBotUtil.ENABLE_EVENT_DIALOG_TITLE).activate();
 
+        shell.bot().radioInGroup(ControlViewSwtBotUtil.GROUP_SELECT_NAME, ControlViewSwtBotUtil.TRACEPOINTS_GROUP_NAME).click();
+
         SWTBotTree tracepointsTree = shell.bot().tree();
         tracepointsTree.select(ControlViewSwtBotUtil.ALL_TREE_NODE);
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();

@@ -12,6 +12,7 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.service;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -35,6 +36,12 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel
 * @author Bernd Hufmann
 */
 public interface ILttngControlService {
+
+
+    /**
+     * List to enable all events
+     */
+    @NonNull List<String> ALL_EVENTS = Collections.singletonList("*");  //$NON-NLS-1$
 
     /**
      * @return the LTTng version object

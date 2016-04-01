@@ -68,7 +68,6 @@ import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
  */
 public class LTTngControlService implements ILttngControlService {
 
-
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -779,8 +778,9 @@ public class LTTngControlService implements ILttngControlService {
     public void enableEvents(String sessionName, String channelName, List<String> eventNames, boolean isKernel, String filterExpression, IProgressMonitor monitor) throws ExecutionException {
 
         ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_ENABLE_EVENT);
+        boolean isAllEvents = ALL_EVENTS.equals(eventNames);
 
-        if (eventNames == null || eventNames.isEmpty()) {
+        if (isAllEvents || (eventNames == null) || (eventNames.isEmpty())) {
             command.add(LTTngControlServiceConstants.OPTION_ALL);
         } else {
             command.add(toCsv(eventNames));
@@ -800,7 +800,9 @@ public class LTTngControlService implements ILttngControlService {
             command.add(channelName);
         }
 
-        command.add(LTTngControlServiceConstants.OPTION_TRACEPOINT);
+        if (!isAllEvents) {
+            command.add(LTTngControlServiceConstants.OPTION_TRACEPOINT);
+        }
 
         if (filterExpression != null) {
             command.add(LTTngControlServiceConstants.OPTION_FILTER);

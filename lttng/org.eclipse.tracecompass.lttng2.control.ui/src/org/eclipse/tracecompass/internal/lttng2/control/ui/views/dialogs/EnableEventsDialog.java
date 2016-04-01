@@ -105,6 +105,13 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
+    @Override
+    public boolean isAllEvents() {
+        if (fIsKernel) {
+            return fKernelComposite.isAllEvents();
+        }
+        return false;
+    }
 
     @Override
     public boolean isTracepoints() {
@@ -353,7 +360,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             }
         });
 
-        getShell().setMinimumSize(new Point(500, 650));
+        getShell().setMinimumSize(new Point(550, 750));
 
         return fDialogComposite;
     }

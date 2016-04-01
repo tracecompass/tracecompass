@@ -53,12 +53,16 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    private enum KernelGroupEnum { TRACEPOINTS, SYSCALLS, PROBE, FUNCTION }
+    private enum KernelGroupEnum { ALL, TRACEPOINTS, SYSCALLS, PROBE, FUNCTION }
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
+    /**
+     * A button to enable/disable the all tracepoints&sycalls group
+     */
+    private Button fAllActivateButton;
     /**
      * A button to enable/disable the tracepoints group
      */
@@ -104,6 +108,10 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
      * component which contains a list of available tracepoints.
      */
     private final TraceProviderGroup fProviderGroup;
+    /**
+     * The flag indicating that all tracepoints/syscalls are selected.
+     */
+    private boolean fIsAllTracepointsAndSyscalls;
     /**
      * The flag indicating that tracepoints are selected.
      */
@@ -171,7 +179,10 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     // ------------------------------------------------------------------------
     // Acessors
     // ------------------------------------------------------------------------
-
+    @Override
+    public boolean isAllEvents() {
+        return fIsAllTracepointsAndSyscalls;
+    }
     @Override
     public boolean isTracepoints() {
         return fIsTracepoints;
@@ -241,6 +252,9 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
      */
     public void createContent() {
 
+        // All Tracepoints/syscalls Group
+        createAllTracepointsSyscallGroup();
+
         // Tracepoints Group
         createTracepointsGroup();
 
@@ -257,7 +271,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
         createFilterGroup();
 
         // Set default enablements
-        setKernelEnablements(KernelGroupEnum.TRACEPOINTS);
+        setKernelEnablements(KernelGroupEnum.ALL);
     }
 
     /**
@@ -265,6 +279,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
      * @return true if configured data is valid and can be retrieved.
      */
     public boolean isValid() {
+        fIsAllTracepointsAndSyscalls = fAllActivateButton.getSelection();
         fIsTracepoints = fTracepointsActivateButton.getSelection();
         fIsSysCalls = fSysCallsActivateButton.getSelection();
         fIsDynamicProbe = fProbeActivateButton.getSelection();
@@ -337,6 +352,39 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
         }
 
         return true;
+    }
+
+    /**
+     * Creates all tracepoints/syscalls group.
+     */
+    private void createAllTracepointsSyscallGroup() {
+
+        GridLayout layout;
+        GridData data;
+        Group tpMainGroup = new Group(this, SWT.SHADOW_NONE);
+        tpMainGroup.setText(Messages.TraceControl_EnableEventsAllEventsLabel);
+        layout = new GridLayout(2, false);
+        tpMainGroup.setLayout(layout);
+        data = new GridData(GridData.FILL_HORIZONTAL);
+        tpMainGroup.setLayoutData(data);
+
+        Composite buttonComposite = new Composite(tpMainGroup, SWT.NONE);
+        layout = new GridLayout(1, true);
+        buttonComposite.setLayout(layout);
+        data = new GridData(SWT.BEGINNING, SWT.CENTER, false, true);
+        buttonComposite.setLayoutData(data);
+
+        fAllActivateButton = new Button(buttonComposite, SWT.RADIO);
+        fAllActivateButton.setText(Messages.TraceControl_EnableGroupSelectionName);
+        fAllActivateButton.setToolTipText(Messages.TraceControl_EnableEventsAllEventsTooltip);
+        data = new GridData(GridData.FILL_HORIZONTAL);
+        fAllActivateButton.setLayoutData(data);
+        fAllActivateButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                setKernelEnablements(KernelGroupEnum.ALL);
+            }
+        });
     }
 
     /**
@@ -561,6 +609,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
      * @param group - group to enable.
      */
     private void setKernelEnablements(KernelGroupEnum group) {
+        fAllActivateButton.setSelection(group == KernelGroupEnum.ALL);
         fTracepointsActivateButton.setSelection(group == KernelGroupEnum.TRACEPOINTS);
         fTracepointsViewer.getTree().setEnabled(group == KernelGroupEnum.TRACEPOINTS);
 

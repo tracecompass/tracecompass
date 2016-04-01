@@ -1119,7 +1119,8 @@ public class LTTngControlServiceTest {
             list.clear();
             fService.enableEvents(sessionName, channelName, list, false, null, new NullProgressMonitor());
 
-            // TODO add test with filters
+            // 6) session name, channel = null,
+            fService.enableEvents(sessionName, null, ILttngControlService.ALL_EVENTS, true, null, new NullProgressMonitor());
 
         } catch (ExecutionException e) {
             fail(e.toString());

@@ -32,6 +32,11 @@ public interface IEnableKernelEvents {
     boolean isTracepoints();
 
     /**
+     * @return a flag indicating all tracepoints and syscall shall be enabled or not
+     */
+    boolean isAllEvents();
+
+    /**
      * @return a flag indicating whether all tracepoints shall be enabled or not.
      */
     boolean isAllTracePoints();

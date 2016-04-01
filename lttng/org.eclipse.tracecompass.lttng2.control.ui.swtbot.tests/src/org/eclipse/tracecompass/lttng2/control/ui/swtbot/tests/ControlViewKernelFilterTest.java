@@ -108,6 +108,8 @@ public class ControlViewKernelFilterTest extends ControlViewTest {
 
         SWTBotShell shell = fBot.shell(ControlViewSwtBotUtil.ENABLE_EVENT_DIALOG_TITLE).activate();
 
+        shell.bot().radioInGroup(ControlViewSwtBotUtil.GROUP_SELECT_NAME, ControlViewSwtBotUtil.TRACEPOINTS_GROUP_NAME).click();
+
         SWTBotTree tracepointsTree = shell.bot().tree();
         tracepointsTree.select(ControlViewSwtBotUtil.ALL_TREE_NODE);
         SWTBotText filterText = shell.bot().textInGroup(ControlViewSwtBotUtil.FILTER_EXPRESSION_LABEL);
