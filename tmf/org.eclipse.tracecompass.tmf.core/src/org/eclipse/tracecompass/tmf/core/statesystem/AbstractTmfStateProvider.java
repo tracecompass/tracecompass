@@ -45,9 +45,11 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
     private final Thread fEventHandlerThread;
 
     private boolean fStateSystemAssigned;
-
     /** State system in which to insert the state changes */
     private @Nullable ITmfStateSystemBuilder fSS = null;
+
+    /* The last safe time at which this state provider can be queried */
+    private volatile long fSafeTime;
 
     /**
      * Instantiate a new state provider plugin.
@@ -61,6 +63,8 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         fTrace = trace;
         fEventsQueue = new BufferedBlockingQueue<>(DEFAULT_EVENTS_QUEUE_SIZE, DEFAULT_EVENTS_CHUNK_SIZE);
         fStateSystemAssigned = false;
+        // set the safe time to before the trace start, the analysis has not yet started
+        fSafeTime = trace.getStartTime().toNanos() - 1;
 
         fEventHandlerThread = new Thread(new EventProcessor(), id + " Event Handler"); //$NON-NLS-1$
     }
@@ -82,6 +86,14 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
     @Override
     public long getStartTime() {
         return fTrace.getStartTime().toNanos();
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public long getLatestSafeTime() {
+        return fSafeTime;
     }
 
     @Override
@@ -197,6 +209,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
                     continue;
                 }
                 currentEvent = event;
+                fSafeTime = event.getTimestamp().toNanos() - 1;
                 eventHandle(event);
                 event = fEventsQueue.take();
             }

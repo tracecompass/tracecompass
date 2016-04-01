@@ -56,6 +56,17 @@ public interface ITmfStateProvider {
     long getStartTime();
 
     /**
+     * Return the last time at which it is safe to query the state system under
+     * construction, ie not the current end time of the underlying state system,
+     * but the time just before the latest event that has been processed.
+     *
+     * @return The last timestamp at which it is safe to query the state system
+     *         underneath
+     * @since 2.0
+     */
+    long getLatestSafeTime();
+
+    /**
      * Assign the target state system where this SCI will insert its state
      * changes. Because of dependencies issues, this can normally not be done at
      * the constructor.

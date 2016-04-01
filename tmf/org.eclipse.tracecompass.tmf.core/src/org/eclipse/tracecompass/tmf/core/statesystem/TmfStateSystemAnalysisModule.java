@@ -66,14 +66,15 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     private final CountDownLatch fInitialized = new CountDownLatch(1);
     private final Object fRequestSyncObj = new Object();
 
-    @Nullable private ITmfStateSystemBuilder fStateSystem;
-    @Nullable private ITmfStateProvider fStateProvider;
-    @Nullable private IStateHistoryBackend fHtBackend;
-    @Nullable private ITmfEventRequest fRequest;
-    @Nullable private TmfTimeRange fTimeRange = null;
+    private @Nullable ITmfStateSystemBuilder fStateSystem;
+    private @Nullable IStateHistoryBackend fHtBackend;
+    private @Nullable ITmfEventRequest fRequest;
+    private @Nullable TmfTimeRange fTimeRange = null;
 
     private int fNbRead = 0;
     private boolean fInitializationSucceeded;
+
+    private volatile @Nullable ITmfStateProvider fStateProvider;
 
     /**
      * State system backend types
@@ -172,6 +173,19 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         return fInitializationSucceeded;
     }
 
+    /**
+     * @since 2.0
+     */
+    @Override
+    public boolean isQueryable(long ts) {
+        /* Return true if there is no state provider available (the analysis is not being built) */
+        ITmfStateProvider provider = fStateProvider;
+        if (provider == null) {
+            return true;
+        }
+        return ts <= provider.getLatestSafeTime();
+    }
+
     // ------------------------------------------------------------------------
     // TmfAbstractAnalysisModule
     // ------------------------------------------------------------------------
@@ -197,7 +211,6 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         try {
             /* Get the state system according to backend */
             StateSystemBackendType backend = getBackendType();
-
 
             ITmfTrace trace = getTrace();
             if (trace == null) {
@@ -425,6 +438,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         if (provider != null) {
             provider.dispose();
         }
+        fStateProvider = null;
         if (deleteFiles && (fHtBackend != null)) {
             fHtBackend.removeFiles();
         }
@@ -525,9 +539,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         @Override
         public void handleCancel() {
             super.handleCancel();
-            if (isCompleteTrace(trace)) {
-                disposeProvider(true);
-            }
+            disposeProvider(true);
         }
 
         @Override
