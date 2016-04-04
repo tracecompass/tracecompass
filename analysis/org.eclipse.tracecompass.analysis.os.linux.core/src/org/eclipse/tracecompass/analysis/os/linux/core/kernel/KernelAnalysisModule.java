@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.DefaultEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
@@ -95,7 +96,7 @@ public class KernelAnalysisModule extends TmfStateSystemAnalysisModule {
             layout = ((IKernelTrace) trace).getKernelEventLayout();
         } else {
             /* Fall-back to the base LttngEventLayout */
-            layout = IKernelAnalysisEventLayout.DEFAULT_LAYOUT;
+            layout = DefaultEventLayout.getInstance();
         }
 
         return new KernelStateProvider(trace, layout);

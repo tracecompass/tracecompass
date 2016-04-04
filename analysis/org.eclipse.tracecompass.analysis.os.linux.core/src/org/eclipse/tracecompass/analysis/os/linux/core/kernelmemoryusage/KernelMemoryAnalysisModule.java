@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.DefaultEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
@@ -47,7 +48,7 @@ public class KernelMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
             layout = ((IKernelTrace) trace).getKernelEventLayout();
         } else {
             /* Fall-back to the base LttngEventLayout */
-            layout = IKernelAnalysisEventLayout.DEFAULT_LAYOUT;
+            layout = DefaultEventLayout.getInstance();
         }
         return new KernelMemoryStateProvider(trace, layout);
     }

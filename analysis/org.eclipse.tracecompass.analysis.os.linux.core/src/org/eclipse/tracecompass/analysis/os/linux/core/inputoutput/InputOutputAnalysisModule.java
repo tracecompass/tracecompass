@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.DefaultEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.InputOutputStateProvider;
@@ -44,7 +45,7 @@ public class InputOutputAnalysisModule extends TmfStateSystemAnalysisModule {
             layout = ((IKernelTrace) trace).getKernelEventLayout();
         } else {
             /* Fall-back to the base LttngEventLayout */
-            layout = IKernelAnalysisEventLayout.DEFAULT_LAYOUT;
+            layout = DefaultEventLayout.getInstance();
         }
 
         return new InputOutputStateProvider(trace, layout);

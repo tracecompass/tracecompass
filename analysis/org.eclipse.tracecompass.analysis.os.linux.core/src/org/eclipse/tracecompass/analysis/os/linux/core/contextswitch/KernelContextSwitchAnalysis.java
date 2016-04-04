@@ -26,6 +26,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.DefaultEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
@@ -66,7 +67,7 @@ public class KernelContextSwitchAnalysis extends TmfStateSystemAnalysisModule {
             layout = ((IKernelTrace) trace).getKernelEventLayout();
         } else {
             /* Fall-back to the base LttngEventLayout */
-            layout = IKernelAnalysisEventLayout.DEFAULT_LAYOUT;
+            layout = DefaultEventLayout.getInstance();
         }
 
         return new KernelContextSwitchStateProvider(trace, layout);
