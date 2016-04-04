@@ -951,6 +951,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fRawViewer.setVisible(false);
 
         createPopupMenu();
+
+        fComposite.addDisposeListener((e) -> {
+            internalDispose();
+        });
     }
 
     /**
@@ -1479,16 +1483,19 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
     @Override
     public void dispose() {
+        fComposite.dispose();
+    }
+
+    private void internalDispose() {
         stopSearchThread();
         stopFilterThread();
         PlatformUI.getWorkbench().getThemeManager().removePropertyChangeListener(this);
         ColorSettingsManager.removeColorSettingsListener(this);
-        fComposite.dispose();
+        fCache.clear();
         if ((fTrace != null) && fDisposeOnClose) {
             fTrace.dispose();
         }
         fResourceManager.dispose();
-        fRawViewer.dispose();
         if (fRawViewerPopupMenuManager != null) {
             fRawViewerPopupMenuManager.dispose();
         }

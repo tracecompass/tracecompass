@@ -105,6 +105,10 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
         fDragProvider.register();
         fTooltipProvider = new SimpleTooltipProvider(this);
         fTooltipProvider.register();
+
+        fChart.addDisposeListener((e) -> {
+            internalDispose();
+        });
     }
 
     /**
@@ -272,6 +276,10 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
 
     @Override
     public void dispose() {
+        fChart.dispose();
+    }
+
+    private void internalDispose() {
         if (fSegmentStoreProvider != null && fListener != null) {
             fSegmentStoreProvider.removeListener(fListener);
         }

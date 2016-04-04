@@ -113,12 +113,9 @@ public class TmfEventsTableHeader extends Composite {
                 toggle();
             }
         });
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        fLabelBackground.dispose();
+        addDisposeListener((e) -> {
+            fLabelBackground.dispose();
+        });
     }
 
     @Override

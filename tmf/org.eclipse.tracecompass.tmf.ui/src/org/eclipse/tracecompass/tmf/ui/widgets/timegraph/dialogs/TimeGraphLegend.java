@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson.
+ * Copyright (c) 2009, 2016 Ericsson.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -92,6 +92,9 @@ public class TimeGraphLegend extends TitleAreaDialog {
         setDialogHelpAvailable(false);
         setHelpAvailable(false);
 
+        composite.addDisposeListener((e) -> {
+            fResourceManager.dispose();
+        });
         return composite;
     }
 
@@ -179,13 +182,6 @@ public class TimeGraphLegend extends TitleAreaDialog {
             gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
             gc.drawRectangle(0, 0, r.width - 1, r.height - 1);
         }
-
-        @Override
-        public void dispose() {
-            super.dispose();
-            color.dispose();
-        }
-
     }
 
 }

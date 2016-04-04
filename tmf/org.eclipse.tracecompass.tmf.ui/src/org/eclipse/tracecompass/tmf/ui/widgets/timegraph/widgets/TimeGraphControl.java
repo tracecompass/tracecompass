@@ -205,15 +205,12 @@ public class TimeGraphControl extends TimeGraphBaseControl
         addKeyListener(this);
         addMenuDetectListener(this);
         addListener(SWT.MouseWheel, this);
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        fResourceManager.dispose();
-        for (Font font : fFonts.values()) {
-            font.dispose();
-        }
+        addDisposeListener((e) -> {
+            fResourceManager.dispose();
+            for (Font font : fFonts.values()) {
+                font.dispose();
+            }
+        });
     }
 
     /**

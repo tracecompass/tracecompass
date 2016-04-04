@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation, Ericsson
+ * Copyright (c) 2005, 2016 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -407,6 +407,23 @@ public class ScrollView extends Composite {
                 }
             });
         }
+
+        addDisposeListener((e) -> {
+            if (fAutoScroll != null) {
+                fAutoScroll.cancel();
+                fAutoScroll = null;
+            }
+            fViewControl = null;
+            fVertScrollBar = null;
+            fHorScrollBar = null;
+            if (fCornerControl != null) {
+                Object data = fCornerControl.getData();
+                if (data instanceof Overview) {
+                    ((Overview) data).dispose();
+                }
+            }
+            fCornerControl = null;
+        });
     }
 
     // ------------------------------------------------------------------------
@@ -421,35 +438,6 @@ public class ScrollView extends Composite {
     @Override
     public void setCursor(Cursor cursor) {
         fViewControl.setCursor(cursor);
-    }
-
-    @Override
-    public void dispose() {
-        if (fAutoScroll != null) {
-            fAutoScroll.cancel();
-            fAutoScroll = null;
-        }
-        if (fViewControl != null) {
-            fViewControl.dispose();
-        }
-        fViewControl = null;
-        if (fVertScrollBar != null) {
-            fVertScrollBar.dispose();
-        }
-        fVertScrollBar = null;
-        if (fHorScrollBar != null) {
-            fHorScrollBar.dispose();
-        }
-        fHorScrollBar = null;
-        if (fCornerControl != null) {
-            Object data = fCornerControl.getData();
-            if (data instanceof Overview) {
-                ((Overview) data).dispose();
-            }
-            fCornerControl.dispose();
-            fCornerControl = null;
-        }
-        super.dispose();
     }
 
     @Override

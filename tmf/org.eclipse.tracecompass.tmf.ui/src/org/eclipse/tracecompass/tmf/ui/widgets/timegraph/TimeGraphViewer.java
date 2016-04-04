@@ -42,8 +42,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MenuDetectListener;
@@ -466,12 +464,9 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
                 super.redraw();
             }
         };
-        fDataViewer.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(DisposeEvent e) {
-                if (fMarkersMenu != null) {
-                    fMarkersMenu.dispose();
-                }
+        fDataViewer.addDisposeListener((e) -> {
+            if (fMarkersMenu != null) {
+                fMarkersMenu.dispose();
             }
         });
         GridLayout gl = new GridLayout(2, false);
@@ -653,17 +648,20 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         fDataViewer.update();
         adjustHorizontalScrollBar();
         adjustVerticalScrollBar();
+
+        fDataViewer.addDisposeListener((e) -> {
+            saveOptions();
+            fColorScheme.dispose();
+        });
+
         return fDataViewer;
     }
 
     /**
-     * Dispose the view.
+     * Dispose the time graph viewer.
      */
     public void dispose() {
-        saveOptions();
-        fTimeGraphCtrl.dispose();
         fDataViewer.dispose();
-        fColorScheme.dispose();
     }
 
     /**

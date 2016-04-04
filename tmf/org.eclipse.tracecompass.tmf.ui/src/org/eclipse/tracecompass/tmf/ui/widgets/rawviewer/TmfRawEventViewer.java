@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson
+ * Copyright (c) 2010, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -198,15 +198,13 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
         // Prevent the slider from being traversed
         setTabList(new Control[] { fScrolledComposite });
-    }
 
-    @Override
-    public void dispose() {
-        if (fBottomContext != null) {
-            fBottomContext.dispose();
-        }
-        PlatformUI.getWorkbench().getThemeManager().removePropertyChangeListener(this);
-        super.dispose();
+        addDisposeListener((e) -> {
+            if (fBottomContext != null) {
+                fBottomContext.dispose();
+            }
+            PlatformUI.getWorkbench().getThemeManager().removePropertyChangeListener(TmfRawEventViewer.this);
+        });
     }
 
     // ------------------------------------------------------------------------

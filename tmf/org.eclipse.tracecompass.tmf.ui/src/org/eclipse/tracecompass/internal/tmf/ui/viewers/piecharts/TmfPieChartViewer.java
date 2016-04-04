@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -194,17 +194,6 @@ public class TmfPieChartViewer extends Composite {
 
         // at creation no content is selected
         setCurrentState(new PieChartViewerStateNoContentSelected(this));
-    }
-
-    @Override
-    public void dispose() {
-        if (fGlobalPC != null) {
-            fGlobalPC.dispose();
-        }
-        if (fTimeRangePC != null) {
-            fTimeRangePC.dispose();
-        }
-        super.dispose();
     }
 
     /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -192,6 +192,10 @@ public class TmfSimpleTableViewer extends TmfViewer {
 
         Menu tablePopup = fTablePopupMenuManager.createContextMenu(getTableViewer().getTable());
         getTableViewer().getTable().setMenu(tablePopup);
+
+        tableControl.addDisposeListener((e) -> {
+            internalDispose();
+        });
     }
 
     @Override
@@ -199,6 +203,9 @@ public class TmfSimpleTableViewer extends TmfViewer {
         if (fTableViewer != null) {
             fTableViewer.getControl().dispose();
         }
+    }
+
+    private void internalDispose() {
         if (fTablePopupMenuManager != null) {
             fTablePopupMenuManager.dispose();
         }

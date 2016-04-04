@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2010, 2016 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -275,9 +275,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             if (fEventsTable != null) {
                 TmfTraceColumnManager.saveColumnOrder(fTrace.getTraceTypeId(), fEventsTable.getColumnOrder());
             }
-        }
-        if (fEventsTable != null) {
-            fEventsTable.dispose();
         }
         super.dispose();
     }

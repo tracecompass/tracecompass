@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson
+ * Copyright (c) 2012, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -153,10 +153,18 @@ public class TmfStatisticsViewer extends TmfViewer {
 
         initContent(parent);
         initInput();
+
+        fSash.addDisposeListener((e) -> {
+            internalDispose();
+        });
     }
 
     @Override
     public void dispose() {
+        fSash.dispose();
+    }
+
+    private void internalDispose() {
         super.dispose();
         if (fWaitCursor != null) {
             fWaitCursor.dispose();

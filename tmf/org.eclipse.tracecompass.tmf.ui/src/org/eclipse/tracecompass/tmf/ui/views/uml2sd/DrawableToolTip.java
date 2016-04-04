@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation, Ericsson
+ * Copyright (c) 2005, 2016 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -113,6 +113,11 @@ public class DrawableToolTip implements PaintListener {
         fToolTipShell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
         fToolTipShell.addPaintListener(this);
         fToolTipShell.setSize(SHELL_WIDTH, SHELL_HEIGHT);
+        fToolTipShell.addDisposeListener((e) -> {
+            for (int i = 0; i < fColors.length; i++) {
+                fColors[i].dispose();
+            }
+        });
 
         fColors = new Color[NUMBER_STEPS];
         int greenBlue = BASE_GREEN_BLUE_VALUE;
@@ -250,12 +255,10 @@ public class DrawableToolTip implements PaintListener {
     }
 
     /**
-     * Disposes the system resource used by this kind of toolTips (a colors array essentially)
+     * Dispose this tool tip
      */
     public void dispose() {
-        for (int i = 0; i < fColors.length; i++) {
-            fColors[i].dispose();
-        }
+        fToolTipShell.dispose();
     }
 
     @Override

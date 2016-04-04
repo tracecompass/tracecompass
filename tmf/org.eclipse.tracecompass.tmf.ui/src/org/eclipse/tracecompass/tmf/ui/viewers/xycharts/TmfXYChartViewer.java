@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2013, 2016 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -118,6 +118,10 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
         fMouseWheelZoomProvider = new TmfMouseWheelZoomProvider(this);
         fToolTipProvider = new TmfSimpleTooltipProvider(this);
         fMouseDragProvider = new TmfMouseDragProvider(this);
+
+        fSwtChart.addDisposeListener((e) -> {
+            internalDispose();
+        });
     }
 
     // ------------------------------------------------------------------------
@@ -239,10 +243,14 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     // ------------------------------------------------------------------------
     // TmfComponent
     // ------------------------------------------------------------------------
+
     @Override
     public void dispose() {
-        super.dispose();
         fSwtChart.dispose();
+    }
+
+    private void internalDispose() {
+        super.dispose();
 
         if (fMouseSelectionProvider != null) {
             fMouseSelectionProvider.dispose();

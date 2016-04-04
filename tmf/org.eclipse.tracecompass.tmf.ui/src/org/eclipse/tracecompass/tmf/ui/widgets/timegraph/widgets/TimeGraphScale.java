@@ -137,12 +137,9 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         addMouseListener(this);
         addMouseMoveListener(this);
         TimeDraw.updateTimeZone();
-    }
-
-    @Override
-    public void dispose() {
-        TmfSignalManager.deregister(this);
-        super.dispose();
+        addDisposeListener((e) -> {
+            TmfSignalManager.deregister(TimeGraphScale.this);
+        });
     }
 
     /**
