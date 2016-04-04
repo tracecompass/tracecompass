@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.tests.stubs.analysis;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 
@@ -26,9 +27,17 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModul
 @NonNullByDefault
 public class TestStateSystemModule extends TmfStateSystemAnalysisModule {
 
+    private @Nullable TestStateSystemProvider fProvider = null;
+    private boolean fThrottleEvents = false;
+
     @Override
     protected ITmfStateProvider createStateProvider() {
-        return new TestStateSystemProvider(checkNotNull(getTrace()));
+
+        TestStateSystemProvider provider = new TestStateSystemProvider(checkNotNull(getTrace()));
+        fProvider = provider;
+        boolean throttle = fThrottleEvents;
+        provider.setThrottling(throttle);
+        return provider;
     }
 
     @Override
@@ -43,6 +52,30 @@ public class TestStateSystemModule extends TmfStateSystemAnalysisModule {
      */
     public String getBackendName() {
         return StateSystemBackendType.INMEM.name();
+    }
+
+    /**
+     * Set whether events are processed one at a time
+     *
+     * @param throttleEvent A value of <code>true</code> will have the events processed one a time instead of adding them all to the queue. To process the next event, one must call the {@link #signalNextEvent()} method. A value of <code>false</code> will return to default behavior.
+     */
+    public void setPerEventSignalling(boolean throttleEvent) {
+        fThrottleEvents = throttleEvent;
+        TestStateSystemProvider provider = fProvider;
+        if (provider != null) {
+            provider.setThrottling(throttleEvent);
+        }
+    }
+
+    /**
+     * Signal for the next event to be processed. This makes sense only if
+     * {@link #setPerEventSignalling(boolean)} method has been set to true
+     */
+    public void signalNextEvent() {
+        TestStateSystemProvider provider = fProvider;
+        if (provider != null) {
+            provider.signalNextEvent();
+        }
     }
 
 }

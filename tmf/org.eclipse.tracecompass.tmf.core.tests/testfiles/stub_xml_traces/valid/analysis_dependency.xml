@@ -1,0 +1,27 @@
+<trace>
+<event timestamp="1" name="noise">
+<field name="noise1" value="1" type="int" />
+<field name="noise2" value="3" type="int" />
+</event>
+<event timestamp="5" name="noise">
+<field name="noise1" value="5" type="int" />
+<field name="noise2" value="2" type="int" />
+</event>
+<event timestamp="5" name="noise">
+<field name="noise1" value="11" type="int" />
+<field name="noise2" value="31" type="int" />
+</event>
+<event timestamp="5" name="crucialEvent">
+<field name="crucialInfo" value="I am important" type="string" />
+</event>
+<event timestamp="7" name="crucialEvent">
+<field name="crucialInfo" value="I am also important" type="string" />
+</event>
+<event timestamp="7" name="noise">
+<field name="noise1" value="1" type="int" />
+<field name="noise2" value="3" type="int" />
+</event>
+<event timestamp="10" name="crucialEvent">
+<field name="crucialInfo" value="The end" type="string" />
+</event>
+</trace>

@@ -54,6 +54,9 @@
          <tracetype
                class="org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub">
          </tracetype>
+         <tracetype
+               class="org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub">
+         </tracetype>
       </module>
       <module
             analysis_module="org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestExperimentAnalysis"

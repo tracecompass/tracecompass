@@ -123,7 +123,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
     }
 
     @Override
-    public final void processEvent(ITmfEvent event) {
+    public void processEvent(ITmfEvent event) {
         /* Make sure the target state system has been assigned */
         if (!fStateSystemAssigned) {
             Activator.logError("Cannot process event without a target state system"); //$NON-NLS-1$
