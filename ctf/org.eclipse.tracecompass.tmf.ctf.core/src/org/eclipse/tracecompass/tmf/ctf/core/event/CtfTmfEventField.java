@@ -246,7 +246,7 @@ final class CTFIntegerField extends CtfTmfEventField {
      *            Is the value signed or not
      */
     CTFIntegerField(@NonNull String name, long longValue, int base, boolean signed) {
-        super(name, longValue, null);
+        super(name, Long.valueOf(longValue), null);
         fSigned = signed;
         fBase = base;
     }
