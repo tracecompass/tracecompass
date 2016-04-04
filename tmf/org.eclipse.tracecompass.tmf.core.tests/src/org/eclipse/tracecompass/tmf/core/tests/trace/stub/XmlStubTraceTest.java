@@ -18,21 +18,13 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
-import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
@@ -49,32 +41,14 @@ import org.junit.Test;
  */
 public class XmlStubTraceTest {
 
-    private static final Path VALID_FILE = new Path("testfiles/stub_xml_traces/valid/test.xml");
-    private static final Path VALID_PATH = new Path("testfiles/stub_xml_traces/valid");
-    private static final Path INVALID_PATH = new Path("testfiles/stub_xml_traces/invalid");
+    private static final String VALID_FILE = "testfiles/stub_xml_traces/valid/test.xml";
+    private static final String VALID_PATH = "testfiles/stub_xml_traces/valid";
+    private static final String INVALID_PATH = "testfiles/stub_xml_traces/invalid";
 
     private static final String EVENT_A = "A";
     private static final String EVENT_B = "B";
     private static final String FIELD_A = "b";
     private static final String FIELD_B = "f";
-
-    private static IPath getAbsolutePath(Path relativePath) {
-        Plugin plugin = TmfCoreTestPlugin.getDefault();
-        if (plugin == null) {
-            /*
-             * Shouldn't happen but at least throw something to get the test to
-             * fail early
-             */
-            throw new IllegalStateException();
-        }
-        URL location = FileLocator.find(plugin.getBundle(), relativePath, null);
-        try {
-            IPath path = new Path(FileLocator.toFileURL(location).getPath());
-            return path;
-        } catch (IOException e) {
-            throw new IllegalStateException();
-        }
-    }
 
     /**
      * Test the
@@ -84,13 +58,13 @@ public class XmlStubTraceTest {
     @Test
     public void testValidate() {
         TmfXmlTraceStub trace = new TmfXmlTraceStub();
-        File[] invalidFiles = getAbsolutePath(INVALID_PATH).toFile().listFiles();
+        File[] invalidFiles = TmfCoreTestPlugin.getAbsoluteFilePath(INVALID_PATH).toFile().listFiles();
         assertTrue(invalidFiles.length > 0);
         for (File f : invalidFiles) {
             assertTrue(!trace.validate(null, f.getAbsolutePath()).isOK());
         }
 
-        File[] validFiles = getAbsolutePath(VALID_PATH).toFile().listFiles();
+        File[] validFiles = TmfCoreTestPlugin.getAbsoluteFilePath(VALID_PATH).toFile().listFiles();
         assertTrue(validFiles.length > 0);
         for (File f : validFiles) {
             assertTrue(trace.validate(null, f.getAbsolutePath()).isOK());
@@ -103,17 +77,7 @@ public class XmlStubTraceTest {
      */
     @Test
     public void testDevelopmentTrace() {
-        TmfXmlTraceStub trace = new TmfXmlTraceStub();
-        IStatus status = trace.validate(null, getAbsolutePath(VALID_FILE).toOSString());
-        if (!status.isOK()) {
-            fail(status.getException().getMessage());
-        }
-
-        try {
-            trace.initTrace(null, getAbsolutePath(VALID_FILE).toOSString(), TmfEvent.class);
-        } catch (TmfTraceException e1) {
-            fail(e1.getMessage());
-        }
+        TmfXmlTraceStub trace = TmfXmlTraceStub.setupTrace(TmfCoreTestPlugin.getAbsoluteFilePath(VALID_FILE));
 
         CustomEventRequest req = new CustomEventRequest(trace);
         trace.sendRequest(req);
@@ -133,17 +97,7 @@ public class XmlStubTraceTest {
      */
     @Test
     public void testAspects() {
-        TmfXmlTraceStub trace = new TmfXmlTraceStub();
-        IStatus status = trace.validate(null, getAbsolutePath(VALID_FILE).toOSString());
-        if (!status.isOK()) {
-            fail(status.getException().getMessage());
-        }
-
-        try {
-            trace.initTrace(null, getAbsolutePath(VALID_FILE).toOSString(), TmfEvent.class);
-        } catch (TmfTraceException e1) {
-            fail(e1.getMessage());
-        }
+        TmfXmlTraceStub trace = TmfXmlTraceStub.setupTrace(TmfCoreTestPlugin.getAbsoluteFilePath(VALID_FILE));
 
         ITmfEventAspect<?> cpuAspect = null;
         ITmfEventAspect<?> testAspect = null;

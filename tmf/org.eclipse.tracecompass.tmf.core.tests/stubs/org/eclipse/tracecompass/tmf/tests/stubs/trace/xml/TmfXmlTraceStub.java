@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.tmf.tests.stubs.trace.xml;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +32,7 @@ import javax.xml.validation.Validator;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.Nullable;
@@ -101,6 +103,27 @@ public class TmfXmlTraceStub extends TmfTrace {
 
     private Collection<ITmfEventAspect<?>> fAspects = TmfTrace.BASE_ASPECTS;
     private final Collection<ITmfEventAspect<?>> fAdditionalAspects = new HashSet<>();
+
+    /**
+     * Validate and initialize a {@link TmfXmlTraceStub} object
+     *
+     * @param absolutePath
+     *            The absolute file path of the trace file
+     * @return The trace
+     */
+    public static TmfXmlTraceStub setupTrace(IPath absolutePath) {
+        TmfXmlTraceStub trace = new TmfXmlTraceStub();
+        IStatus status = trace.validate(null, absolutePath.toOSString());
+        if (!status.isOK()) {
+            fail(status.getException().getMessage());
+        }
+        try {
+            trace.initTrace(null, absolutePath.toOSString(), TmfEvent.class);
+        } catch (TmfTraceException e) {
+            fail(e.getMessage());
+        }
+        return trace;
+    }
 
     /**
      * Constructor. Constructs the custom XML trace with the appropriate

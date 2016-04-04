@@ -12,7 +12,14 @@
 
 package org.eclipse.tracecompass.tmf.core.tests;
 
+import java.io.IOException;
+import java.net.URL;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
 import org.osgi.framework.BundleContext;
 
@@ -79,6 +86,30 @@ public class TmfCoreTestPlugin extends Plugin {
         TmfCoreTracer.stop();
         setDefault(null);
         super.stop(context);
+    }
+
+    /**
+     * Return a path to a file relative to this plugin's base directory
+     *
+     * @param relativePath
+     *            The path relative to the plugin's root directory
+     * @return The path corresponding to the relative path in parameter
+     */
+    public static @NonNull IPath getAbsoluteFilePath(String relativePath) {
+        Plugin plugin = TmfCoreTestPlugin.getDefault();
+        if (plugin == null) {
+            /*
+             * Shouldn't happen but at least throw something to get the test to
+             * fail early
+             */
+            throw new IllegalStateException();
+        }
+        URL location = FileLocator.find(plugin.getBundle(), new Path(relativePath), null);
+        try {
+            return new Path(FileLocator.toFileURL(location).getPath());
+        } catch (IOException e) {
+            throw new IllegalStateException();
+        }
     }
 
 }

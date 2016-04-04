@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.jdt.annotation.NonNull;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -87,7 +88,7 @@ public class Activator extends Plugin {
      *            The path relative to the plugin's root directory
      * @return The path corresponding to the relative path in parameter
      */
-    public static IPath getAbsoluteFilePath(String relativePath) {
+    public static @NonNull IPath getAbsoluteFilePath(String relativePath) {
         Activator plugin = Activator.getDefault();
         if (plugin == null) {
             /*

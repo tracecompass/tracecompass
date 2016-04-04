@@ -11,12 +11,9 @@ package org.eclipse.tracecompass.analysis.graph.core.tests.graph;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import java.util.List;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex.EdgeDirection;
@@ -24,8 +21,6 @@ import org.eclipse.tracecompass.analysis.graph.core.building.TmfGraphBuilderModu
 import org.eclipse.tracecompass.analysis.graph.core.tests.Activator;
 import org.eclipse.tracecompass.analysis.graph.core.tests.stubs.TestGraphWorker;
 import org.eclipse.tracecompass.analysis.graph.core.tests.stubs.module.GraphBuilderModuleStub;
-import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
@@ -56,17 +51,7 @@ public class TmfGraphBuilderModuleTest {
      * @return
      */
     private TmfGraphBuilderModule getModule() {
-        ITmfTrace trace = new TmfXmlTraceStub();
-        IPath filePath = Activator.getAbsoluteFilePath(STUB_TRACE_FILE);
-        IStatus status = trace.validate(null, filePath.toOSString());
-        if (!status.isOK()) {
-            fail(status.getException().getMessage());
-        }
-        try {
-            trace.initTrace(null, filePath.toOSString(), TmfEvent.class);
-        } catch (TmfTraceException e) {
-            fail(e.getMessage());
-        }
+        ITmfTrace trace = TmfXmlTraceStub.setupTrace(Activator.getAbsoluteFilePath(STUB_TRACE_FILE));
         ((TmfTrace) trace).traceOpened(new TmfTraceOpenedSignal(this, trace, null));
         GraphBuilderModuleStub module = null;
         for (GraphBuilderModuleStub mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, GraphBuilderModuleStub.class)) {
