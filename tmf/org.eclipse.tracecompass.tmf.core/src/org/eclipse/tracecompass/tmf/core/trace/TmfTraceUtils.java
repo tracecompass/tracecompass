@@ -24,6 +24,7 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.StreamUtils;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
@@ -101,24 +102,19 @@ public final class TmfTraceUtils {
      *         {@link ITmfEventAspect#resolve(ITmfEvent)} that returns non null
      *         for the event or {@code null} otherwise
      */
-    public static @Nullable <T extends ITmfEventAspect<?>> Object resolveEventAspectOfClassForEvent(
+    public static <T extends ITmfEventAspect<?>> @Nullable Object resolveEventAspectOfClassForEvent(
             ITmfTrace trace, Class<T> aspectClass, ITmfEvent event) {
-        Iterable<ITmfEventAspect<?>> aspects = trace.getEventAspects();
-        for (ITmfEventAspect<?> aspect : aspects) {
-            if (aspectClass.isAssignableFrom(aspect.getClass())) {
-                Object obj = aspect.resolve(event);
-                if (obj != null) {
-                    return obj;
-                }
-            }
-        }
-        return null;
+            return StreamUtils.getStream(trace.getEventAspects())
+                    .filter(aspect -> aspectClass.isAssignableFrom(aspect.getClass()))
+                    .map(aspect -> aspect.resolve(event))
+                    .filter(obj -> obj != null)
+                    .findFirst().orElse(null);
     }
 
     /**
-     * Return the first result of the first aspect that resolves as non null for
-     * the event received in parameter. The result is cast to an Integer if
-     * possible, otherwise null is returned.
+     * Return the first result of the first aspect that resolves as a non-null
+     * Integer for the event received in parameter. If no matching aspects are
+     * found then null is returned.
      *
      * @param trace
      *            The trace for which you want the event aspects
@@ -131,13 +127,14 @@ public final class TmfTraceUtils {
      *         for the event or {@code null} otherwise
      * @since 2.0
      */
-    public static @Nullable <T extends ITmfEventAspect<Integer>> Integer resolveIntEventAspectOfClassForEvent(
+    public static <T extends ITmfEventAspect<Integer>> @Nullable Integer resolveIntEventAspectOfClassForEvent(
             ITmfTrace trace, Class<T> aspectClass, ITmfEvent event) {
-        Object result = resolveEventAspectOfClassForEvent(trace, aspectClass, event);
-        if (result instanceof Integer) {
-            return (Integer) result;
-        }
-        return null;
+            return StreamUtils.getStream(trace.getEventAspects())
+                .filter(aspect -> aspectClass.isAssignableFrom(aspect.getClass()))
+                /* Enforced by the T parameter bounding */
+                .map(aspect -> (Integer) aspect.resolve(event))
+                .filter(obj -> obj != null)
+                .findFirst().orElse(null);
     }
 
     /**
