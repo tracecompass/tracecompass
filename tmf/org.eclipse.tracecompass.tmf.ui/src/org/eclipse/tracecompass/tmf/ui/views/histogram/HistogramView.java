@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Ericsson
+ * Copyright (c) 2009, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -137,11 +137,11 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
     private boolean fLinkState;
 
     // Histogram/request for the full trace range
-    private static FullTraceHistogram fFullTraceHistogram;
+    private FullTraceHistogram fFullTraceHistogram;
     private HistogramRequest fFullTraceRequest;
 
     // Histogram/request for the selected time range
-    private static TimeRangeHistogram fTimeRangeHistogram;
+    private TimeRangeHistogram fTimeRangeHistogram;
     private HistogramRequest fTimeRangeRequest;
 
     // Legend area
