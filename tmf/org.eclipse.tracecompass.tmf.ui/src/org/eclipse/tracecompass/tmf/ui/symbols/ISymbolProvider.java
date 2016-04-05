@@ -24,7 +24,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
  * @author Robert Kiss
  * @since 2.0
  * @see ISymbolProviderFactory
- *
  */
 public interface ISymbolProvider {
 
@@ -65,6 +64,39 @@ public interface ISymbolProvider {
      *         cannot be found
      */
     @Nullable ITmfCallsite getSymbolInfo(long address);
+
+    /**
+     * Return the symbol text corresponding to the given pid/timestamp/address
+     * tuple, or null if there is no such symbol.
+     *
+     * @param pid
+     *            The process Id for which to query
+     * @param timestamp
+     *            The timestamp of the query
+     * @param address
+     *            the address of the symbol
+     * @return the symbol text or null if the symbol cannot be found
+     */
+    default @Nullable String getSymbolText(int pid, long timestamp, long address) {
+        return getSymbolText(address);
+    }
+
+    /**
+     * Return additional information regarding the symbol from the given
+     * pid/timestamp/address tuple, or null if the symbol cannot be found.
+     *
+     * @param pid
+     *            The process Id for which to query
+     * @param timestamp
+     *            The timestamp of the query
+     * @param address
+     *            the address of the symbol
+     * @return the symbol {@link ITmfCallsite} information or null if the symbol
+     *         cannot be found
+     */
+    default @Nullable ITmfCallsite getSymbolInfo(int pid, long timestamp, long address) {
+        return getSymbolInfo(address);
+    }
 
     /**
      * Create the {@link ISymbolProviderPreferencePage} that can be used to
