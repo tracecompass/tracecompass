@@ -25,5 +25,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.lttng2.control.core,
  org.eclipse.tracecompass.ctf.core
 Import-Package: com.google.common.base,
+ com.google.common.cache,
  com.google.common.collect,
  com.google.common.io

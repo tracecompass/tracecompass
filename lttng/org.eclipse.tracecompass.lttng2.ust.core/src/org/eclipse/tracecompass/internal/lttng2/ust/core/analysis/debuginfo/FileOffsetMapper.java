@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +24,11 @@ import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 
+import com.google.common.base.Objects;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 /**
  * Utility class to get file name, function/symbol name and line number from a
  * given offset. In TMF this is represented as a {@link TmfCallsite}.
@@ -33,7 +40,68 @@ public final class FileOffsetMapper {
     private static final String DISCRIMINATOR = "\\(discriminator.*\\)"; //$NON-NLS-1$
     private static final String ADDR2LINE_EXECUTABLE = "addr2line"; //$NON-NLS-1$
 
+    private static final long CACHE_SIZE = 1000;
+
     private FileOffsetMapper() {}
+
+    /**
+     * Class representing an offset in a specific file
+     */
+    private static class FileOffset {
+
+        private final String fFilePath;
+        private final long fOffset;
+
+        public FileOffset(String filePath, long offset) {
+            fFilePath = filePath;
+            fOffset = offset;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(fFilePath, fOffset);
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            FileOffset other = (FileOffset) obj;
+            if (!fFilePath.equals(other.fFilePath)) {
+                return false;
+            }
+            if (fOffset != other.fOffset) {
+                return false;
+            }
+            return true;
+        }
+    }
+
+    /**
+     * Cache of all calls to 'addr2line', so that we can avoid recalling the
+     * external process repeatedly.
+     *
+     * It is static, meaning one cache for the whole application, since the
+     * symbols in a file on disk are independent from the trace referring to it.
+     */
+    private static final LoadingCache<FileOffset, @Nullable Iterable<TmfCallsite>> CALLSITE_CACHE;
+    static {
+        CALLSITE_CACHE = checkNotNull(CacheBuilder.newBuilder()
+            .maximumSize(CACHE_SIZE)
+            .build(new CacheLoader<FileOffset, @Nullable Iterable<TmfCallsite>>() {
+                @Override
+                public @Nullable Iterable<TmfCallsite> load(FileOffset fo) {
+                    return getCallsiteFromOffsetWithAddr2line(fo);
+                }
+            }));
+    }
 
     /**
      * Generate the callsites from a given binary file and address offset.
@@ -53,15 +121,19 @@ public final class FileOffsetMapper {
         if (!Files.exists((file.toPath()))) {
             return null;
         }
-        return getCallsiteFromOffsetWithAddr2line(file, offset);
+        FileOffset fo = new FileOffset(checkNotNull(file.toString()), offset);
+        return CALLSITE_CACHE.getUnchecked(fo);
     }
 
-    private static @Nullable Iterable<TmfCallsite> getCallsiteFromOffsetWithAddr2line(File file, long offset) {
+    private static @Nullable Iterable<TmfCallsite> getCallsiteFromOffsetWithAddr2line(FileOffset fo) {
+        String filePath = fo.fFilePath;
+        long offset = fo.fOffset;
+
         List<TmfCallsite> callsites = new LinkedList<>();
 
         // FIXME Could eventually use CDT's Addr2line class once it implements --inlines
         List<String> output = getOutputFromCommand(Arrays.asList(
-                ADDR2LINE_EXECUTABLE, "-i", "-f", "-C", "-e", file.toString(), "0x" + Long.toHexString(offset)));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+                ADDR2LINE_EXECUTABLE, "-i", "-f", "-C", "-e", filePath, "0x" + Long.toHexString(offset)));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
         if (output == null) {
             /* Command returned an error */
