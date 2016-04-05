@@ -59,27 +59,42 @@ public final class FileOffsetMapper {
     private static @Nullable Iterable<TmfCallsite> getCallsiteFromOffsetWithAddr2line(File file, long offset) {
         List<TmfCallsite> callsites = new LinkedList<>();
 
-        // FIXME Could eventually use CDT's Addr2line class once it imlements --inlines
+        // FIXME Could eventually use CDT's Addr2line class once it implements --inlines
         List<String> output = getOutputFromCommand(Arrays.asList(
-                ADDR2LINE_EXECUTABLE, "-i", "-e", file.toString(), "0x" + Long.toHexString(offset)));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+                ADDR2LINE_EXECUTABLE, "-i", "-f", "-C", "-e", file.toString(), "0x" + Long.toHexString(offset)));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
         if (output == null) {
             /* Command returned an error */
             return null;
         }
 
+        /*
+         * When passing the -f flag, the output alternates between function
+         * names and file/line location.
+         */
+        boolean oddLine = true;
+        String currentFunctionName = null;
         for (String outputLine : output) {
             // Remove discriminator part, for example: /build/buildd/glibc-2.21/elf/dl-object.c:78 (discriminator 8)
             outputLine = outputLine.replaceFirst(DISCRIMINATOR, "").trim(); //$NON-NLS-1$
 
-            String[] elems = outputLine.split(":"); //$NON-NLS-1$
-            String fileName = elems[0];
-            if (fileName.equals("??")) { //$NON-NLS-1$
-                continue;
-            }
-            long lineNumber = Long.parseLong(elems[1]);
+            if (oddLine) {
+                /* This is a line indicating the function name */
+                currentFunctionName = outputLine;
+            } else {
+                /* This is a line indicating a call site */
+                String[] elems = outputLine.split(":"); //$NON-NLS-1$
+                String fileName = elems[0];
+                if (fileName.equals("??")) { //$NON-NLS-1$
+                    continue;
+                }
+                long lineNumber = Long.parseLong(elems[1]);
 
-            callsites.add(new TmfCallsite(fileName, null, lineNumber));
+                callsites.add(new TmfCallsite(fileName, currentFunctionName, lineNumber));
+            }
+
+            /* Flip the boolean for the following line */
+            oddLine = !oddLine;
         }
 
         return callsites;
