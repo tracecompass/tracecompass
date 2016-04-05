@@ -112,7 +112,7 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
             try {
                 ITmfStateValue value = ss.querySingleState(event.getTime(), entry.getQuark()).getStateValue();
                 if (!value.isNull()) {
-                    return fView.getFunctionName(entry.getTrace(), value);
+                    return fView.getFunctionName(entry.getTrace(), entry.getProcessId(), event.getTime(), value);
                 }
             } catch (AttributeNotFoundException e) {
                 Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
@@ -142,7 +142,7 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
         try {
             ITmfStateValue value = ss.querySingleState(event.getTime(), entry.getQuark()).getStateValue();
             if (!value.isNull()) {
-                String name = fView.getFunctionName(entry.getTrace(), value);
+                String name = fView.getFunctionName(entry.getTrace(), entry.getProcessId(), event.getTime(), value);
                 gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
                 Utils.drawText(gc, name, bounds.x, bounds.y, bounds.width, bounds.height, true, true);
             }

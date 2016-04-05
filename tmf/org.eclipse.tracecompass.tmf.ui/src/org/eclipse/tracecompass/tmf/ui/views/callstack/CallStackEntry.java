@@ -28,6 +28,7 @@ public class CallStackEntry extends TimeGraphEntry {
 
     private final int fQuark;
     private final int fStackLevel;
+    private final int fProcessId;
     private final ITmfTrace fTrace;
     private String fFunctionName;
     private long fFunctionEntryTime;
@@ -43,7 +44,7 @@ public class CallStackEntry extends TimeGraphEntry {
      *            The stack level
      * @param trace
      *            The trace that this view is talking about
-     * @deprecated Use {@link #CallStackEntry(String, int, int, ITmfTrace, ITmfStateSystem)}
+     * @deprecated Use {@link #CallStackEntry(String, int, int, int, ITmfTrace, ITmfStateSystem)}
      */
     @Deprecated
     public CallStackEntry(int quark, int stackLevel, ITmfTrace trace) {
@@ -64,11 +65,42 @@ public class CallStackEntry extends TimeGraphEntry {
      *            The trace that this view is talking about
      * @param ss
      *            The call stack state system
+     * @deprecated Use
+     *             {@link #CallStackEntry(String, int, int, int, ITmfTrace, ITmfStateSystem)}
      */
+    @Deprecated
     public CallStackEntry(String name, int quark, int stackLevel, ITmfTrace trace, @NonNull ITmfStateSystem ss) {
         super(name, 0, 0);
         fQuark = quark;
         fStackLevel = stackLevel;
+        fProcessId = -1;
+        fTrace = trace;
+        fFunctionName = ""; //$NON-NLS-1$
+        fSS = ss;
+    }
+
+    /**
+     * Standard constructor
+     *
+     * @param name
+     *            The parent thread name
+     * @param quark
+     *            The call stack quark
+     * @param stackLevel
+     *            The stack level
+     * @param processId The ID of the process this entry belongs to
+     * @param trace
+     *            The trace that this view is talking about
+     * @param ss
+     *            The call stack state system
+     * @since 2.0
+     */
+    public CallStackEntry(String name, int quark, int stackLevel, int processId,
+            ITmfTrace trace, @NonNull ITmfStateSystem ss) {
+        super(name, 0, 0);
+        fQuark = quark;
+        fStackLevel = stackLevel;
+        fProcessId = processId;
         fTrace = trace;
         fFunctionName = ""; //$NON-NLS-1$
         fSS = ss;
@@ -164,6 +196,16 @@ public class CallStackEntry extends TimeGraphEntry {
      */
     public int getStackLevel() {
         return fStackLevel;
+    }
+
+    /**
+     * Retrieve the ID of the process this entry belongs to.
+     *
+     * @return The ID of the process
+     * @since 2.0
+     */
+    public int getProcessId() {
+        return fProcessId;
     }
 
     /**

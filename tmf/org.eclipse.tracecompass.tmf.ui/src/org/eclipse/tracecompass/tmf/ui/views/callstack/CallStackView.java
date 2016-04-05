@@ -189,8 +189,15 @@ public class CallStackView extends AbstractTimeGraphView {
 
     private static class ProcessEntry extends TimeGraphEntry {
 
-        public ProcessEntry(String name, long startTime, long endTime) {
+        private final int fProcessId;
+
+        public ProcessEntry(String name, int processId, long startTime, long endTime) {
             super(name, startTime, endTime);
+            fProcessId = processId;
+        }
+
+        public int getProcessId() {
+            return fProcessId;
         }
 
         @Override
@@ -238,6 +245,8 @@ public class CallStackView extends AbstractTimeGraphView {
         public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
             if (o1 instanceof ThreadEntry && o2 instanceof ThreadEntry) {
                 return fThreadComparator.compare(o1, o2);
+            } else if (o1 instanceof ProcessEntry && o2 instanceof ProcessEntry) {
+                return Integer.compare(((ProcessEntry) o1).fProcessId, ((ProcessEntry) o2).fProcessId);
             }
             return 0;
         }
@@ -610,7 +619,9 @@ public class CallStackView extends AbstractTimeGraphView {
                 ProcessEntry processEntry = processEntryMap.get(processQuark);
                 if (processEntry == null) {
                     String name = ss.getAttributeName(processQuark.intValue());
-                    processEntry = new ProcessEntry(name, start, end);
+                    /* The attribute name should already be parseable to integer */
+                    int processId = Integer.parseInt(name);
+                    processEntry = new ProcessEntry(name, processId, start, end);
                     processEntryMap.put(processQuark, processEntry);
                     traceEntry.addChild(processEntry);
                 } else {
@@ -660,7 +671,8 @@ public class CallStackView extends AbstractTimeGraphView {
                         int level = 1;
                         for (int stackLevelQuark : ss.getSubAttributes(callStackQuark, false)) {
                             if (level > threadEntry.getChildren().size()) {
-                                CallStackEntry callStackEntry = new CallStackEntry(threadName, stackLevelQuark, level, trace, ss);
+                                int processId = processEntry.getProcessId();
+                                CallStackEntry callStackEntry = new CallStackEntry(threadName, stackLevelQuark, level, processId, trace, ss);
                                 threadEntry.addChild(callStackEntry);
                             }
                             level++;
@@ -789,6 +801,9 @@ public class CallStackView extends AbstractTimeGraphView {
         }
         for (TimeGraphEntry traceEntry : entryList) {
             for (ITimeGraphEntry processEntry : traceEntry.getChildren()) {
+                /* The entries should all be parseable to an integer. */
+                int pid = Integer.parseInt(processEntry.getName());
+
                 for (ITimeGraphEntry threadEntry : processEntry.getChildren()) {
                     ITmfStateSystem ss = ((ThreadEntry) threadEntry).getStateSystem();
                     if (ss == null) {
@@ -806,7 +821,8 @@ public class CallStackView extends AbstractTimeGraphView {
                         try {
                             ITmfStateInterval stackLevelInterval = ss.querySingleState(time, callStackEntry.getQuark());
                             ITmfStateValue nameValue = stackLevelInterval.getStateValue();
-                            String name = getFunctionName(trace, nameValue);
+
+                            String name = getFunctionName(trace, pid, time, nameValue);
                             callStackEntry.setFunctionName(name);
                             if (name.length() > 0) {
                                 callStackEntry.setFunctionEntryTime(stackLevelInterval.getStartTime());
@@ -826,7 +842,7 @@ public class CallStackView extends AbstractTimeGraphView {
         }
     }
 
-    String getFunctionName(ITmfTrace trace, ITmfStateValue nameValue) {
+    String getFunctionName(ITmfTrace trace, int processId, long timestamp, ITmfStateValue nameValue) {
         long address = Long.MAX_VALUE;
         String name = ""; //$NON-NLS-1$
         try {
@@ -849,7 +865,7 @@ public class CallStackView extends AbstractTimeGraphView {
         if (address != Long.MAX_VALUE) {
             ISymbolProvider provider = fSymbolProviders.get(trace);
             if (provider != null) {
-                String symbol = provider.getSymbolText(address);
+                String symbol = provider.getSymbolText(processId, timestamp, address);
                 if (symbol != null) {
                     name = symbol;
                 }
