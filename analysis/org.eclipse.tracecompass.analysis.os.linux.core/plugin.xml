@@ -28,11 +28,11 @@
             automatic="false"
             id="org.eclipse.tracecompass.analysis.os.linux.latency.syscall"
             name="%analysis.latency">
-            <tracetype
+         <tracetype
                applies="true"
                class="org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace">
          </tracetype>
-            </module>
+      </module>
       <module
             analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.contextswitch.KernelContextSwitchAnalysis"
             id="org.eclipse.tracecompass.analysis.os.linux.contextswitch"
@@ -46,7 +46,18 @@
             analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage.KernelMemoryAnalysisModule"
             id="org.eclipse.tracecompass.analysis.os.linux.core.kernelmemory"
             name="%analysis.kernelmemory">
-            <tracetype
+         <tracetype
+               applies="true"
+               class="org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace">
+         </tracetype>
+      </module>
+      <module
+            analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.tid.TidAnalysisModule"
+            automatic="true"
+            icon="icons/threads.png"
+            id="org.eclipse.tracecompass.analysis.os.linux.kernel.tid"
+            name="%analysis.tid">
+         <tracetype
                applies="true"
                class="org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace">
          </tracetype>

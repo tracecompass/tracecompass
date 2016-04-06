@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.analysis.os.linux.core.kernel;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.LinuxTidAspect;
+import org.eclipse.tracecompass.analysis.os.linux.core.tid.TidAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -43,17 +44,12 @@ public final class KernelTidAspect extends LinuxTidAspect {
         }
 
         /* Find the analysis module for the trace */
-        KernelAnalysisModule analysis = TmfTraceUtils.getAnalysisModuleOfClass(event.getTrace(),
-                KernelAnalysisModule.class, KernelAnalysisModule.ID);
+        TidAnalysisModule analysis = TmfTraceUtils.getAnalysisModuleOfClass(event.getTrace(),
+                TidAnalysisModule.class, TidAnalysisModule.ID);
         if (analysis == null) {
             return null;
         }
-        Integer tid = KernelThreadInformationProvider.getThreadOnCpu(
-                analysis, cpu, event.getTimestamp().getValue());
-        if (tid != null) {
-            return tid;
-        }
-        return null;
+        return analysis.getThreadOnCpuAtTime(cpu, event.getTimestamp().toNanos());
     }
 
 }

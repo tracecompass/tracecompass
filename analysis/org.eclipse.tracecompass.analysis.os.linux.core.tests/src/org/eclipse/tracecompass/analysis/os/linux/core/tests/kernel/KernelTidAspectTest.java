@@ -11,15 +11,16 @@ package org.eclipse.tracecompass.analysis.os.linux.core.tests.kernel;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelTidAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.LinuxTestCase;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.kernel.KernelAnalysisTestFactory;
+import org.eclipse.tracecompass.analysis.os.linux.core.tid.TidAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -65,7 +66,7 @@ public class KernelTidAspectTest {
         /* Make sure the Kernel analysis has run */
         ((TmfTrace) trace).traceOpened(new TmfTraceOpenedSignal(this, trace, null));
         IAnalysisModule module = null;
-        for (IAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysisModule.class)) {
+        for (IAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, TidAnalysisModule.class)) {
             module = mod;
         }
         assertNotNull(module);
@@ -82,18 +83,11 @@ public class KernelTidAspectTest {
         fTrace.dispose();
     }
 
-    private void resolveNextEvent(ITmfContext context, Integer tid) {
+    private Integer resolveNextEvent(ITmfContext context) {
         ITmfTrace trace = fTrace;
         ITmfEvent event = trace.getNext(context);
         assertNotNull(event);
-
-        Object tidObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(trace, KernelTidAspect.class, event);
-        if (tid == null) {
-            assertNull(tidObj);
-        } else {
-            assertNotNull(tidObj);
-            assertEquals(tid, tidObj);
-        }
+        return (Integer) TmfTraceUtils.resolveEventAspectOfClassForEvent(trace, KernelTidAspect.class, event);
     }
 
     /**
@@ -103,19 +97,26 @@ public class KernelTidAspectTest {
     public void testResolveTidAspect() {
 
         ITmfContext context = fTrace.seekEvent(0L);
-        resolveNextEvent(context, null);
-        resolveNextEvent(context, null);
-        resolveNextEvent(context, null);
-        resolveNextEvent(context, 11);
-        resolveNextEvent(context, null);
-        resolveNextEvent(context, null);
-        resolveNextEvent(context, 20);
-        resolveNextEvent(context, 20);
-        resolveNextEvent(context, 21);
-        resolveNextEvent(context, 11);
-        resolveNextEvent(context, 30);
-        resolveNextEvent(context, 21);
-        resolveNextEvent(context, 20);
+        List<Integer> expected = new ArrayList<>();
+        expected.add(null);
+        expected.add(null);
+        expected.add(null);
+        expected.add(11);
+        expected.add(null);
+        expected.add(null);
+        expected.add(20);
+        expected.add(20);
+        expected.add(21);
+        expected.add(11);
+        expected.add(30);
+        expected.add(21);
+        expected.add(20);
+        List<Integer> tids = new ArrayList<>();
+
+        for (int i = 0; i < expected.size(); i++) {
+            tids.add(resolveNextEvent(context));
+        }
+        assertEquals(expected, tids);
     }
 
 }
