@@ -268,6 +268,12 @@ public class SDView extends ViewPart implements IPartListener {
     @Override
     public void dispose() {
         KeyBindingsManager.getInstance().remove(this.getSite().getId());
+
+        /* Workaround for Bug 490400: Clear the action bars */
+        IActionBars bars = getViewSite().getActionBars();
+        bars.getToolBarManager().removeAll();
+        bars.getMenuManager().removeAll();
+
         disposeZoomActions();
         fPrintActionHandler.dispose();
         super.dispose();

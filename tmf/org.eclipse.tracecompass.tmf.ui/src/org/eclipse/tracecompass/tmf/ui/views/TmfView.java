@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Ericsson
+ * Copyright (c) 2009, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -24,6 +24,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.views.TmfAlignmentSynchronizer;
 import org.eclipse.tracecompass.tmf.core.component.ITmfComponent;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
@@ -73,6 +74,12 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
     @Override
     public void dispose() {
         TmfSignalManager.deregister(this);
+
+        /* Workaround for Bug 490400: Clear the action bars */
+        IActionBars bars = getViewSite().getActionBars();
+        bars.getToolBarManager().removeAll();
+        bars.getMenuManager().removeAll();
+
         super.dispose();
     }
 
