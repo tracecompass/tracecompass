@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -46,7 +47,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfEventTypeCollectionHelper;
  * @author Mathieu Rail
  * @since 2.0
  */
-public class TmfAnalysisRequirement {
+public class TmfAnalysisRequirement implements Predicate<ITmfTrace> {
 
     /**
      * String for requirement type 'event', that can be used by analysis
@@ -277,7 +278,8 @@ public class TmfAnalysisRequirement {
      *            The trace on which to check for this requirement
      * @return True if the trace has all mandatory values of this requirement
      */
-    public boolean isFulfilled(ITmfTrace trace) {
+    @Override
+    public boolean test(ITmfTrace trace) {
         switch (fType) {
         case TYPE_EVENT:
             if (trace instanceof ITmfTraceWithPreDefinedEvents) {

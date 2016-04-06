@@ -11,7 +11,6 @@ package org.eclipse.tracecompass.tmf.core.analysis.requirements;
 
 import java.util.Set;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
 import org.eclipse.tracecompass.tmf.core.trace.TmfEventTypeCollectionHelper;
@@ -50,7 +49,7 @@ public class TmfAnalysisEventRequirement extends TmfAnalysisRequirement {
     }
 
     @Override
-    public boolean isFulfilled(@NonNull ITmfTrace trace) {
+    public boolean test(ITmfTrace trace) {
 
         if (trace instanceof ITmfTraceWithPreDefinedEvents) {
             Set<String> traceEvents = TmfEventTypeCollectionHelper.getEventNames(((ITmfTraceWithPreDefinedEvents) trace).getContainedEventTypes());

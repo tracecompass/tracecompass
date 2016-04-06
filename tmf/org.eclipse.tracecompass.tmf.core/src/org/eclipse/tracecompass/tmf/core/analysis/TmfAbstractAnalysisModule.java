@@ -211,7 +211,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
     @Override
     public boolean canExecute(ITmfTrace trace) {
         for (TmfAnalysisRequirement requirement : getAnalysisRequirements()) {
-            if (!requirement.isFulfilled(trace)) {
+            if (!requirement.test(trace)) {
                 return false;
             }
         }
@@ -492,7 +492,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
         StringBuilder builder = new StringBuilder();
         builder.append(NLS.bind(Messages.TmfAbstractAnalysisModule_AnalysisCannotExecute, getName()));
         for (TmfAnalysisRequirement requirement : getAnalysisRequirements()) {
-            if (!requirement.isFulfilled(trace)) {
+            if (!requirement.test(trace)) {
                 builder.append("\n\n"); //$NON-NLS-1$
                 builder.append(NLS.bind(Messages.TmfAnalysis_RequirementNotFulfilled, requirement.getType()));
                 builder.append("\n"); //$NON-NLS-1$

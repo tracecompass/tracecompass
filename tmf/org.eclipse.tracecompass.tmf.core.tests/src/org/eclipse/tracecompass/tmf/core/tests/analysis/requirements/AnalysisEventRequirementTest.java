@@ -92,14 +92,14 @@ public class AnalysisEventRequirementTest {
     public void testOptionalRequirements() {
         /* Test optional requirement */
         TmfAnalysisRequirement req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1));
-        assertTrue(req.isFulfilled(fTrace));
+        assertTrue(req.test(fTrace));
 
         req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT3));
-        assertTrue(req.isFulfilled(fTrace));
+        assertTrue(req.test(fTrace));
 
         /* FIXME: if no optional requirement is fulfilled it should fail */
         req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT3));
-        assertTrue(req.isFulfilled(fTrace));
+        assertTrue(req.test(fTrace));
     }
 
     /**
@@ -109,17 +109,17 @@ public class AnalysisEventRequirementTest {
     public void testMandatoryRequirements() {
         /* Test mandatory requirement */
         TmfAnalysisRequirement req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1), ValuePriorityLevel.MANDATORY);
-        assertTrue(req.isFulfilled(fTrace));
+        assertTrue(req.test(fTrace));
 
         req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT2), ValuePriorityLevel.MANDATORY);
-        assertTrue(req.isFulfilled(fTrace));
+        assertTrue(req.test(fTrace));
 
         /* Event 3 is not an event of the trace */
         req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT2, EVENT3), ValuePriorityLevel.MANDATORY);
-        assertFalse(req.isFulfilled(fTrace));
+        assertFalse(req.test(fTrace));
 
         req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT3), ValuePriorityLevel.MANDATORY);
-        assertFalse(req.isFulfilled(fTrace));
+        assertFalse(req.test(fTrace));
     }
 
     /**
@@ -132,10 +132,10 @@ public class AnalysisEventRequirementTest {
         TmfTrace traceNoEvents = new TmfTraceStub();
 
         TmfAnalysisRequirement req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT3), ValuePriorityLevel.MANDATORY);
-        assertTrue(req.isFulfilled(traceNoEvents));
+        assertTrue(req.test(traceNoEvents));
 
         req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT2), ValuePriorityLevel.OPTIONAL);
-        assertTrue(req.isFulfilled(traceNoEvents));
+        assertTrue(req.test(traceNoEvents));
 
     }
 
