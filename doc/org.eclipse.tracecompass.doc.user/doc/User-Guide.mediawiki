@@ -2112,27 +2112,55 @@ Clicking the '''Import Mapping File''' ([[Image:images/import.gif]]) icon will o
 
 === Using the Callstack View with LTTng-UST traces ===
 
-There is support in the LTTng-UST integration plugin to display the callstack of applications traced with the ''liblttng-ust-cyg-profile.so'' library (see the ''liblttng-ust-cyg-profile'' man page for additional information). To do so, you need to:
+There is support in the LTTng-UST integration plugin to display the callstack
+of applications traced with the ''liblttng-ust-cyg-profile.so'' library (see
+the ''liblttng-ust-cyg-profile'' man page for additional information). To do
+so, you need to:
 
 * Recompile your application with "''-g -finstrument-functions''".
-* Add the ''vtid'' and ''procname'' contexts to your trace session. See the [[#Adding Contexts to Channels and Events of a Domain]] section. Or if using the command-line:
-** <pre>lttng add-context -u -t vtid -t procname</pre>
+* Set up a tracing session with the the ''vpid'', ''vtid'' and ''procname'' contexts. See the [[#Enabling UST Events On Session Level]] and [[#Adding Contexts to Channels and Events of a Domain]] sections. Or if using the command-line:
+** <pre>lttng enable-event -u -a</pre>
+** <pre>lttng add-context -u -t vpid -t vtid -t procname</pre>
 * Preload the ''liblttng-ust-cyg-profile'' library when running your program:
 ** <pre>LD_PRELOAD=/usr/lib/liblttng-ust-cyg-profile.so ./myprogram</pre>
 
-Once you load the resulting trace, making sure it's set to the ''Common Trace Format - LTTng UST Trace'' type, the Callstack View should be populated with the relevant information. However, since GCC's cyg-profile instrumentation only provides function addresses, and not names, an additional step is required to get the function names showing in the view. The following section explains how to do so.
+Once you load the resulting trace, the Callstack View should be populated with
+the relevant information.
 
-=== Importing a function name mapping file for LTTng-UST traces ===
+Note that for non-trivial applications, ''liblttng-ust-cyg-profile'' generates a
+'''lot''' of events! You may need to increase the channel's subbuffer size to
+avoid lost events. Refer to the
+[http://lttng.org/docs/#doc-fine-tuning-channels LTTng documentation].
 
-If you followed the steps in the previous section, you should have a Callstack View populated with function entries and exits. However, the view will display the function addresses instead of names in the intervals, which are not very useful by themselves. To get the actual function names, you need to:
+For traces taken with LTTng-UST 2.8 or later, the Callstack View should show the
+function names automatically, since it will make use of the debug information
+statedump events (which are enabled when using ''enable-event -u -a'').
 
+For traces taken with prior versions of UST, you would need to set the path to
+the binary file or mapping manually:
+
+=== Importing a binary or function name mapping file (for LTTng-UST <2.8 traces) ===
+
+If you followed the steps in the previous section, you should have a Callstack
+View populated with function entries and exits. However, the view will display
+the function addresses instead of names in the intervals, which are not very
+useful by themselves. To get the actual function names, you need to:
+
+* Click the '''Import Mapping File''' ([[Image:images/import.gif]]) button in the Callstack View.
+
+Then either:
+* Point to the binary that was used for taking the trace
+OR
 * Generate a mapping file from the binary, using:
 ** <pre>nm myprogram > mapping.txt</pre>
-* Click the '''Import Mapping File''' ([[Image:images/import.gif]]) button in the Callstack View, and select the ''mapping.txt'' file that was just created.
+** Select the ''mapping.txt'' file that was just created.
 
-(If you are dealing with C++ executables, you may want to use ''nm --demangle'' instead to get readable function names.)
+(If you are dealing with C++ executables, you may want to use ''nm --demangle''
+instead to get readable function names.)
 
-The view should now update to display the function names instead. Make sure the binary used for taking the trace is the one used for this step too (otherwise, there is a good chance of the addresses not being the same).
+The view should now update to display the function names instead. Make sure the
+binary used for taking the trace is the one used for this step too (otherwise,
+there is a good chance of the addresses not being the same).
 
 === Navigation ===
 
