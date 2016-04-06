@@ -21,7 +21,6 @@ import java.util.TreeSet;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -29,6 +28,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
 
 /**
  * Information provider utility class that retrieves thread-related information
@@ -66,15 +66,8 @@ public final class KernelThreadInformationProvider {
             int cpuQuark = ss.getQuarkAbsolute(Attributes.CPUS, Long.toString(cpuId), Attributes.CURRENT_THREAD);
             ITmfStateInterval interval = ss.querySingleState(ts, cpuQuark);
             ITmfStateValue val = interval.getStateValue();
-            switch (val.getType()) {
-            case INTEGER:
+            if (val.getType().equals(Type.INTEGER)) {
                 return val.unboxInt();
-            case LONG:
-            case DOUBLE:
-            case NULL:
-            case STRING:
-            default:
-                break;
             }
         } catch (AttributeNotFoundException | StateSystemDisposedException | TimeRangeException e) {
         }
@@ -118,10 +111,9 @@ public final class KernelThreadInformationProvider {
      * @return The parent PID or {@code null} if the PPID is not found.
      */
     public static @Nullable Integer getParentPid(KernelAnalysisModule module, Integer threadId, long ts) {
-        Integer ppid = null;
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
-            return ppid;
+            return null;
         }
         Integer ppidNode;
         try {
@@ -129,20 +121,12 @@ public final class KernelThreadInformationProvider {
             ITmfStateInterval ppidInterval = ss.querySingleState(ts, ppidNode);
             ITmfStateValue ppidValue = ppidInterval.getStateValue();
 
-            switch (ppidValue.getType()) {
-            case INTEGER:
-                ppid = NonNullUtils.checkNotNull(Integer.valueOf(ppidValue.unboxInt()));
-                break;
-            case DOUBLE:
-            case LONG:
-            case NULL:
-            case STRING:
-            default:
-                break;
+            if (ppidValue.getType().equals(Type.INTEGER)) {
+                return Integer.valueOf(ppidValue.unboxInt());
             }
         } catch (AttributeNotFoundException | StateSystemDisposedException | TimeRangeException e) {
         }
-        return ppid;
+        return null;
     }
 
     /**
@@ -158,10 +142,9 @@ public final class KernelThreadInformationProvider {
      *         found
      */
     public static @Nullable String getExecutableName(KernelAnalysisModule module, Integer threadId) {
-        String execName = null;
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
-            return execName;
+            return null;
         }
         Integer execNameNode;
         try {
@@ -169,23 +152,17 @@ public final class KernelThreadInformationProvider {
             List<ITmfStateInterval> execNameIntervals = StateSystemUtils.queryHistoryRange(ss, execNameNode, ss.getStartTime(), ss.getCurrentEndTime());
 
             ITmfStateValue execNameValue;
+            String execName = null;
             for (ITmfStateInterval interval : execNameIntervals) {
                 execNameValue = interval.getStateValue();
-                switch (execNameValue.getType()) {
-                case STRING:
+                if (execNameValue.getType().equals(Type.STRING)) {
                     execName = execNameValue.unboxStr();
-                    break;
-                case DOUBLE:
-                case LONG:
-                case NULL:
-                case INTEGER:
-                default:
-                    break;
                 }
             }
+            return execName;
         } catch (AttributeNotFoundException | StateSystemDisposedException | TimeRangeException e) {
         }
-        return execName;
+        return null;
     }
 
     /**
