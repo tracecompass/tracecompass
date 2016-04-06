@@ -34,7 +34,7 @@ public interface IKernelAnalysisEventLayout {
      * The standard layout, very useful for test vectors that are not kernel
      * based.
      */
-    IKernelAnalysisEventLayout DEFAULT_LAYOUT = DefaultEventLayout.INSTANCE;
+    IKernelAnalysisEventLayout DEFAULT_LAYOUT = DefaultEventLayout.getInstance();
 
     /**
      * Whenever a process appears for the first time in a trace, we assume it

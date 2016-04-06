@@ -10,7 +10,6 @@
 package org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.DefaultEventLayout;
-import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 
 /**
  * Class to extend to be able to set the event names for the os unit tests.
@@ -26,7 +25,7 @@ public class KernelEventLayoutStub extends DefaultEventLayout {
         super();
     }
 
-    private static final IKernelAnalysisEventLayout INSTANCE = new KernelEventLayoutStub();
+    private static final KernelEventLayoutStub INSTANCE = new KernelEventLayoutStub();
 
     /**
      * Get an instance of this event layout
@@ -36,7 +35,7 @@ public class KernelEventLayoutStub extends DefaultEventLayout {
      *
      * @return The instance
      */
-    public static IKernelAnalysisEventLayout getInstance() {
+    public static synchronized KernelEventLayoutStub getInstance() {
         return INSTANCE;
     }
 

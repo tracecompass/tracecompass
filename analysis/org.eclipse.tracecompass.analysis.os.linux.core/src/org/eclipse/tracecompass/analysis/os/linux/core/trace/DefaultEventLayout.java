@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.analysis.os.linux.core.trace;
 import java.util.Collection;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 
@@ -29,6 +30,26 @@ import com.google.common.collect.ImmutableList;
  * @since 1.0
  */
 public class DefaultEventLayout implements IKernelAnalysisEventLayout {
+
+    private static @Nullable DefaultEventLayout INSTANCE;
+
+    /**
+     * The instance of this event layout
+     *
+     * This object is completely immutable, so no need to create additional
+     * instances via the constructor.
+     *
+     * @return the instance
+     * @since 2.0
+     */
+    public static synchronized DefaultEventLayout getInstance() {
+        DefaultEventLayout inst = INSTANCE;
+        if (inst == null) {
+            inst = new DefaultEventLayout();
+            INSTANCE = inst;
+        }
+        return inst;
+    }
 
     /* Event names */
     private static final String IRQ_HANDLER_ENTRY = "irq_handler_entry"; //$NON-NLS-1$
@@ -47,8 +68,7 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout {
     private static final String SCHED_WAKING = "sched_waking"; //$NON-NLS-1$
     private static final String SCHED_WAKEUP = "sched_wakeup"; //$NON-NLS-1$
     private static final String SCHED_WAKEUP_NEW = "sched_wakeup_new"; //$NON-NLS-1$
-    private static final Collection<String> SCHED_WAKEUP_EVENTS =
-            ImmutableList.of(SCHED_WAKEUP, SCHED_WAKEUP_NEW);
+    private static final Collection<String> SCHED_WAKEUP_EVENTS = ImmutableList.of(SCHED_WAKEUP, SCHED_WAKEUP_NEW);
 
     private static final String SCHED_PROCESS_FORK = "sched_process_fork"; //$NON-NLS-1$
     private static final String SCHED_PROCESS_EXIT = "sched_process_exit"; //$NON-NLS-1$
@@ -95,14 +115,6 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout {
      */
     protected DefaultEventLayout() {
     }
-
-    /**
-     * The instance of this event layout
-     *
-     * This object is completely immutable, so no need to create additional
-     * instances via the constructor.
-     */
-    static final IKernelAnalysisEventLayout INSTANCE = new DefaultEventLayout();
 
     // ------------------------------------------------------------------------
     // Event names
@@ -191,6 +203,7 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout {
     public String eventCompatSyscallExitPrefix() {
         return SYSCALL_EXIT_PREFIX;
     }
+
     /**
      * @since 2.0
      */
