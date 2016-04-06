@@ -78,7 +78,10 @@ public class UstDebugInfoSourceAspect implements ITmfEventAspect<TmfCallsite> {
      *         and line number
      */
     public static @Nullable TmfCallsite getSourceCallsite(LttngUstTrace trace, BinaryCallsite bc) {
-        Iterable<TmfCallsite> callsites = FileOffsetMapper.getCallsiteFromOffset(new File(bc.getBinaryFilePath()), bc.getOffset());
+        Iterable<TmfCallsite> callsites = FileOffsetMapper.getCallsiteFromOffset(
+                new File(bc.getBinaryFilePath()),
+                bc.getBuildId(),
+                bc.getOffset());
 
         if (callsites == null || Iterables.isEmpty(callsites)) {
             return null;

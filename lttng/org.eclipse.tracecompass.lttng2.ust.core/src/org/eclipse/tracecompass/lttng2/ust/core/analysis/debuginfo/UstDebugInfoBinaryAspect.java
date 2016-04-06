@@ -122,7 +122,7 @@ public class UstDebugInfoBinaryAspect implements ITmfEventAspect<BinaryCallsite>
         // TODO If the binary is present on the current file system, we could
         // try to get the symbol name from it.
 
-        return new BinaryCallsite(fullPath, EMPTY_STRING, offset);
+        return new BinaryCallsite(fullPath, file.getBuildId(), EMPTY_STRING, offset);
     }
 
     /**

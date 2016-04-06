@@ -50,16 +50,18 @@ public final class FileOffsetMapper {
     private static class FileOffset {
 
         private final String fFilePath;
+        private final String fBuildId;
         private final long fOffset;
 
-        public FileOffset(String filePath, long offset) {
+        public FileOffset(String filePath, String buildId, long offset) {
             fFilePath = filePath;
+            fBuildId = buildId;
             fOffset = offset;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(fFilePath, fOffset);
+            return Objects.hashCode(fFilePath, fBuildId, fOffset);
         }
 
         @Override
@@ -74,13 +76,9 @@ public final class FileOffsetMapper {
                 return false;
             }
             FileOffset other = (FileOffset) obj;
-            if (!fFilePath.equals(other.fFilePath)) {
-                return false;
-            }
-            if (fOffset != other.fOffset) {
-                return false;
-            }
-            return true;
+            return Objects.equal(fFilePath, other.fFilePath) &&
+                    Objects.equal(fBuildId, other.fBuildId) &&
+                    Objects.equal(fOffset, other.fOffset);
         }
     }
 
@@ -112,16 +110,22 @@ public final class FileOffsetMapper {
      *
      * @param file
      *            The binary file to look at
+     * @param buildId
+     *            The expected buildId of the binary file (is not verified at
+     *            the moment)
      * @param offset
      *            The memory offset in the file
      * @return The list of callsites corresponding to the offset, reported from
      *         the "highest" inlining location, down to the initial definition.
      */
-    public static @Nullable Iterable<TmfCallsite> getCallsiteFromOffset(File file, long offset) {
+    public static @Nullable Iterable<TmfCallsite> getCallsiteFromOffset(File file, String buildId, long offset) {
         if (!Files.exists((file.toPath()))) {
             return null;
         }
-        FileOffset fo = new FileOffset(checkNotNull(file.toString()), offset);
+        // TODO We should also eventually verify that the passed buildId matches
+        // the file we are attempting to open.
+
+        FileOffset fo = new FileOffset(checkNotNull(file.toString()), buildId, offset);
         return CALLSITE_CACHE.getUnchecked(fo);
     }
 
