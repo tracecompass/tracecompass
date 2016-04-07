@@ -39,6 +39,7 @@ import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -320,6 +321,12 @@ public class TimeGraphControl extends TimeGraphBaseControl
             while (it.hasNext()) {
                 SelectionListener listener = it.next();
                 listener.widgetSelected(null);
+            }
+        }
+
+        if (null != fSelectionChangedListeners) {
+            for (ISelectionChangedListener listener : fSelectionChangedListeners) {
+                listener.selectionChanged(new SelectionChangedEvent(this, getSelection()));
             }
         }
     }
