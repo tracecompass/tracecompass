@@ -2624,6 +2624,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 redraw();
                 updateCursor(e.x, e.stateMask);
                 fTimeGraphScale.setDragRange(fDragX0, fDragX);
+            } else {
+              idx = getItemIndexAtY(e.y);
+              selectItem(idx, false);
+              fireSelectionChanged();
             }
         }
     }
