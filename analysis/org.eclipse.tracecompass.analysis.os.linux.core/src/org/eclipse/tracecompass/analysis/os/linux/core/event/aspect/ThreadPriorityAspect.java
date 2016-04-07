@@ -12,11 +12,13 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.core.event.aspect;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelTidAspect;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.KernelEventHandlerUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -25,6 +27,8 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 /**
@@ -54,7 +58,8 @@ public final class ThreadPriorityAspect implements ITmfEventAspect {
 
     @Override
     public @Nullable Integer resolve(ITmfEvent event) {
-        KernelAnalysisModule kernelAnalysis = TmfTraceUtils.getAnalysisModuleOfClass(event.getTrace(), KernelAnalysisModule.class, KernelAnalysisModule.ID);
+        final @NonNull ITmfTrace trace = event.getTrace();
+        KernelAnalysisModule kernelAnalysis = TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelAnalysisModule.class, KernelAnalysisModule.ID);
         if (kernelAnalysis == null) {
             return null;
         }
@@ -72,7 +77,12 @@ public final class ThreadPriorityAspect implements ITmfEventAspect {
         final long ts = event.getTimestamp().getValue();
         Integer execPrio = null;
         try {
-            int execPrioQuark = ss.getQuarkAbsolute(Attributes.THREADS, tid.toString(), Attributes.PRIO);
+            Integer cpu = 0;
+            if (tid == 0) {
+                /* Find the CPU this event is run on */
+                cpu = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(trace, TmfCpuAspect.class, event);
+            }
+            int execPrioQuark = ss.getQuarkAbsolute(Attributes.THREADS, KernelEventHandlerUtils.buildThreadAttributeName(tid, cpu), Attributes.PRIO);
             ITmfStateInterval interval = ss.querySingleState(ts, execPrioQuark);
             ITmfStateValue prioValue = interval.getStateValue();
             /* We know the prio must be an Integer */
