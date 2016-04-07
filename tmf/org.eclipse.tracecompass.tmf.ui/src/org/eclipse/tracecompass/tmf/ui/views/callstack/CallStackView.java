@@ -28,8 +28,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -40,15 +40,12 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
@@ -421,7 +418,6 @@ public class CallStackView extends AbstractTimeGraphView {
         });
 
         contributeToActionBars();
-        createContextMenu();
         loadSortOption();
 
         IEditorPart editor = getSite().getPage().getActiveEditor();
@@ -855,19 +851,15 @@ public class CallStackView extends AbstractTimeGraphView {
         manager.add(getTimeGraphViewer().getZoomOutAction());
     }
 
-    private void createContextMenu() {
-        final MenuManager contextMenu = new MenuManager();
+    /**
+     * @since 2.0
+     */
+    @Override
+    protected void fillTimeGraphEntryContextMenu(IMenuManager contextMenu) {
         contextMenu.add(new GroupMarker(IWorkbenchActionConstants.GROUP_REORGANIZE));
         contextMenu.add(getSortByNameAction());
         contextMenu.add(getSortByIdAction());
         contextMenu.add(getSortByTimeAction());
-        contextMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-
-        TreeViewer treeViewer = getTimeGraphCombo().getTreeViewer();
-        Tree tree = treeViewer.getTree();
-        Menu menu = contextMenu.createContextMenu(tree);
-        tree.setMenu(menu);
-        getSite().registerContextMenu(contextMenu, treeViewer);
     }
 
     /**

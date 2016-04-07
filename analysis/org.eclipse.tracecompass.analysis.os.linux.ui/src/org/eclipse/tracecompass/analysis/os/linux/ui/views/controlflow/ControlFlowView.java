@@ -24,17 +24,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.events.MenuDetectEvent;
-import org.eclipse.swt.events.MenuDetectListener;
-import org.eclipse.swt.graphics.Point;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.KernelEventHandlerUtils;
@@ -54,7 +49,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractStateSystemTimeGraphView;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphCombo;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
@@ -119,8 +113,6 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
         COLUMN_COMPARATORS = l.toArray(new Comparator[l.size()]);
     }
 
-    private MenuManager fMenuMgr;
-
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -146,32 +138,21 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
         // add "Uncheck inactive" Button to TimeGraphFilterDialog
         super.getTimeGraphCombo().addTimeGraphFilterUncheckInactiveButton(
                 new ControlFlowCheckActiveProvider(Messages.ControlFlowView_uncheckInactiveLabel, Messages.ControlFlowView_uncheckInactiveToolTip));
-        createContextMenu();
     }
 
-    private void createContextMenu() {
-        fMenuMgr = new MenuManager();
-        final TimeGraphCombo timeGraphCombo = getTimeGraphCombo();
-        TreeViewer treeViewer = timeGraphCombo.getTreeViewer();
-        Control control = treeViewer.getControl();
-        Menu menu = fMenuMgr.createContextMenu(control);
-        control.setMenu(menu);
-        control.addMenuDetectListener(new MenuDetectListener() {
-            @Override
-            public void menuDetected(MenuDetectEvent event) {
-                fMenuMgr.removeAll();
-                Point point = control.toControl(event.x, event.y);
-                // this is super important, it makes zoom still work. Do not try
-                // to extend to the time graph area.
-                TreeItem item = treeViewer.getTree().getItem(point);
-
-                if (item.getData() instanceof ControlFlowEntry) {
-                    ControlFlowEntry entry = (ControlFlowEntry) item.getData();
-                    fMenuMgr.add(new FollowThreadAction(ControlFlowView.this, entry.getName(), entry.getThreadId(), entry.getTrace()));
-                }
+    /**
+     * @since 2.0
+     */
+    @Override
+    protected void fillTimeGraphEntryContextMenu(@NonNull IMenuManager menuManager) {
+        ISelection selection = getSite().getSelectionProvider().getSelection();
+        if (selection instanceof StructuredSelection) {
+            StructuredSelection sSel = (StructuredSelection) selection;
+            if (sSel.getFirstElement() instanceof ControlFlowEntry) {
+                ControlFlowEntry entry = (ControlFlowEntry) sSel.getFirstElement();
+                menuManager.add(new FollowThreadAction(ControlFlowView.this, entry.getName(), entry.getThreadId(), entry.getTrace()));
             }
-        });
-
+        }
     }
 
     @Override

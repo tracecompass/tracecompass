@@ -45,10 +45,13 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -66,6 +69,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -109,6 +113,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.MarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IWorkbenchActionConstants;
 
 /**
  * An abstract view all time graph views can inherit
@@ -232,6 +237,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     /** Flag to indicate to reveal selection */
     private volatile boolean fIsRevealSelection = false;
+
+    /**
+     * Menu Manager for context-sensitive menu for time graph entries.
+     * This will be used on the tree viewer in case of the time graph combo.
+     */
+    private final @NonNull MenuManager fEntryMenuManager = new MenuManager();
 
     // ------------------------------------------------------------------------
     // Classes
@@ -1251,6 +1262,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         getSite().setSelectionProvider(fTimeGraphWrapper.getSelectionProvider());
 
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
+
+        createContextMenu();
     }
 
     @Override
@@ -2094,5 +2107,35 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         public ITimeGraphEntry getSelection() {
             return fSelection;
         }
+    }
+
+    private void createContextMenu() {
+        TimeGraphCombo combo = getTimeGraphCombo();
+        if (combo != null) {
+            fEntryMenuManager.setRemoveAllWhenShown(true);
+            TreeViewer treeViewer = combo.getTreeViewer();
+            Tree tree = treeViewer.getTree();
+            Menu menu = fEntryMenuManager.createContextMenu(tree);
+            tree.setMenu(menu);
+            fEntryMenuManager.addMenuListener(new IMenuListener() {
+                @Override
+                public void menuAboutToShow(IMenuManager manager) {
+                    fillTimeGraphEntryContextMenu(fEntryMenuManager);
+                    fEntryMenuManager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+                }
+            });
+            getSite().registerContextMenu(fEntryMenuManager, treeViewer);
+        }
+    }
+
+    /**
+     * Fill context menu
+     *
+     * @param menuManager
+     *          a menuManager to fill
+     * @since 2.0
+     */
+    protected void fillTimeGraphEntryContextMenu (@NonNull IMenuManager menuManager) {
+
     }
 }
