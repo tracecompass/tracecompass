@@ -29,7 +29,7 @@ import com.google.common.collect.Iterables;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-public class UstDebugInfoSourceAspect implements ITmfEventAspect<TmfCallsite> {
+public class UstDebugInfoSourceAspect implements ITmfEventAspect<SourceCallsite> {
 
     /** Singleton instance */
     public static final UstDebugInfoSourceAspect INSTANCE = new UstDebugInfoSourceAspect();
@@ -47,7 +47,7 @@ public class UstDebugInfoSourceAspect implements ITmfEventAspect<TmfCallsite> {
     }
 
     @Override
-    public @Nullable TmfCallsite resolve(ITmfEvent event) {
+    public @Nullable SourceCallsite resolve(ITmfEvent event) {
         /* This aspect only supports UST traces */
         if (!(event.getTrace() instanceof LttngUstTrace)) {
             return null;
@@ -77,8 +77,8 @@ public class UstDebugInfoSourceAspect implements ITmfEventAspect<TmfCallsite> {
      * @return The source callsite, which sould include file name, function name
      *         and line number
      */
-    public static @Nullable TmfCallsite getSourceCallsite(LttngUstTrace trace, BinaryCallsite bc) {
-        Iterable<TmfCallsite> callsites = FileOffsetMapper.getCallsiteFromOffset(
+    public static @Nullable SourceCallsite getSourceCallsite(LttngUstTrace trace, BinaryCallsite bc) {
+        Iterable<SourceCallsite> callsites = FileOffsetMapper.getCallsiteFromOffset(
                 new File(bc.getBinaryFilePath()),
                 bc.getBuildId(),
                 bc.getOffset());
@@ -91,7 +91,7 @@ public class UstDebugInfoSourceAspect implements ITmfEventAspect<TmfCallsite> {
          * We will take the "deepest" one in the stack, which should refer to
          * the initial, non-inlined location.
          */
-        TmfCallsite callsite = Iterables.getLast(callsites);
+        SourceCallsite callsite = Iterables.getLast(callsites);
 
         /*
          * Apply the path prefix again, this time on the path given from
@@ -103,6 +103,6 @@ public class UstDebugInfoSourceAspect implements ITmfEventAspect<TmfCallsite> {
         }
 
         String fullFileName = (pathPrefix + callsite.getFileName());
-        return new TmfCallsite(fullFileName, callsite.getFunctionName(), callsite.getLineNumber());
+        return new SourceCallsite(fullFileName, callsite.getFunctionName(), callsite.getLineNumber());
     }
 }

@@ -23,10 +23,12 @@ public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.messages"; //$NON-NLS-1$
 
-    public static @Nullable String UstDebugInfoAnalysis_SourceAspectName;
-    public static @Nullable String UstDebugInfoAnalysis_SourceAspectHelpText;
     public static @Nullable String UstDebugInfoAnalysis_BinaryAspectName;
     public static @Nullable String UstDebugInfoAnalysis_BinaryAspectHelpText;
+    public static @Nullable String UstDebugInfoAnalysis_FunctionAspectName;
+    public static @Nullable String UstDebugInfoAnalysis_FunctionAspectHelpText;
+    public static @Nullable String UstDebugInfoAnalysis_SourceAspectName;
+    public static @Nullable String UstDebugInfoAnalysis_SourceAspectHelpText;
 
     static {
         // initialize resource bundle

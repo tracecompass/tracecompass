@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.tmf.core.event.lookup;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * The generic call site structure in TMF. A call site has:
@@ -40,7 +41,7 @@ public interface ITmfCallsite {
      *
      * @return the function name or null
      */
-    String getFunctionName();
+    @Nullable String getFunctionName();
 
     /**
      * Returns the line number of the call site.

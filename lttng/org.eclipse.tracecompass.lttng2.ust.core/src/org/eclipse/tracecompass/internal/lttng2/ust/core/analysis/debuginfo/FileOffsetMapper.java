@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.SourceCallsite;
 import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 
 import com.google.common.base.Objects;
@@ -89,13 +90,13 @@ public final class FileOffsetMapper {
      * It is static, meaning one cache for the whole application, since the
      * symbols in a file on disk are independent from the trace referring to it.
      */
-    private static final LoadingCache<FileOffset, @Nullable Iterable<TmfCallsite>> CALLSITE_CACHE;
+    private static final LoadingCache<FileOffset, @Nullable Iterable<SourceCallsite>> CALLSITE_CACHE;
     static {
         CALLSITE_CACHE = checkNotNull(CacheBuilder.newBuilder()
             .maximumSize(CACHE_SIZE)
-            .build(new CacheLoader<FileOffset, @Nullable Iterable<TmfCallsite>>() {
+            .build(new CacheLoader<FileOffset, @Nullable Iterable<SourceCallsite>>() {
                 @Override
-                public @Nullable Iterable<TmfCallsite> load(FileOffset fo) {
+                public @Nullable Iterable<SourceCallsite> load(FileOffset fo) {
                     return getCallsiteFromOffsetWithAddr2line(fo);
                 }
             }));
@@ -118,7 +119,7 @@ public final class FileOffsetMapper {
      * @return The list of callsites corresponding to the offset, reported from
      *         the "highest" inlining location, down to the initial definition.
      */
-    public static @Nullable Iterable<TmfCallsite> getCallsiteFromOffset(File file, String buildId, long offset) {
+    public static @Nullable Iterable<SourceCallsite> getCallsiteFromOffset(File file, String buildId, long offset) {
         if (!Files.exists((file.toPath()))) {
             return null;
         }
@@ -129,11 +130,11 @@ public final class FileOffsetMapper {
         return CALLSITE_CACHE.getUnchecked(fo);
     }
 
-    private static @Nullable Iterable<TmfCallsite> getCallsiteFromOffsetWithAddr2line(FileOffset fo) {
+    private static @Nullable Iterable<SourceCallsite> getCallsiteFromOffsetWithAddr2line(FileOffset fo) {
         String filePath = fo.fFilePath;
         long offset = fo.fOffset;
 
-        List<TmfCallsite> callsites = new LinkedList<>();
+        List<SourceCallsite> callsites = new LinkedList<>();
 
         // FIXME Could eventually use CDT's Addr2line class once it implements --inlines
         List<String> output = getOutputFromCommand(Arrays.asList(
@@ -166,7 +167,7 @@ public final class FileOffsetMapper {
                 }
                 long lineNumber = Long.parseLong(elems[1]);
 
-                callsites.add(new TmfCallsite(fileName, currentFunctionName, lineNumber));
+                callsites.add(new SourceCallsite(fileName, currentFunctionName, lineNumber));
             }
 
             /* Flip the boolean for the following line */
