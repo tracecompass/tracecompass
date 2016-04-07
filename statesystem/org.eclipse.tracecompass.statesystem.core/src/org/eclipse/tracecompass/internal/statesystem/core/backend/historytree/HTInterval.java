@@ -19,6 +19,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue.CustomStateValue;
+import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue.ISafeByteBufferReader;
+import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue.ISafeByteBufferWriter;
+import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue.SafeByteBufferFactory;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -104,6 +108,8 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
              */
             return (minSize + sv.unboxStr().getBytes().length + 2);
         case CUSTOM:
+            /* Length of serialized value (short) + state value */
+            return (minSize + Short.BYTES + ((CustomStateValue) sv).getSerializedSize());
         default:
             /*
              * It's very important that we know how to write the state value in
@@ -154,21 +160,16 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
      *             If there was an error reading from the buffer
      */
     public static final HTInterval readFrom(ByteBuffer buffer) throws IOException {
-        HTInterval interval;
-        long intervalStart, intervalEnd;
-        int attribute;
         TmfStateValue value;
-        byte valueType;
-        byte array[];
 
         int posStart = buffer.position();
         /* Read the Data Section entry */
-        intervalStart = buffer.getLong();
-        intervalEnd = buffer.getLong();
-        attribute = buffer.getInt();
+        long intervalStart = buffer.getLong();
+        long intervalEnd = buffer.getLong();
+        int attribute = buffer.getInt();
 
         /* Read the 'type' of the value, then react accordingly */
-        valueType = buffer.get();
+        byte valueType = buffer.get();
         switch (valueType) {
 
         case TYPE_NULL:
@@ -179,11 +180,11 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
             value = TmfStateValue.newValueInt(buffer.getInt());
             break;
 
-        case TYPE_STRING:
+        case TYPE_STRING: {
             /* the first byte = the size to read */
             int valueSize = buffer.get();
 
-            array = new byte[valueSize];
+            byte[] array = new byte[valueSize];
             buffer.get(array);
             value = TmfStateValue.newValueString(new String(array));
 
@@ -193,6 +194,7 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
                 throw new IOException(errMsg);
             }
             break;
+        }
 
         case TYPE_LONG:
             /* Go read the matching entry in the Strings section of the block */
@@ -204,18 +206,22 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
             value = TmfStateValue.newValueDouble(buffer.getDouble());
             break;
 
-        case TYPE_CUSTOM:
+        case TYPE_CUSTOM: {
+            short valueSize = buffer.getShort();
+            ISafeByteBufferReader safeBuffer = SafeByteBufferFactory.wrapReader(buffer, valueSize);
+            value = CustomStateValue.readSerializedValue(safeBuffer);
+            break;
+        }
         default:
             /* Unknown data, better to not make anything up... */
             throw new IOException(errMsg);
         }
 
         try {
-            interval = new HTInterval(intervalStart, intervalEnd, attribute, value, buffer.position() - posStart);
+            return new HTInterval(intervalStart, intervalEnd, attribute, value, buffer.position() - posStart);
         } catch (TimeRangeException e) {
             throw new IOException(errMsg);
         }
-        return interval;
     }
 
     /**
@@ -252,7 +258,7 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
             buffer.putInt(sv.unboxInt());
             break;
 
-        case TYPE_STRING:
+        case TYPE_STRING: {
             String string = sv.unboxStr();
             byte[] strArray = string.getBytes();
 
@@ -264,6 +270,7 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
             buffer.put(strArray);
             buffer.put((byte) 0);
             break;
+        }
 
         case TYPE_LONG:
             buffer.putLong(sv.unboxLong());
@@ -272,6 +279,14 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
         case TYPE_DOUBLE:
             buffer.putDouble(sv.unboxDouble());
             break;
+
+        case TYPE_CUSTOM: {
+            int size = ((CustomStateValue) sv).getSerializedSize();
+            buffer.putShort((short) size);
+            ISafeByteBufferWriter safeBuffer = SafeByteBufferFactory.wrapWriter(buffer, size);
+            ((CustomStateValue) sv).serialize(safeBuffer);
+            break;
+        }
 
         default:
             break;

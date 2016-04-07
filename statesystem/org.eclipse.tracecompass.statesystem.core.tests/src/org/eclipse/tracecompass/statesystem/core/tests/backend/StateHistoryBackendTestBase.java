@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.tests.stubs.statevalues.CustomStateValueStub;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
@@ -269,6 +270,10 @@ public abstract class StateHistoryBackendTestBase {
         int longQuark = 1;
         int doubleQuark = 2;
         int strQuark = 3;
+        int customQuark = 4;
+        /* Register custom factory and create a custom state value */
+        CustomStateValueStub.registerFactory();
+        ITmfStateValue customVal = new CustomStateValueStub(10, "a string");
 
         try {
             IStateHistoryBackend backend = getBackendForBuilding(startTime);
@@ -305,6 +310,14 @@ public abstract class StateHistoryBackendTestBase {
             assertEquals("String interval start time", startTime, interval.getStartTime());
             assertEquals("String interval end time", startTime + timeStep, interval.getEndTime());
             assertEquals("String interval value", STR_VAL1, interval.getStateValue());
+
+            /* Custom state values */
+            backend.insertPastState(startTime, startTime + timeStep, customQuark, customVal);
+            interval = backend.doSingularQuery(startTime, customQuark);
+
+            assertEquals("Custom interval start time", startTime, interval.getStartTime());
+            assertEquals("Custom interval end time", startTime + timeStep, interval.getEndTime());
+            assertEquals("Custom interval value", customVal, interval.getStateValue());
 
             /*
              * Add other intervals for the int quark and query at different
@@ -343,7 +356,12 @@ public abstract class StateHistoryBackendTestBase {
         int longQuark = 1;
         int doubleQuark = 2;
         int strQuark = 3;
-        int nbAttribs = 4;
+        int customQuark = 4;
+        int nbAttribs = 5;
+        /* Register custom factory and create custom state values */
+        CustomStateValueStub.registerFactory();
+        ITmfStateValue customVal = new CustomStateValueStub(10, "a string");
+        ITmfStateValue customVal2 = new CustomStateValueStub(Short.MAX_VALUE, "another string");
 
         try {
             IStateHistoryBackend backend = getBackendForBuilding(startTime);
@@ -357,10 +375,12 @@ public abstract class StateHistoryBackendTestBase {
                     new TmfStateInterval(startTime, startTime + timeStep, longQuark, LONG_VAL1),
                     new TmfStateInterval(startTime, startTime + timeStep, doubleQuark, DOUBLE_VAL1),
                     new TmfStateInterval(startTime, startTime + timeStep, strQuark, STR_VAL1),
+                    new TmfStateInterval(startTime, startTime + timeStep, customQuark, customVal),
                     new TmfStateInterval(nextStart, endTime, intQuark, INT_VAL2),
                     new TmfStateInterval(nextStart, endTime, longQuark, LONG_VAL2),
                     new TmfStateInterval(nextStart, endTime, doubleQuark, DOUBLE_VAL2),
-                    new TmfStateInterval(nextStart, endTime, strQuark, STR_VAL2)));
+                    new TmfStateInterval(nextStart, endTime, strQuark, STR_VAL2),
+                    new TmfStateInterval(nextStart, endTime, customQuark, customVal2)));
 
             backend.finishedBuilding(endTime);
 
@@ -390,6 +410,10 @@ public abstract class StateHistoryBackendTestBase {
             interval = intervals.get(strQuark);
             assertNotNull(interval);
             assertEquals("String value after read", STR_VAL1, interval.getStateValue());
+            /* Custom */
+            interval = intervals.get(customQuark);
+            assertNotNull(interval);
+            assertEquals("String value after read", customVal, interval.getStateValue());
 
             /* Do a full query at the end and verify the values */
             backendQuery.doQuery(intervals, endTime);
@@ -406,6 +430,10 @@ public abstract class StateHistoryBackendTestBase {
             interval = intervals.get(strQuark);
             assertNotNull(interval);
             assertEquals("String value after read", STR_VAL2, interval.getStateValue());
+            /* Custom */
+            interval = intervals.get(customQuark);
+            assertNotNull(interval);
+            assertEquals("String value after read", customVal2, interval.getStateValue());
 
         } catch (TimeRangeException | IOException | StateSystemDisposedException e) {
             fail(e.getMessage());
