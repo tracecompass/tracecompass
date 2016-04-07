@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -33,7 +33,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationPr
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
 import com.google.common.collect.HashMultimap;
@@ -171,13 +170,11 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                     }
                 });
             }
-            for (ITimeGraphEntry child : entry.getChildren()) {
+            for (TimeGraphEntry child : entry.getChildren()) {
                 if (monitor.isCanceled()) {
                     return;
                 }
-                if (child instanceof TimeGraphEntry) {
-                    zoom((TimeGraphEntry) child, ss, fullStates, prevFullState, monitor);
-                }
+                zoom(child, ss, fullStates, prevFullState, monitor);
             }
         }
 
@@ -198,10 +195,8 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
 
         private void clearZoomedList(TimeGraphEntry entry) {
             entry.setZoomedEventList(null);
-            for (ITimeGraphEntry child : entry.getChildren()) {
-                if (child instanceof TimeGraphEntry) {
-                    clearZoomedList((TimeGraphEntry) child);
-                }
+            for (TimeGraphEntry child : entry.getChildren()) {
+                clearZoomedList(child);
             }
         }
     }
@@ -369,6 +364,10 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
 
     /**
      * Gets the list of events for an entry for a given list of full states.
+     * <p>
+     * Called from the ZoomThread for every entry to update the zoomed event
+     * list. Can be an empty implementation if the view does not support zoomed
+     * event lists. Can also be used to compute the full event list.
      *
      * @param tgentry
      *            The time graph entry

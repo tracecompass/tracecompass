@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2016 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -221,7 +221,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
     // ------------------------------------------------------------------------
 
     @Override
-    protected void buildEventList(ITmfTrace trace, ITmfTrace parentTrace, IProgressMonitor monitor) {
+    protected void buildEntryList(ITmfTrace trace, ITmfTrace parentTrace, IProgressMonitor monitor) {
 
         /*
          * Get the view element from the XML file. If the element can't be

@@ -534,7 +534,7 @@ public class CallStackView extends AbstractTimeGraphView {
     }
 
     @Override
-    protected void buildEventList(final ITmfTrace trace, final ITmfTrace parentTrace, final IProgressMonitor monitor) {
+    protected void buildEntryList(final ITmfTrace trace, final ITmfTrace parentTrace, final IProgressMonitor monitor) {
         if (monitor.isCanceled()) {
             return;
         }

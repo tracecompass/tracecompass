@@ -696,7 +696,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         @Override
         public void run() {
-            buildEventList(fBuildTrace, fParentTrace, fMonitor);
+            buildEntryList(fBuildTrace, fParentTrace, fMonitor);
             synchronized (fBuildThreadMap) {
                 fBuildThreadMap.remove(fBuildTrace);
             }
@@ -849,13 +849,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 }
             }
             redraw();
-            for (ITimeGraphEntry child : entry.getChildren()) {
+            for (TimeGraphEntry child : entry.getChildren()) {
                 if (monitor.isCanceled()) {
                     return;
                 }
-                if (child instanceof TimeGraphEntry) {
-                    zoom((TimeGraphEntry) child, monitor);
-                }
+                zoom(child, monitor);
             }
         }
 
@@ -1644,9 +1642,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     /**
-     * Build the entries list to show in this time graph
-     *
-     * Called from the BuildThread
+     * Build the entry list to show in this time graph view.
+     * <p>
+     * Called from the BuildThread for each trace returned by
+     * {@link #getTracesToBuild(ITmfTrace)}. The full event list is also
+     * normally computed for every entry that is created.
      *
      * @param trace
      *            The trace being built
@@ -1654,11 +1654,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *            The parent of the trace set, or the trace itself
      * @param monitor
      *            The progress monitor object
+     * @since 2.0
      */
-    protected abstract void buildEventList(@NonNull ITmfTrace trace, @NonNull ITmfTrace parentTrace, @NonNull IProgressMonitor monitor);
+    protected abstract void buildEntryList(@NonNull ITmfTrace trace, @NonNull ITmfTrace parentTrace, @NonNull IProgressMonitor monitor);
 
     /**
-     * Gets the list of event for an entry in a given timerange
+     * Gets the list of event for an entry in a given time range.
+     * <p>
+     * Called from the ZoomThread for every entry to update the zoomed event
+     * list. Can be an empty implementation if the view does not support zoomed
+     * event lists. Can also be used to compute the full event list.
      *
      * @param entry
      *            The entry to get events for
@@ -2264,7 +2269,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         fEntryMenuManager.addMenuListener(new IMenuListener() {
             @Override
             public void menuAboutToShow(IMenuManager manager) {
-            	fillTimeGraphEntryContextMenu(fEntryMenuManager);
+                fillTimeGraphEntryContextMenu(fEntryMenuManager);
                 fEntryMenuManager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
             }
         });

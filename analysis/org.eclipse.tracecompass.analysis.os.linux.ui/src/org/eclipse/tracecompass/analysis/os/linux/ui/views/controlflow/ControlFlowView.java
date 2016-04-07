@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson, École Polytechnique de Montréal and others.
+ * Copyright (c) 2012, 2016 Ericsson, École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -246,7 +246,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
     // ------------------------------------------------------------------------
 
     @Override
-    protected void buildEventList(final ITmfTrace trace, final ITmfTrace parentTrace, final IProgressMonitor monitor) {
+    protected void buildEntryList(final ITmfTrace trace, final ITmfTrace parentTrace, final IProgressMonitor monitor) {
         final ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
         if (ssq == null) {
             return;

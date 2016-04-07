@@ -155,7 +155,7 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
     }
 
     @Override
-    protected void buildEventList(ITmfTrace trace, ITmfTrace parentTrace, final IProgressMonitor monitor) {
+    protected void buildEntryList(ITmfTrace trace, ITmfTrace parentTrace, final IProgressMonitor monitor) {
         final ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
         if (ssq == null) {
             return;
@@ -196,34 +196,31 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
             if (parentTrace.equals(getTrace())) {
                 refresh();
             }
-            final List<? extends ITimeGraphEntry> traceEntryChildren = traceEntry.getChildren();
+            final List<@NonNull TimeGraphEntry> traceEntryChildren = traceEntry.getChildren();
             final long resolution = Math.max(1, (endTime - ssq.getStartTime()) / getDisplayWidth());
             final long qStart = start;
             final long qEnd = end;
             queryFullStates(ssq, qStart, qEnd, resolution, monitor, new IQueryHandler() {
                 @Override
                 public void handle(List<List<ITmfStateInterval>> fullStates, List<ITmfStateInterval> prevFullState) {
-                    for (ITimeGraphEntry child : traceEntryChildren) {
+                    for (TimeGraphEntry child : traceEntryChildren) {
                         if (!populateEventsRecursively(fullStates, prevFullState, child).isOK()) {
                             return;
                         }
                     }
                 }
 
-                private IStatus populateEventsRecursively(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState, ITimeGraphEntry entry) {
+                private IStatus populateEventsRecursively(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState, @NonNull TimeGraphEntry entry) {
                     if (monitor.isCanceled()) {
                         return Status.CANCEL_STATUS;
                     }
-                    if (entry instanceof TimeGraphEntry) {
-                        TimeGraphEntry timeGraphEntry = (TimeGraphEntry) entry;
-                        List<ITimeEvent> eventList = getEventList(timeGraphEntry, ssq, fullStates, prevFullState, monitor);
-                        if (eventList != null) {
-                            for (ITimeEvent event : eventList) {
-                                timeGraphEntry.addEvent(event);
-                            }
+                    List<ITimeEvent> eventList = getEventList(entry, ssq, fullStates, prevFullState, monitor);
+                    if (eventList != null) {
+                        for (ITimeEvent event : eventList) {
+                            entry.addEvent(event);
                         }
                     }
-                    for (ITimeGraphEntry child : entry.getChildren()) {
+                    for (TimeGraphEntry child : entry.getChildren()) {
                         IStatus status = populateEventsRecursively(fullStates, prevFullState, child);
                         if (!status.isOK()) {
                             return status;
@@ -339,7 +336,7 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
         return null;
     }
 
-    private static List<ITimeEvent> createCpuEventsList(TimeGraphEntry entry, ITmfStateSystem ssq, List<List<ITmfStateInterval>> fullStates, List<ITmfStateInterval> prevFullState, IProgressMonitor monitor, int quark) {
+    private static List<ITimeEvent> createCpuEventsList(ITimeGraphEntry entry, ITmfStateSystem ssq, List<List<ITmfStateInterval>> fullStates, List<ITmfStateInterval> prevFullState, IProgressMonitor monitor, int quark) {
         List<ITimeEvent> eventList;
         int statusQuark;
         try {
@@ -384,7 +381,7 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
         return eventList;
     }
 
-    private static List<ITimeEvent> createIrqEventsList(TimeGraphEntry entry, List<List<ITmfStateInterval>> fullStates, List<ITmfStateInterval> prevFullState, IProgressMonitor monitor, int quark) {
+    private static List<ITimeEvent> createIrqEventsList(ITimeGraphEntry entry, List<List<ITmfStateInterval>> fullStates, List<ITmfStateInterval> prevFullState, IProgressMonitor monitor, int quark) {
         List<ITimeEvent> eventList;
         eventList = new ArrayList<>(fullStates.size());
         ITmfStateInterval lastInterval = prevFullState == null || quark >= prevFullState.size() ? null : prevFullState.get(quark);

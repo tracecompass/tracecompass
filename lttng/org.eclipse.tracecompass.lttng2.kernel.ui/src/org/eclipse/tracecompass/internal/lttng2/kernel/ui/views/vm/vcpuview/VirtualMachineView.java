@@ -131,7 +131,7 @@ public class VirtualMachineView extends AbstractTimeGraphView {
     // ------------------------------------------------------------------------
 
     @Override
-    protected void buildEventList(ITmfTrace trace, ITmfTrace parentTrace, IProgressMonitor monitor) {
+    protected void buildEntryList(ITmfTrace trace, ITmfTrace parentTrace, IProgressMonitor monitor) {
         setStartTime(Long.MAX_VALUE);
         setEndTime(Long.MIN_VALUE);
 
@@ -311,14 +311,11 @@ public class VirtualMachineView extends AbstractTimeGraphView {
             List<ITimeEvent> eventList = getEventList(entry, startTime, endTime, resolution, monitor);
             entry.setEventList(eventList);
             redraw();
-            for (ITimeGraphEntry child : entry.getChildren()) {
-                if (!(child instanceof TimeGraphEntry)) {
-                    continue;
-                }
+            for (TimeGraphEntry child : entry.getChildren()) {
                 if (monitor.isCanceled()) {
                     return;
                 }
-                buildEntryEventList((TimeGraphEntry) child, ssq, start, end, monitor);
+                buildEntryEventList(child, ssq, start, end, monitor);
             }
         }
     }
@@ -465,14 +462,12 @@ public class VirtualMachineView extends AbstractTimeGraphView {
          * The parent VM entry will contain the thread intervals for all
          * threads. Just take the list from there
          */
-        ITimeGraphEntry parent = vmEntry.getParent();
+        TimeGraphEntry parent = vmEntry.getParent();
         while (threadIntervals == null && parent != null) {
             if (parent instanceof VirtualMachineViewEntry) {
                 threadIntervals = ((VirtualMachineViewEntry) parent).getThreadIntervals(vmEntry.getNumericId());
             }
-            if (parent instanceof TimeGraphEntry) {
-                parent = ((TimeGraphEntry) parent).getParent();
-            }
+            parent = parent.getParent();
         }
         return threadIntervals;
     }

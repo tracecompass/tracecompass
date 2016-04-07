@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2016 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -30,10 +30,10 @@ import org.eclipse.swt.SWT;
 public class TimeGraphEntry implements ITimeGraphEntry {
 
     /** Entry's parent */
-    private ITimeGraphEntry fParent = null;
+    private TimeGraphEntry fParent = null;
 
     /** List of child entries */
-    private final List<@NonNull ITimeGraphEntry> fChildren = new CopyOnWriteArrayList<>();
+    private final List<@NonNull TimeGraphEntry> fChildren = new CopyOnWriteArrayList<>();
 
     /** Name of this entry (text to show) */
     private String fName;
@@ -63,8 +63,11 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     // Getters and setters
     // ---------------------------------------------
 
+    /**
+     * @since 2.0
+     */
     @Override
-    public ITimeGraphEntry getParent() {
+    public TimeGraphEntry getParent() {
         return fParent;
     }
 
@@ -72,23 +75,9 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      * Sets the entry's parent
      *
      * @param entry The new parent entry
+     * @since 2.0
      */
-    /*
-     * TODO: This method can be removed in the next major API version.
-     */
-    protected void setParent(TimeGraphEntry entry) {
-        fParent = entry;
-    }
-
-    /**
-     * Sets the entry's parent
-     *
-     * @param entry The new parent entry
-     */
-    /*
-     * TODO: This method should be added to the interface in the next major API version.
-     */
-    protected void setParent(ITimeGraphEntry entry) {
+    public void setParent(TimeGraphEntry entry) {
         fParent = entry;
     }
 
@@ -98,7 +87,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     }
 
     @Override
-    public synchronized List<@NonNull ? extends ITimeGraphEntry> getChildren() {
+    public synchronized List<@NonNull TimeGraphEntry> getChildren() {
         return fChildren;
     }
 
@@ -251,19 +240,6 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     }
 
     /**
-     * Add a child entry to this one
-     *
-     * @param child
-     *            The child entry
-     */
-    /*
-     * TODO: This method can be removed in the next major API version.
-     */
-    public synchronized void addChild(@NonNull TimeGraphEntry child) {
-        addChild((ITimeGraphEntry) child);
-    }
-
-    /**
      * Add a child entry to this one. If a comparator was previously set with
      * {@link #sortChildren(Comparator)}, the entry will be inserted in its
      * sort-order position. Otherwise it will be added to the end of the list.
@@ -271,13 +247,8 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      * @param child
      *            The child entry
      */
-    public synchronized void addChild(@NonNull ITimeGraphEntry child) {
-        /*
-         * TODO: Use setParent() once it is added to the interface.
-         */
-        if (child instanceof TimeGraphEntry) {
-            ((TimeGraphEntry) child).fParent = this;
-        }
+    public synchronized void addChild(@NonNull TimeGraphEntry child) {
+        child.setParent(this);
         if (fComparator == null) {
             fChildren.add(child);
         } else {
@@ -299,20 +270,16 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      *            Index at which the specified entry is to be inserted
      * @param child
      *            The child entry
+     * @since 2.0
      */
-    public synchronized void addChild(int index, @NonNull ITimeGraphEntry child) {
-        /*
-         * TODO: Use setParent() once it is added to the interface.
-         */
-        if (child instanceof TimeGraphEntry) {
-            ((TimeGraphEntry) child).fParent = this;
-        }
+    public synchronized void addChild(int index, @NonNull TimeGraphEntry child) {
+        child.setParent(this);
         fChildren.add(index, child);
     }
 
     /**
      * Sort the children of this entry using the provided comparator. Subsequent
-     * calls to {@link #addChild(ITimeGraphEntry)} will use this comparator to
+     * calls to {@link #addChild(TimeGraphEntry)} will use this comparator to
      * maintain the sort order.
      *
      * @param comparator
@@ -323,7 +290,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
         if (comparator == null) {
             return;
         }
-        @NonNull ITimeGraphEntry[] array = fChildren.toArray(new @NonNull ITimeGraphEntry[0]);
+        @NonNull TimeGraphEntry[] array = fChildren.toArray(new @NonNull TimeGraphEntry[0]);
         Arrays.sort(array, comparator);
         fChildren.clear();
         fChildren.addAll(Arrays.asList(array));
