@@ -15,12 +15,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.Viewer;
@@ -269,9 +267,6 @@ public class CriticalPathView extends AbstractTimeGraphView {
                 list.add(defaultParent);
             }
 
-            for (TimeGraphEntry entry : list) {
-                buildStatusEvents(trace, (CriticalPathEntry) entry);
-            }
             workerEntries.put(worker, list);
         }
 
@@ -472,22 +467,6 @@ public class CriticalPathView extends AbstractTimeGraphView {
         return state;
     }
 
-    private void buildStatusEvents(ITmfTrace trace, CriticalPathEntry entry) {
-
-        long start = trace.getStartTime().getValue();
-        long end = trace.getEndTime().getValue() + 1;
-        long resolution = Math.max(1, (end - start) / getDisplayWidth());
-        List<ITimeEvent> eventList = getEventList(entry, entry.getStartTime(), entry.getEndTime(), resolution, new NullProgressMonitor());
-
-        entry.setZoomedEventList(eventList);
-
-        redraw();
-
-        for (ITimeGraphEntry child : entry.getChildren()) {
-            buildStatusEvents(trace, (CriticalPathEntry) child);
-        }
-    }
-
     @Override
     protected void buildEventList(@NonNull ITmfTrace trace, @NonNull ITmfTrace parentTrace, @NonNull IProgressMonitor monitor) {
         /* This class uses a content provider instead */
@@ -497,31 +476,11 @@ public class CriticalPathView extends AbstractTimeGraphView {
     protected @Nullable List<ITimeEvent> getEventList(TimeGraphEntry entry,
             long startTime, long endTime, long resolution,
             IProgressMonitor monitor) {
-
-        final long realStart = Math.max(startTime, entry.getStartTime());
-        final long realEnd = Math.min(endTime, entry.getEndTime());
-        if (realEnd <= realStart) {
-            return null;
-        }
-        List<ITimeEvent> eventList = null;
-        entry.setZoomedEventList(null);
-        Iterator<ITimeEvent> iterator = entry.getTimeEventsIterator();
-        eventList = new ArrayList<>();
-
-        while (iterator.hasNext()) {
-            ITimeEvent event = iterator.next();
-            /* is event visible */
-            if (intersects(realStart, realEnd, event)) {
-                eventList.add(event);
-            }
-        }
-        return eventList;
-    }
-
-    private static boolean intersects(final long realStart, final long realEnd, ITimeEvent event) {
-        return ((event.getTime() >= realStart) && (event.getTime() <= realEnd)) ||
-                ((event.getTime() + event.getDuration() > realStart) &&
-                        (event.getTime() + event.getDuration() < realEnd));
+        /*
+         * The event list is built in the HorizontalLinksVisitor. This is called
+         * only from the zoom thread and only for the CriticalPathBaseEntry.
+         */
+        return null;
     }
 
     @Override
