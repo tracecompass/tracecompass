@@ -70,6 +70,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
@@ -3176,6 +3177,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         if (null == fTimeProvider) {
             return;
         }
+        Point p = toControl(e.x, e.y);
         if (e.detail == SWT.MENU_MOUSE) {
             if (fPendingMenuDetectEvent == null) {
                 /* Feature in Linux. The MenuDetectEvent is received before mouseDown.
@@ -3183,10 +3185,16 @@ public class TimeGraphControl extends TimeGraphBaseControl
                  * This allows for the method to detect if mouse is used to drag zoom.
                  */
                 fPendingMenuDetectEvent = e;
+                /*
+                 *  Prevent the platform to show the menu when returning. The
+                 *  menu will be shown (see below) when this method is called
+                 *  again during mouseup().
+                 */
+                e.doit = false;
                 return;
             }
             fPendingMenuDetectEvent = null;
-            if (fDragState != DRAG_ZOOM || fDragX != fDragX0) {
+            if ((p.x >= fTimeProvider.getNameSpace()) && (fDragState != DRAG_ZOOM || fDragX != fDragX0)) {
                 return;
             }
         } else {
@@ -3194,9 +3202,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 return;
             }
         }
-        Point p = toControl(e.x, e.y);
         int idx = getItemIndexAtY(p.y);
         if (idx >= 0 && idx < fItemData.fExpandedItems.length) {
+            e.doit = true;
             Item item = fItemData.fExpandedItems[idx];
             ITimeGraphEntry entry = item.fEntry;
             if (entry.hasTimeEvents()) {
@@ -3204,11 +3212,19 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 if (event != null) {
                     e.data = event;
                     fireMenuEventOnTimeEvent(e);
+                    Menu menu = getMenu();
+                    if (e.doit && (menu != null)) {
+                        menu.setVisible(true);
+                    }
                     return;
                 }
             }
             e.data = entry;
             fireMenuEventOnTimeGraphEntry(e);
+            Menu menu = getMenu();
+            if (e.doit && (menu != null)) {
+                menu.setVisible(true);
+            }
         }
     }
 

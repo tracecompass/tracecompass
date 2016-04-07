@@ -25,14 +25,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.Attributes;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernel.Attributes;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.signals.TmfCpuSelectedSignal;
 import org.eclipse.tracecompass.analysis.os.linux.ui.views.resources.ResourcesEntry.Type;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
@@ -114,7 +114,7 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
         final TimeGraphViewer timeGraphViewer = getTimeGraphViewer();
         Menu menu = fMenuMgr.createContextMenu(timeGraphViewer.getTimeGraphControl());
         timeGraphViewer.getTimeGraphControl().setMenu(menu);
-        getTimeGraphViewer().getTimeGraphControl().addMenuDetectListener(new MenuDetectListener() {
+        getTimeGraphViewer().getTimeGraphControl().addTimeGraphEntryMenuListener(new MenuDetectListener() {
             @Override
             public void menuDetected(MenuDetectEvent event) {
                 fMenuMgr.removeAll();
