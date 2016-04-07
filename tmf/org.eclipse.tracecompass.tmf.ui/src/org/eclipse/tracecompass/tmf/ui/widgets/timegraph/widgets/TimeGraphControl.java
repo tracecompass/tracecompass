@@ -727,10 +727,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
         if (null != trace && null != fTimeProvider) {
             long selectedTime = fTimeProvider.getSelectionBegin();
             ITimeEvent event = Utils.findEvent(trace, selectedTime, 0);
+            sel.add(trace);
             if (event != null) {
                 sel.add(event);
-            } else {
-                sel.add(trace);
             }
         }
         return sel;
@@ -3214,23 +3213,28 @@ public class TimeGraphControl extends TimeGraphBaseControl
             e.doit = true;
             Item item = fItemData.fExpandedItems[idx];
             ITimeGraphEntry entry = item.fEntry;
-            if (entry.hasTimeEvents()) {
-                ITimeEvent event = Utils.findEvent(entry, getTimeAtX(p.x), 2);
-                if (event != null) {
-                    e.data = event;
-                    fireMenuEventOnTimeEvent(e);
-                    Menu menu = getMenu();
-                    if (e.doit && (menu != null)) {
-                        menu.setVisible(true);
-                    }
-                    return;
-                }
-            }
+
+            /* Send menu event for the time graph entry */
+            e.doit = true;
             e.data = entry;
             fireMenuEventOnTimeGraphEntry(e);
             Menu menu = getMenu();
             if (e.doit && (menu != null)) {
                 menu.setVisible(true);
+            }
+
+            /* Send menu event for time event */
+            if (entry.hasTimeEvents()) {
+                ITimeEvent event = Utils.findEvent(entry, getTimeAtX(p.x), 2);
+                if (event != null) {
+                    e.doit = true;
+                    e.data = event;
+                    fireMenuEventOnTimeEvent(e);
+                    menu = getMenu();
+                    if (e.doit && (menu != null)) {
+                        menu.setVisible(true);
+                    }
+                }
             }
         }
     }

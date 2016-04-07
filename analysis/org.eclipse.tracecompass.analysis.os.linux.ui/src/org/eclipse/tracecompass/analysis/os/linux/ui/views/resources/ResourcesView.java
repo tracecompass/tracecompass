@@ -25,12 +25,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.swt.events.MenuDetectEvent;
-import org.eclipse.swt.events.MenuDetectListener;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.signals.TmfCpuSelectedSignal;
@@ -45,13 +42,11 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractStateSystemTimeGraphView;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 
 /**
  * Main implementation for the LTTng 2.0 kernel Resource view
@@ -66,8 +61,6 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
     private static final String[] FILTER_COLUMN_NAMES = new String[] {
             Messages.ResourcesView_stateTypeName
     };
-
-    private MenuManager fMenuMgr = new MenuManager();
 
     private int fCurrentCpu = -1;
 
@@ -103,41 +96,26 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
         }
     }
 
+
+    /**
+     * @since 2.0
+     */
     @Override
-    public void createPartControl(Composite parent) {
-        super.createPartControl(parent);
-        createContextMenu();
-    }
-
-    private void createContextMenu() {
-        fMenuMgr = new MenuManager();
-        final TimeGraphViewer timeGraphViewer = getTimeGraphViewer();
-        Menu menu = fMenuMgr.createContextMenu(timeGraphViewer.getTimeGraphControl());
-        timeGraphViewer.getTimeGraphControl().setMenu(menu);
-        getTimeGraphViewer().getTimeGraphControl().addTimeGraphEntryMenuListener(new MenuDetectListener() {
-            @Override
-            public void menuDetected(MenuDetectEvent event) {
-                fMenuMgr.removeAll();
-                final TimeGraphControl timeGraphControl = ResourcesView.this.getTimeGraphViewer().getTimeGraphControl();
-                Point point = timeGraphControl.toControl(event.x, event.y);
-                // this is super important, it makes zoom still work. Do not try
-                // to extend to the time graph area.
-                if (point.x < timeGraphViewer.getNameSpace()) {
-                    ITimeGraphEntry item = timeGraphControl.getEntry(point);
-
-                    if (item instanceof ResourcesEntry) {
-                        ResourcesEntry resourcesEntry = (ResourcesEntry) item;
-                        if (resourcesEntry.getType().equals(ResourcesEntry.Type.CPU)) {
-                            if (fCurrentCpu >= 0) {
-                                fMenuMgr.add(new UnfollowCpuAction(ResourcesView.this, resourcesEntry.getId(), resourcesEntry.getTrace()));
-                            } else {
-                                fMenuMgr.add(new FollowCpuAction(ResourcesView.this, resourcesEntry.getId(), resourcesEntry.getTrace()));
-                            }
-                        }
+    protected void fillTimeGraphEntryContextMenu(@NonNull IMenuManager menuManager) {
+        ISelection selection = getSite().getSelectionProvider().getSelection();
+        if (selection instanceof IStructuredSelection) {
+            IStructuredSelection sSel = (IStructuredSelection) selection;
+            if (sSel.getFirstElement() instanceof ResourcesEntry) {
+                ResourcesEntry resourcesEntry = (ResourcesEntry) sSel.getFirstElement();
+                if (resourcesEntry.getType().equals(ResourcesEntry.Type.CPU)) {
+                    if (fCurrentCpu >= 0) {
+                        menuManager.add(new UnfollowCpuAction(ResourcesView.this, resourcesEntry.getId(), resourcesEntry.getTrace()));
+                    } else {
+                        menuManager.add(new FollowCpuAction(ResourcesView.this, resourcesEntry.getId(), resourcesEntry.getTrace()));
                     }
                 }
             }
-        });
+        }
     }
 
     private static class ResourcesFilterLabelProvider extends TreeLabelProvider {

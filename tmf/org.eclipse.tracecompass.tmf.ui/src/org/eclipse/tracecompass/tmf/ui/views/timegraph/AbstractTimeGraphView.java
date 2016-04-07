@@ -63,9 +63,12 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -111,6 +114,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.MarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -240,7 +244,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     /**
      * Menu Manager for context-sensitive menu for time graph entries.
-     * This will be used on the tree viewer in case of the time graph combo.
+     * This will be used on the tree viewer in case of the time graph combo
+     * or the on the namespace in case of a single time graph viewer.
      */
     private final @NonNull MenuManager fEntryMenuManager = new MenuManager();
 
@@ -2111,21 +2116,42 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     private void createContextMenu() {
         TimeGraphCombo combo = getTimeGraphCombo();
+        fEntryMenuManager.setRemoveAllWhenShown(true);
         if (combo != null) {
-            fEntryMenuManager.setRemoveAllWhenShown(true);
             TreeViewer treeViewer = combo.getTreeViewer();
             Tree tree = treeViewer.getTree();
             Menu menu = fEntryMenuManager.createContextMenu(tree);
             tree.setMenu(menu);
-            fEntryMenuManager.addMenuListener(new IMenuListener() {
+        } else {
+            TimeGraphControl timeGraphControl = getTimeGraphViewer().getTimeGraphControl();
+            final Menu entryMenu = fEntryMenuManager.createContextMenu(timeGraphControl);
+            timeGraphControl.addTimeGraphEntryMenuListener(new MenuDetectListener() {
                 @Override
-                public void menuAboutToShow(IMenuManager manager) {
-                    fillTimeGraphEntryContextMenu(fEntryMenuManager);
-                    fEntryMenuManager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+                public void menuDetected(MenuDetectEvent event) {
+                    Point p = timeGraphControl.toControl(event.x, event.y);
+                    /*
+                     * The TimeGraphControl will call the TimeGraphEntryMenuListener
+                     * before the TimeEventMenuListener. If the event is
+                     * triggered on the namespace then show the menu else
+                     * clear the menu.
+                     */
+                    if (p.x < getTimeGraphViewer().getNameSpace()) {
+                        timeGraphControl.setMenu(entryMenu);
+                    } else {
+                        timeGraphControl.setMenu(null);
+                        event.doit = false;
+                    }
                 }
             });
-            getSite().registerContextMenu(fEntryMenuManager, treeViewer);
         }
+        fEntryMenuManager.addMenuListener(new IMenuListener() {
+            @Override
+            public void menuAboutToShow(IMenuManager manager) {
+            	fillTimeGraphEntryContextMenu(fEntryMenuManager);
+                fEntryMenuManager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+            }
+        });
+        getSite().registerContextMenu(fEntryMenuManager, fTimeGraphWrapper.getSelectionProvider());
     }
 
     /**
