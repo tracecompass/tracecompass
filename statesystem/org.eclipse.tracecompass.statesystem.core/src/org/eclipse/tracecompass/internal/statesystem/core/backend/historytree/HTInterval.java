@@ -40,6 +40,7 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
     private static final byte TYPE_STRING = 1;
     private static final byte TYPE_LONG = 2;
     private static final byte TYPE_DOUBLE = 3;
+    private static final byte TYPE_CUSTOM = 20;
 
     private final long start;
     private final long end;
@@ -102,6 +103,7 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
              * String's length + 2 (1 byte for size, 1 byte for \0 at the end
              */
             return (minSize + sv.unboxStr().getBytes().length + 2);
+        case CUSTOM:
         default:
             /*
              * It's very important that we know how to write the state value in
@@ -202,6 +204,7 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
             value = TmfStateValue.newValueDouble(buffer.getDouble());
             break;
 
+        case TYPE_CUSTOM:
         default:
             /* Unknown data, better to not make anything up... */
             throw new IOException(errMsg);
@@ -378,6 +381,8 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
             return TYPE_LONG;
         case DOUBLE:
             return TYPE_DOUBLE;
+        case CUSTOM:
+            return TYPE_CUSTOM;
         default:
             /* Should not happen if the switch is fully covered */
             throw new IllegalStateException();

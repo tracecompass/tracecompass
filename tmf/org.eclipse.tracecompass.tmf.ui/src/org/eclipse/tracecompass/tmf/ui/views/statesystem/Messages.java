@@ -76,4 +76,8 @@ public class Messages extends NLS {
 
     /** Label for the type String */
     public static String TypeString;
+
+    /** Label for the type Custom
+     * @since 2.0 */
+    public static String TypeCustom;
 }

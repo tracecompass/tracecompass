@@ -286,6 +286,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
             case DOUBLE:
                 value = TmfStateValue.newValueDouble(Double.parseDouble(fieldString));
                 break;
+            case CUSTOM:
+                throw new IllegalStateException("Custom type cannot be forced"); //$NON-NLS-1$
             case NULL:
             case STRING:
             default:
@@ -305,6 +307,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
             case DOUBLE:
                 value = TmfStateValue.newValueDouble(fieldLong.doubleValue());
                 break;
+            case CUSTOM:
+                throw new IllegalStateException("Custom type cannot be forced"); //$NON-NLS-1$
             case LONG:
             case NULL:
             default:
@@ -324,6 +328,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
             case DOUBLE:
                 value = TmfStateValue.newValueDouble(fieldInteger.doubleValue());
                 break;
+            case CUSTOM:
+                throw new IllegalStateException("Custom type cannot be forced"); //$NON-NLS-1$
             case INTEGER:
             case NULL:
             default:
@@ -343,6 +349,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
             case INTEGER:
                 value = TmfStateValue.newValueInt(fieldDouble.intValue());
                 break;
+            case CUSTOM:
+                throw new IllegalStateException("Custom type cannot be forced"); //$NON-NLS-1$
             case DOUBLE:
             case NULL:
             default:

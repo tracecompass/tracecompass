@@ -31,6 +31,7 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -192,8 +193,7 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
 
                 for (ITmfStateInterval cpuInterval : StateSystemUtils.queryHistoryRange(ss, statusQuark, start, end - 1, resolution, monitor)) {
                     ITmfStateValue stateValue = cpuInterval.getStateValue();
-                    switch (stateValue.getType()) {
-                    case INTEGER:
+                    if (stateValue.getType() == Type.INTEGER) {
                         int value = stateValue.unboxInt();
                         /*
                          * If the current CPU is either preempted or in
@@ -201,21 +201,13 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
                          * processes
                          */
                         if ((value & (VcpuStateValues.VCPU_PREEMPT | VcpuStateValues.VCPU_VMM)) == 0) {
-                            break;
+                            continue;
                         }
                         Integer threadOnCpu = KernelThreadInformationProvider.getThreadOnCpu(kernelModule, virtualCPU, cpuInterval.getStartTime());
                         if (threadOnCpu != null) {
                             map.put(threadOnCpu, new TmfStateInterval(cpuInterval.getStartTime(), cpuInterval.getEndTime(), threadOnCpu, VCPU_PREEMPT_VALUE));
                         }
-                        break;
-                    case DOUBLE:
-                    case LONG:
-                    case NULL:
-                    case STRING:
-                    default:
-                        break;
                     }
-
                 }
             }
         } catch (AttributeNotFoundException | StateSystemDisposedException e) {

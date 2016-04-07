@@ -89,6 +89,7 @@ final class StringStateValue extends TmfStateValue {
         case STRING:
             StringStateValue otherStringValue = (StringStateValue) other;
             return value.compareTo(otherStringValue.value);
+        case CUSTOM:
         default:
             throw new StateValueTypeException("A String state value cannot be compared to the type " + other.getType()); //$NON-NLS-1$
         }

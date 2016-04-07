@@ -131,6 +131,7 @@ public class GenerateTestValues {
                 case STRING:
                     writer.println("TmfStateValue.newValueString(\"" + val.unboxStr() + "\"),");
                     break;
+                case CUSTOM:
                 default:
                     writer.println(val.toString());
                     break;

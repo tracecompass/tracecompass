@@ -226,6 +226,7 @@ public class TmfXmlPatternSegment implements ISegment {
         case LONG:
             return TYPE_LONG;
         case DOUBLE:
+        case CUSTOM:
         default:
             /* Should not happen if the switch is fully covered */
             throw new IllegalStateException("Data type " + type + " not supported"); //$NON-NLS-1$ //$NON-NLS-2$

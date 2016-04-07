@@ -87,6 +87,7 @@ final class DoubleStateValue extends TmfStateValue {
             return Double.compare(this.value, other.unboxDouble());
         case STRING:
             throw new StateValueTypeException("A Double state value cannot be compared to a String state value."); //$NON-NLS-1$
+        case CUSTOM:
         default:
             throw new StateValueTypeException("A Double state value cannot be compared to the type " + other.getType()); //$NON-NLS-1$
         }

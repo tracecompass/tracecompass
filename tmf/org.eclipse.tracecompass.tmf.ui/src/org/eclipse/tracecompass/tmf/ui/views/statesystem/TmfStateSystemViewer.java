@@ -412,6 +412,7 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
             case LONG:
             case DOUBLE:
             case STRING:
+            case CUSTOM:
                 return fValue.toString();
             case NULL:
             default:
@@ -432,6 +433,8 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
                 return Messages.TypeDouble;
             case STRING:
                 return Messages.TypeString;
+            case CUSTOM:
+                return Messages.TypeCustom;
             case NULL:
             default:
                 return EMPTY_STRING;

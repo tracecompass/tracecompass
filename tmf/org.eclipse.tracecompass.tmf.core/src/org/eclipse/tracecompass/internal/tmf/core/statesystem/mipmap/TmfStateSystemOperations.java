@@ -85,6 +85,7 @@ public final class TmfStateSystemOperations {
 
             case NULL:
             case STRING:
+            case CUSTOM:
             default:
                 throw new StateValueTypeException(ss.getSSID() + " Quark:" + quark + ", Type:" + value.getType()); //$NON-NLS-1$ //$NON-NLS-2$
             }
@@ -140,6 +141,7 @@ public final class TmfStateSystemOperations {
 
             case NULL:
             case STRING:
+            case CUSTOM:
             default:
                 throw new StateValueTypeException(ss.getSSID() + " Quark:" + quark + ", Type:" + value.getType()); //$NON-NLS-1$ //$NON-NLS-2$
             }

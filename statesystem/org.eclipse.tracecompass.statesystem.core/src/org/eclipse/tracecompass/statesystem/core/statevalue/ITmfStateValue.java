@@ -35,6 +35,9 @@ public interface ITmfStateValue extends Comparable<ITmfStateValue> {
         DOUBLE,
         /** Variable-length string value */
         STRING,
+        /** Custom state value type
+         * @since 2.0 */
+        CUSTOM;
     }
 
     /**

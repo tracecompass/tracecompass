@@ -307,6 +307,7 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
                                 break;
                             case NULL:
                             case STRING:
+                            case CUSTOM:
                             default:
                                 break;
                             }
