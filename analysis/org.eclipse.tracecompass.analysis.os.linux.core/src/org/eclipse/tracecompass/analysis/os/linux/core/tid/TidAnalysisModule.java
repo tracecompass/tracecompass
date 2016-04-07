@@ -17,6 +17,7 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.DefaultEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
@@ -59,7 +60,7 @@ public class TidAnalysisModule extends TmfStateSystemAnalysisModule {
     @Override
     protected @NonNull ITmfStateProvider createStateProvider() {
         ITmfTrace trace = checkNotNull(getTrace());
-        IKernelAnalysisEventLayout layout = (trace instanceof IKernelTrace) ? ((IKernelTrace) trace).getKernelEventLayout() : IKernelAnalysisEventLayout.DEFAULT_LAYOUT;
+        IKernelAnalysisEventLayout layout = (trace instanceof IKernelTrace) ? ((IKernelTrace) trace).getKernelEventLayout() : DefaultEventLayout.getInstance();
         return new ActiveTidStateProvider(trace, layout);
     }
 
