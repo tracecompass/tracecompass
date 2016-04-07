@@ -82,7 +82,10 @@ public class TidAnalysisModule extends TmfStateSystemAnalysisModule {
 
         Integer tid = null;
         try {
-            int cpuQuark = stateSystem.getQuarkAbsolute(Integer.toString(cpu));
+            int cpuQuark = stateSystem.optQuarkAbsolute(Integer.toString(cpu));
+            if (cpuQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+                return null;
+            }
             ITmfStateValue value = stateSystem.querySingleState(time, cpuQuark).getStateValue();
             if (value.getType().equals(Type.INTEGER)) {
                 tid = value.unboxInt();

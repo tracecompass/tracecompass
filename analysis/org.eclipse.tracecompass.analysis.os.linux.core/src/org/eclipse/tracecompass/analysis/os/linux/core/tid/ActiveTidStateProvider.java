@@ -72,20 +72,21 @@ class ActiveTidStateProvider extends AbstractTmfStateProvider {
         if (cpu == null) {
             return;
         }
-        if (!event.getName().equals(fSchedSwitch)) {
-            return;
-        }
         ITmfStateSystemBuilder ssb = getStateSystemBuilder();
         if (ssb == null) {
             return;
         }
+        Integer cpuQuark = fCpuNumToQuark.get(cpu);
+        if (cpuQuark == null) {
+            // this will only happen once
+            String cpuAttributeName = NonNullUtils.nullToEmptyString(cpu);
+            cpuQuark = ssb.getQuarkAbsoluteAndAdd(cpuAttributeName);
+            fCpuNumToQuark.put(cpu, cpuQuark);
+        }
+        if (!event.getName().equals(fSchedSwitch)) {
+            return;
+        }
         try {
-            Integer cpuQuark = fCpuNumToQuark.get(cpu);
-            if (cpuQuark == null) {
-                String cpuAttributeName = NonNullUtils.nullToEmptyString(cpu);
-                cpuQuark = ssb.getQuarkAbsoluteAndAdd(cpuAttributeName);
-                fCpuNumToQuark.put(cpu, cpuQuark);
-            }
             int nextTid = ((Long) event.getContent().getField(fNextTid).getValue()).intValue();
             final TmfStateValue value = TmfStateValue.newValueInt(nextTid);
             ssb.modifyAttribute(event.getTimestamp().toNanos(), value, cpuQuark);
