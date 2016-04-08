@@ -12,6 +12,10 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
 
+import java.text.FieldPosition;
+import java.text.Format;
+import java.text.ParsePosition;
+
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -30,6 +34,25 @@ import org.swtchart.ISeries;
  * @author Geneviève Bastien
  */
 public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implements MouseTrackListener {
+
+    private static final Format DEFAULT_FORMAT = new Format() {
+
+        /**
+         * Default serial ID
+         */
+        private static final long serialVersionUID = -6130622953193109057L;
+
+        @Override
+        public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
+            return toAppendTo.append(obj);
+        }
+
+        @Override
+        public Object parseObject(String source, ParsePosition pos) {
+            return source;
+        }
+
+    };
 
     /**
      * Constructor for the tooltip provider
@@ -102,6 +125,10 @@ public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implemen
             }
 
             /* set tooltip of closest data point */
+            Format format = getChart().getAxisSet().getYAxis(0).getTick().getFormat();
+            if (format == null) {
+                format = DEFAULT_FORMAT;
+            }
             StringBuffer buffer = new StringBuffer();
             buffer.append("time="); //$NON-NLS-1$
             buffer.append(new TmfTimestamp((long) xCoordinate + getChartViewer().getTimeOffset(), ITmfTimestamp.NANOSECOND_SCALE).toString());
@@ -116,7 +143,7 @@ public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implemen
                 }
                 buffer.append(serie.getId());
                 buffer.append('=');
-                buffer.append(yS[index]);
+                buffer.append(format.format(yS[index]));
                 buffer.append('\n');
             }
 
