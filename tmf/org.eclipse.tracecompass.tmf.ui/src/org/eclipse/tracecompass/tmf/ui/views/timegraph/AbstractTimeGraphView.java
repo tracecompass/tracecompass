@@ -59,6 +59,7 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
@@ -285,6 +286,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         void setAutoExpandLevel(int level);
 
+        boolean getExpandedState(ITimeGraphEntry entry);
+
+        void setExpandedState(ITimeGraphEntry entry, boolean expanded);
+
         void setFilterColumns(String[] columnNames);
 
         void setFilterContentProvider(ITreeContentProvider contentProvider);
@@ -404,6 +409,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         @Override
         public void setAutoExpandLevel(int level) {
             viewer.setAutoExpandLevel(level);
+        }
+
+        @Override
+        public boolean getExpandedState(ITimeGraphEntry entry) {
+            return viewer.getExpandedState(entry);
+        }
+
+        @Override
+        public void setExpandedState(ITimeGraphEntry entry, boolean expanded) {
+            viewer.setExpandedState(entry, expanded);
         }
 
         @Override
@@ -532,6 +547,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         @Override
         public void setAutoExpandLevel(int level) {
             combo.setAutoExpandLevel(level);
+        }
+
+        @Override
+        public boolean getExpandedState(ITimeGraphEntry entry) {
+            return combo.getExpandedState(entry);
+        }
+
+        @Override
+        public void setExpandedState(ITimeGraphEntry entry, boolean expanded) {
+            combo.setExpandedState(entry, expanded);
         }
 
         TimeGraphCombo getTimeGraphCombo() {
@@ -1170,6 +1195,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             if (fColumnComparators != null) {
                 createColumnSelectionListener(combo.getTreeViewer());
             }
+            // Add double click listener to tree viewer
+            createDoubleClickListener(combo.getTreeViewer());
         }
         fTimeGraphWrapper.setTimeGraphContentProvider(fTimeGraphContentProvider);
         fTimeGraphWrapper.setFilterContentProvider(fFilterContentProvider != null ? fFilterContentProvider : fTimeGraphContentProvider);
@@ -2039,6 +2066,21 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             }
         }
     }
+
+    private void createDoubleClickListener(TreeViewer treeViewer) {
+        treeViewer.addDoubleClickListener(event -> {
+            if (event.getSelection() instanceof TreeSelection) {
+                TreeSelection selection = (TreeSelection) event.getSelection();
+                if (selection.getFirstElement() instanceof ITimeGraphEntry) {
+                    ITimeGraphEntry entry = (ITimeGraphEntry) selection.getFirstElement();
+                    if (entry.hasChildren()) {
+                        fTimeGraphWrapper.setExpandedState(entry, !fTimeGraphWrapper.getExpandedState(entry));
+                    }
+                }
+            }
+        });
+    }
+
 
     private void restoreViewContext() {
         TimeGraphCombo combo = getTimeGraphCombo();

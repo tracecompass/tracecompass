@@ -1225,6 +1225,18 @@ public class TimeGraphCombo extends Composite {
     }
 
     /**
+     * Get the expanded state of an entry.
+     *
+     * @param entry
+     *            The entry
+     * @return true if the entry is expanded, false if collapsed
+     * @since 2.0
+     */
+    public boolean getExpandedState(ITimeGraphEntry entry) {
+        return fTimeGraphViewer.getExpandedState(entry);
+    }
+
+    /**
      * Set the expanded state of an entry
      *
      * @param entry
