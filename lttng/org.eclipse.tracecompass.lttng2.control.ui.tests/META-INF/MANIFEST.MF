@@ -26,3 +26,4 @@ Export-Package: org.eclipse.tracecompass.internal.lttng2.control.stubs.dialogs;x
  org.eclipse.tracecompass.lttng2.control.ui.tests;x-friends:="org.eclipse.tracecompass.alltests",
  org.eclipse.tracecompass.lttng2.control.ui.tests.model.component;x-internal:=true,
  org.eclipse.tracecompass.lttng2.control.ui.tests.service;x-internal:=true
+Bundle-Activator: org.eclipse.tracecompass.lttng2.control.ui.tests.Activator

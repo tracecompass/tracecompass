@@ -31,6 +31,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
@@ -59,6 +60,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.ProbeEve
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.SessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.SnapshotInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.UstProviderInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.XmlMiValidationErrorHandler;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandInput;
@@ -77,6 +79,11 @@ import org.xml.sax.SAXException;
  * @author Jonathan Rajotte
  */
 public class LTTngControlServiceMI extends LTTngControlService {
+
+    /**
+     * The tracing key (.options) and System property to control whether or not schema validation should be used.
+     */
+    public static final String MI_SCHEMA_VALIDATION_KEY = Activator.PLUGIN_ID + "/mi/schema-validation"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -105,13 +112,15 @@ public class LTTngControlServiceMI extends LTTngControlService {
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         docBuilderFactory.setValidating(false);
 
-        // Validate XSD schema
-        if (xsdUrl != null) {
-            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            try {
-                docBuilderFactory.setSchema(schemaFactory.newSchema(xsdUrl));
-            } catch (SAXException e) {
-                throw new ExecutionException(Messages.TraceControl_InvalidSchemaError, e);
+        if (isSchemaValidationEnabled()) {
+            // Validate XSD schema
+            if (xsdUrl != null) {
+                SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                try {
+                    docBuilderFactory.setSchema(schemaFactory.newSchema(xsdUrl));
+                } catch (SAXException e) {
+                    throw new ExecutionException(Messages.TraceControl_InvalidSchemaError, e);
+                }
             }
         }
 
@@ -123,6 +132,12 @@ public class LTTngControlServiceMI extends LTTngControlService {
 
         fDocumentBuilder.setErrorHandler(new XmlMiValidationErrorHandler());
 
+    }
+
+    private static boolean isSchemaValidationEnabled() {
+        String schemaValidationKey = Platform.getDebugOption(MI_SCHEMA_VALIDATION_KEY);
+        String systemProperty = System.getProperty(MI_SCHEMA_VALIDATION_KEY);
+        return schemaValidationKey != null && Boolean.parseBoolean(schemaValidationKey) || systemProperty != null && Boolean.parseBoolean(systemProperty);
     }
 
     /**
