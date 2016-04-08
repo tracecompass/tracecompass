@@ -43,12 +43,6 @@
 		<stateAttribute type="constant" value="CPUs" />
 		<stateAttribute type="eventField" value="cpu" />
 	</location>
-<!-- Shortcut for the current scenario -->
-	<location id="CurrentScenario">
-		<stateAttribute type="constant" value="pattern" />
-		<stateAttribute type="constant" value="scenarios" />
-		<stateAttribute type="constant" value="#scenarioName" />
-	</location>
 
 <!-- 	The attribute initial specifies the FSMs that will be instanciated at the beginning of the analysis -->
 	<patternHandler initial="sched_switch:syscall">
@@ -95,7 +89,7 @@
 						<stateAttribute type="constant" value="Current_thread" />
 					</stateValue>
 					<stateValue type="query">
-						<stateAttribute type="location" value="CurrentScenario" />
+						<stateAttribute type="constant" value="#CurrentScenario" />
 						<stateAttribute type="constant" value="thread" />
 					</stateValue>
 				</condition>
@@ -108,20 +102,20 @@
 		<action id="sys_x_founded">
 <!-- 		Save the name of the system call executed under the current scenario path-->
 			<stateChange>
-				<stateAttribute type="location" value="CurrentScenario" />
+				<stateAttribute type="constant" value="#CurrentScenario" />
 				<stateAttribute type="constant" value="syscall" />
 				<stateAttribute type="constant" value="name" />
 				<stateValue type="eventName"/>
 			</stateChange>
 <!-- 		Save the value of the CPU under the current scenario path -->
 			<stateChange>
-				<stateAttribute type="location" value="CurrentScenario" />
+				<stateAttribute type="constant" value="#CurrentScenario" />
 				<stateAttribute type="constant" value="cpu" />
 				<stateValue type="eventField" value="cpu"/>
 			</stateChange>
 <!-- 		Save the value of the current thread PID under the current scenario path -->
 			<stateChange>
-				<stateAttribute type="location" value="CurrentScenario" />
+				<stateAttribute type="constant" value="#CurrentScenario" />
 				<stateAttribute type="constant" value="thread" />
 				<stateValue type="query">
 					<stateAttribute type="location" value="CurrentCPU" />
@@ -137,7 +131,7 @@
 				<segType>
 					<segName>
 						<stateValue type="query">
-							<stateAttribute type="location" value="CurrentScenario" />
+							<stateAttribute type="constant" value="#CurrentScenario" />
 							<stateAttribute type="constant" value="syscall" />
 							<stateAttribute type="constant" value="name" />
 						</stateValue>
@@ -184,9 +178,9 @@
 -->
 		<fsm id="sched_switch" multiple="false">
 <!-- 		if event.name != sched_switch, no processing will be done -->
+			<precondition event="sched_switch"/>
 			<initial>
 				<transition target="sched_switch"/>
-				<precondition event="sched_switch"/>
 			</initial>
 			<state id="sched_switch">
 <!-- 					The state will stay here forever and execute the action "update current thread" each time a sched_switch event will be meet-->

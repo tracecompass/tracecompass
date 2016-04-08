@@ -380,9 +380,6 @@
 			<xs:element maxOccurs="unbounded" minOccurs="1" name="transition" type="transition">
 				<xs:annotation>
 					<xs:documentation>Declares a transition for the state.</xs:documentation></xs:annotation></xs:element>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="precondition" type="transition">
-				<xs:annotation>
-					<xs:documentation>Declares a precondition for this fsm. At least one of the preconditions needs to be validated before being able to activate process the fsm. A precondition is a transition with no target or action. It should contains only conditions that needs to be validated.</xs:documentation></xs:annotation></xs:element>
 		</xs:sequence>
 	</xs:complexType>
 
@@ -402,6 +399,9 @@
 			<xs:element maxOccurs="1" minOccurs="0" name="onexit" type="handlers">
 				<xs:annotation>
 					<xs:documentation>Declares a list of actions to execute when exiting the complex state.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="precondition" type="transition">
+				<xs:annotation>
+					<xs:documentation>Declares a precondition for this fsm. At least one of the preconditions needs to be validated before being able to activate process the fsm. A precondition is a special transition with no target or action. It should contains only conditions that needs to be validated. Only used for fsm.</xs:documentation></xs:annotation></xs:element>
 			<xs:element maxOccurs="1" minOccurs="0" name="initial" type="initialState">
 				<xs:annotation>
 					<xs:documentation>Declares the default initial state of this complex state. Must not be specified for an atomic state</xs:documentation></xs:annotation></xs:element>
