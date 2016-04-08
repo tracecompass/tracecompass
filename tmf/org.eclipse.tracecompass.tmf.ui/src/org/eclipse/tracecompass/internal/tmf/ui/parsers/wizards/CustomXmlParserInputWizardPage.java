@@ -46,8 +46,6 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.TitleEvent;
-import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyleRange;
@@ -329,12 +327,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         gd.widthHint = 800;
         inputText.setLayoutData(gd);
         inputText.setText(getSelectionText());
-        inputText.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                parseXmlInput(inputText.getText());
-            }
-        });
+        inputText.addModifyListener(e -> parseXmlInput(inputText.getText()));
         inputText.addModifyListener(updateListener);
 
         vSash.setWeights(new int[] { hSash.computeSize(SWT.DEFAULT, SWT.DEFAULT).y, sashBottom.computeSize(SWT.DEFAULT, SWT.DEFAULT).y });
@@ -743,13 +736,10 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            EntityResolver resolver = new EntityResolver() {
-                @Override
-                public InputSource resolveEntity(String publicId, String systemId) {
-                    String empty = ""; //$NON-NLS-1$
-                    ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
-                    return new InputSource(bais);
-                }
+            EntityResolver resolver = (publicId, systemId) -> {
+                String empty = ""; //$NON-NLS-1$
+                ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
+                return new InputSource(bais);
             };
             db.setEntityResolver(resolver);
 
@@ -837,12 +827,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         final Shell helpShell = new Shell(getShell(), SWT.SHELL_TRIM);
         helpShell.setLayout(new FillLayout());
         helpBrowser = new Browser(helpShell, SWT.NONE);
-        helpBrowser.addTitleListener(new TitleListener() {
-            @Override
-            public void changed(TitleEvent event) {
-                helpShell.setText(event.title);
-            }
-        });
+        helpBrowser.addTitleListener(event -> helpShell.setText(event.title));
         Rectangle r = container.getBounds();
         Point p = container.toDisplay(r.x, r.y);
         Rectangle trim = helpShell.computeTrim(p.x + (r.width - 750) / 2, p.y + (r.height - 400) / 2, 750, 400);
@@ -910,12 +895,9 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
             gd.widthHint = 0;
             elementNameText.setLayoutData(gd);
-            elementNameText.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    ElementNode.this.inputElement.setElementName(elementNameText.getText().trim());
-                    group.setText(getName(ElementNode.this.inputElement));
-                }
+            elementNameText.addModifyListener(e -> {
+                ElementNode.this.inputElement.setElementName(elementNameText.getText().trim());
+                group.setText(getName(ElementNode.this.inputElement));
             });
             elementNameText.setText(inputElement.getElementName());
             elementNameText.addModifyListener(updateListener);
