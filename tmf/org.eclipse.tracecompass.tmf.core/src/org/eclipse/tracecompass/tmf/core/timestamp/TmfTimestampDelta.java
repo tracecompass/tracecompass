@@ -19,11 +19,14 @@ import java.util.TimeZone;
  *
  * @author Bernd Hufmann
  */
-public class TmfTimestampDelta extends TmfRealTimestamp {
+public class TmfTimestampDelta extends TmfTimestamp {
 
     // ------------------------------------------------------------------------
     // Members
     // ------------------------------------------------------------------------
+
+    private final long fValue;
+    private final int fScale;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -32,7 +35,7 @@ public class TmfTimestampDelta extends TmfRealTimestamp {
      * Default constructor
      */
     public TmfTimestampDelta() {
-        super(0, ITmfTimestamp.SECOND_SCALE);
+        this(0, ITmfTimestamp.SECOND_SCALE);
     }
 
     /**
@@ -43,7 +46,7 @@ public class TmfTimestampDelta extends TmfRealTimestamp {
      */
 
     public TmfTimestampDelta(long value) {
-        super(value, ITmfTimestamp.SECOND_SCALE);
+        this(value, ITmfTimestamp.SECOND_SCALE);
     }
 
     /**
@@ -55,7 +58,8 @@ public class TmfTimestampDelta extends TmfRealTimestamp {
      *            the timestamp scale
      */
     public TmfTimestampDelta(long value, int scale) {
-        super(value, scale);
+        fValue = value;
+        fScale = scale;
     }
 
     /**
@@ -65,12 +69,22 @@ public class TmfTimestampDelta extends TmfRealTimestamp {
      *            the timestamp to copy
      */
     public TmfTimestampDelta(ITmfTimestamp timestamp) {
-        super(timestamp.getValue(), timestamp.getScale());
+        this(timestamp.getValue(), timestamp.getScale());
     }
 
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+
+    @Override
+    public long getValue() {
+        return fValue;
+    }
+
+    @Override
+    public int getScale() {
+        return fScale;
+    }
 
     @Override
     public ITmfTimestamp normalize(final long offset, final int scale) {

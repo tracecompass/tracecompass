@@ -182,8 +182,7 @@ public class TmfNanoTimestampTest {
     @Test
     public void testNormalizeScaleNot0() {
         ITmfTimestamp ts = ts0.normalize(0, 1);
-        assertEquals("getValue", 0, ts.getValue());
-        assertEquals("getscale", 1, ts.getScale());
+        assertEquals("Zero", TmfTimestamp.ZERO, ts);
 
         ts = ts0.normalize(12345, 1);
         assertEquals("getValue", 12345, ts.getValue());

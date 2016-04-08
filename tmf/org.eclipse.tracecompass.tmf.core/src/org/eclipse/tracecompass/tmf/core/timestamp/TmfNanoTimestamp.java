@@ -52,35 +52,6 @@ public final class TmfNanoTimestamp extends TmfTimestamp {
         return ITmfTimestamp.NANOSECOND_SCALE;
     }
 
-    // ------------------------------------------------------------------------
-    // ITmfTimestamp
-    // ------------------------------------------------------------------------
-
-    @Override
-    public ITmfTimestamp normalize(final long offset, final int scale) {
-        if (scale == ITmfTimestamp.NANOSECOND_SCALE) {
-            return new TmfNanoTimestamp(saturatedAdd(getValue(), offset));
-        }
-        return super.normalize(offset, scale);
-    }
-
-    @Override
-    public int compareTo(final ITmfTimestamp ts) {
-        if (ts instanceof TmfNanoTimestamp) {
-            final long delta = getValue() - ts.getValue();
-            return (delta == 0) ? 0 : (delta > 0) ? 1 : -1;
-        }
-        return super.compareTo(ts);
-    }
-
-    @Override
-    public ITmfTimestamp getDelta(final ITmfTimestamp ts) {
-        if (ts instanceof TmfNanoTimestamp) {
-            return new TmfTimestampDelta(getValue() - ts.getValue(), ITmfTimestamp.NANOSECOND_SCALE);
-        }
-        return super.getDelta(ts);
-    }
-
     /**
      * @since 2.0
      */
@@ -88,30 +59,4 @@ public final class TmfNanoTimestamp extends TmfTimestamp {
     public long toNanos() {
         return getValue();
     }
-
-    // ------------------------------------------------------------------------
-    // Object
-    // ------------------------------------------------------------------------
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
-    public boolean equals(final Object other) {
-        if (this == other) {
-            return true;
-        }
-        if (other == null) {
-            return false;
-        }
-        if (!(other instanceof TmfNanoTimestamp)) {
-            return super.equals(other);
-        }
-        final TmfNanoTimestamp ts = (TmfNanoTimestamp) other;
-
-        return compareTo(ts) == 0;
-    }
-
 }

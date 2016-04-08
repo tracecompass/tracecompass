@@ -26,6 +26,57 @@ import org.eclipse.jdt.annotation.NonNull;
  * @author Francois Chouinard
  */
 public abstract class TmfTimestamp implements ITmfTimestamp {
+
+    /**
+     * Default implementation of the tmf timestamp. We want this to be hidden.
+     *
+     * @author Matthew Khouzam
+     *
+     */
+    private static final class Impl extends TmfTimestamp {
+
+        // ------------------------------------------------------------------------
+        // Attributes
+        // ------------------------------------------------------------------------
+
+        /**
+         * The timestamp raw value (mantissa)
+         */
+        private final long fValue;
+
+        /**
+         * The timestamp scale (magnitude)
+         */
+        private final int fScale;
+
+        // ------------------------------------------------------------------------
+        // Constructors
+        // ------------------------------------------------------------------------
+
+        /**
+         * Full constructor
+         *
+         * @param value
+         *            the timestamp value
+         * @param scale
+         *            the timestamp scale
+         */
+        public Impl(final long value, final int scale) {
+            fValue = value;
+            fScale = scale;
+        }
+
+        @Override
+        public long getValue() {
+            return fValue;
+        }
+
+        @Override
+        public int getScale() {
+            return fScale;
+        }
+    }
+
     /**
      * Create a timestamp.
      *
@@ -105,6 +156,9 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
         if (scale == ITmfTimestamp.SECOND_SCALE) {
             return fromSeconds(value);
         }
+        if (value == 0) {
+            return ZERO;
+        }
         return createOther(value, scale);
     }
 
@@ -123,7 +177,7 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
     }
 
     private static @NonNull ITmfTimestamp createOther(long value, int scale) {
-        return new TmfRealTimestamp(value, scale);
+        return new Impl(value, scale);
     }
 
     // ------------------------------------------------------------------------
@@ -131,19 +185,99 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
     // ------------------------------------------------------------------------
 
     /**
-     * The beginning of time
+     * Zero - a zero time constant. The value is zero, so this allows some
+     * interesting simplifications.
      */
-    public static final @NonNull ITmfTimestamp BIG_BANG = new TmfRealTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE);
+    public static final @NonNull ITmfTimestamp ZERO = new TmfTimestamp() {
+        @Override
+        public long getValue() {
+            return 0;
+        }
+
+        @Override
+        public int getScale() {
+            return 0;
+        }
+
+        @Override
+        public @NonNull ITmfTimestamp normalize(long offset, int scale) {
+            if (offset == 0) {
+                return this;
+            }
+            return create(offset, scale);
+        }
+
+        @Override
+        public int compareTo(ITmfTimestamp ts) {
+            return Long.compare(0, ts.getValue());
+        }
+    };
 
     /**
-     * The end of time
+     * The beginning of time will be lesser than any other timestamp
      */
-    public static final @NonNull ITmfTimestamp BIG_CRUNCH = new TmfRealTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE);
+    public static final @NonNull ITmfTimestamp BIG_BANG = new TmfTimestamp() {
+        @Override
+        public long getValue() {
+            return Long.MIN_VALUE;
+        }
+
+        @Override
+        public int getScale() {
+            return Integer.MAX_VALUE;
+        }
+
+        @Override
+        public int compareTo(ITmfTimestamp other) {
+            if (equals(other) == true) {
+                return 0;
+            }
+            return -1;
+        }
+
+        @Override
+        public ITmfTimestamp normalize(long offset, int scale) {
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            return this == other;
+        }
+    };
 
     /**
-     * Zero
+     * The end of time will be greater than any other timestamp
      */
-    public static final @NonNull ITmfTimestamp ZERO = new TmfRealTimestamp(0, 0);
+    public static final @NonNull ITmfTimestamp BIG_CRUNCH = new TmfTimestamp() {
+        @Override
+        public long getValue() {
+            return Long.MAX_VALUE;
+        }
+
+        @Override
+        public int getScale() {
+            return Integer.MAX_VALUE;
+        }
+
+        @Override
+        public int compareTo(ITmfTimestamp other) {
+            if (equals(other) == true) {
+                return 0;
+            }
+            return 1;
+        }
+
+        @Override
+        public ITmfTimestamp normalize(long offset, int scale) {
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            return this == other;
+        }
+    };
 
     // ------------------------------------------------------------------------
     // ITmfTimestamp
@@ -183,12 +317,6 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
 
         // Handle the trivial case
         if (getScale() == scale && offset == 0) {
-            return this;
-        }
-
-        // In case of big bang and big crunch just return this (no need to
-        // normalize)
-        if (this.equals(BIG_BANG) || this.equals(BIG_CRUNCH)) {
             return this;
         }
 
@@ -247,40 +375,48 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
         int scale = getScale();
         // Check the corner cases (we can't use equals() because it uses
         // compareTo()...)
-        if (ts == null) {
+        if (BIG_BANG.equals(ts)) {
             return 1;
         }
-        if (this == ts || (value == ts.getValue() && scale == ts.getScale())) {
-            return 0;
-        }
-        if ((value == BIG_BANG.getValue() && scale == BIG_BANG.getScale()) || (ts.getValue() == BIG_CRUNCH.getValue() && ts.getScale() == BIG_CRUNCH.getScale())) {
+
+        if (BIG_CRUNCH.equals(ts)) {
             return -1;
         }
-        if ((value == BIG_CRUNCH.getValue() && scale == BIG_CRUNCH.getScale()) || (ts.getValue() == BIG_BANG.getValue() && ts.getScale() == BIG_BANG.getScale())) {
-            return 1;
-        }
-        final ITmfTimestamp nts = ts.normalize(0, scale);
-        if ((nts.getValue() == 0 && ts.getValue() != 0) || (ts.getValue() != Long.MAX_VALUE && nts.getValue() == Long.MAX_VALUE) || (ts.getValue() != Long.MIN_VALUE && nts.getValue() == Long.MIN_VALUE)) {
-            // Scaling error. We can figure it out nonetheless.
 
-            // First, look at the sign of the mantissa
-            final long otherValue = ts.getValue();
-            if (value == 0 && otherValue == 0) {
-                return 0;
-            }
-            if (value < 0 && otherValue >= 0) {
-                return -1;
-            }
-            if (value >= 0 && otherValue < 0) {
+        if (this == ts || isIdentical(this, ts)) {
+            return 0;
+        }
+
+        if (scale == ts.getScale()) {
+            if (ts.getValue() == Long.MIN_VALUE) {
                 return 1;
             }
-
-            // Otherwise, just compare the scales
-            final int otherScale = ts.getScale();
-            return (scale > otherScale) ? (otherValue >= 0) ? 1 : -1 : (otherValue >= 0) ? -1 : 1;
+            final long delta = saturatedAdd(getValue(), -ts.getValue());
+            return Long.compare(delta, 0);
         }
-        final long delta = value - nts.getValue();
-        return Long.compare(delta, 0);
+        final ITmfTimestamp largerScale = (scale > ts.getScale()) ? this : ts;
+        final ITmfTimestamp smallerScale = (scale < ts.getScale()) ? this : ts;
+
+        final ITmfTimestamp nts = largerScale.normalize(0, smallerScale.getScale());
+        if (hasSaturated(largerScale, nts)) {
+            // We've saturated largerScale.
+            if (smallerScale.getScale() == scale) {
+                return Long.compare(0, nts.getValue());
+            }
+            return Long.compare(nts.getValue(), 0);
+        }
+        if (smallerScale.getScale() == scale) {
+            return Long.compare(value, nts.getValue());
+        }
+        return Long.compare(nts.getValue(), smallerScale.getValue());
+    }
+
+    private static boolean hasSaturated(final ITmfTimestamp ts, final ITmfTimestamp nts) {
+        return (nts.getValue() == 0 && ts.getValue() != 0) || !isIdentical(ts, nts) && ((nts.getValue() == Long.MAX_VALUE) || (nts.getValue() == Long.MIN_VALUE));
+    }
+
+    private static boolean isIdentical(final ITmfTimestamp ts, final ITmfTimestamp nts) {
+        return ts.getValue() == nts.getValue() && ts.getScale() == nts.getScale();
     }
 
     /**
@@ -360,6 +496,9 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
         }
         /* We allow comparing with other types of *I*TmfTimestamp though */
         final ITmfTimestamp ts = (ITmfTimestamp) other;
+        if (getScale() == ts.getScale()) {
+            return getValue() == ts.getValue();
+        }
         return (compareTo(ts) == 0);
     }
 
