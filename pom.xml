@@ -43,8 +43,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <testArgLine></testArgLine>
 
-    <tycho-version>0.24.0</tycho-version>
-    <tycho-extras-version>0.24.0</tycho-extras-version>
+    <tycho-version>0.25.0</tycho-version>
+    <tycho-extras-version>0.25.0</tycho-extras-version>
     <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/tracecompass/org.eclipse.tracecompass.git</tycho.scmUrl>
     <target-platform>tracecompass-e4.6</target-platform>
     <help-docs-eclipserun-repo>http://download.eclipse.org/eclipse/updates/4.5</help-docs-eclipserun-repo>
