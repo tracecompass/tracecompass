@@ -28,9 +28,6 @@ public class Messages extends NLS {
     public static @Nullable String UstDebugInfoAnalysis_BinaryAspectName;
     public static @Nullable String UstDebugInfoAnalysis_BinaryAspectHelpText;
 
-    public static @Nullable String UstDebugInfoAnalysis_Offset;
-    public static @Nullable String UstDebugInfoAnalysis_Symbol;
-
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

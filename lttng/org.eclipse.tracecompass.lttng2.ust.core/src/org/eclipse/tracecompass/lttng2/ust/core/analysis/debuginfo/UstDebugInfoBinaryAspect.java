@@ -107,22 +107,21 @@ public class UstDebugInfoBinaryAspect implements ITmfEventAspect<BinaryCallsite>
 
         /* Apply the path prefix defined by the trace, if any */
         String fullPath = (trace.getSymbolProviderConfig().getActualRootDirPath() + file.getFilePath());
+        boolean isPIC = isPIC(fullPath);
 
         long offset;
-        if (isPIC(fullPath)) {
+        if (isPIC) {
             offset = (ip - file.getBaseAddress());
         } else {
             /*
-             * In the case of the object being the main binary (loaded at a very
-             * low address), we must pass the actual ip address to addr2line.
+             * In the case of the object being non-position-independant (loaded
+             * at a very low address), we must pass the actual 'ip' address
+             * directly to addr2line.
              */
             offset = ip;
         }
 
-        // TODO If the binary is present on the current file system, we could
-        // try to get the symbol name from it.
-
-        return new BinaryCallsite(fullPath, file.getBuildId(), EMPTY_STRING, offset);
+        return new BinaryCallsite(fullPath, file.getBuildId(), offset, isPIC);
     }
 
     /**

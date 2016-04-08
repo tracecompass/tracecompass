@@ -26,8 +26,8 @@ public class BinaryCallsite {
 
     private final String fBinaryFilePath;
     private final String fBuildId;
-    private final String fSymbolName;
     private final long fOffset;
+    private final boolean fIsPic;
 
     /**
      * Constructor
@@ -39,22 +39,25 @@ public class BinaryCallsite {
      *            The Build-Id of the binary file. This is an unique identifier
      *            for a given object, so it can be used to make sure the file at
      *            the given path is the exact one we expect.
-     * @param symbolName
-     *            The name of the symbol in the path. Should not be null, but
-     *            can be an empty string if not available.
      * @param offset
-     *            The offset *within the binary* of the call site. This should
-     *            be ready to be passed as-is to tools like addr2line.
+     *            The offset of the call site. Its exact meaning will depend on
+     *            the value of 'isPic'. This should be ready to be passed as-is
+     *            to tools like addr2line.
+     * @param isPic
+     *            Indicates if the specified binary is Position-Independant Code
+     *            or not. This will indicate if the 'offset' parameter is an
+     *            absolute address (if isPic is false), or if it is an offset in
+     *            the binary (is isPic is true).
      */
-    public BinaryCallsite(String binaryFilePath, String buildId, String symbolName, long offset) {
+    public BinaryCallsite(String binaryFilePath, String buildId, long offset, boolean isPic) {
         if (offset < 0) {
             throw new IllegalArgumentException("Address offset cannot be negative"); //$NON-NLS-1$
         }
 
         fBinaryFilePath = binaryFilePath;
         fBuildId = buildId;
-        fSymbolName = symbolName;
         fOffset = offset;
+        fIsPic = isPic;
     }
 
     /**
@@ -76,16 +79,6 @@ public class BinaryCallsite {
     }
 
     /**
-     * Get the name of the symbol this instruction pointer is from, if it is
-     * available.
-     *
-     * @return The symbol name, or an empty string if not available
-     */
-    public String getSymbolName() {
-        return fSymbolName;
-    }
-
-    /**
      * Get the address offset within the binary file corresponding to the
      * instruction pointer.
      *
@@ -97,18 +90,22 @@ public class BinaryCallsite {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(fBinaryFilePath);
-        if (!fSymbolName.equals("")) { //$NON-NLS-1$
-            sb.append(", "); //$NON-NLS-1$
-            sb.append(Messages.UstDebugInfoAnalysis_Symbol);
-            sb.append('=');
-            sb.append(fSymbolName);
+        /*
+         * Output is of the following format:
+         *
+         * For PIC/PIE binaries: /usr/lib/mylib.so+0x123
+         * For non-PIC binaries: /usr/myprogram@0x401234
+         */
+        StringBuilder sb = new StringBuilder()
+                .append(fBinaryFilePath);
+
+        if (fIsPic) {
+            sb.append('+');
+        } else {
+            sb.append('@');
         }
-        sb.append(", "); //$NON-NLS-1$
-        sb.append(Messages.UstDebugInfoAnalysis_Offset);
-        sb.append('=');
-        sb.append(fOffset);
+
+        sb.append("0x").append(Long.toHexString(fOffset)); //$NON-NLS-1$
 
         return sb.toString();
     }
