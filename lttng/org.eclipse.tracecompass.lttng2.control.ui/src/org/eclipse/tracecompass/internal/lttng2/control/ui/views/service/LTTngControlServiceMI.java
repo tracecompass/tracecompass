@@ -100,23 +100,29 @@ public class LTTngControlServiceMI extends LTTngControlService {
      *
      * @param shell
      *            the command shell implementation to use
-     * @param xsdUrl
-     *            the xsd schema file for validation
+     * @param version
+     *            the lttng version
      * @throws ExecutionException
      *             if the creation of the Schema and DocumentBuilder objects
      *             fails
      */
-    public LTTngControlServiceMI(@NonNull ICommandShell shell, @Nullable URL xsdUrl) throws ExecutionException {
+    public LTTngControlServiceMI(@NonNull ICommandShell shell, @Nullable LttngVersion version) throws ExecutionException {
         super(shell);
+        setVersion(version);
 
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         docBuilderFactory.setValidating(false);
 
         if (isSchemaValidationEnabled()) {
-            // Validate XSD schema
-            if (xsdUrl != null) {
+            if (version != null) {
                 SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
                 try {
+                    URL xsdUrl = LTTngControlService.class.getResource(LTTngControlServiceConstants.MI_XSD_FILENAME);
+                    if (version.compareTo(new LttngVersion(2, 8, 0, null, null, null, null, null, null)) >= 0) {
+                        xsdUrl = LTTngControlService.class.getResource(LTTngControlServiceConstants.MI3_XSD_FILENAME);
+                        // MI 3.0 added name spaces. It will fail to validate if this is not set to true.
+                        docBuilderFactory.setNamespaceAware(true);
+                    }
                     docBuilderFactory.setSchema(schemaFactory.newSchema(xsdUrl));
                 } catch (SAXException e) {
                     throw new ExecutionException(Messages.TraceControl_InvalidSchemaError, e);
@@ -145,11 +151,13 @@ public class LTTngControlServiceMI extends LTTngControlService {
      *
      * @param xmlStrings
      *            list of strings representing an xml input
+     * @param documentBuilder
+     *            the builder used to get the document
      * @return Document generated from strings input
      * @throws ExecutionException
      *             when parsing has failed
      */
-    private Document getDocumentFromStrings(List<String> xmlStrings) throws ExecutionException {
+    private static Document getDocumentFromStrings(List<String> xmlStrings, DocumentBuilder documentBuilder) throws ExecutionException {
         StringBuilder concatenedString = new StringBuilder();
         for (String string : xmlStrings) {
             concatenedString.append(string);
@@ -158,7 +166,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
 
         Document document;
         try {
-            document = fDocumentBuilder.parse(stream);
+            document = documentBuilder.parse(stream);
         } catch (SAXException | IOException e) {
             throw new ExecutionException(Messages.TraceControl_XmlParsingError + ':' + e.toString(), e);
         }
@@ -167,16 +175,29 @@ public class LTTngControlServiceMI extends LTTngControlService {
     }
 
     /**
-     * Parse, populate and set the internal LTTngVersion variable
-     *
-     * @param xmlOutput
-     *            the mi xml output of lttng version
+     * Parse LTTng version from a MI command result
+     * 
+     * @param commandResult
+     *            the result obtained from a MI command
+     * @return the LTTng version
      * @throws ExecutionException
      *             when xml extraction fail
      */
-    public void setVersion(List<String> xmlOutput) throws ExecutionException {
-        Document doc = getDocumentFromStrings(xmlOutput);
+    public static LttngVersion parseVersion(ICommandResult commandResult) throws ExecutionException {
+        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder;
+        try {
+            documentBuilder = docBuilderFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new ExecutionException(Messages.TraceControl_XmlDocumentBuilderError, e);
+        }
+
+        Document doc = getDocumentFromStrings(commandResult.getOutput(), documentBuilder);
         NodeList element = doc.getElementsByTagName(MIStrings.VERSION);
+        if (element.getLength() != 1) {
+            throw new ExecutionException(Messages.TraceControl_UnsupportedVersionError);
+        }
+
         int major = 0;
         int minor = 0;
         int patchLevel = 0;
@@ -186,47 +207,43 @@ public class LTTngControlServiceMI extends LTTngControlService {
         String description = ""; //$NON-NLS-1$
         String url = ""; //$NON-NLS-1$
         String fullVersion = ""; //$NON-NLS-1$
-        if (element.getLength() == 1) {
-            NodeList child = element.item(0).getChildNodes();
-            // Get basic information
-            for (int i = 0; i < child.getLength(); i++) {
-                Node node = child.item(i);
-                switch (node.getNodeName()) {
-                case MIStrings.VERSION_MAJOR:
-                    major = Integer.parseInt(node.getTextContent());
-                    break;
-                case MIStrings.VERSION_MINOR:
-                    minor = Integer.parseInt(node.getTextContent());
-                    break;
-                case MIStrings.VERSION_PATCH_LEVEL:
-                    patchLevel = Integer.parseInt(node.getTextContent());
-                    break;
-                case MIStrings.VERSION_COMMIT:
-                    commit = node.getTextContent();
-                    break;
-                case MIStrings.VERSION_DESCRIPTION:
-                    description = node.getTextContent();
-                    break;
-                case MIStrings.VERSION_LICENSE:
-                    license = node.getTextContent();
-                    break;
-                case MIStrings.VERSION_NAME:
-                    name = node.getTextContent();
-                    break;
-                case MIStrings.VERSION_STR:
-                    fullVersion = node.getTextContent();
-                    break;
-                case MIStrings.VERSION_WEB:
-                    url = node.getTextContent();
-                    break;
-                default:
-                    break;
-                }
+        NodeList child = element.item(0).getChildNodes();
+        // Get basic information
+        for (int i = 0; i < child.getLength(); i++) {
+            Node node = child.item(i);
+            switch (node.getNodeName()) {
+            case MIStrings.VERSION_MAJOR:
+                major = Integer.parseInt(node.getTextContent());
+                break;
+            case MIStrings.VERSION_MINOR:
+                minor = Integer.parseInt(node.getTextContent());
+                break;
+            case MIStrings.VERSION_PATCH_LEVEL:
+                patchLevel = Integer.parseInt(node.getTextContent());
+                break;
+            case MIStrings.VERSION_COMMIT:
+                commit = node.getTextContent();
+                break;
+            case MIStrings.VERSION_DESCRIPTION:
+                description = node.getTextContent();
+                break;
+            case MIStrings.VERSION_LICENSE:
+                license = node.getTextContent();
+                break;
+            case MIStrings.VERSION_NAME:
+                name = node.getTextContent();
+                break;
+            case MIStrings.VERSION_STR:
+                fullVersion = node.getTextContent();
+                break;
+            case MIStrings.VERSION_WEB:
+                url = node.getTextContent();
+                break;
+            default:
+                break;
             }
-            setVersion(new LttngVersion(major, minor, patchLevel, license, commit, name, description, url, fullVersion));
-        } else {
-            throw new ExecutionException(Messages.TraceControl_UnsupportedVersionError);
         }
+        return new LttngVersion(major, minor, patchLevel, license, commit, name, description, url, fullVersion);
     }
 
     @Override
@@ -234,7 +251,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
         ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_LIST);
         ICommandResult result = executeCommand(command, monitor);
 
-        Document doc = getDocumentFromStrings(result.getOutput());
+        Document doc = getDocumentFromStrings(result.getOutput(), fDocumentBuilder);
 
         NodeList elements = doc.getElementsByTagName(MIStrings.NAME);
 
@@ -254,7 +271,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
         ICommandResult result = executeCommand(command, monitor);
 
         ISessionInfo sessionInfo = new SessionInfo(sessionName);
-        Document document = getDocumentFromStrings(result.getOutput());
+        Document document = getDocumentFromStrings(result.getOutput(), fDocumentBuilder);
 
         NodeList sessionsNode = document.getElementsByTagName(MIStrings.SESSION);
         // There should be only one session
@@ -494,7 +511,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
         // For now only keep the last one.
         ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_SNAPSHOT, LTTngControlServiceConstants.COMMAND_LIST_SNAPSHOT_OUTPUT, LTTngControlServiceConstants.OPTION_SESSION, sessionName);
         ICommandResult result = executeCommand(command, monitor);
-        Document doc = getDocumentFromStrings(result.getOutput());
+        Document doc = getDocumentFromStrings(result.getOutput(), fDocumentBuilder);
         NodeList rawSnapshotsOutputs = doc.getElementsByTagName(MIStrings.SNAPSHOT_OUTPUTS);
 
         ISnapshotInfo snapshotInfo = new SnapshotInfo(""); //$NON-NLS-1$
@@ -551,7 +568,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
             throw new ExecutionException(Messages.TraceControl_CommandError + command.toString());
         }
 
-        Document document = getDocumentFromStrings(result.getOutput());
+        Document document = getDocumentFromStrings(result.getOutput(), fDocumentBuilder);
         NodeList rawEvents = document.getElementsByTagName(MIStrings.EVENT);
         getBaseEventInfo(rawEvents, events);
         return events;
@@ -579,7 +596,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
             throw new ExecutionException(Messages.TraceControl_CommandError + command.toString());
         }
 
-        Document document = getDocumentFromStrings(result.getOutput());
+        Document document = getDocumentFromStrings(result.getOutput(), fDocumentBuilder);
         NodeList rawProviders = document.getElementsByTagName(MIStrings.PID);
 
         IUstProviderInfo providerInfo = null;
@@ -625,7 +642,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
         ICommandInput command = prepareSessionCreationCommand(sessionInfo);
         ICommandResult result = executeCommand(command, monitor);
 
-        Document document = getDocumentFromStrings(result.getOutput());
+        Document document = getDocumentFromStrings(result.getOutput(), fDocumentBuilder);
         NodeList sessions = document.getElementsByTagName(MIStrings.SESSION);
 
         // Number of session should be equal to 1
@@ -668,7 +685,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
 
         ICommandResult result = executeCommand(command, monitor);
 
-        Document document = getDocumentFromStrings(result.getOutput());
+        Document document = getDocumentFromStrings(result.getOutput(), fDocumentBuilder);
         NodeList sessions = document.getElementsByTagName(MIStrings.SESSION);
 
         // Number of session should be equal to 1
@@ -734,7 +751,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
         }
 
         // Check for action effect
-        Document doc = getDocumentFromStrings(result.getOutput());
+        Document doc = getDocumentFromStrings(result.getOutput(), fDocumentBuilder);
         NodeList sessions = doc.getElementsByTagName(MIStrings.SESSION);
         if (sessions.getLength() != 1) {
             throw new ExecutionException(NLS.bind(Messages.TraceControl_MiInvalidNumberOfElementError, MIStrings.SESSION));

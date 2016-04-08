@@ -17,7 +17,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,8 +36,8 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionS
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.SessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.ILttngControlService;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlService;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceConstants;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceMI;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LttngVersion;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -59,8 +58,7 @@ public class LTTngControlServiceMiTest extends LTTngControlServiceTest {
     @Override
     protected ILttngControlService getControlService() {
         try {
-            URL resource = LTTngControlServiceMI.class.getResource(LTTngControlServiceConstants.MI_XSD_FILENAME);
-            return new LTTngControlServiceMI(getShell(), resource);
+            return new LTTngControlServiceMI(getShell(), new LttngVersion("2.7.0"));
         } catch (ExecutionException e) {
             return null;
         }

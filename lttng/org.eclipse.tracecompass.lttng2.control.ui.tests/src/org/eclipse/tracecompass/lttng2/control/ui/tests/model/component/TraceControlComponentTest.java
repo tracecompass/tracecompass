@@ -33,7 +33,6 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.Trac
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceControlRoot;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.ILttngControlService;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlService;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceConstants;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceMI;
 import org.eclipse.tracecompass.tmf.remote.core.proxy.TmfRemoteConnectionFactory;
 import org.eclipse.ui.ISharedImages;
@@ -277,7 +276,7 @@ public class TraceControlComponentTest {
         assertNotNull(service);
         assertEquals(service, result);
 
-        service = new LTTngControlServiceMI(proxy.createCommandShell(), LTTngControlServiceMI.class.getResource(LTTngControlServiceConstants.MI_XSD_FILENAME));
+        service = new LTTngControlServiceMI(proxy.createCommandShell(), null);
         fixture.setControlService(service);
         result = fixture.getControlService();
         assertNotNull(service);

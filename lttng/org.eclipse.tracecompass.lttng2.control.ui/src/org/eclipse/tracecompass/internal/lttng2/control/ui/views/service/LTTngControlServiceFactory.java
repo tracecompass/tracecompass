@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2015 Ericsson
+ * Copyright (c) 2012, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -80,8 +80,7 @@ public final class LTTngControlServiceFactory {
 
         if ((result.getResult() == 0) && (!result.getOutput().isEmpty())) {
             if (machineInterfaceMode) {
-                LTTngControlServiceMI service = new LTTngControlServiceMI(shell, LTTngControlService.class.getResource(LTTngControlServiceConstants.MI_XSD_FILENAME));
-                service.setVersion(result.getOutput());
+                LTTngControlServiceMI service = new LTTngControlServiceMI(shell, LTTngControlServiceMI.parseVersion(result));
                 return service;
             }
 

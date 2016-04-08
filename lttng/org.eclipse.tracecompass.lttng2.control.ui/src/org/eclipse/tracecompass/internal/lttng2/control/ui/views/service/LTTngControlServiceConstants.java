@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2015 Ericsson
+ * Copyright (c) 2012, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -60,6 +60,11 @@ public interface LTTngControlServiceConstants {
      * output from LTTng
      */
     String MI_XSD_FILENAME = "mi_lttng.xsd"; //$NON-NLS-1$
+    /**
+     * Name of the XSD to validate against the xml machine interface
+     * output from LTTng, version 3.0
+     */
+    String MI3_XSD_FILENAME = "mi-lttng-3.0.xsd"; //$NON-NLS-1$
     // ------------------------------------------------------------------------
     // Command constants
     // ------------------------------------------------------------------------
