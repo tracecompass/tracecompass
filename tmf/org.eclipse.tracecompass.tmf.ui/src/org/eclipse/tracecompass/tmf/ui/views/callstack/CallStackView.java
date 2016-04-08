@@ -491,6 +491,24 @@ public class CallStackView extends AbstractTimeGraphView {
         });
     }
 
+    /**
+     * @since 2.0
+     */
+    @Override
+    @TmfSignalHandler
+    public void windowRangeUpdated(final TmfWindowRangeUpdatedSignal signal) {
+
+        if (isPinned()) {
+            fSavedRangeSyncSignal = new TmfWindowRangeUpdatedSignal(signal.getSource(), signal.getCurrentRange());
+            fSavedTimeSyncSignal = null;
+        }
+
+        if ((signal.getSource() == this) || isPinned()) {
+            return;
+        }
+        super.windowRangeUpdated(signal);
+    }
+
     // ------------------------------------------------------------------------
     // Internal
     // ------------------------------------------------------------------------
