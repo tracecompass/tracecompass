@@ -36,6 +36,9 @@
             </goals>
             <configuration>
               <excludes>
+                <plugin id="org.apache.xerces"/>
+                <plugin id="org.apache.xml.resolver"/>
+                <plugin id="org.apache.xml.serializer"/>
                 <plugin id="org.eclipse.cdt.core"/>
                 <plugin id="org.eclipse.cdt.core.native"/>
                 <plugin id="org.eclipse.core.runtime.compatibility.auth"/>
@@ -80,6 +83,19 @@
                 <plugin id="org.eclipse.remote.jsch.ui"/>
                 <plugin id="org.eclipse.remote.ui"/>
                 <plugin id="org.eclipse.remote.console"/>
+                <plugin id="org.eclipse.wst.common.core"/>
+                <plugin id="org.eclipse.wst.common.environment"/>
+                <plugin id="org.eclipse.wst.common.frameworks"/>
+                <plugin id="org.eclipse.wst.common.frameworks.ui"/>
+                <plugin id="org.eclipse.wst.common.project.facet.core"/>
+                <plugin id="org.eclipse.wst.common.ui"/>
+                <plugin id="org.eclipse.wst.common.uriresolver"/>
+                <plugin id="org.eclipse.wst.sse.core"/>
+                <plugin id="org.eclipse.wst.sse.ui"/>
+                <plugin id="org.eclipse.wst.validation"/>
+                <plugin id="org.eclipse.wst.validation.ui"/>
+                <plugin id="org.eclipse.wst.xml.core"/>
+              <plugin id="org.eclipse.wst.xml.ui"/>
               </excludes>
             </configuration>
           </execution>

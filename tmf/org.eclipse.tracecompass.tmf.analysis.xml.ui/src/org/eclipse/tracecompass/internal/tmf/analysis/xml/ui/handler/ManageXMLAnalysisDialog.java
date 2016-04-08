@@ -12,6 +12,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -19,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -47,10 +49,14 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectModelElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPropertyListener;
+import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 
 /**
  * Dialog for XML analysis files
@@ -64,6 +70,7 @@ public class ManageXMLAnalysisDialog extends Dialog {
     private Button fDeleteButton;
     private Button fImportButton;
     private Button fExportButton;
+    private Button fEditButton;
     private Label fInvalidFileLabel;
 
     /**
@@ -103,9 +110,11 @@ public class ManageXMLAnalysisDialog extends Dialog {
                 if (fAnalysesList.getSelectionCount() == 0) {
                     fDeleteButton.setEnabled(false);
                     fExportButton.setEnabled(false);
+                    fEditButton.setEnabled(false);
                 } else {
                     fDeleteButton.setEnabled(true);
                     fExportButton.setEnabled(true);
+                    fEditButton.setEnabled(true);
                     handleSelection(fAnalysesList.getSelection());
                 }
             }
@@ -148,6 +157,22 @@ public class ManageXMLAnalysisDialog extends Dialog {
             public void widgetSelected(SelectionEvent e) {
                 exportAnalysis();
             }
+        });
+
+        fEditButton = new Button(buttonContainer, SWT.PUSH);
+        fEditButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+        fEditButton.setText(Messages.ManageXMLAnalysisDialog_Edit);
+        fEditButton.setEnabled(false);
+        fEditButton.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                editAnalysis();
+            }
+
         });
 
         fDeleteButton = new Button(buttonContainer, SWT.PUSH);
@@ -246,29 +271,38 @@ public class ManageXMLAnalysisDialog extends Dialog {
         String path = dialog.open();
         if (path != null) {
             File file = new File(path);
-            IStatus status = XmlUtils.xmlValidate(file);
-            if (status.isOK()) {
-                deleteSupplementaryFile(file.getName());
-                status = XmlUtils.addXmlFile(file);
-                if (status.isOK()) {
-                    fillAnalysesList();
-                    XmlAnalysisModuleSource.notifyModuleChange();
-                    /*
-                     * FIXME: It refreshes the list of analysis under a trace,
-                     * but since modules are instantiated when the trace opens,
-                     * the changes won't apply to an opened trace, it needs to
-                     * be closed then reopened
-                     */
-                    refreshProject();
-                } else {
-                    Activator.logError(Messages.ManageXMLAnalysisDialog_ImportFileFailed);
-                    TraceUtils.displayErrorMsg(Messages.ManageXMLAnalysisDialog_ImportFileFailed, status.getMessage());
-                }
-            } else {
-                Activator.logError(Messages.ManageXMLAnalysisDialog_ImportFileFailed);
-                TraceUtils.displayErrorMsg(Messages.ManageXMLAnalysisDialog_ImportFileFailed, status.getMessage());
+            if (loadXmlFile(file, true)) {
+                fillAnalysesList();
             }
         }
+    }
+
+    private static boolean loadXmlFile(File file, boolean addFile) {
+        IStatus status = XmlUtils.xmlValidate(file);
+        if (status.isOK()) {
+            deleteSupplementaryFile(file.getName());
+            if (addFile) {
+                status = XmlUtils.addXmlFile(file);
+            }
+            if (status.isOK()) {
+                XmlAnalysisModuleSource.notifyModuleChange();
+                /*
+                 * FIXME: It refreshes the list of analysis under a trace,
+                 * but since modules are instantiated when the trace opens,
+                 * the changes won't apply to an opened trace, it needs to
+                 * be closed then reopened
+                 */
+                refreshProject();
+                return true;
+            }
+
+            Activator.logError(Messages.ManageXMLAnalysisDialog_ImportFileFailed);
+            TraceUtils.displayErrorMsg(Messages.ManageXMLAnalysisDialog_ImportFileFailed, status.getMessage());
+        } else {
+            Activator.logError(Messages.ManageXMLAnalysisDialog_ImportFileFailed);
+            TraceUtils.displayErrorMsg(Messages.ManageXMLAnalysisDialog_ImportFileFailed, status.getMessage());
+        }
+        return false;
     }
 
     private void exportAnalysis() {
@@ -282,6 +316,35 @@ public class ManageXMLAnalysisDialog extends Dialog {
             if (!XmlUtils.exportXmlFile(selection, path).isOK()) {
                 Activator.logError(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToExport, selection));
             }
+        }
+    }
+
+    private void editAnalysis() {
+        String selection = createXmlFileString(fAnalysesList.getSelection()[0]);
+        @Nullable
+        File file = XmlUtils.listFiles().get(selection);
+        if (file == null) {
+            Activator.logError(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToEdit, selection));
+            TraceUtils.displayErrorMsg(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToEdit, selection), NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToEdit, selection));
+            return;
+        }
+        try {
+            IEditorPart editorPart = IDE.openEditorOnFileStore(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), EFS.getStore(file.toURI()));
+            editorPart.addPropertyListener(new IPropertyListener() {
+                @Override
+                public void propertyChanged(Object source, int propId) {
+                    if (ISaveablePart.PROP_DIRTY == propId) {
+                        if (!editorPart.isDirty()) {
+                            // Editor is not dirty anymore, i.e. it was saved
+                            loadXmlFile(file, false);
+                        }
+                    }
+                }
+            });
+            close();
+        } catch (CoreException e) {
+            Activator.logError(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToEdit, selection));
+            TraceUtils.displayErrorMsg(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToEdit, selection), e.getMessage());
         }
     }
 

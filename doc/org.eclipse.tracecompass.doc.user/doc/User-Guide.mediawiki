@@ -2700,6 +2700,10 @@ Click the '''Import''' button and select a file from the opened file dialog to i
 
 Select an XML file from the list, click the '''Export''' button and enter or select a file in the opened file dialog to export the XML analysis. Note that if an existing file containing an analysis is selected, its content will be replaced with the analysis to export.
 
+* Edit
+
+Select an XML file from the list, click the '''Edit''' to open the XML editor. When the file is saved after being modified, it is validated and traces that are affected by this file are closed.
+
 * Delete
 
 Select an XML file from the list and click the '''Delete''' button to remove the XML file. Deleting an XML file will close all the traces for which this analysis applies and remove the analysis.

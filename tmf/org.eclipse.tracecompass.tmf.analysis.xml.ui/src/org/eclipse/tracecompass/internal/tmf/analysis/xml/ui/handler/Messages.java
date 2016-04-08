@@ -48,6 +48,16 @@ public class Messages extends NLS {
     public static String ManageXMLAnalysisDialog_Export;
 
     /**
+     * Edit XML file message
+     */
+    public static String ManageXMLAnalysisDialog_Edit;
+
+    /**
+     * Edit failed message
+     */
+    public static String ManageXMLAnalysisDialog_FailedToEdit;
+
+    /**
      * Export failed message
      */
     public static String ManageXMLAnalysisDialog_FailedToExport;

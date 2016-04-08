@@ -18,7 +18,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.analysis.timing.core,
  org.eclipse.tracecompass.analysis.timing.ui,
  org.eclipse.tracecompass.segmentstore.core,
- org.swtchart
+ org.swtchart,
+ org.eclipse.wst.xml.ui,
+ org.eclipse.ui.ide,
+ org.eclipse.core.filesystem
 Export-Package: org.eclipse.tracecompass.internal.tmf.analysis.xml.ui;x-friends:="org.eclipse.tracecompass.tmf.analysis.xml.ui.tests",
  org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.handler;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module;x-internal:=true,
