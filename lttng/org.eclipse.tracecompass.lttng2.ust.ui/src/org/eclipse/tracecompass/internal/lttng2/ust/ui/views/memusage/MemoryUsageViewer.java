@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryStrings;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryAnalysisModule;
@@ -34,6 +35,7 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModul
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
+import org.swtchart.Chart;
 
 /**
  * Memory usage view
@@ -49,8 +51,6 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
     private final Map<Integer, Integer> fMemoryQuarks = new HashMap<>();
     private final Map<Integer, String> fSeriesName = new HashMap<>();
 
-    private static final int BYTES_TO_KB = 1024;
-
     // Timeout between updates in the updateData thread
     private static final long BUILD_UPDATE_TIMEOUT = 500;
 
@@ -62,6 +62,8 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
      */
     public MemoryUsageViewer(Composite parent) {
         super(parent, Messages.MemoryUsageViewer_Title, Messages.MemoryUsageViewer_XAxis, Messages.MemoryUsageViewer_YAxis);
+        Chart chart = getSwtChart();
+        chart.getAxisSet().getYAxis(0).getTick().setFormat(new DataSizeWithUnitFormat());
     }
 
     @Override
@@ -154,7 +156,7 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
                         double[] values = checkNotNull(fYValues.get(quark));
                         try {
                             Integer memQuark = checkNotNull(fMemoryQuarks.get(quark));
-                            yvalue = ss.querySingleState(time, memQuark.intValue()).getStateValue().unboxLong() / BYTES_TO_KB;
+                            yvalue = ss.querySingleState(time, memQuark.intValue()).getStateValue().unboxLong();
                             values[i] = yvalue;
                         } catch (TimeRangeException e) {
                             values[i] = 0;
