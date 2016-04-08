@@ -54,7 +54,7 @@ public class StateDumpHandler extends KernelEventHandler {
          * with anything relevant for now.
          */
 
-        String threadAttributeName = KernelEventHandlerUtils.buildThreadAttributeName(tid, cpu);
+        String threadAttributeName = Attributes.buildThreadAttributeName(tid, cpu);
         if (threadAttributeName == null) {
             return;
         }

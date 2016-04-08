@@ -46,12 +46,12 @@ public class ProcessForkHandler extends KernelEventHandler {
         Integer parentTid = ((Long) content.getField(getLayout().fieldParentTid()).getValue()).intValue();
         Integer childTid = ((Long) content.getField(getLayout().fieldChildTid()).getValue()).intValue();
 
-        String parentThreadAttributeName = KernelEventHandlerUtils.buildThreadAttributeName(parentTid, cpu);
+        String parentThreadAttributeName = Attributes.buildThreadAttributeName(parentTid, cpu);
         if (parentThreadAttributeName == null) {
             return;
         }
 
-        String childThreadAttributeName = KernelEventHandlerUtils.buildThreadAttributeName(childTid, cpu);
+        String childThreadAttributeName = Attributes.buildThreadAttributeName(childTid, cpu);
         if (childThreadAttributeName == null) {
             return;
         }

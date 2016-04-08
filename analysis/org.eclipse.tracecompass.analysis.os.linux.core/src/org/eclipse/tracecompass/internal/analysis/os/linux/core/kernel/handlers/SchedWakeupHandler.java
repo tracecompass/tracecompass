@@ -40,7 +40,7 @@ public class SchedWakeupHandler extends KernelEventHandler {
         final int tid = ((Long) event.getContent().getField(getLayout().fieldTid()).getValue()).intValue();
         final int prio = ((Long) event.getContent().getField(getLayout().fieldPrio()).getValue()).intValue();
 
-        String threadAttributeName = KernelEventHandlerUtils.buildThreadAttributeName(tid, cpu);
+        String threadAttributeName = Attributes.buildThreadAttributeName(tid, cpu);
         if (threadAttributeName == null) {
             return;
         }

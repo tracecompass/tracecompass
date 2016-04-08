@@ -41,7 +41,7 @@ public class PiSetprioHandler extends KernelEventHandler {
         Integer tid = ((Long) content.getField(getLayout().fieldTid()).getValue()).intValue();
         Integer prio = ((Long) content.getField(getLayout().fieldNewPrio()).getValue()).intValue();
 
-        String threadAttributeName = KernelEventHandlerUtils.buildThreadAttributeName(tid, cpu);
+        String threadAttributeName = Attributes.buildThreadAttributeName(tid, cpu);
         if (threadAttributeName == null) {
             return;
         }

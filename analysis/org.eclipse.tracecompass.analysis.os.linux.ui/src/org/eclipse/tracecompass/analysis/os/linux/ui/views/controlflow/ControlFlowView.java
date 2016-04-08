@@ -32,7 +32,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.KernelEventHandlerUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.FollowThreadAction;
@@ -284,7 +283,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                     for (int threadQuark : threadQuarks) {
                         String threadAttributeName = ssq.getAttributeName(threadQuark);
 
-                        Pair<Integer, Integer> entryKey = KernelEventHandlerUtils.parseThreadAttributeName(threadAttributeName);
+                        Pair<Integer, Integer> entryKey = Attributes.parseThreadAttributeName(threadAttributeName);
                         int threadId = entryKey.getFirst();
 
                         if (threadId < 0) { // ignore the 'unknown' (-1) thread

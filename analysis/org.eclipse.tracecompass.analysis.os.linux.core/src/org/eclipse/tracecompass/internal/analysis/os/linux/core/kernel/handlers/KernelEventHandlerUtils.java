@@ -23,7 +23,6 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
-import org.eclipse.tracecompass.tmf.core.util.Pair;
 
 /**
  * Kernel Event Handler Utils is a collection of static methods to be used in
@@ -100,7 +99,7 @@ public final class KernelEventHandlerUtils {
         int quark = ss.getQuarkRelativeAndAdd(getCurrentCPUNode(cpuNumber, ss), Attributes.CURRENT_THREAD);
         ITmfStateValue value = ss.queryOngoingState(quark);
         int thread = value.isNull() ? -1 : value.unboxInt();
-        return ss.getQuarkRelativeAndAdd(getNodeThreads(ss), buildThreadAttributeName(thread, cpuNumber));
+        return ss.getQuarkRelativeAndAdd(getNodeThreads(ss), Attributes.buildThreadAttributeName(thread, cpuNumber));
     }
 
     /**
@@ -278,64 +277,5 @@ public final class KernelEventHandlerUtils {
         return (ssb.queryOngoingState(threadSystemCallQuark).isNull() ?
                 StateValues.CPU_STATUS_RUN_USERMODE_VALUE :
                 StateValues.CPU_STATUS_RUN_SYSCALL_VALUE);
-    }
-
-    /**
-     * Build the thread attribute name.
-     *
-     * For all threads except "0" this is the string representation of the threadId.
-     * For thread "0" which is the idle thread and can be running concurrently on multiple
-     * CPUs, append "_cpuId".
-     *
-     * @param threadId
-     *              the thread id
-     * @param cpuId
-     *              the cpu id
-     *
-     * @return the thread attribute name
-     *         null if the threadId is zero and the cpuId is null
-     */
-    public static @Nullable String buildThreadAttributeName(int threadId, @Nullable Integer cpuId) {
-
-        if (threadId == 0) {
-            if (cpuId == null) {
-                return null;
-            }
-            return Attributes.THREAD_0_PREFIX + String.valueOf(cpuId);
-        }
-
-        return String.valueOf(threadId);
-    }
-
-    /**
-     * Parse the thread id and CPU id from the thread attribute name string
-     *
-     * For thread "0" the attribute name is in the form "threadId_cpuId", extract both
-     * values from the string.
-     *
-     * For all other threads, the attribute name is the string representation of the
-     * threadId and there is no cpuId.
-     *
-     * @param threadAttributeName
-     *              the thread attribute name
-     * @return the thread id and cpu id
-     */
-    public static Pair<Integer, Integer> parseThreadAttributeName(String threadAttributeName) {
-        Integer threadId = -1;
-        Integer cpuId = -1;
-
-        try {
-            if (threadAttributeName.startsWith(Attributes.THREAD_0_PREFIX)) {
-                threadId = 0;
-                String[] tokens = threadAttributeName.split(Attributes.THREAD_0_SEPARATOR);
-                cpuId = Integer.parseInt(tokens[1]);
-            } else {
-                threadId = Integer.parseInt(threadAttributeName);
-            }
-        } catch (NumberFormatException e1) {
-            //pass
-        }
-
-        return new Pair<>(threadId, cpuId);
     }
 }

@@ -55,8 +55,8 @@ public class SchedSwitchHandler extends KernelEventHandler {
         Integer nextPrio = ((Long) content.getField(getLayout().fieldNextPrio()).getValue()).intValue();
 
         /* Will never return null since "cpu" is null checked */
-        String formerThreadAttributeName = KernelEventHandlerUtils.buildThreadAttributeName(prevTid, cpu);
-        String currenThreadAttributeName = KernelEventHandlerUtils.buildThreadAttributeName(nextTid, cpu);
+        String formerThreadAttributeName = Attributes.buildThreadAttributeName(prevTid, cpu);
+        String currenThreadAttributeName = Attributes.buildThreadAttributeName(nextTid, cpu);
 
         int nodeThreads = KernelEventHandlerUtils.getNodeThreads(ss);
         int formerThreadNode = ss.getQuarkRelativeAndAdd(nodeThreads, formerThreadAttributeName);
