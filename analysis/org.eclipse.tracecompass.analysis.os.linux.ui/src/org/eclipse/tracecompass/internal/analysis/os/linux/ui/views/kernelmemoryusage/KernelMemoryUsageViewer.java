@@ -8,16 +8,13 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.kernelmemoryusage;
 
-import java.text.DecimalFormat;
-import java.text.FieldPosition;
-import java.text.Format;
-import java.text.ParsePosition;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage.KernelMemoryAnalysisModule;
+import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -38,47 +35,6 @@ import org.swtchart.Chart;
  */
 public class KernelMemoryUsageViewer extends TmfCommonXLineChartViewer {
 
-    /**
-     * MemoryFormat
-     *
-     * @author Matthew Khouzam
-     */
-    private static final class MemoryFormat extends Format {
-        private static final long serialVersionUID = 3934127385682676804L;
-        private static final String KB = "KB"; //$NON-NLS-1$
-        private static final String MB = "MB"; //$NON-NLS-1$
-        private static final String GB = "GB"; //$NON-NLS-1$
-        private static final String TB = "TB"; //$NON-NLS-1$
-        private static final long KILO = 1024;
-        private static final Format FORMAT = new DecimalFormat("#.###"); //$NON-NLS-1$
-
-        @Override
-        public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
-            if (obj instanceof Double) {
-                Double value = (Double) obj;
-                if (value == 0) {
-                    return toAppendTo.append("0"); //$NON-NLS-1$
-                }
-                if (value > KILO * KILO * KILO * KILO) {
-                    return toAppendTo.append(FORMAT.format(value / (KILO * KILO * KILO * KILO))).append(' ').append(TB);
-                }
-                if (value > KILO * KILO * KILO) {
-                    return toAppendTo.append(FORMAT.format(value / (KILO * KILO * KILO))).append(' ').append(GB);
-                }
-                if (value > KILO * KILO) {
-                    return toAppendTo.append(FORMAT.format(value / (KILO * KILO))).append(' ').append(MB);
-                }
-                return toAppendTo.append(FORMAT.format(value / (KILO))).append(' ').append(KB);
-            }
-            return toAppendTo;
-        }
-
-        @Override
-        public Object parseObject(String source, ParsePosition pos) {
-            return null;
-        }
-    }
-
     private static final String NOT_SELECTED = "-1"; //$NON-NLS-1$
 
     private TmfStateSystemAnalysisModule fModule = null;
@@ -93,7 +49,7 @@ public class KernelMemoryUsageViewer extends TmfCommonXLineChartViewer {
     public KernelMemoryUsageViewer(Composite parent) {
         super(parent, Messages.MemoryUsageViewer_title, Messages.MemoryUsageViewer_xAxis, Messages.MemoryUsageViewer_yAxis);
         Chart chart = getSwtChart();
-        chart.getAxisSet().getYAxis(0).getTick().setFormat(new MemoryFormat());
+        chart.getAxisSet().getYAxis(0).getTick().setFormat(new DataSizeWithUnitFormat());
         chart.getLegend().setPosition(SWT.BOTTOM);
     }
 
