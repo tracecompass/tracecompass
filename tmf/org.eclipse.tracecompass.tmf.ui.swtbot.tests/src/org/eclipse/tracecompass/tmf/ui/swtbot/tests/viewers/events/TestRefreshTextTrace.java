@@ -135,12 +135,16 @@ public class TestRefreshTextTrace {
 
         @Override
         public boolean test() throws Exception {
-            return fTrace.getNbEvents() == fNbEvents;
+            if (fTrace.getNbEvents() != fNbEvents) {
+                System.out.println("Waiting for expected " + fNbEvents + " events. Current: " + fTrace.getNbEvents());
+                return false;
+            }
+            return true;
         }
 
         @Override
         public String getFailureMessage() {
-            return fTrace.getName() + " did not contain the expected number of " + fNbEvents + " events";
+            return fTrace.getName() + " did not contain the expected number of " + fNbEvents + " events. Current: " + fTrace.getNbEvents();
         }
     }
 
