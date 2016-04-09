@@ -172,8 +172,11 @@ public class SymbolProviderConfigDialog extends TitleAreaDialog implements IPref
     public void updateMessage() {
         if (fTabFolder == null) {
             updateMessage(0);
-        } else {
-            updateMessage(fTabFolder.getSelectionIndex());
+            return;
+        }
+        int curSelectionIndex = fTabFolder.getSelectionIndex();
+        if (curSelectionIndex >= 0) {
+            updateMessage(curSelectionIndex);
         }
     }
 
