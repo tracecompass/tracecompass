@@ -52,8 +52,9 @@ import org.junit.rules.Timeout;
  */
 public abstract class AbstractProviderTest {
 
-    /** Time-out tests after 20 seconds */
-    @Rule public TestRule globalTimeout= new Timeout(20, TimeUnit.SECONDS);
+    /** Time-out tests after 1 minute. */
+    @Rule
+    public TestRule globalTimeout = new Timeout(1, TimeUnit.MINUTES);
 
     // ------------------------------------------------------------------------
     // Attributes

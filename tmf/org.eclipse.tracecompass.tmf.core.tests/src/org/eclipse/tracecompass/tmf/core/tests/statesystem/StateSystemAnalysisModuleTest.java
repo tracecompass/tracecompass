@@ -43,9 +43,9 @@ import org.junit.rules.Timeout;
  */
 public class StateSystemAnalysisModuleTest {
 
-    /** Time-out tests after 20 seconds */
+    /** Time-out tests after 1 minute. */
     @Rule
-    public TestRule globalTimeout= new Timeout(20, TimeUnit.SECONDS);
+    public TestRule globalTimeout = new Timeout(1, TimeUnit.MINUTES);
 
     /** ID of the test state system analysis module */
     public static final String MODULE_SS = "org.eclipse.linuxtools.tmf.core.tests.analysis.sstest";

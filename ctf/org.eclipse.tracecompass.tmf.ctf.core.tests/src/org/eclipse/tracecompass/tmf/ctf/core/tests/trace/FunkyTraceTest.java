@@ -43,9 +43,9 @@ import org.junit.rules.Timeout;
  */
 public class FunkyTraceTest {
 
-    /** Time-out tests after 20 seconds */
+    /** Time-out tests after 1 minute. */
     @Rule
-    public TestRule globalTimeout= new Timeout(20, TimeUnit.SECONDS);
+    public TestRule globalTimeout = new Timeout(1, TimeUnit.MINUTES);
 
     // ------------------------------------------------------------------------
     // Attributes
