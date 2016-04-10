@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.btf.ui;
 
 import java.util.Arrays;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.btf.core.event.BTFPayload;
 import org.eclipse.tracecompass.btf.core.event.BtfEvent;
 import org.eclipse.tracecompass.btf.core.trace.BtfColumnNames;
@@ -57,7 +58,7 @@ public class BtfEventPropertySource extends TmfEventPropertySource {
      * @param event
      *            the event
      */
-    public BtfEventPropertySource(BtfEvent event) {
+    public BtfEventPropertySource(@NonNull BtfEvent event) {
         super(event);
         fEvent = event;
 

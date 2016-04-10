@@ -17,14 +17,19 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyStrin
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.StreamUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfCustomAttributes;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfModelLookup;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
@@ -34,17 +39,11 @@ import org.eclipse.ui.views.properties.IPropertySource;
  */
 public class TmfEventPropertySource implements IPropertySource {
 
-    private static final String ID_TIMESTAMP = "event_timestamp"; //$NON-NLS-1$
-    private static final String ID_TYPE = "event_type"; //$NON-NLS-1$
-    private static final String ID_TRACE = "trace_attribute"; //$NON-NLS-1$
     private static final String ID_CONTENT = "event_content"; //$NON-NLS-1$
     private static final String ID_SOURCE_LOOKUP = "event_lookup"; //$NON-NLS-1$
     private static final String ID_MODEL_URI = "model_uri"; //$NON-NLS-1$
     private static final String ID_CUSTOM_ATTRIBUTE = "custom_attribute"; //$NON-NLS-1$
 
-    private static final String NAME_TIMESTAMP = "Timestamp"; //$NON-NLS-1$
-    private static final String NAME_TYPE = "Type"; //$NON-NLS-1$
-    private static final String NAME_TRACE = "Trace"; //$NON-NLS-1$
     private static final String NAME_CONTENT = "Content"; //$NON-NLS-1$
     private static final String NAME_SOURCE_LOOKUP = "Source Lookup"; //$NON-NLS-1$
     private static final String NAME_MODEL_URI = "Model URI"; //$NON-NLS-1$
@@ -52,56 +51,7 @@ public class TmfEventPropertySource implements IPropertySource {
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
-    private ITmfEvent fEvent;
-
-    private static class TimestampPropertySource implements IPropertySource {
-        private static final String ID_TIMESTAMP_VALUE = "timestamp_value"; //$NON-NLS-1$
-        private static final String ID_TIMESTAMP_SCALE = "timestamp_scale"; //$NON-NLS-1$
-        private static final String NAME_TIMESTAMP_VALUE = "value"; //$NON-NLS-1$
-        private static final String NAME_TIMESTAMP_SCALE = "scale"; //$NON-NLS-1$
-
-        private ITmfTimestamp fTimestamp;
-
-        public TimestampPropertySource(ITmfTimestamp timestamp) {
-            fTimestamp = timestamp;
-        }
-
-        @Override
-        public Object getEditableValue() {
-            return fTimestamp.toString();
-        }
-
-        @Override
-        public IPropertyDescriptor[] getPropertyDescriptors() {
-            IPropertyDescriptor[] descriptors = new IPropertyDescriptor[2];
-            descriptors[0] = new ReadOnlyTextPropertyDescriptor(ID_TIMESTAMP_VALUE, NAME_TIMESTAMP_VALUE);
-            descriptors[1] = new ReadOnlyTextPropertyDescriptor(ID_TIMESTAMP_SCALE, NAME_TIMESTAMP_SCALE);
-            return descriptors;
-        }
-
-        @Override
-        public Object getPropertyValue(Object id) {
-            if (id.equals(ID_TIMESTAMP_VALUE)) {
-                return Long.toString(fTimestamp.getValue());
-            } else if (id.equals(ID_TIMESTAMP_SCALE)) {
-                return Integer.toString(fTimestamp.getScale());
-            }
-            return null;
-        }
-
-        @Override
-        public boolean isPropertySet(Object id) {
-            return false;
-        }
-
-        @Override
-        public void resetPropertyValue(Object id) {
-        }
-
-        @Override
-        public void setPropertyValue(Object id, Object value) {
-        }
-    }
+    private final @NonNull ITmfEvent fEvent;
 
     private static class ContentPropertySource implements IPropertySource {
         private ITmfEventField fContent;
@@ -274,7 +224,7 @@ public class TmfEventPropertySource implements IPropertySource {
      *
      * @param event the event
      */
-    public TmfEventPropertySource(ITmfEvent event) {
+    public TmfEventPropertySource(@NonNull ITmfEvent event) {
         super();
         this.fEvent = event;
     }
@@ -288,13 +238,19 @@ public class TmfEventPropertySource implements IPropertySource {
     public IPropertyDescriptor[] getPropertyDescriptors() {
         List<IPropertyDescriptor> descriptors= new ArrayList<>();
 
-        /* Display basic event information */
-        descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_TIMESTAMP, NAME_TIMESTAMP));
-        descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_TYPE, NAME_TYPE));
-        descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_TRACE, NAME_TRACE));
-
-        /* Display event fields */
-        descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_CONTENT, NAME_CONTENT));
+        /* Display properties for event aspects */
+        getTraceAspects().forEach(aspect -> {
+            /*
+             * Contents has its special property source, which puts the fields
+             * in a sub-tree.
+             */
+            if (aspect == TmfBaseAspects.getContentsAspect()) {
+                descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_CONTENT, NAME_CONTENT));
+            } else {
+                String name = aspect.getName();
+                descriptors.add(new ReadOnlyTextPropertyDescriptor(name, name));
+            }
+        });
 
         /* Display source lookup information, if the event supplies it */
         if ((fEvent instanceof ITmfSourceLookup) && (((ITmfSourceLookup)fEvent).getCallsite() != null)) {
@@ -318,14 +274,14 @@ public class TmfEventPropertySource implements IPropertySource {
     }
 
     @Override
-    public Object getPropertyValue(Object id) {
-        if (id.equals(ID_TIMESTAMP)) {
-            return new TimestampPropertySource(fEvent.getTimestamp());
-        } else if (id.equals(ID_TYPE) && fEvent.getType() != null) {
-            return fEvent.getType().toString();
-        } else if (id.equals(ID_TRACE)) {
-            return fEvent.getTrace().getName();
-        } else if (id.equals(ID_MODEL_URI)) {
+    public Object getPropertyValue(Object objectId) {
+        if (!(objectId instanceof String)) {
+            return null;
+        }
+
+        String id = (String) objectId;
+
+        if (id.equals(ID_MODEL_URI)) {
             return ((ITmfModelLookup)fEvent).getModelUri();
         } else if (id.equals(ID_SOURCE_LOOKUP)) {
             return new SourceLookupPropertySource(((ITmfSourceLookup)fEvent));
@@ -334,7 +290,22 @@ public class TmfEventPropertySource implements IPropertySource {
         } else if (id.equals(ID_CUSTOM_ATTRIBUTE)) {
             return new CustomAttributePropertySource((ITmfCustomAttributes) fEvent);
         }
+
+        /* Look for the ID in the aspect names */
+        Optional<ITmfEventAspect<?>> potentialAspect = getTraceAspects()
+            .filter(aspect -> aspect.getName().equals(id))
+            .findFirst();
+
+        if (potentialAspect.isPresent()) {
+            Object res = potentialAspect.get().resolve(fEvent);
+            return (res == null ? "" : res.toString()); //$NON-NLS-1$
+        }
+
         return null;
+    }
+
+    private Stream<ITmfEventAspect<?>> getTraceAspects() {
+        return StreamUtils.getStream(fEvent.getTrace().getEventAspects());
     }
 
     @Override
