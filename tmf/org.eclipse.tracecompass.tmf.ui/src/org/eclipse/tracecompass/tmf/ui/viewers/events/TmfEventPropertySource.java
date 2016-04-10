@@ -188,7 +188,7 @@ public class TmfEventPropertySource implements IPropertySource {
         }
 
         @Override
-        public Object getPropertyValue(Object id) {
+        public String getPropertyValue(Object id) {
             ITmfCallsite cs = fSourceLookup.getCallsite();
             if (cs == null) {
                 /*
@@ -208,7 +208,7 @@ public class TmfEventPropertySource implements IPropertySource {
             case ID_FUNCTION_NAME:
                 return cs.getFunctionName();
             case ID_LINE_NUMBER:
-                return Long.valueOf(cs.getLineNumber());
+                return String.valueOf(cs.getLineNumber());
             default:
                 return null;
             }
