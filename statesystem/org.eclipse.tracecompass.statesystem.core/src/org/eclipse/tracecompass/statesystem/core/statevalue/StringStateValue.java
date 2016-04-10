@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.statesystem.core.statevalue;
 
+import java.nio.ByteBuffer;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 
@@ -56,6 +58,15 @@ final class StringStateValue extends TmfStateValue {
     @Override
     public String toString() {
         return value;
+    }
+
+    @Override
+    public byte[] serialize() {
+        byte[] strBytes = value.getBytes();
+        ByteBuffer buffer = ByteBuffer.allocate(Byte.BYTES + strBytes.length);
+        buffer.put(getType().getByte());
+        buffer.put(strBytes);
+        return buffer.array();
     }
 
     // ------------------------------------------------------------------------

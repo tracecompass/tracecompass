@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.statesystem.core.statevalue;
 
+import java.nio.ByteBuffer;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 
@@ -56,6 +58,14 @@ final class LongStateValue extends TmfStateValue {
     @Override
     public @Nullable String toString() {
         return String.format("%3d", value); //$NON-NLS-1$
+    }
+
+    @Override
+    public byte[] serialize() {
+        ByteBuffer buffer = ByteBuffer.allocate(Byte.BYTES + Long.BYTES);
+        buffer.put(getType().getByte());
+        buffer.putLong(value);
+        return buffer.array();
     }
 
     // ------------------------------------------------------------------------

@@ -85,4 +85,18 @@ public abstract class StateValueTestBase {
     public void testIsNull() {
         assertFalse(getStateValueFixture().isNull());
     }
+
+    /**
+     * Test state value serialization and deserialization, using
+     * {@link ITmfStateValue#serialize()} and
+     * {@link TmfStateValue#readSerializedValue}.
+     */
+    @Test
+    public void testSerialization() {
+        ITmfStateValue initialValue = getStateValueFixture();
+        byte[] serializedValue = initialValue.serialize();
+        ITmfStateValue readValue = TmfStateValue.readSerializedValue(serializedValue);
+
+        assertEquals(initialValue, readValue);
+    }
 }

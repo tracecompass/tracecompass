@@ -25,7 +25,8 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 final class NullStateValue extends TmfStateValue {
 
-    private final String value = "nullValue"; //$NON-NLS-1$
+    private static final byte[] EMPTY_ARRAY = new byte[0];
+    private static final String STR_VALUE = "nullValue"; //$NON-NLS-1$
 
     @Override
     public Type getType() {
@@ -49,7 +50,12 @@ final class NullStateValue extends TmfStateValue {
 
     @Override
     public String toString() {
-        return value;
+        return STR_VALUE;
+    }
+
+    @Override
+    public byte[] serialize() {
+        return EMPTY_ARRAY;
     }
 
     // ------------------------------------------------------------------------
@@ -73,7 +79,7 @@ final class NullStateValue extends TmfStateValue {
 
     @Override
     public String unboxStr() {
-        return value;
+        return STR_VALUE;
     }
 
     @Override
@@ -90,5 +96,4 @@ final class NullStateValue extends TmfStateValue {
          */
         return -(other.compareTo(this));
     }
-
 }
