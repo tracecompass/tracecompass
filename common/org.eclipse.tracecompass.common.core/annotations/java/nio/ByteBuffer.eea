@@ -5,6 +5,9 @@ allocate
 allocateDirect
  (I)Ljava/nio/ByteBuffer;
  (I)L1java/nio/ByteBuffer;
+array
+ ()[B
+ ()[1B
 wrap
  ([B)Ljava/nio/ByteBuffer;
  ([B)L1java/nio/ByteBuffer;
