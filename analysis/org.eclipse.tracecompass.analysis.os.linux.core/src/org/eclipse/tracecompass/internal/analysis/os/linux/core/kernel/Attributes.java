@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  ******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.core.kernel;
+package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel;
 
 /**
  * This file defines all the attribute names used in the handler. Both the

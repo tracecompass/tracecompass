@@ -12,8 +12,8 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers;
 
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;

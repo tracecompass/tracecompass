@@ -12,8 +12,8 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers
 import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
