@@ -1032,6 +1032,26 @@ Trace Compass supports automatic alignment of the time axis for time base views.
 
 [[Image:images/TimeAlignment_sash.png]]
 
+== Searching in Time Graph Views ==
+
+Search for an entry in a '''Time Graph view''', e.g. [[#Control_Flow_View | Control Flow View]] or [[#Resources_View | Resources View]], using the ''' Find ''' dialog. To use the dialog :
+
+* Select the time graph view you want to search in
+* Press ''' Ctrl + F '''. The following screen will be shown :
+
+[[Image:images/FindDialog.png]]
+
+* Enter the string to find in the ''' Find ''' text drop down and select the ''' Options ''' and ''' Direction ''' you need.
+* Press the ''' Find ''' button or ''' Enter ''' or ''' Alt + n '''. The next match in the selected time graph view will be selected.
+
+Various options are available in the ''' Options ''' group :
+* ''' Case sensitive ''' makes the search case sensitive.
+* ''' Wrap search ''' restarts the search from the first index, depending of the direction, when no entry were found.
+* ''' Whole word ''' allows to search for whole words, delimited by spaces or special character, that are identical to the search text.
+* ''' Regular expression ''' specifies that the search text is a regular expression or not.
+
+The ''' Direction ''' group allows to select the search direction : ''' Forward ''' or ''' Backward '''.
+
 = LTTng Tracer Control =
 
 The LTTng Tracer Control in Eclipse for the LTTng Tracer toolchain version v2.0 (or later) is done using SSH and requires an SSH server to be running on the remote host. For the SSH connection the SSH implementation of Remote Services is used. The functions to control the LTTng tracer (e.g. start and stop), either locally or remotely, are available from a dedicated Control View.
@@ -1698,6 +1718,7 @@ The states flow is usable with the keyboard. The following actions are set:
 *'''Ctrl + +''': Zoom-in vertically
 *'''Ctrl + -''': Zoom-out vertically
 *'''Ctrl + 0''': Reset the vertical zoom
+*'''Ctrl + F''': Search in the view. (see [[#Searching in Time Graph Views | Searching in Time Graph Views]])
 
 When the selection indicators are changed, all the other views are '''synchronized'''. For example, the [[#LTTng Kernel Events Editor|Events Editor]] will show the event matching the current time indicator. The reverse behaviour is also implemented: selecting an event within the Events View will update the Control Flow View current time indicator.
 
@@ -2153,7 +2174,6 @@ The Memory Usage chart is usable with the mouse. The following actions are set:
 * '''middle-drag''': pan left or right
 * '''right-drag horizontally''': zoom region
 * '''mouse wheel up/down''': zoom in or out
-
 
 === Toolbar ===
 
@@ -2632,6 +2652,9 @@ The following screenshot shows the result of the preceding example on a test tra
 
 [[Image:images/Xml_analysis_screenshot.png| XML analysis with view]]
 
+==== Using the keyboard ====
+*'''Ctrl + F''': Search in the view. (see [[#Searching in Time Graph Views | Searching in Time Graph Views]])
+
 == Defining an XML XY chart ==
 
 An XY chart displays series as a set of numerical values over time. The X-axis represents the time and is synchronized with the trace's current time range. The Y-axis can be any numerical value.
@@ -2736,6 +2759,9 @@ In the image below, we see for the virtual CPU status that it has a few more sta
 The entries for each thread of the machine corresponds to the one from the [[#Control flow | Control Flow View]], augmented with the data from the Virtual CPU, so that we see that even though it is running from the guest's point of view, it is actually not running when the Virtual CPU it runs on is in preempted or hypervisor mode.
 
 [[Image:images/vmAnalysis/VM_CPU_view.png | Virtual CPU view]]
+
+==== Using the keyboard ====
+*'''Ctrl + F''': Search in the view. (see [[#Searching in Time Graph Views | Searching in Time Graph Views]])
 
 == Hypervisor-specific Tracing ==
 
