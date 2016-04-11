@@ -594,7 +594,7 @@
         <plugin>
           <groupId>org.jboss.tools.tycho-plugins</groupId>
           <artifactId>repository-utils</artifactId>
-          <version>0.23.2</version>
+          <version>0.23.3</version>
         </plugin>
 
         <plugin>
