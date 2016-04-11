@@ -16,7 +16,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Clock description used in CTF traces
+ * Clock description used in CTF traces.
+ *
+ * From the TSDL perspective, they describe the clock topology of the system, as well as to detail
+ * each clock parameter. In absence of clock description, it is assumed that all fields named
+ * timestamp use the same clock source, which increments once per nanosecond.
+ * <p>
+ * Describing a clock and how it is used by streams is threefold:
+ * <ol>
+ * <li>the clock and clock topology should be described in a clock description block</li>
+ * <li>a reference to this clock should be added within an integer type. (timestamp)</li>
+ * <li>stream declarations can reference the clock they use as a timestamp source</li></ol>
+ * In for trace compass's perspective, clock attributes are added when the trace is parsed. The ones
+ * used at this moment are:
+ * <ul><li>offsets</li><li>names</li><li>frequencies</li></ul>
+ *
+ * Most traces only have one clock source. As all events have timestamps offsetted by the same clock.
+ * It is however possible especially with mixed traces (hardware and software) to have different
+ * clock sources for a given event.
+ * <p>
+ * An individual event should only have one timestamp and therefore only one clock source though.
  */
 public class CTFClock {
 
@@ -45,6 +64,7 @@ public class CTFClock {
      * Default constructor
      */
     public CTFClock() {
+        // The attributes are added later using addAttribute
     }
 
     /**
