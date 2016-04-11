@@ -41,13 +41,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -253,17 +250,14 @@ public class TimeGraphCombo extends Composite {
         protected TimeGraphMarkerAxis createTimeGraphMarkerAxis(Composite parent, @NonNull TimeGraphColorScheme colorScheme, @NonNull ITimeDataProvider timeProvider) {
             TimeGraphMarkerAxisExtension timeGraphMarkerAxis = new TimeGraphMarkerAxisExtension(parent, colorScheme, timeProvider);
             Tree tree = fTreeViewer.getTree();
-            tree.addPaintListener(new PaintListener() {
-                @Override
-                public void paintControl(PaintEvent e) {
-                    /*
-                     * Draw the marker axis over the tree. Only the name area
-                     * will be drawn, since the time area has zero width.
-                     */
-                    Rectangle bounds = timeGraphMarkerAxis.getAxisBounds();
-                    e.gc.setBackground(timeGraphMarkerAxis.getBackground());
-                    timeGraphMarkerAxis.drawMarkerAxis(bounds, bounds.width, e.gc);
-                }
+            tree.addPaintListener(e -> {
+                /*
+                 * Draw the marker axis over the tree. Only the name area
+                 * will be drawn, since the time area has zero width.
+                 */
+                Rectangle bounds = timeGraphMarkerAxis.getAxisBounds();
+                e.gc.setBackground(timeGraphMarkerAxis.getBackground());
+                timeGraphMarkerAxis.drawMarkerAxis(bounds, bounds.width, e.gc);
             });
             tree.addMouseListener(new MouseAdapter() {
                 @Override
@@ -540,12 +534,9 @@ public class TimeGraphCombo extends Composite {
             }
         });
 
-        tree.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(DisposeEvent e) {
-                if (fTreeFont != null) {
-                    fTreeFont.dispose();
-                }
+        tree.addDisposeListener(e -> {
+            if (fTreeFont != null) {
+                fTreeFont.dispose();
             }
         });
 
@@ -610,83 +601,74 @@ public class TimeGraphCombo extends Composite {
         });
 
         // prevent mouse button from selecting a filler tree item
-        tree.addListener(SWT.MouseDown, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                TreeItem treeItem = tree.getItem(new Point(event.x, event.y));
-                if (treeItem == null || treeItem.getData() == FILLER) {
-                    event.doit = false;
-                    List<TreeItem> treeItems = getVisibleExpandedItems(tree, false);
-                    if (treeItems.size() == 0) {
-                        fTreeViewer.setSelection(new StructuredSelection());
-                        fTimeGraphViewer.setSelection(null);
-                        return;
-                    }
-                    // this prevents from scrolling up when selecting
-                    // the partially visible tree item at the bottom
-                    tree.select(treeItems.get(treeItems.size() - 1));
+        tree.addListener(SWT.MouseDown, event -> {
+            TreeItem treeItem = tree.getItem(new Point(event.x, event.y));
+            if (treeItem == null || treeItem.getData() == FILLER) {
+                event.doit = false;
+                List<TreeItem> treeItems = getVisibleExpandedItems(tree, false);
+                if (treeItems.size() == 0) {
                     fTreeViewer.setSelection(new StructuredSelection());
                     fTimeGraphViewer.setSelection(null);
+                    return;
                 }
+                // this prevents from scrolling up when selecting
+                // the partially visible tree item at the bottom
+                tree.select(treeItems.get(treeItems.size() - 1));
+                fTreeViewer.setSelection(new StructuredSelection());
+                fTimeGraphViewer.setSelection(null);
             }
         });
 
         // prevent mouse wheel from scrolling down into filler tree items
-        tree.addListener(SWT.MouseWheel, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                event.doit = false;
-                if (event.count == 0) {
-                    return;
-                }
-                Slider scrollBar = fTimeGraphViewer.getVerticalBar();
-                fTimeGraphViewer.setTopIndex(scrollBar.getSelection() - event.count);
-                alignTreeItems(false);
+        tree.addListener(SWT.MouseWheel, event -> {
+            event.doit = false;
+            if (event.count == 0) {
+                return;
             }
+            Slider scrollBar = fTimeGraphViewer.getVerticalBar();
+            fTimeGraphViewer.setTopIndex(scrollBar.getSelection() - event.count);
+            alignTreeItems(false);
         });
 
         // prevent key stroke from selecting a filler tree item
-        tree.addListener(SWT.KeyDown, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                List<TreeItem> treeItems = getVisibleExpandedItems(tree, false);
-                if (treeItems.size() == 0) {
-                    fTreeViewer.setSelection(new StructuredSelection());
-                    event.doit = false;
-                    return;
-                }
-                if (event.keyCode == SWT.ARROW_DOWN) {
-                    int index = Math.min(fTimeGraphViewer.getSelectionIndex() + 1, treeItems.size() - 1);
-                    fTimeGraphViewer.setSelection((ITimeGraphEntry) treeItems.get(index).getData());
-                    event.doit = false;
-                } else if (event.keyCode == SWT.PAGE_DOWN) {
-                    int height = tree.getSize().y - tree.getHeaderHeight() - tree.getHorizontalBar().getSize().y;
-                    int countPerPage = height / getItemHeight(tree, false);
-                    int index = Math.min(fTimeGraphViewer.getSelectionIndex() + countPerPage - 1, treeItems.size() - 1);
-                    fTimeGraphViewer.setSelection((ITimeGraphEntry) treeItems.get(index).getData());
-                    event.doit = false;
-                } else if (event.keyCode == SWT.END) {
-                    fTimeGraphViewer.setSelection((ITimeGraphEntry) treeItems.get(treeItems.size() - 1).getData());
-                    event.doit = false;
-                } else if ((event.character == '+' || event.character == '=') && ((event.stateMask & SWT.CTRL) != 0)) {
-                    fTimeGraphViewer.getTimeGraphControl().keyPressed(new KeyEvent(event));
-                    return;
-                } else if (event.character == '-' && ((event.stateMask & SWT.CTRL) != 0)) {
-                    fTimeGraphViewer.getTimeGraphControl().keyPressed(new KeyEvent(event));
-                    return;
-                } else if (event.character == '0' && ((event.stateMask & SWT.CTRL) != 0)) {
-                    fTimeGraphViewer.getTimeGraphControl().keyPressed(new KeyEvent(event));
-                    return;
-                } else {
-                    return;
-                }
-                if (fTimeGraphViewer.getSelectionIndex() >= 0) {
-                    fTreeViewer.setSelection(new StructuredSelection(fTimeGraphViewer.getSelection()));
-                } else {
-                    fTreeViewer.setSelection(new StructuredSelection());
-                }
-                alignTreeItems(false);
+        tree.addListener(SWT.KeyDown, event -> {
+            List<TreeItem> treeItems = getVisibleExpandedItems(tree, false);
+            if (treeItems.size() == 0) {
+                fTreeViewer.setSelection(new StructuredSelection());
+                event.doit = false;
+                return;
             }
+            if (event.keyCode == SWT.ARROW_DOWN) {
+                int index = Math.min(fTimeGraphViewer.getSelectionIndex() + 1, treeItems.size() - 1);
+                fTimeGraphViewer.setSelection((ITimeGraphEntry) treeItems.get(index).getData());
+                event.doit = false;
+            } else if (event.keyCode == SWT.PAGE_DOWN) {
+                int height = tree.getSize().y - tree.getHeaderHeight() - tree.getHorizontalBar().getSize().y;
+                int countPerPage = height / getItemHeight(tree, false);
+                int index = Math.min(fTimeGraphViewer.getSelectionIndex() + countPerPage - 1, treeItems.size() - 1);
+                fTimeGraphViewer.setSelection((ITimeGraphEntry) treeItems.get(index).getData());
+                event.doit = false;
+            } else if (event.keyCode == SWT.END) {
+                fTimeGraphViewer.setSelection((ITimeGraphEntry) treeItems.get(treeItems.size() - 1).getData());
+                event.doit = false;
+            } else if ((event.character == '+' || event.character == '=') && ((event.stateMask & SWT.CTRL) != 0)) {
+                fTimeGraphViewer.getTimeGraphControl().keyPressed(new KeyEvent(event));
+                return;
+            } else if (event.character == '-' && ((event.stateMask & SWT.CTRL) != 0)) {
+                fTimeGraphViewer.getTimeGraphControl().keyPressed(new KeyEvent(event));
+                return;
+            } else if (event.character == '0' && ((event.stateMask & SWT.CTRL) != 0)) {
+                fTimeGraphViewer.getTimeGraphControl().keyPressed(new KeyEvent(event));
+                return;
+            } else {
+                return;
+            }
+            if (fTimeGraphViewer.getSelectionIndex() >= 0) {
+                fTreeViewer.setSelection(new StructuredSelection(fTimeGraphViewer.getSelection()));
+            } else {
+                fTreeViewer.setSelection(new StructuredSelection());
+            }
+            alignTreeItems(false);
         });
 
         // ensure alignment of top item between tree and time graph
@@ -698,37 +680,31 @@ public class TimeGraphCombo extends Composite {
         });
 
         // ensure synchronization of selected item between tree and time graph
-        fTreeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                if (fInhibitTreeSelection) {
-                    return;
+        fTreeViewer.addSelectionChangedListener(event -> {
+            if (fInhibitTreeSelection) {
+                return;
+            }
+            if (event.getSelection() instanceof IStructuredSelection) {
+                Object selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
+                if (selection instanceof ITimeGraphEntry) {
+                    fTimeGraphViewer.setSelection((ITimeGraphEntry) selection);
                 }
-                if (event.getSelection() instanceof IStructuredSelection) {
-                    Object selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
-                    if (selection instanceof ITimeGraphEntry) {
-                        fTimeGraphViewer.setSelection((ITimeGraphEntry) selection);
-                    }
-                    alignTreeItems(false);
-                }
+                alignTreeItems(false);
             }
         });
 
         // ensure synchronization of selected item between tree and time graph
-        fTimeGraphViewer.addSelectionListener(new ITimeGraphSelectionListener() {
-            @Override
-            public void selectionChanged(TimeGraphSelectionEvent event) {
-                ITimeGraphEntry entry = fTimeGraphViewer.getSelection();
-                fInhibitTreeSelection = true; // block the tree selection changed listener
-                if (entry != null) {
-                    StructuredSelection selection = new StructuredSelection(entry);
-                    fTreeViewer.setSelection(selection);
-                } else {
-                    fTreeViewer.setSelection(new StructuredSelection());
-                }
-                fInhibitTreeSelection = false;
-                alignTreeItems(false);
+        fTimeGraphViewer.addSelectionListener(event -> {
+            ITimeGraphEntry entry = fTimeGraphViewer.getSelection();
+            fInhibitTreeSelection = true; // block the tree selection changed listener
+            if (entry != null) {
+                StructuredSelection selection = new StructuredSelection(entry);
+                fTreeViewer.setSelection(selection);
+            } else {
+                fTreeViewer.setSelection(new StructuredSelection());
             }
+            fInhibitTreeSelection = false;
+            alignTreeItems(false);
         });
 
         // ensure alignment of top item between tree and time graph
@@ -740,14 +716,11 @@ public class TimeGraphCombo extends Composite {
         });
 
         // ensure alignment of top item between tree and time graph
-        fTimeGraphViewer.getTimeGraphControl().addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(MouseEvent e) {
-                if (e.count == 0) {
-                    return;
-                }
-                alignTreeItems(false);
+        fTimeGraphViewer.getTimeGraphControl().addMouseWheelListener(e -> {
+            if (e.count == 0) {
+                return;
             }
+            alignTreeItems(false);
         });
 
         // ensure the tree has focus control when mouse is over it if the time graph had control
