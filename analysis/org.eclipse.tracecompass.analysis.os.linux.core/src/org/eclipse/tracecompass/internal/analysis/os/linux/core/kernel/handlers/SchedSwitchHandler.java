@@ -73,7 +73,7 @@ public class SchedSwitchHandler extends KernelEventHandler {
         setNewProcessExecName(ss, nextProcessName, newCurrentThreadNode, timestamp);
 
         /* Set the current prio for the new process */
-        setNewProcessPio(ss, nextPrio, newCurrentThreadNode, timestamp);
+        setNewProcessPrio(ss, nextPrio, newCurrentThreadNode, timestamp);
 
         /* Make sure the PPID and system_call sub-attributes exist */
         ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.SYSTEM_CALL);
@@ -156,7 +156,7 @@ public class SchedSwitchHandler extends KernelEventHandler {
         ss.modifyAttribute(timestamp, value, quark);
     }
 
-    private static void setNewProcessPio(ITmfStateSystemBuilder ss, Integer nextPrio, Integer newCurrentThreadNode, long timestamp) throws AttributeNotFoundException {
+    private static void setNewProcessPrio(ITmfStateSystemBuilder ss, Integer nextPrio, Integer newCurrentThreadNode, long timestamp) throws AttributeNotFoundException {
         int quark;
         ITmfStateValue value;
         quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.PRIO);
