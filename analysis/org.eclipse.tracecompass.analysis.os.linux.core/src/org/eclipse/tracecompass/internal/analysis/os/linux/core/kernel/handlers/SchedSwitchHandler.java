@@ -72,16 +72,16 @@ public class SchedSwitchHandler extends KernelEventHandler {
         KernelEventHandlerUtils.setProcessToRunning(timestamp, newCurrentThreadNode, ss);
 
         /* Set the exec name of the former process */
-        setNewProcessExecName(ss, prevProcessName, formerThreadNode, timestamp);
+        setProcessExecName(ss, prevProcessName, formerThreadNode, timestamp);
 
         /* Set the exec name of the new process */
-        setNewProcessExecName(ss, nextProcessName, newCurrentThreadNode, timestamp);
+        setProcessExecName(ss, nextProcessName, newCurrentThreadNode, timestamp);
 
         /* Set the current prio for the former process */
-        setNewProcessPrio(ss, prevPrio, formerThreadNode, timestamp);
+        setProcessPrio(ss, prevPrio, formerThreadNode, timestamp);
 
         /* Set the current prio for the new process */
-        setNewProcessPrio(ss, nextPrio, newCurrentThreadNode, timestamp);
+        setProcessPrio(ss, nextPrio, newCurrentThreadNode, timestamp);
 
         /* Make sure the PPID and system_call sub-attributes exist */
         ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.SYSTEM_CALL);
@@ -164,19 +164,19 @@ public class SchedSwitchHandler extends KernelEventHandler {
         ss.modifyAttribute(timestamp, value, quark);
     }
 
-    private static void setNewProcessPrio(ITmfStateSystemBuilder ss, Integer nextPrio, Integer newCurrentThreadNode, long timestamp) throws AttributeNotFoundException {
+    private static void setProcessPrio(ITmfStateSystemBuilder ss, Integer prio, Integer threadNode, long timestamp) throws AttributeNotFoundException {
         int quark;
         ITmfStateValue value;
-        quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.PRIO);
-        value = TmfStateValue.newValueInt(nextPrio);
+        quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.PRIO);
+        value = TmfStateValue.newValueInt(prio);
         ss.modifyAttribute(timestamp, value, quark);
     }
 
-    private static void setNewProcessExecName(ITmfStateSystemBuilder ss, String nextProcessName, Integer newCurrentThreadNode, long timestamp) throws AttributeNotFoundException {
+    private static void setProcessExecName(ITmfStateSystemBuilder ss, String processName, Integer threadNode, long timestamp) throws AttributeNotFoundException {
         int quark;
         ITmfStateValue value;
-        quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.EXEC_NAME);
-        value = TmfStateValue.newValueString(nextProcessName);
+        quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.EXEC_NAME);
+        value = TmfStateValue.newValueString(processName);
         ss.modifyAttribute(timestamp, value, quark);
     }
 
