@@ -643,7 +643,7 @@ public class CallStackView extends AbstractTimeGraphView {
                     if (monitor.isCanceled()) {
                         return;
                     }
-                    buildStatusEvents(parentTrace, (CallStackEntry) callStackEntry, monitor, start, end);
+                    buildStatusEvents(parentTrace, (CallStackEntry) callStackEntry, monitor, ss.getStartTime(), end);
                 }
             }
             start = end;
@@ -664,9 +664,7 @@ public class CallStackView extends AbstractTimeGraphView {
         long resolution = Math.max(1, (end - ss.getStartTime()) / getDisplayWidth());
         List<ITimeEvent> eventList = getEventList(entry, start, end + 1, resolution, monitor);
         if (eventList != null) {
-            for (ITimeEvent event : eventList) {
-                entry.addEvent(event);
-            }
+            entry.setEventList(eventList);
         }
         if (trace == getTrace()) {
             redraw();
@@ -688,6 +686,7 @@ public class CallStackView extends AbstractTimeGraphView {
         if (end <= start) {
             return null;
         }
+        boolean isZoomThread = Thread.currentThread() instanceof ZoomThread;
         List<ITimeEvent> eventList = null;
         try {
             List<ITmfStateInterval> stackIntervals = StateSystemUtils.queryHistoryRange(ss, entry.getQuark(), start, end - 1, resolution, monitor);
@@ -706,7 +705,7 @@ public class CallStackView extends AbstractTimeGraphView {
                     eventList.add(new CallStackEvent(entry, time, duration, value));
                     lastIsNull = false;
                 } else {
-                    if (lastEndTime == -1) {
+                    if (lastEndTime == -1 && isZoomThread) {
                         // add null event if it intersects the start time
                         eventList.add(new NullTimeEvent(entry, time, duration));
                     } else {
@@ -714,7 +713,7 @@ public class CallStackView extends AbstractTimeGraphView {
                             // add unknown event if between two null states
                             eventList.add(new TimeEvent(entry, lastEndTime, time - lastEndTime));
                         }
-                        if (time + duration >= endTime) {
+                        if (time + duration >= endTime && isZoomThread) {
                             // add null event if it intersects the end time
                             eventList.add(new NullTimeEvent(entry, time, duration));
                         }

@@ -198,9 +198,7 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
             }
             final List<@NonNull TimeGraphEntry> traceEntryChildren = traceEntry.getChildren();
             final long resolution = Math.max(1, (endTime - ssq.getStartTime()) / getDisplayWidth());
-            final long qStart = start;
-            final long qEnd = end;
-            queryFullStates(ssq, qStart, qEnd, resolution, monitor, new IQueryHandler() {
+            queryFullStates(ssq, ssq.getStartTime(), end, resolution, monitor, new IQueryHandler() {
                 @Override
                 public void handle(List<List<ITmfStateInterval>> fullStates, List<ITmfStateInterval> prevFullState) {
                     for (TimeGraphEntry child : traceEntryChildren) {
@@ -216,8 +214,13 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
                     }
                     List<ITimeEvent> eventList = getEventList(entry, ssq, fullStates, prevFullState, monitor);
                     if (eventList != null) {
-                        for (ITimeEvent event : eventList) {
-                            entry.addEvent(event);
+                        /* Start a new event list on first iteration, then append to it */
+                        if (prevFullState == null) {
+                            entry.setEventList(eventList);
+                        } else {
+                            for (ITimeEvent event : eventList) {
+                                entry.addEvent(event);
+                            }
                         }
                     }
                     for (TimeGraphEntry child : entry.getChildren()) {
@@ -348,6 +351,7 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
              */
             return null;
         }
+        boolean isZoomThread = Thread.currentThread() instanceof ZoomThread;
         eventList = new ArrayList<>(fullStates.size());
         ITmfStateInterval lastInterval = prevFullState == null || statusQuark >= prevFullState.size() ? null : prevFullState.get(statusQuark);
         long lastStartTime = lastInterval == null ? -1 : lastInterval.getStartTime();
@@ -372,7 +376,7 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
                     eventList.add(new TimeEvent(entry, lastEndTime, time - lastEndTime));
                 }
                 eventList.add(new TimeEvent(entry, time, duration, status));
-            } else {
+            } else if (isZoomThread) {
                 eventList.add(new NullTimeEvent(entry, time, duration));
             }
             lastStartTime = time;
@@ -383,6 +387,7 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
 
     private static List<ITimeEvent> createIrqEventsList(ITimeGraphEntry entry, List<List<ITmfStateInterval>> fullStates, List<ITmfStateInterval> prevFullState, IProgressMonitor monitor, int quark) {
         List<ITimeEvent> eventList;
+        boolean isZoomThread = Thread.currentThread() instanceof ZoomThread;
         eventList = new ArrayList<>(fullStates.size());
         ITmfStateInterval lastInterval = prevFullState == null || quark >= prevFullState.size() ? null : prevFullState.get(quark);
         long lastStartTime = lastInterval == null ? -1 : lastInterval.getStartTime();
@@ -415,7 +420,9 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
                      */
                     eventList.add(new TimeEvent(entry, lastEndTime, time - lastEndTime, -1));
                 }
-                eventList.add(new NullTimeEvent(entry, time, duration));
+                if (isZoomThread) {
+                    eventList.add(new NullTimeEvent(entry, time, duration));
+                }
                 lastIsNull = true;
             }
             lastStartTime = time;

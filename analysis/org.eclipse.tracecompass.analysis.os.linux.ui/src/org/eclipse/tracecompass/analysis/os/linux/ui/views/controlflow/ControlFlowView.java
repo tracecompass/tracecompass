@@ -275,9 +275,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
             final long resolution = Math.max(1, (end - ssq.getStartTime()) / getDisplayWidth());
             setEndTime(Math.max(getEndTime(), end + 1));
             final List<Integer> threadQuarks = ssq.getQuarks(Attributes.THREADS, "*"); //$NON-NLS-1$
-            final long qStart = start;
-            final long qEnd = end;
-            queryFullStates(ssq, qStart, qEnd, resolution, monitor, new IQueryHandler() {
+            queryFullStates(ssq, start, end, resolution, monitor, new IQueryHandler() {
                 @Override
                 public void handle(List<List<ITmfStateInterval>> fullStates, List<ITmfStateInterval> prevFullState) {
                     for (int threadQuark : threadQuarks) {
@@ -364,12 +362,17 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                         }
                     }
                     updateTree(entryList, parentTrace, ssq);
+                }
+            });
 
+            queryFullStates(ssq, ssq.getStartTime(), end, resolution, monitor, new IQueryHandler() {
+                @Override
+                public void handle(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) {
                     for (final TimeGraphEntry entry : getEntryList(ssq)) {
                         if (monitor.isCanceled()) {
                             return;
                         }
-                        buildStatusEvents(trace, parentTrace, ssq, fullStates, prevFullState, (ControlFlowEntry) entry, monitor, qStart, qEnd);
+                        buildStatusEvents(trace, parentTrace, ssq, fullStates, prevFullState, (ControlFlowEntry) entry, monitor, ssq.getStartTime(), end);
                     }
                 }
             });
@@ -427,8 +430,13 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
             if (eventList == null) {
                 return;
             }
-            for (ITimeEvent event : eventList) {
-                entry.addEvent(event);
+            /* Start a new event list on first iteration, then append to it */
+            if (prevFullState == null) {
+                entry.setEventList(eventList);
+            } else {
+                for (ITimeEvent event : eventList) {
+                    entry.addEvent(event);
+                }
             }
             if (parentTrace.equals(getTrace())) {
                 redraw();
