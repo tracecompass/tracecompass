@@ -490,6 +490,15 @@ public interface IKernelAnalysisEventLayout {
     String fieldNewPrio();
 
     /**
+     * The field with the prev priority. This is used in the scheduler's switch
+     * event to show the priority of the thread being scheduled out.
+     *
+     * @return the name of the field with the priority of the previous thread
+     * @since 2.0
+     */
+    String fieldPrevPrio();
+
+    /**
      * The field with the next priority. This is used in the scheduler's switch
      * event to show the priority of the next thread or process.
      *

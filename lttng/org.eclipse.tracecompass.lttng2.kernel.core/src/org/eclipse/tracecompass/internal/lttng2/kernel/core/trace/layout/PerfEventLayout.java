@@ -237,6 +237,11 @@ public class PerfEventLayout implements IKernelAnalysisEventLayout {
     }
 
     @Override
+    public String fieldPrevPrio() {
+        return "prev_prio"; //$NON-NLS-1$
+    }
+
+    @Override
     public String fieldNextPrio() {
         return "next_prio"; //$NON-NLS-1$
     }

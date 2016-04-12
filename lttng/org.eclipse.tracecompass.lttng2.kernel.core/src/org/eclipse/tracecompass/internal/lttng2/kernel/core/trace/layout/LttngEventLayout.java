@@ -81,6 +81,7 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     private static final String CHILD_COMM = "child_comm";
     private static final String CHILD_TID = "child_tid";
     private static final String PRIO = "prio";
+    private static final String PREV_PRIO = "prev_prio";
     private static final String NEXT_PRIO = "next_prio";
     private static final String NEW_PRIO = "newprio";
     private static final String COMM = "comm";
@@ -288,6 +289,11 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     @Override
     public String fieldNewPrio() {
         return NEW_PRIO;
+    }
+
+    @Override
+    public String fieldPrevPrio() {
+        return PREV_PRIO;
     }
 
     @Override
