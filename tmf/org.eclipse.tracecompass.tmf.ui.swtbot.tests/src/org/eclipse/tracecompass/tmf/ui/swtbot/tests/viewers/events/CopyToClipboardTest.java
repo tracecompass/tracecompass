@@ -32,6 +32,7 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
@@ -41,7 +42,6 @@ import org.eclipse.swtbot.swt.finder.results.StringResult;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
-import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.junit.After;
@@ -187,10 +187,8 @@ public class CopyToClipboardTest {
                 try {
                     SWTBotPreferences.TIMEOUT = 0;
                     tableBot.contextMenu(text);
-                } catch (TimeoutException e) {
+                } catch (WidgetNotFoundException e) {
                     return true;
-                } catch (IndexOutOfBoundsException e) {
-                    /* remove when Bug 474063 is fixed */
                 } finally {
                     SWTBotPreferences.TIMEOUT = TIMEOUT;
                 }
