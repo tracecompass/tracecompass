@@ -48,6 +48,7 @@ public class SchedSwitchHandler extends KernelEventHandler {
         }
 
         ITmfEventField content = event.getContent();
+        String prevProcessName = checkNotNull((String) content.getField(getLayout().fieldPrevComm()).getValue());
         Integer prevTid = ((Long) content.getField(getLayout().fieldPrevTid()).getValue()).intValue();
         Long prevState = checkNotNull((Long) content.getField(getLayout().fieldPrevState()).getValue());
         Integer prevPrio = ((Long) content.getField(getLayout().fieldPrevPrio()).getValue()).intValue();
@@ -69,6 +70,9 @@ public class SchedSwitchHandler extends KernelEventHandler {
 
         /* Set the status of the new scheduled process */
         KernelEventHandlerUtils.setProcessToRunning(timestamp, newCurrentThreadNode, ss);
+
+        /* Set the exec name of the former process */
+        setNewProcessExecName(ss, prevProcessName, formerThreadNode, timestamp);
 
         /* Set the exec name of the new process */
         setNewProcessExecName(ss, nextProcessName, newCurrentThreadNode, timestamp);
