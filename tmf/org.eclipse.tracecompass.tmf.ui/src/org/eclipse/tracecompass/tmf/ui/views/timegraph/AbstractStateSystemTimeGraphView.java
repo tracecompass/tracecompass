@@ -114,10 +114,12 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                 }
             }
             if (!getMonitor().isCanceled()) {
-                getTimeGraphViewer().setLinks(links);
                 /* Refresh the trace-specific markers when zooming */
                 markers.addAll(getTraceMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
-                getTimeGraphViewer().setMarkers(markers);
+                applyResults(() -> {
+                    getTimeGraphViewer().setLinks(links);
+                    getTimeGraphViewer().setMarkers(markers);
+                });
             }
         }
 
@@ -160,9 +162,14 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
         private void zoom(@NonNull TimeGraphEntry entry, ITmfStateSystem ss, @NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState, @NonNull IProgressMonitor monitor) {
             List<ITimeEvent> eventList = getEventList(entry, ss, fullStates, prevFullState, monitor);
             if (eventList != null) {
-                for (ITimeEvent event : eventList) {
-                    entry.addZoomedEvent(event);
-                }
+                applyResults(() -> {
+                    for (ITimeEvent event : eventList) {
+                        if (monitor.isCanceled()) {
+                            return;
+                        }
+                        entry.addZoomedEvent(event);
+                    }
+                });
             }
             for (ITimeGraphEntry child : entry.getChildren()) {
                 if (monitor.isCanceled()) {

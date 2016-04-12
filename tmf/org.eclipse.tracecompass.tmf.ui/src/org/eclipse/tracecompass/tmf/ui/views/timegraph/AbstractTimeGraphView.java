@@ -157,6 +157,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     private AtomicInteger fDirty = new AtomicInteger();
 
+    private final Object fZoomThreadResultLock = new Object();
+
     /** The selected trace */
     private ITmfTrace fTrace;
 
@@ -775,6 +777,24 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
 
         /**
+         * Applies the results of the ZoomThread calculations.
+         *
+         * Note: This method makes sure that only the results of the last
+         * created ZoomThread are applied.
+         *
+         * @param runnable
+         *            the code to run in order to apply the results
+         * @since 2.0
+         */
+        protected void applyResults(Runnable runnable) {
+            synchronized (fZoomThreadResultLock) {
+                if (this == fZoomThread) {
+                    runnable.run();
+                }
+            }
+        }
+
+        /**
          * Run the zoom operation.
          * @since 2.0
          */
@@ -802,25 +822,30 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             }
             /* Refresh the arrows when zooming */
             List<ILinkEvent> events = getLinkList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
-            if (events != null) {
-                fTimeGraphWrapper.getTimeGraphViewer().setLinks(events);
-                redraw();
-            }
             /* Refresh the view-specific markers when zooming */
             List<IMarkerEvent> markers = new ArrayList<>(getViewMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
             /* Refresh the trace-specific markers when zooming */
             markers.addAll(getTraceMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
-            fTimeGraphWrapper.getTimeGraphViewer().setMarkers(markers);
-            redraw();
+            applyResults(() -> {
+                if (events != null) {
+                    fTimeGraphWrapper.getTimeGraphViewer().setLinks(events);
+                }
+                fTimeGraphWrapper.getTimeGraphViewer().setMarkers(markers);
+                redraw();
+            });
         }
 
         private void zoom(@NonNull TimeGraphEntry entry, @NonNull IProgressMonitor monitor) {
             if (getZoomStartTime() <= fStartTime && getZoomEndTime() >= fEndTime) {
-                entry.setZoomedEventList(null);
+                applyResults(() -> {
+                    entry.setZoomedEventList(null);
+                });
             } else {
                 List<ITimeEvent> zoomedEventList = getEventList(entry, getZoomStartTime(), getZoomEndTime(), getResolution(), monitor);
                 if (zoomedEventList != null) {
-                    entry.setZoomedEventList(zoomedEventList);
+                    applyResults(() -> {
+                        entry.setZoomedEventList(zoomedEventList);
+                    });
                 }
             }
             redraw();
@@ -1919,7 +1944,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         long resolution = Math.max(1, (clampedEndTime - clampedStartTime) / fDisplayWidth);
         fZoomThread = createZoomThread(clampedStartTime, clampedEndTime, resolution, restart);
         if (fZoomThread != null) {
-            fZoomThread.start();
+            // Don't start a new thread right away if results are being applied
+            // from an old ZoomThread. Otherwise, the old results might
+            // overwrite the new results if it finishes after.
+            synchronized (fZoomThreadResultLock) {
+                fZoomThread.start();
+            }
         } else {
             fDirty.decrementAndGet();
         }
