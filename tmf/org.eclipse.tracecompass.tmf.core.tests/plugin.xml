@@ -142,5 +142,12 @@
             trace_type="org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub">
       </type>
    </extension>
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.analysis.ondemand">
+      <analysis
+            class="org.eclipse.tracecompass.tmf.tests.stubs.analysis.ondemand.OnDemandAnalysisStub"
+            id="org.eclipse.tracecompass.tmf.core.tests.analysis1">
+      </analysis>
+   </extension>
 
 </plugin>
