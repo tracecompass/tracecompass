@@ -26,6 +26,7 @@ import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -38,10 +39,12 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for Sequence Diagram view in trace compass
  */
+@RunWith(SWTBotJunit4ClassRunner.class)
 public class SDViewTest {
 
     private static final String UML2DVIEW_ID = "org.eclipse.linuxtools.tmf.ui.tmfUml2SDSyncView";
