@@ -9,8 +9,19 @@
 
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
+import java.util.Set;
+
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.tracecompass.tmf.core.analysis.ondemand.IOnDemandAnalysis;
+import org.eclipse.tracecompass.tmf.core.analysis.ondemand.OnDemandAnalysisManager;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
  * Project model element for the "On-Demand Analyses" element, which goes under
@@ -30,6 +41,8 @@ public class TmfOnDemandAnalysesElement extends TmfProjectModelElement {
     public static final String PATH_ELEMENT = ".ondemand-analyses"; //$NON-NLS-1$
 
     private static final String ELEMENT_NAME = Messages.TmfOnDemandAnalysesElement_Name;
+
+    private boolean fInitialized = false;
 
     /**
      * Constructor
@@ -56,7 +69,33 @@ public class TmfOnDemandAnalysesElement extends TmfProjectModelElement {
 
     @Override
     protected void refreshChildren() {
-        /* No children at the moment */
+        ITmfTrace trace = getParent().getTrace();
+        if (trace == null) {
+            /* Trace is not yet initialized */
+            return;
+        }
+
+        /*
+         * The criteria for which analyses can apply to a trace should never
+         * change, so initialization only needs to be done once.
+         */
+        if (!fInitialized) {
+            Set<IOnDemandAnalysis> analyses =
+                    OnDemandAnalysisManager.getInstance().getOndemandAnalyses(trace);
+
+            IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+            IPath nodePath = getResource().getFullPath();
+
+            analyses.forEach(analysis -> {
+                IFolder analysisRes = checkNotNull(root.getFolder(nodePath.append(analysis.getName())));
+                TmfOnDemandAnalysisElement elem = new TmfOnDemandAnalysisElement(
+                        analysis.getName(), analysisRes, this, analysis);
+                addChild(elem);
+            });
+        }
+
+        /* Refresh all children */
+        getChildren().forEach(child -> ((TmfProjectModelElement) child).refreshChildren());
     }
 
 }
