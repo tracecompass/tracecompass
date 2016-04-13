@@ -27,9 +27,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.IStatusLineManager;
@@ -155,6 +157,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private int fDragButton;
     private int fDragX0 = 0;
     private int fDragX = 0;
+    private boolean fHasNamespaceFocus = false;
     private long fDragTime0 = 0; // used to preserve accuracy of modified selection
     private int fIdealNameSpace = 0;
     private long fTime0bak;
@@ -584,6 +587,108 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
+     * Set the expanded state of a given entry to certain relative level.
+     * It will call fireTreeEvent() for each changed entry. At the end
+     * it will call redraw().
+     *
+     * @param entry
+     *            The entry
+     * @param level
+     *            level to expand to or negative for all levels
+     * @param expanded
+     *            True if expanded, false if collapsed
+     */
+    private void setExpandedState(ITimeGraphEntry entry, int level, boolean expanded) {
+        setExpandedStateInt(entry, level, expanded);
+        redraw();
+    }
+
+    /**
+     * Set the expanded state of a given entry and its children to the first
+     * level that has one collapsed entry.
+     *
+     * @param entry
+     *            The entry
+     */
+    private void setExpandedStateLevel(ITimeGraphEntry entry) {
+        int level = findExpandedLevel(entry);
+        if (level >= 0) {
+            setExpandedStateInt(entry, level, true);
+            redraw();
+        }
+    }
+
+    /*
+     * Inner class for finding relative level with at least one
+     * collapsed entry.
+     */
+    private class SearchNode {
+        SearchNode(ITimeGraphEntry e, int l) {
+            entry = e;
+            level = l;
+        }
+        ITimeGraphEntry entry;
+        int level;
+    }
+
+    /**
+     * Finds the relative level with at least one collapsed entry.
+     *
+     * @param entry
+     *            the start entry
+     * @return the found level or -1 if all levels are already expanded.
+     */
+    private int findExpandedLevel(ITimeGraphEntry entry) {
+        Queue<SearchNode> queue = new LinkedList<>();
+        SearchNode root = new SearchNode(entry, 0);
+        SearchNode node = root;
+        queue.add(root);
+
+        while (!queue.isEmpty()) {
+            node = queue.remove();
+            if (node.entry.hasChildren() && !getExpandedState(node.entry)) {
+                return node.level;
+            }
+            for (ITimeGraphEntry e : node.entry.getChildren()) {
+                if (e.hasChildren()) {
+                    SearchNode n = new SearchNode(e, node.level + 1);
+                    queue.add(n);
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Set the expanded state of a given entry to certain relative level.
+     * It will call fireTreeEvent() for each changed entry. No redraw is done.
+     *
+     * @param entry
+     *            The entry
+     * @param level
+     *            level to expand to or negative for all levels
+     * @param expanded
+     *            True if expanded, false if collapsed
+     */
+    private void setExpandedStateInt(ITimeGraphEntry entry, int aLevel, boolean expanded) {
+        int level = aLevel;
+        if ((level > 0) || (level < 0)) {
+            level--;
+            if (entry.hasChildren()) {
+                for (ITimeGraphEntry e : entry.getChildren()) {
+                    setExpandedStateInt(e, level, expanded);
+                }
+            }
+        }
+        Item item = fItemData.findItem(entry);
+        if (item != null && item.fExpanded != expanded) {
+            item.fExpanded = expanded;
+            fItemData.updateExpandedItems();
+            fireTreeEvent(item.fEntry, item.fExpanded);
+        }
+    }
+
+    /**
      * Collapses all nodes of the viewer's tree, starting with the root.
      */
     public void collapseAll() {
@@ -718,6 +823,14 @@ public class TimeGraphControl extends TimeGraphBaseControl
         for (MenuDetectListener listener : fTimeEventMenuListeners) {
             listener.menuDetected(event);
         }
+    }
+
+    @Override
+    public boolean setFocus() {
+        if ((fTimeProvider != null) && fTimeProvider.getNameSpace() > 0) {
+            fHasNamespaceFocus = true;
+        }
+        return super.setFocus();
     }
 
     @Override
@@ -2299,6 +2412,29 @@ public class TimeGraphControl extends TimeGraphBaseControl
             if (fVerticalZoomAlignEntry != null) {
                 setElementPosition(fVerticalZoomAlignEntry.getKey(), fVerticalZoomAlignEntry.getValue());
             }
+        } else if ((e.character == '+' || e.character == '=') && ((e.stateMask & SWT.CTRL) == 0)) {
+            if (fHasNamespaceFocus) {
+                ITimeGraphEntry entry = getSelectedTrace();
+                setExpandedState(entry, 0, true);
+            } else {
+                zoomIn();
+            }
+        } else if (e.character == '-' && ((e.stateMask & SWT.CTRL) == 0)) {
+            if (fHasNamespaceFocus) {
+                ITimeGraphEntry entry = getSelectedTrace();
+                if ((entry != null) && entry.hasChildren()) {
+                    setExpandedState(entry, -1, false);
+                }
+            } else {
+                zoomOut();
+            }
+        } else if ((e.character == '*') && ((e.stateMask & SWT.CTRL) == 0)) {
+            if (fHasNamespaceFocus) {
+                ITimeGraphEntry entry = getSelectedTrace();
+                if ((entry != null) && entry.hasChildren()) {
+                    setExpandedStateLevel(entry);
+                }
+            }
         }
         if (idx >= 0) {
             selectItem(idx, false);
@@ -2499,6 +2635,12 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 redraw();
             }
             fMouseOverSplitLine = mouseOverSplitLine;
+        }
+
+        if (e.x >= fTimeProvider.getNameSpace()) {
+            fHasNamespaceFocus = false;
+        } else {
+            fHasNamespaceFocus = true;
         }
         updateCursor(e.x, e.stateMask);
         updateStatusLine(e.x);

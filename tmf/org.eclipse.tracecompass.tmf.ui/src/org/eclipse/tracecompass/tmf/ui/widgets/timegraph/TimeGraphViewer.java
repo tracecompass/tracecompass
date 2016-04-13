@@ -548,11 +548,7 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         fTimeGraphCtrl.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if ((e.character == '+' || e.character == '=') && ((e.stateMask & SWT.CTRL) == 0)) {
-                    zoomIn();
-                } else if (e.character == '-' && ((e.stateMask & SWT.CTRL) == 0)) {
-                    zoomOut();
-                } else if (e.keyCode == '.') {
+                if (e.keyCode == '.') {
                     boolean extend = (e.stateMask & SWT.SHIFT) != 0;
                     if (extend) {
                         extendToNextMarker();
