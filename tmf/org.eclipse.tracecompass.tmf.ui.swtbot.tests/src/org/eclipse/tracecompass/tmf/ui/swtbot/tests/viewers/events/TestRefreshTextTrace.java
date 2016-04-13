@@ -51,6 +51,7 @@ public class TestRefreshTextTrace {
     private static final int NB_REFRESH = 3;
     private static final long SECOND_TO_MILLISECOND = 1000;
     private static final long MICROSECOND_TO_NANOSECOND = 1000000;
+    private static final int INDEXING_TIMEOUT = 300000;
 
     private static final Calendar CURRENT = Calendar.getInstance();
     private static final String TRACE_LOCATION = TmfTraceManager.getTemporaryDirPath() + File.separator + "test.txt";
@@ -115,7 +116,7 @@ public class TestRefreshTextTrace {
             traceItem.contextMenu("Refresh").click();
 
             // Make sure the refresh is completed
-            fBot.waitUntil(new NumberOfEventsCondition(activeTrace, getNbWrittenEvents()));
+            fBot.waitUntil(new NumberOfEventsCondition(activeTrace, getNbWrittenEvents()), INDEXING_TIMEOUT);
         }
 
         // Make sure the end of the table matches what we expect
@@ -135,11 +136,7 @@ public class TestRefreshTextTrace {
 
         @Override
         public boolean test() throws Exception {
-            if (fTrace.getNbEvents() != fNbEvents) {
-                System.out.println("Waiting for expected " + fNbEvents + " events. Current: " + fTrace.getNbEvents());
-                return false;
-            }
-            return true;
+            return fTrace.getNbEvents() == fNbEvents;
         }
 
         @Override
