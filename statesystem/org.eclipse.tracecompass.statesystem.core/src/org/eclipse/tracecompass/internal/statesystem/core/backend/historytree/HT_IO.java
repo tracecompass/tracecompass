@@ -20,6 +20,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 
 /**
@@ -35,6 +36,26 @@ import org.eclipse.tracecompass.internal.statesystem.core.Activator;
  *
  */
 class HT_IO {
+
+    @NonNullByDefault
+    private static final class CacheElement {
+        private final HTNode value;
+        private final HT_IO key;
+
+        public CacheElement(HT_IO ss, HTNode node) {
+            key = ss;
+            value = node;
+        }
+
+        public HT_IO getKey() {
+            return key;
+        }
+
+        public HTNode getValue() {
+            return value;
+        }
+    }
+
     /* Configuration of the History Tree */
     private final HTConfig fConfig;
 
@@ -50,7 +71,7 @@ class HT_IO {
      */
     private static final int CACHE_SIZE = 256;
     private static final int CACHE_MASK = CACHE_SIZE - 1;
-    private final HTNode fNodeCache[] = new HTNode[CACHE_SIZE];
+    private static final CacheElement NODE_CACHE[] = new CacheElement[CACHE_SIZE];
 
     /**
      * Standard constructor
@@ -106,25 +127,28 @@ class HT_IO {
      */
     public synchronized @NonNull HTNode readNode(int seqNumber) throws ClosedChannelException {
         /* Do a cache lookup */
-        int offset = seqNumber & CACHE_MASK;
-        HTNode readNode = fNodeCache[offset];
-        if (readNode != null && readNode.getSequenceNumber() == seqNumber) {
-            return readNode;
+        int offset = (seqNumber + hashCode()) & CACHE_MASK;
+        CacheElement cachedNode = NODE_CACHE[offset];
+
+        if (cachedNode != null && cachedNode.getKey() == this && cachedNode.getValue().getSequenceNumber() == seqNumber) {
+            return cachedNode.getValue();
         }
 
         /* Lookup on disk */
         try {
             seekFCToNodePos(fFileChannelIn, seqNumber);
-            readNode = HTNode.readNode(fConfig, fFileChannelIn);
+            HTNode readNode = HTNode.readNode(fConfig, fFileChannelIn);
 
             /* Put the node in the cache. */
-            fNodeCache[offset] = readNode;
+            NODE_CACHE[offset] = new CacheElement(this, readNode);
             return readNode;
 
         } catch (ClosedChannelException e) {
             throw e;
         } catch (IOException e) {
-            /* Other types of IOExceptions shouldn't happen at this point though */
+            /*
+             * Other types of IOExceptions shouldn't happen at this point though
+             */
             Activator.getDefault().logError(e.getMessage(), e);
             throw new IllegalStateException();
         }
@@ -134,8 +158,8 @@ class HT_IO {
         try {
             /* Insert the node into the cache. */
             int seqNumber = node.getSequenceNumber();
-            int offset = seqNumber & CACHE_MASK;
-            fNodeCache[offset] = node;
+            int offset = (seqNumber + hashCode()) & CACHE_MASK;
+            NODE_CACHE[offset] = new CacheElement(this, node);
 
             /* Position ourselves at the start of the node and write it */
             seekFCToNodePos(fFileChannelOut, seqNumber);
