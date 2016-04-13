@@ -24,6 +24,8 @@ import org.junit.runners.Suite;
     org.eclipse.tracecompass.ctf.core.tests.perf.trace.TraceSeekBenchmark.class,
 
     org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.analysis.kernel.KernelAnalysisBenchmark.class,
+    org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.analysis.kernel.KernelAnalysisUsageBenchmark.class,
+    org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.analysis.tid.TidAnalysisUsageBenchmark.class,
     org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.analysis.StatisticsAnalysisBenchmark.class,
     org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.event.matching.EventMatchingBenchmark.class,
     org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.event.matching.TraceSynchronizationBenchmark.class,
