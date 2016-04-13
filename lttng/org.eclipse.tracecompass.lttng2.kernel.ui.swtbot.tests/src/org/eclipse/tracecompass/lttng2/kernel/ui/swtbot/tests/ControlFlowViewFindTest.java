@@ -1,0 +1,31 @@
+/*******************************************************************************
+ * Copyright (c) 2016 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
+package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
+
+/**
+ * SWTBot test for Resources view Find dialod
+ *
+ * @author Jean-Christian Kouame
+ */
+public class ControlFlowViewFindTest extends FindDialogTestBase {
+
+    private static final String TITLE = "Control Flow";
+    private static final String TEXT = "IDLE";
+
+    @Override
+    protected String getViewTitle() {
+        return TITLE;
+    }
+
+    @Override
+    protected String getFindText() {
+        return TEXT;
+    }
+
+}
