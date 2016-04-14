@@ -23,7 +23,7 @@ http://www.eclipse.org/legal/epl-v10.html
    </configIni>
 
    <launcherArgs>
-      <programArgs>--launcher.XXMaxPermSize 256m -data @noDefault
+      <programArgs>-data @noDefault
       </programArgs>
       <programArgsLin>--launcher.GTK_version 2
       </programArgsLin>

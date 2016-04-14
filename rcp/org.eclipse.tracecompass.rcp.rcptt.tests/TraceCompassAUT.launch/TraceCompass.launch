@@ -20,7 +20,7 @@
 <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-os ${target.os} -ws ${target.ws} -arch x86_64 -consoleLog"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.pde.ui.workbenchClasspathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms512m -Xmx1024m -Dosgi.requiredJavaVersion=1.8 -XX:MaxPermSize=128m -DdataPath=${workspace_loc:/org.eclipse.tracecompass.rcp.rcptt.tests/target/dependency/tracecompass-test-traces-ctf-jar}"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms512m -Xmx1024m -Dosgi.requiredJavaVersion=1.8 -DdataPath=${workspace_loc:/org.eclipse.tracecompass.rcp.rcptt.tests/target/dependency/tracecompass-test-traces-ctf-jar}"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:/org.eclipse.tracecompass.rcp.rcptt.tests/target/aut/trace-compass}"/>
 <stringAttribute key="pde.version" value="3.3"/>
 <stringAttribute key="product" value="org.eclipse.tracecompass.rcp.branding.product"/>

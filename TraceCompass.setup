@@ -47,13 +47,6 @@
   </setupTask>
   <setupTask
       xsi:type="setup:EclipseIniTask"
-      option="-XX:MaxPermSize="
-      value="256m"
-      vm="true">
-    <description>Set the perm size needed to work with the projects of ${scope.project.label}</description>
-  </setupTask>
-  <setupTask
-      xsi:type="setup:EclipseIniTask"
       option="-Doomph.redirection.tracecompass="
       value="http://git.eclipse.org/c/tracecompass/org.eclipse.tracecompass.git/plain/TraceCompass.setup->${git.clone.tracecompass.location|uri}/TraceCompass.setup"
       vm="true"/>
