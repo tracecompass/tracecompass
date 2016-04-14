@@ -294,7 +294,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             }
         }
 
-        putEntryList(trace, new ArrayList<TimeGraphEntry>(entryList));
+        addToEntryList(parentTrace, new ArrayList<TimeGraphEntry>(entryList));
 
         if (parentTrace.equals(getTrace())) {
             refresh();

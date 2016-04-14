@@ -26,8 +26,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
@@ -487,16 +485,12 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
         throw new UnsupportedOperationException();
     }
 
-    // ------------------------------------------------------------------------
-    // Signal handlers
-    // ------------------------------------------------------------------------
-
-    @TmfSignalHandler
     @Override
-    public void traceClosed(final TmfTraceClosedSignal signal) {
-        super.traceClosed(signal);
+    protected void resetView(ITmfTrace viewTrace) {
+        // Don't remove super call
+        super.resetView(viewTrace);
         synchronized (fSSEntryListMap) {
-            for (ITmfStateSystem ss : fTraceSSMap.removeAll(signal.getTrace())) {
+            for (ITmfStateSystem ss : fTraceSSMap.removeAll(viewTrace)) {
                 fSSEntryListMap.remove(ss);
             }
         }

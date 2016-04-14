@@ -1465,29 +1465,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     @TmfSignalHandler
     public void traceClosed(final TmfTraceClosedSignal signal) {
-        synchronized (fBuildThreadMap) {
-            for (ITmfTrace trace : getTracesToBuild(signal.getTrace())) {
-                BuildThread buildThread = fBuildThreadMap.remove(trace);
-                if (buildThread != null) {
-                    buildThread.cancel();
-                }
-            }
-        }
-        fMarkerEventSourcesMap.remove(signal.getTrace());
-        synchronized (fEntryListMap) {
-            fEntryListMap.remove(signal.getTrace());
-        }
-        fFiltersMap.remove(signal.getTrace());
-        fViewContext.remove(signal.getTrace());
+        resetView(signal.getTrace());
         if (signal.getTrace() == fTrace) {
             fTrace = null;
             fEditorFile = null;
             fStartTime = SWT.DEFAULT;
             fEndTime = SWT.DEFAULT;
-            if (fZoomThread != null) {
-                fZoomThread.cancel();
-                fZoomThread = null;
-            }
             refresh();
         }
     }
@@ -1600,6 +1583,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         if (viewTrace == null) {
             return;
         }
+        resetView(viewTrace);
+
         List<IMarkerEventSource> markerEventSources = new ArrayList<>();
         synchronized (fBuildThreadMap) {
             for (ITmfTrace trace : getTracesToBuild(viewTrace)) {
@@ -2234,6 +2219,42 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
          */
         public ITimeGraphEntry getSelection() {
             return fSelection;
+        }
+    }
+
+    /**
+     * Method to reset the view internal data for a given trace.
+     *
+     * When overriding this method make sure to call the super
+     * implementation.
+     *
+     * @param viewTrace
+     *            trace to reset the view for.
+     * @since 2.0
+     */
+    protected void resetView(ITmfTrace viewTrace) {
+        if (viewTrace == null) {
+            return;
+        }
+        synchronized (fBuildThreadMap) {
+            for (ITmfTrace trace : getTracesToBuild(viewTrace)) {
+                BuildThread buildThread = fBuildThreadMap.remove(trace);
+                if (buildThread != null) {
+                    buildThread.cancel();
+                }
+            }
+        }
+        synchronized (fEntryListMap) {
+            fEntryListMap.remove(viewTrace);
+        }
+        fViewContext.remove(viewTrace);
+        fFiltersMap.remove(viewTrace);
+        fMarkerEventSourcesMap.remove(viewTrace);
+        if (viewTrace == fTrace) {
+            if (fZoomThread != null) {
+                fZoomThread.cancel();
+                fZoomThread = null;
+            }
         }
     }
 
