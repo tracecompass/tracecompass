@@ -24,7 +24,6 @@ import org.eclipse.ui.IWorkbenchPart;
  */
 class ShowFindDialogAction extends Action {
 
-    private static final int SHELL_MINIMUM_SIZE = 320;
     private static TimeGraphFindDialog fDialog;
     private FindTarget fFindTarget;
 
@@ -50,7 +49,6 @@ class ShowFindDialogAction extends Action {
         if (fDialog != null) {
             fDialog.update(findTarget);
             fDialog.open();
-            fDialog.getShell().setMinimumSize(SHELL_MINIMUM_SIZE, SHELL_MINIMUM_SIZE);
         }
     }
 

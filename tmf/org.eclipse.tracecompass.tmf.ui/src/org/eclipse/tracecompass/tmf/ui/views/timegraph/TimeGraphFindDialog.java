@@ -223,6 +223,8 @@ class TimeGraphFindDialog extends Dialog {
         // get find string
         initFindStringFromSelection();
 
+        shell.setMinimumSize(shell.getSize());
+
         // set dialog position
         if (fDialogPositionInit != null) {
             shell.setBounds(fDialogPositionInit);
@@ -499,7 +501,11 @@ class TimeGraphFindDialog extends Dialog {
         panel.setLayout(layout);
 
         fStatusLabel = new Label(panel, SWT.LEFT);
+        fStatusLabel.setText(Messages.TimeGraphFindDialog_StatusWrappedLabel);
         setGridData(fStatusLabel, SWT.FILL, true, SWT.CENTER, false);
+        GridData gd = (GridData) fStatusLabel.getLayoutData();
+        gd.widthHint = fStatusLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+        fStatusLabel.setText("");  //$NON-NLS-1$
 
         Composite buttonSection = new Composite(panel, SWT.NULL);
         GridLayout buttonLayout = new GridLayout();
