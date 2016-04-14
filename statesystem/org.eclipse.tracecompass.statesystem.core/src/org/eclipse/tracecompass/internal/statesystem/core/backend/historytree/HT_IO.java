@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -21,9 +23,16 @@ import java.nio.channels.FileChannel;
 import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * This class abstracts inputs/outputs of the HistoryTree nodes.
@@ -38,24 +47,66 @@ import org.eclipse.tracecompass.internal.statesystem.core.Activator;
  */
 class HT_IO {
 
-    @NonNullByDefault
-    private static final class CacheElement {
-        private final HTNode value;
-        private final HT_IO key;
+    private static final Logger LOGGER = TraceCompassLog.getLogger(HT_IO.class);
 
-        public CacheElement(HT_IO ss, HTNode node) {
-            key = ss;
-            value = node;
+    // ------------------------------------------------------------------------
+    // Global cache of nodes
+    // ------------------------------------------------------------------------
+
+    private static final class CacheKey {
+
+        public final HT_IO fStateHistory;
+        public final int fSeqNumber;
+
+        public CacheKey(HT_IO stateHistory,  int seqNumber) {
+            fStateHistory = stateHistory;
+            fSeqNumber = seqNumber;
         }
 
-        public HT_IO getKey() {
-            return key;
+        @Override
+        public int hashCode() {
+            return Objects.hash(fStateHistory, fSeqNumber);
         }
 
-        public HTNode getValue() {
-            return value;
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            CacheKey other = (CacheKey) obj;
+            return (fStateHistory.equals(other.fStateHistory) &&
+                    fSeqNumber == other.fSeqNumber);
         }
     }
+
+    private static final int CACHE_SIZE = 256;
+
+    private static final LoadingCache<CacheKey, HTNode> NODE_CACHE =
+        checkNotNull(CacheBuilder.newBuilder()
+            .maximumSize(CACHE_SIZE)
+            .build(new CacheLoader<CacheKey, HTNode>() {
+                @Override
+                public HTNode load(CacheKey key) throws IOException {
+                    HT_IO io = key.fStateHistory;
+                    int seqNb = key.fSeqNumber;
+
+                    LOGGER.finest(() -> "[HtIo:CacheMiss] seqNum=" + seqNb); //$NON-NLS-1$
+
+                    io.seekFCToNodePos(io.fFileChannelIn, seqNb);
+                    return HTNode.readNode(io.fConfig, io.fFileChannelIn);
+                }
+            }));
+
+
+    // ------------------------------------------------------------------------
+    // Instance fields
+    // ------------------------------------------------------------------------
 
     /* Configuration of the History Tree */
     private final HTConfig fConfig;
@@ -66,15 +117,11 @@ class HT_IO {
     private final FileChannel fFileChannelIn;
     private final FileChannel fFileChannelOut;
 
-    // TODO test/benchmark optimal cache size
-    /**
-     * Cache size, must be a power of 2
-     */
-    private static final int CACHE_SIZE = 256;
-    private static final int CACHE_MASK = CACHE_SIZE - 1;
-    private static final CacheElement NODE_CACHE[] = new CacheElement[CACHE_SIZE];
+    // ------------------------------------------------------------------------
+    // Methods
+    // ------------------------------------------------------------------------
 
-    private static final Logger LOGGER = TraceCompassLog.getLogger(HT_IO.class);
+
 
     /**
      * Standard constructor
@@ -129,30 +176,20 @@ class HT_IO {
      *             just catch this exception.
      */
     public synchronized @NonNull HTNode readNode(int seqNumber) throws ClosedChannelException {
-        /* Do a cache lookup */
-        int offset = (seqNumber + hashCode()) & CACHE_MASK;
-        CacheElement cachedNode = NODE_CACHE[offset];
-
-        if (cachedNode != null && cachedNode.getKey() == this && cachedNode.getValue().getSequenceNumber() == seqNumber) {
-            LOGGER.finest(() -> "[HtIo:CacheHit] seqNum=" + seqNumber); //$NON-NLS-1$
-            return cachedNode.getValue();
-        }
-
-        /* Lookup on disk */
+        /* Do a cache lookup. If it's not present it will be loaded from disk */
+        LOGGER.finest(() -> "[HtIo:CacheLookup] seqNum=" + seqNumber); //$NON-NLS-1$
+        CacheKey key = new CacheKey(this, seqNumber);
         try {
-            seekFCToNodePos(fFileChannelIn, seqNumber);
-            HTNode readNode = HTNode.readNode(fConfig, fFileChannelIn);
-            LOGGER.finest(() -> "[HtIo:CacheMiss] seqNum=" + seqNumber); //$NON-NLS-1$
+            return checkNotNull(NODE_CACHE.get(key));
 
-            /* Put the node in the cache. */
-            NODE_CACHE[offset] = new CacheElement(this, readNode);
-            return readNode;
-
-        } catch (ClosedChannelException e) {
-            throw e;
-        } catch (IOException e) {
+        } catch (ExecutionException e) {
+            /* Get the inner exception that was generated */
+            Throwable cause = e.getCause();
+            if (cause instanceof ClosedChannelException) {
+                throw (ClosedChannelException) cause;
+            }
             /*
-             * Other types of IOExceptions shouldn't happen at this point though
+             * Other types of IOExceptions shouldn't happen at this point though.
              */
             Activator.getDefault().logError(e.getMessage(), e);
             throw new IllegalStateException();
@@ -161,10 +198,11 @@ class HT_IO {
 
     public synchronized void writeNode(HTNode node) {
         try {
-            /* Insert the node into the cache. */
             int seqNumber = node.getSequenceNumber();
-            int offset = (seqNumber + hashCode()) & CACHE_MASK;
-            NODE_CACHE[offset] = new CacheElement(this, node);
+
+            /* "Write-back" the node into the cache */
+            CacheKey key = new CacheKey(this, seqNumber);
+            NODE_CACHE.put(key, node);
 
             /* Position ourselves at the start of the node and write it */
             seekFCToNodePos(fFileChannelOut, seqNumber);
