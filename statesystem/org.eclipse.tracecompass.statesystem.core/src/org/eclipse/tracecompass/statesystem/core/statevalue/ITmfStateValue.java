@@ -24,61 +24,17 @@ public interface ITmfStateValue extends Comparable<ITmfStateValue> {
     /**
      * The supported types of state values
      */
-    enum Type {
-
+    public enum Type {
         /** Null value, for an interval not carrying any information */
-        NULL((byte) -1),
+        NULL,
         /** 32-bit integer value */
-        INTEGER((byte) 0),
+        INTEGER,
         /** 64-bit integer value */
-        LONG((byte) 1),
+        LONG,
         /** IEEE 754 double precision number */
-        DOUBLE((byte) 2),
+        DOUBLE,
         /** Variable-length string value */
-        STRING((byte) 3);
-
-        private final byte fTypeByte;
-
-        private Type(byte type) {
-            fTypeByte = type;
-        }
-
-        /**
-         * Get the corresponding Type from its byte representation.
-         *
-         * @param type
-         *            The type byte
-         * @return The corresponding Type enum element
-         * @throws IllegalArgumentException
-         *             If the type byte is not recognized
-         * @since 2.0
-         */
-        public static Type getTypeFromByte(byte type) {
-            switch (type) {
-            case -1:
-                return NULL;
-            case 0:
-                return INTEGER;
-            case 1:
-                return LONG;
-            case 2:
-                return DOUBLE;
-            case 3:
-                return STRING;
-            default:
-                throw new IllegalArgumentException();
-            }
-        }
-
-        /**
-         * Get the byte representation of this type.
-         *
-         * @return The type byte
-         * @since 2.0
-         */
-        public byte getByte() {
-            return fTypeByte;
-        }
+        STRING,
     }
 
     /**
@@ -133,19 +89,5 @@ public interface ITmfStateValue extends Comparable<ITmfStateValue> {
      *             If the contained value cannot be read as a String
      */
     String unboxStr();
-
-    /**
-     * Serialize this state value into a byte array.
-     *
-     * The format of this array should always be:
-     *
-     * <pre>[type byte][payload]</pre>
-     *
-     * and the type will determine the layout of [payload].
-     *
-     * @return The serialized form of the state value
-     * @since 2.0
-     */
-    byte[] serialize();
 
 }

@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.statesystem.core.statevalue;
 
-import java.nio.ByteBuffer;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -61,55 +59,6 @@ public abstract class TmfStateValue implements ITmfStateValue {
      */
     public static final TmfStateValue nullValue() {
         return nullValue;
-    }
-
-    /**
-     * Read a serialized value (obtained with the {@link #serialize()} method)
-     * into a real {@link TmfStateValue} object.
-     *
-     * @param array
-     *            The serialized state value
-     * @return The state value object
-     * @since 2.0
-     */
-    public static TmfStateValue readSerializedValue(byte[] array) {
-        if (array.length == 0) {
-            /* This represents a null value */
-            return nullValue;
-        }
-
-        ByteBuffer buffer = ByteBuffer.wrap(array);
-
-        byte typeByte = buffer.get();
-        Type type = Type.getTypeFromByte(typeByte);
-        switch (type) {
-        case NULL: {
-            /* Should have been an empty array, but we'll accept it anyway */
-            return nullValue;
-        }
-        case INTEGER: {
-            int value = buffer.getInt();
-            return newValueInt(value);
-        }
-        case LONG: {
-            long value = buffer.getLong();
-            return newValueLong(value);
-        }
-        case DOUBLE: {
-            double value = buffer.getDouble();
-            return newValueDouble(value);
-        }
-        case STRING: {
-            /* The remaining of the buffer is the string's bytes */
-            int size = array.length - 1;
-            byte[] strBytes = new byte[size];
-            buffer.get(strBytes);
-            String value = new String(strBytes);
-            return newValueString(value);
-        }
-        default:
-            throw new IllegalArgumentException();
-        }
     }
 
     /**
