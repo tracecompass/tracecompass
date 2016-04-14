@@ -42,16 +42,16 @@ public class DataSizeWithUnitFormat extends Format {
             if (value == 0) {
                 return toAppendTo.append("0"); //$NON-NLS-1$
             }
-            if (abs > KILO * KILO * KILO * KILO) {
+            if (abs >= KILO * KILO * KILO * KILO) {
                 return toAppendTo.append(FORMAT.format(value / (KILO * KILO * KILO * KILO))).append(' ').append(TB);
             }
-            if (abs > KILO * KILO * KILO) {
+            if (abs >= KILO * KILO * KILO) {
                 return toAppendTo.append(FORMAT.format(value / (KILO * KILO * KILO))).append(' ').append(GB);
             }
-            if (abs > KILO * KILO) {
+            if (abs >= KILO * KILO) {
                 return toAppendTo.append(FORMAT.format(value / (KILO * KILO))).append(' ').append(MB);
             }
-            if (abs > KILO) {
+            if (abs >= KILO) {
                 return toAppendTo.append(FORMAT.format(value / (KILO))).append(' ').append(KB);
             }
             return toAppendTo.append(FORMAT.format(value)).append(' ').append(B);
