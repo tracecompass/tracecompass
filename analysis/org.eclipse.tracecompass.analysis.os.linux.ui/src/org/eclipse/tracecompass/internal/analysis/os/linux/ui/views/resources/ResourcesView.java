@@ -36,7 +36,6 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.FollowCpuA
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.UnfollowCpuAction;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources.ResourcesEntry.Type;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -337,7 +336,7 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
         int quark = resourcesEntry.getQuark();
 
         if (resourcesEntry.getType().equals(Type.CPU)) {
-            return createCpuEventsList(entry, ssq, fullStates, prevFullState, monitor, quark);
+            return createCpuEventsList(entry, fullStates, prevFullState, monitor, quark);
         } else if ((resourcesEntry.getType().equals(Type.IRQ) || resourcesEntry.getType().equals(Type.SOFT_IRQ)) && (quark >= 0)) {
             return createIrqEventsList(entry, fullStates, prevFullState, monitor, quark);
         }
@@ -345,32 +344,22 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
         return null;
     }
 
-    private static List<ITimeEvent> createCpuEventsList(ITimeGraphEntry entry, ITmfStateSystem ssq, List<List<ITmfStateInterval>> fullStates, List<ITmfStateInterval> prevFullState, IProgressMonitor monitor, int quark) {
+    private static List<ITimeEvent> createCpuEventsList(ITimeGraphEntry entry, List<List<ITmfStateInterval>> fullStates, List<ITmfStateInterval> prevFullState, IProgressMonitor monitor, int quark) {
         List<ITimeEvent> eventList;
-        int statusQuark;
-        try {
-            statusQuark = ssq.getQuarkRelative(quark, Attributes.STATUS);
-        } catch (AttributeNotFoundException e) {
-            /*
-             * The sub-attribute "status" is not available. May happen if the
-             * trace does not have sched_switch events enabled.
-             */
-            return null;
-        }
         boolean isZoomThread = Thread.currentThread() instanceof ZoomThread;
         eventList = new ArrayList<>(fullStates.size());
-        ITmfStateInterval lastInterval = prevFullState == null || statusQuark >= prevFullState.size() ? null : prevFullState.get(statusQuark);
+        ITmfStateInterval lastInterval = prevFullState == null || quark >= prevFullState.size() ? null : prevFullState.get(quark);
         long lastStartTime = lastInterval == null ? -1 : lastInterval.getStartTime();
         long lastEndTime = lastInterval == null ? -1 : lastInterval.getEndTime() + 1;
         for (List<ITmfStateInterval> fullState : fullStates) {
             if (monitor.isCanceled()) {
                 return null;
             }
-            if (statusQuark >= fullState.size()) {
+            if (quark >= fullState.size()) {
                 /* No information on this CPU (yet?), skip it for now */
                 continue;
             }
-            ITmfStateInterval statusInterval = fullState.get(statusQuark);
+            ITmfStateInterval statusInterval = fullState.get(quark);
             int status = statusInterval.getStateValue().unboxInt();
             long time = statusInterval.getStartTime();
             long duration = statusInterval.getEndTime() - time + 1;

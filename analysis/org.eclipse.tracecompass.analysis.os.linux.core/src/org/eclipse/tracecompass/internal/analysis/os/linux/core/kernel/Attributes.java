@@ -32,13 +32,11 @@ public interface Attributes {
 
     /* Sub-attributes of the CPU nodes */
     String CURRENT_THREAD = "Current_thread";
-    String STATUS = "Status";
     String SOFT_IRQS = "Soft_IRQs";
     String IRQS = "IRQs";
 
     /* Sub-attributes of the Thread nodes */
     String PPID = "PPID";
-    // static final String STATUS = "Status"
     String EXEC_NAME = "Exec_name";
 
     String PRIO = "Prio";

@@ -198,12 +198,10 @@ public final class KernelEventHandlerUtils {
      */
     public static void cpuExitInterrupt(long timestamp, Integer cpuNumber, ITmfStateSystemBuilder ssb)
             throws StateValueTypeException, TimeRangeException {
-        int quark;
         int currentCPUNode = getCurrentCPUNode(cpuNumber, ssb);
 
-        quark = ssb.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
         ITmfStateValue value = getCpuStatus(ssb, currentCPUNode);
-        ssb.modifyAttribute(timestamp, value, quark);
+        ssb.modifyAttribute(timestamp, value, currentCPUNode);
     }
 
     /**

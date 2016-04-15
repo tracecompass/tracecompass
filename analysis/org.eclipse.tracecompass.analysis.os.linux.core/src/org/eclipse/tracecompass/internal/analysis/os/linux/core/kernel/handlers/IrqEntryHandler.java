@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers
 
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -61,7 +60,7 @@ public class IrqEntryHandler extends KernelEventHandler {
         ss.modifyAttribute(timestamp, value, quark);
 
         /* Change the status of the CPU to interrupted */
-        quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getCurrentCPUNode(cpu, ss), Attributes.STATUS);
+        quark = KernelEventHandlerUtils.getCurrentCPUNode(cpu, ss);
         value = StateValues.CPU_STATUS_IRQ_VALUE;
         ss.modifyAttribute(timestamp, value, quark);
     }

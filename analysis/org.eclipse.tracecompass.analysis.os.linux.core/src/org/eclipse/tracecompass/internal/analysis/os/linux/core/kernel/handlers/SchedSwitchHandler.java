@@ -151,8 +151,7 @@ public class SchedSwitchHandler extends KernelEventHandler {
         } else {
             value = StateValues.CPU_STATUS_IDLE_VALUE;
         }
-        quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, value, currentCPUNode);
     }
 
     private static void setCpuProcess(ITmfStateSystemBuilder ss, Integer nextTid, long timestamp, int currentCPUNode) {

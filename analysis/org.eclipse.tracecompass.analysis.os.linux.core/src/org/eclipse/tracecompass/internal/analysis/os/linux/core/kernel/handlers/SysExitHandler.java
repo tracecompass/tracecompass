@@ -55,9 +55,8 @@ public class SysExitHandler extends KernelEventHandler {
 
         /* Put the CPU in system call (kernel) mode */
         int currentCPUNode = KernelEventHandlerUtils.getCurrentCPUNode(cpu, ss);
-        quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
         value = StateValues.CPU_STATUS_RUN_USERMODE_VALUE;
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, value, currentCPUNode);
     }
 
 }
