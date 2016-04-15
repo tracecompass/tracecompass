@@ -75,15 +75,21 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 @NonNullByDefault
 public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
 
-    /** Thread attribute
-     * @since 2.0 */
+    /**
+     * Thread attribute
+     *
+     * @since 2.0
+     */
     public static final String PROCESSES = "Processes"; //$NON-NLS-1$
 
     /** CallStack stack-attribute */
     public static final String CALL_STACK = "CallStack"; //$NON-NLS-1$
 
-    /** Undefined process ID
-     * @since 2.0 */
+    /**
+     * Undefined process ID
+     *
+     * @since 2.0
+     */
     protected static final int UNDEFINED_PID = -1;
 
     /** Undefined function exit name */
@@ -91,9 +97,6 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
 
     /** CallStack state system ID */
     private static final String ID = "org.eclipse.linuxtools.tmf.callstack"; //$NON-NLS-1$
-
-    /** Dummy function name for when no function is expected */
-    private static final String NO_FUNCTION = "no function"; //$NON-NLS-1$
 
     /**
      * Default constructor
@@ -115,7 +118,7 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
 
         try {
             /* Check if the event is a function entry */
-            String functionEntryName = functionEntry(event);
+            ITmfStateValue functionEntryName = functionEntry(event);
             if (functionEntryName != null) {
                 long timestamp = event.getTimestamp().toNanos();
                 int pid = getProcessId(event);
@@ -126,31 +129,28 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
                 ss.updateOngoingState(TmfStateValue.newValueLong(threadId), threadQuark);
 
                 int callStackQuark = ss.getQuarkRelativeAndAdd(threadQuark, CALL_STACK);
-                ITmfStateValue value = TmfStateValue.newValueString(functionEntryName);
+                ITmfStateValue value = functionEntryName;
                 ss.pushAttribute(timestamp, value, callStackQuark);
                 return;
             }
 
             /* Check if the event is a function exit */
-            String functionExitName = functionExit(event);
-            if (functionExitName != null) {
+            ITmfStateValue functionExitState = functionExit(event);
+            if (functionExitState != null) {
                 long timestamp = event.getTimestamp().toNanos();
                 int pid = getProcessId(event);
                 String thread = getThreadName(event);
                 int quark = ss.getQuarkAbsoluteAndAdd(PROCESSES, Integer.toString(pid), thread, CALL_STACK);
                 ITmfStateValue poppedValue = ss.popAttribute(timestamp, quark);
-                String poppedName = (poppedValue == null ? NO_FUNCTION : poppedValue.unboxStr());
-
                 /*
                  * Verify that the value we are popping matches the one in the
                  * event field, unless the latter is undefined.
                  */
-                if (!functionExitName.equals(UNDEFINED) &&
-                        !functionExitName.equals(poppedName)) {
+                if (!functionExitState.isNull() && !functionExitState.equals(poppedValue)) {
                     Activator.logWarning(NLS.bind(
                             Messages.CallStackStateProvider_UnmatchedPoppedValue,
-                            functionExitName,
-                            poppedName));
+                            functionExitState,
+                            poppedValue));
                 }
             }
 
@@ -185,20 +185,23 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
      *
      * @param event
      *            An event to check for function entry
-     * @return The function name of the function entry, or null if not a
-     *         function entry.
+     * @return The state value representing the function being entered, or null
+     *         if not a function entry
+     * @since 2.0
      */
-    protected abstract @Nullable String functionEntry(ITmfEvent event);
+    protected abstract @Nullable ITmfStateValue functionEntry(ITmfEvent event);
 
     /**
      * Check an event if it indicates a function exit.
      *
      * @param event
      *            An event to check for function exit
-     * @return The function name, or UNDEFINED, for a function exit, or null if
-     *         not a function exit.
+     * @return The state value representing the function being exited, or
+     *         TmfStateValue#nullValue() if the exited function is undefined,
+     *         or null if not a function exit.
+     * @since 2.0
      */
-    protected abstract @Nullable String functionExit(ITmfEvent event);
+    protected abstract @Nullable ITmfStateValue functionExit(ITmfEvent event);
 
     /**
      * Return the process ID of a function entry event.

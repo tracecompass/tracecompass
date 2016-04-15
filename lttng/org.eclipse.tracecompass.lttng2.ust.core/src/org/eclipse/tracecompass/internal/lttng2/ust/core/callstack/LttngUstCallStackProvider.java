@@ -21,6 +21,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst20EventLayout;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.callstack.CallStackStateProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
@@ -127,17 +129,17 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
     }
 
     @Override
-    public @Nullable String functionEntry(ITmfEvent event) {
+    public @Nullable ITmfStateValue functionEntry(ITmfEvent event) {
         String eventName = event.getName();
         if (!funcEntryEvents.contains(eventName)) {
             return null;
         }
         Long address = (Long) event.getContent().getField(fLayout.fieldAddr()).getValue();
-        return Long.toHexString(address);
+        return TmfStateValue.newValueLong(address);
     }
 
     @Override
-    public @Nullable String functionExit(ITmfEvent event) {
+    public @Nullable ITmfStateValue functionExit(ITmfEvent event) {
         String eventName = event.getName();
         if (!funcExitEvents.contains(eventName)) {
             return null;
@@ -148,10 +150,10 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
          */
         ITmfEventField field = event.getContent().getField(fLayout.fieldAddr());
         if (field == null) {
-            return CallStackStateProvider.UNDEFINED;
+            return TmfStateValue.nullValue();
         }
         Long address = (Long) field.getValue();
-        return Long.toHexString(address);
+        return TmfStateValue.newValueLong(address);
     }
 
     @Override

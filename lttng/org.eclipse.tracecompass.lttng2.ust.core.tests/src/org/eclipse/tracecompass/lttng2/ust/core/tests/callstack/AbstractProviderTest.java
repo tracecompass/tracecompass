@@ -278,7 +278,7 @@ public abstract class AbstractProviderTest {
             String[] ret = new String[depth];
             for (int i = 0; i < depth; i++) {
                 int quark = ss.getQuarkRelative(stackAttribute, String.valueOf(i + 1));
-                ret[i] = state.get(quark).getStateValue().unboxStr();
+                ret[i] = Long.toHexString(state.get(quark).getStateValue().unboxLong());
             }
             return ret;
 

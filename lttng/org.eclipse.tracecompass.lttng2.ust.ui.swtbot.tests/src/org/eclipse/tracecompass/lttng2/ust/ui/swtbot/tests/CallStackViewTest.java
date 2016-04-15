@@ -86,17 +86,17 @@ public class CallStackViewTest {
      * Stack frames of consecutive events in the trace
      */
     private static final String[] STACK_FRAMES[] = new String[][] {
-        {"40472b", "4045c8", "404412", "", ""},
-        {"40472b", "4045c8", "404412", "40392b", ""},
-        {"40472b", "4045c8", "404412", "", ""},
-        {"40472b", "4045c8", "", "", ""},
-        {"40472b", "4045c8", "404412", "", ""},
-        {"40472b", "4045c8", "404412", "40392b", ""},
-        {"40472b", "4045c8", "404412", "", ""},
-        {"40472b", "4045c8", "", "", ""},
-        {"40472b", "4045c8", "404412", "", ""},
-        {"40472b", "4045c8", "404412", "40392b", ""},
-        {"40472b", "4045c8", "404412", "", ""},
+        {"0x40472b", "0x4045c8", "0x404412", "", ""},
+        {"0x40472b", "0x4045c8", "0x404412", "0x40392b", ""},
+        {"0x40472b", "0x4045c8", "0x404412", "", ""},
+        {"0x40472b", "0x4045c8", "", "", ""},
+        {"0x40472b", "0x4045c8", "0x404412", "", ""},
+        {"0x40472b", "0x4045c8", "0x404412", "0x40392b", ""},
+        {"0x40472b", "0x4045c8", "0x404412", "", ""},
+        {"0x40472b", "0x4045c8", "", "", ""},
+        {"0x40472b", "0x4045c8", "0x404412", "", ""},
+        {"0x40472b", "0x4045c8", "0x404412", "0x40392b", ""},
+        {"0x40472b", "0x4045c8", "0x404412", "", ""},
     };
 
     /** Tooltips of the toolbar buttons */
@@ -191,7 +191,7 @@ public class CallStackViewTest {
         String node = "glxgears-cyg-profile";
         String pid = "-1";
         String childName = "glxgears-16073";
-        List<String> expected = ImmutableList.of("40472b", "", "", "", "");
+        List<String> expected = ImmutableList.of("0x40472b", "", "", "", "");
 
         SWTBotView viewBot = fBot.viewById(CallStackView.ID);
         viewBot.setFocus();

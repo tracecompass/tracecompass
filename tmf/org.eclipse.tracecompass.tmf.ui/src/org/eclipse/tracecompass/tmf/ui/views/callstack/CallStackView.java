@@ -857,10 +857,10 @@ public class CallStackView extends AbstractTimeGraphView {
                     // ignore
                 }
             } else if (nameValue.getType() == Type.INTEGER) {
-                name = "0x" + Integer.toHexString(nameValue.unboxInt()); //$NON-NLS-1$
+                name = "0x" + Integer.toUnsignedString(nameValue.unboxInt(), 16); //$NON-NLS-1$
                 address = nameValue.unboxInt();
             } else if (nameValue.getType() == Type.LONG) {
-                name = "0x" + Long.toHexString(nameValue.unboxLong()); //$NON-NLS-1$
+                name = "0x" + Long.toUnsignedString(nameValue.unboxLong(), 16); //$NON-NLS-1$
                 address = nameValue.unboxLong();
             }
         } catch (StateValueTypeException e) {
