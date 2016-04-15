@@ -192,16 +192,14 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                             List<Integer> irqQuarks = ss.getQuarks(Attributes.CPUS, Integer.toString(cpu), Attributes.IRQS, "*"); //$NON-NLS-1$
 
                             for (int irqQuark : irqQuarks) {
-                                if (fullState.get(irqQuark).getStateValue().unboxInt() == cpu) {
-                                    ITmfStateInterval value = ss.querySingleState(event.getTime(), irqQuark);
-                                    if (!value.getStateValue().isNull()) {
-                                        int irq = Integer.parseInt(ss.getAttributeName(irqQuark));
-                                        retMap.put(Messages.ResourcesView_attributeIrqName, String.valueOf(irq));
-                                    }
+                                ITmfStateInterval value = fullState.get(irqQuark);
+                                if (!value.getStateValue().isNull()) {
+                                    String irq = ss.getAttributeName(irqQuark);
+                                    retMap.put(Messages.ResourcesView_attributeIrqName, irq);
                                     break;
                                 }
                             }
-                        } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException e) {
+                        } catch (TimeRangeException | StateValueTypeException e) {
                             Activator.getDefault().logError("Error in ResourcesPresentationProvider", e); //$NON-NLS-1$
                         } catch (StateSystemDisposedException e) {
                             /* Ignored */
@@ -215,16 +213,14 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                             List<Integer> softIrqQuarks = ss.getQuarks(Attributes.CPUS, Integer.toString(cpu), Attributes.SOFT_IRQS, "*"); //$NON-NLS-1$
 
                             for (int softIrqQuark : softIrqQuarks) {
-                                if (fullState.get(softIrqQuark).getStateValue().unboxInt() == cpu) {
-                                    ITmfStateInterval value = ss.querySingleState(event.getTime(), softIrqQuark);
-                                    if (!value.getStateValue().isNull()) {
-                                        int softIrq = Integer.parseInt(ss.getAttributeName(softIrqQuark));
-                                        retMap.put(Messages.ResourcesView_attributeSoftIrqName, String.valueOf(softIrq));
-                                    }
+                                ITmfStateInterval value = fullState.get(softIrqQuark);
+                                if (!value.getStateValue().isNull()) {
+                                    String softIrq = ss.getAttributeName(softIrqQuark);
+                                    retMap.put(Messages.ResourcesView_attributeSoftIrqName, softIrq);
                                     break;
                                 }
                             }
-                        } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException e) {
+                        } catch (TimeRangeException | StateValueTypeException e) {
                             Activator.getDefault().logError("Error in ResourcesPresentationProvider", e); //$NON-NLS-1$
                         } catch (StateSystemDisposedException e) {
                             /* Ignored */
