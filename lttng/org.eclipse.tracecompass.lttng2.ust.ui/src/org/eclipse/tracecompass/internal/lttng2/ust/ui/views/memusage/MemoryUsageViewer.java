@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryStrings;
@@ -63,6 +64,7 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
     public MemoryUsageViewer(Composite parent) {
         super(parent, Messages.MemoryUsageViewer_Title, Messages.MemoryUsageViewer_XAxis, Messages.MemoryUsageViewer_YAxis);
         Chart chart = getSwtChart();
+        chart.getLegend().setPosition(SWT.LEFT);
         chart.getAxisSet().getYAxis(0).getTick().setFormat(new DataSizeWithUnitFormat());
     }
 
