@@ -56,7 +56,7 @@ public class IrqEntryHandler extends KernelEventHandler {
         ss.modifyAttribute(timestamp, value, quark);
 
         /* Change the status of the running process to interrupted */
-        quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getCurrentThreadNode(cpu, ss), Attributes.STATUS);
+        quark = KernelEventHandlerUtils.getCurrentThreadNode(cpu, ss);
         value = StateValues.PROCESS_STATUS_INTERRUPTED_VALUE;
         ss.modifyAttribute(timestamp, value, quark);
 

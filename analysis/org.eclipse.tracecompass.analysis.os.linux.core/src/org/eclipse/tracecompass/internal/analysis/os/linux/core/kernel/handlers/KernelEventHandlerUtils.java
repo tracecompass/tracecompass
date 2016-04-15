@@ -130,8 +130,7 @@ public final class KernelEventHandlerUtils {
             /* We were previously in kernel mode */
             value = StateValues.PROCESS_STATUS_RUN_SYSCALL_VALUE;
         }
-        quark = ssb.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
-        ssb.modifyAttribute(timestamp, value, quark);
+        ssb.modifyAttribute(timestamp, value, currentThreadNode);
     }
 
     /**

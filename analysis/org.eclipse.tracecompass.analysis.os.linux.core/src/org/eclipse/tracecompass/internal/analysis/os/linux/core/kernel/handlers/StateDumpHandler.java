@@ -73,9 +73,7 @@ public class StateDumpHandler extends KernelEventHandler {
 
     private static void setStatus(ITmfStateSystemBuilder ss, int status, int curThreadNode, long timestamp) {
         ITmfStateValue value;
-        int quark;
-        quark = ss.getQuarkRelativeAndAdd(curThreadNode, Attributes.STATUS);
-        if (ss.queryOngoingState(quark).isNull()) {
+        if (ss.queryOngoingState(curThreadNode).isNull()) {
             switch (status) {
             case LinuxValues.STATEDUMP_PROCESS_STATUS_WAIT_CPU:
                 value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
@@ -92,7 +90,7 @@ public class StateDumpHandler extends KernelEventHandler {
             default:
                 value = StateValues.PROCESS_STATUS_UNKNOWN_VALUE;
             }
-            ss.modifyAttribute(timestamp, value, quark);
+            ss.modifyAttribute(timestamp, value, curThreadNode);
         }
     }
 

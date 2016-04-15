@@ -73,9 +73,8 @@ public class ProcessForkHandler extends KernelEventHandler {
         ss.modifyAttribute(timestamp, value, quark);
 
         /* Set the new process' status */
-        quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.STATUS);
         value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, value, childTidNode);
 
         /* Set the process' syscall name, to be the same as the parent's */
         quark = ss.getQuarkRelativeAndAdd(parentTidNode, Attributes.SYSTEM_CALL);

@@ -55,9 +55,8 @@ public class SoftIrqEntryHandler extends KernelEventHandler {
         ss.modifyAttribute(timestamp, value, quark);
 
         /* Change the status of the running process to interrupted */
-        quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
         value = StateValues.PROCESS_STATUS_INTERRUPTED_VALUE;
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, value, currentThreadNode);
 
         /* Change the status of the CPU to interrupted */
         quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);

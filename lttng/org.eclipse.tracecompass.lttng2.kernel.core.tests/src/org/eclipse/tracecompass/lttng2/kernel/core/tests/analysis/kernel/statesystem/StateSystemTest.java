@@ -404,16 +404,16 @@ public abstract class StateSystemTest {
     public void testGetQuarks_end() {
         List<Integer> list = fixture.getQuarks(Attributes.THREADS, "1577", "*");
 
-        /* There should be 5 sub-attributes for each Thread node */
-        assertEquals(5, list.size());
+        /* There should be 4 sub-attributes for each Thread node */
+        assertEquals(4, list.size());
     }
 
     @Test
     public void testGetQuarks_middle_end() {
         List<Integer> list = fixture.getQuarks(Attributes.THREADS, "*", "*");
 
-        /* There should be 169 threads and 5 sub-attributes per thread */
-        assertEquals(169 * 5, list.size());
+        /* There should be 169 threads and 4 sub-attributes per thread */
+        assertEquals(169 * 4, list.size());
     }
 
     @Test
@@ -525,7 +525,7 @@ public abstract class StateSystemTest {
     @Test
     public void testFirstIntervalIsConsidered() {
         try {
-            int quark = fixture.getQuarkAbsolute(Attributes.THREADS, "1397", Attributes.STATUS);
+            int quark = fixture.getQuarkAbsolute(Attributes.THREADS, "1397");
             List<ITmfStateInterval> list = fixture.queryFullState(1331668248014135800L);
             ITmfStateInterval interval = list.get(quark);
             assertEquals(1331668247516664825L, interval.getStartTime());

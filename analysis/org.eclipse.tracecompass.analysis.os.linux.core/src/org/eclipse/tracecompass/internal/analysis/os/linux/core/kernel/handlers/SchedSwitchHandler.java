@@ -118,8 +118,7 @@ public class SchedSwitchHandler extends KernelEventHandler {
         } else {
             value = StateValues.PROCESS_STATUS_WAIT_UNKNOWN_VALUE;
         }
-        int quark = ss.getQuarkRelativeAndAdd(formerThreadNode, Attributes.STATUS);
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, value, formerThreadNode);
 
     }
 

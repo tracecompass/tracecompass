@@ -14,9 +14,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow
 
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -89,7 +87,7 @@ public class ControlFlowCheckActiveProvider implements ITimeGraphEntryActiveProv
                     return false;
                 }
                 try {
-                    int statusQuark = ssq.getQuarkRelative(cfe.getThreadQuark(), Attributes.STATUS);
+                    int statusQuark = cfe.getThreadQuark();
 
                     /* Get the initial state at beginTS */
                     ITmfStateInterval currentInterval = ssq.querySingleState(beginTS, statusQuark);
@@ -107,7 +105,7 @@ public class ControlFlowCheckActiveProvider implements ITimeGraphEntryActiveProv
                         }
                         ts = currentInterval.getEndTime();
                     }
-                } catch (AttributeNotFoundException | StateSystemDisposedException e) {
+                } catch (StateSystemDisposedException e) {
                     /* Ignore ... */
                 }
             }

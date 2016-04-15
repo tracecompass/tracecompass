@@ -52,21 +52,20 @@ public class SchedWakeupHandler extends KernelEventHandler {
          * Assign it to the "wait for cpu" state, but only if it was not already
          * running.
          */
-        int quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.STATUS);
-        int status = ss.queryOngoingState(quark).unboxInt();
+        int status = ss.queryOngoingState(threadNode).unboxInt();
         ITmfStateValue value = null;
         long timestamp = KernelEventHandlerUtils.getTimestamp(event);
         if (status != StateValues.PROCESS_STATUS_RUN_SYSCALL &&
                 status != StateValues.PROCESS_STATUS_RUN_USERMODE) {
             value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
-            ss.modifyAttribute(timestamp, value, quark);
+            ss.modifyAttribute(timestamp, value, threadNode);
         }
 
         /*
          * When a user changes a threads prio (e.g. with pthread_setschedparam),
          * it shows in ftrace with a sched_wakeup.
          */
-        quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.PRIO);
+        int quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.PRIO);
         value = TmfStateValue.newValueInt(prio);
         ss.modifyAttribute(timestamp, value, quark);
     }

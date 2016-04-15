@@ -860,8 +860,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
         }
         ControlFlowEntry entry = (ControlFlowEntry) tgentry;
         try {
-            int threadQuark = entry.getThreadQuark();
-            int statusQuark = ss.getQuarkRelative(threadQuark, Attributes.STATUS);
+            int statusQuark = entry.getThreadQuark();
             eventList = new ArrayList<>(fullStates.size());
             ITmfStateInterval lastInterval = prevFullState == null || statusQuark >= prevFullState.size() ? null : prevFullState.get(statusQuark);
             long lastStartTime = lastInterval == null ? -1 : lastInterval.getStartTime();
@@ -897,7 +896,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                 lastStartTime = time;
                 lastEndTime = time + duration;
             }
-        } catch (AttributeNotFoundException | TimeRangeException e) {
+        } catch (TimeRangeException e) {
             Activator.getDefault().logError(e.getMessage());
         }
         return eventList;
@@ -930,7 +929,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                         ITmfStateInterval currentThreadInterval = ssq.querySingleState(time, currentThreadQuark);
                         int currentThread = currentThreadInterval.getStateValue().unboxInt();
                         if (currentThread > 0) {
-                            int statusQuark = ssq.getQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThread), Attributes.STATUS);
+                            int statusQuark = ssq.getQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThread));
                             ITmfStateInterval statusInterval = ssq.querySingleState(time, statusQuark);
                             if (statusInterval.getStartTime() == time) {
                                 thread = currentThread;
