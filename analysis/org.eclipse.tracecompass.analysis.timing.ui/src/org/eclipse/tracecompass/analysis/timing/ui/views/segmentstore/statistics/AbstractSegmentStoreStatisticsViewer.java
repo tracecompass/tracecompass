@@ -52,7 +52,8 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
             checkNotNull(Messages.SegmentStoreStatistics_Statistics_MinLabel),
             checkNotNull(Messages.SegmentStoreStatistics_MaxLabel),
             checkNotNull(Messages.SegmentStoreStatistics_AverageLabel),
-            checkNotNull(Messages.SegmentStoreStatisticsViewer_StandardDeviation)
+            checkNotNull(Messages.SegmentStoreStatisticsViewer_StandardDeviation),
+            checkNotNull(Messages.SegmentStoreStatisticsViewer_Count)
     };
 
     /**
@@ -90,6 +91,8 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
                         value = String.valueOf(toFormattedString(entry.getEntry().getAverage()));
                     } else if (columnIndex == 4) {
                         value = String.valueOf(toFormattedString(entry.getEntry().getStdDev()));
+                    } else if (columnIndex == 5) {
+                        value = String.valueOf(entry.getEntry().getNbSegments());
                     }
                 }
             }
@@ -204,6 +207,23 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
                         SegmentStoreStatisticsEntry n2 = (SegmentStoreStatisticsEntry) e2;
 
                         return Double.compare(n1.getEntry().getStdDev(), n2.getEntry().getStdDev());
+
+                    }
+                });
+                columns.add(column);
+                column = new TmfTreeColumnData(COLUMN_NAMES[5]);
+                column.setAlignment(SWT.RIGHT);
+                column.setComparator(new ViewerComparator() {
+                    @Override
+                    public int compare(@Nullable Viewer viewer, @Nullable Object e1, @Nullable Object e2) {
+                        if ((e1 == null) || (e2 == null)) {
+                            return 0;
+                        }
+
+                        SegmentStoreStatisticsEntry n1 = (SegmentStoreStatisticsEntry) e1;
+                        SegmentStoreStatisticsEntry n2 = (SegmentStoreStatisticsEntry) e2;
+
+                        return Long.compare(n1.getEntry().getNbSegments(), n2.getEntry().getNbSegments());
 
                     }
                 });
