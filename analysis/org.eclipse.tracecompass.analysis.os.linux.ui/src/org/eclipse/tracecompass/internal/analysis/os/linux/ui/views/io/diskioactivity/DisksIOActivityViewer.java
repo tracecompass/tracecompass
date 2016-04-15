@@ -145,8 +145,8 @@ public class DisksIOActivityViewer extends TmfCommonXLineChartViewer {
                     }
                     prevTime = time;
                 }
-                setSeries(seriesNameWritten, yValuesWritten);
                 setSeries(seriesNameRead, yValuesRead);
+                setSeries(seriesNameWritten, yValuesWritten);
                 if (monitor != null && monitor.isCanceled()) {
                     return;
                 }
