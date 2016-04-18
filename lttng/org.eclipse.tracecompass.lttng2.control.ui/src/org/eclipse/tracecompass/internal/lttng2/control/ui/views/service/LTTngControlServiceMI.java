@@ -851,14 +851,14 @@ public class LTTngControlServiceMI extends LTTngControlService {
                         eventInfo.setState(TraceEnablement.valueOfString(infoNode.getTextContent()));
                         break;
                     case MIStrings.FILTER:
-                        // TODO
-                        // See bug 334 http://bugs.lttng.org/issues/334 from
-                        // LTTng
-                        // For now we emulate the non-mi behavior and simply put
+                        // Before LTTng 2.8: We emulate the non-mi behavior and simply put
                         // "with filter"
                         if (Boolean.TRUE.toString().equals(infoNode.getTextContent())) {
                             eventInfo.setFilterExpression(Messages.TraceControl_DefaultEventFilterString);
                         }
+                        break;
+                    case MIStrings.FILTER_EXPRESSION:
+                        eventInfo.setFilterExpression(infoNode.getTextContent());
                         break;
                     case MIStrings.EXCLUSION:
                         // TODO: Currently not supported by tmf

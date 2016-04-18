@@ -536,6 +536,11 @@ public interface MIStrings {
      */
      String FILTER = "filter";
 
+     /**
+      * Represent the filter_expression xml element
+      */
+     String FILTER_EXPRESSION = "filter_expression";
+
     /**
      * Represent the snapshot_outputs xml element
      */
