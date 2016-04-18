@@ -268,10 +268,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private static final ShowFindDialogAction FIND_ACTION = new ShowFindDialogAction();
 
     /** The find action handler */
-    private static ActionHandler fFindActionHandler;
+    private ActionHandler fFindActionHandler;
 
     /** The find handler activation */
-    private static IHandlerActivation fFindHandlerActivation;
+    private IHandlerActivation fFindHandlerActivation;
 
     /** The find target to use */
     private final FindTarget fFindTarget;
@@ -2317,8 +2317,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     if (fFindActionHandler == null) {
                         fFindActionHandler = new ActionHandler(FIND_ACTION);
                     }
-                    final Object service = PlatformUI.getWorkbench().getService(IHandlerService.class);
-                    fFindHandlerActivation = ((IHandlerService) service).activateHandler(ActionFactory.FIND.getCommandId(), fFindActionHandler);
+                    if (fFindHandlerActivation == null) {
+                        final Object service = PlatformUI.getWorkbench().getService(IHandlerService.class);
+                        fFindHandlerActivation = ((IHandlerService) service).activateHandler(ActionFactory.FIND.getCommandId(), fFindActionHandler);
+                    }
                 }
             }
             // Notify action for all parts
@@ -2329,6 +2331,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             if ((part == AbstractTimeGraphView.this) && (fFindHandlerActivation != null)) {
                 final Object service = PlatformUI.getWorkbench().getService(IHandlerService.class);
                 ((IHandlerService) service).deactivateHandler(fFindHandlerActivation);
+                fFindHandlerActivation = null;
             }
         }
         @Override
