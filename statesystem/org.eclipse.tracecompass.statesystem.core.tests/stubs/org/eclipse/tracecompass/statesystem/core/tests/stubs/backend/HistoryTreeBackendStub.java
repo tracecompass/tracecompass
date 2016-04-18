@@ -85,4 +85,13 @@ public class HistoryTreeBackendStub extends HistoryTreeBackend {
         return new HistoryTreeStub(existingStateFile, providerVersion);
     }
 
+    /**
+     * Get the History Tree built by this backend.
+     *
+     * @return The history tree
+     */
+    public HistoryTreeStub getHistoryTree() {
+        return (HistoryTreeStub) super.getSHT();
+    }
+
 }
