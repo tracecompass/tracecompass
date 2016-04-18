@@ -31,6 +31,7 @@ import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -344,8 +345,29 @@ public class HistoryTree {
      *
      * @return The immutable latest branch
      */
+    @VisibleForTesting
     protected List<@NonNull HTNode> getLatestBranch() {
         return ImmutableList.copyOf(fLatestBranch);
+    }
+
+    /**
+     * Read a node at sequence number
+     *
+     * @param seqNum
+     *            The sequence number of the node to read
+     * @return The HTNode object
+     * @throws ClosedChannelException
+     *             Exception thrown when reading the node
+     */
+    @VisibleForTesting
+    protected @NonNull HTNode getNode(int seqNum) throws ClosedChannelException {
+        // First, check in the latest branch if the node is there
+        for (HTNode node : fLatestBranch) {
+            if (node.getSequenceNumber() == seqNum) {
+                return node;
+            }
+        }
+        return fTreeIO.readNode(seqNum);
     }
 
     // ------------------------------------------------------------------------
@@ -680,97 +702,6 @@ public class HistoryTree {
     // ------------------------------------------------------------------------
     // Test/debugging methods
     // ------------------------------------------------------------------------
-
-    /**
-     * Debugging method to make sure all intervals contained in the given node
-     * have valid start and end times.
-     *
-     * @param zenode
-     *            The node to check
-     * @return True if everything is fine, false if there is at least one
-     *         invalid timestamp (end time < start time, time outside of the
-     *         range of the node, etc.)
-     */
-    @SuppressWarnings("nls")
-    public boolean checkNodeIntegrity(HTNode zenode) {
-        /* Only used for debugging, shouldn't be externalized */
-        HTNode otherNode;
-        CoreNode node;
-        StringBuffer buf = new StringBuffer();
-        boolean ret = true;
-
-        // FIXME /* Only testing Core Nodes for now */
-        if (!(zenode instanceof CoreNode)) {
-            return true;
-        }
-
-        node = (CoreNode) zenode;
-
-        try {
-            /*
-             * Test that this node's start and end times match the start of the
-             * first child and the end of the last child, respectively
-             */
-            if (node.getNbChildren() > 0) {
-                otherNode = fTreeIO.readNode(node.getChild(0));
-                if (node.getNodeStart() != otherNode.getNodeStart()) {
-                    buf.append("Start time of node (" + node.getNodeStart() + ") "
-                            + "does not match start time of first child " + "("
-                            + otherNode.getNodeStart() + "), " + "node #"
-                            + otherNode.getSequenceNumber() + ")\n");
-                    ret = false;
-                }
-                if (node.isOnDisk()) {
-                    otherNode = fTreeIO.readNode(node.getLatestChild());
-                    if (node.getNodeEnd() != otherNode.getNodeEnd()) {
-                        buf.append("End time of node (" + node.getNodeEnd()
-                                + ") does not match end time of last child ("
-                                + otherNode.getNodeEnd() + ", node #"
-                                + otherNode.getSequenceNumber() + ")\n");
-                        ret = false;
-                    }
-                }
-            }
-
-            /*
-             * Test that the childStartTimes[] array matches the real nodes'
-             * start times
-             */
-            for (int i = 0; i < node.getNbChildren(); i++) {
-                otherNode = fTreeIO.readNode(node.getChild(i));
-                if (otherNode.getNodeStart() != node.getChildStart(i)) {
-                    buf.append("  Expected start time of child node #"
-                            + node.getChild(i) + ": " + node.getChildStart(i)
-                            + "\n" + "  Actual start time of node #"
-                            + otherNode.getSequenceNumber() + ": "
-                            + otherNode.getNodeStart() + "\n");
-                    ret = false;
-                }
-            }
-
-        } catch (ClosedChannelException e) {
-            Activator.getDefault().logError(e.getMessage(), e);
-        }
-
-        if (!ret) {
-            Activator.getDefault().logError("SHT: Integrity check failed for node #"
-                    + node.getSequenceNumber() + ":" + buf.toString());
-        }
-        return ret;
-    }
-
-    /**
-     * Check the integrity of all the nodes in the tree. Calls
-     * {@link #checkNodeIntegrity} for every node in the tree.
-     */
-    public void checkIntegrity() {
-        try {
-            for (int i = 0; i < fNodeCount; i++) {
-                checkNodeIntegrity(fTreeIO.readNode(i));
-            }
-        } catch (ClosedChannelException e) {
-        }
-    }
 
     /* Only used for debugging, shouldn't be externalized */
     @SuppressWarnings("nls")
