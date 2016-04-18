@@ -94,15 +94,15 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
         switch (attribute.getAttribute(TmfXmlStrings.TYPE)) {
         case TmfXmlStrings.TYPE_CONSTANT:
             fType = StateAttributeType.CONSTANT;
-            fName = fContainer.getAttributeValue(attribute.getAttribute(TmfXmlStrings.VALUE));
+            fName = getAttributeName(attribute);
             break;
         case TmfXmlStrings.EVENT_FIELD:
             fType = StateAttributeType.EVENTFIELD;
-            fName = fContainer.getAttributeValue(attribute.getAttribute(TmfXmlStrings.VALUE));
+            fName = getAttributeName(attribute);
             break;
         case TmfXmlStrings.TYPE_LOCATION:
             fType = StateAttributeType.LOCATION;
-            fName = fContainer.getAttributeValue(attribute.getAttribute(TmfXmlStrings.VALUE));
+            fName = getAttributeName(attribute);
             break;
         case TmfXmlStrings.TYPE_QUERY:
             List<@Nullable Element> childElements = XmlUtils.getChildElements(attribute);
@@ -118,7 +118,7 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
             break;
         case TmfXmlStrings.TYPE_EVENT_NAME:
             fType = StateAttributeType.EVENTNAME;
-            fName = fContainer.getAttributeValue(attribute.getAttribute(TmfXmlStrings.VALUE));
+            fName = getAttributeName(attribute);
             break;
         case TmfXmlStrings.NULL:
             fType = StateAttributeType.NONE;
@@ -131,6 +131,10 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
         default:
             throw new IllegalArgumentException("TmfXmlStateAttribute constructor: The XML element is not of the right type"); //$NON-NLS-1$
         }
+    }
+
+    private String getAttributeName(Element attribute) {
+        return fContainer.getAttributeValue(attribute.getAttribute(TmfXmlStrings.VALUE)).intern();
     }
 
     /**

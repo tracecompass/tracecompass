@@ -146,7 +146,7 @@ public class TmfXmlPatternSegmentBuilder {
      */
     private void setPatternSegmentContent(ITmfEvent event, ITmfTimestamp start, ITmfTimestamp end, Map<String, ITmfStateValue> fields, @Nullable TmfXmlScenarioInfo scenarioInfo) {
         for (TmfXmlPatternSegmentField field : fFields) {
-            fields.put(field.getName(), field.getValue(event, scenarioInfo));
+            fields.put(field.getName().intern(), field.getValue(event, scenarioInfo));
         }
         if (scenarioInfo != null) {
             addStoredFieldsContent(event, fields, scenarioInfo);
@@ -169,7 +169,7 @@ public class TmfXmlPatternSegmentBuilder {
             for (Entry<String, String> entry : ((XmlPatternStateProvider) fContainer).getStoredFields().entrySet()) {
                 ITmfStateValue value = ((XmlPatternStateProvider) fContainer).getHistoryBuilder().getStoredFieldValue(fContainer, entry.getValue(), info, event);
                 if (!value.isNull()) {
-                    fields.put(entry.getValue(), value);
+                    fields.put(entry.getValue().intern(), value);
                 }
             }
         }
@@ -338,7 +338,7 @@ public class TmfXmlPatternSegmentBuilder {
             } else {
                 name.append(fSegmentNameAttribute);
             }
-            return name.toString();
+            return name.toString().intern();
         }
     }
 }

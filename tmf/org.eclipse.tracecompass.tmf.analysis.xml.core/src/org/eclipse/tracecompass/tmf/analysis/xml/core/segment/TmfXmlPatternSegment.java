@@ -185,7 +185,7 @@ public class TmfXmlPatternSegment implements ISegment {
             int length = in.readInt();
             byte[] bytes = new byte[length];
             in.read(bytes, 0, length);
-            String name = new String(bytes);
+            String name = new String(bytes).intern();
 
             Byte type = in.readByte();
             ITmfStateValue value;
@@ -203,7 +203,7 @@ public class TmfXmlPatternSegment implements ISegment {
                 length = in.readInt();
                 bytes = new byte[length];
                 in.read(bytes, 0, length);
-                value = TmfStateValue.newValueString(new String(bytes));
+                value = TmfStateValue.newValueString(new String(bytes).intern());
                 break;
             default:
                 throw new IOException("Read object failed : Invalid data"); //$NON-NLS-1$
