@@ -31,6 +31,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundExc
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
+import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -113,6 +114,7 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
                 long offset = this.getTimeOffset();
 
                 /* Initialize quarks and series names */
+                List<ITmfStateInterval> fullState = ss.queryFullState(start);
                 for (int quark : tidQuarks) {
                     fYValues.put(quark, new double[xvalues.length]);
                     fMemoryQuarks.put(quark, ss.getQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_MEMORY_ATTRIBUTE));
@@ -120,7 +122,7 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
                     String oldSeriesName = fSeriesName.get(quark);
                     String seriesName = null;
                     try {
-                        ITmfStateValue procnameValue = ss.querySingleState(start, procNameQuark).getStateValue();
+                        ITmfStateValue procnameValue = fullState.get(procNameQuark).getStateValue();
                         String procname = ""; //$NON-NLS-1$
                         if (!procnameValue.isNull()) {
                             procname = procnameValue.unboxStr();
@@ -153,14 +155,18 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
                     // long conversion
                     time = time < traceStart ? traceStart : time;
                     time = time > traceEnd ? traceEnd : time;
+                    try {
+                        fullState = ss.queryFullState(time);
+                        for (int quark : tidQuarks) {
+                            double[] values = checkNotNull(fYValues.get(quark));
 
-                    for (int quark : tidQuarks) {
-                        double[] values = checkNotNull(fYValues.get(quark));
-                        try {
                             Integer memQuark = checkNotNull(fMemoryQuarks.get(quark));
-                            yvalue = ss.querySingleState(time, memQuark.intValue()).getStateValue().unboxLong();
+                            yvalue = fullState.get(memQuark.intValue()).getStateValue().unboxLong();
                             values[i] = yvalue;
-                        } catch (TimeRangeException e) {
+                        }
+                    } catch (TimeRangeException e) {
+                        for (int quark : tidQuarks) {
+                            double[] values = checkNotNull(fYValues.get(quark));
                             values[i] = 0;
                         }
                     }
