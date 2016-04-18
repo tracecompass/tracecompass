@@ -981,4 +981,14 @@ public class LTTngControlServiceMI extends LTTngControlService {
         return node;
     }
 
+    @Override
+    public @NonNull List<String> getContextList(IProgressMonitor monitor) throws ExecutionException {
+        if (!isVersionSupported("2.8.0")) { //$NON-NLS-1$)
+            return super.getContextList(monitor);
+        }
+
+        ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_ADD_CONTEXT, LTTngControlServiceConstants.OPTION_LIST);
+        ICommandResult result = executeCommand(command, monitor);
+        return result.getOutput();
+    }
 }

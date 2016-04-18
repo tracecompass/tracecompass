@@ -18,7 +18,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -34,6 +36,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.SessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.ILttngControlService;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlService;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceConstants;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceMI;
 import org.junit.Ignore;
@@ -43,6 +46,7 @@ import org.junit.Test;
  * @author ejorajo
  *
  */
+@SuppressWarnings("javadoc")
 public class LTTngControlServiceMiTest extends LTTngControlServiceTest {
 
     private static final String MI_TEST_STREAM = "LTTngServiceMiTest.cfg";
@@ -50,6 +54,7 @@ public class LTTngControlServiceMiTest extends LTTngControlServiceTest {
     private static final String SCEN_SESSION_WITH_SYSCALLS = "GetSessionWithSyscalls";
     private static final String SCEN_LIST_SESSION_2_7_COMPAT = "ListSession2.7Compat";
     private static final String SCEN_GET_SESSION_FILTER_EXPRESSION = "GetSessionFilterExpression";
+    private static final String SCEN_LIST_CONTEXT_28 = "ListContext28";
 
     @Override
     protected ILttngControlService getControlService() {
@@ -155,6 +160,32 @@ public class LTTngControlServiceMiTest extends LTTngControlServiceTest {
     public void testAddContextFailure() {
         // TODO This does not use mi feature.And currently the context enabling
         // is wrong for 2.6.
+    }
+
+    @Test
+    public void testListContext28() throws ExecutionException {
+        ((LTTngControlService)fService).setVersion("2.8.0");
+        fShell.setScenario(SCEN_LIST_CONTEXT_28);
+
+        List<String> availContexts = fService.getContextList(new NullProgressMonitor());
+        assertNotNull(availContexts);
+        assertEquals(12, availContexts.size());
+
+        Set<String> expectedContexts = new HashSet<>();
+        expectedContexts.add("pid");
+        expectedContexts.add("procname");
+        expectedContexts.add("prio");
+        expectedContexts.add("nice");
+        expectedContexts.add("vpid");
+        expectedContexts.add("tid");
+        expectedContexts.add("pthread_id");
+        expectedContexts.add("vtid");
+        expectedContexts.add("ppid");
+        expectedContexts.add("vppid");
+        expectedContexts.add("perf:cpu:cpu-cycles");
+        expectedContexts.add("perf:cpu:cycles");
+
+        assertTrue(expectedContexts.containsAll(availContexts));
     }
 
     @Override

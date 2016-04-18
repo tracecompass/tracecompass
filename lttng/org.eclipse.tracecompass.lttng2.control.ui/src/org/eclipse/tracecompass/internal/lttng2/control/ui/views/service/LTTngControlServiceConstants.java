@@ -244,9 +244,14 @@ public interface LTTngControlServiceConstants {
      */
     String OPTION_READ_TIMER = "--read-timer";  //$NON-NLS-1$
     /**
-     * Command line option for printing the help of a specif command
+     * Command line option for printing the help of a specific command
      */
     String OPTION_HELP = "-h";  //$NON-NLS-1$
+    /**
+     * Command line option for listing things. For example listing available
+     * context.
+     */
+    String OPTION_LIST = "--list"; //$NON-NLS-1$
     /**
      * Command line option for listing the fields of UST tracepoints
      */
