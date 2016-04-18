@@ -438,4 +438,19 @@ public abstract class StateHistoryBackendTestBase {
             fail(e.getMessage());
         }
     }
+
+    /**
+     * Test inserting an interval before the start of the backend
+     */
+    @Test(expected = TimeRangeException.class)
+    public void testIntervalBeforeStart() {
+        long startTime = 1000;
+        try {
+            IStateHistoryBackend backend = getBackendForBuilding(startTime);
+            backend.insertPastState(startTime - 1, startTime + 1, 0, INT_VAL1);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
 }

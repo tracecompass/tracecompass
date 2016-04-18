@@ -14,6 +14,7 @@ import java.io.IOException;
 
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.ThreadedHistoryTreeBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
+import org.junit.Test;
 
 /**
  * Test the {@link ThreadedHistoryTreeBackend} class.
@@ -43,4 +44,11 @@ public class ThreadedHistoryTreeBackendTest extends HistoryTreeBackendTest {
         fBackendMap.put(backend, historyTreeFile);
         return backend;
     }
+
+    @Override
+    @Test
+    public void testIntervalBeforeStart() {
+        // Exception is thrown in a thread, so we can't catch it
+    }
+
 }
