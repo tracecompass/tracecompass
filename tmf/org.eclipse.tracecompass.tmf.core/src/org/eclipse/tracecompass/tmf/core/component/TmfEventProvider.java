@@ -298,7 +298,8 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
                     request.getRange(),
                     request.getIndex(),
                     request.getNbRequested(),
-                    request.getExecType());
+                    request.getExecType(),
+                    request.getDependencyLevel());
             coalescedRequest.addRequest(request);
             coalescedRequest.setProviderFilter(this);
             if (TmfCoreTracer.isRequestTraced()) {

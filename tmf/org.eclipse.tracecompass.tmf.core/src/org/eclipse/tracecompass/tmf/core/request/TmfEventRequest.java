@@ -101,6 +101,8 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
 
     private ITmfFilter fEventFilter;
 
+    private int fDependencyLevel;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -153,6 +155,40 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
             long index,
             int nbRequested,
             ExecutionType priority) {
+        this(dataType, range, index, nbRequested, priority, 0);
+    }
+
+    /**
+     * Request 'n' events of a given type, for the given time range, at the
+     * given priority.
+     *
+     * @param dataType
+     *            The requested data type.
+     * @param range
+     *            The time range of the requested events. You can use
+     *            {@link TmfTimeRange#ETERNITY} to indicate you want to cover
+     *            the whole trace.
+     * @param index
+     *            The index of the first event to retrieve. You can use '0' to
+     *            start at the beginning of the trace.
+     * @param nbRequested
+     *            The number of events requested. You can use
+     *            {@link TmfEventRequest#ALL_DATA} to indicate you want all
+     *            events in the time range.
+     * @param priority
+     *            The requested execution priority.
+     * @param dependencyLevel
+     *            The dependency level. Use different dependency level for
+     *            requests that have a dependency with each other. They will
+     *            be serviced separately.
+     * @since 2.0
+     */
+    public TmfEventRequest(Class<? extends ITmfEvent> dataType,
+            TmfTimeRange range,
+            long index,
+            int nbRequested,
+            ExecutionType priority,
+            int dependencyLevel) {
 
         synchronized (TmfEventRequest.class) {
             fRequestId = fRequestNumber++;
@@ -163,6 +199,7 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
         fExecType = priority;
         fRange = range;
         fNbRead = 0;
+        fDependencyLevel = dependencyLevel;
 
         fRequestRunning = false;
         fRequestCompleted = false;
@@ -178,7 +215,8 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
                     + (getExecType() == ExecutionType.BACKGROUND ? "(BG)" : "(FG)")
                     + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested()
                     + " Range=" + getRange()
-                    + " DataType=" + getDataType().getSimpleName();
+                    + " DataType=" + getDataType().getSimpleName()
+                    + " DependencyLevel= " + fDependencyLevel;
             TmfCoreTracer.traceRequest(fRequestId, message);
         }
     }
@@ -250,6 +288,12 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
     @Override
     public void setProviderFilter(ITmfFilter provider) {
         fEventFilter = provider;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public int getDependencyLevel() {
+        return fDependencyLevel;
     }
 
     // ------------------------------------------------------------------------
@@ -404,7 +448,7 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
         }
         return '[' + name + '(' + getRequestId() + ',' + getDataType().getSimpleName() +
                 ',' + getExecType() + ',' + getRange() + ',' + getIndex() +
-                ',' + getNbRequested() + ")]"; //$NON-NLS-1$
+                ',' + getNbRequested() + ','+ getDependencyLevel() + ")]"; //$NON-NLS-1$
     }
 
 }

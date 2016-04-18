@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
+import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -44,6 +45,7 @@ public class TmfEventRequestTest {
     private static TmfEventRequest fRequest2;
     private static TmfEventRequest fRequest3;
     private static TmfEventRequest fRequest4;
+    private static TmfEventRequest fRequest5;
 
     // ------------------------------------------------------------------------
     // Housekeeping
@@ -55,6 +57,7 @@ public class TmfEventRequestTest {
         fRequest2 = new TmfEventRequestStub(ITmfEvent.class, range2, 100, 200);
         fRequest3 = new TmfEventRequestStub(ITmfEvent.class, range2, 200, 200);
         fRequest4 = new TmfEventRequestStub(ITmfEvent.class, range2, 200, 300);
+        fRequest5 = new TmfEventRequestStub(ITmfEvent.class, range2, 200, 300, ExecutionType.FOREGROUND, 1);
     }
 
     private static TmfEventRequest setupTestRequest(final boolean[] flags) {
@@ -111,6 +114,7 @@ public class TmfEventRequestTest {
         assertFalse("isCancelled", request.isCancelled());
 
         assertEquals("getNbRead", 0, request.getNbRead());
+        assertEquals("getDependencyLevel", 0, request.getDependencyLevel());
     }
 
     @Test
@@ -131,6 +135,7 @@ public class TmfEventRequestTest {
         assertFalse("isCancelled", request.isCancelled());
 
         assertEquals("getNbRead", 0, request.getNbRead());
+        assertEquals("getDependencyLevel", 0, request.getDependencyLevel());
     }
 
     @Test
@@ -151,6 +156,7 @@ public class TmfEventRequestTest {
         assertFalse("isCancelled", request.isCancelled());
 
         assertEquals("getNbRead", 0, request.getNbRead());
+        assertEquals("getDependencyLevel", 0, request.getDependencyLevel());
     }
 
     @Test
@@ -171,6 +177,28 @@ public class TmfEventRequestTest {
         assertFalse("isCancelled", request.isCancelled());
 
         assertEquals("getNbRead", 0, request.getNbRead());
+        assertEquals("getDependencyLevel", 0, request.getDependencyLevel());
+    }
+
+    @Test
+    public void testTmfEventRequestWithDependencyLevel() {
+        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.fromSeconds(0), TmfTimestamp.BIG_CRUNCH);
+        TmfEventRequest request = new TmfEventRequestStub(ITmfEvent.class, range, 100, 200, ExecutionType.FOREGROUND, 1);
+
+        assertEquals("getDataType",  ITmfEvent.class, request.getDataType());
+
+        assertEquals("StartTime", TmfTimestamp.fromSeconds(0), request.getRange().getStartTime());
+        assertEquals("EndTime", TmfTimestamp.BIG_CRUNCH, request.getRange().getEndTime());
+
+        assertEquals("getIndex", 0, request.getIndex());
+        assertEquals("getNbRequestedEvents", 100, request.getNbRequested());
+
+        assertFalse("isCompleted", request.isCompleted());
+        assertFalse("isFailed", request.isFailed());
+        assertFalse("isCancelled", request.isCancelled());
+
+        assertEquals("getNbRead", 0, request.getNbRead());
+        assertEquals("getDependencyLevel", 1, request.getDependencyLevel());
     }
 
     // ------------------------------------------------------------------------
@@ -187,6 +215,9 @@ public class TmfEventRequestTest {
         assertFalse(fRequest1.equals(fRequest2));
         assertFalse(fRequest1.equals(fRequest3));
         assertFalse(fRequest1.equals(fRequest4));
+
+        /* Request with different dependency level, but otherwise identical, are not equal */
+        assertFalse(fRequest4.equals(fRequest5));
     }
 
     // ------------------------------------------------------------------------
@@ -195,15 +226,17 @@ public class TmfEventRequestTest {
 
     @Test
     public void testToString() {
-        String expected1 = "[TmfEventRequestStub(" + fRequest1.getRequestId() + ",ITmfEvent,FOREGROUND," + range1 + ",0,100)]";
-        String expected2 = "[TmfEventRequestStub(" + fRequest2.getRequestId() + ",ITmfEvent,FOREGROUND," + range2 + ",0,100)]";
-        String expected3 = "[TmfEventRequestStub(" + fRequest3.getRequestId() + ",ITmfEvent,FOREGROUND," + range2 + ",0,200)]";
-        String expected4 = "[TmfEventRequestStub(" + fRequest4.getRequestId() + ",ITmfEvent,FOREGROUND," + range2 + ",0,200)]";
+        String expected1 = "[TmfEventRequestStub(" + fRequest1.getRequestId() + ",ITmfEvent,FOREGROUND," + range1 + ",0,100,0)]";
+        String expected2 = "[TmfEventRequestStub(" + fRequest2.getRequestId() + ",ITmfEvent,FOREGROUND," + range2 + ",0,100,0)]";
+        String expected3 = "[TmfEventRequestStub(" + fRequest3.getRequestId() + ",ITmfEvent,FOREGROUND," + range2 + ",0,200,0)]";
+        String expected4 = "[TmfEventRequestStub(" + fRequest4.getRequestId() + ",ITmfEvent,FOREGROUND," + range2 + ",0,200,0)]";
+        String expected5 = "[TmfEventRequestStub(" + fRequest5.getRequestId() + ",ITmfEvent,FOREGROUND," + range2 + ",0,200,1)]";
 
         assertEquals("toString", expected1, fRequest1.toString());
         assertEquals("toString", expected2, fRequest2.toString());
         assertEquals("toString", expected3, fRequest3.toString());
         assertEquals("toString", expected4, fRequest4.toString());
+        assertEquals("toString", expected5, fRequest5.toString());
     }
 
     // ------------------------------------------------------------------------

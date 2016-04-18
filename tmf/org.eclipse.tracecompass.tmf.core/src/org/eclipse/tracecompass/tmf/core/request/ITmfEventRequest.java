@@ -39,13 +39,13 @@ public interface ITmfEventRequest {
      */
     enum ExecutionType {
         /**
-         * Backgroung, long-running, lower priority request
+         * Background, long-running, lower priority request.
          */
         BACKGROUND,
         /**
-         * Foreground, short-running, high priority request
+         * Foreground, short-running, high priority request.
          */
-        FOREGROUND
+        FOREGROUND,
     }
 
     // ------------------------------------------------------------------------
@@ -66,6 +66,17 @@ public interface ITmfEventRequest {
      * @return request ID
      */
     ExecutionType getExecType();
+
+    /**
+     * Gets the dependency level. Use different dependency level for requests
+     * that have a dependency with each other. They will be serviced separately.
+     *
+     * @return dependency
+     * @since 2.0
+     */
+    default int getDependencyLevel() {
+        return 0;
+    }
 
     /**
      * @return the index of the first event requested

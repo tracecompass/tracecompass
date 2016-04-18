@@ -73,19 +73,19 @@ public class TmfCoalescedEventRequestTest {
 
     @Before
     public void setUp() {
-        fRequest1 = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 100, ExecutionType.FOREGROUND);
-        fRequest2 = new TmfCoalescedEventRequest(ITmfEvent.class, range2, 0, 100, ExecutionType.FOREGROUND);
-        fRequest3 = new TmfCoalescedEventRequest(ITmfEvent.class, range2, 0, 200, ExecutionType.FOREGROUND);
-        fRequest4 = new TmfCoalescedEventRequest(ITmfEvent.class, range2, 0, 200, ExecutionType.FOREGROUND);
+        fRequest1 = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 100, ExecutionType.FOREGROUND, 0);
+        fRequest2 = new TmfCoalescedEventRequest(ITmfEvent.class, range2, 0, 100, ExecutionType.FOREGROUND, 0);
+        fRequest3 = new TmfCoalescedEventRequest(ITmfEvent.class, range2, 0, 200, ExecutionType.FOREGROUND, 0);
+        fRequest4 = new TmfCoalescedEventRequest(ITmfEvent.class, range2, 0, 200, ExecutionType.FOREGROUND, 0);
 
-        fRequest1c = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 100, ExecutionType.FOREGROUND);
+        fRequest1c = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 100, ExecutionType.FOREGROUND, 0);
 
         fRequestCount = fRequest1c.getRequestId() + 1;
     }
 
     private TmfCoalescedEventRequest setupTestRequest(final boolean[] flags) {
 
-        TmfCoalescedEventRequest request = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 100, ExecutionType.FOREGROUND) {
+        TmfCoalescedEventRequest request = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 100, ExecutionType.FOREGROUND, 0) {
             @Override
             public void handleCompleted() {
                 super.handleCompleted();
@@ -119,7 +119,7 @@ public class TmfCoalescedEventRequestTest {
 
     @Test
     public void testTmfCoalescedEventRequestIndexNbEventsBlocksize() {
-        TmfCoalescedEventRequest request = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 100, ExecutionType.FOREGROUND);
+        TmfCoalescedEventRequest request = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 100, ExecutionType.FOREGROUND, 0);
 
         assertEquals("getRequestId", fRequestCount++, request.getRequestId());
         assertEquals("getDataType", ITmfEvent.class, request.getDataType());
@@ -173,7 +173,7 @@ public class TmfCoalescedEventRequestTest {
 
     @Test
     public void testIsCompatible() {
-        TmfCoalescedEventRequest coalescedRequest = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 100, ExecutionType.FOREGROUND);
+        TmfCoalescedEventRequest coalescedRequest = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 100, ExecutionType.FOREGROUND, 0);
         TmfEventRequest req1 = new TmfEventRequestStub(ITmfEvent.class, range1, 100, 200);
         TmfEventRequest req2 = new TmfEventRequestStub(ITmfEvent.class, range2, 100, 200);
         TmfEventRequest req3 = new TmfEventRequestStub(ITmfEvent.class, range1, 101, 200);
@@ -183,13 +183,31 @@ public class TmfCoalescedEventRequestTest {
         assertTrue("isCompatible", coalescedRequest.isCompatible(req3));
     }
 
+    @Test
+    public void testIsCompatibleDependency() {
+        TmfCoalescedEventRequest coalescedRequest = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 100, ExecutionType.FOREGROUND, 1);
+        TmfEventRequest req1 = new TmfEventRequestStub(ITmfEvent.class, range1, 100, 200, ExecutionType.FOREGROUND, 0);
+        TmfEventRequest req2 = new TmfEventRequestStub(ITmfEvent.class, range2, 100, 2000, ExecutionType.FOREGROUND, 1);
+        TmfEventRequest req3 = new TmfEventRequestStub(ITmfEvent.class, range1, 101, 200, ExecutionType.FOREGROUND, 2);
+
+        assertFalse("isCompatible", coalescedRequest.isCompatible(req1));
+        assertTrue("isCompatible", coalescedRequest.isCompatible(req2));
+        assertFalse("isCompatible", coalescedRequest.isCompatible(req3));
+
+        coalescedRequest = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 100, ExecutionType.FOREGROUND, 0);
+        assertTrue("isCompatible", coalescedRequest.isCompatible(req1));
+        assertFalse("isCompatible", coalescedRequest.isCompatible(req2));
+        assertFalse("isCompatible", coalescedRequest.isCompatible(req3));
+
+    }
+
     // ------------------------------------------------------------------------
     // addEvent
     // ------------------------------------------------------------------------
 
     @Test
     public void testAddEvent1() {
-        TmfCoalescedEventRequest coalescedRequest = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 2147483647, ExecutionType.FOREGROUND);
+        TmfCoalescedEventRequest coalescedRequest = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 2147483647, ExecutionType.FOREGROUND, 0);
         TmfEventRequest req1 = new TmfEventRequestStub(ITmfEvent.class, range1, 0, 2147483647, 200);
         TmfEventRequest req2 = new TmfEventRequestStub(ITmfEvent.class, range1, 1, 2147483647, 200);
 
@@ -205,7 +223,7 @@ public class TmfCoalescedEventRequestTest {
 
     @Test
     public void testAddEvent2() {
-        TmfCoalescedEventRequest coalescedRequest = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 1, 2147483647, ExecutionType.FOREGROUND);
+        TmfCoalescedEventRequest coalescedRequest = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 1, 2147483647, ExecutionType.FOREGROUND, 0);
         TmfEventRequest req1 = new TmfEventRequestStub(ITmfEvent.class, range1, 1, 2147483647, 200);
         TmfEventRequest req2 = new TmfEventRequestStub(ITmfEvent.class, range1, 0, 2147483647, 200);
 

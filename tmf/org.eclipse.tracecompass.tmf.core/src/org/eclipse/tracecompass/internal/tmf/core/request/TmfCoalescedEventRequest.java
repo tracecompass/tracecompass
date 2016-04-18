@@ -74,13 +74,17 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
      *            {@link TmfEventRequest#ALL_DATA} to request all events.
      * @param priority
      *            The requested execution priority
+     * @param dependencyLevel
+     *            The dependency level. Use 0 if no dependency with other
+     *            requests.
      */
     public TmfCoalescedEventRequest(Class<? extends ITmfEvent> dataType,
             TmfTimeRange range,
             long index,
             int nbRequested,
-            ExecutionType priority) {
-        super(ITmfEvent.class, null, index, nbRequested, priority);
+            ExecutionType priority,
+            int dependencyLevel) {
+        super(ITmfEvent.class, null, index, nbRequested, priority, dependencyLevel);
         fRange = range;
 
         if (TmfCoreTracer.isRequestTraced()) {
@@ -134,6 +138,7 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
      */
     public boolean isCompatible(ITmfEventRequest request) {
         if (request.getExecType() == getExecType() &&
+                request.getDependencyLevel() == getDependencyLevel() &&
                 ranksOverlap(request) &&
                 timeRangesOverlap(request)) {
             return true;

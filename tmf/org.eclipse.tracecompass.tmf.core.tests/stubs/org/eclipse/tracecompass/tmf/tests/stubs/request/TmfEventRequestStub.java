@@ -66,6 +66,18 @@ public class TmfEventRequestStub extends TmfEventRequest {
         super(dataType, range, index, nbRequested, ExecutionType.FOREGROUND);
     }
 
+    /**
+     * @param dataType the event type
+     * @param range the requested time range
+     * @param nbRequested the number of events requested
+     * @param blockSize the event block size
+     * @param type the execution type
+     * @param dependency the dependency
+     */
+    public TmfEventRequestStub(final Class<? extends ITmfEvent> dataType, final TmfTimeRange range, final int nbRequested, final int blockSize, ExecutionType type, int dependency) {
+        super(dataType, range, 0, nbRequested, type, dependency);
+    }
+
     @Override
     public void handleData(final ITmfEvent data) {
         super.handleData(data);
