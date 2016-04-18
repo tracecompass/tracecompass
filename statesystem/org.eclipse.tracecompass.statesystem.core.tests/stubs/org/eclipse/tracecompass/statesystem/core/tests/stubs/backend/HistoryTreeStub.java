@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.statesystem.core.tests.stubs.backend;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -42,6 +43,21 @@ public class HistoryTreeStub extends HistoryTree {
      */
     public HistoryTreeStub(HTConfig conf) throws IOException {
         super(conf);
+    }
+
+    /**
+     * "Reader" constructor : instantiate a SHTree from an existing tree file on
+     * disk
+     *
+     * @param existingStateFile
+     *            Path/filename of the history-file we are to open
+     * @param expProviderVersion
+     *            The expected version of the state provider
+     * @throws IOException
+     *             If an error happens reading the file
+     */
+    public HistoryTreeStub(File existingStateFile, int expProviderVersion) throws IOException {
+        super(existingStateFile, expProviderVersion);
     }
 
     @Override
