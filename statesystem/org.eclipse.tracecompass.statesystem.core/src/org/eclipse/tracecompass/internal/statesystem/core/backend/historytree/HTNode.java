@@ -604,7 +604,7 @@ public abstract class HTNode {
     @SuppressWarnings("nls")
     public void debugPrintIntervals(PrintWriter writer) {
         /* Only used for debugging, shouldn't be externalized */
-        writer.println("Node #" + fSequenceNumber + ":");
+        writer.println("Intervals for node #" + fSequenceNumber + ":");
 
         /* Array of children */
         if (getNodeType() == NodeType.CORE) { /* Only Core Nodes can have children */

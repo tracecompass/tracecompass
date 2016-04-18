@@ -795,10 +795,13 @@ public class HistoryTree {
     /* Only used for debugging, shouldn't be externalized */
     @SuppressWarnings("nls")
     private void preOrderPrint(PrintWriter writer, boolean printIntervals,
-            HTNode currentNode, int curDepth) {
+            HTNode currentNode, int curDepth, long ts) {
 
         writer.println(currentNode.toString());
-        if (printIntervals) {
+        /* Print intervals only if timestamp is negative or within the range of the node */
+        if (printIntervals &&
+                (ts <= 0 ||
+                (ts >= currentNode.getNodeStart() && ts <= currentNode.getNodeEnd()))) {
             currentNode.debugPrintIntervals(writer);
         }
 
@@ -814,7 +817,7 @@ public class HistoryTree {
                 int extension = node.getExtensionSequenceNumber();
                 while (extension != -1) {
                     HTNode nextNode = fTreeIO.readNode(extension);
-                    preOrderPrint(writer, printIntervals, nextNode, curDepth);
+                    preOrderPrint(writer, printIntervals, nextNode, curDepth, ts);
                 }
 
                 /* Print the child nodes */
@@ -824,7 +827,7 @@ public class HistoryTree {
                         writer.print("  ");
                     }
                     writer.print("+-");
-                    preOrderPrint(writer, printIntervals, nextNode, curDepth + 1);
+                    preOrderPrint(writer, printIntervals, nextNode, curDepth + 1, ts);
                 }
             } catch (ClosedChannelException e) {
                 Activator.getDefault().logError(e.getMessage());
@@ -843,15 +846,18 @@ public class HistoryTree {
      *            PrintWriter in which to write the output
      * @param printIntervals
      *            Flag to enable full output of the interval information
+     * @param ts
+     *            The timestamp that nodes have to intersect for intervals to be
+     *            printed. A negative value will print intervals for all nodes.
+     *            The timestamp only applies if printIntervals is true.
      */
-    public void debugPrintFullTree(PrintWriter writer, boolean printIntervals) {
+    public void debugPrintFullTree(PrintWriter writer, boolean printIntervals, long ts) {
         /* Only used for debugging, shouldn't be externalized */
 
-        preOrderPrint(writer, false, fLatestBranch.get(0), 0);
+        preOrderPrint(writer, false, fLatestBranch.get(0), 0, ts);
 
         if (printIntervals) {
-            writer.println("\nDetails of intervals:"); //$NON-NLS-1$
-            preOrderPrint(writer, true, fLatestBranch.get(0), 0);
+            preOrderPrint(writer, true, fLatestBranch.get(0), 0, ts);
         }
         writer.println('\n');
     }

@@ -366,7 +366,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     @Override
     public void debugPrint(PrintWriter writer) {
         /* By default don't print out all the intervals */
-        debugPrint(writer, false);
+        debugPrint(writer, false, -1);
     }
 
     /**
@@ -379,8 +379,12 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      *            The PrintWriter to which the debug info will be written
      * @param printIntervals
      *            Should we also print every contained interval individually?
+     * @param ts
+     *            The timestamp that nodes have to intersect for intervals to be
+     *            printed. A negative value will print intervals for all nodes.
+     *            The timestamp only applies if printIntervals is true.
      */
-    public void debugPrint(PrintWriter writer, boolean printIntervals) {
+    public void debugPrint(PrintWriter writer, boolean printIntervals, long ts) {
         /* Only used for debugging, shouldn't be externalized */
         writer.println("------------------------------"); //$NON-NLS-1$
         writer.println("State History Tree:\n"); //$NON-NLS-1$
@@ -389,6 +393,6 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
                 + getAverageNodeUsage());
         writer.println(""); //$NON-NLS-1$
 
-        getSHT().debugPrintFullTree(writer, printIntervals);
+        getSHT().debugPrintFullTree(writer, printIntervals, ts);
     }
 }
