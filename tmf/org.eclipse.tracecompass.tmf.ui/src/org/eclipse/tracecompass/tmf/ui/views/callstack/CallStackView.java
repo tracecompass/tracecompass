@@ -588,25 +588,32 @@ public class CallStackView extends AbstractTimeGraphView {
             } else {
                 traceEntry.updateEndTime(end);
             }
-            for (int i = 0; i < threadQuarks.size(); i++) {
-                if (monitor.isCanceled()) {
-                    return;
-                }
-                int threadQuark = threadQuarks.get(i);
-                try {
+
+            try {
+                /* Only query startStates if necessary (threadEntry == null)*/
+                List<ITmfStateInterval> startStates = null;
+                List<ITmfStateInterval> endStates = ss.queryFullState(ss.getCurrentEndTime());
+                for (int i = 0; i < threadQuarks.size(); i++) {
+                    if (monitor.isCanceled()) {
+                        return;
+                    }
+                    int threadQuark = threadQuarks.get(i);
                     String[] callStackPath = module.getCallStackPath();
                     int callStackQuark = ss.getQuarkRelative(threadQuark, callStackPath);
                     String threadName = ss.getAttributeName(threadQuark);
                     long threadEnd = end + 1;
-                    ITmfStateInterval endInterval = ss.querySingleState(ss.getCurrentEndTime(), callStackQuark);
+                    ITmfStateInterval endInterval = endStates.get(callStackQuark);
                     if (endInterval.getStateValue().isNull() && endInterval.getStartTime() != ss.getStartTime()) {
                         threadEnd = endInterval.getStartTime();
                     }
                     ThreadEntry threadEntry = threadEntryMap.get(threadQuark);
                     if (threadEntry == null) {
-                        long threadId = ss.querySingleState(ss.getCurrentEndTime(), threadQuark).getStateValue().unboxLong();
+                        if (startStates == null) {
+                            startStates = ss.queryFullState(ss.getStartTime());
+                        }
+                        long threadId = endInterval.getStateValue().unboxLong();
                         long threadStart = start;
-                        ITmfStateInterval startInterval = ss.querySingleState(start, callStackQuark);
+                        ITmfStateInterval startInterval = startStates.get(callStackQuark);
                         if (startInterval.getStateValue().isNull()) {
                             threadStart = Math.min(startInterval.getEndTime() + 1, end + 1);
                         }
@@ -624,11 +631,11 @@ public class CallStackView extends AbstractTimeGraphView {
                         }
                         level++;
                     }
-                } catch (AttributeNotFoundException e) {
-                    Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
-                } catch (StateSystemDisposedException e) {
-                    /* Ignored */
                 }
+            } catch (AttributeNotFoundException e) {
+                Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
+            } catch (StateSystemDisposedException e) {
+                /* Ignored */
             }
             if (parentTrace == getTrace()) {
                 synchronized (this) {
