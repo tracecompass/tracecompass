@@ -33,7 +33,13 @@ public class LttngUstCallStackProviderFastTest extends AbstractProviderTest {
     }
 
     @Override
-    protected String getProcName() {
+    protected int getProcessId() {
+        /* This particular trace does not have PID contexts. */
+        return -1;
+    }
+
+    @Override
+    protected String getThreadName() {
         return "glxgears-29822";
     }
 

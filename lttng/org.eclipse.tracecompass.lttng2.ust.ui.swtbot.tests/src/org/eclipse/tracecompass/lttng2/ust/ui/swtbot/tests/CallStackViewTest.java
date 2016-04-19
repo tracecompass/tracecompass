@@ -18,7 +18,9 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
@@ -187,6 +189,7 @@ public class CallStackViewTest {
     @Test
     public void testOpenCallstack() {
         String node = "glxgears-cyg-profile";
+        String pid = "-1";
         String childName = "glxgears-16073";
         List<String> expected = ImmutableList.of("40472b", "", "", "", "");
 
@@ -194,7 +197,7 @@ public class CallStackViewTest {
         viewBot.setFocus();
         final SWTBotView viewBot1 = viewBot;
         SWTBotTree tree = viewBot1.bot().tree();
-        SWTBotTreeItem treeItem = tree.getTreeItem(node);
+        SWTBotTreeItem treeItem = tree.getTreeItem(node).getNode(pid);
         assertEquals(childName, treeItem.getNodes().get(0));
         List<String> names = treeItem.getNode(childName).getNodes();
         assertEquals(expected, names);
@@ -273,15 +276,15 @@ public class CallStackViewTest {
 
     private static List<String> getVisibleStackFrames(final SWTBotView viewBot) {
         SWTBotTree tree = viewBot.bot().tree();
-        List<String> names = new ArrayList<>();
-        for (SWTBotTreeItem swtBotTreeItem : tree.getAllItems()) {
-            for (SWTBotTreeItem items : swtBotTreeItem.getItems()) {
-                for (SWTBotTreeItem item : items.getItems()) {
-                    names.add(item.cell(0));
-                }
-            }
-        }
-        return names;
+        return Arrays.stream(tree.getAllItems())
+                // Process entries
+                .flatMap(item -> Arrays.stream(item.getItems()))
+                // Thread entries
+                .flatMap(item -> Arrays.stream(item.getItems()))
+                // Callstack entries
+                .flatMap(item -> Arrays.stream(item.getItems()))
+                .map(item -> item.cell(0))
+                .collect(Collectors.toList());
     }
 
     private static void goToTime(long timestamp) {

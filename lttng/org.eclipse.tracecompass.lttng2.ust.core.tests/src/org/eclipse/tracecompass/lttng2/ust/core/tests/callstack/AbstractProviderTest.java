@@ -77,9 +77,14 @@ public abstract class AbstractProviderTest {
     protected abstract @NonNull CtfTestTrace getTestTrace();
 
     /**
+     * @return The ID of the process the desired thread belongs to
+     */
+    protected abstract int getProcessId();
+
+    /**
      * @return The name of the executable process in that particular trace
      */
-    protected abstract String getProcName();
+    protected abstract String getThreadName();
 
     /**
      * Get the list of timestamps to query in that trace.
@@ -185,7 +190,7 @@ public abstract class AbstractProviderTest {
     @Test
     public void testCallStackBegin() {
         long start = fSS.getStartTime();
-        String[] cs = getCallStack(fSS, getProcName(), start);
+        String[] cs = getCallStack(fSS, getProcessId(), getThreadName(), start);
         assertEquals(1, cs.length);
 
         assertEquals("40472b", cs[0]);
@@ -196,7 +201,7 @@ public abstract class AbstractProviderTest {
      */
     @Test
     public void testCallStack1() {
-        String[] cs = getCallStack(fSS, getProcName(), getTestTimestamp(0));
+        String[] cs = getCallStack(fSS, getProcessId(), getThreadName(), getTestTimestamp(0));
         assertEquals(2, cs.length);
 
         assertEquals("40472b", cs[0]);
@@ -208,7 +213,7 @@ public abstract class AbstractProviderTest {
      */
     @Test
     public void testCallStack2() {
-        String[] cs = getCallStack(fSS, getProcName(), getTestTimestamp(1));
+        String[] cs = getCallStack(fSS, getProcessId(), getThreadName(), getTestTimestamp(1));
         assertEquals(3, cs.length);
 
         assertEquals("40472b", cs[0]);
@@ -221,7 +226,7 @@ public abstract class AbstractProviderTest {
      */
     @Test
     public void testCallStack3() {
-        String[] cs = getCallStack(fSS, getProcName(), getTestTimestamp(2));
+        String[] cs = getCallStack(fSS, getProcessId(), getThreadName(), getTestTimestamp(2));
         assertEquals(4, cs.length);
 
         assertEquals("40472b", cs[0]);
@@ -236,7 +241,7 @@ public abstract class AbstractProviderTest {
     @Test
     public void testCallStackEnd() {
         long end = fSS.getCurrentEndTime();
-        String[] cs = getCallStack(fSS, getProcName(), end);
+        String[] cs = getCallStack(fSS, getProcessId(), getThreadName(), end);
         assertEquals(3, cs.length);
 
         assertEquals("40472b", cs[0]);
@@ -258,9 +263,9 @@ public abstract class AbstractProviderTest {
     }
 
     /** Get the callstack for the given timestamp, for this particular trace */
-    private static String[] getCallStack(ITmfStateSystem ss, String processName, long timestamp) {
+    private static String[] getCallStack(ITmfStateSystem ss, int pid, String threadName, long timestamp) {
         try {
-            int stackAttribute = ss.getQuarkAbsolute("Threads", processName, "CallStack");
+            int stackAttribute = ss.getQuarkAbsolute("Processes", Integer.toString(pid), threadName, "CallStack");
             List<ITmfStateInterval> state = ss.queryFullState(timestamp);
             int depth = state.get(stackAttribute).getStateValue().unboxInt();
 
