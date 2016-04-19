@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.w3c.dom.Element;
 
 /**
@@ -157,7 +157,7 @@ public class TmfXmlAction implements ITmfXmlAction {
         public void execute(ITmfEvent event, TmfXmlScenarioInfo scenarioInfo) {
             long ts = fProvider.getHistoryBuilder().getStartTime(fProvider, scenarioInfo, event);
             // FIXME Should the scale always be nanoseconds?
-            ITmfTimestamp start = new TmfNanoTimestamp(ts);
+            ITmfTimestamp start = TmfTimestamp.fromNanos(ts);
             ITmfTimestamp end = event.getTimestamp();
             fSegmentBuilder.generatePatternSegment(event, start, end, scenarioInfo);
         }

@@ -26,6 +26,7 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.core;x-friends:="org.eclip
  org.eclipse.tracecompass.internal.tmf.core.statesystem.mipmap;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.tmf.core.synchronization;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.tmf.core.synchronization.graph;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
+ org.eclipse.tracecompass.internal.tmf.core.timestamp;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.tmf.core.trace.experiment;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.tmf.core.trace.indexer;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.tmf.core,

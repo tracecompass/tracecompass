@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,18 +8,18 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
- *   Francois Chouinard - Standardize on the default toString()
+ *   Patrick Tasse - Modified from TmfSimpleTimestamp to use nanosecond scale
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.core.timestamp;
+package org.eclipse.tracecompass.internal.tmf.core.timestamp;
+
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 
 /**
- * A simplified timestamp where scale and precision are set to 0.
- *
- * @author Francois Chouinard
- * @since 2.0
+ * A simplified timestamp where scale is nanoseconds and precision is set to 0.
  */
-public class TmfSecondTimestamp extends TmfTimestamp {
+public final class TmfNanoTimestamp extends TmfTimestamp {
 
     private final long fValue;
 
@@ -30,7 +30,7 @@ public class TmfSecondTimestamp extends TmfTimestamp {
     /**
      * Default constructor (value = 0)
      */
-    public TmfSecondTimestamp() {
+    public TmfNanoTimestamp() {
         this(0);
     }
 
@@ -40,17 +40,26 @@ public class TmfSecondTimestamp extends TmfTimestamp {
      * @param value
      *            the timestamp value
      */
-    public TmfSecondTimestamp(final long value) {
+    public TmfNanoTimestamp(final long value) {
         fValue = value;
-    }
-
-    @Override
-    public int getScale() {
-        return ITmfTimestamp.SECOND_SCALE;
     }
 
     @Override
     public long getValue() {
         return fValue;
+    }
+
+
+    @Override
+    public int getScale() {
+        return ITmfTimestamp.NANOSECOND_SCALE;
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public long toNanos() {
+        return getValue();
     }
 }
