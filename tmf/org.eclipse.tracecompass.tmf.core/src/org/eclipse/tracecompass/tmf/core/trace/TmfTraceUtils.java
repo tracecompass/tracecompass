@@ -18,16 +18,19 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.StreamUtils;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+
+import com.google.common.collect.Iterables;
 
 /**
  * Utility methods for ITmfTrace's.
@@ -43,8 +46,8 @@ public final class TmfTraceUtils {
     }
 
     /**
-     * Get an analysis module belonging to this trace, with the specified ID and
-     * class.
+     * Return the first result of the first analysis module belonging to this trace or its children,
+     * with the specified ID and class.
      *
      * @param trace
      *            The trace for which you want the modules
@@ -67,21 +70,29 @@ public final class TmfTraceUtils {
     }
 
     /**
-     * Return the analysis modules that are of a given class. Module will be
-     * casted to the requested class.
+     * Return the analysis modules that are of a given class. The modules will be
+     * cast to the requested class. If the trace has children, the childrens modules
+     * are also returned.
      *
      * @param trace
-     *            The trace for which you want the modules
+     *            The trace for which you want the modules, the children trace modules
+     *            are added as well.
      * @param moduleClass
      *            Returned modules must extend this class
      * @return List of modules of class moduleClass
      */
     public static <T> Iterable<@NonNull T> getAnalysisModulesOfClass(ITmfTrace trace, Class<T> moduleClass) {
         Iterable<IAnalysisModule> analysisModules = trace.getAnalysisModules();
-        Set<@NonNull T> modules = new HashSet<>();
+        List<@NonNull T> modules = new ArrayList<>();
         for (IAnalysisModule module : analysisModules) {
             if (moduleClass.isAssignableFrom(module.getClass())) {
                 modules.add(checkNotNull(moduleClass.cast(module)));
+            }
+        }
+        for (ITmfEventProvider child : trace.getChildren()) {
+            if (child instanceof ITmfTrace) {
+                ITmfTrace childTrace = (ITmfTrace) child;
+                Iterables.addAll(modules, getAnalysisModulesOfClass(childTrace, moduleClass));
             }
         }
         return modules;
