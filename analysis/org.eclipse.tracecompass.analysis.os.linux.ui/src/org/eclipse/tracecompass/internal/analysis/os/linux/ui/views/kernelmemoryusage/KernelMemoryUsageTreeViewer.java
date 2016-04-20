@@ -170,7 +170,12 @@ public class KernelMemoryUsageTreeViewer extends AbstractTmfTreeViewer {
         List<ITmfTreeViewerEntry> entryList = root.getChildren();
 
         try {
-            List<ITmfStateInterval> memoryStates = ss.queryFullState(start);
+            long newStart = Math.max(start, ss.getStartTime());
+            long newEnd = Math.min(end, ss.getCurrentEndTime());
+            if (ss.getStartTime() > newEnd || ss.getCurrentEndTime() < start) {
+                return root;
+            }
+            List<ITmfStateInterval> memoryStates = ss.queryFullState(newStart);
             List<Integer> threadQuarkList = ss.getSubAttributes(ITmfStateSystem.ROOT_ATTRIBUTE, false);
 
             for (Integer threadQuark : threadQuarkList) {

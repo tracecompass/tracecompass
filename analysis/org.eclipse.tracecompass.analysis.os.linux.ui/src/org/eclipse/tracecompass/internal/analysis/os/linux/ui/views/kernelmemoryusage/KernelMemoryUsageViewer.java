@@ -78,11 +78,15 @@ public class KernelMemoryUsageViewer extends TmfCommonXLineChartViewer {
 
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("No state system for the module " + module.toString()); //$NON-NLS-1$
         }
 
         double[] xvalues = getXAxis(start, end, nb);
         if (xvalues.length == 0) {
+            return;
+        }
+        long clampedEnd = Math.min(end, ss.getCurrentEndTime());
+        if (clampedEnd < ss.getStartTime()) {
             return;
         }
         setXAxis(xvalues);
@@ -103,7 +107,10 @@ public class KernelMemoryUsageViewer extends TmfCommonXLineChartViewer {
 
                 double x = xvalues[i];
                 long t = (long) x + getTimeOffset();
-
+                if( ss.getCurrentEndTime() < t || ss.getStartTime() > t) {
+                    selectedThreadValues[i] = 0;
+                    continue;
+                }
                 List<ITmfStateInterval> kernelState = ss.queryFullState(t);
 
                 /* The subattributes of the root are the different threads */
@@ -132,7 +139,7 @@ public class KernelMemoryUsageViewer extends TmfCommonXLineChartViewer {
              * The lowest value we are searching is at the end of the current
              * selected zone
              */
-            List<ITmfStateInterval> kernelState = ss.queryFullState(end);
+            List<ITmfStateInterval> kernelState = ss.queryFullState(clampedEnd);
             List<Integer> threadQuarkList = ss.getSubAttributes(-1, false);
             /* We add the lowest value of each thread */
             for (Integer threadQuark : threadQuarkList) {
