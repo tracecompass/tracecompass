@@ -193,7 +193,7 @@ public class StreamListView extends TmfView {
             @Override
             public void run() {
                 ITmfTrace trace = fCurrentTrace;
-                if (trace == null || (!(trace instanceof PcapTrace))) {
+                if (trace == null) {
                     return;
                 }
                 StreamListAnalysis analysis = TmfTraceUtils.getAnalysisModuleOfClass(trace, StreamListAnalysis.class, StreamListAnalysis.ID);
