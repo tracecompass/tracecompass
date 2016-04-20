@@ -10,7 +10,7 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.tracecompass.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource;
 
 /**
  * Class that manages information about a latency view for pattern analysis: its

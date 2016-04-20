@@ -11,9 +11,9 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stubs;
 import java.util.HashSet;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlLocation;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 
 /**
  * This class is a stub for State system Container.

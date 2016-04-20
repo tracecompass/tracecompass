@@ -11,7 +11,7 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
-import org.eclipse.tracecompass.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource;
 
 /**
  * Abstract class to manage information about a view for an XML analysis

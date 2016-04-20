@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <listener
-            class="org.eclipse.tracecompass.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource">
+            class="org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource">
       </listener>
    </extension>
    <extension
@@ -65,7 +65,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.tracecompass.tmf.analysis.xml.ui.views.timegraph.XmlTimeGraphView"
+            class="org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.timegraph.XmlTimeGraphView"
             id="org.eclipse.linuxtools.tmf.analysis.xml.ui.views.timegraph"
             name="%xmltimegraph.view.name"
             restorable="true">

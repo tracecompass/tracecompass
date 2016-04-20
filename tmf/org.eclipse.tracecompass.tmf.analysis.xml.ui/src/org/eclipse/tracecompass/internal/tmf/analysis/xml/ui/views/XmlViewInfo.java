@@ -19,9 +19,9 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
-import org.eclipse.tracecompass.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource;
 import org.w3c.dom.Element;
 
 /**
