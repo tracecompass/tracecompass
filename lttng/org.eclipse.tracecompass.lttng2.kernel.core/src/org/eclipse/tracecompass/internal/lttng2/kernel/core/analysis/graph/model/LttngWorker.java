@@ -18,16 +18,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.graph.core.base.IGraphWorker;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelThreadInformationProvider;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider.ProcessStatus;
-import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
-import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
@@ -71,37 +65,28 @@ public class LttngWorker implements IGraphWorker {
     @SuppressWarnings("null")
     @Override
     public @NonNull Map<@NonNull String, @NonNull String> getWorkerInformation(long t) {
-
-        try {
-            int tid = fHostTid.getTid();
-            if (tid == -1) {
-                return Collections.EMPTY_MAP;
-            }
-            Optional<@Nullable KernelAnalysisModule> kam = TmfTraceManager.getInstance().getActiveTraceSet().stream()
-                        .filter(trace -> trace.getHostId().equals(getHostId()))
-                        .map(trace -> TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelAnalysisModule.class, KernelAnalysisModule.ID))
-                        .filter(mod -> mod != null)
-                        .findFirst();
-            if (!kam.isPresent()) {
-                return Collections.EMPTY_MAP;
-            }
-            ITmfStateSystem ss = kam.get().getStateSystem();
-            if (ss == null) {
-                return Collections.EMPTY_MAP;
-            }
-            int quark;
-            Map<String, String> info = new HashMap<>();
-            quark = ss.getQuarkAbsolute(Attributes.THREADS, Integer.toString(tid), Attributes.PRIO);
-            ITmfStateInterval interval = ss.querySingleState(t, quark);
-            ITmfStateValue stateValue = interval.getStateValue();
-            if (stateValue.getType().equals(ITmfStateValue.Type.INTEGER)) {
-                info.put(NonNullUtils.nullToEmptyString(Messages.LttngWorker_threadPriority), Integer.toString(stateValue.unboxInt()));
-            }
-            return info;
-        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
-            Activator.getDefault().logError(e.getMessage(), e);
+        int tid = fHostTid.getTid();
+        if (tid == -1) {
+            return Collections.EMPTY_MAP;
         }
-        return Collections.EMPTY_MAP;
+        Optional<@Nullable KernelAnalysisModule> kam = TmfTraceManager.getInstance().getActiveTraceSet()
+                .stream()
+                .filter(trace -> trace.getHostId().equals(getHostId()))
+                .map(trace -> TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelAnalysisModule.class, KernelAnalysisModule.ID))
+                .filter(mod -> mod != null)
+                .findFirst();
+        if (!kam.isPresent()) {
+            return Collections.EMPTY_MAP;
+        }
+        KernelAnalysisModule module = kam.get();
+
+        Map<String, String> info = new HashMap<>();
+
+        int priority = KernelThreadInformationProvider.getThreadPriority(module, tid, t);
+        if (priority != -1) {
+            info.put(NonNullUtils.nullToEmptyString(Messages.LttngWorker_threadPriority), Integer.toString(priority));
+        }
+        return info;
     }
 
     /**

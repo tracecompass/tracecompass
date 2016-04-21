@@ -50,7 +50,7 @@ public final class KernelThreadInformationProvider {
      * resolve to something that is not an event
      *
      * @param module
-     *            The lttng kernel analysis instance to run this method on
+     *            The kernel analysis instance to run this method on
      * @param cpuId
      *            The CPU number the process is running on
      * @param ts
@@ -79,7 +79,7 @@ public final class KernelThreadInformationProvider {
      * Get the TIDs of the threads from an analysis
      *
      * @param module
-     *            The lttng kernel analysis instance to run this method on
+     *            The kernel analysis instance to run this method on
      * @return The set of TIDs corresponding to the threads
      */
     public static Collection<Integer> getThreadIds(KernelAnalysisModule module) {
@@ -105,7 +105,7 @@ public final class KernelThreadInformationProvider {
      * Get the parent process ID of a thread
      *
      * @param module
-     *            The lttng kernel analysis instance to run this method on
+     *            The kernel analysis instance to run this method on
      * @param threadId
      *            The thread ID of the process for which to get the parent
      * @param ts
@@ -137,7 +137,7 @@ public final class KernelThreadInformationProvider {
      * name the thread has taken, or {@code null} if no name is found
      *
      * @param module
-     *            The lttng kernel analysis instance to run this method on
+     *            The kernel analysis instance to run this method on
      * @param threadId
      *            The thread ID of the process for which to get the name
      * @return The last executable name of this process, or {@code null} if not
@@ -168,10 +168,37 @@ public final class KernelThreadInformationProvider {
     }
 
     /**
+     * Get the priority of this thread at time ts
+     *
+     * @param module
+     *            The kernel analysis instance to run this method on
+     * @param threadId
+     *            The ID of the thread to query
+     * @param ts
+     *            The timestamp at which to query
+     * @return The priority of the thread or <code>-1</code> if not available
+     */
+    public static int getThreadPriority(KernelAnalysisModule module, int threadId, long ts) {
+        ITmfStateSystem ss = module.getStateSystem();
+        if (ss == null) {
+            return -1;
+        }
+        int prioQuark = ss.optQuarkAbsolute(Attributes.THREADS, String.valueOf(threadId), Attributes.PRIO);
+        if (prioQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+            return -1;
+        }
+        try {
+            return ss.querySingleState(ts, prioQuark).getStateValue().unboxInt();
+        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
+            return -1;
+        }
+    }
+
+    /**
      * Get the status intervals for a given thread with a resolution
      *
      * @param module
-     *            The lttng kernel analysis instance to run this method on
+     *            The kernel analysis instance to run this method on
      * @param threadId
      *            The ID of the thread to get the intervals for
      * @param start
