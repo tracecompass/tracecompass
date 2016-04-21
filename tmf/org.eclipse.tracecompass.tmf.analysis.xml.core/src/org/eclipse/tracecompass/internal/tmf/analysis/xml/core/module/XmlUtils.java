@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
@@ -250,12 +249,7 @@ public class XmlUtils {
         File file = getXmlFilesPath().addTrailingSeparator().append(fileName).toFile();
         if (file.exists()) {
             try {
-                /* Load the XML File */
-                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder dBuilder;
-                dBuilder = dbFactory.newDocumentBuilder();
-                Document doc = dBuilder.parse(file);
-                doc.getDocumentElement().normalize();
+                Document doc = getDocumentFromFile(file);
 
                 /* get State Providers modules */
                 NodeList stateproviderNodes = doc.getElementsByTagName(TmfXmlStrings.STATE_PROVIDER);
@@ -273,6 +267,27 @@ public class XmlUtils {
             }
         }
         return ids;
+    }
+
+    /**
+     * Load the XML File
+     *
+     * @param file
+     *            The XML file
+     * @return The document representing the XML file
+     * @throws ParserConfigurationException
+     *             if a DocumentBuilder cannot be created
+     * @throws SAXException
+     *             If any parse errors occur.
+     * @throws IOException
+     *             If any IO errors occur.
+     * @since 2.0
+     */
+    public static Document getDocumentFromFile(File file) throws ParserConfigurationException, SAXException, IOException {
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        Document doc = dbFactory.newDocumentBuilder().parse(file);
+        doc.getDocumentElement().normalize();
+        return doc;
     }
 
     /**
@@ -346,13 +361,7 @@ public class XmlUtils {
         }
 
         try {
-            /* Load the XML File */
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder;
-
-            dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(file);
-            doc.getDocumentElement().normalize();
+            Document doc = getDocumentFromFile(file);
 
             /* get the state providers and find the corresponding one */
             NodeList nodes = doc.getElementsByTagName(elementType);

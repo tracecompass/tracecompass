@@ -17,12 +17,11 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.Activator;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -85,10 +84,7 @@ public enum TmfXmlTestFiles {
         /* Initialize the state provider module */
         Document doc = null;
         try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            doc = dBuilder.parse(getFile());
-            doc.getDocumentElement().normalize();
+            doc = XmlUtils.getDocumentFromFile(getFile());
         } catch (ParserConfigurationException e) {
             fail("Xml document parse exception");
         } catch (SAXException e) {

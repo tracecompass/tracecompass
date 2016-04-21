@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -151,11 +149,7 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
             }
 
             try {
-                /* Load the XML File */
-                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-                Document doc = dBuilder.parse(xmlFile);
-                doc.getDocumentElement().normalize();
+                Document doc = XmlUtils.getDocumentFromFile(xmlFile);
 
                 /* get state provider views if the analysis has state systems */
                 if (module instanceof ITmfAnalysisModuleWithStateSystems) {
