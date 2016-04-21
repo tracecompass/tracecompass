@@ -29,7 +29,7 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class DataSizeFormatTest {
 
-    private static final @NonNull Format FORMAT = new DataSizeWithUnitFormat();
+    private static final @NonNull Format FORMAT = DataSizeWithUnitFormat.getInstance();
 
     private final @NonNull Number fNumValue;
     private final @NonNull String fExpected;

@@ -65,7 +65,7 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
         super(parent, Messages.MemoryUsageViewer_Title, Messages.MemoryUsageViewer_XAxis, Messages.MemoryUsageViewer_YAxis);
         Chart chart = getSwtChart();
         chart.getLegend().setPosition(SWT.LEFT);
-        chart.getAxisSet().getYAxis(0).getTick().setFormat(new DataSizeWithUnitFormat());
+        chart.getAxisSet().getYAxis(0).getTick().setFormat(DataSizeWithUnitFormat.getInstance());
     }
 
     @Override

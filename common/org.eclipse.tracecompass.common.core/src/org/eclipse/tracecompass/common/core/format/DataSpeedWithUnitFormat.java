@@ -10,6 +10,9 @@
 package org.eclipse.tracecompass.common.core.format;
 
 import java.text.FieldPosition;
+import java.text.Format;
+
+import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * Provides a formatter for data speeds in (XB/s). It receives a size in bytes
@@ -21,12 +24,25 @@ import java.text.FieldPosition;
  */
 public class DataSpeedWithUnitFormat extends DataSizeWithUnitFormat {
 
-    /**
-     *
-     */
+    private static final @NonNull Format INSTANCE = new DataSpeedWithUnitFormat();
     private static final long serialVersionUID = -3603301320242441850L;
-
     private static final String PER_SECOND = "/s"; //$NON-NLS-1$
+
+    /**
+     * Protected constructor
+     */
+    protected DataSpeedWithUnitFormat() {
+        super();
+    }
+
+    /**
+     * Returns the instance of this formatter
+     *
+     * @return The instance of this formatter
+     */
+    public static @NonNull Format getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {

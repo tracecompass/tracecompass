@@ -52,7 +52,7 @@ public class DisksIOActivityViewer extends TmfCommonXLineChartViewer {
         super(parent, Messages.DiskIOActivityViewer_Title, Messages.DiskIOActivityViewer_XAxis, Messages.DiskIOActivityViewer_YAxis);
         setResolution(RESOLUTION);
         Chart chart = getSwtChart();
-        chart.getAxisSet().getYAxis(0).getTick().setFormat(new DataSpeedWithUnitFormat());
+        chart.getAxisSet().getYAxis(0).getTick().setFormat(DataSpeedWithUnitFormat.getInstance());
         chart.getLegend().setPosition(SWT.LEFT);
     }
 

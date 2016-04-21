@@ -49,7 +49,7 @@ public class KernelMemoryUsageViewer extends TmfCommonXLineChartViewer {
     public KernelMemoryUsageViewer(Composite parent) {
         super(parent, Messages.MemoryUsageViewer_title, Messages.MemoryUsageViewer_xAxis, Messages.MemoryUsageViewer_yAxis);
         Chart chart = getSwtChart();
-        chart.getAxisSet().getYAxis(0).getTick().setFormat(new DataSizeWithUnitFormat());
+        chart.getAxisSet().getYAxis(0).getTick().setFormat(DataSizeWithUnitFormat.getInstance());
         chart.getLegend().setPosition(SWT.BOTTOM);
     }
 

@@ -14,6 +14,8 @@ import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParsePosition;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
  * Provides a formatter for data sizes along with the unit of size (KG, MB, GB
  * ou TB). It receives a size in bytes and it formats a number in the closest
@@ -24,6 +26,8 @@ import java.text.ParsePosition;
  */
 public class DataSizeWithUnitFormat extends Format {
 
+    private static final @NonNull Format INSTANCE = new DataSizeWithUnitFormat();
+
     private static final long serialVersionUID = 3934127385682676804L;
     private static final String B = "B"; //$NON-NLS-1$
     private static final String KB = "KB"; //$NON-NLS-1$
@@ -32,6 +36,22 @@ public class DataSizeWithUnitFormat extends Format {
     private static final String TB = "TB"; //$NON-NLS-1$
     private static final long KILO = 1024;
     private static final Format FORMAT = new DecimalFormat("#.###"); //$NON-NLS-1$
+
+    /**
+     * Protected constructor
+     */
+    protected DataSizeWithUnitFormat() {
+        super();
+    }
+
+    /**
+     * Returns the instance of this formatter
+     *
+     * @return The instance of this formatter
+     */
+    public static @NonNull Format getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
@@ -56,7 +76,7 @@ public class DataSizeWithUnitFormat extends Format {
             }
             return toAppendTo.append(FORMAT.format(value)).append(' ').append(B);
         }
-        return toAppendTo;
+        return toAppendTo.append(obj);
     }
 
     @Override

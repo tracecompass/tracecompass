@@ -21,7 +21,7 @@ import org.eclipse.tracecompass.common.core.format.DataSpeedWithUnitFormat;
  */
 public class DataSpeedFormatTest extends DataSizeFormatTest {
 
-    private static final @NonNull Format FORMAT = new DataSpeedWithUnitFormat();
+    private static final @NonNull Format FORMAT = DataSpeedWithUnitFormat.getInstance();
     private static final String PER_SECOND = "/s";
 
     /**
