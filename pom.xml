@@ -280,6 +280,19 @@
         </plugins>
       </build>
     </profile>
+
+    <!-- Automatic profile to skip sonar -->
+    <profile>
+      <id>skip-sonar</id>
+      <activation>
+        <file>
+          <exists>sonar.skip.properties</exists>
+        </file>
+      </activation>
+      <properties>
+        <sonar.skip>true</sonar.skip>
+      </properties>
+    </profile>
   </profiles>
 
   <modules>
