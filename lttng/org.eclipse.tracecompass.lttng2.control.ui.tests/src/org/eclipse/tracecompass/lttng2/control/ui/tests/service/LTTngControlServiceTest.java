@@ -73,11 +73,11 @@ public class LTTngControlServiceTest {
     private static final String TEST_STREAM = "LTTngServiceTest.cfg";
 
     private static final String SCEN_LTTNG_NOT_INSTALLED = "LttngNotInstalled";
-    private static final String SCEN_LTTNG_VERSION = "LttngVersion";
-    private static final String SCEN_LTTNG_VERSION_WITH_PROMPT = "LttngVersionWithPrompt";
+    protected static final String SCEN_LTTNG_VERSION = "LttngVersion";
+    protected static final String SCEN_LTTNG_VERSION_WITH_PROMPT = "LttngVersionWithPrompt";
     private static final String SCEN_LTTNG_UNSUPPORTED_VERSION = "LttngUnsupportedVersion";
     private static final String SCEN_LTTNG_NO_VERSION = "LttngNoVersion";
-    private static final String SCEN_LTTNG_COMPILED_VERSION = "LttngVersionCompiled";
+    protected static final String SCEN_LTTNG_COMPILED_VERSION = "LttngVersionCompiled";
     private static final String SCEN_NO_SESSION_AVAILABLE = "NoSessionAvailable";
     private static final String SCEN_GET_SESSION_NAMES1 = "GetSessionNames1";
     private static final String SCEN_GET_SESSION_WITH_GROUP = "GetSessionWithTracingGroup";
