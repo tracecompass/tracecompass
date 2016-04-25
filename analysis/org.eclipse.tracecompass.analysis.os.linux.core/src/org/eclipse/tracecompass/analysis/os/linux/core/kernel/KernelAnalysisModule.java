@@ -37,11 +37,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  */
 public class KernelAnalysisModule extends TmfStateSystemAnalysisModule {
 
-    /**
-     * The file name of the History Tree
-     */
-    public static final String HISTORY_TREE_FILE_NAME = "stateHistory.ht"; //$NON-NLS-1$
-
     /** The ID of this analysis module */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.kernel"; //$NON-NLS-1$
 
@@ -100,12 +95,6 @@ public class KernelAnalysisModule extends TmfStateSystemAnalysisModule {
         }
 
         return new KernelStateProvider(trace, layout);
-    }
-
-    @Override
-    @NonNull
-    protected String getSsFileName() {
-        return HISTORY_TREE_FILE_NAME;
     }
 
     @Override
