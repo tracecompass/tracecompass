@@ -19,6 +19,8 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprov
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.w3c.dom.Element;
 
 /**
@@ -42,7 +44,6 @@ public class TmfXmlTimestampCondition implements ITmfXmlCondition {
         NONE
     }
 
-    private static final long US = 1000l;
     private final IXmlTimestampsCondition fTimestampsCondition;
     private final IXmlStateSystemContainer fParent;
 
@@ -85,14 +86,27 @@ public class TmfXmlTimestampCondition implements ITmfXmlCondition {
         case TmfXmlStrings.NS:
             return timestamp;
         case TmfXmlStrings.US:
-            return timestamp * US;
+            return TmfTimestamp.create(timestamp, ITmfTimestamp.MICROSECOND_SCALE).toNanos();
         case TmfXmlStrings.MS:
-            return timestamp * US * US;
+            return TmfTimestamp.create(timestamp, ITmfTimestamp.MILLISECOND_SCALE).toNanos();
         case TmfXmlStrings.S:
-            return timestamp * US * US * US;
+            return TmfTimestamp.create(timestamp, ITmfTimestamp.SECOND_SCALE).toNanos();
         default:
             throw new IllegalArgumentException("The time unit is not yet supporting."); //$NON-NLS-1$
         }
+    }
+
+    /**
+     * Test if two long value have the same sign
+     *
+     * @param i
+     *            The first long
+     * @param j
+     *            The second long
+     * @return True if the two long value have the same sign, false otherwise
+     */
+    private static boolean compareSign(long i, long j) {
+        return (i < 0) ^ (j >= 0);
     }
 
     /**
@@ -257,7 +271,7 @@ public class TmfXmlTimestampCondition implements ITmfXmlCondition {
             boolean success;
             long ts = event.getTimestamp().toNanos();
             long referenceTimestamps = ((XmlPatternStateProvider) fContainer).getHistoryBuilder().getSpecificStateStartTime(fContainer, fReferenceState, scenarioInfo, event);
-            if (ts < referenceTimestamps) {
+            if (!compareSign(ts, referenceTimestamps) || ts < referenceTimestamps) {
                 throw new IllegalArgumentException("Timestamp is inferior to reference time"); //$NON-NLS-1$
             }
             switch (fType) {
