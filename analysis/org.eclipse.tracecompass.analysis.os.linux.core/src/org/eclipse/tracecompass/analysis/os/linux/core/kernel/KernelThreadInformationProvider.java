@@ -92,7 +92,8 @@ public final class KernelThreadInformationProvider {
             threadQuark = ss.getQuarkAbsolute(Attributes.THREADS);
             Set<@NonNull Integer> tids = new TreeSet<>();
             for (Integer quark : ss.getSubAttributes(threadQuark, false)) {
-                tids.add(Integer.parseInt(ss.getAttributeName(quark)));
+                final @NonNull String attributeName = ss.getAttributeName(quark);
+                tids.add(attributeName.startsWith(Attributes.THREAD_0_PREFIX) ? 0 : Integer.parseInt(attributeName));
             }
             return tids;
         } catch (AttributeNotFoundException e) {
