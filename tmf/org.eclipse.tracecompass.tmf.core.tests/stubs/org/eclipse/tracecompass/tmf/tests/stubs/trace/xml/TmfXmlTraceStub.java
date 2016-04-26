@@ -35,6 +35,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.DefaultLocation;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
@@ -154,6 +156,7 @@ public class TmfXmlTraceStub extends TmfTrace {
     }
 
     @Override
+    @NonNullByDefault({DefaultLocation.TYPE_ARGUMENT})
     public void initTrace(@Nullable IResource resource, @Nullable String path, @Nullable Class<? extends ITmfEvent> type) throws TmfTraceException {
         super.initTrace(resource, path, type);
         ITmfContext ctx;

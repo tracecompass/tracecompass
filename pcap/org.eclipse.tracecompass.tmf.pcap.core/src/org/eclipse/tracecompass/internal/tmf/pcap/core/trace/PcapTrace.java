@@ -29,6 +29,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.DefaultLocation;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.pcap.PcapPacket;
@@ -114,6 +116,7 @@ public class PcapTrace extends TmfTrace implements ITmfPropertiesProvider {
     }
 
     @Override
+    @NonNullByDefault({DefaultLocation.TYPE_ARGUMENT})
     public synchronized void initTrace(@Nullable IResource resource, @Nullable String path, @Nullable Class<? extends ITmfEvent> type) throws TmfTraceException {
         super.initTrace(resource, path, type);
         if (path == null) {
