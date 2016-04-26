@@ -27,6 +27,8 @@
   <modules>
     <module>org.eclipse.tracecompass.analysis.graph.core</module>
     <module>org.eclipse.tracecompass.analysis.graph.core.tests</module>
+    <module>org.eclipse.tracecompass.analysis.lami.core</module>
+    <module>org.eclipse.tracecompass.analysis.lami.ui</module>
     <module>org.eclipse.tracecompass.analysis.graph.ui</module>
     <module>org.eclipse.tracecompass.analysis.os.linux.core</module>
     <module>org.eclipse.tracecompass.analysis.os.linux.core.tests</module>
