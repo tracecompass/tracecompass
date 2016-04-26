@@ -10,7 +10,6 @@
 package org.eclipse.tracecompass.tmf.core.analysis.ondemand;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
@@ -74,15 +73,22 @@ public interface IOnDemandAnalysis {
      * @param trace
      *            The trace on which to execute the analysis
      * @param range
-     *            The time range on which to execute the analysis
+     *            The timerange on which to execute the analysis.
+     *            {@link TmfTimeRange#ETERNITY} can be used to indicate the
+     *            whole trace.
      * @param extraParams
-     *            Extra user-specified parameters to pass to the analysis
+     *            Extra user-defined parameters to add to the analysis's
+     *            command.
      * @param monitor
-     *            The progress monitor, can be null for a default monitor
+     *            The progress monitor to use to display progress, if the
+     *            analysis supports it. You can pass 'new NullProgressMonitor()'
+     *            for a default monitor.
      * @return The results of this analysis. Exact object type is
      *         analysis-dependent, a more specific return type is encouraged.
+     * @throws OnDemandAnalysisException
+     *             If something went wrong with the execution, and expected
+     *             results will not be returned
      */
-    Object execute(ITmfTrace trace, @Nullable TmfTimeRange range,
-            String extraParams, @Nullable IProgressMonitor monitor);
-
+    Object execute(ITmfTrace trace, TmfTimeRange range, String extraParams,
+            IProgressMonitor monitor) throws OnDemandAnalysisException;
 }
