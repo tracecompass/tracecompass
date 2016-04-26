@@ -1823,7 +1823,8 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         if (parent != null) {
             fTimeGraphCtrl.setExpandedState(parent, true);
         }
-        setSelection(entry);
+        fSelectedEntry = entry;
+        fTimeGraphCtrl.selectItem(entry, false);
         adjustVerticalScrollBar();
     }
 
