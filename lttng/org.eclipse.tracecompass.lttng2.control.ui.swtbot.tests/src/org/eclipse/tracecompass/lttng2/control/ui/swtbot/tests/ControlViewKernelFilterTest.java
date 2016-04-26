@@ -39,13 +39,13 @@ public class ControlViewKernelFilterTest extends ControlViewTest {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    private static final String TEST_STREAM = "CreateSessionTestLTTng2_7.cfg";
+    private static final String TEST_STREAM = "CreateSessionTestLTTng2_8.cfg";
     private static final String CREATE_SESSION_KERNEL_FILTER_SCENARIO_NAME = "KernelFilter";
     private static final String CREATE_SESSION_KERNEL_FILTER_PROVIDER_SCENARIO_NAME = "KernelFilterProvider";
 
     private static final String SESSION_NAME = "mysession";
     private static final String FILTER_EXPRESSION = "next_tid==1234";
-    private static final String FILTER_EXPRESSION_DISPLAY = "with filter";
+    private static final String FILTER_EXPRESSION_DISPLAY = "foo > 10";
 
     @Override
     protected String getTestStream() {

@@ -75,10 +75,10 @@ public class ControlViewTest {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    private static final String TEST_STREAM = "CreateSessionTestLTTng2_7.cfg";
+    private static final String TEST_STREAM = "CreateSessionTestLTTng2_8.cfg";
     /** The initialize scenario name */
     protected static final String INIT_SCENARIO_NAME = "Initialize";
-    private static final String CREATE_SESSION_WITH_LTTNG_2_7_SCENARIO_NAME = "CreateSession_2.7";
+    private static final String CREATE_SESSION_WITH_LTTNG_2_8_SCENARIO_NAME = "CreateSession_2.8";
 
     private static final String SESSION_NAME = "mysession";
     private static final String UST_CHANNEL_NAME = ControlViewSwtBotUtil.DEFAULT_CHANNEL_NAME;
@@ -204,7 +204,7 @@ public class ControlViewTest {
 
         testConnectToNode();
         // Set the scenario
-        fProxy.setScenario(CREATE_SESSION_WITH_LTTNG_2_7_SCENARIO_NAME);
+        fProxy.setScenario(CREATE_SESSION_WITH_LTTNG_2_8_SCENARIO_NAME);
         testCreateSession();
         testEnableKernelEvent();
         testEnableSyscalls();
