@@ -186,6 +186,16 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
     }
 
     /**
+     * Get the child element "Reports".
+     *
+     * @return The Reports child element
+     * @since 2.0
+     */
+    public TmfReportsElement getChildElementReports() {
+        return fReportsElement;
+    }
+
+    /**
      * Returns the trace type ID.
      *
      * @return trace type ID.

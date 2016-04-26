@@ -9,8 +9,18 @@
 
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.tracecompass.tmf.core.analysis.ondemand.IOnDemandAnalysisReport;
+
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 /**
  * Project model element for the "Reports" element, which lists the analysis
@@ -30,6 +40,8 @@ public class TmfReportsElement extends TmfProjectModelElement {
     public static final String PATH_ELEMENT = ".reports"; //$NON-NLS-1$
 
     private static final String ELEMENT_NAME = Messages.TmfReportsElement_Name;
+
+    private final BiMap<String, IOnDemandAnalysisReport> fCurrentReports = HashBiMap.create();
 
     /**
      * Constructor
@@ -59,4 +71,46 @@ public class TmfReportsElement extends TmfProjectModelElement {
         /* No children at the moment */
     }
 
+    /**
+     * Add a new report under this element.
+     *
+     * @param report
+     *            The report to add
+     */
+    public void addReport(IOnDemandAnalysisReport report) {
+        IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IPath nodePath = getResource().getFullPath();
+
+        /* Append #2,#3,... to the name if needed */
+        String reportDisplayName = report.getName();
+        int i = 1;
+        while (fCurrentReports.containsKey(reportDisplayName)) {
+            i++;
+            reportDisplayName = report.getName() + " #" + i; //$NON-NLS-1$
+        }
+
+        fCurrentReports.put(reportDisplayName, report);
+
+        IFolder analysisRes = checkNotNull(root.getFolder(nodePath.append(reportDisplayName)));
+        TmfReportElement elem = new TmfReportElement(reportDisplayName, analysisRes, this, report);
+        addChild(elem);
+        refresh();
+    }
+
+    /**
+     * Remove a report from under this element.
+     *
+     * @param report
+     *            The report to remove
+     */
+    public void removeReport(IOnDemandAnalysisReport report) {
+        String displayName = fCurrentReports.inverse().get(report);
+        fCurrentReports.values().remove(report);
+
+        ITmfProjectModelElement elementToRemove = getChildren().stream()
+                .filter(elem -> elem.getName().equals(displayName))
+                .findFirst().orElse(null);
+        removeChild(elementToRemove);
+        refresh();
+    }
 }

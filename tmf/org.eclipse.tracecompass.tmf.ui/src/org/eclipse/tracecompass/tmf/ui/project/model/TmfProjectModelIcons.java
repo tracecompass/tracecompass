@@ -37,6 +37,7 @@ final class TmfProjectModelIcons {
     public static final @NonNull Image DEFAULT_EXPERIMENT_ICON;
     public static final @NonNull Image DEFAULT_ANALYSIS_ICON;
     public static final @NonNull Image DEFAULT_VIEW_ICON;
+    public static final @NonNull Image DEFAULT_REPORT_ICON;
 
     public static final @NonNull Image FOLDER_ICON;
     public static final @NonNull Image VIEWS_ICON;
@@ -51,6 +52,7 @@ final class TmfProjectModelIcons {
     private static final String VIEW_ICON_FILE = "icons/obj16/node_obj.gif"; //$NON-NLS-1$
     private static final String ONDEMAND_ANALYSES_ICON_FILE = "icons/obj16/debugt_obj.gif"; //$NON-NLS-1$
     private static final String REPORTS_ICON_FILE = "icons/obj16/arraypartition_obj.gif"; //$NON-NLS-1$
+    private static final String DEFAULT_REPORT_ICON_FILE = "icons/etool16/copy_edit.gif"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Initialization
@@ -69,6 +71,7 @@ final class TmfProjectModelIcons {
         DEFAULT_EXPERIMENT_ICON = checkNotNull(loadIcon(bundle, EXPERIMENT_ICON_FILE));
         DEFAULT_ANALYSIS_ICON = checkNotNull(loadIcon(bundle, ANALYSIS_ICON_FILE));
         DEFAULT_VIEW_ICON = checkNotNull(loadIcon(bundle, VIEW_ICON_FILE));
+        DEFAULT_REPORT_ICON = checkNotNull(loadIcon(bundle, DEFAULT_REPORT_ICON_FILE));
     }
 
     public static @Nullable Image loadIcon(Bundle bundle, String url) {
