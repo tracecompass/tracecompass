@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioHistoryBuilder.ScenarioStatusType;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
@@ -105,7 +106,8 @@ public class TmfXmlScenario {
             if (action != null) {
                 action.execute(event, fScenarioInfo);
             } else {
-                throw new IllegalStateException("Action " + actionId + " cannot be found."); //$NON-NLS-1$ //$NON-NLS-2$
+                Activator.logError("Action " + actionId + " cannot be found."); //$NON-NLS-1$ //$NON-NLS-2$
+                return;
             }
         }
 
