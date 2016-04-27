@@ -479,7 +479,8 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                     timeRange,
                     index,
                     ITmfEventRequest.ALL_DATA,
-                    ITmfEventRequest.ExecutionType.BACKGROUND);
+                    ITmfEventRequest.ExecutionType.BACKGROUND,
+                    TmfStateSystemAnalysisModule.this.getDependencyLevel());
             this.sci = sp;
             trace = sci.getTrace();
 

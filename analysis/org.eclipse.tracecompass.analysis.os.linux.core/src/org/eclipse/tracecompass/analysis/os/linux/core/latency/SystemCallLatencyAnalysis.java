@@ -14,6 +14,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,15 +24,19 @@ import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelTidAspect;
+import org.eclipse.tracecompass.analysis.os.linux.core.tid.TidAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisEventBasedModule;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
+import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * @author Alexandre Montplaisir
@@ -55,6 +60,19 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
     }
 
     @Override
+    protected Iterable<IAnalysisModule> getDependentAnalyses() {
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            throw new IllegalStateException();
+        }
+        IAnalysisModule module = trace.getAnalysisModule(TidAnalysisModule.ID);
+        if (module == null) {
+            return Collections.EMPTY_SET;
+        }
+        return ImmutableSet.of(module);
+    }
+
+    @Override
     public Iterable<ISegmentAspect> getSegmentAspects() {
         return BASE_ASPECTS;
     }
@@ -74,7 +92,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
         return checkNotNull((Object[]) ois.readObject());
     }
 
-    private static class SyscallLatencyAnalysisRequest extends AbstractSegmentStoreAnalysisRequest {
+    private class SyscallLatencyAnalysisRequest extends AbstractSegmentStoreAnalysisRequest {
 
         private final Map<Integer, SystemCall.InitialInfo> fOngoingSystemCalls = new HashMap<>();
         private @Nullable IKernelAnalysisEventLayout fLayout;

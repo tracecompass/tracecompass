@@ -18,6 +18,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -77,7 +78,7 @@ public abstract class AbstractSegmentStoreAnalysisEventBasedModule extends Abstr
     /**
      * Abstract event request to fill a a segment store
      */
-    protected static abstract class AbstractSegmentStoreAnalysisRequest extends TmfEventRequest {
+    protected abstract class AbstractSegmentStoreAnalysisRequest extends TmfEventRequest {
 
         private final ISegmentStore<ISegment> fSegmentStore;
 
@@ -88,7 +89,7 @@ public abstract class AbstractSegmentStoreAnalysisEventBasedModule extends Abstr
          *            a segment store to fill
          */
         public AbstractSegmentStoreAnalysisRequest(ISegmentStore<ISegment> segmentStore) {
-            super(ITmfEvent.class, 0, ITmfEventRequest.ALL_DATA, ExecutionType.BACKGROUND);
+            super(ITmfEvent.class, TmfTimeRange.ETERNITY, 0, ITmfEventRequest.ALL_DATA, ExecutionType.BACKGROUND, AbstractSegmentStoreAnalysisEventBasedModule.this.getDependencyLevel());
             /*
              * We do NOT make a copy here! We want to modify the list that was
              * passed in parameter.
