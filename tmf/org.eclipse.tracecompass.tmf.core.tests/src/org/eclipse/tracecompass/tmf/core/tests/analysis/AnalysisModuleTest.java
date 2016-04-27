@@ -43,6 +43,8 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * Test suite for the {@link TmfAbstractAnalysisModule} class
  */
@@ -83,6 +85,8 @@ public class AnalysisModuleTest {
         assertNull(module.getParameter(TestAnalysis.PARAM_TEST));
         module.setParameter(TestAnalysis.PARAM_TEST, 1);
         assertEquals(1, module.getParameter(TestAnalysis.PARAM_TEST));
+
+        assertEquals(0, module.getDependencyLevel());
 
         /* Try to set and get wrong parameter */
         String wrongParam = "abc";
@@ -365,8 +369,81 @@ public class AnalysisModuleTest {
         /* Make sure the dependent analysis has run and completed */
         assertEquals(paramAndResult, depModule.getAnalysisOutput());
 
+        /* Check the dependency level of both analyses */
+        assertEquals(0, depModule.getDependencyLevel());
+        assertEquals(1, module.getDependencyLevel());
+
         module.dispose();
         depModule.dispose();
+        trace.dispose();
+
+    }
+
+    /**
+     * Test that the dependency level is consistent with a case where
+     * B depends on A, and C depends on A and B
+     */
+    @Test
+    public void testMultipleDependencies() {
+
+        ITmfTrace trace = TmfTestTrace.A_TEST_10K.getTrace();
+
+        /* Prepare module A with no dependency */
+        IAnalysisModule moduleA = new TestAnalysis();
+        moduleA.setName(MODULE_GENERIC_NAME);
+        moduleA.setId(MODULE_GENERIC_ID);
+        moduleA.addParameter(TestAnalysis.PARAM_TEST);
+        moduleA.setParameter(TestAnalysis.PARAM_TEST, 1);
+
+        /* Prepare module B depending on A */
+        String suffix = " B";
+        IAnalysisModule moduleB = new TestAnalysis() {
+
+            @Override
+            protected Iterable<IAnalysisModule> getDependentAnalyses() {
+                return ImmutableSet.of(moduleA);
+            }
+
+        };
+        moduleB.setName(MODULE_GENERIC_NAME + suffix);
+        moduleB.setId(MODULE_GENERIC_ID + suffix);
+        moduleB.addParameter(TestAnalysis.PARAM_TEST);
+        moduleB.setParameter(TestAnalysis.PARAM_TEST, 1);
+
+        /* Prepare module C depending on A and B */
+        suffix = " C";
+        IAnalysisModule moduleC = new TestAnalysis() {
+
+            @Override
+            protected Iterable<IAnalysisModule> getDependentAnalyses() {
+                return ImmutableSet.of(moduleA, moduleB);
+            }
+
+        };
+        moduleC.setName(MODULE_GENERIC_NAME + suffix);
+        moduleC.setId(MODULE_GENERIC_ID + suffix);
+        moduleC.addParameter(TestAnalysis.PARAM_TEST);
+        moduleC.setParameter(TestAnalysis.PARAM_TEST, 1);
+
+        try {
+            assertTrue(moduleA.setTrace(trace));
+            assertTrue(moduleB.setTrace(trace));
+            assertTrue(moduleC.setTrace(trace));
+        } catch (TmfAnalysisException e) {
+            fail(e.getMessage());
+        }
+
+        moduleC.schedule();
+        assertTrue(moduleC.waitForCompletion());
+
+        /* Check the dependency level of the analyses */
+        assertEquals(0, moduleA.getDependencyLevel());
+        assertEquals(1, moduleB.getDependencyLevel());
+        assertEquals(3, moduleC.getDependencyLevel());
+
+        moduleA.dispose();
+        moduleB.dispose();
+        moduleC.dispose();
         trace.dispose();
 
     }

@@ -136,6 +136,19 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      */
     @Nullable Object getParameter(@NonNull String name);
 
+    /**
+     * Get the level of dependencies on other analyses that this analysis has.
+     * Typically, it would be equal to the number of dependent analyses. An
+     * analysis with no dependence would have a level of 0. This value can be
+     * used for the dependency level of event requests.
+     *
+     * @return The dependency level of this analysis
+     * @since 2.0
+     */
+    default int getDependencyLevel() {
+        return 0;
+    }
+
     // -----------------------------------------------------
     // Functionalities
     // -----------------------------------------------------

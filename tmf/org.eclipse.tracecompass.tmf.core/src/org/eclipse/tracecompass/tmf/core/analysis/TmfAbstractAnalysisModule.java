@@ -66,6 +66,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
     private final List<IAnalysisOutput> fOutputs = new ArrayList<>();
     private Set<IAnalysisParameterProvider> fParameterProviders = new HashSet<>();
     private @Nullable Job fJob = null;
+    private int fDependencyLevel = 0;
 
     private final Object syncObj = new Object();
 
@@ -292,6 +293,14 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
         return Collections.EMPTY_LIST;
     }
 
+    /**
+     * @since 2.0
+     */
+    @Override
+    public int getDependencyLevel() {
+        return fDependencyLevel;
+    }
+
     private void execute(final ITmfTrace trace) {
         /*
          * TODO: The analysis in a job should be done at the analysis manager
@@ -316,9 +325,14 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
 
         /* Execute dependent analyses before creating the job for this one */
         final Iterable<IAnalysisModule> dependentAnalyses = getDependentAnalyses();
+        int depLevel = 0;
         for (IAnalysisModule module : dependentAnalyses) {
             module.schedule();
+            // Add the dependency level of the analysis + 1 to make sure that if
+            // an analysis already depends on another, it is taken into account
+            depLevel += module.getDependencyLevel() + 1;
         }
+        fDependencyLevel = depLevel;
 
         /*
          * Actual analysis will be run on a separate thread
