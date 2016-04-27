@@ -9,7 +9,19 @@
 
 package org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types;
 
-class LamiSize extends LamiInteger {
+/**
+ * Class for LAMI 'size' types.
+ *
+ * @author Philippe Proulx
+ */
+public class LamiSize extends LamiInteger {
+
+    /**
+     * Constructor
+     *
+     * @param value
+     *            The size value, in bytes
+     */
     public LamiSize(long value) {
         super(value);
     }
