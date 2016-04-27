@@ -9,19 +9,15 @@
 
 package org.eclipse.tracecompass.lttng2.ust.ui.tests.analysis.callstack;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.lttng2.ust.ui.analysis.callstack.LttngUstCallStackAnalysisRequirement;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventType;
 import org.junit.Test;
 
@@ -44,276 +40,82 @@ public class LTTngUstCallStackAnalysisRequirementTest {
     private static final @NonNull String CONTEXT_PROCNAME = "context._procname";
     private static final @NonNull String CONTEXT_OTHER = "context._other";
 
-    /* A trace class with pre-defined events with valid events and fields */
-    private static class TraceWithValidEvents extends LttngUstTrace {
-        @Override
-        public @NonNull Set<@NonNull CtfTmfEventType> getContainedEventTypes() {
-            return ImmutableSet.of(
-                    new CtfTmfEventType(FUNC_ENTRY, null) {
+    private static final @NonNull Collection<String> validFields = ImmutableSet.of(CONTEXT_VTID, CONTEXT_PROCNAME);
+    private static final @NonNull Collection<String> badFields = ImmutableSet.of(CONTEXT_OTHER, CONTEXT_PROCNAME);
 
-                        @Override
-                        public @NonNull String getName() {
-                            return FUNC_ENTRY;
-                        }
+    enum EventType {
+        EVT_EXIT_FAST           (FUNC_EXIT_FAST, validFields),
+        EVT_EXIT                (FUNC_EXIT, validFields),
+        EVT_ENTRY_FAST          (FUNC_ENTRY_FAST, validFields),
+        EVT_ENTRY               (FUNC_ENTRY, validFields),
+        EVT_OTHER               (OTHER_EVENT, validFields),
+        EVT_ENTRY_BAD_FIELDS    (FUNC_ENTRY, badFields),
+        EVT_ENTRY_FAST_BAD_FIELDS     (FUNC_ENTRY_FAST, badFields),
+        EVT_ENTRY_FAST_EMPTY_FIELDS   (FUNC_ENTRY_FAST, ImmutableSet.of());
 
-                        @Override
-                        public ITmfEventField getRootField() {
-                            return null;
-                        }
+        private final @NonNull CtfTmfEventType fType;
 
-                        @Override
-                        public Collection<String> getFieldNames() {
-                            return ImmutableSet.of(CONTEXT_VTID, CONTEXT_PROCNAME);
-                        }
-                    },
-                    new CtfTmfEventType(FUNC_EXIT, null) {
-                        @Override
-                        public @NonNull String getName() {
-                            return FUNC_EXIT;
-                        }
+        EventType(@NonNull String name, @NonNull Collection<String> fields) {
+            fType = new CtfTmfEventType(name, null) {
+                @Override
+                public String getName() {
+                    return name;
+                }
+                @Override
+                public @NonNull Collection<String> getFieldNames() {
+                    return fields;
+                }
+            };
+        }
 
-                        @Override
-                        public ITmfEventField getRootField() {
-                            return null;
-                        }
-
-                        @Override
-                        public Collection<String> getFieldNames() {
-                            return ImmutableSet.of(CONTEXT_VTID, CONTEXT_PROCNAME);
-                        }
-                    });
+        @NonNull CtfTmfEventType getEventType() {
+            return fType;
         }
     }
 
-    /* A trace class with pre-defined events with valid events and fields */
-    private static class TraceWithValidEventsFast extends LttngUstTrace {
-        @Override
-        public @NonNull Set<@NonNull CtfTmfEventType> getContainedEventTypes() {
-            return ImmutableSet.of(
-                    new CtfTmfEventType(FUNC_ENTRY_FAST, null) {
+    enum TestData {
+        TRACE_WITH_VALID_EVENTS(EventType.EVT_ENTRY, EventType.EVT_EXIT, true),
+        TRACE_WITH_VALID_EVENTS_FAST(EventType.EVT_ENTRY_FAST, EventType.EVT_EXIT_FAST, true),
+        TRACE_WITH_VALID_EVENTS_MISSING_FIELDS(EventType.EVT_ENTRY_BAD_FIELDS,
+                EventType.EVT_EXIT, false),
+        TRACE_WITH_VALID_EVENTS_MISSING_FIELDS_FAST(EventType.EVT_ENTRY_FAST_BAD_FIELDS,
+                    EventType.EVT_EXIT_FAST, false),
+        TRACE_WITH_VALID_EVENTS_WRONG_FIELDS(EventType.EVT_ENTRY_FAST_EMPTY_FIELDS,
+                EventType.EVT_EXIT_FAST, false),
+        TRACE_WITH_MISSING_EVENTS(EventType.EVT_OTHER,
+                    EventType.EVT_EXIT_FAST, false);
 
-                        @Override
-                        public @NonNull String getName() {
-                            return FUNC_ENTRY_FAST;
-                        }
+        private final @NonNull LttngUstTrace fTrace;
+        private final boolean fIsValid;
 
-                        @Override
-                        public ITmfEventField getRootField() {
-                            return null;
-                        }
-
-                        @Override
-                        public Collection<String> getFieldNames() {
-                            return ImmutableSet.of(CONTEXT_VTID, CONTEXT_PROCNAME);
-                        }
-                    },
-                    new CtfTmfEventType(FUNC_EXIT_FAST, null) {
-                        @Override
-                        public @NonNull String getName() {
-                            return FUNC_EXIT_FAST;
-                        }
-
-                        @Override
-                        public ITmfEventField getRootField() {
-                            return null;
-                        }
-
-                        @Override
-                        public Collection<String> getFieldNames() {
-                            return ImmutableSet.of(CONTEXT_VTID, CONTEXT_PROCNAME);
-                        }
-                    });
+        TestData(EventType first, EventType second, boolean isValid) {
+            fTrace = new LttngUstTrace() {
+                @Override
+                public Set<CtfTmfEventType> getContainedEventTypes() {
+                    return ImmutableSet.of(first.getEventType(), second.getEventType());
+                }
+            };
+            fIsValid = isValid;
         }
-    }
 
-    /*
-     * A trace class with pre-defined events with valid events but missing
-     * fields
-     */
-    private static class TraceWithValidEventsMissingFields extends LttngUstTrace {
-        @Override
-        public @NonNull Set<@NonNull CtfTmfEventType> getContainedEventTypes() {
-            return ImmutableSet.of(
-                    new CtfTmfEventType(FUNC_ENTRY, null) {
-                        @Override
-                        public @NonNull String getName() {
-                            return FUNC_ENTRY;
-                        }
-
-                        @Override
-                        public ITmfEventField getRootField() {
-                            return null;
-                        }
-
-                        @Override
-                        public Collection<String> getFieldNames() {
-                            return Collections.EMPTY_LIST;
-                        }
-                    },
-                    new CtfTmfEventType(FUNC_EXIT, null) {
-                        @Override
-                        public @NonNull String getName() {
-                            return FUNC_EXIT;
-                        }
-
-                        @Override
-                        public ITmfEventField getRootField() {
-                            return null;
-                        }
-
-                        @Override
-                        public Collection<String> getFieldNames() {
-                            return ImmutableSet.of(CONTEXT_VTID, CONTEXT_PROCNAME);
-                        }
-                    });
+        @NonNull LttngUstTrace getTrace() {
+            return fTrace;
         }
-    }
 
-    /*
-     * A trace class with pre-defined events with valid events but missing
-     * fields
-     */
-    private static class TraceWithValidEventsMissingFieldsFast extends LttngUstTrace {
-        @Override
-        public @NonNull Set<@NonNull CtfTmfEventType> getContainedEventTypes() {
-            return ImmutableSet.of(
-                    new CtfTmfEventType(FUNC_ENTRY_FAST, null) {
-                        @Override
-                        public @NonNull String getName() {
-                            return FUNC_ENTRY_FAST;
-                        }
-
-                        @Override
-                        public ITmfEventField getRootField() {
-                            return null;
-                        }
-
-                        @Override
-                        public Collection<String> getFieldNames() {
-                            return ImmutableSet.of(CONTEXT_VTID, CONTEXT_PROCNAME);
-                        }
-                    },
-                    new CtfTmfEventType(FUNC_EXIT_FAST, null) {
-                        @Override
-                        public @NonNull String getName() {
-                            return FUNC_EXIT_FAST;
-                        }
-
-                        @Override
-                        public ITmfEventField getRootField() {
-                            return null;
-                        }
-
-                        @Override
-                        public Collection<String> getFieldNames() {
-                            return Collections.EMPTY_LIST;
-                        }
-                    });
+        boolean isValid() {
+            return fIsValid;
         }
+
     }
-
-    /*
-     * A trace class with pre-defined events with valid events but missing
-     * fields and other fields
-     */
-    private static class TraceWithValidEventsWrongFields extends LttngUstTrace {
-        @Override
-        public @NonNull Set<@NonNull CtfTmfEventType> getContainedEventTypes() {
-            return ImmutableSet.of(
-                    new CtfTmfEventType(FUNC_ENTRY, null) {
-                        @Override
-                        public @NonNull String getName() {
-                            return FUNC_ENTRY;
-                        }
-
-                        @Override
-                        public ITmfEventField getRootField() {
-                            return null;
-                        }
-
-                        @Override
-                        public Collection<String> getFieldNames() {
-                            return ImmutableSet.of(CONTEXT_OTHER, CONTEXT_PROCNAME);
-                        }
-                    },
-                    new CtfTmfEventType(FUNC_EXIT, null) {
-                        @Override
-                        public @NonNull String getName() {
-                            return FUNC_EXIT;
-                        }
-
-                        @Override
-                        public ITmfEventField getRootField() {
-                            return null;
-                        }
-
-                        @Override
-                        public Collection<String> getFieldNames() {
-                            return ImmutableSet.of(CONTEXT_OTHER, CONTEXT_PROCNAME);
-                        }
-                    });
-        }
-    }
-
-    /* A trace class with pre-defined events with missing events */
-    private static class TraceWithMissingEvents extends LttngUstTrace {
-        @Override
-        public @NonNull Set<@NonNull CtfTmfEventType> getContainedEventTypes() {
-            return ImmutableSet.of(
-                    new CtfTmfEventType(OTHER_EVENT, null) {
-                        @Override
-                        public @NonNull String getName() {
-                            return OTHER_EVENT;
-                        }
-
-                        @Override
-                        public ITmfEventField getRootField() {
-                            return null;
-                        }
-
-                        @Override
-                        public Collection<String> getFieldNames() {
-                            return ImmutableSet.of(CONTEXT_VTID, CONTEXT_PROCNAME);
-                        }
-                    },
-                    new CtfTmfEventType(FUNC_EXIT_FAST, null) {
-                        @Override
-                        public @NonNull String getName() {
-                            return FUNC_EXIT_FAST;
-                        }
-
-                        @Override
-                        public ITmfEventField getRootField() {
-                            return null;
-                        }
-
-                        @Override
-                        public Collection<String> getFieldNames() {
-                            return ImmutableSet.of(CONTEXT_VTID, CONTEXT_PROCNAME);
-                        }
-                    });
-        }
-    }
-
-    private final @NonNull TmfTrace traceValid = new TraceWithValidEvents();
-    private final @NonNull TmfTrace traceValidFast = new TraceWithValidEventsFast();
-    private final @NonNull TmfTrace traceValidMissingFields = new TraceWithValidEventsMissingFields();
-    private final @NonNull TmfTrace traceValidMissingFiledsFast = new TraceWithValidEventsMissingFieldsFast();
-    private final @NonNull TmfTrace traceValidEventsWrongFields = new TraceWithValidEventsWrongFields();
-    private final @NonNull TmfTrace traceMissingEvents = new TraceWithMissingEvents();
 
     /**
-     * Test with optional requirements
+     * Test Call Stack Analysis requirements
      */
     @Test
     public void testCallStackRequirements() {
-        /* Test optional requirement */
         LttngUstCallStackAnalysisRequirement req = new LttngUstCallStackAnalysisRequirement(ILttngUstEventLayout.DEFAULT_LAYOUT);
-        assertTrue(req.test(traceValid));
-        assertTrue(req.test(traceValidFast));
-        assertFalse(req.test(traceValidMissingFields));
-        assertFalse(req.test(traceValidMissingFiledsFast));
-        assertFalse(req.test(traceValidEventsWrongFields));
-        assertFalse(req.test(traceMissingEvents));
+        for (TestData item: TestData.values()) {
+            assertEquals(item.name(), item.isValid(), req.test(item.getTrace()));
+        }
     }
 }
