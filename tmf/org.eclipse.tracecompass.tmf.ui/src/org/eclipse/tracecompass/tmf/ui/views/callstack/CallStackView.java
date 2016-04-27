@@ -65,8 +65,8 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampDelta;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampDelta;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor;
@@ -656,7 +656,7 @@ public class CallStackView extends AbstractTimeGraphView {
                             if (startStates == null) {
                                 startStates = ss.queryFullState(ss.getStartTime());
                             }
-                            long threadId = endInterval.getStateValue().unboxLong();
+                            long threadId = endStates.get(threadQuark).getStateValue().unboxLong();
                             long threadStart = start;
                             ITmfStateInterval startInterval = startStates.get(callStackQuark);
                             if (startInterval.getStateValue().isNull()) {
