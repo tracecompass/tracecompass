@@ -1,0 +1,117 @@
+{
+    "table-classes": {
+        "per-syscall": {
+            "column-descriptions": [
+                {
+                    "title": "System call",
+                    "class": "syscall"
+                },
+                {
+                    "title": "Duration",
+                    "class": "duration"
+                },
+                {
+                    "title": "Size",
+                    "class": "size"
+                },
+                {
+                    "title": "Bitrate",
+                    "class": "bitrate"
+                },
+                {
+                    "title": "Time range",
+                    "class": "time-range"
+                }
+            ],
+            "title": "Per-syscall stuff"
+        },
+        "per-proc": {
+            "column-descriptions": [
+                {
+                    "title": "Process",
+                    "class": "process"
+                },
+                {
+                    "title": "Count",
+                    "unit": "things",
+                    "class": "int"
+                },
+                {
+                    "title": "Flag",
+                    "class": "bool"
+                },
+                {
+                    "title": "Value",
+                    "unit": "thou",
+                    "class": "number"
+                },
+                {
+                    "title": "Name",
+                    "class": "string"
+                },
+                {
+                    "title": "Ratio",
+                    "class": "ratio"
+                },
+                {
+                    "title": "Timestamp",
+                    "class": "timestamp"
+                }
+            ],
+            "title": "Per-process stuff"
+        },
+        "per-irq": {
+            "column-descriptions": [
+                {
+                    "title": "Interrupt",
+                    "class": "irq"
+                },
+                {
+                    "title": "File descriptor",
+                    "class": "fd"
+                },
+                {
+                    "title": "File path",
+                    "class": "path"
+                },
+                {
+                    "title": "CPU",
+                    "class": "cpu"
+                },
+                {
+                    "title": "Disk",
+                    "class": "disk"
+                },
+                {
+                    "title": "Partition",
+                    "class": "part"
+                },
+                {
+                    "title": "Network interface",
+                    "class": "netif"
+                }
+            ],
+            "title": "Per-interrupt stuff"
+        }
+    },
+    "title": "LAMI test",
+    "authors": [
+        "Phil Proulx"
+    ],
+    "description": "LTTng analyses machine interface test",
+    "version": {
+        "extra": "dev",
+        "minor": 2,
+        "patch": 3,
+        "major": 1
+    },
+    "tags": [
+        "lami",
+        "test"
+    ],
+    "mi-version": {
+        "minor": 0,
+        "major": 1
+    },
+    "url": "http://perdu.com"
+}

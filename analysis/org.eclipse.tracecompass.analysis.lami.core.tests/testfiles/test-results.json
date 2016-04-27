@@ -1,0 +1,380 @@
+{
+    "results": [
+        {
+            "data": [
+                [
+                    {
+                        "pid": 23,
+                        "name": "zsh",
+                        "class": "process"
+                    },
+                    23,
+                    false,
+                    17.2832,
+                    "typical",
+                    {
+                        "value": 0.154,
+                        "class": "ratio"
+                    },
+                    {
+                        "value": 817232,
+                        "class": "timestamp"
+                    }
+                ],
+                [
+                    {
+                        "name": "chromium",
+                        "class": "process",
+                        "tid": 4987
+                    },
+                    19,
+                    false,
+                    -19457.15,
+                    "beam",
+                    {
+                        "value": 0.001,
+                        "class": "ratio"
+                    },
+                    {
+                        "value": 1194875,
+                        "class": "timestamp"
+                    }
+                ],
+                [
+                    {
+                        "name": "terminator",
+                        "class": "process"
+                    },
+                    -145,
+                    {
+                        "class": "unknown"
+                    },
+                    22.22,
+                    "dry",
+                    {
+                        "value": 0.94,
+                        "class": "ratio"
+                    },
+                    {
+                        "value": 984987658,
+                        "class": "timestamp"
+                    }
+                ],
+                [
+                    {
+                        "pid": 1945,
+                        "class": "process",
+                        "tid": 4497
+                    },
+                    31416,
+                    true,
+                    17.34,
+                    null,
+                    {
+                        "value": 1.5,
+                        "class": "ratio"
+                    },
+                    {
+                        "value": 154484512,
+                        "class": "timestamp"
+                    }
+                ]
+            ],
+            "class": "per-proc",
+            "time-range": {
+                "end": 2000,
+                "begin": 1000,
+                "class": "time-range"
+            }
+        },
+        {
+            "data": [
+                [
+                    {
+                        "name": "read",
+                        "class": "syscall"
+                    },
+                    {
+                        "value": 2398123,
+                        "class": "duration"
+                    },
+                    {
+                        "value": 8123982,
+                        "class": "size"
+                    },
+                    {
+                        "value": 223232,
+                        "class": "bitrate"
+                    },
+                    {
+                        "end": 1293828,
+                        "begin": 98233,
+                        "class": "time-range"
+                    }
+                ],
+                [
+                    {
+                        "name": "write",
+                        "class": "syscall"
+                    },
+                    {
+                        "value": 412434,
+                        "class": "duration"
+                    },
+                    {
+                        "value": 5645,
+                        "class": "size"
+                    },
+                    {
+                        "value": 25235343,
+                        "class": "bitrate"
+                    },
+                    {
+                        "end": 2354523,
+                        "begin": 5454,
+                        "class": "time-range"
+                    }
+                ],
+                [
+                    {
+                        "name": "sync",
+                        "class": "syscall"
+                    },
+                    {
+                        "value": 2312454,
+                        "class": "duration"
+                    },
+                    {
+                        "value": 23433,
+                        "class": "size"
+                    },
+                    null,
+                    {
+                        "end": 645634545454,
+                        "begin": 12,
+                        "class": "time-range"
+                    }
+                ],
+                [
+                    {
+                        "name": "fstat",
+                        "class": "syscall"
+                    },
+                    {
+                        "class": "unknown"
+                    },
+                    {
+                        "value": 2343334,
+                        "class": "size"
+                    },
+                    {
+                        "value": 5864684,
+                        "class": "bitrate"
+                    },
+                    {
+                        "end": 645634545,
+                        "begin": 2134,
+                        "class": "time-range"
+                    }
+                ],
+                [
+                    {
+                        "name": "sync",
+                        "class": "syscall"
+                    },
+                    {
+                        "value": 564533,
+                        "class": "duration"
+                    },
+                    {
+                        "value": 56875,
+                        "class": "size"
+                    },
+                    {
+                        "value": 4494494494,
+                        "class": "bitrate"
+                    },
+                    null
+                ]
+            ],
+            "class": "per-syscall",
+            "time-range": {
+                "end": 2000,
+                "begin": 1000,
+                "class": "time-range"
+            }
+        },
+        {
+            "data": [
+                [
+                    {
+                        "hard": true,
+                        "nr": 15,
+                        "name": "keyboard",
+                        "class": "irq"
+                    },
+                    {
+                        "fd": 3,
+                        "class": "fd"
+                    },
+                    {
+                        "path": "/etc/passwd",
+                        "class": "path"
+                    },
+                    {
+                        "id": 2,
+                        "class": "cpu"
+                    },
+                    {
+                        "name": "sda",
+                        "class": "disk"
+                    },
+                    {
+                        "name": "sdb3",
+                        "class": "part"
+                    },
+                    {
+                        "name": "eth0",
+                        "class": "netif"
+                    }
+                ],
+                [
+                    {
+                        "hard": false,
+                        "nr": 7,
+                        "name": "soft-timer",
+                        "class": "irq"
+                    },
+                    {
+                        "fd": 1,
+                        "class": "fd"
+                    },
+                    {
+                        "path": "/dev/null",
+                        "class": "path"
+                    },
+                    {
+                        "class": "unknown"
+                    },
+                    {
+                        "name": "hda",
+                        "class": "disk"
+                    },
+                    {
+                        "name": "mmcblk0p2",
+                        "class": "part"
+                    },
+                    {
+                        "name": "enp3s25",
+                        "class": "netif"
+                    }
+                ],
+                [
+                    {
+                        "hard": true,
+                        "nr": 34,
+                        "class": "irq"
+                    },
+                    null,
+                    null,
+                    {
+                        "id": 1,
+                        "class": "cpu"
+                    },
+                    {
+                        "name": "sdc",
+                        "class": "disk"
+                    },
+                    {
+                        "name": "sdc3",
+                        "class": "part"
+                    },
+                    {
+                        "name": "lo",
+                        "class": "netif"
+                    }
+                ]
+            ],
+            "class": "per-irq",
+            "time-range": {
+                "end": 2000,
+                "begin": 1000,
+                "class": "time-range"
+            }
+        },
+        {
+            "data": [
+                [
+                    {
+                        "hard": false,
+                        "nr": 12,
+                        "name": "soft-like-silk",
+                        "class": "irq"
+                    },
+                    {
+                        "fd": 10,
+                        "class": "fd"
+                    },
+                    {
+                        "path": "/home/bob/meowmix.txt",
+                        "class": "path"
+                    },
+                    {
+                        "id": 0,
+                        "class": "cpu"
+                    },
+                    {
+                        "name": "sdb",
+                        "class": "disk"
+                    },
+                    {
+                        "name": "sdb2",
+                        "class": "part"
+                    },
+                    {
+                        "name": "eth1",
+                        "class": "netif"
+                    }
+                ],
+                [
+                    {
+                        "hard": true,
+                        "nr": 1,
+                        "name": "mouse2",
+                        "class": "irq"
+                    },
+                    {
+                        "fd": 5,
+                        "class": "fd"
+                    },
+                    null,
+                    {
+                        "id": 7,
+                        "class": "cpu"
+                    },
+                    {
+                        "name": "vda",
+                        "class": "disk"
+                    },
+                    {
+                        "name": "vda3",
+                        "class": "part"
+                    },
+                    {
+                        "name": "wlp3s0",
+                        "class": "netif"
+                    }
+                ]
+            ],
+            "class": {
+                "inherit": "per-irq",
+                "title": "Per-interrupt stuff [with overridden title]"
+            },
+            "time-range": {
+                "end": 2000,
+                "begin": 1000,
+                "class": "time-range"
+            }
+        }
+    ]
+}

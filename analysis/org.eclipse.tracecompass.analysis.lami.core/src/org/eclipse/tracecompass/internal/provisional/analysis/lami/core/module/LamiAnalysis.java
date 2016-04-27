@@ -61,6 +61,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
@@ -141,7 +142,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
     }
 
     @Override
-    public boolean appliesTo(ITmfTrace trace) {
+    public final boolean appliesTo(ITmfTrace trace) {
         return fAppliesTo.test(trace);
     }
 
@@ -151,7 +152,12 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         return fIsAvailable;
     }
 
-    private synchronized void initialize() {
+    /**
+     * Perform initialization of the LAMI script. This means verifying that it
+     * is actually present on disk, and that it returns correct --metadata.
+     */
+    @VisibleForTesting
+    protected synchronized void initialize() {
         if (fInitialized) {
             return;
         }
@@ -174,7 +180,15 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         fInitialized = true;
     }
 
-    private boolean checkMetadata() {
+    /**
+     * Verify that this script returns valid metadata.
+     *
+     * This will populate all remaining non-final fields of this class.
+     *
+     * @return If the metadata is valid or not
+     */
+    @VisibleForTesting
+    protected boolean checkMetadata() {
         /*
          * The initialize() phase of the analysis will be used to check the
          * script's metadata. Actual runs of the script will use the execute()
@@ -638,9 +652,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
             }
 
         } catch (JSONException e) {
-            /* Error parsing the output */
-            Activator.instance().logError(nullToEmptyString(e.getMessage()));
-            return Collections.EMPTY_LIST;
+            throw new OnDemandAnalysisException(e.getMessage());
         }
 
         return resultsBuilder.build();
@@ -660,8 +672,14 @@ public class LamiAnalysis implements IOnDemandAnalysis {
      * Get the output of an external command, used for getting the metadata.
      * Cannot be cancelled, and will not report errors, simply returns null if
      * the process ended abnormally.
+     *
+     * @param command
+     *            The parameters of the command, passed to
+     *            {@link ProcessBuilder}
+     * @return The command output as a string
      */
-    private static @Nullable String getOutputFromCommand(List<String> command) {
+    @VisibleForTesting
+    protected @Nullable String getOutputFromCommand(List<String> command) {
         try {
             ProcessBuilder builder = new ProcessBuilder(command);
             builder.redirectErrorStream(true);
@@ -681,14 +699,20 @@ public class LamiAnalysis implements IOnDemandAnalysis {
     /**
      * Get the results of invoking the specified command.
      *
-     * The result should start with '{"results":...', as specified by the
-     * LAMI JSON protocol. The JSON itself may be split over multiple lines.
+     * The result should start with '{"results":...', as specified by the LAMI
+     * JSON protocol. The JSON itself may be split over multiple lines.
      *
      * @param command
      *            The command to run (program and its arguments)
+     * @param monitor
+     *            The progress monitor
      * @return The analysis results
+     * @throws OnDemandAnalysisException
+     *             If the command ended abnormally, and normal results were not
+     *             returned
      */
-    private static String getResultsFromCommand(List<String> command, IProgressMonitor monitor)
+    @VisibleForTesting
+    protected String getResultsFromCommand(List<String> command, IProgressMonitor monitor)
             throws OnDemandAnalysisException {
 
         final int scale = 1000;

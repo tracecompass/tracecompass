@@ -12,10 +12,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.tmf.core
 Export-Package: org.eclipse.tracecompass.internal.analysis.lami.core;x-internal:=true,
- org.eclipse.tracecompass.internal.provisional.analysis.lami.core;x-friends:="org.eclipse.tracecompass.analysis.lami.ui,org.eclipse.tracecompass.lttng2.kernel.core",
- org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect;x-friends:="org.eclipse.tracecompass.analysis.lami.ui,org.eclipse.tracecompass.lttng2.kernel.core",
- org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module;x-friends:="org.eclipse.tracecompass.analysis.lami.ui,org.eclipse.tracecompass.lttng2.kernel.core",
- org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types;x-friends:="org.eclipse.tracecompass.analysis.lami.ui,org.eclipse.tracecompass.lttng2.kernel.core"
-Import-Package: com.google.common.base,
+ org.eclipse.tracecompass.internal.provisional.analysis.lami.core;x-friends:="org.eclipse.tracecompass.analysis.lami.ui,org.eclipse.tracecompass.lttng2.kernel.core,org.eclipse.tracecompass.analysis.lami.core.tests",
+ org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect;x-friends:="org.eclipse.tracecompass.analysis.lami.ui,org.eclipse.tracecompass.lttng2.kernel.core,org.eclipse.tracecompass.analysis.lami.core.tests",
+ org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module;x-friends:="org.eclipse.tracecompass.analysis.lami.ui,org.eclipse.tracecompass.lttng2.kernel.core,org.eclipse.tracecompass.analysis.lami.core.tests",
+ org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types;x-friends:="org.eclipse.tracecompass.analysis.lami.ui,org.eclipse.tracecompass.lttng2.kernel.core,org.eclipse.tracecompass.analysis.lami.core.tests"
+Import-Package: com.google.common.annotations,
+ com.google.common.base,
  com.google.common.collect,
  org.json

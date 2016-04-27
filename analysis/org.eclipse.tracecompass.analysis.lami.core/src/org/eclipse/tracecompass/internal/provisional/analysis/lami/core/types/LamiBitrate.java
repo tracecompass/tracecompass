@@ -9,7 +9,19 @@
 
 package org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types;
 
-class LamiBitrate extends LamiInteger {
+/**
+ * Class for LAMI 'bitrate' types.
+ *
+ * @author Philippe Proulx
+ */
+public class LamiBitrate extends LamiInteger {
+
+    /**
+     * Constructor
+     *
+     * @param value
+     *            The bitrate value, in bits per second (bps)
+     */
     public LamiBitrate(long value) {
         super(value);
     }
