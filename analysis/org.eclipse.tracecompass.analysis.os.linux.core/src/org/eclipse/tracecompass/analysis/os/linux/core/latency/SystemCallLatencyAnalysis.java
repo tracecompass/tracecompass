@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelTidAspect;
@@ -96,6 +98,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
 
         private final Map<Integer, SystemCall.InitialInfo> fOngoingSystemCalls = new HashMap<>();
         private @Nullable IKernelAnalysisEventLayout fLayout;
+        private final IProgressMonitor fMonitor = new NullProgressMonitor();
 
         public SyscallLatencyAnalysisRequest(ISegmentStore<ISegment> syscalls) {
             super(syscalls);
@@ -116,7 +119,12 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
                     eventName.startsWith(layout.eventCompatSyscallEntryPrefix())) {
                 /* This is a system call entry event */
 
-                Integer tid = KernelTidAspect.INSTANCE.resolve(event);
+                Integer tid;
+                try {
+                    tid = KernelTidAspect.INSTANCE.resolve(event, true, fMonitor);
+                } catch (InterruptedException e) {
+                    return;
+                }
                 if (tid == null) {
                     // no information on this event/trace ?
                     return;
@@ -137,7 +145,12 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
             } else if (eventName.startsWith(layout.eventSyscallExitPrefix())) {
                 /* This is a system call exit event */
 
-                Integer tid = KernelTidAspect.INSTANCE.resolve(event);
+                Integer tid;
+                try {
+                    tid = KernelTidAspect.INSTANCE.resolve(event, true, fMonitor);
+                } catch (InterruptedException e) {
+                    return;
+                }
                 if (tid == null) {
                     return;
                 }
@@ -161,6 +174,13 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
         @Override
         public void handleCompleted() {
             fOngoingSystemCalls.clear();
+            super.handleCompleted();
+        }
+
+        @Override
+        public void handleCancel() {
+            fMonitor.setCanceled(true);
+            super.handleCancel();
         }
     }
 

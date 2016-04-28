@@ -12,6 +12,9 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.core.kernel;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.LinuxTidAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.tid.TidAnalysisModule;
@@ -31,11 +34,23 @@ public final class KernelTidAspect extends LinuxTidAspect {
     /** The singleton instance */
     public static final KernelTidAspect INSTANCE = new KernelTidAspect();
 
+    private static final IProgressMonitor NULL_MONITOR = new NullProgressMonitor();
+
     private KernelTidAspect() {
     }
 
     @Override
     public @Nullable Integer resolve(ITmfEvent event) {
+        try {
+            return resolve(event, false, NULL_MONITOR);
+        } catch (InterruptedException e) {
+            /* Should not happen since there is nothing to interrupt */
+            return null;
+        }
+    }
+
+    @Override
+    public @Nullable Integer resolve(@NonNull ITmfEvent event, boolean block, final IProgressMonitor monitor) throws InterruptedException {
         /* Find the CPU this event is run on */
         Integer cpu = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(),
                 TmfCpuAspect.class, event);
@@ -49,7 +64,11 @@ public final class KernelTidAspect extends LinuxTidAspect {
         if (analysis == null) {
             return null;
         }
-        return analysis.getThreadOnCpuAtTime(cpu, event.getTimestamp().toNanos());
+        long ts = event.getTimestamp().toNanos();
+        while (block && !analysis.isQueryable(ts) && !monitor.isCanceled()) {
+            Thread.sleep(100);
+        }
+        return analysis.getThreadOnCpuAtTime(cpu, ts);
     }
 
 }
