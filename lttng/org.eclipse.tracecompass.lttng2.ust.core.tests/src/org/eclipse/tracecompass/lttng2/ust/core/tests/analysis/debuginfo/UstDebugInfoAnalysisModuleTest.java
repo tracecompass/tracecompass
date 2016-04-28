@@ -28,7 +28,7 @@ import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstEvent;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -89,7 +89,7 @@ public class UstDebugInfoAnalysisModuleTest {
      */
     @Test
     public void testGetAnalysisRequirements() {
-        Iterable<TmfAnalysisRequirement> requirements = fModule.getAnalysisRequirements();
+        Iterable<TmfAbstractAnalysisRequirement> requirements = fModule.getAnalysisRequirements();
         assertNotNull(requirements);
         assertTrue(Iterables.isEmpty(requirements));
     }

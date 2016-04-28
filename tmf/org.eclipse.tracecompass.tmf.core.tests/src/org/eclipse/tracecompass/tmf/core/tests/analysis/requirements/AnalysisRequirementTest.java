@@ -20,14 +20,15 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.PriorityLevel;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement.PriorityLevel;
+import org.eclipse.tracecompass.tmf.tests.stubs.analysis.AnalysisRequirementFactory;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableSet;
 
 /**
- * Test suite for the {@link TmfAnalysisRequirement} class.
+ * Test suite for the {@link TmfAbstractAnalysisRequirement} class.
  *
  * @author Guilliano Molaire
  * @author Mathieu Rail
@@ -43,13 +44,12 @@ public class AnalysisRequirementTest {
     private static final @NonNull String INFO_B = "This is another information.";
 
     /**
-     * Test the {@link TmfAnalysisRequirement#addInformation} and the
-     * {@link TmfAnalysisRequirement#getInformation} methods.
+     * Test the {@link TmfAbstractAnalysisRequirement#addInformation(String)} and the
+     * {@link TmfAbstractAnalysisRequirement#getInformation()} methods.
      */
     @Test
     public void testAddAndGetInformation() {
-        TmfAnalysisRequirement requirement = new TmfAnalysisRequirement(Collections.EMPTY_SET, PriorityLevel.OPTIONAL);
-
+        TmfAbstractAnalysisRequirement requirement = new AnalysisRequirementFactory.TmfRequirementStub(Collections.EMPTY_SET, PriorityLevel.OPTIONAL);
         requirement.addInformation(INFO_A);
         requirement.addInformation(INFO_B);
         requirement.addInformation(INFO_B);
@@ -63,34 +63,35 @@ public class AnalysisRequirementTest {
     }
 
     /**
-     * Test the {@link TmfAnalysisRequirement#getValueLevel} method.
+     * Test the {@link TmfAbstractAnalysisRequirement#getPriorityLevel()} method.
      */
     @Test
     public void testGetValueLevel() {
         /* Optional requirement */
-        TmfAnalysisRequirement requirement = new TmfAnalysisRequirement(Collections.EMPTY_SET, PriorityLevel.OPTIONAL);
+        TmfAbstractAnalysisRequirement requirement = new AnalysisRequirementFactory.TmfRequirementStub(Collections.EMPTY_SET, PriorityLevel.OPTIONAL);
         assertEquals(PriorityLevel.OPTIONAL, requirement.getPriorityLevel());
 
         /* All or nothing */
-        requirement = new TmfAnalysisRequirement(Collections.EMPTY_SET, PriorityLevel.ALL_OR_NOTHING);
+        requirement = new AnalysisRequirementFactory.TmfRequirementStub(Collections.EMPTY_SET, PriorityLevel.ALL_OR_NOTHING);
         assertEquals(PriorityLevel.ALL_OR_NOTHING, requirement.getPriorityLevel());
 
         /* At least one */
-        requirement = new TmfAnalysisRequirement(Collections.EMPTY_SET, PriorityLevel.AT_LEAST_ONE);
+        requirement = new AnalysisRequirementFactory.TmfRequirementStub(Collections.EMPTY_SET, PriorityLevel.AT_LEAST_ONE);
         assertEquals(PriorityLevel.AT_LEAST_ONE, requirement.getPriorityLevel());
 
         /* Mandatory */
-        requirement = new TmfAnalysisRequirement(Collections.EMPTY_SET, PriorityLevel.MANDATORY);
+        requirement = new AnalysisRequirementFactory.TmfRequirementStub(Collections.EMPTY_SET, PriorityLevel.MANDATORY);
         assertEquals(PriorityLevel.MANDATORY, requirement.getPriorityLevel());
     }
 
     /**
-     * Test the {@link TmfAnalysisRequirement#getValues()} method
+     * Test the {@link TmfAbstractAnalysisRequirement#getValues()} method
      */
     @Test
     public void testGetValues() {
         ImmutableSet<@NonNull String> values = ImmutableSet.of(VALUE_A, VALUE_B);
-        TmfAnalysisRequirement requirement = new TmfAnalysisRequirement(values, PriorityLevel.OPTIONAL);
+
+        TmfAbstractAnalysisRequirement requirement = new AnalysisRequirementFactory.TmfRequirementStub(values, PriorityLevel.OPTIONAL);
         assertEquals(values, requirement.getValues());
     }
 

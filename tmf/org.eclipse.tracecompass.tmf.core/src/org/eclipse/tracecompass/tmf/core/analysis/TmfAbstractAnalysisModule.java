@@ -36,7 +36,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
@@ -210,7 +210,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
 
     @Override
     public boolean canExecute(ITmfTrace trace) {
-        for (TmfAnalysisRequirement requirement : getAnalysisRequirements()) {
+        for (TmfAbstractAnalysisRequirement requirement : getAnalysisRequirements()) {
             if (!requirement.test(trace)) {
                 return false;
             }
@@ -504,7 +504,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
     protected String getTraceCannotExecuteHelpText(ITmfTrace trace) {
         StringBuilder builder = new StringBuilder();
         builder.append(NLS.bind(Messages.TmfAbstractAnalysisModule_AnalysisCannotExecute, getName()));
-        for (TmfAnalysisRequirement requirement : getAnalysisRequirements()) {
+        for (TmfAbstractAnalysisRequirement requirement : getAnalysisRequirements()) {
             if (!requirement.test(trace)) {
                 builder.append("\n\n"); //$NON-NLS-1$
                 builder.append(NLS.bind(Messages.TmfAnalysis_RequirementNotFulfilled, requirement.getPriorityLevel()));
@@ -535,7 +535,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
     }
 
     @Override
-    public Iterable<@NonNull TmfAnalysisRequirement> getAnalysisRequirements() {
+    public Iterable<@NonNull TmfAbstractAnalysisRequirement> getAnalysisRequirements() {
         return Collections.EMPTY_SET;
     }
 

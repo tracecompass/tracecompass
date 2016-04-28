@@ -17,7 +17,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
@@ -64,8 +64,8 @@ public class TestRequirementAnalysis extends TmfAbstractAnalysisModule {
     }
 
     @Override
-    public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
-        Set<TmfAnalysisRequirement> requirements = ImmutableSet.of(
+    public Iterable<TmfAbstractAnalysisRequirement> getAnalysisRequirements() {
+        Set<TmfAbstractAnalysisRequirement> requirements = ImmutableSet.of(
                 AnalysisRequirementFactory.REQUIREMENT_1,
                 AnalysisRequirementFactory.REQUIREMENT_3);
 

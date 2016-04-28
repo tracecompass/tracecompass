@@ -26,7 +26,7 @@ import com.google.common.collect.Multimap;
  * @author Bernd Hufmann
  * @since 2.0
  */
-public class TmfAnalysisEventFieldRequirement extends TmfAnalysisRequirement {
+public class TmfAnalysisEventFieldRequirement extends TmfAbstractAnalysisRequirement {
 
     /** The event name of the event containing the mandatory fields */
     private String fEventName;

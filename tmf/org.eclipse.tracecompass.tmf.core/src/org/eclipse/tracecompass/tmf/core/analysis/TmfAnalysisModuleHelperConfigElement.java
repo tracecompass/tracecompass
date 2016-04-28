@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.analysis.TmfAnalysisModuleSourceConfigElement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
@@ -154,7 +154,7 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
     }
 
     @Override
-    public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
+    public Iterable<TmfAbstractAnalysisRequirement> getAnalysisRequirements() {
         IAnalysisModule module = createModule();
         if (module != null) {
             return module.getAnalysisRequirements();

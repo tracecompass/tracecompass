@@ -38,8 +38,8 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.PriorityLevel;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement.PriorityLevel;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -69,7 +69,7 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
 
     /** The requirements as an immutable set */
     private static final KernelEventLayoutRequirement LAYOUT_REQUIREMENT;
-    private static final SetMultimap<IKernelAnalysisEventLayout, TmfAnalysisRequirement> LAYOUT_REQ_MAP = NonNullUtils.checkNotNull(HashMultimap.create());
+    private static final SetMultimap<IKernelAnalysisEventLayout, TmfAbstractAnalysisRequirement> LAYOUT_REQ_MAP = NonNullUtils.checkNotNull(HashMultimap.create());
 
     static {
         LAYOUT_REQUIREMENT = new KernelEventLayoutRequirement(ImmutableSet.of((l) -> l.eventSchedSwitch()), PriorityLevel.MANDATORY);
@@ -333,10 +333,10 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
     }
 
     @Override
-    public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
+    public Iterable<TmfAbstractAnalysisRequirement> getAnalysisRequirements() {
         ITmfTrace trace = getTrace();
         IKernelAnalysisEventLayout layout = getLayout(trace);
-        Set<TmfAnalysisRequirement> reqs = LAYOUT_REQ_MAP.get(layout);
+        Set<TmfAbstractAnalysisRequirement> reqs = LAYOUT_REQ_MAP.get(layout);
         if (reqs.isEmpty()) {
             reqs= ImmutableSet.of(LAYOUT_REQUIREMENT.instanciateRequirements(layout));
             LAYOUT_REQ_MAP.putAll(layout, reqs);

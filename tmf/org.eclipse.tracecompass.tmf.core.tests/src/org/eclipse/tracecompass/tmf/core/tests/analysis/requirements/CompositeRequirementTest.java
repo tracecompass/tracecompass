@@ -16,8 +16,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collections;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.PriorityLevel;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement.PriorityLevel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
 import org.junit.Before;
@@ -34,28 +34,28 @@ import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfCompositeAnaly
  */
 public class CompositeRequirementTest {
 
-    private static final @NonNull TmfAnalysisRequirement FALSE_REQ1 = new TmfAnalysisRequirement(Collections.EMPTY_SET, PriorityLevel.MANDATORY) {
+    private static final @NonNull TmfAbstractAnalysisRequirement FALSE_REQ1 = new TmfAbstractAnalysisRequirement(Collections.EMPTY_SET, PriorityLevel.MANDATORY) {
         @Override
         public boolean test(ITmfTrace trace) {
             return false;
         }
     };
 
-    private static final @NonNull TmfAnalysisRequirement FALSE_REQ2 = new TmfAnalysisRequirement(Collections.EMPTY_SET, PriorityLevel.MANDATORY) {
+    private static final @NonNull TmfAbstractAnalysisRequirement FALSE_REQ2 = new TmfAbstractAnalysisRequirement(Collections.EMPTY_SET, PriorityLevel.MANDATORY) {
         @Override
         public boolean test(ITmfTrace trace) {
             return false;
         }
     };
 
-    private static final @NonNull TmfAnalysisRequirement TRUE_REQ1 = new TmfAnalysisRequirement(Collections.EMPTY_SET, PriorityLevel.MANDATORY) {
+    private static final @NonNull TmfAbstractAnalysisRequirement TRUE_REQ1 = new TmfAbstractAnalysisRequirement(Collections.EMPTY_SET, PriorityLevel.MANDATORY) {
         @Override
         public boolean test(ITmfTrace trace) {
             return true;
         }
     };
 
-    private static final @NonNull TmfAnalysisRequirement TRUE_REQ2 = new TmfAnalysisRequirement(Collections.EMPTY_SET, PriorityLevel.MANDATORY) {
+    private static final @NonNull TmfAbstractAnalysisRequirement TRUE_REQ2 = new TmfAbstractAnalysisRequirement(Collections.EMPTY_SET, PriorityLevel.MANDATORY) {
         @Override
         public boolean test(ITmfTrace trace) {
             return true;
@@ -80,7 +80,7 @@ public class CompositeRequirementTest {
         ITmfTrace trace = fTrace;
         assertNotNull(trace);
 
-        TmfAnalysisRequirement req = new TmfCompositeAnalysisRequirement(ImmutableSet.of(TRUE_REQ1), PriorityLevel.MANDATORY);
+        TmfAbstractAnalysisRequirement req = new TmfCompositeAnalysisRequirement(ImmutableSet.of(TRUE_REQ1), PriorityLevel.MANDATORY);
         assertTrue(req.test(trace));
 
         req = new TmfCompositeAnalysisRequirement(ImmutableSet.of(TRUE_REQ1, TRUE_REQ2), PriorityLevel.MANDATORY);
@@ -104,7 +104,7 @@ public class CompositeRequirementTest {
         ITmfTrace trace = fTrace;
         assertNotNull(trace);
 
-        TmfAnalysisRequirement req = new TmfCompositeAnalysisRequirement(ImmutableSet.of(TRUE_REQ1), PriorityLevel.AT_LEAST_ONE);
+        TmfAbstractAnalysisRequirement req = new TmfCompositeAnalysisRequirement(ImmutableSet.of(TRUE_REQ1), PriorityLevel.AT_LEAST_ONE);
         assertTrue(req.test(trace));
 
         req = new TmfCompositeAnalysisRequirement(ImmutableSet.of(TRUE_REQ1, TRUE_REQ2), PriorityLevel.AT_LEAST_ONE);
@@ -128,7 +128,7 @@ public class CompositeRequirementTest {
         ITmfTrace trace = fTrace;
         assertNotNull(trace);
 
-        TmfAnalysisRequirement req = new TmfCompositeAnalysisRequirement(ImmutableSet.of(TRUE_REQ1), PriorityLevel.ALL_OR_NOTHING);
+        TmfAbstractAnalysisRequirement req = new TmfCompositeAnalysisRequirement(ImmutableSet.of(TRUE_REQ1), PriorityLevel.ALL_OR_NOTHING);
         assertTrue(req.test(trace));
 
         req = new TmfCompositeAnalysisRequirement(ImmutableSet.of(TRUE_REQ1, TRUE_REQ2), PriorityLevel.ALL_OR_NOTHING);
@@ -152,7 +152,7 @@ public class CompositeRequirementTest {
         ITmfTrace trace = fTrace;
         assertNotNull(trace);
 
-        TmfAnalysisRequirement req = new TmfCompositeAnalysisRequirement(ImmutableSet.of(TRUE_REQ1), PriorityLevel.OPTIONAL);
+        TmfAbstractAnalysisRequirement req = new TmfCompositeAnalysisRequirement(ImmutableSet.of(TRUE_REQ1), PriorityLevel.OPTIONAL);
         assertTrue(req.test(trace));
 
         req = new TmfCompositeAnalysisRequirement(ImmutableSet.of(TRUE_REQ1, TRUE_REQ2), PriorityLevel.OPTIONAL);

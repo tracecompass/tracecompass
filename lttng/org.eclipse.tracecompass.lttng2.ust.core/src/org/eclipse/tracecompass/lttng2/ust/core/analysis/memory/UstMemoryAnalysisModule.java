@@ -24,8 +24,8 @@ import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemo
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisEventRequirement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.PriorityLevel;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement.PriorityLevel;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -47,7 +47,7 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
     public static final @NonNull String ID = "org.eclipse.linuxtools.lttng2.ust.analysis.memory"; //$NON-NLS-1$
 
     /** The analysis's requirements. Only set after the trace is set. */
-    private @Nullable Set<TmfAnalysisRequirement> fAnalysisRequirements;
+    private @Nullable Set<TmfAbstractAnalysisRequirement> fAnalysisRequirements;
 
     @Override
     protected ITmfStateProvider createStateProvider() {
@@ -71,8 +71,8 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
     }
 
     @Override
-    public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
-        Set<TmfAnalysisRequirement> requirements = fAnalysisRequirements;
+    public Iterable<TmfAbstractAnalysisRequirement> getAnalysisRequirements() {
+        Set<TmfAbstractAnalysisRequirement> requirements = fAnalysisRequirements;
         if (requirements == null) {
             LttngUstTrace trace = getTrace();
             ILttngUstEventLayout layout;
@@ -92,7 +92,7 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
                   );
 
             /* Initialize the requirements for the analysis: domain and events */
-            TmfAnalysisRequirement eventsReq = new TmfAnalysisEventRequirement(requiredEvents, PriorityLevel.MANDATORY);
+            TmfAbstractAnalysisRequirement eventsReq = new TmfAnalysisEventRequirement(requiredEvents, PriorityLevel.MANDATORY);
             /*
              * In order to have these events, the libc wrapper with probes should be
              * loaded

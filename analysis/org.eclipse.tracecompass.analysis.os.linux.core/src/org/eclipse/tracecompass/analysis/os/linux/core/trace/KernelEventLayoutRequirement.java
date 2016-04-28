@@ -13,8 +13,8 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisEventRequirement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.PriorityLevel;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement.PriorityLevel;
 
 import com.google.common.collect.ImmutableList.Builder;
 
@@ -69,7 +69,7 @@ public class KernelEventLayoutRequirement {
      *            The event layout from which to build the requirements.
      * @return The real requirement
      */
-    public TmfAnalysisRequirement instanciateRequirements(IKernelAnalysisEventLayout layout) {
+    public TmfAbstractAnalysisRequirement instanciateRequirements(IKernelAnalysisEventLayout layout) {
         Builder<String> events = new Builder<>();
         for (ILayoutToEventName eventNameLayout : fEventNames) {
             String eventName = eventNameLayout.getEventName(layout);

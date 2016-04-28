@@ -16,7 +16,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryAnalysisModule;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class UstMemoryAnalysisModuleTest {
     @Ignore("Need to assign a trace to the module to check the requirements now")
     @Test
     public void testGetAnalysisRequirements() {
-        Iterable<TmfAnalysisRequirement> requirements = fUstAnalysisModule.getAnalysisRequirements();
+        Iterable<TmfAbstractAnalysisRequirement> requirements = fUstAnalysisModule.getAnalysisRequirements();
 
         assertNotNull(requirements);
         assertTrue(requirements.iterator().hasNext());

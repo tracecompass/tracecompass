@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.internal.lttng2.ust.core.callstack.LttngUstCallS
 import org.eclipse.tracecompass.internal.lttng2.ust.ui.analysis.callstack.LttngUstCallStackAnalysisRequirement;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -39,7 +39,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class LttngUstCallStackAnalysis extends AbstractCallStackAnalysis {
 
-    private @Nullable Set<@NonNull TmfAnalysisRequirement> fAnalysisRequirements = null;
+    private @Nullable Set<@NonNull TmfAbstractAnalysisRequirement> fAnalysisRequirements = null;
 
     /**
      * @since 1.0
@@ -63,9 +63,9 @@ public class LttngUstCallStackAnalysis extends AbstractCallStackAnalysis {
     }
 
     @Override
-    public @NonNull Iterable<@NonNull TmfAnalysisRequirement> getAnalysisRequirements() {
+    public @NonNull Iterable<@NonNull TmfAbstractAnalysisRequirement> getAnalysisRequirements() {
 
-        Set<@NonNull TmfAnalysisRequirement> requirements = fAnalysisRequirements;
+        Set<@NonNull TmfAbstractAnalysisRequirement> requirements = fAnalysisRequirements;
         if (requirements == null) {
             LttngUstTrace trace = getTrace();
             ILttngUstEventLayout layout = ILttngUstEventLayout.DEFAULT_LAYOUT;

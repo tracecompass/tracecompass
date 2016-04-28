@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfEventTypeCollectionHelper;
  * @author Geneviève Bastien
  * @since 2.0
  */
-public class TmfAnalysisEventRequirement extends TmfAnalysisRequirement {
+public class TmfAnalysisEventRequirement extends TmfAbstractAnalysisRequirement {
 
     /**
      * Constructor for an optional requirement

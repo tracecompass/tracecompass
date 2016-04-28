@@ -23,9 +23,9 @@ import com.google.common.collect.ImmutableList;
  * @author Geneviève Bastien
  * @since 2.0
  */
-public class TmfCompositeAnalysisRequirement extends TmfAnalysisRequirement {
+public class TmfCompositeAnalysisRequirement extends TmfAbstractAnalysisRequirement {
 
-    private final Collection<TmfAnalysisRequirement> fSubReqs;
+    private final Collection<TmfAbstractAnalysisRequirement> fSubReqs;
 
     /**
      * Constructor with sub requirements
@@ -35,14 +35,14 @@ public class TmfCompositeAnalysisRequirement extends TmfAnalysisRequirement {
      * @param level
      *            The level of this requirement
      */
-    public TmfCompositeAnalysisRequirement(Collection<TmfAnalysisRequirement> subRequirements, PriorityLevel level) {
+    public TmfCompositeAnalysisRequirement(Collection<TmfAbstractAnalysisRequirement> subRequirements, PriorityLevel level) {
         super(Collections.EMPTY_SET, level);
         fSubReqs = ImmutableList.copyOf(subRequirements);
     }
 
     @Override
     public boolean test(ITmfTrace trace) {
-        Collection<TmfAnalysisRequirement> subReqs = fSubReqs;
+        Collection<TmfAbstractAnalysisRequirement> subReqs = fSubReqs;
         if (subReqs.isEmpty()) {
             return true;
         }

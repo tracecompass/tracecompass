@@ -17,7 +17,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisEventFieldRequirement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfCompositeAnalysisRequirement;
 
 import com.google.common.collect.ImmutableSet;
@@ -43,7 +43,7 @@ public class LttngUstCallStackAnalysisRequirement extends TmfCompositeAnalysisRe
         addInformation(nullToEmptyString(Messages.LttnUstCallStackAnalysisModule_EventsLoadingInformation));
     }
 
-    private static Collection<TmfAnalysisRequirement> getSubRequirements(ILttngUstEventLayout layout) {
+    private static Collection<TmfAbstractAnalysisRequirement> getSubRequirements(ILttngUstEventLayout layout) {
         Set<@NonNull String> requiredEventsFields = ImmutableSet.of(
                 layout.contextProcname(),
                 layout.contextVtid());
@@ -54,12 +54,12 @@ public class LttngUstCallStackAnalysisRequirement extends TmfCompositeAnalysisRe
                 requiredEventsFields,
                 PriorityLevel.MANDATORY);
 
-        TmfAnalysisRequirement exitReq = new TmfAnalysisEventFieldRequirement(
+        TmfAbstractAnalysisRequirement exitReq = new TmfAnalysisEventFieldRequirement(
                 layout.eventCygProfileFuncExit(),
                 requiredEventsFields,
                 PriorityLevel.MANDATORY);
 
-        TmfAnalysisRequirement cygProfile = new TmfCompositeAnalysisRequirement(ImmutableSet.of(entryReq, exitReq), PriorityLevel.MANDATORY);
+        TmfAbstractAnalysisRequirement cygProfile = new TmfCompositeAnalysisRequirement(ImmutableSet.of(entryReq, exitReq), PriorityLevel.MANDATORY);
 
         // Requirement for the cyg_profile_fast events
         entryReq = new TmfAnalysisEventFieldRequirement(
@@ -71,7 +71,7 @@ public class LttngUstCallStackAnalysisRequirement extends TmfCompositeAnalysisRe
                 layout.eventCygProfileFastFuncExit(),
                 requiredEventsFields,
                 PriorityLevel.MANDATORY);
-        TmfAnalysisRequirement cygProfileFast = new TmfCompositeAnalysisRequirement(ImmutableSet.of(entryReq, exitReq), PriorityLevel.MANDATORY);
+        TmfAbstractAnalysisRequirement cygProfileFast = new TmfCompositeAnalysisRequirement(ImmutableSet.of(entryReq, exitReq), PriorityLevel.MANDATORY);
 
         return ImmutableSet.of(cygProfile, cygProfileFast);
     }

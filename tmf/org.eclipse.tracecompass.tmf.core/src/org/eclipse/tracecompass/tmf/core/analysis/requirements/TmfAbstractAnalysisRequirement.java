@@ -36,7 +36,7 @@ import com.google.common.collect.ImmutableSet;
  * @author Geneviève Bastien
  * @since 2.0
  */
-public class TmfAnalysisRequirement implements Predicate<ITmfTrace> {
+public abstract class TmfAbstractAnalysisRequirement implements Predicate<ITmfTrace> {
 
     private final Set<@NonNull String> fValues = new HashSet<>();
     private final Set<@NonNull String> fInformation = new HashSet<>();
@@ -68,7 +68,7 @@ public class TmfAnalysisRequirement implements Predicate<ITmfTrace> {
      * @param level
      *            A level associated with all the values
      */
-    public TmfAnalysisRequirement(Collection<String> values, PriorityLevel level) {
+    public TmfAbstractAnalysisRequirement(Collection<String> values, PriorityLevel level) {
         fLevel = level;
         fValues.addAll(values);
     }
@@ -110,18 +110,6 @@ public class TmfAnalysisRequirement implements Predicate<ITmfTrace> {
      */
     public PriorityLevel getPriorityLevel() {
         return fLevel;
-    }
-
-    /**
-     * Verifies whether a trace fulfills this requirement
-     *
-     * @param trace
-     *            The trace on which to check for this requirement
-     * @return True if the trace has all mandatory values of this requirement
-     */
-    @Override
-    public boolean test(ITmfTrace trace) {
-        return true;
     }
 
     @Override

@@ -28,7 +28,7 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisModuleHelperConfigElement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -354,8 +354,8 @@ public class AnalysisModuleHelperTest {
      */
     @Test
     public void testGetRequirements() {
-        Iterable<TmfAnalysisRequirement> requirements = fReqModule.getAnalysisRequirements();
-        Set<TmfAnalysisRequirement> expected = ImmutableSet.of(
+        Iterable<TmfAbstractAnalysisRequirement> requirements = fReqModule.getAnalysisRequirements();
+        Set<TmfAbstractAnalysisRequirement> expected = ImmutableSet.of(
                 AnalysisRequirementFactory.REQUIREMENT_1,
                 AnalysisRequirementFactory.REQUIREMENT_3);
 

@@ -28,5 +28,5 @@ public interface IAnalysisRequirementProvider {
      *
      * @return List of requirement
      */
-    Iterable<TmfAnalysisRequirement> getAnalysisRequirements();
+    Iterable<TmfAbstractAnalysisRequirement> getAnalysisRequirements();
 }
