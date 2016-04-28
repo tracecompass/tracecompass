@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -186,7 +186,7 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
         if (other == null) {
             return false;
         }
-        if (!(other instanceof TmfProjectModelElement)) {
+        if (!(other.getClass().equals(this.getClass()))) {
             return false;
         }
         TmfProjectModelElement element = (TmfProjectModelElement) other;
