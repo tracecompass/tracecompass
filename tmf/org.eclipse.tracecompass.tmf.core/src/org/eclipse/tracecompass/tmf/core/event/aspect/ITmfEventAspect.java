@@ -13,6 +13,7 @@
 
 package org.eclipse.tracecompass.tmf.core.event.aspect;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
@@ -67,12 +68,31 @@ public interface ITmfEventAspect<T> {
      * events of your own trace type. It is perfectly fine to return
      * {@link #EMPTY_STRING} for event types you don't support.
      *
-     * You also can (and should) provide a more specific return type than
-     * Object.
-     *
      * @param event
      *            The event to process
      * @return The resulting tidbit of information for this event.
      */
     @Nullable T resolve(ITmfEvent event);
+
+    /**
+     * This method will return the same result as {@link #resolve(ITmfEvent)},
+     * but it allows to specify whether to wait until the requested information
+     * is available.
+     *
+     * @param event
+     *            The event to process
+     * @param block
+     *            Whether to block if the requested information is not yet
+     *            available but will be later.
+     * @param monitor
+     *            The progress monitor, to be used by implementation to verify
+     *            the cancellation of the current thread
+     * @return The resulting tidbit of information for this event.
+     * @throws InterruptedException
+     *             If any thread has interrupted the current thread
+     * @since 2.0
+     */
+    default @Nullable T resolve(ITmfEvent event, boolean block, IProgressMonitor monitor) throws InterruptedException {
+        return resolve(event);
+    }
 }
