@@ -18,7 +18,7 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisEventRequirement;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.ValuePriorityLevel;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.PriorityLevel;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
@@ -108,17 +108,17 @@ public class AnalysisEventRequirementTest {
     @Test
     public void testMandatoryRequirements() {
         /* Test mandatory requirement */
-        TmfAnalysisRequirement req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1), ValuePriorityLevel.MANDATORY);
+        TmfAnalysisRequirement req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1), PriorityLevel.MANDATORY);
         assertTrue(req.test(fTrace));
 
-        req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT2), ValuePriorityLevel.MANDATORY);
+        req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT2), PriorityLevel.MANDATORY);
         assertTrue(req.test(fTrace));
 
         /* Event 3 is not an event of the trace */
-        req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT2, EVENT3), ValuePriorityLevel.MANDATORY);
+        req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT2, EVENT3), PriorityLevel.MANDATORY);
         assertFalse(req.test(fTrace));
 
-        req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT3), ValuePriorityLevel.MANDATORY);
+        req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT3), PriorityLevel.MANDATORY);
         assertFalse(req.test(fTrace));
     }
 
@@ -131,10 +131,10 @@ public class AnalysisEventRequirementTest {
         /* A simple trace with no pre-defined events */
         TmfTrace traceNoEvents = new TmfTraceStub();
 
-        TmfAnalysisRequirement req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT3), ValuePriorityLevel.MANDATORY);
+        TmfAnalysisRequirement req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT3), PriorityLevel.MANDATORY);
         assertTrue(req.test(traceNoEvents));
 
-        req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT2), ValuePriorityLevel.OPTIONAL);
+        req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT2), PriorityLevel.OPTIONAL);
         assertTrue(req.test(traceNoEvents));
 
     }

@@ -12,7 +12,6 @@
 
 package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.kernel;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -20,14 +19,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
-import org.eclipse.tracecompass.lttng2.control.core.session.SessionConfigStrings;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestHelper;
@@ -37,10 +33,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Test the {@link KernelAnalysisModule} class
@@ -126,65 +119,4 @@ public class LttngKernelAnalysisTest {
         trace.dispose();
     }
 
-    /**
-     * Test for {@link KernelAnalysisModule#getAnalysisRequirements()}
-     *
-     * FIXME Ignored for now because the analysis does not provide any
-     * requirements (it doesn't look for particular event names anymore).
-     */
-    @Test
-    @Ignore
-    public void testGetAnalysisRequirements() {
-        Iterable<TmfAnalysisRequirement> requirements = fKernelAnalysisModule.getAnalysisRequirements();
-        assertNotNull(requirements);
-
-        /* There should be the event and domain type */
-        TmfAnalysisRequirement eventReq = null;
-        TmfAnalysisRequirement domainReq = null;
-        int numberOfRequirement = 0;
-        for (TmfAnalysisRequirement requirement : requirements) {
-            ++numberOfRequirement;
-            if (requirement.getType().equals(SessionConfigStrings.CONFIG_ELEMENT_EVENT)) {
-                eventReq = requirement;
-            } else if (requirement.getType().equals(SessionConfigStrings.CONFIG_ELEMENT_DOMAIN)) {
-                domainReq = requirement;
-            }
-        }
-        assertNotNull(eventReq);
-        assertNotNull(domainReq);
-
-        /* There should be two requirements */
-        assertEquals(2, numberOfRequirement);
-
-        /* Verify the content of the requirements themselves */
-        /* Domain should be kernel */
-        assertEquals(1, domainReq.getValues().size());
-        for (String domain : domainReq.getValues()) {
-            assertEquals(SessionConfigStrings.CONFIG_DOMAIN_TYPE_KERNEL, domain);
-        }
-
-        /* Events */
-        Set<String> expectedEvents = ImmutableSet.of(
-//                LttngStrings.EXIT_SYSCALL,
-//                LttngStrings.IRQ_HANDLER_ENTRY,
-//                LttngStrings.IRQ_HANDLER_EXIT,
-//                LttngStrings.SOFTIRQ_ENTRY,
-//                LttngStrings.SOFTIRQ_EXIT,
-//                LttngStrings.SOFTIRQ_RAISE,
-//                LttngStrings.SCHED_SWITCH,
-//                LttngStrings.SCHED_PROCESS_FORK,
-//                LttngStrings.SCHED_PROCESS_EXIT,
-//                LttngStrings.SCHED_PROCESS_FREE,
-//                LttngStrings.STATEDUMP_PROCESS_STATE,
-//                LttngStrings.SCHED_WAKEUP,
-//                LttngStrings.SCHED_WAKEUP_NEW,
-//                /* Add the prefix for syscalls */
-//                LttngStrings.SYSCALL_PREFIX
-                );
-
-        assertEquals(0, eventReq.getValues().size());
-        for (String event : eventReq.getValues()) {
-            assertTrue("Unexpected event " + event, expectedEvents.contains(event));
-        }
-    }
 }

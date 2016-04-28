@@ -12,16 +12,17 @@
 
 package org.eclipse.tracecompass.tmf.tests.stubs.analysis;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.ValuePriorityLevel;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Analysis type to test requirements acquisition
@@ -29,17 +30,17 @@ import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
 @SuppressWarnings({ "javadoc", "nls" })
 public class TestRequirementAnalysis extends TmfAbstractAnalysisModule {
     /* Test requirement types */
-    public static final String EVENT_TYPE = "event";
-    public static final String FIELD_TYPE = "field";
+    public static final @NonNull String EVENT_TYPE = "event";
+    public static final @NonNull String FIELD_TYPE = "field";
 
     /* A few event names */
-    public static final String EXIT_SYSCALL = "exit_syscall";
-    public static final String SCHED_SWITCH = "sched_switch";
-    public static final String SCHED_WAKEUP = "sched_wakeup";
+    public static final @NonNull String EXIT_SYSCALL = "exit_syscall";
+    public static final @NonNull String SCHED_SWITCH = "sched_switch";
+    public static final @NonNull String SCHED_WAKEUP = "sched_wakeup";
 
     /* A few fields */
-    public static final String PID = "pid";
-    public static final String TID = "tid";
+    public static final @NonNull String PID = "pid";
+    public static final @NonNull String TID = "tid";
 
     @Override
     public boolean canExecute(ITmfTrace trace) {
@@ -64,21 +65,10 @@ public class TestRequirementAnalysis extends TmfAbstractAnalysisModule {
 
     @Override
     public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
-        Map<String, TmfAnalysisRequirement> requirements = new HashMap<>();
+        Set<TmfAnalysisRequirement> requirements = ImmutableSet.of(
+                AnalysisRequirementFactory.REQUIREMENT_1,
+                AnalysisRequirementFactory.REQUIREMENT_3);
 
-        /* Event type requirement and values */
-        TmfAnalysisRequirement eventReqs = new TmfAnalysisRequirement(EVENT_TYPE);
-        eventReqs.addValue(EXIT_SYSCALL, ValuePriorityLevel.MANDATORY);
-        eventReqs.addValue(SCHED_SWITCH, ValuePriorityLevel.MANDATORY);
-        eventReqs.addValue(SCHED_WAKEUP, ValuePriorityLevel.MANDATORY);
-        requirements.put(EVENT_TYPE, eventReqs);
-
-        /* Field type requirement and values */
-        TmfAnalysisRequirement fieldReqs = new TmfAnalysisRequirement(FIELD_TYPE);
-        fieldReqs.addValue(PID, ValuePriorityLevel.MANDATORY);
-        fieldReqs.addValue(TID, ValuePriorityLevel.MANDATORY);
-        requirements.put(FIELD_TYPE, fieldReqs);
-
-        return requirements.values();
+        return requirements;
     }
 }

@@ -37,7 +37,6 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.ValuePriorityLevel;
 import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
@@ -508,9 +507,9 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
         for (TmfAnalysisRequirement requirement : getAnalysisRequirements()) {
             if (!requirement.test(trace)) {
                 builder.append("\n\n"); //$NON-NLS-1$
-                builder.append(NLS.bind(Messages.TmfAnalysis_RequirementNotFulfilled, requirement.getType()));
+                builder.append(NLS.bind(Messages.TmfAnalysis_RequirementNotFulfilled, requirement.getPriorityLevel()));
                 builder.append("\n"); //$NON-NLS-1$
-                builder.append(NLS.bind(Messages.TmfAnalysis_RequirementMandatoryValues, requirement.getValues(ValuePriorityLevel.MANDATORY)));
+                builder.append(NLS.bind(Messages.TmfAnalysis_RequirementMandatoryValues, requirement.getValues()));
                 Set<String> information = requirement.getInformation();
                 if (!information.isEmpty()) {
                     builder.append("\n"); //$NON-NLS-1$

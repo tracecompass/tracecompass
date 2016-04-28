@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.tmf.core.analysis.requirements;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -31,8 +33,8 @@ public class TmfAnalysisEventRequirement extends TmfAnalysisRequirement {
      * @param eventNames
      *            The list of event names the trace must have
      */
-    public TmfAnalysisEventRequirement(Iterable<String> eventNames) {
-        super(TmfAnalysisRequirement.TYPE_EVENT, eventNames, ValuePriorityLevel.OPTIONAL);
+    public TmfAnalysisEventRequirement(Collection<String> eventNames) {
+        super(eventNames, PriorityLevel.OPTIONAL);
     }
 
     /**
@@ -44,16 +46,17 @@ public class TmfAnalysisEventRequirement extends TmfAnalysisRequirement {
      * @param level
      *            A level associated with all the values
      */
-    public TmfAnalysisEventRequirement(Iterable<String> eventNames, ValuePriorityLevel level) {
-        super(TmfAnalysisRequirement.TYPE_EVENT, eventNames, level);
+    public TmfAnalysisEventRequirement(Collection<String> eventNames, PriorityLevel level) {
+        super(eventNames, level);
     }
 
     @Override
     public boolean test(ITmfTrace trace) {
 
+        // TODO: implement for all levels
         if (trace instanceof ITmfTraceWithPreDefinedEvents) {
             Set<String> traceEvents = TmfEventTypeCollectionHelper.getEventNames(((ITmfTraceWithPreDefinedEvents) trace).getContainedEventTypes());
-            Set<String> mandatoryValues = getValues(ValuePriorityLevel.MANDATORY);
+            Set<String> mandatoryValues = getPriorityLevel().equals(PriorityLevel.MANDATORY) ? getValues() : Collections.EMPTY_SET;
             return traceEvents.containsAll(mandatoryValues);
         }
 

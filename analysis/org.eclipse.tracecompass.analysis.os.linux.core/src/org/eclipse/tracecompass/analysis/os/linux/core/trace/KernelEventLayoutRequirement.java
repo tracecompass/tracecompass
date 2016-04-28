@@ -14,7 +14,7 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisEventRequirement;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.ValuePriorityLevel;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.PriorityLevel;
 
 import com.google.common.collect.ImmutableList.Builder;
 
@@ -45,7 +45,7 @@ public class KernelEventLayoutRequirement {
     }
 
     private final Set<ILayoutToEventName> fEventNames;
-    private final ValuePriorityLevel fLevel;
+    private final PriorityLevel fLevel;
 
     /**
      * Constructor
@@ -56,7 +56,7 @@ public class KernelEventLayoutRequirement {
      *            Whether the requirement represented by these mapping is
      *            mandatory or optional
      */
-    public KernelEventLayoutRequirement(Set<ILayoutToEventName> layoutReqs, ValuePriorityLevel level) {
+    public KernelEventLayoutRequirement(Set<ILayoutToEventName> layoutReqs, PriorityLevel level) {
         fEventNames = layoutReqs;
         fLevel = level;
     }

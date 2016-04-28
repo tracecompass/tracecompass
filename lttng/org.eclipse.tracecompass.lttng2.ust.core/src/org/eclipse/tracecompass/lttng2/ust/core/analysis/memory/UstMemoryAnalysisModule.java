@@ -21,11 +21,11 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryStateProvider;
-import org.eclipse.tracecompass.lttng2.control.core.session.SessionConfigStrings;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisEventRequirement;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.ValuePriorityLevel;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.PriorityLevel;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -92,8 +92,7 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
                   );
 
             /* Initialize the requirements for the analysis: domain and events */
-            TmfAnalysisRequirement eventsReq = new TmfAnalysisRequirement(
-                    nullToEmptyString(SessionConfigStrings.CONFIG_ELEMENT_EVENT), requiredEvents, ValuePriorityLevel.MANDATORY);
+            TmfAnalysisRequirement eventsReq = new TmfAnalysisEventRequirement(requiredEvents, PriorityLevel.MANDATORY);
             /*
              * In order to have these events, the libc wrapper with probes should be
              * loaded
@@ -102,10 +101,11 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
             eventsReq.addInformation(nullToEmptyString(Messages.UstMemoryAnalysisModule_EventsLoadingExampleInformation));
 
             /* The domain type of the analysis */
-            TmfAnalysisRequirement domainReq = new TmfAnalysisRequirement(nullToEmptyString(SessionConfigStrings.CONFIG_ELEMENT_DOMAIN));
-            domainReq.addValue(nullToEmptyString(SessionConfigStrings.CONFIG_DOMAIN_TYPE_UST), ValuePriorityLevel.MANDATORY);
+            // FIXME: The domain requirement should have a way to be verified. It is useless otherwise
+            // TmfAnalysisRequirement domainReq = new TmfAnalysisRequirement(nullToEmptyString(SessionConfigStrings.CONFIG_ELEMENT_DOMAIN));
+            // domainReq.addValue(nullToEmptyString(SessionConfigStrings.CONFIG_DOMAIN_TYPE_UST), ValuePriorityLevel.MANDATORY);
 
-            requirements = ImmutableSet.of(domainReq, eventsReq);
+            requirements = ImmutableSet.of(eventsReq);
             fAnalysisRequirements = requirements;
         }
         return requirements;

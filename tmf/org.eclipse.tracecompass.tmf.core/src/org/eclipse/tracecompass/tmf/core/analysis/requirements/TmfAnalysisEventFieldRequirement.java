@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.tmf.core.analysis.requirements;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -27,9 +28,6 @@ import com.google.common.collect.Multimap;
  */
 public class TmfAnalysisEventFieldRequirement extends TmfAnalysisRequirement {
 
-    /** The type of requirement */
-    private static final String TYPE_EVENT_FIELD = "field"; //$NON-NLS-1$
-
     /** The event name of the event containing the mandatory fields */
     private String fEventName;
 
@@ -44,7 +42,7 @@ public class TmfAnalysisEventFieldRequirement extends TmfAnalysisRequirement {
      *            The list of event field names the trace must have
      */
     public TmfAnalysisEventFieldRequirement(String eventName, Collection<String> fields) {
-        this(eventName, fields, ValuePriorityLevel.OPTIONAL);
+        this(eventName, fields, PriorityLevel.OPTIONAL);
     }
 
     /**
@@ -61,15 +59,16 @@ public class TmfAnalysisEventFieldRequirement extends TmfAnalysisRequirement {
      *            A level associated with all the values
      * @throws IllegalArgumentException if no event names are provided
      */
-    public TmfAnalysisEventFieldRequirement(String eventName, Collection<String> fields, ValuePriorityLevel level) {
-        super(TYPE_EVENT_FIELD, fields, level);
+    public TmfAnalysisEventFieldRequirement(String eventName, Collection<String> fields, PriorityLevel level) {
+        super(fields, level);
         fEventName = eventName;
     }
 
     @Override
     public boolean test(ITmfTrace trace) {
         if ((trace instanceof ITmfTraceWithPreDefinedEvents)) {
-            Set<String> mandatoryValues = getValues(ValuePriorityLevel.MANDATORY);
+            // TODO Implement for all levels of requirements
+            Set<String> mandatoryValues = getPriorityLevel().equals(PriorityLevel.MANDATORY) ? getValues() : Collections.EMPTY_SET;
             if (mandatoryValues.isEmpty()) {
                 return true;
             }

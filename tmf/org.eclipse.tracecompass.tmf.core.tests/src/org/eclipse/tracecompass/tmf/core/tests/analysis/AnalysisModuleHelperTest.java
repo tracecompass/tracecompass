@@ -20,8 +20,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Platform;
@@ -36,9 +34,9 @@ import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
+import org.eclipse.tracecompass.tmf.tests.stubs.analysis.AnalysisRequirementFactory;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestAnalysis;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestAnalysis2;
-import org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestRequirementAnalysis;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub2;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub3;
@@ -357,32 +355,10 @@ public class AnalysisModuleHelperTest {
     @Test
     public void testGetRequirements() {
         Iterable<TmfAnalysisRequirement> requirements = fReqModule.getAnalysisRequirements();
-        assertNotNull(requirements);
+        Set<TmfAnalysisRequirement> expected = ImmutableSet.of(
+                AnalysisRequirementFactory.REQUIREMENT_1,
+                AnalysisRequirementFactory.REQUIREMENT_3);
 
-        Map<String, TmfAnalysisRequirement> rMap = new HashMap<>();
-
-        for (TmfAnalysisRequirement req : requirements) {
-            assertFalse(rMap.containsKey(req.getType()));
-            rMap.put(req.getType(), req);
-        }
-        assertEquals(2, rMap.size());
-
-        /* Test if all types and values have been obtained */
-        TmfAnalysisRequirement req = rMap.get(TestRequirementAnalysis.EVENT_TYPE);
-        assertNotNull(req);
-
-        Set<String> values = req.getValues();
-        assertEquals(3, values.size());
-        assertTrue(values.contains(TestRequirementAnalysis.EXIT_SYSCALL));
-        assertTrue(values.contains(TestRequirementAnalysis.SCHED_SWITCH));
-        assertTrue(values.contains(TestRequirementAnalysis.SCHED_WAKEUP));
-
-        req = rMap.get(TestRequirementAnalysis.FIELD_TYPE);
-        assertNotNull(req);
-
-        values = req.getValues();
-        assertEquals(2, values.size());
-        assertTrue(values.contains(TestRequirementAnalysis.PID));
-        assertTrue(values.contains(TestRequirementAnalysis.TID));
+        assertEquals(expected, requirements);
     }
 }

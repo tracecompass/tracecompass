@@ -39,7 +39,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.ValuePriorityLevel;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.PriorityLevel;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -72,7 +72,7 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
     private static final SetMultimap<IKernelAnalysisEventLayout, TmfAnalysisRequirement> LAYOUT_REQ_MAP = NonNullUtils.checkNotNull(HashMultimap.create());
 
     static {
-        LAYOUT_REQUIREMENT = new KernelEventLayoutRequirement(ImmutableSet.of((l) -> l.eventSchedSwitch()), ValuePriorityLevel.MANDATORY);
+        LAYOUT_REQUIREMENT = new KernelEventLayoutRequirement(ImmutableSet.of((l) -> l.eventSchedSwitch()), PriorityLevel.MANDATORY);
     }
 
     private static IKernelAnalysisEventLayout getLayout(@Nullable ITmfTrace trace) {

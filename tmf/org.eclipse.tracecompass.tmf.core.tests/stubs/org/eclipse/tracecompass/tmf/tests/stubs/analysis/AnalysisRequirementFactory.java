@@ -16,7 +16,7 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.ValuePriorityLevel;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisRequirement.PriorityLevel;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -28,10 +28,6 @@ import com.google.common.collect.ImmutableSet;
 public final class AnalysisRequirementFactory {
 
     private AnalysisRequirementFactory() {}
-
-    public static final String REQUIREMENT_TYPE_1 = "car";
-    public static final String REQUIREMENT_TYPE_2 = "factory";
-    public static final String REQUIREMENT_TYPE_3 = "code";
 
     public static final String REQUIREMENT_VALUE_1 = "value1";
     public static final String REQUIREMENT_VALUE_2 = "value2";
@@ -58,17 +54,10 @@ public final class AnalysisRequirementFactory {
             );
 
     public static final TmfAnalysisRequirement REQUIREMENT_1 =
-            new TmfAnalysisRequirement(REQUIREMENT_TYPE_1, REQUIREMENT_VALUES_1, ValuePriorityLevel.MANDATORY);
+            new TmfAnalysisRequirement(REQUIREMENT_VALUES_1, PriorityLevel.MANDATORY);
     public static final TmfAnalysisRequirement REQUIREMENT_2 =
-            new TmfAnalysisRequirement(REQUIREMENT_TYPE_2);
+            new TmfAnalysisRequirement(REQUIREMENT_VALUES_2, PriorityLevel.MANDATORY);
     public static final TmfAnalysisRequirement REQUIREMENT_3 =
-            new TmfAnalysisRequirement(REQUIREMENT_TYPE_3, REQUIREMENT_VALUES_3, ValuePriorityLevel.MANDATORY);
+            new TmfAnalysisRequirement(REQUIREMENT_VALUES_3, PriorityLevel.MANDATORY);
 
-    static {
-        REQUIREMENT_2.addValue(REQUIREMENT_VALUE_1, ValuePriorityLevel.MANDATORY);
-        REQUIREMENT_2.addValue(REQUIREMENT_VALUE_2, ValuePriorityLevel.OPTIONAL);
-        REQUIREMENT_2.addValue(REQUIREMENT_VALUE_3, ValuePriorityLevel.MANDATORY);
-        REQUIREMENT_2.addValue(REQUIREMENT_VALUE_4, ValuePriorityLevel.OPTIONAL);
-        REQUIREMENT_2.addValue(REQUIREMENT_VALUE_5, ValuePriorityLevel.MANDATORY);
-    }
 }
