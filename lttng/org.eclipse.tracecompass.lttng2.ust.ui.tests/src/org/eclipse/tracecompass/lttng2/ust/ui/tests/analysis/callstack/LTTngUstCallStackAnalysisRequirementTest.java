@@ -83,7 +83,8 @@ public class LTTngUstCallStackAnalysisRequirementTest {
         TRACE_WITH_VALID_EVENTS_WRONG_FIELDS(EventType.EVT_ENTRY_FAST_EMPTY_FIELDS,
                 EventType.EVT_EXIT_FAST, false),
         TRACE_WITH_MISSING_EVENTS(EventType.EVT_OTHER,
-                    EventType.EVT_EXIT_FAST, false);
+                    EventType.EVT_EXIT_FAST, false),
+        TRACE_MISMATCH_EVENTS(EventType.EVT_ENTRY_FAST, EventType.EVT_EXIT, false);
 
         private final @NonNull LttngUstTrace fTrace;
         private final boolean fIsValid;
