@@ -12,12 +12,15 @@
 
 package org.eclipse.tracecompass.internal.lttng2.kernel.core;
 
+import java.io.IOException;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpEventMatching;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.ConfigFileLamiAnalysisFactory.ConfigFileLamiAnalysisFactoryException;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
 import org.osgi.framework.BundleContext;
 
@@ -76,6 +79,13 @@ public class Activator extends Plugin {
         plugin = this;
         TmfEventMatching.registerMatchObject(new TcpEventMatching());
         TmfEventMatching.registerMatchObject(new TcpLttngEventMatching());
+
+        try {
+            LttngAnalysesLoader.load();
+        } catch (ConfigFileLamiAnalysisFactoryException | IOException e) {
+            // Not the end of the world if the analyses are not available
+            logWarning("Cannot find LTTng analyses configuration files: " + e.getMessage()); //$NON-NLS-1$
+        }
     }
 
     @Override

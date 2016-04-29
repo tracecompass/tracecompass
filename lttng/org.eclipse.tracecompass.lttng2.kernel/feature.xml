@@ -45,6 +45,20 @@
    </requires>
 
    <plugin
+         id="org.eclipse.tracecompass.analysis.lami.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.tracecompass.analysis.lami.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="org.eclipse.tracecompass.analysis.os.linux.core"
          download-size="0"
          install-size="0"

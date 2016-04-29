@@ -11,8 +11,7 @@ package org.eclipse.tracecompass.tmf.core.analysis.ondemand;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,7 +59,7 @@ public final class OnDemandAnalysisManager {
                     }
             }));
 
-    private final List<OndemandAnalysisWrapper> fAnalysisWrappers;
+    private final Set<OndemandAnalysisWrapper> fAnalysisWrappers;
 
     /**
      * Internal class used to store extension point information
@@ -92,7 +91,7 @@ public final class OnDemandAnalysisManager {
      * Private constructor, should only be called via {@link #getInstance()}.
      */
     private OnDemandAnalysisManager() {
-        fAnalysisWrappers = new ArrayList<>();
+        fAnalysisWrappers = new HashSet<>();
         IConfigurationElement[] configElements = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_POINT_ID);
 
         for (IConfigurationElement element : configElements) {
@@ -119,5 +118,15 @@ public final class OnDemandAnalysisManager {
      */
     public Set<IOnDemandAnalysis> getOndemandAnalyses(ITmfTrace trace) {
         return checkNotNull(analysisCache.getUnchecked(trace));
+    }
+
+    /**
+     * Registers an on-demand analysis to this manager.
+     *
+     * @param analysis
+     *            On-demand analysis to register
+     */
+    public void registerAnalysis(IOnDemandAnalysis analysis) {
+        fAnalysisWrappers.add(new OndemandAnalysisWrapper(analysis));
     }
 }
