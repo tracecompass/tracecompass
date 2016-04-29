@@ -111,7 +111,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
 
                 Map<String, String> args = event.getContent().getFieldNames().stream()
                     .collect(Collectors.toMap(Function.identity(),
-                            input -> checkNotNull(event.getContent().getField(input).getValue().toString())));
+                            input -> checkNotNull(event.getContent().getField(input).toString())));
 
                 SystemCall.InitialInfo newSysCall = new SystemCall.InitialInfo(startTime, checkNotNull(syscallName), checkNotNull(args));
                 fOngoingSystemCalls.put(tid, newSysCall);
