@@ -67,9 +67,9 @@ public class TcpEventMatching implements ITmfMatchEventDefinition {
 
         /* Is the event a tcp socket in or out event */
         if (evname.equals(TcpEventStrings.INET_SOCK_LOCAL_IN)) {
-            return Direction.CAUSE;
-        } else if (evname.equals(TcpEventStrings.INET_SOCK_LOCAL_OUT)) {
             return Direction.EFFECT;
+        } else if (evname.equals(TcpEventStrings.INET_SOCK_LOCAL_OUT)) {
+            return Direction.CAUSE;
         }
         return null;
     }

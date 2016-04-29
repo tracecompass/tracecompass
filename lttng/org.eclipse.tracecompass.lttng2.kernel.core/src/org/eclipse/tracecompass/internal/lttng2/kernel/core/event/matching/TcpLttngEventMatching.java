@@ -82,9 +82,9 @@ public class TcpLttngEventMatching implements ITmfMatchEventDefinition {
 
         /* Is the event a tcp socket in or out event */
         if (evname.equals(TcpEventStrings.NETIF_RECEIVE_SKB) && canMatchPacket(event)) {
-            return Direction.CAUSE;
-        } else if (evname.equals(TcpEventStrings.NET_DEV_QUEUE) && canMatchPacket(event)) {
             return Direction.EFFECT;
+        } else if (evname.equals(TcpEventStrings.NET_DEV_QUEUE) && canMatchPacket(event)) {
+            return Direction.CAUSE;
         }
         return null;
     }

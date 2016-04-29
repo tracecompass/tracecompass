@@ -246,11 +246,11 @@ public class TmfEventMatching implements ITmfEventMatching {
 
         /* Point to the appropriate table */
         switch (evType) {
-        case CAUSE:
+        case EFFECT:
             unmatchedTbl = fUnmatchedIn;
             companionTbl = fUnmatchedOut;
             break;
-        case EFFECT:
+        case CAUSE:
             unmatchedTbl = fUnmatchedOut;
             companionTbl = fUnmatchedIn;
             break;
@@ -271,10 +271,10 @@ public class TmfEventMatching implements ITmfEventMatching {
 
                 /* Create the dependency object */
                 switch (evType) {
-                case CAUSE:
+                case EFFECT:
                     dep = new TmfEventDependency(companionEvent, event);
                     break;
-                case EFFECT:
+                case CAUSE:
                     dep = new TmfEventDependency(event, companionEvent);
                     break;
                 default:
