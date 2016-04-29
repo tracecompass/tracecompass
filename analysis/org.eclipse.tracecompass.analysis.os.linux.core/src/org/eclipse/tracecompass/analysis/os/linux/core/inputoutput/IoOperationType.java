@@ -13,7 +13,6 @@ package org.eclipse.tracecompass.analysis.os.linux.core.inputoutput;
  * Enum type for IO operations
  *
  * @author Geneviève Bastien
- * @since 2.0
  */
 public enum IoOperationType {
 

@@ -16,7 +16,6 @@ import org.eclipse.osgi.util.NLS;
  * Externalized message strings from the I/O Analysis
  *
  * @author Houssem Daoud
- * @since 2.0
  */
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.lttng2.kernel.core.inputoutput.analysis.messages"; //$NON-NLS-1$

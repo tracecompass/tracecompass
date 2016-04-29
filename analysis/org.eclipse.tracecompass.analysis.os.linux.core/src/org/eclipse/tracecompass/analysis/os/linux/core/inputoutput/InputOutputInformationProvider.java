@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
  *
  * @author Geneviève Bastien
  * @author Houssem Daoud
- * @since 2.0
  */
 public final class InputOutputInformationProvider {
 

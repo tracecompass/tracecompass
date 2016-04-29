@@ -28,7 +28,6 @@ import com.google.common.hash.Hashing;
  * SSD, a USB key, etc.
  *
  * @author Geneviève Bastien
- * @since 2.0
  */
 public class Disk {
 

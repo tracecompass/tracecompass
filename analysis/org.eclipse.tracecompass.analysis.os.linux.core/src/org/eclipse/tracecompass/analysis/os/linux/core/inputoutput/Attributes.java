@@ -19,8 +19,6 @@ package org.eclipse.tracecompass.analysis.os.linux.core.inputoutput;
  * be done on the viewer side.
  *
  * @author Houssem Daoud
- * @since 2.0
- *
  */
 @SuppressWarnings({ "nls" })
 public interface Attributes {

@@ -16,7 +16,6 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
  * State values that are used in the io analysis event handlers.
  *
  * @author Houssem Daoud
- * @since 2.0
  */
 public interface StateValues {
 

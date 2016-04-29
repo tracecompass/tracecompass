@@ -29,7 +29,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  * State System Module for Input Output traces
  *
  * @author Houssem Daoud
- * @since 2.0
  */
 public class InputOutputAnalysisModule extends TmfStateSystemAnalysisModule {
 
