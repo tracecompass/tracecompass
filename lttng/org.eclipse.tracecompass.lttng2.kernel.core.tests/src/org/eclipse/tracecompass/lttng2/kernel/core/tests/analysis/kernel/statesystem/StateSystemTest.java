@@ -19,6 +19,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -405,6 +406,70 @@ public abstract class StateSystemTest {
 
         /* There should be 5 sub-attributes for each Thread node */
         assertEquals(5, list.size());
+    }
+
+    @Test
+    public void testGetQuarks_middle_end() {
+        List<Integer> list = fixture.getQuarks(Attributes.THREADS, "*", "*");
+
+        /* There should be 169 threads and 5 sub-attributes per thread */
+        assertEquals(169 * 5, list.size());
+    }
+
+    @Test
+    public void testGetQuarks_empty() {
+        List<Integer> list = fixture.getQuarks();
+
+        assertEquals(Arrays.asList(ITmfStateSystem.ROOT_ATTRIBUTE), list);
+    }
+
+    @Test
+    public void testGetQuarks_relative() {
+        int threadsQuark = INVALID_ATTRIBUTE;
+        try {
+            threadsQuark = fixture.getQuarkAbsolute(Attributes.THREADS);
+        } catch (AttributeNotFoundException e) {
+            fail();
+        }
+        assertNotEquals(INVALID_ATTRIBUTE, threadsQuark);
+
+        List<Integer> list = fixture.getQuarks(threadsQuark, "*", Attributes.EXEC_NAME);
+
+        /* Number of different kernel threads in the trace */
+        assertEquals(169, list.size());
+    }
+
+    @Test
+    public void testGetQuarks_relative_up_wildcard() {
+        int threadsQuark = INVALID_ATTRIBUTE;
+        try {
+            threadsQuark = fixture.getQuarkAbsolute(Attributes.THREADS);
+        } catch (AttributeNotFoundException e) {
+            fail();
+        }
+        assertNotEquals(INVALID_ATTRIBUTE, threadsQuark);
+
+        List<Integer> list = fixture.getQuarks(threadsQuark, "..", Attributes.CPUS, "*");
+
+        /* There should be 2 CPUs */
+        assertEquals(2, list.size());
+    }
+
+    @Test
+    public void testGetQuarks_relative_empty() {
+        int threadsQuark = INVALID_ATTRIBUTE;
+        try {
+            threadsQuark = fixture.getQuarkAbsolute(Attributes.THREADS);
+        } catch (AttributeNotFoundException e) {
+            fail();
+        }
+        assertNotEquals(INVALID_ATTRIBUTE, threadsQuark);
+
+        List<Integer> list = fixture.getQuarks(threadsQuark, new String[0]);
+        assertEquals(Arrays.asList(threadsQuark), list);
+
+        list = fixture.getQuarks(threadsQuark);
+        assertEquals(Arrays.asList(threadsQuark), list);
     }
 
     @Test

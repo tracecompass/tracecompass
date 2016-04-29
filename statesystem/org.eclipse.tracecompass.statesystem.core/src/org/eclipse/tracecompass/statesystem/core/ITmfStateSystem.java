@@ -254,29 +254,58 @@ public interface ITmfStateSystem {
 
     /**
      * Batch quark-retrieving method. This method allows you to specify a path
-     * pattern which includes a wildcard "*" somewhere. It will check all the
-     * existing attributes in the attribute tree and return those who match the
-     * pattern.
-     *
+     * pattern which can include wildcard "*" or parent ".." elements. It will
+     * check all the existing attributes in the attribute tree and return those
+     * who match the pattern.
+     * <p>
      * For example, passing ("Threads", "*", "Exec_mode") will return the list
      * of quarks for attributes "Threads/1000/Exec_mode",
      * "Threads/1500/Exec_mode", and so on, depending on what exists at this
      * time in the attribute tree.
-     *
-     * If no wildcard is specified, the behavior is the same as
-     * getQuarkAbsolute() (except it will return a List with one entry). This
+     * <p>
+     * If no wildcard or parent element is specified, the behavior is the same
+     * as getQuarkAbsolute() (except it will return a List with one entry, or an
+     * empty list if there is no match instead of throwing an exception). This
      * method will never create new attributes.
      *
-     * Only one wildcard "*" is supported at this time.
-     *
      * @param pattern
-     *            The array of strings representing the pattern to look for. It
-     *            should ideally contain one entry that is only a "*".
-     * @return A List of attribute quarks, representing attributes that matched
-     *         the pattern. If no attribute matched, the list will be empty (but
-     *         not null).
+     *            The array of strings representing the pattern to look for.
+     * @return A List of unique attribute quarks, representing attributes that
+     *         matched the pattern. If no attribute matched, the list will be
+     *         empty (but not null). If the pattern is empty,
+     *         {@link #ROOT_ATTRIBUTE} is returned in the list.
      */
     @NonNull List<@NonNull Integer> getQuarks(String... pattern);
+
+    /**
+     * Relative batch quark-retrieving method. This method allows you to specify
+     * a path pattern which can include wildcard "*" or parent ".." elements. It
+     * will check all the existing attributes in the attribute tree and return
+     * those who match the pattern.
+     * <p>
+     * For example, passing (5, "Threads", "*", "Exec_mode") will return the
+     * list of quarks for attributes "<path of quark 5>/Threads/1000/Exec_mode",
+     * "<path of quark 5>/Threads/1500/Exec_mode", and so on, depending on what
+     * exists at this time in the attribute tree.
+     * <p>
+     * If no wildcard or parent element is specified, the behavior is the same
+     * as getQuarkRelative() (except it will return a List with one entry, or an
+     * empty list if there is no match instead of throwing an exception). This
+     * method will never create new attributes.
+     *
+     * @param startingNodeQuark
+     *            The quark of the attribute from which 'pattern' originates.
+     * @param pattern
+     *            The array of strings representing the pattern to look for.
+     * @return A List of unique attribute quarks, representing attributes that
+     *         matched the pattern. If no attribute matched, the list will be
+     *         empty (but not null). If the pattern is empty, the starting node
+     *         quark is returned in the list.
+     * @throws IndexOutOfBoundsException
+     *             If the starting node quark is out of range
+     * @since 2.0
+     */
+    @NonNull List<@NonNull Integer> getQuarks(int startingNodeQuark, String... pattern);
 
     /**
      * Return the name assigned to this quark. This returns only the "basename",

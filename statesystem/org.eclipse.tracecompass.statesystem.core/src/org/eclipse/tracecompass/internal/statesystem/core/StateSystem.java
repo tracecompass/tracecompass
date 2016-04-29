@@ -38,6 +38,9 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
+import com.google.common.collect.ImmutableCollection.Builder;
+import com.google.common.collect.ImmutableSet;
+
 /**
  * This is the core class of the Generic State System. It contains all the
  * methods to build and query a state history. It's exposed externally through
@@ -52,6 +55,9 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
  *
  */
 public class StateSystem implements ITmfStateSystemBuilder {
+
+    private static final String PARENT = ".."; //$NON-NLS-1$
+    private static final String WILDCARD = "*"; //$NON-NLS-1$
 
     /* References to the inner structures */
     private final AttributeTree attributeTree;
@@ -274,16 +280,16 @@ public class StateSystem implements ITmfStateSystemBuilder {
     }
 
     @Override
-    public List<Integer> getSubAttributes(int quark, boolean recursive)
+    public List<@NonNull Integer> getSubAttributes(int quark, boolean recursive)
             throws AttributeNotFoundException {
         return getAttributeTree().getSubAttributes(quark, recursive);
     }
 
     @Override
-    public List<Integer> getSubAttributes(int quark, boolean recursive, String pattern)
+    public List<@NonNull Integer> getSubAttributes(int quark, boolean recursive, String pattern)
             throws AttributeNotFoundException {
         List<Integer> all = getSubAttributes(quark, recursive);
-        List<Integer> ret = new LinkedList<>();
+        List<@NonNull Integer> ret = new LinkedList<>();
         for (Integer attQuark : all) {
             String name = getAttributeName(attQuark.intValue());
             if (name.matches(pattern)) {
@@ -300,87 +306,56 @@ public class StateSystem implements ITmfStateSystemBuilder {
 
     @Override
     public List<@NonNull Integer> getQuarks(String... pattern) {
-        List<@NonNull Integer> quarks = new LinkedList<>();
-        List<String> prefix = new LinkedList<>();
-        List<String> suffix = new LinkedList<>();
-        boolean split = false;
-        String[] prefixStr;
-        String[] suffixStr;
-        List<Integer> directChildren;
-        int startingAttribute;
+        return getQuarks(ROOT_ATTRIBUTE, pattern);
+    }
 
-        /* Fill the "prefix" and "suffix" parts of the pattern around the '*' */
-        for (String entry : pattern) {
-            if (entry.equals("*")) { //$NON-NLS-1$
-                if (split) {
-                    /*
-                     * Split was already true? This means there was more than
-                     * one wildcard. This is not supported, return an empty
-                     * list.
-                     */
-                    return quarks;
-                }
-                split = true;
-                continue;
-            }
-
-            if (split) {
-                suffix.add(entry);
-            } else {
-                prefix.add(entry);
-            }
-        }
-        prefixStr = prefix.toArray(new String[prefix.size()]);
-        suffixStr = suffix.toArray(new String[suffix.size()]);
-
-        /*
-         * If there was no wildcard, we'll only return the one matching
-         * attribute, if there is one.
-         */
-        if (!split) {
-            int quark;
-            try {
-                quark = getQuarkAbsolute(prefixStr);
-            } catch (AttributeNotFoundException e) {
-                /* It's fine, we'll just return the empty List */
-                return quarks;
-            }
-            quarks.add(quark);
-            return quarks;
-        }
-
-        if (prefix.isEmpty()) {
-            /*
-             * If 'prefix' is empty, this means the wildcard was the first
-             * element. Look for the root node's sub-attributes.
-             */
-            startingAttribute = ROOT_ATTRIBUTE;
+    @Override
+    public List<@NonNull Integer> getQuarks(int startingNodeQuark, String... pattern) {
+        Builder<@NonNull Integer> builder = ImmutableSet.builder();
+        if (pattern.length > 0) {
+            getQuarks(builder, startingNodeQuark, Arrays.asList(pattern));
         } else {
-            startingAttribute = optQuarkAbsolute(prefixStr);
-            if (startingAttribute == INVALID_ATTRIBUTE) {
-                /* That attribute path did not exist, return the empty array */
-                return quarks;
-            }
+            builder.add(startingNodeQuark);
         }
+        return builder.build().asList();
+    }
+
+    private void getQuarks(Builder<@NonNull Integer> builder, int quark, List<String> pattern) {
         try {
-            directChildren = getSubAttributes(startingAttribute, false);
-        } catch (AttributeNotFoundException e) {
-            /* Should not happen, starting attribute is a valid quark */
-            throw new IllegalStateException();
-        }
-
-        /*
-         * Iterate of all the sub-attributes, and only keep those who match the
-         * 'suffix' part of the initial pattern.
-         */
-        for (int childQuark : directChildren) {
-            int matchingQuark = optQuarkRelative(childQuark, suffixStr);
-            if (matchingQuark != INVALID_ATTRIBUTE) {
-                quarks.add(matchingQuark);
+            String element = pattern.get(0);
+            if (element == null) {
+                return;
             }
+            List<String> remainder = pattern.subList(1, pattern.size());
+            if (remainder.isEmpty()) {
+                if (element.equals(WILDCARD)) {
+                    builder.addAll(getSubAttributes(quark, false));
+                } else if (element.equals(PARENT)){
+                    builder.add(getParentAttributeQuark(quark));
+                } else {
+                    int subQuark = optQuarkRelative(quark, element);
+                    if (subQuark != INVALID_ATTRIBUTE) {
+                        builder.add(subQuark);
+                    }
+                }
+            } else {
+                if (element.equals(WILDCARD)) {
+                    for (@NonNull Integer subquark : getSubAttributes(quark, false)) {
+                        getQuarks(builder, subquark, remainder);
+                    }
+                } else if (element.equals(PARENT)){
+                    getQuarks(builder, getParentAttributeQuark(quark), remainder);
+                } else {
+                    int subQuark = optQuarkRelative(quark, element);
+                    if (subQuark != INVALID_ATTRIBUTE) {
+                        getQuarks(builder, subQuark, remainder);
+                    }
+                }
+            }
+        } catch (AttributeNotFoundException e) {
+            /* The starting node quark is out of range */
+            throw new IndexOutOfBoundsException(String.format("Index: %d, Size: %d", quark, getNbAttributes())); //$NON-NLS-1$
         }
-
-        return quarks;
     }
 
     //--------------------------------------------------------------------------
