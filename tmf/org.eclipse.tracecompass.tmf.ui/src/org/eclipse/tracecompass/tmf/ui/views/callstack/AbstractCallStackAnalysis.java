@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -29,7 +29,8 @@ public abstract class AbstractCallStackAnalysis extends TmfStateSystemAnalysisMo
     private static final String[] DEFAULT_PROCESSES_PATTERN =
             new String[] { CallStackStateProvider.PROCESSES, "*" }; //$NON-NLS-1$
 
-    private static final String DEFAULT_THREADS_PATTERN = ".*"; //$NON-NLS-1$
+    private static final String[] DEFAULT_THREADS_PATTERN =
+            new String[] { "*" }; //$NON-NLS-1$
 
     private static final String[] DEFAULT_CALL_STACK_PATH =
             new String[] { CallStackStateProvider.CALL_STACK };
@@ -44,13 +45,18 @@ public abstract class AbstractCallStackAnalysis extends TmfStateSystemAnalysisMo
     }
 
     /**
-     * The quark pattern to get the list of attributes representing the
-     * different processes.
+     * The quark pattern, relative to the root, to get the list of attributes
+     * representing the different processes of a trace.
+     * <p>
+     * If the trace does not define processes, an empty array can be returned.
+     * <p>
+     * The pattern is passed as-is to
+     * {@link org.eclipse.tracecompass.statesystem.core.ITmfStateSystem#getQuarks(String...)}.
+     * <p>
+     * Override this method if the state system attributes do not match the
+     * default pattern defined by {@link CallStackStateProvider}.
      *
-     * It is passed as-is to
-     * {@link org.eclipse.tracecompass.statesystem.core.ITmfStateSystem#getQuarks}
-     * .
-     * @return The quark pattern to find the processes attribute
+     * @return The quark pattern to find the process attributes
      * @since 2.0
      */
     public String[] getProcessesPattern() {
@@ -58,29 +64,36 @@ public abstract class AbstractCallStackAnalysis extends TmfStateSystemAnalysisMo
     }
 
     /**
-     * The regex to match sub-attributes of each Process attributes representing
-     * the threads of this process.
-     *
+     * The quark pattern, relative to an attribute found by
+     * {@link #getProcessesPattern()}, to get the list of attributes
+     * representing the threads of a process, or the threads a trace if the
+     * process pattern was empty.
+     * <p>
+     * If the trace does not define threads, an empty array can be returned.
+     * <p>
      * This will be passed as-is to
-     * {@link org.eclipse.tracecompass.statesystem.core.ITmfStateSystem#getSubAttributes(int, boolean, String)}
+     * {@link org.eclipse.tracecompass.statesystem.core.ITmfStateSystem#getQuarks(int, String...)}.
+     * <p>
+     * Override this method if the state system attributes do not match the
+     * default pattern defined by {@link CallStackStateProvider}.
      *
-     * @return The regex to pass
-     * @since 2.0
+     * @return The quark pattern to find the thread attributes
      */
-    public String getThreadsForProcessPattern() {
+    public String[] getThreadsPattern() {
         return DEFAULT_THREADS_PATTERN;
     }
 
     /**
-     * Get the call stack attribute path relative to a thread attribute found by
-     * {@link #getThreadsForProcessPattern()}. Override this method if the state
-     * system attributes do not match the default pattern defined by
-     * {@link CallStackStateProvider}.
+     * Get the call stack attribute path, relative to an attribute found by the
+     * combination of {@link #getProcessesPattern()} and
+     * {@link #getThreadsPattern()}.
+     * <p>
+     * Override this method if the state system attributes do not match the
+     * default pattern defined by {@link CallStackStateProvider}.
      *
      * @return the relative path of the call stack attribute
-     * @since 2.0
      */
-    public String[] getCallStackPathForThread() {
+    public String[] getCallStackPath() {
         return DEFAULT_CALL_STACK_PATH;
     }
 }
