@@ -1139,10 +1139,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                          */
                         IMarker marker = null;
                         final ArrayList<IFile> files = new ArrayList<>();
+                        IPath p = new Path(trimmedPath);
                         ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceVisitor() {
                             @Override
                             public boolean visit(IResource resource) throws CoreException {
-                                if (resource instanceof IFile && resource.getFullPath().toString().endsWith(trimmedPath)) {
+                                if (resource instanceof IFile && resource.getFullPath().toString().endsWith(p.lastSegment())) {
                                     files.add((IFile) resource);
                                 }
                                 return true;
