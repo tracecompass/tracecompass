@@ -32,6 +32,13 @@ public class Messages extends NLS {
     public static String ParameterDialog_ReportNameSuffix;
     public static String ParameterDialog_Error;
     public static String ParameterDialog_ErrorMessage;
+    public static String AddAnalysisDialog_Name;
+    public static String AddAnalysisDialog_Command;
+    public static String AddAnalysisDialog_NameEmptyErrorMessage;
+    public static String AddAnalysisDialog_CommandEmptyErrorMessage;
+    public static String AddAnalysisDialog_Title;
+    public static String AddAnalysisDialog_ErrorBoxTitle;
+    public static String AddAnalysisDialog_ErrorBoxMessage;
 
     static {
         // initialize resource bundle

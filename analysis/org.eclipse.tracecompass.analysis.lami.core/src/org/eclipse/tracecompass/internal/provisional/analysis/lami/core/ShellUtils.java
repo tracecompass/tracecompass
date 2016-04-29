@@ -32,14 +32,14 @@ public class ShellUtils {
     public static List<String> commandStringToArgs(String command) {
         int index = 0;
         boolean inQuotes = false;
-        List<String> args = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
+        final List<String> args = new ArrayList<>();
+        final StringBuilder sb = new StringBuilder();
 
         while (index < command.length()) {
-            char ch = command.charAt(index);
+            final char ch = command.charAt(index);
 
             if (ch == '\\' && index < command.length() - 1) {
-                char escaped = command.charAt(index + 1);
+                final char escaped = command.charAt(index + 1);
 
                 if (escaped == '\\' || escaped == '"') {
                     // Valid escaped character

@@ -15,9 +15,9 @@ import java.util.Properties;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng27EventLayout;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.ConfigFileLamiAnalysisFactory;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.ConfigFileLamiAnalysisFactory.ConfigFileLamiAnalysisFactoryException;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiAnalysis;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiAnalysisFactoryException;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiAnalysisFactoryFromConfigFile;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.tracecompass.tmf.core.analysis.ondemand.OnDemandAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -37,8 +37,8 @@ final class LttngAnalysesLoader {
     private static boolean appliesTo(ITmfTrace trace) {
         /* LTTng-Analysis is supported only on LTTng >= 2.7 kernel traces */
         if (trace instanceof LttngKernelTrace) {
-            LttngKernelTrace kernelTrace = (LttngKernelTrace) trace;
-            IKernelAnalysisEventLayout layout = kernelTrace.getKernelEventLayout();
+            final LttngKernelTrace kernelTrace = (LttngKernelTrace) trace;
+            final IKernelAnalysisEventLayout layout = kernelTrace.getKernelEventLayout();
 
             if (layout instanceof Lttng27EventLayout) {
                 return true;
@@ -49,12 +49,12 @@ final class LttngAnalysesLoader {
     }
 
     private static String[] getAnalysisNames() throws IOException {
-        ClassLoader loader = LttngAnalysesLoader.class.getClassLoader();
-        String path = "/" + CONFIG_DIR_NAME + "/index.properties"; //$NON-NLS-1$ //$NON-NLS-2$
-        String[] names = new String[0];
-        Properties indexProps = new Properties();
+        final ClassLoader loader = LttngAnalysesLoader.class.getClassLoader();
+        final String path = "/" + CONFIG_DIR_NAME + "/index.properties"; //$NON-NLS-1$ //$NON-NLS-2$
+        final String[] names = new String[0];
+        final Properties indexProps = new Properties();
 
-        try (InputStream in = loader.getResourceAsStream(path)) {
+        try (final InputStream in = loader.getResourceAsStream(path)) {
             if (in == null) {
                 return names;
             }
@@ -69,24 +69,22 @@ final class LttngAnalysesLoader {
         }
 
         analyses = analyses.trim();
-        String[] splitNames = analyses.split("\\s+"); //$NON-NLS-1$
-
-        return splitNames;
+        return analyses.split("\\s+"); //$NON-NLS-1$
     }
 
-    public static void load() throws ConfigFileLamiAnalysisFactoryException, IOException {
-        String[] names = getAnalysisNames();
-        ClassLoader loader = LttngAnalysesLoader.class.getClassLoader();
+    public static void load() throws LamiAnalysisFactoryException, IOException {
+        final String[] names = getAnalysisNames();
+        final ClassLoader loader = LttngAnalysesLoader.class.getClassLoader();
 
-        for (String name : names) {
-            String path = String.format("/%s/%s.properties", CONFIG_DIR_NAME, name); //$NON-NLS-1$
+        for (final String name : names) {
+            final String path = String.format("/%s/%s.properties", CONFIG_DIR_NAME, name); //$NON-NLS-1$
 
-            try (InputStream in = loader.getResourceAsStream(path)) {
+            try (final InputStream in = loader.getResourceAsStream(path)) {
                 if (in == null) {
                     continue;
                 }
 
-                LamiAnalysis analysis = ConfigFileLamiAnalysisFactory.buildFromInputStream(in, false, LttngAnalysesLoader::appliesTo);
+                final LamiAnalysis analysis = LamiAnalysisFactoryFromConfigFile.buildFromInputStream(in, false, LttngAnalysesLoader::appliesTo);
                 OnDemandAnalysisManager.getInstance().registerAnalysis(analysis);
             }
         }

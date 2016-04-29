@@ -11,6 +11,8 @@ package org.eclipse.tracecompass.tmf.ui.project.model;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFolder;
@@ -41,8 +43,6 @@ public class TmfOnDemandAnalysesElement extends TmfProjectModelElement {
     public static final String PATH_ELEMENT = ".ondemand-analyses"; //$NON-NLS-1$
 
     private static final String ELEMENT_NAME = Messages.TmfOnDemandAnalysesElement_Name;
-
-    private boolean fInitialized = false;
 
     /**
      * Constructor
@@ -75,24 +75,30 @@ public class TmfOnDemandAnalysesElement extends TmfProjectModelElement {
             return;
         }
 
-        /*
-         * The criteria for which analyses can apply to a trace should never
-         * change, so initialization only needs to be done once.
-         */
-        if (!fInitialized) {
-            Set<IOnDemandAnalysis> analyses =
-                    OnDemandAnalysisManager.getInstance().getOndemandAnalyses(trace);
+        // Remove children first
+        List<ITmfProjectModelElement> children = new ArrayList<>(getChildren());
+        children.stream().forEach(elem -> {
+            removeChild(elem);
+        });
 
-            IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-            IPath nodePath = getResource().getFullPath();
+        Set<IOnDemandAnalysis> analyses =
+                OnDemandAnalysisManager.getInstance().getOndemandAnalyses(trace);
 
-            analyses.forEach(analysis -> {
-                IFolder analysisRes = checkNotNull(root.getFolder(nodePath.append(analysis.getName())));
-                TmfOnDemandAnalysisElement elem = new TmfOnDemandAnalysisElement(
-                        analysis.getName(), analysisRes, this, analysis);
-                addChild(elem);
-            });
-        }
+        IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IPath nodePath = getResource().getFullPath();
+
+        analyses.forEach(analysis -> {
+            IFolder analysisRes = checkNotNull(root.getFolder(nodePath.append(analysis.getName())));
+            TmfOnDemandAnalysisElement elem;
+
+            if (analysis.isUserDefined()) {
+                elem = new TmfUserDefinedOnDemandAnalysisElement(analysis.getName(), analysisRes, this, analysis);
+            } else {
+                elem = new TmfBuiltInOnDemandAnalysisElement(analysis.getName(), analysisRes, this, analysis);
+            }
+
+            addChild(elem);
+        });
 
         /* Refresh all children */
         getChildren().forEach(child -> ((TmfProjectModelElement) child).refreshChildren());

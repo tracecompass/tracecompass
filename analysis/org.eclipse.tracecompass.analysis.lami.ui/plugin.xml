@@ -59,6 +59,38 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.handler.RemoveAnalysisHandler"
+            commandId="org.eclipse.tracecompass.tmf.ui.command.analysis_remove">
+         <activeWhen>
+            <and>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <instanceof
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfUserDefinedOnDemandAnalysisElement">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.handler.AddAnalysisHandler"
+            commandId="org.eclipse.tracecompass.tmf.ui.command.analysis_add">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate
+                     operator="and">
+                  <instanceof
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfOnDemandAnalysesElement">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -67,6 +99,18 @@
             description="%command.analysis_run.description"
             id="org.eclipse.tracecompass.tmf.ui.command.analysis_run"
             name="%command.analysis_run">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
+            description="%command.analysis_remove.description"
+            id="org.eclipse.tracecompass.tmf.ui.command.analysis_remove"
+            name="%command.analysis_remove">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
+            description="%command.analysis_add.description"
+            id="org.eclipse.tracecompass.tmf.ui.command.analysis_add"
+            name="%command.analysis_add">
       </command>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
@@ -101,6 +145,52 @@
                   <iterate>
                      <instanceof
                            value="org.eclipse.tracecompass.tmf.ui.project.model.TmfOnDemandAnalysisElement">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <command
+               commandId="org.eclipse.tracecompass.tmf.ui.command.analysis_remove"
+               label="%command.analysis_remove"
+               mnemonic="%command.analysis_remove.mnemonic"
+               style="push"
+               tooltip="%command.analysis_remove.description">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false">
+                     <instanceof
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfUserDefinedOnDemandAnalysisElement">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <command
+               commandId="org.eclipse.tracecompass.tmf.ui.command.analysis_add"
+               label="%command.analysis_add"
+               mnemonic="%command.analysis_add.mnemonic"
+               style="push"
+               tooltip="%command.analysis_add.description">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <instanceof
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfOnDemandAnalysesElement">
                      </instanceof>
                   </iterate>
                </with>

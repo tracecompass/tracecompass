@@ -31,7 +31,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * @since 2.0
  */
 @NonNullByDefault
-public class TmfOnDemandAnalysisElement extends TmfProjectModelElement
+public abstract class TmfOnDemandAnalysisElement extends TmfProjectModelElement
         implements ITmfStyledProjectModelElement {
 
     /**
@@ -103,9 +103,7 @@ public class TmfOnDemandAnalysisElement extends TmfProjectModelElement
     }
 
     @Override
-    public Image getIcon() {
-        return TmfProjectModelIcons.DEFAULT_ANALYSIS_ICON;
-    }
+    public abstract Image getIcon();
 
     @Override
     protected void refreshChildren() {

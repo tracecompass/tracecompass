@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.function.Predicate;
 
+import org.eclipse.tracecompass.internal.analysis.lami.core.Activator;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.LamiConfigFileStrings;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.ShellUtils;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -30,71 +31,21 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  *
  * @author Philippe Proulx
  */
-public final class ConfigFileLamiAnalysisFactory {
+public final class LamiAnalysisFactoryFromConfigFile {
 
-    /**
-     * Class-specific exception, for when things go wrong with the
-     * {@link ConfigFileLamiAnalysisFactory}.
-     */
-    public static class ConfigFileLamiAnalysisFactoryException extends Exception {
+    private LamiAnalysisFactoryFromConfigFile() {}
 
-        private static final long serialVersionUID = 1349804105078874111L;
-
-        /**
-         * Default constructor
-         */
-        public ConfigFileLamiAnalysisFactoryException() {
-            super();
-        }
-
-        /**
-         * Constructor specifying a message
-         *
-         * @param message
-         *            The exception message
-         */
-        public ConfigFileLamiAnalysisFactoryException(String message) {
-            super(message);
-        }
-
-        /**
-         * Constructor specifying both a cause and a message
-         *
-         * @param message
-         *            The exception message
-         * @param cause
-         *            The exception that caused this one
-         */
-        public ConfigFileLamiAnalysisFactoryException(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        /**
-         * Constructor specifying a cause
-         *
-         * @param cause
-         *            The exception that caused this one
-         */
-        public ConfigFileLamiAnalysisFactoryException(Throwable cause) {
-            super(cause);
-        }
-
-    }
-
-    private ConfigFileLamiAnalysisFactory() {
-    }
-
-    private static String getProperty(Properties props, String propName) throws ConfigFileLamiAnalysisFactoryException {
+    private static String getProperty(Properties props, String propName) throws LamiAnalysisFactoryException {
         String prop = props.getProperty(propName);
 
         if (prop == null) {
-            throw new ConfigFileLamiAnalysisFactoryException(String.format("Cannot find \"%s\" property", propName)); //$NON-NLS-1$
+            throw new LamiAnalysisFactoryException(String.format("Cannot find \"%s\" property", propName)); //$NON-NLS-1$
         }
 
         prop = prop.trim();
 
         if (prop.isEmpty()) {
-            throw new ConfigFileLamiAnalysisFactoryException(String.format("\"%s\" property cannot be empty", propName)); //$NON-NLS-1$
+            throw new LamiAnalysisFactoryException(String.format("\"%s\" property cannot be empty", propName)); //$NON-NLS-1$
         }
 
         return prop;
@@ -115,26 +66,26 @@ public final class ConfigFileLamiAnalysisFactory {
      *            Predicate to use to check whether or not this analysis applies
      *            to a given trace
      * @return Built {@link LamiAnalysis} object
-     * @throws ConfigFileLamiAnalysisFactoryException
-     *             If something go wrong
+     * @throws LamiAnalysisFactoryException
+     *             If something went wrong reading the input stream
      */
     public static LamiAnalysis buildFromInputStream(InputStream inputStream, boolean isUserDefined,
-            Predicate<ITmfTrace> appliesTo) throws ConfigFileLamiAnalysisFactoryException {
-        Properties props = new Properties();
+            Predicate<ITmfTrace> appliesTo) throws LamiAnalysisFactoryException {
+        final Properties props = new Properties();
 
         // Load properties
         try {
             props.load(inputStream);
         } catch (IOException e) {
-            throw new ConfigFileLamiAnalysisFactoryException(e);
+            throw new LamiAnalysisFactoryException(e);
         }
 
         // Get analysis' name and command
-        String name = getProperty(props, LamiConfigFileStrings.PROP_NAME);
-        String command = getProperty(props, LamiConfigFileStrings.PROP_COMMAND);
+        final String name = getProperty(props, LamiConfigFileStrings.PROP_NAME);
+        final String command = getProperty(props, LamiConfigFileStrings.PROP_COMMAND);
 
         // Get individual arguments from command string
-        List<String> args = ShellUtils.commandStringToArgs(command);
+        final List<String> args = ShellUtils.commandStringToArgs(command);
 
         return new LamiAnalysis(name, isUserDefined, appliesTo, args);
     }
@@ -150,15 +101,15 @@ public final class ConfigFileLamiAnalysisFactory {
      *            Predicate to use to check whether or not this analysis applies
      *            to a given trace
      * @return Built {@link LamiAnalysis} object
-     * @throws ConfigFileLamiAnalysisFactoryException
-     *             If something go wrong
+     * @throws LamiAnalysisFactoryException
+     *             If something went wrong reading the file
      */
     public static LamiAnalysis buildFromConfigFile(Path configFilePath, boolean isUserDefined,
-            Predicate<ITmfTrace> appliesTo) throws ConfigFileLamiAnalysisFactoryException {
-        try (FileInputStream propsStream = new FileInputStream(configFilePath.toFile())) {
+            Predicate<ITmfTrace> appliesTo) throws LamiAnalysisFactoryException {
+        try (final FileInputStream propsStream = new FileInputStream(configFilePath.toFile())) {
             return buildFromInputStream(propsStream, isUserDefined, appliesTo);
         } catch (IOException e) {
-            throw new ConfigFileLamiAnalysisFactoryException(e);
+            throw new LamiAnalysisFactoryException(e);
         }
     }
 
@@ -175,19 +126,23 @@ public final class ConfigFileLamiAnalysisFactory {
      *            Predicate to use to check whether or not those analyses apply
      *            to a given trace
      * @return List of built {@link LamiAnalysis} objects
-     * @throws ConfigFileLamiAnalysisFactoryException
-     *             If something go wrong
+     * @throws LamiAnalysisFactoryException
+     *             If something went wrong reading the directory
      */
     public static List<LamiAnalysis> buildFromConfigDir(Path configDir, boolean isUserDefined,
-            Predicate<ITmfTrace> appliesTo) throws ConfigFileLamiAnalysisFactoryException {
-        List<LamiAnalysis> analyses = new ArrayList<>();
+            Predicate<ITmfTrace> appliesTo) throws LamiAnalysisFactoryException {
+        final List<LamiAnalysis> analyses = new ArrayList<>();
 
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(configDir)) {
-            for (Path path : directoryStream) {
-                analyses.add(buildFromConfigFile(path, isUserDefined, appliesTo));
+        try (final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(configDir)) {
+            for (final Path path : directoryStream) {
+                try {
+                    analyses.add(buildFromConfigFile(path, isUserDefined, appliesTo));
+                } catch (LamiAnalysisFactoryException e) {
+                    Activator.instance().logWarning(String.format("Cannot load external analysis \"%s\"", path)); //$NON-NLS-1$
+                }
             }
         } catch (IOException e) {
-            throw new ConfigFileLamiAnalysisFactoryException(e);
+            throw new LamiAnalysisFactoryException(e);
         }
 
         return analyses;
