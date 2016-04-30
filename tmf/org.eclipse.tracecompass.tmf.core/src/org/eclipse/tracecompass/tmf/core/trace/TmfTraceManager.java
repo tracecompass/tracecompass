@@ -301,7 +301,7 @@ public final class TmfTraceManager {
      * @since 2.0
      */
     @TmfSignalHandler
-    public synchronized void signalReceived(final TmfTraceModelSignal signal) {
+    public synchronized void signalReceived(final @NonNull TmfTraceModelSignal signal) {
         fTraces.forEach((t, u) -> u.receive(signal));
     }
 
