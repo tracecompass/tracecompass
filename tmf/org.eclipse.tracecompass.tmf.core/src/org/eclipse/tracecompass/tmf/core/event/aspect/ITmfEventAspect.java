@@ -13,15 +13,8 @@
 
 package org.eclipse.tracecompass.tmf.core.event.aspect;
 
-import java.util.List;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * An aspect is a piece of information that can be extracted, directly or
@@ -42,103 +35,6 @@ public interface ITmfEventAspect<T> {
      * Static definition of an empty string. You can use this instead of 'null'!
      */
     String EMPTY_STRING = ""; //$NON-NLS-1$
-
-    /**
-     * List of all common base aspects
-     */
-    public static final List<ITmfEventAspect<?>> BASE_ASPECTS =
-            ImmutableList.of(
-                    BaseAspects.TIMESTAMP,
-                    BaseAspects.EVENT_TYPE,
-                    BaseAspects.CONTENTS,
-                    BaseAspects.TRACE_NAME
-                    );
-    /**
-     * Some basic aspects that all trace types should be able to use, using
-     * methods found in {@link ITmfEvent}.
-     */
-    interface BaseAspects {
-
-        /**
-         * Aspect for the event timestamp
-         */
-        ITmfEventAspect<ITmfTimestamp> TIMESTAMP = new ITmfEventAspect<ITmfTimestamp>() {
-            @Override
-            public String getName() {
-                return Messages.getMessage(Messages.AspectName_Timestamp);
-            }
-
-            @Override
-            public String getHelpText() {
-                return EMPTY_STRING;
-            }
-
-            @Override
-            public @Nullable ITmfTimestamp resolve(ITmfEvent event) {
-                return event.getTimestamp();
-            }
-        };
-
-        /**
-         * Aspect for the event type
-         */
-        ITmfEventAspect<String> EVENT_TYPE = new ITmfEventAspect<String>() {
-            @Override
-            public String getName() {
-                return Messages.getMessage(Messages.AspectName_EventType);
-            }
-
-            @Override
-            public String getHelpText() {
-                return Messages.getMessage(Messages.AspectHelpText_EventType);
-            }
-
-            @Override
-            public @Nullable String resolve(ITmfEvent event) {
-                ITmfEventType type = event.getType();
-                if (type == null) {
-                    return null;
-                }
-                return type.getName();
-            }
-        };
-
-        /**
-         * Aspect for the aggregated event contents (fields)
-         */
-        TmfEventFieldAspect CONTENTS = new TmfEventFieldAspect(Messages.getMessage(Messages.AspectName_Contents), null, new TmfEventFieldAspect.IRootField() {
-            @Override
-            public @Nullable ITmfEventField getRootField(ITmfEvent event) {
-                return event.getContent();
-            }
-        }) {
-            @Override
-            public String getHelpText() {
-                return Messages.getMessage(Messages.AspectHelpText_Contents);
-            }
-
-        };
-
-        /**
-         * Aspect for the trace's name (for experiments with many traces)
-         */
-        ITmfEventAspect<String> TRACE_NAME = new ITmfEventAspect<String>() {
-            @Override
-            public String getName() {
-                return Messages.getMessage(Messages.AspectName_TraceName);
-            }
-
-            @Override
-            public String getHelpText() {
-                return Messages.getMessage(Messages.AspectHelpText_TraceName);
-            }
-
-            @Override
-            public @Nullable String resolve(ITmfEvent event) {
-                return event.getTrace().getName();
-            }
-        };
-    }
 
     /**
      * Get the name of this aspect. This name will be user-visible and, as such,

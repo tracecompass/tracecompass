@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
-import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfContentFieldAspect;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode.Type;
@@ -117,7 +117,7 @@ public class TmfFilterCompareNodeTest extends TmfFilterTreeNodeTestBase {
 
     @Test
     public void testMatchesTimestamp() {
-        fFilter.setEventAspect(ITmfEventAspect.BaseAspects.TIMESTAMP);
+        fFilter.setEventAspect(TmfBaseAspects.getTimestampAspect());
         fFilter.setType(Type.TIMESTAMP);
         fFilter.setValue("0.000000002");
 

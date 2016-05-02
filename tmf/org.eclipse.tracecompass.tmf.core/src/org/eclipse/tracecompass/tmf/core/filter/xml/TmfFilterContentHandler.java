@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.tmf.core.filter.xml;
 
 import java.util.Stack;
 
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
@@ -232,7 +233,7 @@ public class TmfFilterContentHandler extends DefaultHandler {
         traceTypeId = TmfTraceType.buildCompatibilityTraceTypeId(traceTypeId);
         String name = atts.getValue(TmfFilterAspectNode.EVENT_ASPECT_ATTR);
         if (TmfFilterAspectNode.BASE_ASPECT_ID.equals(traceTypeId)) {
-            for (ITmfEventAspect<?> eventAspect : ITmfEventAspect.BASE_ASPECTS) {
+            for (ITmfEventAspect<?> eventAspect : TmfBaseAspects.getBaseAspects()) {
                 if (eventAspect.getName().equals(name)) {
                     node.setEventAspect(eventAspect);
                     node.setTraceTypeId(traceTypeId);
@@ -267,16 +268,16 @@ public class TmfFilterContentHandler extends DefaultHandler {
             String field = atts.getValue(FIELD_ATTR);
             if (field != null) {
                 if (field.equals(EVENT_FIELD_TIMESTAMP)) {
-                    node.setEventAspect(ITmfEventAspect.BaseAspects.TIMESTAMP);
+                    node.setEventAspect(TmfBaseAspects.getTimestampAspect());
                     node.setTraceTypeId(TmfFilterAspectNode.BASE_ASPECT_ID);
                 } else if (field.equals(EVENT_FIELD_TYPE)) {
-                    node.setEventAspect(ITmfEventAspect.BaseAspects.EVENT_TYPE);
+                    node.setEventAspect(TmfBaseAspects.getEventTypeAspect());
                     node.setTraceTypeId(TmfFilterAspectNode.BASE_ASPECT_ID);
                 } else if (field.equals(EVENT_FIELD_CONTENT)) {
-                    node.setEventAspect(ITmfEventAspect.BaseAspects.CONTENTS);
+                    node.setEventAspect(TmfBaseAspects.getContentsAspect());
                     node.setTraceTypeId(TmfFilterAspectNode.BASE_ASPECT_ID);
                 } else {
-                    node.setEventAspect(ITmfEventAspect.BaseAspects.CONTENTS.forField(field));
+                    node.setEventAspect(TmfBaseAspects.getContentsAspect().forField(field));
                     node.setTraceTypeId(TmfFilterAspectNode.BASE_ASPECT_ID);
                 }
             }

@@ -45,6 +45,7 @@ import org.eclipse.tracecompass.internal.tmf.pcap.core.event.aspect.PcapReferenc
 import org.eclipse.tracecompass.internal.tmf.pcap.core.event.aspect.PcapSourceAspect;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.util.PcapEventFactory;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
@@ -73,12 +74,12 @@ public class PcapTrace extends TmfTrace implements ITmfPropertiesProvider {
 
     private static final Collection<ITmfEventAspect<?>> PCAP_ASPECTS =
             ImmutableList.of(
-                    ITmfEventAspect.BaseAspects.TIMESTAMP,
+                    TmfBaseAspects.getTimestampAspect(),
                     PcapSourceAspect.INSTANCE,
                     PcapDestinationAspect.INSTANCE,
                     PcapReferenceAspect.INSTANCE,
                     PcapProtocolAspect.INSTANCE,
-                    ITmfEventAspect.BaseAspects.CONTENTS
+                    TmfBaseAspects.getContentsAspect()
                     );
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$

@@ -39,6 +39,7 @@ import org.eclipse.tracecompass.tmf.core.component.TmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfLostEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -98,9 +99,9 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
      */
     public static final @NonNull Collection<@NonNull ITmfEventAspect<?>> BASE_ASPECTS =
             ImmutableList.of(
-                    ITmfEventAspect.BaseAspects.TIMESTAMP,
-                    ITmfEventAspect.BaseAspects.EVENT_TYPE,
-                    ITmfEventAspect.BaseAspects.CONTENTS
+                    TmfBaseAspects.getTimestampAspect(),
+                    TmfBaseAspects.getEventTypeAspect(),
+                    TmfBaseAspects.getContentsAspect()
                     );
 
     // ------------------------------------------------------------------------

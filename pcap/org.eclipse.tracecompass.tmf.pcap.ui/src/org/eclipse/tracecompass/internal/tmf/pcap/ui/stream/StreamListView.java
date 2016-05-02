@@ -42,7 +42,7 @@ import org.eclipse.tracecompass.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.signal.TmfPacketStreamSelectedSignal;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.trace.PcapTrace;
 import org.eclipse.tracecompass.internal.tmf.pcap.ui.Activator;
-import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAspectNode;
@@ -463,7 +463,7 @@ public class StreamListView extends TmfView {
 
                         // Third stage - protocol + or
                         TmfFilterContainsNode protocolFilter = new TmfFilterContainsNode(and);
-                        protocolFilter.setEventAspect(ITmfEventAspect.BaseAspects.CONTENTS.forField(stream.getProtocol().getName()));
+                        protocolFilter.setEventAspect(TmfBaseAspects.getContentsAspect().forField(stream.getProtocol().getName()));
                         protocolFilter.setTraceTypeId(TmfFilterAspectNode.BASE_ASPECT_ID);
                         protocolFilter.setValue(EMPTY_STRING);
                         TmfFilterOrNode or = new TmfFilterOrNode(and);

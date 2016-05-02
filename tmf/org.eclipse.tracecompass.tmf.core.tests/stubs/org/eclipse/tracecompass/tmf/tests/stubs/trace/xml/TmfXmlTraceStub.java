@@ -46,6 +46,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfContentFieldAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
@@ -351,8 +352,8 @@ public class TmfXmlTraceStub extends TmfTrace {
         ImmutableList.Builder<ITmfEventAspect<?>> builder = new ImmutableList.Builder<>();
 
         /* Initialize the first default trace aspects */
-        builder.add(ITmfEventAspect.BaseAspects.TIMESTAMP);
-        builder.add(ITmfEventAspect.BaseAspects.EVENT_TYPE);
+        builder.add(TmfBaseAspects.getTimestampAspect());
+        builder.add(TmfBaseAspects.getEventTypeAspect());
 
         /* Add custom aspects in between */
         for (ITmfEventField field : fieldsArray) {
@@ -375,7 +376,7 @@ public class TmfXmlTraceStub extends TmfTrace {
         }
 
         /* Add the big content aspect */
-        builder.add(ITmfEventAspect.BaseAspects.CONTENTS);
+        builder.add(TmfBaseAspects.getContentsAspect());
         /* Add the additional aspects */
         builder.addAll(fAdditionalAspects);
         fAspects = builder.build();

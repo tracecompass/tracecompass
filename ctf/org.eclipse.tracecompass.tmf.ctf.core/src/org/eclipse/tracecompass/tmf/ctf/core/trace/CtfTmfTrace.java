@@ -46,6 +46,7 @@ import org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator.CtfIterator
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
@@ -105,11 +106,11 @@ public class CtfTmfTrace extends TmfTrace
      */
     protected static final @NonNull Collection<@NonNull ITmfEventAspect<?>> CTF_ASPECTS =
             ImmutableList.of(
-                    ITmfEventAspect.BaseAspects.TIMESTAMP,
+                    TmfBaseAspects.getTimestampAspect(),
                     new CtfChannelAspect(),
                     new CtfCpuAspect(),
-                    ITmfEventAspect.BaseAspects.EVENT_TYPE,
-                    ITmfEventAspect.BaseAspects.CONTENTS
+                    TmfBaseAspects.getEventTypeAspect(),
+                    TmfBaseAspects.getContentsAspect()
                     );
 
     /**

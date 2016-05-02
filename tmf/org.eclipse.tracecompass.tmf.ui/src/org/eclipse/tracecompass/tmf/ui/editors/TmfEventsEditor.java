@@ -43,6 +43,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
@@ -351,7 +352,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         ImmutableSet.Builder<ITmfEventAspect<?>> builder = new ImmutableSet.Builder<>();
 
         /* For experiments, we'll add a "trace name" aspect/column */
-        builder.add(ITmfEventAspect.BaseAspects.TRACE_NAME);
+        builder.add(TmfBaseAspects.getTraceNameAspect());
 
         String commonTraceType = getCommonTraceType(experiment);
         if (commonTraceType != null) {

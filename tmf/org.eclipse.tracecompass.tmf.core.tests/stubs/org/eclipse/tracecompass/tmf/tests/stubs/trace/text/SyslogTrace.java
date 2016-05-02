@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfContentFieldAspect;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -66,7 +67,7 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
     /** The event aspects */
     public static final @NonNull Collection<ITmfEventAspect<?>> ASPECTS =
             ImmutableList.of(
-                    ITmfEventAspect.BaseAspects.TIMESTAMP,
+                    TmfBaseAspects.getTimestampAspect(),
                     new TmfContentFieldAspect(Field.HOST, Field.HOST),
                     new TmfContentFieldAspect(Field.LOGGER, Field.LOGGER),
                     new TmfContentFieldAspect(Field.FILE, Field.FILE),

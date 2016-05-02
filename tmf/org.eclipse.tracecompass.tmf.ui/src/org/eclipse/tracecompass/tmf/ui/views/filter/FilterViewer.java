@@ -61,6 +61,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
@@ -626,7 +627,7 @@ class FilterViewer extends Composite {
             ArrayList<AspectItem> aspectList = new ArrayList<>();
 
             aspectList.add(new AspectItem(Messages.FilterViewer_CommonCategory));
-            for (ITmfEventAspect<?> aspect : ITmfEventAspect.BASE_ASPECTS) {
+            for (ITmfEventAspect<?> aspect : TmfBaseAspects.getBaseAspects()) {
                 aspectList.add(new AspectItem(aspect.getName(), aspect, TmfFilterAspectNode.BASE_ASPECT_ID));
             }
 
