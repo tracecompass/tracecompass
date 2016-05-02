@@ -32,6 +32,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
+import org.eclipse.tracecompass.tmf.core.callstack.CallStackStateProvider;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -265,7 +266,8 @@ public abstract class AbstractProviderTest {
     /** Get the callstack for the given timestamp, for this particular trace */
     private static String[] getCallStack(ITmfStateSystem ss, int pid, String threadName, long timestamp) {
         try {
-            int stackAttribute = ss.getQuarkAbsolute("Processes", Integer.toString(pid), threadName, "CallStack");
+            String processName = (pid == CallStackStateProvider.UNKNOWN_PID) ? CallStackStateProvider.UNKNOWN : Integer.toString(pid);
+            int stackAttribute = ss.getQuarkAbsolute("Processes", processName, threadName, "CallStack");
             List<ITmfStateInterval> state = ss.queryFullState(timestamp);
             int depth = state.get(stackAttribute).getStateValue().unboxInt();
 

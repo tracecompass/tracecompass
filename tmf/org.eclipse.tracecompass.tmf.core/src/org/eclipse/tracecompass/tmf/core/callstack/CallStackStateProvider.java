@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -60,11 +60,12 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  *
  * where:
  * <ul>
- * <li>(PID n) is an attribute name representing a unique process identifier.
- * </li>
+ * <li>(PID n) is an attribute whose name is the display name of the process.
+ * Optionally, its value can be an int representing the process id. Otherwise,
+ * the attribute name can be set to the process id formatted as a string.</li>
  * <li>(TID n) is an attribute whose name is the display name of the thread.
- * Optionally, its value is a long representing the thread id, used for sorting.
- * </li>
+ * Optionally, its value can be a long representing the thread id. Otherwise,
+ * the attribute name can be set to the thread id formatted as a string.</li>
  * <li>"CallStack" is a stack-attribute whose pushed values are either a string,
  * int or long representing the function name or address in the call stack. The
  * type of value used must be constant for a particular CallStack.</li>
@@ -86,14 +87,18 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
     public static final String CALL_STACK = "CallStack"; //$NON-NLS-1$
 
     /**
-     * Undefined process ID
+     * Unknown process ID
      *
      * @since 2.0
      */
-    protected static final int UNDEFINED_PID = -1;
+    public static final int UNKNOWN_PID = -1;
 
-    /** Undefined function exit name */
-    protected static final String UNDEFINED = "UNDEFINED"; //$NON-NLS-1$
+    /**
+     * Unknown name
+     *
+     * @since 2.0
+     */
+    public static final String UNKNOWN = "UNKNOWN"; //$NON-NLS-1$
 
     /** CallStack state system ID */
     private static final String ID = "org.eclipse.linuxtools.tmf.callstack"; //$NON-NLS-1$
@@ -121,11 +126,21 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
             ITmfStateValue functionEntryName = functionEntry(event);
             if (functionEntryName != null) {
                 long timestamp = event.getTimestamp().toNanos();
-                int pid = getProcessId(event);
-                String threadName = getThreadName(event);
-                int threadQuark = ss.getQuarkAbsoluteAndAdd(PROCESSES, Integer.toString(pid), threadName);
 
+                String processName = getProcessName(event);
+                int processId = getProcessId(event);
+                if (processName == null) {
+                    processName = (processId == UNKNOWN_PID) ? UNKNOWN : Integer.toString(processId);
+                }
+                int processQuark = ss.getQuarkAbsoluteAndAdd(PROCESSES, processName);
+                ss.updateOngoingState(TmfStateValue.newValueInt(processId), processQuark);
+
+                String threadName = getThreadName(event);
                 long threadId = getThreadId(event);
+                if (threadName == null) {
+                    threadName = Long.toString(threadId);
+                }
+                int threadQuark = ss.getQuarkRelativeAndAdd(processQuark, threadName);
                 ss.updateOngoingState(TmfStateValue.newValueLong(threadId), threadQuark);
 
                 int callStackQuark = ss.getQuarkRelativeAndAdd(threadQuark, CALL_STACK);
@@ -138,9 +153,16 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
             ITmfStateValue functionExitState = functionExit(event);
             if (functionExitState != null) {
                 long timestamp = event.getTimestamp().toNanos();
-                int pid = getProcessId(event);
-                String thread = getThreadName(event);
-                int quark = ss.getQuarkAbsoluteAndAdd(PROCESSES, Integer.toString(pid), thread, CALL_STACK);
+                String processName = getProcessName(event);
+                if (processName == null) {
+                    int processId = getProcessId(event);
+                    processName = (processId == UNKNOWN_PID) ? UNKNOWN : Integer.toString(processId);
+                }
+                String threadName = getThreadName(event);
+                if (threadName == null) {
+                    threadName = Long.toString(getThreadId(event));
+                }
+                int quark = ss.getQuarkAbsoluteAndAdd(PROCESSES, processName, threadName, CALL_STACK);
                 ITmfStateValue poppedValue = ss.popAttribute(timestamp, quark);
                 /*
                  * Verify that the value we are popping matches the one in the
@@ -205,8 +227,8 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
 
     /**
      * Return the process ID of a function entry event.
-     *
-     * Use {@link #UNDEFINED_PID} if it is not known.
+     * <p>
+     * Use {@link #UNKNOWN_PID} if it is not known.
      *
      * @param event
      *            The event
@@ -214,6 +236,20 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
      * @since 2.0
      */
     protected abstract int getProcessId(ITmfEvent event);
+
+    /**
+     * Return the process name of a function entry event.
+     *
+     * @param event
+     *            The event
+     * @return The process name (as will be shown in the view) or null to use
+     *         the process ID formatted as a string (or {@link #UNKNOWN})
+     * @since 2.0
+     */
+    protected @Nullable String getProcessName(ITmfEvent event) {
+        /* Override to provide a process name */
+        return null;
+    }
 
     /**
      * Return the thread id of a function entry event.
@@ -230,7 +266,11 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
      *
      * @param event
      *            The event
-     * @return The thread name (as will be shown in the view)
+     * @return The thread name (as will be shown in the view) or null to use the
+     *         thread id formatted as a string
      */
-    protected abstract String getThreadName(ITmfEvent event);
+    protected @Nullable String getThreadName(ITmfEvent event) {
+        /* Override to provide a thread name */
+        return null;
+    }
 }

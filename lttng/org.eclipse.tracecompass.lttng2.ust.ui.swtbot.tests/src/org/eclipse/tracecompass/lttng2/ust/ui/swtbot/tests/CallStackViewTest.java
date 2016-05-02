@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -189,7 +189,7 @@ public class CallStackViewTest {
     @Test
     public void testOpenCallstack() {
         String node = "glxgears-cyg-profile";
-        String pid = "-1";
+        String processName = "UNKNOWN";
         String childName = "glxgears-16073";
         List<String> expected = ImmutableList.of("0x40472b", "", "", "", "");
 
@@ -197,7 +197,7 @@ public class CallStackViewTest {
         viewBot.setFocus();
         final SWTBotView viewBot1 = viewBot;
         SWTBotTree tree = viewBot1.bot().tree();
-        SWTBotTreeItem treeItem = tree.getTreeItem(node).getNode(pid);
+        SWTBotTreeItem treeItem = tree.getTreeItem(node).getNode(processName);
         assertEquals(childName, treeItem.getNodes().get(0));
         List<String> names = treeItem.getNode(childName).getNodes();
         assertEquals(expected, names);

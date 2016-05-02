@@ -577,40 +577,49 @@ public class CallStackView extends AbstractTimeGraphView {
                 traceEntry.updateEndTime(end);
             }
 
-            List<Integer> processQuarks = ss.getQuarks(module.getProcessesPattern());
-            for (int processQuark : processQuarks) {
+            try {
+                List<ITmfStateInterval> endStates = ss.queryFullState(ss.getCurrentEndTime());
 
-                /*
-                 * Default to trace entry, overwrite if a process entry exists.
-                 */
-                TimeGraphEntry threadParent = traceEntry;
-                int processId = -1;
-                if (processQuark != ITmfStateSystem.ROOT_ATTRIBUTE) {
-                    /* Create the entry for the process */
-                    ProcessEntry processEntry = processEntryMap.get(processQuark);
-                    if (processEntry == null) {
-                        String name = ss.getAttributeName(processQuark);
-                        /* The attribute name should already be parseable to integer */
-                        processId = Integer.parseInt(name);
-                        processEntry = new ProcessEntry(name, processId, start, end);
-                        processEntryMap.put(processQuark, processEntry);
-                        traceEntry.addChild(processEntry);
-                    } else {
-                        processEntry.updateEndTime(end);
+                List<Integer> processQuarks = ss.getQuarks(module.getProcessesPattern());
+                for (int processQuark : processQuarks) {
+
+                    /*
+                     * Default to trace entry, overwrite if a process entry exists.
+                     */
+                    TimeGraphEntry threadParent = traceEntry;
+                    int processId = -1;
+                    if (processQuark != ITmfStateSystem.ROOT_ATTRIBUTE) {
+                        /* Create the entry for the process */
+                        ProcessEntry processEntry = processEntryMap.get(processQuark);
+                        if (processEntry == null) {
+                            String processName = ss.getAttributeName(processQuark);
+                            ITmfStateValue processStateValue = endStates.get(processQuark).getStateValue();
+                            if (processStateValue.getType() == Type.INTEGER) {
+                                processId = processStateValue.unboxInt();
+                            } else {
+                                try {
+                                    processId = Integer.parseInt(processName);
+                                } catch (NumberFormatException e) {
+                                    /* use default processId */
+                                }
+                            }
+                            processEntry = new ProcessEntry(processName, processId, start, end);
+                            processEntryMap.put(processQuark, processEntry);
+                            traceEntry.addChild(processEntry);
+                        } else {
+                            processEntry.updateEndTime(end);
+                        }
+                        /* The parent of the thread entries will be a process */
+                        threadParent = processEntry;
                     }
-                    /* The parent of the thread entries will be a process */
-                    threadParent = processEntry;
-                }
 
-                /* Create the threads under the process */
-                try {
+                    /* Create the threads under the process */
                     List<Integer> threadQuarks = ss.getQuarks(processQuark, module.getThreadsPattern());
 
                     /*
                      * Only query startStates if necessary (threadEntry == null)
                      */
                     List<ITmfStateInterval> startStates = null;
-                    List<ITmfStateInterval> endStates = ss.queryFullState(ss.getCurrentEndTime());
                     for (int threadQuark : threadQuarks) {
                         if (monitor.isCanceled()) {
                             return;
@@ -634,7 +643,17 @@ public class CallStackView extends AbstractTimeGraphView {
                                 if (startStates == null) {
                                     startStates = ss.queryFullState(ss.getStartTime());
                                 }
-                                long threadId = endStates.get(threadQuark).getStateValue().unboxLong();
+                                long threadId = -1;
+                                ITmfStateValue threadStateValue = endStates.get(threadQuark).getStateValue();
+                                if (threadStateValue.getType() == Type.LONG || threadStateValue.getType() == Type.INTEGER) {
+                                    threadId = threadStateValue.unboxLong();
+                                } else {
+                                    try {
+                                        threadId = Long.parseLong(threadName);
+                                    } catch (NumberFormatException e) {
+                                        /* use default threadId */
+                                    }
+                                }
                                 long threadStart = start;
                                 ITmfStateInterval startInterval = startStates.get(callStackQuark);
                                 if (startInterval.getStateValue().isNull()) {
@@ -658,11 +677,11 @@ public class CallStackView extends AbstractTimeGraphView {
                             level++;
                         }
                     }
-                } catch (AttributeNotFoundException e) {
-                    Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
-                } catch (StateSystemDisposedException e) {
-                    /* Ignored */
                 }
+            } catch (AttributeNotFoundException e) {
+                Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
+            } catch (StateSystemDisposedException e) {
+                /* Ignored */
             }
 
             if (parentTrace == getTrace()) {

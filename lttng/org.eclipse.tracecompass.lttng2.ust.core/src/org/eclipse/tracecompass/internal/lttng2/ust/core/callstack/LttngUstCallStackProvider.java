@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -162,7 +162,7 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
         ITmfEventField content = event.getContent();
         ITmfEventField vpidContextField = content.getField(fLayout.contextVpid());
         if (vpidContextField == null) {
-            return UNDEFINED_PID;
+            return UNKNOWN_PID;
         }
         return ((Long) vpidContextField.getValue()).intValue();
     }
@@ -175,7 +175,7 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
     }
 
     @Override
-    public String getThreadName(ITmfEvent event) {
+    public @Nullable String getThreadName(ITmfEvent event) {
         /* We checked earlier that the "procname" context is present */
         ITmfEventField content = event.getContent();
         String procName = (String) content.getField(fLayout.contextProcname()).getValue();
