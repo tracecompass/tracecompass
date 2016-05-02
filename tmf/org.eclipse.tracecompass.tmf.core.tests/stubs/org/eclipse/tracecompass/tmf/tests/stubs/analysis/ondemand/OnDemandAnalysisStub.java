@@ -50,4 +50,9 @@ public class OnDemandAnalysisStub implements IOnDemandAnalysis {
         /* Do nothing */
         return new Object();
     }
+
+    @Override
+    public boolean isUserDefined() {
+        return false;
+    }
 }
