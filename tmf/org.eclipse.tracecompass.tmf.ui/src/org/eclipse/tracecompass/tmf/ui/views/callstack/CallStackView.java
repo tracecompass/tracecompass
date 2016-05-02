@@ -753,7 +753,7 @@ public class CallStackView extends AbstractTimeGraphView {
             List<ITmfStateInterval> stackIntervals = StateSystemUtils.queryHistoryRange(ss, entry.getQuark(), start, end - 1, resolution, monitor);
             eventList = new ArrayList<>(stackIntervals.size());
             long lastEndTime = -1;
-            boolean lastIsNull = true;
+            boolean lastIsNull = false;
             for (ITmfStateInterval statusInterval : stackIntervals) {
                 if (monitor.isCanceled()) {
                     return null;
