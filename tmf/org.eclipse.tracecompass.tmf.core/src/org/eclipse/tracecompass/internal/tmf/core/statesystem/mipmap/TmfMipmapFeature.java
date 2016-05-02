@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -149,11 +150,11 @@ public abstract class TmfMipmapFeature implements ITmfMipmapFeature {
             /* update the current-level attribute */
             ss.modifyAttribute(startTime, value, levelQuark);
         } catch (StateValueTypeException e) {
-            e.printStackTrace();
+            Activator.logError("TmfMipmapFeature : Bad state value type", e); //$NON-NLS-1$
         } catch (AttributeNotFoundException e) {
-            e.printStackTrace();
+            Activator.logError("TmfMipmapFeature : Attribute not found", e); //$NON-NLS-1$
         } catch (TimeRangeException e) {
-            e.printStackTrace();
+            Activator.logError("TmfMipmapFeature : Time stamp is out of range", e); //$NON-NLS-1$
         }
     }
 
