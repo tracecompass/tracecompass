@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -192,11 +193,11 @@ public abstract class AbstractTmfMipmapStateProvider extends AbstractTmfStatePro
                     features.add(mf);
                 }
             } catch (TimeRangeException e) {
-                e.printStackTrace();
+                Activator.logError("MipMapProvider : Time stamp outside of time range of state system", e); //$NON-NLS-1$
             } catch (AttributeNotFoundException e) {
-                e.printStackTrace();
+                Activator.logError("MipMapProvider : Attribute not found", e); //$NON-NLS-1$
             } catch (StateValueTypeException e) {
-                e.printStackTrace();
+                Activator.logError("MipMapProvider : Wrong state value type", e); //$NON-NLS-1$
             }
         }
         return features;
