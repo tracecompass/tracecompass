@@ -136,12 +136,17 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
     @Override
     public void run(IProgressMonitor progressMonitor) {
         try {
+            final int ARCHIVE_OR_DIRECTORY_PROGRESS = 45;
+            final int EXTRA_IMPORT_OPERATION_PROGRESS = 45;
+            final int DELETE_PROGRESS = 10;
+            final int TOTAL_PROGRESS = ARCHIVE_OR_DIRECTORY_PROGRESS +
+                    EXTRA_IMPORT_OPERATION_PROGRESS + DELETE_PROGRESS;
 
             final List<TraceFileSystemElement> selectedFileSystemElements = fSelectedFileSystemElements;
 
             // List fileSystemElements will be filled using the
             // passThroughFilter
-            SubMonitor subMonitor = SubMonitor.convert(progressMonitor, 1);
+            SubMonitor subMonitor = SubMonitor.convert(progressMonitor, TOTAL_PROGRESS);
 
             // Check if operation was cancelled.
             ModalContext.checkCanceled(subMonitor);
@@ -155,14 +160,13 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
             SubMonitor monitor = subMonitor.newChild(1);
             destTempFolder.create(IResource.HIDDEN, true, monitor);
 
-            subMonitor = SubMonitor.convert(progressMonitor, 2);
             String baseSourceLocation = null;
             if (fImportFromArchive) {
                 // When importing from archive, we first extract the
                 // *selected* files to a temporary folder then create new
                 // TraceFileSystemElements
 
-                SubMonitor archiveMonitor = SubMonitor.convert(subMonitor.newChild(1), 2);
+                SubMonitor archiveMonitor = SubMonitor.convert(subMonitor.newChild(ARCHIVE_OR_DIRECTORY_PROGRESS), 2);
 
                 // Extract selected files from source archive to temporary
                 // folder
@@ -178,7 +182,7 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
                     extractAllArchiveFiles(tempFolderFileSystemElements, destTempFolder, destTempFolder.getLocation(), archiveMonitor.newChild(1));
                 }
             } else {
-                SubMonitor directoryMonitor = SubMonitor.convert(subMonitor.newChild(1), 2);
+                SubMonitor directoryMonitor = SubMonitor.convert(subMonitor.newChild(ARCHIVE_OR_DIRECTORY_PROGRESS), 2);
                 // Import selected files, excluding archives (done in a later step)
                 importFileSystemElements(directoryMonitor.newChild(1), selectedFileSystemElements);
 
@@ -203,12 +207,12 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
                 // Never import extracted files as links, they would link to the
                 // temporary directory that will be deleted
                 fImportOptionFlags = fImportOptionFlags & ~ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
-                SubMonitor importTempMonitor = subMonitor.newChild(1);
+                SubMonitor importTempMonitor = subMonitor.newChild(EXTRA_IMPORT_OPERATION_PROGRESS);
                 importFileSystemElements(importTempMonitor, tempFolderFileSystemElements);
             }
 
             if (destTempFolder.exists()) {
-                destTempFolder.delete(true, progressMonitor);
+                destTempFolder.delete(true, subMonitor.newChild(TOTAL_PROGRESS));
             }
 
             setStatus(Status.OK_STATUS);
