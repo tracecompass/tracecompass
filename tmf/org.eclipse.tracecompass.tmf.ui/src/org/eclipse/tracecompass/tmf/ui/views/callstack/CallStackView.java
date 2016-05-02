@@ -275,10 +275,13 @@ public class CallStackView extends AbstractTimeGraphView {
 
         @Override
         public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
-            ThreadEntry t1 = (ThreadEntry) o1;
-            ThreadEntry t2 = (ThreadEntry) o2;
-            return reverse ? Long.compare(t2.getThreadId(), t1.getThreadId()) :
+            if (o1 instanceof ThreadEntry && o2 instanceof ThreadEntry) {
+                ThreadEntry t1 = (ThreadEntry) o1;
+                ThreadEntry t2 = (ThreadEntry) o2;
+                return reverse ? Long.compare(t2.getThreadId(), t1.getThreadId()) :
                     Long.compare(t1.getThreadId(), t2.getThreadId());
+            }
+            return 0;
         }
     }
 
