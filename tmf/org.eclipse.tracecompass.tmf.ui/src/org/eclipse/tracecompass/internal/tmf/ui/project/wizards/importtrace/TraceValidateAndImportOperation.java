@@ -38,10 +38,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.URIUtil;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.project.operations.TmfWorkspaceModifyOperation;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
@@ -62,7 +62,7 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
  * control
  *
  */
-public class TraceValidateAndImportOperation implements IRunnableWithProgress {
+public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation {
 
     private static final String TRACE_IMPORT_TEMP_FOLDER = ".traceImport"; //$NON-NLS-1$
 
@@ -134,7 +134,7 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
     }
 
     @Override
-    public void run(IProgressMonitor progressMonitor) {
+    protected void execute(IProgressMonitor progressMonitor) throws CoreException, InvocationTargetException, InterruptedException {
         try {
             final int ARCHIVE_OR_DIRECTORY_PROGRESS = 45;
             final int EXTRA_IMPORT_OPERATION_PROGRESS = 45;
@@ -534,7 +534,7 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
         // Finally import trace
         IResource importedResource = importResource(fileSystemElement, monitor);
         if (importedResource != null) {
-            TmfTraceTypeUIUtils.setTraceType(importedResource, traceTypeHelper);
+            TmfTraceTypeUIUtils.setTraceType(importedResource, traceTypeHelper, false);
             fImportedResources.add(importedResource);
         }
 

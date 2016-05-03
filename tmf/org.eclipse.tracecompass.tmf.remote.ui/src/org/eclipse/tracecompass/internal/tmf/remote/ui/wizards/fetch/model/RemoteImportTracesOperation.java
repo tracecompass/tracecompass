@@ -381,7 +381,7 @@ public class RemoteImportTracesOperation extends TmfWorkspaceModifyOperation {
                 // super fast on the same drive
                 Files.move(intermediateFile.toPath(), destination.toFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
-        } catch (CoreException e) {
+        } catch (CoreException | InvocationTargetException | InterruptedException e) {
             Activator.getDefault().logError(e.getMessage(), e);
         } finally {
             if (intermediateFile != null && intermediateFile.exists()) {
