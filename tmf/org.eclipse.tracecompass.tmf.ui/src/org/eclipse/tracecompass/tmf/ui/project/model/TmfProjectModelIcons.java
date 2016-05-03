@@ -53,6 +53,7 @@ final class TmfProjectModelIcons {
     private static final String ONDEMAND_ANALYSES_ICON_FILE = "icons/obj16/debugt_obj.gif"; //$NON-NLS-1$
     private static final String REPORTS_ICON_FILE = "icons/obj16/arraypartition_obj.gif"; //$NON-NLS-1$
     private static final String DEFAULT_REPORT_ICON_FILE = "icons/etool16/copy_edit.gif"; //$NON-NLS-1$
+    private static final String VIEWS_ICON_FILE = "icons/obj16/analysisprovider_obj.gif"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Initialization
@@ -63,7 +64,6 @@ final class TmfProjectModelIcons {
         Bundle bundle = Activator.getDefault().getBundle();
 
         FOLDER_ICON = checkNotNull(sharedImages.getImage(ISharedImages.IMG_OBJ_FOLDER));
-        VIEWS_ICON = checkNotNull(sharedImages.getImage(ISharedImages.IMG_OBJ_ELEMENT));
         ONDEMAND_ANALYSES_ICON = checkNotNull(loadIcon(bundle, ONDEMAND_ANALYSES_ICON_FILE));
         REPORTS_ICON = checkNotNull(loadIcon(bundle, REPORTS_ICON_FILE));
 
@@ -72,6 +72,7 @@ final class TmfProjectModelIcons {
         DEFAULT_ANALYSIS_ICON = checkNotNull(loadIcon(bundle, ANALYSIS_ICON_FILE));
         DEFAULT_VIEW_ICON = checkNotNull(loadIcon(bundle, VIEW_ICON_FILE));
         DEFAULT_REPORT_ICON = checkNotNull(loadIcon(bundle, DEFAULT_REPORT_ICON_FILE));
+        VIEWS_ICON = checkNotNull(loadIcon(bundle, VIEWS_ICON_FILE));
     }
 
     public static @Nullable Image loadIcon(Bundle bundle, String url) {
