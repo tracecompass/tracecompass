@@ -64,7 +64,7 @@ public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile
 
     @Override
     public boolean equals(@Nullable Object obj) {
-        if (obj == null || !(obj instanceof UstDebugInfoBinaryFile)) {
+        if (!(obj instanceof UstDebugInfoBinaryFile)) {
             return false;
         }
         UstDebugInfoBinaryFile other = (UstDebugInfoBinaryFile) obj;
