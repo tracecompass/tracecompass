@@ -618,7 +618,7 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
         operation.run(SubMonitor.convert(monitor).newChild(1));
         String sourceLocation = fileSystemElement.getSourceLocation();
         IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(tracePath);
-        if (sourceLocation != null) {
+        if ((sourceLocation != null) && (resource != null)) {
             resource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
         }
 
