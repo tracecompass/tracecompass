@@ -478,10 +478,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
                 propertyDescriptorArray[index] = descriptor;
                 index++;
             }
-            for (int i = 0; i < sfDescriptors.length; i++) {
-                propertyDescriptorArray[index] = sfDescriptors[i];
-                index++;
-            }
+            System.arraycopy(sfDescriptors, 0, propertyDescriptorArray, index, sfDescriptors.length);
             return propertyDescriptorArray;
         }
         return Arrays.copyOf(sfDescriptors, sfDescriptors.length);

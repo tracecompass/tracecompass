@@ -834,9 +834,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         String[] availableTraceTypes = TmfTraceType.getAvailableTraceTypes();
         String[] traceTypeList = new String[availableTraceTypes.length + 1];
         traceTypeList[0] = TRACE_TYPE_AUTO_DETECT;
-        for (int i = 0; i < availableTraceTypes.length; i++) {
-            traceTypeList[i + 1] = availableTraceTypes[i];
-        }
+        System.arraycopy(availableTraceTypes, 0, traceTypeList, 1, availableTraceTypes.length);
         fTraceTypes.setItems(traceTypeList);
         fTraceTypes.addSelectionListener(new SelectionAdapter() {
             @Override
