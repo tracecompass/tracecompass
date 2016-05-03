@@ -168,7 +168,7 @@ public abstract class BaseMessage extends GraphNode {
         int width = 0;
         int activationWidth = Metrics.EXECUTION_OCCURRENCE_WIDTH / 2;
         if ((fStartLifeline != null) && (fEndLifeline != null)) {
-            if (fStartLifeline == fEndLifeline) {
+            if (fStartLifeline.equals(fEndLifeline)) {
                 width = Metrics.INTERNAL_MESSAGE_WIDTH + Metrics.EXECUTION_OCCURRENCE_WIDTH;
             } else {
                 width = fEndLifeline.getX() + Metrics.getLifelineWidth() / 2 - getX(true);
@@ -364,7 +364,7 @@ public abstract class BaseMessage extends GraphNode {
         int tempHeight = Metrics.MESSAGES_NAME_SPACING + Metrics.getMessageFontHeigth();
 
         // Is it a self message?
-        if (fStartLifeline == fEndLifeline) {
+        if (fStartLifeline.equals(fEndLifeline)) {
             /*
              * Rectangle.contains(x,y, width, height) does not works with negative height or width We check here if the
              * rectangle width is negative.
@@ -426,7 +426,7 @@ public abstract class BaseMessage extends GraphNode {
 
         // UML2 found message (always drawn from left to right)
         // or UML2 lost message (always drawn from left to right)
-        if ((fStartLifeline == null || fEndLifeline == null) && fStartLifeline != fEndLifeline) {
+        if ((fStartLifeline == null || fEndLifeline == null) && !fStartLifeline.equals(fEndLifeline)) {
             // Draw the message label above the message and centered
             // The label is truncated if it cannot fit between the two message end
             // 2*Metrics.MESSAGES_NAME_SPACING = space above the label + space below the label
@@ -482,7 +482,7 @@ public abstract class BaseMessage extends GraphNode {
             fH = height + 2 * yt.intValue();
         }
         // it is self message (always drawn at the left side of the owning lifeLifeline)
-        else if (fStartLifeline != null && fEndLifeline != null && fStartLifeline == fEndLifeline) {
+        else if (fStartLifeline != null && fEndLifeline != null && fStartLifeline.equals(fEndLifeline)) {
             /*
              * Self syncMessages are drawn in 5 parts 1 -----------+ + 2 + | | | 3 | + 5 + 4 -----------+
              */
@@ -707,7 +707,7 @@ public abstract class BaseMessage extends GraphNode {
 
         ISDPreferences pref = SDViewPref.getInstance();
 
-        if ((fStartLifeline != fEndLifeline) && (getStartOccurrence() == getEndOccurrence())) {
+        if ((!fStartLifeline.equals(fEndLifeline)) && (getStartOccurrence() == getEndOccurrence())) {
             context.setLineStyle(context.getLineDotStyle());
             context.setLineWidth(Metrics.NORMAL_LINE_WIDTH);
             context.setBackground(pref.getBackGroundColorSelection());
@@ -715,7 +715,7 @@ public abstract class BaseMessage extends GraphNode {
             context.drawFocus(getX(), getY() - 3, getWidth(), getHeight() + 6);
         } else if ((fStartLifeline == fEndLifeline) && (getStartOccurrence() == getEndOccurrence())) {
             context.drawFocus(getX(), getY() - 3, getWidth(), Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT + 6);
-        } else if ((fStartLifeline != fEndLifeline) && (getStartOccurrence() != getEndOccurrence())) {
+        } else if ((!fStartLifeline.equals(fEndLifeline)) && (getStartOccurrence() != getEndOccurrence())) {
             context.setLineStyle(context.getLineDotStyle());
             context.setLineWidth(Metrics.NORMAL_LINE_WIDTH);
             context.setBackground(pref.getBackGroundColor(ISDPreferences.PREF_LIFELINE_HEADER));
