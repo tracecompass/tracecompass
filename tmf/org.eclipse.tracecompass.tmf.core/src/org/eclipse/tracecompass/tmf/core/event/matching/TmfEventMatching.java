@@ -419,19 +419,4 @@ class EventMatchingBuildRequest extends TmfEventRequest {
         }
         matching.matchEvent(event, trace, fMonitor);
     }
-
-    @Override
-    public void handleSuccess() {
-        super.handleSuccess();
-    }
-
-    @Override
-    public void handleCancel() {
-        super.handleCancel();
-    }
-
-    @Override
-    public void handleFailure() {
-        super.handleFailure();
-    }
 }
