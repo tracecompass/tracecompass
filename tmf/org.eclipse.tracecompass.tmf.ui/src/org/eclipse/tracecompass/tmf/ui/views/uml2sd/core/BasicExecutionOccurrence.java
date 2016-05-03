@@ -135,26 +135,6 @@ public class BasicExecutionOccurrence extends GraphNode {
     }
 
     /**
-     * Get the execution start event occurrence
-     *
-     * @return the start event occurrence to set
-     */
-    @Override
-    public int getStartOccurrence() {
-        return super.getStartOccurrence();
-    }
-
-    /**
-     * Set the execution end event occurrence
-     *
-     * @return the end event occurrence to set
-     */
-    @Override
-    public int getEndOccurrence() {
-        return super.getEndOccurrence();
-    }
-
-    /**
      * Set the execution start event occurrence
      *
      * @param occurrence the start event occurrence to set
