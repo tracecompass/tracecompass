@@ -172,7 +172,7 @@ public class DiskWriteModel extends Disk {
         Pair<Request, Integer> reqQuark = fWaitingQueue.get(initialSector);
         if (reqQuark == null) {
             return addWaitingRequest(ts, request);
-        } else if (initialSector != request.getSector()) {
+        } else if (!initialSector.equals(request.getSector())) {
             fWaitingQueue.remove(initialSector);
             fWaitingQueue.put(request.getSector(), reqQuark);
         }
