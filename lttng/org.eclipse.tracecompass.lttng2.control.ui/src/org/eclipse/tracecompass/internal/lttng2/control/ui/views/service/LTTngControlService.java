@@ -949,7 +949,7 @@ public class LTTngControlService implements ILttngControlService {
                 inList = true;
             } else if (endMatcher.matches()) {
                 break;
-            } else if (inList == true) {
+            } else if (inList) {
                 String[] tmp = line.split(","); //$NON-NLS-1$
                 for (int i = 0; i < tmp.length; i++) {
                     contexts.add(tmp[i].trim());
