@@ -223,32 +223,31 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                 if (name == null) {
                     throw new IllegalStateException("Invalid attribute name"); //$NON-NLS-1$
                 }
-                if (name.equals(TmfXmlStrings.CPU)) {
-                    /* See if the event advertises a CPU aspect */
-                    Integer cpu = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(
-                            event.getTrace(), TmfCpuAspect.class, event);
-                    if (cpu != null) {
-                        quark = getQuarkRelativeAndAdd(startQuark, cpu.toString());
+                /* First, look for a field with the given name */
+                ITmfEventField field = event.getContent().getField(name);
+                /* Field not found, see if it is a special case field */
+                if (field == null) {
+                    if (name.equalsIgnoreCase(TmfXmlStrings.CPU)) {
+                        /* See if the event advertises a CPU aspect */
+                        Integer cpu = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(
+                                event.getTrace(), TmfCpuAspect.class, event);
+                        if (cpu != null) {
+                            return getQuarkRelativeAndAdd(startQuark, cpu.toString());
+                        }
                     }
-                } else {
-                    final ITmfEventField content = event.getContent();
-                    /* stop if the event field doesn't exist */
-                    if (content.getField(name) == null) {
-                        return IXmlStateSystemContainer.ERROR_QUARK;
-                    }
+                    return IXmlStateSystemContainer.ERROR_QUARK;
+                }
+                Object fieldValue = field.getValue();
 
-                    Object field = content.getField(name).getValue();
-
-                    if (field instanceof String) {
-                        String fieldString = (String) field;
-                        quark = getQuarkRelativeAndAdd(startQuark, fieldString);
-                    } else if (field instanceof Long) {
-                        Long fieldLong = (Long) field;
-                        quark = getQuarkRelativeAndAdd(startQuark, fieldLong.toString());
-                    } else if (field instanceof Integer) {
-                        Integer fieldInterger = (Integer) field;
-                        quark = getQuarkRelativeAndAdd(startQuark, fieldInterger.toString());
-                    }
+                if (fieldValue instanceof String) {
+                    String fieldString = (String) fieldValue;
+                    quark = getQuarkRelativeAndAdd(startQuark, fieldString);
+                } else if (fieldValue instanceof Long) {
+                    Long fieldLong = (Long) fieldValue;
+                    quark = getQuarkRelativeAndAdd(startQuark, fieldLong.toString());
+                } else if (fieldValue instanceof Integer) {
+                    Integer fieldInterger = (Integer) fieldValue;
+                    quark = getQuarkRelativeAndAdd(startQuark, fieldInterger.toString());
                 }
                 return quark;
             }

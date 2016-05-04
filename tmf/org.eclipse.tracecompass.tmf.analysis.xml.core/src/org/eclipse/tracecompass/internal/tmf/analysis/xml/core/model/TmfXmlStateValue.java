@@ -248,33 +248,36 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
 
         ITmfStateValue value = TmfStateValue.nullValue();
 
-        final ITmfEventField content = event.getContent();
+        final ITmfEventField field = event.getContent().getField(fieldName);
 
-        /* Exception for "CPU", returns the source of this event */
-        /* FIXME : Nameclash if a eventfield have "cpu" for name. */
-        if (fieldName.equals(TmfXmlStrings.CPU)) {
-            Integer cpu = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
-            if (cpu != null) {
-                return TmfStateValue.newValueInt(cpu.intValue());
+        /* If the field does not exist, see if it's a special case */
+        if (field == null) {
+
+            if (fieldName.equalsIgnoreCase(TmfXmlStrings.CPU)) {
+                /* A "CPU" field will return the CPU aspect if available */
+                Integer cpu = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
+                if (cpu != null) {
+                    return TmfStateValue.newValueInt(cpu.intValue());
+                }
+            } else if (fieldName.equalsIgnoreCase(TmfXmlStrings.TIMESTAMP)) {
+                /*
+                 * Exception also for "TIMESTAMP", returns the timestamp of this
+                 * event
+                 */
+                return TmfStateValue.newValueLong(event.getTimestamp().getValue());
             }
-        }
-        /* Exception also for "TIMESTAMP", returns the timestamp of this event */
-        if (fieldName.equals(TmfXmlStrings.TIMESTAMP)) {
-            return TmfStateValue.newValueLong(event.getTimestamp().getValue());
-        }
-        if (content.getField(fieldName) == null) {
             return value;
         }
 
-        Object field = content.getField(fieldName).getValue();
+        Object fieldValue = field.getValue();
 
         /*
          * Try to find the right type. The type can be forced by
          * "forcedType" argument.
          */
 
-        if (field instanceof String) {
-            String fieldString = (String) field;
+        if (fieldValue instanceof String) {
+            String fieldString = (String) fieldValue;
 
             switch (fForcedType) {
             case INTEGER:
@@ -294,8 +297,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
                 value = TmfStateValue.newValueString(fieldString);
                 break;
             }
-        } else if (field instanceof Long) {
-            Long fieldLong = (Long) field;
+        } else if (fieldValue instanceof Long) {
+            Long fieldLong = (Long) fieldValue;
 
             switch (fForcedType) {
             case INTEGER:
@@ -315,8 +318,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
                 value = TmfStateValue.newValueLong(fieldLong);
                 break;
             }
-        } else if (field instanceof Integer) {
-            Integer fieldInteger = (Integer) field;
+        } else if (fieldValue instanceof Integer) {
+            Integer fieldInteger = (Integer) fieldValue;
 
             switch (fForcedType) {
             case LONG:
@@ -336,8 +339,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
                 value = TmfStateValue.newValueInt(fieldInteger);
                 break;
             }
-        } else if (field instanceof Double) {
-            Double fieldDouble = (Double) field;
+        } else if (fieldValue instanceof Double) {
+            Double fieldDouble = (Double) fieldValue;
 
             switch (fForcedType) {
             case LONG:
