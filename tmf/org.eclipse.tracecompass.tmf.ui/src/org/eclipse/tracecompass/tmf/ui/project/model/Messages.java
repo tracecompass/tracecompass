@@ -75,6 +75,10 @@ public class Messages extends NLS {
     /** The descriptor for the event type property */
     public static String TmfTraceElement_EventType;
 
+    /** The descriptor for the trace type ID property
+     * @since 2.0*/
+    public static String TmfTraceElement_TraceTypeId;
+
     /** The descriptor for the linked property */
     public static String TmfTraceElement_IsLinked;
 
