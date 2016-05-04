@@ -136,7 +136,6 @@ public class FlatArray extends AbstractFileCheckpointCollection {
                 lower = middle + 1;
             }
         }
-        long insertionPoint = lower;
-        return -(insertionPoint) - 1;
+        return -(lower) - 1;
     }
 }
