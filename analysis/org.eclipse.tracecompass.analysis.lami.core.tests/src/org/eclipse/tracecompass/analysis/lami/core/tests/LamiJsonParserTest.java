@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiTableEntryAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiResultTable;
@@ -30,7 +31,6 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.La
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiSize;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiSystemCall;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiTimeRange;
-import org.eclipse.tracecompass.tmf.core.analysis.ondemand.OnDemandAnalysisException;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -124,10 +124,10 @@ public class LamiJsonParserTest {
     /**
      * Test the results parsing.
      *
-     * @throws OnDemandAnalysisException when execute() fails.
+     * @throws CoreException when execute() fails.
      */
     @Test
-    public void testResults() throws OnDemandAnalysisException {
+    public void testResults() throws CoreException {
         LamiAnalysisStub analysis = new LamiAnalysisStub("test-metadata.json", "test-results.json");
 
         List<LamiResultTable> resultTables = analysis.execute(fTrace, null, "", new NullProgressMonitor());
@@ -213,10 +213,10 @@ public class LamiJsonParserTest {
     /**
      * Test the error parsing of the results.
      *
-     * @throws OnDemandAnalysisException when execute() fails.
+     * @throws CoreException when execute() fails.
      */
-    @Test (expected = OnDemandAnalysisException.class)
-    public void testResultsError() throws OnDemandAnalysisException {
+    @Test (expected = CoreException.class)
+    public void testResultsError() throws CoreException {
         LamiAnalysisStub analysis = new LamiAnalysisStub("test-metadata.json", "test-error.json");
 
         analysis.execute(fTrace, null, "", new NullProgressMonitor());

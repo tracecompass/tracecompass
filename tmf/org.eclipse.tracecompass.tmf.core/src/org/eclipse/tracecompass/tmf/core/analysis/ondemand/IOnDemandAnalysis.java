@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.tmf.core.analysis.ondemand;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -93,10 +94,10 @@ public interface IOnDemandAnalysis {
      *            for a default monitor.
      * @return The results of this analysis. Exact object type is
      *         analysis-dependent, a more specific return type is encouraged.
-     * @throws OnDemandAnalysisException
+     * @throws CoreException
      *             If something went wrong with the execution, and expected
      *             results will not be returned
      */
     Object execute(ITmfTrace trace, TmfTimeRange range, String extraParams,
-            IProgressMonitor monitor) throws OnDemandAnalysisException;
+            IProgressMonitor monitor) throws CoreException;
 }

@@ -20,12 +20,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiAnalysis;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel;
-import org.eclipse.tracecompass.tmf.core.analysis.ondemand.OnDemandAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.ImmutableMultimap;
@@ -65,8 +65,7 @@ public class LamiAnalysisStub extends LamiAnalysis {
 
     @Override
     protected String getResultsFromCommand(List<String> command, IProgressMonitor monitor)
-            throws OnDemandAnalysisException {
-
+            throws CoreException {
         return readLamiFile(fResultFilename);
     }
 

@@ -16,14 +16,15 @@ import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IInputValidator;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -35,7 +36,6 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.L
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportViewFactory;
 import org.eclipse.tracecompass.tmf.core.analysis.ondemand.IOnDemandAnalysis;
 import org.eclipse.tracecompass.tmf.core.analysis.ondemand.IOnDemandAnalysisReport;
-import org.eclipse.tracecompass.tmf.core.analysis.ondemand.OnDemandAnalysisException;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -137,22 +137,37 @@ public class RunAnalysisHandler extends AbstractHandler {
                     });
                     return Status.OK_STATUS;
 
-                } catch (OnDemandAnalysisException e) {
-                    String errMsg = e.getMessage();
+                } catch (CoreException e) {
+                    /*
+                     * The analysis execution did not complete normally, we will
+                     * report it to the user.
+                     */
+                    IStatus status = e.getStatus();
 
-                    if (errMsg != null) {
-                        /* The analysis execution yielded an error */
-                        Display.getDefault().asyncExec(() -> {
-                            MessageDialog.openError(shell,
-                                    /* Dialog title */
-                                    Messages.ParameterDialog_Error,
-                                    /* Dialog message */
-                                    Messages.ParameterDialog_ErrorMessage + ":\n\n" + //$NON-NLS-1$
-                                            errMsg);
-                        });
+                    /* Don't display a dialog if it was simply cancelled by the user */
+                    if (status.matches(IStatus.CANCEL)) {
+                        return status;
                     }
 
-                    return Status.CANCEL_STATUS;
+                    String dialogTitle;
+                    String dialogMessage;
+                    if (status.matches(IStatus.ERROR)) {
+                        dialogTitle = Messages.ErrorDialog_Error;
+                        dialogMessage = Messages.ErrorDialog_ErrorMessage;
+                    } else {
+                        dialogTitle = Messages.ErrorDialog_Info;
+                        dialogMessage = Messages.ErrorDialog_InfoMessage;
+                    }
+
+                    Display.getDefault().asyncExec(() -> {
+                        ErrorDialog.openError(shell, dialogTitle, dialogMessage, status);
+                    });
+
+                    /*
+                     * We showed our own error message, no need for the Job to
+                     * show another one.
+                     */
+                    return Status.OK_STATUS;
                 }
             }
         };

@@ -27,6 +27,8 @@ public class Messages extends NLS {
 
     public static String LamiAnalysis_MainTaskName;
     public static String LamiAnalysis_NoResults;
+    public static String LamiAnalysis_ErrorDuringExecution;
+    public static String LamiAnalysis_ErrorNoOutput;
     public static String LamiAnalysis_ExecutionInterrupted;
 
     public static String LamiAnalysis_ExtendedTableNamePrefix;

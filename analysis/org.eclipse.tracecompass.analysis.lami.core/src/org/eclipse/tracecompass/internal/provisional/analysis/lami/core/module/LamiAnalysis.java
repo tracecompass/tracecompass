@@ -30,7 +30,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.analysis.lami.core.Activator;
@@ -54,7 +58,6 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.La
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiData.DataType;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiTimeRange;
 import org.eclipse.tracecompass.tmf.core.analysis.ondemand.IOnDemandAnalysis;
-import org.eclipse.tracecompass.tmf.core.analysis.ondemand.OnDemandAnalysisException;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.json.JSONArray;
@@ -487,12 +490,12 @@ public class LamiAnalysis implements IOnDemandAnalysis {
      * @param monitor
      *            The progress monitor used to report progress
      * @return The script's output, formatted into {@link LamiTableEntry}'s.
-     * @throws OnDemandAnalysisException
+     * @throws CoreException
      *             If execution did not terminate normally
      */
     @Override
     public List<LamiResultTable> execute(ITmfTrace trace, @Nullable TmfTimeRange timeRange,
-            String extraParams, IProgressMonitor monitor) throws OnDemandAnalysisException {
+            String extraParams, IProgressMonitor monitor) throws CoreException {
         /* Should have been called already, but in case it was not */
         initialize();
 
@@ -511,7 +514,8 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         String output = getResultsFromCommand(command, monitor);
 
         if (output.isEmpty()) {
-            throw new OnDemandAnalysisException(Messages.LamiAnalysis_NoResults);
+            IStatus status = new Status(IStatus.INFO, Activator.instance().getPluginId(), Messages.LamiAnalysis_NoResults);
+            throw new CoreException(status);
         }
 
         /*
@@ -585,7 +589,8 @@ public class LamiAnalysis implements IOnDemandAnalysis {
                  * No results were reported. This may be normal, but warn the
                  * user why a report won't be created.
                  */
-                throw new OnDemandAnalysisException(Messages.LamiAnalysis_NoResults);
+                IStatus status = new Status(IStatus.INFO, Activator.instance().getPluginId(), Messages.LamiAnalysis_NoResults);
+                throw new CoreException(status);
             }
 
             for (int i = 0; i < results.length(); i++) {
@@ -652,7 +657,8 @@ public class LamiAnalysis implements IOnDemandAnalysis {
             }
 
         } catch (JSONException e) {
-            throw new OnDemandAnalysisException(e.getMessage());
+            IStatus status = new Status(IStatus.ERROR, Activator.instance().getPluginId(), e.getMessage(), e);
+            throw new CoreException(status);
         }
 
         return resultsBuilder.build();
@@ -707,13 +713,13 @@ public class LamiAnalysis implements IOnDemandAnalysis {
      * @param monitor
      *            The progress monitor
      * @return The analysis results
-     * @throws OnDemandAnalysisException
+     * @throws CoreException
      *             If the command ended abnormally, and normal results were not
      *             returned
      */
     @VisibleForTesting
     protected String getResultsFromCommand(List<String> command, IProgressMonitor monitor)
-            throws OnDemandAnalysisException {
+            throws CoreException {
 
         final int scale = 1000;
         double workedSoFar = 0.0;
@@ -792,7 +798,8 @@ public class LamiAnalysis implements IOnDemandAnalysis {
 
             if (monitor.isCanceled()) {
                 /* We were interrupted by the canceller thread. */
-                throw new OnDemandAnalysisException(null);
+                IStatus status = new Status(IStatus.CANCEL, Activator.instance().getPluginId(), null);
+                throw new CoreException(status);
             }
 
             if (ret != 0) {
@@ -801,8 +808,21 @@ public class LamiAnalysis implements IOnDemandAnalysis {
                  * gather the stderr and report it to the user.
                  */
                 BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-                String stdErrOutput = br.lines().collect(Collectors.joining("\n")); //$NON-NLS-1$
-                throw new OnDemandAnalysisException(stdErrOutput);
+                List<String> stdErrOutput = br.lines().collect(Collectors.toList());
+
+                MultiStatus status = new MultiStatus(Activator.instance().getPluginId(),
+                        IStatus.ERROR, Messages.LamiAnalysis_ErrorDuringExecution, null);
+                for (String str : stdErrOutput) {
+                    status.add(new Status(IStatus.ERROR, Activator.instance().getPluginId(), str));
+                }
+                if (stdErrOutput.isEmpty()) {
+                    /*
+                     * At least say "no output", so an error message actually
+                     * shows up.
+                     */
+                    status.add(new Status(IStatus.ERROR, Activator.instance().getPluginId(), Messages.LamiAnalysis_ErrorNoOutput));
+                }
+                throw new CoreException(status);
             }
 
             /* External script ended successfully, all is fine! */
@@ -810,7 +830,8 @@ public class LamiAnalysis implements IOnDemandAnalysis {
             return checkNotNull(resultsStr);
 
         } catch (IOException | InterruptedException e) {
-            throw new OnDemandAnalysisException(Messages.LamiAnalysis_ExecutionInterrupted);
+            IStatus status = new Status(IStatus.ERROR, Activator.instance().getPluginId(), Messages.LamiAnalysis_ExecutionInterrupted, e);
+            throw new CoreException(status);
 
         } finally {
             if (cancellerRunnable != null) {
