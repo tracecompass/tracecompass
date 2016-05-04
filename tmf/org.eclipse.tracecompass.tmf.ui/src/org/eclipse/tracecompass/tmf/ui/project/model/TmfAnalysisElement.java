@@ -295,7 +295,10 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
      */
     private Map<String, String> getAnalysisProperties() {
         ITmfProjectModelElement parent = getParent();
-
+        if (!(parent instanceof TmfViewsElement)) {
+            return Collections.EMPTY_MAP;
+        }
+        parent = parent.getParent();
         if (parent instanceof TmfCommonProjectElement) {
             ITmfTrace trace = ((TmfCommonProjectElement) parent).getTrace();
             if (trace == null) {
