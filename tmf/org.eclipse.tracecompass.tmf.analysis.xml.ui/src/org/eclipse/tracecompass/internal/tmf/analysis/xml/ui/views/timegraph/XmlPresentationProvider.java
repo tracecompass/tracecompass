@@ -40,12 +40,17 @@ import org.w3c.dom.Element;
  * provider.
  *
  * TODO: This should support colors/states defined for each entry element in the
- * XML element. Also, event values may not be integers only (for instance, this
- * wouldn't support yet the callstack view)
+ * XML element.
  *
  * @author Florian Wininger
  */
 public class XmlPresentationProvider extends TimeGraphPresentationProvider {
+
+    private static final long[] COLOR_SEED = { 0x0000ff, 0xff0000, 0x00ff00,
+            0xff00ff, 0x00ffff, 0xffff00, 0x000000, 0xf07300
+    };
+
+    private static final int COLOR_MASK = 0xffffff;
 
     private List<StateItem> stateValues = new ArrayList<>();
     /*
@@ -126,7 +131,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
      * @param viewElement
      *            The XML view element
      */
-    public void loadNewStates(@NonNull Element viewElement) {
+    public synchronized void loadNewStates(@NonNull Element viewElement) {
         stateValues.clear();
         stateIndex.clear();
         List<Element> states = XmlUtils.getChildElements(viewElement, TmfXmlStrings.DEFINED_VALUE);
@@ -136,24 +141,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
             String name = state.getAttribute(TmfXmlStrings.NAME);
             String color = state.getAttribute(TmfXmlStrings.COLOR);
 
-            // FIXME Allow this case
-            if (value < 0) {
-                return;
-            }
-
-            final RGB colorRGB = (color.startsWith(TmfXmlStrings.COLOR_PREFIX)) ? parseColor(color) : calcColor(value);
-
-            StateItem item = new StateItem(colorRGB, name);
-
-            Integer index = stateIndex.get(value);
-            if (index == null) {
-                /* Add the new state value */
-                stateIndex.put(value, stateValues.size());
-                stateValues.add(item);
-            } else {
-                /* Override a previous state value */
-                stateValues.set(index, item);
-            }
+            addOrUpdateState(value, name, color);
         }
         Display.getDefault().asyncExec(new Runnable() {
             @Override
@@ -161,6 +149,51 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
                 fireColorSettingsChanged();
             }
         });
+    }
+
+    /**
+     * Add a new state in the time graph view. This allow to define at runtime
+     * new states that cannot be known at the conception of this analysis.
+     *
+     * @param name
+     *            The string associated with the state
+     * @return the value for this state
+     */
+    public synchronized int addState(String name) {
+        // Find a value for this name, start at 10000
+        int value = 10000;
+        while (stateIndex.get(value) != null) {
+            value++;
+        }
+        addOrUpdateState(value, name, ""); //$NON-NLS-1$
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                fireColorSettingsChanged();
+            }
+        });
+        return value;
+    }
+
+    private synchronized void addOrUpdateState(int value, String name, String color) {
+        // FIXME Allow this case
+        if (value < 0) {
+            return;
+        }
+
+        final RGB colorRGB = (color.startsWith(TmfXmlStrings.COLOR_PREFIX)) ? parseColor(color) : calcColor(name);
+
+        StateItem item = new StateItem(colorRGB, name);
+
+        Integer index = stateIndex.get(value);
+        if (index == null) {
+            /* Add the new state value */
+            stateIndex.put(value, stateValues.size());
+            stateValues.add(item);
+        } else {
+            /* Override a previous state value */
+            stateValues.set(index, item);
+        }
     }
 
     private static RGB parseColor(String color) {
@@ -173,39 +206,18 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
         return colorRGB;
     }
 
-    private static RGB calcColor(int value) {
-        int x = (value * 97) % 1530;
-        int r = 0, g = 0, b = 0;
-        if (x >= 0 && x < 255) {
-            r = 255;
-            g = x;
-            b = 0;
-        }
-        if (x >= 255 && x < 510) {
-            r = 510 - x;
-            g = 255;
-            b = 0;
-        }
-        if (x >= 510 && x < 765) {
-            r = 0;
-            g = 255;
-            b = x - 510;
-        }
-        if (x >= 765 && x < 1020) {
-            r = 0;
-            g = 1020 - x;
-            b = 255;
-        }
-        if (x >= 1020 && x < 1275) {
-            r = x - 1020;
-            g = 0;
-            b = 255;
-        }
-        if (x >= 1275 && x <= 1530) {
-            r = 255;
-            g = 0;
-            b = 1530 - x;
-        }
+    /*
+     * This method will always return the same color for a same name, no matter
+     * the value, so that different traces with the same XML analysis will
+     * display identically states with the same name.
+     */
+    private static RGB calcColor(String name) {
+        long hash = name.hashCode(); // hashcodes can be Integer.MIN_VALUE.
+        long base = COLOR_SEED[(int) (Math.abs(hash) % COLOR_SEED.length)];
+        int x = (int) ((hash & COLOR_MASK) ^ base);
+        final int r = (x >> 16) & 0xff;
+        final int g = (x >> 8) & 0xff;
+        final int b = x & 0xff;
         return new RGB(r, g, b);
     }
 
