@@ -36,12 +36,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.URIUtil;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.project.operations.TmfWorkspaceModifyOperation;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
@@ -61,7 +60,7 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
  * inputs are a collection of TraceFileSystemElement and several flags that control
  *
  */
-public class TraceValidateAndImportOperation implements IRunnableWithProgress {
+public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation {
 
     private static final String TRACE_IMPORT_TEMP_FOLDER = ".traceImport"; //$NON-NLS-1$
 
@@ -132,14 +131,19 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
     }
 
     @Override
-    public void run(IProgressMonitor progressMonitor) {
+    protected void execute(IProgressMonitor progressMonitor) throws CoreException, InvocationTargetException, InterruptedException {
         try {
+            final int ARCHIVE_OR_DIRECTORY_PROGRESS = 45;
+            final int EXTRA_IMPORT_OPERATION_PROGRESS = 45;
+            final int DELETE_PROGRESS = 10;
+            final int TOTAL_PROGRESS = ARCHIVE_OR_DIRECTORY_PROGRESS +
+                    EXTRA_IMPORT_OPERATION_PROGRESS + DELETE_PROGRESS;
 
             final List<TraceFileSystemElement> selectedFileSystemElements = fSelectedFileSystemElements;
 
             // List fileSystemElements will be filled using the
             // passThroughFilter
-            SubMonitor subMonitor = SubMonitor.convert(progressMonitor, 1);
+            SubMonitor subMonitor = SubMonitor.convert(progressMonitor, TOTAL_PROGRESS);
 
             // Check if operation was cancelled.
             ModalContext.checkCanceled(subMonitor);
@@ -147,20 +151,19 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
             // Temporary directory to contain any extracted files
             IFolder destTempFolder = fTraceFolderElement.getProject().getResource().getFolder(TRACE_IMPORT_TEMP_FOLDER);
             if (destTempFolder.exists()) {
-                SubProgressMonitor monitor = new SubProgressMonitor(subMonitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
+                SubMonitor monitor = subMonitor.newChild(1);
                 destTempFolder.delete(true, monitor);
             }
-            SubProgressMonitor monitor = new SubProgressMonitor(subMonitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
+            SubMonitor monitor = subMonitor.newChild(1);
             destTempFolder.create(IResource.HIDDEN, true, monitor);
 
-            subMonitor = SubMonitor.convert(progressMonitor, 2);
             String baseSourceLocation = null;
             if (fImportFromArchive) {
                 // When importing from archive, we first extract the
                 // *selected* files to a temporary folder then create new
                 // TraceFileSystemElements
 
-                SubMonitor archiveMonitor = SubMonitor.convert(subMonitor.newChild(1), 2);
+                SubMonitor archiveMonitor = SubMonitor.convert(subMonitor.newChild(ARCHIVE_OR_DIRECTORY_PROGRESS), 2);
 
                 // Extract selected files from source archive to temporary
                 // folder
@@ -176,7 +179,7 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
                     extractAllArchiveFiles(tempFolderFileSystemElements, destTempFolder, destTempFolder.getLocation(), archiveMonitor.newChild(1));
                 }
             } else {
-                SubMonitor directoryMonitor = SubMonitor.convert(subMonitor.newChild(1), 2);
+                SubMonitor directoryMonitor = SubMonitor.convert(subMonitor.newChild(ARCHIVE_OR_DIRECTORY_PROGRESS), 2);
                 // Import selected files, excluding archives (done in a later
                 // step)
                 importFileSystemElements(directoryMonitor.newChild(1), selectedFileSystemElements);
@@ -204,12 +207,12 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
                 // Never import extracted files as links, they would link to the
                 // temporary directory that will be deleted
                 fImportOptionFlags = fImportOptionFlags & ~ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
-                SubMonitor importTempMonitor = subMonitor.newChild(1);
+                SubMonitor importTempMonitor = subMonitor.newChild(EXTRA_IMPORT_OPERATION_PROGRESS);
                 importFileSystemElements(importTempMonitor, tempFolderFileSystemElements);
             }
 
             if (destTempFolder.exists()) {
-                destTempFolder.delete(true, progressMonitor);
+                destTempFolder.delete(true, subMonitor.newChild(TOTAL_PROGRESS));
             }
 
             setStatus(Status.OK_STATUS);
@@ -445,7 +448,7 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
         operation.setOverwriteResources(false);
         operation.setVirtualFolders(false);
 
-        operation.run(new SubProgressMonitor(progressMonitor, subList.size(), SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
+        operation.run(SubMonitor.convert(progressMonitor).newChild(subList.size()));
     }
 
     private static TraceFileSystemElement getRootElement(TraceFileSystemElement element) {
@@ -527,7 +530,7 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
         // Finally import trace
         IResource importedResource = importResource(fileSystemElement, monitor);
         if (importedResource != null) {
-            TmfTraceTypeUIUtils.setTraceType(importedResource, traceTypeHelper);
+            TmfTraceTypeUIUtils.setTraceType(importedResource, traceTypeHelper, false);
             fImportedResources.add(importedResource);
         }
 
@@ -608,10 +611,10 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
         operation.setCreateLinks(createLinksInWorkspace);
         operation.setVirtualFolders(false);
 
-        operation.run(new SubProgressMonitor(monitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
+        operation.run(SubMonitor.convert(monitor).newChild(1));
         String sourceLocation = fileSystemElement.getSourceLocation();
         IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(tracePath);
-        if (sourceLocation != null) {
+        if ((sourceLocation != null) && (resource != null)) {
             resource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
         }
 
