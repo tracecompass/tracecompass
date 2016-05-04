@@ -302,7 +302,8 @@ public class TmfXmlFsm {
      * @return True if the start of a new scenario is allowed, false otherwise
      */
     public synchronized boolean isNewScenarioAllowed() {
-        return !fActiveScenariosList.get(fActiveScenariosList.size() - 1).getScenarioInfos().getStatus().equals(ScenarioStatusType.PENDING)
-                && fInstanceMultipleEnabled && fTotalScenarios > 0;
+        return fTotalScenarios > 0
+                && !fActiveScenariosList.get(fActiveScenariosList.size() - 1).getScenarioInfos().getStatus().equals(ScenarioStatusType.PENDING)
+                && fInstanceMultipleEnabled;
     }
 }
