@@ -23,15 +23,21 @@ import java.util.function.ToDoubleFunction;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiTableEntryAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel;
@@ -41,6 +47,8 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.L
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.signals.LamiSelectionUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.swtchart.Chart;
 import org.swtchart.ITitle;
 
@@ -162,6 +170,8 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
     private boolean fSelected;
     private Set<Integer> fSelection;
 
+    private final ToolBar fToolBar;
+
     /**
      * Creates a Viewer instance based on SWTChart.
      *
@@ -278,6 +288,8 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
         /* Refresh the titles to fit the current chart size */
         refreshDisplayTitles();
 
+        fToolBar = createChartToolBar();
+
         fChart.addDisposeListener(e -> {
                 /* Dispose resources of this class */
                 LamiXYChartViewer.super.dispose();
@@ -393,6 +405,13 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
      */
     protected Chart getChart() {
         return fChart;
+    }
+
+    /**
+     * @return the toolBar
+     */
+    public ToolBar getToolBar() {
+        return fToolBar;
     }
 
     /**
@@ -591,5 +610,89 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
         setSelection(signal.getEntryIndex());
 
         redraw();
+    }
+
+    /**
+     * Create a tool bar on top right of the chart. Contained actions:
+     * <ul>
+     * <li>Dispose the current viewer, also known as "Close the chart"</li>
+     * </ul>
+     *
+     * This tool bar should only appear when the mouse enters the composite.
+     *
+     * @return the tool bar
+     */
+    protected ToolBar createChartToolBar() {
+        Image removeImage = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_REMOVE);
+        ToolBar toolBar = new ToolBar(getChart(), SWT.HORIZONTAL);
+
+        /* Default state */
+        toolBar.moveAbove(null);
+        toolBar.setVisible(false);
+
+        /*
+         * Close chart button
+         */
+        ToolItem closeButton = new ToolItem(toolBar, SWT.PUSH);
+        closeButton.setImage(removeImage);
+        closeButton.setToolTipText(Messages.LamiXYChartViewer_CloseChartToolTip);
+        closeButton.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(@Nullable SelectionEvent e) {
+                Composite parent = getParent();
+                dispose();
+                parent.layout();
+            }
+
+            @Override
+            public void widgetDefaultSelected(@Nullable SelectionEvent e) {
+            }
+        });
+
+        toolBar.pack();
+        toolBar.setLocation(new Point(getChart().getSize().x - toolBar.getSize().x, 0));
+
+        /* Visibility toggle filter */
+        Listener toolBarVisibilityToggleListener = e -> {
+            if (e.widget instanceof Control) {
+                Control control = (Control) e.widget;
+                Point display = control.toDisplay(e.x, e.y);
+                Point location = getChart().getParent().toControl(display);
+
+                /*
+                 * Only set to visible if we are at the right location, in the
+                 * right shell.
+                 */
+                boolean visible = getChart().getBounds().contains(location) &&
+                        control.getShell().equals(getChart().getShell());
+                getToolBar().setVisible(visible);
+            }
+        };
+
+        /* Filter to make sure we hide the toolbar if we exit the window */
+        Listener hideToolBarListener = (e -> getToolBar().setVisible(false));
+
+        /*
+         * Add the filters to the main Display, and remove them when we dispose
+         * the chart.
+         */
+        Display display = getChart().getDisplay();
+        display.addFilter(SWT.MouseEnter, toolBarVisibilityToggleListener);
+        display.addFilter(SWT.MouseExit, hideToolBarListener);
+
+        getChart().addDisposeListener(e -> {
+            display.removeFilter(SWT.MouseEnter, toolBarVisibilityToggleListener);
+            display.removeFilter(SWT.MouseExit, hideToolBarListener);
+        });
+
+        /* Reposition the tool bar on resize */
+        getChart().addListener(SWT.Resize, new Listener() {
+            @Override
+            public void handleEvent(@Nullable Event event) {
+                toolBar.setLocation(new Point(getChart().getSize().x - toolBar.getSize().x, 0));
+            }
+        });
+
+        return toolBar;
     }
 }

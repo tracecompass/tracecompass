@@ -23,9 +23,11 @@ public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = Messages.class.getPackage().getName() + ".messages"; //$NON-NLS-1$
 
-    public static String LamiViewer_DefaultValueName;
-
     public static String LamiScatterViewer_by;
+
+    public static String LamiXYChartViewer_CloseChartToolTip;
+
+    public static String LamiViewer_DefaultValueName;
 
     static {
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
