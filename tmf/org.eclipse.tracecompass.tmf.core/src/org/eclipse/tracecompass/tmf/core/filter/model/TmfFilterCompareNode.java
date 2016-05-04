@@ -178,7 +178,7 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode {
             }
         } else if (fType == Type.ALPHA) {
             String valueString = value.toString();
-            int comp = (int) Math.signum(valueString.compareTo(fValue.toString()));
+            int comp = (int) Math.signum(valueString.compareTo(fValue));
             return (comp == fResult) ^ fNot;
         } else if (fType == Type.TIMESTAMP) {
             if (fValueTimestamp != null) {
