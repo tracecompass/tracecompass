@@ -231,7 +231,7 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
 
         @Override
         public int compareTo(ITmfTimestamp other) {
-            if (equals(other) == true) {
+            if (equals(other)) {
                 return 0;
             }
             return -1;
