@@ -576,7 +576,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         // Avoid overwriting destination path without repeatedly trigger
         // call of handleEvent();
         synchronized (fSyncObject) {
-            if (fIsDestinationChanged == false) {
+            if (!fIsDestinationChanged) {
                 event.display.asyncExec(new Runnable() {
                     @Override
                     public void run() {
