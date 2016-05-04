@@ -17,7 +17,9 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioHistoryBuilder.ScenarioStatusType;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
@@ -204,7 +206,12 @@ public class TmfXmlFsm {
     public @Nullable TmfXmlStateTransition next(ITmfEvent event, Map<String, TmfXmlTransitionValidator> tests, TmfXmlScenarioInfo scenarioInfo) {
         boolean matched = false;
         TmfXmlStateTransition stateTransition = null;
-        TmfXmlState state = NonNullUtils.checkNotNull(fStatesMap.get(scenarioInfo.getActiveState()));
+        TmfXmlState state = fStatesMap.get(scenarioInfo.getActiveState());
+        if (state == null) {
+            /** FIXME: This logging should be replaced by something the user will see, this is XML debugging information! */
+            Activator.logError(NLS.bind(Messages.TmfXmlFsm_StateUndefined, scenarioInfo.getActiveState(), getId()));
+            return null;
+        }
         for (int i = 0; i < state.getTransitionList().size() && !matched; i++) {
             stateTransition = state.getTransitionList().get(i);
             matched = stateTransition.test(event, scenarioInfo, tests);
