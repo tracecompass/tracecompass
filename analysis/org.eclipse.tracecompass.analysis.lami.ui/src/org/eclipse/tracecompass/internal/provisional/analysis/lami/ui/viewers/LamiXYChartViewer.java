@@ -214,23 +214,33 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
              * There are multiple series in the chart, if they all share the same
              * units, display that.
              */
-            long nbDiffAspects = getXAxisAspects().stream()
+            long nbDiffAspectsUnits = getXAxisAspects().stream()
                 .map(aspect -> aspect.getUnits())
                 .distinct()
                 .count();
 
+            long nbDiffAspectName = getXAxisAspects().stream()
+                    .map(aspect -> aspect.getName())
+                    .distinct()
+                    .count();
+
+            String xBaseTitle = Messages.LamiViewer_DefaultValueName;
+            if (nbDiffAspectName == 1) {
+                xBaseTitle = getXAxisAspects().get(0).getName();
+            }
+
             String units = getXAxisAspects().get(0).getUnits();
-            if (nbDiffAspects == 1 && units != null) {
+            if (nbDiffAspectsUnits == 1 && units != null) {
                 /* All aspects use the same unit type */
 
                 // The time duration formatter converts ns to s on the axis
                 if (NANOSECONDS_SYMBOL.equals(units)) {
                     units = SECONDS_SYMBOL;
                 }
-                fXTitle = Messages.LamiViewer_DefaultValueName + " (" + units + ')'; //$NON-NLS-1$
+                fXTitle = xBaseTitle + " (" + units + ')'; //$NON-NLS-1$
             } else {
                 /* Various unit types, just say "Value" */
-                fXTitle = nullToEmptyString(Messages.LamiViewer_DefaultValueName);
+                fXTitle = nullToEmptyString(xBaseTitle);
             }
         }
 
@@ -252,23 +262,33 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
              * There are multiple series in the chart, if they all share the same
              * units, display that.
              */
-            long nbDiffAspects = getYAxisAspects().stream()
+            long nbDiffAspectsUnits = getYAxisAspects().stream()
                 .map(aspect -> aspect.getUnits())
                 .distinct()
                 .count();
 
+            long nbDiffAspectName = getYAxisAspects().stream()
+                    .map(aspect -> aspect.getName())
+                    .distinct()
+                    .count();
+
+            String yBaseTitle = Messages.LamiViewer_DefaultValueName;
+            if (nbDiffAspectName == 1) {
+                yBaseTitle = getYAxisAspects().get(0).getName();
+            }
+
             String units = getYAxisAspects().get(0).getUnits();
-            if (nbDiffAspects == 1 && units != null) {
+            if (nbDiffAspectsUnits == 1 && units != null) {
                 /* All aspects use the same unit type */
 
                 // The time duration formatter converts ns to s on the axis
                 if (NANOSECONDS_SYMBOL.equals(units)) {
                     units = SECONDS_SYMBOL;
                 }
-                fYTitle = Messages.LamiViewer_DefaultValueName + " (" + units + ')'; //$NON-NLS-1$
+                fYTitle = yBaseTitle + " (" + units + ')'; //$NON-NLS-1$
             } else {
-                /* Various unit types, just say "Value" */
-                fYTitle = nullToEmptyString(Messages.LamiViewer_DefaultValueName);
+                /* Various unit types, don't display any units */
+                fYTitle = nullToEmptyString(yBaseTitle);
             }
 
             /* Put legend at the bottom */
