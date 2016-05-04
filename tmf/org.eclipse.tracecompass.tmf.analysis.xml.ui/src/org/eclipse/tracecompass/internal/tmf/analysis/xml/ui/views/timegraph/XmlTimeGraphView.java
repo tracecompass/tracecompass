@@ -49,6 +49,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -97,6 +98,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
 
     private final @NonNull XmlViewInfo fViewInfo = new XmlViewInfo(ID);
     private final ITmfXmlModelFactory fFactory;
+    private final Map<String, Integer> fStringValueMap = new HashMap<>();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -243,6 +245,10 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             title = Messages.XmlTimeGraphView_DefaultTitle;
         }
         setViewTitle(title);
+
+        // Empty the additional state values
+        fStringValueMap.clear();
+
         Set<String> analysisIds = fViewInfo.getViewAnalysisIds(viewElement);
 
         List<Element> entries = XmlUtils.getChildElements(viewElement, TmfXmlUiStrings.ENTRY_ELEMENT);
@@ -491,7 +497,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
                     if (monitor.isCanceled()) {
                         return null;
                     }
-                    int status = statusInterval.getStateValue().unboxInt();
+                    int status = getStatusFromInterval(statusInterval);
                     long time = statusInterval.getStartTime();
                     long duration = statusInterval.getEndTime() - time + 1;
                     if (!statusInterval.getStateValue().isNull()) {
@@ -510,6 +516,42 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             /* Ignored */
         }
         return eventList;
+    }
+
+    private int getStatusFromInterval(ITmfStateInterval statusInterval) {
+        ITmfStateValue stateValue = statusInterval.getStateValue();
+        int status = -1;
+        switch (stateValue.getType()) {
+        case INTEGER:
+        case NULL:
+            status = stateValue.unboxInt();
+            break;
+        case LONG:
+            status = (int) stateValue.unboxLong();
+            break;
+        case STRING:
+            String statusStr = stateValue.unboxStr();
+            Integer statusInt = fStringValueMap.get(statusStr);
+            if (statusInt != null) {
+                status = statusInt;
+                break;
+            }
+            ITimeGraphPresentationProvider2 pres = this.getPresentationProvider();
+            if (pres instanceof XmlPresentationProvider) {
+                // Add this new state to the presentation provider
+                status = ((XmlPresentationProvider) pres).addState(statusStr);
+                fStringValueMap.put(statusStr, status);
+            }
+            break;
+        case DOUBLE:
+            status = (int) stateValue.unboxDouble();
+            break;
+        case CUSTOM:
+        default:
+            break;
+        }
+
+        return status;
     }
 
     @Override
