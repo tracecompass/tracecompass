@@ -79,21 +79,24 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
     private static final String LOCATION = "location"; //$NON-NLS-1$
     private static final String FOLDER_SUFFIX = "_exp"; //$NON-NLS-1$
     private static final String EXPERIMENT_TYPE = "type"; //$NON-NLS-1$
+    private static final String EXPERIMENT_TYPE_ID = "type ID"; //$NON-NLS-1$
 
     private static final ReadOnlyTextPropertyDescriptor NAME_DESCRIPTOR = new ReadOnlyTextPropertyDescriptor(NAME, NAME);
     private static final ReadOnlyTextPropertyDescriptor PATH_DESCRIPTOR = new ReadOnlyTextPropertyDescriptor(PATH, PATH);
     private static final ReadOnlyTextPropertyDescriptor LOCATION_DESCRIPTOR = new ReadOnlyTextPropertyDescriptor(LOCATION,
             LOCATION);
     private static final ReadOnlyTextPropertyDescriptor TYPE_DESCRIPTOR = new ReadOnlyTextPropertyDescriptor(EXPERIMENT_TYPE, EXPERIMENT_TYPE);
+    private static final ReadOnlyTextPropertyDescriptor TYPE_ID_DESCRIPTOR = new ReadOnlyTextPropertyDescriptor(EXPERIMENT_TYPE_ID, EXPERIMENT_TYPE_ID);
 
     private static final IPropertyDescriptor[] DESCRIPTORS = { NAME_DESCRIPTOR, PATH_DESCRIPTOR,
-            LOCATION_DESCRIPTOR, TYPE_DESCRIPTOR };
+            LOCATION_DESCRIPTOR, TYPE_DESCRIPTOR, TYPE_ID_DESCRIPTOR };
 
     static {
         NAME_DESCRIPTOR.setCategory(INFO_CATEGORY);
         PATH_DESCRIPTOR.setCategory(INFO_CATEGORY);
         LOCATION_DESCRIPTOR.setCategory(INFO_CATEGORY);
         TYPE_DESCRIPTOR.setCategory(INFO_CATEGORY);
+        TYPE_ID_DESCRIPTOR.setCategory(INFO_CATEGORY);
     }
 
     // The mapping of available trace type IDs to their corresponding
@@ -517,6 +520,15 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
                     }
                 }
                 return ce.getAttribute(TmfTraceType.NAME_ATTR);
+            }
+        }
+        if (EXPERIMENT_TYPE_ID.equals(id)) {
+            if (getTraceType() != null) {
+                IConfigurationElement ce = TRACE_TYPE_ATTRIBUTES.get(getTraceType());
+                if (ce == null) {
+                    return ""; //$NON-NLS-1$
+                }
+                return ce.getAttribute(TmfTraceType.ID_ATTR);
             }
         }
 
