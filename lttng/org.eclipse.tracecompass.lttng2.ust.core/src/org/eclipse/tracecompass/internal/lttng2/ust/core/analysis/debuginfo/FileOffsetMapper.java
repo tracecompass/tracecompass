@@ -149,9 +149,12 @@ public final class FileOffsetMapper {
          * When passing the -f flag, the output alternates between function
          * names and file/line location.
          */
-        boolean oddLine = true;
+        boolean oddLine = false; // We flip at the start, first loop will be odd
         String currentFunctionName = null;
         for (String outputLine : output) {
+            /* Flip the boolean for the following line */
+            oddLine = !oddLine;
+
             // Remove discriminator part, for example: /build/buildd/glibc-2.21/elf/dl-object.c:78 (discriminator 8)
             outputLine = outputLine.replaceFirst(DISCRIMINATOR, "").trim(); //$NON-NLS-1$
 
@@ -165,13 +168,18 @@ public final class FileOffsetMapper {
                 if (fileName.equals("??")) { //$NON-NLS-1$
                     continue;
                 }
-                long lineNumber = Long.parseLong(elems[1]);
+                try {
+                    long lineNumber = Long.parseLong(elems[1]);
+                    callsites.add(new SourceCallsite(fileName, currentFunctionName, lineNumber));
 
-                callsites.add(new SourceCallsite(fileName, currentFunctionName, lineNumber));
+                } catch (NumberFormatException e) {
+                    /*
+                     * Probably a '?' output, meaning unknown line number.
+                     * Ignore this entry.
+                     */
+                    continue;
+                }
             }
-
-            /* Flip the boolean for the following line */
-            oddLine = !oddLine;
         }
 
         return callsites;
