@@ -78,7 +78,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
     private static final int DL_BUILD_ID_INDEX = 2;
     private static final int DL_DEBUG_LINK_INDEX = 3;
     private static final int DL_DLCLOSE_INDEX = 4;
-    private static final int STATEDUMP_SOINFO_INDEX = 5;
+    private static final int STATEDUMP_BIN_INFO_INDEX = 5;
     private static final int STATEDUMP_BUILD_ID_INDEX = 6;
     private static final int STATEDUMP_DEBUG_LINK_INDEX = 7;
 
@@ -116,7 +116,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
         builder.put(layout.eventDlBuildId(), DL_BUILD_ID_INDEX);
         builder.put(layout.eventDlDebugLink(), DL_DEBUG_LINK_INDEX);
         builder.put(layout.eventDlClose(), DL_DLCLOSE_INDEX);
-        builder.put(layout.eventStatedumpSoInfo(), STATEDUMP_SOINFO_INDEX);
+        builder.put(layout.eventStatedumpBinInfo(), STATEDUMP_BIN_INFO_INDEX);
         builder.put(layout.eventStateDumpBuildId(), STATEDUMP_BUILD_ID_INDEX);
         builder.put(layout.eventStateDumpDebugLink(), STATEDUMP_DEBUG_LINK_INDEX);
         return builder.build();
@@ -151,7 +151,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
         try {
             switch (intIndex) {
             case DL_DLOPEN_INDEX:
-            case STATEDUMP_SOINFO_INDEX:
+            case STATEDUMP_BIN_INFO_INDEX:
             {
                 handleOpen(event, vpid, ss);
                 break;
@@ -195,7 +195,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
     private void handleOpen(ITmfEvent event, final Long vpid, final ITmfStateSystemBuilder ss) throws AttributeNotFoundException {
         Long baddr = (Long) event.getContent().getField(fLayout.fieldBaddr()).getValue();
         Long memsz = (Long) event.getContent().getField(fLayout.fieldMemsz()).getValue();
-        String sopath = (String) event.getContent().getField(fLayout.fieldSopath()).getValue();
+        String sopath = (String) event.getContent().getField(fLayout.fieldPath()).getValue();
 
         long endAddr = baddr.longValue() + memsz.longValue();
         int addrQuark = ss.getQuarkAbsoluteAndAdd(vpid.toString(), baddr.toString());

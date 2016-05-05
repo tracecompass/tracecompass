@@ -45,8 +45,8 @@ public class LttngUst28EventLayout extends LttngUst27EventLayout {
         return "lttng_ust_statedump:end";
     }
 
-    public String eventStatedumpSoInfo() {
-        return "lttng_ust_statedump:soinfo";
+    public String eventStatedumpBinInfo() {
+        return "lttng_ust_statedump:bin_info";
     }
 
     public String eventStateDumpBuildId() {
@@ -82,8 +82,8 @@ public class LttngUst28EventLayout extends LttngUst27EventLayout {
         return "memsz";
     }
 
-    public String fieldSopath() {
-        return "sopath";
+    public String fieldPath() {
+        return "path";
     }
 
     public String fieldBuildId() {
