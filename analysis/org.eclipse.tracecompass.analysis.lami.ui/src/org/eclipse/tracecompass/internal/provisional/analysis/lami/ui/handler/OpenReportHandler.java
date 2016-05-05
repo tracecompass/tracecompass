@@ -57,7 +57,7 @@ public class OpenReportHandler extends AbstractHandler {
 
             Display.getDefault().syncExec(() -> {
                 try {
-                    LamiReportViewFactory.createNewViews(lamiReport);
+                    LamiReportViewFactory.createNewView(lamiReport);
                 } catch (PartInitException e) {
                 }
             });

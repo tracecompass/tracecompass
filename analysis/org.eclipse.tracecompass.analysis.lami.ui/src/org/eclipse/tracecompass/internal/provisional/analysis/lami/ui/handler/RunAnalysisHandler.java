@@ -131,7 +131,7 @@ public class RunAnalysisHandler extends AbstractHandler {
                     /* Automatically open the report for convenience */
                     Display.getDefault().syncExec(() -> {
                         try {
-                            LamiReportViewFactory.createNewViews(report);
+                            LamiReportViewFactory.createNewView(report);
                         } catch (PartInitException e) {
                         }
                     });

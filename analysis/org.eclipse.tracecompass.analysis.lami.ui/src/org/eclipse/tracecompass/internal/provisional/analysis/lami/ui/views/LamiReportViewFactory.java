@@ -11,7 +11,6 @@ package org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiAnalysisReport;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiResultTable;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -28,16 +27,17 @@ public final class LamiReportViewFactory {
     private LamiReportViewFactory() {
     }
 
-    private static @Nullable LamiResultTable currentTable;
+    private static @Nullable LamiAnalysisReport currentReport;
     private static int secondaryViewId = 1;
 
     /**
-     * Return the current result table
+     * Return the current report. Should be accessed by the view currently being
+     * built.
      *
-     * @return The current result table
+     * @return The current report
      */
-    public static @Nullable LamiResultTable getCurrentResultTable() {
-        return currentTable;
+    public static @Nullable LamiAnalysisReport getCurrentReport() {
+        return currentReport;
     }
 
     /**
@@ -48,21 +48,24 @@ public final class LamiReportViewFactory {
      * @throws PartInitException
      *             If there was a problem initializing a view
      */
-    public static synchronized void createNewViews(LamiAnalysisReport report) throws PartInitException {
-        boolean firstView = true;
+    public static synchronized void createNewView(LamiAnalysisReport report)
+            throws PartInitException {
+        currentReport = report;
 
-        for (LamiResultTable table : report.getTables()) {
-            currentTable = table;
+        final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
-            int mode = (firstView ? IWorkbenchPage.VIEW_ACTIVATE : IWorkbenchPage.VIEW_VISIBLE);
+        /*
+         * Doing this in two operations here, instead of using
+         * IWorkbenchPage.VIEW_ACTIVATE, works around a bug where the contextual
+         * menu would get "stuck" until the Project view is defocused and
+         * refocused.
+         */
+        page.showView(LamiReportView.VIEW_ID, String.valueOf(secondaryViewId), IWorkbenchPage.VIEW_VISIBLE);
+        page.activate(page.findView(LamiReportView.VIEW_ID));
 
-            final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-            page.showView(LamiReportView.VIEW_ID, String.valueOf(secondaryViewId), mode);
-            secondaryViewId++;
+        secondaryViewId++;
 
-            currentTable = null;
-            firstView = false;
-        }
+        currentReport = null;
     }
 
 }
