@@ -201,7 +201,7 @@ public final class Attribute {
      *
      * @return The full attribute path elements
      */
-    public String @NonNull [] getFullAttribute() {
+    public @NonNull String @NonNull [] getFullAttribute() {
         LinkedList<String> list = new LinkedList<>();
         Attribute curNode = this;
 
@@ -211,7 +211,7 @@ public final class Attribute {
             curNode = curNode.parent;
         }
 
-        return list.toArray(new String[0]);
+        return list.toArray(new @NonNull String[list.size()]);
     }
 
     /**

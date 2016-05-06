@@ -47,6 +47,12 @@ public final class AttributeTree {
     /* "Magic number" for attribute tree files or file sections */
     private static final int ATTRIB_TREE_MAGIC_NUMBER = 0x06EC3671;
 
+    /**
+     * Character used to indicate an attribute path element is the same as the
+     * previous attribute. Used for serialization.
+     */
+    private static final String SERIALIZATION_WILDCARD = "*"; //$NON-NLS-1$
+
     private final StateSystem ss;
     private final List<Attribute> attributeList;
     private final Attribute attributeTreeRoot;
@@ -86,10 +92,10 @@ public final class AttributeTree {
         }
 
 
-        ArrayList<String[]> attribList;
+        ArrayList<@NonNull String @NonNull []> attribList;
         try {
             @SuppressWarnings("unchecked")
-            ArrayList<String[]> list = (ArrayList<String[]>) ois.readObject();
+            ArrayList<@NonNull String @NonNull []> list = (ArrayList<@NonNull String @NonNull []>) ois.readObject();
             attribList = list;
         } catch (ClassNotFoundException e) {
             throw new IOException("Unrecognizable attribute list"); //$NON-NLS-1$
@@ -99,8 +105,11 @@ public final class AttributeTree {
          * Now we have 'list', the ArrayList of String arrays representing all
          * the attributes. Simply create attributes the normal way from them.
          */
+        String[] prevFullAttribute = null, curFullAttribute = null;
         for (String[] attrib : attribList) {
-            this.getQuarkAndAdd(ROOT_ATTRIBUTE, attrib);
+            curFullAttribute = decodeFullAttribute(prevFullAttribute, attrib);
+            this.getQuarkAndAdd(ROOT_ATTRIBUTE, curFullAttribute);
+            prevFullAttribute = curFullAttribute;
         }
     }
 
@@ -123,8 +132,12 @@ public final class AttributeTree {
 
                 /* Compute the serialized list of attributes and write it */
                 List<String[]> list = new ArrayList<>(attributeList.size());
+                String[] prevFullAttribute = null, curFullAttribute = null, curEncodedAttribute = null;
                 for (Attribute entry : this.attributeList) {
-                    list.add(entry.getFullAttribute());
+                    curFullAttribute = entry.getFullAttribute();
+                    curEncodedAttribute = encodeFullAttribute(prevFullAttribute, entry.getFullAttribute());
+                    list.add(curEncodedAttribute);
+                    prevFullAttribute = curFullAttribute;
                 }
                 oos.writeObject(list);
             }
@@ -132,6 +145,60 @@ public final class AttributeTree {
             e.printStackTrace();
         }
 
+    }
+
+    /**
+     * Avoid repeating path elements that are the same from one attribute to the
+     * next, and replace identical path elements with "*".
+     *
+     * @param prevPath
+     *            The previous attribute's full attribute path
+     * @param curPath
+     *            The current attribute's full attribute path
+     * @return An encoded version of the current entry's full attribute path
+     *         where subpaths[i] equal to that of prevEntry's subpaths[i] is
+     *         replaced by "*" or curPath if prevPath is null.
+     */
+    private static String[] encodeFullAttribute(String[] prevPath, String[] curPath) {
+        if (prevPath == null) {
+            return curPath;
+        }
+        String[] diff = new String[curPath.length];
+        for (int i = 0; i < curPath.length; i++) {
+            if (i < prevPath.length && prevPath[i].equals(curPath[i])) {
+                diff[i] = SERIALIZATION_WILDCARD;
+            } else {
+                diff[i] = curPath[i];
+            }
+        }
+        return diff;
+    }
+
+    /**
+     * Decode a full attribute path that was encoded by
+     * {@link #encodeFullAttribute}.
+     *
+     * @param prevPath
+     *            The previous attribute's decoded full attribute path
+     * @param curPath
+     *            The current attribute's encoded full attribute path
+     * @return A decoded version of the current entry's full attribute path
+     *         where subpaths[i] equal to "*" are replaced by prevEntry's
+     *         subpaths[i] or curPath if prevPath is null.
+     */
+    private static String[] decodeFullAttribute(String[] prevPath, String[] curPath) {
+        if(prevPath == null){
+            return curPath;
+        }
+        String[] diff = new String[curPath.length];
+        for (int i = 0; i < curPath.length; i++) {
+            if (i < prevPath.length && curPath[i].equals(SERIALIZATION_WILDCARD)) {
+                diff[i] = prevPath[i];
+            } else {
+                diff[i] = curPath[i];
+            }
+        }
+        return diff;
     }
 
     /**
