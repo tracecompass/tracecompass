@@ -19,7 +19,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -121,63 +120,58 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
 
         ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
 
-        try {
-            /* Check if the event is a function entry */
-            ITmfStateValue functionEntryName = functionEntry(event);
-            if (functionEntryName != null) {
-                long timestamp = event.getTimestamp().toNanos();
+        /* Check if the event is a function entry */
+        ITmfStateValue functionEntryName = functionEntry(event);
+        if (functionEntryName != null) {
+            long timestamp = event.getTimestamp().toNanos();
 
-                String processName = getProcessName(event);
+            String processName = getProcessName(event);
+            int processId = getProcessId(event);
+            if (processName == null) {
+                processName = (processId == UNKNOWN_PID) ? UNKNOWN : Integer.toString(processId);
+            }
+            int processQuark = ss.getQuarkAbsoluteAndAdd(PROCESSES, processName);
+            ss.updateOngoingState(TmfStateValue.newValueInt(processId), processQuark);
+
+            String threadName = getThreadName(event);
+            long threadId = getThreadId(event);
+            if (threadName == null) {
+                threadName = Long.toString(threadId);
+            }
+            int threadQuark = ss.getQuarkRelativeAndAdd(processQuark, threadName);
+            ss.updateOngoingState(TmfStateValue.newValueLong(threadId), threadQuark);
+
+            int callStackQuark = ss.getQuarkRelativeAndAdd(threadQuark, CALL_STACK);
+            ITmfStateValue value = functionEntryName;
+            ss.pushAttribute(timestamp, value, callStackQuark);
+            return;
+        }
+
+        /* Check if the event is a function exit */
+        ITmfStateValue functionExitState = functionExit(event);
+        if (functionExitState != null) {
+            long timestamp = event.getTimestamp().toNanos();
+            String processName = getProcessName(event);
+            if (processName == null) {
                 int processId = getProcessId(event);
-                if (processName == null) {
-                    processName = (processId == UNKNOWN_PID) ? UNKNOWN : Integer.toString(processId);
-                }
-                int processQuark = ss.getQuarkAbsoluteAndAdd(PROCESSES, processName);
-                ss.updateOngoingState(TmfStateValue.newValueInt(processId), processQuark);
-
-                String threadName = getThreadName(event);
-                long threadId = getThreadId(event);
-                if (threadName == null) {
-                    threadName = Long.toString(threadId);
-                }
-                int threadQuark = ss.getQuarkRelativeAndAdd(processQuark, threadName);
-                ss.updateOngoingState(TmfStateValue.newValueLong(threadId), threadQuark);
-
-                int callStackQuark = ss.getQuarkRelativeAndAdd(threadQuark, CALL_STACK);
-                ITmfStateValue value = functionEntryName;
-                ss.pushAttribute(timestamp, value, callStackQuark);
-                return;
+                processName = (processId == UNKNOWN_PID) ? UNKNOWN : Integer.toString(processId);
             }
-
-            /* Check if the event is a function exit */
-            ITmfStateValue functionExitState = functionExit(event);
-            if (functionExitState != null) {
-                long timestamp = event.getTimestamp().toNanos();
-                String processName = getProcessName(event);
-                if (processName == null) {
-                    int processId = getProcessId(event);
-                    processName = (processId == UNKNOWN_PID) ? UNKNOWN : Integer.toString(processId);
-                }
-                String threadName = getThreadName(event);
-                if (threadName == null) {
-                    threadName = Long.toString(getThreadId(event));
-                }
-                int quark = ss.getQuarkAbsoluteAndAdd(PROCESSES, processName, threadName, CALL_STACK);
-                ITmfStateValue poppedValue = ss.popAttribute(timestamp, quark);
-                /*
-                 * Verify that the value we are popping matches the one in the
-                 * event field, unless the latter is undefined.
-                 */
-                if (!functionExitState.isNull() && !functionExitState.equals(poppedValue)) {
-                    Activator.logWarning(NLS.bind(
-                            Messages.CallStackStateProvider_UnmatchedPoppedValue,
-                            functionExitState,
-                            poppedValue));
-                }
+            String threadName = getThreadName(event);
+            if (threadName == null) {
+                threadName = Long.toString(getThreadId(event));
             }
-
-        } catch (AttributeNotFoundException e) {
-            e.printStackTrace();
+            int quark = ss.getQuarkAbsoluteAndAdd(PROCESSES, processName, threadName, CALL_STACK);
+            ITmfStateValue poppedValue = ss.popAttribute(timestamp, quark);
+            /*
+             * Verify that the value we are popping matches the one in the
+             * event field, unless the latter is undefined.
+             */
+            if (!functionExitState.isNull() && !functionExitState.equals(poppedValue)) {
+                Activator.logWarning(NLS.bind(
+                        Messages.CallStackStateProvider_UnmatchedPoppedValue,
+                        functionExitState,
+                        poppedValue));
+            }
         }
     }
 

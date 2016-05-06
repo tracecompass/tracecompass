@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -18,7 +18,6 @@ import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -151,8 +150,6 @@ public abstract class TmfMipmapFeature implements ITmfMipmapFeature {
             ss.modifyAttribute(startTime, value, levelQuark);
         } catch (StateValueTypeException e) {
             Activator.logError("TmfMipmapFeature : Bad state value type", e); //$NON-NLS-1$
-        } catch (AttributeNotFoundException e) {
-            Activator.logError("TmfMipmapFeature : Attribute not found", e); //$NON-NLS-1$
         } catch (TimeRangeException e) {
             Activator.logError("TmfMipmapFeature : Time stamp is out of range", e); //$NON-NLS-1$
         }

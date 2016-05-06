@@ -189,7 +189,7 @@ public final class KernelThreadInformationProvider {
         }
         try {
             return ss.querySingleState(ts, prioQuark).getStateValue().unboxInt();
-        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
+        } catch (StateSystemDisposedException e) {
             return -1;
         }
     }

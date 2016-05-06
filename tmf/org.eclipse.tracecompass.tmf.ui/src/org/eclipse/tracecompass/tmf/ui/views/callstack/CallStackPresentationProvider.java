@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,7 +19,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -114,8 +113,6 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
                 if (!value.isNull()) {
                     return fView.getFunctionName(entry.getTrace(), entry.getProcessId(), event.getTime(), value);
                 }
-            } catch (AttributeNotFoundException e) {
-                Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
             } catch (TimeRangeException e) {
                 Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
             } catch (StateSystemDisposedException e) {
@@ -146,8 +143,6 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
                 gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
                 Utils.drawText(gc, name, bounds.x, bounds.y, bounds.width, bounds.height, true, true);
             }
-        } catch (AttributeNotFoundException e) {
-            Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
         } catch (TimeRangeException e) {
             Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
         } catch (StateSystemDisposedException e) {

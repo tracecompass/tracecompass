@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,7 +13,6 @@
 package org.eclipse.tracecompass.statesystem.core;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -79,6 +78,8 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      * @param subPath
      *            "Rest" of the path to get to the final attribute
      * @return The matching quark, either if it's new of just got created.
+     * @throws IndexOutOfBoundsException
+     *             If the starting node quark is out of range
      */
     int getQuarkRelativeAndAdd(int startingNodeQuark, String... subPath);
 
@@ -102,11 +103,10 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *            The new value that will overwrite the "current" one.
      * @param attributeQuark
      *            For which attribute in the system
-     * @throws AttributeNotFoundException
-     *             If the requested attribute is invalid
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
      */
-    void updateOngoingState(@NonNull ITmfStateValue newValue, int attributeQuark)
-            throws AttributeNotFoundException;
+    void updateOngoingState(@NonNull ITmfStateValue newValue, int attributeQuark);
 
     /**
      * Basic attribute modification method, we simply specify a new value, for a
@@ -121,14 +121,14 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *            want to modify
      * @throws TimeRangeException
      *             If the requested time is outside of the trace's range
-     * @throws AttributeNotFoundException
-     *             If the requested attribute quark is invalid
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
      * @throws StateValueTypeException
      *             If the inserted state value's type does not match what is
      *             already assigned to this attribute.
      */
     void modifyAttribute(long t, ITmfStateValue value, int attributeQuark)
-            throws AttributeNotFoundException, StateValueTypeException;
+            throws StateValueTypeException;
 
     /**
      * Increment attribute method. Reads the current value of a given integer
@@ -144,15 +144,15 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *             If the attribute already exists but is not of type Integer
      * @throws TimeRangeException
      *             If the given timestamp is invalid
-     * @throws AttributeNotFoundException
-     *             If the quark is invalid
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
      * @deprecated Use
      *             {@link StateSystemBuilderUtils#incrementAttributeInt(ITmfStateSystemBuilder, long, int, int)}
      *             instead
      */
     @Deprecated
     void incrementAttribute(long t, int attributeQuark)
-            throws AttributeNotFoundException, StateValueTypeException;
+            throws StateValueTypeException;
 
     /**
      * "Push" helper method. This uses the given integer attribute as a stack:
@@ -170,14 +170,14 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *            will be created (with depth = 1)
      * @throws TimeRangeException
      *             If the requested timestamp is invalid
-     * @throws AttributeNotFoundException
-     *             If the attribute is invalid
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
      * @throws StateValueTypeException
      *             If the attribute 'attributeQuark' already exists, but is not
      *             of integer type.
      */
     void pushAttribute(long t, ITmfStateValue value, int attributeQuark)
-            throws AttributeNotFoundException, StateValueTypeException;
+            throws StateValueTypeException;
 
     /**
      * Antagonist of the pushAttribute(), pops the top-most attribute on the
@@ -191,8 +191,8 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *            Quark of the stack-attribute to pop
      * @return The state value that was popped, or 'null' if nothing was
      *         actually removed from the stack.
-     * @throws AttributeNotFoundException
-     *             If the attribute is invalid
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
      * @throws TimeRangeException
      *             If the timestamp is invalid
      * @throws StateValueTypeException
@@ -200,7 +200,7 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *             type is invalid (not an integer)
      */
     ITmfStateValue popAttribute(long t, int attributeQuark)
-            throws AttributeNotFoundException, StateValueTypeException;
+            throws StateValueTypeException;
 
     /**
      * Remove attribute method. Similar to the above modify- methods, with value
@@ -213,11 +213,10 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *            Attribute to remove
      * @throws TimeRangeException
      *             If the timestamp is invalid
-     * @throws AttributeNotFoundException
-     *             If the quark is invalid
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
      */
-    void removeAttribute(long t, int attributeQuark)
-            throws AttributeNotFoundException;
+    void removeAttribute(long t, int attributeQuark);
 
     /**
      * Method to close off the History Provider. This happens for example when

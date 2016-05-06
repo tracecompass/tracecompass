@@ -71,7 +71,7 @@ public class DiskWriteModel extends Disk {
         super.setDiskName(diskname);
         try {
             fSs.modifyAttribute(fSs.getCurrentEndTime(), TmfStateValue.newValueString(diskname), getQuark());
-        } catch (StateValueTypeException | AttributeNotFoundException e) {
+        } catch (StateValueTypeException e) {
             Activator.getDefault().logError("Cannot set the diskname for disk " + diskname, e); //$NON-NLS-1$
         }
     }
@@ -145,7 +145,7 @@ public class DiskWriteModel extends Disk {
 
             int mergedInQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.MERGED_IN);
             fSs.modifyAttribute(ts, TmfStateValue.nullValue(), mergedInQuark);
-        } catch (StateValueTypeException | AttributeNotFoundException e) {
+        } catch (StateValueTypeException e) {
             Activator.getDefault().logError("Error inserting request", e); //$NON-NLS-1$
         }
         fWaitingQueue.put(request.getSector(), new Pair<>(request, slotQuark));
@@ -192,7 +192,7 @@ public class DiskWriteModel extends Disk {
 
             int mergedInQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.MERGED_IN);
             fSs.modifyAttribute(ts, TmfStateValue.nullValue(), mergedInQuark);
-        } catch (StateValueTypeException | AttributeNotFoundException e) {
+        } catch (StateValueTypeException e) {
             Activator.getDefault().logError("Error inserting request", e); //$NON-NLS-1$
         }
 
@@ -275,7 +275,7 @@ public class DiskWriteModel extends Disk {
 
             int issuedFromQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.ISSUED_FROM);
             fSs.modifyAttribute(ts, issuedFromValue, issuedFromQuark);
-        } catch (StateValueTypeException | AttributeNotFoundException e) {
+        } catch (StateValueTypeException e) {
             Activator.getDefault().logError("Error issuing request", e); //$NON-NLS-1$
         }
 
@@ -341,7 +341,7 @@ public class DiskWriteModel extends Disk {
 
                 int issuedFromQuark = fSs.getQuarkRelativeAndAdd(mergedQuark, Attributes.MERGED_IN);
                 fSs.modifyAttribute(ts, TmfStateValue.newValueInt(Integer.parseInt(reqQueueId)), issuedFromQuark);
-            } catch (StateValueTypeException | AttributeNotFoundException e) {
+            } catch (StateValueTypeException e) {
                 Activator.getDefault().logError("Error adding the merged request information", e); //$NON-NLS-1$
             }
         }
@@ -363,7 +363,7 @@ public class DiskWriteModel extends Disk {
             fSs.modifyAttribute(ts, TmfStateValue.newValueInt(getDriverQueueSize()), fDriverQueueLength);
             int fWaitinQueueLength = fSs.getQuarkRelativeAndAdd(getQuark(), Attributes.WAITING_QUEUE_LENGTH);
             fSs.modifyAttribute(ts, TmfStateValue.newValueInt(getWaitingQueueSize()), fWaitinQueueLength);
-        } catch (StateValueTypeException | AttributeNotFoundException e) {
+        } catch (StateValueTypeException e) {
             Activator.getDefault().logError("Error updating queues lengths", e); //$NON-NLS-1$
         }
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -23,7 +23,6 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -135,8 +134,6 @@ public abstract class AbstractTmfMipmapStateProvider extends AbstractTmfStatePro
      *            The mipmap resolution (must be greater than 1)
      * @throws TimeRangeException
      *             If the requested time is outside of the trace's range
-     * @throws AttributeNotFoundException
-     *             If the requested attribute quark is invalid
      * @throws StateValueTypeException
      *             If the inserted state value's type does not match what is
      *             already assigned to this attribute.
@@ -145,7 +142,7 @@ public abstract class AbstractTmfMipmapStateProvider extends AbstractTmfStatePro
      * @see #AVG
      */
     public void modifyMipmapAttribute(long ts, ITmfStateValue value, int baseQuark, int mipmapFeatureBits, int resolution)
-            throws TimeRangeException, AttributeNotFoundException, StateValueTypeException {
+            throws TimeRangeException, StateValueTypeException {
         ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
         ss.modifyAttribute(ts, value, baseQuark);
         if (value.getType() == Type.LONG || value.getType() == Type.INTEGER || value.getType() == Type.DOUBLE || value.isNull()) {
@@ -194,8 +191,6 @@ public abstract class AbstractTmfMipmapStateProvider extends AbstractTmfStatePro
                 }
             } catch (TimeRangeException e) {
                 Activator.logError("MipMapProvider : Time stamp outside of time range of state system", e); //$NON-NLS-1$
-            } catch (AttributeNotFoundException e) {
-                Activator.logError("MipMapProvider : Attribute not found", e); //$NON-NLS-1$
             } catch (StateValueTypeException e) {
                 Activator.logError("MipMapProvider : Wrong state value type", e); //$NON-NLS-1$
             }

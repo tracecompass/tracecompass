@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -338,7 +337,7 @@ public abstract class StateHistoryBackendTestBase {
             interval = backend.doSingularQuery(startTime + (2 * timeStep) + 1, intQuark);
             assertEquals("Int interval value", INT_VAL1, interval.getStateValue());
 
-        } catch (TimeRangeException | StateSystemDisposedException | IOException | AttributeNotFoundException e) {
+        } catch (TimeRangeException | StateSystemDisposedException | IOException e) {
             fail(e.getMessage());
         }
     }

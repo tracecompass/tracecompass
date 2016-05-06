@@ -33,7 +33,6 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 
 /**
  * The Attribute Tree is the /proc-like filesystem used to organize attributes.
@@ -160,10 +159,10 @@ public final class AttributeTree {
      * @return The quark of the specified attribute, or
      *         {@link ITmfStateSystem#INVALID_ATTRIBUTE} if that attribute does
      *         not exist.
+     * @throws IndexOutOfBoundsException
+     *             If the starting node quark is out of range
      */
     public synchronized int getQuarkDontAdd(int startingNodeQuark, String... subPath) {
-        assert (startingNodeQuark >= ROOT_ATTRIBUTE);
-
         Attribute prevNode;
 
         /* If subPath is empty, simply return the starting quark */
@@ -193,12 +192,12 @@ public final class AttributeTree {
      * @param subPath
      *            The path to the attribute, relative to the starting node.
      * @return The quark of the attribute represented by the path
+     * @throws IndexOutOfBoundsException
+     *             If the starting node quark is out of range
      */
     public synchronized int getQuarkAndAdd(int startingNodeQuark, String... subPath) {
         // FIXME synchronized here is probably quite costly... maybe only locking
         // the "for" would be enough?
-        assert (subPath != null && subPath.length > 0);
-        assert (startingNodeQuark >= ROOT_ATTRIBUTE);
 
         Attribute nextNode = null;
         Attribute prevNode;
@@ -246,19 +245,12 @@ public final class AttributeTree {
      *            one level deep will be returned. If true, all descendants will
      *            be returned (depth-first search)
      * @return The list of quarks representing the children attributes
-     * @throws AttributeNotFoundException
-     *             If 'attributeQuark' is invalid, or if there is no attribute
-     *             associated to it.
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
      */
-    public synchronized @NonNull List<@NonNull Integer> getSubAttributes(int attributeQuark, boolean recursive)
-            throws AttributeNotFoundException {
+    public synchronized @NonNull List<@NonNull Integer> getSubAttributes(int attributeQuark, boolean recursive) {
         List<@NonNull Integer> listOfChildren = new ArrayList<>();
         Attribute startingAttribute;
-
-        /* Check if the quark is valid */
-        if (attributeQuark < ROOT_ATTRIBUTE || attributeQuark >= attributeList.size()) {
-            throw new AttributeNotFoundException(ss.getSSID() + " Quark:" + attributeQuark); //$NON-NLS-1$
-        }
 
         /* Set up the node from which we'll start the search */
         if (attributeQuark == ROOT_ATTRIBUTE) {
@@ -281,6 +273,8 @@ public final class AttributeTree {
      *            The quark of the attribute
      * @return Quark of the parent attribute or
      *         {@link ITmfStateSystem#ROOT_ATTRIBUTE} for the root attribute
+     * @throws IndexOutOfBoundsException
+     *             If the quark is out of range
      */
     public synchronized int getParentAttributeQuark(int quark) {
         if (quark == ROOT_ATTRIBUTE) {
@@ -305,6 +299,8 @@ public final class AttributeTree {
      * @param quark
      *            The quark of the attribute
      * @return The (base) name of the attribute
+     * @throws IndexOutOfBoundsException
+     *             If the quark is out of range
      */
     public synchronized @NonNull String getAttributeName(int quark) {
         return attributeList.get(quark).getName();
@@ -316,6 +312,8 @@ public final class AttributeTree {
      * @param quark
      *            The quark of the attribute
      * @return The full path name of the attribute
+     * @throws IndexOutOfBoundsException
+     *             If the quark is out of range
      */
     public synchronized @NonNull String getFullAttributeName(int quark) {
         return attributeList.get(quark).getFullAttributeName();
@@ -328,6 +326,8 @@ public final class AttributeTree {
      * @param quark
      *            The quark of the attribute
      * @return The path elements of the full path
+     * @throws IndexOutOfBoundsException
+     *             If the quark is out of range
      */
     public synchronized String @NonNull [] getFullAttributePathArray(int quark) {
         return attributeList.get(quark).getFullAttribute();

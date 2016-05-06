@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -19,7 +19,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.statesystem.mipmap.AbstractTmfMipmapStateProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -48,7 +47,6 @@ class TmfMipmapStateProviderStub extends AbstractTmfMipmapStateProvider {
     private ITmfStateValue.Type type;
     private static final @NonNull String MIPMAP_ID = "MIPMAP_ID"; //$NON-NLS-1$
 
-    private final String ERROR_ATTRIBUTE_NOT_FOUND = "Error : Impossible to find the attribute"; //$NON-NLS-1$
     private final String ERROR_INVALID_STATE_VALUE = "Error : Invalid state value"; //$NON-NLS-1$
     private final String ERROR_INVALID_TIMESTAMP = "Error : Invalid timestamp"; //$NON-NLS-1$
 
@@ -76,8 +74,6 @@ class TmfMipmapStateProviderStub extends AbstractTmfMipmapStateProvider {
             modifyMipmapAttribute(ts, value, quark, MIN | MAX | AVG, resolution);
         } catch (TimeRangeException e) {
             Activator.logError(ERROR_INVALID_TIMESTAMP, e);
-        } catch (AttributeNotFoundException e) {
-            Activator.logError(ERROR_ATTRIBUTE_NOT_FOUND, e);
         } catch (StateValueTypeException e) {
             Activator.logError(ERROR_INVALID_STATE_VALUE, e);
         }

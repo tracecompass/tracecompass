@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2016 École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -29,7 +29,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -257,48 +256,44 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
 
     private boolean updateStateEntries(ITmfStateSystem ss, List<ITmfStateInterval> fullState, TmfTreeViewerEntry parent, int parentQuark, long timestamp) {
         boolean changed = false;
-        try {
-            for (int quark : ss.getSubAttributes(parentQuark, false)) {
-                if (quark >= fullState.size()) {
-                    // attribute was created after the full state query
-                    continue;
-                }
-                ITmfStateInterval interval = fullState.get(quark);
-                StateEntry stateEntry = findStateEntry(parent, quark);
-                if (stateEntry == null) {
-                    boolean modified = fFilterStatus ?
-                            interval.getStartTime() == timestamp :
-                                !interval.getStateValue().isNull();
-                    stateEntry = new StateEntry(ss.getAttributeName(quark), quark, ss.getFullAttributePath(quark),
-                            interval.getStateValue(),
-                            TmfTimestamp.fromNanos(interval.getStartTime()),
-                            TmfTimestamp.fromNanos(interval.getEndTime()),
-                            modified);
-
-                    // update children first to know if parent is really needed
-                    updateStateEntries(ss, fullState, stateEntry, quark, timestamp);
-
-                    /*
-                     * Add this entry to parent if filtering is off, or
-                     * if the entry has children to display, or
-                     * if there is a state change at the current timestamp
-                     */
-                    if (!fFilterStatus || stateEntry.hasChildren() || interval.getStartTime() == timestamp) {
-                        parent.addChild(stateEntry);
-                        changed = true;
-                    }
-                } else {
-                    stateEntry.update(interval.getStateValue(),
-                            TmfTimestamp.fromNanos(interval.getStartTime()),
-                            TmfTimestamp.fromNanos(interval.getEndTime()));
-
-                    // update children recursively
-                    updateStateEntries(ss, fullState, stateEntry, quark, timestamp);
-                }
-
+        for (int quark : ss.getSubAttributes(parentQuark, false)) {
+            if (quark >= fullState.size()) {
+                // attribute was created after the full state query
+                continue;
             }
-        } catch (AttributeNotFoundException e) {
-            /* Should not happen, we're iterating on known attributes */
+            ITmfStateInterval interval = fullState.get(quark);
+            StateEntry stateEntry = findStateEntry(parent, quark);
+            if (stateEntry == null) {
+                boolean modified = fFilterStatus ?
+                        interval.getStartTime() == timestamp :
+                            !interval.getStateValue().isNull();
+                stateEntry = new StateEntry(ss.getAttributeName(quark), quark, ss.getFullAttributePath(quark),
+                        interval.getStateValue(),
+                        TmfTimestamp.fromNanos(interval.getStartTime()),
+                        TmfTimestamp.fromNanos(interval.getEndTime()),
+                        modified);
+
+                // update children first to know if parent is really needed
+                updateStateEntries(ss, fullState, stateEntry, quark, timestamp);
+
+                /*
+                 * Add this entry to parent if filtering is off, or
+                 * if the entry has children to display, or
+                 * if there is a state change at the current timestamp
+                 */
+                if (!fFilterStatus || stateEntry.hasChildren() || interval.getStartTime() == timestamp) {
+                    parent.addChild(stateEntry);
+                    changed = true;
+                }
+            } else {
+                stateEntry.update(interval.getStateValue(),
+                        TmfTimestamp.fromNanos(interval.getStartTime()),
+                        TmfTimestamp.fromNanos(interval.getEndTime()));
+
+                // update children recursively
+                updateStateEntries(ss, fullState, stateEntry, quark, timestamp);
+            }
+
         }
         return changed;
     }

@@ -987,7 +987,7 @@ public class CallStackView extends AbstractTimeGraphView {
                             viewer.getTimeGraphControl().fireSelectionChanged();
                             startZoomThread(viewer.getTime0(), viewer.getTime1());
 
-                        } catch (AttributeNotFoundException | TimeRangeException | StateSystemDisposedException | StateValueTypeException e) {
+                        } catch (TimeRangeException | StateSystemDisposedException | StateValueTypeException e) {
                             Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
                         }
                     }
@@ -1032,7 +1032,7 @@ public class CallStackView extends AbstractTimeGraphView {
                             viewer.getTimeGraphControl().fireSelectionChanged();
                             startZoomThread(viewer.getTime0(), viewer.getTime1());
 
-                        } catch (AttributeNotFoundException | TimeRangeException | StateSystemDisposedException | StateValueTypeException e) {
+                        } catch (TimeRangeException | StateSystemDisposedException | StateValueTypeException e) {
                             Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
                         }
                     }

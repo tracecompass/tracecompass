@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2014, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2014, 2016 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -22,7 +22,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -226,7 +225,7 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
             long prevMemValue = prevMem.unboxLong();
             prevMemValue += memoryDiff.longValue();
             ss.modifyAttribute(ts, TmfStateValue.newValueLong(prevMemValue), tidMemQuark);
-        } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException e) {
+        } catch (TimeRangeException | StateValueTypeException e) {
             throw new IllegalStateException(e);
         }
     }

@@ -16,9 +16,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 
 /**
  * This class allows to recycle state system attributes. Instead of creating a
@@ -137,11 +135,7 @@ public class TmfAttributePool {
         if (!fQuarksInUse.remove(quark)) {
             throw new IllegalArgumentException();
         }
-        try {
-            fSs.removeAttribute(ts, quark);
-        } catch (AttributeNotFoundException e) {
-            Activator.logError("Error getting sub-attributes", e); //$NON-NLS-1$
-        }
+        fSs.removeAttribute(ts, quark);
         fAvailableQuarks.add(quark);
     }
 

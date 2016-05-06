@@ -17,7 +17,6 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -97,7 +96,7 @@ public class TmfXmlScenarioHistoryBuilder {
             int attributeQuark = getQuarkRelativeAndAdd(ss, info.getQuark(), START_TIME);
             ITmfStateInterval state = ss.querySingleState(ts, attributeQuark);
             return state.getStartTime();
-        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
+        } catch (StateSystemDisposedException e) {
             Activator.logError("failed to get the start time of the scenario", e); //$NON-NLS-1$
         }
         return -1L;
@@ -123,7 +122,7 @@ public class TmfXmlScenarioHistoryBuilder {
         try {
             int attributeQuark = getQuarkRelativeAndAdd(ss, info.getQuark(), TmfXmlStrings.STORED_FIELDS, attributeName);
             ss.modifyAttribute(ts, value, attributeQuark);
-        } catch (StateValueTypeException | AttributeNotFoundException e) {
+        } catch (StateValueTypeException e) {
             Activator.logError("failed to save the stored field " + attributeName, e); //$NON-NLS-1$
         }
     }
@@ -147,7 +146,7 @@ public class TmfXmlScenarioHistoryBuilder {
         try {
             int attributeQuark = getQuarkRelativeAndAdd(ss, info.getQuark(), TmfXmlStrings.STORED_FIELDS, attributeName);
             ss.modifyAttribute(ts, value, attributeQuark);
-        } catch (StateValueTypeException | AttributeNotFoundException e) {
+        } catch (StateValueTypeException e) {
             Activator.logError("failed to clear the stored fields", e); //$NON-NLS-1$
         }
     }
@@ -173,7 +172,7 @@ public class TmfXmlScenarioHistoryBuilder {
         try {
             int attributeQuark = getQuarkRelativeAndAdd(ss, info.getQuark(), TmfXmlStrings.STORED_FIELDS, attributeName);
             state = ss.querySingleState(ts, attributeQuark);
-        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
+        } catch (StateSystemDisposedException e) {
             Activator.logError("failed to get the value of the stored field " + attributeName, e); //$NON-NLS-1$
         }
         return (state != null) ? NonNullUtils.checkNotNull(state.getStateValue()) : TmfStateValue.nullValue();
@@ -250,7 +249,7 @@ public class TmfXmlScenarioHistoryBuilder {
             int attributeQuark = getQuarkRelativeAndAdd(ss, info.getQuark(), TmfXmlStrings.STATE, stateName, START_TIME);
             ITmfStateInterval state = ss.querySingleState(ts, attributeQuark);
             return state.getStartTime();
-        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
+        } catch (StateSystemDisposedException e) {
             Activator.logError("failed the start time of the state " + stateName, e); //$NON-NLS-1$
         }
         return -1l;
@@ -339,7 +338,7 @@ public class TmfXmlScenarioHistoryBuilder {
                 break;
             }
             ss.modifyAttribute(ts, value, info.getStatusQuark());
-        } catch (StateValueTypeException | AttributeNotFoundException e) {
+        } catch (StateValueTypeException e) {
             Activator.logError("failed to update scenario status"); //$NON-NLS-1$
         }
     }
@@ -362,7 +361,7 @@ public class TmfXmlScenarioHistoryBuilder {
             ITmfStateValue value = TmfStateValue.newValueString(info.getActiveState());
             int attributeQuark = ss.getQuarkRelativeAndAdd(info.getQuark(), TmfXmlStrings.STATE);
             ss.modifyAttribute(ts, value, attributeQuark);
-        } catch (StateValueTypeException | AttributeNotFoundException e) {
+        } catch (StateValueTypeException e) {
             Activator.logError("failed to update scenario state"); //$NON-NLS-1$
         }
     }
@@ -388,7 +387,7 @@ public class TmfXmlScenarioHistoryBuilder {
                 ITmfStateValue value = TmfStateValue.newValueLong(ts);
                 ss.modifyAttribute(ts, value, attributeQuark);
             }
-        } catch (StateValueTypeException | AttributeNotFoundException e) {
+        } catch (StateValueTypeException e) {
             Activator.logError("failed to update the start time of the state"); //$NON-NLS-1$
         }
     }
@@ -412,7 +411,7 @@ public class TmfXmlScenarioHistoryBuilder {
             ITmfStateValue value = TmfStateValue.newValueLong(ts);
             int attributeQuark = ss.getQuarkRelativeAndAdd(info.getQuark(), START_TIME);
             ss.modifyAttribute(ts, value, attributeQuark);
-        } catch (StateValueTypeException | AttributeNotFoundException e) {
+        } catch (StateValueTypeException e) {
             Activator.logError("failed to update the start time of the scenario"); //$NON-NLS-1$
         }
     }

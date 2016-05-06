@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson
+ * Copyright (c) 2012, 2016 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
  *
@@ -23,7 +23,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -91,13 +90,12 @@ public class TransientState {
      * @param quark
      *            The quark of the attribute to look for
      * @return The corresponding state value
-     * @throws AttributeNotFoundException
-     *             If the quark is invalid
+     * @throws IndexOutOfBoundsException
+     *             If the quark is out of range
      */
-    public ITmfStateValue getOngoingStateValue(int quark) throws AttributeNotFoundException {
+    public ITmfStateValue getOngoingStateValue(int quark) {
         fRWLock.readLock().lock();
         try {
-            checkValidAttribute(quark);
             return fOngoingStateInfo.get(quark);
         } finally {
             fRWLock.readLock().unlock();
@@ -110,13 +108,12 @@ public class TransientState {
      * @param quark
      *            The quark of the attribute to look for
      * @return The start time of the current state for this attribute
-     * @throws AttributeNotFoundException
-     *             If the quark is invalid
+     * @throws IndexOutOfBoundsException
+     *             If the quark is out of range
      */
-    public long getOngoingStartTime(int quark) throws AttributeNotFoundException {
+    public long getOngoingStartTime(int quark) {
         fRWLock.readLock().lock();
         try {
-            checkValidAttribute(quark);
             return fOngoingStateStartTimes.get(quark);
         } finally {
             fRWLock.readLock().unlock();
@@ -131,14 +128,12 @@ public class TransientState {
      *            The quark of the attribute to modify
      * @param newValue
      *            The state value the attribute should have
-     * @throws AttributeNotFoundException
-     *             If the quark is invalid
+     * @throws IndexOutOfBoundsException
+     *             If the quark is out of range
      */
-    public void changeOngoingStateValue(int quark, ITmfStateValue newValue)
-            throws AttributeNotFoundException {
+    public void changeOngoingStateValue(int quark, ITmfStateValue newValue) {
         fRWLock.writeLock().lock();
         try {
-            checkValidAttribute(quark);
             fOngoingStateInfo.set(quark, newValue);
         } finally {
             fRWLock.writeLock().unlock();
@@ -153,13 +148,12 @@ public class TransientState {
      *            The quark of the attribute
      * @return An interval representing the current state (but whose end time is
      *         the current one, and probably not the "final" one)
-     * @throws AttributeNotFoundException
-     *             If the quark is invalid
+     * @throws IndexOutOfBoundsException
+     *             If the quark is out of range
      */
-    public ITmfStateInterval getOngoingInterval(int quark) throws AttributeNotFoundException {
+    public ITmfStateInterval getOngoingInterval(int quark) {
         fRWLock.readLock().lock();
         try {
-            checkValidAttribute(quark);
             return new TmfStateInterval(fOngoingStateStartTimes.get(quark), fLatestTime,
                     quark, fOngoingStateInfo.get(quark));
         } finally {
@@ -178,26 +172,19 @@ public class TransientState {
      *            The quark of the attribute to look for
      * @return The corresponding TmfStateInterval object if we could find it in
      *         this transient state, or null if we couldn't.
+     * @throws IndexOutOfBoundsException
+     *             If the quark is out of range
      */
     public @Nullable ITmfStateInterval getIntervalAt(long time, int quark) {
         fRWLock.readLock().lock();
         try {
-            checkValidAttribute(quark);
             if (!isActive() || time < fOngoingStateStartTimes.get(quark)) {
                 return null;
             }
             return new TmfStateInterval(fOngoingStateStartTimes.get(quark),
                     fLatestTime, quark, fOngoingStateInfo.get(quark));
-        } catch (AttributeNotFoundException e) {
-            return null;
         } finally {
             fRWLock.readLock().unlock();
-        }
-    }
-
-    private void checkValidAttribute(int quark) throws AttributeNotFoundException {
-        if (quark > fOngoingStateInfo.size() - 1 || quark < 0) {
-            throw new AttributeNotFoundException(fBackend.getSSID() + " Quark:" + quark); //$NON-NLS-1$
         }
     }
 
@@ -265,14 +252,14 @@ public class TransientState {
      *            The quark of the attribute that is being modified
      * @throws TimeRangeException
      *             If 'eventTime' is invalid
-     * @throws AttributeNotFoundException
-     *             IF 'quark' does not represent an existing attribute
+     * @throws IndexOutOfBoundsException
+     *             If the quark is out of range
      * @throws StateValueTypeException
      *             If the state value to be inserted is of a different type of
      *             what was inserted so far for this attribute.
      */
     public void processStateChange(long eventTime, ITmfStateValue value, int quark)
-            throws TimeRangeException, AttributeNotFoundException, StateValueTypeException {
+            throws TimeRangeException, StateValueTypeException {
         if (!this.fIsActive) {
             return;
         }
@@ -280,7 +267,6 @@ public class TransientState {
         fRWLock.writeLock().lock();
         try {
             Type expectedSvType = fStateValueTypes.get(quark);
-            checkValidAttribute(quark);
 
             /*
              * Make sure the state value type we're inserting is the same as the

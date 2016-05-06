@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 EfficiOS Inc., Alexandre Montplaisir
+ * Copyright (c) 2015, 2016 EfficiOS Inc., Alexandre Montplaisir
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -119,44 +119,40 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
         ITmfStateSystem ss = checkNotNull(getStateSystem());
 
         Set<UstDebugInfoBinaryFile> files = new TreeSet<>();
-        try {
-            ImmutableList.Builder<Integer> builder = ImmutableList.builder();
-            List<Integer> vpidQuarks = ss.getSubAttributes(-1, false);
-            for (Integer vpidQuark : vpidQuarks) {
-                builder.addAll(ss.getSubAttributes(vpidQuark, false));
-            }
-            List<Integer> baddrQuarks = builder.build();
+        ImmutableList.Builder<Integer> builder = ImmutableList.builder();
+        List<Integer> vpidQuarks = ss.getSubAttributes(-1, false);
+        for (Integer vpidQuark : vpidQuarks) {
+            builder.addAll(ss.getSubAttributes(vpidQuark, false));
+        }
+        List<Integer> baddrQuarks = builder.build();
 
-            /*
-             * For each "baddr" attribute, get the "buildId" sub-attribute,
-             * whose value is the file path.
-             */
+        /*
+         * For each "baddr" attribute, get the "buildId" sub-attribute,
+         * whose value is the file path.
+         */
 
-            for (Integer baddrQuark : baddrQuarks) {
+        for (Integer baddrQuark : baddrQuarks) {
 
-                List<Integer> buildIdQuarks = ss.getSubAttributes(baddrQuark, false);
-                for (Integer buildIdQuark : buildIdQuarks) {
-                    String buildId = ss.getAttributeName(buildIdQuark);
+            List<Integer> buildIdQuarks = ss.getSubAttributes(baddrQuark, false);
+            for (Integer buildIdQuark : buildIdQuarks) {
+                String buildId = ss.getAttributeName(buildIdQuark);
 
+                /*
+                 * Explore the history of this attribute "horizontally",
+                 * even though there should only be one valid interval.
+                 */
+                ITmfStateInterval interval = StateSystemUtils.queryUntilNonNullValue(ss, buildIdQuark, ss.getStartTime(), Long.MAX_VALUE);
+                if (interval == null) {
                     /*
-                     * Explore the history of this attribute "horizontally",
-                     * even though there should only be one valid interval.
+                     * If we created the attribute, we should have assigned
+                     * a value to it!
                      */
-                    ITmfStateInterval interval = StateSystemUtils.queryUntilNonNullValue(ss, buildIdQuark, ss.getStartTime(), Long.MAX_VALUE);
-                    if (interval == null) {
-                        /*
-                         * If we created the attribute, we should have assigned
-                         * a value to it!
-                         */
-                        throw new IllegalStateException();
-                    }
-                    String filePath = interval.getStateValue().unboxStr();
-
-                    files.add(new UstDebugInfoBinaryFile(filePath, buildId));
+                    throw new IllegalStateException();
                 }
+                String filePath = interval.getStateValue().unboxStr();
+
+                files.add(new UstDebugInfoBinaryFile(filePath, buildId));
             }
-        } catch (AttributeNotFoundException e) {
-            throw new IllegalStateException(e);
         }
         return files;
     }

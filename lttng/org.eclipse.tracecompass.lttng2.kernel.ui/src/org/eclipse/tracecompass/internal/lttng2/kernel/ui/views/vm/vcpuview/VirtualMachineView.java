@@ -227,11 +227,6 @@ public class VirtualMachineView extends AbstractTimeGraphView {
                 /* Add the entries for the threads */
                 buildThreadEntries(vmEntry, entryMap, startTime, endTime);
             }
-        } catch (AttributeNotFoundException e) {
-            /*
-             * The attribute may not exist yet if the state system is being
-             * built
-             */
         } catch (TimeRangeException | StateValueTypeException e) {
             Activator.getDefault().logError("VirtualMachineView: error building event list", e); //$NON-NLS-1$
         }

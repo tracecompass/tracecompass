@@ -25,7 +25,6 @@ import org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage.KernelM
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage.KernelMemoryStateProvider;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -183,7 +182,7 @@ public class KernelMemoryUsageTreeViewer extends AbstractTmfTreeViewer {
                     entryList.add(obj);
                 }
             }
-        } catch (StateSystemDisposedException | AttributeNotFoundException e) {
+        } catch (StateSystemDisposedException e) {
             Activator.getDefault().logError(e.getMessage(), e);
         }
         return root;

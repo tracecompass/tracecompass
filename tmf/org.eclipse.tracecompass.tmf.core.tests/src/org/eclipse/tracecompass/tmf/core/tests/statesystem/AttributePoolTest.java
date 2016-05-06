@@ -20,7 +20,6 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemFactory;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
@@ -108,21 +107,13 @@ public class AttributePoolTest {
         assertEquals("1", fStateSystem.getAttributeName(available2));
 
         /* Modify them */
-        try {
-            fStateSystem.modifyAttribute(START_TIME + 10, VALUE, available);
-            fStateSystem.modifyAttribute(START_TIME + 10, VALUE, available2);
-        } catch (StateValueTypeException | AttributeNotFoundException e) {
-            fail(e.getMessage());
-        }
+        fStateSystem.modifyAttribute(START_TIME + 10, VALUE, available);
+        fStateSystem.modifyAttribute(START_TIME + 10, VALUE, available2);
 
         /* Recycle one and make sure it is set to null */
         pool.recycle(available, START_TIME + 20);
-        try {
-            ITmfStateValue value = fStateSystem.queryOngoingState(available);
-            assertEquals(TmfStateValue.nullValue(), value);
-        } catch (AttributeNotFoundException e) {
-            fail(e.getMessage());
-        }
+        ITmfStateValue value = fStateSystem.queryOngoingState(available);
+        assertEquals(TmfStateValue.nullValue(), value);
 
         /* Get a new one and make sure it is reusing the one just recycled */
         Integer available3 = pool.getAvailable();
@@ -176,7 +167,7 @@ public class AttributePoolTest {
             assertEquals(TmfStateValue.nullValue(), value);
             value = fStateSystem.queryOngoingState(child2);
             assertEquals(TmfStateValue.nullValue(), value);
-        } catch (StateValueTypeException | AttributeNotFoundException e) {
+        } catch (StateValueTypeException e) {
             fail(e.getMessage());
         }
     }

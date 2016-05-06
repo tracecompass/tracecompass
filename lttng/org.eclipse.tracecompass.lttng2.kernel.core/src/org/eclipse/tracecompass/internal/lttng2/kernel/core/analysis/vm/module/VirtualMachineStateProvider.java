@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2016 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -335,7 +335,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
                 break;
             }
 
-        } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException e) {
+        } catch (TimeRangeException | StateValueTypeException e) {
             Activator.getDefault().logError("Error handling event in VirtualMachineStateProvider", e); //$NON-NLS-1$
         }
     }

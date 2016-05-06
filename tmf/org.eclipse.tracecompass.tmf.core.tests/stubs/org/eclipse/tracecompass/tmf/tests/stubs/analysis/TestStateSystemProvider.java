@@ -18,7 +18,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
@@ -63,7 +62,7 @@ public class TestStateSystemProvider extends AbstractTmfStateProvider {
                 int quarkId = ss.getQuarkAbsoluteAndAdd("String");
                 int quark = ss.getQuarkRelativeAndAdd(quarkId, fString);
                 ss.modifyAttribute(event.getTimestamp().getValue(), TmfStateValue.newValueInt(fCount++), quark);
-            } catch (TimeRangeException | AttributeNotFoundException | StateValueTypeException e) {
+            } catch (TimeRangeException | StateValueTypeException e) {
 
             }
         }
@@ -113,8 +112,6 @@ public class TestStateSystemProvider extends AbstractTmfStateProvider {
         ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
         sfHandler.eventHandle(ss, event);
     }
-
-
 
     @Override
     public void processEvent(@NonNull ITmfEvent event) {

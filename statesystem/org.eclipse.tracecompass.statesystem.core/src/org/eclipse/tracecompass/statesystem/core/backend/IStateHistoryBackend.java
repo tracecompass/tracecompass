@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -173,17 +172,15 @@ public interface IStateHistoryBackend {
      *            The target timestamp of the query.
      * @param attributeQuark
      *            The single attribute for which you want the state interval
-     * @return The state interval matching this timestamp/attribute pair
+     * @return The state interval matching this timestamp/attribute pair, or
+     *         null if it was not found
      * @throws TimeRangeException
      *             If the timestamp was invalid
-     * @throws AttributeNotFoundException
-     *             If the quark was invalid
      * @throws StateSystemDisposedException
      *             If the state system is disposed while a request is ongoing.
      */
     ITmfStateInterval doSingularQuery(long t, int attributeQuark)
-            throws TimeRangeException, AttributeNotFoundException,
-            StateSystemDisposedException;
+            throws TimeRangeException, StateSystemDisposedException;
 
     /**
      * Debug method to print the contents of the history backend.

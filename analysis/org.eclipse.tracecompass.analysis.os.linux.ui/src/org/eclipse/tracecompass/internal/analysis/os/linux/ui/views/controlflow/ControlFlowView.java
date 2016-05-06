@@ -458,8 +458,6 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                                     ppidInterval = ssq.querySingleState(startTime - 1, ppidQuark);
                                     startTime = execNameInterval.getStartTime();
                                     endTime = execNameInterval.getEndTime() + 1;
-                                } catch (AttributeNotFoundException e) {
-                                    Activator.getDefault().logError(e.getMessage());
                                 } catch (StateSystemDisposedException e) {
                                     /* ignored */
                                 }
@@ -773,9 +771,6 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                         long end = Math.min(currentThreadInterval.getEndTime() + 1, ss.getCurrentEndTime());
                         currentThreadIntervals.add(ss.querySingleState(end, currentThreadQuark));
                     }
-                } catch (AttributeNotFoundException e) {
-                    Activator.getDefault().logError(e.getMessage());
-                    return list;
                 } catch (StateSystemDisposedException e) {
                     /* Ignored */
                     return list;

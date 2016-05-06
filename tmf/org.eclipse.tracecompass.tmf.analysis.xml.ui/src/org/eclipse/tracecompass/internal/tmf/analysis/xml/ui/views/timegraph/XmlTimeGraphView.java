@@ -336,43 +336,40 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         int i = 0;
         List<Integer> quarks = Collections.singletonList(baseQuark);
 
-        try {
-            while (i < paths.length) {
-                List<Integer> subQuarks = new LinkedList<>();
-                /* Replace * by .* to have a regex string */
-                String name = paths[i].replaceAll("\\*", ".*"); //$NON-NLS-1$ //$NON-NLS-2$
-                for (int relativeQuark : quarks) {
-                    for (int quark : ss.getSubAttributes(relativeQuark, false, name)) {
-                        subQuarks.add(quark);
-                    }
+        while (i < paths.length) {
+            List<Integer> subQuarks = new LinkedList<>();
+            /* Replace * by .* to have a regex string */
+            String name = paths[i].replaceAll("\\*", ".*"); //$NON-NLS-1$ //$NON-NLS-2$
+            for (int relativeQuark : quarks) {
+                for (int quark : ss.getSubAttributes(relativeQuark, false, name)) {
+                    subQuarks.add(quark);
                 }
-                quarks = subQuarks;
-                i++;
             }
+            quarks = subQuarks;
+            i++;
+        }
 
-            /* Process each quark */
-            XmlEntry currentEntry = parentEntry;
-            Element displayElement = null;
-            Map<String, XmlEntry> entryMap = new HashMap<>();
-            if (!displayElements.isEmpty()) {
-                displayElement = displayElements.get(0);
+        /* Process each quark */
+        XmlEntry currentEntry = parentEntry;
+        Element displayElement = null;
+        Map<String, XmlEntry> entryMap = new HashMap<>();
+        if (!displayElements.isEmpty()) {
+            displayElement = displayElements.get(0);
+        }
+        for (int quark : quarks) {
+            currentEntry = parentEntry;
+            /* Process the current entry, if specified */
+            if (displayElement != null) {
+                currentEntry = processEntry(entryElement, displayElement, parentEntry, quark, ss);
+                entryMap.put(currentEntry.getId(), currentEntry);
             }
-            for (int quark : quarks) {
-                currentEntry = parentEntry;
-                /* Process the current entry, if specified */
-                if (displayElement != null) {
-                    currentEntry = processEntry(entryElement, displayElement, parentEntry, quark, ss);
-                    entryMap.put(currentEntry.getId(), currentEntry);
-                }
-                /* Process the children entry of this entry */
-                for (Element subEntryEl : entryElements) {
-                    buildEntry(subEntryEl, currentEntry, quark);
-                }
+            /* Process the children entry of this entry */
+            for (Element subEntryEl : entryElements) {
+                buildEntry(subEntryEl, currentEntry, quark);
             }
-            if (!entryMap.isEmpty()) {
-                buildTree(entryMap, parentEntry);
-            }
-        } catch (AttributeNotFoundException e) {
+        }
+        if (!entryMap.isEmpty()) {
+            buildTree(entryMap, parentEntry);
         }
     }
 
@@ -417,7 +414,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             }
             entryEnd = oneInterval.getEndTime();
 
-        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
+        } catch (StateSystemDisposedException e) {
         }
 
         return new XmlEntry(quark, displayQuark, parentEntry.getTrace(), ss.getAttributeName(quark),

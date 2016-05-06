@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 École Polytechnique de Montréal and others.
+ * Copyright (c) 2014, 2016 École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -37,7 +37,6 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -190,22 +189,14 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
             String[] paths = fPath.split(SPLIT_STRING);
             List<Integer> quarks = Collections.singletonList(IXmlStateSystemContainer.ROOT_QUARK);
 
-            try {
-                for (String path : paths) {
-                    List<Integer> subQuarks = new LinkedList<>();
-                    /* Replace * by .* to have a regex string */
-                    String name = WILDCARD_PATTERN.matcher(path).replaceAll(".*"); //$NON-NLS-1$
-                    for (int relativeQuark : quarks) {
-                        subQuarks.addAll(fStateSystem.getSubAttributes(relativeQuark, false, name));
-                    }
-                    quarks = subQuarks;
+            for (String path : paths) {
+                List<Integer> subQuarks = new LinkedList<>();
+                /* Replace * by .* to have a regex string */
+                String name = WILDCARD_PATTERN.matcher(path).replaceAll(".*"); //$NON-NLS-1$
+                for (int relativeQuark : quarks) {
+                    subQuarks.addAll(fStateSystem.getSubAttributes(relativeQuark, false, name));
                 }
-            } catch (AttributeNotFoundException e) {
-                /*
-                 * We get all attributes from the state system itself, this
-                 * should not happen.
-                 */
-                throw new IllegalStateException();
+                quarks = subQuarks;
             }
             return quarks;
         }
@@ -322,7 +313,7 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
                     setSeries(data.getSeriesName(), data.getYValues());
                 }
                 updateDisplay();
-            } catch (AttributeNotFoundException | StateValueTypeException e) {
+            } catch (StateValueTypeException e) {
                 Activator.logError("Error updating the data of XML XY view", e); //$NON-NLS-1$
             } catch (StateSystemDisposedException e) {
                 return;

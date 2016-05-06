@@ -23,7 +23,6 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -90,7 +89,7 @@ public class TidAnalysisModule extends TmfStateSystemAnalysisModule {
             if (value.getType().equals(Type.INTEGER)) {
                 tid = value.unboxInt();
             }
-        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
+        } catch (StateSystemDisposedException e) {
             Activator.getDefault().logError(NonNullUtils.nullToEmptyString(e.getMessage()), e);
         }
         return tid;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -24,7 +24,6 @@ import java.util.List;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -171,7 +170,7 @@ public class InMemoryBackendTest extends StateHistoryBackendTestBase {
             ITmfStateInterval ref[] = intervalQuery.toArray(new ITmfStateInterval[0]);
             assertArrayEquals(ref, interval);
 
-        } catch (TimeRangeException | AttributeNotFoundException | StateSystemDisposedException e) {
+        } catch (TimeRangeException | StateSystemDisposedException e) {
             fail(e.getMessage());
         }
     }
@@ -187,7 +186,7 @@ public class InMemoryBackendTest extends StateHistoryBackendTestBase {
             ITmfStateInterval interval = backend.doSingularQuery(999, 0);
             assertEquals(TmfStateValue.nullValue(), interval.getStateValue());
 
-        } catch (TimeRangeException | AttributeNotFoundException | StateSystemDisposedException e) {
+        } catch (TimeRangeException | StateSystemDisposedException e) {
             fail(e.getMessage());
         }
     }
@@ -205,7 +204,7 @@ public class InMemoryBackendTest extends StateHistoryBackendTestBase {
             assertEquals(90, interval.getEndTime());
             assertEquals(0, interval.getStateValue().unboxInt());
 
-        } catch (TimeRangeException | AttributeNotFoundException | StateSystemDisposedException e) {
+        } catch (TimeRangeException | StateSystemDisposedException e) {
             fail(e.getMessage());
         }
     }
@@ -221,7 +220,7 @@ public class InMemoryBackendTest extends StateHistoryBackendTestBase {
             ITmfStateInterval interval = backend.doSingularQuery(99998, 9);
             testInterval(interval, 99909, 99999, 99);
 
-        } catch (TimeRangeException | AttributeNotFoundException | StateSystemDisposedException e) {
+        } catch (TimeRangeException | StateSystemDisposedException e) {
             fail(e.getMessage());
         }
     }
@@ -240,7 +239,7 @@ public class InMemoryBackendTest extends StateHistoryBackendTestBase {
             ITmfStateInterval interval = backend.doSingularQuery(-1, 0);
             assertNull(interval);
 
-        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
+        } catch (StateSystemDisposedException e) {
             fail(e.getMessage());
         }
     }
@@ -259,7 +258,7 @@ public class InMemoryBackendTest extends StateHistoryBackendTestBase {
             ITmfStateInterval interval = backend.doSingularQuery(100000, 0);
             assertNull(interval);
 
-        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
+        } catch (StateSystemDisposedException e) {
             fail(e.getMessage());
         }
     }

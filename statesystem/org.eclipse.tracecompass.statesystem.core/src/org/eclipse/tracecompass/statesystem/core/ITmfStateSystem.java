@@ -223,11 +223,10 @@ public interface ITmfStateSystem {
      *            True if you want all recursive sub-attributes, false if you
      *            only want the first level.
      * @return A List of integers, matching the quarks of the sub-attributes.
-     * @throws AttributeNotFoundException
-     *             If the quark was not existing or invalid.
+     * @throws IndexOutOfBoundsException
+     *             If the quark is out of range
      */
-    @NonNull List<@NonNull Integer> getSubAttributes(int quark, boolean recursive)
-            throws AttributeNotFoundException;
+    @NonNull List<@NonNull Integer> getSubAttributes(int quark, boolean recursive);
 
     /**
      * Return the sub-attributes of the target attribute, as a List of quarks,
@@ -246,11 +245,10 @@ public interface ITmfStateSystem {
      * @return A List of integers, matching the quarks of the sub-attributes
      *         that match the regex. An empty list is returned if there is no
      *         matching attribute.
-     * @throws AttributeNotFoundException
-     *             If the 'quark' was not existing or invalid.
+     * @throws IndexOutOfBoundsException
+     *             If the quark is out of range
      */
-    @NonNull List<@NonNull Integer> getSubAttributes(int quark, boolean recursive, String pattern)
-            throws AttributeNotFoundException;
+    @NonNull List<@NonNull Integer> getSubAttributes(int quark, boolean recursive, String pattern);
 
     /**
      * Batch quark-retrieving method. This method allows you to specify a path
@@ -371,24 +369,22 @@ public interface ITmfStateSystem {
      * @param attributeQuark
      *            For which attribute we want the current state
      * @return The State value that's "current" for this attribute
-     * @throws AttributeNotFoundException
-     *             If the requested attribute is invalid
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
      */
-    @NonNull ITmfStateValue queryOngoingState(int attributeQuark)
-            throws AttributeNotFoundException;
+    @NonNull ITmfStateValue queryOngoingState(int attributeQuark);
 
     /**
      * Get the start time of the current ongoing state, for the specified
      * attribute.
      *
-     * @param attribute
+     * @param attributeQuark
      *            Quark of the attribute
      * @return The current start time of the ongoing state
-     * @throws AttributeNotFoundException
-     *             If the attribute is invalid
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
      */
-    long getOngoingStartTime(int attribute)
-            throws AttributeNotFoundException;
+    long getOngoingStartTime(int attributeQuark);
 
     /**
      * Load the complete state information at time 't' into the returned List.
@@ -430,11 +426,11 @@ public interface ITmfStateSystem {
      * @return The StateInterval representing the state
      * @throws TimeRangeException
      *             If 't' is invalid
-     * @throws AttributeNotFoundException
-     *             If the requested quark does not exist in the model
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
      * @throws StateSystemDisposedException
      *             If the query is sent after the state system has been disposed
      */
     @NonNull ITmfStateInterval querySingleState(long t, int attributeQuark)
-            throws AttributeNotFoundException, StateSystemDisposedException;
+            throws StateSystemDisposedException;
 }

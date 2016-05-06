@@ -280,14 +280,12 @@ public class StateSystem implements ITmfStateSystemBuilder {
     }
 
     @Override
-    public List<@NonNull Integer> getSubAttributes(int quark, boolean recursive)
-            throws AttributeNotFoundException {
+    public List<@NonNull Integer> getSubAttributes(int quark, boolean recursive) {
         return getAttributeTree().getSubAttributes(quark, recursive);
     }
 
     @Override
-    public List<@NonNull Integer> getSubAttributes(int quark, boolean recursive, String pattern)
-            throws AttributeNotFoundException {
+    public List<@NonNull Integer> getSubAttributes(int quark, boolean recursive, String pattern) {
         List<Integer> all = getSubAttributes(quark, recursive);
         List<@NonNull Integer> ret = new LinkedList<>();
         for (Integer attQuark : all) {
@@ -321,40 +319,35 @@ public class StateSystem implements ITmfStateSystemBuilder {
     }
 
     private void getQuarks(Builder<@NonNull Integer> builder, int quark, List<String> pattern) {
-        try {
-            String element = pattern.get(0);
-            if (element == null) {
-                return;
-            }
-            List<String> remainder = pattern.subList(1, pattern.size());
-            if (remainder.isEmpty()) {
-                if (element.equals(WILDCARD)) {
-                    builder.addAll(getSubAttributes(quark, false));
-                } else if (element.equals(PARENT)){
-                    builder.add(getParentAttributeQuark(quark));
-                } else {
-                    int subQuark = optQuarkRelative(quark, element);
-                    if (subQuark != INVALID_ATTRIBUTE) {
-                        builder.add(subQuark);
-                    }
-                }
+        String element = pattern.get(0);
+        if (element == null) {
+            return;
+        }
+        List<String> remainder = pattern.subList(1, pattern.size());
+        if (remainder.isEmpty()) {
+            if (element.equals(WILDCARD)) {
+                builder.addAll(getSubAttributes(quark, false));
+            } else if (element.equals(PARENT)){
+                builder.add(getParentAttributeQuark(quark));
             } else {
-                if (element.equals(WILDCARD)) {
-                    for (@NonNull Integer subquark : getSubAttributes(quark, false)) {
-                        getQuarks(builder, subquark, remainder);
-                    }
-                } else if (element.equals(PARENT)){
-                    getQuarks(builder, getParentAttributeQuark(quark), remainder);
-                } else {
-                    int subQuark = optQuarkRelative(quark, element);
-                    if (subQuark != INVALID_ATTRIBUTE) {
-                        getQuarks(builder, subQuark, remainder);
-                    }
+                int subQuark = optQuarkRelative(quark, element);
+                if (subQuark != INVALID_ATTRIBUTE) {
+                    builder.add(subQuark);
                 }
             }
-        } catch (AttributeNotFoundException e) {
-            /* The starting node quark is out of range */
-            throw new IndexOutOfBoundsException(String.format("Index: %d, Size: %d", quark, getNbAttributes())); //$NON-NLS-1$
+        } else {
+            if (element.equals(WILDCARD)) {
+                for (@NonNull Integer subquark : getSubAttributes(quark, false)) {
+                    getQuarks(builder, subquark, remainder);
+                }
+            } else if (element.equals(PARENT)){
+                getQuarks(builder, getParentAttributeQuark(quark), remainder);
+            } else {
+                int subQuark = optQuarkRelative(quark, element);
+                if (subQuark != INVALID_ATTRIBUTE) {
+                    getQuarks(builder, subQuark, remainder);
+                }
+            }
         }
     }
 
@@ -364,8 +357,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
 
     @Override
     public void modifyAttribute(long t, ITmfStateValue value, int attributeQuark)
-            throws TimeRangeException, AttributeNotFoundException,
-            StateValueTypeException {
+            throws TimeRangeException, StateValueTypeException {
         if (value == null) {
             /*
              * TODO Replace with @NonNull parameter (will require fixing all the
@@ -379,8 +371,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
     @Deprecated
     @Override
     public void incrementAttribute(long t, int attributeQuark)
-            throws StateValueTypeException, TimeRangeException,
-            AttributeNotFoundException {
+            throws StateValueTypeException, TimeRangeException {
         ITmfStateValue stateValue = queryOngoingState(attributeQuark);
         int prevValue = 0;
         /* if the attribute was previously null, start counting at 0 */
@@ -393,8 +384,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
 
     @Override
     public void pushAttribute(long t, ITmfStateValue value, int attributeQuark)
-            throws TimeRangeException, AttributeNotFoundException,
-            StateValueTypeException {
+            throws TimeRangeException, StateValueTypeException {
         int stackDepth;
         int subAttributeQuark;
         ITmfStateValue previousSV = transState.getOngoingStateValue(attributeQuark);
@@ -419,7 +409,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
              * out of control due to buggy insertions
              */
             String message = " Stack limit reached, not pushing"; //$NON-NLS-1$
-            throw new AttributeNotFoundException(getSSID() + " Quark:" + attributeQuark + message); //$NON-NLS-1$
+            throw new IllegalStateException(getSSID() + " Quark:" + attributeQuark + message); //$NON-NLS-1$
         }
 
         stackDepth++;
@@ -431,8 +421,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
 
     @Override
     public ITmfStateValue popAttribute(long t, int attributeQuark)
-            throws AttributeNotFoundException, TimeRangeException,
-            StateValueTypeException {
+            throws TimeRangeException, StateValueTypeException {
         /* These are the state values of the stack-attribute itself */
         ITmfStateValue previousSV = transState.getOngoingStateValue(attributeQuark);
 
@@ -461,7 +450,13 @@ public class StateSystem implements ITmfStateSystemBuilder {
         }
 
         /* The attribute should already exist at this point */
-        int subAttributeQuark = getQuarkRelative(attributeQuark, String.valueOf(stackDepth));
+        int subAttributeQuark;
+        try {
+            subAttributeQuark = getQuarkRelative(attributeQuark, String.valueOf(stackDepth));
+        } catch (AttributeNotFoundException e) {
+            String message = " Stack attribute missing sub-attribute for depth:" + stackDepth; //$NON-NLS-1$
+            throw new IllegalStateException(getSSID() + " Quark:" + attributeQuark + message); //$NON-NLS-1$
+        }
         ITmfStateValue poppedValue = queryOngoingState(subAttributeQuark);
 
         /* Update the state value of the stack-attribute */
@@ -482,11 +477,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
 
     @Override
     public void removeAttribute(long t, int attributeQuark)
-            throws TimeRangeException, AttributeNotFoundException {
-        if (attributeQuark < 0) {
-            throw new IllegalArgumentException();
-        }
-
+            throws TimeRangeException {
         /*
          * Nullify our children first, recursively. We pass 'false' because we
          * handle the recursion ourselves.
@@ -516,20 +507,17 @@ public class StateSystem implements ITmfStateSystemBuilder {
     //--------------------------------------------------------------------------
 
     @Override
-    public ITmfStateValue queryOngoingState(int attributeQuark)
-            throws AttributeNotFoundException {
+    public ITmfStateValue queryOngoingState(int attributeQuark) {
         return transState.getOngoingStateValue(attributeQuark);
     }
 
     @Override
-    public long getOngoingStartTime(int attribute)
-            throws AttributeNotFoundException {
+    public long getOngoingStartTime(int attribute) {
         return transState.getOngoingStartTime(attribute);
     }
 
     @Override
-    public void updateOngoingState(ITmfStateValue newValue, int attributeQuark)
-            throws AttributeNotFoundException {
+    public void updateOngoingState(ITmfStateValue newValue, int attributeQuark) {
         transState.changeOngoingStateValue(attributeQuark, newValue);
     }
 
@@ -588,8 +576,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
 
     @Override
     public ITmfStateInterval querySingleState(long t, int attributeQuark)
-            throws AttributeNotFoundException, TimeRangeException,
-            StateSystemDisposedException {
+            throws TimeRangeException, StateSystemDisposedException {
         if (isDisposed) {
             throw new StateSystemDisposedException();
         }

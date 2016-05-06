@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2016 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,7 +19,6 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
@@ -88,7 +87,7 @@ public class TestExperimentAnalysis extends TmfStateSystemAnalysisModule {
                     int quarkId = ss.getQuarkAbsoluteAndAdd(TRACE_QUARK_NAME);
                     ss.modifyAttribute(event.getTimestamp().getValue(), TmfStateValue.newValueInt(++fCount), quarkId);
                     fTraces.add(event.getTrace());
-                } catch (TimeRangeException | AttributeNotFoundException | StateValueTypeException e) {
+                } catch (TimeRangeException | StateValueTypeException e) {
 
                 }
             }

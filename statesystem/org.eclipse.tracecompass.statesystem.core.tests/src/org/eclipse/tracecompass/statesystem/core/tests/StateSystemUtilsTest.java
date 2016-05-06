@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2016 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -58,7 +58,7 @@ public class StateSystemUtilsTest {
             fStateSystem.modifyAttribute(1200L, TmfStateValue.newValueInt(10), quark);
             fStateSystem.modifyAttribute(1500L, TmfStateValue.newValueInt(20), quark);
             fStateSystem.closeHistory(2000L);
-        } catch (StateValueTypeException | AttributeNotFoundException e) {
+        } catch (StateValueTypeException e) {
             fail(e.getMessage());
         }
     }

@@ -17,7 +17,6 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEven
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -90,7 +89,7 @@ class ActiveTidStateProvider extends AbstractTmfStateProvider {
             int nextTid = ((Long) event.getContent().getField(fNextTid).getValue()).intValue();
             final TmfStateValue value = TmfStateValue.newValueInt(nextTid);
             ssb.modifyAttribute(event.getTimestamp().toNanos(), value, cpuQuark);
-        } catch (StateValueTypeException | AttributeNotFoundException e) {
+        } catch (StateValueTypeException e) {
             Activator.getDefault().logError(NonNullUtils.nullToEmptyString(e.getMessage()), e);
         }
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
@@ -28,7 +28,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -255,18 +254,13 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
          * looking for. However, the method expects a List of *state intervals*,
          * not state values, so we'll create intervals with a dummy end time.
          */
-        try {
-            for (int i = 0; i < currentStateInfo.size(); i++) {
-                long start = 0;
-                start = ((ITmfStateSystem) fPartialSS).getOngoingStartTime(i);
-                ITmfStateValue val = ((ITmfStateSystem) fPartialSS).queryOngoingState(i);
+        for (int i = 0; i < currentStateInfo.size(); i++) {
+            long start = 0;
+            start = ((ITmfStateSystem) fPartialSS).getOngoingStartTime(i);
+            ITmfStateValue val = ((ITmfStateSystem) fPartialSS).queryOngoingState(i);
 
-                ITmfStateInterval interval = new TmfStateInterval(start, t, i, checkNotNull(val));
-                currentStateInfo.set(i, interval);
-            }
-        } catch (AttributeNotFoundException e) {
-            /* Should not happen, we iterate over existing values. */
-            e.printStackTrace();
+            ITmfStateInterval interval = new TmfStateInterval(start, t, i, checkNotNull(val));
+            currentStateInfo.set(i, interval);
         }
 
         fPartialSS.releaseQueryLock();
