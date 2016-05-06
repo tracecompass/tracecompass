@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson, others
+ * Copyright (c) 2012, 2016 Ericsson, others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -189,6 +189,9 @@ public class TimeGraphCombo extends Composite {
                      * finished updating the item heights.
                      */
                     getDisplay().asyncExec(() -> {
+                        if (isDisposed()) {
+                            return;
+                        }
                         super.setElementPosition(entry, y);
                         alignTreeItems(false);
                     });
@@ -1029,6 +1032,9 @@ public class TimeGraphCombo extends Composite {
         getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
+                if (isDisposed()) {
+                    return;
+                }
                 alignTreeItems(true);
             }
         });
