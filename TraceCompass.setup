@@ -67,9 +67,12 @@
   <setupTask
       xsi:type="setup:VariableTask"
       name="eclipse.target.platform"
-      defaultValue="tracecompass-e4.5"
+      defaultValue="tracecompass-e4.6"
       storageURI="scope://Workspace"
       label="Target Platform">
+    <choice
+        value="tracecompass-e4.6"
+        label="Trace Compass Eclipse Neon - 4.6"/>
     <choice
         value="tracecompass-eStaging"
         label="Trace Compass Eclipse Neon - 4.6"/>
