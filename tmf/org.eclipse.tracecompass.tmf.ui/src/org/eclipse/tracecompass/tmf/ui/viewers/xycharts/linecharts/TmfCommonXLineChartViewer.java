@@ -80,6 +80,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      */
     public TmfCommonXLineChartViewer(Composite parent, String title, String xLabel, String yLabel) {
         super(parent, title, xLabel, yLabel);
+        getSwtChart().getTitle().setVisible(false);
         getSwtChart().getLegend().setPosition(SWT.BOTTOM);
         getSwtChart().getAxisSet().getXAxes()[0].getTitle().setVisible(false);
         setResolution(RESOLUTION);

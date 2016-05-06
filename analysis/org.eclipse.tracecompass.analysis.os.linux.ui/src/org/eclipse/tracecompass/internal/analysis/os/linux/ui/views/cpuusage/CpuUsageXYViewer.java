@@ -74,6 +74,8 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
     public CpuUsageXYViewer(Composite parent) {
         super(parent, Messages.CpuUsageXYViewer_Title, Messages.CpuUsageXYViewer_TimeXAxis, Messages.CpuUsageXYViewer_CpuYAxis);
         setResolution(RESOLUTION);
+        getSwtChart().getTitle().setVisible(true);
+        getSwtChart().getLegend().setVisible(false);
     }
 
     @Override

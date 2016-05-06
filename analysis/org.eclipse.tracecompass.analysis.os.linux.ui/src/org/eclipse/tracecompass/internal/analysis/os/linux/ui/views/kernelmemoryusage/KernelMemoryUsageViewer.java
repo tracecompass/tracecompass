@@ -54,6 +54,7 @@ public class KernelMemoryUsageViewer extends TmfCommonXLineChartViewer {
         Chart chart = getSwtChart();
         chart.getAxisSet().getYAxis(0).getTick().setFormat(DataSizeWithUnitFormat.getInstance());
         chart.getLegend().setPosition(SWT.BOTTOM);
+        chart.getLegend().setVisible(false);
     }
 
     @Override
