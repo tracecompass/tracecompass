@@ -9,10 +9,10 @@
 * accompanies this distribution, and is available at
 * http://www.eclipse.org/legal/epl-v10.html
 *************************************************************************** -->
-<pattern version="0" id="xml syscall abstraction provider">
+<pattern version="0" id="syscall.analysis">
 	<head>
 		<traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
-		<label value="xml syscall abstraction provider" />
+		<label value="XML system call analysis" />
 	</head>
 
 <!-- STORED FIELDS -->
@@ -153,11 +153,11 @@
 			</initial>
 			<state id="wait_syscall_entry_x">
 <!-- 				The state will stay here until we have a "syscall_entry_*" event -->
-				<transition event="syscall_entry_*" target="syscall_entry_x" action="sys_x_founded" saveStoredFields="true"/>
+				<transition event="sys_*" target="syscall_entry_x" action="sys_x_founded" saveStoredFields="true"/>
 			</state>
 			<state id="syscall_entry_x" >
 <!-- 				The state will stay here until we have a "syscall_exit_*" event -->
-				<transition event="syscall_exit_*" cond="thread_thread" target="syscall_exit_x" action="exit_syscall_founded" saveStoredFields="true" clearStoredFields="true"/>
+				<transition event="exit_syscall" cond="thread_thread" target="syscall_exit_x" action="exit_syscall_founded" saveStoredFields="true" clearStoredFields="true"/>
 			</state>
 <!-- 				The state will stay here forever -->
 			<final id="syscall_exit_x"/>
