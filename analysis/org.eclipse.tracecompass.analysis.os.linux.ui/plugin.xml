@@ -148,4 +148,13 @@
          </analysisModuleClass>
       </output>
    </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.eclipse.tracecompass.internal.analysis.os.linux.ui.perspectives.KernelOverviewPerspectiveFactory"
+            icon="icons/obj16/os_overview.png"
+            id="org.eclipse.tracecompass.analysis.os.linux.ui.perspective"
+            name="%perspective.name">
+      </perspective>
+   </extension>
 </plugin>
