@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestStateSystemProvider
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -237,6 +238,7 @@ public class StateSystemAnalysisModuleTest {
      * Test the {@link TmfStateSystemAnalysisModule#isQueryable(long)} method
      * when the analysis is cancelled
      */
+    @Ignore("Hangs very often")
     @Test
     public void testIsQueryableCancel() {
 
