@@ -30,6 +30,8 @@ import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.tracecompass.ctf.core.tests.shared.LttngKernelTraceGenerator;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
@@ -67,6 +69,7 @@ public class ControlFlowViewTest extends KernelTestBase {
     private static final String FOLLOW_CPU_FORWARD = "Follow CPU Forward";
     private static final String SELECT_PREVIOUS_EVENT = "Select Previous Event";
     private static final String SELECT_NEXT_EVENT = "Select Next Event";
+    private static final String SELECT_NEXT_PROCESS = "Select Next Process";
     private static final Keyboard KEYBOARD = KeyboardFactory.getSWTKeyboard();
     private static final @NonNull ITmfTimestamp START_TIME = TmfTimestamp.fromNanos(1368000272650993664L);
     private static final @NonNull ITmfTimestamp TID1_TIME1 = TmfTimestamp.fromNanos(1368000272651208412L);
@@ -130,6 +133,7 @@ public class ControlFlowViewTest extends KernelTestBase {
         /* select first item */
         final SWTBotTree tree = fViewBot.bot().tree();
         tree.pressShortcut(Keystrokes.HOME);
+        fViewBot.toolbarButton(SELECT_NEXT_PROCESS).click();
 
         /* set focus on time graph */
         final TimeGraphControl timegraph = fViewBot.bot().widget(WidgetOfType.widgetOfType(TimeGraphControl.class));
@@ -253,7 +257,7 @@ public class ControlFlowViewTest extends KernelTestBase {
         TreeCheckedCounter treeCheckCounter = new TreeCheckedCounter(treeBot);
         // get how many items there are
         Integer checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals("default", 225, checked.intValue());
+        assertEquals("default", 226, checked.intValue());
         // test "uncheck all button"
         bot.button(UNCHECK_ALL).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
@@ -261,49 +265,52 @@ public class ControlFlowViewTest extends KernelTestBase {
         // test check active
         bot.button(CHECK_ACTIVE).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(CHECK_ACTIVE, 68, checked.intValue());
+        assertEquals(CHECK_ACTIVE, 69, checked.intValue());
         // test check all
         bot.button(CHECK_ALL).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(CHECK_ALL, 225, checked.intValue());
+        assertEquals(CHECK_ALL, 226, checked.intValue());
         // test uncheck inactive
         bot.button(UNCHECK_INACTIVE).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(UNCHECK_INACTIVE, 68, checked.intValue());
+        assertEquals(UNCHECK_INACTIVE, 69, checked.intValue());
         // test check selected
-        treeBot.select(1);
+        treeBot.getTreeItem(LttngKernelTraceGenerator.getName()).select("gnuplot");
         bot.button(UNCHECK_ALL).click();
         bot.button(CHECK_SELECTED).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(CHECK_SELECTED, 1, checked.intValue());
+        assertEquals(CHECK_SELECTED, 2, checked.intValue());
         // test check subtree
         bot.button(UNCHECK_ALL).click();
         bot.button(CHECK_SUBTREE).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(CHECK_SUBTREE, 1, checked.intValue());
+        assertEquals(CHECK_SUBTREE, 2, checked.intValue());
         // test uncheck selected
         bot.button(CHECK_ALL).click();
         bot.button(UNCHECK_SELECTED).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(UNCHECK_SELECTED, 224, checked.intValue());
+        assertEquals(UNCHECK_SELECTED, 225, checked.intValue());
         // test uncheck subtree
         bot.button(CHECK_ALL).click();
         bot.button(UNCHECK_SUBTREE).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(UNCHECK_SELECTED, 224, checked.intValue());
+        assertEquals(UNCHECK_SELECTED, 225, checked.intValue());
         // test filter
         bot.button(UNCHECK_ALL).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
         assertEquals(0, checked.intValue());
         bot.text().setText("half-life 3");
-        fBot.waitUntil(org.eclipse.swtbot.swt.finder.waits.Conditions.treeHasRows(treeBot, 25));
+        SWTBotTreeItem treeItem = treeBot.getTreeItem(LttngKernelTraceGenerator.getName());
+        treeItem.rowCount();
+        fBot.waitUntil(ConditionHelpers.treeItemCount(treeItem, 25));
         bot.button(CHECK_ALL).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals("Filtered", 25, checked.intValue());
+        assertEquals("Filtered", 26, checked.intValue());
         bot.button("OK").click();
         treeBot = fViewBot.bot().tree();
+        treeItem = treeBot.getTreeItem(LttngKernelTraceGenerator.getName());
         for (int i = 0; i < 25; i++) {
-            assertEquals("Filtered Control flow view", "Half-life 3", treeBot.cell(i, 0));
+            assertEquals("Filtered Control flow view", "Half-life 3", treeItem.cell(i, 0));
         }
     }
 
@@ -324,6 +331,7 @@ public class ControlFlowViewTest extends KernelTestBase {
         /* select first item */
         final SWTBotTree tree = fViewBot.bot().tree();
         tree.pressShortcut(Keystrokes.HOME);
+        fViewBot.toolbarButton(SELECT_NEXT_PROCESS).click();
 
         /* set focus on time graph */
         final TimeGraphControl timegraph = fViewBot.bot().widget(WidgetOfType.widgetOfType(TimeGraphControl.class));

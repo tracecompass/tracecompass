@@ -119,10 +119,7 @@ public class ControlFlowEntry extends TimeGraphEntry {
         if (pattern.matcher(Integer.toString(fThreadQuark)).find()) {
             return true;
         }
-        if (pattern.matcher(Utils.formatTime(getStartTime(), TimeFormat.CALENDAR, Resolution.NANOSEC)).find()) {
-            return true;
-        }
-        return pattern.matcher(fTrace.getName()).find();
+        return (pattern.matcher(Utils.formatTime(getStartTime(), TimeFormat.CALENDAR, Resolution.NANOSEC)).find());
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -100,7 +100,7 @@ public final class ConditionHelpers {
 
             @Override
             public String getFailureMessage() {
-                return NLS.bind("No child of tree {0} found with text '{1}'. Child items: {2}",
+                return NLS.bind("No child of tree {0} found with text {1}. Child items: {2}",
                         new String[] { tree.toString(), name, Arrays.toString(tree.getAllItems()) });
             }
         };
@@ -185,6 +185,31 @@ public final class ConditionHelpers {
             public String getFailureMessage() {
                 return NLS.bind("Child of tree item {0} found with text '{1}' not removed. Child items: {2}",
                         new String[] { treeItem.toString(), String.valueOf(length), Arrays.toString(treeItem.getItems()) });
+            }
+        };
+    }
+
+    /**
+     * Condition to check if the number of direct children of the
+     * provided tree item equals the specified count.
+     *
+     * @param treeItem
+     *            the SWTBot tree item
+     * @param count
+     *            the expected count
+     * @return ICondition for verification
+     */
+    public static ICondition treeItemCount(final SWTBotTreeItem treeItem, int count) {
+        return new SWTBotTestCondition() {
+            @Override
+            public boolean test() throws Exception {
+                return treeItem.rowCount() == count;
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return NLS.bind("Tree item count: {0} expected: {1}",
+                        treeItem.rowCount(), count);
             }
         };
     }

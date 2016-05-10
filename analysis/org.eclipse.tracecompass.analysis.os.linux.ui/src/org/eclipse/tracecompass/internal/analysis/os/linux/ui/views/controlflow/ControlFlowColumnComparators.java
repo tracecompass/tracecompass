@@ -43,13 +43,8 @@ public final class ControlFlowColumnComparators {
 
         @Override
         public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
-            /* First sort by trace */
-            int result = compareTrace(fDirection, o1, o2);
-
-            if (result == 0) {
-                /* Then sort by process name */
-                result = IControlFlowEntryComparator.PROCESS_NAME_COMPARATOR.compare(o1, o2);
-            }
+            /* First sort by process name */
+            int result = IControlFlowEntryComparator.PROCESS_NAME_COMPARATOR.compare(o1, o2);
             return compareList(result, fDirection, SECONDARY_COMPARATORS, o1, o2);
         }
 
@@ -78,13 +73,8 @@ public final class ControlFlowColumnComparators {
 
         @Override
         public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
-            /* First sort by trace */
-            int result = compareTrace(fDirection, o1, o2);
-
-            if (result == 0) {
-                /* Then sort by TID */
-                result = IControlFlowEntryComparator.TID_COMPARATOR.compare(o1, o2);
-            }
+            /* First sort by TID */
+            int result = IControlFlowEntryComparator.TID_COMPARATOR.compare(o1, o2);
             return compareList(result, fDirection, SECONDARY_COMPARATORS, o1, o2);
         }
 
@@ -114,12 +104,8 @@ public final class ControlFlowColumnComparators {
 
         @Override
         public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
-            /* First sort by trace */
-            int result = compareTrace(fDirection, o1, o2);
-            if (result == 0) {
-                /* Then sort by PTID */
-                result = IControlFlowEntryComparator.PTID_COMPARATOR.compare(o1, o2);
-            }
+            /* First sort by PTID */
+            int result = IControlFlowEntryComparator.PTID_COMPARATOR.compare(o1, o2);
             return compareList(result, fDirection, SECONDARY_COMPARATORS, o1, o2);
         }
 
@@ -148,12 +134,8 @@ public final class ControlFlowColumnComparators {
         @Override
         public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
 
-            int result = compareTrace(fDirection, o1, o2);
-
-            if (result == 0) {
-                /* Sort all child processes according to birth time. */
-                result = IControlFlowEntryComparator.BIRTH_TIME_COMPARATOR.compare(o1, o2);
-            }
+            /* Sort all child processes according to birth time. */
+            int result = IControlFlowEntryComparator.BIRTH_TIME_COMPARATOR.compare(o1, o2);
             return compareList(result, fDirection, SECONDARY_COMPARATORS, o1, o2);
         }
 
@@ -170,44 +152,6 @@ public final class ControlFlowColumnComparators {
             return builder.build();
         }
     };
-
-    /**
-     * Trace comparator. This compares first the trace, then the process birth
-     * time, the process name, the process TID and finally the process's parent
-     * TID.
-     */
-    public static final ITimeGraphEntryComparator TRACE_COLUMN_COMPARATOR = new ITimeGraphEntryComparator() {
-        private final List<Comparator<ITimeGraphEntry>> SECONDARY_COMPARATORS = init();
-        private int fDirection = SWT.DOWN;
-
-        @Override
-        public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
-            int result = IControlFlowEntryComparator.TRACE_COMPARATOR.compare(o1, o2);
-            return compareList(result, fDirection, SECONDARY_COMPARATORS, o1, o2);
-        }
-
-        @Override
-        public void setDirection(int direction) {
-            fDirection = direction;
-        }
-
-        private List<Comparator<ITimeGraphEntry>> init() {
-            ImmutableList.Builder<Comparator<ITimeGraphEntry>> builder = ImmutableList.builder();
-            builder.add(IControlFlowEntryComparator.BIRTH_TIME_COMPARATOR)
-                .add(IControlFlowEntryComparator.PROCESS_NAME_COMPARATOR)
-                .add(IControlFlowEntryComparator.TID_COMPARATOR)
-                .add(IControlFlowEntryComparator.PTID_COMPARATOR);
-            return builder.build();
-        }
-    };
-
-    private static int compareTrace(int direction, ITimeGraphEntry o1, ITimeGraphEntry o2) {
-        int result = IControlFlowEntryComparator.TRACE_COMPARATOR.compare(o1, o2);
-        if (direction == SWT.UP) {
-            result = -result;
-        }
-        return result;
-    }
 
     private static int compareList(int prevResult, int direction, List<Comparator<ITimeGraphEntry>> comps, ITimeGraphEntry o1, ITimeGraphEntry o2) {
         int result = prevResult;

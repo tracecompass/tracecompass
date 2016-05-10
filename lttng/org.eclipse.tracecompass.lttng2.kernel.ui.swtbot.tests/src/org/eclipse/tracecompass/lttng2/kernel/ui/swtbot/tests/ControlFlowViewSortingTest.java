@@ -13,6 +13,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -59,6 +61,7 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
+    private static final String TRACE_NAME = "scp_dest";
     private static final String FILTER_ACTION = "Show View Filters";
     private static final String FILTER_DIALOG_TITLE = "Filter";
     private static final String UNCHECK_ALL = "Uncheck all";
@@ -72,7 +75,6 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
     private static final String PTID_COLUMN = "PTID";
     private static final String BIRTH_COLUMN = "Birth time";
     private static final int BIRTH_COLUMN_ID = 3;
-    private static final String TRACE_COLUMN = "Trace";
 
     private static final String SYSTEMD_PROCESS_NAME = "systemd";
     private static final long SYSTEMD_BIRTHTIME = 1361214078967531336L;
@@ -109,12 +111,12 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
             defaultPreferences.put(ITmfTimePreferencesConstants.TIME_ZONE, "GMT-05:00");
             TmfTimestampFormat.updateDefaultFormats();
 
-            String tracePath = FileLocator.toFileURL(CtfTestTrace.SYNC_DEST.getTraceURL()).getPath();
+            String tracePath = Paths.get(FileLocator.toFileURL(CtfTestTrace.SYNC_DEST.getTraceURL()).toURI()).toString();
             SWTBotUtils.openTrace(TRACE_PROJECT_NAME, tracePath, KERNEL_TRACE_TYPE);
             fViewBot = fBot.viewByTitle("Control Flow");
             fViewBot.show();
             fViewBot.setFocus();
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             fail();
         }
     }
@@ -142,14 +144,13 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
         // Create a known state
         applyFilter();
         final SWTBotTree tree = fViewBot.bot().tree();
-        SWTBotTreeItem item = SWTBotUtils.getTreeItem(fBot, tree, SYSTEMD_PROCESS_NAME);
+        SWTBotTreeItem item = SWTBotUtils.getTreeItem(fBot, tree, TRACE_NAME, SYSTEMD_PROCESS_NAME);
         item.select();
 
         testProcessSorting(tree);
         testTidSorting(tree);
         testPidSorting(tree);
         testBirthtimeSorting(tree);
-        testTraceSorting(tree);
     }
 
     // ------------------------------------------------------------------------
@@ -178,7 +179,7 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
     }
 
     private static void checkFilterTreeItems(SWTBot bot, SWTBotTree treeBot, String process) {
-        SWTBotTreeItem item = SWTBotUtils.getTreeItem(bot, treeBot, process);
+        SWTBotTreeItem item = SWTBotUtils.getTreeItem(bot, treeBot, TRACE_NAME, process);
         item.select();
         bot.button(CHECK_SUBTREE).click();
         TreeCheckedCounter treeCheckCounter = new TreeCheckedCounter(treeBot);
@@ -244,25 +245,6 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
         clickColumn(tree, column, condition);
     }
 
-    /*
-     * Note: In this test only one trace is visualized in CFV.
-     * Sorting is done based on birth time (up direction).
-     * The implementation in CFV won't change the order when changing
-     * the direction.
-     */
-    private static void testTraceSorting(final SWTBotTree tree) {
-        SWTBotTreeColumn column = tree.header(TRACE_COLUMN);
-        String[] expected = { LTTNG_CONSUMER_PROCESS_NAME, SYSTEMD_PROCESS_NAME, KTHREAD_PROCESS_NAME };
-
-        /* Sort direction Up */
-        SWTBotTestCondition condition = getSortCondition(TRACE_COLUMN, PROCESS_COLUMN_ID, expected, tree, false);
-        clickColumn(tree, column, condition);
-
-        /* Sort direction Down */
-        condition = getSortCondition(TRACE_COLUMN, PROCESS_COLUMN_ID, expected, tree, false);
-        clickColumn(tree, column, condition);
-    }
-
     private static void clickColumn(final SWTBotTree tree, SWTBotTreeColumn processColumn, SWTBotTestCondition condition) {
         processColumn.click();
         fBot.waitUntil(condition);
@@ -272,7 +254,7 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
         return new SWTBotTestCondition() {
             @Override
             public boolean test() throws Exception {
-                SWTBotTreeItem[] items = tree.getAllItems();
+                SWTBotTreeItem[] items = tree.getTreeItem(TRACE_NAME).getItems();
                 if (reverse) {
                     for (int i = expected.length - 1; i > 0; i--) {
                         if (!expected[i].equals(items[expected.length - (i + 1)].cell(cell))) {
@@ -290,7 +272,7 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
             }
             @Override
             public String getFailureMessage() {
-                return NLS.bind("Test Case: \'{0}\' failed!", testCase);
+                return NLS.bind("Test Case: {0} failed!", testCase);
             }
         };
     }

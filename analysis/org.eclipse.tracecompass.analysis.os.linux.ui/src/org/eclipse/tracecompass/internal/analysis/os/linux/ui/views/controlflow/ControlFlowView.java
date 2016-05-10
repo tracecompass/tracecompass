@@ -16,6 +16,7 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -88,14 +89,12 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
     private static final String TID_COLUMN = Messages.ControlFlowView_tidColumn;
     private static final String PTID_COLUMN = Messages.ControlFlowView_ptidColumn;
     private static final String BIRTH_TIME_COLUMN = Messages.ControlFlowView_birthTimeColumn;
-    private static final String TRACE_COLUMN = Messages.ControlFlowView_traceColumn;
 
     private static final String[] COLUMN_NAMES = new String[] {
             PROCESS_COLUMN,
             TID_COLUMN,
             PTID_COLUMN,
-            BIRTH_TIME_COLUMN,
-            TRACE_COLUMN
+            BIRTH_TIME_COLUMN
     };
 
     private static final String[] FILTER_COLUMN_NAMES = new String[] {
@@ -115,8 +114,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
         builder.add(ControlFlowColumnComparators.PROCESS_NAME_COLUMN_COMPARATOR)
             .add(ControlFlowColumnComparators.TID_COLUMN_COMPARATOR)
             .add(ControlFlowColumnComparators.PTID_COLUMN_COMPARATOR)
-            .add(ControlFlowColumnComparators.BIRTH_TIME_COLUMN_COMPARATOR)
-            .add(ControlFlowColumnComparators.TRACE_COLUMN_COMPARATOR);
+            .add(ControlFlowColumnComparators.BIRTH_TIME_COLUMN_COMPARATOR);
         List<Comparator<ITimeGraphEntry>> l = builder.build();
         COLUMN_COMPARATORS = l.toArray(new Comparator[l.size()]);
     }
@@ -214,8 +212,12 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                     fFlatTraces.remove(parentTrace);
                     for (ITmfTrace trace : TmfTraceManager.getTraceSet(parentTrace)) {
                         final ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
-                        List<ControlFlowEntry> currentRootList = getEntryList(ss).stream().filter(e -> e instanceof ControlFlowEntry).map(e -> (ControlFlowEntry) e).collect(Collectors.toList());
-                        addEntriesToHierarchicalTree(currentRootList, parentTrace, ss);
+                        for (TimeGraphEntry traceEntry : getEntryList(ss)) {
+                            List<ControlFlowEntry> currentRootList = traceEntry.getChildren().stream()
+                                    .filter(e -> e instanceof ControlFlowEntry)
+                                    .map(e -> (ControlFlowEntry) e).collect(Collectors.toList());
+                            addEntriesToHierarchicalTree(currentRootList, traceEntry);
+                        }
                     }
                 }
                 refresh();
@@ -235,7 +237,9 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                     fFlatTraces.add(parentTrace);
                     for (ITmfTrace trace : TmfTraceManager.getTraceSet(parentTrace)) {
                         final ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
-                        hierarchicalToFlatTree(parentTrace, ss);
+                        for (TimeGraphEntry traceEntry : getEntryList(ss)) {
+                            hierarchicalToFlatTree(traceEntry);
+                        }
                     }
                 }
                 refresh();
@@ -273,6 +277,12 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
 
         @Override
         public String getColumnText(Object element, int columnIndex) {
+            if (element instanceof TraceEntry) {
+                if (columnIndex == 0) {
+                    return ((TraceEntry) element).getName();
+                }
+                return ""; //$NON-NLS-1$
+            }
             ControlFlowEntry entry = (ControlFlowEntry) element;
 
             if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_processColumn)) {
@@ -285,8 +295,6 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                 }
             } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_birthTimeColumn)) {
                 return Utils.formatTime(entry.getStartTime(), TimeFormat.CALENDAR, Resolution.NANOSEC);
-            } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_traceColumn)) {
-                return entry.getTrace().getName();
             }
             return ""; //$NON-NLS-1$
         }
@@ -297,6 +305,12 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
 
         @Override
         public String getColumnText(Object element, int columnIndex) {
+            if (element instanceof TraceEntry) {
+                if (columnIndex == 0) {
+                    return ((TraceEntry) element).getName();
+                }
+                return ""; //$NON-NLS-1$
+            }
             ControlFlowEntry entry = (ControlFlowEntry) element;
 
             if (columnIndex == 0) {
@@ -307,6 +321,18 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
             return ""; //$NON-NLS-1$
         }
 
+    }
+
+    private static class TraceEntry extends TimeGraphEntry {
+
+        public TraceEntry(String name, long startTime, long endTime) {
+            super(name, startTime, endTime);
+        }
+
+        @Override
+        public boolean hasTimeEvents() {
+            return false;
+        }
     }
 
     @TmfSignalHandler
@@ -345,7 +371,9 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
         }
 
         final List<ControlFlowEntry> entryList = new ArrayList<>();
-        /** Map of view entries, key is a pair [threadId, cpuId] */
+        /** Map of trace entries */
+        Map<ITmfTrace, TraceEntry> traceEntryMap = new HashMap<>();
+        /** Map of control flow entries, key is a pair [threadId, cpuId] */
         final Map<Pair<Integer, Integer>, ControlFlowEntry> entryMap = new HashMap<>();
 
         long start = ssq.getStartTime();
@@ -364,6 +392,17 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
             if (start == end && !complete) { // when complete execute one last time regardless of end time
                 continue;
             }
+
+            TraceEntry aTraceEntry = traceEntryMap.get(trace);
+            if (aTraceEntry == null) {
+                aTraceEntry = new TraceEntry(trace.getName(), start, end + 1);
+                traceEntryMap.put(trace, aTraceEntry);
+                addToEntryList(parentTrace, ssq, Collections.singletonList(aTraceEntry));
+            } else {
+                aTraceEntry.updateEndTime(end + 1);
+            }
+            final TraceEntry traceEntry = aTraceEntry;
+
             final long resolution = Math.max(1, (end - ssq.getStartTime()) / getDisplayWidth());
             setEndTime(Math.max(getEndTime(), end + 1));
             final List<Integer> threadQuarks = ssq.getQuarks(Attributes.THREADS, "*"); //$NON-NLS-1$
@@ -455,9 +494,9 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                     }
                     synchronized (fFlatTraces) {
                         if (fFlatTraces.contains(parentTrace)) {
-                            addEntriesToFlatTree(entryList, parentTrace, ssq);
+                            addEntriesToFlatTree(entryList, traceEntry);
                         } else {
-                            addEntriesToHierarchicalTree(entryList, parentTrace, ssq);
+                            addEntriesToHierarchicalTree(entryList, traceEntry);
                         }
                     }
                 }
@@ -466,7 +505,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
             queryFullStates(ssq, ssq.getStartTime(), end, resolution, monitor, new IQueryHandler() {
                 @Override
                 public void handle(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) {
-                    for (final TimeGraphEntry entry : getEntryList(ssq)) {
+                    for (final TimeGraphEntry entry : traceEntry.getChildren()) {
                         if (monitor.isCanceled()) {
                             return;
                         }
@@ -484,12 +523,12 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
     }
 
     /**
-     * Add entries to the traces's entry list in a flat fashion (no hierarchy).
+     * Add entries to the traces's child list in a flat fashion (no hierarchy).
      * If one entry has children, we do a depth first search to add each child
-     * to the trace's entry list and update the parent and child relations.
+     * to the trace's child list and update the parent and child relations.
      */
-    private void hierarchicalToFlatTree(ITmfTrace parentTrace, ITmfStateSystem ss) {
-        List<@NonNull TimeGraphEntry> rootList = getEntryList(ss);
+    private static void hierarchicalToFlatTree(TimeGraphEntry traceEntry) {
+        List<@NonNull TimeGraphEntry> rootList = traceEntry.getChildren();
         // We visit the children of every entry to add
         StreamFlattener<TimeGraphEntry> sf = new StreamFlattener<>(entry -> entry.getChildren().stream());
         Stream<TimeGraphEntry> allEntries = rootList.stream().flatMap(entry -> sf.flatten(entry));
@@ -502,33 +541,31 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
             entry.clearChildren();
         });
         rootListToAdd.forEach(entry -> {
-            entry.setParent(null);
+            traceEntry.addChild(entry);
             entry.clearChildren();
         });
-        addToEntryList(parentTrace, ss, rootListToAdd);
     }
 
     /**
-     * Add entries to the traces's entry list in a flat fashion (no hierarchy).
+     * Add entries to the traces's child list in a flat fashion (no hierarchy).
      */
-    private void addEntriesToFlatTree(List<@NonNull ControlFlowEntry> entryList, ITmfTrace parentTrace, ITmfStateSystem ss) {
-        List<TimeGraphEntry> rootList = getEntryList(ss);
-        List<@NonNull TimeGraphEntry> rootListToAdd = entryList.stream()
-                .filter(entry -> !rootList.contains(entry))
-                .collect(Collectors.toList());
-        addToEntryList(parentTrace, ss, rootListToAdd);
+    private static void addEntriesToFlatTree(List<@NonNull ControlFlowEntry> entryList, TimeGraphEntry traceEntry) {
+        List<TimeGraphEntry> rootList = traceEntry.getChildren();
+        for (ControlFlowEntry entry : entryList) {
+            if (!rootList.contains(entry)) {
+                traceEntry.addChild(entry);
+            }
+        }
     }
 
     /**
-     * Add entries to the trace's entry list in a hierarchical fashion.
+     * Add entries to the trace's child list in a hierarchical fashion.
      */
-    private void addEntriesToHierarchicalTree(List<ControlFlowEntry> entryList, ITmfTrace parentTrace, ITmfStateSystem ss) {
-        List<@NonNull TimeGraphEntry> rootListToAdd = new ArrayList<>();
-        List<TimeGraphEntry> rootListToRemove = new ArrayList<>();
-        List<TimeGraphEntry> rootList = getEntryList(ss);
+    private static void addEntriesToHierarchicalTree(List<ControlFlowEntry> entryList, TimeGraphEntry traceEntry) {
+        List<TimeGraphEntry> rootList = traceEntry.getChildren();
 
         for (ControlFlowEntry entry : entryList) {
-            boolean root = (entry.getParent() == null);
+            boolean root = (entry.getParent() == null || entry.getParent() == traceEntry);
             if (root && entry.getParentThreadId() > 0) {
                 for (ControlFlowEntry parent : entryList) {
                     /*
@@ -544,20 +581,17 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                             entry.getEndTime() < parent.getStartTime())) {
                         parent.addChild(entry);
                         root = false;
-                        if (rootList != null && rootList.contains(entry)) {
-                            rootListToRemove.add(entry);
+                        if (rootList.contains(entry)) {
+                            traceEntry.removeChild(entry);
                         }
                         break;
                     }
                 }
             }
-            if (root && (rootList == null || !rootList.contains(entry))) {
-                rootListToAdd.add(entry);
+            if (root && (!rootList.contains(entry))) {
+                traceEntry.addChild(entry);
             }
         }
-
-        addToEntryList(parentTrace, ss, rootListToAdd);
-        removeFromEntryList(parentTrace, ss, rootListToRemove);
     }
 
     private void buildStatusEvents(ITmfTrace trace, ITmfTrace parentTrace, ITmfStateSystem ss, @NonNull List<List<ITmfStateInterval>> fullStates,
@@ -779,17 +813,18 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
         return list;
     }
 
-    private ControlFlowEntry findEntry(List<? extends ITimeGraphEntry> entryList, ITmfTrace trace, int threadId) {
-        for (ITimeGraphEntry entry : entryList) {
+    private ControlFlowEntry findEntry(List<TimeGraphEntry> entryList, ITmfTrace trace, int threadId) {
+        for (TimeGraphEntry entry : entryList) {
             if (entry instanceof ControlFlowEntry) {
                 ControlFlowEntry controlFlowEntry = (ControlFlowEntry) entry;
                 if (controlFlowEntry.getThreadId() == threadId && controlFlowEntry.getTrace() == trace) {
                     return controlFlowEntry;
-                } else if (entry.hasChildren()) {
-                    controlFlowEntry = findEntry(entry.getChildren(), trace, threadId);
-                    if (controlFlowEntry != null) {
-                        return controlFlowEntry;
-                    }
+                }
+            }
+            if (entry.hasChildren()) {
+                ControlFlowEntry controlFlowEntry = findEntry(entry.getChildren(), trace, threadId);
+                if (controlFlowEntry != null) {
+                    return controlFlowEntry;
                 }
             }
         }

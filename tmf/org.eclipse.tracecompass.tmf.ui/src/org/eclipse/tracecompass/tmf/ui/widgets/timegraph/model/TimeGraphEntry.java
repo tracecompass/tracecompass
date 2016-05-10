@@ -96,7 +96,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      *
      * @since 2.0
      */
-    public void clearChildren() {
+    public synchronized void clearChildren() {
         fChildren.clear();
     }
 
@@ -284,6 +284,18 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     public synchronized void addChild(int index, @NonNull TimeGraphEntry child) {
         child.setParent(this);
         fChildren.add(index, child);
+    }
+
+    /**
+     * Remove a child entry from this one.
+     *
+     * @param child
+     *            The child entry
+     * @since 2.0
+     */
+    public synchronized void removeChild(@NonNull TimeGraphEntry child) {
+        child.setParent(null);
+        fChildren.remove(child);
     }
 
     /**

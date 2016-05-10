@@ -24,7 +24,6 @@ public class Messages extends NLS {
     public static String ControlFlowView_tidColumn;
     public static String ControlFlowView_ptidColumn;
     public static String ControlFlowView_processColumn;
-    public static String ControlFlowView_traceColumn;
 
     public static String ControlFlowView_stateTypeName;
     public static String ControlFlowView_multipleStates;

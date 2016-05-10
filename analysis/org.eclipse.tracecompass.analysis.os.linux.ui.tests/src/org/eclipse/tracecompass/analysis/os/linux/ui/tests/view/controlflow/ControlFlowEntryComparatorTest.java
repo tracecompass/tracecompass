@@ -12,7 +12,7 @@ package org.eclipse.tracecompass.analysis.os.linux.ui.tests.view.controlflow;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.ITimeGraphEntryComparator;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -62,7 +63,7 @@ public class ControlFlowEntryComparatorTest {
     private static final int TRACE_START_TIME2 = 2;
     private static final int TRACE_START_TIME3 = 3;
 
-    private static final int TRACE_END_TIME1 = 4;
+    private static final int TRACE_END_TIME = 4;
 
 
     /**
@@ -76,196 +77,149 @@ public class ControlFlowEntryComparatorTest {
     }
 
     /**
-     * Test {@link IControlFlowEntryComparator#TRACE_COMPARATOR}
-     */
-    @Test
-    public void traceComparatorTest() {
-        ControlFlowEntry entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-        ControlFlowEntry entry2 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-        ControlFlowEntry entry3 = new ControlFlowEntry(0, checkNotNull(TRACE3), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-        List<ControlFlowEntry> testVec = getListOfEntries(entry1, entry2, entry3);
-        List<ControlFlowEntry> expected = getListOfEntries(entry2, entry1, entry3);
-
-        Collections.sort(testVec, IControlFlowEntryComparator.TRACE_COMPARATOR);
-        assertEquals(expected, testVec);
-    }
-
-    /**
      * Test {@link IControlFlowEntryComparator#PROCESS_NAME_COMPARATOR}
      */
     @Test
     public void execNameComparatorTest() {
-        ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-        ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME2, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-        ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME3, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-        List<ControlFlowEntry> testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1);
-        List<ControlFlowEntry> expected = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
+        ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME2, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME3, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        List<ControlFlowEntry> testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        List<ControlFlowEntry> expected = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
 
         Collections.sort(testVec, IControlFlowEntryComparator.PROCESS_NAME_COMPARATOR);
         assertEquals(expected, testVec);
     }
 
     /**
-    * Test {@link IControlFlowEntryComparator#TID_COMPARATOR}
-    */
-   @Test
-   public void tidComparatorTest() {
-       ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID2, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID3, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       List<ControlFlowEntry> testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1);
-       List<ControlFlowEntry> expected = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
+     * Test {@link IControlFlowEntryComparator#TID_COMPARATOR}
+     */
+    @Test
+    public void tidComparatorTest() {
+        ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID2, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID3, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        List<ControlFlowEntry> testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        List<ControlFlowEntry> expected = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
 
-       Collections.sort(testVec, IControlFlowEntryComparator.TID_COMPARATOR);
-       assertEquals(expected, testVec);
-   }
+        Collections.sort(testVec, IControlFlowEntryComparator.TID_COMPARATOR);
+        assertEquals(expected, testVec);
+    }
 
-   /**
-    * Test {@link IControlFlowEntryComparator#PTID_COMPARATOR}
-    */
-   @Test
-   public void ptidComparatorTest() {
-       ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID2, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID3, TRACE_START_TIME1, TRACE_END_TIME1);
-       List<ControlFlowEntry> testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1);
-       List<ControlFlowEntry> expected = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
+    /**
+     * Test {@link IControlFlowEntryComparator#PTID_COMPARATOR}
+     */
+    @Test
+    public void ptidComparatorTest() {
+        ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID2, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID3, TRACE_START_TIME1, TRACE_END_TIME);
+        List<ControlFlowEntry> testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        List<ControlFlowEntry> expected = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
 
-       Collections.sort(testVec, IControlFlowEntryComparator.PTID_COMPARATOR);
-       assertEquals(expected, testVec);
-   }
+        Collections.sort(testVec, IControlFlowEntryComparator.PTID_COMPARATOR);
+        assertEquals(expected, testVec);
+    }
 
-   /**
-    * Test {@link IControlFlowEntryComparator#BIRTH_TIME_COMPARATOR}
-    */
-   @Test
-   public void birthTimeComparatorTest() {
-       ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME2, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME3, TRACE_END_TIME1);
-       List<ControlFlowEntry> testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1);
-       List<ControlFlowEntry> expected = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
+    /**
+     * Test {@link IControlFlowEntryComparator#BIRTH_TIME_COMPARATOR}
+     */
+    @Test
+    public void birthTimeComparatorTest() {
+        ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME2, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME3, TRACE_END_TIME);
+        List<ControlFlowEntry> testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        List<ControlFlowEntry> expected = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
 
-       Collections.sort(testVec, IControlFlowEntryComparator.BIRTH_TIME_COMPARATOR);
-       assertEquals(expected, testVec);
-   }
+        Collections.sort(testVec, IControlFlowEntryComparator.BIRTH_TIME_COMPARATOR);
+        assertEquals(expected, testVec);
+    }
 
-   /**
-    * Test {@link ControlFlowColumnComparators#TRACE_COLUMN_COMPARATOR}
-    *
-    * Note when the trace is the same: The order that is birth time,
-    * TID  and PTID. Note that for secondary comparators the sort
-    * direction is not changed.
-    */
-   @Test
-   public void traceColumnComparatorTest() {
-       ControlFlowEntry entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry entry2 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME2, TRACE_END_TIME1);
-       ControlFlowEntry entry3 = new ControlFlowEntry(0, checkNotNull(TRACE3), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME3, TRACE_END_TIME1);
-       List<ControlFlowEntry> testVec = getListOfEntries(entry2, entry3, entry1);
-       List<ControlFlowEntry> expectedDown = getListOfEntries(entry2, entry1, entry3);
-       List<ControlFlowEntry> expectedUp = getListOfEntries(entry3, entry1, entry2);
-       runTest(ControlFlowColumnComparators.TRACE_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+    /**
+     * Test {@link ControlFlowColumnComparators#PROCESS_NAME_COLUMN_COMPARATOR}
+     */
+    @Test
+    public void execNameColumnComparatorTest() {
+        TimeGraphEntry trace1Entry = new TimeGraphEntry(TRACE1.getName(), TRACE_START_TIME1, TRACE_END_TIME);
+        TimeGraphEntry trace2Entry = new TimeGraphEntry(TRACE2.getName(), TRACE_START_TIME2, TRACE_END_TIME);
+        TimeGraphEntry trace3Entry = new TimeGraphEntry(TRACE3.getName(), TRACE_START_TIME3, TRACE_END_TIME);
 
-       entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       entry2 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME2, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       entry3 = new ControlFlowEntry(0, checkNotNull(TRACE3), TRACE_EXEC_NAME3, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       testVec = getListOfEntries(entry2, entry3, entry1);
-       expectedDown = getListOfEntries(entry2, entry1, entry3);
-       expectedUp = getListOfEntries(entry3, entry1, entry2);
-       runTest(ControlFlowColumnComparators.TRACE_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+        List<TimeGraphEntry> testVec = Arrays.asList(trace1Entry, trace2Entry, trace3Entry);
+        List<TimeGraphEntry> expectedDown = Arrays.asList(trace3Entry, trace1Entry, trace2Entry);
+        List<TimeGraphEntry> expectedUp = Arrays.asList(trace2Entry, trace1Entry, trace3Entry);
+        runTest(ControlFlowColumnComparators.PROCESS_NAME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
 
-       entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       entry2 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME1, TRACE_TID2, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       entry3 = new ControlFlowEntry(0, checkNotNull(TRACE3), TRACE_EXEC_NAME1, TRACE_TID3, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       testVec = getListOfEntries(entry2, entry3, entry1);
-       expectedDown = getListOfEntries(entry2, entry1, entry3);
-       expectedUp = getListOfEntries(entry3, entry1, entry2);
-       runTest(ControlFlowColumnComparators.TRACE_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+        ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME2, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME3, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
 
-       entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       entry2 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID2, TRACE_START_TIME1, TRACE_END_TIME1);
-       entry3 = new ControlFlowEntry(0, checkNotNull(TRACE3), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID3, TRACE_START_TIME1, TRACE_END_TIME1);
-       testVec = getListOfEntries(entry2, entry3, entry1);
-       expectedDown = getListOfEntries(entry2, entry1, entry3);
-       expectedUp = getListOfEntries(entry3, entry1, entry2);
-       runTest(ControlFlowColumnComparators.TRACE_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
-   }
-
-   /**
-    * Test {@link ControlFlowColumnComparators#PROCESS_NAME_COLUMN_COMPARATOR}
-    */
-   @Test
-   public void execNameColumnComparatorTest() {
-       ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME2, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME3, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-
-       ControlFlowEntry trace2Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace2Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME2, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace2Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME3, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-
-       List<ControlFlowEntry> testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1, trace2Entry2, trace2Entry3, trace2Entry1);
-       List<ControlFlowEntry> expectedDown = getListOfEntries(trace2Entry1, trace2Entry2, trace2Entry3, trace1Entry1, trace1Entry2, trace1Entry3);
-       List<ControlFlowEntry> expectedUp = getListOfEntries(trace2Entry3, trace2Entry2, trace2Entry1, trace1Entry3, trace1Entry2, trace1Entry1);
-       runTest(ControlFlowColumnComparators.PROCESS_NAME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
-   }
+        testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        expectedDown = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        expectedUp = Arrays.asList(trace1Entry3, trace1Entry2, trace1Entry1);
+        runTest(ControlFlowColumnComparators.PROCESS_NAME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+    }
 
     /**
      * Test {@link ControlFlowColumnComparators#PROCESS_NAME_COLUMN_COMPARATOR}
      *
      * Note, that when the exec name is the same: The order that is birth time,
-     * TID  and PTID. Note that for secondary comparators the sort direction is
+     * TID and PTID. Note that for secondary comparators the sort direction is
      * not changed.
      */
-   @Test
-   public void execNameSecondaryTimeColumnComparatorTest() {
-       ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME2, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME3, TRACE_END_TIME1);
+    @Test
+    public void execNameSecondaryTimeColumnComparatorTest() {
+        ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME2, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME3, TRACE_END_TIME);
 
-       List<ControlFlowEntry> testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1);
-       List<ControlFlowEntry> expectedDown = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       List<ControlFlowEntry> expectedUp = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       runTest(ControlFlowColumnComparators.PROCESS_NAME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+        List<TimeGraphEntry> testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        List<TimeGraphEntry> expectedDown = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        List<TimeGraphEntry> expectedUp = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        runTest(ControlFlowColumnComparators.PROCESS_NAME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
 
-       trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID2, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID3, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
+        trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID2, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID3, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
 
-       testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1);
-       expectedDown = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       expectedUp = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       runTest(ControlFlowColumnComparators.PROCESS_NAME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+        testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        expectedDown = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        expectedUp = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        runTest(ControlFlowColumnComparators.PROCESS_NAME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
 
-       trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID2, TRACE_START_TIME1, TRACE_END_TIME1);
-       trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID3, TRACE_START_TIME1, TRACE_END_TIME1);
+        trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID2, TRACE_START_TIME1, TRACE_END_TIME);
+        trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID3, TRACE_START_TIME1, TRACE_END_TIME);
 
-       testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1);
-       expectedDown = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       expectedUp = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       runTest(ControlFlowColumnComparators.PROCESS_NAME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
-   }
+        testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        expectedDown = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        expectedUp = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        runTest(ControlFlowColumnComparators.PROCESS_NAME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+    }
 
-   /**
-    * Test {@link ControlFlowColumnComparators#TID_COLUMN_COMPARATOR}
-    */
-   @Test
-   public void tidColumnComparatorTest() {
-       ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID2, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID3, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
+    /**
+     * Test {@link ControlFlowColumnComparators#TID_COLUMN_COMPARATOR}
+     */
+    @Test
+    public void tidColumnComparatorTest() {
+        TimeGraphEntry trace1Entry = new TimeGraphEntry(TRACE1.getName(), TRACE_START_TIME1, TRACE_END_TIME);
+        TimeGraphEntry trace2Entry = new TimeGraphEntry(TRACE2.getName(), TRACE_START_TIME2, TRACE_END_TIME);
+        TimeGraphEntry trace3Entry = new TimeGraphEntry(TRACE3.getName(), TRACE_START_TIME3, TRACE_END_TIME);
 
-       ControlFlowEntry trace2Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace2Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME1, TRACE_TID2, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace2Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME1, TRACE_TID3, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
+        List<TimeGraphEntry> testVec = Arrays.asList(trace1Entry, trace2Entry, trace3Entry);
+        List<TimeGraphEntry> expectedDown = Arrays.asList(trace1Entry, trace2Entry, trace3Entry);
+        List<TimeGraphEntry> expectedUp = Arrays.asList(trace1Entry, trace2Entry, trace3Entry);
+        runTest(ControlFlowColumnComparators.TID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
 
-       List<ControlFlowEntry> testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1, trace2Entry2, trace2Entry3, trace2Entry1);
-       List<ControlFlowEntry> expectedDown = getListOfEntries(trace2Entry1, trace2Entry2, trace2Entry3, trace1Entry1, trace1Entry2, trace1Entry3);
-       List<ControlFlowEntry> expectedUp = getListOfEntries(trace2Entry3, trace2Entry2, trace2Entry1, trace1Entry3, trace1Entry2, trace1Entry1);
-       runTest(ControlFlowColumnComparators.TID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
-   }
+        ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID2, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID3, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+
+        testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        expectedDown = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        expectedUp = Arrays.asList(trace1Entry3, trace1Entry2, trace1Entry1);
+        runTest(ControlFlowColumnComparators.TID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+    }
 
     /**
      * Test {@link ControlFlowColumnComparators#TID_COLUMN_COMPARATOR}
@@ -274,169 +228,170 @@ public class ControlFlowEntryComparatorTest {
      * time, process name and PTID. Note that for secondary comparators the
      * sort direction is not changed.
      */
-   @Test
-   public void tidSecondaryTimeColumnComparatorTest() {
+    @Test
+    public void tidSecondaryTimeColumnComparatorTest() {
 
-       ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME2, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME3, TRACE_END_TIME1);
+        ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME2, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME3, TRACE_END_TIME);
 
-       List<ControlFlowEntry> testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1);
-       List<ControlFlowEntry> expectedDown = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       List<ControlFlowEntry> expectedUp = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       runTest(ControlFlowColumnComparators.TID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+        List<TimeGraphEntry> testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        List<TimeGraphEntry> expectedDown = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        List<TimeGraphEntry> expectedUp = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        runTest(ControlFlowColumnComparators.TID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
 
-       trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME2, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME3, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
+        trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME2, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME3, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
 
-       testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1);
-       expectedDown = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       expectedUp = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       runTest(ControlFlowColumnComparators.TID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+        testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        expectedDown = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        expectedUp = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        runTest(ControlFlowColumnComparators.TID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
 
-       trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID2, TRACE_START_TIME1, TRACE_END_TIME1);
-       trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID3, TRACE_START_TIME1, TRACE_END_TIME1);
+        trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID2, TRACE_START_TIME1, TRACE_END_TIME);
+        trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID3, TRACE_START_TIME1, TRACE_END_TIME);
 
-       testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1);
-       expectedDown = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       expectedUp = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       runTest(ControlFlowColumnComparators.TID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
-   }
+        testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        expectedDown = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        expectedUp = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        runTest(ControlFlowColumnComparators.TID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+    }
 
-   /**
-    * Test {@link ControlFlowColumnComparators#PTID_COLUMN_COMPARATOR}
-    */
-   @Test
-   public void ptidColumnComparatorTest() {
-       ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID2, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID3, TRACE_START_TIME1, TRACE_END_TIME1);
+    /**
+     * Test {@link ControlFlowColumnComparators#PTID_COLUMN_COMPARATOR}
+     */
+    @Test
+    public void ptidColumnComparatorTest() {
+        TimeGraphEntry trace1Entry = new TimeGraphEntry(TRACE1.getName(), TRACE_START_TIME1, TRACE_END_TIME);
+        TimeGraphEntry trace2Entry = new TimeGraphEntry(TRACE2.getName(), TRACE_START_TIME2, TRACE_END_TIME);
+        TimeGraphEntry trace3Entry = new TimeGraphEntry(TRACE3.getName(), TRACE_START_TIME3, TRACE_END_TIME);
 
-       ControlFlowEntry trace2Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace2Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID2, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace2Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID3, TRACE_START_TIME1, TRACE_END_TIME1);
+        List<TimeGraphEntry> testVec = Arrays.asList(trace1Entry, trace2Entry, trace3Entry);
+        List<TimeGraphEntry> expectedDown = Arrays.asList(trace1Entry, trace2Entry, trace3Entry);
+        List<TimeGraphEntry> expectedUp = Arrays.asList(trace1Entry, trace2Entry, trace3Entry);
+        runTest(ControlFlowColumnComparators.PTID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
 
-       List<ControlFlowEntry> testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1, trace2Entry2, trace2Entry3, trace2Entry1);
-       List<ControlFlowEntry> expectedDown = getListOfEntries(trace2Entry1, trace2Entry2, trace2Entry3, trace1Entry1, trace1Entry2, trace1Entry3);
-       List<ControlFlowEntry> expectedUp = getListOfEntries(trace2Entry3, trace2Entry2, trace2Entry1, trace1Entry3, trace1Entry2, trace1Entry1);
-       runTest(ControlFlowColumnComparators.PTID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
-   }
+        ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID2, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID3, TRACE_START_TIME1, TRACE_END_TIME);
+
+        testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        expectedDown = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        expectedUp = Arrays.asList(trace1Entry3, trace1Entry2, trace1Entry1);
+        runTest(ControlFlowColumnComparators.PTID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+    }
 
     /**
      * Test {@link ControlFlowColumnComparators#PTID_COLUMN_COMPARATOR}
      *
      * Note, that when PTID is the same: The order for that is birth time,
-     * process name and ptid. Note that for secondary comparators the sort
+     * process name and TID. Note that for secondary comparators the sort
      * direction is not changed.
      */
-   @Test
-   public void ptidSecondaryTimeColumnComparatorTest() {
-       ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME2, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME3, TRACE_END_TIME1);
+    @Test
+    public void ptidSecondaryTimeColumnComparatorTest() {
+        ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME2, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME3, TRACE_END_TIME);
 
-       List<ControlFlowEntry> testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1);
-       List<ControlFlowEntry> expectedDown = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       List<ControlFlowEntry> expectedUp = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       runTest(ControlFlowColumnComparators.PTID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+        List<TimeGraphEntry> testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        List<TimeGraphEntry> expectedDown = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        List<TimeGraphEntry> expectedUp = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        runTest(ControlFlowColumnComparators.PTID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
 
-       trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME2, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME3, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
+        trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME2, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME3, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
 
-       testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1);
-       expectedDown = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       expectedUp = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       runTest(ControlFlowColumnComparators.PTID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+        testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        expectedDown = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        expectedUp = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        runTest(ControlFlowColumnComparators.PTID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
 
-       trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID2, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID3, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
+        trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID2, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID3, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
 
-       testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1);
-       expectedDown = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       expectedUp = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       runTest(ControlFlowColumnComparators.PTID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
-   }
+        testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        expectedDown = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        expectedUp = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        runTest(ControlFlowColumnComparators.PTID_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+    }
 
-   /**
-    * Test {@link ControlFlowColumnComparators#BIRTH_TIME_COLUMN_COMPARATOR}
-    */
-   @Test
-   public void birthTimeColumnComparatorTest() {
-       ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME2, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME3, TRACE_END_TIME1);
+    /**
+     * Test {@link ControlFlowColumnComparators#BIRTH_TIME_COLUMN_COMPARATOR}
+     */
+    @Test
+    public void birthTimeColumnComparatorTest() {
+        TimeGraphEntry trace1Entry = new TimeGraphEntry(TRACE1.getName(), TRACE_START_TIME1, TRACE_END_TIME);
+        TimeGraphEntry trace2Entry = new TimeGraphEntry(TRACE2.getName(), TRACE_START_TIME2, TRACE_END_TIME);
+        TimeGraphEntry trace3Entry = new TimeGraphEntry(TRACE3.getName(), TRACE_START_TIME3, TRACE_END_TIME);
 
-       ControlFlowEntry trace2Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace2Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME2, TRACE_END_TIME1);
-       ControlFlowEntry trace2Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE2), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME3, TRACE_END_TIME1);
+        List<TimeGraphEntry> testVec = Arrays.asList(trace1Entry, trace2Entry, trace3Entry);
+        List<TimeGraphEntry> expectedDown = Arrays.asList(trace1Entry, trace2Entry, trace3Entry);
+        List<TimeGraphEntry> expectedUp = Arrays.asList(trace3Entry, trace2Entry, trace1Entry);
+        runTest(ControlFlowColumnComparators.BIRTH_TIME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
 
-       List<ControlFlowEntry> testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1, trace2Entry2, trace2Entry3, trace2Entry1);
-       List<ControlFlowEntry> expectedDown = getListOfEntries(trace2Entry1, trace2Entry2, trace2Entry3, trace1Entry1, trace1Entry2, trace1Entry3);
-       List<ControlFlowEntry> expectedUp = getListOfEntries(trace2Entry3, trace2Entry2, trace2Entry1, trace1Entry3, trace1Entry2, trace1Entry1);
-       runTest(ControlFlowColumnComparators.BIRTH_TIME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
-   }
+        ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME2, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME3, TRACE_END_TIME);
+
+        testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        expectedDown = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        expectedUp = Arrays.asList(trace1Entry3, trace1Entry2, trace1Entry1);
+        runTest(ControlFlowColumnComparators.BIRTH_TIME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+    }
 
     /**
      * Test {@link ControlFlowColumnComparators#BIRTH_TIME_COLUMN_COMPARATOR}
      *
-     * Note, taht when when birth time is the same: The order for that is
-     * process name, tid and ptid. Note that for secondary comparators the
+     * Note, that when when birth time is the same: The order for that is
+     * process name, TID and PTID. Note that for secondary comparators the
      * sort direction is not changed.
      */
-   @Test
-   public void birthTimeSecondaryTimeColumnComparatorTest() {
-       ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME2, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME3, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
+    @Test
+    public void birthTimeSecondaryTimeColumnComparatorTest() {
+        ControlFlowEntry trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME2, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        ControlFlowEntry trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME3, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
 
-       List<ControlFlowEntry> testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1);
-       List<ControlFlowEntry> expectedDown = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       List<ControlFlowEntry> expectedUp = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       runTest(ControlFlowColumnComparators.BIRTH_TIME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+        List<TimeGraphEntry> testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        List<TimeGraphEntry> expectedDown = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        List<TimeGraphEntry> expectedUp = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        runTest(ControlFlowColumnComparators.BIRTH_TIME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
 
-       trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID2, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID2, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
+        trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID2, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID2, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
 
-       testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1);
-       expectedDown = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       expectedUp = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       runTest(ControlFlowColumnComparators.BIRTH_TIME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+        testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        expectedDown = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        expectedUp = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        runTest(ControlFlowColumnComparators.BIRTH_TIME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
 
-       trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME1);
-       trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID2, TRACE_START_TIME1, TRACE_END_TIME1);
-       trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID3, TRACE_START_TIME1, TRACE_END_TIME1);
+        trace1Entry1 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID1, TRACE_START_TIME1, TRACE_END_TIME);
+        trace1Entry2 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID2, TRACE_START_TIME1, TRACE_END_TIME);
+        trace1Entry3 = new ControlFlowEntry(0, checkNotNull(TRACE1), TRACE_EXEC_NAME1, TRACE_TID1, TRACE_PTID3, TRACE_START_TIME1, TRACE_END_TIME);
 
-       testVec = getListOfEntries(trace1Entry2, trace1Entry3, trace1Entry1);
-       expectedDown = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       expectedUp = getListOfEntries(trace1Entry1, trace1Entry2, trace1Entry3);
-       runTest(ControlFlowColumnComparators.BIRTH_TIME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
+        testVec = Arrays.asList(trace1Entry2, trace1Entry3, trace1Entry1);
+        expectedDown = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        expectedUp = Arrays.asList(trace1Entry1, trace1Entry2, trace1Entry3);
+        runTest(ControlFlowColumnComparators.BIRTH_TIME_COLUMN_COMPARATOR, testVec, expectedDown, expectedUp);
 
-   }
-
-   private static void runTest(ITimeGraphEntryComparator comparator, List<ControlFlowEntry> testVec, List<ControlFlowEntry> expectedDown, List<ControlFlowEntry> expectedUp) {
-       comparator.setDirection(SWT.DOWN);
-       Collections.sort(testVec, comparator);
-       assertEquals(expectedDown, testVec);
-
-       comparator.setDirection(SWT.UP);
-       Comparator<ITimeGraphEntry> reverseComp = comparator;
-       reverseComp = Collections.reverseOrder(reverseComp);
-       Collections.sort(testVec, reverseComp);
-       assertEquals(expectedUp, testVec);
-   }
-
-    private static List<ControlFlowEntry> getListOfEntries(ControlFlowEntry... entries) {
-        List<ControlFlowEntry> retList = new ArrayList<>();
-        for (ControlFlowEntry entry : entries) {
-            retList.add(entry);
-        }
-        return retList;
     }
 
+    private static void runTest(ITimeGraphEntryComparator comparator, List<TimeGraphEntry> testVec, List<TimeGraphEntry> expectedDown, List<TimeGraphEntry> expectedUp) {
+        comparator.setDirection(SWT.DOWN);
+        Collections.sort(testVec, comparator);
+        assertEquals(expectedDown, testVec);
+
+        comparator.setDirection(SWT.UP);
+        Comparator<ITimeGraphEntry> reverseComp = comparator;
+        reverseComp = Collections.reverseOrder(reverseComp);
+        Collections.sort(testVec, reverseComp);
+        assertEquals(expectedUp, testVec);
+    }
 
 }
