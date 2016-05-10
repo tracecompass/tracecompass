@@ -199,6 +199,53 @@ public class TmfTimestampFormatTest {
     }
 
     /**
+     * Test unit of seconds format
+     *
+     * @throws ParseException
+     *             should not happen, if it does, the test is a failure
+     */
+    @Test
+    public void testUnitOfSecondsFormat() throws ParseException {
+        assertEquals("000000071.234567890", new TmfTimestampFormat("TTTTTTTTTd.SSSSSSSSS").format(7123456789L));
+        assertEquals("71.234567890", new TmfTimestampFormat("Td.SSSSSSSSS").format(7123456789L));
+        assertEquals("71.23456789", new TmfTimestampFormat("Td.SSSSSSSS").format(7123456789L));
+
+        assertEquals("000000712.345678900", new TmfTimestampFormat("TTTTTTTTTc.SSSSSSSSS").format(7123456789L));
+        assertEquals("712.345678900", new TmfTimestampFormat("Tc.SSSSSSSSS").format(7123456789L));
+        assertEquals("712.3456789", new TmfTimestampFormat("Tc.SSSSSSS").format(7123456789L));
+
+        assertEquals("000007123.456789000", new TmfTimestampFormat("TTTTTTTTTm.SSSSSSSSS").format(7123456789L));
+        assertEquals("7123.456789000", new TmfTimestampFormat("Tm.SSSSSSSSS").format(7123456789L));
+        assertEquals("7123.456789", new TmfTimestampFormat("Tm.SSSSSS").format(7123456789L));
+
+        assertEquals("007123456.789000000", new TmfTimestampFormat("TTTTTTTTTu.SSSSSSSSS").format(7123456789L));
+        assertEquals("7123456.789000000", new TmfTimestampFormat("Tu.SSSSSSSSS").format(7123456789L));
+        assertEquals("7123456.789", new TmfTimestampFormat("Tu.SSS").format(7123456789L));
+
+        assertEquals("7123456789.000000000", new TmfTimestampFormat("TTTTTTTTTn.SSSSSSSSS").format(7123456789L));
+        assertEquals("7123456789.000000000", new TmfTimestampFormat("Tn.SSSSSSSSS").format(7123456789L));
+        assertEquals("7123456789", new TmfTimestampFormat("Tn").format(7123456789L));
+
+        assertEquals(7123456789L, new TmfTimestampFormat("Td.SSSSSSSS").parseValue("71.23456789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("Tc.SSSSSSS").parseValue("712.3456789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("Tm.SSSSSS").parseValue("7123.456789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("Tu.SSS").parseValue("7123456.789"));
+        assertEquals(7123456789L, new TmfTimestampFormat("Tn").parseValue("7123456789"));
+
+        assertEquals(-100000L, new TmfTimestampFormat("Tm.S").parseValue("-0.1"));
+        assertEquals(-100000L, new TmfTimestampFormat("Tm.S").parseValue("-.1"));
+        assertEquals(-7000000L, new TmfTimestampFormat("Tm.S").parseValue("-7"));
+        assertEquals(-7000000L, new TmfTimestampFormat("Tm.S").parseValue("-7."));
+        assertEquals(-7000000L, new TmfTimestampFormat("Tm.S").parseValue("-7.0"));
+        assertEquals(-7100000L, new TmfTimestampFormat("Tm.S").parseValue("-7.1"));
+
+        assertEquals("9223372036854775807", new TmfTimestampFormat("Tn").format(9223372036854775807L));
+        assertEquals(9223372036854775807L, new TmfTimestampFormat("Tn").parseValue("9223372036854775807"));
+        assertEquals("-9223372036854775808", new TmfTimestampFormat("Tn").format(-9223372036854775808L));
+        assertEquals(-9223372036854775808L, new TmfTimestampFormat("Tn").parseValue("-9223372036854775808"));
+    }
+
+    /**
      * Test parsing of date and time patterns
      *
      * @throws ParseException
@@ -324,6 +371,13 @@ public class TmfTimestampFormatTest {
 
         time = new TmfTimestampFormat("yyyy MM dd HH mm ss SSS SSS SSS", GMT, CA).parseValue("2014 \t 1 \t 2 \t 3 \t 4 \t 5 \t 123 456 789");
         assertEquals("2014-01-02 03:04:05.123456789", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss.SSS", GMT, CA).parseValue("1970-01-01 00:00:00.000");
+        assertEquals("1970-01-01 00:00:00.000000000", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss.SSS", GMT, CA).parseValue("1969-12-31 23:59:59.123");
+        assertEquals("1969-12-31 23:59:59.123000000", tsf.format(time));
+
     }
 
     /**

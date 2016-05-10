@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson
+ * Copyright (c) 2012, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -20,8 +20,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -38,22 +40,47 @@ import java.util.TimeZone;
  * supported with the following exceptions:
  * <blockquote>
  * <table border=0 cellspacing=3 cellpadding=0 >
- *     <tr bgcolor="#ccccff">
+ *     <tr>
  *         <th align=left>Format
  *         <th align=left>Description
  *         <th align=left>Value Range
  *         <th align=left>Example
- *     <tr bgcolor="#eeeeff">
+ *     <tr>
  *         <td><code>T</code>
  *         <td>The seconds since the epoch
  *         <td><code>0-9223372036</code>
  *         <td><code>1332170682</code>
  *     <tr>
+ *         <td><code>Td</code>
+ *         <td>The deciseconds since the epoch
+ *         <td><code>0-92233720368</code>
+ *         <td><code>13321706825</code>
+ *     <tr>
+ *         <td><code>Tc</code>
+ *         <td>The centiseconds since the epoch
+ *         <td><code>0-922337203685</code>
+ *         <td><code>133217068253</code>
+ *     <tr>
+ *         <td><code>Tm</code>
+ *         <td>The milliseconds since the epoch
+ *         <td><code>0-9223372036854</code>
+ *         <td><code>1332170682539</code>
+ *     <tr>
+ *         <td><code>Tu</code>
+ *         <td>The microseconds since the epoch
+ *         <td><code>0-9223372036854775</code>
+ *         <td><code>1332170682539677</code>
+ *     <tr>
+ *         <td><code>Tn</code>
+ *         <td>The nanoseconds since the epoch
+ *         <td><code>0-9223372036854775807</code>
+ *         <td><code>1332170682539677389</code>
+ *     <tr>
  *         <td><code>S</code>
  *         <td>Millisecond
  *         <td><code>N/A</code>
  *         <td><code>Not supported</code>
- *     <tr bgcolor="#eeeeff">
+ *     <tr>
  *         <td><code>W</code>
  *         <td>Week in month
  *         <td><code>N/A</code>
@@ -73,17 +100,17 @@ import java.util.TimeZone;
  * <h4>Sub-Seconds Patterns</h4>
  * <blockquote>
  * <table border=0 cellspacing=3 cellpadding=0 >
- *     <tr bgcolor="#ccccff">
+ *     <tr>
  *         <th align=left>Format
  *         <th align=left>Description
  *         <th align=left>Value Range
  *         <th align=left>Example
  *     <tr>
  *         <td><code>S</code>
- *         <td>Fraction of second
+ *         <td>Fraction of second (or unit of second)
  *         <td><code>0-999999999</code>
  *         <td><code>123456789</code>
- *     <tr bgcolor="#eeeeff">
+ *     <tr>
  *         <td><code>C</code>
  *         <td>Microseconds in ms
  *         <td><code>0-999</code>
@@ -131,27 +158,33 @@ import java.util.TimeZone;
  *
  * <blockquote>
  * <table border=0 cellspacing=3 cellpadding=0>
- *     <tr bgcolor="#ccccff">
+ *     <tr>
  *         <th align=left>Date and Time Pattern
  *         <th align=left>Result
  *     <tr>
  *         <td><code>"yyyy-MM-dd HH:mm:ss.SSS.SSS.SSS"</code>
  *         <td><code>2012-03-19 11:24:42.539.677.389</code>
- *     <tr bgcolor="#eeeeff">
+ *     <tr>
  *         <td><code>"yyyy-MM-dd HH:mm:ss.SSS.SSS"</code>
  *         <td><code>2012-03-19 11:24:42.539.677</code>
  *     <tr>
  *         <td><code>"yyyy-D HH:mm:ss.SSS.SSS"</code>
  *         <td><code>2012-79 11:24:42.539.677</code>
- *     <tr bgcolor="#eeeeff">
+ *     <tr>
  *         <td><code>"ss,SSSS"</code>
  *         <td><code>42,5397</code>
  *     <tr>
  *         <td><code>"T.SSS SSS SSS"</code>
  *         <td><code>1332170682.539 677 389</code>
- *     <tr bgcolor="#eeeeff">
+ *     <tr>
  *         <td><code>"T"</code>
  *         <td><code>1332170682</code>
+ *     <tr>
+ *         <td><code>"Tm.SSSSSS"</code>
+ *         <td><code>1332170682539.677389</code>
+ *     <tr>
+ *         <td><code>"Tn"</code>
+ *         <td><code>1332170682539677389</code>
  * </table>
  * </blockquote>
  * <p>
@@ -206,6 +239,9 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     // The list of supplementary patterns
     private List<String> fSupplPatterns = new ArrayList<>();
 
+    // The unit of seconds denominator e.g. 10^9 for ns
+    private long fUnitOfSeconds = 1;
+
     // The locale
     private final Locale fLocale;
 
@@ -224,6 +260,20 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      * The optional sub-second delimiter characters.
      */
     protected String fDelimiterChars = " .,-_:;/'\""; //$NON-NLS-1$
+    /**
+     * The map of optional unit of seconds suffix characters that can follow the
+     * T pattern. The map value is the unit of seconds denominator.
+     *
+     * @since 2.0
+     */
+    protected Map<Character, Long> fUnitOfSecondsMap = new HashMap<>();
+    {
+        fUnitOfSecondsMap.put('d', 10L);
+        fUnitOfSecondsMap.put('c', 100L);
+        fUnitOfSecondsMap.put('m', 1000L);
+        fUnitOfSecondsMap.put('u', 1000000L);
+        fUnitOfSecondsMap.put('n', 1000000000L);
+    }
 
     /*
      * The bracketing symbols used to mitigate the risk of a format string
@@ -370,16 +420,16 @@ public class TmfTimestampFormat extends SimpleDateFormat {
         // Split the timestamp value into its sub-components
         long date = value / 1000000; // milliseconds since January 1, 1970, 00:00:00 GMT
         long sec = value / 1000000000;    // seconds since January 1, 1970, 00:00:00 GMT
-        long ms  = Math.abs((value % 1000000000) / 1000000); // milliseconds
-        long cs  = Math.abs((value % 1000000)    / 1000);    // microseconds
-        long ns  = Math.abs(value % 1000);                   // nanoseconds
+        long ms  = Math.abs((value % 1000000000) / 1000000); // 0-999 milliseconds
+        long us  = Math.abs((value % 1000000)    / 1000);    // 0-999 microseconds
+        long ns  = Math.abs(value % 1000);                   // 0-999 nanoseconds
 
         // Adjust for negative value when formatted as a date
-        if (value < 0 && ms + cs + ns > 0 && !super.toPattern().contains(fOpenBracket + "T")) { //$NON-NLS-1$
+        if (value < 0 && ms + us + ns > 0 && !super.toPattern().contains(fOpenBracket + "T")) { //$NON-NLS-1$
             date -= 1;
-            long nanosec = 1000000000 - (1000000 * ms + 1000 * cs + ns);
+            long nanosec = 1000000000 - (1000000 * ms + 1000 * us + ns);
             ms = nanosec / 1000000;
-            cs = (nanosec % 1000000) / 1000;
+            us = (nanosec % 1000000) / 1000;
             ns = nanosec % 1000;
         }
 
@@ -402,14 +452,22 @@ public class TmfTimestampFormat extends SimpleDateFormat {
                         result.insert(0, '-');
                     }
                     val = sec;
+                    if (fUnitOfSeconds != 1) {
+                        // Avoid multiplication to prevent overflow
+                        val = value / (1000000000 / fUnitOfSeconds);
+                    }
                     bufLength = Math.min(length, 10);
                     break;
                 case 'S':
-                    val = 1000000 * ms + 1000 * cs + ns;
+                    val = 1000000 * ms + 1000 * us + ns;
+                    if (fUnitOfSeconds != 1) {
+                        val *= fUnitOfSeconds;
+                        val %= 1000000000;
+                    }
                     bufLength = 9;
                     break;
                 case 'C':
-                    val = cs;
+                    val = us;
                     bufLength = Math.min(length, 3);
                     break;
                 case 'N':
@@ -456,32 +514,35 @@ public class TmfTimestampFormat extends SimpleDateFormat {
             return 0;
         }
 
-        long seconds  = 0;
-        boolean isNegative = source.charAt(0) == '-';
-        boolean isDateTimeFormat = true;
-
         int index = indexOfSourceDecimalSeparator(source);
 
         // Check for seconds in epoch pattern
         for (String pattern : fSupplPatterns) {
             if (pattern.charAt(0) == 'T') {
-                isDateTimeFormat = false;
-                // Remove everything up to the first "." and compute the
+                long unitsOfSecond  = 0;
+                boolean isNegative = source.charAt(0) == '-';
+                // Remove everything up to the decimal separator and compute the
                 // number of seconds since the epoch. If there is no period,
                 // assume an integer value and return immediately
                 if (index == 0 || (isNegative && index <= 1)) {
-                    seconds = 0;
+                    unitsOfSecond = 0;
                 } else if (index == source.length()) {
-                    return new DecimalFormat("0").parse(source).longValue() * 1000000000; //$NON-NLS-1$
+                    return new DecimalFormat("0").parse(source).longValue() * (1000000000 / fUnitOfSeconds); //$NON-NLS-1$
                 } else {
-                    seconds = new DecimalFormat("0").parse(source.substring(0, index)).longValue(); //$NON-NLS-1$
+                    unitsOfSecond = new DecimalFormat("0").parse(source.substring(0, index)).longValue(); //$NON-NLS-1$
                 }
-                break;
+                long nanos = parseSubSeconds(source.substring(index));
+                if (isNegative) {
+                    nanos = -nanos;
+                }
+                // Compute the value in ns
+                return unitsOfSecond * (1000000000 / fUnitOfSeconds) + nanos;
             }
         }
 
-        // If there was no "T" (thus not an interval), parse as a date
-        if (isDateTimeFormat && super.toPattern().length() > 0) {
+        // If there was no "T", parse as a date
+        long seconds  = 0;
+        if (super.toPattern().length() > 0) {
             Date baseDate = super.parse(source.substring(0, index));
             getCalendar();
 
@@ -533,15 +594,13 @@ public class TmfTimestampFormat extends SimpleDateFormat {
             } else {
                 seconds = baseDate.getTime() / 1000;
             }
-        } else if (isDateTimeFormat && ref != Long.MIN_VALUE) {
+        } else if (ref != Long.MIN_VALUE) {
             // If the date and time pattern is empty, adjust for reference
             seconds = ref / 1000000000;
         }
 
         long nanos = parseSubSeconds(source.substring(index));
-        if (isNegative && !isDateTimeFormat) {
-            nanos = -nanos;
-        }
+
         // Compute the value in ns
         return seconds * 1000000000 + nanos;
     }
@@ -690,7 +749,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
             patternIndex++;
             inputIndex++;
         }
-        return Long.parseLong(digits.toString());
+        return Long.parseLong(digits.toString()) / fUnitOfSeconds;
     }
 
     /**
@@ -756,6 +815,14 @@ public class TmfTimestampFormat extends SimpleDateFormat {
                     result.append(c);
                     pat.append(c);
                     i++;
+                }
+                if (c == 'T' && (i + 1) < length) {
+                    c = pattern.charAt(i + 1);
+                    Long unitOfSeconds = fUnitOfSecondsMap.get(c);
+                    if (unitOfSeconds != null) {
+                        fUnitOfSeconds = unitOfSeconds;
+                        i++;
+                    }
                 }
                 result.append(fCloseBracket);
                 if (includeQuotes) {
