@@ -1,15 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2016 École Polytechnique de Montréal
+ * Copyright (c) 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stateprovider;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -18,37 +14,35 @@ import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 
 /**
- * Test suite for the XmlStateSystemModule Test. It tests the reading of the
- * file, the header and the module's proper functioning as a module, but not the
- * state system building, which is covered by another test suite.
+ * Test the pattern analysis module
  *
- * @author Geneviève Bastien
+ * @author Jean-Christian Kouame
  */
-public class StateProviderModuleTest extends XmlModuleTestBase {
+public class PatternModuleTest extends XmlModuleTestBase {
 
     @Override
     protected String getAnalysisId() {
-        return "kernel.linux.sp";
+        return "syscall.analysis";
     }
 
     @Override
     protected String getAnalysisName() {
-        return "Xml kernel State System";
+        return "XML system call analysis";
     }
 
     @Override
     protected TmfXmlTestFiles getXmlFile() {
-        return TmfXmlTestFiles.VALID_FILE;
+        return TmfXmlTestFiles.VALID_PATTERN_FILE;
     }
 
     @Override
     protected @NonNull String getAnalysisNodeName() {
-        return TmfXmlStrings.STATE_PROVIDER;
+        return TmfXmlStrings.PATTERN;
     }
 
     @Override
     protected @NonNull CtfTestTrace getTrace() {
-        return CtfTestTrace.KERNEL;
+        return CtfTestTrace.ARM_64_BIT_HEADER;
     }
 
 }
