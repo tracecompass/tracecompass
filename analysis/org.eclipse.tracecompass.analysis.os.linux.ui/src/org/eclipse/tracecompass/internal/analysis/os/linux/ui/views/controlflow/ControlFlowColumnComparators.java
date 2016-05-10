@@ -153,6 +153,64 @@ public final class ControlFlowColumnComparators {
         }
     };
 
+    /**
+     * Trace comparator. This compares first the trace, then the process birth
+     * time, the process name, the process TID and finally the process's parent
+     * TID.
+     */
+    public static final ITimeGraphEntryComparator TRACE_COLUMN_COMPARATOR = new ITimeGraphEntryComparator() {
+        private final List<Comparator<ITimeGraphEntry>> SECONDARY_COMPARATORS = init();
+        private int fDirection = SWT.DOWN;
+
+        @Override
+        public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
+            int result = IControlFlowEntryComparator.TRACE_COMPARATOR.compare(o1, o2);
+            return compareList(result, fDirection, SECONDARY_COMPARATORS, o1, o2);
+        }
+
+        @Override
+        public void setDirection(int direction) {
+            fDirection = direction;
+        }
+
+        private List<Comparator<ITimeGraphEntry>> init() {
+            ImmutableList.Builder<Comparator<ITimeGraphEntry>> builder = ImmutableList.builder();
+            builder.add(IControlFlowEntryComparator.BIRTH_TIME_COMPARATOR)
+                .add(IControlFlowEntryComparator.PROCESS_NAME_COMPARATOR)
+                .add(IControlFlowEntryComparator.TID_COMPARATOR)
+                .add(IControlFlowEntryComparator.PTID_COMPARATOR);
+            return builder.build();
+        }
+    };
+
+    /**
+     * Scheduling comparator.
+     */
+    public static final ITimeGraphEntryComparator SCHEDULING_COLUMN_COMPARATOR = new ITimeGraphEntryComparator() {
+        private final List<Comparator<ITimeGraphEntry>> SECONDARY_COMPARATORS = init();
+        private int fDirection = SWT.DOWN;
+
+        @Override
+        public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
+            int result = IControlFlowEntryComparator.SCHEDULING_COMPARATOR.compare(o1, o2);
+            return compareList(result, fDirection, SECONDARY_COMPARATORS, o1, o2);
+        }
+
+        @Override
+        public void setDirection(int direction) {
+            fDirection = direction;
+        }
+
+        private List<Comparator<ITimeGraphEntry>> init() {
+            ImmutableList.Builder<Comparator<ITimeGraphEntry>> builder = ImmutableList.builder();
+            builder.add(IControlFlowEntryComparator.BIRTH_TIME_COMPARATOR)
+                .add(IControlFlowEntryComparator.PROCESS_NAME_COMPARATOR)
+                .add(IControlFlowEntryComparator.TID_COMPARATOR)
+                .add(IControlFlowEntryComparator.PTID_COMPARATOR);
+            return builder.build();
+        }
+    };
+
     private static int compareList(int prevResult, int direction, List<Comparator<ITimeGraphEntry>> comps, ITimeGraphEntry o1, ITimeGraphEntry o2) {
         int result = prevResult;
         for (Comparator<ITimeGraphEntry> comparator : comps) {

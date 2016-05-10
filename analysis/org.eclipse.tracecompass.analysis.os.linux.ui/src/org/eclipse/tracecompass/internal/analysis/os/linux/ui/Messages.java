@@ -24,6 +24,8 @@ public class Messages extends NLS {
     public static String ControlFlowView_tidColumn;
     public static String ControlFlowView_ptidColumn;
     public static String ControlFlowView_processColumn;
+    public static String ControlFlowView_traceColumn;
+    public static String ControlFlowView_invisibleColumn;
 
     public static String ControlFlowView_stateTypeName;
     public static String ControlFlowView_multipleStates;
@@ -43,6 +45,8 @@ public class Messages extends NLS {
     public static String ControlFlowView_flatViewToolTip;
     public static String ControlFlowView_hierarchicalViewLabel;
     public static String ControlFlowView_hierarchicalViewToolTip;
+    public static String ControlFlowView_optimizeLabel;
+    public static String ControlFlowView_optimizeToolTip;
 
     public static String ResourcesView_stateTypeName;
     public static String ResourcesView_multipleStates;

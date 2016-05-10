@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow
 import java.util.Comparator;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
 /**
@@ -82,6 +83,42 @@ public interface IControlFlowEntryComparator {
                 throw new IllegalArgumentException();
             }
             return Long.compare(o1.getStartTime(), o2.getStartTime());
+        }
+    };
+
+    /**
+     * Trace Comparator (uses trace start time and name)
+     */
+    Comparator<ITimeGraphEntry> TRACE_COMPARATOR = new Comparator<ITimeGraphEntry>() {
+        @Override
+        public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
+            if (o1 == null || o2 == null) {
+                throw new IllegalArgumentException();
+            }
+            int result = 0;
+            if ((o1 instanceof ControlFlowEntry) && (o2 instanceof ControlFlowEntry)) {
+                ITmfTrace trace1 = ((ControlFlowEntry) o1).getTrace();
+                ITmfTrace trace2 = ((ControlFlowEntry) o2).getTrace();
+                result = trace1.getStartTime().compareTo(trace2.getStartTime());
+                if (result == 0) {
+                    result = trace1.getName().compareTo(trace2.getName());
+                }
+            }
+            return result;
+        }
+    };
+
+    /**
+     * Scheduling Comparator - this is for the link optimizer. It compares the
+     * values in an invisible column. (scheduled position)
+     */
+    Comparator<ITimeGraphEntry> SCHEDULING_COMPARATOR = new Comparator<ITimeGraphEntry>() {
+        @Override
+        public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
+            if ((o1 instanceof ControlFlowEntry) && (o2 instanceof ControlFlowEntry)) {
+                return Long.compare(((ControlFlowEntry) o1).getSchedulingPosition(), ((ControlFlowEntry) o2).getSchedulingPosition());
+            }
+            return 0;
         }
     };
 

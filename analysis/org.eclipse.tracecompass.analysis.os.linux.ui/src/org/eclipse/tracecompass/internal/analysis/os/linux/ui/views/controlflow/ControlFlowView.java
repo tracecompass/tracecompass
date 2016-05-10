@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,10 +35,12 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.common.core.StreamUtils.StreamFlattener;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
@@ -85,10 +88,15 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
      */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.views.controlflow"; //$NON-NLS-1$
 
+    private static final String ICONS_PATH = "icons/"; //$NON-NLS-1$
+    private static final String OPTIMIZE_ICON = ICONS_PATH + "elcl16/Optimization.png"; //$NON-NLS-1$
+
     private static final String PROCESS_COLUMN = Messages.ControlFlowView_processColumn;
     private static final String TID_COLUMN = Messages.ControlFlowView_tidColumn;
     private static final String PTID_COLUMN = Messages.ControlFlowView_ptidColumn;
     private static final String BIRTH_TIME_COLUMN = Messages.ControlFlowView_birthTimeColumn;
+    private static final String INVISIBLE_COLUMN = Messages.ControlFlowView_invisibleColumn;
+    private Action fOptimizationAction;
 
     private static final String[] COLUMN_NAMES = new String[] {
             PROCESS_COLUMN,
@@ -169,6 +177,13 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
 
     @Override
     protected void fillLocalToolBar(IToolBarManager manager) {
+        // add "Optimization" Button to local tool bar of Controlflow
+        IAction optimizationAction = getOptimizationAction();
+        manager.add(optimizationAction);
+
+        // add a separator to local tool bar
+        manager.add(new Separator());
+
         super.fillLocalToolBar(manager);
         IDialogSettings settings = Activator.getDefault().getDialogSettings();
         IDialogSettings section = settings.getSection(getClass().getName());
@@ -188,6 +203,16 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
         followArrowFwdAction.setText(Messages.ControlFlowView_followCPUFwdText);
         followArrowFwdAction.setToolTipText(Messages.ControlFlowView_followCPUFwdText);
         manager.add(followArrowFwdAction);
+    }
+
+    private IAction getOptimizationAction() {
+        if (fOptimizationAction == null) {
+            fOptimizationAction = new OptimizationAction();
+            fOptimizationAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(OPTIMIZE_ICON));
+            fOptimizationAction.setText(Messages.ControlFlowView_optimizeLabel);
+            fOptimizationAction.setToolTipText(Messages.ControlFlowView_optimizeToolTip);
+        }
+        return fOptimizationAction;
     }
 
     @Override
@@ -215,7 +240,8 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                         for (TimeGraphEntry traceEntry : getEntryList(ss)) {
                             List<ControlFlowEntry> currentRootList = traceEntry.getChildren().stream()
                                     .filter(e -> e instanceof ControlFlowEntry)
-                                    .map(e -> (ControlFlowEntry) e).collect(Collectors.toList());
+                                    .map(e -> (ControlFlowEntry) e)
+                                    .collect(Collectors.toList());
                             addEntriesToHierarchicalTree(currentRootList, traceEntry);
                         }
                     }
@@ -270,6 +296,119 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
     }
 
     /**
+     * This is an optimization action used to find cliques of entries due to
+     * links and put them closer together
+     *
+     * @author Samuel Gagnon
+     */
+    private final class OptimizationAction extends Action {
+        @Override
+        public void runWithEvent(Event event) {
+            ITmfTrace trace = getTrace();
+            if (trace == null) {
+                return;
+            }
+
+            createFlatAction().run();
+
+            /*
+             * "transitions" contains the count of every arrows between
+             * two tids (Pair<Integer, Integer>). For constructing the
+             * Pair, we always put the smallest tid first
+             */
+            Map<Pair<Integer, Integer>, Integer> transitions = new HashMap<>();
+
+            /*
+             * This method only returns the arrows in the current time
+             * interval [a,b] of ControlFlowView. Thus, we only optimize
+             * for that time interval
+             */
+            List<ILinkEvent> arrows = getTimeGraphViewer().getTimeGraphControl().getArrows();
+
+            /*
+             * We iterate in arrows to count the number of transitions
+             * between every pair (tid,tid) in the current view
+             */
+            for (ILinkEvent arrow : arrows) {
+                ITimeGraphEntry from = arrow.getEntry();
+                ITimeGraphEntry to = arrow.getDestinationEntry();
+                if (!(from instanceof ControlFlowEntry) || !(to instanceof ControlFlowEntry)) {
+                    continue;
+                }
+                int fromTid = ((ControlFlowEntry) from).getThreadId();
+                int toTid = ((ControlFlowEntry) to).getThreadId();
+                if (fromTid != toTid) {
+                    Pair<Integer, Integer> key = new Pair<>(Math.min(fromTid, toTid), Math.max(fromTid, toTid));
+                    Integer count = transitions.getOrDefault(key, 0);
+                    transitions.put(key, count + 1);
+                }
+            }
+
+            /*
+             * We now have a transition count for every pair (tid,tid).
+             * The next step is to sort every pair according to its
+             * count in decreasing order
+             */
+            List<Pair<Integer, Integer>> sortedTransitionsByCount = transitions.entrySet().stream().sorted(Map.Entry.<Pair<Integer, Integer>, Integer> comparingByValue().reversed()).map(Map.Entry::getKey).collect(Collectors.toList());
+
+            /*
+             * Next, we find the order in which we want to display our
+             * threads. We simply iterate in every pair (tid,tid) in
+             * orderedTidList. Each time we see a new tid, we add it at
+             * the end of orderedTidList. This way, threads with lots of
+             * transitions will be grouped in the top. While very naive,
+             * this algorithm is fast, simple and gives decent results.
+             */
+            Map<Integer, Integer> orderedTidMap = new LinkedHashMap<>();
+            int pos = 0;
+            for (Pair<Integer, Integer> threadPair : sortedTransitionsByCount) {
+                if (orderedTidMap.get(threadPair.getFirst()) == null) {
+                    orderedTidMap.put(threadPair.getFirst(), pos);
+                    pos++;
+                }
+                if (orderedTidMap.get(threadPair.getSecond()) == null) {
+                    orderedTidMap.put(threadPair.getSecond(), pos);
+                    pos++;
+                }
+            }
+
+            /*
+             * Now that we have our list of ordered tid, it's time to
+             * assign a position for each threads in the view. For this,
+             * we assign a value to an invisible column and sort
+             * according to the values in this column.
+             */
+            final ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
+            List<TimeGraphEntry> currentList = getEntryList(ss);
+            for (TimeGraphEntry entry : currentList) {
+                if (entry instanceof TraceEntry) {
+                    for (TimeGraphEntry child : ((TraceEntry) entry).getChildren()) {
+                        if (child instanceof ControlFlowEntry) {
+                            ControlFlowEntry cEntry = (ControlFlowEntry) child;
+                            /*
+                             * If the thread is in our list, we give it
+                             * a position. Otherwise, it means there's
+                             * no activity in the current interval for
+                             * that thread. We set its position to
+                             * Long.MAX_VALUE so it goes to the bottom.
+                             */
+                            Integer threadPos = orderedTidMap.get(cEntry.getThreadId());
+                            if (threadPos != null) {
+                                cEntry.setSchedulingPosition(threadPos);
+                            } else {
+                                cEntry.setSchedulingPosition(Long.MAX_VALUE);
+                            }
+                        }
+                    }
+                }
+            }
+
+            setEntryComparator(ControlFlowColumnComparators.SCHEDULING_COLUMN_COMPARATOR);
+            refresh();
+        }
+    }
+
+    /**
      * @author gbastien
      *
      */
@@ -295,6 +434,10 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                 }
             } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_birthTimeColumn)) {
                 return Utils.formatTime(entry.getStartTime(), TimeFormat.CALENDAR, Resolution.NANOSEC);
+            } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_traceColumn)) {
+                return entry.getTrace().getName();
+            } else if (COLUMN_NAMES[columnIndex].equals(INVISIBLE_COLUMN)) {
+                return Long.toString(entry.getSchedulingPosition());
             }
             return ""; //$NON-NLS-1$
         }

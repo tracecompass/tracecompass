@@ -33,6 +33,12 @@ public class ControlFlowEntry extends TimeGraphEntry {
     private final int fThreadQuark;
 
     /**
+     * This column is for keeping the order we found with the scheduling algorithm.
+     * It will be used for sorting.
+     */
+    private long fSchedulingPosition;
+
+    /**
      * Constructor
      *
      * @param quark
@@ -56,6 +62,7 @@ public class ControlFlowEntry extends TimeGraphEntry {
         fThreadId = threadId;
         fParentThreadId = parentThreadId;
         fThreadQuark = quark;
+        fSchedulingPosition = Long.MAX_VALUE;
     }
 
     /**
@@ -125,5 +132,28 @@ public class ControlFlowEntry extends TimeGraphEntry {
     @Override
     public String toString() {
         return getClass().getSimpleName() + '(' + getName() + '[' + fThreadId + "])"; //$NON-NLS-1$
+    }
+
+    /**
+     * Get the position this entry should be according to the scheduling
+     * algorithm shown in ControlFlowView#OptimizationAction. The position helps
+     * layout entries with more links closer together
+     *
+     * @return The position
+     */
+    public long getSchedulingPosition() {
+        return fSchedulingPosition;
+    }
+
+    /**
+     * Set the position this entry should be according to the scheduling
+     * algorithm shown in ControlFlowView#OptimizationAction algorithm shown in
+     * ControlFlowView#OptimizationAction
+     *
+     * @param schedulingPosition
+     *            The position
+     */
+    public void setSchedulingPosition(long schedulingPosition) {
+        fSchedulingPosition = schedulingPosition;
     }
 }
