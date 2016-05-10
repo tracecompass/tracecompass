@@ -14,6 +14,10 @@ package org.eclipse.tracecompass.tmf.ui.viewers.tree;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
@@ -399,9 +403,9 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
      *            <code>false</code> for the visible time range
      */
     protected void updateContent(final long start, final long end, final boolean isSelection) {
-        Thread thread = new Thread() {
+        Job thread = new Job("") { //$NON-NLS-1$
             @Override
-            public void run() {
+            public IStatus run(IProgressMonitor monitor) {
                 final ITmfTreeViewerEntry rootEntry = updateElements(start, end, isSelection);
                 /* Set the input in main thread only if it didn't change */
                 if (rootEntry != null) {
@@ -426,9 +430,11 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
                         }
                     });
                 }
+                return Status.OK_STATUS;
             }
         };
-        thread.start();
+        thread.setSystem(true);
+        thread.schedule();
     }
 
     /**

@@ -13,6 +13,7 @@ Require-Bundle: org.apache.log4j,
  org.eclipse.core.runtime,
  org.eclipse.tracecompass.lttng2.kernel.core,
  org.eclipse.tracecompass.lttng2.kernel.ui,
+ org.eclipse.tracecompass.analysis.os.linux.core,
  org.eclipse.tracecompass.lttng2.control.ui,
  org.eclipse.tracecompass.analysis.os.linux.ui,
  org.eclipse.tracecompass.tmf.core,
@@ -28,4 +29,5 @@ Require-Bundle: org.apache.log4j,
  org.eclipse.ui.ide,
  org.eclipse.ui.views,
  org.junit
-Import-Package: org.eclipse.tracecompass.testtraces.ctf
+Import-Package: org.eclipse.tracecompass.testtraces.ctf,
+ org.swtchart;version="0.7.0"
