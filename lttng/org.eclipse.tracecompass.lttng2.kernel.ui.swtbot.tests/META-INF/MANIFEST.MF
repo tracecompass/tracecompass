@@ -28,6 +28,7 @@ Require-Bundle: org.apache.log4j,
  org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.ui.views,
- org.junit
+ org.junit,
+ org.eclipse.tracecompass.analysis.graph.ui
 Import-Package: org.eclipse.tracecompass.testtraces.ctf,
  org.swtchart;version="0.7.0"
