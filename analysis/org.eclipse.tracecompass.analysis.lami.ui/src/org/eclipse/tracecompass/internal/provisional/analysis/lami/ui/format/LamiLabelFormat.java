@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module;
+package org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.format;
 
 import java.text.FieldPosition;
 import java.text.Format;

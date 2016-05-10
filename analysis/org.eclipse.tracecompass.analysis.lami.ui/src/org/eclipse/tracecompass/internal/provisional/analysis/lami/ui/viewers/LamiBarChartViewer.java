@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.viewers;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -82,6 +83,10 @@ public class LamiBarChartViewer extends LamiXYChartViewer {
     private final Map<ISeries, List<Mapping>> fIndexPerSeriesMapping;
     private final Map<LamiTableEntry, Mapping> fEntryToCategoriesMap;
 
+    private LamiGraphRange fYInternalRange = new LamiGraphRange(checkNotNull(BigDecimal.ZERO), checkNotNull(BigDecimal.ONE));
+    private LamiGraphRange fYExternalRange;
+
+
     /**
      * Creates a bar chart Viewer instance based on SWTChart.
      *
@@ -127,6 +132,10 @@ public class LamiBarChartViewer extends LamiXYChartViewer {
         }
         fCategories = xCategories.toArray(new String[0]);
 
+        /* The y values range */
+        /* Clamp minimum to zero or negative value */
+        fYExternalRange = getRange(yAxisAspects, true);
+
         /*
          * Log scale magic course 101:
          *
@@ -141,19 +150,28 @@ public class LamiBarChartViewer extends LamiXYChartViewer {
          */
         double min = Double.MAX_VALUE;
         double max = Double.MIN_VALUE;
-        double logScaleEpsilon = ZERO;
+        double logScaleEpsilon = ZERO_DOUBLE;
         if (logscale) {
 
-            /* Find minimum and maximum values */
+            /* Find minimum and maximum values excluding <= 0 values */
             for (LamiTableEntryAspect aspect : yAxisAspects) {
                 for (LamiTableEntry entry : entries) {
-                    Double value = aspect.resolveDouble(entry);
-                    if (value == null || value <= 0) {
+                    Number externalValue = aspect.resolveNumber(entry);
+                    if (externalValue == null) {
+                        continue;
+                    }
+                    Double value = getInternalDoubleValue(externalValue, fYInternalRange, fYExternalRange);
+                    if (value <= 0) {
                         continue;
                     }
                     min = Math.min(min, value);
                     max = Math.max(max, value);
                 }
+            }
+
+            if (min == Double.MAX_VALUE) {
+                /* Series are empty in log scale*/
+                return;
             }
 
             double delta = max - min;
@@ -172,21 +190,26 @@ public class LamiBarChartViewer extends LamiXYChartViewer {
 
             for (int i = 0; i < entries.size(); i++) {
                 Integer categoryIndex = checkNotNull(fEntryToCategoriesMap.get(checkNotNull(entries.get(i)))).fInternalValue;
-                Double yValue = yAxisAspect.resolveDouble(entries.get(i));
+
                 if (categoryIndex == null) {
                     /* Invalid value do not show */
                     continue;
                 }
 
-                if (yValue == null) {
+                Double yValue = ZERO_DOUBLE;
+                @Nullable Number number = yAxisAspect.resolveNumber(entries.get(i));
+
+                if (number == null) {
                     /*
                      * Null value for y is the same as zero since this is a bar
                      * chart
                      */
-                    yValue = Double.valueOf(ZERO);
+                    yValue = ZERO_DOUBLE;
+                } else {
+                    yValue = getInternalDoubleValue(number, fYInternalRange, fYExternalRange);
                 }
 
-                if (logscale && yValue <= ZERO) {
+                if (logscale && yValue <= ZERO_DOUBLE) {
                     /*
                      * Less or equal to 0 values can't be plotted on a log
                      * scale. We map them to the mean of the >=0 minimal value
@@ -220,12 +243,27 @@ public class LamiBarChartViewer extends LamiXYChartViewer {
 
         /* Set the formatter on the Y axis */
         IAxisTick yTick = getChart().getAxisSet().getYAxis(0).getTick();
-        yTick.setFormat(getContinuousAxisFormatter(yAxisAspects, entries));
+        yTick.setFormat(getContinuousAxisFormatter(yAxisAspects, entries, fYInternalRange, fYExternalRange));
+
+        /*
+         * SWTChart workaround: SWTChart fiddles with tick mark visibility based
+         * on the fact that it can parse the label to double or not.
+         *
+         * If the label happens to be a double, it checks for the presence of
+         * that value in its own tick labels to decide if it should add it or
+         * not. If it happens that the parsed value is already present in its
+         * map, the tick gets a visibility of false.
+         *
+         * The X axis does not have this problem since SWTCHART checks on label
+         * angle, and if it is != 0 simply does no logic regarding visibility.
+         * So simply set a label angle of 1 to the axis.
+         */
         yTick.setTickLabelAngle(1);
 
         /* Adjust the chart range */
         getChart().getAxisSet().adjustRange();
-        if (logscale) {
+
+        if (logscale && logScaleEpsilon != max) {
             getChart().getAxisSet().getYAxis(0).setRange(new Range(logScaleEpsilon, max));
         }
 

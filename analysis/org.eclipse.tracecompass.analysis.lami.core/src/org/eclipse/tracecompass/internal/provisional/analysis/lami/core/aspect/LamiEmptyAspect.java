@@ -46,7 +46,7 @@ public class LamiEmptyAspect extends LamiTableEntryAspect {
     }
 
     @Override
-    public @Nullable Double resolveDouble(@NonNull LamiTableEntry entry) {
+    public @Nullable Number resolveNumber(@NonNull LamiTableEntry entry) {
         return null;
     }
 

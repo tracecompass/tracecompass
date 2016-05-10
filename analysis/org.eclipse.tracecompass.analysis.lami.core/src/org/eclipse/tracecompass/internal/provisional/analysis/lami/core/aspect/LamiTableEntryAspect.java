@@ -117,7 +117,7 @@ public abstract class LamiTableEntryAspect {
      *            The table row
      * @return The double value for the given cell
      */
-    public abstract @Nullable Double resolveDouble(LamiTableEntry entry);
+    public abstract @Nullable Number resolveNumber(LamiTableEntry entry);
 
     /**
      * Get the comparator that should be used to compare this entry (or table

@@ -71,7 +71,7 @@ public class LamiIRQ extends LamiData {
      *
      * @return The IRQ number
      */
-    public int getNumber() {
+    public Integer getNumber() {
         return fNumber;
     }
 

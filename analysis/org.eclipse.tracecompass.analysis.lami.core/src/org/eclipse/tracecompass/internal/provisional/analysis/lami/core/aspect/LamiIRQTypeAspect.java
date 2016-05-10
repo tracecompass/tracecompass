@@ -70,7 +70,7 @@ public class LamiIRQTypeAspect extends LamiTableEntryAspect {
     }
 
     @Override
-    public @Nullable Double resolveDouble(LamiTableEntry entry) {
+    public @Nullable Number resolveNumber(LamiTableEntry entry) {
         return null;
     }
 
@@ -80,8 +80,15 @@ public class LamiIRQTypeAspect extends LamiTableEntryAspect {
             String s1 = resolveString(o1);
             String s2 = resolveString(o2);
 
-            if (s1 == null || s2 == null) {
+            if (s1 == null && s2 == null) {
                 return 0;
+            }
+            if (s1 == null) {
+                return 1;
+            }
+
+            if (s2 == null) {
+                return -1;
             }
 
             return s1.compareTo(s2);

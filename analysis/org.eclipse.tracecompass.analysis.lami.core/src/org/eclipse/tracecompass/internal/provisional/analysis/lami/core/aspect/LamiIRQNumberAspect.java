@@ -61,10 +61,10 @@ public class LamiIRQNumberAspect extends LamiTableEntryAspect {
     }
 
     @Override
-    public @Nullable Double resolveDouble(LamiTableEntry entry) {
+    public @Nullable Number resolveNumber(LamiTableEntry entry) {
         LamiData data = entry.getValue(fColIndex);
         if (data instanceof LamiIRQ) {
-            return Double.valueOf(((LamiIRQ) data).getNumber());
+            return (((LamiIRQ) data).getNumber());
         }
 
         return null;
@@ -73,13 +73,21 @@ public class LamiIRQNumberAspect extends LamiTableEntryAspect {
     @Override
     public Comparator<LamiTableEntry> getComparator() {
         return (o1, o2) -> {
-            Double dO1 = resolveDouble(o1);
-            Double dO2 = resolveDouble(o2);
-            if (dO1 == null || dO2 == null) {
+            Number d1 = resolveNumber(o1);
+            Number d2 = resolveNumber(o2);
+
+            if (d1 == null && d2 == null) {
                 return 0;
             }
+            if (d1 == null) {
+                return 1;
+            }
 
-            return dO1.compareTo(dO2);
+            if (d2 == null) {
+                return -1;
+            }
+
+            return Integer.compare(d1.intValue(), d2.intValue());
         };
     }
 

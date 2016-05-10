@@ -201,12 +201,12 @@ public class LamiJsonParserTest {
         List<LamiTableEntryAspect> aspects = perSyscallClass.getAspects();
 
         assertEquals("read()", aspects.get(0).resolveString(readEntry));
-        assertEquals(2398123.0, checkNotNull(aspects.get(1).resolveDouble(readEntry)).doubleValue(), DELTA);
-        assertEquals(8123982.0, checkNotNull(aspects.get(2).resolveDouble(readEntry)).doubleValue(), DELTA);
-        assertEquals(223232.0, checkNotNull(aspects.get(3).resolveDouble(readEntry)).doubleValue(), DELTA);
-        assertEquals(98233.0, checkNotNull(aspects.get(4).resolveDouble(readEntry)).doubleValue(), DELTA);
-        assertEquals(1293828.0, checkNotNull(aspects.get(5).resolveDouble(readEntry)).doubleValue(), DELTA);
-        assertEquals(1195595.0, checkNotNull(aspects.get(6).resolveDouble(readEntry)).doubleValue(), DELTA);
+        assertEquals(2398123.0, checkNotNull(aspects.get(1).resolveNumber(readEntry)).doubleValue(), DELTA);
+        assertEquals(8123982.0, checkNotNull(aspects.get(2).resolveNumber(readEntry)).doubleValue(), DELTA);
+        assertEquals(223232.0, checkNotNull(aspects.get(3).resolveNumber(readEntry)).doubleValue(), DELTA);
+        assertEquals(98233.0, checkNotNull(aspects.get(4).resolveNumber(readEntry)).doubleValue(), DELTA);
+        assertEquals(1293828.0, checkNotNull(aspects.get(5).resolveNumber(readEntry)).doubleValue(), DELTA);
+        assertEquals(1195595.0, checkNotNull(aspects.get(6).resolveNumber(readEntry)).doubleValue(), DELTA);
         assertNull(aspects.get(7).resolveString(readEntry));
     }
 
