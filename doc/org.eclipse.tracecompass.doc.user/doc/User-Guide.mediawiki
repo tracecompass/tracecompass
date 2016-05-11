@@ -1678,7 +1678,7 @@ The display of arrows is optional and can be toggled using the '''Hide Arrows'''
 
 ==== Using the mouse ====
 
-The states flow is usable with the mouse. The following actions are set:
+The following mouse actions are available:
 
 * '''left-click''': select a time or time range begin time
 * '''Shift-left-click''': select a time range end time
@@ -1697,7 +1697,8 @@ When the current time indicator is changed (when clicking in the states flow), a
 
 ==== Using the keyboard ====
 
-The states flow is usable with the keyboard. The following actions are set:
+The following keyboard shortcuts are available:
+
 *'''arrow-right key''': selects the next state for the selected process
 *'''arrow-left key''': selects the previous state for the selected process
 *'''Shift + arrow-right key''': updates the selection end time of the current selection range by selecting the next state of the current process
@@ -1719,6 +1720,12 @@ The states flow is usable with the keyboard. The following actions are set:
 *'''Ctrl + -''': Zoom-out vertically
 *'''Ctrl + 0''': Reset the vertical zoom
 *'''Ctrl + F''': Search in the view. (see [[#Searching in Time Graph Views | Searching in Time Graph Views]])
+When the mouse cursor is over entries (left pane):
+*'''-''': Collapse selected entry
+*'''+''': Expand selected entry
+*'''*''': Expand selected entry to the level with at least one collapsed entry
+
+'''Please note that the behavior of some shortcuts can slightly differ based on the operating system.'''
 
 When the selection indicators are changed, all the other views are '''synchronized'''. For example, the [[#LTTng Kernel Events Editor|Events Editor]] will show the event matching the current time indicator. The reverse behaviour is also implemented: selecting an event within the Events View will update the Control Flow View current time indicator.
 
