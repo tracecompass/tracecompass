@@ -49,6 +49,8 @@ public class SegmentStoreStatisticsTest {
         assertEquals("Standard Deviation", osc.getStdDev(), sss.getStdDev(), ERROR);
         assertEquals("Min", osc.getMin(), sss.getMin());
         assertEquals("Max", osc.getMax(), sss.getMax());
+        assertEquals("Min Segment", osc.getMin(), sss.getMinSegment().getLength());
+        assertEquals("Max Segment", osc.getMax(), sss.getMaxSegment().getLength());
     }
 
     /**
@@ -65,6 +67,8 @@ public class SegmentStoreStatisticsTest {
         assertEquals("Min", 0, sss.getMin());
         assertEquals("Max", 99, sss.getMax());
         assertEquals("Standard Deviation", 29.0, sss.getStdDev(), 0.02);
+        assertEquals("Min Segment", 0, sss.getMinSegment().getLength());
+        assertEquals("Max Segment", 99, sss.getMaxSegment().getLength());
         testOnlineVsOffline(fixture);
     }
 
@@ -90,6 +94,8 @@ public class SegmentStoreStatisticsTest {
         assertEquals("Min", 0, sss.getMin());
         assertEquals("Max", 100, sss.getMax());
         assertEquals("Standard Deviation", 29.3, sss.getStdDev(), 0.01);
+        assertEquals("Min Segment", 0, sss.getMinSegment().getLength());
+        assertEquals("Max Segment", 100, sss.getMaxSegment().getLength());
         testOnlineVsOffline(fixture);
     }
 

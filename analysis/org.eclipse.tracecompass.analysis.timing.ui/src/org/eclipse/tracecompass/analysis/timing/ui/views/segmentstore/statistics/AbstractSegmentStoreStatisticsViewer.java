@@ -18,15 +18,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
@@ -46,6 +56,7 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
 
     @Nullable
     private TmfAbstractAnalysisModule fModule;
+    private MenuManager fTablePopupMenuManager;
 
     private static final String[] COLUMN_NAMES = new String[] {
             checkNotNull(Messages.SegmentStoreStatistics_LevelLabel),
@@ -65,6 +76,20 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
     public AbstractSegmentStoreStatisticsViewer(Composite parent) {
         super(parent, false);
         setLabelProvider(new SegmentStoreStatisticsLabelProvider());
+        fTablePopupMenuManager = new MenuManager();
+        fTablePopupMenuManager.setRemoveAllWhenShown(true);
+        fTablePopupMenuManager.addMenuListener(manager -> {
+            TreeViewer viewer = getTreeViewer();
+            ISelection selection = viewer.getSelection();
+            if (selection instanceof IStructuredSelection) {
+                IStructuredSelection sel = (IStructuredSelection) selection;
+                if (manager != null) {
+                    appendToTablePopupMenu(manager, sel);
+                }
+            }
+        });
+        Menu tablePopup = fTablePopupMenuManager.createContextMenu(getTreeViewer().getTree());
+        getTreeViewer().getTree().setMenu(tablePopup);
     }
 
     /** Provides label for the Segment Store tree viewer cells */
@@ -251,6 +276,40 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
             } catch (TmfAnalysisException e) {
                 Activator.getDefault().logError("Error initializing statistics analysis module", e); //$NON-NLS-1$
             }
+        }
+    }
+
+    /**
+     * Method to add commands to the context sensitive menu.
+     * @param manager
+     *          the menu manager
+     * @param sel
+     *          the current selection
+     */
+    protected void appendToTablePopupMenu(IMenuManager manager, IStructuredSelection sel) {
+        Object element =  sel.getFirstElement();
+        if ((element instanceof SegmentStoreStatisticsEntry) && !(element instanceof HiddenTreeViewerEntry)) {
+            final SegmentStoreStatisticsEntry segment = (SegmentStoreStatisticsEntry) element;
+            IAction gotoStartTime = new Action(Messages.SegmentStoreStatisticsViewer_GotoMinAction) {
+                @Override
+                public void run() {
+                    long start = segment.getEntry().getMinSegment().getStart();
+                    long end = segment.getEntry().getMinSegment().getEnd();
+                    broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreStatisticsViewer.this, TmfTimestamp.fromNanos(start), TmfTimestamp.fromNanos(end)));
+                }
+            };
+
+            IAction gotoEndTime = new Action(Messages.SegmentStoreStatisticsViewer_GotoMaxAction) {
+                @Override
+                public void run() {
+                    long start = segment.getEntry().getMaxSegment().getStart();
+                    long end = segment.getEntry().getMaxSegment().getEnd();
+                    broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreStatisticsViewer.this, TmfTimestamp.fromNanos(start), TmfTimestamp.fromNanos(end)));
+                }
+            };
+
+            manager.add(gotoStartTime);
+            manager.add(gotoEndTime);
         }
     }
 

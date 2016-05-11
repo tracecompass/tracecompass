@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics;
 
+import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 
 /**
@@ -19,8 +20,8 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
  * @author Bernd Hufmann
  */
 public class SegmentStoreStatistics {
-    private long fMin;
-    private long fMax;
+    private ISegment fMin;
+    private ISegment fMax;
     private long fNbSegments;
     private double fAverage;
     private double fVariance;
@@ -29,8 +30,8 @@ public class SegmentStoreStatistics {
      * Constructor
      */
     public SegmentStoreStatistics() {
-        fMin = Long.MAX_VALUE;
-        fMax = Long.MIN_VALUE;
+        fMin = new BasicSegment(0, Long.MAX_VALUE);
+        fMax = new BasicSegment(Long.MIN_VALUE, 0);
         fNbSegments = 0;
         fAverage = 0.0;
         fVariance = 0.0;
@@ -42,7 +43,7 @@ public class SegmentStoreStatistics {
      * @return minimum value
      */
     public long getMin() {
-        return fMin;
+        return fMin.getLength();
     }
 
     /**
@@ -51,6 +52,24 @@ public class SegmentStoreStatistics {
      * @return maximum value
      */
     public long getMax() {
+        return fMax.getLength();
+    }
+
+    /**
+     * Get segment with minimum length
+     *
+     * @return segment with minimum length
+     */
+    public ISegment getMinSegment() {
+        return fMin;
+    }
+
+    /**
+     * Get segment with maximum length
+     *
+     * @return segment with maximum length
+     */
+    public ISegment getMaxSegment() {
         return fMax;
     }
 
@@ -98,8 +117,10 @@ public class SegmentStoreStatistics {
         /*
          * Min and max are trivial, as well as number of segments
          */
-        fMin = Math.min(fMin, value);
-        fMax = Math.max(fMax, value);
+        long min = fMin.getLength();
+        long max = fMax.getLength();
+        fMin = min <= value ? fMin : segment;
+        fMax = max >= value ? fMax : segment;
 
         fNbSegments++;
         /*
