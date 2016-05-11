@@ -273,7 +273,7 @@ public final class ConditionHelpers {
                     if( cell == null ) {
                         return false;
                     }
-                    return cell.endsWith(content);
+                    return cell.contains(content);
                 } catch (Exception e) {
                 }
                 return false;
