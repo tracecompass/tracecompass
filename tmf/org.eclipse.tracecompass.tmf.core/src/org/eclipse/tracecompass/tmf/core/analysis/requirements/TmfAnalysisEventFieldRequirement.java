@@ -10,7 +10,7 @@
 package org.eclipse.tracecompass.tmf.core.analysis.requirements;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -66,25 +66,61 @@ public class TmfAnalysisEventFieldRequirement extends TmfAbstractAnalysisRequire
 
     @Override
     public boolean test(ITmfTrace trace) {
-        if ((trace instanceof ITmfTraceWithPreDefinedEvents)) {
-            // TODO Implement for all levels of requirements
-            Set<String> mandatoryValues = getPriorityLevel().equals(PriorityLevel.MANDATORY) ? getValues() : Collections.EMPTY_SET;
-            if (mandatoryValues.isEmpty()) {
-                return true;
-            }
-            Multimap<@NonNull String, @NonNull String> traceEvents =
-                    TmfEventTypeCollectionHelper.getEventFieldNames((((ITmfTraceWithPreDefinedEvents) trace).getContainedEventTypes()));
 
-            if (fEventName.isEmpty()) {
-                return traceEvents.keys().stream().allMatch(eventName -> {
-                    Collection<@NonNull String> fields = traceEvents.get(fEventName);
-                    return fields.containsAll(mandatoryValues);
-                });
-            }
-            Collection<@NonNull String> fields = traceEvents.get(fEventName);
-            return fields.containsAll(mandatoryValues);
+        if (!(trace instanceof ITmfTraceWithPreDefinedEvents)) {
+            return true;
         }
-        return true;
+
+        Set<String> values = getValues();
+        if (values.isEmpty()) {
+            return true;
+        }
+
+        final Multimap<@NonNull String, @NonNull String> traceEvents = TmfEventTypeCollectionHelper.getEventFieldNames((((ITmfTraceWithPreDefinedEvents) trace).getContainedEventTypes()));
+
+        if (fEventName.isEmpty()) {
+            switch(getPriorityLevel()) {
+            case ALL_OR_NOTHING:
+                return traceEvents.keys().stream().allMatch(eventName -> {
+                    Collection<@NonNull String> fields = new HashSet<>(traceEvents.get(eventName));
+                    fields.retainAll(values);
+                    return (fields.size() == 0 || fields.size() == values.size());
+                });
+            case AT_LEAST_ONE:
+                return traceEvents.keys().stream().allMatch(eventName -> {
+                    Collection<@NonNull String> fields = new HashSet<>(traceEvents.get(eventName));
+                    fields.retainAll(values);
+                    return fields.size() > 0;
+                });
+            case MANDATORY:
+                return traceEvents.keys().stream().allMatch(eventName -> {
+                    Collection<@NonNull String> fields = traceEvents.get(eventName);
+                    return fields.containsAll(values);
+                });
+            case OPTIONAL:
+                return true;
+            default:
+                throw new IllegalStateException("Unknown value level: " + getPriorityLevel()); //$NON-NLS-1$
+            }
+        }
+
+        // Check the level for required event only
+        Collection<@NonNull String> fields = traceEvents.get(fEventName);
+        switch(getPriorityLevel()) {
+        case ALL_OR_NOTHING:
+            fields.retainAll(values);
+            return (fields.size() == 0 || fields.size() == values.size());
+        case AT_LEAST_ONE:
+            fields.retainAll(values);
+            return fields.size() > 0;
+        case MANDATORY:
+            return fields.containsAll(values);
+        case OPTIONAL:
+            return true;
+        default:
+            throw new IllegalStateException("Unknown value level: " + getPriorityLevel()); //$NON-NLS-1$
+        }
+
     }
 
 }

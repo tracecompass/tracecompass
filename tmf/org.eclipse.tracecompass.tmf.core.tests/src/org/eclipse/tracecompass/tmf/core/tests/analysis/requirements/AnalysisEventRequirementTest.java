@@ -123,6 +123,46 @@ public class AnalysisEventRequirementTest {
     }
 
     /**
+     * Test with {@link PriorityLevel#AT_LEAST_ONE} requirements
+     */
+    @Test
+    public void testAtLeastOneRequirements() {
+        /* Test mandatory requirement */
+        TmfAbstractAnalysisRequirement req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1), PriorityLevel.AT_LEAST_ONE);
+        assertTrue(req.test(fTrace));
+
+        req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT2), PriorityLevel.AT_LEAST_ONE);
+        assertTrue(req.test(fTrace));
+
+        /* Event 3 is not an event of the trace */
+        req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT2, EVENT3), PriorityLevel.AT_LEAST_ONE);
+        assertTrue(req.test(fTrace));
+
+        req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT3), PriorityLevel.AT_LEAST_ONE);
+        assertFalse(req.test(fTrace));
+    }
+
+    /**
+     * Test with {@link PriorityLevel#ALL_OR_NOTHING} requirements
+     */
+    @Test
+    public void testAllOrNothingRequirements() {
+        /* Test mandatory requirement */
+        TmfAbstractAnalysisRequirement req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1), PriorityLevel.ALL_OR_NOTHING);
+        assertTrue(req.test(fTrace));
+
+        req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT2), PriorityLevel.ALL_OR_NOTHING);
+        assertTrue(req.test(fTrace));
+
+        /* Event 3 is not an event of the trace */
+        req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT2, EVENT3), PriorityLevel.ALL_OR_NOTHING);
+        assertFalse(req.test(fTrace));
+
+        req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT3), PriorityLevel.ALL_OR_NOTHING);
+        assertTrue(req.test(fTrace));
+    }
+
+    /**
      * Test event requirements on a trace with no pre-defined events. They
      * should all pass
      */

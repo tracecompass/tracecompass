@@ -10,7 +10,6 @@
 package org.eclipse.tracecompass.tmf.core.analysis.requirements;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -53,14 +52,27 @@ public class TmfAnalysisEventRequirement extends TmfAbstractAnalysisRequirement 
     @Override
     public boolean test(ITmfTrace trace) {
 
-        // TODO: implement for all levels
-        if (trace instanceof ITmfTraceWithPreDefinedEvents) {
-            Set<String> traceEvents = TmfEventTypeCollectionHelper.getEventNames(((ITmfTraceWithPreDefinedEvents) trace).getContainedEventTypes());
-            Set<String> mandatoryValues = getPriorityLevel().equals(PriorityLevel.MANDATORY) ? getValues() : Collections.EMPTY_SET;
-            return traceEvents.containsAll(mandatoryValues);
+        if (!(trace instanceof ITmfTraceWithPreDefinedEvents)) {
+            return true;
         }
 
-        return true;
+        Set<String> traceEvents = TmfEventTypeCollectionHelper.getEventNames(((ITmfTraceWithPreDefinedEvents) trace).getContainedEventTypes());
+        Set<String> values = getValues();
+
+        switch (getPriorityLevel()) {
+        case ALL_OR_NOTHING:
+            traceEvents.retainAll(values);
+            return (traceEvents.size() == 0 || traceEvents.size() == values.size());
+        case AT_LEAST_ONE:
+            traceEvents.retainAll(values);
+            return traceEvents.size() > 0;
+        case MANDATORY:
+            return traceEvents.containsAll(values);
+        case OPTIONAL:
+            return true;
+        default:
+            throw new IllegalStateException("Unknown value level: " + getPriorityLevel()); //$NON-NLS-1$
+        }
     }
 
 }

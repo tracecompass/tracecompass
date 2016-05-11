@@ -152,11 +152,81 @@ public class AnalysisEventFieldRequirementTest {
         assertFalse(req.test(trace));
 
         /* Test case that all events need to have the given fields */
-        req = new TmfAnalysisEventFieldRequirement("", ImmutableSet.of(EVENT1_FIELD1, EVENT1_FIELD2));
+        req = new TmfAnalysisEventFieldRequirement("", ImmutableSet.of(EVENT1_FIELD1, EVENT1_FIELD2), PriorityLevel.MANDATORY);
         assertTrue(req.test(trace));
+
+        /* Test case that all events need to have the given fields */
+        req = new TmfAnalysisEventFieldRequirement("", ImmutableSet.of(EVENT2_FIELD1), PriorityLevel.MANDATORY);
+        assertFalse(req.test(trace));
 
         /* Test case that empty list of event fields behaves like Event Requirements */
         req = new TmfAnalysisEventFieldRequirement(EVENT1, checkNotNull(Collections.EMPTY_LIST));
+        assertTrue(req.test(trace));
+    }
+
+    /**
+     * Test with {@link PriorityLevel#AT_LEAST_ONE} requirements
+     */
+    @Test
+    public void testAtLeastOneRequirements() {
+        /* Test at least one requirement */
+        TmfAbstractAnalysisRequirement req = new TmfAnalysisEventFieldRequirement(EVENT1, ImmutableSet.of(EVENT1_FIELD1), PriorityLevel.AT_LEAST_ONE);
+        assertTrue(req.test(trace));
+
+        req = new TmfAnalysisEventFieldRequirement(EVENT1, ImmutableSet.of(EVENT1_FIELD1, EVENT1_FIELD2), PriorityLevel.AT_LEAST_ONE);
+        assertTrue(req.test(trace));
+
+        /* EVENT3 is not part of the trace. Test case that the event is part of the trace */
+        req = new TmfAnalysisEventFieldRequirement(EVENT3, ImmutableSet.of(EVENT1_FIELD1, EVENT1_FIELD2), PriorityLevel.AT_LEAST_ONE);
+        assertFalse(req.test(trace));
+
+        /* EVENT_FIELD is not an event field of the trace */
+        req = new TmfAnalysisEventFieldRequirement(EVENT1, ImmutableSet.of(EVENT1_FIELD1, EVENT1_FIELD2, EVENT_FIELD), PriorityLevel.AT_LEAST_ONE);
+        assertTrue(req.test(trace));
+
+        /* Test case that all events need to have at least one of the given fields */
+        req = new TmfAnalysisEventFieldRequirement("", ImmutableSet.of(EVENT1_FIELD1, EVENT2_FIELD2), PriorityLevel.AT_LEAST_ONE);
+        assertTrue(req.test(trace));
+
+        /* Test case that all events need to have the given fields */
+        req = new TmfAnalysisEventFieldRequirement("", ImmutableSet.of(EVENT2_FIELD1), PriorityLevel.AT_LEAST_ONE);
+        assertFalse(req.test(trace));
+
+        /* Test case that empty list of event fields behaves like Event Requirements */
+        req = new TmfAnalysisEventFieldRequirement(EVENT1, checkNotNull(Collections.EMPTY_LIST), PriorityLevel.AT_LEAST_ONE);
+        assertTrue(req.test(trace));
+    }
+
+    /**
+     * Test with {@link PriorityLevel#ALL_OR_NOTHING} requirements
+     */
+    @Test
+    public void testAllOrNothingRequirements() {
+        /* Test at least one requirement */
+        TmfAbstractAnalysisRequirement req = new TmfAnalysisEventFieldRequirement(EVENT1, ImmutableSet.of(EVENT1_FIELD1), PriorityLevel.ALL_OR_NOTHING);
+        assertTrue(req.test(trace));
+
+        req = new TmfAnalysisEventFieldRequirement(EVENT1, ImmutableSet.of(EVENT1_FIELD1, EVENT1_FIELD2), PriorityLevel.ALL_OR_NOTHING);
+        assertTrue(req.test(trace));
+
+        /* EVENT3 is not part of the trace. Test case that the event is part of the trace */
+        req = new TmfAnalysisEventFieldRequirement(EVENT3, ImmutableSet.of(EVENT1_FIELD1, EVENT1_FIELD2), PriorityLevel.ALL_OR_NOTHING);
+        assertTrue(req.test(trace));
+
+        /* EVENT_FIELD is not an event field of the trace */
+        req = new TmfAnalysisEventFieldRequirement(EVENT1, ImmutableSet.of(EVENT1_FIELD1, EVENT1_FIELD2, EVENT_FIELD), PriorityLevel.ALL_OR_NOTHING);
+        assertFalse(req.test(trace));
+
+        /* Test case that all events need to have either all or none of the given fields */
+        req = new TmfAnalysisEventFieldRequirement("", ImmutableSet.of(EVENT1_FIELD1, EVENT2_FIELD2), PriorityLevel.ALL_OR_NOTHING);
+        assertFalse(req.test(trace));
+
+        /* Test case that all events need to have the given fields */
+        req = new TmfAnalysisEventFieldRequirement("", ImmutableSet.of(EVENT1_FIELD1), PriorityLevel.ALL_OR_NOTHING);
+        assertTrue(req.test(trace));
+
+        /* Test case that empty list of event fields behaves like Event Requirements */
+        req = new TmfAnalysisEventFieldRequirement(EVENT1, checkNotNull(Collections.EMPTY_LIST), PriorityLevel.ALL_OR_NOTHING);
         assertTrue(req.test(trace));
     }
 
