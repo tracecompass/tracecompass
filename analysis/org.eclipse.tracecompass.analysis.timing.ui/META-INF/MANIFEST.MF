@@ -25,4 +25,5 @@ Export-Package: org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore,
  org.eclipse.tracecompass.internal.analysis.timing.ui,
  org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density,
  org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter,
+ org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics,
  org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.table

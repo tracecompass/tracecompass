@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
+import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics.Messages;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
