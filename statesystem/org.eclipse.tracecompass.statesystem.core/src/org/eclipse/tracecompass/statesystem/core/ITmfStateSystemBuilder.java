@@ -127,7 +127,7 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *             If the inserted state value's type does not match what is
      *             already assigned to this attribute.
      */
-    void modifyAttribute(long t, ITmfStateValue value, int attributeQuark)
+    void modifyAttribute(long t, @NonNull ITmfStateValue value, int attributeQuark)
             throws StateValueTypeException;
 
     /**
@@ -176,7 +176,7 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *             If the attribute 'attributeQuark' already exists, but is not
      *             of integer type.
      */
-    void pushAttribute(long t, ITmfStateValue value, int attributeQuark)
+    void pushAttribute(long t, @NonNull ITmfStateValue value, int attributeQuark)
             throws StateValueTypeException;
 
     /**

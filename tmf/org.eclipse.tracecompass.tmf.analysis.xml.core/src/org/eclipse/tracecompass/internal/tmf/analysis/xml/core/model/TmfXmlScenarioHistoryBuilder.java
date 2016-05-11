@@ -337,7 +337,7 @@ public class TmfXmlScenarioHistoryBuilder {
                 value = TmfStateValue.nullValue();
                 break;
             }
-            ss.modifyAttribute(ts, value, info.getStatusQuark());
+            ss.modifyAttribute(ts, NonNullUtils.checkNotNull(value), info.getStatusQuark());
         } catch (StateValueTypeException e) {
             Activator.logError("failed to update scenario status"); //$NON-NLS-1$
         }

@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.btf.core.analysis;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.btf.core.event.BtfEvent;
 import org.eclipse.tracecompass.btf.core.trace.BtfColumnNames;
 import org.eclipse.tracecompass.btf.core.trace.BtfTrace;
@@ -65,14 +66,14 @@ public class BtfStateProvider extends AbstractTmfStateProvider {
 
     private static class TmfNamedStateValue {
         private final String fName;
-        private final TmfStateValue fValue;
+        private final @NonNull TmfStateValue fValue;
 
-        public TmfNamedStateValue(TmfStateValue value, String name) {
+        public TmfNamedStateValue(@NonNull TmfStateValue value, String name) {
             fValue = value;
             fName = name;
         }
 
-        public TmfStateValue getValue() {
+        public @NonNull TmfStateValue getValue() {
             return fValue;
         }
 

@@ -360,15 +360,8 @@ public class StateSystem implements ITmfStateSystemBuilder {
     //--------------------------------------------------------------------------
 
     @Override
-    public void modifyAttribute(long t, ITmfStateValue value, int attributeQuark)
+    public void modifyAttribute(long t, @NonNull ITmfStateValue value, int attributeQuark)
             throws TimeRangeException, StateValueTypeException {
-        if (value == null) {
-            /*
-             * TODO Replace with @NonNull parameter (will require fixing all the
-             * state providers!)
-             */
-            throw new IllegalArgumentException();
-        }
         transState.processStateChange(t, value, attributeQuark);
     }
 
@@ -387,7 +380,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
     }
 
     @Override
-    public void pushAttribute(long t, ITmfStateValue value, int attributeQuark)
+    public void pushAttribute(long t, @NonNull ITmfStateValue value, int attributeQuark)
             throws TimeRangeException, StateValueTypeException {
         int stackDepth;
         int subAttributeQuark;
