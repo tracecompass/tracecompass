@@ -434,7 +434,7 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
             public void widgetSelected(SelectionEvent e) {
                 if (fIsAdvancedEnabled) {
                     fIsAdvancedEnabled = false;
-                    fAdvancedButton.setText(">>> " + Messages.TraceControl_CreateSessionConfigureStreamingButtonText); //$NON-NLS-1$
+                    fAdvancedButton.setText(Messages.TraceControl_CreateSessionConfigureStreamingButtonText + " >>>"); //$NON-NLS-1$
                     fAdvancedButton.setToolTipText(Messages.TraceControl_CreateSessionConfigureStreamingButtonTooltip);
 
                     if (fParent.isNetworkStreamingSupported()) {
