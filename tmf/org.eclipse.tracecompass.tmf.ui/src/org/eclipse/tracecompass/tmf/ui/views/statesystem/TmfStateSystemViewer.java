@@ -34,6 +34,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
@@ -42,7 +43,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
@@ -207,15 +207,21 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
 
     private static TmfTreeViewerEntry createTraceEntry(ITmfTrace trace) {
         TmfTreeViewerEntry traceEntry = new TmfTreeViewerEntry(trace.getName());
-        Iterable<ITmfAnalysisModuleWithStateSystems> modules = TmfTraceUtils.getAnalysisModulesOfClass(trace, ITmfAnalysisModuleWithStateSystems.class);
-        for (ITmfAnalysisModuleWithStateSystems module : modules) {
-            /* Just schedule the module, the data will be filled when available */
-            module.schedule();
-            if (!module.waitForInitialization()) {
-                continue;
-            }
-            for (ITmfStateSystem ss : module.getStateSystems()) {
-                traceEntry.addChild(new StateSystemEntry(ss));
+        Iterable<IAnalysisModule> modules = trace.getAnalysisModules();
+        for (IAnalysisModule module : modules) {
+            if (module instanceof ITmfAnalysisModuleWithStateSystems) {
+                ITmfAnalysisModuleWithStateSystems moduleWithStateSystem = (ITmfAnalysisModuleWithStateSystems) module;
+                /*
+                 * Just schedule the module, the data will be filled when
+                 * available
+                 */
+                moduleWithStateSystem.schedule();
+                if (!moduleWithStateSystem.waitForInitialization()) {
+                    continue;
+                }
+                for (ITmfStateSystem ss : moduleWithStateSystem.getStateSystems()) {
+                    traceEntry.addChild(new StateSystemEntry(ss));
+                }
             }
         }
         return traceEntry;
