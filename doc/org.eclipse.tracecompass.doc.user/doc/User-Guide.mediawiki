@@ -1873,6 +1873,8 @@ Alternatively, go in '''Window''' -> '''Show View''' -> '''Other...''' and selec
 This view shows the state of system resources i.e. if changes occurred during the trace either on '''CPUs''', '''IRQs''' or '''soft IRQs''', it will appear in this view. The left side of the view present a list of resources that are affected by at least one event of the trace. The right side illustrate the state in which each resource is at some point in time. For state '''USERMODE''' it also prints the process name in the state bar. For state '''SYSCALL''' the name of the system call is
 displayed in the state region.
 
+When an '''IRQ''' is handled by a '''CPU''', its states are shown under the corresponding '''CPU''' entry. Similarly, the '''CPU''' that was handling an '''IRQ''' is shown under the handled '''IRQ'''. Therefore, the trace can be visualized from a '''CPU''' point of view or from an '''IRQ''' point of view.
+
 Just like other views, according to which trace points and system calls are activated, the content of this view may change from one trace to another.
 
 The time axis is aligned with other views that support automatic time axis alignment (see [[#Automatic Time Axis Alignment | Automatic Time Axis Alignment]]).
