@@ -131,19 +131,6 @@ public abstract class CtfTmfEventField extends TmfEventField {
             CompoundDeclaration arrDecl = (CompoundDeclaration) decl;
             IDeclaration elemType = null;
             elemType = arrDecl.getElementType();
-            if (arrayDef instanceof ByteArrayDefinition) {
-                ByteArrayDefinition byteArrayDefinition = (ByteArrayDefinition) arrayDef;
-                /* it's a CTFIntegerArrayField */
-                int size = arrayDef.getLength();
-                long[] values = new long[size];
-                for (int i = 0; i < size; i++) {
-                    values[i] = Byte.toUnsignedLong(byteArrayDefinition.getByte(i));
-                }
-                field = new CTFIntegerArrayField(fieldName, values,
-                        16,
-                        false);
-
-            }
             if (elemType instanceof IntegerDeclaration) {
                 /*
                  * Array of integers => CTFIntegerArrayField, unless it's a
@@ -154,6 +141,18 @@ public abstract class CtfTmfEventField extends TmfEventField {
                 if (elemIntType.isCharacter()) {
                     /* it's a CTFStringField */
                     field = new CTFStringField(fieldName, arrayDef.toString());
+                } else if (arrayDef instanceof ByteArrayDefinition) { // unsigned byte array
+                    ByteArrayDefinition byteArrayDefinition = (ByteArrayDefinition) arrayDef;
+                    /* it's a CTFIntegerArrayField */
+                    int size = arrayDef.getLength();
+                    long[] values = new long[size];
+                    for (int i = 0; i < size; i++) {
+                        values[i] = Byte.toUnsignedLong(byteArrayDefinition.getByte(i));
+                    }
+                    field = new CTFIntegerArrayField(fieldName, values,
+                            elemIntType.getBase(),
+                            elemIntType.isSigned());
+
                 } else {
                     /* it's a CTFIntegerArrayField */
                     int size = arrayDef.getLength();
