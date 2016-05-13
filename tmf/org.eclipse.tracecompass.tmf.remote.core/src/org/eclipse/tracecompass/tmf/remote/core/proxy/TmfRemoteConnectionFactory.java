@@ -228,8 +228,8 @@ public class TmfRemoteConnectionFactory {
         return manager.getAllRemoteConnections().stream()
             .filter(connection ->
                 (connection != null) &&
-                connection.getConnectionType().getId().equals(remoteServicesId.toString()) &&
-                connection.getName().equals(name.toString()))
+                connection.getConnectionType().getId().equals(remoteServicesId) &&
+                connection.getName().equals(name))
             .findFirst()
             .orElse(null);
     }
