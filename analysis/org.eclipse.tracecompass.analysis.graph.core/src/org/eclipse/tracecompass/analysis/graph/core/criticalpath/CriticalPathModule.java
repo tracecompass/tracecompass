@@ -50,7 +50,7 @@ public class CriticalPathModule extends TmfAbstractAnalysisModule {
 
     private @Nullable TmfGraphBuilderModule fGraphModule;
 
-    private @Nullable TmfGraph fCriticalPath;
+    private volatile @Nullable TmfGraph fCriticalPath;
 
     /**
      * Default constructor
@@ -138,6 +138,7 @@ public class CriticalPathModule extends TmfAbstractAnalysisModule {
 
     @Override
     protected void parameterChanged(String name) {
+        fCriticalPath = null;
         cancel();
         resetAnalysis();
         schedule();

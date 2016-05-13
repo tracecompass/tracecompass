@@ -17,8 +17,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.Viewer;
@@ -195,10 +198,48 @@ public class CriticalPathView extends AbstractTimeGraphView {
             }
         }
 
-        private Map<Object, Map<Object, CriticalPathEntry>> workerMaps = new HashMap<>();
-        private Map<Object, List<TimeGraphEntry>> workerEntries = new HashMap<>();
-        private Map<Object, List<ILinkEvent>> linkMap = new HashMap<>();
+        private class BuildThread extends Thread {
+            private final ITmfTrace fBuildTrace;
+            private final IProgressMonitor fMonitor;
+
+            public BuildThread(final ITmfTrace trace) {
+                super("Critical path view build"); //$NON-NLS-1$
+                fBuildTrace = trace;
+                fMonitor = new NullProgressMonitor();
+            }
+
+            @Override
+            public void run() {
+                try {
+                    CriticalPathModule module = Iterables.<@Nullable CriticalPathModule> getFirst(
+                            TmfTraceUtils.getAnalysisModulesOfClass(fBuildTrace, CriticalPathModule.class),
+                            null);
+                    if (module == null) {
+                        return;
+                    }
+                    module.schedule();
+                    if (module.waitForCompletion(fMonitor)) {
+                        refresh();
+                    }
+
+                } finally {
+                    fSyncLock.lock();
+                    fBuildThread = null;
+                    fSyncLock.unlock();
+                }
+            }
+
+            public void cancel() {
+                fMonitor.setCanceled(true);
+            }
+        }
+
+        private final Lock fSyncLock = new ReentrantLock();
+        private final Map<Object, Map<Object, CriticalPathEntry>> workerMaps = new HashMap<>();
+        private final Map<Object, List<TimeGraphEntry>> workerEntries = new HashMap<>();
+        private final Map<Object, List<ILinkEvent>> linkMap = new HashMap<>();
         private @Nullable Object fCurrentObject;
+        private @Nullable BuildThread fBuildThread = null;
 
         @Override
         public ITimeGraphEntry[] getElements(@Nullable Object inputElement) {
@@ -278,10 +319,6 @@ public class CriticalPathView extends AbstractTimeGraphView {
                 throw new IllegalStateException("View requires an analysis module"); //$NON-NLS-1$
             }
 
-            module.schedule();
-            if (!module.waitForCompletion()) {
-                return null;
-            }
             final TmfGraph graph = module.getCriticalPath();
             return graph;
         }
@@ -339,11 +376,46 @@ public class CriticalPathView extends AbstractTimeGraphView {
 
         @Override
         public void dispose() {
-
+            fSyncLock.lock();
+            try {
+                BuildThread buildThread = fBuildThread;
+                if (buildThread != null) {
+                    buildThread.cancel();
+                }
+            } finally {
+                fSyncLock.unlock();
+            }
         }
 
         @Override
         public void inputChanged(@Nullable Viewer viewer, @Nullable Object oldInput, @Nullable Object newInput) {
+            // The input has changed, the critical path will be re-computed,
+            // wait for the analysis to be finished, then call the refresh
+            // method of the view
+            if (!(newInput instanceof List)) {
+                return;
+            }
+            List<?> list = (List<?>) newInput;
+            if (list.isEmpty()) {
+                return;
+            }
+            final ITmfTrace trace = getTrace();
+            if (trace == null) {
+                return;
+            }
+
+            fSyncLock.lock();
+            try {
+                BuildThread buildThread = fBuildThread;
+                if (buildThread != null) {
+                    buildThread.cancel();
+                }
+                buildThread = new BuildThread(trace);
+                buildThread.start();
+                fBuildThread = buildThread;
+            } finally {
+                fSyncLock.unlock();
+            }
         }
 
         @Override
