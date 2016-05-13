@@ -235,7 +235,6 @@ public class CriticalPathView extends AbstractTimeGraphView {
         private final Lock fSyncLock = new ReentrantLock();
         private final Map<Object, Map<Object, CriticalPathEntry>> workerMaps = new HashMap<>();
         private final Map<Object, List<TimeGraphEntry>> workerEntries = new HashMap<>();
-        private final Map<Object, List<ILinkEvent>> linkMap = new HashMap<>();
         private @Nullable Object fCurrentObject;
         private @Nullable BuildThread fBuildThread = null;
 
@@ -336,18 +335,19 @@ public class CriticalPathView extends AbstractTimeGraphView {
             if (current == null) {
                 return null;
             }
-            /*
-             * Critical path typically has relatively few links, so we calculate
-             * and save them all, but just return those in range
-             */
-            List<ILinkEvent> links = linkMap.get(current);
-            if (links != null) {
-                return links;
-            }
             final ITmfTrace trace = getTrace();
             if (trace == null) {
                 return null;
             }
+            /*
+             * Critical path typically has relatively few links, so we calculate
+             * and save them all, but just return those in range
+             */
+            List<ILinkEvent> links = fLinks.get(trace, current);
+            if (links != null) {
+                return getLinksInRange(links, startTime, endTime);
+            }
+
             CriticalPathModule module = Iterables.<@Nullable CriticalPathModule> getFirst(
                     TmfTraceUtils.getAnalysisModulesOfClass(trace, CriticalPathModule.class), null);
             if (module == null) {
@@ -369,11 +369,14 @@ public class CriticalPathView extends AbstractTimeGraphView {
 
             /* find vertical links */
             graph.scanLineTraverse(vertex, new VerticalLinksVisitor(graph, graphLinks, entryMap));
-            fLinks.put(trace, checkNotNull(fCurrentObject), graphLinks);
-            links = graphLinks;
+            fLinks.put(trace, current, graphLinks);
 
+            return getLinksInRange(graphLinks, startTime, endTime);
+        }
+
+        private List<ILinkEvent> getLinksInRange(List<ILinkEvent> allLinks, long startTime, long endTime) {
             List<ILinkEvent> linksInRange = new ArrayList<>();
-            for (ILinkEvent link : links) {
+            for (ILinkEvent link : allLinks) {
                 if (((link.getTime() >= startTime) && (link.getTime() <= endTime)) ||
                         ((link.getTime() + link.getDuration() >= startTime) && (link.getTime() + link.getDuration() <= endTime))) {
                     linksInRange.add(link);
