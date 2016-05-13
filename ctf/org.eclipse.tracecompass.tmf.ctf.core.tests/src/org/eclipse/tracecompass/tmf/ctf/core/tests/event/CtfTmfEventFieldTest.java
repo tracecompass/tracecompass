@@ -89,12 +89,13 @@ public class CtfTmfEventFieldTest {
 
         StructDeclaration sDec = new StructDeclaration(1l);
         StringDeclaration strDec = StringDeclaration.getStringDeclaration(Encoding.UTF8);
-        IntegerDeclaration intDec = IntegerDeclaration.UINT_8_DECL;
+        IntegerDeclaration byteDec = IntegerDeclaration.UINT_8_DECL;
+        IntegerDeclaration intDec = IntegerDeclaration.INT_8_DECL;
         FloatDeclaration flDec = new FloatDeclaration(8, 24,
                 ByteOrder.BIG_ENDIAN, 8);
-        SequenceDeclaration seqDec = new SequenceDeclaration(LEN, intDec);
+        SequenceDeclaration seqDec = new SequenceDeclaration(LEN, byteDec);
         StructDeclaration structDec = new StructDeclaration(8);
-        EnumDeclaration enumDec = new EnumDeclaration(intDec);
+        EnumDeclaration enumDec = new EnumDeclaration(byteDec);
         VariantDeclaration varDec = new VariantDeclaration();
         ArrayDeclaration arrStrDec = new ArrayDeclaration(ARRAY_SIZE, strDec);
         ArrayDeclaration arrFloatDec = new ArrayDeclaration(ARRAY_SIZE, flDec);
@@ -103,7 +104,7 @@ public class CtfTmfEventFieldTest {
         ArrayDeclaration arrVariantDec = new ArrayDeclaration(ARRAY_SIZE, varDec);
         ArrayDeclaration arrEnumDec = new ArrayDeclaration(ARRAY_SIZE, enumDec);
 
-        sDec.addField(INT, intDec);
+        sDec.addField(INT, byteDec);
         bb.put(TEST_NUMBER);
 
         sDec.addField(ARRAY_INT, arrIntDec);
@@ -111,7 +112,7 @@ public class CtfTmfEventFieldTest {
             bb.put(TEST_NUMBER);
         }
 
-        sDec.addField(LEN, intDec);
+        sDec.addField(LEN, byteDec);
         bb.put(TEST_NUMBER);
 
         sDec.addField(FLOAT, flDec);
@@ -137,7 +138,7 @@ public class CtfTmfEventFieldTest {
         bb.put(TEST_NUMBER);
 
         structDec.addField(STR, strDec);
-        structDec.addField(INT, intDec);
+        structDec.addField(INT, byteDec);
         sDec.addField(STRUCT, structDec);
         bb.put(testStringBytes);
         bb.put((byte) 0);
@@ -160,7 +161,7 @@ public class CtfTmfEventFieldTest {
             bb.put(TEST_NUMBER);
         }
 
-        varDec.addField(LEN, intDec);
+        varDec.addField(LEN, byteDec);
         varDec.addField(FLOAT, flDec);
         varDec.setTag(ENUM);
         sDec.addField(VARIANT, varDec);
