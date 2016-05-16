@@ -34,6 +34,10 @@ class ControlViewSwtBotUtil {
     public static final String PROVIDER_GROUP_NAME = "Provider";
     public static final String ALL_EVENTS_NAME = "*";
     public static final String SCHED_SWITCH_EVENT_NAME = "sched_switch";
+    public static final String SCHED_WAKEUP_EVENT_NAME = "sched_wakeup";
+    public static final String SCHED_PROCESSWAIT_EVENT_NAME = "sched_process_wait";
+    public static final String SCHED_PROCESSFORK_EVENT_NAME = "sched_process_fork";
+    public static final String SCHED_PROCESSEXEC_EVENT_NAME = "sched_process_exec";
     public static final String PROFILE_SUFFIX = ".lttng";
     public static final String KERNEL_TRACE_NAME = "kernel";
 
@@ -59,6 +63,7 @@ class ControlViewSwtBotUtil {
     public static final String ENABLE_EVENT_DIALOG_TITLE = "Enable Events";
     public static final String ALL_TREE_NODE = "All";
     public static final String ALL_EVENT_GROUP_NAME = "All Tracepoint Events and Syscalls";
+    public static final String SPECIFIC_EVENT_GROUP_NAME = "Specific event";
     public static final String TRACEPOINTS_GROUP_NAME = "Tracepoint Events";
     public static final String SYSCALL_GROUP_NAME = "All Syscalls";
     public static final String GROUP_SELECT_NAME = "Select";
