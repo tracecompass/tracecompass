@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.viewers;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.math.BigDecimal;
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,6 +46,7 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.L
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiResultTable;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiTableEntry;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.format.LamiLabelFormat;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.format.LamiTimeStampFormat;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.signals.LamiSelectionUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.swtchart.IAxisTick;
@@ -283,7 +285,13 @@ public class LamiScatterViewer extends LamiXYChartViewer {
         /* Modify x axis related chart styling */
         IAxisTick xTick = getChart().getAxisSet().getXAxis(0).getTick();
         if (areXAspectsContinuous) {
-            xTick.setFormat(getContinuousAxisFormatter(xAxisAspects, getResultTable().getEntries(), fXInternalRange, fXExternalRange));
+            Format xAxisFormat = getContinuousAxisFormatter(xAxisAspects, getResultTable().getEntries(), fXInternalRange, fXExternalRange);
+
+            xTick.setFormat(xAxisFormat);
+
+            if (xAxisFormat instanceof LamiTimeStampFormat) {
+                setXUnits(((LamiTimeStampFormat) xAxisFormat).getPattern());
+            }
         } else {
             xTick.setFormat(new LamiLabelFormat(checkNotNull(xMap)));
             updateTickMark(checkNotNull(xMap), xTick, getChart().getPlotArea().getSize().x);
@@ -295,7 +303,13 @@ public class LamiScatterViewer extends LamiXYChartViewer {
         /* Modify Y axis related chart styling */
         IAxisTick yTick = getChart().getAxisSet().getYAxis(0).getTick();
         if (areYAspectsContinuous) {
-            yTick.setFormat(getContinuousAxisFormatter(yAxisAspects, getResultTable().getEntries(), fYInternalRange, fYExternalRange));
+            Format yAxisFormat = getContinuousAxisFormatter(yAxisAspects, getResultTable().getEntries(), fYInternalRange, fYExternalRange);
+
+            yTick.setFormat(yAxisFormat);
+
+            if (yAxisFormat instanceof LamiTimeStampFormat) {
+                setYUnits(((LamiTimeStampFormat) yAxisFormat).getPattern());
+            }
         } else {
             yTick.setFormat(new LamiLabelFormat(checkNotNull(yMap)));
             updateTickMark(checkNotNull(yMap), yTick, getChart().getPlotArea().getSize().y);

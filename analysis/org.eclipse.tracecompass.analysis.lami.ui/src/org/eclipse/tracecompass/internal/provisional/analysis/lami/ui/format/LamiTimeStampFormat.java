@@ -152,4 +152,12 @@ public class LamiTimeStampFormat extends Format {
         return null;
     }
 
+    /**
+     * Get the pattern string of the format.
+     *
+     * @return the pattern string.
+     */
+    public String getPattern() {
+        return fFormat.toPattern();
+    }
 }
