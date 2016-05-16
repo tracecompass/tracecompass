@@ -13,7 +13,9 @@
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -75,6 +77,10 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
      * A button to enable/disable the syscalls group
      */
     private Button fSysCallsActivateButton;
+    /**
+     * A Text field for the specific event name.
+     */
+    private Text fSpecificEventText;
     /**
      * A button to enable or disable the dynamic probe group.
      */
@@ -304,6 +310,16 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
                 nbEvents += comp.getChildren().length;
             }
             fIsAllTracepoints = (nbEvents == fSelectedEvents.size());
+            String tmpSpecificEvent = fSpecificEventText.getText();
+            if (!fIsAllTracepoints && !tmpSpecificEvent.trim().isEmpty()) {
+                // Format the text to a List<String>
+                // Removing all non visible characters
+                tmpSpecificEvent = tmpSpecificEvent.replaceAll("\\s", ""); //$NON-NLS-1$ //$NON-NLS-2$
+                // Splitting the different events that are separated by commas
+                List<String> list = Arrays.asList(tmpSpecificEvent.split(",")); //$NON-NLS-1$
+                fSelectedEvents.addAll(list);
+                fSelectedEvents = fSelectedEvents.stream().distinct().collect(Collectors.toList());
+            }
         }
 
         if (fIsDynamicProbe) {
@@ -445,6 +461,24 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
                 treeViewer.expandAll();
             }
         };
+
+        Group specificEventGroup = new Group(tracepointsGroup, SWT.SHADOW_NONE);
+        specificEventGroup.setText(Messages.TraceControl_EnableEventsSpecificEventGroupName);
+        layout = new GridLayout(4, true);
+        specificEventGroup.setLayout(layout);
+        specificEventGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label specificEventLabel = new Label(specificEventGroup, SWT.LEFT);
+        specificEventLabel.setText(Messages.TraceControl_EnableEventsSpecificEventLabel);
+        data = new GridData(GridData.FILL_HORIZONTAL);
+        data.horizontalSpan = 1;
+        specificEventLabel.setLayoutData(data);
+
+        fSpecificEventText = new Text(specificEventGroup, SWT.LEFT);
+        fSpecificEventText.setToolTipText(Messages.TraceControl_EnableEventsSpecificEventTooltip);
+        data = new GridData(GridData.FILL_HORIZONTAL);
+        data.horizontalSpan = 3;
+        fSpecificEventText.setLayoutData(data);
     }
 
     /**
@@ -612,6 +646,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
         fAllActivateButton.setSelection(group == KernelGroupEnum.ALL);
         fTracepointsActivateButton.setSelection(group == KernelGroupEnum.TRACEPOINTS);
         fTracepointsViewer.getTree().setEnabled(group == KernelGroupEnum.TRACEPOINTS);
+        fSpecificEventText.setEnabled(group == KernelGroupEnum.TRACEPOINTS);
 
         fSysCallsActivateButton.setSelection(group == KernelGroupEnum.SYSCALLS);
 
