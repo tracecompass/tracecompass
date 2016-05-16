@@ -171,8 +171,12 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
     private final Chart fChart;
 
     private final String fChartTitle;
-    private final String fXTitle;
-    private final String fYTitle;
+
+    private String fXLabel;
+    private @Nullable String fXUnits;
+
+    private String fYLabel;
+    private @Nullable String fYUnits;
 
     private boolean fSelected;
     private Set<Integer> fSelection;
@@ -198,6 +202,9 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
         fChartModel = chartModel;
         fSelection = new HashSet<>();
 
+        fXLabel = ""; //$NON-NLS-1$
+        fYLabel = ""; //$NON-NLS-1$
+
         fChart = new Chart(parent, SWT.NONE);
         fChart.addListener(SWT.Resize, fResizeListener);
 
@@ -208,14 +215,9 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
         if (fChartModel.getXSeriesColumns().size() == 1) {
             /*
              * There is only 1 series in the chart, we will use its name as the
-             * Y axis (and hide the legend).
+             * X axis.
              */
-            String seriesName = getChartModel().getXSeriesColumns().get(0);
-            // The time duration formatter converts ns to s on the axis
-            if (NANOSECONDS_SYMBOL.equals(getXAxisAspects().get(0).getUnits())) {
-                seriesName = getXAxisAspects().get(0).getName() + " (" + SECONDS_SYMBOL + ')'; //$NON-NLS-1$
-            }
-            fXTitle = seriesName;
+            innerSetXTitle(getXAxisAspects().get(0).getName(), getXAxisAspects().get(0).getUnits());
         } else {
             /*
              * There are multiple series in the chart, if they all share the same
@@ -236,19 +238,13 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
                 xBaseTitle = getXAxisAspects().get(0).getName();
             }
 
-            String units = getXAxisAspects().get(0).getUnits();
-            if (nbDiffAspectsUnits == 1 && units != null) {
+            String units = null;
+            if (nbDiffAspectsUnits == 1) {
                 /* All aspects use the same unit type */
-
-                // The time duration formatter converts ns to s on the axis
-                if (NANOSECONDS_SYMBOL.equals(units)) {
-                    units = SECONDS_SYMBOL;
-                }
-                fXTitle = xBaseTitle + " (" + units + ')'; //$NON-NLS-1$
-            } else {
-                /* Various unit types, just say "Value" */
-                fXTitle = nullToEmptyString(xBaseTitle);
+                units = getXAxisAspects().get(0).getUnits();
             }
+
+            innerSetXTitle(xBaseTitle, units);
         }
 
         /* Set Y axis title */
@@ -257,12 +253,9 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
              * There is only 1 series in the chart, we will use its name as the
              * Y axis (and hide the legend).
              */
-            String seriesName = getChartModel().getYSeriesColumns().get(0);
-            // The time duration formatter converts ns to s on the axis
-            if (NANOSECONDS_SYMBOL.equals(getYAxisAspects().get(0).getUnits())) {
-                seriesName = getYAxisAspects().get(0).getName() + " (" + SECONDS_SYMBOL + ')'; //$NON-NLS-1$
-            }
-            fYTitle = seriesName;
+            innerSetYTitle(getYAxisAspects().get(0).getName(), getYAxisAspects().get(0).getUnits());
+
+            /* Hide the legend */
             fChart.getLegend().setVisible(false);
         } else {
             /*
@@ -284,19 +277,13 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
                 yBaseTitle = getYAxisAspects().get(0).getName();
             }
 
-            String units = getYAxisAspects().get(0).getUnits();
-            if (nbDiffAspectsUnits == 1 && units != null) {
+            String units = null;
+            if (nbDiffAspectsUnits == 1) {
                 /* All aspects use the same unit type */
-
-                // The time duration formatter converts ns to s on the axis
-                if (NANOSECONDS_SYMBOL.equals(units)) {
-                    units = SECONDS_SYMBOL;
-                }
-                fYTitle = yBaseTitle + " (" + units + ')'; //$NON-NLS-1$
-            } else {
-                /* Various unit types, don't display any units */
-                fYTitle = nullToEmptyString(yBaseTitle);
+                units = getYAxisAspects().get(0).getUnits();
             }
+
+            innerSetYTitle(yBaseTitle, units);
 
             /* Put legend at the bottom */
             fChart.getLegend().setPosition(SWT.BOTTOM);
@@ -321,6 +308,122 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
                 /* Dispose resources of this class */
                 LamiXYChartViewer.super.dispose();
         });
+    }
+
+    /**
+     * Set the Y axis title and refresh the chart.
+     *
+     * @param label
+     *            the label string.
+     * @param units
+     *            the units string.
+     */
+    protected void setYTitle(@Nullable String label, @Nullable String units) {
+        innerSetYTitle(label, units);
+    }
+
+    private void innerSetYTitle(@Nullable String label, @Nullable String units) {
+        fYLabel = nullToEmptyString(label);
+        innerSetYUnits(units);
+        refreshDisplayTitles();
+    }
+
+    /**
+     * Set the units on the Y Axis title and refresh the chart.
+     *
+     * @param units
+     *            the units string.
+     */
+    protected void setYUnits(@Nullable String units) {
+        innerSetYUnits(units);
+    }
+
+    private void innerSetYUnits(@Nullable String units) {
+        /*
+         * All time durations in the Lami protocol are nanoseconds, on the
+         * charts we use an axis formater that converts back to seconds as a
+         * base unit and then uses prefixes like nano and milli depending on the
+         * range.
+         *
+         * So set the units to seconds in the title to match the base unit of
+         * the formater.
+         */
+        if (NANOSECONDS_SYMBOL.equals(units)) {
+            fYUnits = SECONDS_SYMBOL;
+        } else {
+            fYUnits = units;
+        }
+        refreshDisplayTitles();
+    }
+
+    /**
+     * Get the Y axis title string.
+     *
+     * If the units is non-null, the title will be: "label (units)"
+     *
+     * If the units is null, the title will be: "label"
+     *
+     * @return the title of the Y axis.
+     */
+    protected String getYTitle() {
+        if (fYUnits == null) {
+            return fYLabel;
+        }
+        return fYLabel + " (" + fYUnits + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
+    /**
+     * Set the X axis title and refresh the chart.
+     *
+     * @param label
+     *            the label string.
+     * @param units
+     *            the units string.
+     */
+    protected void setXTitle(@Nullable String label, @Nullable String units) {
+        innerSetXTitle(label, units);
+    }
+
+    private void innerSetXTitle(@Nullable String label, @Nullable String units) {
+        fXLabel = nullToEmptyString(label);
+        innerSetXUnits(units);
+        refreshDisplayTitles();
+    }
+
+    /**
+     * Set the units on the X Axis title.
+     *
+     * @param units
+     *            the units string
+     */
+    protected void setXUnits(@Nullable String units) {
+        innerSetXUnits(units);
+    }
+
+    private void innerSetXUnits(@Nullable String units) {
+        /* The time duration formatter converts ns to s on the axis */
+        if (NANOSECONDS_SYMBOL.equals(units)) {
+            fXUnits = SECONDS_SYMBOL;
+        } else {
+            fXUnits = units;
+        }
+        refreshDisplayTitles();
+    }
+
+    /**
+     * Get the X axis title string.
+     *
+     * If the units is non-null, the title will be: "label (units)"
+     *
+     * If the units is null, the title will be: "label"
+     *
+     * @return the title of the Y axis.
+     */
+    protected String getXTitle() {
+        if (fXUnits == null) {
+            return fXLabel;
+        }
+        return fXLabel + " (" + fXUnits + ")"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /**
@@ -603,10 +706,10 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
         refreshDisplayTitle(chartTitle, fChartTitle, chartRect.width);
 
         ITitle xTitle = checkNotNull(fChart.getAxisSet().getXAxis(0).getTitle());
-        refreshDisplayTitle(xTitle, fXTitle, plotRect.width);
+        refreshDisplayTitle(xTitle, getXTitle(), plotRect.width);
 
         ITitle yTitle = checkNotNull(fChart.getAxisSet().getYAxis(0).getTitle());
-        refreshDisplayTitle(yTitle, fYTitle, plotRect.height);
+        refreshDisplayTitle(yTitle, getYTitle(), plotRect.height);
     }
 
     /**
