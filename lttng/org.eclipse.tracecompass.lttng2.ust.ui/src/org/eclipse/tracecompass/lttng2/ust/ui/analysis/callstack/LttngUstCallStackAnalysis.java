@@ -39,6 +39,13 @@ import com.google.common.collect.ImmutableSet;
  */
 public class LttngUstCallStackAnalysis extends AbstractCallStackAnalysis {
 
+    /**
+     * ID
+     *
+     * @since 2.0
+     */
+    public static final String ID = "org.eclipse.linuxtools.lttng2.ust.analysis.callstack"; //$NON-NLS-1$
+
     private @Nullable Set<@NonNull TmfAbstractAnalysisRequirement> fAnalysisRequirements = null;
 
     /**
@@ -77,7 +84,5 @@ public class LttngUstCallStackAnalysis extends AbstractCallStackAnalysis {
         }
         return requirements;
     }
-
-
 
 }
