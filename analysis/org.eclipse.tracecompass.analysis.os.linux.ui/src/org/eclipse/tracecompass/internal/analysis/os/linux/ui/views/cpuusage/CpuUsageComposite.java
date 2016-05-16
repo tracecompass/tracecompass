@@ -35,6 +35,7 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -227,7 +228,7 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
         }
 
         boolean complete = false;
-        long currentEnd = start;
+        long currentEnd = Math.max(start, ss.getStartTime());
 
         while (!complete && currentEnd < end) {
             complete = ss.waitUntilBuilt(BUILD_UPDATE_TIMEOUT);
@@ -293,7 +294,7 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
                     try {
                         execNameQuark = kernelSs.getQuarkRelative(tidQuark, Attributes.EXEC_NAME);
                         execNameIntervals = StateSystemUtils.queryHistoryRange(kernelSs, execNameQuark, getStartTime(), getEndTime());
-                    } catch (AttributeNotFoundException e) {
+                    } catch (TimeRangeException | AttributeNotFoundException e) {
                         /*
                          * No information on this thread (yet?), skip it for now
                          */

@@ -107,7 +107,7 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
             setXAxis(xvalues);
 
             boolean complete = false;
-            long currentEnd = start;
+            long currentEnd = Math.max(ss.getStartTime(), start);
 
             while (!complete && currentEnd < end) {
 
@@ -115,7 +115,7 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
                     return;
                 }
 
-                long traceStart = getStartTime();
+                long traceStart = Math.max(getStartTime(), ss.getStartTime());
                 long traceEnd = getEndTime();
                 long offset = getTimeOffset();
                 long selectedThread = fSelectedThread;
