@@ -40,6 +40,7 @@ import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
+import org.eclipse.tracecompass.tmf.core.tests.analysis.AnalysisManagerTest;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -220,6 +221,45 @@ public class TmfExperimentTest {
         Iterable<TestExperimentAnalysis> testModules = TmfTraceUtils.getAnalysisModulesOfClass(experiment, TestExperimentAnalysis.class);
         assertTrue(modules.iterator().hasNext());
         assertTrue(testModules.iterator().hasNext());
+
+        /*
+         * Test that a module that applies to one of its trace is present in an
+         * experiment
+         */
+        ITmfTrace trace1 = TmfTestTrace.A_TEST_10K.getTrace();
+        ITmfTrace trace2 = TmfTestTrace.A_TEST_10K2.getTrace();
+        ITmfTrace trace3 = TmfTestTrace.A_TEST_10K2.getTraceAsStub2();
+
+        /*
+         * Create an experiment with TmfTraceStub, the module other should not
+         * be there
+         */
+        ITmfTrace[] tracesExp1 = { trace1, trace2 };
+        TmfExperiment exp1 = new TmfExperiment(tracesExp1[0].getEventType(), "Experiment 1", tracesExp1, TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, null);
+
+        /*
+         * Create an experiment containing some TmfTraceStub2, the module other
+         * should be present
+         */
+        ITmfTrace[] tracesExp2 = { trace1, trace3 };
+        TmfExperiment exp2 = new TmfExperiment(tracesExp2[0].getEventType(), "Experiment 1", tracesExp2, TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, null);
+
+        try {
+            /* Open the experiment, the modules should be populated */
+            exp1.traceOpened(new TmfTraceOpenedSignal(this, exp1, null));
+            assertNull(exp1.getAnalysisModule(AnalysisManagerTest.MODULE_SECOND));
+
+            /* Open the experiment, the modules should be populated */
+            exp2.traceOpened(new TmfTraceOpenedSignal(this, exp2, null));
+            assertNotNull(exp2.getAnalysisModule(AnalysisManagerTest.MODULE_SECOND));
+        } finally {
+            trace1.dispose();
+            trace2.dispose();
+            trace3.dispose();
+            exp1.dispose();
+            exp2.dispose();
+        }
+
     }
 
     // ------------------------------------------------------------------------

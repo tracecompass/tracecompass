@@ -132,7 +132,7 @@ public class AnalysisModuleHelperTest {
         assertFalse(fModuleOther.appliesToTraceType(TmfTraceStub.class));
         assertTrue(fModuleOther.appliesToTraceType(TmfTraceStub2.class));
         assertTrue(fModuleOther.appliesToTraceType(TmfTraceStub3.class));
-        assertFalse(fModuleOther.appliesToTraceType(TmfExperiment.class));
+        assertTrue(fModuleOther.appliesToTraceType(TmfExperiment.class));
     }
 
     /**
