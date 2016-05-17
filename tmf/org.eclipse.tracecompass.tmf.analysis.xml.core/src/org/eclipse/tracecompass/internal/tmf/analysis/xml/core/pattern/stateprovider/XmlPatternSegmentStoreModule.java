@@ -65,11 +65,16 @@ public class XmlPatternSegmentStoreModule extends AbstractSegmentStoreAnalysisMo
         if (trace == null) {
             /* This analysis was cancelled in the meantime */
             segmentStoreReady(false);
+            segments.close(true);
             return false;
         }
-        waitForSegmentStoreCompletion();
-        segments.addAll(getSegments());
-        return true;
+        if (waitForSegmentStoreCompletion()) {
+            segments.addAll(getSegments());
+            segments.close(false);
+            return true;
+        }
+        segments.close(true);
+        return false;
     }
 
     @Override

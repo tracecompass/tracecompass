@@ -105,6 +105,9 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
      * segments are found by parsing the events of a trace, the event request
      * would be done in this method.
      *
+     * Note: After this method, the segment store should be completed, so it
+     * should also close the segment store at the end of the analysis
+     *
      * @param segmentStore
      *            The segment store to fill
      * @param monitor

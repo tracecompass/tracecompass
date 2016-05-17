@@ -105,5 +105,29 @@ public abstract class AbstractSegmentStoreAnalysisEventBasedModule extends Abstr
         public ISegmentStore<ISegment> getSegmentStore() {
             return fSegmentStore;
         }
+
+        @Override
+        public void handleSuccess() {
+            super.handleSuccess();
+            closeSegmentStore(false);
+        }
+
+        @Override
+        public void handleFailure() {
+            super.handleFailure();
+            closeSegmentStore(true);
+        }
+
+        @Override
+        public void handleCancel() {
+            super.handleCancel();
+            closeSegmentStore(true);
+        }
+
+        private void closeSegmentStore(boolean deleteFiles) {
+            fSegmentStore.close(deleteFiles);
+        }
+
     }
+
 }

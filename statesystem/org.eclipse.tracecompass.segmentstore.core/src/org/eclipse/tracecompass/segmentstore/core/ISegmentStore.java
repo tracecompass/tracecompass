@@ -59,4 +59,17 @@ public interface ISegmentStore<E extends ISegment> extends Collection<E> {
      * with it.
      */
     void dispose();
+
+    /**
+     * Method to close off the segment store. This happens for example when we
+     * are done reading an off-line trace. Implementers can use this method to
+     * save the segment store on disk
+     *
+     * @param deleteFiles
+     *            Whether to delete any file that was created while building the
+     *            segment store
+     */
+    default void close(boolean deleteFiles) {
+
+    }
 }
