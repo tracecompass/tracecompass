@@ -18,6 +18,10 @@
     <properties>
         <productId>org.eclipse.tracecompass.rcp</productId>
         <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+        <archiveFileName>trace-compass-${unqualifiedVersion}-${build.timestamp}</archiveFileName>
+        <rootFolder>trace-compass</rootFolder>
+        <!-- for MacOSX, make sure you use a folder ending with .app , see bug 463670 -->
+        <rootFolderMac>${rootFolder}.app</rootFolderMac>
     </properties>
 
     <build>
@@ -51,12 +55,11 @@
                 <configuration>
                     <products>
                         <product>
-                            <archiveFileName>trace-compass-${unqualifiedVersion}-${build.timestamp}</archiveFileName>
+                            <archiveFileName>${archiveFileName}</archiveFileName>
                             <id>${productId}</id>
-                            <rootFolder>trace-compass</rootFolder>
+                            <rootFolder>${rootFolder}</rootFolder>
                             <rootFolders>
-                            <!-- for MacOSX, make sure you use a folder ending with .app , see bug 463670 -->
-                                <macosx>trace-compass.app</macosx>
+                                <macosx>${rootFolderMac}</macosx>
                             </rootFolders>
                         </product>
                     </products>
@@ -66,8 +69,73 @@
         </plugins>
     </build>
 
-  <!-- Deploy RCP builds and update site to the downloads area -->
   <profiles>
+    <profile>
+      <id>sign-update-site</id>
+      <build>
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-p2-director-plugin</artifactId>
+                <version>${tycho-version}</version>
+                <executions>
+                    <execution>
+                        <id>materialize-products</id>
+                        <goals>
+                            <goal>materialize-products</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>archive-products</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>archive-products</goal>
+                        </goals>
+                        <configuration>
+                            <formats>
+                                <linux>tar.gz</linux>
+                                <macosx>tar.gz</macosx>
+                                <solaris>zip</solaris>
+                                <win32>zip</win32>
+                            </formats>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <products>
+                        <product>
+                            <archiveFileName>${archiveFileName}</archiveFileName>
+                            <id>${productId}</id>
+                            <rootFolder>${rootFolder}</rootFolder>
+                            <rootFolders>
+                                <macosx>${rootFolderMac}</macosx>
+                            </rootFolders>
+                        </product>
+                    </products>
+                    <source>repository</source>
+                </configuration>
+            </plugin>
+          <plugin>
+            <groupId>org.eclipse.cbi.maven.plugins</groupId>
+            <artifactId>eclipse-macsigner-plugin</artifactId>
+            <version>${cbi-plugins.version}</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+                <configuration>
+                  <signFiles>
+                    <signFile>${project.build.directory}/products/${productId}/macosx/cocoa/x86_64/${rootFolderMac}</signFile>
+                  </signFiles>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  <!-- Deploy RCP builds and update site to the downloads area -->
     <profile>
       <id>deploy-rcp</id>
       <properties>
