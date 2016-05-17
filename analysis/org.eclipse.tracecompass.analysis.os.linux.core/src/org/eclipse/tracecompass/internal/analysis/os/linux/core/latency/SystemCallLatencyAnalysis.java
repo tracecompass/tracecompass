@@ -18,8 +18,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -135,11 +133,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
                 long startTime = event.getTimestamp().getValue();
                 String syscallName = eventName.substring(layout.eventSyscallEntryPrefix().length());
 
-                Map<String, String> args = event.getContent().getFieldNames().stream()
-                    .collect(Collectors.toMap(Function.identity(),
-                            input -> checkNotNull(event.getContent().getField(input).toString())));
-
-                SystemCall.InitialInfo newSysCall = new SystemCall.InitialInfo(startTime, checkNotNull(syscallName), checkNotNull(args));
+                SystemCall.InitialInfo newSysCall = new SystemCall.InitialInfo(startTime, syscallName.intern());
                 fOngoingSystemCalls.put(tid, newSysCall);
 
             } else if (eventName.startsWith(layout.eventSyscallExitPrefix())) {
@@ -165,8 +159,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
                 }
 
                 long endTime = event.getTimestamp().getValue();
-                int ret = ((Long) event.getContent().getField("ret").getValue()).intValue(); //$NON-NLS-1$
-                ISegment syscall = new SystemCall(info, endTime, ret);
+                ISegment syscall = new SystemCall(info, endTime);
                 getSegmentStore().add(syscall);
             }
         }

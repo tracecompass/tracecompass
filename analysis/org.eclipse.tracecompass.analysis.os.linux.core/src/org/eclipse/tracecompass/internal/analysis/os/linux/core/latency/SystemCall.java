@@ -10,12 +10,9 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.latency;
 
 import java.io.Serializable;
-import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * A linux kernel system call, represented as an {@link ISegment}.
@@ -36,45 +33,35 @@ public class SystemCall implements ISegment {
 
         private final long fStartTime;
         private final String fName;
-        private final Map<String, String> fArgs;
 
         /**
          * @param startTime
          *            Start time of the system call
          * @param name
          *            Name of the system call
-         * @param arguments
-         *            Arguments of the system call
          */
         public InitialInfo(
                 long startTime,
-                String name,
-                Map<String, String> arguments) {
+                String name) {
             fStartTime = startTime;
             fName = name;
-            fArgs = ImmutableMap.copyOf(arguments);
         }
     }
 
     private final InitialInfo fInfo;
     private final long fEndTime;
-    private final int fRet;
 
     /**
      * @param info
      *            Initial information of the system call
      * @param endTime
      *            End time of the system call
-     * @param ret
-     *            Return value of the system call
      */
     public SystemCall(
             InitialInfo info,
-            long endTime,
-            int ret) {
+            long endTime) {
         fInfo = info;
         fEndTime = endTime;
-        fRet = ret;
     }
 
     @Override
@@ -96,24 +83,6 @@ public class SystemCall implements ISegment {
         return fInfo.fName;
     }
 
-    /**
-     * Get the arguments of the system call
-     *
-     * @return Map of the arguments
-     */
-    public Map<String, String> getArguments() {
-        return fInfo.fArgs;
-    }
-
-    /**
-     * Get the return value of the system call
-     *
-     * @return Return value
-     */
-    public int getReturnValue() {
-        return fRet;
-    }
-
     @Override
     public int compareTo(@NonNull ISegment o) {
         int ret = ISegment.super.compareTo(o);
@@ -128,8 +97,6 @@ public class SystemCall implements ISegment {
         return "Start Time = " + getStart() + //$NON-NLS-1$
                 "; End Time = " + getEnd() + //$NON-NLS-1$
                 "; Duration = " + getLength() + //$NON-NLS-1$
-                "; Name = " + getName() + //$NON-NLS-1$
-                "; Args = " + getArguments().toString() + //$NON-NLS-1$
-                "; Return = " + getReturnValue(); //$NON-NLS-1$
+                "; Name = " + getName(); //$NON-NLS-1$
     }
 }
