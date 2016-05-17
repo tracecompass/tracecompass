@@ -693,16 +693,21 @@ public class CallStackView extends AbstractTimeGraphView {
                 refresh();
             }
 
-            for (ITimeGraphEntry processEntry : traceEntry.getChildren()) {
-                for (ITimeGraphEntry threadEntry : processEntry.getChildren()) {
-                    for (ITimeGraphEntry callStackEntry : threadEntry.getChildren()) {
-                        if (monitor.isCanceled()) {
-                            return;
-                        }
-                        buildStatusEvents(parentTrace, (CallStackEntry) callStackEntry, monitor, ss.getStartTime(), end);
+            Consumer<TimeGraphEntry> consumer = new Consumer<TimeGraphEntry>() {
+                @Override
+                public void accept(TimeGraphEntry entry) {
+                    if (monitor.isCanceled()) {
+                        return;
                     }
+                    if (entry instanceof CallStackEntry) {
+                        buildStatusEvents(parentTrace, (CallStackEntry) entry, monitor, ss.getStartTime(), end);
+                        return;
+                    }
+                    entry.getChildren().forEach(this);
                 }
-            }
+            };
+            traceEntry.getChildren().forEach(consumer);
+
             start = end;
         }
     }
