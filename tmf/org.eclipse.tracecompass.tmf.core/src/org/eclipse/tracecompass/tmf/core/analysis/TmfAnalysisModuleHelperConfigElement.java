@@ -107,8 +107,7 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
         return ContributorFactoryOSGi.resolve(fCe.getContributor());
     }
 
-    @Override
-    public boolean appliesToTraceType(Class<? extends ITmfTrace> traceclass) {
+    private boolean appliesToTraceClass(Class<? extends ITmfTrace> traceclass) {
         boolean applies = false;
 
         /* Get the module's applying tracetypes */
@@ -136,6 +135,17 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
             } catch (ClassNotFoundException | InvalidRegistryObjectException e) {
                 Activator.logError("Error in applies to trace", e); //$NON-NLS-1$
             }
+        }
+        return applies;
+    }
+
+    @Override
+    public boolean appliesToTraceType(Class<? extends ITmfTrace> traceclass) {
+        boolean applies = appliesToTraceClass(traceclass);
+
+        /* Check if it applies to an experiment */
+        if (!applies && TmfExperiment.class.isAssignableFrom(traceclass)) {
+            applies = appliesToExperiment();
         }
         return applies;
     }
@@ -183,14 +193,14 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
     public IAnalysisModule newModule(ITmfTrace trace) throws TmfAnalysisException {
 
         /* Check if it applies to trace itself */
-        boolean applies = appliesToTraceType(trace.getClass());
+        boolean applies = appliesToTraceClass(trace.getClass());
         /*
          * If the trace is an experiment, check if this module would apply to an
          * experiment should it apply to one of its traces.
          */
         if (!applies && (trace instanceof TmfExperiment) && appliesToExperiment()) {
             for (ITmfTrace expTrace : TmfTraceManager.getTraceSet(trace)) {
-                if (appliesToTraceType(expTrace.getClass())) {
+                if (appliesToTraceClass(expTrace.getClass())) {
                     applies = true;
                     break;
                 }
