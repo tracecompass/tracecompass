@@ -16,6 +16,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.segmentstore.core
 Export-Package: org.eclipse.tracecompass.analysis.timing.core.segmentstore,
  org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics,
- org.eclipse.tracecompass.internal.analysis.timing.core
+ org.eclipse.tracecompass.internal.analysis.timing.core,
+ org.eclipse.tracecompass.internal.analysis.timing.core.store;x-friends:="org.eclipse.tracecompass.analysis.timing.core.tests"
 Import-Package: com.google.common.collect,
  com.google.common.hash
