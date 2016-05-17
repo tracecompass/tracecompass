@@ -17,7 +17,6 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -35,10 +34,9 @@ import org.eclipse.swtbot.swt.finder.results.BoolResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
-import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCall;
-import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCall.InitialInfo;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyView;
+import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
@@ -160,9 +158,9 @@ public class SystemCallLatencyTableAnalysisTest {
      */
     @Test
     public void climbTest() {
-        List<@NonNull SystemCall> fixture = new ArrayList<>();
+        List<@NonNull BasicSegment> fixture = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
-            fixture.add(new SystemCall(new InitialInfo(i, "", Collections.EMPTY_MAP), 2 * i, 0));
+            fixture.add(new BasicSegment(i, 2 * i));
         }
 
         assertNotNull(fTable);
@@ -181,9 +179,9 @@ public class SystemCallLatencyTableAnalysisTest {
      */
     @Test
     public void decrementingTest() {
-        List<@NonNull SystemCall> fixture = new ArrayList<>();
+        List<@NonNull BasicSegment> fixture = new ArrayList<>();
         for (int i = 100; i >= 0; i--) {
-            fixture.add(new SystemCall(new InitialInfo(i, "", Collections.EMPTY_MAP), 2 * i, 0));
+            fixture.add(new BasicSegment(i, 2 * i));
         }
         assertNotNull(fTable);
         fTable.updateModel(fixture);
@@ -201,9 +199,9 @@ public class SystemCallLatencyTableAnalysisTest {
      */
     @Test
     public void smallTest() {
-        List<@NonNull SystemCall> fixture = new ArrayList<>();
+        List<@NonNull BasicSegment> fixture = new ArrayList<>();
         for (int i = 1; i >= 0; i--) {
-            fixture.add(new SystemCall(new InitialInfo(i, "", Collections.EMPTY_MAP), 2 * i, 0));
+            fixture.add(new BasicSegment(i, 2 * i));
         }
         assertNotNull(fTable);
         fTable.updateModel(fixture);
@@ -222,9 +220,9 @@ public class SystemCallLatencyTableAnalysisTest {
     @Test
     public void largeTest() {
         final int size = 1000000;
-        SystemCall[] fixture = new SystemCall[size];
+        BasicSegment[] fixture = new BasicSegment[size];
         for (int i = 0; i < size; i++) {
-            fixture[i] = (new SystemCall(new InitialInfo(i, "", Collections.EMPTY_MAP), 2 * i, 0));
+            fixture[i] = (new BasicSegment(i, 2 * i));
         }
         assertNotNull(fTable);
         fTable.updateModel(fixture);
@@ -245,11 +243,11 @@ public class SystemCallLatencyTableAnalysisTest {
         Random rnd = new Random();
         rnd.setSeed(1234);
         final int size = 1000000;
-        SystemCall[] fixture = new SystemCall[size];
+        BasicSegment[] fixture = new BasicSegment[size];
         for (int i = 0; i < size; i++) {
             int start = Math.abs(rnd.nextInt(100000000));
             int end = start + Math.abs(rnd.nextInt(1000000));
-            fixture[i] = (new SystemCall(new InitialInfo(start, "", Collections.EMPTY_MAP), end, 0));
+            fixture[i] = (new BasicSegment(start, end));
         }
         assertNotNull(fTable);
         fTable.updateModel(fixture);
@@ -269,12 +267,12 @@ public class SystemCallLatencyTableAnalysisTest {
     public void gaussianNoiseTest() {
         Random rnd = new Random();
         rnd.setSeed(1234);
-        List<@NonNull SystemCall> fixture = new ArrayList<>();
+        List<@NonNull BasicSegment> fixture = new ArrayList<>();
         for (int i = 1; i <= 1000000; i++) {
             int start = Math.abs(rnd.nextInt(100000000));
             final int delta = Math.abs(rnd.nextInt(1000));
             int end = start + delta * delta;
-            fixture.add(new SystemCall(new InitialInfo(start, "", Collections.EMPTY_MAP), end, 0));
+            fixture.add(new BasicSegment(start, end));
         }
         assertNotNull(fTable);
         fTable.updateModel(fixture);

@@ -8,4 +8,4 @@
  *******************************************************************************/
 
 @org.eclipse.jdt.annotation.NonNullByDefault
-package org.eclipse.tracecompass.analysis.os.linux.core.latency;
+package org.eclipse.tracecompass.internal.analysis.os.linux.core.latency;

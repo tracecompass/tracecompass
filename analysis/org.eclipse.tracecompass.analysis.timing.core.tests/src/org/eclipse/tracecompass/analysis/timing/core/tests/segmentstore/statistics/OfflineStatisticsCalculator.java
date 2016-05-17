@@ -12,7 +12,7 @@ package org.eclipse.tracecompass.analysis.timing.core.tests.segmentstore.statist
 import java.util.Collection;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCall;
+import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 
 /**
@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
  *
  */
 public class OfflineStatisticsCalculator {
-    private final Collection<@NonNull SystemCall> fSs;
+    private final Collection<@NonNull BasicSegment> fSs;
 
     /**
      * Constructor
@@ -31,7 +31,7 @@ public class OfflineStatisticsCalculator {
      * @param ss
      *            segment store, fully build
      */
-    public OfflineStatisticsCalculator(Collection<@NonNull SystemCall> ss) {
+    public OfflineStatisticsCalculator(Collection<@NonNull BasicSegment> ss) {
         fSs = ss;
     }
 
