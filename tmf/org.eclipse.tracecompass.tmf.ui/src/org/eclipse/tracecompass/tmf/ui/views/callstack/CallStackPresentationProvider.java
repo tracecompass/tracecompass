@@ -59,7 +59,7 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
     /**
      * Constructor
      *
-     * @since 2.0
+     * @since 1.2
      */
     public CallStackPresentationProvider() {
     }
@@ -69,7 +69,7 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
      *
      * @param view
      *            The call stack view that will contain the time events
-     * @since 2.0
+     * @since 1.2
      */
     public void setCallStackView(CallStackView view) {
         fView = view;

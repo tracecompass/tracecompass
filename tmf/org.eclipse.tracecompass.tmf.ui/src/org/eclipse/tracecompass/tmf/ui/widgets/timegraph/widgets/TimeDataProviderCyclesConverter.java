@@ -68,7 +68,7 @@ public class TimeDataProviderCyclesConverter implements ITimeDataProviderConvert
     }
 
     /**
-     * @since 2.0
+     * @since 1.2
      */
     @Override
     public void setSelectionRangeNotify(long beginTime, long endTime, boolean ensureVisible) {
@@ -76,7 +76,7 @@ public class TimeDataProviderCyclesConverter implements ITimeDataProviderConvert
     }
 
     /**
-     * @since 2.0
+     * @since 1.2
      */
     @Override
     public void setSelectionRange(long beginTime, long endTime, boolean ensureVisible) {

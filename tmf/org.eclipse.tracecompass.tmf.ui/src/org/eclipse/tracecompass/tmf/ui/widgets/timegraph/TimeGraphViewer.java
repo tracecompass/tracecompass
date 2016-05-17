@@ -320,7 +320,7 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
      * Sets the tree columns for this time graph combo's filter dialog.
      *
      * @param columnNames the tree column names
-     * @since 2.0
+     * @since 1.2
      */
     public void setFilterColumns(String[] columnNames) {
         getShowFilterDialogAction().getFilterDialog().setColumnNames(columnNames);
@@ -330,7 +330,7 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
      * Sets the tree content provider used by the filter dialog
      *
      * @param contentProvider the tree content provider
-     * @since 2.0
+     * @since 1.2
      */
     public void setFilterContentProvider(ITreeContentProvider contentProvider) {
         getShowFilterDialogAction().getFilterDialog().setContentProvider(contentProvider);
@@ -340,7 +340,7 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
      * Sets the tree label provider used by the filter dialog
      *
      * @param labelProvider the tree label provider
-     * @since 2.0
+     * @since 1.2
      */
     public void setFilterLabelProvider(ITableLabelProvider labelProvider) {
         getShowFilterDialogAction().getFilterDialog().setLabelProvider(labelProvider);
@@ -998,7 +998,7 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
     }
 
     /**
-     * @since 2.0
+     * @since 1.2
      */
     @Override
     public void setSelectionRangeNotify(long beginTime, long endTime, boolean ensureVisible) {
@@ -1006,7 +1006,7 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
     }
 
     /**
-     * @since 2.0
+     * @since 1.2
      */
     @Override
     public void setSelectionRange(long beginTime, long endTime, boolean ensureVisible) {
@@ -2138,7 +2138,7 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
      * Get the show filter dialog action.
      *
      * @return The Action object
-     * @since 2.0
+     * @since 1.2
      */
     public ShowFilterDialogAction getShowFilterDialogAction() {
         if (fShowFilterDialogAction == null) {
@@ -2543,7 +2543,7 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
      * Returns this viewer's filters.
      *
      * @return an array of viewer filters
-     * @since 2.0
+     * @since 1.2
      */
     public @NonNull ViewerFilter[] getFilters() {
         return fTimeGraphCtrl.getFilters();
@@ -2555,7 +2555,7 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
      *
      * @param filters
      *            an array of viewer filters, or null
-     * @since 2.0
+     * @since 1.2
      */
     public void setFilters(@NonNull ViewerFilter[] filters) {
         fTimeGraphCtrl.setFilters(filters);

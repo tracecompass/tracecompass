@@ -31,7 +31,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
  * unselected elements in the time graph viewer. The filter is removed if all
  * elements are selected.
  *
- * @since 2.0
+ * @since 1.2
  */
 public class ShowFilterDialogAction extends Action {
 

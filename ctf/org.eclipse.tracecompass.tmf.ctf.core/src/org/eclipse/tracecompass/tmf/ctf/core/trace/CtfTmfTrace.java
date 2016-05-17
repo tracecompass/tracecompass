@@ -91,7 +91,7 @@ public class CtfTmfTrace extends TmfTrace
 
     /**
      * Clock offset property
-     * @since 2.0
+     * @since 1.2
      */
     public static final String CLOCK_OFFSET = "clock_offset"; //$NON-NLS-1$
 

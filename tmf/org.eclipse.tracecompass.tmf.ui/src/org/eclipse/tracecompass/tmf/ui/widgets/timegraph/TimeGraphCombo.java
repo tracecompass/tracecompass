@@ -851,7 +851,7 @@ public class TimeGraphCombo extends Composite {
      * Get the show filter dialog action.
      *
      * @return The Action object
-     * @since 2.0
+     * @since 1.2
      */
     public ShowFilterDialogAction getShowFilterDialogAction() {
         if (fShowFilterDialogAction == null) {
@@ -1091,7 +1091,7 @@ public class TimeGraphCombo extends Composite {
      * Returns this viewer's filters.
      *
      * @return an array of viewer filters
-     * @since 2.0
+     * @since 1.2
      */
     public @NonNull ViewerFilter[] getFilters() {
         return fTimeGraphViewer.getFilters();
@@ -1103,7 +1103,7 @@ public class TimeGraphCombo extends Composite {
      *
      * @param filters
      *            an array of viewer filters, or null
-     * @since 2.0
+     * @since 1.2
      */
     public void setFilters(@NonNull ViewerFilter[] filters) {
         fInhibitTreeSelection = true;

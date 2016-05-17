@@ -1011,7 +1011,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *
      * @param contentProvider
      *            The filter content provider
-     * @since 2.0
+     * @since 1.2
      */
     protected void setFilterContentProvider(final ITreeContentProvider contentProvider) {
         checkPartNotCreated();

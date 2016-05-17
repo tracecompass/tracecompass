@@ -729,7 +729,7 @@ public class CallStackView extends AbstractTimeGraphView {
     }
 
     /**
-     * @since 2.0
+     * @since 1.2
      */
     @Override
     protected final List<ITimeEvent> getEventList(TimeGraphEntry tgentry, long startTime, long endTime, long resolution, IProgressMonitor monitor) {
@@ -790,7 +790,7 @@ public class CallStackView extends AbstractTimeGraphView {
     }
 
     /**
-     * @since 2.0
+     * @since 1.2
      */
     @Override
     protected void synchingToTime(final long time) {
@@ -920,7 +920,7 @@ public class CallStackView extends AbstractTimeGraphView {
     }
 
     /**
-     * @since 2.0
+     * @since 1.2
      */
     @Override
     protected void fillLocalToolBar(IToolBarManager manager) {

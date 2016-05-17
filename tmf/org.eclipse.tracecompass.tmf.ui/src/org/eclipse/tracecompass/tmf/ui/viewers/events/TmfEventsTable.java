@@ -2733,7 +2733,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * @param site
      *            the site that the context menus will be registered for
      *
-     * @since 2.0
+     * @since 1.2
      */
     public void registerContextMenus(IWorkbenchPartSite site) {
         if (site instanceof IEditorSite) {
