@@ -62,7 +62,7 @@ public class ArrayListStore<@NonNull E extends ISegment> implements ISegmentStor
 
     private final ReadWriteLock fLock = new ReentrantReadWriteLock(false);
 
-    private final List<E> fStore = new ArrayList<>();
+    private final List<E> fStore;
 
     private @Nullable transient Iterable<E> fLastSnapshot = null;
 
@@ -70,18 +70,25 @@ public class ArrayListStore<@NonNull E extends ISegment> implements ISegmentStor
      * Constructor
      */
     public ArrayListStore() {
-        /*
-         * For the start times index, the "key comparator" will compare the
-         * start times as longs directly. This is the primary comparator for its
-         * tree map.
-         *
-         * The secondary "value" comparator will check the end times first.
-         *
-         * The same is done for the end times index, but swapping the first two
-         * comparators instead.
-         */
+        fStore = new ArrayList<>();
     }
 
+    /**
+     * Constructor
+     *
+     * @param array
+     *            an array of elements to wrap in the segment store
+     *
+     */
+    public ArrayListStore(Object[] array) {
+        fStore = new ArrayList<>();
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] instanceof ISegment) {
+                fStore.add((E) array[i]);
+            }
+        }
+        fStore.sort(COMPARATOR);
+    }
     // ------------------------------------------------------------------------
     // Methods from Collection
     // ------------------------------------------------------------------------
