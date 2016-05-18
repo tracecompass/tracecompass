@@ -23,6 +23,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.timing.core.store.ArrayListStore;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -146,13 +147,7 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
                 /* Attempt to read the existing file */
                 try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(file))) {
                     Object[] segmentArray = readObject(ois);
-                    final ISegmentStore<ISegment> store = new ArrayListStore<>();
-                    for (Object element : segmentArray) {
-                        if (element instanceof ISegment) {
-                            ISegment segment = (ISegment) element;
-                            store.add(segment);
-                        }
-                    }
+                    ISegmentStore<ISegment> store = new ArrayListStore<>(NonNullUtils.checkNotNullContents(segmentArray));
                     fSegmentStore = store;
                     sendUpdate(store);
                     return true;
