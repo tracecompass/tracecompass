@@ -32,7 +32,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readonly.TmfXmlReadOnlyModelFactory;
@@ -52,7 +51,6 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
@@ -520,46 +518,4 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         return Collections.EMPTY_LIST;
     }
 
-    /**
-     * This method will pre-filter the traces that contain analysis modules
-     * supported by this view, whether they are from a trace or an experiment.
-     */
-    @Override
-    protected Iterable<ITmfTrace> getTracesToBuild(ITmfTrace trace) {
-        /*
-         * Get the view element from the XML file. If the element can't be
-         * found, return.
-         */
-        Element viewElement = fViewInfo.getViewElement(TmfXmlUiStrings.TIME_GRAPH_VIEW);
-        if (viewElement == null) {
-            return super.getTracesToBuild(trace);
-        }
-
-        Set<String> analysisIds = fViewInfo.getViewAnalysisIds(viewElement);
-        Set<ITmfTrace> traces = new HashSet<>();
-
-        for (ITmfTrace aTrace : TmfTraceManager.getTraceSetWithExperiment(trace)) {
-            if (aTrace == null) {
-                continue;
-            }
-            if ((analysisIds.isEmpty() && TmfTraceUtils.getAnalysisModulesOfClass(aTrace, ITmfAnalysisModuleWithStateSystems.class).iterator().hasNext())) {
-                /*
-                 * No analysis ID specified, so this trace will be built only if
-                 * it has state system modules
-                 */
-                traces.add(aTrace);
-            } else {
-                /* Build this trace only if it has one the requested modules */
-                for (String moduleId : analysisIds) {
-                    if (TmfTraceUtils.getAnalysisModuleOfClass(aTrace, ITmfAnalysisModuleWithStateSystems.class, NonNullUtils.checkNotNull(moduleId)) != null) {
-                        traces.add(aTrace);
-                    }
-                }
-            }
-        }
-        if (traces.isEmpty()) {
-            return super.getTracesToBuild(trace);
-        }
-        return traces;
-    }
 }
