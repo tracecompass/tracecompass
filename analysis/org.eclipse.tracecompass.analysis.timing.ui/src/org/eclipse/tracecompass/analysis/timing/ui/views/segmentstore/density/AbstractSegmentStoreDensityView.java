@@ -19,6 +19,7 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
@@ -85,8 +86,14 @@ public abstract class AbstractSegmentStoreDensityView extends TmfView {
         IToolBarManager toolBar = getViewSite().getActionBars().getToolBarManager();
         toolBar.add(zoomOut);
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
-        if (trace != null && fDensityViewer != null) {
-            fDensityViewer.loadTrace(trace);
+        if (trace != null) {
+            TmfTraceSelectedSignal signal = new TmfTraceSelectedSignal(this, trace);
+            if (fDensityViewer != null) {
+                fDensityViewer.traceSelected(signal);
+            }
+            if (fTableViewer != null) {
+                fTableViewer.traceSelected(signal);
+            }
         }
     }
 
