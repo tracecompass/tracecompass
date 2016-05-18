@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 EfficiOS Inc., Alexandre Montplaisir
+ * Copyright (c) 2015, 2016 EfficiOS Inc., Alexandre Montplaisir and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,7 +9,9 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.latency;
 
-import java.io.Serializable;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
@@ -20,19 +22,17 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-public class SystemCall implements ISegment {
+public final class SystemCall implements ISegment {
 
     private static final long serialVersionUID = 1554494342105208730L;
 
     /**
      * The subset of information that is available from the syscall entry event.
      */
-    public static class InitialInfo implements Serializable {
+    public static class InitialInfo {
 
-        private static final long serialVersionUID = -5009710718804983721L;
-
-        private final long fStartTime;
-        private final String fName;
+        private long fStartTime;
+        private String fName;
 
         /**
          * @param startTime
@@ -44,12 +44,13 @@ public class SystemCall implements ISegment {
                 long startTime,
                 String name) {
             fStartTime = startTime;
-            fName = name;
+            fName = name.intern();
         }
     }
 
-    private final InitialInfo fInfo;
-    private final long fEndTime;
+    private long fStartTime;
+    private long fEndTime;
+    private String fName;
 
     /**
      * @param info
@@ -60,13 +61,26 @@ public class SystemCall implements ISegment {
     public SystemCall(
             InitialInfo info,
             long endTime) {
-        fInfo = info;
+        fStartTime = info.fStartTime;
+        fName = info.fName;
         fEndTime = endTime;
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeLong(fStartTime);
+        out.writeLong(fEndTime);
+        out.writeUTF(fName);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException {
+        fStartTime = in.readLong();
+        fEndTime = in.readLong();
+        fName = in.readUTF().intern();
     }
 
     @Override
     public long getStart() {
-        return fInfo.fStartTime;
+        return fStartTime;
     }
 
     @Override
@@ -80,7 +94,7 @@ public class SystemCall implements ISegment {
      * @return Name
      */
     public String getName() {
-        return fInfo.fName;
+        return fName;
     }
 
     @Override
