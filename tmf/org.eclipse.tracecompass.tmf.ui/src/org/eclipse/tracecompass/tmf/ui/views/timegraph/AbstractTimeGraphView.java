@@ -1374,6 +1374,14 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     @Override
     public void dispose() {
         super.dispose();
+        synchronized (fBuildThreadMap) {
+            fBuildThreadMap.values().forEach(buildThread -> {
+                buildThread.cancel();
+            });
+        }
+        if (fZoomThread != null) {
+            fZoomThread.cancel();
+        }
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
         getSite().getPage().removePartListener(fPartListener);
     }
