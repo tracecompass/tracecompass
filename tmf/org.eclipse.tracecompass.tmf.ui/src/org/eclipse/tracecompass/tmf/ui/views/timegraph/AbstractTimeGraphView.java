@@ -1477,8 +1477,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         if (signal.getTrace() == fTrace) {
             fTrace = null;
             fEditorFile = null;
-            fStartTime = SWT.DEFAULT;
-            fEndTime = SWT.DEFAULT;
+            setStartTime(SWT.DEFAULT);
+            setEndTime(SWT.DEFAULT);
             refresh();
         }
     }
@@ -1573,8 +1573,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             if (fEntryList == null) {
                 rebuild();
             } else {
-                fStartTime = fTrace.getStartTime().toNanos();
-                fEndTime = fTrace.getEndTime().toNanos();
+                setStartTime(fTrace.getStartTime().toNanos());
+                setEndTime(fTrace.getEndTime().toNanos());
                 refresh();
             }
         }

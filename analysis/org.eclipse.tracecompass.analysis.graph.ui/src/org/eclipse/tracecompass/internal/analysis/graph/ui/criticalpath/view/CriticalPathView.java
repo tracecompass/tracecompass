@@ -30,6 +30,7 @@ import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge.EdgeType;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
+import org.eclipse.tracecompass.analysis.graph.core.building.TmfGraphBuilderModule;
 import org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathModule;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.graph.core.base.TmfGraphStatistics;
@@ -146,12 +147,6 @@ public class CriticalPathView extends AbstractTimeGraphView {
             }
 
             @Override
-            public void visit(TmfVertex node) {
-                setStartTime(Math.min(getStartTime(), node.getTs()));
-                setEndTime(Math.max(getEndTime(), node.getTs()));
-            }
-
-            @Override
             public void visit(TmfEdge link, boolean horizontal) {
                 if (horizontal) {
                     Object parent = fGraph.getParentOf(link.getVertexFrom());
@@ -219,6 +214,9 @@ public class CriticalPathView extends AbstractTimeGraphView {
                     }
                     module.schedule();
                     if (module.waitForCompletion(fMonitor)) {
+                        // Module is completed, set the start and end time of
+                        // this view
+                        setStartEndTime(module);
                         refresh();
                     }
 
@@ -260,9 +258,17 @@ public class CriticalPathView extends AbstractTimeGraphView {
         private ITimeGraphEntry[] getWorkerEntries(IGraphWorker worker) {
             fCurrentObject = worker;
             List<TimeGraphEntry> entries = workerEntries.get(worker);
+            ITmfTrace trace = getTrace();
             if (entries == null) {
                 buildEntryList(worker);
                 entries = workerEntries.get(worker);
+            } else if (trace != null) {
+                // Get the statistics object for this worker
+                TmfGraphStatistics stats = fObjectStatistics.get(trace, worker);
+                if (stats == null) {
+                    stats = new TmfGraphStatistics();
+                }
+                fStats = stats;
             }
 
             return (entries == null) ?
@@ -279,8 +285,6 @@ public class CriticalPathView extends AbstractTimeGraphView {
             if (graph == null) {
                 return;
             }
-            setStartTime(Long.MAX_VALUE);
-            setEndTime(Long.MIN_VALUE);
 
             final HashMap<Object, CriticalPathEntry> rootList = new HashMap<>();
             fLinks.remove(trace, worker);
@@ -587,17 +591,43 @@ public class CriticalPathView extends AbstractTimeGraphView {
             throw new IllegalStateException("Trace is null"); //$NON-NLS-1$
         }
         IGraphWorker worker = (IGraphWorker) obj;
-        TmfGraphStatistics stats = fObjectStatistics.get(trace, worker);
-        if (stats == null) {
-            stats = new TmfGraphStatistics();
-            fObjectStatistics.put(trace, worker, stats);
-        }
-        fStats = stats;
 
         TimeGraphEntry tge = new CriticalPathBaseEntry(worker);
         List<TimeGraphEntry> list = Collections.singletonList(tge);
         putEntryList(trace, list);
         refresh();
+    }
+
+    private void setStartEndTime(CriticalPathModule module) {
+        // Initialize the start/end time of the view to trace's times
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            throw new IllegalStateException("The trace should not be null when we have a critical path to display"); //$NON-NLS-1$
+        }
+        long start = trace.getStartTime().toNanos();
+        long end = trace.getEndTime().toNanos();
+
+        // Set the start/end time of the view
+        Object paramGraph = module.getParameter(CriticalPathModule.PARAM_GRAPH);
+        if (paramGraph instanceof TmfGraphBuilderModule) {
+            TmfGraphBuilderModule graphModule = (TmfGraphBuilderModule) paramGraph;
+            TmfGraph graph = graphModule.getGraph();
+            if (graph == null) {
+                return;
+            }
+            TmfVertex head = graph.getHead();
+            if (head != null) {
+                start = Math.min(start, head.getTs());
+                for (IGraphWorker w : graph.getWorkers()) {
+                    TmfVertex tail = graph.getTail(w);
+                    if (tail != null) {
+                        end = Math.max(end, tail.getTs());
+                    }
+                }
+            }
+        }
+        setStartTime(start);
+        setEndTime(end);
     }
 
 }
