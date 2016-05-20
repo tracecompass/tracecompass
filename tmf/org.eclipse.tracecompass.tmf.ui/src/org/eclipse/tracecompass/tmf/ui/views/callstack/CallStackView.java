@@ -526,6 +526,20 @@ public class CallStackView extends AbstractTimeGraphView {
         if (monitor.isCanceled()) {
             return;
         }
+
+        /*
+         * Load the symbol provider for the current trace, even if it does not
+         * provide a call stack analysis module. See
+         * https://bugs.eclipse.org/bugs/show_bug.cgi?id=494212
+         */
+        ISymbolProvider provider = fSymbolProviders.get(trace);
+        if (provider == null) {
+            provider = SymbolProviderManager.getInstance().getSymbolProvider(trace);
+            provider.loadConfiguration(null);
+            fSymbolProviders.put(trace, provider);
+        }
+
+        /* Continue with the call stack view specific operations */
         AbstractCallStackAnalysis module = getCallStackModule(trace);
         if (module == null) {
             addUnavailableEntry(trace, parentTrace);
@@ -556,16 +570,6 @@ public class CallStackView extends AbstractTimeGraphView {
             if (start == end && !complete) { // when complete execute one last time regardless of end time
                 continue;
             }
-
-            ISymbolProvider provider = fSymbolProviders.get(trace);
-            if (provider == null) {
-                provider = SymbolProviderManager.getInstance().getSymbolProvider(trace);
-                provider.loadConfiguration(monitor);
-                fSymbolProviders.put(trace, provider);
-            }
-
-            getConfigureSymbolsAction().setEnabled(true);
-
 
             TraceEntry traceEntry = traceEntryMap.get(trace);
             if (traceEntry == null) {
@@ -1223,6 +1227,12 @@ public class CallStackView extends AbstractTimeGraphView {
 
         fConfigureSymbolsAction.setToolTipText(Messages.CallStackView_ConfigureSymbolProvidersTooltip);
         fConfigureSymbolsAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(IMPORT_BINARY_ICON_PATH));
+
+        /*
+         * The updateConfigureSymbolsAction() method (called by refresh()) will
+         * set the action to true if applicable after the symbol provider has
+         * been properly loaded.
+         */
         fConfigureSymbolsAction.setEnabled(false);
 
         return fConfigureSymbolsAction;
