@@ -17,6 +17,7 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisParamProvider;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -85,6 +86,16 @@ public class CriticalPathParameterProvider extends TmfAbstractAnalysisParamProvi
         if (threadSignal != null) {
             setCurrentHostThread(new HostThread(threadSignal.getTraceHost(), threadSignal.getThreadId()));
         }
+    }
+
+    /**
+     * Reset the selection when a new trace is selected
+     *
+     * @param signal The trace selected signal
+     */
+    @TmfSignalHandler
+    public void traceSelected(TmfTraceSelectedSignal signal) {
+        fCurrentHostThread = null;
     }
 
 }
