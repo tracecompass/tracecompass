@@ -24,9 +24,7 @@ import org.eclipse.tracecompass.internal.analysis.graph.core.criticalpath.Messag
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 /**
@@ -95,19 +93,10 @@ public class CriticalPathModule extends TmfAbstractAnalysisModule {
             fCriticalPath = new TmfGraph();
             return true;
         }
-        TmfTimeRange tr = TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange();
-        TmfVertex start = graph.getVertexAt(tr.getStartTime(), worker);
-        if (start == null) {
-            /*
-             * Nothing happens with this worker after start, return an empty
-             * graph
-             */
-            fCriticalPath = new TmfGraph();
-            return true;
-        }
+
         ICriticalPathAlgorithm cp = getAlgorithm(graph);
         try {
-            fCriticalPath = cp.compute(start, null);
+            fCriticalPath = cp.compute(head, null);
             return true;
         } catch (CriticalPathAlgorithmException e) {
             Activator.getInstance().logError(NonNullUtils.nullToEmptyString(e.getMessage()), e);
