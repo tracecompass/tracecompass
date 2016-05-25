@@ -44,7 +44,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
  *
  * @author Vincent Perot
  */
-public class PcapEventFactory {
+public final class PcapEventFactory {
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
