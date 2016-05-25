@@ -248,6 +248,7 @@ public class ManageXMLAnalysisDialog extends Dialog {
             File file = new File(path);
             IStatus status = XmlUtils.xmlValidate(file);
             if (status.isOK()) {
+                deleteSupplementaryFile(file.getName());
                 status = XmlUtils.addXmlFile(file);
                 if (status.isOK()) {
                     fillAnalysesList();
