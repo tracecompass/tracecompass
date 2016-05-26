@@ -84,6 +84,10 @@ public class Messages extends NLS {
      */
     public static String ImportTraceWizard_TraceValidationFailed;
     /**
+     * The title of message dialog (import trace wizard).
+     */
+    public static String ImportTraceWizard_MessageTitle;
+    /**
      * The error message when a trace already exists in project (import trace wizard).
      */
     public static String ImportTraceWizard_TraceAlreadyExists;

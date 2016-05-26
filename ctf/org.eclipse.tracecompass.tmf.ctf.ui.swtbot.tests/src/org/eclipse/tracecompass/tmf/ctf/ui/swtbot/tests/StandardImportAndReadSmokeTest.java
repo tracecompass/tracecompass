@@ -57,6 +57,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportConfirmation;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportTraceWizard;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportTraceWizardPage;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.Messages;
@@ -156,7 +157,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
      */
     @Test
     public void testImportWithExperimentValidation() throws Exception {
-        testImport(ImportTraceWizardPage.OPTION_CREATE_EXPERIMENT, false, false, false);
+        testImport(ImportTraceWizardPage.OPTION_CREATE_EXPERIMENT, false, false, false, true, ImportConfirmation.CONTINUE);
     }
 
     /**
@@ -190,8 +191,32 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
      */
     @Test
     public void testImportFromDirectoryOverwrite() throws Exception {
-        testImport(0, false, false);
+        testImport(0, false, false, true, false, ImportConfirmation.CONTINUE);
         testImport(ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES, false, false);
+    }
+
+    /**
+     * Test import from directory, overwrite all
+     *
+     * @throws Exception
+     *             on error
+     */
+    @Test
+    public void testImportFromDirectoryOverwriteRenameAll() throws Exception {
+        testImport(0, false, false, true, false, ImportConfirmation.CONTINUE);
+        testImport(0, false, false, true, true, ImportConfirmation.RENAME_ALL);
+    }
+
+    /**
+     * Test import from directory, overwrite all
+     *
+     * @throws Exception
+     *             on error
+     */
+    @Test
+    public void testImportFromDirectoryOverwriteOverwriteAll() throws Exception {
+        testImport(0, false, false, true, false, ImportConfirmation.CONTINUE);
+        testImport(0, false, false, true, true, ImportConfirmation.OVERWRITE_ALL);
     }
 
     /**
@@ -233,7 +258,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
      */
     @Test
     public void testImportFromArchiveOverwrite() throws Exception {
-        testImport(0, false, true);
+        testImport(0, false, true, true, false, ImportConfirmation.CONTINUE);
         testImport(ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES, false, true);
     }
 
@@ -426,10 +451,10 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
     }
 
     private void testImport(int options, boolean testViews, boolean fromArchive) throws Exception {
-        testImport(options, testViews, fromArchive, true);
+        testImport(options, testViews, fromArchive, true, true, ImportConfirmation.CONTINUE);
     }
 
-    private void testImport(int options, boolean testViews, boolean fromArchive, boolean defaultExperiment) throws Exception {
+    private void testImport(int options, boolean testViews, boolean fromArchive, boolean defaultExperiment, boolean clearTraces, ImportConfirmation confirmationMode) throws Exception {
         String expectedSourceLocation = null;
 
         @NonNull String experimentName;
@@ -464,14 +489,20 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         }
         checkFinishButton(true);
 
-        importFinish();
+        importFinish(confirmationMode);
 
         IPath expectedElementPath = new Path(TRACE_NAME);
         if ((options & ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE) != 0) {
             expectedElementPath = new Path(TRACE_FOLDER).append(expectedElementPath);
         }
 
-        checkOptions(options, expectedSourceLocation, expectedElementPath, experimentName);
+        if (confirmationMode == ImportConfirmation.RENAME_ALL) {
+            IPath expectedElementPathRenamed = new Path(TRACE_NAME + "(2)");
+            checkOptions(options, expectedSourceLocation, expectedElementPath, experimentName, expectedElementPathRenamed);
+        } else {
+            checkOptions(options, expectedSourceLocation, expectedElementPath, experimentName, null);
+        }
+
         TmfEventsEditor tmfEd = SWTBotUtils.openEditor(fBot, TRACE_PROJECT_NAME, expectedElementPath);
         if (testViews) {
             testViews(tmfEd);
@@ -480,7 +511,9 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         fBot.closeAllEditors();
 
         SWTBotUtils.clearExperimentFolder(fBot, TRACE_PROJECT_NAME);
-        SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
+        if (clearTraces) {
+            SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
+        }
     }
 
     private void testImportAndExtractArchives(int options, boolean testViews, boolean fromArchive) throws Exception {
@@ -731,10 +764,10 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
     }
 
     private static void checkOptions(int optionFlags, String expectedSourceLocation, IPath expectedElementPath) throws CoreException {
-        checkOptions(optionFlags, expectedSourceLocation, expectedElementPath, null);
+        checkOptions(optionFlags, expectedSourceLocation, expectedElementPath, null, null);
     }
 
-    private static void checkOptions(int optionFlags, String expectedSourceLocation, IPath expectedElementPath, String experimentName) throws CoreException {
+    private static void checkOptions(int optionFlags, String expectedSourceLocation, IPath expectedElementPath, String experimentName, IPath expectedElementPathRenamed) throws CoreException {
         IProject project = getProjectResource();
         assertTrue(project.exists());
         TmfProjectElement tmfProject = TmfProjectRegistry.getProject(project, true);
@@ -758,6 +791,12 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         // i.e. /Tracing/Traces
         IPath expectedPath = Path.ROOT.append(new Path(TRACE_PROJECT_NAME)).append(TmfTracesFolder.TRACES_FOLDER_NAME).append(expectedElementPath);
         assertEquals(expectedPath, traceResource.getFullPath());
+
+        if (expectedElementPathRenamed != null) {
+            IPath expectedPathRenamed = Path.ROOT.append(new Path(TRACE_PROJECT_NAME)).append(TmfTracesFolder.TRACES_FOLDER_NAME).append(expectedElementPathRenamed);
+            IResource traceResourceRenamed = traces.get(1).getResource();
+            assertEquals(expectedPathRenamed, traceResourceRenamed.getFullPath());
+        }
 
         String sourceLocation = traceResource.getPersistentProperty(TmfCommonConstants.SOURCE_LOCATION);
         assertNotNull(sourceLocation);

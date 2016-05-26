@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -118,7 +119,7 @@ public class ImportConflictHandler {
     // ------------------------------------------------------------------------
     private ImportConfirmation checkForNameClash(IPath tracePath) throws InterruptedException {
         // handle rename
-        if (getExistingTrace(tracePath) != null) {
+        if (getExistingResource(tracePath) != null) {
             if ((fConfirmationMode == ImportConfirmation.RENAME_ALL) ||
                     (fConfirmationMode == ImportConfirmation.OVERWRITE_ALL) ||
                     (fConfirmationMode == ImportConfirmation.SKIP_ALL)) {
@@ -138,7 +139,7 @@ public class ImportConflictHandler {
 
     private int promptForOverwrite(IPath tracePath) {
         final MessageDialog dialog = new MessageDialog(fShell,
-                 null, null, NLS.bind(Messages.ImportTraceWizard_TraceAlreadyExists, tracePath.makeRelativeTo(fTraceFolderElement.getProject().getPath())),
+                Messages.ImportTraceWizard_MessageTitle, null, NLS.bind(Messages.ImportTraceWizard_TraceAlreadyExists, tracePath.makeRelativeTo(fTraceFolderElement.getProject().getPath())),
                 MessageDialog.QUESTION, new String[] {
                         ImportConfirmation.RENAME.getInName(),
                         ImportConfirmation.RENAME_ALL.getInName(),
@@ -164,18 +165,19 @@ public class ImportConflictHandler {
         return returnValue[0];
     }
 
-    private String rename(IPath tracePath) {
-        TmfTraceElement trace = getExistingTrace(tracePath);
-        if (trace == null) {
+    private static String rename(IPath tracePath) {
+        IResource existingResource = getExistingResource(tracePath);
+        if (existingResource == null) {
             return tracePath.lastSegment();
         }
 
         // Not using IFolder on purpose to leave the door open to import
         // directly into an IProject
-        IContainer folder = (IContainer) trace.getParent().getResource();
+        IContainer folder = existingResource.getParent();
+
         int i = 2;
         while (true) {
-            String name = trace.getName() + '(' + Integer.toString(i++) + ')';
+            String name = existingResource.getName() + '(' + Integer.toString(i++) + ')';
             IResource resource = folder.findMember(name);
             if (resource == null) {
                 return name;
@@ -184,12 +186,19 @@ public class ImportConflictHandler {
     }
 
     private void delete(IPath tracePath, IProgressMonitor monitor) throws CoreException {
-        TmfTraceElement trace = getExistingTrace(tracePath);
-        if (trace == null) {
+        IResource existingResource = getExistingResource(tracePath);
+        if (existingResource == null) {
+            return;
+        }
+        TmfTraceElement existingTraceElement = getExistingTrace(tracePath);
+        if (existingTraceElement != null) {
+            // Delete existing TmfTraceElement
+            existingTraceElement.delete(monitor);
             return;
         }
 
-        trace.delete(monitor);
+        // Delete resource existing in workspace
+        existingResource.delete(true, monitor);
     }
 
     private TmfTraceElement getExistingTrace(IPath tracePath) {
@@ -200,6 +209,11 @@ public class ImportConflictHandler {
             }
         }
         return null;
+    }
+
+    private static IResource getExistingResource(IPath tracePath) {
+        // Look for existing resource
+        return ResourcesPlugin.getWorkspace().getRoot().findMember(tracePath);
     }
 }
 
