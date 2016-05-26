@@ -25,6 +25,7 @@ public class SegmentStoreStatistics {
     private long fNbSegments;
     private double fAverage;
     private double fVariance;
+    private double fTotal;
 
     /**
      * Constructor
@@ -35,6 +36,7 @@ public class SegmentStoreStatistics {
         fNbSegments = 0;
         fAverage = 0.0;
         fVariance = 0.0;
+        fTotal = 0.0;
     }
 
     /**
@@ -129,5 +131,16 @@ public class SegmentStoreStatistics {
         double delta = value - fAverage;
         fAverage += delta / fNbSegments;
         fVariance += delta * (value - fAverage);
+        fTotal += value;
+    }
+
+    /**
+     * Get total value
+     *
+     * @return total value
+     * @since 1.1
+     */
+    public double getTotal() {
+        return fTotal;
     }
 }

@@ -32,6 +32,12 @@ public class Messages extends NLS {
     public static String SegmentStoreStatistics_AverageLabel;
     /** Name of count column */
     public static String SegmentStoreStatisticsViewer_Count;
+    /**
+     * Name of count column
+     *
+     * @since 1.1
+     */
+    public static String SegmentStoreStatisticsViewer_Total;
     /** Name of average column */
     public static String SegmentStoreStatisticsViewer_StandardDeviation;
     /** Menu item for go to minimum duration */
