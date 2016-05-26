@@ -118,7 +118,7 @@ public abstract class LamiData {
                     return type;
                 }
             }
-            throw new IllegalArgumentException("Unrecognized type: " + value);
+            throw new IllegalArgumentException("Unrecognized type: " + value); //$NON-NLS-1$
         }
 
         /**
