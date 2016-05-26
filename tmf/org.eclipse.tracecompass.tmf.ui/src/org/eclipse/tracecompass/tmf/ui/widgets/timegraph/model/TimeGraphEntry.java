@@ -14,7 +14,6 @@
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -24,6 +23,8 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
+
+import com.google.common.collect.Iterables;
 
 /**
  * An entry for use in the time graph views
@@ -84,7 +85,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
 
     @Override
     public synchronized boolean hasChildren() {
-        return fChildren.size() > 0;
+        return !fChildren.isEmpty();
     }
 
     @Override
@@ -166,24 +167,13 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      *            The time event to add
      */
     public void addEvent(ITimeEvent event) {
-        long start = event.getTime();
-        long end = start + event.getDuration();
         int lastIndex = fEventList.size() - 1;
         if (lastIndex >= 0 && fEventList.get(lastIndex).getTime() == event.getTime()) {
             fEventList.set(lastIndex, event);
         } else {
             fEventList.add(event);
         }
-        if (event instanceof NullTimeEvent) {
-            /* A NullTimeEvent should not affect the entry bounds */
-            return;
-        }
-        if (fStartTime == SWT.DEFAULT || start < fStartTime) {
-            fStartTime = start;
-        }
-        if (fEndTime == SWT.DEFAULT || end > fEndTime) {
-            fEndTime = end;
-        }
+        updateEntryBounds(event);
     }
 
     /**
@@ -231,7 +221,6 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      */
     public void addZoomedEvent(ITimeEvent event) {
         long start = event.getTime();
-        long end = start + event.getDuration();
         int lastIndex = fZoomedEventList.size() - 1;
         long lastStart = lastIndex >= 0 ? fZoomedEventList.get(lastIndex).getTime() : Long.MIN_VALUE;
         if (start > lastStart) {
@@ -242,16 +231,74 @@ public class TimeGraphEntry implements ITimeGraphEntry {
             fZoomedEventList.clear();
             fZoomedEventList.add(event);
         }
+        updateEntryBounds(event);
+    }
+
+    private void updateEntryBounds(ITimeEvent event) {
         if (event instanceof NullTimeEvent) {
             /* A NullTimeEvent should not affect the entry bounds */
             return;
         }
+        long start = event.getTime();
         if (fStartTime == SWT.DEFAULT || start < fStartTime) {
             fStartTime = start;
         }
+        long end = start + event.getDuration();
         if (fEndTime == SWT.DEFAULT || end > fEndTime) {
             fEndTime = end;
         }
+    }
+
+    /**
+     * Method to insert event to entry even if it isn't the last
+     *
+     * @param event
+     *            event to insert
+     * @param zoom
+     *            insert in ZoomedEventList if true, else insert in EventList
+     * @since 3.1
+     */
+    public void insertEvent(ITimeEvent event, boolean zoom) {
+        List<ITimeEvent> eventList = zoom ? fZoomedEventList : fEventList;
+        if (eventList.isEmpty() || Iterables.getLast(eventList).getTime() < event.getTime()) {
+            /* Optimize for most common case, when the event is after the events in the list. */
+            eventList.add(event);
+        } else {
+            int insertionIndex = Collections.binarySearch(eventList, event, Comparator.comparing(ITimeEvent::getTime));
+            if (insertionIndex >= 0) {
+                /*
+                 * This can happen as we are only comparing event start times, update the
+                 * eventList with the more recent one.
+                 */
+                eventList.set(insertionIndex, event);
+            } else {
+                insertionIndex = -insertionIndex - 1;
+                eventList.add(insertionIndex, event);
+            }
+        }
+        updateEntryBounds(event);
+    }
+
+    /**
+     * Method to add time events between gaps in the zoomed events list.
+     *
+     * @since 3.1
+     */
+    public void fillZoomedEventList() {
+        List<ITimeEvent> incomplete = fZoomedEventList;
+        List<ITimeEvent> full = new ArrayList<>(incomplete.size());
+        ITimeEvent prev = null;
+        for (ITimeEvent event : incomplete) {
+            if (prev != null) {
+                long prevEnd = prev.getTime() + prev.getDuration();
+                if (prevEnd < event.getTime()) {
+                    full.add(new TimeEvent(this, prevEnd, event.getTime() - prevEnd));
+                }
+            }
+            prev = event;
+            full.add(event);
+        }
+        fZoomedEventList = full;
     }
 
     /**
@@ -320,10 +367,10 @@ public class TimeGraphEntry implements ITimeGraphEntry {
         if (comparator == null) {
             return;
         }
-        @NonNull TimeGraphEntry[] array = fChildren.toArray(new @NonNull TimeGraphEntry[0]);
-        Arrays.sort(array, comparator);
+        List<@NonNull TimeGraphEntry> copy = new ArrayList<>(fChildren);
+        copy.sort(comparator);
         fChildren.clear();
-        fChildren.addAll(Arrays.asList(array));
+        fChildren.addAll(copy);
     }
 
     @Override

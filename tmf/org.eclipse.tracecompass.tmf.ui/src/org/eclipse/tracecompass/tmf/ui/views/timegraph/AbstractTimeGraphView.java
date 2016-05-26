@@ -194,7 +194,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private List<TimeGraphEntry> fEntryList;
 
     /** The trace to entry list hash map */
-    private final Map<ITmfTrace, List<TimeGraphEntry>> fEntryListMap = new HashMap<>();
+    private final Map<ITmfTrace, List<@NonNull TimeGraphEntry>> fEntryListMap = new HashMap<>();
 
     /** The trace to filters hash map */
     private final Map<ITmfTrace, @NonNull ViewerFilter[]> fFiltersMap = new HashMap<>();
@@ -838,7 +838,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *
      * @return the entry list map
      */
-    protected @Nullable List<TimeGraphEntry> getEntryList(ITmfTrace trace) {
+    protected @Nullable List<@NonNull TimeGraphEntry> getEntryList(ITmfTrace trace) {
         synchronized (fEntryListMap) {
             return fEntryListMap.get(trace);
         }
@@ -852,7 +852,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @param list
      *            the list of time graph entries
      */
-    protected void putEntryList(ITmfTrace trace, List<TimeGraphEntry> list) {
+    protected void putEntryList(ITmfTrace trace, List<@NonNull TimeGraphEntry> list) {
         synchronized (fEntryListMap) {
             fEntryListMap.put(trace, new CopyOnWriteArrayList<>(list));
         }
@@ -866,7 +866,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @param list
      *            the list of time graph entries to add
      */
-    protected void addToEntryList(ITmfTrace trace, List<TimeGraphEntry> list) {
+    protected void addToEntryList(ITmfTrace trace, List<@NonNull TimeGraphEntry> list) {
         synchronized (fEntryListMap) {
             List<TimeGraphEntry> entryList = fEntryListMap.get(trace);
             if (entryList == null) {
