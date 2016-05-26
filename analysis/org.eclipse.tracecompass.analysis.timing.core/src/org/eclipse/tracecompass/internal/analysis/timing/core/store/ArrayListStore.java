@@ -134,7 +134,12 @@ public class ArrayListStore<@NonNull E extends ISegment> implements ISegmentStor
 
     @Override
     public boolean isEmpty() {
-        return fStore.isEmpty();
+        fLock.readLock().lock();
+        try {
+            return fStore.isEmpty();
+        } finally {
+            fLock.readLock().unlock();
+        }
     }
 
     @Override
