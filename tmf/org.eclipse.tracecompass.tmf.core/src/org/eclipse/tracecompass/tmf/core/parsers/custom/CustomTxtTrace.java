@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson
+ * Copyright (c) 2010, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -33,6 +33,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.parsers.custom.CustomEventAspects;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
@@ -66,9 +67,9 @@ public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexabl
     private static final int MAX_CONFIDENCE = 100;
 
     private final CustomTxtTraceDefinition fDefinition;
-    private final CustomTxtEventType fEventType;
+    private final ITmfEventField fRootField;
     private BufferedRandomAccessFile fFile;
-    private final String fTraceTypeId;
+    private final @NonNull String fTraceTypeId;
 
     private static final char SEPARATOR = ':';
     private static final String CUSTOM_TXT_TRACE_TYPE_PREFIX = "custom.txt.trace" + SEPARATOR; //$NON-NLS-1$
@@ -83,7 +84,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexabl
      */
     public CustomTxtTrace(final CustomTxtTraceDefinition definition) {
         fDefinition = definition;
-        fEventType = new CustomTxtEventType(fDefinition);
+        fRootField = CustomEventType.getRootField(definition);
         fTraceTypeId = buildTraceTypeId(definition.categoryName, definition.definitionName);
         setCacheSize(DEFAULT_CACHE_SIZE);
     }
@@ -413,7 +414,8 @@ public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexabl
      * @return The first event
      */
     public CustomTxtEvent parseFirstLine(final CustomTxtTraceContext context) {
-        final CustomTxtEvent event = new CustomTxtEvent(fDefinition, this, TmfTimestamp.ZERO, fEventType);
+        CustomTxtEventType eventType = new CustomTxtEventType(checkNotNull(fDefinition.definitionName), fRootField);
+        final CustomTxtEvent event = new CustomTxtEvent(fDefinition, this, TmfTimestamp.ZERO, eventType);
         event.processGroups(context.inputLine, context.firstLineMatcher);
         event.setContent(new CustomEventContent(event, new StringBuffer(context.firstLine)));
         return event;

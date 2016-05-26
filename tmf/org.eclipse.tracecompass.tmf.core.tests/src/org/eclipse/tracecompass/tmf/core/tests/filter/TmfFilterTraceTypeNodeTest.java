@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
@@ -60,8 +61,8 @@ public class TmfFilterTraceTypeNodeTest extends TmfFilterTreeNodeTestBase {
 
     private static final String CATEGORY_TXT = "txt";
     private static final String CATEGORY_XML = "xml";
-    private static final String DEFINITION_NAME_TXT = "name txt";
-    private static final String DEFINITION_NAME_XML = "name xml";
+    private static final @NonNull String DEFINITION_NAME_TXT = "name txt";
+    private static final @NonNull String DEFINITION_NAME_XML = "name xml";
     private static final String SEP = ":";
     private static final String CUSTOM_TXT_TRACE_TYPE_PREFIX = "custom.txt.trace" + SEP;
     private static final String CUSTOM_XML_TRACE_TYPE_PREFIX = "custom.xml.trace" + SEP;
@@ -76,8 +77,8 @@ public class TmfFilterTraceTypeNodeTest extends TmfFilterTreeNodeTestBase {
     }
     private static CustomTxtTrace fCustomTxtTrace = new CustomTxtTrace(fCustomTxtDefinition);
     private static CustomXmlTrace fCustomXmlTrace = new CustomXmlTrace(fCustomXmlDefinition);
-    private static TmfEventType fCustomTxtEventType = new CustomTxtEventType(fCustomTxtDefinition);
-    private static TmfEventType fCustomXmlEventType = new CustomXmlEventType(fCustomXmlDefinition);
+    private static TmfEventType fCustomTxtEventType = new CustomTxtEventType(DEFINITION_NAME_TXT, null);
+    private static TmfEventType fCustomXmlEventType = new CustomXmlEventType(DEFINITION_NAME_XML, null);
     private ITmfEventField fContent = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, null, null);
     private TmfEvent fEvent1 = new TmfEvent(TRACE, 0, TmfTimestamp.fromNanos(1), EVENT_TYPE, fContent);
     private TmfEvent fEvent2 = new CustomTxtEvent(fCustomTxtDefinition, fCustomTxtTrace, TmfTimestamp.fromNanos(2), fCustomTxtEventType);

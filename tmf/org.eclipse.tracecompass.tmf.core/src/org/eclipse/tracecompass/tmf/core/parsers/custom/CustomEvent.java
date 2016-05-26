@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -147,6 +147,14 @@ public class CustomEvent extends TmfEvent {
         return customEventType;
     }
 
+    @Override
+    public String getName() {
+        if (fData != null) {
+            processData();
+        }
+        return super.getName();
+    }
+
     // ------------------------------------------------------------------------
     // Setters
     // ------------------------------------------------------------------------
@@ -231,6 +239,13 @@ public class CustomEvent extends TmfEvent {
             }
         } else {
             setTimestamp(TmfTimestamp.ZERO);
+        }
+
+        // Update the custom event type of this event if set
+        String eventName = fData.get(CustomTraceDefinition.TAG_EVENT_TYPE);
+        ITmfEventType type = getType();
+        if (eventName != null && type instanceof CustomEventType) {
+            ((CustomEventType) type).setName(eventName);
         }
 
         int i = 0;

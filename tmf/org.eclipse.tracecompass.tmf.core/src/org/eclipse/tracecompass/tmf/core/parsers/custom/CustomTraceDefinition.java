@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson
+ * Copyright (c) 2010, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -48,6 +48,10 @@ public abstract class CustomTraceDefinition {
 
     /** "Other" tag */
     public static final String TAG_OTHER = Messages.CustomTraceDefinition_otherTag;
+
+    /** Event type tag
+     * @since 2.1*/
+    public static final String TAG_EVENT_TYPE = Messages.CustomTraceDefinition_eventTypeTag;
 
     /** Category of this trace definition */
     public String categoryName;

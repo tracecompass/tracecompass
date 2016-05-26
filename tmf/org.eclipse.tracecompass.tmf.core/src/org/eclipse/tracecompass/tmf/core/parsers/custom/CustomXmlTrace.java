@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson
+ * Copyright (c) 2010, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,6 +12,8 @@
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.core.parsers.custom;
+
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -31,6 +33,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.parsers.custom.CustomEventAspects;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
@@ -72,10 +75,10 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
     private static final int CONFIDENCE = 100;
 
     private final CustomXmlTraceDefinition fDefinition;
-    private final CustomXmlEventType fEventType;
+    private final ITmfEventField fRootField;
     private final CustomXmlInputElement fRecordInputElement;
     private BufferedRandomAccessFile fFile;
-    private final String fTraceTypeId;
+    private final @NonNull String fTraceTypeId;
 
     private static final char SEPARATOR = ':';
     private static final String CUSTOM_XML_TRACE_TYPE_PREFIX = "custom.xml.trace" + SEPARATOR; //$NON-NLS-1$
@@ -90,7 +93,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
      */
     public CustomXmlTrace(final CustomXmlTraceDefinition definition) {
         fDefinition = definition;
-        fEventType = new CustomXmlEventType(fDefinition);
+        fRootField = CustomEventType.getRootField(definition);
         fRecordInputElement = getRecordInputElement(fDefinition.rootInputElement);
         fTraceTypeId = buildTraceTypeId(definition.categoryName, definition.definitionName);
         setCacheSize(DEFAULT_CACHE_SIZE);
@@ -506,7 +509,8 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
      * @return The extracted event
      */
     public CustomXmlEvent extractEvent(final Element element, final CustomXmlInputElement inputElement) {
-        final CustomXmlEvent event = new CustomXmlEvent(fDefinition, this, TmfTimestamp.ZERO, fEventType);
+        CustomXmlEventType eventType = new CustomXmlEventType(checkNotNull(fDefinition.definitionName), fRootField);
+        final CustomXmlEvent event = new CustomXmlEvent(fDefinition, this, TmfTimestamp.ZERO, eventType);
         event.setContent(new CustomEventContent(event, new StringBuffer()));
         parseElement(element, event, inputElement);
         return event;

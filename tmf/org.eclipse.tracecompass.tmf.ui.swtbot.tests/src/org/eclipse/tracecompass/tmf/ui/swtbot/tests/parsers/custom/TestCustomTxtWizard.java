@@ -97,10 +97,11 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
     @Test
     public void testNew() throws FileNotFoundException, IOException {
         File xmlFile = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(".metadata/.plugins/org.eclipse.tracecompass.tmf.core/custom_txt_parsers.xml").toFile();
+        // Open the custom parsers dialog
         SWTBotUtils.createProject(PROJECT_NAME);
-        SWTBotView proejctExplorerBot = fBot.viewByTitle("Project Explorer");
-        proejctExplorerBot.show();
-        SWTBotTreeItem treeItem = proejctExplorerBot.bot().tree().getTreeItem(PROJECT_NAME);
+        SWTBotView projectExplorerBot = fBot.viewByTitle("Project Explorer");
+        projectExplorerBot.show();
+        SWTBotTreeItem treeItem = projectExplorerBot.bot().tree().getTreeItem(PROJECT_NAME);
         treeItem.select();
         treeItem.expand();
         SWTBotTreeItem treeNode = null;
@@ -116,15 +117,21 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
         fBot.waitUntil(Conditions.shellIsActive(MANAGE_CUSTOM_PARSERS_SHELL_TITLE));
         fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).setFocus();
 
+        // Open the new custom txt parser dialog
         fBot.button("New...").click();
         fBot.waitUntil(Conditions.shellIsActive(CUSTOM_TEXT_PARSER_SHELL_TITLE));
 
+        // Setting header
         fBot.textWithLabel("Category:").setText(CATEGORY_NAME);
         fBot.textWithLabel("Trace type:").setText(TRACETYPE_NAME);
         fBot.textWithLabel("Time Stamp format:").setText("ss");
+
+        // Fill Group 1 as time stamp
         fBot.comboBox(1).setSelection("Time Stamp");
         fBot.textWithLabel("format:").setText("ss");
+        // Click on the New group button
         fBot.button(8).click();
+        // Add next line
         fBot.button(2).click();
         SWTBotTreeItem[] treeItems = fBot.tree().getAllItems();
         SWTBotTreeItem eventLine[] = new SWTBotTreeItem[2];
@@ -139,12 +146,14 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
         }
         assertNotNull(eventLine[0]);
         assertNotNull(eventLine[1]);
+        // Set the regular expression for each event line
         fBot.styledText().setText("12 Hello\nWorld\n23 Goodbye\ncruel world");
         eventLine[0].select();
         SWTBotUtils.waitForJobs();
         fBot.textWithLabel("Regular expression:").setText("\\s*(\\d\\d)\\s(.*\\S)");
         eventLine[1].select();
         fBot.textWithLabel("Regular expression:").setText("([^0-9]*)");
+        // Click on the new group of root line 2
         fBot.button(7).click();
         fBot.comboBox("Set").setSelection("Append with |");
         fBot.button("Highlight All").click();
@@ -204,6 +213,7 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
             fw.write(xmlContent);
             fw.flush();
         }
+        // Open the custom parsers dialog
         SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotView proejctExplorerBot = fBot.viewByTitle("Project Explorer");
         proejctExplorerBot.show();
@@ -221,14 +231,18 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
         assertNotNull(treeNode);
         treeNode.contextMenu("Manage Custom Parsers...").click();
         fBot.waitUntil(Conditions.shellIsActive(MANAGE_CUSTOM_PARSERS_SHELL_TITLE));
+        // Open the edition dialog for txt parser
         fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).setFocus();
         fBot.list().select("Demo Category : Demo trace");
         fBot.button("Edit...").click();
         fBot.waitUntil(Conditions.shellIsActive(CUSTOM_TEXT_PARSER_SHELL_TITLE));
 
+        // update parser's data
         fBot.textWithLabel("Category:").setText(CATEGORY_NAME);
         fBot.textWithLabel("Trace type:").setText(TRACETYPE_NAME);
         fBot.textWithLabel("Time Stamp format:").setText("ss");
+
+        // update time stamp format
         fBot.comboBox(1).setSelection("Time Stamp");
         fBot.textWithLabel("format:").setText("ss");
         fBot.button(2).click();

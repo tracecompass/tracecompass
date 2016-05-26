@@ -1234,10 +1234,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                         inputGroup.tagLabel.setVisible(true);
                         inputGroup.tagText.setVisible(true);
                         inputGroup.tagText.addModifyListener(updateListener);
-                    } else if (inputData.name.equals(CustomTraceDefinition.TAG_MESSAGE)) {
+                    } else if (inputData.name.equals(CustomTraceDefinition.TAG_EVENT_TYPE)) {
                         inputGroup.tagCombo.select(1);
-                    } else {
+                    } else if (inputData.name.equals(CustomTraceDefinition.TAG_MESSAGE)) {
                         inputGroup.tagCombo.select(2);
+                    } else {
+                        inputGroup.tagCombo.select(3);
                         inputGroup.tagText.setText(inputData.name);
                         inputGroup.tagLabel.setText(Messages.CustomTxtParserInputWizardPage_name);
                         inputGroup.tagLabel.setVisible(true);
@@ -1409,9 +1411,10 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
             tagCombo = new Combo(tagComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
             tagCombo.setItems(new String[] { CustomTraceDefinition.TAG_TIMESTAMP,
+                    CustomTraceDefinition.TAG_EVENT_TYPE,
                     CustomTraceDefinition.TAG_MESSAGE,
-                    CustomTraceDefinition.TAG_OTHER });
-            tagCombo.select(1);
+                    CustomTraceDefinition.TAG_OTHER});
+            tagCombo.select(2);
             tagCombo.addSelectionListener(new SelectionListener() {
                 @Override
                 public void widgetDefaultSelected(SelectionEvent e) {
@@ -1427,19 +1430,19 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                         tagText.setVisible(true);
                         tagText.addModifyListener(updateListener);
                         break;
-                    case 1: // Message
+                    case 1: // Event type
                         tagLabel.setVisible(false);
                         tagText.setVisible(false);
                         break;
-                    case 2: // Other
+                    case 2: // Message
+                        tagLabel.setVisible(false);
+                        tagText.setVisible(false);
+                        break;
+                    case 3: // Other
                         tagLabel.setText(Messages.CustomTxtParserInputWizardPage_name);
                         tagLabel.setVisible(true);
                         tagText.setVisible(true);
                         tagText.addModifyListener(updateListener);
-                        break;
-                    case 3: // Continue
-                        tagLabel.setVisible(false);
-                        tagText.setVisible(false);
                         break;
                     default:
                         break;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson.
+ * Copyright (c) 2013, 2016 Ericsson.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,8 @@ public class Messages extends NLS {
     public static String CustomTrace_FileNotFound;
 
     // TODO: These strings should not be externalized
+    /** @since 2.1 */
+    public static String CustomTraceDefinition_eventTypeTag;
     public static String CustomTraceDefinition_messageTag;
     public static String CustomTraceDefinition_otherTag;
     public static String CustomTraceDefinition_timestampTag;

@@ -942,7 +942,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
                 tagCombo = new Combo(tagComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
                 tagCombo.setItems(new String[] { CustomXmlTraceDefinition.TAG_IGNORE, CustomTraceDefinition.TAG_TIMESTAMP,
-                        CustomTraceDefinition.TAG_MESSAGE, CustomTraceDefinition.TAG_OTHER });
+                        CustomTraceDefinition.TAG_EVENT_TYPE, CustomTraceDefinition.TAG_MESSAGE, CustomTraceDefinition.TAG_OTHER });
                 tagCombo.setVisibleItemCount(tagCombo.getItemCount());
                 tagCombo.addSelectionListener(new SelectionListener() {
                     @Override
@@ -965,12 +965,17 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                             tagText.addModifyListener(updateListener);
                             actionCombo.setVisible(true);
                             break;
-                        case 2: // Message
+                        case 2: // Event type
                             tagLabel.setVisible(false);
                             tagText.setVisible(false);
                             actionCombo.setVisible(true);
                             break;
-                        case 3: // Other
+                        case 3: // Message
+                            tagLabel.setVisible(false);
+                            tagText.setVisible(false);
+                            actionCombo.setVisible(true);
+                            break;
+                        case 4: // Other
                             tagLabel.setText(Messages.CustomXmlParserInputWizardPage_tagName);
                             tagLabel.setVisible(true);
                             if (tagText.getText().trim().length() == 0) {
@@ -1013,12 +1018,16 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     tagLabel.setText(Messages.CustomXmlParserInputWizardPage_format);
                     tagText.setText(inputElement.getInputFormat());
                     tagText.addModifyListener(updateListener);
-                } else if (inputElement.getInputName().equals(CustomTraceDefinition.TAG_MESSAGE)) {
+                } else if (inputElement.getInputName().equals(CustomTraceDefinition.TAG_EVENT_TYPE)) {
                     tagCombo.select(2);
                     tagLabel.setVisible(false);
                     tagText.setVisible(false);
-                } else {
+                } else if (inputElement.getInputName().equals(CustomTraceDefinition.TAG_MESSAGE)) {
                     tagCombo.select(3);
+                    tagLabel.setVisible(false);
+                    tagText.setVisible(false);
+                } else {
+                    tagCombo.select(4);
                     tagLabel.setText(Messages.CustomXmlParserInputWizardPage_tagName);
                     tagText.setText(inputElement.getInputName());
                     tagText.addModifyListener(updateListener);
@@ -1298,9 +1307,9 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             tagComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
             tagCombo = new Combo(tagComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-            tagCombo.setItems(new String[] { CustomTraceDefinition.TAG_TIMESTAMP, CustomTraceDefinition.TAG_MESSAGE,
-                    CustomTraceDefinition.TAG_OTHER });
-            tagCombo.select(2); // Other
+            tagCombo.setItems(new String[] { CustomTraceDefinition.TAG_TIMESTAMP, CustomTraceDefinition.TAG_EVENT_TYPE,
+                    CustomTraceDefinition.TAG_MESSAGE, CustomTraceDefinition.TAG_OTHER });
+            tagCombo.select(3); // Other
             tagCombo.addSelectionListener(new SelectionListener() {
                 @Override
                 public void widgetDefaultSelected(SelectionEvent e) {
@@ -1316,11 +1325,15 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         tagText.setVisible(true);
                         tagText.addModifyListener(updateListener);
                         break;
-                    case 1: // Message
+                    case 1: // Event type
                         tagLabel.setVisible(false);
                         tagText.setVisible(false);
                         break;
-                    case 2: // Other
+                    case 2: // Message
+                        tagLabel.setVisible(false);
+                        tagText.setVisible(false);
+                        break;
+                    case 3: // Other
                         tagLabel.setText(Messages.CustomXmlParserInputWizardPage_tagName);
                         tagLabel.setVisible(true);
                         if (tagText.getText().trim().length() == 0) {
@@ -1358,12 +1371,16 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 tagLabel.setText(Messages.CustomXmlParserInputWizardPage_format);
                 tagText.setText(inputAttribute.getInputFormat());
                 tagText.addModifyListener(updateListener);
-            } else if (inputAttribute.getInputName().equals(CustomTraceDefinition.TAG_MESSAGE)) {
+            } else if (inputAttribute.getInputName().equals(CustomTraceDefinition.TAG_EVENT_TYPE)) {
                 tagCombo.select(1);
                 tagLabel.setVisible(false);
                 tagText.setVisible(false);
-            } else {
+            } else if (inputAttribute.getInputName().equals(CustomTraceDefinition.TAG_MESSAGE)) {
                 tagCombo.select(2);
+                tagLabel.setVisible(false);
+                tagText.setVisible(false);
+            } else {
+                tagCombo.select(3);
                 tagLabel.setText(Messages.CustomXmlParserInputWizardPage_tagName);
                 tagText.setText(inputAttribute.getInputName());
                 tagText.addModifyListener(updateListener);
