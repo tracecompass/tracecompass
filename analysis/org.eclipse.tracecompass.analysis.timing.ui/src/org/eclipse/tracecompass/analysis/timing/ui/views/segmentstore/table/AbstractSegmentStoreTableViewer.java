@@ -13,6 +13,9 @@
 
 package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table;
 
+import java.text.DecimalFormat;
+import java.text.Format;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -58,6 +61,8 @@ import org.eclipse.tracecompass.tmf.ui.viewers.table.TmfSimpleTableViewer;
  * @since 2.0
  */
 public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableViewer {
+
+    private static final Format FORMATTER = new DecimalFormat("###,###.##");
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -174,7 +179,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         createColumn(Messages.SegmentStoreTableViewer_duration, new SegmentStoreTableColumnLabelProvider() {
             @Override
             public String getTextForSegment(ISegment input) {
-                return NonNullUtils.nullToEmptyString(Long.toString(input.getLength()));
+                return NonNullUtils.nullToEmptyString(FORMATTER.format(input.getLength()));
             }
         }, SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
     }

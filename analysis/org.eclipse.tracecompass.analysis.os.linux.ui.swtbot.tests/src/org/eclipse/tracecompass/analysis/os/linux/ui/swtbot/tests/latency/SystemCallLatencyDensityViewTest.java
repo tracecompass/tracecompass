@@ -184,11 +184,11 @@ public class SystemCallLatencyDensityViewTest {
         createDensityViewer();
         SWTBotUtils.waitForJobs();
         SWTBotTable tableBot = new SWTBotTable(fDensityViewer.getTableViewer().getTable());
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1600", 0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1,600", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1600", 0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1,600", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1001046400", 0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1,001,046,400", 0, 2));
         final Chart densityChart = fDensityChart;
         assertNotNull(densityChart);
         bot.waitUntil(ConditionHelpers.numberOfSeries(densityChart, 1));

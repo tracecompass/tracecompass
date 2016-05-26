@@ -232,7 +232,7 @@ public class SystemCallLatencyTableAnalysisTest {
         tableBot.header("Duration").click();
         bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "999999", 0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "999,999", 0, 2));
     }
 
     /**
@@ -253,11 +253,11 @@ public class SystemCallLatencyTableAnalysisTest {
         fTable.updateModel(fixture);
         SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
         SWTBot bot = new SWTBot();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "894633", 0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "894,633", 0, 2));
         tableBot.header("Duration").click();
         bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "999999", 0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "999,999", 0, 2));
     }
 
     /**
@@ -278,11 +278,11 @@ public class SystemCallLatencyTableAnalysisTest {
         fTable.updateModel(fixture);
         SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
         SWTBot bot = new SWTBot();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "400689", 0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "400,689", 0, 2));
         tableBot.header("Duration").click();
         bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "998001", 0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "998,001", 0, 2));
     }
 
     /**
@@ -308,11 +308,11 @@ public class SystemCallLatencyTableAnalysisTest {
         createTable();
         SWTBotUtils.waitForJobs();
         SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "24100", 0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "24,100", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1000", 0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1,000", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "5904091700", 0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "5,904,091,700", 0, 2));
         bot.closeAllEditors();
         SWTBotUtils.deleteProject(PROJECT_NAME, bot);
     }
