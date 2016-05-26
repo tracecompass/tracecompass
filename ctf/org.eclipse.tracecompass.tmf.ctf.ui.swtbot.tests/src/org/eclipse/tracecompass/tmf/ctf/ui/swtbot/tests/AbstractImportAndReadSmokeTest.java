@@ -37,6 +37,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportConfirmation;
 import org.eclipse.tracecompass.internal.tmf.ui.views.statistics.TmfStatisticsViewImpl;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
@@ -149,9 +150,33 @@ public abstract class AbstractImportAndReadSmokeTest {
      * Finishes the wizard
      */
     protected void importFinish() {
+        importFinish(ImportConfirmation.CONTINUE);
+    }
+
+    /**
+     * Finishes the wizard
+     *
+     * @param confirmationMode
+     *            a confirmation value
+     *            Note: Only {@link ImportConfirmation#RENAME_ALL},
+     *            {@link ImportConfirmation#OVERWRITE_ALL},
+     *            {@link ImportConfirmation#CONTINUE} are supported
+     */
+    protected void importFinish(ImportConfirmation confirmationMode) {
         SWTBotShell shell = fBot.activeShell();
         final SWTBotButton finishButton = fBot.button("Finish");
         finishButton.click();
+        if (confirmationMode == ImportConfirmation.RENAME_ALL) {
+            fBot.waitUntil(Conditions.shellIsActive("Confirmation"));
+            SWTBotShell shell2 = fBot.activeShell();
+            SWTBotButton button = shell2.bot().button("Rename All");
+            button.click();
+        } else if (confirmationMode == ImportConfirmation.OVERWRITE_ALL) {
+            fBot.waitUntil(Conditions.shellIsActive("Confirmation"));
+            SWTBotShell shell2 = fBot.activeShell();
+            SWTBotButton button = shell2.bot().button("Overwrite All");
+            button.click();
+        }
         fBot.waitUntil(Conditions.shellCloses(shell));
         SWTBotUtils.waitForJobs();
     }
