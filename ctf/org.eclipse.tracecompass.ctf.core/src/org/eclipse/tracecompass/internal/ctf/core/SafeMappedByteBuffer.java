@@ -24,7 +24,7 @@ import java.nio.channels.FileChannel;
  *
  * http://bugs.java.com/view_bug.do?bug_id=4715154
  */
-public class SafeMappedByteBuffer {
+public final class SafeMappedByteBuffer {
 
     private static final boolean IS_WIN32 = System.getProperty("os.name").startsWith("Windows");  //$NON-NLS-1$//$NON-NLS-2$
 
