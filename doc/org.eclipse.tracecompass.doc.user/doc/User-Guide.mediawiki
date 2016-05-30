@@ -2079,6 +2079,93 @@ Hover the cursor over a line of the chart and a tooltip will pop up with the fol
 
 [[Image:images/kernelMemoryUsage/KernelMemoryUsageChart.png]]
 
+== Process Wait Analysis ==
+
+TraceCompass can recover wait causes of local and distributed processes using operating system events. The analysis highlights the tasks and devices causing wait. Wait cause recovery is recursive, comprise all tasks running on the system and works across computers using packet trace synchronization.
+
+The analysis details are available in the paper [http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7294678&isnumber=4359390 Wait analysis of distributed systems using kernel tracing].
+
+=== Prerequisites ===
+
+The analysis requires a Linux kernel trace. Additional instrumentation may be required for specific kernel version and for distributed tracing. This instrumentation is available in [https://github.com/giraldeau/lttng-modules/tree/addons LTTng modules addons] on GitHub.
+
+The required events are:
+* '''sched_switch, sched_wakeup''': Scheduling events indicate when a process is blocked and the wake-up event indicates the task or resource that unblocked the task. For kernel versions comprised between 3.8 and 4.1, the event '''sched_ttwu''' (which stands for Try To Wake-Up) is provided for backward compatibility in LTTng modules addons.
+* '''IRQ, SoftIRQ and IPI''': Interrupt events are required to distinguish the context of the wake-up. When a wake-up occurs inside an interrupt handler, it must be associated with the device causing the interrupt and not the interrupted task. For that reason, interrupt entry and exit events are required.
+* '''inet_sock_local_in, inet_sock_local_out''': The network events record a subset of TCP/IP packet header using a netfilter hook in the kernel. The send and receive events are matched to show the communication between distributed processes. Network events are mandatory for analyzing wait in TCP/IP programs, whether they are executing locally or on different computers. They also used to synchronize traces recorded on multiple computers. For further details, refer to the [[#Trace synchronization]] section.
+
+To analyze a distributed program, all computers involved in the processing must be traced simultaneously. The LTTng Tracer Control of TraceCompass can trace a remote computer, but controlling simultaneous tracing is not supported at the moment, meaning that all sessions must be started separately and interactively. TraceCompass will support this feature in the future. For now, it is suggested to use [https://github.com/giraldeau/lttng-cluster lttng-cluster] command line tool to control simultaneous tracing sessions on multiple computers. This tool is based on [http://www.fabfile.org/ Fabric] and uses SSH to start the tracing sessions, execute a workload, stop the sessions and gather traces on the local computer. For more information, refer to the lttng-cluster documentation.
+
+We use the [https://github.com/giraldeau/traces/blob/master/django-vote.tar.gz Django trace] as an example to demonstrate the wait analysis. [https://www.djangoproject.com/ Django] is a popular Web framework. The application is the [https://docs.djangoproject.com/en/1.9/intro/tutorial01/ Django Poll app tutorial]. The traces were recorded on three computers, namely the client (implemented with Python Mechanize), the Web server (Apache with WSGI) and the database server (PostgreSQL). The client simulates a vote in the poll.
+
+=== Running the analysis ===
+
+To open all three traces simultaneously, we first create an experiment containing these traces and then synchronize the traces, such that they have a common time base. Then, the analysis is done by selecting a task in the '''Control Flow View'''. The result is displayed in the '''Critical Flow View''', which works like the '''Control Flow View'''. The steps to load the Django example follows.
+
+# Download and extract the [https://github.com/giraldeau/traces/blob/master/django-vote.tar.gz Django trace] archive.
+# In TraceCompass, open the [[#LTTng Kernel Perspective]].
+# Create a new tracing project. Select '''File -> New -> Tracing -> Tracing Project''', choose a name and click '''Finish'''.
+# Under the created tracing project, right-click on '''Traces''' and select '''Import...'''. In the import dialog, select the root directory containing the extracted trace by clicking on '''Browse'''. Three traces should be listed. Select the traces and click '''Finish'''. After the import is completed, the traces should be listed below '''Traces'''.
+# Right-click on '''Experiments''', select '''New...''' and enter a name for the experiment, such as '''django'''.
+# Right-click on the '''django''' experiment and click on '''Select Traces...'''. In the dialog, check the three traces '''django-client''', '''django-httpd''' and '''django-db'''. These traces will appear below the experiment. If the experiment is opened at this stage, the traces are not synchronized and there will be a large time gap between events from different traces.
+# To synchronize the traces, right-click on the '''django''' experiment and select '''Synchronize Traces'''. In the '''Select reference trace''' dialog, select any available trace and click '''Finish'''. Once the synchronization is completed, a new entry with an underline suffix will appear for each modified trace. The created trace entries have a function which is applied to the timestamps of events in order to shift the time according to the reference trace. The '''Project Explorer''' after the import is shown below.
+#:[[Image:images/waitAnalysis/KernelWaitAnalysisProjectExplorer.png]]
+# Open the experiment '''django'''. The '''Control Flow''' and the '''Resources''' views should display the three traces simultaneously.
+# In the main menu, select '''Window -> Show View -> Other...''' and under '''LTTng''' select '''Critical Flow View'''. The view is empty for the moment.
+# In the '''Critical Flow View''', right-click on the '''Process''' entry to analyze and select '''Follow''', as shown in the figure below.
+#:[[Image:images/waitAnalysis/KernelWaitAnalysisFollow.png]]
+#:The analysis will execute and the result will appear in the '''Critical Flow View'''. For the Django example, use the '''View Filters''' to search for the python process with TID 2327. When zooming on the execution, the view displays the work done by the Web server and the database to process the request of the python client. Vertical arrows represent synchronization and communication between processes. The legend [[Image:images/show_legend.gif]] displays the colors associated with the processes states.
+
+[[Image:images/waitAnalysis/KernelWaitAnalysisDjango.png]]
+
+== Input/Output Analysis ==
+
+TraceCompass can analyse disk input/output through the read/write system calls to get the read/write per processes, but also with the disk request events, to get the actual reads and writes to disk.
+
+=== Get the trace ===
+
+The following tracepoints should be enabled to get the disk read/write data. Also, enabling syscalls will allow to match the reads and writes per processes.
+
+    # sudo lttng list -k
+    Kernel events:
+    -------------
+      ...
+      block_rq_complete (loglevel: TRACE_EMERG (0)) (type: tracepoint)
+      block_rq_insert (loglevel: TRACE_EMERG (0)) (type: tracepoint)
+      block_rq_issue (loglevel: TRACE_EMERG (0)) (type: tracepoint) # on the guest
+      block_bio_frontmerge (loglevel: TRACE_EMERG (0)) (type: tracepoint) # on the guest
+      ...
+
+For full disk request tracking, some extra tracepoints are necessary. They are not required for the I/O analysis, but make the analysis more complete. Here is the procedure to get those tracepoints that are not yet part of the mainline kernel.
+
+    # git clone https://github.com/giraldeau/lttng-modules.git
+    # cd lttng-modules
+
+Checkout the addons branch, compile and install lttng-modules as per the lttng-modules documentation.
+
+    # git checkout addons
+    # make
+    # sudo make modules_install
+    # sudo depmod -a
+
+The lttng addons modules must be inserted manually for the extra tracepoints to be available:
+
+    # sudo modprobe lttng-addons
+    # sudo modprobe lttng-elv
+
+And enable the following tracepoint
+
+    addons_elv_merge_requests
+
+=== Input/Output Views ===
+
+The following views are available for input/output analyses:
+
+* Disk I/O Activity
+A time aligned XY chart of the read and write speed for the different disks on the system. This view is useful to see where there was more activity on the disks and whether it was mostly reads or writes.
+
+ [[Image:images/io/diskIoActivity.png| Disk I/O Activity Example]]
+
 == LTTng Kernel Events Editor ==
 
 The LTTng Kernel Events editor '''is''' the plain TMF [[#Events_Editor | Events Editor]], except that it provides its own specialized viewer to replace the standard one. In short, it has exactly the same behaviour but the layout is slightly different:
