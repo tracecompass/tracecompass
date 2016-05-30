@@ -22,6 +22,12 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.tmf.ui.views.timegraph.messages"; //$NON-NLS-1$
 
     public static String AbstractTimeGraphtView_NextText;
+    /**
+     * Build Job title
+     * @since 2.1
+     */
+    public static String AbstractTimeGraphView_BuildJob;
+
     public static String AbstractTimeGraphView_NextTooltip;
     public static String AbstractTimeGraphView_PreviousText;
     public static String AbstractTimeGraphView_PreviousTooltip;

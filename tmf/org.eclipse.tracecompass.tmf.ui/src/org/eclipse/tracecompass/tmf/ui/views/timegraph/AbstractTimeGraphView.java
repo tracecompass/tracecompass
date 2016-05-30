@@ -41,8 +41,10 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
@@ -79,6 +81,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
@@ -187,7 +190,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private final Map<ITmfTrace, List<IMarkerEventSource>> fMarkerEventSourcesMap = new HashMap<>();
 
     /** The trace to build thread hash map */
-    private final Map<ITmfTrace, BuildThread> fBuildThreadMap = new HashMap<>();
+    private final Map<ITmfTrace, Job> fBuildJobMap = new HashMap<>();
 
     /** The start time */
     private long fStartTime = SWT.DEFAULT;
@@ -688,32 +691,25 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     }
 
-    private class BuildThread extends Thread {
+    private class BuildRunnable implements ICoreRunnable {
         private final @NonNull ITmfTrace fBuildTrace;
         private final @NonNull ITmfTrace fParentTrace;
-        private final @NonNull IProgressMonitor fMonitor;
 
-        public BuildThread(final @NonNull ITmfTrace trace, final @NonNull ITmfTrace parentTrace, final String name) {
-            super(name + " build"); //$NON-NLS-1$
+        public BuildRunnable(final @NonNull ITmfTrace trace, final @NonNull ITmfTrace parentTrace) {
             fBuildTrace = trace;
             fParentTrace = parentTrace;
-            fMonitor = new NullProgressMonitor();
         }
 
         @Override
-        public void run() {
-            LOGGER.info(() -> "[TimeGraphView:BuildThreadStart] trace=" + fBuildTrace.getName()); //$NON-NLS-1$
+        public void run(IProgressMonitor monitor) throws CoreException {
+            LOGGER.info(() -> "[TimeGraphView:BuildJobStart] trace=" + fBuildTrace.getName()); //$NON-NLS-1$
 
-            buildEntryList(fBuildTrace, fParentTrace, fMonitor);
-            synchronized (fBuildThreadMap) {
-                fBuildThreadMap.remove(fBuildTrace);
+            buildEntryList(fBuildTrace, fParentTrace, NonNullUtils.checkNotNull(monitor));
+            synchronized (fBuildJobMap) {
+                fBuildJobMap.remove(fBuildTrace);
             }
 
-            LOGGER.info(() -> "[TimeGraphView:BuildThreadEnd]"); //$NON-NLS-1$
-        }
-
-        public void cancel() {
-            fMonitor.setCanceled(true);
+            LOGGER.info(() -> "[TimeGraphView:BuildJobEnd]"); //$NON-NLS-1$
         }
     }
 
@@ -1394,9 +1390,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     @Override
     public void dispose() {
         super.dispose();
-        synchronized (fBuildThreadMap) {
-            fBuildThreadMap.values().forEach(buildThread -> {
-                buildThread.cancel();
+        synchronized (fBuildJobMap) {
+            fBuildJobMap.values().forEach(buildJob -> {
+                buildJob.cancel();
             });
         }
         if (fZoomThread != null) {
@@ -1631,15 +1627,15 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         resetView(viewTrace);
 
         List<IMarkerEventSource> markerEventSources = new ArrayList<>();
-        synchronized (fBuildThreadMap) {
+        synchronized (fBuildJobMap) {
             for (ITmfTrace trace : getTracesToBuild(viewTrace)) {
                 if (trace == null) {
                     break;
                 }
                 markerEventSources.addAll(TmfTraceAdapterManager.getAdapters(trace, IMarkerEventSource.class));
-                BuildThread buildThread = new BuildThread(trace, viewTrace, getName());
-                fBuildThreadMap.put(trace, buildThread);
-                buildThread.start();
+                Job buildJob = Job.create(getTitle() + Messages.AbstractTimeGraphView_BuildJob, new BuildRunnable(trace, viewTrace));
+                fBuildJobMap.put(trace, buildJob);
+                buildJob.schedule();
             }
         }
         fMarkerEventSourcesMap.put(viewTrace, markerEventSources);
@@ -1675,7 +1671,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     /**
      * Build the entry list to show in this time graph view.
      * <p>
-     * Called from the BuildThread for each trace returned by
+     * Called from the BuildJob for each trace returned by
      * {@link #getTracesToBuild(ITmfTrace)}. The full event list is also
      * normally computed for every entry that is created.
      *
@@ -2287,11 +2283,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         if (viewTrace == null) {
             return;
         }
-        synchronized (fBuildThreadMap) {
+        synchronized (fBuildJobMap) {
             for (ITmfTrace trace : getTracesToBuild(viewTrace)) {
-                BuildThread buildThread = fBuildThreadMap.remove(trace);
-                if (buildThread != null) {
-                    buildThread.cancel();
+                Job buildJob = fBuildJobMap.remove(trace);
+                if (buildJob != null) {
+                    buildJob.cancel();
                 }
             }
         }
