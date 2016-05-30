@@ -21,7 +21,7 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-public class UstDebugInfoFunctionAspect implements ITmfEventAspect<FunctionLocation> {
+public final class UstDebugInfoFunctionAspect implements ITmfEventAspect<FunctionLocation> {
 
     /** Singleton instance */
     public static final UstDebugInfoFunctionAspect INSTANCE = new UstDebugInfoFunctionAspect();

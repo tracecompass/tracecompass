@@ -29,7 +29,7 @@ import com.google.common.collect.Iterables;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-public class UstDebugInfoSourceAspect implements ITmfEventAspect<SourceCallsite> {
+public final class UstDebugInfoSourceAspect implements ITmfEventAspect<SourceCallsite> {
 
     /** Singleton instance */
     public static final UstDebugInfoSourceAspect INSTANCE = new UstDebugInfoSourceAspect();
