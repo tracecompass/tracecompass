@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson
+ * Copyright (c) 2010, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -30,6 +30,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventFilterAppliedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventSearchAppliedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
@@ -561,9 +562,9 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         for (IMarkerDelta delta : event.findMarkerDeltas(IMarker.BOOKMARK, false)) {
             for (TimeChartDecorationProvider provider : fDecorationProviders.values()) {
                 if (delta.getResource().equals(provider.getBookmarksFile())) {
-                    if (delta.getKind() == IResourceDelta.CHANGED && delta.getMarker().getAttribute(IMarker.LOCATION, -1) != -1) {
-                        provider.refreshBookmarks();
-                    } else if (delta.getKind() == IResourceDelta.REMOVED) {
+                    if (delta.getKind() == IResourceDelta.REMOVED ||
+                            delta.getMarker().getAttribute(IMarker.LOCATION, -1) != -1 ||
+                            delta.getMarker().getAttribute(ITmfMarker.MARKER_RANK, (String) null) != null) {
                         provider.refreshBookmarks();
                     }
                 }
