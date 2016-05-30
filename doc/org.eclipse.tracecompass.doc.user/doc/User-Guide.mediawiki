@@ -2118,6 +2118,53 @@ To open all three traces simultaneously, we first create an experiment containin
 
 [[Image:images/waitAnalysis/KernelWaitAnalysisDjango.png]]
 
+== Input/Output Analysis ==
+
+TraceCompass can analyse disk input/output through the read/write system calls to get the read/write per processes, but also with the disk request events, to get the actual reads and writes to disk.
+
+=== Get the trace ===
+
+The following tracepoints should be enabled to get the disk read/write data. Also, enabling syscalls will allow to match the reads and writes per processes.
+
+    # sudo lttng list -k
+    Kernel events:
+    -------------
+      ...
+      block_rq_complete (loglevel: TRACE_EMERG (0)) (type: tracepoint)
+      block_rq_insert (loglevel: TRACE_EMERG (0)) (type: tracepoint)
+      block_rq_issue (loglevel: TRACE_EMERG (0)) (type: tracepoint) # on the guest
+      block_bio_frontmerge (loglevel: TRACE_EMERG (0)) (type: tracepoint) # on the guest
+      ...
+
+For full disk request tracking, some extra tracepoints are necessary. They are not required for the I/O analysis, but make the analysis more complete. Here is the procedure to get those tracepoints that are not yet part of the mainline kernel.
+
+    # git clone https://github.com/giraldeau/lttng-modules.git
+    # cd lttng-modules
+
+Checkout the addons branch, compile and install lttng-modules as per the lttng-modules documentation.
+
+    # git checkout addons
+    # make
+    # sudo make modules_install
+    # sudo depmod -a
+
+The lttng addons modules must be inserted manually for the extra tracepoints to be available:
+
+    # sudo modprobe lttng-addons
+    # sudo modprobe lttng-elv
+
+And enable the following tracepoint
+
+    addons_elv_merge_requests
+
+=== Input/Output Views ===
+
+The following views are available for input/output analyses:
+
+* Disk I/O Activity
+A time aligned XY chart of the read and write speed for the different disks on the system. This view is useful to see where there was more activity on the disks and whether it was mostly reads or writes.
+
+ [[Image:images/io/diskIoActivity.png| Disk I/O Activity Example]]
 
 == LTTng Kernel Events Editor ==
 
