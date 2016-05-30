@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.model.TmfPieChartStatisticsModel;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsTreeManager;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsTreeNode;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsEventTypesModule;
@@ -175,9 +176,17 @@ class StatisticsUpdateJob extends Job {
          * </pre>
          */
 
-        /* Fill in an the event counts (either cells C or D) */
-        for (Map.Entry<String, Long> entry : map.entrySet()) {
-            statsData.setTypeCount(name, entry.getKey(), fIsGlobal, entry.getValue());
+        if (map.isEmpty() && !fIsGlobal) {
+            /* Reset all time range event counts (cells D) */
+            TmfStatisticsTreeNode eventTypeNode = statsData.getNode(name, TmfStatisticsTree.HEADER_EVENT_TYPES);
+            if (eventTypeNode != null) {
+                eventTypeNode.resetTimeRangeValue();
+            }
+        } else {
+            /* Fill in the event counts (either cells C or D) */
+            for (Map.Entry<String, Long> entry : map.entrySet()) {
+                statsData.setTypeCount(name, entry.getKey(), fIsGlobal, entry.getValue());
+            }
         }
 
         /*
