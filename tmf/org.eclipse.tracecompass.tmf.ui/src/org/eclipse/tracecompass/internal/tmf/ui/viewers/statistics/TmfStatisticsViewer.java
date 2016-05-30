@@ -229,7 +229,12 @@ public class TmfStatisticsViewer extends TmfViewer {
         }
         ITmfTimestamp begin = signal.getBeginTime();
         ITmfTimestamp end = signal.getEndTime();
-        TmfTimeRange timeRange = new TmfTimeRange(begin, end);
+        TmfTimeRange timeRange;
+        if (begin.compareTo(end) <= 0) {
+            timeRange = new TmfTimeRange(begin, end);
+        } else {
+            timeRange = new TmfTimeRange(end, begin);
+        }
         requestTimeRangeData(fTrace, timeRange);
     }
 
