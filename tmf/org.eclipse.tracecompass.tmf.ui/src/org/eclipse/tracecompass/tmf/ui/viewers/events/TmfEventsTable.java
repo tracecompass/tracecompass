@@ -1796,15 +1796,15 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                                 applyHeader();
                                 if ((e.stateMask & SWT.CTRL) != 0) {
                                     applySearchAsFilter();
-                                } else {
-                                    /*
-                                     * Set focus on the table so that the next
-                                     * carriage return goes to the next result
-                                     */
-                                    TmfEventsTable.this.getTable().setFocus();
                                 }
+                                /*
+                                 * Set focus on the table so that the next
+                                 * carriage return goes to the next result
+                                 */
+                                TmfEventsTable.this.getTable().setFocus();
                             } else if (e.character == SWT.ESC) {
                                 tableEditor.getEditor().dispose();
+                                TmfEventsTable.this.getTable().setFocus();
                             }
                         }
                     });
