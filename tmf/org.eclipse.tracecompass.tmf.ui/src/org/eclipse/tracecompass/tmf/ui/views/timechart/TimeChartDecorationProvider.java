@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
+import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
 
 /**
  * Provider for decorations in the time chart view
@@ -78,9 +79,17 @@ public class TimeChartDecorationProvider {
             }
             for (IMarker bookmark : fBookmarksFile.findMarkers(
                     IMarker.BOOKMARK, false, IResource.DEPTH_ZERO)) {
-                int location = bookmark.getAttribute(IMarker.LOCATION, -1);
-                if (location != -1) {
-                    Long rank = (long) location;
+                /* try location as an integer for backward compatibility */
+                long rank = bookmark.getAttribute(IMarker.LOCATION, -1);
+                if (rank == -1) {
+                    String rankString = bookmark.getAttribute(ITmfMarker.MARKER_RANK, (String) null);
+                    try {
+                        rank = Long.parseLong(rankString);
+                    } catch (NumberFormatException e) {
+                        /* ignored */
+                    }
+                }
+                if (rank != -1) {
                     fBookmarksSet.add(rank);
                 }
             }
