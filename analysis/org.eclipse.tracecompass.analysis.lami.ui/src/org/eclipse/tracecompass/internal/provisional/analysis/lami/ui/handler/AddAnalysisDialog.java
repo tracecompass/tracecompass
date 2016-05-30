@@ -105,7 +105,6 @@ class AddAnalysisDialog extends Dialog {
         Color color = new Color(parent.getDisplay(), 0xe7, 0x4c, 0x3c);
         label.setForeground(color);
         final FontDescriptor fd = FontDescriptor.createFrom(parent.getFont());
-        fd.setHeight(9);
         Font font = fd.createFont(parent.getDisplay());
         label.setFont(font);
 
