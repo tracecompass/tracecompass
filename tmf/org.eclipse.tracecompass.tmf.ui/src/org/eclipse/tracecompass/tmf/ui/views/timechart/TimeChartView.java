@@ -82,6 +82,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
     private final List<TimeChartAnalysisEntry> fTimeAnalysisEntries = new ArrayList<>();
     private final Map<ITmfTrace, TimeChartDecorationProvider> fDecorationProviders = new HashMap<>();
     private final List<DecorateThread> fDecorateThreads = new ArrayList<>();
+    private final Map<ITmfTrace, ProcessTraceThread> fProcessTraceThreads = new HashMap<>();
     private long fStartTime = 0;
     private long fStopTime = Long.MAX_VALUE;
     private boolean fRefreshBusy = false;
@@ -120,8 +121,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
             TimeChartAnalysisEntry timeAnalysisEntry = new TimeChartAnalysisEntry(trace, fDisplayWidth * 2);
             fTimeAnalysisEntries.add(timeAnalysisEntry);
             fDecorationProviders.put(trace, new TimeChartDecorationProvider(bookmarksFile));
-            Thread thread = new ProcessTraceThread(timeAnalysisEntry);
-            thread.start();
+            startProcessTraceThread(timeAnalysisEntry);
         }
         fViewer.setInput(fTimeAnalysisEntries.toArray(new TimeChartAnalysisEntry[0]));
 
@@ -132,8 +132,10 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
     @Override
     public void dispose() {
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-        for (DecorateThread thread : fDecorateThreads) {
-            thread.cancel();
+        synchronized (fDecorateThreads) {
+            for (DecorateThread thread : fDecorateThreads) {
+                thread.cancel();
+            }
         }
         ColorSettingsManager.removeColorSettingsListener(this);
         super.dispose();
@@ -144,22 +146,50 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         fViewer.setFocus();
     }
 
+    private void startProcessTraceThread(TimeChartAnalysisEntry entry) {
+        synchronized (fProcessTraceThreads) {
+            ProcessTraceThread thread = fProcessTraceThreads.get(entry.getTrace());
+            if (thread != null) {
+                thread.restart();
+            } else {
+                thread = new ProcessTraceThread(entry);
+                fProcessTraceThreads.put(entry.getTrace(), thread);
+                thread.start();
+            }
+        }
+    }
+
     private class ProcessTraceThread extends Thread {
 
         private final TimeChartAnalysisEntry fTimeAnalysisEntry;
+        private boolean fRestart;
 
         public ProcessTraceThread(TimeChartAnalysisEntry timeAnalysisEntry) {
             super("ProcessTraceJob:" + timeAnalysisEntry.getName()); //$NON-NLS-1$
             fTimeAnalysisEntry = timeAnalysisEntry;
         }
 
+        public void restart() {
+            synchronized (fProcessTraceThreads) {
+                fRestart = true;
+            }
+        }
+
         @Override
         public void run() {
-            TmfTimeRange range = TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange();
-
-            updateTraceEntry(fTimeAnalysisEntry, Long.MAX_VALUE,
-                    range.getStartTime().toNanos(),
-                    range.getEndTime().toNanos());
+            while (true) {
+                updateTraceEntry(fTimeAnalysisEntry, Long.MAX_VALUE,
+                        TmfTimestamp.BIG_BANG.toNanos(),
+                        TmfTimestamp.BIG_CRUNCH.toNanos());
+                synchronized (fProcessTraceThreads) {
+                    if (fRestart) {
+                        fRestart = false;
+                    } else {
+                        fProcessTraceThreads.remove(fTimeAnalysisEntry.getTrace());
+                        return;
+                    }
+                }
+            }
         }
     }
 
@@ -240,7 +270,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
                     return;
                 }
                 fViewer.setInput(fTimeAnalysisEntries.toArray(new TimeChartAnalysisEntry[0]));
-                fViewer.resetStartFinishTime();
+                fViewer.resetStartFinishTime(false);
                 synchronized (fSyncObj) {
                     fRefreshBusy = false;
                     if (fRefreshPending) {
@@ -598,8 +628,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
             timeAnalysisEntry = new TimeChartAnalysisEntry(trace, fDisplayWidth * 2);
             fTimeAnalysisEntries.add(timeAnalysisEntry);
             fDecorationProviders.put(trace, new TimeChartDecorationProvider(bookmarksFile));
-            Thread thread = new ProcessTraceThread(timeAnalysisEntry);
-            thread.start();
+            startProcessTraceThread(timeAnalysisEntry);
         }
         refreshViewer();
     }
@@ -667,7 +696,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         for (int i = 0; i < fTimeAnalysisEntries.size(); i++) {
             TimeChartAnalysisEntry timeAnalysisEntry = fTimeAnalysisEntries.get(i);
             if (timeAnalysisEntry.getTrace().equals(trace)) {
-                updateTraceEntry(timeAnalysisEntry, Long.MAX_VALUE, 0, Long.MAX_VALUE);
+                startProcessTraceThread(timeAnalysisEntry);
                 break;
             }
         }

@@ -979,6 +979,19 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         fTimeRangeFixed = false;
     }
 
+    /**
+     * @since 2.0
+     */
+    @Override
+    public void resetStartFinishTime(boolean notify) {
+        if (notify) {
+            setStartFinishTimeNotify(fTime0Bound, fTime1Bound);
+        } else {
+            setStartFinishTime(fTime0Bound, fTime1Bound);
+        }
+        fTimeRangeFixed = false;
+    }
+
     @Override
     public void setSelectedTimeNotify(long time, boolean ensureVisible) {
         setSelectedTimeInt(time, ensureVisible, true);

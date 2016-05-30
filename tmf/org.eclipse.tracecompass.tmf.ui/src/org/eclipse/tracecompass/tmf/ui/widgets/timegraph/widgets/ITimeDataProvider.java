@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2015 Intel Corporation, Ericsson
+ * Copyright (c) 2007, 2016 Intel Corporation, Ericsson
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -175,6 +175,21 @@ public interface ITimeDataProvider {
      * Reset the start and end times and notify the registered listeners
      */
     void resetStartFinishTime();
+
+    /**
+     * Reset the start and end times.
+     *
+     * @param notify
+     *            if true, notify the registered listeners
+     * @since 2.0
+     */
+    default void resetStartFinishTime(boolean notify) {
+        if (notify) {
+            setStartFinishTimeNotify(getMinTime(), getMaxTime());
+        } else {
+            setStartFinishTime(getMinTime(), getMaxTime());
+        }
+    }
 
     /**
      * @return The names' width
