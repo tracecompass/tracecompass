@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson
+ * Copyright (c) 2012, 2016 Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,6 +35,8 @@ public class Messages extends NLS {
     public static String ManageCustomParsersDialog_ExportParserSelection;
     public static String ManageCustomParsersDialog_ImportButtonLabel;
     public static String ManageCustomParsersDialog_ImportParserSelection;
+    public static String ManageCustomParsersDialog_ImportFailureTitle;
+    public static String ManageCustomParsersDialog_ImportFailureMessage;
     public static String ManageCustomParsersDialog_NewButtonLabel;
     public static String ManageCustomParsersDialog_TextButtonLabel;
 
