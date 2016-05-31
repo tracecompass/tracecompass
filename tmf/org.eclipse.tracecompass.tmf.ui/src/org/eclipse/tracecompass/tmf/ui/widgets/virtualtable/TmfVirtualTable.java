@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson and others.
+ * Copyright (c) 2010, 2016 Ericsson and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -20,6 +20,8 @@ import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -657,6 +659,16 @@ public class TmfVirtualTable extends Composite {
             }
         });
 
+        /*
+         * The SWT.NO_FOCUS style is only a hint and is not always respected. If
+         * the slider gains focus, give it back to the table.
+         */
+        fSlider.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                fTable.setFocus();
+            }
+        });
     }
 
     // ------------------------------------------------------------------------
@@ -1074,12 +1086,31 @@ public class TmfVirtualTable extends Composite {
         }
         if (start <= end) {
             fTable.setSelection(start, end);
+            /* Reset origin in case partially visible item selected */
+            fTable.setTopIndex(0);
             if (startRank == fSelectedEventRank) {
                 fTable.select(start);
             } else {
                 fTable.select(end);
             }
         } else {
+            /*
+             * In GTK2, when the table is given focus, one table item is
+             * highlighted even if there is no selection. In that case the
+             * highlighted item is the last selected item. Make that last
+             * selected item the top or bottom item depending on if the
+             * out-of-range selection is above or below the visible items.
+             */
+            if (SWT.getPlatform().equals("gtk") && fTableRows > 0) { //$NON-NLS-1$
+                fTable.setRedraw(false);
+                if (start < Integer.MAX_VALUE) {
+                    fTable.setSelection(0);
+                } else {
+                    fTable.setSelection(fTableRows - 1);
+                    fTable.setTopIndex(0);
+                }
+                fTable.setRedraw(true);
+            }
             fTable.deselectAll();
         }
     }
