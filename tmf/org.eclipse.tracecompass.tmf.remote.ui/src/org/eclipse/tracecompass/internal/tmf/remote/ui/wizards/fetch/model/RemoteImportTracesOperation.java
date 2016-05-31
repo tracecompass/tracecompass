@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -132,7 +133,7 @@ public class RemoteImportTracesOperation extends TmfWorkspaceModifyOperation {
         try {
             doRun(monitor);
             setStatus(Status.OK_STATUS);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | OperationCanceledException e) {
             setStatus(Status.CANCEL_STATUS);
             throw e;
         } catch (Exception e) {
