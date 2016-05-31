@@ -18,6 +18,11 @@ public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.tmf.core.parsers.custom.messages"; //$NON-NLS-1$
 
+    /** @since 2.2*/
+    public static String CustomExtraFieldsAspect_extraFieldsAspectHelp;
+    /** @since 2.2*/
+    public static String CustomExtraFieldsAspect_extraFieldsAspectName;
+
     public static String CustomTrace_FileNotFound;
 
     // TODO: These strings should not be externalized
@@ -26,6 +31,10 @@ public class Messages extends NLS {
     public static String CustomTraceDefinition_messageTag;
     public static String CustomTraceDefinition_otherTag;
     public static String CustomTraceDefinition_timestampTag;
+    /** @since 2.2*/
+    public static String CustomTraceDefinition_extraFieldNameTag;
+    /** @since 2.2*/
+    public static String CustomTraceDefinition_extraFieldValueTag;
     public static String CustomTxtTraceDefinition_action;
     public static String CustomTxtTraceDefinition_cardinality;
     public static String CustomTxtTraceDefinition_category;

@@ -13,6 +13,9 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.parsers.custom;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
@@ -45,15 +48,25 @@ public class CustomEventAspects {
      * @return The set of event aspects for the given trace
      */
     public static @NonNull Iterable<ITmfEventAspect<?>> generateAspects(CustomTraceDefinition definition) {
+        List<String> fieldNames = new ArrayList<>();
         ImmutableList.Builder<ITmfEventAspect<?>> builder = new ImmutableList.Builder<>();
         for (OutputColumn output : definition.outputs) {
+
             if (output.tag.equals(Tag.TIMESTAMP) &&
                     (definition.timeStampOutputFormat == null || definition.timeStampOutputFormat.isEmpty())) {
                 builder.add(TmfBaseAspects.getTimestampAspect());
+                fieldNames.add(output.name);
             } else if (output.tag.equals(Tag.EVENT_TYPE)) {
                 builder.add(TmfBaseAspects.getEventTypeAspect());
+                fieldNames.add(output.name);
+            } else if (output.tag.equals(Tag.EXTRA_FIELD_NAME) || output.tag.equals(Tag.EXTRA_FIELD_VALUE)) {
+                // These tags should have been substituted with Tag.EXTRA_FIELDS
+                continue;
+            } else if (output.tag.equals(Tag.EXTRA_FIELDS)) {
+                builder.add(new CustomExtraFieldsAspect());
             } else {
                 builder.add(new TmfContentFieldAspect(output.name, output.name));
+                fieldNames.add(output.name);
             }
         }
         return builder.build();

@@ -31,4 +31,42 @@
 <OutputColumn name="Timestamp" tag="TIMESTAMP"/>
 <OutputColumn name="Event type" tag="EVENT_TYPE"/>
 </Definition>
+<Definition category="Custom XML" name="xmleventfields">
+<TimeStampOutputFormat>Tn</TimeStampOutputFormat>
+<InputElement name="trace">
+<InputElement logentry="true" name="event">
+<InputData action="0" name="Ignore" tag="IGNORE"/>
+<Attribute name="name">
+<InputData action="0" name="Message" tag="MESSAGE"/>
+</Attribute>
+<Attribute name="timestamp">
+<InputData action="0" format="Tn" name="Timestamp" tag="TIMESTAMP"/>
+</Attribute>
+<InputElement name="field">
+<InputData action="0" name="Ignore" tag="IGNORE"/>
+<Attribute name="name">
+<InputData action="2" name="Extra field name" tag="EXTRA_FIELD_NAME"/>
+</Attribute>
+<Attribute name="value">
+<InputData action="2" name="Extra field value" tag="EXTRA_FIELD_VALUE"/>
+</Attribute>
+</InputElement>
+<InputElement name="fieldName">
+<InputData action="0" name="Ignore" tag="IGNORE"/>
+<Attribute name="value">
+<InputData action="0" name="Extra field name" tag="EXTRA_FIELD_NAME"/>
+</Attribute>
+</InputElement>
+<InputElement name="fieldValue">
+<InputData action="0" name="Ignore" tag="IGNORE"/>
+<Attribute name="value">
+<InputData action="0" name="Extra field value" tag="EXTRA_FIELD_VALUE"/>
+</Attribute>
+</InputElement>
+</InputElement>
+</InputElement>
+<OutputColumn name="Message" tag="MESSAGE"/>
+<OutputColumn name="Timestamp" tag="TIMESTAMP"/>
+<OutputColumn name="Extra fields" tag="EXTRA_FIELDS"/>
+</Definition>
 </CustomXMLTraceDefinitionList>

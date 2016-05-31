@@ -942,13 +942,13 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 } else if (input.action == CustomTraceDefinition.ACTION_APPEND_WITH_SEPARATOR) {
                     String s = data.get(key);
                     if (s != null) {
-                        data.put(key, s + " | " + value); //$NON-NLS-1$
+                        data.put(key, s + CustomTraceDefinition.SEPARATOR + value);
                     } else {
                         data.put(key, value);
                     }
                     if (input.tag.equals(Tag.TIMESTAMP)) {
                         if (timeStampFormat != null) {
-                            timeStampFormat += " | " + input.format; //$NON-NLS-1$
+                            timeStampFormat += CustomTraceDefinition.SEPARATOR + input.format;
                         } else {
                             timeStampFormat = input.format;
                         }
@@ -1278,7 +1278,6 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             }
             eventTypeText.addModifyListener(updateListener);
 
-
             if (inputLine.columns != null) {
                 for (InputData inputData : inputLine.columns) {
                     InputGroup inputGroup = new InputGroup(group, this, inputs.size() + 1);
@@ -1289,17 +1288,27 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                         inputGroup.tagLabel.setVisible(true);
                         inputGroup.tagText.setVisible(true);
                         inputGroup.tagText.addModifyListener(updateListener);
+                        inputGroup.actionCombo.setVisible(true);
                     } else if (inputData.tag.equals(Tag.EVENT_TYPE)) {
                         inputGroup.tagCombo.select(1);
+                        inputGroup.actionCombo.setVisible(true);
                     } else if (inputData.tag.equals(Tag.MESSAGE)) {
                         inputGroup.tagCombo.select(2);
-                    } else {
+                        inputGroup.actionCombo.setVisible(true);
+                    } else if (inputData.tag.equals(Tag.EXTRA_FIELD_NAME)) {
                         inputGroup.tagCombo.select(3);
+                        inputGroup.actionCombo.setVisible(false);
+                    } else if (inputData.tag.equals(Tag.EXTRA_FIELD_VALUE)) {
+                        inputGroup.tagCombo.select(4);
+                        inputGroup.actionCombo.setVisible(true);
+                    } else {
+                        inputGroup.tagCombo.select(5);
                         inputGroup.tagText.setText(inputData.name);
                         inputGroup.tagLabel.setText(Messages.CustomTxtParserInputWizardPage_name);
                         inputGroup.tagLabel.setVisible(true);
                         inputGroup.tagText.setVisible(true);
                         inputGroup.tagText.addModifyListener(updateListener);
+                        inputGroup.actionCombo.setVisible(true);
                     }
                     inputGroup.actionCombo.select(inputData.action);
                     inputs.add(inputGroup);
@@ -1471,6 +1480,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                     Tag.TIMESTAMP.toString(),
                     Tag.EVENT_TYPE.toString(),
                     Tag.MESSAGE.toString(),
+                    Tag.EXTRA_FIELD_NAME.toString(),
+                    Tag.EXTRA_FIELD_VALUE.toString(),
                     Tag.OTHER.toString()});
             tagCombo.select(2);
             tagCombo.addSelectionListener(new SelectionListener() {
@@ -1487,20 +1498,34 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                         tagLabel.setVisible(true);
                         tagText.setVisible(true);
                         tagText.addModifyListener(updateListener);
+                        actionCombo.setVisible(true);
                         break;
                     case 1: // Event type
                         tagLabel.setVisible(false);
                         tagText.setVisible(false);
+                        actionCombo.setVisible(true);
                         break;
                     case 2: // Message
                         tagLabel.setVisible(false);
                         tagText.setVisible(false);
+                        actionCombo.setVisible(true);
                         break;
-                    case 3: // Other
+                    case 3: // Field name
+                        tagLabel.setVisible(false);
+                        tagText.setVisible(false);
+                        actionCombo.setVisible(false);
+                        break;
+                    case 4: // Field type
+                        tagLabel.setVisible(false);
+                        tagText.setVisible(false);
+                        actionCombo.setVisible(true);
+                        break;
+                    case 5: // Other
                         tagLabel.setText(Messages.CustomTxtParserInputWizardPage_name);
                         tagLabel.setVisible(true);
                         tagText.setVisible(true);
                         tagText.addModifyListener(updateListener);
+                        actionCombo.setVisible(true);
                         break;
                     default:
                         break;

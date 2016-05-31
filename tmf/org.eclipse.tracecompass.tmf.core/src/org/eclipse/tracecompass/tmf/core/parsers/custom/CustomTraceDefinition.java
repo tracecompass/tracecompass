@@ -60,6 +60,20 @@ public abstract class CustomTraceDefinition {
         EVENT_TYPE(TmfBaseAspects.getEventTypeAspect().getName()),
         /** Message */
         MESSAGE(Messages.CustomTraceDefinition_messageTag),
+        /** Extra field name
+         * @since 2.2*/
+        EXTRA_FIELD_NAME(Messages.CustomTraceDefinition_extraFieldNameTag),
+        /** Extra field value
+         * @since 2.2*/
+        EXTRA_FIELD_VALUE(Messages.CustomTraceDefinition_extraFieldValueTag),
+        /**
+         * Extra fields
+         * <p>
+         * Used as output tag corresponding to the {@link #EXTRA_FIELD_NAME} and
+         * {@link #EXTRA_FIELD_VALUE} input tags.
+         * @since 2.2
+         */
+        EXTRA_FIELDS(Messages.CustomExtraFieldsAspect_extraFieldsAspectName),
         /** Other */
         OTHER(Messages.CustomTraceDefinition_otherTag);
 
@@ -106,6 +120,14 @@ public abstract class CustomTraceDefinition {
             return null;
         }
     }
+
+    /**
+     * Separator to use with the
+     * {@link CustomTraceDefinition#ACTION_APPEND_WITH_SEPARATOR}
+     *
+     * @since 2.2
+     */
+    public static final @NonNull String SEPARATOR = " | ";  //$NON-NLS-1$
 
     /** Timestamp tag
      * @deprecated Use {@link Tag#TIMESTAMP} instead. */

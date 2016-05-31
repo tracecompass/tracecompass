@@ -967,6 +967,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         Tag.TIMESTAMP.toString(),
                         Tag.EVENT_TYPE.toString(),
                         Tag.MESSAGE.toString(),
+                        Tag.EXTRA_FIELD_NAME.toString(),
+                        Tag.EXTRA_FIELD_VALUE.toString(),
                         Tag.OTHER.toString() });
                 tagCombo.setVisibleItemCount(tagCombo.getItemCount());
                 tagCombo.addSelectionListener(new SelectionListener() {
@@ -1000,7 +1002,17 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                             tagText.setVisible(false);
                             actionCombo.setVisible(true);
                             break;
-                        case 4: // Other
+                        case 4: // Field names
+                            tagLabel.setVisible(false);
+                            tagText.setVisible(false);
+                            actionCombo.setVisible(false);
+                            break;
+                        case 5: // Field values
+                            tagLabel.setVisible(false);
+                            tagText.setVisible(false);
+                            actionCombo.setVisible(true);
+                            break;
+                        case 6: // Other
                             tagLabel.setText(Messages.CustomXmlParserInputWizardPage_name);
                             tagLabel.setVisible(true);
                             if (tagText.getText().trim().length() == 0) {
@@ -1043,19 +1055,33 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     tagLabel.setText(Messages.CustomXmlParserInputWizardPage_format);
                     tagText.setText(inputElement.getInputFormat());
                     tagText.addModifyListener(updateListener);
+                    actionCombo.setVisible(true);
                 } else if (inputElement.getInputTag().equals(Tag.EVENT_TYPE)) {
                     tagCombo.select(2);
                     tagLabel.setVisible(false);
                     tagText.setVisible(false);
+                    actionCombo.setVisible(true);
                 } else if (inputElement.getInputTag().equals(Tag.MESSAGE)) {
                     tagCombo.select(3);
                     tagLabel.setVisible(false);
                     tagText.setVisible(false);
-                } else {
+                    actionCombo.setVisible(true);
+                } else if (inputElement.getInputTag().equals(Tag.EXTRA_FIELD_NAME)) {
                     tagCombo.select(4);
+                    tagLabel.setVisible(false);
+                    tagText.setVisible(false);
+                    actionCombo.setVisible(false);
+                } else if (inputElement.getInputTag().equals(Tag.EXTRA_FIELD_VALUE)) {
+                    tagCombo.select(5);
+                    tagLabel.setVisible(false);
+                    tagText.setVisible(false);
+                    actionCombo.setVisible(true);
+                } else {
+                    tagCombo.select(6);
                     tagLabel.setText(Messages.CustomXmlParserInputWizardPage_name);
                     tagText.setText(inputElement.getInputName());
                     tagText.addModifyListener(updateListener);
+                    actionCombo.setVisible(true);
                 }
 
                 eventTypeButton = new Button(group, SWT.CHECK);
@@ -1129,8 +1155,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                                 }
                             } else if (actionCombo.getSelectionIndex() == CustomTraceDefinition.ACTION_APPEND_WITH_SEPARATOR) {
                                 if (timeStampValue != null) {
-                                    timeStampValue += " | " + value; //$NON-NLS-1$
-                                    timeStampFormat += " | " + tagText.getText().trim(); //$NON-NLS-1$
+                                    timeStampValue += CustomTraceDefinition.SEPARATOR + value;
+                                    timeStampFormat += CustomTraceDefinition.SEPARATOR + tagText.getText().trim();
                                 } else {
                                     timeStampValue = value;
                                     timeStampFormat = tagText.getText().trim();
@@ -1368,6 +1394,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     Tag.TIMESTAMP.toString(),
                     Tag.EVENT_TYPE.toString(),
                     Tag.MESSAGE.toString(),
+                    Tag.EXTRA_FIELD_NAME.toString(),
+                    Tag.EXTRA_FIELD_VALUE.toString(),
                     Tag.OTHER.toString() });
             tagCombo.select(3); // Other
             tagCombo.addSelectionListener(new SelectionListener() {
@@ -1384,16 +1412,29 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         tagLabel.setVisible(true);
                         tagText.setVisible(true);
                         tagText.addModifyListener(updateListener);
+                        actionCombo.setVisible(true);
                         break;
                     case 1: // Event type
                         tagLabel.setVisible(false);
                         tagText.setVisible(false);
+                        actionCombo.setVisible(true);
                         break;
                     case 2: // Message
                         tagLabel.setVisible(false);
                         tagText.setVisible(false);
+                        actionCombo.setVisible(true);
                         break;
-                    case 3: // Other
+                    case 3: // Field names
+                        tagLabel.setVisible(false);
+                        tagText.setVisible(false);
+                        actionCombo.setVisible(false);
+                        break;
+                    case 4: // Field values
+                        tagLabel.setVisible(false);
+                        tagText.setVisible(false);
+                        actionCombo.setVisible(true);
+                        break;
+                    case 5: // Other
                         tagLabel.setText(Messages.CustomXmlParserInputWizardPage_name);
                         tagLabel.setVisible(true);
                         if (tagText.getText().trim().length() == 0) {
@@ -1401,6 +1442,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         }
                         tagText.setVisible(true);
                         tagText.addModifyListener(updateListener);
+                        actionCombo.setVisible(true);
                         break;
                     default:
                         break;
@@ -1431,19 +1473,33 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 tagLabel.setText(Messages.CustomXmlParserInputWizardPage_format);
                 tagText.setText(inputAttribute.getInputFormat());
                 tagText.addModifyListener(updateListener);
+                actionCombo.setVisible(true);
             } else if (inputAttribute.getInputTag().equals(Tag.EVENT_TYPE)) {
                 tagCombo.select(1);
                 tagLabel.setVisible(false);
                 tagText.setVisible(false);
+                actionCombo.setVisible(true);
             } else if (inputAttribute.getInputTag().equals(Tag.MESSAGE)) {
                 tagCombo.select(2);
                 tagLabel.setVisible(false);
                 tagText.setVisible(false);
-            } else {
+                actionCombo.setVisible(true);
+            } else if (inputAttribute.getInputTag().equals(Tag.EXTRA_FIELD_NAME)) {
                 tagCombo.select(3);
+                tagLabel.setVisible(false);
+                tagText.setVisible(false);
+                actionCombo.setVisible(false);
+            } else if (inputAttribute.getInputTag().equals(Tag.EXTRA_FIELD_VALUE)) {
+                tagCombo.select(4);
+                tagLabel.setVisible(false);
+                tagText.setVisible(false);
+                actionCombo.setVisible(true);
+            } else {
+                tagCombo.select(5);
                 tagLabel.setText(Messages.CustomXmlParserInputWizardPage_name);
                 tagText.setText(inputAttribute.getInputName());
                 tagText.addModifyListener(updateListener);
+                actionCombo.setVisible(true);
             }
         }
 

@@ -16,14 +16,14 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.core.parsers.custom.CustomExtraField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
@@ -89,7 +89,7 @@ public class CustomEvent extends TmfEvent {
     public CustomEvent(CustomTraceDefinition definition) {
         super(null, ITmfContext.UNKNOWN_RANK, null, null, null);
         fDefinition = definition;
-        fData = new HashMap<>();
+        fData = new LinkedHashMap<>();
         customEventTimestamp = TmfTimestamp.ZERO;
     }
 
@@ -104,7 +104,7 @@ public class CustomEvent extends TmfEvent {
     public CustomEvent(CustomTraceDefinition definition, @NonNull TmfEvent other) {
         super(other);
         fDefinition = definition;
-        fData = new HashMap<>();
+        fData = new LinkedHashMap<>();
 
         /* Set our overridden fields */
         customEventTimestamp = other.getTimestamp();
@@ -129,7 +129,7 @@ public class CustomEvent extends TmfEvent {
         /* Do not use upstream's fields for stuff we override */
         super(parentTrace, ITmfContext.UNKNOWN_RANK, null, null, null);
         fDefinition = definition;
-        fData = new HashMap<>();
+        fData = new LinkedHashMap<>();
 
         /* Set our overridden fields */
         if (timestamp == null) {
@@ -244,8 +244,9 @@ public class CustomEvent extends TmfEvent {
     }
 
     private void processData() {
-        String timestampString = fData.get(Tag.TIMESTAMP);
-        String timestampInputFormat = fData.get(Key.TIMESTAMP_INPUT_FORMAT);
+        // Remove the values as they are processed, so we can process the extra values at the end
+        String timestampString = fData.remove(Tag.TIMESTAMP);
+        String timestampInputFormat = fData.remove(Key.TIMESTAMP_INPUT_FORMAT);
         ITmfTimestamp timestamp = null;
         if (timestampInputFormat != null && timestampString != null) {
             TmfTimestampFormat timestampFormat = new TmfTimestampFormat(timestampInputFormat);
@@ -261,25 +262,33 @@ public class CustomEvent extends TmfEvent {
         }
 
         // Update the custom event type of this event if set
-        String eventName = fData.get(Tag.EVENT_TYPE);
+        String eventName = fData.remove(Tag.EVENT_TYPE);
         ITmfEventType type = getType();
         if (eventName != null && type instanceof CustomEventType) {
             ((CustomEventType) type).setName(eventName);
         }
 
-        List<ITmfEventField> fields = new ArrayList<>(fDefinition.outputs.size());
+        Map<String, TmfEventField> fieldMap = new LinkedHashMap<>();
         for (OutputColumn outputColumn : fDefinition.outputs) {
-            Object key = (outputColumn.tag.equals(Tag.OTHER) ? outputColumn.name : outputColumn.tag);
             if (outputColumn.tag.equals(Tag.TIMESTAMP)) {
                 if (timestamp != null && fDefinition.timeStampOutputFormat != null && !fDefinition.timeStampOutputFormat.isEmpty()) {
                     TmfTimestampFormat timestampFormat = new TmfTimestampFormat(fDefinition.timeStampOutputFormat);
-                    fields.add(new TmfEventField(outputColumn.name, timestampFormat.format(timestamp.getValue()), null));
+                    fieldMap.put(outputColumn.name, new TmfEventField(outputColumn.name, timestampFormat.format(timestamp.getValue()), null));
                 }
-            } else if (!outputColumn.tag.equals(Tag.EVENT_TYPE)){
-                fields.add(new TmfEventField(outputColumn.name, nullToEmptyString(fData.get(key)), null));
+            } else if (outputColumn.tag.equals(Tag.OTHER) || outputColumn.tag.equals(Tag.MESSAGE)) {
+                Object key = (outputColumn.tag.equals(Tag.OTHER) ? outputColumn.name : outputColumn.tag);
+                fieldMap.put(outputColumn.name, new TmfEventField(outputColumn.name, nullToEmptyString(fData.remove(key)), null));
             }
         }
-        setContent(new CustomEventContent(customEventContent.getName(), customEventContent.getValue(), fields.toArray(new ITmfEventField[0])));
+        // This event contains extra values, we process them now
+        for (Entry<Object, String> entry : fData.entrySet()) {
+            String fieldName = nullToEmptyString(entry.getKey().toString());
+            // Ignore extra fields if a field of same name is already set
+            if (!fieldMap.containsKey(fieldName)) {
+                fieldMap.put(fieldName, new CustomExtraField(fieldName, nullToEmptyString(entry.getValue()), null));
+            }
+        }
+        setContent(new CustomEventContent(customEventContent.getName(), customEventContent.getValue(), fieldMap.values().toArray(new ITmfEventField[fieldMap.size()])));
         fData = null;
     }
 

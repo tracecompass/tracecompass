@@ -17,6 +17,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -138,6 +139,21 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
         if (visible) {
             this.definition = wizard.inputPage.getDefinition();
             final List<Entry<Tag, String>> inputs = wizard.inputPage.getInputs();
+
+            // substitute extra field name/value with extra fields tag
+            Iterator<Entry<Tag, String>> iterator = inputs.iterator();
+            boolean addExtraFields = false;
+            while (iterator.hasNext()) {
+                Entry<Tag, String> entry = iterator.next();
+                if (entry.getKey().equals(Tag.EXTRA_FIELD_NAME) ||
+                        entry.getKey().equals(Tag.EXTRA_FIELD_VALUE)) {
+                    iterator.remove();
+                    addExtraFields = true;
+                }
+            }
+            if (addExtraFields) {
+                inputs.add(new SimpleEntry<>(Tag.EXTRA_FIELDS, Tag.EXTRA_FIELDS.toString()));
+            }
 
             // dispose outputs that have been removed in the input page
             final Iterator<Output> iter = outputs.iterator();

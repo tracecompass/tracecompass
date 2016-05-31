@@ -31,6 +31,8 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  */
 public class CustomTxtEvent extends CustomEvent {
 
+    private String fLastExtraFieldName = null;
+
     /**
      * Constructor
      *
@@ -98,6 +100,21 @@ public class CustomTxtEvent extends CustomEvent {
                     continue;
                 }
                 Object key = (column.tag.equals(Tag.OTHER) ? column.name : column.tag);
+                if (key.equals(Tag.EXTRA_FIELD_NAME)) {
+                    // If tag extra field name, save the extra field name for
+                    // the next extra field value and add the field to the map
+                    fLastExtraFieldName = value;
+                    if (!fData.containsKey(value)) {
+                        fData.put(value, null);
+                    }
+                    continue;
+                } else if (key.equals(Tag.EXTRA_FIELD_VALUE)) {
+                    // If tag extra field value, use the extra field name as key
+                    if (fLastExtraFieldName == null) {
+                        continue;
+                    }
+                    key = fLastExtraFieldName;
+                }
                 if (column.action == CustomTraceDefinition.ACTION_SET) {
                     fData.put(key, value);
                     if (key.equals(Tag.TIMESTAMP)) {
@@ -121,7 +138,7 @@ public class CustomTxtEvent extends CustomEvent {
                 } else if (column.action == CustomTraceDefinition.ACTION_APPEND_WITH_SEPARATOR) {
                     String s = fData.get(key);
                     if (s != null) {
-                        fData.put(key, s + " | " + value); //$NON-NLS-1$
+                        fData.put(key, s + CustomTraceDefinition.SEPARATOR + value);
                     } else {
                         fData.put(key, value);
                     }

@@ -27,6 +27,8 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  */
 public class CustomXmlEvent extends CustomEvent {
 
+    private String fLastExtraFieldName = null;
+
     /**
      * Constructor defining only the trace definition
      *
@@ -99,6 +101,21 @@ public class CustomXmlEvent extends CustomEvent {
             return;
         }
         Object key = (inputTag.equals(Tag.OTHER) ? inputName : inputTag);
+        if (key.equals(Tag.EXTRA_FIELD_NAME)) {
+            // If tag extra field name, save the extra field name for
+            // the next extra field value and add the field to the map
+            fLastExtraFieldName = value;
+            if (!fData.containsKey(value)) {
+                fData.put(value, null);
+            }
+            return;
+        } else if (key.equals(Tag.EXTRA_FIELD_VALUE)) {
+            // If tag extra field value, use the extra field name as key
+            if (fLastExtraFieldName == null) {
+                return;
+            }
+            key = fLastExtraFieldName;
+        }
         if (inputAction == CustomTraceDefinition.ACTION_SET) {
             fData.put(key, value);
             if (key.equals(Tag.TIMESTAMP)) {
@@ -122,7 +139,7 @@ public class CustomXmlEvent extends CustomEvent {
         } else if (inputAction == CustomTraceDefinition.ACTION_APPEND_WITH_SEPARATOR) {
             String s = fData.get(key);
             if (s != null) {
-                fData.put(key, s + " | " + value); //$NON-NLS-1$
+                fData.put(key, s + CustomTraceDefinition.SEPARATOR + value);
             } else {
                 fData.put(key, value);
             }

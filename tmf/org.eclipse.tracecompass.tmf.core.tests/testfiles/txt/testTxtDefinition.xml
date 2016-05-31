@@ -32,4 +32,49 @@
 <OutputColumn name="Timestamp" tag="TIMESTAMP"/>
 <OutputColumn name="Event type" tag="EVENT_TYPE"/>
 </Definition>
+<Definition category="Custom Text" name="testtxtcustomfields">
+<TimeStampOutputFormat>dd/MM/yyyy HH:mm:ss:SSS</TimeStampOutputFormat>
+<InputLine>
+<Cardinality max="2147483647" min="0"/>
+<RegEx>(\d*) ([\w|\d]*)\s*([\w|\d]*)=([\w|\d]*)</RegEx>
+<InputData action="0" format="Tn" name="Timestamp" tag="TIMESTAMP"/>
+<InputData action="0" format="" name="Message" tag="MESSAGE"/>
+<InputData action="0" format="" name="Extra field name" tag="EXTRA_FIELD_NAME"/>
+<InputData action="2" format="" name="Extra field value" tag="EXTRA_FIELD_VALUE"/>
+</InputLine>
+<InputLine>
+<Cardinality max="2147483647" min="0"/>
+<RegEx>(\d*) ([\w|\d]*)\s*([\w|\d]*)=([\w|\d]*)\s*([\w|\d]*)=([\w|\d]*)</RegEx>
+<InputData action="0" format="Tn" name="Timestamp" tag="TIMESTAMP"/>
+<InputData action="0" format="" name="Message" tag="MESSAGE"/>
+<InputData action="2" format="" name="Extra field name" tag="EXTRA_FIELD_NAME"/>
+<InputData action="2" format="" name="Extra field value" tag="EXTRA_FIELD_VALUE"/>
+<InputData action="2" format="" name="Extra field name" tag="EXTRA_FIELD_NAME"/>
+<InputData action="2" format="" name="Extra field value" tag="EXTRA_FIELD_VALUE"/>
+</InputLine>
+<InputLine>
+<Cardinality max="2147483647" min="0"/>
+<RegEx>(\d*) ([\w|\d]*)\s*([\w|\d]*)=([\w|\d]*) other ([\w|\d]*)</RegEx>
+<InputData action="0" format="Tn" name="Timestamp" tag="TIMESTAMP"/>
+<InputData action="0" format="" name="Message" tag="MESSAGE"/>
+<InputData action="2" format="" name="Extra field name" tag="EXTRA_FIELD_NAME"/>
+<InputData action="2" format="" name="Extra field value" tag="EXTRA_FIELD_VALUE"/>
+<InputData action="2" format="" name="Extra field value" tag="EXTRA_FIELD_VALUE"/>
+</InputLine>
+<InputLine>
+<Cardinality max="2147483647" min="0"/>
+<RegEx>(\d*) ([\w|\d]*)\s*([\w|\d]*)=([\w|\d]*)\s*([\w|\d]*)=([\w|\d]*)\s*([\w|\d]*)=([\w|\d]*)</RegEx>
+<InputData action="0" format="Tn" name="Timestamp" tag="TIMESTAMP"/>
+<InputData action="0" format="" name="Message" tag="MESSAGE"/>
+<InputData action="0" format="" name="Extra field name" tag="EXTRA_FIELD_NAME"/>
+<InputData action="0" format="" name="Extra field value" tag="EXTRA_FIELD_VALUE"/>
+<InputData action="0" format="" name="Extra field name" tag="EXTRA_FIELD_NAME"/>
+<InputData action="0" format="" name="Extra field value" tag="EXTRA_FIELD_VALUE"/>
+<InputData action="0" format="" name="Extra field name" tag="EXTRA_FIELD_NAME"/>
+<InputData action="0" format="" name="Extra field value" tag="EXTRA_FIELD_VALUE"/>
+</InputLine>
+<OutputColumn name="Timestamp" tag="TIMESTAMP"/>
+<OutputColumn name="Message" tag="MESSAGE"/>
+<OutputColumn name="Extra fields" tag="EXTRA_FIELDS"/>
+</Definition>
 </CustomTxtTraceDefinitionList>
