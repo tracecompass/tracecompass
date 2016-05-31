@@ -611,15 +611,16 @@ public class TimeGraphCombo extends Composite {
 
         // prevent mouse button from selecting a filler tree item
         tree.addListener(SWT.MouseDown, event -> {
-            TreeItem treeItem = tree.getItem(new Point(event.x, event.y));
-            if (treeItem == null || treeItem.getData() == FILLER) {
+            List<TreeItem> treeItems = getVisibleExpandedItems(tree, false);
+            if (treeItems.isEmpty()) {
                 event.doit = false;
-                List<TreeItem> treeItems = getVisibleExpandedItems(tree, false);
-                if (treeItems.size() == 0) {
-                    fTreeViewer.setSelection(new StructuredSelection());
-                    fTimeGraphViewer.setSelection(null);
-                    return;
-                }
+                fTreeViewer.setSelection(new StructuredSelection());
+                fTimeGraphViewer.setSelection(null);
+                return;
+            }
+            TreeItem lastTreeItem = treeItems.get(treeItems.size() - 1);
+            if (event.y >= lastTreeItem.getBounds().y + lastTreeItem.getBounds().height) {
+                event.doit = false;
                 // this prevents from scrolling up when selecting
                 // the partially visible tree item at the bottom
                 tree.select(treeItems.get(treeItems.size() - 1));
