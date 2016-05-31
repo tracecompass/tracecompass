@@ -262,6 +262,10 @@ public class ManageCustomParsersDialog extends Dialog {
                             }
                         }
                         fillParserList();
+                    } else {
+                        MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+                                Messages.ManageCustomParsersDialog_ImportFailureTitle,
+                                Messages.ManageCustomParsersDialog_ImportFailureMessage);
                     }
                 }
             }

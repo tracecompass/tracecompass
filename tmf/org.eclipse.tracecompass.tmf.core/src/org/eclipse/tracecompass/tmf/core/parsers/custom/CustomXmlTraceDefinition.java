@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson
+ * Copyright (c) 2010, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -169,6 +169,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             if (file.canRead()) {
                 doc = db.parse(file);
                 if (!doc.getDocumentElement().getNodeName().equals(CUSTOM_XML_TRACE_DEFINITION_ROOT_ELEMENT)) {
+                    Activator.logError(String.format("Error saving CustomXmlTraceDefinition: path=%s is not a valid custom parser file", path)); //$NON-NLS-1$
                     return;
                 }
             } else {

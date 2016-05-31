@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson
+ * Copyright (c) 2010, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -34,7 +34,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -494,6 +493,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             if (file.canRead()) {
                 doc = db.parse(file);
                 if (!doc.getDocumentElement().getNodeName().equals(CUSTOM_TXT_TRACE_DEFINITION_ROOT_ELEMENT)) {
+                    Activator.logError(String.format("Error saving CustomTxtTraceDefinition: path=%s is not a valid custom parser file", path)); //$NON-NLS-1$
                     return;
                 }
             } else {
@@ -546,17 +546,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
             TmfTraceType.addCustomTraceType(CustomTxtTrace.class, categoryName, definitionName);
 
-        } catch (ParserConfigurationException e) {
-            Activator.logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
-        } catch (TransformerConfigurationException e) {
-            Activator.logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
-        } catch (TransformerFactoryConfigurationError e) {
-            Activator.logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
-        } catch (TransformerException e) {
-            Activator.logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
-        } catch (IOException e) {
-            Activator.logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
-        } catch (SAXException e) {
+        } catch (ParserConfigurationException | TransformerFactoryConfigurationError | TransformerException | IOException | SAXException e) {
             Activator.logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
         }
     }
