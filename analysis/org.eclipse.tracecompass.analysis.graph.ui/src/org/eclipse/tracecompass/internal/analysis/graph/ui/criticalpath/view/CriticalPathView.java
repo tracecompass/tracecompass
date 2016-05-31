@@ -267,6 +267,10 @@ public class CriticalPathView extends AbstractTimeGraphView {
                 TmfGraphStatistics stats = fObjectStatistics.get(trace, worker);
                 if (stats == null) {
                     stats = new TmfGraphStatistics();
+                    final TmfGraph graph = getGraph(trace);
+                    if (graph != null) {
+                        stats.computeGraphStatistics(graph, worker);
+                    }
                 }
                 fStats = stats;
             }
