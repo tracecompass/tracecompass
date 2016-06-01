@@ -3015,7 +3015,7 @@ Like for the time graph views, optional header information can be added to the v
 
 <pre>
 <head>
-    <analysis id="org.eclipse.tracecompass.lttng2.kernel.analysis" />
+    <analysis id="org.eclipse.tracecompass.analysis.os.linux.kernel" />
     <label value="CPU status XY view" />
 </head>
 </pre>
