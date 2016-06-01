@@ -2849,7 +2849,7 @@ The CtfTmfEvent is an ITmfEvent that is used to wrap event declarations and even
 There are other helper files that format given events for views, they are simpler and the architecture does not depend on them.
 
 === Limitations ===
-For the moment live trace reading is not supported, there are no sources of traces to test on.
+For the moment live CTF trace reading is not supported.
 
 = Event matching and trace synchronization =
 
