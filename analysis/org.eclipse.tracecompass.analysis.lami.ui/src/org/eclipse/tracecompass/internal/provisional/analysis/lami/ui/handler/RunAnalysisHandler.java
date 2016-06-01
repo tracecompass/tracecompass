@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -108,8 +107,7 @@ public class RunAnalysisHandler extends AbstractHandler {
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
         ParameterDialog dialog = new ParameterDialog(shell, Messages.ParameterDialog_ExternalParameters,
                 Messages.ParameterDialog_ExternalParametersDescription,
-                        baseCommand,
-                PARAM_STRING_VALIDATOR);
+                baseCommand, null);
         if (dialog.open() != Window.OK) {
             /* User clicked Cancel, don't run */
             return null;
@@ -175,13 +173,6 @@ public class RunAnalysisHandler extends AbstractHandler {
 
         return null;
     }
-
-    private static final IInputValidator PARAM_STRING_VALIDATOR = text -> {
-        if (text.isEmpty() || text.matches("[a-zA-Z0-9\\,\\-\\s]+")) { //$NON-NLS-1$
-            return null;
-        }
-        return Messages.ParameterDialog_StringValidatorMessage;
-    };
 
     /**
      * Register a new report
