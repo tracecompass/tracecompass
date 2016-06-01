@@ -38,6 +38,9 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -364,6 +367,20 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
     public void clearCpu() {
         fCpus.clear();
         updateContent(getWindowStartTime(), getWindowEndTime(), false);
+    }
+
+    @Override
+    @TmfSignalHandler
+    public void traceSelected(TmfTraceSelectedSignal signal) {
+        setSelectedThread(null);
+        super.traceSelected(signal);
+    }
+
+    @Override
+    @TmfSignalHandler
+    public void traceOpened(TmfTraceOpenedSignal signal) {
+        setSelectedThread(null);
+        super.traceOpened(signal);
     }
 
 }

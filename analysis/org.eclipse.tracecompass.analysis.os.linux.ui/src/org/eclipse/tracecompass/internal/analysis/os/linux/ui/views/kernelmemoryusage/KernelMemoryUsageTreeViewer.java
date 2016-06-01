@@ -27,6 +27,9 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
@@ -227,5 +230,19 @@ public class KernelMemoryUsageTreeViewer extends AbstractTmfTreeViewer {
      */
     public void setSelectedThread(String tid) {
         fSelectedThread = tid;
+    }
+
+    @Override
+    @TmfSignalHandler
+    public void traceSelected(TmfTraceSelectedSignal signal) {
+        setSelectedThread(null);
+        super.traceSelected(signal);
+    }
+
+    @Override
+    @TmfSignalHandler
+    public void traceOpened(TmfTraceOpenedSignal signal) {
+        setSelectedThread(null);
+        super.traceOpened(signal);
     }
 }

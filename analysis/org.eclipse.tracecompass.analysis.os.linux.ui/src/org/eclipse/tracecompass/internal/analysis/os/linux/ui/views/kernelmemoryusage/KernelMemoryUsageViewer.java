@@ -21,6 +21,9 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundExc
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -185,6 +188,20 @@ public class KernelMemoryUsageViewer extends TmfCommonXLineChartViewer {
         deleteSeries(fSelectedThread);
         fSelectedThread = tid;
         updateContent();
+    }
+
+    @Override
+    @TmfSignalHandler
+    public void traceSelected(TmfTraceSelectedSignal signal) {
+        setSelectedThread(NOT_SELECTED);
+        super.traceSelected(signal);
+    }
+
+    @Override
+    @TmfSignalHandler
+    public void traceOpened(TmfTraceOpenedSignal signal) {
+        setSelectedThread(NOT_SELECTED);
+        super.traceOpened(signal);
     }
 
 }

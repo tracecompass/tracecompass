@@ -29,6 +29,9 @@ import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.KernelCpuUsageAn
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
@@ -43,6 +46,8 @@ import com.google.common.base.Joiner;
  */
 public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
 
+    private static final int NOT_SELECTED = -1;
+
     private KernelCpuUsageAnalysis fModule = null;
 
     /* Maps a thread ID to a list of y values */
@@ -56,7 +61,7 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
     // Timeout between updates in the updateData thread
     private static final long BUILD_UPDATE_TIMEOUT = 500;
 
-    private long fSelectedThread = -1;
+    private long fSelectedThread = NOT_SELECTED;
 
     private final @NonNull Set<@NonNull Integer> fCpus = new TreeSet<>();
 
@@ -129,7 +134,7 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
                 fYValues.clear();
                 fYValues.put(Messages.CpuUsageXYViewer_Total, zeroFill(xvalues.length));
                 String stringSelectedThread = Long.toString(selectedThread);
-                if (selectedThread != -1) {
+                if (selectedThread != NOT_SELECTED) {
                     fYValues.put(stringSelectedThread, zeroFill(xvalues.length));
                 }
 
@@ -281,6 +286,20 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
         cancelUpdate();
         updateContent();
         getSwtChart().getTitle().setText(Messages.CpuUsageView_Title);
+    }
+
+    @Override
+    @TmfSignalHandler
+    public void traceSelected(TmfTraceSelectedSignal signal) {
+        setSelectedThread(NOT_SELECTED);
+        super.traceSelected(signal);
+    }
+
+    @Override
+    @TmfSignalHandler
+    public void traceOpened(TmfTraceOpenedSignal signal) {
+        setSelectedThread(NOT_SELECTED);
+        super.traceOpened(signal);
     }
 
 }
