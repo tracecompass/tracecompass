@@ -371,9 +371,15 @@ public final class LamiReportViewTabPage extends TmfComponent {
             LamiTimeRange timeRange = table.getEntries().get(index).getCorrespondingTimeRange();
             if (timeRange != null) {
                 /* Send Range update to other views */
-                ITmfTimestamp start = TmfTimestamp.fromNanos(timeRange.getStart());
-                ITmfTimestamp end = TmfTimestamp.fromNanos(timeRange.getEnd());
-                TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(LamiReportViewTabPage.this, start, end));
+                // TODO: Consider low and high limits of timestamps here.
+                Number tsBeginValueNumber = timeRange.getBegin().getValue();
+                Number tsEndValueNumber = timeRange.getEnd().getValue();
+
+                if (tsBeginValueNumber != null && tsEndValueNumber != null) {
+                    ITmfTimestamp start = TmfTimestamp.fromNanos(tsBeginValueNumber.longValue());
+                    ITmfTimestamp end = TmfTimestamp.fromNanos(tsEndValueNumber.longValue());
+                    TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(LamiReportViewTabPage.this, start, end));
+                }
             }
         }
 
@@ -412,9 +418,18 @@ public final class LamiReportViewTabPage extends TmfComponent {
                 return selections;
             }
 
-            TmfTimeRange tempTimeRange = new TmfTimeRange(TmfTimestamp.fromNanos(timerange.getStart()), TmfTimestamp.fromNanos(timerange.getEnd()));
-            if (tempTimeRange.getIntersection(range) != null) {
-                selections.add(table.getEntries().indexOf(entry));
+            // TODO: Consider low and high limits of timestamps here.
+            Number tsBeginValueNumber = timerange.getBegin().getValue();
+            Number tsEndValueNumber = timerange.getEnd().getValue();
+
+            if (tsBeginValueNumber != null && tsEndValueNumber != null) {
+                ITmfTimestamp start = TmfTimestamp.fromNanos(tsBeginValueNumber.longValue());
+                ITmfTimestamp end = TmfTimestamp.fromNanos(tsEndValueNumber.longValue());
+
+                TmfTimeRange tempTimeRange = new TmfTimeRange(start, end);
+                if (tempTimeRange.getIntersection(range) != null) {
+                    selections.add(table.getEntries().indexOf(entry));
+                }
             }
         }
         return selections;

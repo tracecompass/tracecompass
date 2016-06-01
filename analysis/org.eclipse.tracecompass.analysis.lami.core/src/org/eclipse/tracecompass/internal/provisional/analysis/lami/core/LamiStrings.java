@@ -12,8 +12,8 @@ package org.eclipse.tracecompass.internal.provisional.analysis.lami.core;
 /**
  * Strings used in the LAMI v1.0 protocol.
  *
- * The full spec is documented <a href=
- * "https://github.com/lttng/lami-spec/blob/d6129206184988b3fd7cccb76deace4a69c1443e/lami.md">here</a>.
+ * The full spec is documented
+ * <a href="http://lttng.org/files/lami/lami-1.0.1.html">here</a>.
  *
  * @author Alexandre Montplaisir
  * @noimplement This interface is not intended to be implemented by clients.
@@ -35,10 +35,16 @@ public interface LamiStrings {
 
     /* Data types */
     String VALUE = "value";
+    String LOW = "low";
+    String HIGH = "high";
     String ID = "id";
     String FD = "fd";
     String NAME = "name";
     String PATH = "path";
+
+    /* Positive and negative infinity */
+    String NEG_INF = "-inf";
+    String POS_INF = "+inf";
 
     /* Time ranges */
     String BEGIN = "begin";
@@ -60,6 +66,9 @@ public interface LamiStrings {
 
     /* Data classes */
     String DATA_CLASS_UNKNOWN = "unknown";
+    String DATA_CLASS_NUMBER = "number";
+    String DATA_CLASS_BOOLEAN = "bool";
+    String DATA_CLASS_STRING = "string";
     String DATA_CLASS_RATIO = "ratio";
     String DATA_CLASS_TIMESTAMP = "timestamp";
     String DATA_CLASS_TIME_RANGE = "time-range";

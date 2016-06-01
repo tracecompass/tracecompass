@@ -9,12 +9,14 @@
 
 package org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * Class for LAMI 'bitrate' types.
  *
  * @author Philippe Proulx
  */
-public class LamiBitrate extends LamiInteger {
+public class LamiBitrate extends LamiDoubleNumber {
 
     /**
      * Constructor
@@ -22,7 +24,21 @@ public class LamiBitrate extends LamiInteger {
      * @param value
      *            The bitrate value, in bits per second (bps)
      */
-    public LamiBitrate(long value) {
+    public LamiBitrate(double value) {
         super(value);
+    }
+
+    /**
+     * Constructor (with limits)
+     *
+     * @param low
+     *            Lower bound of value (bps)
+     * @param value
+     *            Value (bps)
+     * @param high
+     *            Higher bound of value (bps)
+     */
+    public LamiBitrate(@Nullable Double low, @Nullable Double value, @Nullable Double high) {
+        super(low, value, high);
     }
 }

@@ -9,12 +9,14 @@
 
 package org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * Duration data element
  *
  * @author Philippe Proulx
  */
-public class LamiDuration extends LamiInteger {
+public class LamiDuration extends LamiLongNumber {
 
     /**
      * Constructor
@@ -25,4 +27,19 @@ public class LamiDuration extends LamiInteger {
     public LamiDuration(long value) {
         super(value);
     }
+
+    /**
+     * Constructor (with limits)
+     *
+     * @param low
+     *            Lower bound of value (ns)
+     * @param value
+     *            Value (ns)
+     * @param high
+     *            Higher bound of value (ns)
+     */
+    public LamiDuration(@Nullable Long low, @Nullable Long value, @Nullable Long high) {
+        super(low, value, high);
+    }
+
 }

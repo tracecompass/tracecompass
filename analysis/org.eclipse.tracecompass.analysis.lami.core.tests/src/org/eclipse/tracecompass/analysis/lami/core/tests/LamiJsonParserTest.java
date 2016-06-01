@@ -31,6 +31,7 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.La
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiSize;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiSystemCall;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiTimeRange;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -152,9 +153,8 @@ public class LamiJsonParserTest {
         assertEquals("Per-interrupt stuff [with overridden title]", perInterruptOverrideTable.getTableClass().getTableTitle());
         assertEquals("Extended per-irq", perInterruptOverrideTable.getTableClass().getTableClassName());
 
-        assertEquals(1000, perProcessTable.getTimeRange().getStart());
-        assertEquals(2000, perProcessTable.getTimeRange().getEnd());
-        assertEquals(1000, perProcessTable.getTimeRange().getDuration());
+        LamiTimeRange expectedTimeRange = new LamiTimeRange(new LamiTimestamp(1000), new LamiTimestamp(2000));
+        assertEquals(expectedTimeRange, perProcessTable.getTimeRange());
 
         List<LamiTableEntry> syscallEntries = perSyscallTable.getEntries();
 
@@ -164,11 +164,9 @@ public class LamiJsonParserTest {
         LamiTableEntry readEntry = syscallEntries.get(0);
         LamiTimeRange readEntryTimeRange = readEntry.getCorrespondingTimeRange();
 
+        expectedTimeRange = new LamiTimeRange(new LamiTimestamp(98233), new LamiTimestamp(1293828));
         assertNotNull(readEntryTimeRange);
-        assertEquals(98233, readEntryTimeRange.getStart());
-        assertEquals(1293828, readEntryTimeRange.getEnd());
-        assertEquals(1195595, readEntryTimeRange.getDuration());
-
+        assertEquals(expectedTimeRange, readEntryTimeRange);
 
         /* Test raw values */
         LamiData value0 = readEntry.getValue(0);
@@ -177,21 +175,20 @@ public class LamiJsonParserTest {
 
         LamiData value1 = readEntry.getValue(1);
         assertTrue(value1 instanceof LamiDuration);
-        assertEquals(2398123, ((LamiDuration) value1).getValue());
+        assertEquals(new LamiDuration(2398123), value1);
 
         LamiData value2 = readEntry.getValue(2);
         assertTrue(value2 instanceof LamiSize);
-        assertEquals(8123982, ((LamiSize) value2).getValue());
+        assertEquals(new LamiSize(8123982), value2);
 
         LamiData value3 = readEntry.getValue(3);
         assertTrue(value3 instanceof LamiBitrate);
-        assertEquals(223232, ((LamiBitrate) value3).getValue());
+        assertEquals(new LamiBitrate(223232), value3);
 
         LamiData value4 = readEntry.getValue(4);
+        expectedTimeRange = new LamiTimeRange(new LamiTimestamp(98233), new LamiTimestamp(1293828));
         assertTrue(value4 instanceof LamiTimeRange);
-        assertEquals(98233, ((LamiTimeRange) value4).getStart());
-        assertEquals(1293828, ((LamiTimeRange) value4).getEnd());
-
+        assertEquals(expectedTimeRange, value4);
 
         /* Test with aspects */
         Map<String, LamiTableClass> tableModels = analysis.getTableClasses();

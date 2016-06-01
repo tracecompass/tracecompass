@@ -9,8 +9,22 @@
 
 package org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types;
 
-class LamiFileDescriptor extends LamiInteger {
-    public LamiFileDescriptor(long value) {
-        super(value);
+import org.eclipse.jdt.annotation.Nullable;
+
+class LamiFileDescriptor extends LamiData {
+
+    private final int fFd;
+
+    public LamiFileDescriptor(int fd) {
+        fFd = fd;
+    }
+
+    public int getId() {
+        return fFd;
+    }
+
+    @Override
+    public @Nullable String toString() {
+        return Integer.toString(fFd);
     }
 }

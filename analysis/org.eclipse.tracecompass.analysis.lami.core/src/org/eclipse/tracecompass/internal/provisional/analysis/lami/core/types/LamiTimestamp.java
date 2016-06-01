@@ -9,12 +9,14 @@
 
 package org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * Lami timestamp data type
  *
  * @author Alexandre Montplaisir
  */
-public class LamiTimestamp extends LamiInteger {
+public class LamiTimestamp extends LamiLongNumber {
 
     /**
      * Construct a time stamp from a value in ns.
@@ -24,5 +26,19 @@ public class LamiTimestamp extends LamiInteger {
      */
     public LamiTimestamp(long value) {
         super(value);
+    }
+
+    /**
+     * Constructor (with limits)
+     *
+     * @param low
+     *            Lower bound of value (ns since Unix epoch)
+     * @param value
+     *            Value (ns since Unix epoch)
+     * @param high
+     *            Higher bound of value (ns since Unix epoch)
+     */
+    public LamiTimestamp(@Nullable Long low, @Nullable Long value, @Nullable Long high) {
+        super(low, value, high);
     }
 }

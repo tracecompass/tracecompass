@@ -9,8 +9,22 @@
 
 package org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types;
 
-class LamiCPU extends LamiInteger {
-    public LamiCPU(long value) {
-        super(value);
+import org.eclipse.jdt.annotation.Nullable;
+
+class LamiCPU extends LamiData {
+
+    private final int fId;
+
+    public LamiCPU(int id) {
+        fId = id;
+    }
+
+    public int getId() {
+        return fId;
+    }
+
+    @Override
+    public @Nullable String toString() {
+        return Integer.toString(fId);
     }
 }

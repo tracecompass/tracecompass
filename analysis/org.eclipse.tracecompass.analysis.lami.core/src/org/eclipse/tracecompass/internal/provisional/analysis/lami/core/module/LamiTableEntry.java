@@ -83,16 +83,21 @@ public class LamiTableEntry {
 
         if (timestamps.size() > 1) {
             /* We can try using the first two timestamps to create a range (making sure it's valid) */
-            long first = timestamps.get(0).getValue();
-            long second = timestamps.get(1).getValue();
-            if (second >= first) {
-                return new LamiTimeRange(first, second);
+            LamiTimestamp firstTs = timestamps.get(0);
+            LamiTimestamp secondTs = timestamps.get(1);
+            Number firstTsValue = firstTs.getValue();
+            Number secondTsValue = secondTs.getValue();
+
+            // TODO: Consider low and high limits in comparisons.
+            if (firstTsValue != null && secondTsValue != null &&
+                    Long.compare(firstTsValue.longValue(), secondTsValue.longValue()) <= 0) {
+                return new LamiTimeRange(firstTs, secondTs);
             }
         }
 
         if (!timestamps.isEmpty()) {
             /* If there is only one timestamp, use it to create a punctual range */
-            long ts = timestamps.get(0).getValue();
+            LamiTimestamp ts = timestamps.get(0);
             return new LamiTimeRange(ts, ts);
         }
 

@@ -15,7 +15,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiTableEntry;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiData;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiInteger;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 
 /**
@@ -53,9 +53,15 @@ public class LamiTimestampAspect extends LamiTableEntryAspect {
     @Override
     public @Nullable String resolveString(LamiTableEntry entry) {
         LamiData data = entry.getValue(fColIndex);
-        if (data instanceof LamiInteger) {
-            LamiInteger range = (LamiInteger) data;
-            return TmfTimestampFormat.getDefaulTimeFormat().format(range.getValue());
+        if (data instanceof LamiTimestamp) {
+            LamiTimestamp ts = (LamiTimestamp) data;
+
+            // TODO: Consider low and high limits here.
+            Number timestamp = ts.getValue();
+
+            if (timestamp != null) {
+                return TmfTimestampFormat.getDefaulTimeFormat().format(timestamp.longValue());
+            }
         }
         return data.toString();
     }
@@ -63,9 +69,11 @@ public class LamiTimestampAspect extends LamiTableEntryAspect {
     @Override
     public @Nullable Number resolveNumber(@NonNull LamiTableEntry entry) {
         LamiData data = entry.getValue(fColIndex);
-        if (data instanceof LamiInteger) {
-            LamiInteger range = (LamiInteger) data;
-            return Long.valueOf(range.getValue());
+        if (data instanceof LamiTimestamp) {
+            LamiTimestamp ts = (LamiTimestamp) data;
+
+            // TODO: Consider low and high limits here.
+            return ts.getValue();
         }
         return null;
     }

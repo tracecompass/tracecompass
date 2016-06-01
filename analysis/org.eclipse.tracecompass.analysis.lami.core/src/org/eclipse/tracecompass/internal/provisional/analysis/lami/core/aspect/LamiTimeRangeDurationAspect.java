@@ -59,7 +59,13 @@ public class LamiTimeRangeDurationAspect extends LamiTableEntryAspect {
         LamiData data = entry.getValue(fColIndex);
         if (data instanceof LamiTimeRange) {
             LamiTimeRange range = (LamiTimeRange) data;
-            return String.valueOf(range.getDuration());
+
+            // TODO: Consider low and high limits here.
+            Number duration = range.getDuration();
+
+            if (duration != null) {
+                return String.valueOf(duration.longValue());
+            }
         }
         return data.toString();
     }
@@ -69,7 +75,9 @@ public class LamiTimeRangeDurationAspect extends LamiTableEntryAspect {
         LamiData data = entry.getValue(fColIndex);
         if (data instanceof LamiTimeRange) {
             LamiTimeRange range = (LamiTimeRange) data;
-            return Long.valueOf(range.getDuration());
+
+            // TODO: Consider low and high limits here.
+            return range.getDuration();
         }
         return null;
     }

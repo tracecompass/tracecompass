@@ -9,12 +9,14 @@
 
 package org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * Class for LAMI 'size' types.
  *
  * @author Philippe Proulx
  */
-public class LamiSize extends LamiInteger {
+public class LamiSize extends LamiLongNumber {
 
     /**
      * Constructor
@@ -24,5 +26,19 @@ public class LamiSize extends LamiInteger {
      */
     public LamiSize(long value) {
         super(value);
+    }
+
+    /**
+     * Constructor (with limits)
+     *
+     * @param low
+     *            Lower bound of value (bytes)
+     * @param value
+     *            Value (bytes)
+     * @param high
+     *            Higher bound of value (bytes)
+     */
+    public LamiSize(@Nullable Long low, @Nullable Long value, @Nullable Long high) {
+        super(low, value, high);
     }
 }
