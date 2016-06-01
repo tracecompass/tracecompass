@@ -160,6 +160,21 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         return fIsAvailable;
     }
 
+    private static boolean executableExists(String name) {
+        if (name.contains(File.separator)) {
+            // This seems like a path, not just an executable name
+            return Files.isExecutable(Paths.get(name));
+        }
+
+        // Check if this name is found in the PATH environment variable
+        final String pathEnv = System.getenv("PATH"); //$NON-NLS-1$
+        final String[] exeDirs = pathEnv.split(checkNotNull(Pattern.quote(File.pathSeparator)));
+
+        return Stream.of(exeDirs)
+                .map(Paths::get)
+                .anyMatch(path -> Files.isExecutable(path.resolve(name)));
+    }
+
     /**
      * Perform initialization of the LAMI script. This means verifying that it
      * is actually present on disk, and that it returns correct --metadata.
@@ -173,11 +188,10 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         /* Do the analysis's initialization */
 
         /* Check if the script's expected executable is on the PATH */
-        String executable = fScriptCommand.get(0);
-        boolean exists = Stream.of(System.getenv("PATH").split(checkNotNull(Pattern.quote(File.pathSeparator)))) //$NON-NLS-1$
-                .map(Paths::get)
-                .anyMatch(path -> Files.exists(path.resolve(executable)));
-        if (!exists) {
+        final String executable = fScriptCommand.get(0);
+        final boolean executableExists = executableExists(executable);
+
+        if (!executableExists) {
             /* Script is not found */
             fIsAvailable = false;
             fInitialized = true;
