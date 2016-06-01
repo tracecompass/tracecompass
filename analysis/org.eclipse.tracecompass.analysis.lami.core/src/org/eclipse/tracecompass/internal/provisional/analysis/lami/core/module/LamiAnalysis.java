@@ -20,7 +20,6 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +40,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.internal.analysis.lami.core.Activator;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.LamiStrings;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.ShellUtils;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiDurationAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiEmptyAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiGenericAspect;
@@ -502,31 +502,19 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         return builder;
     }
 
-    /**
-     * Call the currently defined LAMI script with the given arguments.
-     *
-     * @param timeRange
-     *            The time range. Null for the whole trace.
-     * @param monitor
-     *            The progress monitor used to report progress
-     * @return The script's output, formatted into {@link LamiTableEntry}'s.
-     * @throws CoreException
-     *             If execution did not terminate normally
-     */
     @Override
     public List<LamiResultTable> execute(ITmfTrace trace, @Nullable TmfTimeRange timeRange,
-            String extraParams, IProgressMonitor monitor) throws CoreException {
+            String extraParamsString, IProgressMonitor monitor) throws CoreException {
         /* Should have been called already, but in case it was not */
         initialize();
 
         final @NonNull String tracePath = checkNotNull(trace.getPath());
-        final @NonNull String[] splitParams = extraParams.trim().split(" "); //$NON-NLS-1$
+        final @NonNull String trimmedExtraParamsString = checkNotNull(extraParamsString.trim());
+        final List<String> extraParams = ShellUtils.commandStringToArgs(trimmedExtraParamsString);
 
         ImmutableList.Builder<String> builder = getBaseCommand(timeRange);
 
-        if (!extraParams.trim().equals("")) { //$NON-NLS-1$
-            builder.addAll(Arrays.asList(splitParams));
-        }
+        builder.addAll(extraParams);
         builder.add(tracePath);
         List<String> command = builder.build();
 
