@@ -130,11 +130,8 @@ public class LamiTimeStampFormat extends Format {
                 return checkNotNull(toAppendTo.append(fFormat.format(time)));
             }
 
-            if (internalRange.getDelta().compareTo(BigDecimal.ZERO) == 0) {
-                return checkNotNull(toAppendTo.append(fFormat.format(externalRange.getMinimum().doubleValue())));
-            }
-
-            if (externalRange.getDelta().compareTo(BigDecimal.ZERO) == 0) {
+            if (internalRange.getDelta().compareTo(BigDecimal.ZERO) == 0 ||
+                    externalRange.getDelta().compareTo(BigDecimal.ZERO) == 0) {
                 return checkNotNull(toAppendTo.append(fFormat.format(externalRange.getMinimum().doubleValue())));
             }
 
