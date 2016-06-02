@@ -3226,7 +3226,7 @@ The following screenshot shows the result of the preceding example on a LTTng Ke
 
 Trace Compass offers a feature called Latency analysis. This allows an analysis to return intervals and these intervals will be displayed in four different views. An example analysis is provided with kernel system call latencies being provided. The available views are: 
 
-* System Call Latencies 
+* System Call Latencies
 A '''table''' of the raw latencies. This view is useful to inspect individual latencies.
 
  [[Image:images/LatenciesTable.png| Latency Table example - System Call Latencies]]
@@ -3239,7 +3239,11 @@ A time aligned '''scatter chart''' of the latencies with respect to the current 
 
 
 * System Call Latency Statistics
-A view of the total '''statistics''' of the latencies. These show the ''minimum'', ''maximum'', ''average'' and ''standard deviation'' of the latencies when applicable. This tool is useful for finding the outliers on a per-category basis. 
+A view of the total '''statistics''' of the latencies. These show the ''minimum'', ''maximum'', ''average'', ''standard deviation'', and ''count'' of the latencies when applicable. This tool is useful for finding the outliers on a per-category basis.
+
+Right-clicking on an entry of the table and select '''Go to minimum''' allows to select the range of the minimum latency for the selected entry and synchronize the other views to this time range.
+
+Right-clicking on an entry of the table and select '''Go to maximum''' allows to select the range of the maximum latency for the selected entry and synchronize the other views to this time range.
 
 [[Image:images/LatenciesStatistics.png| Latency Statistics example - System Call Latency Statistics]]
 
