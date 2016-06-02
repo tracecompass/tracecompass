@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -90,6 +90,9 @@ public class FlatArray extends AbstractFileCheckpointCollection {
         ITmfCheckpoint checkpoint = null;
         try {
             long pos = getHeader().getSize() + fCheckpointSize * rank;
+            if (getRandomAccessFile() == null) {
+                return null;
+            }
             getRandomAccessFile().seek(pos);
             fByteBuffer.clear();
             getRandomAccessFile().read(fByteBuffer.array());
