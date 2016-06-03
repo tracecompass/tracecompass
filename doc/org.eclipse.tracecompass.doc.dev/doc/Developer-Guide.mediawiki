@@ -683,6 +683,36 @@ Several features in TMF and the Eclipse LTTng integration are using this framewo
 ** ''org.eclipse.tracecompass.tmf.ui.views.statesystem.TmfStateSystemExplorer.java''
 ** ''org.eclipse.tracecompass.analysis.os.linux.ui.views.cpuusage.CpuUsageComposite.java''
 
+== Timing Analysis Views and Viewers ==
+
+Trace Compass provides base implementations for timing views and viewers for generating Latency Tables, Scatter Charts, Density Graphs and Statistics Tables. They are well integrated with various Trace Compass features such as reading traces and time synchronization with other views. They also handle mouse events for navigating the trace and view, zooming or presenting detailed information at mouse position. The code can be found in the Analysis Timing plug-in ''org.eclipse.tracecompass.analysis.timing.ui''. See below for a list of relevant java packages:
+
+* Latency Table
+** ''org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table'': Base classes for Latency Tables
+* Scatter Chart
+** ''org.eclipse.tracecompass.tmf.ui.views.tmfChartView.java'': Common base classes for X-Y-Chart viewers based on SWTChart
+** ''org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter'': Base classes for Scatter Charts
+* Density Graph
+** ''org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density'': Base classes for Density Graphs
+* Statistics Table
+** ''org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics'': Base classes for Statistics Tables
+
+Several features in Trace Compass are using this framework and can be used as example for further development:
+
+* Latency Table
+** ''org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyView.java''
+** ''org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternLatencyTableView.java''
+* Scatter Chart
+** ''org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyScatterView.java''
+** ''org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternScatterGraphView.java''
+* Density Graph
+** ''org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyDensityView.java''
+** ''org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternDensityView.java''
+
+* Statistics Table
+** ''org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics.SystemCallLatencyStatisticsView.java''
+** ''org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternStatisticsView.java''
+
 = Component Interaction =
 
 TMF provides a mechanism for different components to interact with each other using signals. The signals can carry information that is specific to each signal.
