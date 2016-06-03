@@ -24,6 +24,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisOutputElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectModelElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfReportElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.handlers.IHandlerService;
@@ -57,7 +58,8 @@ public class OpenAction extends Action {
             Object firstElement = sSelection.getFirstElement();
             if ((sSelection.size() == 1) && (firstElement instanceof TmfTraceElement ||
                     firstElement instanceof TmfExperimentElement ||
-                    firstElement instanceof TmfAnalysisOutputElement)) {
+                    firstElement instanceof TmfAnalysisOutputElement ||
+                    firstElement instanceof TmfReportElement)) {
                 element = (TmfProjectModelElement) firstElement;
                 return true;
             }
@@ -70,7 +72,9 @@ public class OpenAction extends Action {
         try {
             Object service = page.getActivePart().getSite().getService(IHandlerService.class);
             IHandlerService handlerService = (IHandlerService) service;
-            boolean executeCommand = ((element instanceof TmfTraceElement) || (element instanceof TmfAnalysisOutputElement));
+            boolean executeCommand = (element instanceof TmfTraceElement ||
+                    element instanceof TmfAnalysisOutputElement ||
+                    element instanceof TmfReportElement);
 
             if (!executeCommand && element instanceof TmfExperimentElement) {
                 TmfExperimentElement experiment = (TmfExperimentElement) element;

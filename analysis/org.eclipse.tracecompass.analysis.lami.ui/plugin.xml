@@ -31,7 +31,7 @@
       </handler>
       <handler
             class="org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.handler.OpenReportHandler"
-            commandId="org.eclipse.tracecompass.tmf.ui.command.report_open">
+            commandId="org.eclipse.ui.navigate.openResource">
          <activeWhen>
             <and>
                <iterate
@@ -114,12 +114,6 @@
       </command>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
-            description="%command.report_open.description"
-            id="org.eclipse.tracecompass.tmf.ui.command.report_open"
-            name="%command.report_open">
-      </command>
-      <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
             description="%command.report_delete.description"
             id="org.eclipse.tracecompass.tmf.ui.command.report_delete"
             name="%command.report_delete">
@@ -199,9 +193,9 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+            locationURI="popup:org.eclipse.ui.popup.any?after=group.open">
          <command
-               commandId="org.eclipse.tracecompass.tmf.ui.command.report_open"
+               commandId="org.eclipse.ui.navigate.openResource"
                label="%command.report_open"
                mnemonic="%command.report_open.mnemonic"
                style="push"
@@ -211,7 +205,8 @@
                <with
                      variable="selection">
                   <iterate
-                        ifEmpty="false">
+                        ifEmpty="false"
+                        operator="and">
                      <instanceof
                            value="org.eclipse.tracecompass.tmf.ui.project.model.TmfReportElement">
                      </instanceof>
