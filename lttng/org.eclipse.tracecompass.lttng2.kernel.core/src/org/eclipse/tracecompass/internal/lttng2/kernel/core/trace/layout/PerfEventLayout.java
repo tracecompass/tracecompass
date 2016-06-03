@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Alexandre Montplaisir
  */
-public class PerfEventLayout implements IKernelAnalysisEventLayout {
+public final class PerfEventLayout implements IKernelAnalysisEventLayout {
 
     private PerfEventLayout() {}
 

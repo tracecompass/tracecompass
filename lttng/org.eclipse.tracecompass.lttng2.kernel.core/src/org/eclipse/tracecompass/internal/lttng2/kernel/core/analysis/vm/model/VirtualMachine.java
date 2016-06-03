@@ -18,7 +18,7 @@ package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model;
  *
  * @author Geneviève Bastien
  */
-public class VirtualMachine {
+public final class VirtualMachine {
 
     private static enum MachineType {
         HOST,

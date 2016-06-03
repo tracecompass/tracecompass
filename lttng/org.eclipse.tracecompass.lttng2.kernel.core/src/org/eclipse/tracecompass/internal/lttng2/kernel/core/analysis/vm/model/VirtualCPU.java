@@ -23,7 +23,7 @@ import com.google.common.collect.Table;
  *
  * @author Geneviève Bastien
  */
-public class VirtualCPU {
+public final class VirtualCPU {
 
     private static final Table<VirtualMachine, Long, @Nullable VirtualCPU> VIRTUAL_CPU_TABLE = HashBasedTable.create();
 
