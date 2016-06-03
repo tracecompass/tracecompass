@@ -3131,15 +3131,11 @@ public class MyLttngKernelAnalysis extends TmfAbstractAnalysisModule {
     @Override
     public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
 
-        // initialize the requirement: domain and events
-        TmfAnalysisRequirement domainReq = new TmfAnalysisRequirement(SessionConfigStrings.CONFIG_ELEMENT_DOMAIN);
-        domainReq.addValue(SessionConfigStrings.CONFIG_DOMAIN_TYPE_KERNEL, ValuePriorityLevel.MANDATORY);
+        // initialize the requirement: events
+        Set<@NonNull String> requiredEvents = ImmutableSet.of("sched_switch", "sched_wakeup");
+        TmfAbstractAnalysisRequirement eventsReq = new TmfAnalysisEventRequirement(requiredEvents, PriorityLevel.MANDATORY);
 
-        List<String> requiredEvents = ImmutableList.of("sched_switch", "sched_wakeup");
-        TmfAnalysisRequirement eventReq = new TmfAnalysisRequirement(SessionConfigStrings.CONFIG_ELEMENT_EVENT,
-                requiredEvents, ValuePriorityLevel.MANDATORY);
-
-        return ImmutableList.of(domainReq, eventReq);
+        return ImmutableList.of(eventsReq);
     }
 
     @Override
@@ -3366,41 +3362,67 @@ where '''MyLttngKernelParameterProvider''' will be registered to analysis ''"my.
 
 === Analysis requirement provider API ===
 
-A requirement defines the needs of an analysis. For example, an analysis could need an event named ''"sched_switch"'' in order to be properly executed. The requirements are represented by the class '''TmfAnalysisRequirement'''. Since '''IAnalysisModule''' extends the '''IAnalysisRequirementProvider''' interface, all analysis modules must provide their requirements. If the analysis module extends '''TmfAbstractAnalysisModule''', it has the choice between overriding the requirements getter ('''IAnalysisRequirementProvider#getAnalysisRequirements()''') or not, since the abstract class returns an empty collection by default (no requirements).
+A requirement defines the needs of an analysis. For example, an analysis could need an event named ''"sched_switch"'' in order to be properly executed. The requirements are represented by extending the class '''TmfAbstractAnalysisRequirement'''. Since '''IAnalysisModule''' extends the '''IAnalysisRequirementProvider''' interface, all analysis modules must provide their requirements. If the analysis module extends '''TmfAbstractAnalysisModule''', it has the choice between overriding the requirements getter ('''IAnalysisRequirementProvider#getAnalysisRequirements()''') or not, since the abstract class returns an empty collection by default (no requirements).
 
 === Requirement values ===
 
-When instantiating a requirement, the developer needs to specify a type to which all the values added to the requirement will be linked. In the earlier example, there would be an ''"event"''  or ''"eventName"'' type. The type is represented by a string, like all values added to the requirement object. With an 'event' type requirement, a trace generator like the LTTng Control could automatically enable the required events. This is possible by calling the '''TmfAnalysisRequirementHelper''' class. Another point we have to take into consideration is the priority level of each value added to the requirement object. The enum '''TmfAnalysisRequirement#ValuePriorityLevel''' gives the choice between '''ValuePriorityLevel#MANDATORY''' and '''ValuePriorityLevel#OPTIONAL'''. That way, we can tell if an analysis can run without a value or not. To add values, one must call '''TmfAnalysisRequirement#addValue()'''.
+When creating a requirement, the developer needs to specify a type to which all
+the values added to the requirement will be linked. In the earlier example,
+there would be an ''"event"''  or ''"eventName"'' type. The type is represented
+by a string, like all values added to the requirement object. With an 'event'
+type requirement, a trace generator like the LTTng Control could automatically
+enable the required events. Another point we have to take into consideration
+is the priority level when creating a requirement object.
+The enum '''TmfAbstractAnalysisRequirement#PriorityLevel''' gives the choice
+between '''PriorityLevel#OPTIONAL''', '''PriorityLevel#ALL_OR_NOTHING''',
+'''PriorityLevel#AT_LEAST_ONE''' or '''PriorityLevel#MANDATORY'''. That way, we
+can tell if an analysis can run without a value or not.
+
+
+To create an requirement one has the choice to extend the abstract class
+'''TmfAbstractAnalysisRequirement''' or use the exiting implementation
+'''TmfAnalysisEventRequirement''', '''TmfAnalysisEventFieldRequirement''' or
+'''TmfCompositeAnalysisRequirement'''.
 
 Moreover, information can be added to requirements. That way, the developer can explicitly give help details at the requirement level instead of at the analysis level (which would just be a general help text). To add information to a requirement, the method '''TmfAnalysisRequirement#addInformation()''' must be called. Adding information is not mandatory.
 
 === Example of providing requirements ===
 
-In this example, we will implement a method that initializes a requirement object and return it in the '''IAnalysisRequirementProvider#getAnalysisRequirements()''' getter. The example method will return a set with two requirements. The first one will indicate the events needed by a specific analysis and the last one will tell on what domain type the analysis applies. In the event type requirement, we will indicate that the analysis needs a mandatory event and an optional one.
+In this example, we will implement a method that initializes a requirement object
+and return it in the '''IAnalysisRequirementProvider#getAnalysisRequirements()'''
+getter. The example method will return a set with three requirements.
+The first one will indicate a mandatory event needed by a specific analysis,
+the second one will tell an optional event name and the third will indicate
+mandatory event fields for the given event type.
+
+Note that in LTTng event contexts are considered as event fields. Using the
+'''TmfAnalysisEventFieldRequirement''' it's possible to define requirements
+on event contexts (see 3rd requirement in example below).
 
 <pre>
-@Override
-public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
-    Set<TmfAnalysisRequirement> requirements = new HashSet<>();
+    @Override
+    public @NonNull Iterable<@NonNull TmfAbstractAnalysisRequirement> getAnalysisRequirements() {
 
-    /* Create requirements of type 'event' and 'domain' */
-    TmfAnalysisRequirement eventRequirement = new TmfAnalysisRequirement("event");
-    TmfAnalysisRequirement domainRequirement = new TmfAnalysisRequirement("domain");
+        /* Requirement on event name */
+        Set<@NonNull String> requiredEvents = ImmutableSet.of("sched_wakeup");
+        TmfAbstractAnalysisRequirement eventsReq1 = new TmfAnalysisEventRequirement(requiredEvents, PriorityLevel.MANDATORY);
 
-    /* Add the values */
-    domainRequirement.addValue("kernel", TmfAnalysisRequirement.ValuePriorityLevel.MANDATORY);
-    eventRequirement.addValue("sched_switch", TmfAnalysisRequirement.ValuePriorityLevel.MANDATORY);
-    eventRequirement.addValue("sched_wakeup", TmfAnalysisRequirement.ValuePriorityLevel.OPTIONAL);
+        requiredEvents = ImmutableSet.of("sched_switch");
+        TmfAbstractAnalysisRequirement eventsReq2 = new TmfAnalysisEventRequirement(requiredEvents, PriorityLevel.OPTIONAL);
 
-    /* An information about the events */
-    eventRequirement.addInformation("The event sched_wakeup is optional because it's not properly handled by this analysis yet.");
+        /* An information about the events */
+        eventsReq2.addInformation("The event sched_wakeup is optional because it's not properly handled by this analysis yet.");
 
-    /* Add them to the set */
-    requirements.add(domainRequirement);
-    requirements.add(eventRequirement);
+        /* Requirement on event fields */
+        Set<@NonNull String> requiredEventFields = ImmutableSet.of("context._procname", "context._ip");
+        TmfAbstractAnalysisRequirement eventFiledRequirement = new TmfAnalysisEventFieldRequirement(
+                 "event name",
+                 requiredEventFields,
+                 PriorityLevel.MANDATORY);
 
-    return requirements;
-}
+         Set<TmfAbstractAnalysisRequirement> requirements = ImmutableSet.of(eventsReq1, eventsReq2, eventFiledRequirement);
+         return requirements;
+    }
 </pre>
 
 
