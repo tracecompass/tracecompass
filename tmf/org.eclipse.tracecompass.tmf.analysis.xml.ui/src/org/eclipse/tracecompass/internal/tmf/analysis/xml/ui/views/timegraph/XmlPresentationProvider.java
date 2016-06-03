@@ -212,8 +212,8 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
      * display identically states with the same name.
      */
     private static RGB calcColor(String name) {
-        int hash = name.hashCode();
-        long base = COLOR_SEED[Math.abs(hash) % COLOR_SEED.length];
+        long hash = name.hashCode(); // hashcodes can be Integer.MIN_VALUE.
+        long base = COLOR_SEED[(int) (Math.abs(hash) % COLOR_SEED.length)];
         int x = (int) ((hash & COLOR_MASK) ^ base);
         final int r = (x >> 16) & 0xff;
         final int g = (x >> 8) & 0xff;
