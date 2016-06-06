@@ -89,7 +89,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
         for (int i = 0; i < traceArr.length; i++) {
             for (int j = i + 1; j < traceArr.length; j++) {
                 if (!traceArr[i].getHostId().equals(traceArr[j].getHostId())) {
-                    ConvexHull algo = new ConvexHull(traceArr[i].getHostId(), traceArr[j].getHostId());
+                    ConvexHull algo = new ConvexHull(traceArr[i], traceArr[j]);
                     fSyncs.add(algo);
                 }
             }
@@ -98,8 +98,10 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
 
     @Override
     protected void processMatch(TmfEventDependency match) {
-        String host1 = match.getSourceEvent().getTrace().getHostId();
-        String host2 = match.getDestinationEvent().getTrace().getHostId();
+        ITmfTrace trace1 = match.getSourceEvent().getTrace();
+        ITmfTrace trace2 = match.getDestinationEvent().getTrace();
+        String host1 = trace1.getHostId();
+        String host2 = trace2.getHostId();
 
         /* Process only if source and destination are different */
         if (host1.equals(host2)) {
@@ -114,7 +116,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
             }
         }
         if (algo == null) {
-            algo = new ConvexHull(host1, host2);
+            algo = new ConvexHull(trace1, trace2);
             fSyncs.add(algo);
         }
         algo.processMatch(match);
@@ -210,7 +212,9 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
         private static final long serialVersionUID = 8309351175030935291L;
 
         private final String fReferenceHost;
+        private final String fReferenceHostName;
         private final String fOtherHost;
+        private final String fOtherHostName;
 
         /**
          * Slopes and ordinate at origin of respectively fLmin, fLmax and the
@@ -241,18 +245,24 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
         /**
          * Initialization of the attributes
          *
-         * @param host1
-         *            ID of the first host
-         * @param host2
-         *            ID of the second host
+         * @param trace1
+         *            Trace of the first host
+         * @param trace2
+         *            Trace of the second host
          */
-        public ConvexHull(String host1, String host2) {
+        public ConvexHull(ITmfTrace trace1, ITmfTrace trace2) {
+            String host1 = trace1.getHostId();
+            String host2 = trace2.getHostId();
             if (host1.compareTo(host2) > 0) {
                 fReferenceHost = host2;
+                fReferenceHostName = trace2.getName();
                 fOtherHost = host1;
+                fOtherHostName = trace1.getName();
             } else {
                 fReferenceHost = host1;
+                fReferenceHostName = trace1.getName();
                 fOtherHost = host2;
+                fOtherHostName = trace2.getName();
             }
             fAlpha = BigDecimal.ONE;
             fAlphamax = BigDecimal.ONE;
@@ -482,8 +492,8 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
                     break;
                 }
 
-                fStats.put(Messages.SyncAlgorithmFullyIncremental_refhost, fReferenceHost);
-                fStats.put(Messages.SyncAlgorithmFullyIncremental_otherhost, fOtherHost);
+                fStats.put(Messages.SyncAlgorithmFullyIncremental_refhost, fReferenceHostName + " (" + fReferenceHost + ")");
+                fStats.put(Messages.SyncAlgorithmFullyIncremental_otherhost, fOtherHostName + " (" + fOtherHost + ")");
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_quality, syncQuality);
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_alpha, fAlpha);
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_beta, fBeta);
