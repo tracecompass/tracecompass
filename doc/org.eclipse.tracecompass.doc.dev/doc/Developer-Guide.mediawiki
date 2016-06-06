@@ -1383,6 +1383,23 @@ analysis plugin will normally ship both the state provider and the view, and
 they will have been written by the same person. In other cases, it's possible to
 use getSubAttributes() to explore the organization of the attribute tree first.
 
+===== optQuarkAbsolute()/optQuarkRelative() =====
+
+These two methods are similar to their counterparts getQuarkAbsolute() and
+getQuarkRelative(). The only difference is that if the referenced attribute does
+not exist, the value ITmfStateSystem#INVALID_ATTRIBUTE (-2) is returned instead
+of throwing an exception.
+
+These methods should be used when the presence of the referenced attribute is
+known to be optional, to avoid the performance cost of generating exceptions.
+
+===== getQuarks() =====
+
+This method (with or without a starting node quark) takes an attribute path
+array which may contain wildcard "*" or parent ".." elements, and returns the
+list of matching attribute quarks. If no matching attribute is found, an empty
+list is returned.
+
 ===== waitUntilBuilt() =====
 
 This is a simple method used to block the caller until the construction phase of
@@ -1481,7 +1498,7 @@ state system activities.
 
 ==== AttributeNotFoundException ====
 
-This is thrown by getQuarkRelative() and getQuarkAbsolute() (but not byt the
+This is thrown by getQuarkRelative() and getQuarkAbsolute() (but not by the
 -AndAdd versions!) when passing an attribute path that is not present in the
 state system. This is to ensure that no new attribute is created when using
 these versions of the methods.
