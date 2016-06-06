@@ -757,9 +757,17 @@ In each histogram, the following keys are handled:
 
 == Statistics View ==
 
-The Statistics View displays the various event counters that are collected when analyzing a trace. The data is organized per trace. After opening a trace, the element '''Statistics''' is added under the '''Tmf Statistics Analysis''' tree element in the Project Explorer. To open the view, double-click the '''Statistics''' tree element. Alternatively, select '''Statistics''' under '''Tracing''' within the '''Show View''' window ('''Window''' -> '''Show View''' -> '''Other...'''). This view shows 3 columns: ''Level'' ''Events total'' and ''Events in selected time range''. After parsing a trace the view will display the number of events per event type in the second column and in the third, the currently selected time range's event type distribution is shown. The cells where the number of events are printed also contain a colored bar with a number that indicates the percentage of the event count in relation to the total number of events. The statistics is collected for the whole trace. This view is part of the '''Tracing and Monitoring Framework (TMF)''' and is generic. It will work for any trace type extensions. For the LTTng 2.0 integration the Statistics view will display statistics as shown below.:
+The Statistics View displays the various event counters that are collected when analyzing a trace. After opening a trace, the element '''Statistics''' is added under the '''Tmf Statistics Analysis''' tree element in the Project Explorer. To open the view, double-click the '''Statistics''' tree element. Alternatively, select '''Statistics''' under '''Tracing''' within the '''Show View''' window ('''Window''' -> '''Show View''' -> '''Other...'''). The statistics is collected for the whole trace. This view is part of the '''Tracing and Monitoring Framework (TMF)''' and is generic. It will work for any trace type extensions.
 
-[[Image:images/LTTng2StatisticsView.png]]
+The view is separated in two sides. The left side of the view presents the Statistics in a table. The table shows 3 columns: ''Level'' ''Events total'' and ''Events in selected time range''. The data is organized per trace. After parsing a trace the view will display the number of events per event type in the second column and in the third, the currently selected time range's event type distribution is shown. The cells where the number of events are printed also contain a colored bar with a number that indicates the percentage of the event count in relation to the total number of events.
+
+[[Image:images/LTTng2StatisticsTableView.png]]
+
+The right side illustrates the proportion of types of events into two pie charts. The legend of each pie chart gives the representation of each color in the chart.
+* The ''Global'' pie chart displays the general proportion of the events in the trace.
+* When there is a range selection, the ''Events in selection'' pie chart appears next to the ''Global'' pie chart and displays the proportion the event in the selected range of the trace.
+
+[[Image:images/LTTng2StatisticsPieChartView.png]]
 
 By default, the statistics use a state system, therefore will load very quickly once the state system is written to the disk as a supplementary file.
 
