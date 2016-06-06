@@ -177,7 +177,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
         }
     }
 
-    private static class SyscallNameAspect implements ISegmentAspect {
+    private static final class SyscallNameAspect implements ISegmentAspect {
         public static final ISegmentAspect INSTANCE = new SyscallNameAspect();
 
         private SyscallNameAspect() { }
