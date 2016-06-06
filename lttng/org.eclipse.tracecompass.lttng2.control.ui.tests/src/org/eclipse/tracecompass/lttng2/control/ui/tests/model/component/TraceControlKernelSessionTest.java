@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceChannelOutputType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
@@ -165,7 +166,7 @@ public class TraceControlKernelSessionTest {
         // Enable channel on session
         // ------------------------------------------------------------------------
         EnableChannelDialogStub channelStub = new EnableChannelDialogStub();
-        channelStub.setIsKernel(true);
+        channelStub.setDomain(TraceDomainType.KERNEL);
         TraceControlDialogFactory.getInstance().setEnableChannelDialog(channelStub);
 
         fFacility.executeCommand(session, "enableChannelOnSession");
@@ -236,7 +237,7 @@ public class TraceControlKernelSessionTest {
         events.add("sched_kthread_stop");
         events.add("sched_kthread_stop_ret");
         eventsDialogStub.setNames(events);
-        eventsDialogStub.setIsKernel(true);
+        eventsDialogStub.setDomain(TraceDomainType.KERNEL);
         TraceControlDialogFactory.getInstance().setEnableEventsDialog(eventsDialogStub);
 
         // ------------------------------------------------------------------------

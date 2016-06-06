@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BufferType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.ChannelInfo;
@@ -105,7 +106,7 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
      * The parent domain component where the channel node should be added.
      * Null in case of creation on session level.
      */
-    private TraceDomainComponent fDomain = null;
+    private TraceDomainComponent fDomainComponent = null;
     /**
      * The target node component
      */
@@ -123,9 +124,9 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
      */
     private IChannelInfo fChannelInfo = null;
     /**
-     * Output domain information. True in case of Kernel domain. False for UST.
+     * Domain type ({@link TraceDomainType})
      */
-    private boolean fIsKernel;
+    private TraceDomainType fDomain = null;
     /**
      *  Flag which indicates whether Kernel domain is available or not
      */
@@ -169,7 +170,7 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
      */
     public EnableChannelDialog(Shell shell) {
        super(shell);
-       fIsKernel = true;
+       fDomain = TraceDomainType.KERNEL;
 
         // Common verify listener
         fVerifyListener = new VerifyListener() {
@@ -216,25 +217,25 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
 
     @Override
     public void setDomainComponent(TraceDomainComponent domain) {
-        fDomain = domain;
-        if (fDomain != null) {
-            fIsKernel = fDomain.isKernel();
+        fDomainComponent = domain;
+        if (fDomainComponent != null) {
+            fDomain = fDomainComponent.getDomain();
         } else {
-            fIsKernel = true;
+            fDomain = TraceDomainType.KERNEL;
         }
     }
 
     @Override
-    public boolean isKernel() {
-        return fIsKernel;
+    public TraceDomainType getDomain() {
+        return fDomain;
     }
 
     @Override
     public void setHasKernel(boolean hasKernel) {
-        if (fDomain != null) {
-            fIsKernel = fDomain.isKernel();
+        if (fDomainComponent != null) {
+            fDomain = fDomainComponent.getDomain();
         } else {
-            fIsKernel = hasKernel;
+            fDomain = hasKernel ? TraceDomainType.KERNEL : TraceDomainType.UST;
         }
 
         fHasKernel = hasKernel;
@@ -364,10 +365,10 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
 
         fKernelButton = new Button(domainGroup, SWT.RADIO);
         fKernelButton.setText(Messages.TraceControl_KernelDomainDisplayName);
-        fKernelButton.setSelection(fIsKernel);
+        fKernelButton.setSelection(fDomain.equals(TraceDomainType.KERNEL));
         fUstButton = new Button(domainGroup, SWT.RADIO);
         fUstButton.setText(Messages.TraceControl_UstDisplayName);
-        fUstButton.setSelection(!fIsKernel);
+        fUstButton.setSelection(fDomain.equals(TraceDomainType.UST));
 
         if (fTargetNodeComponent.isBufferTypeConfigSupported()) {
             Group bufferTypeGroup = new Group(dialogComposite, SWT.SHADOW_NONE);
@@ -381,7 +382,7 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
 
             fSharedBuffersButton = new Button(bufferTypeGroup, SWT.RADIO);
             fSharedBuffersButton.setText(Messages.TraceControl_SharedBuffersDisplayName);
-            fSharedBuffersButton.setSelection(fIsKernel);
+            fSharedBuffersButton.setSelection(fDomain.equals(TraceDomainType.KERNEL));
             fSharedBuffersButton.setEnabled(false);
 
             fPIDBuffersButton = new Button(bufferTypeGroup, SWT.RADIO);
@@ -394,8 +395,8 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
             fUIDBuffersButton.setToolTipText(Messages.TraceControl_PerPidBuffersTooltip);
             fUIDBuffersButton.setSelection(false);
 
-            fUIDBuffersButton.setEnabled(!fIsKernel);
-            fPIDBuffersButton.setEnabled(!fIsKernel);
+            fUIDBuffersButton.setEnabled(fDomain.equals(TraceDomainType.UST));
+            fPIDBuffersButton.setEnabled(fDomain.equals(TraceDomainType.UST));
 
             // Update buffers type buttons depending on UST or Kernel
             fUstButton.addSelectionListener(new SelectionAdapter() {
@@ -418,7 +419,7 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
             });
         }
 
-        if ((fDomain != null) || (!fHasKernel)) {
+        if ((fDomainComponent != null) || (!fHasKernel)) {
             fKernelButton.setEnabled(false);
             fUstButton.setEnabled(false);
 
@@ -512,7 +513,12 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
             }
         }
 
-        fIsKernel = fKernelButton.getSelection();
+        if (fKernelButton.getSelection()) {
+            fDomain = TraceDomainType.KERNEL;
+        }
+        else if (fUstButton.getSelection()) {
+            fDomain = TraceDomainType.UST;
+        }
 
         // Check for invalid names
         if (!channelInfo.getName().matches("^[a-zA-Z0-9\\-\\_]{1,}$")) { //$NON-NLS-1$
@@ -523,7 +529,7 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
         }
 
         // Check for duplicate names
-        if (fDomain != null && fDomain.containsChild(channelInfo.getName())) {
+        if (fDomainComponent != null && fDomainComponent.containsChild(channelInfo.getName())) {
             MessageDialog.openError(getShell(),
                     Messages.TraceControl_EnableChannelDialogTitle,
                     Messages.TraceControl_ChannelAlreadyExistsError + " (" + channelInfo.getName() + ") \n");  //$NON-NLS-1$ //$NON-NLS-2$
@@ -574,8 +580,8 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
     }
 
     private void setBufferTypeButtonSelection() {
-        if ((fDomain != null) && fDomain.getBufferType() != null) {
-            switch (fDomain.getBufferType()) {
+        if ((fDomainComponent != null) && fDomainComponent.getBufferType() != null) {
+            switch (fDomainComponent.getBufferType()) {
             case BUFFER_PER_PID:
                 fPIDBuffersButton.setSelection(true);
                 break;

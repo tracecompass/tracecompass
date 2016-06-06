@@ -21,6 +21,7 @@ import java.util.List;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
@@ -96,15 +97,15 @@ class NullControlService implements ILttngControlService {
     }
 
     @Override
-    public void enableChannels(String sessionName, List<String> channelNames, boolean isKernel, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException {
+    public void enableChannels(String sessionName, List<String> channelNames, TraceDomainType domain, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException {
     }
 
     @Override
-    public void disableChannels(String sessionName, List<String> channelNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
+    public void disableChannels(String sessionName, List<String> channelNames, TraceDomainType domain, IProgressMonitor monitor) throws ExecutionException {
     }
 
     @Override
-    public void enableEvents(String sessionName, String channelName, List<String> eventNames, boolean isKernel, String filterExpression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
+    public void enableEvents(String sessionName, String channelName, List<String> eventNames, TraceDomainType domain, String filterExpression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
     }
 
     @Override
@@ -120,7 +121,7 @@ class NullControlService implements ILttngControlService {
     }
 
     @Override
-    public void disableEvent(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
+    public void disableEvent(String sessionName, String channelName, List<String> eventNames, TraceDomainType domain, IProgressMonitor monitor) throws ExecutionException {
     }
 
     @Override
@@ -129,7 +130,7 @@ class NullControlService implements ILttngControlService {
     }
 
     @Override
-    public void addContexts(String sessionName, String channelName, String eventName, boolean isKernel, List<String> contexts, IProgressMonitor monitor) throws ExecutionException {
+    public void addContexts(String sessionName, String channelName, String eventName, TraceDomainType domain, List<String> contexts, IProgressMonitor monitor) throws ExecutionException {
     }
 
     @Override

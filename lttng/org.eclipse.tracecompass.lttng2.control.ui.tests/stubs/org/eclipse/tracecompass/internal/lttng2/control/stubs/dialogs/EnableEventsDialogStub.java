@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.internal.lttng2.control.stubs.dialogs;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.IEnableEventsDialog;
@@ -29,7 +30,6 @@ public class EnableEventsDialogStub implements IEnableEventsDialog {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    private boolean fIsKernel;
     private boolean fIsTracePoints;
     private boolean fIsAllEvents;
     private boolean fIsAllTracePoints;
@@ -49,12 +49,13 @@ public class EnableEventsDialogStub implements IEnableEventsDialog {
     private String fFilter;
     private List<String> fNames = new ArrayList<>();
     private List<String> fExcludedEvents;
+    private TraceDomainType fDomain;
 
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-    public void setIsKernel(boolean isKernel) {
-        fIsKernel = isKernel;
+    public void setDomain(TraceDomainType domain) {
+        fDomain = domain;
     }
 
     public void setIsAllEvents(boolean isAllEvents) {
@@ -220,8 +221,8 @@ public class EnableEventsDialogStub implements IEnableEventsDialog {
     }
 
     @Override
-    public boolean isKernel() {
-        return fIsKernel;
+    public TraceDomainType getDomain() {
+        return fDomain;
     }
 
     @Override

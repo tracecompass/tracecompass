@@ -12,6 +12,7 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs;
 
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 
@@ -38,10 +39,10 @@ public interface IGetEventInfoDialog {
     TraceChannelComponent getChannel();
 
     /**
-     * Sets flag about domain.
-     * @param isKernel - true for kernel, false for UST
+     * Sets the domain type.
+     * @param domain domain type ({@link TraceDomainType})
      */
-    void setIsKernel(boolean isKernel);
+    void setDomain(TraceDomainType domain);
 
     /**
      * Sets available session.

@@ -29,6 +29,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.IGetEventInfoDialog;
@@ -85,7 +86,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
 
         // Open dialog box to retrieve the session and channel where the events should be enabled in.
         final IGetEventInfoDialog dialog = TraceControlDialogFactory.getInstance().getGetEventInfoDialog();
-        dialog.setIsKernel(param.isKernel());
+        dialog.setDomain(param.getDomain());
         dialog.setSessions(param.getSessions());
 
         if (dialog.open() != Window.OK) {
@@ -110,7 +111,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
                     TraceChannelComponent channel = dialog.getChannel();
                     if (channel == null) {
                         // enable events on default channel (which will be created by lttng-tools)
-                        session.enableEvents(eventNames, param.isKernel(), dialog.getFilterExpression(), null, monitor);
+                        session.enableEvents(eventNames, param.getDomain(), dialog.getFilterExpression(), null, monitor);
                     } else {
                         channel.enableEvents(eventNames, dialog.getFilterExpression(), null, monitor);
                     }
@@ -140,7 +141,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
     public boolean isEnabled() {
         @NonNull ArrayList<@NonNull BaseEventComponent> events = new ArrayList<>();
         @NonNull TraceSessionComponent[] sessions = null;
-        Boolean isKernel = null;
+        TraceDomainType domain = null;
 
         // Get workbench page for the Control View
         IWorkbenchPage page = getWorkbenchPage();
@@ -160,19 +161,19 @@ public class AssignEventHandler extends BaseControlViewHandler {
                     ITraceControlComponent provider = event.getParent();
 
                     // check for kernel or UST provider
-                    boolean temp = false;
+                    TraceDomainType temp = null;
                     if (provider instanceof KernelProviderComponent) {
-                        temp = true;
+                        temp = TraceDomainType.KERNEL;
                     } else if (provider instanceof UstProviderComponent) {
-                        temp = false;
+                        temp = TraceDomainType.UST;
                     } else {
                         return false;
                     }
-                    if (isKernel == null) {
-                        isKernel = Boolean.valueOf(temp);
+                    if (domain == null) {
+                        domain = temp;
                     } else {
                         // don't mix events from Kernel and UST provider
-                        if (isKernel.booleanValue() != temp) {
+                        if (!domain.equals(temp)) {
                             return false;
                         }
                     }
@@ -191,7 +192,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
         boolean isEnabled = ((!events.isEmpty()) && (sessions != null) && (sessions.length > 0));
 
         // To avoid compiler warnings check for null even if isKernel is always not null when used below
-        if (isKernel == null) {
+        if (domain == null) {
             return false;
         }
 
@@ -199,7 +200,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
         try {
             fParam = null;
             if(isEnabled) {
-                fParam = new Parameter(NonNullUtils.checkNotNull(sessions), events, isKernel);
+                fParam = new Parameter(NonNullUtils.checkNotNull(sessions), events, domain);
             }
         } finally {
             fLock.unlock();
@@ -224,22 +225,22 @@ public class AssignEventHandler extends BaseControlViewHandler {
         private final @NonNull TraceSessionComponent[] fSessions;
 
         /**
-         * Flag for indicating Kernel or UST.
+         * The domain type ({@link TraceDomainType})
          */
-        private final boolean fIsKernel;
+        private final TraceDomainType fDomain;
 
         /**
          * Constructor
          *
          * @param sessions - a array of trace sessions
          * @param events - a lists of events to enable
-         * @param isKernel - domain (true for kernel or UST)
+         * @param domain - domain type ({@link TraceDomainType})
          */
-        public Parameter(@NonNull TraceSessionComponent[] sessions, List<BaseEventComponent> events, boolean isKernel) {
+        public Parameter(@NonNull TraceSessionComponent[] sessions, List<BaseEventComponent> events, TraceDomainType domain) {
             fSessions = NonNullUtils.checkNotNull(Arrays.copyOf(sessions, sessions.length));
             fEvents = new ArrayList<>();
             fEvents.addAll(events);
-            fIsKernel = isKernel;
+            fDomain = domain;
         }
 
         /**
@@ -247,7 +248,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
          * @param other - a parameter to copy
          */
         public Parameter(Parameter other) {
-            this(other.fSessions, other.fEvents, other.fIsKernel);
+            this(other.fSessions, other.fEvents, other.fDomain);
         }
 
         public TraceSessionComponent[] getSessions() {
@@ -258,8 +259,8 @@ public class AssignEventHandler extends BaseControlViewHandler {
             return fEvents;
         }
 
-        public boolean isKernel() {
-            return fIsKernel;
+        public TraceDomainType getDomain() {
+            return fDomain;
         }
     }
 }

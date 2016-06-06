@@ -18,6 +18,7 @@ import java.util.List;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
@@ -272,11 +273,11 @@ public class TraceSessionComponent extends TraceControlComponent {
 
     /**
      * Returns if node supports filtering of events
-     * @param isKernel - <code>true</code> for kernel provider else <code>false</code>
+     * @param domain - the domain type ({@link TraceDomainType})
      * @return <code>true</code> if node supports filtering else <code>false</code>
      */
-    public boolean isEventFilteringSupported(boolean isKernel) {
-        return ((TargetNodeComponent)getParent().getParent()).isEventFilteringSupported(isKernel);
+    public boolean isEventFilteringSupported(TraceDomainType domain) {
+        return ((TargetNodeComponent)getParent().getParent()).isEventFilteringSupported(domain);
     }
 
     /**
@@ -354,17 +355,17 @@ public class TraceSessionComponent extends TraceControlComponent {
      * @param info
      *            - channel information to set for the channel (use null for
      *            default)
-     * @param isKernel
-     *            - a flag for indicating kernel or UST.
+     * @param domain
+     *            - indicate the domain type ({@link TraceDomainType})
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
     public void enableChannels(List<String> channelNames, IChannelInfo info,
-            boolean isKernel, IProgressMonitor monitor)
+            TraceDomainType domain, IProgressMonitor monitor)
             throws ExecutionException {
-        getControlService().enableChannels(getName(), channelNames, isKernel,
+        getControlService().enableChannels(getName(), channelNames, domain,
                 info, monitor);
     }
 
@@ -373,8 +374,8 @@ public class TraceSessionComponent extends TraceControlComponent {
      *
      * @param eventNames
      *            - a list of event names to enabled.
-     * @param isKernel
-     *            - a flag for indicating kernel or UST.
+     * @param domain
+     *            - the type of the domain type ({@link TraceDomainType})
      * @param filterExpression
      *            - a filter expression
      * @param excludedEvents
@@ -384,9 +385,9 @@ public class TraceSessionComponent extends TraceControlComponent {
      * @throws ExecutionException
      *             If the command fails
      */
-    public void enableEvents(List<String> eventNames, boolean isKernel,
+    public void enableEvents(List<String> eventNames, TraceDomainType domain,
             String filterExpression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
-        getControlService().enableEvents(getName(), null, eventNames, isKernel,
+        getControlService().enableEvents(getName(), null, eventNames, domain,
                 filterExpression, excludedEvents, monitor);
     }
 

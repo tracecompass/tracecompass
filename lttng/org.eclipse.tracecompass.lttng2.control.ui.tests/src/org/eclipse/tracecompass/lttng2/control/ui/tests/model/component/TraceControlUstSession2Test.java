@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BufferType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.ChannelInfo;
@@ -147,7 +148,7 @@ public class TraceControlUstSession2Test {
         // Enable default channel on created session above
         // ------------------------------------------------------------------------
         EnableChannelDialogStub channelStub = new EnableChannelDialogStub();
-        channelStub.setIsKernel(false);
+        channelStub.setDomain(TraceDomainType.UST);
         ChannelInfo info = (ChannelInfo)channelStub.getChannelInfo();
         info.setName("mychannel");
         info.setOverwriteMode(false);

@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.window.Window;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.IEnableChannelDialog;
@@ -58,15 +59,15 @@ abstract class BaseEnableChannelHandler extends BaseControlViewHandler {
      * @param info
      *            - channel information to set for the channel (use null for
      *            default)
-     * @param isKernel
-     *            - a flag for indicating kernel or UST.
+     * @param domain
+     *            - indicate the domain type ({@link TraceDomainType})
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If something goes wrong when enabling the channel
      */
     public abstract void enableChannel(CommandParameter param,
-            List<String> channelNames, IChannelInfo info, boolean isKernel,
+            List<String> channelNames, IChannelInfo info, TraceDomainType domain,
             IProgressMonitor monitor) throws ExecutionException;
 
     /**
@@ -109,7 +110,7 @@ abstract class BaseEnableChannelHandler extends BaseControlViewHandler {
                 channelNames.add(dialog.getChannelInfo().getName());
 
                 try {
-                    enableChannel(param, channelNames, dialog.getChannelInfo(), dialog.isKernel(), monitor);
+                    enableChannel(param, channelNames, dialog.getChannelInfo(), dialog.getDomain(), monitor);
                 } catch (ExecutionException e) {
                     error = e;
                 }

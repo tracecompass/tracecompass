@@ -21,6 +21,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
@@ -44,7 +45,7 @@ public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
     // ------------------------------------------------------------------------
 
     @Override
-    public void enableEvents(CommandParameter param, List<String> eventNames, boolean isKernel, String filterExression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
+    public void enableEvents(CommandParameter param, List<String> eventNames, TraceDomainType domain, String filterExression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
         if (param instanceof DomainCommandParameter) {
             ((DomainCommandParameter)param).getDomain().enableEvents(eventNames, filterExression, excludedEvents, monitor);
         }

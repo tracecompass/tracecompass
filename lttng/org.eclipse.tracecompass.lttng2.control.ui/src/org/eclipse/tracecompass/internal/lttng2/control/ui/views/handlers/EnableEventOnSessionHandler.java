@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
@@ -47,8 +48,8 @@ public class EnableEventOnSessionHandler extends BaseEnableEventHandler {
     // ------------------------------------------------------------------------
 
     @Override
-    public void enableEvents(CommandParameter param, List<String> eventNames, boolean isKernel, String filterExpression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
-        param.getSession().enableEvents(eventNames, isKernel, filterExpression, excludedEvents, monitor);
+    public void enableEvents(CommandParameter param, List<String> eventNames, TraceDomainType domain, String filterExpression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
+        param.getSession().enableEvents(eventNames, domain, filterExpression, excludedEvents, monitor);
     }
 
     @Override

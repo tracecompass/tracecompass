@@ -188,7 +188,7 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
                     // Enable command only for events of same session, same channel and domain
                     if ((!sessionName.equals(event.getSessionName())) ||
                         (!channelName.equals(event.getChannelName())) ||
-                        (channel.isKernel() != event.isKernel())) {
+                        (!channel.getDomain().equals(event.getDomain()))) {
                         events.clear();
                         break;
                     }

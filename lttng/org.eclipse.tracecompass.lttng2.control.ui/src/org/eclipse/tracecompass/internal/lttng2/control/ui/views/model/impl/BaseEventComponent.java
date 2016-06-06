@@ -12,6 +12,7 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl;
 
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IFieldInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
@@ -153,10 +154,10 @@ public class BaseEventComponent extends TraceControlComponent {
     }
 
     /**
-     * @return if provider kernel or UST
+     * @return the domain type ({@link TraceDomainType})
      */
-    public boolean isKernel() {
-        return getParent() instanceof KernelProviderComponent;
+    public TraceDomainType getDomain() {
+        return getParent() instanceof KernelProviderComponent ? TraceDomainType.KERNEL : TraceDomainType.UST;
     }
 
     // ------------------------------------------------------------------------

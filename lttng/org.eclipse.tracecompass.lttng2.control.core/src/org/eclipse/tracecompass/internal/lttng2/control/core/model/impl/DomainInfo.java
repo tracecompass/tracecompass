@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
 
@@ -35,7 +36,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
      * The channels information of the domain.
      */
     private final List<IChannelInfo> fChannels = new ArrayList<>();
-    private boolean fIsKernel = false;
+    private TraceDomainType fDomain = TraceDomainType.UST;
     private BufferType fBufferType = BufferType.BUFFER_TYPE_UNKNOWN;
 
     // ------------------------------------------------------------------------
@@ -62,18 +63,18 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
                 fChannels.add(other.fChannels.get(i));
             }
         }
-        fIsKernel = other.fIsKernel;
+        fDomain = other.getDomain();
         fBufferType = other.fBufferType;
     }
 
     @Override
-    public boolean isKernel() {
-        return fIsKernel;
+    public TraceDomainType getDomain() {
+        return fDomain;
     }
 
     @Override
-    public void setIsKernel(boolean isKernel) {
-        fIsKernel = isKernel;
+    public void setDomain(TraceDomainType domain) {
+        fDomain = domain;
     }
 
     // ------------------------------------------------------------------------
@@ -104,7 +105,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + fChannels.hashCode();
-        result = prime * result + (fIsKernel ? 1231 : 1237);
+        result = prime * result + ((fDomain == null) ? 0 : (fDomain.ordinal() + 1));
         result = prime * result + ((fBufferType == null) ? 0 : (fBufferType.ordinal() + 1));
         return result;
     }
@@ -124,7 +125,11 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
         if (!fChannels.equals(other.fChannels)) {
             return false;
         }
-        if (fIsKernel != other.fIsKernel) {
+        if (fDomain == null) {
+            if (other.fDomain != null) {
+                return false;
+            }
+        } else if (!fDomain.equals(other.fDomain)) {
             return false;
         }
         if (fBufferType != other.fBufferType) {
@@ -135,7 +140,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
 
     @Override
     public BufferType getBufferType() {
-        if (fIsKernel) {
+        if (fDomain.equals(TraceDomainType.KERNEL)) {
             return BufferType.BUFFER_SHARED;
         }
         return fBufferType;
@@ -162,7 +167,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
                 }
             }
             output.append(",isKernel=");
-            output.append(String.valueOf(fIsKernel));
+            output.append(String.valueOf(fDomain.equals(TraceDomainType.KERNEL)));
             if ((fBufferType != null) && !fBufferType.equals(BufferType.BUFFER_TYPE_UNKNOWN) && !fBufferType.equals(BufferType.BUFFER_SHARED)) {
                 output.append(",BufferType=");
                 output.append(fBufferType);

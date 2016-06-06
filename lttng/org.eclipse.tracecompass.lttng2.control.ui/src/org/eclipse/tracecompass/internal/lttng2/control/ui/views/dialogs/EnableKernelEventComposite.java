@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceControlComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.BaseEventComponent;
@@ -359,7 +360,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
 
         // initialize filter with null
         fFilterExpression = null;
-        if (fProviderGroup.isEventFilteringSupported(true)) {
+        if (fProviderGroup.isEventFilteringSupported(TraceDomainType.KERNEL)) {
             String tempFilter = fFilterText.getText();
 
             if(!tempFilter.trim().isEmpty()) {
@@ -660,7 +661,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     }
 
     private void createFilterGroup() {
-        if (fProviderGroup.isEventFilteringSupported(true)) {
+        if (fProviderGroup.isEventFilteringSupported(TraceDomainType.KERNEL)) {
             Group filterMainGroup = new Group(this, SWT.SHADOW_NONE);
             filterMainGroup.setText(Messages.TraceControl_EnableEventsFilterGroupName);
             GridLayout layout = new GridLayout(3, false);

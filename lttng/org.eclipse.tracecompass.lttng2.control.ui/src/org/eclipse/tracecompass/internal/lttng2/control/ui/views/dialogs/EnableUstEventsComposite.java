@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
@@ -385,7 +386,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
 
         // initialize filter with null
         fFilterExpression = null;
-        if (fProviderGroup.isEventFilteringSupported(false)) {
+        if (fProviderGroup.isEventFilteringSupported(TraceDomainType.UST)) {
             String tempFilter = fFilterText.getText();
 
             if(!tempFilter.trim().isEmpty()) {
@@ -630,7 +631,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
     }
 
     void createFilterGroup() {
-        if (fProviderGroup.isEventFilteringSupported(false)) {
+        if (fProviderGroup.isEventFilteringSupported(TraceDomainType.UST)) {
             Group filterMainGroup = new Group(this, SWT.SHADOW_NONE);
             filterMainGroup.setText(Messages.TraceControl_EnableEventsFilterGroupName);
             GridLayout layout = new GridLayout(3, false);

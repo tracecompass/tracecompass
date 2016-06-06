@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
@@ -84,11 +85,12 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
      * The parent domain component where the channel node should be added.
      * Null in case the domain is not known (i.e. on session level).
      */
-    private TraceDomainComponent fDomain;
+    private TraceDomainComponent fDomainComponent;
     /**
-     * Output domain information. True in case of Kernel domain. False for UST.
+     * The domain type ({@link TraceDomainType})
      */
-    private boolean fIsKernel;
+    private TraceDomainType fDomain;
+
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -107,7 +109,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
     // ------------------------------------------------------------------------
     @Override
     public boolean isAllEvents() {
-        if (fIsKernel) {
+        if (fDomain.equals(TraceDomainType.KERNEL)) {
             return fKernelComposite.isAllEvents();
         }
         return false;
@@ -115,7 +117,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public boolean isTracepoints() {
-        if (fIsKernel) {
+        if (fDomain.equals(TraceDomainType.KERNEL)) {
             return fKernelComposite.isTracepoints();
         }
         return fUstComposite.isTracepoints();
@@ -123,7 +125,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public boolean isAllTracePoints() {
-        if (fIsKernel) {
+        if (fDomain.equals(TraceDomainType.KERNEL)) {
             return fKernelComposite.isAllTracePoints();
         }
         return fUstComposite.isAllTracePoints();
@@ -131,7 +133,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public boolean isSysCalls() {
-        if (fIsKernel) {
+        if (fDomain.equals(TraceDomainType.KERNEL)) {
             return fKernelComposite.isSysCalls();
         }
         return false;
@@ -139,7 +141,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public boolean isAllSysCalls() {
-        if (fIsKernel) {
+        if (fDomain.equals(TraceDomainType.KERNEL)) {
             return fKernelComposite.isSysCalls();
         }
         return false;
@@ -147,7 +149,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public List<String> getEventNames() {
-        if (fIsKernel) {
+        if (fDomain.equals(TraceDomainType.KERNEL)) {
             return fKernelComposite.getEventNames();
         }
         return fUstComposite.getEventNames();
@@ -155,7 +157,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public boolean isDynamicProbe() {
-        if (fIsKernel) {
+        if (fDomain.equals(TraceDomainType.KERNEL)) {
             return fKernelComposite.isDynamicProbe();
         }
         return false;
@@ -163,7 +165,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public String getProbeName() {
-        if (fIsKernel) {
+        if (fDomain.equals(TraceDomainType.KERNEL)) {
             return fKernelComposite.getProbeName();
         }
         return null;
@@ -171,7 +173,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public String getProbeEventName() {
-        if (fIsKernel) {
+        if (fDomain.equals(TraceDomainType.KERNEL)) {
             return fKernelComposite.getProbeEventName();
         }
         return null;
@@ -179,7 +181,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public boolean isDynamicFunctionProbe() {
-        if (fIsKernel) {
+        if (fDomain.equals(TraceDomainType.KERNEL)) {
             return fKernelComposite.isDynamicFunctionProbe();
         }
         return false;
@@ -187,7 +189,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public String getFunctionEventName() {
-        if (fIsKernel) {
+        if (fDomain.equals(TraceDomainType.KERNEL)) {
             return fKernelComposite.getFunctionEventName();
         }
         return null;
@@ -195,7 +197,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public String getFunction() {
-        if (fIsKernel) {
+        if (fDomain.equals(TraceDomainType.KERNEL)) {
             return fKernelComposite.getFunction();
         }
         return null;
@@ -203,7 +205,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public boolean isWildcard() {
-        if (!fIsKernel) {
+        if (fDomain.equals(TraceDomainType.UST)) {
             return fUstComposite.isWildcard();
         }
         return false;
@@ -211,7 +213,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public String getWildcard() {
-        if (!fIsKernel) {
+        if (fDomain.equals(TraceDomainType.UST)) {
             return fUstComposite.getWildcard();
         }
         return null;
@@ -219,7 +221,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public boolean isLogLevel() {
-        if (!fIsKernel) {
+        if (fDomain.equals(TraceDomainType.UST)) {
             return fUstComposite.isLogLevel();
         }
         return false;
@@ -227,7 +229,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public LogLevelType getLogLevelType() {
-        if (!fIsKernel) {
+        if (fDomain.equals(TraceDomainType.UST)) {
             return fUstComposite.getLogLevelType();
         }
         return null;
@@ -235,7 +237,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public TraceLogLevel getLogLevel() {
-        if (!fIsKernel) {
+        if (fDomain.equals(TraceDomainType.UST)) {
             return fUstComposite.getLogLevel();
         }
         return null;
@@ -243,15 +245,15 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public String getLogLevelEventName() {
-        if (!fIsKernel) {
+        if (fDomain.equals(TraceDomainType.UST)) {
             return fUstComposite.getLogLevelEventName();
         }
         return null;
     }
 
     @Override
-    public boolean isKernel() {
-        return fIsKernel;
+    public TraceDomainType getDomain() {
+        return fDomain;
     }
 
     @Override
@@ -261,25 +263,36 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public void setTraceDomainComponent(TraceDomainComponent domain) {
-        fDomain = domain;
-        if (fDomain != null) {
-            fIsKernel = fDomain.isKernel();
+        fDomainComponent = domain;
+        if (fDomainComponent != null) {
+            fDomain = fDomainComponent.getDomain();
         } else {
-            fIsKernel = fProviderGroup != null ? fProviderGroup.hasKernelProvider() : true;
+            if (fProviderGroup != null) {
+                fDomain = fProviderGroup.hasKernelProvider() ? TraceDomainType.KERNEL : TraceDomainType.UST;
+            }
         }
     }
 
     @Override
     public String getFilterExpression() {
-        if (fIsKernel) {
+
+        switch (fDomain) {
+        case KERNEL:
             return fKernelComposite.getFilterExpression();
+        case UST:
+            return fUstComposite.getFilterExpression();
+        case JUL:
+        case LOG4J:
+        case PYTHON:
+        case UNKNOWN:
+        default:
+            return null;
         }
-        return fUstComposite.getFilterExpression();
     }
 
     @Override
     public List<String> getExcludedEvents() {
-        if (!fIsKernel) {
+        if (fDomain.equals(TraceDomainType.UST)) {
             return fUstComposite.getExcludedEvents();
         }
         return null;
@@ -315,12 +328,25 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
         fKernelButton = new Button(domainGroup, SWT.RADIO);
         fKernelButton.setText(Messages.TraceControl_KernelDomainDisplayName);
-        fKernelButton.setSelection(fIsKernel);
         fUstButton = new Button(domainGroup, SWT.RADIO);
         fUstButton.setText(Messages.TraceControl_UstDisplayName);
-        fUstButton.setSelection(!fIsKernel);
 
-        if ((fDomain != null) || ((fProviderGroup != null) && (!fProviderGroup.hasKernelProvider()))) {
+        switch (fDomain) {
+        case KERNEL:
+            fKernelButton.setSelection(true);
+            break;
+        case UST:
+            fUstButton.setSelection(true);
+            break;
+        case JUL:
+        case LOG4J:
+        case PYTHON:
+        case UNKNOWN:
+        default:
+            break;
+        }
+
+        if ((fDomainComponent != null) || ((fProviderGroup != null) && (!fProviderGroup.hasKernelProvider()))) {
             fKernelButton.setEnabled(false);
             fUstButton.setEnabled(false);
         }
@@ -339,11 +365,21 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         // ------------------------------------------------------------------------
         fUstComposite = null;
         fKernelComposite = null;
-        if (fIsKernel) {
+
+        switch (fDomain) {
+
+        case KERNEL:
             createKernelComposite();
-            fUstComposite = null;
-        } else {
+            break;
+        case UST:
             createUstComposite();
+            break;
+        case JUL:
+        case LOG4J:
+        case PYTHON:
+        case UNKNOWN:
+        default:
+            break;
         }
 
         fKernelButton.addSelectionListener(new SelectionAdapter() {
@@ -381,7 +417,12 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     protected void okPressed() {
-        fIsKernel = fKernelButton.getSelection();
+
+        if (fKernelButton.getSelection()) {
+            fDomain = TraceDomainType.KERNEL;
+        } else if (fUstButton.getSelection()){
+            fDomain = TraceDomainType.UST;
+        }
 
         // Validate kernel composite in case of kernel domain
         if (fKernelComposite != null && !fKernelComposite.isValid()) {

@@ -18,6 +18,7 @@ import java.util.List;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
@@ -266,10 +267,10 @@ public class TraceChannelComponent extends TraceControlComponent {
     }
 
     /**
-     * @return if domain is kernel or UST
+     * @return the domain type ({@link TraceDomainType})
      */
-    public boolean isKernel() {
-        return ((TraceDomainComponent)getParent()).isKernel();
+    public TraceDomainType getDomain() {
+        return ((TraceDomainComponent)getParent()).getDomain();
     }
 
     /**
@@ -312,7 +313,7 @@ public class TraceChannelComponent extends TraceControlComponent {
      *             If the command fails
      */
     public void enableEvents(List<String> eventNames, String filterExpression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
-        getControlService().enableEvents(getSessionName(), getName(), eventNames, isKernel(), filterExpression, excludedEvents, monitor);
+        getControlService().enableEvents(getSessionName(), getName(), eventNames, getDomain(), filterExpression, excludedEvents, monitor);
     }
 
     /**
@@ -381,7 +382,7 @@ public class TraceChannelComponent extends TraceControlComponent {
     public void disableEvent(List<String> eventNames, IProgressMonitor monitor)
             throws ExecutionException {
         getControlService().disableEvent(getParent().getParent().getName(),
-                getName(), eventNames, isKernel(), monitor);
+                getName(), eventNames, getDomain(), monitor);
     }
 
     /**
@@ -397,6 +398,6 @@ public class TraceChannelComponent extends TraceControlComponent {
     public void addContexts(List<String> contexts, IProgressMonitor monitor)
             throws ExecutionException {
         getControlService().addContexts(getSessionName(), getName(), null,
-                isKernel(), contexts, monitor);
+                getDomain(), contexts, monitor);
     }
 }

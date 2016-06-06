@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceChannelOutputType;
@@ -165,7 +166,7 @@ public class TraceControlUstSessionTest {
         // Enable default channel on created session above
         // ------------------------------------------------------------------------
         EnableChannelDialogStub channelStub = new EnableChannelDialogStub();
-        channelStub.setIsKernel(false);
+        channelStub.setDomain(TraceDomainType.UST);
         TraceControlDialogFactory.getInstance().setEnableChannelDialog(channelStub);
 
         fFacility.executeCommand(session, "enableChannelOnSession");
@@ -287,7 +288,7 @@ public class TraceControlUstSessionTest {
         List<String> events = new ArrayList<>();
         events.add("ust_tests_hello:tptest_sighandler");
         eventsDialogStub.setNames(events);
-        eventsDialogStub.setIsKernel(false);
+        eventsDialogStub.setDomain(TraceDomainType.UST);
         TraceControlDialogFactory.getInstance().setEnableEventsDialog(eventsDialogStub);
 
         fFacility.executeCommand(session, "enableEventOnSession");

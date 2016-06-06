@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IUstProviderInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
@@ -99,11 +100,11 @@ public class TraceProviderGroup extends TraceControlComponent {
 
     /**
      * Returns if node supports filtering of events
-     * @param isKernel - <code>true</code> for kernel provider else <code>false</code>
+     * @param domain - the domain type ({@link TraceDomainType})
      * @return <code>true</code> if node supports filtering else <code>false</code>
      */
-    public boolean isEventFilteringSupported(boolean isKernel) {
-        return ((TargetNodeComponent)getParent()).isEventFilteringSupported(isKernel);
+    public boolean isEventFilteringSupported(TraceDomainType domain) {
+        return ((TargetNodeComponent)getParent()).isEventFilteringSupported(domain);
     }
 }
 

@@ -15,7 +15,6 @@
 package org.eclipse.tracecompass.lttng2.control.ui.tests.model.component;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -29,6 +28,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceChannelOutputType;
@@ -507,12 +507,20 @@ public class TraceControlTreeModelTest {
 
     private static void verifyDomainGettersSetters(TraceDomainComponent domain) {
         // save original values
-        boolean isKernel = domain.isKernel();
+        TraceDomainType tmpDomain = domain.getDomain();
 
-        domain.setIsKernel(false);
-        assertFalse(domain.isKernel());
-        domain.setIsKernel(true);
-        assertTrue(domain.isKernel());
+        domain.setDomain(TraceDomainType.KERNEL);
+        assertEquals(domain.getDomain(), TraceDomainType.KERNEL);
+        domain.setDomain(TraceDomainType.UST);
+        assertEquals(domain.getDomain(), TraceDomainType.UST);
+        domain.setDomain(TraceDomainType.JUL);
+        assertEquals(domain.getDomain(), TraceDomainType.JUL);
+        domain.setDomain(TraceDomainType.LOG4J);
+        assertEquals(domain.getDomain(), TraceDomainType.LOG4J);
+        domain.setDomain(TraceDomainType.PYTHON);
+        assertEquals(domain.getDomain(), TraceDomainType.PYTHON);
+        domain.setDomain(TraceDomainType.UNKNOWN);
+        assertEquals(domain.getDomain(), TraceDomainType.UNKNOWN);
 
         ITraceControlComponent[] children = domain.getChildren();
         TraceChannelComponent[] channels = domain.getChannels();
@@ -527,7 +535,7 @@ public class TraceControlTreeModelTest {
         assertEquals(TARGET_NODE_NAME, nodeName);
 
         // restore original values
-        domain.setIsKernel(isKernel);
+        domain.setDomain(tmpDomain);
     }
 
     private static void verifyBaseEventGettersSetters(BaseEventComponent event) {

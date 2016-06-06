@@ -43,6 +43,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISnapshotInfo
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IUstProviderInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceChannelOutputType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
@@ -106,7 +107,7 @@ public class LTTngControlServiceTest {
     private static final String SCEN_DESTROY_SESSION_VERBOSE = "DestroySessionVerbose";
     private static final String SCEN_CHANNEL_HANDLING = "ChannelHandling";
     private static final String SCEN_EVENT_HANDLING = "EventHandling";
-    private static final String SCEN_EVENT_EXLUDED = "EventExcluded";
+    private static final String SCEN_EVENT_EXCLUDED = "EventExcluded";
     private static final String SCEN_CONTEXT_HANDLING = "ContextHandling";
     private static final String SCEN_CONTEXT_ERROR_HANDLING = "ContextErrorHandling";
     private static final String SCEN_CREATE_SESSION_2_1 = "CreateSessionLttng2.1";
@@ -964,7 +965,7 @@ public class LTTngControlServiceTest {
             chanInfo.setNumberOfSubBuffers(2);
             chanInfo.setMaxNumberTraceFiles(10);
             chanInfo.setMaxSizeTraceFiles(0);
-            fService.enableChannels(sessionName, list, true, chanInfo, new NullProgressMonitor());
+            fService.enableChannels(sessionName, list, TraceDomainType.KERNEL, chanInfo, new NullProgressMonitor());
 
             // Create/enable/configure 1 UST channel
             list.clear();
@@ -978,7 +979,7 @@ public class LTTngControlServiceTest {
             chanInfo.setNumberOfSubBuffers(1);
             chanInfo.setMaxNumberTraceFiles(20);
             chanInfo.setMaxSizeTraceFiles(0);
-            fService.enableChannels(sessionName, list, false, chanInfo, new NullProgressMonitor());
+            fService.enableChannels(sessionName, list, TraceDomainType.UST, chanInfo, new NullProgressMonitor());
             ((LTTngControlService)fService).setVersion("2.0.0");
 
         } catch (ExecutionException e) {
@@ -1005,7 +1006,7 @@ public class LTTngControlServiceTest {
             chanInfo.setMaxNumberTraceFiles(20);
             chanInfo.setMaxSizeTraceFiles(0);
             chanInfo.setBufferType(BufferType.BUFFER_PER_UID);
-            fService.enableChannels(sessionName, list, false, chanInfo, new NullProgressMonitor());
+            fService.enableChannels(sessionName, list, TraceDomainType.UST, chanInfo, new NullProgressMonitor());
             ((LTTngControlService)fService).setVersion("2.0.0");
 
         } catch (ExecutionException e) {
@@ -1034,7 +1035,7 @@ public class LTTngControlServiceTest {
             chanInfo.setMaxSizeTraceFiles(-1);
             chanInfo.setBufferType(BufferType.BUFFER_PER_PID);
 
-            fService.enableChannels(sessionName, list, false, chanInfo, new NullProgressMonitor());
+            fService.enableChannels(sessionName, list, TraceDomainType.UST, chanInfo, new NullProgressMonitor());
             ((LTTngControlService)fService).setVersion("2.0.0");
 
         } catch (ExecutionException e) {
@@ -1054,11 +1055,11 @@ public class LTTngControlServiceTest {
             list.add(kernelChannel1);
 
             fShell.setScenario(SCEN_CHANNEL_HANDLING);
-            fService.disableChannels(sessionName, list, true, new NullProgressMonitor());
+            fService.disableChannels(sessionName, list, TraceDomainType.KERNEL, new NullProgressMonitor());
 
             list.clear();
             list.add("ustChannel");
-            fService.disableChannels(sessionName, list, false, new NullProgressMonitor());
+            fService.disableChannels(sessionName, list, TraceDomainType.UST, new NullProgressMonitor());
 
         } catch (ExecutionException e) {
             fail(e.toString());
@@ -1077,13 +1078,13 @@ public class LTTngControlServiceTest {
             list.add(kernelChannel1);
 
             fShell.setScenario(SCEN_CHANNEL_HANDLING);
-            fService.enableChannels(sessionName, list, true, null, new NullProgressMonitor());
+            fService.enableChannels(sessionName, list, TraceDomainType.KERNEL, null, new NullProgressMonitor());
 
             // Create/enable/configure 1 UST channel
             list.clear();
             list.add("ustChannel");
 
-            fService.enableChannels(sessionName, list, false, null, new NullProgressMonitor());
+            fService.enableChannels(sessionName, list, TraceDomainType.UST, null, new NullProgressMonitor());
 
         } catch (ExecutionException e) {
             fail(e.toString());
@@ -1112,37 +1113,37 @@ public class LTTngControlServiceTest {
             eventList.add(eventName0);
             eventList.add(eventName1);
             eventList.add(eventName2);
-            fService.enableEvents(sessionName, null, eventList, true, null, null, new NullProgressMonitor());
+            fService.enableEvents(sessionName, null, eventList, TraceDomainType.KERNEL, null, null, new NullProgressMonitor());
 
             // 2) session name, channel = mychannel, event name= null, kernel
-            fService.enableEvents(sessionName, channelName, null, true, null, null, new NullProgressMonitor());
+            fService.enableEvents(sessionName, channelName, null, TraceDomainType.KERNEL, null, null, new NullProgressMonitor());
 
             // 3) session name, channel = mychannel, 1 event name, ust, no filter
             eventList.clear();
             eventList.add(ustEventName0);
-            fService.enableEvents(sessionName, channelName, eventList, false, null, null, new NullProgressMonitor());
+            fService.enableEvents(sessionName, channelName, eventList, TraceDomainType.UST, null, null, new NullProgressMonitor());
 
             // 4) session name, channel = mychannel, no event name, ust, with filter
-            fService.enableEvents(sessionName, channelName, eventList, false, "intfield==10", null, new NullProgressMonitor());
+            fService.enableEvents(sessionName, channelName, eventList, TraceDomainType.UST, "intfield==10", null, new NullProgressMonitor());
 
             // 5) session name, channel = mychannel, no event name, ust, no filter
             eventList.clear();
-            fService.enableEvents(sessionName, channelName, eventList, false, null, null, new NullProgressMonitor());
+            fService.enableEvents(sessionName, channelName, eventList, TraceDomainType.UST, null, null, new NullProgressMonitor());
 
             // 6) session name, channel = null,
-            fService.enableEvents(sessionName, null, ILttngControlService.ALL_EVENTS, true, null, null, new NullProgressMonitor());
+            fService.enableEvents(sessionName, null, ILttngControlService.ALL_EVENTS, TraceDomainType.KERNEL, null, null, new NullProgressMonitor());
 
             // 7) session name, channel = mychannel, all events, ust, exclude 1 event
             excludeList.add(ustEventName0);
-            fService.enableEvents(sessionName, channelName, null, false, null, excludeList, new NullProgressMonitor());
+            fService.enableEvents(sessionName, channelName, null, TraceDomainType.UST, null, excludeList, new NullProgressMonitor());
 
             // 8) session name, channel = mychannel, all events, ust, exclude 2 events
             excludeList.add(ustEventName1);
-            fService.enableEvents(sessionName, channelName, null, false, null, excludeList, new NullProgressMonitor());
+            fService.enableEvents(sessionName, channelName, null, TraceDomainType.UST, null, excludeList, new NullProgressMonitor());
 
             // 9) session name, channel = mychannel, enable 'ust*', ust, exclude 2 events
             eventList.add(ustEventWildcard);
-            fService.enableEvents(sessionName, channelName, eventList, false, null, excludeList, new NullProgressMonitor());
+            fService.enableEvents(sessionName, channelName, eventList, TraceDomainType.UST, null, excludeList, new NullProgressMonitor());
 
         } catch (ExecutionException e) {
             fail(e.toString());
@@ -1164,12 +1165,12 @@ public class LTTngControlServiceTest {
 
             @NonNull
             LttngVersion version = fService.getVersion();
-            fShell.setScenario(SCEN_EVENT_EXLUDED);
+            fShell.setScenario(SCEN_EVENT_EXCLUDED);
 
             // 1) 1 event excluded
             eventList.add(ustEventWildcard);
             excludeList.add(ustEventName0);
-            fService.enableEvents(sessionName, channelName, eventList, false, null, excludeList, new NullProgressMonitor());
+            fService.enableEvents(sessionName, channelName, eventList, TraceDomainType.UST, null, excludeList, new NullProgressMonitor());
 
             @Nullable
             ISessionInfo session = fService.getSession(sessionName, new NullProgressMonitor());
@@ -1185,7 +1186,7 @@ public class LTTngControlServiceTest {
 
             // 2) 2 events excluded
             excludeList.add(ustEventName1);
-            fService.enableEvents(sessionName, channelName, eventList, false, null, excludeList, new NullProgressMonitor());
+            fService.enableEvents(sessionName, channelName, eventList, TraceDomainType.UST, null, excludeList, new NullProgressMonitor());
 
             session = fService.getSession(sessionName, new NullProgressMonitor());
             assertNotNull(session);
@@ -1308,7 +1309,7 @@ public class LTTngControlServiceTest {
             assertTrue(expectedContexts.containsAll(availContexts));
 
             // 1) session name, channel = null, event name, loglevel-only, TRACE_DEBUG
-            fService.addContexts(sessionName, channelName, eventName, false, contexts, new NullProgressMonitor());
+            fService.addContexts(sessionName, channelName, eventName, TraceDomainType.UST, contexts, new NullProgressMonitor());
 
         } catch (ExecutionException e) {
             fail(e.toString());
@@ -1334,7 +1335,7 @@ public class LTTngControlServiceTest {
         }
         try {
             // 1) session name, channel = null, event name, loglevel-only, TRACE_DEBUG
-            fService.addContexts(sessionName, channelName, eventName, false, contexts, new NullProgressMonitor());
+            fService.addContexts(sessionName, channelName, eventName, TraceDomainType.UST, contexts, new NullProgressMonitor());
             fail("No exeption generated");
         } catch (ExecutionException e) {
             // success

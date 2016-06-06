@@ -11,6 +11,7 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.stubs.dialogs;
 
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BufferType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.ChannelInfo;
@@ -27,9 +28,9 @@ public class EnableChannelDialogStub implements IEnableChannelDialog {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    private TraceDomainComponent fDomain;
+    private TraceDomainComponent fDomainComponent;
     private ChannelInfo fChannelInfo;
-    private boolean fIsKernel;
+    private TraceDomainType fDomain;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -46,9 +47,6 @@ public class EnableChannelDialogStub implements IEnableChannelDialog {
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-    public void setIsKernel(boolean isKernel) {
-        fIsKernel = isKernel;
-    }
 
     @Override
     public IChannelInfo getChannelInfo() {
@@ -57,9 +55,9 @@ public class EnableChannelDialogStub implements IEnableChannelDialog {
 
     @Override
     public void setDomainComponent(TraceDomainComponent domain) {
-        fDomain = domain;
-        if (fDomain != null) {
-            fIsKernel = fDomain.isKernel();
+        fDomainComponent = domain;
+        if (fDomainComponent != null) {
+            fDomain = fDomainComponent.getDomain();
         }
     }
 
@@ -69,8 +67,12 @@ public class EnableChannelDialogStub implements IEnableChannelDialog {
     }
 
     @Override
-    public boolean isKernel() {
-        return fIsKernel;
+    public TraceDomainType getDomain() {
+        return fDomain;
+    }
+
+    public void setDomain(TraceDomainType domain) {
+        fDomain = domain;
     }
 
     @Override

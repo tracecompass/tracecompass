@@ -42,15 +42,15 @@ public interface IDomainInfo extends ITraceInfo {
     void addChannel(IChannelInfo channel);
 
     /**
-     * @return true if domain is kernel, false for UST
+     * @return the domain type ({@link TraceDomainType})
      */
-    boolean isKernel();
+    TraceDomainType getDomain();
 
     /**
-     * Sets whether domain is  Kernel domain or UST
-     * @param isKernel true for kernel, false for UST
+     * Sets the domain type.
+     * @param domain - the domain type ({@link TraceDomainType})
      */
-    void setIsKernel(boolean isKernel);
+    void setDomain(TraceDomainType domain);
 
     /**
      * @return Information about the buffer type

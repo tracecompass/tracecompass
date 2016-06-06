@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
@@ -198,7 +199,7 @@ public abstract class ChangeChannelStateHandler extends BaseControlViewHandler {
                     }
 
                     if ((channel.getState() != getNewState())) {
-                        if (channel.isKernel()) {
+                        if (channel.getDomain().equals(TraceDomainType.KERNEL)) {
                             kernelChannels.add(channel);
                             if (kernelDomain == null) {
                                 kernelDomain = (TraceDomainComponent) channel.getParent();

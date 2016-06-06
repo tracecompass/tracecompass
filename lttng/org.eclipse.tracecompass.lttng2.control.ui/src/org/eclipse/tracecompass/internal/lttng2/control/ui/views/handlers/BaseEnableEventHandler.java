@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.window.Window;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
@@ -65,8 +66,8 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
      *            - a parameter instance with data for the command execution
      * @param eventNames
      *            - list of event names
-     * @param isKernel
-     *            - true if kernel domain else false
+     * @param domain
+     *            - the domain type ({@link TraceDomainType})
      * @param filterExpression
      *            - a filter expression
      * @param excludedEvents
@@ -76,7 +77,7 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
      * @throws ExecutionException
      *             If the command fails for some reason
      */
-    public abstract void enableEvents(CommandParameter param, List<String> eventNames, boolean isKernel, String filterExpression,  List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException;
+    public abstract void enableEvents(CommandParameter param, List<String> eventNames, TraceDomainType domain, String filterExpression,  List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException;
 
     /**
      * Enables all syscall events.
@@ -177,15 +178,15 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
                 try {
                     String filter = dialog.getFilterExpression();
                     if (dialog.isAllEvents()) {
-                        enableEvents(param, ILttngControlService.ALL_EVENTS, dialog.isKernel(), filter, dialog.getExcludedEvents(), monitor);
+                        enableEvents(param, ILttngControlService.ALL_EVENTS, dialog.getDomain(), filter, dialog.getExcludedEvents(), monitor);
                     } else if (dialog.isTracepoints()) {
                         // Enable tracepoint events
                         if (dialog.isAllTracePoints()) {
-                            enableEvents(param, null, dialog.isKernel(), filter, dialog.getExcludedEvents(), monitor);
+                            enableEvents(param, null, dialog.getDomain(), filter, dialog.getExcludedEvents(), monitor);
                         } else {
                             List<String> eventNames = dialog.getEventNames();
                             if (!eventNames.isEmpty()) {
-                                enableEvents(param, eventNames, dialog.isKernel(), filter, dialog.getExcludedEvents(), monitor);
+                                enableEvents(param, eventNames, dialog.getDomain(), filter, dialog.getExcludedEvents(), monitor);
                             }
                         }
                     }
@@ -211,7 +212,7 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
                         eventNames.add(dialog.getWildcard());
 
                         if (!eventNames.isEmpty()) {
-                            enableEvents(param, eventNames, dialog.isKernel(), filter, dialog.getExcludedEvents(), monitor);
+                            enableEvents(param, eventNames, dialog.getDomain(), filter, dialog.getExcludedEvents(), monitor);
                         }
                     }
 

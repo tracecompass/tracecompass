@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,7 +9,6 @@
  * Contributors:
  *   Jonathan Rajotte - Initial API and implementation
  **********************************************************************/
-
 package org.eclipse.tracecompass.internal.lttng2.control.core.model;
 
 /**
@@ -18,13 +17,17 @@ package org.eclipse.tracecompass.internal.lttng2.control.core.model;
  * @author Jonathan Rajotte
  */
 public enum TraceDomainType {
-    /** Domain type : ust */
-    UST("ust"), //$NON-NLS-1$
-    /** Domain type : kernel */
+    /** Linux kernel domain */
     KERNEL("kernel"), //$NON-NLS-1$
-    /** Domain type : jul */
-    JUL("jul"), //$NON-NLS-1$
-    /** Unknown domain type */
+    /** user space domain */
+    UST("ust"), //$NON-NLS-1$
+    /** java.util.logging (JUL) domain */
+    JUL("jul"), //$NON-NLS-1$s
+    /** log4j domain */
+    LOG4J("log4j"), //$NON-NLS-1$
+    /** python domain */
+    PYTHON("python"), //$NON-NLS-1$
+    /** Unknown domain */
     UNKNOWN("Unknown domain type"); //$NON-NLS-1$
 
     private final String fInName;

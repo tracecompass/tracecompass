@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.lttng2.control.core.Activator;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IEventInfo;
@@ -225,13 +226,23 @@ public final class SessionConfigGenerator {
         for (IDomainInfo domain : session.getDomains()) {
             Element domainElement = document.createElement(SessionConfigStrings.CONFIG_ELEMENT_DOMAIN);
 
-            /*
-             * Add everything specific to a domain
-             *
-             * TODO: We suppose here that domain is either kernel or UST. It
-             * will have to change if other domains are supported
-             */
-            String domainType = domain.isKernel() ? SessionConfigStrings.CONFIG_DOMAIN_TYPE_KERNEL : SessionConfigStrings.CONFIG_DOMAIN_TYPE_UST;
+            String domainType = null;
+            switch (domain.getDomain()) {
+            case KERNEL:
+                domainType = SessionConfigStrings.CONFIG_DOMAIN_TYPE_KERNEL;
+                break;
+            case UST:
+                domainType = SessionConfigStrings.CONFIG_DOMAIN_TYPE_UST;
+                break;
+            // TODO: Add the following cases when more domains are supported
+            case JUL:
+            case LOG4J:
+            case PYTHON:
+            case UNKNOWN:
+            default:
+                break;
+
+            }
             addElementContent(document, domainElement, SessionConfigStrings.CONFIG_ELEMENT_TYPE, domainType);
 
             String bufferType = null;
@@ -252,7 +263,7 @@ public final class SessionConfigGenerator {
             addElementContent(document, domainElement, SessionConfigStrings.CONFIG_ELEMENT_DOMAIN_BUFFER_TYPE, bufferType);
 
             /* Add the channels */
-            domainElement.appendChild(getChannelsElement(document, domain.isKernel(), domain.getChannels()));
+            domainElement.appendChild(getChannelsElement(document, domain.getDomain(), domain.getChannels()));
             domainsElement.appendChild(domainElement);
         }
 
@@ -289,13 +300,13 @@ public final class SessionConfigGenerator {
      *
      * @param document
      *            The document in which the nodes are being added
-     * @param isKernel
-     *            Is it a kernel domain type
+     * @param domain
+     *            The domain type ({@link TraceDomainType})
      * @param channels
      *            The channels to be added as elements
      * @return The channels element as an XML element
      */
-    private static Element getChannelsElement(Document document, boolean isKernel, IChannelInfo[] channels) {
+    private static Element getChannelsElement(Document document, TraceDomainType domain, IChannelInfo[] channels) {
         Element channelsElement = document.createElement(SessionConfigStrings.CONFIG_ELEMENT_CHANNELS);
 
         for (IChannelInfo channel : channels) {
@@ -327,7 +338,7 @@ public final class SessionConfigGenerator {
             addElementContent(document, channelElement, SessionConfigStrings.CONFIG_ELEMENT_LIVE_TIMER_INTERVAL, SessionConfigStrings.CONFIG_STRING_ZERO);
 
             /* Add the events */
-            channelElement.appendChild(getEventsElement(document, isKernel, channel.getEvents()));
+            channelElement.appendChild(getEventsElement(document, domain, channel.getEvents()));
             channelsElement.appendChild(channelElement);
         }
 
@@ -340,13 +351,13 @@ public final class SessionConfigGenerator {
      *
      * @param document
      *            The document in which the nodes are being added
-     * @param isKernel
-     *            Is the domain type kernel
+     * @param domain
+     *            The domain type ({@link TraceDomainType})
      * @param events
      *            The event informations to be added
      * @return An element containing all the event informations as XML elements
      */
-    private static Element getEventsElement(Document document, boolean isKernel, IEventInfo[] events) {
+    private static Element getEventsElement(Document document, TraceDomainType domain, IEventInfo[] events) {
         Element eventsElement = document.createElement(SessionConfigStrings.CONFIG_ELEMENT_EVENTS);
 
         for (IEventInfo event : events) {
@@ -366,7 +377,7 @@ public final class SessionConfigGenerator {
             }
 
             /* Specific to UST session config: the log level */
-            if (!isKernel && !event.getLogLevel().equals(TraceLogLevel.LEVEL_UNKNOWN)) {
+            if (domain.equals(TraceDomainType.UST) && !event.getLogLevel().equals(TraceLogLevel.LEVEL_UNKNOWN)) {
                 addElementContent(document, eventElement, SessionConfigStrings.CONFIG_ELEMENT_LOGLEVEL, event.getLogLevel().ordinal());
             }
 

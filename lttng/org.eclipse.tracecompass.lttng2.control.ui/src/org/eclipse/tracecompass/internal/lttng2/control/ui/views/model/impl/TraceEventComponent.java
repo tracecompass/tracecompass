@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
@@ -252,10 +253,10 @@ public class TraceEventComponent extends TraceControlComponent {
     }
 
     /**
-     * @return if domain is kernel or UST
+     * @return the domain type ({@link TraceDomainType})
      */
-    public boolean isKernel() {
-        return ((TraceChannelComponent)getParent()).isKernel();
+    public TraceDomainType getDomain() {
+        return ((TraceChannelComponent)getParent()).getDomain();
     }
 
     // ------------------------------------------------------------------------
@@ -275,6 +276,6 @@ public class TraceEventComponent extends TraceControlComponent {
     public void addContexts(List<String> contexts, IProgressMonitor monitor)
             throws ExecutionException {
         getControlService().addContexts(getSessionName(), getChannelName(),
-                getName(), isKernel(), contexts, monitor);
+                getName(), getDomain(), contexts, monitor);
     }
 }

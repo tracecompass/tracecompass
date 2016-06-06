@@ -19,6 +19,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
@@ -193,9 +194,8 @@ public interface ILttngControlService {
      *            - a session name to create
      * @param channelNames
      *            - a list of channel names to be enabled
-     * @param isKernel
-     *            - a flag to indicate Kernel or UST (true for Kernel, false for
-     *            UST)
+     * @param domain
+     *            - indicate the domain type ({@link TraceDomainType})
      * @param info
      *            - channel information used for creation of a channel (or null
      *            for default)
@@ -205,7 +205,7 @@ public interface ILttngControlService {
      *             If the command fails
      */
     void enableChannels(String sessionName, List<String> channelNames,
-            boolean isKernel, IChannelInfo info, IProgressMonitor monitor)
+            TraceDomainType domain, IChannelInfo info, IProgressMonitor monitor)
             throws ExecutionException;
 
     /**
@@ -216,16 +216,15 @@ public interface ILttngControlService {
      *            - a session name to create
      * @param channelNames
      *            - a list of channel names to be enabled
-     * @param isKernel
-     *            - a flag to indicate Kernel or UST (true for Kernel, false for
-     *            UST)
+     * @param domain
+     *            - indicate the domain type ({@link TraceDomainType})
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
     void disableChannels(String sessionName, List<String> channelNames,
-            boolean isKernel, IProgressMonitor monitor)
+            TraceDomainType domain, IProgressMonitor monitor)
             throws ExecutionException;
 
     /**
@@ -238,8 +237,8 @@ public interface ILttngControlService {
      * @param eventNames
      *            - a list of event names to be enabled, or null (list of size =
      *            0)for all events .
-     * @param isKernel
-     *            - a flag for indicating kernel or UST.
+     * @param domain
+     *            - indicate the domain type ({@link TraceDomainType})
      * @param filterExpression
      *            - a filter expression
      * @param excludedEvents
@@ -250,7 +249,7 @@ public interface ILttngControlService {
      *             If the command fails
      */
     void enableEvents(String sessionName, String channelName,
-            List<String> eventNames, boolean isKernel, String filterExpression, List<String> excludedEvents,
+            List<String> eventNames, TraceDomainType domain, String filterExpression, List<String> excludedEvents,
             IProgressMonitor monitor)
             throws ExecutionException;
 
@@ -326,15 +325,15 @@ public interface ILttngControlService {
      *            - a channel name (null for default channel)
      * @param eventNames
      *            - a list of event names to enabled.
-     * @param isKernel
-     *            - a flag for indicating kernel or UST.
+     * @param domain
+     *            - indicate the domain type ({@link TraceDomainType})
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
     void disableEvent(String sessionName, String channelName,
-            List<String> eventNames, boolean isKernel, IProgressMonitor monitor)
+            List<String> eventNames, TraceDomainType domain, IProgressMonitor monitor)
             throws ExecutionException;
 
     /**
@@ -358,8 +357,8 @@ public interface ILttngControlService {
      *            - a channel name (null for all channels)
      * @param eventName
      *            - a event name (null for all events)
-     * @param isKernel
-     *            - a flag for indicating kernel or UST.
+     * @param domain
+     *            - indicate the domain type ({@link TraceDomainType})
      * @param contexts
      *            - a list of name of contexts to add
      * @param monitor
@@ -368,7 +367,7 @@ public interface ILttngControlService {
      *             If the command fails
      */
     void addContexts(String sessionName, String channelName,
-            String eventName, boolean isKernel, List<String> contexts,
+            String eventName, TraceDomainType domain, List<String> contexts,
             IProgressMonitor monitor) throws ExecutionException;
 
     /**

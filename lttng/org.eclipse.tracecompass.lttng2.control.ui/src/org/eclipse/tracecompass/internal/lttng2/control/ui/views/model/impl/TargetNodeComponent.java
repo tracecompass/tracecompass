@@ -34,6 +34,7 @@ import org.eclipse.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.remote.core.RemoteConnectionChangeEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
@@ -222,11 +223,11 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
 
     /**
      * Returns if node supports filtering of events
-     * @param isKernel - <code>true</code> for kernel provider else <code>false</code>
+     * @param domain - the domain type ({@link TraceDomainType})
      * @return <code>true</code> if node supports filtering else <code>false</code>
      */
-    public boolean isEventFilteringSupported(boolean isKernel) {
-        if (isKernel) {
+    public boolean isEventFilteringSupported(TraceDomainType domain) {
+        if (domain.equals(TraceDomainType.KERNEL)) {
             return getControlService().isVersionSupported("2.7.0"); //$NON-NLS-1$
         }
         return getControlService().isVersionSupported("2.1.0"); //$NON-NLS-1$

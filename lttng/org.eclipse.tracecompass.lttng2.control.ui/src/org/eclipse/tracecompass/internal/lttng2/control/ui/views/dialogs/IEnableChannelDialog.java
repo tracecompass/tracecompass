@@ -11,6 +11,7 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs;
 
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent;
@@ -45,9 +46,9 @@ public interface IEnableChannelDialog {
     void setTargetNodeComponent(TargetNodeComponent node);
 
     /**
-     * @return true for Kernel domain. False for UST.
+     * @return The domain type ({@link TraceDomainType})
      */
-    boolean isKernel();
+    TraceDomainType getDomain();
 
     /**
      * Sets the whether dialog is for Kernel or UST

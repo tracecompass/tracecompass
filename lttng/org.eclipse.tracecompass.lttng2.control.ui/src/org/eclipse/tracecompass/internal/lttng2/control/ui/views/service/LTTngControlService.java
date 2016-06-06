@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
@@ -251,8 +252,8 @@ public class LTTngControlService implements ILttngControlService {
                 // Create Domain
                 IDomainInfo domainInfo = new DomainInfo(Messages.TraceControl_KernelDomainDisplayName);
 
-                // set kernel flag
-                domainInfo.setIsKernel(true);
+                // set kernel domain
+                domainInfo.setDomain(TraceDomainType.KERNEL);
 
                 // in domain kernel
                 ArrayList<IChannelInfo> channels = new ArrayList<>();
@@ -272,8 +273,8 @@ public class LTTngControlService implements ILttngControlService {
             if (matcher.matches()) {
                 IDomainInfo domainInfo = new DomainInfo(Messages.TraceControl_UstGlobalDomainDisplayName);
 
-                // set kernel flag
-                domainInfo.setIsKernel(false);
+                // set kernel domain
+                domainInfo.setDomain(TraceDomainType.UST);
 
                 // in domain UST
                 ArrayList<IChannelInfo> channels = new ArrayList<>();
@@ -668,7 +669,7 @@ public class LTTngControlService implements ILttngControlService {
     }
 
     @Override
-    public void enableChannels(String sessionName, List<String> channelNames, boolean isKernel, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException {
+    public void enableChannels(String sessionName, List<String> channelNames, TraceDomainType domain, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException {
 
         // no channels to enable
         if (channelNames.isEmpty()) {
@@ -679,10 +680,19 @@ public class LTTngControlService implements ILttngControlService {
 
         command.add(toCsv(channelNames));
 
-        if (isKernel) {
+        switch (domain) {
+        case KERNEL:
             command.add(LTTngControlServiceConstants.OPTION_KERNEL);
-        } else {
+            break;
+        case UST:
             command.add(LTTngControlServiceConstants.OPTION_UST);
+            break;
+        case JUL:
+        case LOG4J:
+        case PYTHON:
+        case UNKNOWN:
+        default:
+            break;
         }
 
         command.add(LTTngControlServiceConstants.OPTION_SESSION);
@@ -723,7 +733,7 @@ public class LTTngControlService implements ILttngControlService {
             if (isVersionSupported("2.2.0")) { //$NON-NLS-1$
                 // --buffers-uid Every application sharing the same UID use the
                 // same buffers --buffers-pid Buffers are allocated per PID
-                if (!isKernel) {
+                if (domain.equals(TraceDomainType.UST)) {
                     if (info.getBufferType() == BufferType.BUFFER_PER_PID) {
                         command.add(LTTngControlServiceConstants.OPTION_PER_PID_BUFFERS);
 
@@ -751,7 +761,7 @@ public class LTTngControlService implements ILttngControlService {
     }
 
     @Override
-    public void disableChannels(String sessionName, List<String> channelNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
+    public void disableChannels(String sessionName, List<String> channelNames, TraceDomainType domain, IProgressMonitor monitor) throws ExecutionException {
 
         // no channels to enable
         if (channelNames.isEmpty()) {
@@ -762,10 +772,20 @@ public class LTTngControlService implements ILttngControlService {
 
         command.add(toCsv(channelNames));
 
-        if (isKernel) {
+        switch (domain) {
+        case KERNEL:
             command.add(LTTngControlServiceConstants.OPTION_KERNEL);
-        } else {
+            break;
+        case UST:
             command.add(LTTngControlServiceConstants.OPTION_UST);
+            break;
+        case JUL:
+        case LOG4J:
+        case PYTHON:
+        case UNKNOWN:
+        default:
+            break;
+
         }
 
         command.add(LTTngControlServiceConstants.OPTION_SESSION);
@@ -775,7 +795,7 @@ public class LTTngControlService implements ILttngControlService {
     }
 
     @Override
-    public void enableEvents(String sessionName, String channelName, List<String> eventNames, boolean isKernel, String filterExpression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
+    public void enableEvents(String sessionName, String channelName, List<String> eventNames, TraceDomainType domain, String filterExpression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
 
         ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_ENABLE_EVENT);
         boolean isAllEvents = ALL_EVENTS.equals(eventNames);
@@ -786,10 +806,19 @@ public class LTTngControlService implements ILttngControlService {
             command.add(toCsv(eventNames));
         }
 
-        if (isKernel) {
+        switch (domain) {
+        case KERNEL:
             command.add(LTTngControlServiceConstants.OPTION_KERNEL);
-        } else {
+            break;
+        case UST:
             command.add(LTTngControlServiceConstants.OPTION_UST);
+            break;
+        case JUL:
+        case LOG4J:
+        case PYTHON:
+        case UNKNOWN:
+        default:
+            break;
         }
 
         command.add(LTTngControlServiceConstants.OPTION_SESSION);
@@ -892,7 +921,7 @@ public class LTTngControlService implements ILttngControlService {
     }
 
     @Override
-    public void disableEvent(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
+    public void disableEvent(String sessionName, String channelName, List<String> eventNames, TraceDomainType domain, IProgressMonitor monitor) throws ExecutionException {
         ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_DISABLE_EVENT);
 
         if (eventNames == null) {
@@ -914,10 +943,19 @@ public class LTTngControlService implements ILttngControlService {
             command.add(eventNameParameter.toString());
         }
 
-        if (isKernel) {
+        switch (domain) {
+        case KERNEL:
             command.add(LTTngControlServiceConstants.OPTION_KERNEL);
-        } else {
+            break;
+        case UST:
             command.add(LTTngControlServiceConstants.OPTION_UST);
+            break;
+        case JUL:
+        case LOG4J:
+        case PYTHON:
+        case UNKNOWN:
+        default:
+            break;
         }
 
         command.add(LTTngControlServiceConstants.OPTION_SESSION);
@@ -966,7 +1004,7 @@ public class LTTngControlService implements ILttngControlService {
     }
 
     @Override
-    public void addContexts(String sessionName, String channelName, String eventName, boolean isKernel, List<String> contextNames, IProgressMonitor monitor) throws ExecutionException {
+    public void addContexts(String sessionName, String channelName, String eventName, TraceDomainType domain, List<String> contextNames, IProgressMonitor monitor) throws ExecutionException {
         ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_ADD_CONTEXT);
 
         command.add(LTTngControlServiceConstants.OPTION_SESSION);
@@ -982,10 +1020,19 @@ public class LTTngControlService implements ILttngControlService {
             command.add(eventName);
         }
 
-        if (isKernel) {
+        switch (domain) {
+        case KERNEL:
             command.add(LTTngControlServiceConstants.OPTION_KERNEL);
-        } else {
+            break;
+        case UST:
             command.add(LTTngControlServiceConstants.OPTION_UST);
+            break;
+        case JUL:
+        case LOG4J:
+        case PYTHON:
+        case UNKNOWN:
+        default:
+            break;
         }
 
         for (Iterator<String> iterator = contextNames.iterator(); iterator.hasNext();) {
@@ -1141,7 +1188,7 @@ public class LTTngControlService implements ILttngControlService {
         int index = currentIndex;
 
         // if kernel set the buffer type to shared
-        if (domainInfo.isKernel()) {
+        if (domainInfo.getDomain().equals(TraceDomainType.KERNEL)) {
             domainInfo.setBufferType(BufferType.BUFFER_SHARED);
         }
 

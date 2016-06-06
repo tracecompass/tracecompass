@@ -20,6 +20,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
@@ -45,7 +46,7 @@ public class EnableChannelOnDomainHandler extends BaseEnableChannelHandler {
     // ------------------------------------------------------------------------
 
     @Override
-    public void enableChannel(CommandParameter param, List<String> channelNames, IChannelInfo info, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
+    public void enableChannel(CommandParameter param, List<String> channelNames, IChannelInfo info, TraceDomainType domain, IProgressMonitor monitor) throws ExecutionException {
         if (param instanceof DomainCommandParameter) {
             ((DomainCommandParameter)param).getDomain().enableChannels(channelNames, info, monitor);
         }

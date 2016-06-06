@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceChannelOutputType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
@@ -175,7 +176,7 @@ public class TraceControlUstProviderTest {
         // ------------------------------------------------------------------------
         fProxy.setScenario(SCEN_SCENARIO2_TEST);
         EnableChannelDialogStub channelDialogStub = new EnableChannelDialogStub();
-        channelDialogStub.setIsKernel(false);
+        channelDialogStub.setDomain(TraceDomainType.UST);
         channelDialogStub.getChannelInfo().setOverwriteMode(false);
         channelDialogStub.getChannelInfo().setSwitchTimer(200);
         channelDialogStub.getChannelInfo().setReadTimer(100);

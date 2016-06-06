@@ -36,6 +36,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
@@ -46,7 +47,6 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISnapshotInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IUstProviderInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
@@ -375,11 +375,11 @@ public class LTTngControlServiceMI extends LTTngControlService {
         switch (domainType) {
         case KERNEL:
             domain = new DomainInfo(Messages.TraceControl_KernelProviderDisplayName);
-            domain.setIsKernel(true);
+            domain.setDomain(TraceDomainType.KERNEL);
             break;
         case UST:
             domain = new DomainInfo(Messages.TraceControl_UstGlobalDomainDisplayName);
-            domain.setIsKernel(false);
+            domain.setDomain(TraceDomainType.UST);
             break;
         case JUL:
             /**
@@ -388,12 +388,13 @@ public class LTTngControlServiceMI extends LTTngControlService {
              * JUL domain only events. The channel is activated in UST Channel
              */
             domain = new DomainInfo(Messages.TraceControl_JULDomainDisplayName);
-            domain.setIsKernel(false);
+            domain.setDomain(TraceDomainType.JUL);
             break;
         case UNKNOWN:
             domain = new DomainInfo(Messages.TraceControl_UnknownDomainDisplayName);
-            domain.setIsKernel(false);
+            domain.setDomain(TraceDomainType.UNKNOWN);
             break;
+            //$CASES-OMITTED$
         default:
             throw new ExecutionException(Messages.TraceControl_MiInvalidElementError);
         }

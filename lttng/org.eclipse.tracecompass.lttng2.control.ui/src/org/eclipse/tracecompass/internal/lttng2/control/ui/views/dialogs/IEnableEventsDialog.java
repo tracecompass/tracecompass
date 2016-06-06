@@ -11,6 +11,7 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs;
 
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceProviderGroup;
 
@@ -27,9 +28,9 @@ public interface IEnableEventsDialog extends IEnableKernelEvents, IEnableUstEven
     // Accessors
     // ------------------------------------------------------------------------
     /**
-     * @return the session the events shall be enabled.
+     * @return the domain type ({@link TraceDomainType})
      */
-    boolean isKernel();
+    TraceDomainType getDomain();
 
     /**
      * Sets the trace provider group.

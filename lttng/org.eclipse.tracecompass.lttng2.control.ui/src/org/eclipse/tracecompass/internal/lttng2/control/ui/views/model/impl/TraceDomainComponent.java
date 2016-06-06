@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
@@ -106,18 +107,20 @@ public class TraceDomainComponent extends TraceControlComponent {
     }
 
     /**
-     * @return true if domain is kernel, false for UST
+     * @return the domain type ({@link TraceDomainType})
      */
-    public boolean isKernel() {
-        return fDomainInfo.isKernel();
+    public TraceDomainType getDomain() {
+        return fDomainInfo.getDomain();
     }
 
     /**
-     * Sets whether domain is  Kernel domain or UST
-     * @param isKernel true for kernel, false for UST
+     * Sets the domain type
+     *
+     * @param domain
+     *            the domain type ({@link TraceDomainType})
      */
-    public void setIsKernel(boolean isKernel) {
-        fDomainInfo.setIsKernel(isKernel);
+    public void setDomain(TraceDomainType domain) {
+        fDomainInfo.setDomain(domain);
     }
 
     /**
@@ -177,7 +180,7 @@ public class TraceDomainComponent extends TraceControlComponent {
     public void enableChannels(List<String> channelNames, IChannelInfo info,
             IProgressMonitor monitor) throws ExecutionException {
         getControlService().enableChannels(getParent().getName(), channelNames,
-                isKernel(), info, monitor);
+                getDomain(), info, monitor);
     }
 
     /**
@@ -193,7 +196,7 @@ public class TraceDomainComponent extends TraceControlComponent {
     public void disableChannels(List<String> channelNames,
             IProgressMonitor monitor) throws ExecutionException {
         getControlService().disableChannels(getParent().getName(),
-                channelNames, isKernel(), monitor);
+                channelNames, getDomain(), monitor);
     }
 
     /**
@@ -213,7 +216,7 @@ public class TraceDomainComponent extends TraceControlComponent {
     public void enableEvents(List<String> eventNames, String filterExpression, List<String> excludedEvents, IProgressMonitor monitor)
             throws ExecutionException {
         getControlService().enableEvents(getSessionName(), null, eventNames,
-                isKernel(), filterExpression, excludedEvents, monitor);
+                getDomain(), filterExpression, excludedEvents, monitor);
     }
 
     /**
@@ -286,7 +289,7 @@ public class TraceDomainComponent extends TraceControlComponent {
     public void addContexts(List<String> contexts, IProgressMonitor monitor)
             throws ExecutionException {
         getControlService().addContexts(getSessionName(), null, null,
-                isKernel(), contexts, monitor);
+                getDomain(), contexts, monitor);
     }
 
 }

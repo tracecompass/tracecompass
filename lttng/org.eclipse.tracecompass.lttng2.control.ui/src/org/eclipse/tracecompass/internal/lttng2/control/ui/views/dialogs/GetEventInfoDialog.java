@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent;
@@ -72,9 +73,9 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
      */
     private TraceSessionComponent[] fSessions;
     /**
-     * True for kernel, false for UST.
+     * The domain type ({@link TraceDomainType})
      */
-    private boolean fIsKernel;
+    private TraceDomainType fDomain;
     /**
      * Index in session array (selected session).
      */
@@ -119,8 +120,8 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
     }
 
     @Override
-    public void setIsKernel(boolean isKernel) {
-        fIsKernel = isKernel;
+    public void setDomain(TraceDomainType domain) {
+        fDomain = domain;
     }
 
     @Override
@@ -194,7 +195,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
                     TraceDomainComponent[] domains = fSessions[fSessionIndex].getDomains();
                     for (int i = 0; i < domains.length; i++) {
 
-                        if (domains[i].isKernel() == fIsKernel) {
+                        if (domains[i].getDomain().equals(fDomain)) {
                             domain = domains[i];
                             break;
                         }
@@ -223,7 +224,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
         });
 
         // take first session to test whether events filtering is supported or not
-        if (fSessions[0].isEventFilteringSupported(fIsKernel)) {
+        if (fSessions[0].isEventFilteringSupported(fDomain)) {
             Group filterMainGroup = new Group(dialogComposite, SWT.SHADOW_NONE);
             filterMainGroup.setText(Messages.TraceControl_EnableEventsFilterGroupName);
             layout = new GridLayout(2, false);
@@ -268,7 +269,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
 
         // initialize filter with null
         fFilterExpression = null;
-        if (fSessions[0].isEventFilteringSupported(fIsKernel)) {
+        if (fSessions[0].isEventFilteringSupported(fDomain)) {
             String tempFilter = fFilterText.getText();
 
             if(!tempFilter.trim().isEmpty()) {

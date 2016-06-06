@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.internal.lttng2.control.stubs.dialogs;
 
 import java.util.Arrays;
 
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.IGetEventInfoDialog;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
@@ -36,7 +37,7 @@ public class GetEventInfoDialogStub implements IGetEventInfoDialog {
     }
 
     @Override
-    public void setIsKernel(boolean isKernel) {
+    public void setDomain(TraceDomainType domain) {
     }
 
     @Override
