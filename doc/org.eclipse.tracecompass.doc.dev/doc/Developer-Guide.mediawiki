@@ -991,6 +991,63 @@ Sent by the Stream List View when the user selects a new packet stream.
 
 Received by views that analyze packet streams.
 
+=== TmfStartAnalysisSignal ===
+
+''Purpose''
+
+This signal is used to indicate that an analysis has started.
+
+''Senders''
+
+Sent by an analysis module when it starts to execute the analyis.
+
+''Receivers''
+
+Received by components that need to be notified of the start of an analysis
+or that need to receive the analysis module.
+
+=== TmfCpuSelectedSignal ===
+
+''Purpose''
+
+This signal is used to indicate that the user has selected a CPU core.
+
+''Senders''
+
+Sent by any component that allows the user to select a CPU.
+
+''Receivers''
+
+Received by viewers that show information specific to a selected CPU.
+
+=== TmfThreadSelectedSignal ===
+
+''Purpose''
+
+This signal is used to indicate that the user has selected a thread.
+
+''Senders''
+
+Sent by any component that allows the user to select a thread.
+
+''Receivers''
+
+Received by viewers that show information specific to a selected thread.
+
+=== TmfTraceSynchronizedSignal ===
+
+''Purpose''
+
+This signal is used to indicate that trace synchronization has been completed.
+
+''Senders''
+
+Sent by the experiment after trace synchronization.
+
+''Receivers''
+
+Received by any component that needs to be notified of trace synchronization.
+
 == Debugging ==
 
 TMF has built-in Eclipse tracing support for the debugging of signal interaction between components. To enable it, open the '''Run/Debug Configuration...''' dialog, select a configuration, click the '''Tracing''' tab, select the plug-in '''org.eclipse.tracecompass.tmf.core''', and check the '''signal''' item.
