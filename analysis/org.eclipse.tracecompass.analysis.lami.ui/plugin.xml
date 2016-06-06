@@ -14,7 +14,7 @@
          point="org.eclipse.ui.handlers">
       <handler
             class="org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.handler.RunAnalysisHandler"
-            commandId="org.eclipse.tracecompass.tmf.ui.command.analysis_run">
+            commandId="org.eclipse.ui.navigate.openResource">
          <activeWhen>
             <and>
                <count
@@ -96,12 +96,6 @@
          point="org.eclipse.ui.commands">
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
-            description="%command.analysis_run.description"
-            id="org.eclipse.tracecompass.tmf.ui.command.analysis_run"
-            name="%command.analysis_run">
-      </command>
-      <command
-            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
             description="%command.analysis_remove.description"
             id="org.eclipse.tracecompass.tmf.ui.command.analysis_remove"
             name="%command.analysis_remove">
@@ -122,9 +116,9 @@
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+            locationURI="popup:org.eclipse.ui.popup.any?after=group.open">
          <command
-               commandId="org.eclipse.tracecompass.tmf.ui.command.analysis_run"
+               commandId="org.eclipse.ui.navigate.openResource"
                label="%command.analysis_run"
                mnemonic="%command.analysis_run.mnemonic"
                style="push"
@@ -136,7 +130,9 @@
                   <count
                         value="1">
                   </count>
-                  <iterate>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
                      <instanceof
                            value="org.eclipse.tracecompass.tmf.ui.project.model.TmfOnDemandAnalysisElement">
                      </instanceof>
