@@ -3366,23 +3366,22 @@ A requirement defines the needs of an analysis. For example, an analysis could n
 
 === Requirement values ===
 
-When creating a requirement, the developer needs to specify a type to which all
-the values added to the requirement will be linked. In the earlier example,
-there would be an ''"event"''  or ''"eventName"'' type. The type is represented
-by a string, like all values added to the requirement object. With an 'event'
-type requirement, a trace generator like the LTTng Control could automatically
-enable the required events. Another point we have to take into consideration
-is the priority level when creating a requirement object.
+Each concrete analysis requirement class will define how a requirement is verified on a given trace. 
+When creating a requirement, the developer will specify a set of values for that class.
+With an 'event' type requirement, a trace generator like the LTTng Control could automatically
+enable the required events. 
+Another point we have to take into consideration is the priority level when creating a requirement object.
 The enum '''TmfAbstractAnalysisRequirement#PriorityLevel''' gives the choice
 between '''PriorityLevel#OPTIONAL''', '''PriorityLevel#ALL_OR_NOTHING''',
 '''PriorityLevel#AT_LEAST_ONE''' or '''PriorityLevel#MANDATORY'''. That way, we
 can tell if an analysis can run without a value or not.
 
 
-To create an requirement one has the choice to extend the abstract class
-'''TmfAbstractAnalysisRequirement''' or use the exiting implementation
-'''TmfAnalysisEventRequirement''', '''TmfAnalysisEventFieldRequirement''' or
-'''TmfCompositeAnalysisRequirement'''.
+To create a requirement one has the choice to extend the abstract class
+'''TmfAbstractAnalysisRequirement''' or use the existing implementations:
+'''TmfAnalysisEventRequirement''' (will verify the presence of events identified by name),
+'''TmfAnalysisEventFieldRequirement''' (will verify the presence of fields for some or all events) or
+'''TmfCompositeAnalysisRequirement''' (join requirements together with one of the priority levels).
 
 Moreover, information can be added to requirements. That way, the developer can explicitly give help details at the requirement level instead of at the analysis level (which would just be a general help text). To add information to a requirement, the method '''TmfAnalysisRequirement#addInformation()''' must be called. Adding information is not mandatory.
 
@@ -3415,12 +3414,12 @@ on event contexts (see 3rd requirement in example below).
 
         /* Requirement on event fields */
         Set<@NonNull String> requiredEventFields = ImmutableSet.of("context._procname", "context._ip");
-        TmfAbstractAnalysisRequirement eventFiledRequirement = new TmfAnalysisEventFieldRequirement(
+        TmfAbstractAnalysisRequirement eventFieldRequirement = new TmfAnalysisEventFieldRequirement(
                  "event name",
                  requiredEventFields,
                  PriorityLevel.MANDATORY);
 
-         Set<TmfAbstractAnalysisRequirement> requirements = ImmutableSet.of(eventsReq1, eventsReq2, eventFiledRequirement);
+         Set<TmfAbstractAnalysisRequirement> requirements = ImmutableSet.of(eventsReq1, eventsReq2, eventFieldRequirement);
          return requirements;
     }
 </pre>
