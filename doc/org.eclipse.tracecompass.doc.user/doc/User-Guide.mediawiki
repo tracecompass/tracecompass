@@ -1892,6 +1892,9 @@ Then, by selecting '''Next Event''', it will show the next state transition and 
 
 This view is also synchronized with the others : [[#Histogram_View | Histogram View]], [[#LTTng_Kernel_Events_Editor | Events Editor]], [[#Control_Flow_View | Control Flow View]], etc.
 
+=== Follow CPU ===
+It is possible to follow a CPU by right-clicking on its entry in the view, then selecting ''Follow CPU X'' where X is the number of the CPU. Following a CPU will filter the [[#LTTng CPU Usage View | CPU Usage View]] to display only usage for the selected CPU. To unfollow a CPU, one needs to right-click on any CPU entry and select ''Unfollow CPU''.
+
 === Navigation ===
 
 See Control Flow View's '''[[#Using_the_mouse | Using the mouse]]''', '''[[#Using_the_keyboard | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
@@ -2030,6 +2033,8 @@ The CPU Usage View '''toolbar''', located at the top right of the view, has shor
 
 [[Image:images/LTTng_CpuUsageViewToolTip.png]]
 
+==== CPU Filtering ====
+[[#Follow CPU | Follow a CPU]] will filter the CPU Usage View and will display only usage for the followed CPU.
 
 == Kernel Memory Usage ==
 
