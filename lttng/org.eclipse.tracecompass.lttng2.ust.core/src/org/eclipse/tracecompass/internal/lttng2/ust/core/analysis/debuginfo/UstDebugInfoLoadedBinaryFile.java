@@ -28,9 +28,11 @@ public class UstDebugInfoLoadedBinaryFile extends UstDebugInfoBinaryFile {
      *            The file path of the loaded binary/library
      * @param buildId
      *            The build ID of the binary object
+     * @param isPic
+     *            If the binary is position-independent or not
      */
-    public UstDebugInfoLoadedBinaryFile(long baseAddress, String filePath, String buildId) {
-        super(filePath, buildId);
+    public UstDebugInfoLoadedBinaryFile(long baseAddress, String filePath, String buildId, boolean isPic) {
+        super(filePath, buildId, isPic);
         this.baseAddress = baseAddress;
     }
 
