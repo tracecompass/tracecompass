@@ -44,9 +44,12 @@ import com.google.common.io.BaseEncoding;
  *   +-- 3000 (VPIDs)
  *        +-- baddr (value = addr range end, long)
  *        |     +-- buildId (value = /path/to/library (sopath), string)
+ *        |           +- is_pic (value = 0 or 1 (int))
  *        +-- baddr
  *        |     +-- buildId1
+ *        |           +- is_pic
  *        |     +-- buildId2 (if the same address is re-used later)
+ *        |           +- is_pic
  *       ...
  * </pre>
  *
@@ -71,8 +74,14 @@ import com.google.common.io.BaseEncoding;
  */
 public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
 
+    /**
+     * Sub-attribute indicating if a given binary is PIC (position-independent
+     * code) or not. This information is present directly in the trace.
+     */
+    public static final String IS_PIC_ATTRIB  = "is_pic"; //$NON-NLS-1$
+
     /* Version of this state provider */
-    private static final int VERSION = 1;
+    private static final int VERSION = 2;
 
     private static final int DL_DLOPEN_INDEX = 1;
     private static final int DL_BUILD_ID_INDEX = 2;
@@ -89,9 +98,25 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
      * We need both the soinfo/dlopen event AND the matching build_id/debug_link
      * event to get all the information about a particular binary.
      *
-     * Between these two events, we will store the <baddr, sopath> in here.
+     * Between these two events, we will store the <baddr, BinInfo> in here.
      */
-    private final Map<Long, String> fPendingEntries = new HashMap<>();
+    private final Map<Long, BinInfo> fPendingEntries = new HashMap<>();
+
+    /**
+     * Information contained in a "bin_info" event, which means a binary's path,
+     * base address, and if it is a PIC or not.
+     */
+    private static class BinInfo {
+        public final long fBaddr;
+        public final String fPath;
+        public final int fIsPic;
+
+        public BinInfo(long baddr, String path, int isPic) {
+            fBaddr = baddr;
+            fPath = path;
+            fIsPic = isPic;
+        }
+    }
 
     /**
      * Constructor
@@ -192,10 +217,14 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
      *
      * Uses fields: Long baddr, Long memsz, String sopath
      */
-    private void handleOpen(ITmfEvent event, final Long vpid, final ITmfStateSystemBuilder ss) throws AttributeNotFoundException {
+    private void handleOpen(ITmfEvent event, final Long vpid, final ITmfStateSystemBuilder ss) {
         Long baddr = (Long) event.getContent().getField(fLayout.fieldBaddr()).getValue();
         Long memsz = (Long) event.getContent().getField(fLayout.fieldMemsz()).getValue();
         String sopath = (String) event.getContent().getField(fLayout.fieldPath()).getValue();
+
+        /* "dlopen" events do not have a "is_pic" field, they always refer to PIC libs */
+        ITmfEventField isPicField = event.getContent().getField(fLayout.fieldIsPic());
+        Long isPicVal = (isPicField == null ? 1L : (Long) isPicField.getValue());
 
         long endAddr = baddr.longValue() + memsz.longValue();
         int addrQuark = ss.getQuarkAbsoluteAndAdd(vpid.toString(), baddr.toString());
@@ -207,7 +236,8 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
          * Add this library to the pending entries, the matching
          * build_id/debug_link event will finish updating this attribute
          */
-        fPendingEntries.put(baddr, checkNotNull(sopath));
+        BinInfo binInfo = new BinInfo(baddr, checkNotNull(sopath), isPicVal.intValue());
+        fPendingEntries.put(binInfo.fBaddr, binInfo);
     }
 
     /**
@@ -226,8 +256,8 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
         String buildId = BaseEncoding.base16().encode(longArrayToByteArray(buildIdArray)).toLowerCase();
 
         /* Retrieve the matching sopath from the pending entries */
-        String sopath = fPendingEntries.remove(baddr);
-        if (sopath == null) {
+        BinInfo binInfo = fPendingEntries.remove(baddr);
+        if (binInfo == null) {
             /*
              * We did not previously handle the initial event for this
              * library. Lost events?
@@ -237,9 +267,15 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
         }
         /* addrQuark should already exist */
         int addrQuark = ss.getQuarkAbsolute(vpid.toString(), baddr.toString());
+
+        /* build-id attribute */
         int buildIdQuark = ss.getQuarkRelativeAndAdd(addrQuark, buildId);
         long ts = event.getTimestamp().getValue();
-        ss.modifyAttribute(ts, TmfStateValue.newValueString(sopath), buildIdQuark);
+        ss.modifyAttribute(ts, TmfStateValue.newValueString(binInfo.fPath), buildIdQuark);
+
+        /* "is_pic" sub-attribute */
+        int isPicQuark = ss.getQuarkRelativeAndAdd(buildIdQuark, IS_PIC_ATTRIB);
+        ss.modifyAttribute(ts, TmfStateValue.newValueInt(binInfo.fIsPic), isPicQuark);
     }
 
     /**

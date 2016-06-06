@@ -89,4 +89,8 @@ public class LttngUst28EventLayout extends LttngUst27EventLayout {
     public String fieldBuildId() {
         return "build_id";
     }
+
+    public String fieldIsPic() {
+        return "is_pic";
+    }
 }

@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo;
 
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
@@ -20,6 +22,7 @@ public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile
 
     private final String fFilePath;
     private final String fBuildId;
+    private final boolean fIsPic;
     private final String fToString;
 
     /**
@@ -29,11 +32,17 @@ public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile
      *            The binary's path on the filesystem
      * @param buildId
      *            The binary's unique buildID (in base16 form).
+     * @param isPic
+     *            If the binary is position-independent or not
      */
-    public UstDebugInfoBinaryFile(String filePath, String buildId) {
+    public UstDebugInfoBinaryFile(String filePath, String buildId, boolean isPic) {
         fFilePath = filePath;
         fBuildId = buildId;
-        fToString = filePath + " (" + buildId + ')'; //$NON-NLS-1$
+        fIsPic = isPic;
+
+        fToString = filePath + " (" + //$NON-NLS-1$
+                (fIsPic ? "PIC" : "non-PIC") + //$NON-NLS-1$ //$NON-NLS-2$
+                ", " + buildId + ')'; //$NON-NLS-1$
     }
 
     /**
@@ -57,6 +66,20 @@ public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile
         return fBuildId;
     }
 
+    /**
+     * Return whether the given file (binary or library) is Position-Independent
+     * Code or not.
+     *
+     * This indicates whether the symbols in the ELF are absolute or relative to
+     * the runtime base address, and determines which address we need to pass to
+     * 'addr2line'.
+     *
+     * @return Whether this file is position-independent or not
+     */
+    public boolean isPic() {
+        return fIsPic;
+    }
+
     @Override
     public String toString() {
         return fToString;
@@ -68,17 +91,14 @@ public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile
             return false;
         }
         UstDebugInfoBinaryFile other = (UstDebugInfoBinaryFile) obj;
-        return (fFilePath == other.fFilePath &&
-                fBuildId == other.fBuildId);
+        return (fFilePath.equals(other.fFilePath) &&
+                fBuildId.equals(other.fBuildId) &&
+                fIsPic == other.fIsPic);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + fBuildId.hashCode();
-        result = prime * result +  fFilePath.hashCode();
-        return result;
+        return Objects.hash(fBuildId, fFilePath, fIsPic);
     }
 
     /**

@@ -151,7 +151,20 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
                 }
                 String filePath = interval.getStateValue().unboxStr();
 
-                files.add(new UstDebugInfoBinaryFile(filePath, buildId));
+                /* Retrieve the value of "is_pic" at that time */
+                try {
+                    int isPicQuark = ss.getQuarkRelative(buildIdQuark, UstDebugInfoStateProvider.IS_PIC_ATTRIB);
+                    int isPicVal = ss.querySingleState(interval.getStartTime(), isPicQuark).getStateValue().unboxInt();
+                    boolean isPic = (isPicVal != 0);
+
+                    files.add(new UstDebugInfoBinaryFile(filePath, buildId, isPic));
+
+                } catch (AttributeNotFoundException e) {
+                    /* We should have built "is_pic" sub-attributes */
+                    throw new IllegalStateException("Missing expected \"is_pic\" attribute"); //$NON-NLS-1$
+                } catch (StateSystemDisposedException e) {
+                    /* We're closing down, ignore */
+                }
             }
         }
         return files;
@@ -229,7 +242,12 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
             int buildIdQuark = potentialBuildIdQuark.get().intValue();
             String buildId = ss.getAttributeName(buildIdQuark);
             String filePath = fullState.get(buildIdQuark).getStateValue().unboxStr();
-            return new UstDebugInfoLoadedBinaryFile(baddr, filePath, buildId);
+
+            int isPicQuark = ss.getQuarkRelative(buildIdQuark, UstDebugInfoStateProvider.IS_PIC_ATTRIB);
+            int isPicVal = fullState.get(isPicQuark).getStateValue().unboxInt();
+            boolean isPic = (isPicVal != 0);
+
+            return new UstDebugInfoLoadedBinaryFile(baddr, filePath, buildId, isPic);
 
         } catch (AttributeNotFoundException e) {
             /* We're only using quarks we've checked for. */

@@ -107,10 +107,9 @@ public final class UstDebugInfoBinaryAspect implements ITmfEventAspect<BinaryCal
 
         /* Apply the path prefix defined by the trace, if any */
         String fullPath = (trace.getSymbolProviderConfig().getActualRootDirPath() + file.getFilePath());
-        boolean isPIC = isPIC(fullPath);
 
         long offset;
-        if (isPIC) {
+        if (file.isPic()) {
             offset = (ip - file.getBaseAddress());
         } else {
             /*
@@ -121,21 +120,7 @@ public final class UstDebugInfoBinaryAspect implements ITmfEventAspect<BinaryCal
             offset = ip;
         }
 
-        return new BinaryCallsite(fullPath, file.getBuildId(), offset, isPIC);
-    }
-
-    /**
-     * Return if the given file (binary or library) is Position-Independent Code
-     * or not. This indicates if addr2line considers the addresses as absolute
-     * addresses or as offsets.
-     */
-    private static boolean isPIC(String filePath) {
-        /*
-         * Ghetto binary/library identification for now. It would be possible to
-         * parse the ELF binary to check if it is position-independent
-         * (-fPIC/-fPIE) or not.
-         */
-        return (filePath.endsWith(".so") || filePath.contains(".so.")); //$NON-NLS-1$ //$NON-NLS-2$
+        return new BinaryCallsite(fullPath, file.getBuildId(), offset, file.isPic());
     }
 
 }
