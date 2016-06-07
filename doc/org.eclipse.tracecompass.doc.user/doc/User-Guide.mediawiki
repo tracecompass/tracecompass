@@ -1855,6 +1855,10 @@ View Menu
 |
 | Show Markers
 | A marker highlights a time interval. A marker can be used for instance to indicate a time range where lost events occurred or to bookmark an interesting interval for future reference. Selecting a category name will toggle the visibility of markers of that category.
+|-
+|
+| Thread Presentation
+| Select the threads layout. Two layouts are available. '''Flat''' layout lists the threads in a flat list per trace. '''Hierarchical''' layout shows the threads in a parent-child tree per trace.
 |}
 
 === Marker Axis ===
