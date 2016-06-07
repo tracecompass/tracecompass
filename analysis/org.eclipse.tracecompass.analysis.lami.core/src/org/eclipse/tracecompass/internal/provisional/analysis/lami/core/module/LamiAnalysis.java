@@ -78,8 +78,12 @@ import com.google.common.collect.Multimap;
  */
 public class LamiAnalysis implements IOnDemandAnalysis {
 
-    /** Maximum major version of the LAMI protocol we support */
-    private static final int MAX_SUPPORTED_MAJOR_VERSION = 1;
+    /**
+     * Maximum major version of the LAMI protocol we support.
+     *
+     * Currently only 0.x/unversioned MI, outputted by lttng-analyses 0.4.x
+     */
+    private static final int MAX_SUPPORTED_MAJOR_VERSION = 0;
 
     private static final String DOUBLE_QUOTES = "\""; //$NON-NLS-1$
 
