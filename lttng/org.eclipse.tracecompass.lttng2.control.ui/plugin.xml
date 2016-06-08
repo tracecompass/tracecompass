@@ -210,6 +210,24 @@
             id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.save"
             name="%commands.control.save">
       </command>
+      <command
+            categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
+            description="%commands.control.enable.logger.description"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableLogger"
+            name="%commands.control.enable.logger">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
+            description="%commands.control.disable.logger.description"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.disableLogger"
+            name="%commands.control.disable.logger">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
+            description="%commands.control.assign.logger.description"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.assign.logger"
+            name="%commands.control.assign.logger">
+      </command>
 
    </extension>
    <extension
@@ -673,12 +691,15 @@
                   checkEnabled="false">
                <with
                      variable="activeMenuSelection">
-                  <iterate
-                        operator="or">
-                     <instanceof
-                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.BaseEventComponent">
-                     </instanceof>
-                  </iterate>
+                  <or>
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
+                        <instanceof
+                              value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.BaseEventComponent">
+                        </instanceof>
+                     </iterate>
+                  </or>
                </with>
             </visibleWhen>
          </command>
@@ -840,9 +861,63 @@
                </with>
             </visibleWhen>
          </command>
+         <command
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableLogger"
+               icon="icons/obj16/logger_enabled.gif"
+               label="%commands.control.enable.logger"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceLoggerComponent">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.disableLogger"
+               icon="icons/elcl16/disable_event.gif"
+               label="%commands.control.disable.logger"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceLoggerComponent">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.assign.logger"
+               icon="icons/obj16/logger_enabled.gif"
+               label="%commands.control.assign.logger"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <or>
+                     <iterate>
+                        <instanceof
+                              value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.BaseLoggerComponent">
+                        </instanceof>
+                     </iterate>
+                  </or>
+               </with>
+            </visibleWhen>
+         </command>
 
       </menuContribution>
-      
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -1270,7 +1345,51 @@
             </with>
          </activeWhen>
       </handler>
-      
+      <handler
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.EnableLoggerHandler"
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableLogger">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceLoggerComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.DisableLoggerHandler"
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.disableLogger">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceLoggerComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.AssignLoggerHandler"
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.assign.logger">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.BaseLoggerComponent">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">

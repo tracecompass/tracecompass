@@ -16,6 +16,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseLoggerInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ILoggerInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IUstProviderInfo;
 
 /**
@@ -41,6 +43,11 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
      * List of event information.
      */
     private final List<IBaseEventInfo> fEvents = new ArrayList<>();
+
+    /**
+     * List of logger information.
+     */
+    private final List<ILoggerInfo> fLoggers = new ArrayList<>();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -104,6 +111,24 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
         fEvents.add(event);
     }
 
+    @Override
+    public List<ILoggerInfo> getLoggers() {
+        return new ArrayList<>(fLoggers);
+    }
+
+    @Override
+    public void setLoggers(List<ILoggerInfo> loggers) {
+        fLoggers.clear();
+        for (ILoggerInfo logger : loggers) {
+            fLoggers.add(logger);
+        }
+    }
+
+    @Override
+    public void addLogger(ILoggerInfo logger) {
+        fLoggers.add(logger);
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -113,6 +138,7 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + fEvents.hashCode();
+        result = prime * result + fLoggers.hashCode();
         result = prime * result + fPid;
         return result;
     }
@@ -132,6 +158,9 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
         if (!fEvents.equals(other.fEvents)) {
             return false;
         }
+        if (!fLoggers.equals(other.fLoggers)) {
+            return false;
+        }
         if (fPid != other.fPid) {
             return false;
         }
@@ -142,7 +171,7 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
     @Override
     public String toString() {
         StringBuffer output = new StringBuffer();
-            output.append("[EventInfo(");
+            output.append("[UstProviderInfo(");
             output.append(super.toString());
             output.append(",PID=");
             output.append(fPid);
@@ -153,6 +182,14 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
                 for (Iterator<IBaseEventInfo> iterator = fEvents.iterator(); iterator.hasNext();) {
                     IBaseEventInfo event = iterator.next();
                     output.append(event.toString());
+                }
+            }
+            output.append(",Loggers=");
+            if (fLoggers.isEmpty()) {
+                output.append("None");
+            } else {
+                for (IBaseLoggerInfo logger : fLoggers) {
+                    output.append(logger.toString());
                 }
             }
             output.append(")]");

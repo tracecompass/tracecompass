@@ -26,9 +26,9 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInf
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISnapshotInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IUstProviderInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.ILttngControlService;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LttngVersion;
 
@@ -117,7 +117,7 @@ class NullControlService implements ILttngControlService {
     }
 
     @Override
-    public void enableLogLevel(String sessionName, String channelName, String eventName, LogLevelType logLevelType, TraceLogLevel level, String filterExpression, IProgressMonitor monitor) throws ExecutionException {
+    public void enableLogLevel(String sessionName, String channelName, List<String> eventName, LogLevelType logLevelType, ITraceLogLevel level, String filterExpression, TraceDomainType domain, IProgressMonitor monitor) throws ExecutionException {
     }
 
     @Override

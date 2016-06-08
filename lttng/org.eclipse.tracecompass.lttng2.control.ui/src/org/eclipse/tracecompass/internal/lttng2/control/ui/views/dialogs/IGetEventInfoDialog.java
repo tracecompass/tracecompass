@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs;
 
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 
 /**
  * <p>
@@ -23,15 +22,11 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.Trac
  *
  * @author Bernd Hufmann
  */
-public interface IGetEventInfoDialog {
+public interface IGetEventInfoDialog extends IBaseGetInfoDialog {
 
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-    /**
-     * @return the session the events shall be enabled.
-     */
-    TraceSessionComponent getSession();
 
     /**
      * @return the channel the events shall be enabled. Null for default channel.
@@ -45,22 +40,8 @@ public interface IGetEventInfoDialog {
     void setDomain(TraceDomainType domain);
 
     /**
-     * Sets available session.
-     * @param sessions - a array of available sessions.
-     */
-    void setSessions(TraceSessionComponent[] sessions);
-
-    /**
      * Returns the filter expression.
      * @return the filter expression or null for no filtering
      */
     String getFilterExpression();
-
-    // ------------------------------------------------------------------------
-    // Operations
-    // ------------------------------------------------------------------------
-    /**
-     * @return returns the open return value
-     */
-    int open();
 }

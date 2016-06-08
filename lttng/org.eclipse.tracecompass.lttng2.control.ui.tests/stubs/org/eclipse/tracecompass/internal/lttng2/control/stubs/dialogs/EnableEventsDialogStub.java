@@ -43,7 +43,6 @@ public class EnableEventsDialogStub implements IEnableEventsDialog {
     private boolean fIsWildcard;
     private String fWildcard;
     private boolean fIsLogLevel;
-    private String fLogLevelEventName;
     private TraceLogLevel fLogLevel;
     private LogLevelType fLogLevelType;
     private String fFilter;
@@ -108,10 +107,6 @@ public class EnableEventsDialogStub implements IEnableEventsDialog {
 
     public void setIsLogLevel(boolean isLogLevel) {
         fIsLogLevel = isLogLevel;
-    }
-
-    public void setLogLevelEventName(String logLevelEventName) {
-        fLogLevelEventName = logLevelEventName;
     }
 
     public void setLogLevel(TraceLogLevel logLevel) {
@@ -213,11 +208,6 @@ public class EnableEventsDialogStub implements IEnableEventsDialog {
     @Override
     public TraceLogLevel getLogLevel() {
         return fLogLevel;
-    }
-
-    @Override
-    public String getLogLevelEventName() {
-        return fLogLevelEventName;
     }
 
     @Override

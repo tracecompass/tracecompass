@@ -92,6 +92,11 @@ public class EnableChannelOnDomainHandler extends BaseEnableChannelHandler {
 
         boolean isEnabled = domain != null;
 
+        // If it's a JUL domain, the enable channel is disabled.
+        if ((domain != null) && TraceDomainType.JUL.equals(domain.getDomain())) {
+            isEnabled = false;
+        }
+
         fLock.lock();
         try {
             fParam = null;

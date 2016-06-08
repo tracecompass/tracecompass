@@ -24,9 +24,9 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInf
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISnapshotInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IUstProviderInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 
 
 /**
@@ -298,22 +298,24 @@ public interface ILttngControlService {
      *            - a session name
      * @param channelName
      *            - a channel name (null for default channel)
-     * @param eventName
-     *            - a event name
+     * @param eventNames
+     *            - a list of event names
      * @param logLevelType
      *            - a log level type
      * @param level
      *            - a log level
      * @param filterExpression
      *            - a filter expression
+     * @param domain
+     *            - the domain type
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
     void enableLogLevel(String sessionName, String channelName,
-            String eventName, LogLevelType logLevelType, TraceLogLevel level,
-            String filterExpression,
+            List<String> eventNames, LogLevelType logLevelType, ITraceLogLevel level,
+            String filterExpression, TraceDomainType domain,
             IProgressMonitor monitor) throws ExecutionException;
 
     /**

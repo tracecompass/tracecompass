@@ -21,10 +21,10 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IEventInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceChannelOutputType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.ChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.ProbeEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
@@ -363,23 +363,25 @@ public class TraceChannelComponent extends TraceControlComponent {
     /**
      * Enables events using log level.
      *
-     * @param eventName
-     *            - a event name
+     * @param eventNames
+     *            - a list of event names
      * @param logLevelType
      *            - a log level type
      * @param level
      *            - a log level
      * @param filterExpression
      *            - a filter expression
+     * @param domain
+     *            - the domain type ({@link TraceDomainType})
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
-    public void enableLogLevel(String eventName, LogLevelType logLevelType,
-            TraceLogLevel level, String filterExpression, IProgressMonitor monitor)
+    public void enableLogLevel(List<String> eventNames, LogLevelType logLevelType,
+            ITraceLogLevel level, String filterExpression, TraceDomainType domain, IProgressMonitor monitor)
             throws ExecutionException {
-        getControlService().enableLogLevel(getSessionName(), getName(), eventName, logLevelType, level, filterExpression, monitor);
+        getControlService().enableLogLevel(getSessionName(), getName(), eventNames, logLevelType, level, filterExpression, domain, monitor);
     }
 
     /**

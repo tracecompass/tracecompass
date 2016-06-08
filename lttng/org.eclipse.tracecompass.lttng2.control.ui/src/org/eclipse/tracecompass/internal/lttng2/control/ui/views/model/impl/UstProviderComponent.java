@@ -14,9 +14,12 @@ package org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ILoggerInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IUstProviderInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.UstProviderInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceControlComponent;
@@ -38,7 +41,31 @@ public class UstProviderComponent extends TraceControlComponent {
     /**
      * Path to icon file for this component.
      */
-    public static final String USTL_PROVIDER_ICON_FILE = "icons/obj16/targets.gif"; //$NON-NLS-1$
+    private static final String USTL_PROVIDER_ICON_FILE = "icons/obj16/targets.gif"; //$NON-NLS-1$
+    /**
+     * UST domain event created by a Java application.
+     */
+    private static final String LTTNG_JUL_USER_EVENT = "lttng_jul:user_event"; //$NON-NLS-1$
+    /**
+     * UST domain event created by a Java application.
+     */
+    private static final String LTTNG_JUL_SYS_EVENT = "lttng_jul:sys_event"; //$NON-NLS-1$
+    /**
+     * UST domain event created by a Java application.
+     */
+    private static final String LTTNG_LOG4J_USER_EVENT = "lttng_log4j:user_event"; //$NON-NLS-1$
+    /**
+     * UST domain event created by a Java application.
+     */
+    private static final String LTTNG_LOG4J_SYS_EVENT = "lttng_log4j:sys_event"; //$NON-NLS-1$
+    /**
+     * UST domain event created by a Java application.
+     */
+    private static final String LTTNG_JUL_EVENT = "lttng_jul:event"; //$NON-NLS-1$
+    /**
+     * UST domain event created by a Java application.
+     */
+    private static final String LTTNG_LOG4J_EVENT = "lttng_log4j:event"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -77,10 +104,42 @@ public class UstProviderComponent extends TraceControlComponent {
         for (int i = 0; i < events.length; i++) {
             BaseEventComponent component  = new BaseEventComponent(events[i].getName(), this);
             component.setEventInfo(events[i]);
-            eventComponents.add(component);
+
+            // Only add the events that are useful for the user, no JUL and log4j events
+            if ( !events[i].getName().equals(LTTNG_JUL_USER_EVENT) &&
+                    !events[i].getName().equals(LTTNG_JUL_SYS_EVENT) &&
+                    !events[i].getName().equals(LTTNG_LOG4J_USER_EVENT) &&
+                    !events[i].getName().equals(LTTNG_LOG4J_SYS_EVENT) &&
+                    !events[i].getName().equals(LTTNG_JUL_EVENT) &&
+                    !events[i].getName().equals(LTTNG_LOG4J_EVENT) ) {
+                eventComponents.add(component);
+            }
         }
         setChildren(eventComponents);
-        setName(getName() + " [PID=" + fProviderInfo.getPid() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        // Adding loggers
+        List<ILoggerInfo> loggers = providerInfo.getLoggers();
+        List<ITraceControlComponent> loggerComponents = new ArrayList<>();
+
+        for (ILoggerInfo logger : loggers) {
+            BaseLoggerComponent component = new BaseLoggerComponent(logger.getName(), this);
+            component.setLoggerInfo(logger);
+
+            // Only add the loggers that are useful for the user, not global
+            if (!logger.getName().equals("global")) { //$NON-NLS-1$
+                loggerComponents.add(component);
+            }
+        }
+        setChildren(loggerComponents);
+
+        StringBuilder providerName = new StringBuilder();
+        providerName.append(getName() + " [PID=" + fProviderInfo.getPid() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        // If the UST provider contains logger(s)
+        if (!loggerComponents.isEmpty()) {
+            providerName.append(" (With logger)"); //$NON-NLS-1$
+        }
+        setName(providerName.toString());
     }
 
     /**
@@ -96,6 +155,20 @@ public class UstProviderComponent extends TraceControlComponent {
      */
     public void setPid(int pid) {
         fProviderInfo.setPid(pid);
+    }
+
+    /**
+     * Gets all logger components of a certain domain
+     *
+     * @param domain
+     *            the logger domain type
+     *
+     * @return all logger components of a certain domain
+     */
+    public List<ITraceControlComponent> getLoggerComponents(TraceDomainType domain) {
+        return getChildren(BaseLoggerComponent.class).stream()
+                .filter(loggerComp -> domain.equals(((BaseLoggerComponent) loggerComp).getDomain()))
+                .collect(Collectors.toList());
     }
 
     @Override

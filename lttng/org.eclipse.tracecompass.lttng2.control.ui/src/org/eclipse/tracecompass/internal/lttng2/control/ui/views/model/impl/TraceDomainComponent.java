@@ -19,8 +19,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ILoggerInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BufferType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.DomainInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
@@ -81,6 +82,17 @@ public class TraceDomainComponent extends TraceControlComponent {
             TraceChannelComponent channel = new TraceChannelComponent(channels[i].getName(), this);
             channel.setChannelInfo(channels[i]);
             addChild(channel);
+        }
+
+        // Since the loggers are not in a channel in the JUL domain, the loggers
+        // won't be added by the previous loop.
+        if (TraceDomainType.JUL.equals(domainInfo.getDomain())) {
+            List<ILoggerInfo> loggers = fDomainInfo.getLoggers();
+            for (ILoggerInfo loggerInfo : loggers) {
+                TraceLoggerComponent logger = new TraceLoggerComponent(loggerInfo.getName(), this);
+                logger.setLoggerInfo(loggerInfo);
+                addChild(logger);
+            }
         }
     }
 
@@ -220,6 +232,21 @@ public class TraceDomainComponent extends TraceControlComponent {
     }
 
     /**
+     * Disables events with given names which are part of this domain.
+     *
+     * @param loggerNames
+     *            - a list of logger names to disable
+     * @param monitor
+     *            - a progress monitor
+     * @throws ExecutionException
+     *             If the command fails
+     */
+    public void disableLoggers(List<String> loggerNames,
+            IProgressMonitor monitor) throws ExecutionException {
+        getControlService().disableEvent(getSessionName(), null, loggerNames, getDomain(), monitor);
+    }
+
+    /**
      * Enables all syscalls (for kernel domain)
      *
      * @param monitor
@@ -256,24 +283,26 @@ public class TraceDomainComponent extends TraceControlComponent {
     /**
      * Enables events using log level.
      *
-     * @param eventName
-     *            - a event name
+     * @param eventNames
+     *            - a list of event names
      * @param logLevelType
      *            - a log level type
      * @param level
      *            - a log level
      * @param filterExpression
      *            - a filter expression
+     * @param domain
+     *            - the domain type ({@link TraceDomainType})
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
-    public void enableLogLevel(String eventName, LogLevelType logLevelType,
-            TraceLogLevel level, String filterExpression, IProgressMonitor monitor)
+    public void enableLogLevel(List<String> eventNames, LogLevelType logLevelType,
+            ITraceLogLevel level, String filterExpression, TraceDomainType domain, IProgressMonitor monitor)
             throws ExecutionException {
-        getControlService().enableLogLevel(getSessionName(), null, eventName,
-                logLevelType, level, filterExpression, monitor);
+        getControlService().enableLogLevel(getSessionName(), null, eventNames,
+                logLevelType, level, filterExpression, domain, monitor);
     }
 
     /**

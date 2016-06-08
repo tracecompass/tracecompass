@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2015 Ericsson
+ * Copyright (c) 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,8 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Bernd Hufmann - Initial API and implementation
- *   Bernd Hufmann - Updated for support of LTTng Tools 2.1
+ *   Bruno Roy - Initial API and implementation
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers;
 
@@ -32,27 +31,21 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.IGetEventInfoDialog;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.GetLoggerInfoDialog;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.TraceControlDialogFactory;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceControlComponent;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.BaseEventComponent;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.KernelProviderComponent;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.BaseLoggerComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.UstProviderComponent;
 import org.eclipse.ui.IWorkbenchPage;
 
 /**
- * <p>
- * Command handler implementation to assign events to a session and channel and enable/configure them.
+ * Command handler implementation to assign loggers to a session and enable/configure them.
  * This is done on the trace provider level.
- * </p>
  *
- * @author Bernd Hufmann
+ * @author Bruno Roy
  */
-public class AssignEventHandler extends BaseControlViewHandler {
+public class AssignLoggerHandler extends BaseControlViewHandler {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -74,7 +67,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
         fLock.lock();
         try {
             tmpParam = fParam;
-            if (tmpParam == null)  {
+            if (tmpParam == null) {
                 return null;
             }
             tmpParam = new Parameter(tmpParam);
@@ -83,36 +76,34 @@ public class AssignEventHandler extends BaseControlViewHandler {
         }
         final Parameter param = tmpParam;
 
-        // Open dialog box to retrieve the session and channel where the events should be enabled in.
-        final IGetEventInfoDialog dialog = TraceControlDialogFactory.getInstance().getGetEventInfoDialog();
-        dialog.setDomain(param.getDomain());
+        // Open dialog box to retrieve the session and channel where the events
+        // should be enabled in.
+        final GetLoggerInfoDialog dialog = TraceControlDialogFactory.getInstance().getGetLoggerInfoDialog();
         dialog.setSessions(param.getSessions());
 
         if (dialog.open() != Window.OK) {
             return null;
         }
 
-        Job job = new Job(Messages.TraceControl_EnableEventsJob) {
+        Job job = new Job(Messages.TraceControl_EnableLoggersDialogTitle) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
 
                 Exception error = null;
                 TraceSessionComponent session = dialog.getSession();
                 try {
-                    List<String> eventNames = new ArrayList<>();
-                    List<BaseEventComponent> events = param.getEvents();
+                    List<String> loggerNames = new ArrayList<>();
+                    List<BaseLoggerComponent> loggers = param.getLoggers();
                     // Create list of event names
-                    for (Iterator<BaseEventComponent> iterator = events.iterator(); iterator.hasNext();) {
-                        BaseEventComponent baseEvent = iterator.next();
-                        eventNames.add(baseEvent.getName());
+                    for (BaseLoggerComponent logger : loggers) {
+                        loggerNames.add(logger.getName());
                     }
 
-                    TraceChannelComponent channel = dialog.getChannel();
-                    if (channel == null) {
-                        // enable events on default channel (which will be created by lttng-tools)
-                        session.enableEvents(eventNames, param.getDomain(), dialog.getFilterExpression(), null, monitor);
+                    // enable events on default channel
+                    if (dialog.getLogLevel() != null) {
+                        session.enableLogLevel(loggerNames, dialog.getLogLevelType(), dialog.getLogLevel(), null, TraceDomainType.JUL, monitor);
                     } else {
-                        channel.enableEvents(eventNames, dialog.getFilterExpression(), null, monitor);
+                        session.enableEvents(loggerNames, TraceDomainType.JUL, null, null, monitor);
                     }
 
                 } catch (ExecutionException e) {
@@ -120,9 +111,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
                 }
 
                 // refresh in all cases
-                if (session != null) {
-                    refresh(new CommandParameter(session));
-                }
+                refresh(new CommandParameter(session));
 
                 if (error != null) {
                     return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_EnableEventsFailure, error);
@@ -138,8 +127,10 @@ public class AssignEventHandler extends BaseControlViewHandler {
 
     @Override
     public boolean isEnabled() {
-        @NonNull ArrayList<@NonNull BaseEventComponent> events = new ArrayList<>();
-        @NonNull TraceSessionComponent[] sessions = null;
+        @NonNull
+        ArrayList<@NonNull BaseLoggerComponent> loggers = new ArrayList<>();
+        @NonNull
+        TraceSessionComponent[] sessions = null;
         TraceDomainType domain = null;
 
         // Get workbench page for the Control View
@@ -155,43 +146,31 @@ public class AssignEventHandler extends BaseControlViewHandler {
             StructuredSelection structered = ((StructuredSelection) selection);
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
                 Object element = iterator.next();
-                if (element instanceof BaseEventComponent) {
-                    BaseEventComponent event = (BaseEventComponent) element;
-                    ITraceControlComponent provider = event.getParent();
+                if (element instanceof BaseLoggerComponent) {
+                    BaseLoggerComponent logger = (BaseLoggerComponent) element;
 
-                    // check for the domain provider
-                    TraceDomainType temp = null;
-                    if (provider instanceof KernelProviderComponent) {
-                        temp = TraceDomainType.KERNEL;
-                    } else if (provider instanceof UstProviderComponent) {
-                        temp = TraceDomainType.UST; // Loggers are under the UST domain
-                    } else {
-                        return false;
-                    }
+                    // The domain is always going to be UST for loggers
+                    domain = TraceDomainType.UST;
 
-                    if (domain == null) {
-                        domain = temp;
-                    } else {
-                        // don't mix events from Kernel and UST provider
-                        if (!domain.equals(temp)) {
-                            return false;
-                        }
-                    }
+                    // TODO: Add some logic when more loggers are added to
+                    // determine if the multiple selection is OK, only loggers
+                    // from the same type should be able to be enabled at the
+                    // same time
+                    // check AssignEventHandler for reference
 
-                    // Add BaseEventComponents
-                    events.add(event);
+                    // Add BaseLoggerComponents
+                    loggers.add(logger);
 
                     if (sessions == null) {
-                        TargetNodeComponent  root = (TargetNodeComponent)event.getParent().getParent().getParent();
+                        TargetNodeComponent root = (TargetNodeComponent) logger.getParent().getParent().getParent();
                         sessions = root.getSessions();
                     }
                 }
             }
         }
 
-        boolean isEnabled = ((!events.isEmpty()) && (sessions != null) && (sessions.length > 0));
+        boolean isEnabled = ((!loggers.isEmpty()) && (sessions != null) && (sessions.length > 0));
 
-        // To avoid compiler warnings check for null even if isKernel is always not null when used below
         if (domain == null) {
             return false;
         }
@@ -199,8 +178,8 @@ public class AssignEventHandler extends BaseControlViewHandler {
         fLock.lock();
         try {
             fParam = null;
-            if(isEnabled) {
-                fParam = new Parameter(NonNullUtils.checkNotNull(sessions), events, domain);
+            if (isEnabled) {
+                fParam = new Parameter(NonNullUtils.checkNotNull(sessions), loggers, domain);
             }
         } finally {
             fLock.unlock();
@@ -209,15 +188,15 @@ public class AssignEventHandler extends BaseControlViewHandler {
     }
 
     /**
-     *  Class containing parameter for the command execution.
+     * Class containing parameter for the command execution.
      */
     @NonNullByDefault
     private static final class Parameter {
 
         /**
-         * The list of event components the command is to be executed on.
+         * The list of logger components the command is to be executed on.
          */
-        private final List<BaseEventComponent> fEvents;
+        private final List<BaseLoggerComponent> fLoggers;
 
         /**
          * The list of available sessions.
@@ -232,35 +211,46 @@ public class AssignEventHandler extends BaseControlViewHandler {
         /**
          * Constructor
          *
-         * @param sessions - a array of trace sessions
-         * @param events - a lists of events to enable
-         * @param domain - domain type ({@link TraceDomainType})
+         * @param sessions
+         *            a array of trace sessions
+         * @param loggers
+         *            a lists of loggers to enable
+         * @param domain
+         *            domain type ({@link TraceDomainType})
          */
-        public Parameter(@NonNull TraceSessionComponent[] sessions, List<BaseEventComponent> events, TraceDomainType domain) {
+        public Parameter(@NonNull TraceSessionComponent[] sessions, List<BaseLoggerComponent> loggers, TraceDomainType domain) {
             fSessions = NonNullUtils.checkNotNull(Arrays.copyOf(sessions, sessions.length));
-            fEvents = new ArrayList<>();
-            fEvents.addAll(events);
+            fLoggers = new ArrayList<>();
+            fLoggers.addAll(loggers);
             fDomain = domain;
         }
 
         /**
          * Copy constructor
-         * @param other - a parameter to copy
+         *
+         * @param other
+         *            a parameter to copy
          */
         public Parameter(Parameter other) {
-            this(other.fSessions, other.fEvents, other.fDomain);
+            this(other.fSessions, other.fLoggers, other.fDomain);
         }
 
+        /**
+         * Return an array of session component
+         *
+         * @return array of session component
+         */
         public TraceSessionComponent[] getSessions() {
             return fSessions;
         }
 
-        public List<BaseEventComponent> getEvents() {
-            return fEvents;
-        }
-
-        public TraceDomainType getDomain() {
-            return fDomain;
+        /**
+         * Return a list of logger component
+         *
+         * @return list of base logger component
+         */
+        public List<BaseLoggerComponent> getLoggers() {
+            return fLoggers;
         }
     }
 }

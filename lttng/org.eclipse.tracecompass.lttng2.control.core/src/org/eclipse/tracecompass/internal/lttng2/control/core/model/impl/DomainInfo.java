@@ -18,6 +18,7 @@ import java.util.List;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ILoggerInfo;
 
 /**
  * <p>
@@ -36,7 +37,17 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
      * The channels information of the domain.
      */
     private final List<IChannelInfo> fChannels = new ArrayList<>();
+    /**
+     * The loggers information of the domain.
+     */
+    private List<ILoggerInfo> fLoggers = new ArrayList<>();
+    /**
+     * The domain type
+     */
     private TraceDomainType fDomain = TraceDomainType.UST;
+    /**
+     * The buffer type
+     */
     private BufferType fBufferType = BufferType.BUFFER_TYPE_UNKNOWN;
 
     // ------------------------------------------------------------------------
@@ -56,11 +67,20 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
      */
     public DomainInfo(DomainInfo other) {
         super(other);
+        // Add channels to domain
         for (int i = 0; i < other.fChannels.size(); i++) {
             if (other.fChannels.get(i) instanceof ChannelInfo) {
                 fChannels.add(new ChannelInfo((ChannelInfo)other.fChannels.get(i)));
             } else {
                 fChannels.add(other.fChannels.get(i));
+            }
+        }
+        // Add loggers to domain (loggers are not inside a channel)
+        for (ILoggerInfo loggerInfo : other.fLoggers) {
+            if (loggerInfo instanceof LoggerInfo) {
+                fLoggers.add(new LoggerInfo((LoggerInfo)loggerInfo));
+            } else {
+                fLoggers.add(loggerInfo);
             }
         }
         fDomain = other.getDomain();
@@ -101,10 +121,24 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
     }
 
     @Override
+    public List<ILoggerInfo> getLoggers() {
+        return new ArrayList<>(fLoggers);
+    }
+
+    @Override
+    public void setLoggers(List<ILoggerInfo> loggers) {
+        fLoggers.clear();
+        for (ILoggerInfo logger : loggers) {
+            fLoggers.add(logger);
+        }
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + fChannels.hashCode();
+        result = prime * result + fLoggers.hashCode();
         result = prime * result + ((fDomain == null) ? 0 : (fDomain.ordinal() + 1));
         result = prime * result + ((fBufferType == null) ? 0 : (fBufferType.ordinal() + 1));
         return result;
@@ -123,6 +157,9 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
         }
         DomainInfo other = (DomainInfo) obj;
         if (!fChannels.equals(other.fChannels)) {
+            return false;
+        }
+        if (!fLoggers.equals(other.fLoggers)) {
             return false;
         }
         if (fDomain == null) {
@@ -164,6 +201,14 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
                 for (Iterator<IChannelInfo> iterator = fChannels.iterator(); iterator.hasNext();) {
                     IChannelInfo channel = iterator.next();
                     output.append(channel.toString());
+                }
+            }
+            output.append(",Loggers=");
+            if (fLoggers.isEmpty()) {
+                output.append("None");
+            } else {
+                for (ILoggerInfo logger : fLoggers) {
+                    output.append(logger.toString());
                 }
             }
             output.append(",isKernel=");

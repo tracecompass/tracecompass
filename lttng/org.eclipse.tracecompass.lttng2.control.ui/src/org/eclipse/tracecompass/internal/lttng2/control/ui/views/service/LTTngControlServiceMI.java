@@ -41,6 +41,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IFieldInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ILoggerInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IProbeEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISnapshotInfo;
@@ -49,6 +50,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BufferType;
@@ -56,6 +58,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.ChannelI
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.DomainInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.EventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.FieldInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.LoggerInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.ProbeEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.SessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.SnapshotInfo;
@@ -414,6 +417,11 @@ public class LTTngControlServiceMI extends LTTngControlService {
                     domain.setChannels(channels);
                 }
                 break;
+            case MIStrings.EVENTS:
+                ArrayList<ILoggerInfo> loggers = new ArrayList<>();
+                getLoggerInfo(rawInfo.getChildNodes(), loggers, domain.getDomain());
+                domain.setLoggers(loggers);
+                break;
             default:
                 break;
             }
@@ -584,10 +592,9 @@ public class LTTngControlServiceMI extends LTTngControlService {
     @Override
     public List<IUstProviderInfo> getUstProvider(IProgressMonitor monitor) throws ExecutionException {
         ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_LIST, LTTngControlServiceConstants.OPTION_UST);
-        // Get the field to
+        // Get the field too
         command.add(LTTngControlServiceConstants.OPTION_FIELDS);
-
-        // Execute
+        // Execute UST listing
         ICommandResult result = executeCommand(command, monitor, false);
         List<IUstProviderInfo> allProviders = new ArrayList<>();
 
@@ -637,6 +644,41 @@ public class LTTngControlServiceMI extends LTTngControlService {
             allProviders.add(providerInfo);
         }
 
+        // Getting the loggers information since those are under the UST provider
+        ICommandInput commandJul = createCommand(LTTngControlServiceConstants.COMMAND_LIST, LTTngControlServiceConstants.OPTION_JUL);
+        // Execute JUL listing
+        ICommandResult resultJul = executeCommand(commandJul, monitor, false);
+
+        if (isError(resultJul)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + commandJul.toString());
+        }
+
+        Document documentJul = getDocumentFromStrings(resultJul.getOutput(), fDocumentBuilder);
+        NodeList rawProvidersJul = documentJul.getElementsByTagName(MIStrings.PID);
+
+        for (int i = 0; i < rawProvidersJul.getLength(); i++) {
+            Node provider = rawProvidersJul.item(i);
+            Node name = getFirstOf(provider.getChildNodes(), MIStrings.NAME);
+            if (name == null) {
+                throw new ExecutionException(Messages.TraceControl_MiInvalidProviderError);
+            }
+
+            Node id = getFirstOf(provider.getChildNodes(), MIStrings.PID_ID);
+
+            if (id != null) {
+                for (int k = 0; k < allProviders.size(); k++) {
+                    if (allProviders.get(k).getPid() == Integer.parseInt(id.getTextContent())) {
+                        Node events = getFirstOf(provider.getChildNodes(), MIStrings.EVENTS);
+                        if (events != null) {
+                            List<ILoggerInfo> loggers = new ArrayList<>();
+                            NodeList rawEvents = events.getChildNodes();
+                            getLoggerInfo(rawEvents, loggers, TraceDomainType.JUL);
+                            allProviders.get(k).setLoggers(loggers);
+                        }
+                    }
+                }
+            }
+        }
         return allProviders;
     }
 
@@ -961,6 +1003,43 @@ public class LTTngControlServiceMI extends LTTngControlService {
         }
     }
 
+    static void getLoggerInfo(NodeList xmlEvents, List<ILoggerInfo> loggers, TraceDomainType domain) throws ExecutionException {
+        ILoggerInfo loggerInfo = null;
+        for (int i = 0; i < xmlEvents.getLength(); i++) {
+            NodeList rawInfos = xmlEvents.item(i).getChildNodes();
+            // Search for name
+            if (xmlEvents.item(i).getNodeName().equalsIgnoreCase(MIStrings.EVENT)) {
+                Node rawName = getFirstOf(rawInfos, MIStrings.NAME);
+                if (rawName == null) {
+                    throw new ExecutionException(Messages.TraceControl_MiMissingRequiredError);
+                }
+
+                loggerInfo = new LoggerInfo(rawName.getTextContent());
+                loggerInfo.setDomain(domain);
+
+                // Basic information
+                for (int j = 0; j < rawInfos.getLength(); j++) {
+                    Node infoNode = rawInfos.item(j);
+                    switch (infoNode.getNodeName()) {
+                    case MIStrings.LOGLEVEL_TYPE:
+                        loggerInfo.setLogLevelType(LogLevelType.valueOfString(infoNode.getTextContent()));
+                        break;
+                    case MIStrings.LOGLEVEL:
+                        loggerInfo.setLogLevel(TraceJulLogLevel.valueOfString(infoNode.getTextContent()));
+                        break;
+                    case MIStrings.ENABLED:
+                        loggerInfo.setState(TraceEnablement.valueOfString(infoNode.getTextContent()));
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                // Add the event
+                loggers.add(loggerInfo);
+            }
+        }
+    }
+
     /**
      * @param fieldsList
      *            a list of xml event_field element
@@ -1021,7 +1100,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
 
     @Override
     public @NonNull List<String> getContextList(IProgressMonitor monitor) throws ExecutionException {
-        if (!isVersionSupported("2.8.0")) { //$NON-NLS-1$)
+        if (!isVersionSupported("2.8.0")) { //$NON-NLS-1$
             return super.getContextList(monitor);
         }
 

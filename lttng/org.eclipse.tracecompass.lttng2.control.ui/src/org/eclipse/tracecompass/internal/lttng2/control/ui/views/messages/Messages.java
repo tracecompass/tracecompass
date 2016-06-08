@@ -97,6 +97,8 @@ public final class Messages extends NLS {
     public static String TraceControl_ChangeChannelStateFailure;
     public static String TraceControl_ChangeEventStateJob;
     public static String TraceControl_ChangeEventStateFailure;
+    public static String TraceControl_ChangeLoggerStateJob;
+    public static String TraceControl_ChangeLoggerStateFailure;
 
     public static String TraceControl_EnableEventsJob;
     public static String TraceControl_EnableEventsFailure;
@@ -200,6 +202,8 @@ public final class Messages extends NLS {
     public static String TraceControl_EnableEventsNoSessionError;
     public static String TraceControl_EnableEventsNoChannelError;
 
+    public static String TraceControl_EnableLoggersDialogTitle;
+
     public static String TraceControl_EnableGroupSelectionName;
     public static String TraceControl_EnableEventsAllEventsLabel;
     public static String TraceControl_EnableEventsAllEventsTooltip;
@@ -221,6 +225,8 @@ public final class Messages extends NLS {
     public static String TraceControl_EnableEventsFucntionGroupName;
     public static String TraceControl_EnableEventsFunctionEventNameTooltip;
     public static String TraceControl_EnableEventsFunctionNameLabel;
+    public static String TraceControl_EnableEventsLoggerGroupName;
+    public static String TraceControl_EnableEventsLoggerTreeTooltip;
 
     public static String TraceControl_EnableEventsWildcardGroupName;
     public static String TraceControl_EnableEventsWildcardLabel;
@@ -240,6 +246,7 @@ public final class Messages extends NLS {
     public static String TraceControl_InvalidWildcardError;
     public static String TraceControl_InvalidLogLevelEventNameError;
     public static String TraceControl_InvalidLogLevel;
+    public static String TraceControl_InvalidLogger;
 
     public static String TraceControl_AddContextDialogTitle;
     public static String TraceControl_AddContextAvailableContextsLabel;
@@ -261,6 +268,7 @@ public final class Messages extends NLS {
     public static String TraceControl_BufferTypeDisplayName;
     public static String TraceControl_ChannelDisplayName;
     public static String TraceControl_EventDisplayName;
+    public static String TraceControl_LoggerDisplayName;
     public static String TraceControl_ProviderDisplayName;
     public static String TraceControl_KernelProviderDisplayName;
     public static String TraceControl_SharedBuffersDisplayName;
@@ -283,6 +291,8 @@ public final class Messages extends NLS {
     public static String TraceControl_BufferTypePropertyName;
     public static String TraceControl_ChannelNamePropertyName;
     public static String TraceControl_OpenConnectionTo;
+    public static String TraceControl_LoggerNamePropertyName;
+    public static String TraceControl_LoggerTypePropertyName;
 
     public static String TraceControl_OverwriteModePropertyName;
     public static String TraceControl_SubBufferSizePropertyName;

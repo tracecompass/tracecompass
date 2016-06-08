@@ -74,6 +74,11 @@ public final class TraceControlDialogFactory {
     private IGetEventInfoDialog fGetEventInfoDialog;
 
     /**
+     * The get event info dialog.
+     */
+    private GetLoggerInfoDialog fGetLoggerInfoDialog;
+
+    /**
      * The confirmation dialog implementation.
      */
     private IConfirmDialog fConfirmDialog;
@@ -238,11 +243,29 @@ public final class TraceControlDialogFactory {
     }
 
     /**
+     * @return get loggers info dialog implementation.
+     */
+    public GetLoggerInfoDialog getGetLoggerInfoDialog() {
+        if (fGetLoggerInfoDialog == null) {
+            fGetLoggerInfoDialog = new GetLoggerInfoDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+        }
+        return fGetLoggerInfoDialog;
+    }
+
+    /**
      * Sets a get events info dialog implementation.
      * @param getEventInfoDialog - a get events info dialog implementation
      */
     public void setGetEventInfoDialog(IGetEventInfoDialog getEventInfoDialog) {
         fGetEventInfoDialog = getEventInfoDialog;
+    }
+
+    /**
+     * Sets a get loggers info dialog implementation.
+     * @param getLoggerInfoDialog - a get loggers info dialog implementation
+     */
+    public void setGetLoggerInfoDialog(GetLoggerInfoDialog getLoggerInfoDialog) {
+        fGetLoggerInfoDialog = getLoggerInfoDialog;
     }
 
     /**

@@ -14,17 +14,12 @@ package org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs;
 
 import java.util.List;
 
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
-
 /**
- * <p>
  * Interface for providing information about UST events to be enabled.
- * </p>
  *
  * @author Bernd Hufmann
  */
-public interface IEnableUstEvents {
+public interface IEnableUstEvents  extends IBaseEnableUstEvents {
 
     // ------------------------------------------------------------------------
     // Accessors
@@ -36,16 +31,6 @@ public interface IEnableUstEvents {
     boolean isTracepoints();
 
     /**
-     * @return a flag indicating whether all tracepoints shall be enabled or not.
-     */
-    boolean isAllTracePoints();
-
-    /**
-     * @return a list of event names to be enabled.
-     */
-    List<String> getEventNames();
-
-    /**
      * @return a flag whether events using wildcards should be enabled
      */
     boolean isWildcard();
@@ -54,26 +39,6 @@ public interface IEnableUstEvents {
      * @return a wildcard
      */
     String getWildcard();
-
-    /**
-     * @return a flag whether events using log levels should be enabled
-     */
-    boolean isLogLevel();
-
-    /**
-     * @return a log level type (loglevel or loglevel-only)
-     */
-    LogLevelType getLogLevelType();
-
-    /**
-     * @return a log level
-     */
-    TraceLogLevel getLogLevel();
-
-    /**
-     * @return a event name for the log level enable action
-     */
-    String getLogLevelEventName();
 
     /**
      * @return a filter expression

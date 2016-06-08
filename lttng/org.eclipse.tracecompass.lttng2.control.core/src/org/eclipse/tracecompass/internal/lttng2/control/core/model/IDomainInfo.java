@@ -30,10 +30,22 @@ public interface IDomainInfo extends ITraceInfo {
     IChannelInfo[] getChannels();
 
     /**
+     * @return information about all loggers
+     */
+    List<ILoggerInfo> getLoggers();
+
+    /**
      * Sets the channel information specified by given list.
      * @param channels - all channel information to set.
      */
     void setChannels(List<IChannelInfo> channels);
+
+    /**
+     * Sets the logger information specified by given list.
+     * @param loggers - all loggers information to set.
+     */
+    void setLoggers(List<ILoggerInfo> loggers);
+
 
     /**
      * Adds a single channel information.

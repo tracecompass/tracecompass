@@ -12,10 +12,6 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs;
 
-import java.util.Arrays;
-
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -34,7 +30,6 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 
 /**
  * <p>
@@ -43,23 +38,11 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.Trac
  *
  * @author Bernd Hufmann
  */
-public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
-
-    // ------------------------------------------------------------------------
-    // Constants
-    // ------------------------------------------------------------------------
-    /**
-     * The icon file for this dialog box.
-     */
-    public static final String TARGET_NEW_CONNECTION_ICON_FILE = "icons/elcl16/enable_event.gif"; //$NON-NLS-1$
+public class GetEventInfoDialog extends BaseGetInfoDialog implements IGetEventInfoDialog {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    /**
-     * The session combo box.
-     */
-    private CCombo fSessionsCombo = null;
     /**
      * The channel combo box.
      */
@@ -69,17 +52,9 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
      */
     private Text fFilterText;
     /**
-     * The list of available sessions.
-     */
-    private TraceSessionComponent[] fSessions;
-    /**
      * The domain type ({@link TraceDomainType})
      */
     private TraceDomainType fDomain;
-    /**
-     * Index in session array (selected session).
-     */
-    private int fSessionIndex = 0;
     /**
      * The Channel where the events should be enabled.
      */
@@ -110,11 +85,6 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
     // ------------------------------------------------------------------------
 
     @Override
-    public TraceSessionComponent getSession() {
-        return fSessions[fSessionIndex];
-    }
-
-    @Override
     public TraceChannelComponent getChannel() {
         return fChannel;
     }
@@ -122,11 +92,6 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
     @Override
     public void setDomain(TraceDomainType domain) {
         fDomain = domain;
-    }
-
-    @Override
-    public void setSessions(TraceSessionComponent[] sessions) {
-        fSessions = Arrays.copyOf(sessions, sessions.length);
     }
 
     @Override
@@ -148,43 +113,17 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
     @Override
     protected Control createDialogArea(Composite parent) {
 
-        // Main dialog panel
+        // Creating the main component
+        super.createDialogArea(parent);
+
+        // Initializations
         Composite dialogComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, true);
         dialogComposite.setLayout(layout);
         dialogComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-        Group sessionsGroup = new Group(dialogComposite, SWT.SHADOW_NONE);
-        sessionsGroup.setText(Messages.TraceControl_EnableEventsSessionGroupName);
-        layout = new GridLayout(1, true);
-        sessionsGroup.setLayout(layout);
         GridData data = new GridData(GridData.FILL_HORIZONTAL);
-        sessionsGroup.setLayoutData(data);
 
-        fSessionsCombo = new CCombo(sessionsGroup, SWT.READ_ONLY);
-        fSessionsCombo.setToolTipText(Messages.TraceControl_EnableEventsSessionsTooltip);
-        fSessionsCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        String items[] = new String[fSessions.length];
-        for (int i = 0; i < items.length; i++) {
-            items[i] = String.valueOf(fSessions[i].getName());
-        }
-
-        fSessionsCombo.setItems(items);
-        fSessionsCombo.setEnabled(fSessions.length > 0);
-
-        Group channelsGroup = new Group(dialogComposite, SWT.SHADOW_NONE);
-        channelsGroup.setText(Messages.TraceControl_EnableEventsChannelGroupName);
-        layout = new GridLayout(1, true);
-        channelsGroup.setLayout(layout);
-        data = new GridData(GridData.FILL_HORIZONTAL);
-        channelsGroup.setLayoutData(data);
-
-        fChannelsCombo = new CCombo(channelsGroup, SWT.READ_ONLY);
-        fChannelsCombo.setToolTipText(Messages.TraceControl_EnableEventsChannelsTooltip);
-        fChannelsCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        fChannelsCombo.setEnabled(false);
-
+        // Adding the listener to the session component
         fSessionsCombo.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -223,6 +162,19 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
             }
         });
 
+        // Channel group
+        Group channelsGroup = new Group(dialogComposite, SWT.SHADOW_NONE);
+        channelsGroup.setText(Messages.TraceControl_EnableEventsChannelGroupName);
+        layout = new GridLayout(1, true);
+        channelsGroup.setLayout(layout);
+        data = new GridData(GridData.FILL_HORIZONTAL);
+        channelsGroup.setLayoutData(data);
+
+        fChannelsCombo = new CCombo(channelsGroup, SWT.READ_ONLY);
+        fChannelsCombo.setToolTipText(Messages.TraceControl_EnableEventsChannelsTooltip);
+        fChannelsCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        fChannelsCombo.setEnabled(false);
+
         // take first session to test whether events filtering is supported or not
         if (fSessions[0].isEventFilteringSupported(fDomain)) {
             Group filterMainGroup = new Group(dialogComposite, SWT.SHADOW_NONE);
@@ -241,12 +193,6 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
         getShell().setMinimumSize(new Point(300, 200));
 
         return dialogComposite;
-    }
-
-    @Override
-    protected void createButtonsForButtonBar(Composite parent) {
-        createButton(parent, IDialogConstants.CANCEL_ID, "&Cancel", true); //$NON-NLS-1$
-        createButton(parent, IDialogConstants.OK_ID, "&Ok", true); //$NON-NLS-1$
     }
 
     @Override

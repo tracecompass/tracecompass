@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,55 +7,42 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Bernd Hufmann - Initial API and implementation
- *   Jonathan Rajotte - Utility function
+ *   Bruno Roy - Initial API and implementation
  *********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.core.model;
 
-
 /**
- * Log Level enumeration.
+ * Log Level for JUL enumeration.
  *
- * @author Bernd Hufmann
+ * @author Bruno Roy
  */
 @SuppressWarnings("nls")
-public enum TraceLogLevel implements ITraceLogLevel {
+public enum TraceJulLogLevel implements ITraceLogLevel{
 
     // ------------------------------------------------------------------------
     // Enum definition
     // ------------------------------------------------------------------------
-    /** Log level 0 */
-    TRACE_EMERG("TRACE_EMERG"),
-    /** Log level 1 */
-    TRACE_ALERT("TRACE_ALERT"),
-    /** Log level 2 */
-    TRACE_CRIT("TRACE_CRIT"),
-    /** Log level 3 */
-    TRACE_ERR("TRACE_ERR"),
-    /** Log level 4 */
-    TRACE_WARNING("TRACE_WARNING"),
-    /** Log level 5 */
-    TRACE_NOTICE("TRACE_NOTICE"),
-    /** Log level 6 */
-    TRACE_INFO("TRACE_INFO"),
-    /** Log level 7 */
-    TRACE_DEBUG_SYSTEM("TRACE_DEBUG_SYSTEM"),
-    /** Log level 8 */
-    TRACE_DEBUG_PROGRAM("TRACE_DEBUG_PROGRAM"),
-    /** Log level 9 */
-    TRACE_DEBUG_PROCESS("TRACE_DEBUG_PROCESS"),
-    /** Log level 10 */
-    TRACE_DEBUG_MODULE("TRACE_DEBUG_MODULE"),
-    /** Log level 11 */
-    TRACE_DEBUG_UNIT("TRACE_DEBUG_UNIT"),
-    /** Log level 12 */
-    TRACE_DEBUG_FUNCTION("TRACE_DEBUG_FUNCTION"),
-    /** Log level 13 */
-    TRACE_DEBUG_LINE("TRACE_DEBUG_LINE"),
-    /** Log level 14 */
-    TRACE_DEBUG("TRACE_DEBUG"),
-    /** Log level 15 */
+    /** Log level off */
+    JUL_OFF("Off"),
+    /** Log level severe */
+    JUL_SEVERE("Severe"),
+    /** Log level warning */
+    JUL_WARNING("Warning"),
+    /** Log level info */
+    JUL_INFO("Info"),
+    /** Log level config */
+    JUL_CONFIG("Config"),
+    /** Log level fine */
+    JUL_FINE("Fine"),
+    /** Log level finer */
+    JUL_FINER("Finer"),
+    /** Log level finest */
+    JUL_FINEST("Finest"),
+    /** Log level all */
+    JUL_ALL("All"),
+    /** Log level unknown */
     LEVEL_UNKNOWN("LEVEL_UNKNOWN");
+
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -75,13 +62,14 @@ public enum TraceLogLevel implements ITraceLogLevel {
      * @param name
      *            the name of state
      */
-    private TraceLogLevel(String name) {
+    private TraceJulLogLevel(String name) {
         fInName = name;
     }
 
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
+
     @Override
     public String getInName() {
         return fInName;
@@ -91,18 +79,18 @@ public enum TraceLogLevel implements ITraceLogLevel {
     // Utility
     // ------------------------------------------------------------------------
     /**
-     * Return the corresponding {@link TraceLogLevel} to String "name"
+     * Return the corresponding {@link TraceJulLogLevel} to String "name"
      *
      * @param name
-     *            String to compare to retrieve the good {@link TraceLogLevel}
-     * @return the corresponding {@link TraceLogLevel}
+     *            String to compare to retrieve the good {@link TraceJulLogLevel}
+     * @return the corresponding {@link TraceJulLogLevel}
      */
-    public static TraceLogLevel valueOfString(String name) {
+    public static TraceJulLogLevel valueOfString(String name) {
         if (name == null) {
             throw new IllegalArgumentException();
         }
-        for (TraceLogLevel tllevel : TraceLogLevel.values()) {
-            if (tllevel.getInName().equalsIgnoreCase(name)) {
+        for (TraceJulLogLevel tllevel : TraceJulLogLevel.values()) {
+            if (tllevel.name().equals(name)) {
                 return tllevel;
             }
         }

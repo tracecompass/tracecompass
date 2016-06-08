@@ -22,8 +22,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent;
@@ -69,9 +69,9 @@ public class EnableEventOnChannelHandler extends BaseEnableEventHandler {
     }
 
     @Override
-    public void enableLogLevel(CommandParameter param, String eventName, LogLevelType logLevelType, TraceLogLevel level, String filterExression, IProgressMonitor monitor) throws ExecutionException {
+    public void enableLogLevel(CommandParameter param, List<String> eventNames, LogLevelType logLevelType, ITraceLogLevel level, String filterExression, TraceDomainType domain, IProgressMonitor monitor) throws ExecutionException {
         if (param instanceof ChannelCommandParameter) {
-            ((ChannelCommandParameter)param).getChannel().enableLogLevel(eventName, logLevelType, level, filterExression, monitor);
+            ((ChannelCommandParameter)param).getChannel().enableLogLevel(eventNames, logLevelType, level, filterExression, domain, monitor);
         }
     }
 
@@ -102,7 +102,7 @@ public class EnableEventOnChannelHandler extends BaseEnableEventHandler {
                     // Add only if corresponding TraceSessionComponents is inactive and not destroyed
                     TraceChannelComponent tmpChannel = (TraceChannelComponent) element;
                     session = tmpChannel.getSession();
-                    if(!session.isDestroyed()) {
+                    if (!session.isDestroyed()) {
                         channel = tmpChannel;
                     }
                 }

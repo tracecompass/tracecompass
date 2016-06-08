@@ -21,8 +21,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent;
@@ -63,8 +63,8 @@ public class EnableEventOnSessionHandler extends BaseEnableEventHandler {
     }
 
     @Override
-    public void enableLogLevel(CommandParameter param, String eventName, LogLevelType logLevelType, TraceLogLevel level, String filterExpression, IProgressMonitor monitor) throws ExecutionException {
-        param.getSession().enableLogLevel(eventName, logLevelType, level, filterExpression, monitor);
+    public void enableLogLevel(CommandParameter param, List<String> eventNames, LogLevelType logLevelType, ITraceLogLevel level, String filterExpression, TraceDomainType domain, IProgressMonitor monitor) throws ExecutionException {
+        param.getSession().enableLogLevel(eventNames, logLevelType, level, filterExpression, domain, monitor);
     }
 
     @Override

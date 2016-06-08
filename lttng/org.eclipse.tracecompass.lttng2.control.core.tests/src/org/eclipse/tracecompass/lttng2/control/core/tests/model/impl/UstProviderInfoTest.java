@@ -166,8 +166,7 @@ public class UstProviderInfoTest {
         UstProviderInfo fixture = new UstProviderInfo("test");
         fixture.setPid(2468);
         String result = fixture.toString();
-
-        assertEquals("[EventInfo([TraceInfo(Name=test)],PID=2468,Events=None)]", result);
+        assertEquals("[UstProviderInfo([TraceInfo(Name=test)],PID=2468,Events=None,Loggers=None)]", result);
     }
 
     /**
@@ -176,10 +175,11 @@ public class UstProviderInfoTest {
     @Test
     public void testToString_2() {
         String result = fUstProviderInfo2.toString();
-        assertEquals("[EventInfo([TraceInfo(Name=myUST2)],PID=2345,Events=[BaseEventInfo([TraceInfo(Name=event1)]," +
-                "type=UNKNOWN,level=TRACE_DEBUG,Fields=[FieldInfo([TraceInfo(Name=intfield)],type=int[FieldInfo" +
-                "([TraceInfo(Name=stringfield)],type=string,Filter=intField==10)][BaseEventInfo([TraceInfo(Name=event2)]," +
-                "type=TRACEPOINT,level=TRACE_DEBUG)])]", result);
+
+        assertEquals("[UstProviderInfo([TraceInfo(Name=myUST2)],PID=2345,Events=[BaseEventInfo([TraceInfo(Name=event1)],"
+                + "type=UNKNOWN,level=TRACE_DEBUG,Fields=[FieldInfo([TraceInfo(Name=intfield)],"
+                + "type=int[FieldInfo([TraceInfo(Name=stringfield)],type=string,Filter=intField==10)][BaseEventInfo([TraceInfo(Name=event2)],"
+                + "type=TRACEPOINT,level=TRACE_DEBUG)],Loggers=None)]", result);
     }
 
     // ------------------------------------------------------------------------

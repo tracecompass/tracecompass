@@ -23,8 +23,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.window.Window;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.IEnableEventsDialog;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.TraceControlDialogFactory;
@@ -33,7 +33,6 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceCon
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceProviderGroup;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.ILttngControlService;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
@@ -114,20 +113,22 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
      *
      * @param param
      *            - a parameter instance with data for the command execution
-     * @param eventName
-     *            - a event name
+     * @param eventNames
+     *            - a list of event names
      * @param logLevelType
      *            - a log level type
      * @param level
      *            - a log level
      * @param filterExpression
      *            - a filter expression
+     * @param domain
+     *            - the domain type
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails for some reason
      */
-    public abstract void enableLogLevel(CommandParameter param, String eventName, LogLevelType logLevelType, TraceLogLevel level, String filterExpression, IProgressMonitor monitor) throws ExecutionException;
+    public abstract void enableLogLevel(CommandParameter param, List<String> eventNames, LogLevelType logLevelType, ITraceLogLevel level, String filterExpression, TraceDomainType domain, IProgressMonitor monitor) throws ExecutionException;
 
     /**
      * @param param
@@ -174,51 +175,69 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 Exception error = null;
-
                 try {
                     String filter = dialog.getFilterExpression();
-                    if (dialog.isAllEvents()) {
-                        enableEvents(param, ILttngControlService.ALL_EVENTS, dialog.getDomain(), filter, dialog.getExcludedEvents(), monitor);
-                    } else if (dialog.isTracepoints()) {
-                        // Enable tracepoint events
-                        if (dialog.isAllTracePoints()) {
+                    switch (dialog.getDomain()) {
+                    case KERNEL:
+                    case UST:
+                        if (dialog.isAllEvents()) {
                             enableEvents(param, null, dialog.getDomain(), filter, dialog.getExcludedEvents(), monitor);
-                        } else {
+                        } else if (dialog.isTracepoints()) {
+                            // Enable tracepoint events
+                            if (dialog.isAllTracePoints()) {
+                                enableEvents(param, null, dialog.getDomain(), filter, dialog.getExcludedEvents(), monitor);
+                            } else {
+                                List<String> eventNames = dialog.getEventNames();
+                                if (!eventNames.isEmpty()) {
+                                    enableEvents(param, eventNames, dialog.getDomain(), filter, dialog.getExcludedEvents(), monitor);
+                                }
+                            }
+                        }
+
+                        // Enable syscall events
+                        if (dialog.isAllSysCalls()) {
+                            enableSyscalls(param, monitor);
+                        }
+
+                        // Enable dynamic probe
+                        if (dialog.isDynamicProbe() && (dialog.getProbeEventName() != null) && (dialog.getProbeName() != null)) {
+                            enableProbe(param, dialog.getProbeEventName(), false, dialog.getProbeName(), monitor);
+                        }
+
+                        // Enable dynamic function probe
+                        if (dialog.isDynamicFunctionProbe() && (dialog.getFunctionEventName() != null) && (dialog.getFunction() != null)) {
+                            enableProbe(param, dialog.getFunctionEventName(), true, dialog.getFunction(), monitor);
+                        }
+
+                        // Enable event using a wildcard
+                        if (dialog.isWildcard()) {
                             List<String> eventNames = dialog.getEventNames();
+                            eventNames.add(dialog.getWildcard());
+
                             if (!eventNames.isEmpty()) {
                                 enableEvents(param, eventNames, dialog.getDomain(), filter, dialog.getExcludedEvents(), monitor);
                             }
                         }
-                    }
 
-                    // Enable syscall events
-                    if (dialog.isAllSysCalls()) {
-                        enableSyscalls(param, monitor);
-                    }
-
-                    // Enable dynamic probe
-                    if (dialog.isDynamicProbe() && (dialog.getProbeEventName() != null) && (dialog.getProbeName() != null)) {
-                        enableProbe(param, dialog.getProbeEventName(), false, dialog.getProbeName(), monitor);
-                    }
-
-                    // Enable dynamic function probe
-                    if (dialog.isDynamicFunctionProbe() && (dialog.getFunctionEventName() != null) && (dialog.getFunction() != null)) {
-                        enableProbe(param, dialog.getFunctionEventName(), true, dialog.getFunction(), monitor);
-                    }
-
-                    // Enable event using a wildcard
-                    if (dialog.isWildcard()) {
+                        // Enable events using log level
+                        if (dialog.isLogLevel()) {
+                            enableLogLevel(param, dialog.getEventNames(), dialog.getLogLevelType(), dialog.getLogLevel(), filter, dialog.getDomain(), monitor);
+                        }
+                        break;
+                    case JUL:
                         List<String> eventNames = dialog.getEventNames();
-                        eventNames.add(dialog.getWildcard());
-
-                        if (!eventNames.isEmpty()) {
+                        if (dialog.isAllTracePoints()) {
+                            eventNames = null;
+                        }
+                        if (dialog.isLogLevel()) {
+                            enableLogLevel(param, eventNames, dialog.getLogLevelType(), dialog.getLogLevel(), filter, dialog.getDomain(), monitor);
+                        } else {
                             enableEvents(param, eventNames, dialog.getDomain(), filter, dialog.getExcludedEvents(), monitor);
                         }
-                    }
-
-                    // Enable events using log level
-                    if (dialog.isLogLevel()) {
-                        enableLogLevel(param, dialog.getLogLevelEventName(), dialog.getLogLevelType(), dialog.getLogLevel(), filter, monitor);
+                        break;
+                        //$CASES-OMITTED$
+                    default:
+                        break;
                     }
 
                 } catch (ExecutionException e) {

@@ -23,6 +23,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -1287,10 +1288,10 @@ public class LTTngControlServiceTest {
             fShell.setScenario(SCEN_EVENT_HANDLING);
 
             // 1) session name, channel = null, event name, loglevel-only, TRACE_DEBUG
-            fService.enableLogLevel(sessionName, null, eventName4, LogLevelType.LOGLEVEL_ONLY, TraceLogLevel.TRACE_DEBUG, null, new NullProgressMonitor());
+            fService.enableLogLevel(sessionName, null, Arrays.asList(eventName4), LogLevelType.LOGLEVEL_ONLY, TraceLogLevel.TRACE_DEBUG, null, TraceDomainType.UST, new NullProgressMonitor());
 
             // 2) session name, channel = mychannel, null, loglevel, TRACE_DEBUG_FUNCTION
-            fService.enableLogLevel(sessionName, channelName, eventName5, LogLevelType.LOGLEVEL, TraceLogLevel.TRACE_DEBUG_FUNCTION, null, new NullProgressMonitor());
+            fService.enableLogLevel(sessionName, channelName, Arrays.asList(eventName5), LogLevelType.LOGLEVEL, TraceLogLevel.TRACE_DEBUG_FUNCTION, null, TraceDomainType.UST, new NullProgressMonitor());
 
             // TODO add test with filters
 

@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
@@ -39,8 +38,10 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.IFieldInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IProbeEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISnapshotInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IUstProviderInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BaseEventInfo;
@@ -680,20 +681,7 @@ public class LTTngControlService implements ILttngControlService {
 
         command.add(toCsv(channelNames));
 
-        switch (domain) {
-        case KERNEL:
-            command.add(LTTngControlServiceConstants.OPTION_KERNEL);
-            break;
-        case UST:
-            command.add(LTTngControlServiceConstants.OPTION_UST);
-            break;
-        case JUL:
-        case LOG4J:
-        case PYTHON:
-        case UNKNOWN:
-        default:
-            break;
-        }
+        command.add(getDomainOption(domain));
 
         command.add(LTTngControlServiceConstants.OPTION_SESSION);
         command.add(sessionName);
@@ -772,21 +760,7 @@ public class LTTngControlService implements ILttngControlService {
 
         command.add(toCsv(channelNames));
 
-        switch (domain) {
-        case KERNEL:
-            command.add(LTTngControlServiceConstants.OPTION_KERNEL);
-            break;
-        case UST:
-            command.add(LTTngControlServiceConstants.OPTION_UST);
-            break;
-        case JUL:
-        case LOG4J:
-        case PYTHON:
-        case UNKNOWN:
-        default:
-            break;
-
-        }
+        command.add(getDomainOption(domain));
 
         command.add(LTTngControlServiceConstants.OPTION_SESSION);
         command.add(sessionName);
@@ -806,20 +780,7 @@ public class LTTngControlService implements ILttngControlService {
             command.add(toCsv(eventNames));
         }
 
-        switch (domain) {
-        case KERNEL:
-            command.add(LTTngControlServiceConstants.OPTION_KERNEL);
-            break;
-        case UST:
-            command.add(LTTngControlServiceConstants.OPTION_UST);
-            break;
-        case JUL:
-        case LOG4J:
-        case PYTHON:
-        case UNKNOWN:
-        default:
-            break;
-        }
+        command.add(getDomainOption(domain));
 
         command.add(LTTngControlServiceConstants.OPTION_SESSION);
         command.add(sessionName);
@@ -893,11 +854,19 @@ public class LTTngControlService implements ILttngControlService {
     }
 
     @Override
-    public void enableLogLevel(String sessionName, String channelName, String eventName, LogLevelType logLevelType, TraceLogLevel level, String filterExpression, IProgressMonitor monitor) throws ExecutionException {
+    public void enableLogLevel(String sessionName, String channelName, List<String> eventNames, LogLevelType logLevelType, ITraceLogLevel level, String filterExpression, TraceDomainType domain, IProgressMonitor monitor) throws ExecutionException {
         ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_ENABLE_EVENT);
 
-        command.add(eventName);
-        command.add(LTTngControlServiceConstants.OPTION_UST);
+        // Checking if we should enable all events (with option '-a')
+        boolean isAllEvents = ALL_EVENTS.equals(eventNames);
+
+        if (isAllEvents || (eventNames == null) || (eventNames.isEmpty())) {
+            command.add(LTTngControlServiceConstants.OPTION_ALL);
+        } else {
+            command.add(toCsv(eventNames));
+        }
+
+        command.add(getDomainOption(domain));
 
         command.add(LTTngControlServiceConstants.OPTION_SESSION);
         command.add(sessionName);
@@ -911,12 +880,10 @@ public class LTTngControlService implements ILttngControlService {
             command.add(LTTngControlServiceConstants.OPTION_LOGLEVEL);
         } else if (logLevelType == LogLevelType.LOGLEVEL_ONLY) {
             command.add(LTTngControlServiceConstants.OPTION_LOGLEVEL_ONLY);
-
         } else {
             return;
         }
         command.add(level.getInName());
-
         executeCommand(command, monitor);
     }
 
@@ -943,20 +910,7 @@ public class LTTngControlService implements ILttngControlService {
             command.add(eventNameParameter.toString());
         }
 
-        switch (domain) {
-        case KERNEL:
-            command.add(LTTngControlServiceConstants.OPTION_KERNEL);
-            break;
-        case UST:
-            command.add(LTTngControlServiceConstants.OPTION_UST);
-            break;
-        case JUL:
-        case LOG4J:
-        case PYTHON:
-        case UNKNOWN:
-        default:
-            break;
-        }
+        command.add(getDomainOption(domain));
 
         command.add(LTTngControlServiceConstants.OPTION_SESSION);
         command.add(sessionName);
@@ -1020,20 +974,7 @@ public class LTTngControlService implements ILttngControlService {
             command.add(eventName);
         }
 
-        switch (domain) {
-        case KERNEL:
-            command.add(LTTngControlServiceConstants.OPTION_KERNEL);
-            break;
-        case UST:
-            command.add(LTTngControlServiceConstants.OPTION_UST);
-            break;
-        case JUL:
-        case LOG4J:
-        case PYTHON:
-        case UNKNOWN:
-        default:
-            break;
-        }
+        command.add(getDomainOption(domain));
 
         for (Iterator<String> iterator = contextNames.iterator(); iterator.hasNext();) {
             String context = iterator.next();
@@ -1116,6 +1057,22 @@ public class LTTngControlService implements ILttngControlService {
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
+
+    private static @NonNull String getDomainOption(TraceDomainType domain) {
+        switch (domain) {
+        case KERNEL:
+            return LTTngControlServiceConstants.OPTION_KERNEL;
+        case UST:
+            return LTTngControlServiceConstants.OPTION_UST;
+        case JUL:
+            return LTTngControlServiceConstants.OPTION_JUL;
+        case LOG4J:
+        case PYTHON:
+        case UNKNOWN:
+        default:
+            return TraceDomainType.UNKNOWN.name();
+        }
+    }
 
     /**
      * Checks if command result is an error result.
@@ -1607,5 +1564,4 @@ public class LTTngControlService implements ILttngControlService {
 
         return result;
     }
-
 }

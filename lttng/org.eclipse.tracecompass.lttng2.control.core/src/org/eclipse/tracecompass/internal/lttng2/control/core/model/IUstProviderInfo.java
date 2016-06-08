@@ -29,7 +29,9 @@ public interface IUstProviderInfo extends ITraceInfo {
 
     /**
      * Sets the process ID of the UST provider to the given value.
-     * @param pid - process ID to set
+     *
+     * @param pid
+     *            - process ID to set
      */
     void setPid(int pid);
 
@@ -40,13 +42,38 @@ public interface IUstProviderInfo extends ITraceInfo {
 
     /**
      * Sets the event information specified by given list.
-     * @param events - all event information to set.
+     *
+     * @param events
+     *            - all event information to set.
      */
     void setEvents(List<IBaseEventInfo> events);
 
     /**
      * Adds a single event information.
-     * @param event - event information to add.
+     *
+     * @param event
+     *            - event information to add.
      */
     void addEvent(IBaseEventInfo event);
+
+    /**
+     * @return all loggers information as array.
+     */
+    List<ILoggerInfo> getLoggers();
+
+    /**
+     * Sets the loggers information specified by given list.
+     *
+     * @param loggers
+     *            - all loggers information to set.
+     */
+    void setLoggers(List<ILoggerInfo> loggers);
+
+    /**
+     * Adds a single logger information.
+     *
+     * @param logger
+     *            - logger information to add.
+     */
+    void addLogger(ILoggerInfo logger);
 }

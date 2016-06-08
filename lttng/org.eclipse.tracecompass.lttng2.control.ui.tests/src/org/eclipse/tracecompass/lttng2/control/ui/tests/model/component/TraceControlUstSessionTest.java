@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -483,7 +484,7 @@ public class TraceControlUstSessionTest {
         events.clear();
         eventsDialogStub.setIsWildcard(false);
         eventsDialogStub.setIsLogLevel(true);
-        eventsDialogStub.setLogLevelEventName("myevent1");
+        eventsDialogStub.setNames(Arrays.asList("myevent1"));
         eventsDialogStub.setLogLevelType(LogLevelType.LOGLEVEL);
         eventsDialogStub.setLogLevel(TraceLogLevel.TRACE_WARNING);
 
@@ -513,7 +514,7 @@ public class TraceControlUstSessionTest {
         // ------------------------------------------------------------------------
         // Enable event (loglevel) on session
         // ------------------------------------------------------------------------
-        eventsDialogStub.setLogLevelEventName("myevent2");
+        eventsDialogStub.setNames(Arrays.asList("myevent2"));
         eventsDialogStub.setLogLevelType(LogLevelType.LOGLEVEL_ONLY);
         eventsDialogStub.setLogLevel(TraceLogLevel.TRACE_DEBUG_FUNCTION);
 
@@ -543,7 +544,7 @@ public class TraceControlUstSessionTest {
         // ------------------------------------------------------------------------
         // Enable event (loglevel) on channel
         // ------------------------------------------------------------------------
-        eventsDialogStub.setLogLevelEventName("myevent0");
+        eventsDialogStub.setNames(Arrays.asList("myevent0"));
         eventsDialogStub.setLogLevelType(LogLevelType.LOGLEVEL_ONLY);
         eventsDialogStub.setLogLevel(TraceLogLevel.TRACE_DEBUG_FUNCTION);
 

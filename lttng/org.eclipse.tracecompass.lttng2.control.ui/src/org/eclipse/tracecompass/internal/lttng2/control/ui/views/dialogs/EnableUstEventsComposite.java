@@ -140,10 +140,6 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
      */
     private boolean fIsLogLevel;
     /**
-     * The event name for the log level enablement.
-     */
-    private String fLogLevelEventName;
-    /**
      * The type of the log level (loglevel or loglevel-only)
      */
     private LogLevelType fLogLevelType;
@@ -231,11 +227,6 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
     }
 
     @Override
-    public String getLogLevelEventName() {
-        return fLogLevelEventName;
-    }
-
-    @Override
     public String getFilterExpression() {
         return fFilterExpression;
     }
@@ -308,7 +299,8 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
             int nbUstEvents = 0;
             List<ITraceControlComponent> comps = fProviderGroup.getChildren(UstProviderComponent.class);
             for (ITraceControlComponent comp : comps) {
-                nbUstEvents += comp.getChildren().length;
+                List<ITraceControlComponent> children = comp.getChildren(BaseEventComponent.class);
+                nbUstEvents = children.size();
             }
             fIsAllTracepoints = (nbUstEvents == totalNbEvents);
         }
@@ -333,8 +325,8 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
 
 
         // initialize log level event name string
+        // We are using the fSelectedEvents for the loglevels
         fLogLevelType = LogLevelType.LOGLEVEL_NONE;
-        fLogLevelEventName = null;
 
         if (fIsLogLevel) {
             if (fLogLevelButton.getSelection()) {
@@ -344,6 +336,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
             }
 
             String temp = fLogLevelEventNameText.getText();
+            // TODO : Add support for comma separated list of events
             if (temp.trim().isEmpty() ||
                 (!temp.matches("^[\\s]{0,}$") && !temp.matches("^[a-zA-Z0-9\\-\\_]{1,}$"))) { //$NON-NLS-1$ //$NON-NLS-2$
                 MessageDialog.openError(getShell(),
@@ -353,7 +346,8 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
                 return false;
             }
 
-            fLogLevelEventName = temp;
+            // Format the String into a List<String>
+            fSelectedEvents = Arrays.asList(temp.trim().split(",")); //$NON-NLS-1$
 
             TraceLogLevel[] levels = TraceLogLevel.values();
             int id = fLogLevelCombo.getSelectionIndex();
@@ -685,9 +679,11 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
                 List<ITraceControlComponent> children = ((ITraceControlComponent)parentElement).getChildren(UstProviderComponent.class);
                 return children.toArray(new ITraceControlComponent[children.size()]);
             }
-            if (parentElement instanceof ITraceControlComponent) {
-                return ((ITraceControlComponent)parentElement).getChildren();
+            if (parentElement instanceof UstProviderComponent) {
+                List<ITraceControlComponent> events = ((UstProviderComponent) parentElement).getChildren(BaseEventComponent.class);
+                return events.toArray(new BaseEventComponent[events.size()]);
             }
+
             return new Object[0];
         }
     }

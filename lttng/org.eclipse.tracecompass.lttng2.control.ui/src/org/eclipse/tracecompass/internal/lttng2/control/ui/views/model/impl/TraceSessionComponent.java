@@ -18,13 +18,13 @@ import java.util.List;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISnapshotInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.SessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
@@ -312,8 +312,7 @@ public class TraceSessionComponent extends TraceControlComponent {
 
             IDomainInfo[] domains = fSessionInfo.getDomains();
             for (int i = 0; i < domains.length; i++) {
-                TraceDomainComponent domainComponent = new TraceDomainComponent(
-                        domains[i].getName(), this);
+                TraceDomainComponent domainComponent = new TraceDomainComponent(domains[i].getName(), this);
                 addChild(domainComponent);
                 domainComponent.setDomainInfo(domains[i]);
             }
@@ -427,24 +426,27 @@ public class TraceSessionComponent extends TraceControlComponent {
     /**
      * Enables events using log level.
      *
-     * @param eventName
-     *            - a event name
+     * @param eventNames
+     *            - a list of event names
      * @param logLevelType
      *            - a log level type
      * @param level
      *            - a log level
      * @param filterExpression
      *            - a filter expression
+     * @param domain
+     *            - the domain type ({@link TraceDomainType})
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
-    public void enableLogLevel(String eventName, LogLevelType logLevelType,
-            TraceLogLevel level, String filterExpression, IProgressMonitor monitor)
+    public void enableLogLevel(List<String> eventNames, LogLevelType logLevelType,
+            ITraceLogLevel level, String filterExpression,
+            TraceDomainType domain, IProgressMonitor monitor)
             throws ExecutionException {
-        getControlService().enableLogLevel(getName(), null, eventName,
-                logLevelType, level, null, monitor);
+        getControlService().enableLogLevel(getName(), null, eventNames,
+                logLevelType, level, null, domain, monitor);
     }
 
     /**

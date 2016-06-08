@@ -28,8 +28,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent;
@@ -69,6 +69,10 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
      */
     private EnableUstEventsComposite fUstComposite;
     /**
+     * The composite with widgets for collecting information about JUL events.
+     */
+    private EnableJulEventsComposite fJulComposite;
+    /**
      * Radio button for selecting kernel domain.
      */
     private Button fKernelButton;
@@ -76,6 +80,10 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
      * Radio button for selecting UST domain.
      */
     private Button fUstButton;
+    /**
+     * Radio button for selecting JUL domain.
+     */
+    private Button fJulButton;
     /**
      * The referenced trace provider group containing the kernel provider and UST
      * provider component which contains a list of available tracepoints.
@@ -109,26 +117,54 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
     // ------------------------------------------------------------------------
     @Override
     public boolean isAllEvents() {
-        if (fDomain.equals(TraceDomainType.KERNEL)) {
+        switch (fDomain) {
+        case KERNEL:
             return fKernelComposite.isAllEvents();
+        case JUL:
+            return fJulComposite.isAllTracePoints();
+        case UST:
+            return fUstComposite.isAllTracePoints();
+        case LOG4J:
+        case PYTHON:
+        case UNKNOWN:
+        default:
+            return false;
         }
-        return false;
     }
 
     @Override
     public boolean isTracepoints() {
-        if (fDomain.equals(TraceDomainType.KERNEL)) {
+        switch (fDomain) {
+        case JUL:
+            // Loggers are always TRACEPOINT
+            return true;
+        case KERNEL:
             return fKernelComposite.isTracepoints();
+        case UST:
+            return fUstComposite.isTracepoints();
+        case LOG4J:
+        case PYTHON:
+        case UNKNOWN:
+        default:
+            return false;
         }
-        return fUstComposite.isTracepoints();
     }
 
     @Override
     public boolean isAllTracePoints() {
-        if (fDomain.equals(TraceDomainType.KERNEL)) {
+        switch (fDomain) {
+        case KERNEL:
             return fKernelComposite.isAllTracePoints();
+        case UST:
+            return fUstComposite.isAllTracePoints();
+        case JUL:
+            return fJulComposite.isAllTracePoints();
+        case LOG4J:
+        case PYTHON:
+        case UNKNOWN:
+        default:
+            return false;
         }
-        return fUstComposite.isAllTracePoints();
     }
 
     @Override
@@ -149,10 +185,19 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public List<String> getEventNames() {
-        if (fDomain.equals(TraceDomainType.KERNEL)) {
+        switch (fDomain) {
+        case JUL:
+            return fJulComposite.getEventNames();
+        case KERNEL:
             return fKernelComposite.getEventNames();
+        case UST:
+            return fUstComposite.getEventNames();
+        case LOG4J:
+        case PYTHON:
+        case UNKNOWN:
+        default:
+            return null;
         }
-        return fUstComposite.getEventNames();
     }
 
     @Override
@@ -221,34 +266,53 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public boolean isLogLevel() {
-        if (fDomain.equals(TraceDomainType.UST)) {
+        switch (fDomain) {
+        case JUL:
+            return fJulComposite.isLogLevel();
+        case KERNEL:
+            return false;
+        case UST:
             return fUstComposite.isLogLevel();
+        case LOG4J:
+        case PYTHON:
+        case UNKNOWN:
+        default:
+            return false;
         }
-        return false;
     }
 
     @Override
     public LogLevelType getLogLevelType() {
-        if (fDomain.equals(TraceDomainType.UST)) {
+        switch (fDomain) {
+        case JUL:
+            return fJulComposite.getLogLevelType();
+        case KERNEL:
+            return null;
+        case UST:
             return fUstComposite.getLogLevelType();
+        case LOG4J:
+        case PYTHON:
+        case UNKNOWN:
+        default:
+            return null;
         }
-        return null;
     }
 
     @Override
-    public TraceLogLevel getLogLevel() {
-        if (fDomain.equals(TraceDomainType.UST)) {
+    public ITraceLogLevel getLogLevel() {
+        switch (fDomain) {
+        case JUL:
+            return fJulComposite.getLogLevel();
+        case KERNEL:
+            return null;
+        case UST:
             return fUstComposite.getLogLevel();
+        case LOG4J:
+        case PYTHON:
+        case UNKNOWN:
+        default:
+            return null;
         }
-        return null;
-    }
-
-    @Override
-    public String getLogLevelEventName() {
-        if (fDomain.equals(TraceDomainType.UST)) {
-            return fUstComposite.getLogLevelEventName();
-        }
-        return null;
     }
 
     @Override
@@ -323,13 +387,15 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         // ------------------------------------------------------------------------
         Group domainGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
         domainGroup.setText(Messages.TraceControl_DomainDisplayName);
-        layout = new GridLayout(2, true);
+        layout = new GridLayout(3, true);
         domainGroup.setLayout(layout);
 
         fKernelButton = new Button(domainGroup, SWT.RADIO);
         fKernelButton.setText(Messages.TraceControl_KernelDomainDisplayName);
         fUstButton = new Button(domainGroup, SWT.RADIO);
         fUstButton.setText(Messages.TraceControl_UstDisplayName);
+        fJulButton = new Button(domainGroup, SWT.RADIO);
+        fJulButton.setText(Messages.TraceControl_JULDomainDisplayName);
 
         switch (fDomain) {
         case KERNEL:
@@ -339,6 +405,8 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             fUstButton.setSelection(true);
             break;
         case JUL:
+            fJulButton.setSelection(true);
+            break;
         case LOG4J:
         case PYTHON:
         case UNKNOWN:
@@ -346,9 +414,14 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             break;
         }
 
-        if ((fDomainComponent != null) || ((fProviderGroup != null) && (!fProviderGroup.hasKernelProvider()))) {
+        if (fDomainComponent != null) {
             fKernelButton.setEnabled(false);
             fUstButton.setEnabled(false);
+            fJulButton.setEnabled(false);
+        } else if ((fProviderGroup != null) && (!fProviderGroup.hasKernelProvider())) {
+            fKernelButton.setEnabled(false);
+            fUstButton.setEnabled(true);
+            fJulButton.setEnabled(true);
         }
 
         // layout widgets
@@ -361,13 +434,13 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         fUstButton.setLayoutData(data);
 
         // ------------------------------------------------------------------------
-        // Kernel or UST event data group
+        // Domain data group
         // ------------------------------------------------------------------------
         fUstComposite = null;
         fKernelComposite = null;
+        fJulComposite = null;
 
         switch (fDomain) {
-
         case KERNEL:
             createKernelComposite();
             break;
@@ -375,6 +448,8 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             createUstComposite();
             break;
         case JUL:
+            createJulComposite();
+            break;
         case LOG4J:
         case PYTHON:
         case UNKNOWN:
@@ -386,7 +461,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (fKernelButton.getSelection()) {
-                    disposeUstComposite();
+                    disposeAllComposite();
                     createKernelComposite();
                     fDialogComposite.layout();
                 }
@@ -397,12 +472,24 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (fUstButton.getSelection()) {
-                    disposeKernelComposite();
+                    disposeAllComposite();
                     createUstComposite();
                     fDialogComposite.layout();
                 }
             }
         });
+
+        fJulButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (fJulButton.getSelection()) {
+                    disposeAllComposite();
+                    createJulComposite();
+                    fDialogComposite.layout();
+                }
+            }
+        });
+
 
         getShell().setMinimumSize(new Point(550, 750));
 
@@ -422,6 +509,8 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             fDomain = TraceDomainType.KERNEL;
         } else if (fUstButton.getSelection()){
             fDomain = TraceDomainType.UST;
+        } else if (fJulButton.getSelection()) {
+            fDomain = TraceDomainType.JUL;
         }
 
         // Validate kernel composite in case of kernel domain
@@ -429,8 +518,13 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             return;
         }
 
-     // Validate UST composite in case of UST domain
+        // Validate UST composite in case of UST domain
         if (fUstComposite != null && !fUstComposite.isValid()) {
+            return;
+        }
+
+        // Validate JUL composite in case of JUL domain
+        if (fJulComposite != null && !fJulComposite.isValid()) {
             return;
         }
 
@@ -441,6 +535,15 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
+
+    /**
+     * Disposes all composites (if existing)
+     */
+    private void disposeAllComposite() {
+        disposeKernelComposite();
+        disposeUstComposite();
+        disposeJulComposite();
+    }
 
     /**
      * Creates the kernel composite (if not existing)
@@ -489,4 +592,30 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             fUstComposite = null;
         }
     }
+
+
+    /**
+     * Creates the JUL composite (if not existing)
+     */
+    private void createJulComposite() {
+        if (fJulComposite == null) {
+            fJulComposite = new EnableJulEventsComposite(fDialogComposite, SWT.NONE, fProviderGroup);
+            GridLayout layout = new GridLayout(1, true);
+            fJulComposite.setLayout(layout);
+            fJulComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+            fJulComposite.createContent();
+        }
+    }
+
+    /**
+     * Disposes the JUL composite (if existing)
+     */
+    private void disposeJulComposite() {
+        if (fJulComposite != null) {
+            fJulComposite.dispose();
+            fJulComposite = null;
+        }
+    }
+
 }

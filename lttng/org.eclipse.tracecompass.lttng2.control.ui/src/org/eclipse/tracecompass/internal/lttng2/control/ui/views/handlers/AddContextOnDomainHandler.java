@@ -20,6 +20,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent;
@@ -82,6 +83,10 @@ public class AddContextOnDomainHandler extends BaseAddContextHandler {
         }
 
         boolean isEnabled = domain != null;
+
+        if (TraceDomainType.JUL.equals(domain)) {
+            isEnabled = false;
+        }
 
         fLock.lock();
         try {

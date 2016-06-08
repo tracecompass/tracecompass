@@ -195,6 +195,10 @@ public interface LTTngControlServiceConstants {
      */
     String OPTION_UST = "-u"; //$NON-NLS-1$
     /**
+     * Command line option for JUL tracer.
+     */
+    String OPTION_JUL = "-j"; //$NON-NLS-1$
+    /**
      * Command line option for specifying a session.
      */
     String OPTION_SESSION = "-s";  //$NON-NLS-1$
