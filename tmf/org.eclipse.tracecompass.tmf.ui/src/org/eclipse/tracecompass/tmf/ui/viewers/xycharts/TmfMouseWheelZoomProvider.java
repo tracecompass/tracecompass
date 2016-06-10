@@ -12,9 +12,11 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.swtchart.IAxis;
+import org.swtchart.Range;
 
 /**
  * Class for providing zooming based on mouse wheel. It centers the zoom on
@@ -71,32 +73,39 @@ public class TmfMouseWheelZoomProvider extends TmfBaseProvider implements MouseW
     public synchronized void mouseScrolled(MouseEvent event) {
         ITmfChartTimeProvider viewer = getChartViewer();
 
-        long oldDuration = viewer.getWindowDuration();
+        final int count = event.count;
+        if (count != 0 && (event.stateMask & SWT.CTRL) != 0) {
+            final int x = event.x;
+            zoom(viewer, count, x);
+        }
+    }
 
-        if (oldDuration == 0 || event.count == 0) {
+    private void zoom(ITmfChartTimeProvider viewer, final int count, final int x) {
+        // Compute the new time range
+        long newDuration = viewer.getWindowDuration();
+        if (newDuration == 0 || count == 0) {
             return;
         }
-
-        // Compute the new time range
-        long newDuration = oldDuration;
         double ratio = 1.0;
-        if (event.count > 0) {
+        if (count > 0) {
             ratio = ZOOM_FACTOR;
-            newDuration = Math.round(ZOOM_FACTOR * oldDuration);
+            newDuration = Math.round(ZOOM_FACTOR * newDuration);
         } else {
             ratio = 1.0 / ZOOM_FACTOR;
-            newDuration = (long) Math.ceil(oldDuration * ratio);
+            newDuration = (long) Math.ceil(newDuration * ratio);
         }
         newDuration = Math.max(MIN_WINDOW_SIZE, newDuration);
 
         // Center the zoom on mouse position, distribute new duration and adjust for boundaries.
         IAxis xAxis = getChart().getAxisSet().getXAxis(0);
-        long timeAtXPos = limitXDataCoordinate(xAxis.getDataCoordinate(event.x)) + viewer.getTimeOffset();
+        long timeAtXPos = limitXDataCoordinate(xAxis.getDataCoordinate(x)) + viewer.getTimeOffset();
         // Note: ratio = newDuration/oldDuration
         long newWindowStartTime = timeAtXPos - Math.round(ratio * (timeAtXPos - viewer.getWindowStartTime()));
         long newWindowEndTime = validateWindowEndTime(newWindowStartTime, newWindowStartTime + newDuration);
         newWindowStartTime = validateWindowStartTime(newWindowStartTime);
         viewer.updateWindow(newWindowStartTime, newWindowEndTime);
+        xAxis.setRange(new Range(newWindowStartTime - viewer.getTimeOffset(),
+            newWindowEndTime - viewer.getTimeOffset()));
     }
 
     // ------------------------------------------------------------------------
