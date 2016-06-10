@@ -20,7 +20,7 @@ package org.eclipse.tracecompass.tmf.core.signal;
  */
 public class TmfSignalTracer {
 
-    static TmfSignalTracer fInstance;
+    private static TmfSignalTracer fInstance;
 
     /**
      * @return The single instance of the signal tracer object
