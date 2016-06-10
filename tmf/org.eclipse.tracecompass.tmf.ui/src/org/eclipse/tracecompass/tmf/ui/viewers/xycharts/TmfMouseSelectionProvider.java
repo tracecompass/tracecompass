@@ -21,8 +21,8 @@ import org.swtchart.ICustomPaintListener;
 import org.swtchart.IPlotArea;
 
 /**
- * Class for providing selection of ranges with the left mouse button.
- * It also notifies the viewer about a change of selection.
+ * Class for providing selection of ranges with the left mouse button. It also
+ * notifies the viewer about a change of selection.
  *
  * @author Bernd Hufmann
  */
@@ -47,7 +47,7 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
      * Default constructor
      *
      * @param tmfChartViewer
-     *          The chart viewer reference.
+     *            The chart viewer reference.
      */
     public TmfMouseSelectionProvider(ITmfChartTimeProvider tmfChartViewer) {
         super(tmfChartViewer);
@@ -83,6 +83,9 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
     @Override
     public void mouseDown(MouseEvent e) {
         if ((getChartViewer().getWindowDuration() != 0) && (e.button == 1)) {
+            if ((e.stateMask & SWT.CTRL) != 0) {
+                return;
+            }
             fDragBeginMarker = false;
             if ((e.stateMask & SWT.SHIFT) != SWT.SHIFT) {
                 IAxis xAxis = getChart().getAxisSet().getXAxis(0);

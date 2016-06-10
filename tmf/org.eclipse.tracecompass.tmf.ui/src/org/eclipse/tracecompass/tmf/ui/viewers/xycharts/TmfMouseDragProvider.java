@@ -11,6 +11,7 @@
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -82,7 +83,7 @@ public class TmfMouseDragProvider extends TmfBaseProvider implements MouseListen
 
     @Override
     public void mouseDown(MouseEvent e) {
-        if ((getChartViewer().getWindowDuration() != 0) && (e.button == 2)) {
+        if ((getChartViewer().getWindowDuration() != 0) && ((e.button == 2) || (e.button == 1 && (e.stateMask & SWT.CTRL) != 0))) {
             fStartPosition = e.x;
             fIsUpdate = true;
         }
