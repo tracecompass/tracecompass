@@ -44,7 +44,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      *
      * @since 1.1
      */
-    public static final class Pair {
+    public static class Pair {
         private final long fFirst;
         private final long fSecond;
 

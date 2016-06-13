@@ -30,7 +30,7 @@ import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
  * @author Simon Marchi
  */
 @NonNullByDefault
-public final class StringDeclaration extends Declaration {
+public class StringDeclaration extends Declaration {
 
     private static final StringDeclaration STRING_DEC_UTF8 = new StringDeclaration(Encoding.UTF8);
     private static final StringDeclaration STRING_DEC_ASCII = new StringDeclaration(Encoding.ASCII);
