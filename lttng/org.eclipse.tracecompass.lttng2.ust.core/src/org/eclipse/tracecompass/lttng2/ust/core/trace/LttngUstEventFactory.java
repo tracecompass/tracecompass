@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-public final class LttngUstEventFactory extends CtfTmfEventFactory {
+public class LttngUstEventFactory extends CtfTmfEventFactory {
 
     private static final @NonNull LttngUstEventFactory INSTANCE = new LttngUstEventFactory();
 
