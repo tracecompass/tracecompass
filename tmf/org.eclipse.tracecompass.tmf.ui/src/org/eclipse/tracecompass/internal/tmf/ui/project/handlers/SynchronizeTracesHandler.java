@@ -225,7 +225,7 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                                     Activator.getDefault().logError(String.format(Messages.SynchronizeTracesHandler_ErrorSynchingForTrace, exp.getName(), traceel.getName()), e);
                                     TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title, Messages.SynchronizeTracesHandler_Error + CR + CR + e.getMessage());
                                 }
-                                trace.setTimestampTransform(syncAlgo.getTimestampTransform(trace));
+                                trace.setTimestampTransform(syncAlgo.getTimestampTransform(expTrace));
                                 TmfTraceManager.refreshSupplementaryFiles(trace);
                                 trace.dispose();
 
