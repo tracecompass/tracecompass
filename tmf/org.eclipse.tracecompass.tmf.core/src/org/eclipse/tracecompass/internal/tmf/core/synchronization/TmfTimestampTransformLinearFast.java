@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.synchronization;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
@@ -73,8 +75,7 @@ public class TmfTimestampTransformLinearFast implements ITmfTimestampTransformIn
     private final int fDeltaBits;
     private final int fHashCode;
 
-    private long fOffset;
-
+    private transient long fOffset;
     private transient long fRangeStart;
     private transient long fScaleMiss;
     private transient long fScaleHit;
@@ -151,8 +152,7 @@ public class TmfTimestampTransformLinearFast implements ITmfTimestampTransformIn
         fDeltaBits = Math.max(Math.min(width, DECIMAL_BITS), 0);
         fDeltaMax = 1 << fDeltaBits;
         fAlphaLong = fAlpha.multiply(BigDecimal.valueOf(fDeltaMax), MC).longValue();
-        fRangeStart = 0L;
-        fOffset = 0L;
+        rescale(0);
         fScaleMiss = 0;
         fScaleHit = 0;
         fHashCode = HASHER.newHasher()
@@ -185,14 +185,18 @@ public class TmfTimestampTransformLinearFast implements ITmfTimestampTransformIn
              *
              * TODO: use exact math arithmetic to detect overflow when switching to Java 8
              */
-            fRangeStart = timestamp - (timestamp % fDeltaMax);
-            fOffset = BigDecimal.valueOf(fRangeStart).multiply(fAlpha, MC).add(fBeta, MC).longValue();
+            rescale(timestamp);
             delta = Math.abs(timestamp - fRangeStart);
             fScaleMiss++;
         } else {
             fScaleHit++;
         }
         return ((fAlphaLong * delta) >> fDeltaBits) + fOffset;
+    }
+
+    private void rescale(long timestamp) {
+        fRangeStart = timestamp - (timestamp % fDeltaMax);
+        fOffset = BigDecimal.valueOf(fRangeStart).multiply(fAlpha, MC).add(fBeta, MC).longValue();
     }
 
     //-------------------------------------------------------------------------
@@ -306,6 +310,14 @@ public class TmfTimestampTransformLinearFast implements ITmfTimestampTransformIn
     @Override
     public int hashCode() {
         return fHashCode;
+    }
+
+    // Deserialization method, make sure there is a first scaling
+    private void readObject(ObjectInputStream stream)
+            throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+
+        rescale(0);
     }
 
 }

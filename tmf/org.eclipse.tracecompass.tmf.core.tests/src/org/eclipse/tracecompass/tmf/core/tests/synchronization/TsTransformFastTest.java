@@ -16,20 +16,96 @@ package org.eclipse.tracecompass.tmf.core.tests.synchronization;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Arrays;
 
 import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfTimestampTransformLinear;
 import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfTimestampTransformLinearFast;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests for {@link TmfTimestampTransformLinearFast}
  *
  * @author Geneviève Bastien
  */
+@RunWith(Parameterized.class)
 public class TsTransformFastTest {
 
     private static final long ts = 1361657893526374091L;
+
+    private static interface IFastTransformFactory {
+        public TmfTimestampTransformLinearFast create(double alpha, double beta);
+    }
+
+    private static final IFastTransformFactory fNewObject = (a, b) -> {
+        return new TmfTimestampTransformLinearFast(a, b);
+    };
+
+    private static final IFastTransformFactory fDeserialized = (a, b) -> {
+        TmfTimestampTransformLinearFast tt = new TmfTimestampTransformLinearFast(a, b);
+        /* Serialize the object */
+        String filePath = null;
+        try {
+            File temp = File.createTempFile("serialSyncAlgo", ".tmp");
+            filePath = temp.getAbsolutePath();
+        } catch (IOException e) {
+            fail("Could not create temporary file for serialization");
+        }
+        assertNotNull(filePath);
+
+        try (FileOutputStream fileOut = new FileOutputStream(filePath);
+                ObjectOutputStream out = new ObjectOutputStream(fileOut);) {
+            out.writeObject(tt);
+        } catch (IOException e) {
+            fail("Error serializing the synchronization algorithm " + e.getMessage());
+        }
+
+        TmfTimestampTransformLinearFast deserialTt = null;
+        /* De-Serialize the object */
+        try (FileInputStream fileIn = new FileInputStream(filePath);
+                ObjectInputStream in = new ObjectInputStream(fileIn);) {
+            deserialTt = (TmfTimestampTransformLinearFast) in.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            fail("Error de-serializing the synchronization algorithm " + e.getMessage());
+        }
+        return deserialTt;
+    };
+
+    private final IFastTransformFactory fTransformFactory;
+
+    /**
+     * Constructor
+     *
+     * @param name
+     *            The name of this parameterized test
+     * @param factory
+     *            Factory to create the timestamp transform
+     */
+    public TsTransformFastTest(String name, IFastTransformFactory factory) {
+        fTransformFactory = factory;
+    }
+
+    /**
+     * @return the test parameters
+     */
+    @Parameters(name = "Factory={0}")
+    public static Iterable<Object[]> parameters() {
+        return Arrays.asList(new Object[][] {
+                { "Object", fNewObject },
+                { "Deserialized", fDeserialized }
+        });
+    }
 
     /**
      * Test whether the fast linear transform always yields the same value for
@@ -37,7 +113,7 @@ public class TsTransformFastTest {
      */
     @Test
     public void testFLTRepeatability() {
-        TmfTimestampTransformLinearFast fast = new TmfTimestampTransformLinearFast(Math.PI, 0);
+        TmfTimestampTransformLinearFast fast = fTransformFactory.create(Math.PI, 0);
         // Access fDeltaMax to compute the cache range boundaries
         long deltaMax = fast.getDeltaMax();
         // Initialize the transform
@@ -68,8 +144,8 @@ public class TsTransformFastTest {
      */
     @Test
     public void testFLTEquivalence() {
-        TmfTimestampTransformLinearFast fast = new TmfTimestampTransformLinearFast(Math.PI, 0);
-        TmfTimestampTransformLinearFast fast2 = new TmfTimestampTransformLinearFast(Math.PI, 0);
+        TmfTimestampTransformLinearFast fast = fTransformFactory.create(Math.PI, 0);
+        TmfTimestampTransformLinearFast fast2 = fTransformFactory.create(Math.PI, 0);
 
         long deltaMax = fast.getDeltaMax();
 
@@ -84,7 +160,7 @@ public class TsTransformFastTest {
     @Test
     public void testFastTransformPrecision() {
         TmfTimestampTransformLinear precise = new TmfTimestampTransformLinear(Math.PI, 0);
-        TmfTimestampTransformLinearFast fast = new TmfTimestampTransformLinearFast(Math.PI, 0);
+        TmfTimestampTransformLinearFast fast = fTransformFactory.create(Math.PI, 0);
         int samples = 100;
         long start = (long) Math.pow(10, 18);
         long end = Long.MAX_VALUE;
@@ -106,11 +182,11 @@ public class TsTransformFastTest {
                         samples, fast.getCacheMisses()), samples >= fast.getCacheMisses());
             }
         }
-
     }
 
     /**
-     * Test that fast transform produces the same result for small and large slopes.
+     * Test that fast transform produces the same result for small and large
+     * slopes.
      */
     @Test
     public void testFastTransformSlope() {
@@ -120,9 +196,25 @@ public class TsTransformFastTest {
             for (int d = 0; d < dir.length; d++) {
                 double slope = Math.pow(10.0, ex);
                 TmfTimestampTransformLinear precise = new TmfTimestampTransformLinear(slope, 0);
-                TmfTimestampTransformLinearFast fast = new TmfTimestampTransformLinearFast(slope, 0);
+                TmfTimestampTransformLinearFast fast = fTransformFactory.create(slope, 0);
                 checkTime(precise, fast, 1000, start, dir[d]);
             }
+        }
+    }
+
+    /**
+     * Test that fast transform produces the same result with a slope and
+     * offset, for small and large values
+     */
+    @Test
+    public void testFastTransformSlopeAndOffset() {
+        double offset = 54321.0;
+        double slope = Math.pow(10.0, 4);
+        for (int ex = 0; ex <= Long.SIZE - 1; ex++) {
+            long start = 1 << ex;
+            TmfTimestampTransformLinear precise = new TmfTimestampTransformLinear(slope, offset);
+            TmfTimestampTransformLinearFast fast = fTransformFactory.create(slope, offset);
+            checkTime(precise, fast, 5, start, 1);
         }
     }
 
@@ -131,11 +223,11 @@ public class TsTransformFastTest {
      */
     @Test
     public void testFastTransformArguments() {
-        double[] slopes = new double[] { -1.0, ((double)Integer.MAX_VALUE) + 1, 1e-10 };
-        for (double slope: slopes) {
+        double[] slopes = new double[] { -1.0, ((double) Integer.MAX_VALUE) + 1, 1e-10 };
+        for (double slope : slopes) {
             Exception exception = null;
             try {
-                new TmfTimestampTransformLinearFast(slope, 0.0);
+                fTransformFactory.create(slope, 0.0);
             } catch (IllegalArgumentException e) {
                 exception = e;
             }
@@ -152,7 +244,7 @@ public class TsTransformFastTest {
             long act = fast.transform(time);
             long err = act - exp;
             // allow only two ns of error
-            assertTrue("[" + err + "]", Math.abs(err) < 3);
+            assertTrue("start: " + start + " [" + err + "]", Math.abs(err) < 3);
             if (i > 0) {
                 if (step > 0) {
                     assertTrue("monotonic error" + act + " " + prev, act >= prev);
