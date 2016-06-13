@@ -41,6 +41,8 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractStateSystemTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
@@ -58,11 +60,12 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
     /** View ID. */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.views.resources"; //$NON-NLS-1$
 
+    /** ID of the followed CPU in the map data in {@link TmfTraceContext} */
+    public static final @NonNull String RESOURCES_FOLLOW_CPU = ID + ".FOLLOW_CPU"; //$NON-NLS-1$
+
     private static final String[] FILTER_COLUMN_NAMES = new String[] {
             Messages.ResourcesView_stateTypeName
     };
-
-    private int fCurrentCpu = -1;
 
     // Timeout between updates in the build thread in ms
     private static final long BUILD_UPDATE_TIMEOUT = 500;
@@ -108,7 +111,10 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
             if (sSel.getFirstElement() instanceof ResourcesEntry) {
                 ResourcesEntry resourcesEntry = (ResourcesEntry) sSel.getFirstElement();
                 if (resourcesEntry.getType().equals(ResourcesEntry.Type.CPU)) {
-                    if (fCurrentCpu >= 0) {
+                    TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+                    Integer data = (Integer) ctx.getData(RESOURCES_FOLLOW_CPU);
+                    int cpu = data != null ? data.intValue() : -1;
+                    if (cpu >= 0) {
                         menuManager.add(new UnfollowCpuAction(ResourcesView.this, resourcesEntry.getId(), resourcesEntry.getTrace()));
                     } else {
                         menuManager.add(new FollowCpuAction(ResourcesView.this, resourcesEntry.getId(), resourcesEntry.getTrace()));
@@ -440,11 +446,9 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
      */
     @TmfSignalHandler
     public void listenToCpu(TmfCpuSelectedSignal signal) {
-        if (signal.getCore() >= 0) {
-            fCurrentCpu = signal.getCore();
-        } else {
-            fCurrentCpu = -1;
-        }
+        int data = signal.getCore() >= 0 ? signal.getCore() : -1;
+        TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+        ctx.setData(RESOURCES_FOLLOW_CPU, data);
     }
 
 }

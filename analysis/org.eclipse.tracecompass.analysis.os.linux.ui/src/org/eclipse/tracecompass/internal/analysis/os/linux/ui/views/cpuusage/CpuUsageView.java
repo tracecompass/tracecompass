@@ -12,6 +12,12 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.cpuusage;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -21,13 +27,18 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.signals.TmfCpuSelectedSignal;
+import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
+
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 
 /**
  * CPU usage view. It contains 2 viewers: one tree viewer showing all the
@@ -41,6 +52,12 @@ public class CpuUsageView extends TmfChartView {
 
     /** ID string */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.views.cpuusage"; //$NON-NLS-1$
+
+    /** ID of the selected thread in the map of data in {@link TmfTraceContext} */
+    public static final @NonNull String CPU_USAGE_SELECTED_THREAD = ID + ".CPU_USAGE_SELECTED_TRHEAD"; //$NON-NLS-1$
+
+    /** ID of the followed CPU in the map data in {@link TmfTraceContext} */
+    public static final @NonNull String CPU_USAGE_FOLLOW_CPU = ID + ".FOLLOW_CPU"; //$NON-NLS-1$
 
     private @Nullable CpuUsageComposite fTreeViewer = null;
     private @Nullable CpuUsageXYViewer fXYViewer = null;
@@ -96,6 +113,7 @@ public class CpuUsageView extends TmfChartView {
                         if (fXYViewer != null) {
                             fXYViewer.setSelectedThread(Long.valueOf(entry.getTid()));
                         }
+                        saveData(CPU_USAGE_SELECTED_THREAD, entry.getTid());
                     }
                 }
             }
@@ -110,6 +128,19 @@ public class CpuUsageView extends TmfChartView {
 
         fTreeViewer = viewer;
         return fTreeViewer;
+    }
+
+    /**
+     * Save a data in the data map of {@link TmfTraceContext}
+     */
+    private static void saveData(@NonNull String key, Object data) {
+        TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+        ctx.setData(key, checkNotNull(data));
+    }
+
+    private static Object getData(@NonNull String key) {
+        TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+        return ctx.getData(key);
     }
 
     @Override
@@ -131,13 +162,29 @@ public class CpuUsageView extends TmfChartView {
         final @Nullable CpuUsageXYViewer xyViewer = fXYViewer;
         final @Nullable CpuUsageComposite treeViewer = fTreeViewer;
         if (xyViewer != null && treeViewer != null) {
-            int core = signal.getCore();
-            if (core >= 0) {
-                xyViewer.addCpu(core);
-                treeViewer.addCpu(core);
+            Object data = getData(CPU_USAGE_FOLLOW_CPU);
+            if (data == null) {
+                data = new TreeSet<Integer>();
+            }
+            if (data instanceof Set<?>) {
+                Set<?> set = (Set<?>) data;
+                int core = signal.getCore();
+                if (core >= 0) {
+                    xyViewer.addCpu(core);
+                    treeViewer.addCpu(core);
+                    if (Iterables.all(set, Predicates.instanceOf(Integer.class))) {
+                        @SuppressWarnings("unchecked")
+                        Set<Integer> intSet = (Set<Integer>) set;
+                        intSet.add(core);
+                    }
+                } else {
+                    xyViewer.clearCpu();
+                    treeViewer.clearCpu();
+                    ((Set<?>) data).clear();
+                }
+                saveData(CPU_USAGE_FOLLOW_CPU, data);
             } else {
-                xyViewer.clearCpu();
-                treeViewer.clearCpu();
+                Activator.getDefault().logError("The followed cores should have been store in a Set"); //$NON-NLS-1$
             }
         }
     }

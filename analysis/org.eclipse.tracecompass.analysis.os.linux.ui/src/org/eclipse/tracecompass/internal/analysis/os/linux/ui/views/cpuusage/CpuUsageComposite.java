@@ -43,6 +43,8 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
@@ -372,15 +374,39 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
     @Override
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
-        setSelectedThread(null);
+        initSelection();
+        initCPU();
         super.traceSelected(signal);
     }
 
     @Override
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
-        setSelectedThread(null);
+        initSelection();
+        initCPU();
         super.traceOpened(signal);
     }
 
+    private void initSelection() {
+        TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+        String thread = (String) ctx.getData(CpuUsageView.CPU_USAGE_SELECTED_THREAD);
+        setSelectedThread(thread);
+    }
+
+    private void initCPU() {
+        clearCpu();
+        TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+        Object data =  ctx.getData(CpuUsageView.CPU_USAGE_FOLLOW_CPU);
+        if (data instanceof Set<?>) {
+            Set<?> set = (Set<?>) data;
+            for (Object coreObject : set) {
+                if (coreObject instanceof Integer) {
+                    Integer core = (Integer) coreObject;
+                    if (core >= 0) {
+                        addCpu(core);
+                    }
+                }
+            }
+        }
+    }
 }

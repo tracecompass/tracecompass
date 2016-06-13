@@ -37,11 +37,11 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventFilterAppliedSignal;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTraceModelSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceModelSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
@@ -334,10 +334,12 @@ public final class TmfTraceManager {
         if (context == null) {
             throw new RuntimeException();
         }
-        fTraces.put(newTrace, newTrace.createTraceContext(context.getSelectionRange(),
+        final TmfTraceContext newContext = newTrace.createTraceContext(context.getSelectionRange(),
                 context.getWindowRange(),
                 context.getEditorFile(),
-                signal.getEventFilter()));
+                signal.getEventFilter());
+        newContext.setData(context.getData());
+        fTraces.put(newTrace, newContext);
     }
 
     /**
@@ -387,6 +389,7 @@ public final class TmfTraceManager {
                         prevCtx.getWindowRange(),
                         prevCtx.getEditorFile(),
                         prevCtx.getFilter());
+                newCtx.setData(prevCtx.getData());
                 entry.setValue(newCtx);
             }
         }
@@ -420,6 +423,7 @@ public final class TmfTraceManager {
             /* Keep the values from the old context, except for the window range */
             TmfTraceContext newCtx = trace.createTraceContext(prevCtx.getSelectionRange(),
                     newWindowTr, prevCtx.getEditorFile(), prevCtx.getFilter());
+            newCtx.setData(prevCtx.getData());
             entry.setValue(newCtx);
         }
     }

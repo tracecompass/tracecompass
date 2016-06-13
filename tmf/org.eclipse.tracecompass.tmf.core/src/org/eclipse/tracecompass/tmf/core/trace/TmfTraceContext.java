@@ -14,12 +14,18 @@
 
 package org.eclipse.tracecompass.tmf.core.trace;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.resources.IFile;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Context of a trace, which is the representation of the "view" the user
@@ -42,6 +48,7 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
     private final TmfTimeRange fWindowRange;
     private final @Nullable IFile fEditorFile;
     private final @Nullable ITmfFilter fFilter;
+    private final Map<@NonNull String, @NonNull Object> fData = new HashMap<>();
 
     /**
      * Build a new trace context.
@@ -61,6 +68,7 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
         fWindowRange = windowRange;
         fEditorFile = editorFile;
         fFilter = filter;
+        fData.clear();
     }
 
     /**
@@ -97,6 +105,52 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
      */
     public @Nullable ITmfFilter getFilter() {
         return fFilter;
+    }
+
+    /**
+     * Store a data for the trace
+     *
+     * @param key
+     *            The id of the data
+     * @param value
+     *            The value of the data
+     * @since 2.1
+     */
+    public synchronized void setData(String key, Object value) {
+        fData.put(key, value);
+    }
+
+    /**
+     * Copy data into the data map
+     *
+     * @param data
+     *            The map of data to copy
+     * @since 2.1
+     */
+    public synchronized void setData(Map<String, Object> data) {
+        fData.putAll(data);
+    }
+
+    /**
+     * Get the data for the specific key
+     *
+     * @param key
+     *            The id of the data
+     * @return The data or null if the key do not exist
+     * @since 2.1
+     */
+    public synchronized @Nullable Object getData(String key) {
+        return fData.get(key);
+    }
+
+    /**
+     * Get a copy of the data map
+     *
+     * @return The data map copy
+     * @since 2.1
+     */
+    public synchronized Map<String, Object> getData() {
+        return ImmutableMap.copyOf(fData);
     }
 
     @Override
