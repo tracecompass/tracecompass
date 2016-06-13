@@ -111,7 +111,9 @@ public class ControlViewKernelFilterTest extends ControlViewTest {
         shell.bot().radioInGroup(ControlViewSwtBotUtil.GROUP_SELECT_NAME, ControlViewSwtBotUtil.TRACEPOINTS_GROUP_NAME).click();
 
         SWTBotTree tracepointsTree = shell.bot().tree();
-        tracepointsTree.select(ControlViewSwtBotUtil.ALL_TREE_NODE);
+        SWTBotTreeItem allItem = SWTBotUtils.getTreeItem(fBot, tracepointsTree, ControlViewSwtBotUtil.ALL_TREE_NODE);
+        allItem.check();
+
         SWTBotText filterText = shell.bot().textInGroup(ControlViewSwtBotUtil.FILTER_EXPRESSION_LABEL);
         filterText.setText(FILTER_EXPRESSION);
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();

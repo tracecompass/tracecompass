@@ -296,7 +296,8 @@ public class ControlViewTest {
         shell.bot().radioInGroup(ControlViewSwtBotUtil.GROUP_SELECT_NAME, ControlViewSwtBotUtil.TRACEPOINTS_GROUP_NAME).click();
 
         SWTBotTree tracepointsTree = shell.bot().tree();
-        tracepointsTree.select(ControlViewSwtBotUtil.ALL_TREE_NODE);
+        SWTBotTreeItem allItem = SWTBotUtils.getTreeItem(fBot, tracepointsTree, ControlViewSwtBotUtil.ALL_TREE_NODE);
+        allItem.check();
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
         SWTBotUtils.waitForJobs();
 
