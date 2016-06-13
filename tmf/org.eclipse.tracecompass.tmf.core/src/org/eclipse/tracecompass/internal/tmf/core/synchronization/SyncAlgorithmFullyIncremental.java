@@ -158,7 +158,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
             fTree = new SyncSpanningTree(getRootNode());
             for (ConvexHull traceSync : fSyncs) {
                 SyncQuality q = traceSync.getQuality();
-                if (q == SyncQuality.ACCURATE || q == SyncQuality.APPROXIMATE) {
+                if (q == SyncQuality.ACCURATE || q == SyncQuality.APPROXIMATE || q == SyncQuality.FAIL) {
                     String from = traceSync.getReferenceHost();
                     String to = traceSync.getOtherHost();
                     fTree.addSynchronization(from, to, traceSync.getTimestampTransform(to), traceSync.getAccuracy());

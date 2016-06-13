@@ -29,6 +29,7 @@ import java.util.LinkedList;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.synchronization.SyncAlgorithmFullyIncremental;
+import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfTimestampTransformLinearFast;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventDependency;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationAlgorithm;
@@ -119,11 +120,27 @@ public class SyncTest {
         assertEquals(syncAlgo.getTimestampTransform(t1.getHostId()), tt1);
         assertEquals(TimestampTransformFactory.getDefaultTransform(), tt1);
         assertEquals(syncAlgo.getTimestampTransform(t2.getHostId()), tt2);
+        assertTrue(tt2 instanceof TmfTimestampTransformLinearFast);
 
-        /* Make the two hulls intersect */
+        /*
+         * Make the two hulls intersect, and make sure the last good formula is
+         * kept after failure
+         */
         addSyncMatch(syncAlgo, t1, 7, t2, 4);
+        assertEquals(SyncQuality.ACCURATE, syncAlgo.getSynchronizationQuality(t1, t2));
+        assertEquals("SyncAlgorithmFullyIncremental [Between t1 and t2 [ alpha 0.375 beta 1.625 ]]", syncAlgo.toString());
+        // Last good synchronization
+        tt2 = syncAlgo.getTimestampTransform(t2);
+        tt1 = syncAlgo.getTimestampTransform(t1);
+        assertTrue(tt2 instanceof TmfTimestampTransformLinearFast);
+
         addSyncMatch(syncAlgo, t2, 7, t1, 3);
         assertEquals(SyncQuality.FAIL, syncAlgo.getSynchronizationQuality(t1, t2));
+        assertEquals("SyncAlgorithmFullyIncremental [Between t1 and t2 [ alpha 0.375 beta 1.625 ]]", syncAlgo.toString());
+
+        assertEquals(tt2, syncAlgo.getTimestampTransform(t2.getHostId()));
+        assertEquals(tt1, syncAlgo.getTimestampTransform(t1.getHostId()));
+        assertEquals(TimestampTransformFactory.getDefaultTransform(), tt1);
     }
 
     /**
