@@ -73,6 +73,7 @@ class ControlViewSwtBotUtil {
     public static final String BUFFERTYPE_GROUP_NAME = "Buffer Type";
     public static final String BUFFERTYPE_PER_UID = "Per UID buffers";
     public static final String FILTER_EXPRESSION_LABEL = "Filter Expression";
+    public static final String EXCLUDE_EVENT_LABEL = "Exclude Events";
     public static final String SESSION_LIST_GROUP_NAME = "Session List";
 
     public static final String DESTROY_CONFIRM_DIALOG_TITLE = "Destroy Confirmation";

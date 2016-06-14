@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.eclipse.tracecompass.lttng2.control.ui.swtbot.tests.ControlPerspectiveFactory"
+            id="org.eclipse.tracecompass.lttng2.control.ui.swtbot.tests.perspective"
+            name="Control">
+      </perspective>
+   </extension>
+
+</plugin>

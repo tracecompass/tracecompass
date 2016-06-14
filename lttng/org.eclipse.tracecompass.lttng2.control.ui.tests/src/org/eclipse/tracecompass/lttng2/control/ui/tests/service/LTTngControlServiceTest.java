@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
@@ -56,6 +57,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.preferences.Con
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.ILttngControlService;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlService;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceFactory;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LttngVersion;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -104,6 +106,7 @@ public class LTTngControlServiceTest {
     private static final String SCEN_DESTROY_SESSION_VERBOSE = "DestroySessionVerbose";
     private static final String SCEN_CHANNEL_HANDLING = "ChannelHandling";
     private static final String SCEN_EVENT_HANDLING = "EventHandling";
+    private static final String SCEN_EVENT_EXLUDED = "EventExcluded";
     private static final String SCEN_CONTEXT_HANDLING = "ContextHandling";
     private static final String SCEN_CONTEXT_ERROR_HANDLING = "ContextErrorHandling";
     private static final String SCEN_CREATE_SESSION_2_1 = "CreateSessionLttng2.1";
@@ -1090,37 +1093,112 @@ public class LTTngControlServiceTest {
     @Test
     public void testEnableEvents() {
         try {
-            // 1) session name, channel = null, 3 event names, kernel
             String sessionName = "mysession2";
-            List<String> list = new ArrayList<>();
+            String channelName = "mychannel";
+            // Lists
+            List<String> eventList = new ArrayList<>();
+            List<String> excludeList = new ArrayList<>();
+            // Events
             String eventName0 = "block_rq_remap";
             String eventName1 = "block_bio_remap";
             String eventName2 = "softirq_entry";
-            list.add(eventName0);
-            list.add(eventName1);
-            list.add(eventName2);
-            fShell.setScenario(SCEN_EVENT_HANDLING);
-            fService.enableEvents(sessionName, null, list, true, null, null, new NullProgressMonitor());
+            String ustEventName0 = "ust_tests_hello:tptest_sighandler";
+            String ustEventName1 = "ust_tests_bye:tptest_sighandler";
+            String ustEventWildcard = "ust*";
 
-            // 2) session name, channel=mychannel, event name= null, kernel
-            String channelName = "mychannel";
+            fShell.setScenario(SCEN_EVENT_HANDLING);
+
+            // 1) session name, channel = null, 3 event names, kernel
+            eventList.add(eventName0);
+            eventList.add(eventName1);
+            eventList.add(eventName2);
+            fService.enableEvents(sessionName, null, eventList, true, null, null, new NullProgressMonitor());
+
+            // 2) session name, channel = mychannel, event name= null, kernel
             fService.enableEvents(sessionName, channelName, null, true, null, null, new NullProgressMonitor());
 
-            // 3) session name, channel=mychannel, 1 event name, ust, no filter
-            String ustEventName = "ust_tests_hello:tptest_sighandler";
-            list.clear();
-            list.add(ustEventName);
-            fService.enableEvents(sessionName, channelName, list, false, null, null, new NullProgressMonitor());
+            // 3) session name, channel = mychannel, 1 event name, ust, no filter
+            eventList.clear();
+            eventList.add(ustEventName0);
+            fService.enableEvents(sessionName, channelName, eventList, false, null, null, new NullProgressMonitor());
 
             // 4) session name, channel = mychannel, no event name, ust, with filter
-            fService.enableEvents(sessionName, channelName, list, false, "intfield==10", null, new NullProgressMonitor());
+            fService.enableEvents(sessionName, channelName, eventList, false, "intfield==10", null, new NullProgressMonitor());
 
             // 5) session name, channel = mychannel, no event name, ust, no filter
-            list.clear();
-            fService.enableEvents(sessionName, channelName, list, false, null, null, new NullProgressMonitor());
+            eventList.clear();
+            fService.enableEvents(sessionName, channelName, eventList, false, null, null, new NullProgressMonitor());
 
             // 6) session name, channel = null,
             fService.enableEvents(sessionName, null, ILttngControlService.ALL_EVENTS, true, null, null, new NullProgressMonitor());
+
+            // 7) session name, channel = mychannel, all events, ust, exclude 1 event
+            excludeList.add(ustEventName0);
+            fService.enableEvents(sessionName, channelName, null, false, null, excludeList, new NullProgressMonitor());
+
+            // 8) session name, channel = mychannel, all events, ust, exclude 2 events
+            excludeList.add(ustEventName1);
+            fService.enableEvents(sessionName, channelName, null, false, null, excludeList, new NullProgressMonitor());
+
+            // 9) session name, channel = mychannel, enable 'ust*', ust, exclude 2 events
+            eventList.add(ustEventWildcard);
+            fService.enableEvents(sessionName, channelName, eventList, false, null, excludeList, new NullProgressMonitor());
+
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+    @Test
+    public void testEventExcluded() {
+        try {
+            String sessionName = "mysession2";
+            String channelName = "mychannel";
+            // Lists
+            List<String> eventList = new ArrayList<>();
+            List<String> excludeList = new ArrayList<>();
+            // Events
+            String ustEventName0 = "ust_tests_hello:tptest_sighandler";
+            String ustEventName1 = "ust_tests_bye:tptest_sighandler";
+            String ustEventWildcard = "ust*";
+
+            @NonNull
+            LttngVersion version = fService.getVersion();
+            fShell.setScenario(SCEN_EVENT_EXLUDED);
+
+            // 1) 1 event excluded
+            eventList.add(ustEventWildcard);
+            excludeList.add(ustEventName0);
+            fService.enableEvents(sessionName, channelName, eventList, false, null, excludeList, new NullProgressMonitor());
+
+            @Nullable
+            ISessionInfo session = fService.getSession(sessionName, new NullProgressMonitor());
+            assertNotNull(session);
+            IEventInfo eventInfo = session.getDomains()[0].getChannels()[0].getEvents()[0];
+            assertNotNull(eventInfo);
+            // version 2.8 and above supports the excluded events list
+            if (version.getMajor() > 1 && version.getMinor() > 7) {
+                assertTrue(eventInfo.getExcludedEvents().contains(ustEventName0));
+            } else {
+                assertEquals("has exclusions", eventInfo.getExcludedEvents());
+            }
+
+            // 2) 2 events excluded
+            excludeList.add(ustEventName1);
+            fService.enableEvents(sessionName, channelName, eventList, false, null, excludeList, new NullProgressMonitor());
+
+            session = fService.getSession(sessionName, new NullProgressMonitor());
+            assertNotNull(session);
+            eventInfo = session.getDomains()[0].getChannels()[0].getEvents()[0];
+            assertNotNull(eventInfo);
+
+            // version 2.8 and above supports the excluded events list
+            if (version.getMajor() > 1 && version.getMinor() > 7) {
+                assertTrue(eventInfo.getExcludedEvents().contains(ustEventName0));
+                assertTrue(eventInfo.getExcludedEvents().contains(ustEventName1));
+            } else {
+                assertEquals("has exclusions", eventInfo.getExcludedEvents());
+            }
 
         } catch (ExecutionException e) {
             fail(e.toString());

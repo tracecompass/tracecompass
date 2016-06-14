@@ -51,6 +51,11 @@ public interface LTTngControlServiceConstants {
     /** The default directory for session */
     public static final String DEFAULT_PATH = ".lttng/sessions"; //$NON-NLS-1$
 
+    /**
+     * The string returned when some event(s) are excluded.
+     */
+    String HAS_EXCLUSIONS = "has exclusions"; //$NON-NLS-1$
+
     // ------------------------------------------------------------------------
     // LTTng Machine Interface constants
     // ------------------------------------------------------------------------

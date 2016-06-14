@@ -1070,6 +1070,16 @@ public class LTTngControlService implements ILttngControlService {
     // Helper methods
     // ------------------------------------------------------------------------
 
+    private static void setFilterExpression(IEventInfo eventInfo, String filter) {
+        // remove '[' and ']'
+        String temp = filter.substring(1, filter.length() - 1);
+        if (temp.equals(LTTngControlServiceConstants.HAS_EXCLUSIONS)) {
+            eventInfo.setExcludedEvents(temp);
+        } else {
+            eventInfo.setFilterExpression(temp);
+        }
+    }
+
     /**
      * Checks if command result is an error result.
      *
@@ -1292,9 +1302,7 @@ public class LTTngControlService implements ILttngControlService {
                 eventInfo.setState(matcher.group(5));
                 String filter = matcher.group(6);
                 if (filter != null) {
-                    // remove '[' and ']'
-                    filter = filter.substring(1, filter.length() - 1);
-                    eventInfo.setFilterExpression(filter);
+                    setFilterExpression(eventInfo, filter);
                 }
                 events.add(eventInfo);
                 index++;
@@ -1305,9 +1313,7 @@ public class LTTngControlService implements ILttngControlService {
                 eventInfo.setState(matcher2.group(3));
                 String filter = matcher2.group(4);
                 if (filter != null) {
-                    // remove '[' and ']'
-                    filter = filter.substring(1, filter.length() - 1);
-                    eventInfo.setFilterExpression(filter);
+                    setFilterExpression(eventInfo, filter);
                 }
 
                 if ((eventInfo.getEventType() == TraceEventType.PROBE) ||

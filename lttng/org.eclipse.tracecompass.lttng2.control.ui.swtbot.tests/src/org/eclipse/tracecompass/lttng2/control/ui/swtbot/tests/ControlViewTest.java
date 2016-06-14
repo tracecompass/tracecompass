@@ -83,6 +83,7 @@ public class ControlViewTest {
     private static final String SESSION_NAME = "mysession";
     private static final String UST_CHANNEL_NAME = ControlViewSwtBotUtil.DEFAULT_CHANNEL_NAME;
     private static final String NODE_NAME = "myNode";
+    private static final String PERSPECTIVE_ID = "org.eclipse.tracecompass.lttng2.control.ui.swtbot.tests.perspective";
 
     // ------------------------------------------------------------------------
     // Test data
@@ -126,6 +127,8 @@ public class ControlViewTest {
 
         /* finish waiting for eclipse to load */
         SWTBotUtils.waitForJobs();
+
+        SWTBotUtils.switchToPerspective(PERSPECTIVE_ID);
     }
 
     /**
