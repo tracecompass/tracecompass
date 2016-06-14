@@ -24,9 +24,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -58,6 +60,8 @@ public class StateSystem implements ITmfStateSystemBuilder {
 
     private static final String PARENT = ".."; //$NON-NLS-1$
     private static final String WILDCARD = "*"; //$NON-NLS-1$
+
+    private static final Logger LOGGER = TraceCompassLog.getLogger(StateSystem.class);
 
     /* References to the inner structures */
     private final AttributeTree attributeTree;
@@ -544,6 +548,8 @@ public class StateSystem implements ITmfStateSystemBuilder {
             throw new StateSystemDisposedException();
         }
 
+        LOGGER.info(() -> "[StateSystem:FullQueryStart] ssid=" + this.getSSID() + ", ts=" + t);  //$NON-NLS-1$//$NON-NLS-2$
+
         final int nbAttr = getNbAttributes();
         List<@Nullable ITmfStateInterval> stateInfo = new ArrayList<>(nbAttr);
 
@@ -571,6 +577,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
                 throw new IllegalStateException("Incoherent interval storage"); //$NON-NLS-1$
             }
         }
+        LOGGER.info(() -> "[StateSystem:FullQueryEnd]");  //$NON-NLS-1$
         return stateInfo;
     }
 
@@ -580,6 +587,8 @@ public class StateSystem implements ITmfStateSystemBuilder {
         if (isDisposed) {
             throw new StateSystemDisposedException();
         }
+
+        LOGGER.info(() -> "[StateSystem:SingleQueryStart] ssid=" + this.getSSID() + ", ts=" + t + ", attribute=" + attributeQuark);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 
         ITmfStateInterval ret = transState.getIntervalAt(t, attributeQuark);
         if (ret == null) {
@@ -597,6 +606,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
              */
             throw new IllegalStateException("Incoherent interval storage"); //$NON-NLS-1$
         }
+        LOGGER.info(() -> "[StateSystem:SingleQueryEnd]");  //$NON-NLS-1$
         return ret;
     }
 

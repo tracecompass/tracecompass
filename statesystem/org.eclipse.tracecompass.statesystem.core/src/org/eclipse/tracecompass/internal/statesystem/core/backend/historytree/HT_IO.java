@@ -18,9 +18,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
+import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 
 /**
@@ -33,7 +35,6 @@ import org.eclipse.tracecompass.internal.statesystem.core.Activator;
  * HistoryTree must contain 1 and only 1 HT_IO element.
  *
  * @author Alexandre Montplaisir
- *
  */
 class HT_IO {
 
@@ -72,6 +73,8 @@ class HT_IO {
     private static final int CACHE_SIZE = 256;
     private static final int CACHE_MASK = CACHE_SIZE - 1;
     private static final CacheElement NODE_CACHE[] = new CacheElement[CACHE_SIZE];
+
+    private static final Logger LOGGER = TraceCompassLog.getLogger(HT_IO.class);
 
     /**
      * Standard constructor
@@ -131,6 +134,7 @@ class HT_IO {
         CacheElement cachedNode = NODE_CACHE[offset];
 
         if (cachedNode != null && cachedNode.getKey() == this && cachedNode.getValue().getSequenceNumber() == seqNumber) {
+            LOGGER.finest(() -> "[HtIo:CacheHit] seqNum=" + seqNumber); //$NON-NLS-1$
             return cachedNode.getValue();
         }
 
@@ -138,6 +142,7 @@ class HT_IO {
         try {
             seekFCToNodePos(fFileChannelIn, seqNumber);
             HTNode readNode = HTNode.readNode(fConfig, fFileChannelIn);
+            LOGGER.finest(() -> "[HtIo:CacheMiss] seqNum=" + seqNumber); //$NON-NLS-1$
 
             /* Put the node in the cache. */
             NODE_CACHE[offset] = new CacheElement(this, readNode);
