@@ -1939,9 +1939,9 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
                 }
             };
 
-            fNextEventAction.setText(Messages.TmfTimeGraphViewer_NextEventActionNameText);
-            fNextEventAction.setToolTipText(Messages.TmfTimeGraphViewer_NextEventActionToolTipText);
-            fNextEventAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NEXT_EVENT));
+            fNextEventAction.setText(Messages.TmfTimeGraphViewer_NextStateChangeActionNameText);
+            fNextEventAction.setToolTipText(Messages.TmfTimeGraphViewer_NextStateChangeActionToolTipText);
+            fNextEventAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NEXT_STATE_CHANGE));
         }
 
         return fNextEventAction;
@@ -1962,9 +1962,9 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
                 }
             };
 
-            fPrevEventAction.setText(Messages.TmfTimeGraphViewer_PreviousEventActionNameText);
-            fPrevEventAction.setToolTipText(Messages.TmfTimeGraphViewer_PreviousEventActionToolTipText);
-            fPrevEventAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_PREV_EVENT));
+            fPrevEventAction.setText(Messages.TmfTimeGraphViewer_PreviousStateChangeActionNameText);
+            fPrevEventAction.setToolTipText(Messages.TmfTimeGraphViewer_PreviousStateChangeActionToolTipText);
+            fPrevEventAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_PREV_STATE_CHANGE));
         }
 
         return fPrevEventAction;

@@ -67,8 +67,8 @@ public class ControlFlowViewTest extends KernelTestBase {
 
     private static final String FOLLOW_CPU_BACKWARD = "Follow CPU Backward";
     private static final String FOLLOW_CPU_FORWARD = "Follow CPU Forward";
-    private static final String SELECT_PREVIOUS_EVENT = "Select Previous Event";
-    private static final String SELECT_NEXT_EVENT = "Select Next Event";
+    private static final String SELECT_PREVIOUS_STATE_CHANGE = "Select Previous State Change";
+    private static final String SELECT_NEXT_STATE_CHANGE = "Select Next State Change";
     private static final String SELECT_NEXT_PROCESS = "Select Next Process";
     private static final Keyboard KEYBOARD = KeyboardFactory.getSWTKeyboard();
     private static final @NonNull ITmfTimestamp START_TIME = TmfTimestamp.fromNanos(1368000272650993664L);
@@ -110,14 +110,14 @@ public class ControlFlowViewTest extends KernelTestBase {
     }
 
     /**
-     * Test tool bar buttons "Select Next Event" and "Select Previous Event"
+     * Test tool bar buttons "Select Next State Change" and "Select Previous State Change"
      */
     @Test
-    public void testToolBarSelectNextPreviousEvent() {
-        testNextPreviousEvent(() -> fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(),
-                () -> fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT),
-                () -> fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(),
-                () -> fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT));
+    public void testToolBarSelectNextPreviousStateChange() {
+        testNextPreviousEvent(() -> fViewBot.toolbarButton(SELECT_NEXT_STATE_CHANGE).click(),
+                () -> fViewBot.toolbarButton(SELECT_NEXT_STATE_CHANGE).click(SWT.SHIFT),
+                () -> fViewBot.toolbarButton(SELECT_PREVIOUS_STATE_CHANGE).click(),
+                () -> fViewBot.toolbarButton(SELECT_PREVIOUS_STATE_CHANGE).click(SWT.SHIFT));
     }
 
     private void testNextPreviousEvent(Runnable selectNext, Runnable shiftSelectNext, Runnable selectPrevious, Runnable shiftSelectPrevious) {
@@ -144,7 +144,7 @@ public class ControlFlowViewTest extends KernelTestBase {
             }
         });
 
-        /* click "Select Next Event" 3 times */
+        /* click "Select Next State Change" 3 times */
         selectNext.run();
         timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME1, TID1_TIME1));
         selectNext.run();
@@ -154,7 +154,7 @@ public class ControlFlowViewTest extends KernelTestBase {
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME3)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME3));
 
-        /* shift-click "Select Next Event" 3 times */
+        /* shift-click "Select Next State Change" 3 times */
         shiftSelectNext.run();
         timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME3, TID1_TIME4));
         shiftSelectNext.run();
@@ -164,7 +164,7 @@ public class ControlFlowViewTest extends KernelTestBase {
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME6)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME6));
 
-        /* shift-click "Select Previous Event" 4 times */
+        /* shift-click "Select Previous State Change" 4 times */
         shiftSelectPrevious.run();
         timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME3, TID1_TIME5));
         shiftSelectPrevious.run();
@@ -176,7 +176,7 @@ public class ControlFlowViewTest extends KernelTestBase {
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME2)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME2));
 
-        /* click "Select Next Event" 2 times */
+        /* click "Select Next State Change" 2 times */
         selectNext.run();
         timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME3, TID1_TIME3));
         selectNext.run();
@@ -184,7 +184,7 @@ public class ControlFlowViewTest extends KernelTestBase {
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME4)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME4));
 
-        /* shift-click "Select Previous Event" 3 times */
+        /* shift-click "Select Previous State Change" 3 times */
         shiftSelectPrevious.run();
         timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME4, TID1_TIME3));
         shiftSelectPrevious.run();
@@ -194,7 +194,7 @@ public class ControlFlowViewTest extends KernelTestBase {
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME1)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME1));
 
-        /* shift-click "Select Next Event" 4 times */
+        /* shift-click "Select Next State Change" 4 times */
         shiftSelectNext.run();
         timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME4, TID1_TIME2));
         shiftSelectNext.run();
@@ -206,7 +206,7 @@ public class ControlFlowViewTest extends KernelTestBase {
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME5)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME5));
 
-        /* click "Select Previous Event" 5 times */
+        /* click "Select Previous State Change" 5 times */
         selectPrevious.run();
         timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME4, TID1_TIME4));
         selectPrevious.run();

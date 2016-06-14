@@ -426,7 +426,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
             }
         };
         nextTrace.setText("NextTrace");
-        nextTrace.setToolTipText("Select Next Event");
+        nextTrace.setToolTipText("Select Next Trace");
 
         // action8
         prevTrace = new Action() {

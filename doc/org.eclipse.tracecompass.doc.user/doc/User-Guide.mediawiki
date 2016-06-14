@@ -1876,11 +1876,11 @@ The Control Flow View '''toolbar''', located at the top right of the view, has s
 | Resets the zoom window to the full range.
 |-
 | [[Image:images/prev_event.gif]]
-| Select Previous Event
+| Select Previous State Change
 | Selects the previous state for the selected process. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
 |-
 | [[Image:images/next_event.gif]]
-| Select Next Event
+| Select Next State Change
 | Selects the next state for the selected process. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
 |-
 | [[Image:images/add_bookmark.gif]]
@@ -2018,11 +2018,11 @@ The Resources View '''toolbar''', located at the top right of the view, has shor
 | Resets the zoom window to the full range.
 |-
 | [[Image:images/prev_event.gif]]
-| Select Previous Event
+| Select Previous State Change
 | Selects the previous state for the selected resource. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
 |-
 | [[Image:images/next_event.gif]]
-| Select Next Event
+| Select Next State Change
 | Selects the next state for the selected resource. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
 |-
 | [[Image:images/add_bookmark.gif]]
@@ -2302,7 +2302,7 @@ Shift-clicking on the time graph will select a time range. When the selection is
 
 Double-clicking on a call stack event will zoom the time graph to the selected function's range of execution.
 
-Clicking the '''Select Next Event''' or '''Select Previous Event''' or using the left and right arrows will navigate to the next or previous call stack event, and select the function currently at the top of the call stack. Note that pressing the '''Shift''' key at the same time will update the selection end time of the current selection.
+Clicking the '''Select Next State Change''' or '''Select Previous State Change''' or using the left and right arrows will navigate to the next or previous call stack event, and select the function currently at the top of the call stack. Note that pressing the '''Shift''' key at the same time will update the selection end time of the current selection.
 
 Clicking the '''Import Mapping File''' ([[Image:images/import.gif]]) icon will open a file selection dialog, allowing you to import a text file containing mappings from function addresses to function names. If the callstack provider for the current trace type only provides function addresses, a mapping file will be required to get the function names in the view. See the following sections for an example with LTTng-UST traces.
 

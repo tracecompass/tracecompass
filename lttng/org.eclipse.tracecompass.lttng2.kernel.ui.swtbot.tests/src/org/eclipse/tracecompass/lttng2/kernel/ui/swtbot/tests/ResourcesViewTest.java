@@ -54,8 +54,8 @@ public class ResourcesViewTest extends KernelTestBase {
 
     private static final String NEXT_MARKER = "Next Marker";
     private static final String PREVIOUS_MARKER = "Previous Marker";
-    private static final String SELECT_NEXT_EVENT = "Select Next Event";
-    private static final String SELECT_PREVIOUS_EVENT = "Select Previous Event";
+    private static final String SELECT_NEXT_STATE_CHANGE = "Select Next State Change";
+    private static final String SELECT_PREVIOUS_STATE_CHANGE = "Select Previous State Change";
     private static final String ADD_BOOKMARK = "Add Bookmark...";
     private static final String REMOVE_BOOKMARK = "Remove Bookmark";
     private static final String ADD_BOOKMARK_DIALOG = "Add Bookmark";
@@ -235,10 +235,10 @@ public class ResourcesViewTest extends KernelTestBase {
         KEYBOARD.pressShortcut(Keystrokes.HOME);
         KEYBOARD.pressShortcut(Keystrokes.DOWN);
 
-        /* click "Select Next Event" 2 times */
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
+        /* click "Select Next State Change" 2 times */
+        fViewBot.toolbarButton(SELECT_NEXT_STATE_CHANGE).click();
         timeGraphIsReadyCondition(new TmfTimeRange(CPU0_TIME1, CPU0_TIME1), CPU0_TIME1);
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
+        fViewBot.toolbarButton(SELECT_NEXT_STATE_CHANGE).click();
         timeGraphIsReadyCondition(new TmfTimeRange(CPU0_TIME2, CPU0_TIME2), CPU0_TIME2);
 
         /* click "Add Bookmark..." and fill Add Bookmark dialog */
@@ -247,12 +247,12 @@ public class ResourcesViewTest extends KernelTestBase {
         dialogBot.text().setText("B1");
         dialogBot.button(OK).click();
 
-        /* click "Select Next Event" 2 times and shift-click "Select Next Event*/
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
+        /* click "Select Next State Change" 2 times and shift-click "Select Next State Change*/
+        fViewBot.toolbarButton(SELECT_NEXT_STATE_CHANGE).click();
         timeGraphIsReadyCondition(new TmfTimeRange(CPU0_TIME3, CPU0_TIME3), CPU0_TIME3);
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
+        fViewBot.toolbarButton(SELECT_NEXT_STATE_CHANGE).click();
         timeGraphIsReadyCondition(new TmfTimeRange(CPU0_TIME4, CPU0_TIME4), CPU0_TIME4);
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
+        fViewBot.toolbarButton(SELECT_NEXT_STATE_CHANGE).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(CPU0_TIME4, CPU0_TIME5), CPU0_TIME5);
 
         /* click "Add Bookmark..." and fill Add Bookmark dialog */
@@ -279,8 +279,8 @@ public class ResourcesViewTest extends KernelTestBase {
         fViewBot.toolbarButton(PREVIOUS_MARKER).click();
         timeGraphIsReadyCondition(new TmfTimeRange(CPU0_TIME4, CPU0_TIME5), CPU0_TIME5);
 
-        /* click "Select Previous Event" */
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
+        /* click "Select Previous State Change" */
+        fViewBot.toolbarButton(SELECT_PREVIOUS_STATE_CHANGE).click();
         timeGraphIsReadyCondition(new TmfTimeRange(CPU0_TIME4, CPU0_TIME4), CPU0_TIME4);
     }
 

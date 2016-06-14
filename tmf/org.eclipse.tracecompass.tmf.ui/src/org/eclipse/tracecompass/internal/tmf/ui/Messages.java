@@ -116,10 +116,10 @@ public class Messages extends NLS {
     public static String TmfTimeGraphViewer_ResetScaleActionToolTipText;
     public static String TmfTimeGraphViewer_LegendActionNameText;
     public static String TmfTimeGraphViewer_LegendActionToolTipText;
-    public static String TmfTimeGraphViewer_NextEventActionNameText;
-    public static String TmfTimeGraphViewer_NextEventActionToolTipText;
-    public static String TmfTimeGraphViewer_PreviousEventActionNameText;
-    public static String TmfTimeGraphViewer_PreviousEventActionToolTipText;
+    public static String TmfTimeGraphViewer_NextStateChangeActionNameText;
+    public static String TmfTimeGraphViewer_NextStateChangeActionToolTipText;
+    public static String TmfTimeGraphViewer_PreviousStateChangeActionNameText;
+    public static String TmfTimeGraphViewer_PreviousStateChangeActionToolTipText;
     public static String TmfTimeGraphViewer_NextItemActionNameText;
     public static String TmfTimeGraphViewer_NextItemActionToolTipText;
     public static String TmfTimeGraphViewer_PreviousItemActionNameText;

@@ -36,8 +36,8 @@ public interface ITmfImageConstants {
     String IMG_UI_FIRST_PAGE = ICONS_PATH + "elcl16/backward_nav.gif";
     String IMG_UI_LAST_PAGE = ICONS_PATH + "elcl16/forward_nav.gif";
     String IMG_UI_SHOW_LEGEND = ICONS_PATH + "elcl16/show_legend.gif";
-    String IMG_UI_NEXT_EVENT = ICONS_PATH + "elcl16/next_event.gif";
-    String IMG_UI_PREV_EVENT = ICONS_PATH + "elcl16/prev_event.gif";
+    String IMG_UI_NEXT_STATE_CHANGE = ICONS_PATH + "elcl16/next_event.gif";
+    String IMG_UI_PREV_STATE_CHANGE = ICONS_PATH + "elcl16/prev_event.gif";
     String IMG_UI_ADD_BOOKMARK = ICONS_PATH + "elcl16/add_bookmark.gif";
     String IMG_UI_NEXT_BOOKMARK = ICONS_PATH + "elcl16/next_bookmark.gif";
     String IMG_UI_PREVIOUS_BOOKMARK = ICONS_PATH + "elcl16/prev_bookmark.gif";

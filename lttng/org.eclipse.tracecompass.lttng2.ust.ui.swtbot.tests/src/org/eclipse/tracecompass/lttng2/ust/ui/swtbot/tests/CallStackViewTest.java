@@ -111,8 +111,8 @@ public class CallStackViewTest {
     private static final @NonNull String SHOW_VIEW_FILTERS = "Show View Filters";
     // Separator
     private static final @NonNull String RESET_TIME_SCALE = "Reset the Time Scale to Default";
-    private static final @NonNull String SELECT_PREVIOUS_EVENT = "Select Previous Event";
-    private static final @NonNull String SELECT_NEXT_EVENT = "Select Next Event";
+    private static final @NonNull String SELECT_PREVIOUS_STATE_CHANGE = "Select Previous State Change";
+    private static final @NonNull String SELECT_NEXT_STATE_CHANGE = "Select Next State Change";
     // Separator
     private static final @NonNull String ADD_BOOKMARK = "Add Bookmark...";
     private static final @NonNull String PREVIOUS_MARKER = "Previous Marker";
@@ -131,7 +131,7 @@ public class CallStackViewTest {
             "",
             SHOW_VIEW_FILTERS,
             "",
-            RESET_TIME_SCALE, SELECT_PREVIOUS_EVENT, SELECT_NEXT_EVENT,
+            RESET_TIME_SCALE, SELECT_PREVIOUS_STATE_CHANGE, SELECT_NEXT_STATE_CHANGE,
             "",
             ADD_BOOKMARK, PREVIOUS_MARKER, NEXT_MARKER,
             "",
@@ -228,7 +228,7 @@ public class CallStackViewTest {
         final SWTBotView viewBot = fBot.viewById(CallStackView.ID);
         // forward 10 times
         for (int i = 0; i < 10; i++) {
-            viewBot.toolbarPushButton(SELECT_NEXT_EVENT).click();
+            viewBot.toolbarPushButton(SELECT_NEXT_STATE_CHANGE).click();
             currentEventOffset++;
             fBot.waitUntil(ConditionHelpers.selectionInEventsTable(fBot, TIMESTAMPS[currentEventOffset]));
             SWTBotUtils.waitForJobs();
@@ -237,7 +237,7 @@ public class CallStackViewTest {
         }
         // back twice
         for (int i = 0; i < 2; i++) {
-            viewBot.toolbarPushButton(SELECT_PREVIOUS_EVENT).click();
+            viewBot.toolbarPushButton(SELECT_PREVIOUS_STATE_CHANGE).click();
             currentEventOffset--;
             fBot.waitUntil(ConditionHelpers.selectionInEventsTable(fBot, TIMESTAMPS[currentEventOffset]));
             SWTBotUtils.waitForJobs();
