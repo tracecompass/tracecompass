@@ -19,10 +19,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -61,6 +63,9 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
 
     /** The trace to state system multi map */
     private final Multimap<ITmfTrace, ITmfStateSystem> fTraceSSMap = HashMultimap.create();
+
+    /** Instance-specific logger, which will use the concrete class's name */
+    private final Logger fLogger = TraceCompassLog.getLogger(getClass());
 
     // ------------------------------------------------------------------------
     // Classes
@@ -117,6 +122,8 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                     getTimeGraphViewer().setLinks(links);
                     getTimeGraphViewer().setMarkers(markers);
                 });
+            } else {
+                fLogger.info(() -> "[TimeGraphView:ZoomThreadCanceled]"); //$NON-NLS-1$
             }
         }
 
@@ -142,15 +149,19 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             queryFullStates(ss, start, end, resolution, monitor, new IQueryHandler() {
                 @Override
                 public void handle(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) {
+                    fLogger.config(() -> "[TimeGraphView:ZoomThreadGettingStates]"); //$NON-NLS-1$
                     if (!fullRange) {
                         for (TimeGraphEntry entry : entryList) {
                             zoom(checkNotNull(entry), ss, fullStates, prevFullState, monitor);
                         }
                     }
                     /* Refresh the arrows when zooming */
+                    fLogger.config(() -> "[TimeGraphView:ZoomThreadGettingLinks]"); //$NON-NLS-1$
                     links.addAll(getLinkList(ss, fullStates, prevFullState, monitor));
                     /* Refresh the view-specific markers when zooming */
+                    fLogger.config(() -> "[TimeGraphView:ZoomThreadGettingMarkers]"); //$NON-NLS-1$
                     markers.addAll(getViewMarkerList(ss, fullStates, prevFullState, monitor));
+                    fLogger.config(() -> "[TimeGraphView:ZoomThreadDone]"); //$NON-NLS-1$
                 }
             });
             refresh();
@@ -170,6 +181,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             }
             for (TimeGraphEntry child : entry.getChildren()) {
                 if (monitor.isCanceled()) {
+                    fLogger.info(() -> "[TimeGraphView:ZoomThreadCanceled]"); //$NON-NLS-1$
                     return;
                 }
                 zoom(child, ss, fullStates, prevFullState, monitor);
