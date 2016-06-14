@@ -605,7 +605,7 @@ public class LTTngControlService implements ILttngControlService {
      *            the session to create
      * @return the basic command for command creation
      */
-     protected @NonNull ICommandInput prepareStreamedSessionCreationCommand(ISessionInfo sessionInfo) {
+    protected @NonNull ICommandInput prepareStreamedSessionCreationCommand(ISessionInfo sessionInfo) {
         ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_CREATE_SESSION);
         if (!sessionInfo.getName().isEmpty()) {
             command.add(sessionInfo.getName());
@@ -775,7 +775,7 @@ public class LTTngControlService implements ILttngControlService {
     }
 
     @Override
-    public void enableEvents(String sessionName, String channelName, List<String> eventNames, boolean isKernel, String filterExpression, IProgressMonitor monitor) throws ExecutionException {
+    public void enableEvents(String sessionName, String channelName, List<String> eventNames, boolean isKernel, String filterExpression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
 
         ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_ENABLE_EVENT);
         boolean isAllEvents = ALL_EVENTS.equals(eventNames);
@@ -809,8 +809,12 @@ public class LTTngControlService implements ILttngControlService {
             command.add(filterExpression);
         }
 
-        executeCommand(command, monitor);
+        if (excludedEvents != null && !excludedEvents.isEmpty()) {
+            command.add(LTTngControlServiceConstants.OPTION_EXCLUDE);
+            command.add(toCsv(excludedEvents));
+        }
 
+        executeCommand(command, monitor);
     }
 
     @Override
@@ -820,7 +824,6 @@ public class LTTngControlService implements ILttngControlService {
 
         command.add(LTTngControlServiceConstants.OPTION_ALL);
         command.add(LTTngControlServiceConstants.OPTION_KERNEL);
-
 
         command.add(LTTngControlServiceConstants.OPTION_SESSION);
         command.add(sessionName);
@@ -1094,6 +1097,7 @@ public class LTTngControlService implements ILttngControlService {
 
     /**
      * Creates a comma separated string from list of names
+     *
      * @param names
      *          List of name to convert
      * @return comma separated string
@@ -1409,8 +1413,7 @@ public class LTTngControlService implements ILttngControlService {
                 } else {
                     index++;
                 }
-            }
-            else if (LTTngControlServiceConstants.UST_PROVIDER_PATTERN.matcher(line).matches()) {
+            } else if (LTTngControlServiceConstants.UST_PROVIDER_PATTERN.matcher(line).matches()) {
                 return index;
             } else {
                 index++;
@@ -1557,6 +1560,5 @@ public class LTTngControlService implements ILttngControlService {
 
         return result;
     }
-
 
 }

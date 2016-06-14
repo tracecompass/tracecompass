@@ -294,7 +294,7 @@ public class TraceChannelComponent extends TraceControlComponent {
      *             If the command fails
      */
     public void enableEvents(List<String> eventNames, IProgressMonitor monitor) throws ExecutionException {
-        enableEvents(eventNames, null,  monitor);
+        enableEvents(eventNames, null, null, monitor);
     }
 
     /**
@@ -304,13 +304,15 @@ public class TraceChannelComponent extends TraceControlComponent {
      *            - a list of event names to enabled.
      * @param filterExpression
      *            - a filter expression
+     * @param excludedEvents
+     *            - a list of events to exclude.
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
-    public void enableEvents(List<String> eventNames, String filterExpression, IProgressMonitor monitor) throws ExecutionException {
-        getControlService().enableEvents(getSessionName(), getName(), eventNames, isKernel(), filterExpression,  monitor);
+    public void enableEvents(List<String> eventNames, String filterExpression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().enableEvents(getSessionName(), getName(), eventNames, isKernel(), filterExpression, excludedEvents, monitor);
     }
 
     /**

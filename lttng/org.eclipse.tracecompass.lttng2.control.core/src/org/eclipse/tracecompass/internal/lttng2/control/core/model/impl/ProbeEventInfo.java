@@ -78,6 +78,7 @@ public class ProbeEventInfo extends EventInfo implements IProbeEventInfo {
         setLogLevelType(eventInfo.getLogLevelType());
         setLogLevel(eventInfo.getLogLevel());
         setFilterExpression(eventInfo.getFilterExpression());
+        setExcludedEvents(eventInfo.getExcludedEvents());
         setEventType(eventInfo.getEventType());
     }
 

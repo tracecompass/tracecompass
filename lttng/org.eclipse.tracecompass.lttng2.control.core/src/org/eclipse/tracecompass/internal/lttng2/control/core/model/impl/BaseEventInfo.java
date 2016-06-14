@@ -49,6 +49,10 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
      * The filter expression.
      */
     private String fFilterExpression;
+    /**
+     * The excluded events.
+     */
+    private String fExcludedEvents;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -78,6 +82,7 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
             }
         }
         fFilterExpression = other.fFilterExpression;
+        fExcludedEvents = other.fExcludedEvents;
     }
 
     // ------------------------------------------------------------------------
@@ -154,6 +159,16 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
     }
 
     @Override
+    public String getExcludedEvents() {
+        return fExcludedEvents;
+    }
+
+    @Override
+    public void setExcludedEvents(String events) {
+        fExcludedEvents = events;
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
@@ -161,6 +176,7 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
         result = prime * result + fFields.hashCode();
         result = prime * result + ((fFilterExpression == null) ? 0 : fFilterExpression.hashCode());
         result = prime * result + ((fLogLevel == null) ? 0 : fLogLevel.hashCode());
+        result = prime * result + ((fExcludedEvents == null) ? 0 : fExcludedEvents.hashCode());
         return result;
     }
 
@@ -192,6 +208,13 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
         if (fLogLevel != other.fLogLevel) {
             return false;
         }
+        if (fExcludedEvents == null) {
+            if (other.fExcludedEvents != null) {
+                return false;
+            }
+        } else if (!fExcludedEvents.equals(other.fExcludedEvents)) {
+            return false;
+        }
         return true;
     }
 
@@ -215,6 +238,10 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
             if (fFilterExpression != null) {
                 output.append(",Filter=");
                 output.append(fFilterExpression);
+            }
+            if (fExcludedEvents !=  null) {
+                output.append(",Exclusion=");
+                output.append(fExcludedEvents);
             }
             output.append(")]");
             return output.toString();

@@ -54,6 +54,10 @@ public class TraceEventPropertySource extends BasePropertySource {
      * The trace event 'filter' property ID.
      */
     public static final String TRACE_EVENT_FILTER_PROPERTY_ID = "trace.event.filter"; //$NON-NLS-1$
+    /**
+     * The trace event 'exclude' property ID.
+     */
+    public static final String TRACE_EVENT_EXCLUDE_PROPERTY_ID = "trace.event.exclude"; //$NON-NLS-1$
 
     /**
      *  The trace event 'name' property name.
@@ -75,6 +79,10 @@ public class TraceEventPropertySource extends BasePropertySource {
      * The trace event 'filter' property name.
      */
     public static final String TRACE_EVENT_FILTER_PROPERTY_NAME = Messages.TraceControl_FilterPropertyName;
+    /**
+     * The trace event 'exclude' property name.
+     */
+    public static final String TRACE_EVENT_EXCLUDE_PROPERTY_NAME = Messages.TraceControl_ExcludePropertyName;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -113,6 +121,9 @@ public class TraceEventPropertySource extends BasePropertySource {
         if (fEvent.getFilterExpression() != null) {
             list.add(new ReadOnlyTextPropertyDescriptor(TRACE_EVENT_FILTER_PROPERTY_ID, TRACE_EVENT_FILTER_PROPERTY_NAME));
         }
+        if (fEvent.getExcludedEvents() != null && !fEvent.getExcludedEvents().isEmpty()) {
+            list.add(new ReadOnlyTextPropertyDescriptor(TRACE_EVENT_EXCLUDE_PROPERTY_ID, TRACE_EVENT_EXCLUDE_PROPERTY_NAME));
+        }
         return list.toArray(new IPropertyDescriptor[list.size()]);
     }
 
@@ -137,6 +148,9 @@ public class TraceEventPropertySource extends BasePropertySource {
         }
         if (TRACE_EVENT_FILTER_PROPERTY_ID.equals(id)) {
             return fEvent.getFilterExpression();
+        }
+        if (TRACE_EVENT_EXCLUDE_PROPERTY_ID.equals(id)) {
+            return fEvent.getExcludedEvents();
         }
 
         return null;

@@ -86,4 +86,16 @@ public interface IBaseEventInfo extends ITraceInfo {
      */
     void setFilterExpression(String filter);
 
+    /**
+     * Returns the excluded events.
+     * @return excluded events
+     */
+    public String getExcludedEvents();
+
+    /**
+     * Sets the excluded events.
+     * @param events The excluded events to set
+     */
+    public void setExcludedEvents(String events);
+
 }

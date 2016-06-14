@@ -1100,27 +1100,27 @@ public class LTTngControlServiceTest {
             list.add(eventName1);
             list.add(eventName2);
             fShell.setScenario(SCEN_EVENT_HANDLING);
-            fService.enableEvents(sessionName, null, list, true, null, new NullProgressMonitor());
+            fService.enableEvents(sessionName, null, list, true, null, null, new NullProgressMonitor());
 
             // 2) session name, channel=mychannel, event name= null, kernel
             String channelName = "mychannel";
-            fService.enableEvents(sessionName, channelName, null, true, null, new NullProgressMonitor());
+            fService.enableEvents(sessionName, channelName, null, true, null, null, new NullProgressMonitor());
 
             // 3) session name, channel=mychannel, 1 event name, ust, no filter
             String ustEventName = "ust_tests_hello:tptest_sighandler";
             list.clear();
             list.add(ustEventName);
-            fService.enableEvents(sessionName, channelName, list, false, null, new NullProgressMonitor());
+            fService.enableEvents(sessionName, channelName, list, false, null, null, new NullProgressMonitor());
 
             // 4) session name, channel = mychannel, no event name, ust, with filter
-            fService.enableEvents(sessionName, channelName, list, false, "intfield==10", new NullProgressMonitor());
+            fService.enableEvents(sessionName, channelName, list, false, "intfield==10", null, new NullProgressMonitor());
 
             // 5) session name, channel = mychannel, no event name, ust, no filter
             list.clear();
-            fService.enableEvents(sessionName, channelName, list, false, null, new NullProgressMonitor());
+            fService.enableEvents(sessionName, channelName, list, false, null, null, new NullProgressMonitor());
 
             // 6) session name, channel = null,
-            fService.enableEvents(sessionName, null, ILttngControlService.ALL_EVENTS, true, null, new NullProgressMonitor());
+            fService.enableEvents(sessionName, null, ILttngControlService.ALL_EVENTS, true, null, null, new NullProgressMonitor());
 
         } catch (ExecutionException e) {
             fail(e.toString());

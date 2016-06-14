@@ -104,7 +104,7 @@ class NullControlService implements ILttngControlService {
     }
 
     @Override
-    public void enableEvents(String sessionName, String channelName, List<String> eventNames, boolean isKernel, String filterExpression, IProgressMonitor monitor) throws ExecutionException {
+    public void enableEvents(String sessionName, String channelName, List<String> eventNames, boolean isKernel, String filterExpression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
     }
 
     @Override

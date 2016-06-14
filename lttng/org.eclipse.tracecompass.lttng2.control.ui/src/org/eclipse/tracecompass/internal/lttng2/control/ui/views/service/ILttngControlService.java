@@ -242,13 +242,15 @@ public interface ILttngControlService {
      *            - a flag for indicating kernel or UST.
      * @param filterExpression
      *            - a filter expression
+     * @param excludedEvents
+     *            - a list of event names to be excluded, or null
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
     void enableEvents(String sessionName, String channelName,
-            List<String> eventNames, boolean isKernel, String filterExpression,
+            List<String> eventNames, boolean isKernel, String filterExpression, List<String> excludedEvents,
             IProgressMonitor monitor)
             throws ExecutionException;
 

@@ -47,8 +47,8 @@ public class EnableEventOnSessionHandler extends BaseEnableEventHandler {
     // ------------------------------------------------------------------------
 
     @Override
-    public void enableEvents(CommandParameter param, List<String> eventNames, boolean isKernel, String filterExpression, IProgressMonitor monitor) throws ExecutionException {
-        param.getSession().enableEvents(eventNames, isKernel, filterExpression, monitor);
+    public void enableEvents(CommandParameter param, List<String> eventNames, boolean isKernel, String filterExpression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
+        param.getSession().enableEvents(eventNames, isKernel, filterExpression, excludedEvents, monitor);
     }
 
     @Override

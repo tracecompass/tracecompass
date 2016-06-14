@@ -69,12 +69,14 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
      *            - true if kernel domain else false
      * @param filterExpression
      *            - a filter expression
+     * @param excludedEvents
+     *            - list of events to exclude
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails for some reason
      */
-    public abstract void enableEvents(CommandParameter param, List<String> eventNames, boolean isKernel, String filterExpression, IProgressMonitor monitor) throws ExecutionException;
+    public abstract void enableEvents(CommandParameter param, List<String> eventNames, boolean isKernel, String filterExpression,  List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException;
 
     /**
      * Enables all syscall events.
@@ -175,15 +177,15 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
                 try {
                     String filter = dialog.getFilterExpression();
                     if (dialog.isAllEvents()) {
-                        enableEvents(param, ILttngControlService.ALL_EVENTS, dialog.isKernel(), filter, monitor);
+                        enableEvents(param, ILttngControlService.ALL_EVENTS, dialog.isKernel(), filter, dialog.getExcludedEvents(), monitor);
                     } else if (dialog.isTracepoints()) {
                         // Enable tracepoint events
                         if (dialog.isAllTracePoints()) {
-                            enableEvents(param, null, dialog.isKernel(), filter, monitor);
+                            enableEvents(param, null, dialog.isKernel(), filter, dialog.getExcludedEvents(), monitor);
                         } else {
                             List<String> eventNames = dialog.getEventNames();
                             if (!eventNames.isEmpty()) {
-                                enableEvents(param, eventNames, dialog.isKernel(), filter, monitor);
+                                enableEvents(param, eventNames, dialog.isKernel(), filter, dialog.getExcludedEvents(), monitor);
                             }
                         }
                     }
@@ -209,7 +211,7 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
                         eventNames.add(dialog.getWildcard());
 
                         if (!eventNames.isEmpty()) {
-                            enableEvents(param, eventNames, dialog.isKernel(), filter, monitor);
+                            enableEvents(param, eventNames, dialog.isKernel(), filter, dialog.getExcludedEvents(), monitor);
                         }
                     }
 

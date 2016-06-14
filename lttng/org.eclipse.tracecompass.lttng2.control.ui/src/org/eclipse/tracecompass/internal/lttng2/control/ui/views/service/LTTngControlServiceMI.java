@@ -176,7 +176,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
 
     /**
      * Parse LTTng version from a MI command result
-     * 
+     *
      * @param commandResult
      *            the result obtained from a MI command
      * @return the LTTng version
@@ -878,8 +878,22 @@ public class LTTngControlServiceMI extends LTTngControlService {
                         eventInfo.setFilterExpression(infoNode.getTextContent());
                         break;
                     case MIStrings.EXCLUSION:
-                        // TODO: Currently not supported by tmf
-                        // ExclusionS element is ignored
+                        // Before LTTng 2.8: We emulate the non-mi behavior and simply put
+                        // "with exclude"
+                        if (Boolean.TRUE.toString().equals(infoNode.getTextContent())) {
+                            eventInfo.setExcludedEvents(Messages.TraceControl_DefaultEventExcludeString);
+                        }
+                        break;
+                    case MIStrings.EXCLUSIONS:
+                        StringBuilder tmpString = new StringBuilder();
+                        // If there is multiple events excluded.
+                        for (int k = 0; k < infoNode.getChildNodes().getLength(); k++) {
+                            if (k > 0) {
+                                tmpString.append(", "); //$NON-NLS-1$
+                            }
+                            tmpString.append(infoNode.getChildNodes().item(k).getTextContent());
+                        }
+                        eventInfo.setExcludedEvents(tmpString.toString());
                         break;
                     default:
                         break;

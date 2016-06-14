@@ -206,6 +206,9 @@ public final class Messages extends NLS {
     public static String TraceControl_EnableEventsSpecificEventGroupName;
     public static String TraceControl_EnableEventsSpecificEventLabel;
     public static String TraceControl_EnableEventsSpecificEventTooltip;
+    public static String TraceControl_EnableEventsExcludedEventGroupName;
+    public static String TraceControl_EnableEventsExcludedEventLabel;
+    public static String TraceControl_EnableEventsExcludedEventTooltip;
     public static String TraceControl_EnableEventsTracepointGroupName;
     public static String TraceControl_EnableEventsTracepointTreeTooltip;
     public static String TraceControl_EnableEventsTracepointTreeAllLabel;
@@ -234,6 +237,7 @@ public final class Messages extends NLS {
     public static String TraceControl_EnableEventsFilterTooltip;
 
     public static String TraceControl_InvalidProbeNameError;
+    public static String TraceControl_InvalidExcludedEventsError;
     public static String TraceControl_InvalidWildcardError;
     public static String TraceControl_InvalidLogLevelEventNameError;
     public static String TraceControl_InvalidLogLevel;
@@ -273,6 +277,7 @@ public final class Messages extends NLS {
     public static String TraceControl_LogLevelPropertyName;
     public static String TraceControl_FieldsPropertyName;
     public static String TraceControl_FilterPropertyName;
+    public static String TraceControl_ExcludePropertyName;
     public static String TraceControl_StatePropertyName;
     public static String TraceControl_VersionPropertyName;
     public static String TraceControl_DomainNamePropertyName;
@@ -349,6 +354,7 @@ public final class Messages extends NLS {
     public static String TraceControl_DeleteQuery;
 
     public static String TraceControl_DefaultEventFilterString;
+    public static String TraceControl_DefaultEventExcludeString;
 
     static {
         // initialize resource bundle

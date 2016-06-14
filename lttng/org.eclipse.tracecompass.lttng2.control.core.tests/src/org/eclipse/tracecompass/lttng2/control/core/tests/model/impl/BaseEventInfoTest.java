@@ -480,6 +480,25 @@ public class BaseEventInfoTest {
     }
 
     /**
+     * test set excluded events
+     */
+    @Test
+    public void testExcludedEvents() {
+        BaseEventInfo info = new BaseEventInfo((BaseEventInfo)fEventInfo2);
+        String event = "foo";
+        String events = "foo,bar,buz";
+        info.setExcludedEvents(null);
+        assertEquals(null, info.getExcludedEvents());
+
+        info.setExcludedEvents(event);
+        assertEquals(event, info.getExcludedEvents());
+
+        info.setExcludedEvents(events);
+        assertEquals(events, info.getExcludedEvents());
+
+    }
+
+    /**
      * Run the String toString() method test.
      */
     @Test
@@ -493,6 +512,14 @@ public class BaseEventInfoTest {
 
         // add additional test code here
         assertEquals("[BaseEventInfo([TraceInfo(Name=testName)],type=TRACEPOINT,level=TRACE_ERR)]", result);
+
+        fixture.setExcludedEvents(null);
+        result = fixture.toString();
+        assertEquals("[BaseEventInfo([TraceInfo(Name=testName)],type=TRACEPOINT,level=TRACE_ERR)]", result);
+
+        fixture.setExcludedEvents("testExcludedEvent");
+        result = fixture.toString();
+        assertEquals("[BaseEventInfo([TraceInfo(Name=testName)],type=TRACEPOINT,level=TRACE_ERR,Exclusion=testExcludedEvent)]", result);
     }
 
     // ------------------------------------------------------------------------
@@ -509,6 +536,11 @@ public class BaseEventInfoTest {
 
         assertTrue("equals", !fEventInfo1.equals(fEventInfo2));
         assertTrue("equals", !fEventInfo2.equals(fEventInfo1));
+
+        fEventInfo1.setExcludedEvents(null);
+        assertTrue("equals", fEventInfo1.equals(fEventInfo1));
+        fEventInfo1.setExcludedEvents("foo");
+        assertTrue("equals", fEventInfo1.equals(fEventInfo1));
     }
 
     /**
@@ -524,6 +556,18 @@ public class BaseEventInfoTest {
 
         assertTrue("equals", info2.equals(fEventInfo2));
         assertTrue("equals", fEventInfo2.equals(info2));
+
+        info1.setExcludedEvents(null);
+        assertTrue("equals", info1.equals(fEventInfo1));
+        assertTrue("equals", fEventInfo1.equals(info1));
+
+        info1.setExcludedEvents("foo");
+        assertTrue("equals", !info1.equals(fEventInfo1));
+        assertTrue("equals", !fEventInfo1.equals(info1));
+
+        fEventInfo1.setExcludedEvents("foo");
+        assertTrue("equals", info1.equals(fEventInfo1));
+        assertTrue("equals", fEventInfo1.equals(info1));
     }
 
     /**
@@ -535,6 +579,26 @@ public class BaseEventInfoTest {
         BaseEventInfo info2 = new BaseEventInfo((BaseEventInfo)fEventInfo1);
         BaseEventInfo info3 = new BaseEventInfo((BaseEventInfo)fEventInfo1);
 
+        assertTrue("equals", info1.equals(info2));
+        assertTrue("equals", info2.equals(info3));
+        assertTrue("equals", info1.equals(info3));
+
+        info1.setExcludedEvents(null);
+        assertTrue("equals", info1.equals(info2));
+        assertTrue("equals", info2.equals(info3));
+        assertTrue("equals", info1.equals(info3));
+
+        info1.setExcludedEvents("foo");
+        assertTrue("equals", !info1.equals(info2));
+        assertTrue("equals", info2.equals(info3));
+        assertTrue("equals", !info1.equals(info3));
+
+        info2.setExcludedEvents("foo");
+        assertTrue("equals", info1.equals(info2));
+        assertTrue("equals", !info2.equals(info3));
+        assertTrue("equals", !info1.equals(info3));
+
+        info3.setExcludedEvents("foo");
         assertTrue("equals", info1.equals(info2));
         assertTrue("equals", info2.equals(info3));
         assertTrue("equals", info1.equals(info3));
@@ -566,5 +630,17 @@ public class BaseEventInfoTest {
 
         assertTrue("hashCode", fEventInfo1.hashCode() != info2.hashCode());
         assertTrue("hashCode", fEventInfo2.hashCode() != info1.hashCode());
+
+        BaseEventInfo info3 = new BaseEventInfo((BaseEventInfo)fEventInfo1);
+        BaseEventInfo info4 = new BaseEventInfo((BaseEventInfo)fEventInfo1);
+
+        info3.setExcludedEvents(null);
+        assertTrue("hashCode", fEventInfo1.hashCode() == info3.hashCode());
+        info3.setExcludedEvents("foo");
+        assertTrue("hashCode", fEventInfo1.hashCode() != info3.hashCode());
+        assertTrue("hashCode", info3.hashCode() != info4.hashCode());
+        info4.setExcludedEvents("foo");
+        assertTrue("hashCode", info3.hashCode()== info4.hashCode());
+
     }
 }

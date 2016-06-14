@@ -80,4 +80,9 @@ public interface IEnableUstEvents {
      */
     String getFilterExpression();
 
+    /**
+     * @return a list of events to exclude
+     */
+    List<String> getExcludedEvents();
+
 }

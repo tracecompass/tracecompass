@@ -266,6 +266,10 @@ public interface LTTngControlServiceConstants {
      */
     String OPTION_FILTER = "--filter"; //$NON-NLS-1$
     /**
+     * Command line option for configuring excluded event
+     */
+    String OPTION_EXCLUDE = "--exclude"; //$NON-NLS-1$
+    /**
      * Command line option for configuring the streaming network URL (common for control and data channel).
      */
     String OPTION_NETWORK_URL = "-U"; //$NON-NLS-1$

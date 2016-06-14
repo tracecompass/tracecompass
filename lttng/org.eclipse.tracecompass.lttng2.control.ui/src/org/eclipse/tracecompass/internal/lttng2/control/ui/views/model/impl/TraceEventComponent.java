@@ -184,6 +184,22 @@ public class TraceEventComponent extends TraceControlComponent {
     }
 
     /**
+     * Returns excluded events.
+     * @return excluded events
+     */
+    public String getExcludedEvents() {
+        return fEventInfo.getExcludedEvents();
+    }
+
+    /**
+     * Sets the excluded events.
+     * @param events The excluded events to set
+     */
+    public void setExcludedEvents(String events) {
+        fEventInfo.setExcludedEvents(events);
+    }
+
+    /**
      * Returns the log level type
      * @return event log level type
      */

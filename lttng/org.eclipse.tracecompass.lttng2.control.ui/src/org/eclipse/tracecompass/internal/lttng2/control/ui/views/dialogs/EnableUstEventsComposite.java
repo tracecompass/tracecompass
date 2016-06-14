@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -134,7 +135,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
      */
     private String fWildcard;
     /**
-     *The flag indicating that all log level are selected.
+     * The flag indicating that all log level are selected.
      */
     private boolean fIsLogLevel;
     /**
@@ -153,6 +154,22 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
      * The filter expression
      */
     private String fFilterExpression;
+    /**
+    * A button to enable/disable the exclusion of event(s).
+    */
+    private Button fExcludedEventsButton;
+    /**
+    * A Text field for the excluded event(s).
+    */
+    private Text fExcludedEventsText;
+    /**
+     * A list of event(s) to be excluded.
+     */
+    private List<String> fExcludedEvents;
+    /**
+     * The flag indicating that excluded event(s) are selected.
+     */
+    private boolean fIsExcludedEvents;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -222,6 +239,11 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         return fFilterExpression;
     }
 
+    @Override
+    public List<String> getExcludedEvents(){
+        return fExcludedEvents;
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -236,6 +258,9 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
 
         // Wildcard Group
         createWildCardGroup();
+
+        // Exclude event(s)
+        createExcludeGroup();
 
         // Log Level Group
         createLogLevelGroup();
@@ -257,6 +282,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         fIsTracepoints = fTracepointsActivateButton.getSelection();
         fIsWildcard = fWildcardActivateButton.getSelection();
         fIsLogLevel = fLogLevelActivateButton.getSelection();
+        fIsExcludedEvents = fExcludedEventsButton.getSelection();
 
         // initialize tracepoint fields
         fIsAllTracepoints = false;
@@ -285,6 +311,25 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
             }
             fIsAllTracepoints = (nbUstEvents == totalNbEvents);
         }
+
+        // Get the list of event(s) to exclude
+        fExcludedEvents = null;
+        if (fIsExcludedEvents) {
+            String tmpExcludedEvent = fExcludedEventsText.getText();
+            if (tmpExcludedEvent.trim().isEmpty()) {
+                MessageDialog.openError(getShell(),
+                        Messages.TraceControl_EnableEventsDialogTitle,
+                        Messages.TraceControl_InvalidExcludedEventsError);
+
+                return false;
+            }
+            // Format the text to a List<String>
+            // Removing all non visible characters
+            tmpExcludedEvent = tmpExcludedEvent.replaceAll("\\s", ""); //$NON-NLS-1$ //$NON-NLS-2$
+            // Splitting the different events that are separated by commas
+            fExcludedEvents = Arrays.asList(tmpExcludedEvent.split(",")); //$NON-NLS-1$
+        }
+
 
         // initialize log level event name string
         fLogLevelType = LogLevelType.LOGLEVEL_NONE;
@@ -453,6 +498,58 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         data.horizontalSpan = 2;
         fWildcardText.setLayoutData(data);
     }
+
+    /**
+     * Creates exclude events group.
+     */
+    private void createExcludeGroup() {
+        Group excludedEventMainGroup = new Group(this, SWT.SHADOW_NONE);
+        excludedEventMainGroup.setText(Messages.TraceControl_EnableEventsExcludedEventGroupName);
+        GridLayout layout = new GridLayout(2, false);
+        excludedEventMainGroup.setLayout(layout);
+        GridData data = new GridData(GridData.FILL_HORIZONTAL);
+        excludedEventMainGroup.setLayoutData(data);
+
+        Composite buttonComposite = new Composite(excludedEventMainGroup, SWT.NONE);
+        layout = new GridLayout(1, false);
+        buttonComposite.setLayout(layout);
+        data = new GridData(SWT.BEGINNING, SWT.CENTER, false, true);
+        buttonComposite.setLayoutData(data);
+
+        fExcludedEventsButton = new Button(buttonComposite, SWT.CHECK);
+        fExcludedEventsButton.setText(Messages.TraceControl_EnableGroupSelectionName);
+        fExcludedEventsButton.setSelection(false);
+
+        data = new GridData(GridData.FILL_HORIZONTAL);
+        fExcludedEventsButton.setLayoutData(data);
+
+        fExcludedEventsButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                fExcludedEventsText.setEnabled(fExcludedEventsButton.getSelection());
+            }
+        });
+
+        Group excludedEventGroup = new Group(excludedEventMainGroup, SWT.SHADOW_NONE);
+        layout = new GridLayout(3, true);
+        excludedEventGroup.setLayout(layout);
+        data = new GridData(GridData.FILL_HORIZONTAL);
+        excludedEventGroup.setLayoutData(data);
+
+        Label excludedEventLabel = new Label(excludedEventGroup, SWT.LEFT);
+        excludedEventLabel.setText(Messages.TraceControl_EnableEventsExcludedEventLabel);
+
+        data.horizontalSpan = 1;
+        excludedEventLabel.setLayoutData(data);
+
+        fExcludedEventsText = new Text(excludedEventGroup, SWT.LEFT);
+        fExcludedEventsText.setToolTipText(Messages.TraceControl_EnableEventsExcludedEventTooltip);
+        data = new GridData(GridData.FILL_HORIZONTAL);
+        data.horizontalSpan = 2;
+        fExcludedEventsText.setLayoutData(data);
+        fExcludedEventsText.setEnabled(false);
+    }
+
 
     /**
      * Creates log level group.

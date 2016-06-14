@@ -277,6 +277,14 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         return fUstComposite.getFilterExpression();
     }
 
+    @Override
+    public List<String> getExcludedEvents() {
+        if (!fIsKernel) {
+            return fUstComposite.getExcludedEvents();
+        }
+        return null;
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

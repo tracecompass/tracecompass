@@ -44,9 +44,9 @@ public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
     // ------------------------------------------------------------------------
 
     @Override
-    public void enableEvents(CommandParameter param, List<String> eventNames, boolean isKernel, String filterExression, IProgressMonitor monitor) throws ExecutionException {
+    public void enableEvents(CommandParameter param, List<String> eventNames, boolean isKernel, String filterExression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
         if (param instanceof DomainCommandParameter) {
-            ((DomainCommandParameter)param).getDomain().enableEvents(eventNames, filterExression, monitor);
+            ((DomainCommandParameter)param).getDomain().enableEvents(eventNames, filterExression, excludedEvents, monitor);
         }
     }
 

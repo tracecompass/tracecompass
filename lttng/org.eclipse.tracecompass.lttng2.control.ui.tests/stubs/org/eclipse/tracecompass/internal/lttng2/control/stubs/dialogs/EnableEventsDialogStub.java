@@ -48,6 +48,7 @@ public class EnableEventsDialogStub implements IEnableEventsDialog {
     private LogLevelType fLogLevelType;
     private String fFilter;
     private List<String> fNames = new ArrayList<>();
+    private List<String> fExcludedEvents;
 
     // ------------------------------------------------------------------------
     // Accessors
@@ -239,6 +240,11 @@ public class EnableEventsDialogStub implements IEnableEventsDialog {
     @Override
     public String getFilterExpression() {
         return fFilter;
+    }
+
+    @Override
+    public List<String> getExcludedEvents() {
+        return fExcludedEvents;
     }
 
 }

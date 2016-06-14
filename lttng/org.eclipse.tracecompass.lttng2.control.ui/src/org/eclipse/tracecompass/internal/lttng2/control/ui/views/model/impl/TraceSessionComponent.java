@@ -377,15 +377,17 @@ public class TraceSessionComponent extends TraceControlComponent {
      *            - a flag for indicating kernel or UST.
      * @param filterExpression
      *            - a filter expression
+     * @param excludedEvents
+     *            - a list of events to exclude.
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
     public void enableEvents(List<String> eventNames, boolean isKernel,
-            String filterExpression, IProgressMonitor monitor) throws ExecutionException {
+            String filterExpression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
         getControlService().enableEvents(getName(), null, eventNames, isKernel,
-                filterExpression, monitor);
+                filterExpression, excludedEvents, monitor);
     }
 
     /**
