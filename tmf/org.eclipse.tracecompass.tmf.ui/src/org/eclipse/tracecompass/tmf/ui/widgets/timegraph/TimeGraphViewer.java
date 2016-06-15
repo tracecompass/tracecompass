@@ -736,6 +736,10 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         for (ITimeGraphEntry entry : entries) {
             setTimeRange(entry);
         }
+        if (fTime0Bound > fTime1Bound) {
+            fTime0Bound = SWT.DEFAULT;
+            fTime1Bound = SWT.DEFAULT;
+        }
     }
 
     private void setTimeRange(ITimeGraphEntry entry) {
