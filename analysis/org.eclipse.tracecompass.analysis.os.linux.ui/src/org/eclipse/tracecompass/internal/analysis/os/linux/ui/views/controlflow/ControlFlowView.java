@@ -24,10 +24,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
@@ -42,6 +47,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelTidAspect;
 import org.eclipse.tracecompass.common.core.StreamUtils.StreamFlattener;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
@@ -54,11 +60,17 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractStateSystemTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
@@ -68,6 +80,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
@@ -98,6 +111,9 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
     private static final String INVISIBLE_COLUMN = Messages.ControlFlowView_invisibleColumn;
     private Action fOptimizationAction;
 
+    private static final String NEXT_EVENT_ICON_PATH = "icons/elcl16/shift_r_edit.gif"; //$NON-NLS-1$
+    private static final String PREV_EVENT_ICON_PATH = "icons/elcl16/shift_l_edit.gif"; //$NON-NLS-1$
+
     private static final String[] COLUMN_NAMES = new String[] {
             PROCESS_COLUMN,
             TID_COLUMN,
@@ -127,7 +143,22 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
         COLUMN_COMPARATORS = l.toArray(new Comparator[l.size()]);
     }
 
+    /**
+     * Mutex rule for search action jobs, making sure they execute sequentially
+     */
+    private final ISchedulingRule fSearchActionMutexRule = new ISchedulingRule() {
+        @Override
+        public boolean isConflicting(ISchedulingRule rule) {
+            return (rule == this);
+        }
+        @Override
+        public boolean contains(ISchedulingRule rule) {
+            return (rule == this);
+        }
+    };
+
     private final Set<ITmfTrace> fFlatTraces = new HashSet<>();
+
 
     private IAction fFlatAction;
 
@@ -203,6 +234,18 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
         followArrowFwdAction.setText(Messages.ControlFlowView_followCPUFwdText);
         followArrowFwdAction.setToolTipText(Messages.ControlFlowView_followCPUFwdText);
         manager.add(followArrowFwdAction);
+
+        IAction previousEventAction = new SearchEventAction(false, PackageMessages.ControlFlowView_PreviousEventJobName);
+        previousEventAction.setText(PackageMessages.ControlFlowView_PreviousEventActionName);
+        previousEventAction.setToolTipText(PackageMessages.ControlFlowView_PreviousEventActionTooltip);
+        previousEventAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(PREV_EVENT_ICON_PATH));
+        manager.add(previousEventAction);
+
+        IAction nextEventAction = new SearchEventAction(true, PackageMessages.ControlFlowView_NextEventJobName);
+        nextEventAction.setText(PackageMessages.ControlFlowView_NextEventActionName);
+        nextEventAction.setToolTipText(PackageMessages.ControlFlowView_NextEventActionTooltip);
+        nextEventAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(NEXT_EVENT_ICON_PATH));
+        manager.add(nextEventAction);
     }
 
     private IAction getOptimizationAction() {
@@ -226,6 +269,84 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
         item.add(fHierarchicalAction);
         manager.add(item);
 
+    }
+
+    /**
+     * Base Action for the "Go to Next/Previous Event for thread" actions
+     */
+    private class SearchEventAction extends Action {
+
+        private final boolean ifDirection;
+        private final String ifJobName;
+
+        /**
+         * Constructor
+         *
+         * @param direction
+         *            The direction of the search, "true" for forwards and
+         *            "false" for backwards.
+         * @param jobName
+         *            The name of the job that will be spawned
+         */
+        public SearchEventAction(boolean direction, String jobName) {
+            ifDirection = direction;
+            ifJobName = jobName;
+        }
+
+        @Override
+        public void run() {
+            Job job = new Job(ifJobName) {
+                @Override
+                protected IStatus run(IProgressMonitor monitor) {
+                    TimeGraphControl ctrl = getTimeGraphViewer().getTimeGraphControl();
+                    ITimeGraphEntry traceEntry = ctrl.getSelectedTrace();
+
+                    long ts = getTimeGraphViewer().getSelectionBegin();
+                    ITimeEvent selectedState = Utils.findEvent(traceEntry, ts, 0);
+
+                    if (selectedState == null) {
+                        /* No selection currently in the view, do nothing */
+                        return Status.OK_STATUS;
+                    }
+                    ITimeGraphEntry entry = selectedState.getEntry();
+                    if (!(entry instanceof ControlFlowEntry)) {
+                        return Status.OK_STATUS;
+                    }
+                    ControlFlowEntry cfEntry = (ControlFlowEntry) entry;
+                    int tid = cfEntry.getThreadId();
+
+                    ITmfTrace trace = cfEntry.getTrace();
+                    ITmfContext ctx = trace.seekEvent(TmfTimestamp.fromNanos(ts));
+                    long rank = ctx.getRank();
+                    ctx.dispose();
+
+                    Predicate<@NonNull ITmfEvent> predicate = event -> {
+                        /*
+                         * TODO Specific to the Control Flow View and kernel
+                         * traces for now. Could be eventually generalized to
+                         * anything represented by the time graph row.
+                         */
+                        Integer eventTid = KernelTidAspect.INSTANCE.resolve(event);
+                        return (eventTid != null && eventTid.intValue() == tid);
+                    };
+
+                    ITmfEvent event = (ifDirection ?
+                            TmfTraceUtils.getNextEventMatching(cfEntry.getTrace(), rank, predicate, monitor) :
+                            TmfTraceUtils.getPreviousEventMatching(cfEntry.getTrace(), rank, predicate, monitor));
+                    if (event != null) {
+                        TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, event.getTimestamp()));
+                    }
+                    return Status.OK_STATUS;
+
+                }
+            };
+            /*
+             * Make subsequent jobs not run concurrently, but wait after one
+             * another.
+             */
+            job.setRule(fSearchActionMutexRule);
+            job.schedule();
+        }
     }
 
     private IAction createHierarchicalAction() {

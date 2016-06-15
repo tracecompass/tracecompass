@@ -245,6 +245,16 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
+     * Gets the time data provider used by this viewer.
+     *
+     * @return The time data provider, or <code>null</code> if not set
+     * @since 2.1
+     */
+    public ITimeDataProvider getTimeDataProvider() {
+        return fTimeProvider;
+    }
+
+    /**
      * Gets the color map used by this timegraph viewer.
      *
      * @return a color map, or <code>null</code> if not set.
