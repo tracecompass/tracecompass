@@ -16,4 +16,20 @@
 <OutputColumn name="Time Stamp"/>
 <OutputColumn name="Message"/>
 </Definition>
+<Definition name="testtxtevname">
+<TimeStampOutputFormat>dd/MM/yyyy HH:mm:ss:SSS</TimeStampOutputFormat>
+<InputLine>
+<Cardinality max="2147483647" min="0"/>
+<RegEx>(\d*) (.*\S)</RegEx>
+<InputData action="0" format="Tn" name="Time Stamp"/>
+<InputData action="0" format="" name="Event type"/>
+<InputLine>
+<Cardinality max="2147483647" min="0"/>
+<RegEx>(.*\S)</RegEx>
+<InputData action="2" name="Message"/>
+</InputLine>
+</InputLine>
+<OutputColumn name="Time Stamp"/>
+<OutputColumn name="Event type"/>
+</Definition>
 </CustomTxtTraceDefinitionList>

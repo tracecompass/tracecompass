@@ -13,4 +13,17 @@
 <OutputColumn name="Time Stamp"/>
 <OutputColumn name="Message"/>
 </Definition>
+<Definition name="xmlevname">
+<TimeStampOutputFormat>HH:mm:ss:SSS</TimeStampOutputFormat>
+<InputElement name="trace">
+<InputElement logentry="true" name="element">
+<InputData action="0" format="" name="Event type"/>
+<Attribute name="time">
+<InputData action="0" format="Tn" name="Time Stamp"/>
+</Attribute>
+</InputElement>
+</InputElement>
+<OutputColumn name="Time Stamp"/>
+<OutputColumn name="Event type"/>
+</Definition>
 </CustomXMLTraceDefinitionList>
