@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -29,6 +30,7 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 
 import com.google.common.collect.Iterables;
 
@@ -174,5 +176,158 @@ public final class TmfTraceUtils {
             }
         }
         return true;
+    }
+
+    // ------------------------------------------------------------------------
+    // Event matching methods
+    // ------------------------------------------------------------------------
+
+    /**
+     * Retrieve from a trace the next event, from a starting rank, matching the
+     * given predicate.
+     *
+     * @param trace
+     *            The trace
+     * @param startRank
+     *            The rank of the event at which to start searching. Use
+     *            <code>0</code> to search from the start of the trace.
+     * @param predicate
+     *            The predicate to test events against
+     * @return The first event matching the predicate, or null if the end of the
+     *         trace was reached and no event was found
+     */
+    public static @Nullable ITmfEvent getNextEventMatching(ITmfTrace trace, long startRank, Predicate<ITmfEvent> predicate) {
+        /* rank + 1 because we do not want to include the start event itself in the search */
+        EventMatchingRequest req = new EventMatchingRequest(startRank + 1, predicate, false);
+        trace.sendRequest(req);
+        try {
+            req.waitForCompletion();
+        } catch (InterruptedException e) {
+            return null;
+        }
+
+        return req.getFoundEvent();
+    }
+
+    /**
+     * Retrieve from a trace the previous event, from a given rank, matching the
+     * given predicate.
+     *
+     * @param trace
+     *            The trace
+     * @param startRank
+     *            The rank of the event at which to start searching backwards.
+     * @param predicate
+     *            The predicate to test events against
+     * @return The first event found matching the predicate, or null if the
+     *         beginning of the trace was reached and no event was found
+     */
+    public static @Nullable ITmfEvent getPreviousEventMatching(ITmfTrace trace, long startRank, Predicate<ITmfEvent> predicate) {
+        /*
+         * Slightly less straightforward since we unfortunately cannot iterate
+         * backwards on events. Do a series of forward-queries.
+         */
+        final int targetStep = 100;
+
+        /*
+         * If we are close to the beginning of the trace, make sure we only look
+         * for the events before the startRank.
+         */
+        int step = (startRank < targetStep ? (int) startRank : targetStep);
+
+        long currentRank = startRank;
+        try {
+            while (currentRank > 0) {
+                currentRank = Math.max(currentRank - step, 0);
+
+                EventMatchingRequest req = new EventMatchingRequest(currentRank, step, predicate, true);
+                trace.sendRequest(req);
+                req.waitForCompletion();
+
+                ITmfEvent event = req.getFoundEvent();
+                if (event != null) {
+                    /* We found an actual event, return it! */
+                    return event;
+                }
+                /* Keep searching, next loop */
+
+            }
+        } catch (InterruptedException e) {
+            return null;
+        }
+
+        /*
+         * We searched up to the beginning of the trace and didn't find
+         * anything.
+         */
+        return null;
+
+    }
+
+    /**
+     * Event request looking for an event matching a Predicate.
+     */
+    private static class EventMatchingRequest extends TmfEventRequest {
+
+        private final Predicate<ITmfEvent> fPredicate;
+        private final boolean fReturnLast;
+
+        private @Nullable ITmfEvent fFoundEvent = null;
+
+        /**
+         * Basic constructor, will query the trace until the end.
+         *
+         * @param startRank
+         *            The rank at which to start, use 0 for the beginning
+         * @param predicate
+         *            The predicate to test against each event
+         * @param returnLast
+         *            Should we return the last or first event found. If false,
+         *            the request ends as soon as a matching event is found. If
+         *            false, we will go through all events to find a possible
+         *            last-match.
+         */
+        public EventMatchingRequest(long startRank, Predicate<ITmfEvent> predicate, boolean returnLast) {
+            super(ITmfEvent.class, startRank, ALL_DATA, ExecutionType.FOREGROUND);
+            fPredicate = predicate;
+            fReturnLast = returnLast;
+        }
+
+        /**
+         * Basic constructor, will query the trace the limit is reached.
+         *
+         * @param startRank
+         *            The rank at which to start, use 0 for the beginning
+         * @param limit
+         *            The limit on the number of events
+         * @param predicate
+         *            The predicate to test against each event
+         * @param returnLast
+         *            Should we return the last or first event found. If false,
+         *            the request ends as soon as a matching event is found. If
+         *            false, we will go through all events to find a possible
+         *            last-match.
+         */
+        public EventMatchingRequest(long startRank, int limit, Predicate<ITmfEvent> predicate, boolean returnLast) {
+            super(ITmfEvent.class, startRank, limit, ExecutionType.FOREGROUND);
+            fPredicate = predicate;
+            fReturnLast = returnLast;
+        }
+
+        public @Nullable ITmfEvent getFoundEvent() {
+            return fFoundEvent;
+        }
+
+        @Override
+        public void handleData(ITmfEvent event) {
+            super.handleData(event);
+
+            if (fPredicate.test(event)) {
+                fFoundEvent = event;
+                if (!fReturnLast) {
+                    this.done();
+                }
+            }
+        }
     }
 }
