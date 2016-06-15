@@ -84,7 +84,7 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
     public void mouseDown(MouseEvent e) {
         if ((getChartViewer().getWindowDuration() != 0) && (e.button == 1)) {
             fDragBeginMarker = false;
-            if (((e.stateMask & SWT.SHIFT) != SWT.SHIFT) || (fEndTime == fBeginTime)) {
+            if ((e.stateMask & SWT.SHIFT) != SWT.SHIFT) {
                 IAxis xAxis = getChart().getAxisSet().getXAxis(0);
                 fBeginTime = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
                 fEndTime = fBeginTime;
