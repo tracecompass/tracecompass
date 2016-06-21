@@ -195,6 +195,7 @@ public final class TmfTraceUtils {
      *            The predicate to test events against
      * @return The first event matching the predicate, or null if the end of the
      *         trace was reached and no event was found
+     * @since 2.1
      */
     public static @Nullable ITmfEvent getNextEventMatching(ITmfTrace trace, long startRank, Predicate<ITmfEvent> predicate) {
         /* rank + 1 because we do not want to include the start event itself in the search */
@@ -221,6 +222,7 @@ public final class TmfTraceUtils {
      *            The predicate to test events against
      * @return The first event found matching the predicate, or null if the
      *         beginning of the trace was reached and no event was found
+     * @since 2.1
      */
     public static @Nullable ITmfEvent getPreviousEventMatching(ITmfTrace trace, long startRank, Predicate<ITmfEvent> predicate) {
         /*
