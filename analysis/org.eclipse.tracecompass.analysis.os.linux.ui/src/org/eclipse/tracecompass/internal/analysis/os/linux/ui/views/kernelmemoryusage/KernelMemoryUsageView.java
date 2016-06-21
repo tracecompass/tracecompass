@@ -8,6 +8,8 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.kernelmemoryusage;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -18,6 +20,7 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
@@ -34,6 +37,8 @@ public class KernelMemoryUsageView extends TmfChartView {
 
     /** ID string */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.ui.kernelmemoryusageview"; //$NON-NLS-1$
+    /** ID of the Kernel Memory Usage view data in the data map of {@link TmfTraceContext} */
+    public static final @NonNull String KERNEL_MEMORY = ID + ".KERNEL_MEMORY"; //$NON-NLS-1$
 
     /*
      * We need this reference to update the viewer when there is a new selection
@@ -62,6 +67,8 @@ public class KernelMemoryUsageView extends TmfChartView {
                     KernelMemoryUsageEntry entry = (KernelMemoryUsageEntry) structSelection;
                     fTreeViewerReference.setSelectedThread(entry.getTid());
                     ((KernelMemoryUsageViewer) getChartViewer()).setSelectedThread(entry.getTid());
+                    TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+                    ctx.setData(KERNEL_MEMORY, checkNotNull(entry.getTid()));
                 }
             }
         }

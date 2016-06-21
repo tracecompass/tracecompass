@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.widgets.Composite;
@@ -31,6 +32,8 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
@@ -235,14 +238,21 @@ public class KernelMemoryUsageTreeViewer extends AbstractTmfTreeViewer {
     @Override
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
-        setSelectedThread(null);
+        initSelection();
         super.traceSelected(signal);
     }
 
     @Override
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
-        setSelectedThread(null);
+        initSelection();
         super.traceOpened(signal);
+    }
+
+    private void initSelection() {
+        TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+        final @Nullable Object data = ctx.getData(KernelMemoryUsageView.KERNEL_MEMORY);
+        String thread = data instanceof String ? (String) data : null;
+        setSelectedThread(thread);
     }
 }

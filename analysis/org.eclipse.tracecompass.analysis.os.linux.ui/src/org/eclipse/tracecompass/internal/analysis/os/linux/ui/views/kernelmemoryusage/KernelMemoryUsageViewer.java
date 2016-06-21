@@ -26,6 +26,8 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 import org.swtchart.Chart;
@@ -194,15 +196,22 @@ public class KernelMemoryUsageViewer extends TmfCommonXLineChartViewer {
     @Override
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
-        setSelectedThread(NOT_SELECTED);
+        initSelection();
         super.traceSelected(signal);
     }
 
     @Override
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
-        setSelectedThread(NOT_SELECTED);
+        initSelection();
         super.traceOpened(signal);
+    }
+
+    private void initSelection() {
+        TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+        Object data = ctx.getData(KernelMemoryUsageView.KERNEL_MEMORY);
+        String thread = data instanceof String ? (String) data : NOT_SELECTED;
+        setSelectedThread(thread);
     }
 
 }
