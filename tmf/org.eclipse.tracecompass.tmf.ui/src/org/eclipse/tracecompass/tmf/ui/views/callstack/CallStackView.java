@@ -984,14 +984,14 @@ public class CallStackView extends AbstractTimeGraphView {
                             CallStackEntry callStackEntry = (CallStackEntry) entry;
                             ITmfStateSystem ss = callStackEntry.getStateSystem();
                             long time = Math.max(ss.getStartTime(), Math.min(ss.getCurrentEndTime(), viewer.getSelectionBegin()));
-                            ThreadEntry threadEntry = (ThreadEntry) callStackEntry.getParent();
+                            TimeGraphEntry parentEntry = callStackEntry.getParent();
                             int quark = ss.getParentAttributeQuark(callStackEntry.getQuark());
                             ITmfStateInterval stackInterval = ss.querySingleState(time, quark);
                             long newTime = stackInterval.getEndTime() + 1;
                             viewer.setSelectedTimeNotify(newTime, true);
                             stackInterval = ss.querySingleState(Math.min(ss.getCurrentEndTime(), newTime), quark);
                             int stackLevel = stackInterval.getStateValue().unboxInt();
-                            ITimeGraphEntry selectedEntry = threadEntry.getChildren().get(Math.max(0, stackLevel - 1));
+                            ITimeGraphEntry selectedEntry = parentEntry.getChildren().get(Math.max(0, stackLevel - 1));
                             getTimeGraphCombo().setSelection(selectedEntry);
                             viewer.getTimeGraphControl().fireSelectionChanged();
                             startZoomThread(viewer.getTime0(), viewer.getTime1());
@@ -1028,7 +1028,7 @@ public class CallStackView extends AbstractTimeGraphView {
                             CallStackEntry callStackEntry = (CallStackEntry) entry;
                             ITmfStateSystem ss = callStackEntry.getStateSystem();
                             long time = Math.max(ss.getStartTime(), Math.min(ss.getCurrentEndTime(), viewer.getSelectionBegin()));
-                            ThreadEntry threadEntry = (ThreadEntry) callStackEntry.getParent();
+                            TimeGraphEntry parentEntry = callStackEntry.getParent();
                             int quark = ss.getParentAttributeQuark(callStackEntry.getQuark());
                             ITmfStateInterval stackInterval = ss.querySingleState(time, quark);
                             if (stackInterval.getStartTime() == time && time > ss.getStartTime()) {
@@ -1036,7 +1036,7 @@ public class CallStackView extends AbstractTimeGraphView {
                             }
                             viewer.setSelectedTimeNotify(stackInterval.getStartTime(), true);
                             int stackLevel = stackInterval.getStateValue().unboxInt();
-                            ITimeGraphEntry selectedEntry = threadEntry.getChildren().get(Math.max(0, stackLevel - 1));
+                            ITimeGraphEntry selectedEntry = parentEntry.getChildren().get(Math.max(0, stackLevel - 1));
                             getTimeGraphCombo().setSelection(selectedEntry);
                             viewer.getTimeGraphControl().fireSelectionChanged();
                             startZoomThread(viewer.getTime0(), viewer.getTime1());
