@@ -19,8 +19,10 @@ import org.swtchart.IAxis;
 import org.swtchart.Range;
 
 /**
- * Class for providing zooming based on mouse wheel. It centers the zoom on
- * mouse position. It also notifies the viewer about a change of range.
+ * Class for providing zooming and scrolling based on mouse wheel. For zooming,
+ * it centers the zoom on mouse position. For scrolling, it will move the zoom
+ * window to another position while maintaining the window size. It also
+ * notifies the viewer about a change of range.
  *
  * @author Bernd Hufmann
  */
@@ -74,10 +76,39 @@ public class TmfMouseWheelZoomProvider extends TmfBaseProvider implements MouseW
         ITmfChartTimeProvider viewer = getChartViewer();
 
         final int count = event.count;
-        if (count != 0 && (event.stateMask & SWT.CTRL) != 0) {
-            final int x = event.x;
-            zoom(viewer, count, x);
+        if (count != 0) {
+            if ((event.stateMask & SWT.CTRL) != 0) {
+                final int x = event.x;
+                zoom(viewer, count, x);
+            } else if ((event.stateMask & SWT.SHIFT) != 0) {
+                scroll(viewer, count);
+            }
         }
+    }
+
+    private void scroll(ITmfChartTimeProvider viewer, int count) {
+        IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+
+        long windowStartTime = viewer.getWindowStartTime();
+        long windowsEndTime = viewer.getWindowEndTime();
+
+        long startTime = viewer.getStartTime();
+        long endTime = viewer.getEndTime();
+
+        long range = windowsEndTime - windowStartTime;
+        if (range <= 0) {
+            return;
+        }
+        long increment = Math.max(1, range / 2);
+        if (count > 0) {
+            windowStartTime = Math.max(windowStartTime - increment, startTime);
+            windowsEndTime = windowStartTime + range;
+        } else {
+            windowsEndTime = Math.min(windowsEndTime + increment, endTime);
+            windowStartTime = windowsEndTime - range;
+        }
+        viewer.updateWindow(windowStartTime, windowsEndTime);
+        xAxis.setRange(new Range(windowStartTime - viewer.getTimeOffset(), windowsEndTime - viewer.getTimeOffset()));
     }
 
     private void zoom(ITmfChartTimeProvider viewer, final int count, final int x) {
@@ -96,7 +127,8 @@ public class TmfMouseWheelZoomProvider extends TmfBaseProvider implements MouseW
         }
         newDuration = Math.max(MIN_WINDOW_SIZE, newDuration);
 
-        // Center the zoom on mouse position, distribute new duration and adjust for boundaries.
+        // Center the zoom on mouse position, distribute new duration and adjust
+        // for boundaries.
         IAxis xAxis = getChart().getAxisSet().getXAxis(0);
         long timeAtXPos = limitXDataCoordinate(xAxis.getDataCoordinate(x)) + viewer.getTimeOffset();
         // Note: ratio = newDuration/oldDuration
@@ -105,7 +137,7 @@ public class TmfMouseWheelZoomProvider extends TmfBaseProvider implements MouseW
         newWindowStartTime = validateWindowStartTime(newWindowStartTime);
         viewer.updateWindow(newWindowStartTime, newWindowEndTime);
         xAxis.setRange(new Range(newWindowStartTime - viewer.getTimeOffset(),
-            newWindowEndTime - viewer.getTimeOffset()));
+                newWindowEndTime - viewer.getTimeOffset()));
     }
 
     // ------------------------------------------------------------------------
