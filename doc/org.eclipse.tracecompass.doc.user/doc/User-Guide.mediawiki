@@ -845,7 +845,7 @@ To modify the time of attributes shown in the view, select a different current t
 
 == External Analyses ==
 
-Trace Compass supports the execution of '''external analyses''' conforming to the machine interface of [http://github.com/lttng/lttng-analyses LTTng analyses] 0.4. Later versions of LTTng analyses are supported by later versions of Trace Compass.
+Trace Compass supports the execution of '''external analyses''' conforming to the machine interface of [https://github.com/lttng/lttng-analyses/releases/tag/v0.4.3 LTTng-Analyses 0.4.3], or any later [https://github.com/lttng/lttng-analyses/releases LTTng-Analyses 0.4.x] version. Later (0.5+) versions of LTTng-Analyses will be supported by later versions of Trace Compass.
 
 An external analysis is a [[#Run an External Analysis|program executed by Trace Compass]]. When the program is done analyzing, Trace Compass generates a '''[[#Open a Report|report]]''' containing its results. A report contains one or more tables which can also be viewed as bar and scatter [[#Create a Chart from a Result Table|charts]].
 
