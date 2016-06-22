@@ -17,6 +17,7 @@ package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
 import static org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory.withPartName;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -25,6 +26,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
@@ -39,6 +41,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
@@ -565,5 +568,93 @@ public final class ConditionHelpers {
      */
     public static ICondition timeGraphIsReadyCondition(AbstractTimeGraphView view, @NonNull TmfTimeRange selectionRange, @NonNull ITmfTimestamp visibleTime) {
         return new TimeGraphIsReadyCondition(view, selectionRange, visibleTime);
+    }
+
+    private static class NumberOfEventsCondition extends DefaultCondition {
+
+        private ITmfTrace fTrace;
+        private long fNbEvents;
+
+        private NumberOfEventsCondition(ITmfTrace trace, long nbEvents) {
+            fTrace = trace;
+            fNbEvents = nbEvents;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            return fTrace.getNbEvents() == fNbEvents;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return fTrace.getName() + " did not contain the expected number of " + fNbEvents + " events. Current: " + fTrace.getNbEvents();
+        }
+    }
+
+    /**
+     * Wait until the trace contains the specified number of events.
+     *
+     * @param trace
+     *            the trace
+     * @param nbEvents
+     *            the number of events to wait for
+     * @return ICondition for verification
+     */
+    public static ICondition numberOfEventsInTrace(ITmfTrace trace, long nbEvents) {
+        return new NumberOfEventsCondition(trace, nbEvents);
+    }
+
+    /**
+     * Wait until there is an active events editor. A title can also be
+     * specified to wait until a more specific editor.
+     */
+    public static final class ActiveEventsEditor extends DefaultCondition {
+        private final SWTWorkbenchBot fWorkbenchBot;
+        private SWTBotEditor fEditor;
+        private String fEditorTitle;
+
+        /**
+         * Wait until there is an active events editor.
+         *
+         * @param workbenchBot
+         *            a workbench bot
+         * @param editorTitle
+         *            If specified, wait until an active events editor with this
+         *            title. Can be set to null.
+         */
+        public ActiveEventsEditor(SWTWorkbenchBot workbenchBot, String editorTitle) {
+            fWorkbenchBot = workbenchBot;
+            fEditorTitle = editorTitle;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            List<SWTBotEditor> editors = fWorkbenchBot.editors(WidgetMatcherFactory.withPartId(TmfEventsEditor.ID));
+            for (SWTBotEditor e : editors) {
+                // We are careful not to call e.getWidget() here because it actually forces the editor to show.
+                // This is especially a problem for cases where we wait until there is no active editor.
+                if (e.isActive()) {
+                    if (fEditorTitle != null && !fEditorTitle.equals(e.getTitle())) {
+                        return false;
+                    }
+                    fEditor = e;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            String editorMessage = fEditorTitle != null ? " " + fEditorTitle : "";
+            return "Active events editor" + editorMessage + " not found";
+        }
+
+        /**
+         * @return The active editor found
+         */
+        public SWTBotEditor getActiveEditor() {
+            return fEditor;
+        }
     }
 }

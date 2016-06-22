@@ -699,6 +699,11 @@ public final class SWTBotUtils {
     public static SWTBotTreeItem selectProject(SWTWorkbenchBot bot, String projectName) {
         SWTBotView projectExplorerBot = bot.viewByTitle("Project Explorer");
         projectExplorerBot.show();
+        // FIXME: Bug 496519. Sometimes, the tree becomes disabled for a certain
+        // amount of time. This can happen during a long running operation
+        // (BusyIndicator.showWhile) which brings up the modal dialog "operation
+        // in progress" and this disables all shells
+        projectExplorerBot.bot().waitUntil(Conditions.widgetIsEnabled(projectExplorerBot.bot().tree()));
         SWTBotTreeItem treeItem = projectExplorerBot.bot().tree().getTreeItem(projectName);
         treeItem.select();
         return treeItem;
@@ -839,26 +844,26 @@ public final class SWTBotUtils {
      * @return the active events editor
      */
     public static SWTBotEditor activeEventsEditor(final SWTWorkbenchBot workbenchBot) {
-        final SWTBotEditor editor[] = new SWTBotEditor[1];
-        workbenchBot.waitUntil(new DefaultCondition() {
-            @Override
-            public boolean test() throws Exception {
-                List<SWTBotEditor> editors = workbenchBot.editors(WidgetMatcherFactory.withPartId(TmfEventsEditor.ID));
-                for (SWTBotEditor e : editors) {
-                    if (e.isActive() && !e.getWidget().isDisposed()) {
-                        editor[0] = e;
-                        return true;
-                    }
-                }
-                return false;
-            }
+        ConditionHelpers.ActiveEventsEditor condition = new ConditionHelpers.ActiveEventsEditor(workbenchBot, null);
+        workbenchBot.waitUntil(condition);
+        return condition.getActiveEditor();
+    }
 
-            @Override
-            public String getFailureMessage() {
-                return "Active events editor not found";
-            }
-        });
-        return editor[0];
+    /**
+     * Get the active events editor. Note that this will wait until such editor
+     * is available.
+     *
+     * @param workbenchBot
+     *            a given workbench bot
+     * @param editorTitle
+     *            the desired editor title. If null, any active events editor
+     *            will be considered valid.
+     * @return the active events editor
+     */
+    public static SWTBotEditor activeEventsEditor(final SWTWorkbenchBot workbenchBot, String editorTitle) {
+        ConditionHelpers.ActiveEventsEditor condition = new ConditionHelpers.ActiveEventsEditor(workbenchBot, editorTitle);
+        workbenchBot.waitUntil(condition);
+        return condition.getActiveEditor();
     }
 
     /**
