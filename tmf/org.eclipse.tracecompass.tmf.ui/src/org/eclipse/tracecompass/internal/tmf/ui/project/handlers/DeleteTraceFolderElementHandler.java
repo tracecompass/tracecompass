@@ -27,6 +27,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -238,10 +240,13 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
 
         // Confirm the operation
         Shell shell = window.getShell();
-        MessageBox confirmOperation = new MessageBox(shell, SWT.ICON_QUESTION | SWT.CANCEL | SWT.OK);
-        confirmOperation.setText(getTitle(deleteType));
-        confirmOperation.setMessage(getMessage(deleteType));
-        if (confirmOperation.open() != SWT.OK) {
+        MessageDialog dialog = new MessageDialog(shell, getTitle(deleteType), null, getMessage(deleteType), MessageDialog.QUESTION, 1, new String[] { IDialogConstants.YES_LABEL,
+                IDialogConstants.NO_LABEL }) {
+            {
+                setShellStyle(SWT.SHEET);
+            }
+        };
+        if (dialog.open() != 0) {
             return null;
         }
 
