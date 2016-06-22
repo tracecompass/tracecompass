@@ -47,6 +47,7 @@ import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.ui.IEditorReference;
 import org.hamcrest.Matcher;
+import org.swtchart.Chart;
 
 /**
  * Is a tree node available
@@ -656,5 +657,46 @@ public final class ConditionHelpers {
         public SWTBotEditor getActiveEditor() {
             return fEditor;
         }
+    }
+
+    private static class NumberOfSeries extends DefaultCondition {
+        private String fFailureMessage;
+        private Chart fChart;
+        private final int fNumberOfSeries;
+
+        public NumberOfSeries(Chart chart, int numberOfSeries) {
+            fChart = chart;
+            fNumberOfSeries = numberOfSeries;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            int length = fChart.getSeriesSet().getSeries().length;
+            if (length != fNumberOfSeries){
+                fFailureMessage = "Chart did not contain the expected number series. Actual " + length + ", expected " + fNumberOfSeries;
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return fFailureMessage;
+        }
+    }
+
+    /**
+     * Wait until the chart has the specified number of series.
+     *
+     * @param chart
+     *            the chart
+     * @param numberOfSeries
+     *            the number of expected series
+     *
+     * @return ICondition for verification
+     */
+    public static ICondition numberOfSeries(Chart chart, int numberOfSeries) {
+        return new NumberOfSeries(chart, numberOfSeries);
     }
 }

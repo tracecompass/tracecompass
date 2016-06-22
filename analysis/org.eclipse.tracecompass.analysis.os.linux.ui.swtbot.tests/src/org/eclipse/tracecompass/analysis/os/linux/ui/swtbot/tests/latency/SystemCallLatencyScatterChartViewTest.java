@@ -167,6 +167,8 @@ public class SystemCallLatencyScatterChartViewTest {
 
         final Chart scatterChart = fScatterChart;
         assertNotNull(scatterChart);
+        bot.waitUntil(ConditionHelpers.numberOfSeries(scatterChart, 1));
+
         SWTBotChart chartBot = new SWTBotChart(scatterChart);
         assertVisible(chartBot);
         assertEquals("", chartBot.getToolTipText());

@@ -191,6 +191,8 @@ public class SystemCallLatencyDensityViewTest {
         bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1001046400", 0, 2));
         final Chart densityChart = fDensityChart;
         assertNotNull(densityChart);
+        bot.waitUntil(ConditionHelpers.numberOfSeries(densityChart, 1));
+
         SWTBotChart chartBot = new SWTBotChart(densityChart);
         assertVisible(chartBot);
         assertEquals("", chartBot.getToolTipText());

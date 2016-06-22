@@ -40,7 +40,8 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.tracecompass.tmf.pcap.ui.swtbot.tests,
  org.eclipse.tracecompass.tmf.remote.core.tests,
  org.eclipse.tracecompass.tmf.remote.ui.tests,
- org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests
+ org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests,
+ org.eclipse.tracecompass.tmf.analysis.xml.ui.swtbot.tests
 Export-Package: org.eclipse.tracecompass.alltests;x-internal:=true,
  org.eclipse.tracecompass.alltests.perf;x-internal:=true,
  org.eclipse.tracecompass.alltests.swtbot;x-internal:=true

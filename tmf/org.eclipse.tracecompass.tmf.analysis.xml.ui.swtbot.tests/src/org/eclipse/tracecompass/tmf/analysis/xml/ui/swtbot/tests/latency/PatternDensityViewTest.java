@@ -127,6 +127,8 @@ public class PatternDensityViewTest extends PatternLatencyViewTestBase {
         //Test the chart content
         final Chart densityChart = fDensityChart;
         assertNotNull(densityChart);
+        fBot.waitUntil(ConditionHelpers.numberOfSeries(densityChart, 1));
+
         SWTBotChart chartBot = new SWTBotChart(densityChart);
         assertVisible(chartBot);
 
