@@ -517,6 +517,10 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
     }
 
     private void parseElement(final Element element, final CustomXmlEvent event, final CustomXmlInputElement inputElement) {
+        String eventType = inputElement.getEventType();
+        if (eventType != null && event.getType() instanceof CustomEventType) {
+            ((CustomEventType) event.getType()).setName(eventType);
+        }
         if (inputElement.getInputName() != null && !inputElement.getInputName().equals(CustomXmlTraceDefinition.TAG_IGNORE)) {
             event.parseInput(parseElement(element, new StringBuffer()).toString(), inputElement.getInputName(), inputElement.getInputAction(), inputElement.getInputFormat());
         }

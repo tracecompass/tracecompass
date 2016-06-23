@@ -31,6 +31,8 @@ public class Messages extends NLS {
     public static String CustomTxtTraceDefinition_category;
     public static String CustomTxtTraceDefinition_definition;
     public static String CustomTxtTraceDefinition_definitionRootElement;
+    /** @since 2.1 */
+    public static String CustomTxtTraceDefinition_eventType;
     public static String CustomTxtTraceDefinition_format;
     public static String CustomTxtTraceDefinition_inputData;
     public static String CustomTxtTraceDefinition_inputLine;
@@ -45,6 +47,8 @@ public class Messages extends NLS {
     public static String CustomXmlTraceDefinition_category;
     public static String CustomXmlTraceDefinition_definition;
     public static String CustomXmlTraceDefinition_definitionRootElement;
+    /** @since 2.1 */
+    public static String CustomXmlTraceDefinition_eventType;
     public static String CustomXmlTraceDefinition_format;
     public static String CustomXmlTraceDefinition_ignoreTag;
     public static String CustomXmlTraceDefinition_inputData;

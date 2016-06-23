@@ -1051,6 +1051,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         private Label cardinalityMaxLabel;
         private Text cardinalityMaxText;
         private Button infiniteButton;
+        private Button eventTypeButton;
+        private Text eventTypeText;
         private List<InputGroup> inputs = new ArrayList<>();
         private Button addGroupButton;
         private Label addGroupLabel;
@@ -1224,6 +1226,35 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             cardinalityMinText.addVerifyListener(digitsListener);
             cardinalityMaxText.addVerifyListener(digitsListener);
 
+            eventTypeButton = new Button(group, SWT.CHECK);
+            eventTypeButton.setText(Messages.CustomTxtParserInputWizardPage_eventType);
+            eventTypeButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+            eventTypeButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    if (eventTypeButton.getSelection()) {
+                        eventTypeText.setEnabled(true);
+                    } else {
+                        eventTypeText.setEnabled(false);
+                    }
+                }
+            });
+            eventTypeButton.addSelectionListener(updateListener);
+
+            eventTypeText = new Text(group, SWT.BORDER | SWT.SINGLE);
+            gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
+            gd.widthHint = 0;
+            eventTypeText.setLayoutData(gd);
+            if (inputLine.eventType != null) {
+                eventTypeText.setText(inputLine.eventType);
+                eventTypeButton.setSelection(true);
+            } else {
+                eventTypeText.setEnabled(false);
+                eventTypeButton.setSelection(false);
+            }
+            eventTypeText.addModifyListener(updateListener);
+
+
             if (inputLine.columns != null) {
                 for (InputData inputData : inputLine.columns) {
                     InputGroup inputGroup = new InputGroup(group, this, inputs.size() + 1);
@@ -1301,6 +1332,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
         private void extractInputs() {
             inputLine.setRegex(selectedLine.regexText.getText());
+            inputLine.eventType = selectedLine.eventTypeButton.getSelection() ? selectedLine.eventTypeText.getText().trim() : null;
             switch (cardinalityCombo.getSelectionIndex()) {
             case 0:
                 inputLine.cardinality = Cardinality.ZERO_OR_MORE;
@@ -1622,6 +1654,16 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         } else {
             if (line != null) {
                 line.cardinalityMaxText.setBackground(COLOR_TEXT_BACKGROUND);
+            }
+        }
+        if (inputLine.eventType != null && inputLine.eventType.trim().isEmpty()) {
+            errors.append("Enter the event type (Line " + name + "). "); //$NON-NLS-1$ //$NON-NLS-2$
+            if (line != null) {
+                line.eventTypeText.setBackground(COLOR_LIGHT_RED);
+            }
+        } else {
+            if (line != null) {
+                line.eventTypeText.setBackground(COLOR_TEXT_BACKGROUND);
             }
         }
         for (int i = 0; inputLine.columns != null && i < inputLine.columns.size(); i++) {

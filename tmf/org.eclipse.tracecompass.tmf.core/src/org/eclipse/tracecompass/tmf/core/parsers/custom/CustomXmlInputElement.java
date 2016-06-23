@@ -48,6 +48,9 @@ public final class CustomXmlInputElement {
     /** Child elements */
     private List<CustomXmlInputElement> fChildElements;
 
+    /** Event type associated with this input element */
+    private String fEventType;
+
     /**
      * Default (empty) constructor
      */
@@ -203,6 +206,23 @@ public final class CustomXmlInputElement {
      */
     public void setInputName(String inputName) {
         fInputName = inputName;
+    }
+
+    /**
+     * @return the eventType, or null
+     * @since 2.1
+     */
+    public String getEventType() {
+        return fEventType;
+    }
+
+    /**
+     * @param eventType
+     *            the eventType to set, or null
+     * @since 2.1
+     */
+    public void setEventType(String eventType) {
+        fEventType = eventType;
     }
 
     /**

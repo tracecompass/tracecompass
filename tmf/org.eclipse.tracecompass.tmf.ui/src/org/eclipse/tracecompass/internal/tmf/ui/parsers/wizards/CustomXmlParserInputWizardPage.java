@@ -872,6 +872,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         private Label previewLabel;
         private Text previewText;
         private Button logEntryButton;
+        private Button eventTypeButton;
+        private Text eventTypeText;
         private Label fillerLabel;
         private Composite addAttributeComposite;
         private Button addAttributeButton;
@@ -1032,6 +1034,34 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     tagText.setText(inputElement.getInputName());
                     tagText.addModifyListener(updateListener);
                 }
+
+                eventTypeButton = new Button(group, SWT.CHECK);
+                eventTypeButton.setText(Messages.CustomTxtParserInputWizardPage_eventType);
+                eventTypeButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+                eventTypeButton.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        if (eventTypeButton.getSelection()) {
+                            eventTypeText.setEnabled(true);
+                        } else {
+                            eventTypeText.setEnabled(false);
+                        }
+                    }
+                });
+                eventTypeButton.addSelectionListener(updateListener);
+
+                eventTypeText = new Text(group, SWT.BORDER | SWT.SINGLE);
+                gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
+                gd.widthHint = 0;
+                eventTypeText.setLayoutData(gd);
+                if (inputElement.getEventType() != null) {
+                    eventTypeText.setText(inputElement.getEventType());
+                    eventTypeButton.setSelection(true);
+                } else {
+                    eventTypeText.setEnabled(false);
+                    eventTypeButton.setSelection(false);
+                }
+                eventTypeText.addModifyListener(updateListener);
             }
 
             if (inputElement.getAttributes() != null) {
@@ -1191,6 +1221,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             inputElement.setElementName(elementNameText.getText().trim());
             if (inputElement.getParentElement() != null) {
                 inputElement.setLogEntry(logEntryButton.getSelection());
+                inputElement.setEventType(eventTypeButton.getSelection() ? eventTypeText.getText().trim() : null);
                 if (tagCombo.getText().equals(CustomTraceDefinition.TAG_OTHER)) {
                     inputElement.setInputName(tagText.getText().trim());
                 } else {
@@ -1632,6 +1663,16 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             } else {
                 if (elementNode != null) {
                     elementNode.tagText.setBackground(COLOR_TEXT_BACKGROUND);
+                }
+            }
+            if (inputElement.getEventType() != null && inputElement.getEventType().trim().isEmpty()) {
+                errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_emptyEventTypeError, getName(inputElement)));
+                if (elementNode != null) {
+                    elementNode.eventTypeText.setBackground(COLOR_LIGHT_RED);
+                }
+            } else {
+                if (elementNode != null) {
+                    elementNode.eventTypeText.setBackground(COLOR_TEXT_BACKGROUND);
                 }
             }
         }

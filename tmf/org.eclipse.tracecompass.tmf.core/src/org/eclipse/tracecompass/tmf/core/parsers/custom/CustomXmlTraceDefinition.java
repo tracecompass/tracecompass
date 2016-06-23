@@ -106,6 +106,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
     private static final String CATEGORY_ATTRIBUTE = Messages.CustomXmlTraceDefinition_category;
     private static final String NAME_ATTRIBUTE = Messages.CustomXmlTraceDefinition_name;
     private static final String LOG_ENTRY_ATTRIBUTE = Messages.CustomXmlTraceDefinition_logEntry;
+    private static final String EVENT_TYPE_ATTRIBUTE = Messages.CustomXmlTraceDefinition_eventType;
     private static final String TIME_STAMP_OUTPUT_FORMAT_ELEMENT = Messages.CustomXmlTraceDefinition_timestampOutputFormat;
     private static final String INPUT_ELEMENT_ELEMENT = Messages.CustomXmlTraceDefinition_inputElement;
     private static final String ATTRIBUTE_ELEMENT = Messages.CustomXmlTraceDefinition_attribute;
@@ -231,6 +232,10 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
 
         if (inputElement.isLogEntry()) {
             inputElementElement.setAttribute(LOG_ENTRY_ATTRIBUTE, Boolean.toString(inputElement.isLogEntry()));
+        }
+
+        if (inputElement.getEventType() != null) {
+            inputElementElement.setAttribute(EVENT_TYPE_ATTRIBUTE, inputElement.getEventType());
         }
 
         if (inputElement.getParentElement() != null) {
@@ -532,6 +537,8 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         CustomXmlInputElement inputElement = new CustomXmlInputElement();
         inputElement.setElementName(inputElementElement.getAttribute(NAME_ATTRIBUTE));
         inputElement.setLogEntry((Boolean.toString(true).equals(inputElementElement.getAttribute(LOG_ENTRY_ATTRIBUTE))) ? true : false);
+        String eventType = inputElementElement.getAttribute(EVENT_TYPE_ATTRIBUTE);
+        inputElement.setEventType(eventType.isEmpty() ? null : eventType);
         NodeList nodeList = inputElementElement.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);

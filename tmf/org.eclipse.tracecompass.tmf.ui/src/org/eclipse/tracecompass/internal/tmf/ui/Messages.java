@@ -184,6 +184,7 @@ public class Messages extends NLS {
     public static String CustomTxtParserInputWizardPage_category;
     public static String CustomTxtParserInputWizardPage_desccriptionEdit;
     public static String CustomTxtParserInputWizardPage_descriptionNew;
+    public static String CustomTxtParserInputWizardPage_eventType;
     public static String CustomTxtParserInputWizardPage_format;
     public static String CustomTxtParserInputWizardPage_group;
     public static String CustomTxtParserInputWizardPage_highlightAll;
@@ -223,6 +224,7 @@ public class Messages extends NLS {
     public static String CustomTxtParserOutputWizardPage_moveBefore;
     public static String CustomTxtParserOutputWizardPage_visible;
     public static String CustomXmlParserInputWizardPage_emptyCategoryError;
+    public static String CustomXmlParserInputWizardPage_emptyEventTypeError;
     public static String CustomXmlParserInputWizardPage_emptyLogTypeError;
     public static String CustomXmlParserInputWizardPage_invalidCategoryError;
     public static String CustomXmlParserInputWizardPage_invalidLogTypeError;

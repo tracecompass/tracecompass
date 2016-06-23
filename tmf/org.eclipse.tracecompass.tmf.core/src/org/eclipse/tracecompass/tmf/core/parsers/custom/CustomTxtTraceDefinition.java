@@ -107,6 +107,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     private static final String MIN_ATTRIBUTE = Messages.CustomTxtTraceDefinition_min;
     private static final String MAX_ATTRIBUTE = Messages.CustomTxtTraceDefinition_max;
     private static final String REGEX_ELEMENT = Messages.CustomTxtTraceDefinition_regEx;
+    private static final String EVENT_TYPE_ELEMENT = Messages.CustomTxtTraceDefinition_eventType;
     private static final String INPUT_DATA_ELEMENT = Messages.CustomTxtTraceDefinition_inputData;
     private static final String ACTION_ATTRIBUTE = Messages.CustomTxtTraceDefinition_action;
     private static final String FORMAT_ATTRIBUTE = Messages.CustomTxtTraceDefinition_format;
@@ -164,6 +165,10 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
         /** Children of this line (if one "event" spans many lines) */
         public List<InputLine> childrenInputs;
+
+        /** Event type associated with this line
+         * @since 2.1*/
+        public String eventType;
 
         private String regex;
         private Pattern pattern;
@@ -563,6 +568,12 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         inputLineElement.appendChild(regexElement);
         regexElement.appendChild(doc.createTextNode(inputLine.regex));
 
+        if (inputLine.eventType != null) {
+            Element eventTypeElement = doc.createElement(EVENT_TYPE_ELEMENT);
+            inputLineElement.appendChild(eventTypeElement);
+            eventTypeElement.appendChild(doc.createTextNode(inputLine.eventType));
+        }
+
         if (inputLine.columns != null) {
             for (InputData inputData : inputLine.columns) {
                 Element inputDataElement = doc.createElement(INPUT_DATA_ELEMENT);
@@ -826,6 +837,9 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             } else if (nodeName.equals(REGEX_ELEMENT)) {
                 Element regexElement = (Element) node;
                 inputLine.regex = regexElement.getTextContent();
+            } else if (nodeName.equals(EVENT_TYPE_ELEMENT)) {
+                Element eventTypeElement = (Element) node;
+                inputLine.eventType = eventTypeElement.getTextContent();
             } else if (nodeName.equals(INPUT_DATA_ELEMENT)) {
                 Element inputDataElement = (Element) node;
                 InputData inputData = new InputData();

@@ -83,6 +83,9 @@ public class CustomTxtEvent extends CustomEvent {
      *            The regex matcher to use
      */
     public void processGroups(InputLine input, Matcher matcher) {
+        if (input.eventType != null) {
+            fData.put(CustomTraceDefinition.TAG_EVENT_TYPE, input.eventType);
+        }
         if (input.columns == null) {
             return;
         }
