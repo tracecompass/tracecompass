@@ -98,8 +98,10 @@ class HT_IO {
 
                     LOGGER.finest(() -> "[HtIo:CacheMiss] seqNum=" + seqNb); //$NON-NLS-1$
 
-                    io.seekFCToNodePos(io.fFileChannelIn, seqNb);
-                    return HTNode.readNode(io.fConfig, io.fFileChannelIn);
+                    synchronized (io) {
+                        io.seekFCToNodePos(io.fFileChannelIn, seqNb);
+                        return HTNode.readNode(io.fConfig, io.fFileChannelIn);
+                    }
                 }
             }));
 
@@ -175,7 +177,7 @@ class HT_IO {
      *             reading. Instead of using a big reader-writer lock, we'll
      *             just catch this exception.
      */
-    public synchronized @NonNull HTNode readNode(int seqNumber) throws ClosedChannelException {
+    public @NonNull HTNode readNode(int seqNumber) throws ClosedChannelException {
         /* Do a cache lookup. If it's not present it will be loaded from disk */
         LOGGER.finest(() -> "[HtIo:CacheLookup] seqNum=" + seqNumber); //$NON-NLS-1$
         CacheKey key = new CacheKey(this, seqNumber);
@@ -196,7 +198,7 @@ class HT_IO {
         }
     }
 
-    public synchronized void writeNode(HTNode node) {
+    public void writeNode(HTNode node) {
         try {
             int seqNumber = node.getSequenceNumber();
 
@@ -205,8 +207,10 @@ class HT_IO {
             NODE_CACHE.put(key, node);
 
             /* Position ourselves at the start of the node and write it */
-            seekFCToNodePos(fFileChannelOut, seqNumber);
-            node.writeSelf(fFileChannelOut);
+            synchronized (this) {
+                seekFCToNodePos(fFileChannelOut, seqNumber);
+                node.writeSelf(fFileChannelOut);
+            }
         } catch (IOException e) {
             /* If we were able to open the file, we should be fine now... */
             Activator.getDefault().logError(e.getMessage(), e);
