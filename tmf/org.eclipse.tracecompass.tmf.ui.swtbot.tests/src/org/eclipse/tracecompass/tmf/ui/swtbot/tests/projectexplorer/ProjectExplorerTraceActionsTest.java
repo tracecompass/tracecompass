@@ -126,6 +126,13 @@ public class ProjectExplorerTraceActionsTest {
 
     /**
      * Test that the expected context menu items are there
+     * <p>
+     * Action : Trace menu
+     * <p>
+     * Procedure :Select an LTTng trace and open its context menu
+     * <p>
+     * Expected Results: Correct menu opens (Open , Copy, Rename, …)
+     *
      */
     @Test
     public void test4_01ContextMenuPresence() {
@@ -133,7 +140,8 @@ public class ProjectExplorerTraceActionsTest {
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
 
         final List<String> EXPECTED_MENU_LABELS = ImmutableList.of(
-                "&Open\tShift+Ctrl+R", "Open With", "&Copy...\tCtrl+C", "Rena&me...\tF2", "&Delete\tDelete", "Delete &Supplementary Files...", "&Export Trace Package...", "Select &Trace Type...", "Apply Time Offset...", "Clear Time Offset", "Refresh\tF5");
+                "&Open\tShift+Ctrl+R", "Open With", "&Copy...\tCtrl+C", "Rena&me...\tF2", "&Delete\tDelete", "Delete &Supplementary Files...", "&Export Trace Package...", "Select &Trace Type...", "Apply Time Offset...", "Clear Time Offset",
+                "Refresh\tF5");
 
         // TODO: SWTBot needs a better way to do this
         ContextMenuFinder finder = new ContextMenuFinder(fBot.tree().widget);
@@ -149,6 +157,13 @@ public class ProjectExplorerTraceActionsTest {
 
     /**
      * Test that the trace opens with the context menu
+     * <p>
+     * Action : Open trace
+     * <p>
+     * Procedure :Select the Open menu
+     * <p>
+     * Expected Results: Trace is opened and views are populated
+     *
      */
     @Test
     public void test4_02Open() {
@@ -163,6 +178,13 @@ public class ProjectExplorerTraceActionsTest {
 
     /**
      * Test that the trace can be copied with the context menu
+     * <p>
+     * Action : Copy trace
+     * <p>
+     * Procedure :Select the Copy menu and provide a new name. Open.
+     * <p>
+     * Expected Results: Trace is replicated under the new name
+     *
      */
     @Test
     public void test4_03Copy() {
@@ -181,6 +203,12 @@ public class ProjectExplorerTraceActionsTest {
 
     /**
      * Test that the trace can be renamed with the context menu
+     * <p>
+     * Action : Rename trace
+     * <p>
+     * Procedure :Select the Rename menu and provide a new name. Reopen.
+     * <p>
+     * Expected Results: Trace is renamed. The trace editor is closed.
      */
     @Test
     public void test4_04Rename() {
@@ -206,6 +234,13 @@ public class ProjectExplorerTraceActionsTest {
 
     /**
      * Test that the trace can be deleted with the context menu
+     * <p>
+     * Action : Delete trace
+     * <p>
+     * Procedure :Select the Delete menu and confirm deletion
+     * <p>
+     * Expected Results: Trace is deleted. The trace editor is closed.
+     *
      */
     @Test
     public void test4_05Delete() {
@@ -223,6 +258,13 @@ public class ProjectExplorerTraceActionsTest {
 
     /**
      * Test that the trace opens with the keyboard
+     * <p>
+     * Action : Open Trace (Accelerator)
+     * <p>
+     * Procedure :Select trace and press Enter
+     * <p>
+     * Expected Results: Trace is opened
+     *
      *
      * @throws WidgetNotFoundException
      *             when a widget is not found
@@ -241,6 +283,12 @@ public class ProjectExplorerTraceActionsTest {
 
     /**
      * Test that the trace can be deleted with the keyboard
+     * <p>
+     * Action : Delete Trace (Accelerator)
+     * <p>
+     * Procedure :Select trace and press Delete and confirm deletion
+     * <p>
+     * Expected Results: Trace is deleted. The trace editor is closed.
      */
     @Test
     public void test4_07DeleteKeyboard() {
@@ -258,6 +306,12 @@ public class ProjectExplorerTraceActionsTest {
 
     /**
      * Test that the trace opens with double-click
+     * <p>
+     * Action : Open Trace (double click)
+     * <p>
+     * Procedure :Double-click a trace
+     * <p>
+     * Expected Results: Trace is opened
      *
      * @throws WidgetNotFoundException
      *             when a widget is not found
@@ -276,6 +330,12 @@ public class ProjectExplorerTraceActionsTest {
 
     /**
      * Test that the trace is brought to top if already opened
+     * <p>
+     * Action : Open Trace (already open)
+     * <p>
+     * Procedure :Open two traces. Open the first trace again.
+     * <p>
+     * Expected Results: The first trace editor is simply brought to front.
      */
     @Test
     public void test4_09BringToTop() {
