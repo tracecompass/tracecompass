@@ -17,6 +17,7 @@ package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue.CustomStateValue;
@@ -348,17 +349,26 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof HTInterval &&
-                this.compareTo((HTInterval) other) == 0) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        return false;
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        HTInterval other = (HTInterval) obj;
+        return (start == other.start &&
+                end == other.end &&
+                attribute == other.attribute &&
+                sv.equals(other.sv));
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hash(start, end, attribute, sv);
     }
 
     @Override
