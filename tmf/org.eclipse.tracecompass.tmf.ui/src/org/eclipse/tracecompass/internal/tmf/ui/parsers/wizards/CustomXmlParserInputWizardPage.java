@@ -978,7 +978,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                             actionCombo.setVisible(true);
                             break;
                         case 4: // Other
-                            tagLabel.setText(Messages.CustomXmlParserInputWizardPage_tagName);
+                            tagLabel.setText(Messages.CustomXmlParserInputWizardPage_name);
                             tagLabel.setVisible(true);
                             if (tagText.getText().trim().length() == 0) {
                                 tagText.setText(elementNameText.getText().trim());
@@ -1030,7 +1030,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     tagText.setVisible(false);
                 } else {
                     tagCombo.select(4);
-                    tagLabel.setText(Messages.CustomXmlParserInputWizardPage_tagName);
+                    tagLabel.setText(Messages.CustomXmlParserInputWizardPage_name);
                     tagText.setText(inputElement.getInputName());
                     tagText.addModifyListener(updateListener);
                 }
@@ -1076,8 +1076,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
         private void updatePreview() {
             Element element = getPreviewElement(inputElement);
-            if (inputElement.getParentElement() != null) { // no preview text for
-                                                      // document element
+            // no preview text for document element
+            if (inputElement.getParentElement() != null) {
                 previewText.setText(Messages.CustomXmlParserInputWizardPage_noMatchingElement);
                 if (element != null) {
                     previewText.setText(CustomXmlTrace.parseElement(element, new StringBuffer()).toString());
@@ -1086,8 +1086,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                             logEntryFound = true;
                             logEntriesCount++;
                         } else {
-                            logEntryButton.setSelection(false); // remove nested
-                                                                // log entry
+                            // remove nested log entry
+                            logEntryButton.setSelection(false);
                         }
                     }
                     if (tagCombo.getText().equals(CustomTraceDefinition.TAG_TIMESTAMP) && logEntriesCount <= 1) {
@@ -1365,7 +1365,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         tagText.setVisible(false);
                         break;
                     case 3: // Other
-                        tagLabel.setText(Messages.CustomXmlParserInputWizardPage_tagName);
+                        tagLabel.setText(Messages.CustomXmlParserInputWizardPage_name);
                         tagLabel.setVisible(true);
                         if (tagText.getText().trim().length() == 0) {
                             tagText.setText(attributeNameText.getText().trim());
@@ -1412,7 +1412,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 tagText.setVisible(false);
             } else {
                 tagCombo.select(3);
-                tagLabel.setText(Messages.CustomXmlParserInputWizardPage_tagName);
+                tagLabel.setText(Messages.CustomXmlParserInputWizardPage_name);
                 tagText.setText(inputAttribute.getInputName());
                 tagText.addModifyListener(updateListener);
             }

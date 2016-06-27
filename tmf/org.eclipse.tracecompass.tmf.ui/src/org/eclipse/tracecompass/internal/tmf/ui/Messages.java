@@ -272,12 +272,11 @@ public class Messages extends NLS {
     public static String CustomXmlParserInputWizardPage_removeAttribute;
     public static String CustomXmlParserInputWizardPage_removeElement;
     public static String CustomXmlParserInputWizardPage_set;
-    public static String CustomXmlParserInputWizardPage_tagName;
     public static String CustomXmlParserInputWizardPage_timestampFormat;
     public static String CustomXmlParserInputWizardPage_timestampFormatHelp;
-    public static String CustomXmlParserInputWizardPage_windowTitle;
     public static String CustomXmlParserInputWizardPage_titleEdit;
     public static String CustomXmlParserInputWizardPage_titleNew;
+    public static String CustomXmlParserInputWizardPage_windowTitle;
     public static String CustomXmlParserOutputWizardPage_description;
     public static String CustomXmlParserOutputWizardPage_moveAfter;
     public static String CustomXmlParserOutputWizardPage_moveBefore;
