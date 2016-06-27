@@ -17,6 +17,7 @@ package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -36,6 +37,8 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
  * @author Alexandre Montplaisir
  */
 public final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
+
+    private static final Charset CHARSET = Charset.forName("UTF-8"); //$NON-NLS-1$
 
     private static final String errMsg = "Invalid interval data. Maybe your file is corrupt?"; //$NON-NLS-1$
 
@@ -104,10 +107,17 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
         case DOUBLE:
             return (minSize + Double.BYTES);
         case STRING:
+            String str = sv.unboxStr();
+            int strLength = str.getBytes(CHARSET).length;
+
+            if (strLength > Short.MAX_VALUE) {
+                throw new IllegalArgumentException("String is too long to be stored in state system: " + str); //$NON-NLS-1$
+            }
+
             /*
-             * String's length + 2 (1 byte for size, 1 byte for \0 at the end
+             * String's length + 3 (2 bytes for size, 1 byte for \0 at the end)
              */
-            return (minSize + sv.unboxStr().getBytes().length + 2);
+            return (minSize + strLength + 3);
         case CUSTOM:
             /* Length of serialized value (short) + state value */
             return (minSize + Short.BYTES + ((CustomStateValue) sv).getSerializedSize());
@@ -182,12 +192,12 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
             break;
 
         case TYPE_STRING: {
-            /* the first byte = the size to read */
-            int valueSize = buffer.get();
+            /* the first short = the size to read */
+            int valueSize = buffer.getShort();
 
             byte[] array = new byte[valueSize];
             buffer.get(array);
-            value = TmfStateValue.newValueString(new String(array));
+            value = TmfStateValue.newValueString(new String(array, CHARSET));
 
             /* Confirm the 0'ed byte at the end */
             byte res = buffer.get();
@@ -261,13 +271,13 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
 
         case TYPE_STRING: {
             String string = sv.unboxStr();
-            byte[] strArray = string.getBytes();
+            byte[] strArray = string.getBytes(CHARSET);
 
             /*
              * Write the Strings entry (1st byte = size, then the bytes, then
              * the 0). We have checked the string length at the constructor.
              */
-            buffer.put((byte) strArray.length);
+            buffer.putShort((short) strArray.length);
             buffer.put(strArray);
             buffer.put((byte) 0);
             break;
