@@ -240,8 +240,8 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
 
         // Confirm the operation
         Shell shell = window.getShell();
-        MessageDialog dialog = new MessageDialog(shell, getTitle(deleteType), null, getMessage(deleteType), MessageDialog.QUESTION, 1, new String[] { IDialogConstants.YES_LABEL,
-                IDialogConstants.NO_LABEL }) {
+        MessageDialog dialog = new MessageDialog(shell, getTitle(deleteType), null, getMessage(deleteType), MessageDialog.QUESTION, new String[] { IDialogConstants.YES_LABEL,
+                IDialogConstants.NO_LABEL }, 1) {
             {
                 setShellStyle(SWT.SHEET);
             }
