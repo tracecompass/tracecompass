@@ -186,7 +186,11 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
      */
     @Nullable UstDebugInfoLoadedBinaryFile getMatchingFile(long ts, long vpid, long ip) {
         waitForCompletion();
-        final ITmfStateSystem ss = checkNotNull(getStateSystem());
+        final ITmfStateSystem ss = getStateSystem();
+        if (ss == null) {
+            /* State system might not yet be initialized */
+            return null;
+        }
 
         List<Integer> possibleBaddrQuarks = ss.getQuarks(String.valueOf(vpid), "*"); //$NON-NLS-1$
 
