@@ -81,6 +81,21 @@ public class TmfTraceUtilsSearchingTest {
     }
 
     /**
+     * Test the {@link TmfTraceUtils#getNextEventMatching} method where no event
+     * matches the passed predicate. It should return null.
+     */
+    @Test
+    public void testNextMatchingEventNoMatch() {
+        ITmfTrace trace = fTrace;
+        assertNotNull(trace);
+
+        Predicate<@NonNull ITmfEvent> predicate = event -> event.getName().equals("non-existent-event");
+
+        ITmfEvent actualEvent = TmfTraceUtils.getNextEventMatching(trace, START_RANK, predicate);
+        assertNull(actualEvent);
+    }
+
+    /**
      * Test the {@link TmfTraceUtils#getNextEventMatching} method, where the
      * event from which we start the search already matches the criterion (it
      * should be correctly skipped so we can advance).
@@ -113,6 +128,21 @@ public class TmfTraceUtilsSearchingTest {
         ITmfEvent expectedEvent = trace.getNext(ctx);
 
         assertEquals(expectedEvent, actualEvent);
+    }
+
+    /**
+     * Test the {@link TmfTraceUtils#getPreviousEventMatching} method where no event
+     * matches the passed predicate. It should return null.
+     */
+    @Test
+    public void testPreviousMatchingEventNoMatch() {
+        ITmfTrace trace = fTrace;
+        assertNotNull(trace);
+
+        Predicate<@NonNull ITmfEvent> predicate = event -> event.getName().equals("non-existent-event");
+
+        ITmfEvent actualEvent = TmfTraceUtils.getPreviousEventMatching(trace, START_RANK, predicate);
+        assertNull(actualEvent);
     }
 
     /**
