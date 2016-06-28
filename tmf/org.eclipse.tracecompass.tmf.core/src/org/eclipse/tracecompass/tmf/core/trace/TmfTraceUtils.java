@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -33,6 +34,7 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 /**
  * Utility methods for ITmfTrace's.
@@ -226,30 +228,37 @@ public final class TmfTraceUtils {
      */
     public static @Nullable ITmfEvent getPreviousEventMatching(ITmfTrace trace, long startRank, Predicate<ITmfEvent> predicate) {
         /*
-         * Slightly less straightforward since we unfortunately cannot iterate
-         * backwards on events. Do a series of forward-queries.
+         * We are going to do a series of queries matching the trace's cache
+         * size in length (which should minimize on-disk seeks), then iterate on
+         * the found events in reverse order until we find a match.
          */
-        final int targetStep = 100;
+        int step = trace.getCacheSize();
 
         /*
          * If we are close to the beginning of the trace, make sure we only look
          * for the events before the startRank.
          */
-        int step = (startRank < targetStep ? (int) startRank : targetStep);
+        if (startRank < step) {
+            step = (int) startRank;
+        }
 
         long currentRank = startRank;
         try {
             while (currentRank > 0) {
                 currentRank = Math.max(currentRank - step, 0);
 
-                EventMatchingRequest req = new EventMatchingRequest(currentRank, step, predicate, true);
+                List<ITmfEvent> list = new ArrayList<>(step);
+                ArrayFillingRequest req = new ArrayFillingRequest(currentRank, step, list);
                 trace.sendRequest(req);
                 req.waitForCompletion();
 
-                ITmfEvent event = req.getFoundEvent();
-                if (event != null) {
-                    /* We found an actual event, return it! */
-                    return event;
+                Optional<ITmfEvent> matchingEvent = Lists.reverse(list).stream()
+                    .filter(predicate)
+                    .findFirst();
+
+                if (matchingEvent.isPresent()) {
+                    /* We found an event matching, return it! */
+                    return matchingEvent.get();
                 }
                 /* Keep searching, next loop */
 
@@ -331,5 +340,26 @@ public final class TmfTraceUtils {
                 }
             }
         }
+    }
+
+    /**
+     * Event request that simply puts all returned events into a list passed in
+     * parameter.
+     */
+    private static class ArrayFillingRequest extends TmfEventRequest {
+
+        private final List<ITmfEvent> fList;
+
+        public ArrayFillingRequest(long startRank, int limit, List<ITmfEvent> listToFill) {
+            super(ITmfEvent.class, startRank, limit, ExecutionType.FOREGROUND);
+            fList = listToFill;
+        }
+
+        @Override
+        public void handleData(ITmfEvent event) {
+            super.handleData(event);
+            fList.add(event);
+        }
+
     }
 }
