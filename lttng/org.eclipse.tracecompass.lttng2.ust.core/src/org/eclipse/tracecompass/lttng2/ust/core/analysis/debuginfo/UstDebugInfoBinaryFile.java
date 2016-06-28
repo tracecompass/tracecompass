@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo;
+package org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo;
 
 import java.util.Objects;
 
@@ -17,32 +17,35 @@ import org.eclipse.jdt.annotation.Nullable;
  * Wrapper class to reference to a particular binary, which can be an
  * executable or library. It contains both the complete file path (at the
  * time the trace was taken) and the build ID of the binary.
+ *
+ * @author Alexandre Montplaisir
+ * @noreference Meant to be used internally by the analysis only
  */
 public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile> {
 
     private final String fFilePath;
-    private final String fBuildId;
+    private final @Nullable String fBuildId;
+    private final @Nullable String fDebugLink;
     private final boolean fIsPic;
-    private final String fToString;
 
     /**
      * Constructor
      *
      * @param filePath
-     *            The binary's path on the filesystem
+     *            The binary's path on the filesystem.
      * @param buildId
      *            The binary's unique buildID (in base16 form).
+     * @param debugLink
+     *            Path to the binary's separate debug info.
      * @param isPic
-     *            If the binary is position-independent or not
+     *            Whether the code in the binary is position-independent.
      */
-    public UstDebugInfoBinaryFile(String filePath, String buildId, boolean isPic) {
+    public UstDebugInfoBinaryFile(String filePath, @Nullable String buildId,
+            @Nullable String debugLink, boolean isPic) {
         fFilePath = filePath;
         fBuildId = buildId;
+        fDebugLink = debugLink;
         fIsPic = isPic;
-
-        fToString = filePath + " (" + //$NON-NLS-1$
-                (fIsPic ? "PIC" : "non-PIC") + //$NON-NLS-1$ //$NON-NLS-2$
-                ", " + buildId + ')'; //$NON-NLS-1$
     }
 
     /**
@@ -60,10 +63,20 @@ public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile
      * On Unix systems, you can use <pre>eu-readelf -n [binary]</pre> to get
      * this ID.
      *
-     * @return The file's build ID.
+     * @return The file's build ID, or null if the file has no build ID..
      */
-    public String getBuildId() {
+    public @Nullable String getBuildId() {
         return fBuildId;
+    }
+
+    /**
+     * Get the path to the separate debug info of this binary.
+     *
+     * @return The path to the separate debug info, or null if the file has no
+     *         separate debug info.
+     */
+    public @Nullable String getDebugLink() {
+        return fDebugLink;
     }
 
     /**
@@ -82,23 +95,37 @@ public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile
 
     @Override
     public String toString() {
-        return fToString;
-    }
-
-    @Override
-    public boolean equals(@Nullable Object obj) {
-        if (!(obj instanceof UstDebugInfoBinaryFile)) {
-            return false;
-        }
-        UstDebugInfoBinaryFile other = (UstDebugInfoBinaryFile) obj;
-        return (fFilePath.equals(other.fFilePath) &&
-                fBuildId.equals(other.fBuildId) &&
-                fIsPic == other.fIsPic);
+        return com.google.common.base.Objects.toStringHelper(this)
+            .add("path", fFilePath)
+            .add("build_id", fBuildId)
+            .add("debug_link", fDebugLink)
+            .add("is_pic", fIsPic)
+            .toString();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fBuildId, fFilePath, fIsPic);
+        return Objects.hash(fFilePath, fBuildId, fDebugLink, fIsPic);
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(getClass().equals(obj.getClass()))) {
+            return false;
+        }
+
+        UstDebugInfoBinaryFile other = (UstDebugInfoBinaryFile) obj;
+
+        return Objects.equals(fFilePath, other.fFilePath) &&
+                Objects.equals(fBuildId, other.fBuildId) &&
+                Objects.equals(fDebugLink, other.fDebugLink) &&
+                fIsPic == other.fIsPic;
     }
 
     /**

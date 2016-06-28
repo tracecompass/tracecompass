@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * Object carrying the information about the "binary callsite" corresponding to
  * an instruction pointer. This consists in:
@@ -25,7 +27,7 @@ package org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo;
 public class BinaryCallsite {
 
     private final String fBinaryFilePath;
-    private final String fBuildId;
+    private final @Nullable String fBuildId;
     private final long fOffset;
     private final boolean fIsPic;
 
@@ -49,7 +51,7 @@ public class BinaryCallsite {
      *            absolute address (if isPic is false), or if it is an offset in
      *            the binary (is isPic is true).
      */
-    public BinaryCallsite(String binaryFilePath, String buildId, long offset, boolean isPic) {
+    public BinaryCallsite(String binaryFilePath, @Nullable String buildId, long offset, boolean isPic) {
         if (offset < 0) {
             throw new IllegalArgumentException("Address offset cannot be negative"); //$NON-NLS-1$
         }
@@ -74,7 +76,7 @@ public class BinaryCallsite {
      *
      * @return The build-id
      */
-    public String getBuildId() {
+    public @Nullable String getBuildId() {
         return fBuildId;
     }
 

@@ -51,10 +51,10 @@ public final class FileOffsetMapper {
     private static class FileOffset {
 
         private final String fFilePath;
-        private final String fBuildId;
+        private final @Nullable String fBuildId;
         private final long fOffset;
 
-        public FileOffset(String filePath, String buildId, long offset) {
+        public FileOffset(String filePath, @Nullable String buildId, long offset) {
             fFilePath = filePath;
             fBuildId = buildId;
             fOffset = offset;
@@ -119,7 +119,7 @@ public final class FileOffsetMapper {
      * @return The list of callsites corresponding to the offset, reported from
      *         the "highest" inlining location, down to the initial definition.
      */
-    public static @Nullable Iterable<SourceCallsite> getCallsiteFromOffset(File file, String buildId, long offset) {
+    public static @Nullable Iterable<SourceCallsite> getCallsiteFromOffset(File file, @Nullable String buildId, long offset) {
         if (!Files.exists((file.toPath()))) {
             return null;
         }

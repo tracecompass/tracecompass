@@ -13,19 +13,22 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.lttng2.ust.core.Activator;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst28EventLayout;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
+import org.eclipse.tracecompass.tmf.core.util.Pair;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.BaseEncoding;
@@ -37,51 +40,49 @@ import com.google.common.io.BaseEncoding;
  * The layout of the generated attribute tree will look like this:
  *
  * <pre>
- *  * [root]
- *   +-- 1000
- *   +-- 2000
- *  ...
- *   +-- 3000 (VPIDs)
- *        +-- baddr (value = addr range end, long)
- *        |     +-- buildId (value = /path/to/library (sopath), string)
- *        |           +- is_pic (value = 0 or 1 (int))
- *        +-- baddr
- *        |     +-- buildId1
- *        |           +- is_pic
- *        |     +-- buildId2 (if the same address is re-used later)
- *        |           +- is_pic
- *       ...
+ * Key                       Value
+ * /vpid                     null
+ * /vpid/<baddr>             Integer 1 if the memory mapping active at this
+ *                           point in time, null otherwise.
+ * /vpid/<baddr>/build_id    Build ID of the binary as an hex string, e.g.
+ *                           "0123456789abcdef", or null if it doesn't have a
+ *                           build id.
+ * /vpid/<baddr>/debug_link  Path to the separate debug info of the binary, e.g.
+ *                           "/usr/lib/libhello.so.debug", or null if it doesn't
+ *                           have separate debug info.
+ * /vpid/<baddr>/memsz       Size of the memory mapping in bytes.
+ * /vpid/<baddr>/path        Path to the binary, e.g. "/usr/lib/libhello.so".
+ * /vpid/<baddr>/is_pic      Integer 1 if the binary contains position
+ *                           independent code, 0 otherwise.
  * </pre>
  *
- * The "baddr" attribute name will represent the range start as a string, and
- * its value will be range end. If null, it means this particular library is not
- * loaded at this location at the moment.
- *
- * This sits under the mtime (modification time of the file) attribute. This is
- * to handle cases like multiple concurrent dlopen's of the same library, or the
- * very mind-blowing edge case of a file being modified and being reloaded later
- * on, possibly side-by-side with its previous version.
- *
- * Since the state system is not a spatial database, it's not really worth
- * indexing by memory ranges, and since the amount of loaded libraries is
- * usually small, we should afford to iterate through all mappings to find each
- * match.
- *
- * Still, for better scalability (and for science), it could be interesting to
- * look into storing the memory-model-over-time in something like an R-Tree.
+ * The "baddr" attribute name represents the memory mapping base address a
+ * string (in decimal).
  *
  * @author Alexandre Montplaisir
+ * @author Simon Marchi
  */
 public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
 
-    /**
-     * Sub-attribute indicating if a given binary is PIC (position-independent
-     * code) or not. This information is present directly in the trace.
-     */
-    public static final String IS_PIC_ATTRIB  = "is_pic"; //$NON-NLS-1$
+    /** State system attribute name for the in-memory binary size */
+    public static final String MEMSZ_ATTRIB = "memsz"; //$NON-NLS-1$
 
-    /* Version of this state provider */
-    private static final int VERSION = 2;
+    /** State system attribute name for the binary path */
+    public static final String PATH_ATTRIB = "path"; //$NON-NLS-1$
+
+    /** State system attribute name for the PICness of the binary */
+    public static final String IS_PIC_ATTRIB = "is_pic"; //$NON-NLS-1$
+
+    /** State system attribute name for the build ID of the binary */
+    public static final String BUILD_ID_ATTRIB = "build_id"; //$NON-NLS-1$
+
+    /** State system attribute name for the debug link of the binary */
+    public static final String DEBUG_LINK_ATTRIB = "debug_link"; //$NON-NLS-1$
+
+    /** Version of this state provider */
+    private static final int VERSION = 3;
+
+    private static final Logger LOGGER = TraceCompassLog.getLogger(UstDebugInfoStateProvider.class);
 
     private static final int DL_DLOPEN_INDEX = 1;
     private static final int DL_BUILD_ID_INDEX = 2;
@@ -90,31 +91,66 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
     private static final int STATEDUMP_BIN_INFO_INDEX = 5;
     private static final int STATEDUMP_BUILD_ID_INDEX = 6;
     private static final int STATEDUMP_DEBUG_LINK_INDEX = 7;
+    private static final int STATEDUMP_START_INDEX = 8;
 
     private final LttngUst28EventLayout fLayout;
     private final Map<String, Integer> fEventNames;
 
-    /**
-     * We need both the soinfo/dlopen event AND the matching build_id/debug_link
-     * event to get all the information about a particular binary.
-     *
-     * Between these two events, we will store the <baddr, BinInfo> in here.
+    /*
+     * Store for data that is incomplete, for which we are waiting for some
+     * upcoming events (build_id or debug_link). Maps <vpid, baddr> to
+     * PendingBinInfo object.
      */
-    private final Map<Long, BinInfo> fPendingEntries = new HashMap<>();
+    private final Map<Pair<Long, Long>, PendingBinInfo> fPendingBinInfos = new HashMap<>();
 
-    /**
-     * Information contained in a "bin_info" event, which means a binary's path,
-     * base address, and if it is a PIC or not.
-     */
-    private static class BinInfo {
-        public final long fBaddr;
-        public final String fPath;
-        public final int fIsPic;
+    private class PendingBinInfo {
 
-        public BinInfo(long baddr, String path, int isPic) {
+        /* The event data, saved here until we put everything in the state system. */
+        private final long fVpid;
+        private final long fBaddr;
+        private final long fMemsz;
+        private final String fPath;
+        private final boolean fIsPIC;
+
+        private @Nullable String fBuildId = null;
+        private @Nullable String fDebugLink = null;
+
+        /* Which info are we waiting for? */
+        private boolean fBuildIdPending;
+        private boolean fDebugLinkPending;
+
+        public PendingBinInfo(boolean hasBuildId, boolean hasDebugLink,
+                long vpid, long baddr, long memsz, String path, boolean isPIC) {
+            fVpid = vpid;
             fBaddr = baddr;
+            fMemsz = memsz;
             fPath = path;
-            fIsPic = isPic;
+            fIsPIC = isPIC;
+
+            fBuildIdPending = hasBuildId;
+            fDebugLinkPending = hasDebugLink;
+        }
+
+        boolean done() {
+            return !(fBuildIdPending || fDebugLinkPending);
+        }
+
+        public void setBuildId(String buildId) {
+            fBuildIdPending = false;
+            fBuildId = buildId;
+        }
+
+        public @Nullable String getBuildId() {
+            return fBuildId;
+        }
+
+        public void setDebugLink(String debugLink) {
+            fDebugLinkPending = false;
+            fDebugLink = debugLink;
+        }
+
+        public @Nullable String getDebugLink() {
+            return fDebugLink;
         }
     }
 
@@ -144,6 +180,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
         builder.put(layout.eventStatedumpBinInfo(), STATEDUMP_BIN_INFO_INDEX);
         builder.put(layout.eventStateDumpBuildId(), STATEDUMP_BUILD_ID_INDEX);
         builder.put(layout.eventStateDumpDebugLink(), STATEDUMP_DEBUG_LINK_INDEX);
+        builder.put(layout.eventStatedumpStart(), STATEDUMP_START_INDEX);
         return builder.build();
     }
 
@@ -169,71 +206,178 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
         }
         int intIndex = index.intValue();
 
+        switch (intIndex) {
+        case STATEDUMP_START_INDEX: {
+            handleStatedumpStart(event, vpid, ss);
+            break;
+        }
+
+        case DL_DLOPEN_INDEX:
+        case STATEDUMP_BIN_INFO_INDEX: {
+            handleOpen(event, vpid, ss);
+            break;
+        }
+
+        case DL_BUILD_ID_INDEX:
+        case STATEDUMP_BUILD_ID_INDEX: {
+            handleBuildId(event, vpid, ss);
+            break;
+        }
+
+        case DL_DEBUG_LINK_INDEX:
+        case STATEDUMP_DEBUG_LINK_INDEX: {
+            handleDebugLink(event, vpid, ss);
+            break;
+        }
+
+        case DL_DLCLOSE_INDEX: {
+            handleClose(event, vpid, ss);
+            break;
+        }
+
+        default:
+            /* Ignore other events */
+            break;
+        }
+    }
+
+    /**
+     * Commit the binary information contained in pending to the state system.
+     *
+     * This method should only be called when there is no more pending
+     * information for that binary.
+     */
+    private static void commitPendingToStateSystem(PendingBinInfo pending,
+            long ts, ITmfStateSystemBuilder ss) {
+        if (!pending.done()) {
+            throw new IllegalStateException();
+        }
+
+        long vpid = pending.fVpid;
+        long baddr = pending.fBaddr;
+        long memsz = pending.fMemsz;
+        String path = pending.fPath;
+        String buildId = pending.getBuildId();
+        String debugLink = pending.getDebugLink();
+        boolean isPIC = pending.fIsPIC;
+
+        /* Create the "top-level" attribute for this object. */
+        int baddrQuark = ss.getQuarkAbsoluteAndAdd(Long.toString(vpid), Long.toString(baddr));
+
+        /* Create the attributes that contain actual data. */
+        int memszQuark = ss.getQuarkRelativeAndAdd(baddrQuark, MEMSZ_ATTRIB);
+        int pathQuark = ss.getQuarkRelativeAndAdd(baddrQuark, PATH_ATTRIB);
+        int isPICQuark = ss.getQuarkRelativeAndAdd(baddrQuark, IS_PIC_ATTRIB);
+        int buildIdQuark = ss.getQuarkRelativeAndAdd(baddrQuark, BUILD_ID_ATTRIB);
+        int debugLinkQuark = ss.getQuarkRelativeAndAdd(baddrQuark, DEBUG_LINK_ATTRIB);
         try {
-            switch (intIndex) {
-            case DL_DLOPEN_INDEX:
-            case STATEDUMP_BIN_INFO_INDEX:
-            {
-                handleOpen(event, vpid, ss);
-                break;
+            ss.modifyAttribute(ts, TmfStateValue.newValueInt(1), baddrQuark);
+            ss.modifyAttribute(ts, TmfStateValue.newValueLong(memsz), memszQuark);
+            ss.modifyAttribute(ts, TmfStateValue.newValueString(path), pathQuark);
+            ss.modifyAttribute(ts, TmfStateValue.newValueInt(isPIC ? 1 : 0), isPICQuark);
+            if (buildId != null) {
+                ss.modifyAttribute(ts, TmfStateValue.newValueString(buildId), buildIdQuark);
+            } else {
+                ss.modifyAttribute(ts, TmfStateValue.nullValue(), buildIdQuark);
             }
 
-            case DL_BUILD_ID_INDEX:
-            case STATEDUMP_BUILD_ID_INDEX:
-            {
-                handleBuildId(event, vpid, ss);
-                break;
+            if (debugLink != null) {
+                ss.modifyAttribute(ts,  TmfStateValue.newValueString(debugLink), debugLinkQuark);
+            } else {
+                ss.modifyAttribute(ts, TmfStateValue.nullValue(), debugLinkQuark);
             }
+        } catch (StateValueTypeException e) {
+            /* Something went very wrong. */
+            throw new IllegalStateException(e);
+        }
+    }
 
-            case DL_DEBUG_LINK_INDEX:
-            case STATEDUMP_DEBUG_LINK_INDEX:
-            /* Fields: Long baddr, Long crc, String filename */
-            {
-                // TODO NYI
-                break;
-            }
+    /**
+     * Locate a PendingBinInfo object in the map of pending binary informations
+     * with the key <vpid, baddr>. Remove it from the map and return it if it is
+     * found, return null otherwise.
+     */
+    private @Nullable PendingBinInfo retrievePendingBinInfo(long vpid, long baddr) {
+        Pair<Long, Long> key = new Pair<>(vpid, baddr);
 
-            case DL_DLCLOSE_INDEX:
-            {
-                handleClose(event, vpid, ss);
-                break;
-            }
+        return fPendingBinInfos.remove(key);
+    }
 
-            default:
-                /* Ignore other events */
-                break;
-            }
+    /**
+     * Check whether we know everything there is to know about the binary
+     * described by pending, and if so, commit it to the state system.
+     * Otherwise, put it in the map of pending binary informations.
+     */
+    private void processPendingBinInfo(PendingBinInfo pending, long ts,
+            ITmfStateSystemBuilder ss) {
+        if (pending.done()) {
+            commitPendingToStateSystem(pending, ts, ss);
+        } else {
+            /* We are expecting more data for this binary, put in the pending map. */
+            Pair<Long, Long> key = new Pair<>(pending.fVpid, pending.fBaddr);
+
+            fPendingBinInfos.put(key, pending);
+        }
+    }
+
+    /**
+     * Handle the start of a statedump.
+     *
+     * When a process does an exec, a new statedump is done and all previous
+     * mappings are now invalid.
+     */
+    private static void handleStatedumpStart(ITmfEvent event, final Long vpid, final ITmfStateSystemBuilder ss) {
+        try {
+            long ts = event.getTimestamp().getValue();
+            int vpidQuark = ss.getQuarkAbsolute(vpid.toString());
+
+            ss.removeAttribute(ts, vpidQuark);
         } catch (AttributeNotFoundException e) {
-            Activator.getDefault().logError("Unexpected exception in UstDebugInfoStateProvider", e); //$NON-NLS-1$
+            /* We didn't know anything about this vpid yet, so there is nothing to remove. */
         }
     }
 
     /**
      * Handle opening a shared library.
      *
-     * Uses fields: Long baddr, Long memsz, String sopath
+     * Uses fields: Long baddr, Long memsz, String path, Long is_pic
      */
     private void handleOpen(ITmfEvent event, final Long vpid, final ITmfStateSystemBuilder ss) {
-        Long baddr = (Long) event.getContent().getField(fLayout.fieldBaddr()).getValue();
-        Long memsz = (Long) event.getContent().getField(fLayout.fieldMemsz()).getValue();
-        String sopath = (String) event.getContent().getField(fLayout.fieldPath()).getValue();
+        Long baddr = event.getContent().getFieldValue(Long.class, fLayout.fieldBaddr());
+        Long memsz = event.getContent().getFieldValue(Long.class, fLayout.fieldMemsz());
+        String path = event.getContent().getFieldValue(String.class, fLayout.fieldPath());
+        Long hasBuildIdValue = event.getContent().getFieldValue(Long.class, fLayout.fieldHasBuildId());
+        Long hasDebugLinkValue = event.getContent().getFieldValue(Long.class, fLayout.fieldHasDebugLink());
+        Long isPicValue = event.getContent().getFieldValue(Long.class, fLayout.fieldIsPic());
 
-        /* "dlopen" events do not have a "is_pic" field, they always refer to PIC libs */
-        ITmfEventField isPicField = event.getContent().getField(fLayout.fieldIsPic());
-        Long isPicVal = (isPicField == null ? 1L : (Long) isPicField.getValue());
-
-        long endAddr = baddr.longValue() + memsz.longValue();
-        int addrQuark = ss.getQuarkAbsoluteAndAdd(vpid.toString(), baddr.toString());
-
-        long ts = event.getTimestamp().getValue();
-        ss.modifyAttribute(ts, TmfStateValue.newValueLong(endAddr), addrQuark);
+        if (baddr == null ||
+                memsz == null ||
+                path == null ||
+                hasBuildIdValue == null ||
+                hasDebugLinkValue == null) {
+            LOGGER.warning(() -> "[UstDebugInfoStateProvider:InvalidDlOpenEvent] event=" + event.toString()); //$NON-NLS-1$
+            return;
+        }
 
         /*
-         * Add this library to the pending entries, the matching
-         * build_id/debug_link event will finish updating this attribute
+         * The is_pic field is only present in the lttng_ust_statedump:bin_info
+         * event. Binaries loaded with dlopen always have PIC. Therefore, we
+         * start assuming isPIC is true, and change our mind if the field is
+         * present and says the opposite.
          */
-        BinInfo binInfo = new BinInfo(baddr, checkNotNull(sopath), isPicVal.intValue());
-        fPendingEntries.put(binInfo.fBaddr, binInfo);
+        boolean isPic = true;
+        if (isPicValue != null) {
+            isPic = (isPicValue != 0);
+        }
+
+        boolean hasBuildId = hasBuildIdValue != 0;
+        boolean hasDebugLink = hasDebugLinkValue != 0;
+
+        long ts = event.getTimestamp().getValue();
+
+        PendingBinInfo p = new PendingBinInfo(hasBuildId, hasDebugLink, vpid, baddr, memsz, path, isPic);
+
+        processPendingBinInfo(p, ts, ss);
     }
 
     /**
@@ -241,37 +385,57 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
      *
      * Uses fields: Long baddr, long[] build_id
      */
-    private void handleBuildId(ITmfEvent event, final Long vpid, final ITmfStateSystemBuilder ss) throws AttributeNotFoundException {
-        Long baddr = (Long) event.getContent().getField(fLayout.fieldBaddr()).getValue();
-        long[] buildIdArray = checkNotNull((long[]) event.getContent().getField(fLayout.fieldBuildId()).getValue());
+    private void handleBuildId(ITmfEvent event, final Long vpid, final ITmfStateSystemBuilder ss) {
+        long[] buildIdArray = event.getContent().getFieldValue(long[].class, fLayout.fieldBuildId());
+        Long baddr = event.getContent().getFieldValue(Long.class, fLayout.fieldBaddr());
+
+        if (buildIdArray == null || baddr == null) {
+            LOGGER.warning(() -> "[UstDebugInfoStateProvider:InvalidBuildIdEvent] event=" + event.toString()); //$NON-NLS-1$
+            return;
+        }
+
         /*
          * Decode the buildID from the byte array in the trace field.
          * Use lower-case encoding, since this is how eu-readelf
          * displays it.
          */
-        String buildId = BaseEncoding.base16().encode(longArrayToByteArray(buildIdArray)).toLowerCase();
+        String buildId = checkNotNull(BaseEncoding.base16().encode(longArrayToByteArray(buildIdArray)).toLowerCase());
 
-        /* Retrieve the matching sopath from the pending entries */
-        BinInfo binInfo = fPendingEntries.remove(baddr);
-        if (binInfo == null) {
-            /*
-             * We did not previously handle the initial event for this
-             * library. Lost events?
-             */
-            Activator.getDefault().logWarning("UstDebugInfoStateProvider: Received a build_id event without a matching soinfo/dlopen one."); //$NON-NLS-1$
+        long ts = event.getTimestamp().getValue();
+
+        PendingBinInfo p = retrievePendingBinInfo(vpid, baddr);
+
+        /*
+         * We have never seen the bin_info event this event is related to,
+         * there's nothing much we can do.
+         */
+        if (p == null) {
             return;
         }
-        /* addrQuark should already exist */
-        int addrQuark = ss.getQuarkAbsolute(vpid.toString(), baddr.toString());
 
-        /* build-id attribute */
-        int buildIdQuark = ss.getQuarkRelativeAndAdd(addrQuark, buildId);
+        p.setBuildId(buildId);
+
+        processPendingBinInfo(p, ts, ss);
+    }
+
+    private void handleDebugLink(ITmfEvent event, final Long vpid, final ITmfStateSystemBuilder ss) {
+        Long baddr = event.getContent().getFieldValue(Long.class, fLayout.fieldBaddr());
+        String debugLink = event.getContent().getFieldValue(String.class, fLayout.fieldDebugLinkFilename());
+
+        if (baddr == null || debugLink == null) {
+            LOGGER.warning(() -> "[UstDebugInfoStateProvider:InvalidDebugLinkEvent] event=" + event.toString()); //$NON-NLS-1$
+            return;
+        }
+
         long ts = event.getTimestamp().getValue();
-        ss.modifyAttribute(ts, TmfStateValue.newValueString(binInfo.fPath), buildIdQuark);
 
-        /* "is_pic" sub-attribute */
-        int isPicQuark = ss.getQuarkRelativeAndAdd(buildIdQuark, IS_PIC_ATTRIB);
-        ss.modifyAttribute(ts, TmfStateValue.newValueInt(binInfo.fIsPic), isPicQuark);
+        PendingBinInfo pendingBinInfo = retrievePendingBinInfo(vpid, baddr);
+        if (pendingBinInfo == null) {
+            return;
+        }
+
+        pendingBinInfo.setDebugLink(debugLink);
+        processPendingBinInfo(pendingBinInfo, ts, ss);
     }
 
     /**
@@ -280,7 +444,12 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
      * Uses fields: Long baddr
      */
     private void handleClose(ITmfEvent event, final Long vpid, final ITmfStateSystemBuilder ss) {
-        Long baddr = (Long) event.getContent().getField(fLayout.fieldBaddr()).getValue();
+        Long baddr = event.getContent().getFieldValue(Long.class, fLayout.fieldBaddr());
+
+        if (baddr == null) {
+            LOGGER.warning(() -> "[UstDebugInfoStateProvider:InvalidDlCloseEvent] event=" + event.toString()); //$NON-NLS-1$
+            return;
+        }
 
         try {
             int quark = ss.getQuarkAbsolute(vpid.toString(), baddr.toString());
@@ -321,5 +490,4 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
     public int getVersion() {
         return VERSION;
     }
-
 }

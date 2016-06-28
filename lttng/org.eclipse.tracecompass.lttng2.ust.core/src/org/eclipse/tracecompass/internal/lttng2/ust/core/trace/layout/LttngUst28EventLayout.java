@@ -86,8 +86,20 @@ public class LttngUst28EventLayout extends LttngUst27EventLayout {
         return "path";
     }
 
+    public String fieldHasBuildId() {
+        return "has_build_id";
+    }
+
+    public String fieldHasDebugLink() {
+        return "has_debug_link";
+    }
+
     public String fieldBuildId() {
         return "build_id";
+    }
+
+    public String fieldDebugLinkFilename() {
+        return "filename";
     }
 
     public String fieldIsPic() {

@@ -12,7 +12,6 @@ package org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo.UstDebugInfoLoadedBinaryFile;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -110,17 +109,15 @@ public class UstDebugInfoBinaryAspect implements ITmfEventAspect<BinaryCallsite>
 
         long offset;
         if (file.isPic()) {
-            offset = (ip - file.getBaseAddress());
+            offset = ip - file.getBaseAddress();
         } else {
             /*
-             * In the case of the object being non-position-independant (loaded
-             * at a very low address), we must pass the actual 'ip' address
-             * directly to addr2line.
+             * In the case of the object being non-position-independent, we
+             * must pass the actual 'ip' address directly to addr2line.
              */
             offset = ip;
         }
 
         return new BinaryCallsite(fullPath, file.getBuildId(), offset, file.isPic());
     }
-
 }
