@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -97,8 +98,20 @@ public class CriticalPathTest extends KernelTestBase {
         SWTBotMenu menu = item.contextMenu("Follow " + PROCESS + "/" + TID);
         assertEquals("Follow " + PROCESS + "/" + TID, menu.getText());
         menu.click();
-        SWTBotUtils.waitForJobs();
-        allItems = treeCp.getAllItems();
-        assertEquals("[" + PROCESS + "," + TID + "]", allItems[0].getNode(0).getText());
+        fBot.waitUntil(new DefaultCondition() {
+
+            private final String EXPECTED_TREE_TEXT = "[" + PROCESS + "," + TID + "]";
+
+            @Override
+            public boolean test() throws Exception {
+                SWTBotTreeItem[] items = treeCp.getAllItems();
+                return EXPECTED_TREE_TEXT.equals(items[0].getNode(0).getText());
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return "Could not find " + EXPECTED_TREE_TEXT + " in Critical Path view";
+            }
+        });
     }
 }
