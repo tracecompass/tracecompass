@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="tracecompass-eStaging" sequenceNumber="69">
+<?pde version="3.8"?><target name="tracecompass-eStaging" sequenceNumber="70">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.cdt.gnu.dsf.feature.group" version="0.0.0"/>
@@ -58,8 +58,8 @@
 <repository location="http://download.eclipse.org/eclipse/updates/4.6/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf" version="1.4.0"/>
-<repository location="http://archive.eclipse.org/tracecompass/tracecompass-test-traces/repository/"/>
+<unit id="org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf" version="1.5.0"/>
+<repository location="http://archive.eclipse.org/tracecompass/tracecompass-test-traces/repository/1.5.0"/>
 </location>
 </locations>
 <targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
