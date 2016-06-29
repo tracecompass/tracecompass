@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
@@ -254,6 +255,7 @@ public class ProjectExplorerTraceActionsTest {
         shell.bot().button("Yes").click();
         fBot.waitUntil(Conditions.shellCloses(shell));
         fBot.waitWhile(new ConditionHelpers.ActiveEventsEditor(fBot, null));
+        fBot.waitUntil(new TraceDeletedCondition());
     }
 
     /**
@@ -302,6 +304,7 @@ public class ProjectExplorerTraceActionsTest {
         shell.bot().button("Yes").click();
         fBot.waitUntil(Conditions.shellCloses(shell));
         fBot.waitWhile(new ConditionHelpers.ActiveEventsEditor(fBot, null));
+        fBot.waitUntil(new TraceDeletedCondition());
     }
 
     /**
@@ -411,5 +414,17 @@ public class ProjectExplorerTraceActionsTest {
         SWTBotView view = fBot.viewById(TmfStatisticsView.ID);
         assertTrue(view.bot().tree().hasItems());
         view.bot().tree().cell(0, 1).equals(Long.toString(NB_EVENTS));
+    }
+
+    private final class TraceDeletedCondition extends DefaultCondition {
+        @Override
+        public boolean test() throws Exception {
+            return ResourcesPlugin.getWorkspace().getRoot().getProject(TRACE_PROJECT_NAME).findMember(new Path("Traces/" + TRACE_NAME)) == null;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return TRACE_NAME + " was not deleted successfully.";
+        }
     }
 }
