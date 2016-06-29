@@ -5,31 +5,31 @@
 <InputLine>
 <Cardinality max="2147483647" min="0"/>
 <RegEx>(\S*\s\S*) (.*\S)</RegEx>
-<InputData action="0" format="dd/MM/yyyy HH:mm:ss:SSS" name="Time Stamp"/>
-<InputData action="0" format="" name="Message"/>
+<InputData action="0" format="dd/MM/yyyy HH:mm:ss:SSS" name="Timestamp" tag="TIMESTAMP"/>
+<InputData action="0" format="" name="Message" tag="MESSAGE"/>
 <InputLine>
 <Cardinality max="2147483647" min="0"/>
 <RegEx>(.*\S)</RegEx>
-<InputData action="2" name="Message"/>
+<InputData action="2" tag="MESSAGE"/>
 </InputLine>
 </InputLine>
-<OutputColumn name="Time Stamp"/>
-<OutputColumn name="Message"/>
+<OutputColumn name="Time Stamp" tag="TIMESTAMP"/>
+<OutputColumn name="Message" tag="MESSAGE"/>
 </Definition>
 <Definition name="testtxtevname">
 <TimeStampOutputFormat>dd/MM/yyyy HH:mm:ss:SSS</TimeStampOutputFormat>
 <InputLine>
 <Cardinality max="2147483647" min="0"/>
 <RegEx>(\d*) (.*\S)</RegEx>
-<InputData action="0" format="Tn" name="Time Stamp"/>
-<InputData action="0" format="" name="Event type"/>
+<InputData action="0" format="Tn" name="Timestamp" tag="TIMESTAMP"/>
+<InputData action="0" name="Event type" tag="EVENT_TYPE"/>
 <InputLine>
 <Cardinality max="2147483647" min="0"/>
 <RegEx>(.*\S)</RegEx>
-<InputData action="2" name="Message"/>
+<InputData action="2" name="Message" tag="MESSAGE"/>
 </InputLine>
 </InputLine>
-<OutputColumn name="Time Stamp"/>
-<OutputColumn name="Event type"/>
+<OutputColumn name="Timestamp" tag="TIMESTAMP"/>
+<OutputColumn name="Event type" tag="EVENT_TYPE"/>
 </Definition>
 </CustomTxtTraceDefinitionList>

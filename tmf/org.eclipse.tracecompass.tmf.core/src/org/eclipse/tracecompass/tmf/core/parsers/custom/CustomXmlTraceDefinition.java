@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -39,6 +40,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.w3c.dom.Document;
@@ -58,7 +60,9 @@ import org.xml.sax.SAXParseException;
  */
 public class CustomXmlTraceDefinition extends CustomTraceDefinition {
 
-    /** "ignore" tag */
+    /** Ignore tag
+     * @deprecated Use {@link Tag#IGNORE} instead. */
+    @Deprecated
     public static final String TAG_IGNORE = Messages.CustomXmlTraceDefinition_ignoreTag;
 
     /**
@@ -104,6 +108,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
     private static final String CUSTOM_XML_TRACE_DEFINITION_ROOT_ELEMENT = Messages.CustomXmlTraceDefinition_definitionRootElement;
     private static final String DEFINITION_ELEMENT = Messages.CustomXmlTraceDefinition_definition;
     private static final String CATEGORY_ATTRIBUTE = Messages.CustomXmlTraceDefinition_category;
+    private static final String TAG_ATTRIBUTE = Messages.CustomXmlTraceDefinition_tag;
     private static final String NAME_ATTRIBUTE = Messages.CustomXmlTraceDefinition_name;
     private static final String LOG_ENTRY_ATTRIBUTE = Messages.CustomXmlTraceDefinition_logEntry;
     private static final String EVENT_TYPE_ATTRIBUTE = Messages.CustomXmlTraceDefinition_eventType;
@@ -202,6 +207,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
                 for (OutputColumn output : outputs) {
                     Element outputColumnElement = doc.createElement(OUTPUT_COLUMN_ELEMENT);
                     definitionElement.appendChild(outputColumnElement);
+                    outputColumnElement.setAttribute(TAG_ATTRIBUTE, output.tag.name());
                     outputColumnElement.setAttribute(NAME_ATTRIBUTE, output.name);
                 }
             }
@@ -241,10 +247,12 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         if (inputElement.getParentElement() != null) {
             Element inputDataElement = doc.createElement(INPUT_DATA_ELEMENT);
             inputElementElement.appendChild(inputDataElement);
+            inputDataElement.setAttribute(TAG_ATTRIBUTE, inputElement.getInputTag().name());
             inputDataElement.setAttribute(NAME_ATTRIBUTE, inputElement.getInputName());
             inputDataElement.setAttribute(ACTION_ATTRIBUTE, Integer.toString(inputElement.getInputAction()));
-            if (inputElement.getInputFormat() != null) {
-                inputDataElement.setAttribute(FORMAT_ATTRIBUTE, inputElement.getInputFormat());
+            String inputFormat = inputElement.getInputFormat();
+            if (inputFormat != null && !inputFormat.isEmpty()) {
+                inputDataElement.setAttribute(FORMAT_ATTRIBUTE, inputFormat);
             }
         }
 
@@ -255,10 +263,12 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
                 inputAttributeElement.setAttribute(NAME_ATTRIBUTE, attribute.getAttributeName());
                 Element inputDataElement = doc.createElement(INPUT_DATA_ELEMENT);
                 inputAttributeElement.appendChild(inputDataElement);
+                inputDataElement.setAttribute(TAG_ATTRIBUTE, attribute.getInputTag().name());
                 inputDataElement.setAttribute(NAME_ATTRIBUTE, attribute.getInputName());
                 inputDataElement.setAttribute(ACTION_ATTRIBUTE, Integer.toString(attribute.getInputAction()));
-                if (attribute.getInputFormat() != null) {
-                    inputDataElement.setAttribute(FORMAT_ATTRIBUTE, attribute.getInputFormat());
+                String inputFormat = attribute.getInputFormat();
+                if (inputFormat != null && !inputFormat.isEmpty()) {
+                    inputDataElement.setAttribute(FORMAT_ATTRIBUTE, inputFormat);
                 }
             }
         }
@@ -525,8 +535,8 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
                 }
             } else if (nodeName.equals(OUTPUT_COLUMN_ELEMENT)) {
                 Element outputColumnElement = (Element) node;
-                OutputColumn outputColumn = new OutputColumn();
-                outputColumn.name = outputColumnElement.getAttribute(NAME_ATTRIBUTE);
+                Entry<@NonNull Tag, @NonNull String> entry = extractTagAndName(outputColumnElement, TAG_ATTRIBUTE, NAME_ATTRIBUTE);
+                OutputColumn outputColumn = new OutputColumn(entry.getKey(), entry.getValue());
                 def.outputs.add(outputColumn);
             }
         }
@@ -545,28 +555,28 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             String nodeName = node.getNodeName();
             if (nodeName.equals(INPUT_DATA_ELEMENT)) {
                 Element inputDataElement = (Element) node;
-                inputElement.setInputName(inputDataElement.getAttribute(NAME_ATTRIBUTE));
+                Entry<@NonNull Tag, @NonNull String> entry = extractTagAndName(inputDataElement, TAG_ATTRIBUTE, NAME_ATTRIBUTE);
+                inputElement.setInputTag(entry.getKey());
+                inputElement.setInputName(entry.getValue());
                 inputElement.setInputAction(Integer.parseInt(inputDataElement.getAttribute(ACTION_ATTRIBUTE)));
                 inputElement.setInputFormat(inputDataElement.getAttribute(FORMAT_ATTRIBUTE));
             } else if (nodeName.equals(ATTRIBUTE_ELEMENT)) {
                 Element attributeElement = (Element) node;
 
                 String attributeName = attributeElement.getAttribute(NAME_ATTRIBUTE);
-                String inputName = null;
-                int inputAction = 0;
-                String inputFormat = null;
                 NodeList attributeNodeList = attributeElement.getChildNodes();
                 for (int j = 0; j < attributeNodeList.getLength(); j++) {
                     Node attributeNode = attributeNodeList.item(j);
                     String attributeNodeName = attributeNode.getNodeName();
                     if (attributeNodeName.equals(INPUT_DATA_ELEMENT)) {
                         Element inputDataElement = (Element) attributeNode;
-                        inputName = inputDataElement.getAttribute(NAME_ATTRIBUTE);
-                        inputAction = Integer.parseInt(inputDataElement.getAttribute(ACTION_ATTRIBUTE));
-                        inputFormat = inputDataElement.getAttribute(FORMAT_ATTRIBUTE);
+                        Entry<@NonNull Tag, @NonNull String> entry = extractTagAndName(inputDataElement, TAG_ATTRIBUTE, NAME_ATTRIBUTE);
+                        int action = Integer.parseInt(inputDataElement.getAttribute(ACTION_ATTRIBUTE));
+                        String format = inputDataElement.getAttribute(FORMAT_ATTRIBUTE);
+                        inputElement.addAttribute(new CustomXmlInputAttribute(attributeName, entry.getKey(), entry.getValue(), action, format));
+                        break;
                     }
                 }
-                inputElement.addAttribute(new CustomXmlInputAttribute(attributeName, inputName, inputAction, inputFormat));
             } else if (nodeName.equals(INPUT_ELEMENT_ELEMENT)) {
                 Element childInputElementElement = (Element) node;
                 CustomXmlInputElement childInputElement = extractInputElement(childInputElementElement);

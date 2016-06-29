@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -41,6 +42,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.w3c.dom.Document;
@@ -100,6 +102,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     private static final String CUSTOM_TXT_TRACE_DEFINITION_ROOT_ELEMENT = Messages.CustomTxtTraceDefinition_definitionRootElement;
     private static final String DEFINITION_ELEMENT = Messages.CustomTxtTraceDefinition_definition;
     private static final String CATEGORY_ATTRIBUTE = Messages.CustomTxtTraceDefinition_category;
+    private static final String TAG_ATTRIBUTE = Messages.CustomTxtTraceDefinition_tag;
     private static final String NAME_ATTRIBUTE = Messages.CustomTxtTraceDefinition_name;
     private static final String TIME_STAMP_OUTPUT_FORMAT_ELEMENT = Messages.CustomTxtTraceDefinition_timestampOutputFormat;
     private static final String INPUT_LINE_ELEMENT = Messages.CustomTxtTraceDefinition_inputLine;
@@ -365,7 +368,11 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
      */
     public static class InputData {
 
-        /** Name of this column */
+        /** Tag of this input
+         * @since 2.1*/
+        public Tag tag;
+
+        /** Name of this input for "Other" tag */
         public String name;
 
         /** Action id */
@@ -406,6 +413,20 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
          */
         public InputData(String name, int action) {
             this.name = name;
+            this.action = action;
+        }
+
+        /**
+         * Constructor
+         *
+         * @param tag
+         *            Tag
+         * @param action
+         *            Action
+         * @since 2.1
+         */
+        public InputData(Tag tag, int action) {
+            this.tag = tag;
             this.action = action;
         }
     }
@@ -532,6 +553,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                 for (OutputColumn output : outputs) {
                     Element outputColumnElement = doc.createElement(OUTPUT_COLUMN_ELEMENT);
                     definitionElement.appendChild(outputColumnElement);
+                    outputColumnElement.setAttribute(TAG_ATTRIBUTE, output.tag.name());
                     outputColumnElement.setAttribute(NAME_ATTRIBUTE, output.name);
                 }
             }
@@ -578,6 +600,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             for (InputData inputData : inputLine.columns) {
                 Element inputDataElement = doc.createElement(INPUT_DATA_ELEMENT);
                 inputLineElement.appendChild(inputDataElement);
+                inputDataElement.setAttribute(TAG_ATTRIBUTE, inputData.tag.name());
                 inputDataElement.setAttribute(NAME_ATTRIBUTE, inputData.name);
                 inputDataElement.setAttribute(ACTION_ATTRIBUTE, Integer.toString(inputData.action));
                 if (inputData.format != null) {
@@ -811,8 +834,8 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                 }
             } else if (nodeName.equals(OUTPUT_COLUMN_ELEMENT)) {
                 Element outputColumnElement = (Element) node;
-                OutputColumn outputColumn = new OutputColumn();
-                outputColumn.name = outputColumnElement.getAttribute(NAME_ATTRIBUTE);
+                Entry<@NonNull Tag, @NonNull String> entry = extractTagAndName(outputColumnElement, TAG_ATTRIBUTE, NAME_ATTRIBUTE);
+                OutputColumn outputColumn = new OutputColumn(entry.getKey(), entry.getValue());
                 def.outputs.add(outputColumn);
             }
         }
@@ -843,7 +866,9 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             } else if (nodeName.equals(INPUT_DATA_ELEMENT)) {
                 Element inputDataElement = (Element) node;
                 InputData inputData = new InputData();
-                inputData.name = inputDataElement.getAttribute(NAME_ATTRIBUTE);
+                Entry<@NonNull Tag, @NonNull String> entry = extractTagAndName(inputDataElement, TAG_ATTRIBUTE, NAME_ATTRIBUTE);
+                inputData.tag = checkNotNull(entry.getKey());
+                inputData.name = checkNotNull(entry.getValue());
                 inputData.action = Integer.parseInt(inputDataElement.getAttribute(ACTION_ATTRIBUTE));
                 inputData.format = inputDataElement.getAttribute(FORMAT_ATTRIBUTE);
                 inputLine.addColumn(inputData);

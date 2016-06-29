@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,6 +16,8 @@ package org.eclipse.tracecompass.tmf.core.parsers.custom;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.Tag;
+
 /**
  * Wrapper for input XML elements
  */
@@ -26,6 +28,9 @@ public final class CustomXmlInputElement {
 
     /** Indicates if this is a log entry */
     private boolean fLogEntry;
+
+    /** Tag of the input element */
+    private Tag fInputTag;
 
     /** Name of the input element */
     private String fInputName;
@@ -65,19 +70,54 @@ public final class CustomXmlInputElement {
      * @param logEntry
      *            If this element is a log entry
      * @param inputName
-     *            Name of the the input
+     *            Name of the input
      * @param inputAction
      *            Input action
      * @param inputFormat
      *            Input format
      * @param attributes
      *            XML attributes of this element
+     * @deprecated Use
+     *             {@link #CustomXmlInputElement(String, boolean, Tag, String, int, String, List)}
+     *             instead.
      */
+    @Deprecated
     public CustomXmlInputElement(String elementName, boolean logEntry,
             String inputName, int inputAction, String inputFormat,
             List<CustomXmlInputAttribute> attributes) {
         fElementName = elementName;
         fLogEntry = logEntry;
+        fInputName = inputName;
+        fInputAction = inputAction;
+        fInputFormat = inputFormat;
+        fAttributes = attributes;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param elementName
+     *            Element name
+     * @param logEntry
+     *            If this element is a log entry
+     * @param inputTag
+     *            Tag of the input
+     * @param inputName
+     *            Name of the input
+     * @param inputAction
+     *            Input action
+     * @param inputFormat
+     *            Input format
+     * @param attributes
+     *            XML attributes of this element
+     * @since 2.1
+     */
+    public CustomXmlInputElement(String elementName, boolean logEntry, Tag inputTag,
+            String inputName, int inputAction, String inputFormat,
+            List<CustomXmlInputAttribute> attributes) {
+        fElementName = elementName;
+        fLogEntry = logEntry;
+        fInputTag = inputTag;
         fInputName = inputName;
         fInputAction = inputAction;
         fInputFormat = inputFormat;
@@ -191,6 +231,23 @@ public final class CustomXmlInputElement {
      */
     public void setLogEntry(boolean logEntry) {
         fLogEntry = logEntry;
+    }
+
+    /**
+     * @return the inputTag
+     * @since 2.1
+     */
+    public Tag getInputTag() {
+        return fInputTag;
+    }
+
+    /**
+     * @param inputTag
+     *            the inputTag to set
+     * @since 2.1
+     */
+    public void setInputTag(Tag inputTag) {
+        fInputTag = inputTag;
     }
 
     /**

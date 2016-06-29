@@ -16,6 +16,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.Tag;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
@@ -77,44 +78,60 @@ public class CustomXmlEvent extends CustomEvent {
      * @param name Name
      * @param inputAction Input action
      * @param inputFormat Input format
+     * @deprecated Use {@link #parseInput(String, Tag, String, int, String)} instead.
      */
+    @Deprecated
     public void parseInput(String value, String name, int inputAction, String inputFormat) {
+    }
+
+    /**
+     * Parse an entry.
+     *
+     * @param value Value
+     * @param inputTag Input tag
+     * @param inputName Input name
+     * @param inputAction Input action
+     * @param inputFormat Input format
+     * @since 2.1
+     */
+    public void parseInput(String value, Tag inputTag, String inputName, int inputAction, String inputFormat) {
         if (value.length() == 0) {
             return;
         }
+        Object key = (inputTag.equals(Tag.OTHER) ? inputName : inputTag);
         if (inputAction == CustomTraceDefinition.ACTION_SET) {
-            fData.put(name, value);
-            if (name.equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
-                fData.put(TIMESTAMP_INPUT_FORMAT_KEY, inputFormat);
+            fData.put(key, value);
+            if (key.equals(Tag.TIMESTAMP)) {
+                fData.put(Key.TIMESTAMP_INPUT_FORMAT, inputFormat);
             }
         } else if (inputAction == CustomTraceDefinition.ACTION_APPEND) {
-            String s = fData.get(name);
+            String s = fData.get(key);
             if (s != null) {
-                fData.put(name, s + value);
+                fData.put(key, s + value);
             } else {
-                fData.put(name, value);
+                fData.put(key, value);
             }
-            if (name.equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
-                String timeStampInputFormat = fData.get(TIMESTAMP_INPUT_FORMAT_KEY);
+            if (key.equals(Tag.TIMESTAMP)) {
+                String timeStampInputFormat = fData.get(Key.TIMESTAMP_INPUT_FORMAT);
                 if (timeStampInputFormat != null) {
-                    fData.put(TIMESTAMP_INPUT_FORMAT_KEY, timeStampInputFormat + inputFormat);
+                    fData.put(Key.TIMESTAMP_INPUT_FORMAT, timeStampInputFormat + inputFormat);
                 } else {
-                    fData.put(TIMESTAMP_INPUT_FORMAT_KEY, inputFormat);
+                    fData.put(Key.TIMESTAMP_INPUT_FORMAT, inputFormat);
                 }
             }
         } else if (inputAction == CustomTraceDefinition.ACTION_APPEND_WITH_SEPARATOR) {
-            String s = fData.get(name);
+            String s = fData.get(key);
             if (s != null) {
-                fData.put(name, s + " | " + value); //$NON-NLS-1$
+                fData.put(key, s + " | " + value); //$NON-NLS-1$
             } else {
-                fData.put(name, value);
+                fData.put(key, value);
             }
-            if (name.equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
-                String timeStampInputFormat = fData.get(TIMESTAMP_INPUT_FORMAT_KEY);
+            if (key.equals(Tag.TIMESTAMP)) {
+                String timeStampInputFormat = fData.get(Key.TIMESTAMP_INPUT_FORMAT);
                 if (timeStampInputFormat != null) {
-                    fData.put(TIMESTAMP_INPUT_FORMAT_KEY, timeStampInputFormat + " | " + inputFormat); //$NON-NLS-1$
+                    fData.put(Key.TIMESTAMP_INPUT_FORMAT, timeStampInputFormat + " | " + inputFormat); //$NON-NLS-1$
                 } else {
-                    fData.put(TIMESTAMP_INPUT_FORMAT_KEY, inputFormat);
+                    fData.put(Key.TIMESTAMP_INPUT_FORMAT, inputFormat);
                 }
             }
         }

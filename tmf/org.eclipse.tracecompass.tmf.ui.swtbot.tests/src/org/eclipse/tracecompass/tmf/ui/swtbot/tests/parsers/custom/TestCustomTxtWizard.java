@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 Ericsson
+ * Copyright (c) 2014, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -75,16 +75,16 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
             "<InputLine>\n" +
             "<Cardinality max=\"2147483647\" min=\"0\"/>\n" +
             "<RegEx>\\s*(\\d\\d)\\s(.*\\S)</RegEx>\n" +
-            "<InputData action=\"0\" format=\"ss\" name=\"Time Stamp\"/>\n" +
-            "<InputData action=\"0\" name=\"Message\"/>\n" +
+            "<InputData action=\"0\" format=\"ss\" name=\"Timestamp\" tag=\"TIMESTAMP\"/>\n" +
+            "<InputData action=\"0\" name=\"Message\" tag=\"MESSAGE\"/>\n" +
             "</InputLine>\n" +
             "<InputLine>\n" +
             "<Cardinality max=\"2147483647\" min=\"0\"/>\n" +
             "<RegEx>([^0-9]*)</RegEx>\n" +
-            "<InputData action=\"2\" name=\"Message\"/>\n" +
+            "<InputData action=\"2\" name=\"Message\" tag=\"MESSAGE\"/>\n" +
             "</InputLine>\n" +
-            "<OutputColumn name=\"Time Stamp\"/>\n" +
-            "<OutputColumn name=\"Message\"/>\n";
+            "<OutputColumn name=\"Timestamp\" tag=\"TIMESTAMP\"/>\n" +
+            "<OutputColumn name=\"Message\" tag=\"MESSAGE\"/>\n";
 
     /**
      * Test to create a custom txt trace and compare the xml
@@ -127,7 +127,7 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
         fBot.textWithLabel("Time Stamp format:").setText("ss");
 
         // Fill Group 1 as time stamp
-        fBot.comboBox(1).setSelection("Time Stamp");
+        fBot.comboBox(1).setSelection("Timestamp");
         fBot.textWithLabel("format:").setText("ss");
         // Click on the New group button
         fBot.button(8).click();
@@ -192,22 +192,22 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
                     "<InputLine>\n" +
                     "<Cardinality max=\"2147483647\" min=\"0\"/>\n" +
                     "<RegEx>\\s*(\\d*)\\s(.*)</RegEx>\n" +
-                    "<InputData action=\"0\" format=\"sss\" name=\"Time Stamp\"/>\n" +
-                    "<InputData action=\"0\" name=\"Message\"/>\n" +
+                    "<InputData action=\"0\" format=\"sss\" name=\"Timestamp\" tag=\"TIMESTAMP\"/>\n" +
+                    "<InputData action=\"0\" name=\"Message\" tag=\"MESSAGE\"/>\n" +
                     "</InputLine>\n" +
-                    "<OutputColumn name=\"Time Stamp\"/>\n" +
-                    "<OutputColumn name=\"Message\"/>\n" +
+                    "<OutputColumn name=\"Timestamp\" tag=\"TIMESTAMP\"/>\n" +
+                    "<OutputColumn name=\"Message\" tag=\"MESSAGE\"/>\n" +
                     "</Definition>\n" +
                     "<Definition name=\"dmesg\">\n" +
                     "<TimeStampOutputFormat>sssssss.ssssss</TimeStampOutputFormat>\n" +
                     "<InputLine>\n" +
                     "<Cardinality max=\"2147483647\" min=\"0\"/>\n" +
                     "<RegEx>^[([0-9]*\\.[0.9]*)]\\s(.*)</RegEx>\n" +
-                    "<InputData action=\"0\" format=\"sssss.sssss\" name=\"Time Stamp\"/>\n" +
-                    "<InputData action=\"0\" name=\"Message\"/>\n" +
+                    "<InputData action=\"0\" format=\"sssss.sssss\" name=\"Timestamp\" tag=\"TIMESTAMP\"/>\n" +
+                    "<InputData action=\"0\" name=\"Message\" tag=\"MESSAGE\"/>\n" +
                     "</InputLine>\n" +
-                    "<OutputColumn name=\"Time Stamp\"/>\n" +
-                    "<OutputColumn name=\"Message\"/>\n" +
+                    "<OutputColumn name=\"Timestamp\" tag=\"TIMESTAMP\"/>\n" +
+                    "<OutputColumn name=\"Message\" tag=\"MESSAGE\"/>\n" +
                     "</Definition>\n" +
                     "</CustomTxtTraceDefinitionList>";
             fw.write(xmlContent);
@@ -243,7 +243,7 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
         fBot.textWithLabel("Time Stamp format:").setText("ss");
 
         // update time stamp format
-        fBot.comboBox(1).setSelection("Time Stamp");
+        fBot.comboBox(1).setSelection("Timestamp");
         fBot.textWithLabel("format:").setText("ss");
         fBot.button(2).click();
         SWTBotTreeItem[] treeItems = fBot.tree().getAllItems();

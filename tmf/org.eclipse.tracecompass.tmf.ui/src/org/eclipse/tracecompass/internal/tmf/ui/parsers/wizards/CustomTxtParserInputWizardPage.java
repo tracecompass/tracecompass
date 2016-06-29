@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,12 +19,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -82,6 +84,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.Tag;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition.Cardinality;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition.InputData;
@@ -394,7 +397,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         if (definition == null) {
             definition = new CustomTxtTraceDefinition();
             definition.inputs.add(new InputLine(Cardinality.ZERO_OR_MORE, DEFAULT_REGEX,
-                    Arrays.asList(new InputData(CustomTraceDefinition.TAG_MESSAGE, CustomTraceDefinition.ACTION_SET))));
+                    Arrays.asList(new InputData(Tag.MESSAGE, CustomTraceDefinition.ACTION_SET))));
         }
         loadDefinition(definition);
         treeViewer.expandAll();
@@ -564,16 +567,16 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     }
 
     /**
-     * Get the global list of input names.
+     * Get the global list of inputs.
      *
-     * @return The list of input names
+     * @return The list of inputs
      */
-    public List<String> getInputNames() {
-        List<String> inputs = new ArrayList<>();
+    public List<Entry<Tag, String>> getInputs() {
+        List<Entry<Tag, String>> inputs = new ArrayList<>();
         for (InputLine inputLine : definition.inputs) {
-            for (String inputName : getInputNames(inputLine)) {
-                if (!inputs.contains(inputName)) {
-                    inputs.add(inputName);
+            for (Entry<Tag, String> input : getInputs(inputLine)) {
+                if (!inputs.contains(input)) {
+                    inputs.add(input);
                 }
             }
         }
@@ -581,27 +584,27 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     }
 
     /**
-     * Get the list of input names for the given input line.
+     * Get the list of inputs for the given input line, recursively.
      *
      * @param inputLine
      *            The input line
-     * @return The list of input names
+     * @return The list of inputs
      */
-    public List<String> getInputNames(InputLine inputLine) {
-        List<String> inputs = new ArrayList<>();
+    private List<Entry<Tag, String>> getInputs(InputLine inputLine) {
+        List<Entry<Tag, String>> inputs = new ArrayList<>();
         if (inputLine.columns != null) {
             for (InputData inputData : inputLine.columns) {
-                String inputName = inputData.name;
-                if (!inputs.contains(inputName)) {
-                    inputs.add(inputName);
+                Entry<Tag, String> input = new SimpleEntry<>(inputData.tag, inputData.name);
+                if (!inputs.contains(input)) {
+                    inputs.add(input);
                 }
             }
         }
         if (inputLine.childrenInputs != null) {
             for (InputLine childInputLine : inputLine.childrenInputs) {
-                for (String inputName : getInputNames(childInputLine)) {
-                    if (!inputs.contains(inputName)) {
-                        inputs.add(inputName);
+                for (Entry<Tag, String> input : getInputs(childInputLine)) {
+                    if (!inputs.contains(input)) {
+                        inputs.add(input);
                     }
                 }
             }
@@ -677,7 +680,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 }
             }
 
-            Map<String, String> data = new HashMap<>();
+            Map<Object, String> data = new HashMap<>();
             int rootLineMatches = 0;
             String firstEntryTimeStamp = null;
             String firstEntryTimeStampInputFormat = null;
@@ -709,7 +712,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                         timeStampFormat = null;
                         updatePreviewLine(rootInputLine, matcher, data, rawPos, rootLineMatches);
                         if (rootLineMatches == 1) {
-                            firstEntryTimeStamp = data.get(CustomTraceDefinition.TAG_TIMESTAMP);
+                            firstEntryTimeStamp = data.get(Tag.TIMESTAMP);
                             firstEntryTimeStampInputFormat = timeStampFormat;
                         }
                         HashMap<InputLine, Integer> countMap = new HashMap<>();
@@ -848,14 +851,14 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             }
 
             if (rootLineMatches == 1) {
-                firstEntryTimeStamp = data.get(CustomTraceDefinition.TAG_TIMESTAMP);
+                firstEntryTimeStamp = data.get(Tag.TIMESTAMP);
                 firstEntryTimeStampInputFormat = timeStampFormat;
             }
             if (firstEntryTimeStamp == null) {
                 timestampPreviewText.setText(Messages.CustomTxtParserInputWizardPage_noTimestampGroup);
                 if (selectedLine != null) {
                     for (InputGroup group : selectedLine.inputs) {
-                        if (group.tagCombo.getText().equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
+                        if (group.tagCombo.getText().equals(Tag.TIMESTAMP.toString())) {
                             timestampPreviewText.setText(Messages.CustomTxtParserInputWizardPage_noMatchingTimestamp);
                             break;
                         }
@@ -877,7 +880,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         }
     }
 
-    private void updatePreviewLine(InputLine line, Matcher matcher, Map<String, String> data, int rawPos, int rootLineMatches) {
+    private void updatePreviewLine(InputLine line, Matcher matcher, Map<Object, String> data, int rawPos, int rootLineMatches) {
         for (int i = 0; i < line.columns.size(); i++) {
             InputData input = line.columns.get(i);
             if (i < matcher.groupCount() && matcher.group(i + 1) != null) {
@@ -896,19 +899,20 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 if (value.length() == 0) {
                     continue;
                 }
+                Object key = (input.tag.equals(Tag.OTHER) ? input.name : input.tag);
                 if (input.action == CustomTraceDefinition.ACTION_SET) {
-                    data.put(input.name, value);
-                    if (input.name.equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
+                    data.put(key, value);
+                    if (input.tag.equals(Tag.TIMESTAMP)) {
                         timeStampFormat = input.format;
                     }
                 } else if (input.action == CustomTraceDefinition.ACTION_APPEND) {
-                    String s = data.get(input.name);
+                    String s = data.get(key);
                     if (s != null) {
-                        data.put(input.name, s + value);
+                        data.put(key, s + value);
                     } else {
-                        data.put(input.name, value);
+                        data.put(key, value);
                     }
-                    if (input.name.equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
+                    if (input.tag.equals(Tag.TIMESTAMP)) {
                         if (timeStampFormat != null) {
                             timeStampFormat += input.format;
                         } else {
@@ -916,13 +920,13 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                         }
                     }
                 } else if (input.action == CustomTraceDefinition.ACTION_APPEND_WITH_SEPARATOR) {
-                    String s = data.get(input.name);
+                    String s = data.get(key);
                     if (s != null) {
-                        data.put(input.name, s + " | " + value); //$NON-NLS-1$
+                        data.put(key, s + " | " + value); //$NON-NLS-1$
                     } else {
-                        data.put(input.name, value);
+                        data.put(key, value);
                     }
-                    if (input.name.equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
+                    if (input.tag.equals(Tag.TIMESTAMP)) {
                         if (timeStampFormat != null) {
                             timeStampFormat += " | " + input.format; //$NON-NLS-1$
                         } else {
@@ -1258,16 +1262,16 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             if (inputLine.columns != null) {
                 for (InputData inputData : inputLine.columns) {
                     InputGroup inputGroup = new InputGroup(group, this, inputs.size() + 1);
-                    if (inputData.name.equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
+                    if (inputData.tag.equals(Tag.TIMESTAMP)) {
                         inputGroup.tagCombo.select(0);
                         inputGroup.tagText.setText(inputData.format);
                         inputGroup.tagLabel.setText(Messages.CustomTxtParserInputWizardPage_format);
                         inputGroup.tagLabel.setVisible(true);
                         inputGroup.tagText.setVisible(true);
                         inputGroup.tagText.addModifyListener(updateListener);
-                    } else if (inputData.name.equals(CustomTraceDefinition.TAG_EVENT_TYPE)) {
+                    } else if (inputData.tag.equals(Tag.EVENT_TYPE)) {
                         inputGroup.tagCombo.select(1);
-                    } else if (inputData.name.equals(CustomTraceDefinition.TAG_MESSAGE)) {
+                    } else if (inputData.tag.equals(Tag.MESSAGE)) {
                         inputGroup.tagCombo.select(2);
                     } else {
                         inputGroup.tagCombo.select(3);
@@ -1373,11 +1377,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             for (int i = 0; i < inputs.size(); i++) {
                 InputGroup grp = inputs.get(i);
                 InputData inputData = new InputData();
-                if (grp.tagCombo.getText().equals(CustomTraceDefinition.TAG_OTHER)) {
+                inputData.tag = Tag.fromLabel(grp.tagCombo.getText());
+                if (inputData.tag.equals(Tag.OTHER)) {
                     inputData.name = grp.tagText.getText().trim();
                 } else {
-                    inputData.name = grp.tagCombo.getText();
-                    if (grp.tagCombo.getText().equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
+                    inputData.name = inputData.tag.toString();
+                    if (inputData.tag.equals(Tag.TIMESTAMP)) {
                         inputData.format = grp.tagText.getText().trim();
                     }
                 }
@@ -1442,10 +1447,11 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             tagComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
             tagCombo = new Combo(tagComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-            tagCombo.setItems(new String[] { CustomTraceDefinition.TAG_TIMESTAMP,
-                    CustomTraceDefinition.TAG_EVENT_TYPE,
-                    CustomTraceDefinition.TAG_MESSAGE,
-                    CustomTraceDefinition.TAG_OTHER});
+            tagCombo.setItems(new String[] {
+                    Tag.TIMESTAMP.toString(),
+                    Tag.EVENT_TYPE.toString(),
+                    Tag.MESSAGE.toString(),
+                    Tag.OTHER.toString()});
             tagCombo.select(2);
             tagCombo.addSelectionListener(new SelectionListener() {
                 @Override
@@ -1672,7 +1678,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             if (line != null) {
                 group = line.inputs.get(i);
             }
-            if (inputData.name.equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
+            if (inputData.tag.equals(Tag.TIMESTAMP)) {
                 timestampFound = true;
                 if (inputData.format.length() == 0) {
                     errors.append("Enter the input format for the Time Stamp (Line " + name + " Group " + (i + 1) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -1692,10 +1698,21 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                         }
                     }
                 }
-            } else if (inputData.name.length() == 0) {
-                errors.append("Enter a name for the data group (Line " + name + " Group " + (i + 1) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                if (group != null) {
-                    group.tagText.setBackground(COLOR_LIGHT_RED);
+            } else if (inputData.tag.equals(Tag.OTHER)) {
+                if (inputData.name.isEmpty()) {
+                    errors.append("Enter a name for the data group (Line " + name + " Group " + (i + 1) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    if (group != null) {
+                        group.tagText.setBackground(COLOR_LIGHT_RED);
+                    }
+                } else if (Tag.fromLabel(inputData.name) != null) {
+                    errors.append("Cannot use reserved name for the data group (Line " + name + " Group " + (i + 1) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    if (group != null) {
+                        group.tagText.setBackground(COLOR_LIGHT_RED);
+                    }
+                } else {
+                    if (group != null) {
+                        group.tagText.setBackground(COLOR_TEXT_BACKGROUND);
+                    }
                 }
             } else {
                 if (group != null) {

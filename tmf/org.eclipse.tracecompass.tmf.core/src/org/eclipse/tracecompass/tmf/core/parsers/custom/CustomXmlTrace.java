@@ -37,6 +37,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.Tag;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -521,12 +522,12 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
         if (eventType != null && event.getType() instanceof CustomEventType) {
             ((CustomEventType) event.getType()).setName(eventType);
         }
-        if (inputElement.getInputName() != null && !inputElement.getInputName().equals(CustomXmlTraceDefinition.TAG_IGNORE)) {
-            event.parseInput(parseElement(element, new StringBuffer()).toString(), inputElement.getInputName(), inputElement.getInputAction(), inputElement.getInputFormat());
+        if (!inputElement.getInputTag().equals(Tag.IGNORE)) {
+            event.parseInput(parseElement(element, new StringBuffer()).toString(), inputElement.getInputTag(), inputElement.getInputName(), inputElement.getInputAction(), inputElement.getInputFormat());
         }
         if (inputElement.getAttributes() != null) {
             for (final CustomXmlInputAttribute attribute : inputElement.getAttributes()) {
-                event.parseInput(element.getAttribute(attribute.getAttributeName()), attribute.getInputName(), attribute.getInputAction(), attribute.getInputFormat());
+                event.parseInput(element.getAttribute(attribute.getAttributeName()), attribute.getInputTag(), attribute.getInputName(), attribute.getInputAction(), attribute.getInputFormat());
             }
         }
         final NodeList childNodes = element.getChildNodes();

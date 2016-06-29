@@ -41,6 +41,8 @@ public class Messages extends NLS {
     public static String CustomTxtTraceDefinition_name;
     public static String CustomTxtTraceDefinition_outputColumn;
     public static String CustomTxtTraceDefinition_regEx;
+    /** @since 2.1 */
+    public static String CustomTxtTraceDefinition_tag;
     public static String CustomTxtTraceDefinition_timestampOutputFormat;
     public static String CustomXmlTraceDefinition_action;
     public static String CustomXmlTraceDefinition_attribute;
@@ -56,6 +58,8 @@ public class Messages extends NLS {
     public static String CustomXmlTraceDefinition_logEntry;
     public static String CustomXmlTraceDefinition_name;
     public static String CustomXmlTraceDefinition_outputColumn;
+    /** @since 2.1 */
+    public static String CustomXmlTraceDefinition_tag;
     public static String CustomXmlTraceDefinition_timestampOutputFormat;
 
     static {

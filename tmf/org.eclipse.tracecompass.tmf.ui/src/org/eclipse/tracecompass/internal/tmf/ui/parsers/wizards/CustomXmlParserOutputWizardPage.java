@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson
+ * Copyright (c) 2010, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -39,6 +40,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.Tag;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -127,7 +129,7 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
 
     private void loadDefinition(final CustomTraceDefinition def) {
         for (final OutputColumn outputColumn : def.outputs) {
-            final Output output = new Output(outputsContainer, outputColumn.name);
+            final Output output = new Output(outputsContainer, outputColumn.tag, outputColumn.name);
             outputs.add(output);
         }
     }
@@ -136,15 +138,16 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
     public void setVisible(final boolean visible) {
         if (visible) {
             this.definition = wizard.inputPage.getDefinition();
-            final List<String> outputNames = wizard.inputPage.getInputNames();
+            final List<Entry<Tag, String>> inputs = wizard.inputPage.getInputs();
 
             // dispose outputs that have been removed in the input page
             final Iterator<Output> iter = outputs.iterator();
             while (iter.hasNext()) {
                 final Output output = iter.next();
                 boolean found = false;
-                for (final String name : outputNames) {
-                    if (output.name.equals(name)) {
+                for (final Entry<Tag, String> input : inputs) {
+                    if (output.tag.equals(input.getKey()) &&
+                            output.name.equals(input.getValue())) {
                         found = true;
                         break;
                     }
@@ -156,16 +159,17 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
             }
 
             // create outputs that have been added in the input page
-            for (final String name : outputNames) {
+            for (final Entry<Tag, String> input : inputs) {
                 boolean found = false;
                 for (final Output output : outputs) {
-                    if (output.name.equals(name)) {
+                    if (output.tag.equals(input.getKey()) &&
+                            output.name.equals(input.getValue())) {
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    outputs.add(new Output(outputsContainer, name));
+                    outputs.add(new Output(outputsContainer, input.getKey(), input.getValue()));
                 }
             }
 
@@ -253,19 +257,10 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
      * @return The list of output columns
      */
     public List<OutputColumn> extractOutputs() {
-        int numColumns = 0;
-        for (int i = 0; i < outputs.size(); i++) {
-            if (outputs.get(i).enabledButton.getSelection()) {
-                numColumns++;
-            }
-        }
-        final List<OutputColumn> outputColumns = new ArrayList<>(numColumns);
-        numColumns = 0;
-        for (int i = 0; i < outputs.size(); i++) {
-            final Output output = outputs.get(i);
+        final List<OutputColumn> outputColumns = new ArrayList<>();
+        for (Output output : outputs) {
             if (output.enabledButton.getSelection()) {
-                final OutputColumn column = new OutputColumn();
-                column.name = checkNotNull(output.nameLabel.getText());
+                final OutputColumn column = new OutputColumn(checkNotNull(output.tag), checkNotNull(output.name));
                 outputColumns.add(column);
             }
         }
@@ -273,13 +268,15 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
     }
 
     private class Output {
+        Tag tag;
         String name;
         Button enabledButton;
         Text nameLabel;
         Button upButton;
         Button downButton;
 
-        public Output(final Composite parent, final String name) {
+        public Output(final Composite parent, final Tag tag, final String name) {
+            this.tag = tag;
             this.name = name;
 
             enabledButton = new Button(parent, SWT.CHECK);

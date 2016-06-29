@@ -50,17 +50,17 @@ public class TestCustomXmlWizard extends AbstractCustomParserWizard {
             "<TimeStampOutputFormat>ss</TimeStampOutputFormat>\n" +
             "<InputElement name=\"trace\">\n" +
             "<InputElement logentry=\"true\" name=\"event\">\n" +
-            "<InputData action=\"0\" format=\"\" name=\"Ignore\"/>\n" +
+            "<InputData action=\"0\" name=\"Ignore\" tag=\"IGNORE\"/>\n" +
             "<Attribute name=\"msg\">\n" +
-            "<InputData action=\"0\" name=\"msg\"/>\n" +
+            "<InputData action=\"0\" name=\"msg\" tag=\"OTHER\"/>\n" +
             "</Attribute>\n" +
             "<Attribute name=\"time\">\n" +
-            "<InputData action=\"0\" name=\"time\"/>\n" +
+            "<InputData action=\"0\" name=\"time\" tag=\"OTHER\"/>\n" +
             "</Attribute>\n" +
             "</InputElement>\n" +
             "</InputElement>\n" +
-            "<OutputColumn name=\"msg\"/>\n" +
-            "<OutputColumn name=\"time\"/>\n";
+            "<OutputColumn name=\"msg\" tag=\"OTHER\"/>\n" +
+            "<OutputColumn name=\"time\" tag=\"OTHER\"/>\n";
 
     /**
      * Test to create a custom XML trace and compare the XML generated

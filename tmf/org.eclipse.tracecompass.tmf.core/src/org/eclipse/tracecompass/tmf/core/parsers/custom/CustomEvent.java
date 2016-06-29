@@ -24,6 +24,7 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.Tag;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
@@ -37,7 +38,16 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  */
 public class CustomEvent extends TmfEvent {
 
-    /** Input format key */
+    /** Payload data map key
+     * @since 2.1*/
+    protected enum Key {
+        /** Timestamp input format */
+        TIMESTAMP_INPUT_FORMAT
+    }
+
+    /** Input format key
+     * @deprecated Use {@link Key#TIMESTAMP_INPUT_FORMAT} instead. */
+    @Deprecated
     protected static final String TIMESTAMP_INPUT_FORMAT_KEY = "CE_TS_I_F"; //$NON-NLS-1$
 
     /** Empty message */
@@ -55,8 +65,12 @@ public class CustomEvent extends TmfEvent {
     /** The trace to which this event belongs */
     protected CustomTraceDefinition fDefinition;
 
-    /** The payload data of this event, <field name, value> */
-    protected Map<String, String> fData;
+    /**
+     * The payload data of this event, where the key is one of: the {@link Tag},
+     * the field name string if the tag is {@link Tag#OTHER}, or
+     * {@link Key#TIMESTAMP_INPUT_FORMAT}.
+     */
+    protected Map<Object, String> fData;
 
     private TmfEventField[] fColumnData;
 
@@ -224,8 +238,8 @@ public class CustomEvent extends TmfEvent {
     }
 
     private void processData() {
-        String timestampString = fData.get(CustomTraceDefinition.TAG_TIMESTAMP);
-        String timestampInputFormat = fData.get(TIMESTAMP_INPUT_FORMAT_KEY);
+        String timestampString = fData.get(Tag.TIMESTAMP);
+        String timestampInputFormat = fData.get(Key.TIMESTAMP_INPUT_FORMAT);
         ITmfTimestamp timestamp = null;
         if (timestampInputFormat != null && timestampString != null) {
             TmfTimestampFormat timestampFormat = new TmfTimestampFormat(timestampInputFormat);
@@ -241,7 +255,7 @@ public class CustomEvent extends TmfEvent {
         }
 
         // Update the custom event type of this event if set
-        String eventName = fData.get(CustomTraceDefinition.TAG_EVENT_TYPE);
+        String eventName = fData.get(Tag.EVENT_TYPE);
         ITmfEventType type = getType();
         if (eventName != null && type instanceof CustomEventType) {
             ((CustomEventType) type).setName(eventName);
@@ -250,8 +264,9 @@ public class CustomEvent extends TmfEvent {
         int i = 0;
         fColumnData = new TmfEventField[fDefinition.outputs.size()];
         for (OutputColumn outputColumn : fDefinition.outputs) {
-            String value = fData.get(outputColumn.name);
-            if (outputColumn.name.equals(CustomTraceDefinition.TAG_TIMESTAMP) && timestamp != null) {
+            Object key = (outputColumn.tag.equals(Tag.OTHER) ? outputColumn.name : outputColumn.tag);
+            String value = fData.get(key);
+            if (outputColumn.tag.equals(Tag.TIMESTAMP) && timestamp != null) {
                 TmfTimestampFormat timestampFormat = new TmfTimestampFormat(fDefinition.timeStampOutputFormat);
                 fColumnData[i++] = new TmfEventField(outputColumn.name, timestampFormat.format(timestamp.getValue()), null);
             } else {

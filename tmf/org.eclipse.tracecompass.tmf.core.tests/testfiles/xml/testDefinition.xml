@@ -4,26 +4,26 @@
 <TimeStampOutputFormat>HH:mm:ss:SSS</TimeStampOutputFormat>
 <InputElement name="trace">
 <InputElement logentry="true" name="element">
-<InputData action="0" format="" name="Message"/>
+<InputData action="0" name="Message" tag="MESSAGE"/>
 <Attribute name="time">
-<InputData action="0" format="dd/MM/yyyy HH:mm:ss:SSS" name="Time Stamp"/>
+<InputData action="0" format="dd/MM/yyyy HH:mm:ss:SSS" name="Timestamp" tag="TIMESTAMP"/>
 </Attribute>
 </InputElement>
 </InputElement>
-<OutputColumn name="Time Stamp"/>
-<OutputColumn name="Message"/>
+<OutputColumn name="Timestamp" tag="TIMESTAMP"/>
+<OutputColumn name="Message" tag="MESSAGE"/>
 </Definition>
 <Definition name="xmlevname">
 <TimeStampOutputFormat>HH:mm:ss:SSS</TimeStampOutputFormat>
 <InputElement name="trace">
 <InputElement logentry="true" name="element">
-<InputData action="0" format="" name="Event type"/>
+<InputData action="0" name="Event type" tag="EVENT_TYPE"/>
 <Attribute name="time">
-<InputData action="0" format="Tn" name="Time Stamp"/>
+<InputData action="0" format="Tn" name="Timestamp" tag="TIMESTAMP"/>
 </Attribute>
 </InputElement>
 </InputElement>
-<OutputColumn name="Time Stamp"/>
-<OutputColumn name="Event type"/>
+<OutputColumn name="Timestamp" tag="TIMESTAMP"/>
+<OutputColumn name="Event type" tag="EVENT_TYPE"/>
 </Definition>
 </CustomXMLTraceDefinitionList>

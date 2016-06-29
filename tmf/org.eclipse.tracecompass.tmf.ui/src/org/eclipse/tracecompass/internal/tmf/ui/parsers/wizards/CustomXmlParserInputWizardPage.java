@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,8 +19,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -75,6 +77,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.Tag;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlInputAttribute;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlInputElement;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
@@ -380,7 +383,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         addChildButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                CustomXmlInputElement inputElement = new CustomXmlInputElement("", false, CustomXmlTraceDefinition.TAG_IGNORE, 0, "", null); //$NON-NLS-1$ //$NON-NLS-2$
+                CustomXmlInputElement inputElement = new CustomXmlInputElement("", false, Tag.IGNORE, Tag.IGNORE.toString(), 0, "", null); //$NON-NLS-1$ //$NON-NLS-2$
                 if (definition.rootInputElement == null) {
                     definition.rootInputElement = inputElement;
                     inputElement.setElementName(getChildNameSuggestion(null));
@@ -402,7 +405,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         addNextButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                CustomXmlInputElement inputElement = new CustomXmlInputElement("", false, CustomXmlTraceDefinition.TAG_IGNORE, 0, "", null); //$NON-NLS-1$ //$NON-NLS-2$
+                CustomXmlInputElement inputElement = new CustomXmlInputElement("", false, Tag.IGNORE, Tag.IGNORE.toString(), 0, "", null); //$NON-NLS-1$ //$NON-NLS-2$
                 if (definition.rootInputElement == null) {
                     definition.rootInputElement = inputElement;
                     inputElement.setElementName(getChildNameSuggestion(null));
@@ -430,7 +433,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 CustomXmlInputElement inputElement = null;
                 if (definition.rootInputElement == null) {
                     if (getChildNameSuggestion(null).length() != 0) {
-                        inputElement = new CustomXmlInputElement(getChildNameSuggestion(null), false, CustomXmlTraceDefinition.TAG_IGNORE, 0, "", null); //$NON-NLS-1$
+                        inputElement = new CustomXmlInputElement(getChildNameSuggestion(null), false, Tag.IGNORE, Tag.IGNORE.toString(), 0, "", null); //$NON-NLS-1$
                         definition.rootInputElement = inputElement;
                         feelingLucky(inputElement);
                     } else {
@@ -495,7 +498,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             if (attributeName.length() == 0) {
                 break;
             }
-            CustomXmlInputAttribute attribute = new CustomXmlInputAttribute(attributeName, attributeName, 0, ""); //$NON-NLS-1$
+            CustomXmlInputAttribute attribute = new CustomXmlInputAttribute(attributeName, Tag.OTHER, attributeName, 0, ""); //$NON-NLS-1$
             inputElement.addAttribute(attribute);
         }
         while (true) {
@@ -503,7 +506,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             if (childName.length() == 0) {
                 break;
             }
-            CustomXmlInputElement childElement = new CustomXmlInputElement(childName, false, CustomXmlTraceDefinition.TAG_IGNORE, 0, "", null); //$NON-NLS-1$
+            CustomXmlInputElement childElement = new CustomXmlInputElement(childName, false, Tag.IGNORE, Tag.IGNORE.toString(), 0, "", null); //$NON-NLS-1$
             inputElement.addChild(childElement);
             feelingLucky(childElement);
         }
@@ -648,42 +651,42 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     }
 
     /**
-     * Get the global list of input names.
+     * Get the global list of inputs.
      *
-     * @return The list of input names
+     * @return The list of inputs
      */
-    public List<String> getInputNames() {
-        return getInputNames(definition.rootInputElement);
+    public List<Entry<Tag, String>> getInputs() {
+        return getInputs(definition.rootInputElement);
     }
 
     /**
-     * Get the list of input names for a given element.
+     * Get the list of inputs for a given element, recursively.
      *
      * @param inputElement
      *            The element
-     * @return The input names for this element
+     * @return The list of inputs
      */
-    public List<String> getInputNames(CustomXmlInputElement inputElement) {
-        List<String> inputs = new ArrayList<>();
-        if (inputElement.getInputName() != null && !inputElement.getInputName().equals(CustomXmlTraceDefinition.TAG_IGNORE)) {
-            String inputName = inputElement.getInputName();
-            if (!inputs.contains(inputName)) {
-                inputs.add(inputName);
+    public List<Entry<Tag, String>> getInputs(CustomXmlInputElement inputElement) {
+        List<Entry<Tag, String>> inputs = new ArrayList<>();
+        if (inputElement.getInputTag() != null && !inputElement.getInputTag().equals(Tag.IGNORE)) {
+            Entry<Tag, String> input = new SimpleEntry<>(inputElement.getInputTag(), inputElement.getInputName());
+            if (!inputs.contains(input)) {
+                inputs.add(input);
             }
         }
         if (inputElement.getAttributes() != null) {
             for (CustomXmlInputAttribute attribute : inputElement.getAttributes()) {
-                String inputName = attribute.getInputName();
-                if (!inputs.contains(inputName)) {
-                    inputs.add(inputName);
+                Entry<Tag, String> input = new SimpleEntry<>(attribute.getInputTag(), attribute.getInputName());
+                if (!inputs.contains(input)) {
+                    inputs.add(input);
                 }
             }
         }
         if (inputElement.getChildElements() != null) {
             for (CustomXmlInputElement childInputElement : inputElement.getChildElements()) {
-                for (String inputName : getInputNames(childInputElement)) {
-                    if (!inputs.contains(inputName)) {
-                        inputs.add(inputName);
+                for (Entry<Tag, String> input : getInputs(childInputElement)) {
+                    if (!inputs.contains(input)) {
+                        inputs.add(input);
                     }
                 }
             }
@@ -943,8 +946,12 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 tagComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
                 tagCombo = new Combo(tagComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-                tagCombo.setItems(new String[] { CustomXmlTraceDefinition.TAG_IGNORE, CustomTraceDefinition.TAG_TIMESTAMP,
-                        CustomTraceDefinition.TAG_EVENT_TYPE, CustomTraceDefinition.TAG_MESSAGE, CustomTraceDefinition.TAG_OTHER });
+                tagCombo.setItems(new String[] {
+                        Tag.IGNORE.toString(),
+                        Tag.TIMESTAMP.toString(),
+                        Tag.EVENT_TYPE.toString(),
+                        Tag.MESSAGE.toString(),
+                        Tag.OTHER.toString() });
                 tagCombo.setVisibleItemCount(tagCombo.getItemCount());
                 tagCombo.addSelectionListener(new SelectionListener() {
                     @Override
@@ -1010,21 +1017,21 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 actionCombo.select(inputElement.getInputAction());
                 actionCombo.addSelectionListener(updateListener);
 
-                if (inputElement.getInputName().equals(CustomXmlTraceDefinition.TAG_IGNORE)) {
+                if (inputElement.getInputTag().equals(Tag.IGNORE)) {
                     tagCombo.select(0);
                     tagLabel.setVisible(false);
                     tagText.setVisible(false);
                     actionCombo.setVisible(false);
-                } else if (inputElement.getInputName().equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
+                } else if (inputElement.getInputTag().equals(Tag.TIMESTAMP)) {
                     tagCombo.select(1);
                     tagLabel.setText(Messages.CustomXmlParserInputWizardPage_format);
                     tagText.setText(inputElement.getInputFormat());
                     tagText.addModifyListener(updateListener);
-                } else if (inputElement.getInputName().equals(CustomTraceDefinition.TAG_EVENT_TYPE)) {
+                } else if (inputElement.getInputTag().equals(Tag.EVENT_TYPE)) {
                     tagCombo.select(2);
                     tagLabel.setVisible(false);
                     tagText.setVisible(false);
-                } else if (inputElement.getInputName().equals(CustomTraceDefinition.TAG_MESSAGE)) {
+                } else if (inputElement.getInputTag().equals(Tag.MESSAGE)) {
                     tagCombo.select(3);
                     tagLabel.setVisible(false);
                     tagText.setVisible(false);
@@ -1090,7 +1097,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                             logEntryButton.setSelection(false);
                         }
                     }
-                    if (tagCombo.getText().equals(CustomTraceDefinition.TAG_TIMESTAMP) && logEntriesCount <= 1) {
+                    if (tagCombo.getText().equals(Tag.TIMESTAMP.toString()) && logEntriesCount <= 1) {
                         String value = previewText.getText().trim();
                         if (value.length() != 0) {
                             if (actionCombo.getSelectionIndex() == CustomTraceDefinition.ACTION_SET) {
@@ -1122,7 +1129,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     String value = element.getAttribute(attribute.attributeNameText.getText().trim());
                     if (value.length() != 0) {
                         attribute.previewText.setText(value);
-                        if (attribute.tagCombo.getText().equals(CustomTraceDefinition.TAG_TIMESTAMP) && logEntriesCount <= 1) {
+                        if (attribute.tagCombo.getText().equals(Tag.TIMESTAMP.toString()) && logEntriesCount <= 1) {
                             if (attribute.actionCombo.getSelectionIndex() == CustomTraceDefinition.ACTION_SET) {
                                 timeStampValue = value;
                                 timeStampFormat = attribute.tagText.getText().trim();
@@ -1177,7 +1184,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 public void widgetSelected(SelectionEvent e) {
                     removeAddButton();
                     String attributeName = getAttributeNameSuggestion(inputElement);
-                    CustomXmlInputAttribute inputAttribute = new CustomXmlInputAttribute(attributeName, attributeName, 0, ""); //$NON-NLS-1$
+                    CustomXmlInputAttribute inputAttribute = new CustomXmlInputAttribute(attributeName, Tag.OTHER, attributeName, 0, ""); //$NON-NLS-1$
                     attributes.add(new Attribute(group, ElementNode.this, inputAttribute, attributes.size() + 1));
                     createAddButton();
                     elementContainer.layout();
@@ -1222,11 +1229,13 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             if (inputElement.getParentElement() != null) {
                 inputElement.setLogEntry(logEntryButton.getSelection());
                 inputElement.setEventType(eventTypeButton.getSelection() ? eventTypeText.getText().trim() : null);
-                if (tagCombo.getText().equals(CustomTraceDefinition.TAG_OTHER)) {
+                Tag inputTag = Tag.fromLabel(tagCombo.getText());
+                inputElement.setInputTag(inputTag);
+                if (inputTag.equals(Tag.OTHER)) {
                     inputElement.setInputName(tagText.getText().trim());
                 } else {
-                    inputElement.setInputName(tagCombo.getText());
-                    if (tagCombo.getText().equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
+                    inputElement.setInputName(inputTag.toString());
+                    if (inputTag.equals(Tag.TIMESTAMP)) {
                         inputElement.setInputFormat(tagText.getText().trim());
                     }
                 }
@@ -1238,16 +1247,17 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 String inputFormat = null;
                 Attribute attribute = attributes.get(i);
                 String attributeName = attribute.attributeNameText.getText().trim();
-                if (attribute.tagCombo.getText().equals(CustomTraceDefinition.TAG_OTHER)) {
+                Tag inputTag = Tag.fromLabel(attribute.tagCombo.getText());
+                if (inputTag.equals(Tag.OTHER)) {
                     inputName = attribute.tagText.getText().trim();
                 } else {
-                    inputName = attribute.tagCombo.getText();
-                    if (attribute.tagCombo.getText().equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
+                    inputName = inputTag.toString();
+                    if (inputTag.equals(Tag.TIMESTAMP)) {
                         inputFormat = attribute.tagText.getText().trim();
                     }
                 }
                 int inputAction = attribute.actionCombo.getSelectionIndex();
-                inputElement.addAttribute(new CustomXmlInputAttribute(attributeName, inputName, inputAction, inputFormat));
+                inputElement.addAttribute(new CustomXmlInputAttribute(attributeName, inputTag, inputName, inputAction, inputFormat));
             }
         }
     }
@@ -1338,8 +1348,11 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             tagComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
             tagCombo = new Combo(tagComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-            tagCombo.setItems(new String[] { CustomTraceDefinition.TAG_TIMESTAMP, CustomTraceDefinition.TAG_EVENT_TYPE,
-                    CustomTraceDefinition.TAG_MESSAGE, CustomTraceDefinition.TAG_OTHER });
+            tagCombo.setItems(new String[] {
+                    Tag.TIMESTAMP.toString(),
+                    Tag.EVENT_TYPE.toString(),
+                    Tag.MESSAGE.toString(),
+                    Tag.OTHER.toString() });
             tagCombo.select(3); // Other
             tagCombo.addSelectionListener(new SelectionListener() {
                 @Override
@@ -1397,16 +1410,16 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             actionCombo.select(inputAttribute.getInputAction());
             actionCombo.addSelectionListener(updateListener);
 
-            if (inputAttribute.getInputName().equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
+            if (inputAttribute.getInputTag().equals(Tag.TIMESTAMP)) {
                 tagCombo.select(0);
                 tagLabel.setText(Messages.CustomXmlParserInputWizardPage_format);
                 tagText.setText(inputAttribute.getInputFormat());
                 tagText.addModifyListener(updateListener);
-            } else if (inputAttribute.getInputName().equals(CustomTraceDefinition.TAG_EVENT_TYPE)) {
+            } else if (inputAttribute.getInputTag().equals(Tag.EVENT_TYPE)) {
                 tagCombo.select(1);
                 tagLabel.setVisible(false);
                 tagText.setVisible(false);
-            } else if (inputAttribute.getInputName().equals(CustomTraceDefinition.TAG_MESSAGE)) {
+            } else if (inputAttribute.getInputTag().equals(Tag.MESSAGE)) {
                 tagCombo.select(2);
                 tagLabel.setVisible(false);
                 tagText.setVisible(false);
@@ -1635,7 +1648,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             if (inputElement.isLogEntry()) {
                 logEntryFound = true;
             }
-            if (inputElement.getInputName().equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
+            if (inputElement.getInputTag().equals(Tag.TIMESTAMP)) {
                 timeStampFound = true;
                 if (inputElement.getInputFormat().length() == 0) {
                     errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_elementMissingTimestampFmtError, getName(inputElement)));
@@ -1657,6 +1670,11 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 }
             } else if (inputElement.getInputName().length() == 0) {
                 errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_elementMissingInputNameError, getName(inputElement)));
+                if (elementNode != null) {
+                    elementNode.tagText.setBackground(COLOR_LIGHT_RED);
+                }
+            } else if (inputElement.getInputTag().equals(Tag.OTHER) && Tag.fromLabel(inputElement.getInputName()) != null) {
+                errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_elementReservedInputNameError, getName(inputElement)));
                 if (elementNode != null) {
                     elementNode.tagText.setBackground(COLOR_LIGHT_RED);
                 }
@@ -1705,7 +1723,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         elementNode.attributes.get(i).attributeNameText.setBackground(COLOR_LIGHT_RED);
                     }
                 }
-                if (attribute.getInputName().equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
+                if (attribute.getInputTag().equals(Tag.TIMESTAMP)) {
                     timeStampFound = true;
                     if (attribute.getInputFormat().length() == 0) {
                         errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_attributeMissingTimestampFmtError, getName(attribute, inputElement)));
@@ -1727,6 +1745,11 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     }
                 } else if (attribute.getInputName().length() == 0) {
                     errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_attributeMissingInputNameError, getName(attribute, inputElement)));
+                    if (elementNode != null) {
+                        elementNode.attributes.get(i).tagText.setBackground(COLOR_LIGHT_RED);
+                    }
+                } else if (attribute.getInputTag().equals(Tag.OTHER) && Tag.fromLabel(attribute.getInputName()) != null) {
+                    errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_attributeReservedInputNameError, getName(attribute, inputElement)));
                     if (elementNode != null) {
                         elementNode.attributes.get(i).tagText.setBackground(COLOR_LIGHT_RED);
                     }

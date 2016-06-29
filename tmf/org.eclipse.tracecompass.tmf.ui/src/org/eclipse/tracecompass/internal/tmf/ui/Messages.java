@@ -239,11 +239,13 @@ public class Messages extends NLS {
     public static String CustomXmlParserInputWizardPage_elementMissingTimestampFmtError;
     public static String CustomXmlParserInputWizardPage_elementInvalidTimestampFmtError;
     public static String CustomXmlParserInputWizardPage_elementDuplicateNameError;
+    public static String CustomXmlParserInputWizardPage_elementReservedInputNameError;
     public static String CustomXmlParserInputWizardPage_attributeMissingNameError;
     public static String CustomXmlParserInputWizardPage_attributeMissingInputNameError;
     public static String CustomXmlParserInputWizardPage_attributeMissingTimestampFmtError;
     public static String CustomXmlParserInputWizardPage_attributeInvalidTimestampFmtError;
     public static String CustomXmlParserInputWizardPage_attributeDuplicateNameError;
+    public static String CustomXmlParserInputWizardPage_attributeReservedInputNameError;
     public static String CustomXmlParserInputWizardPage_addAttribute;
     public static String CustomXmlParserInputWizardPage_addChildElement;
     public static String CustomXmlParserInputWizardPage_addDocumentEleemnt;
