@@ -116,7 +116,11 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
      */
     public Collection<UstDebugInfoBinaryFile> getAllBinaries() {
         waitForCompletion();
-        ITmfStateSystem ss = checkNotNull(getStateSystem());
+        ITmfStateSystem ss = getStateSystem();
+        if (ss == null) {
+            /* State system might not yet be initialized */
+            return Collections.EMPTY_SET;
+        }
 
         Set<UstDebugInfoBinaryFile> files = new TreeSet<>();
         ImmutableList.Builder<Integer> builder = ImmutableList.builder();
