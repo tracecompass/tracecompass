@@ -903,15 +903,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         // Handle the table item requests
         fTable.addListener(SWT.SetData, new SetDataListener());
 
-        fTable.addListener(SWT.MenuDetect, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                fLastMenuCursorLocation = new Point(event.x, event.y);
-                Point pt = fTable.getDisplay().map(null, fTable, fLastMenuCursorLocation);
-                Rectangle clientArea = fTable.getClientArea();
-                boolean header = clientArea.y <= pt.y && pt.y < (clientArea.y + fTable.getHeaderHeight());
-                fTable.setMenu(header ? fHeaderMenu : fTablePopup);
-            }
+        fTable.addMenuDetectListener( event -> {
+            fLastMenuCursorLocation = new Point(event.x, event.y);
+            Point pt = fTable.getDisplay().map(null, fTable, fLastMenuCursorLocation);
+            Rectangle clientArea = fTable.getClientArea();
+            boolean header = clientArea.y <= pt.y && pt.y < (clientArea.y + fTable.getHeaderHeight());
+            fTable.setMenu(header ? fHeaderMenu : fTablePopup);
         });
 
         fTable.addMouseListener(new MouseDoubleClickListener());
