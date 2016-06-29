@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -195,15 +196,28 @@ public final class TmfTraceUtils {
      *            <code>0</code> to search from the start of the trace.
      * @param predicate
      *            The predicate to test events against
+     * @param monitor
+     *            Optional progress monitor that can be used to cancel the
+     *            operation
      * @return The first event matching the predicate, or null if the end of the
      *         trace was reached and no event was found
      * @since 2.1
      */
-    public static @Nullable ITmfEvent getNextEventMatching(ITmfTrace trace, long startRank, Predicate<ITmfEvent> predicate) {
+    public static @Nullable ITmfEvent getNextEventMatching(ITmfTrace trace, long startRank,
+            Predicate<ITmfEvent> predicate, @Nullable IProgressMonitor monitor) {
         /* rank + 1 because we do not want to include the start event itself in the search */
         EventMatchingRequest req = new EventMatchingRequest(startRank + 1, predicate, false);
         trace.sendRequest(req);
         try {
+            /* Check periodically if the job was cancelled */
+            req.waitForStart();
+            while (req.isRunning()) {
+                Thread.sleep(200);
+                if (monitor != null && monitor.isCanceled()) {
+                    req.cancel();
+                    return null;
+                }
+            }
             req.waitForCompletion();
         } catch (InterruptedException e) {
             return null;
@@ -222,11 +236,14 @@ public final class TmfTraceUtils {
      *            The rank of the event at which to start searching backwards.
      * @param predicate
      *            The predicate to test events against
+     * @param monitor Optional progress monitor that can be used to cancel the
+     *            operation
      * @return The first event found matching the predicate, or null if the
      *         beginning of the trace was reached and no event was found
      * @since 2.1
      */
-    public static @Nullable ITmfEvent getPreviousEventMatching(ITmfTrace trace, long startRank, Predicate<ITmfEvent> predicate) {
+    public static @Nullable ITmfEvent getPreviousEventMatching(ITmfTrace trace, long startRank,
+            Predicate<ITmfEvent> predicate, @Nullable IProgressMonitor monitor) {
         /*
          * We are going to do a series of queries matching the trace's cache
          * size in length (which should minimize on-disk seeks), then iterate on
@@ -250,6 +267,16 @@ public final class TmfTraceUtils {
                 List<ITmfEvent> list = new ArrayList<>(step);
                 ArrayFillingRequest req = new ArrayFillingRequest(currentRank, step, list);
                 trace.sendRequest(req);
+
+                /* Check periodically if the job was cancelled */
+                req.waitForStart();
+                while (req.isRunning()) {
+                    Thread.sleep(200);
+                    if (monitor != null && monitor.isCanceled()) {
+                        req.cancel();
+                        return null;
+                    }
+                }
                 req.waitForCompletion();
 
                 Optional<ITmfEvent> matchingEvent = Lists.reverse(list).stream()

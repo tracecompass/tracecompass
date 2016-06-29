@@ -16,6 +16,8 @@ import static org.junit.Assert.assertNotEquals;
 
 import java.util.function.Predicate;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -62,6 +64,10 @@ public class TmfTraceUtilsSearchingTest {
         }
     }
 
+    // ------------------------------------------------------------------------
+    // Forwards searches
+    // ------------------------------------------------------------------------
+
     /**
      * Test the {@link TmfTraceUtils#getNextEventMatching} method.
      */
@@ -72,7 +78,26 @@ public class TmfTraceUtilsSearchingTest {
 
         Predicate<@NonNull ITmfEvent> predicate = event -> event.getName().equals("sched_switch");
 
-        ITmfEvent actualEvent = TmfTraceUtils.getNextEventMatching(trace, START_RANK, predicate);
+        ITmfEvent actualEvent = TmfTraceUtils.getNextEventMatching(trace, START_RANK, predicate, null);
+
+        ITmfContext ctx = trace.seekEvent(508L); // following sched_switch event
+        ITmfEvent expectedEvent = trace.getNext(ctx);
+
+        assertEquals(expectedEvent, actualEvent);
+    }
+
+    /**
+     * Test that the presence of progress monitor does not affect the results.
+     */
+    @Test
+    public void testNextMatchingEventProgressMonitor() {
+        ITmfTrace trace = fTrace;
+        assertNotNull(trace);
+
+        Predicate<@NonNull ITmfEvent> predicate = event -> event.getName().equals("sched_switch");
+
+        IProgressMonitor monitor = new NullProgressMonitor();
+        ITmfEvent actualEvent = TmfTraceUtils.getNextEventMatching(trace, START_RANK, predicate, monitor);
 
         ITmfContext ctx = trace.seekEvent(508L); // following sched_switch event
         ITmfEvent expectedEvent = trace.getNext(ctx);
@@ -91,7 +116,7 @@ public class TmfTraceUtilsSearchingTest {
 
         Predicate<@NonNull ITmfEvent> predicate = event -> event.getName().equals("non-existent-event");
 
-        ITmfEvent actualEvent = TmfTraceUtils.getNextEventMatching(trace, START_RANK, predicate);
+        ITmfEvent actualEvent = TmfTraceUtils.getNextEventMatching(trace, START_RANK, predicate, null);
         assertNull(actualEvent);
     }
 
@@ -106,11 +131,33 @@ public class TmfTraceUtilsSearchingTest {
         assertNotNull(trace);
 
         Predicate<@NonNull ITmfEvent> predicate = event -> event.getName().equals("softirq_raise");
-        ITmfEvent foundEvent = TmfTraceUtils.getNextEventMatching(trace, START_RANK, predicate);
+        ITmfEvent foundEvent = TmfTraceUtils.getNextEventMatching(trace, START_RANK, predicate, null);
 
         assertNotNull(foundEvent);
         assertNotEquals(fStartEvent, foundEvent);
     }
+
+    /**
+     * Test with a progress monitor that cancels the job.
+     */
+    @Test
+    public void testNextMatchingEventCancelled() {
+        ITmfTrace trace = fTrace;
+        assertNotNull(trace);
+
+        Predicate<@NonNull ITmfEvent> predicate = event -> event.getName().equals("sched_switch");
+
+        IProgressMonitor monitor = new NullProgressMonitor();
+        monitor.setCanceled(true);
+        ITmfEvent actualEvent = TmfTraceUtils.getNextEventMatching(trace, START_RANK, predicate, monitor);
+
+        /* No event should be returend */
+        assertNull(actualEvent);
+    }
+
+    // ------------------------------------------------------------------------
+    // Backwards searches
+    // ------------------------------------------------------------------------
 
     /**
      * Test the {@link TmfTraceUtils#getPreviousEventMatching} method.
@@ -122,7 +169,26 @@ public class TmfTraceUtilsSearchingTest {
 
         Predicate<@NonNull ITmfEvent> predicate = event -> event.getName().equals("sched_switch");
 
-        ITmfEvent actualEvent = TmfTraceUtils.getPreviousEventMatching(trace, START_RANK, predicate);
+        ITmfEvent actualEvent = TmfTraceUtils.getPreviousEventMatching(trace, START_RANK, predicate, null);
+
+        ITmfContext ctx = trace.seekEvent(455L); // previous sched_switch event
+        ITmfEvent expectedEvent = trace.getNext(ctx);
+
+        assertEquals(expectedEvent, actualEvent);
+    }
+
+    /**
+     * Test that the presence of progress monitor does not affect the results.
+     */
+    @Test
+    public void testPreviousMatchingEventProgressMonitor() {
+        ITmfTrace trace = fTrace;
+        assertNotNull(trace);
+
+        Predicate<@NonNull ITmfEvent> predicate = event -> event.getName().equals("sched_switch");
+
+        IProgressMonitor monitor = new NullProgressMonitor();
+        ITmfEvent actualEvent = TmfTraceUtils.getPreviousEventMatching(trace, START_RANK, predicate, monitor);
 
         ITmfContext ctx = trace.seekEvent(455L); // previous sched_switch event
         ITmfEvent expectedEvent = trace.getNext(ctx);
@@ -141,7 +207,7 @@ public class TmfTraceUtilsSearchingTest {
 
         Predicate<@NonNull ITmfEvent> predicate = event -> event.getName().equals("non-existent-event");
 
-        ITmfEvent actualEvent = TmfTraceUtils.getPreviousEventMatching(trace, START_RANK, predicate);
+        ITmfEvent actualEvent = TmfTraceUtils.getPreviousEventMatching(trace, START_RANK, predicate, null);
         assertNull(actualEvent);
     }
 
@@ -156,7 +222,7 @@ public class TmfTraceUtilsSearchingTest {
         assertNotNull(trace);
 
         Predicate<@NonNull ITmfEvent> predicate = event -> event.getName().equals("softirq_raise");
-        ITmfEvent foundEvent = TmfTraceUtils.getPreviousEventMatching(trace, START_RANK, predicate);
+        ITmfEvent foundEvent = TmfTraceUtils.getPreviousEventMatching(trace, START_RANK, predicate, null);
 
         assertNotNull(foundEvent);
         assertNotEquals(fStartEvent, foundEvent);
@@ -172,7 +238,7 @@ public class TmfTraceUtilsSearchingTest {
         assertNotNull(trace);
 
         Predicate<@NonNull ITmfEvent> predicate = event -> event.getName().equals("sys_write");
-        ITmfEvent actualEvent = TmfTraceUtils.getPreviousEventMatching(trace, START_RANK, predicate);
+        ITmfEvent actualEvent = TmfTraceUtils.getPreviousEventMatching(trace, START_RANK, predicate, null);
 
         ITmfContext ctx = trace.seekEvent(387L); // previous sched_switch event
         ITmfEvent expectedEvent = trace.getNext(ctx);
@@ -196,12 +262,30 @@ public class TmfTraceUtilsSearchingTest {
 
         /* There is a sys_mmap at rank 6, it should not be matched! */
         Predicate<@NonNull ITmfEvent> predicate = event -> event.getName().equals("sys_mmap");
-        ITmfEvent foundEvent = TmfTraceUtils.getPreviousEventMatching(trace, startRank, predicate);
+        ITmfEvent foundEvent = TmfTraceUtils.getPreviousEventMatching(trace, startRank, predicate, null);
         assertNull(foundEvent);
 
         /* Do not match the event itself either, or any later "exit_syscall" */
         predicate = event -> event.getName().equals("exit_syscall");
-        foundEvent = TmfTraceUtils.getPreviousEventMatching(trace, startRank, predicate);
+        foundEvent = TmfTraceUtils.getPreviousEventMatching(trace, startRank, predicate, null);
         assertNull(foundEvent);
+    }
+
+    /**
+     * Test with a progress monitor that cancels the job.
+     */
+    @Test
+    public void testPreviousMatchingEventCancelled() {
+        ITmfTrace trace = fTrace;
+        assertNotNull(trace);
+
+        Predicate<@NonNull ITmfEvent> predicate = event -> event.getName().equals("sched_switch");
+
+        IProgressMonitor monitor = new NullProgressMonitor();
+        monitor.setCanceled(true);
+        ITmfEvent actualEvent = TmfTraceUtils.getPreviousEventMatching(trace, START_RANK, predicate, monitor);
+
+        /* No event should be returend */
+        assertNull(actualEvent);
     }
 }
