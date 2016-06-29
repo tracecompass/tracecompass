@@ -1347,7 +1347,7 @@ To enable all '''Tracepoints''' and all '''System calls (Syscall)''', select the
 
 Upon successful operation, the domain '''Kernel''' will be created in the tree (if neccessary), the default channel with name "channel0" will be added under the domain (if necessary) as well as all a wildcard event '''*''' of type  '''TRACEPOINT''' under the channel and a wildcard event '''*''' of type '''SYSCALL''' . The channel and events will be '''ENABLED'''.
 
-To enable '''Tracepoint''' events, first select the corresponding '''Select''' button, then select either all tracepoins (select '''All''') or select selectively one or more tracepoints in the displayed tree of tracepoints and finally press '''Ok'''.
+To enable '''Tracepoint''' events, first select the corresponding '''Select''' button, then select either all tracepoins (select '''All''') or select selectively one or more tracepoints in the displayed tree of tracepoints. You can also enter directly the name of the events you want to enable (comma separated list and wildcards are supported). Finally press '''Ok'''.
 
 [[Image:images/LTTng2TracepointEventsDialog.png]]
 
