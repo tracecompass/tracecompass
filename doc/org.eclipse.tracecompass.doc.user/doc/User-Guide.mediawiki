@@ -1399,6 +1399,10 @@ Upon successful operation, the event with the given wildcard and event type '''T
 
 [[Image:images/LTTng2EnabledUstWildcardEvents.png]]
 
+When enabling '''Tracepoint''' with wildcard, it is possible to specify event(s) (comma separated list) that we want to '''exclude''' from that wildcard selection. To '''exclude''' '''Tracepoint''' events, check the corresponding '''Select''' check box, fill the '''Event Names''' field and press '''Ok'''.
+
+[[Image:images/LTTng2UstExcludeEventsDialog.png]]
+
 For UST it is possible to enable '''Tracepoint''' events using log levels. To enable '''Tracepoint''' events using log levels, select first the corresponding '''Select''' button, select a log level from the drop down menu, fill in the relevant information (see below) and press '''Ok'''.
 
 * '''Event Name''': Name to display
