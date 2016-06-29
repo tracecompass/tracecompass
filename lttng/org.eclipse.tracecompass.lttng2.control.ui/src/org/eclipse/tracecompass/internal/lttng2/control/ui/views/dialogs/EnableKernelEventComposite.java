@@ -469,7 +469,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
         specificEventGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label specificEventLabel = new Label(specificEventGroup, SWT.LEFT);
-        specificEventLabel.setText(Messages.TraceControl_EnableEventsSpecificEventLabel);
+        specificEventLabel.setText(Messages.TraceControl_EnableEventsEventNameLabel);
         data = new GridData(GridData.FILL_HORIZONTAL);
         data.horizontalSpan = 1;
         specificEventLabel.setLayoutData(data);
