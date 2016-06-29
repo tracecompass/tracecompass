@@ -598,6 +598,19 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         data.horizontalSpan = 2;
         fLogLevelEventNameText.setLayoutData(data);
 
+        fLogLevelButton = new Button(logLevelGroup, SWT.RADIO);
+        fLogLevelButton.setText(Messages.TraceControl_EnableEventsLogLevelTypeName);
+        fLogLevelButton.setToolTipText(Messages.TraceControl_EnableEventsLogLevelTypeTooltip);
+        data = new GridData(GridData.FILL_BOTH);
+        fLogLevelButton.setLayoutData(data);
+        fLogLevelButton.setSelection(true);
+
+        fLogLevelOnlyButton = new Button(logLevelGroup, SWT.RADIO);
+        fLogLevelOnlyButton.setText(Messages.TraceControl_EnableEventsLogLevelOnlyTypeName);
+        fLogLevelOnlyButton.setToolTipText(Messages.TraceControl_EnableEventsLogLevelOnlyTypeTooltip);
+        data = new GridData(GridData.FILL_BOTH);
+        fLogLevelButton.setLayoutData(data);
+
         TraceLogLevel[] levels = TraceLogLevel.values();
 
         String[] levelNames = new String[levels.length - 1];
@@ -614,19 +627,6 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         data = new GridData(GridData.FILL_HORIZONTAL);
         data.horizontalSpan = 4;
         fLogLevelCombo.setLayoutData(data);
-
-        fLogLevelButton = new Button(logLevelGroup, SWT.RADIO);
-        fLogLevelButton.setText(Messages.TraceControl_EnableEventsLogLevelTypeName);
-        fLogLevelButton.setToolTipText(Messages.TraceControl_EnableEventsLogLevelTypeTooltip);
-        data = new GridData(GridData.FILL_BOTH);
-        fLogLevelButton.setLayoutData(data);
-        fLogLevelButton.setSelection(true);
-
-        fLogLevelOnlyButton = new Button(logLevelGroup, SWT.RADIO);
-        fLogLevelOnlyButton.setText(Messages.TraceControl_EnableEventsLogLevelOnlyTypeName);
-        fLogLevelOnlyButton.setToolTipText(Messages.TraceControl_EnableEventsLogLevelOnlyTypeTooltip);
-        data = new GridData(GridData.FILL_BOTH);
-        fLogLevelButton.setLayoutData(data);
     }
 
     void createFilterGroup() {
