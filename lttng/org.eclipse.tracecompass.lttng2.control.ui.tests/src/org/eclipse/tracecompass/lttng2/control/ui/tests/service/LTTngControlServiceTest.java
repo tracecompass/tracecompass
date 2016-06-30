@@ -1145,6 +1145,9 @@ public class LTTngControlServiceTest {
             eventList.add(ustEventWildcard);
             fService.enableEvents(sessionName, channelName, eventList, TraceDomainType.UST, null, excludeList, new NullProgressMonitor());
 
+            // 10) session name, channel = mychannel, enable 'ust*', ust, with filter, exclude 2 events
+            fService.enableEvents(sessionName, channelName, eventList, TraceDomainType.UST, "ust==\"Challenger\"", excludeList, new NullProgressMonitor());
+
         } catch (ExecutionException e) {
             fail(e.toString());
         }
@@ -1199,6 +1202,28 @@ public class LTTngControlServiceTest {
                 assertTrue(eventInfo.getExcludedEvents().contains(ustEventName1));
             } else {
                 assertEquals("has exclusions", eventInfo.getExcludedEvents());
+            }
+
+            // 3) 2 events excluded and using a filter
+            fService.enableEvents(sessionName, channelName, eventList, TraceDomainType.UST, "ust==\"Challenger\"", excludeList, new NullProgressMonitor());
+
+            session = fService.getSession(sessionName, new NullProgressMonitor());
+            assertNotNull(session);
+            eventInfo = session.getDomains()[0].getChannels()[0].getEvents()[0];
+            assertNotNull(eventInfo);
+
+            // version 2.8 and above supports the excluded events list
+            if (version.getMajor() > 1 && version.getMinor() > 7) {
+                assertTrue(eventInfo.getExcludedEvents().contains(ustEventName0));
+                assertTrue(eventInfo.getExcludedEvents().contains(ustEventName1));
+            } else {
+                assertEquals("has exclusions", eventInfo.getExcludedEvents());
+            }
+
+            if (version.getMajor() > 1 && version.getMinor() > 7) {
+                assertTrue(eventInfo.getFilterExpression().equals("ust==Challenger"));
+            } else {
+                assertEquals("with filter", eventInfo.getFilterExpression());
             }
 
         } catch (ExecutionException e) {

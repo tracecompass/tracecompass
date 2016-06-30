@@ -56,6 +56,11 @@ public interface LTTngControlServiceConstants {
      */
     String HAS_EXCLUSIONS = "has exclusions"; //$NON-NLS-1$
 
+    /**
+     * The string returned when some event(s) are filtered.
+     */
+    String WITH_FILTER = "with filter"; //$NON-NLS-1$
+
     // ------------------------------------------------------------------------
     // LTTng Machine Interface constants
     // ------------------------------------------------------------------------
@@ -391,11 +396,11 @@ public interface LTTngControlServiceConstants {
     /**
      * Pattern to match for event information (lttng list <session>)
      */
-    Pattern EVENT_PATTERN = Pattern.compile("\\s+(.*)\\s+\\(loglevel\\s*(:|<=|==)\\s+(.*)\\s+\\(\\d*\\)\\)\\s+\\(type:\\s+(.*)\\)\\s+\\[(enabled|disabled)\\]\\s*(\\[.*\\]){0,1}.*"); //$NON-NLS-1$
+    Pattern EVENT_PATTERN = Pattern.compile("\\s+(.*)\\s+\\(loglevel\\s*(:|<=|==)\\s+(.*)\\s+\\(\\d*\\)\\)\\s+\\(type:\\s+(.*)\\)\\s+\\[(enabled|disabled)\\]\\s*(\\[has exclusions\\])?\\s*(\\[with filter\\])?.*"); //$NON-NLS-1$
     /**
      * Pattern to match a wildcarded event information (lttng list <session>)
      */
-    Pattern WILDCARD_EVENT_PATTERN = Pattern.compile("\\s+(.*)\\s+\\(type:\\s+(.*)\\)\\s+\\[(enabled|disabled)\\]\\s*(\\[.*\\]){0,1}.*"); //$NON-NLS-1$
+    Pattern WILDCARD_EVENT_PATTERN = Pattern.compile("\\s+(.*)\\s+\\(type:\\s+(.*)\\)\\s+\\[(enabled|disabled)\\]\\s*(\\[has exclusions\\])?\\s*(\\[with filter\\])?.*"); //$NON-NLS-1$
     /**
      * Pattern to match a probe address information (lttng list <session>)
      */

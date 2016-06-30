@@ -1117,16 +1117,6 @@ public class LTTngControlService implements ILttngControlService {
     // Helper methods
     // ------------------------------------------------------------------------
 
-    private static void setFilterExpression(IEventInfo eventInfo, String filter) {
-        // remove '[' and ']'
-        String temp = filter.substring(1, filter.length() - 1);
-        if (temp.equals(LTTngControlServiceConstants.HAS_EXCLUSIONS)) {
-            eventInfo.setExcludedEvents(temp);
-        } else {
-            eventInfo.setFilterExpression(temp);
-        }
-    }
-
     /**
      * Checks if command result is an error result.
      *
@@ -1347,9 +1337,11 @@ public class LTTngControlService implements ILttngControlService {
                 eventInfo.setLogLevel(matcher.group(3).trim());
                 eventInfo.setEventType(matcher.group(4).trim());
                 eventInfo.setState(matcher.group(5));
-                String filter = matcher.group(6);
-                if (filter != null) {
-                    setFilterExpression(eventInfo, filter);
+                if (("[" + LTTngControlServiceConstants.HAS_EXCLUSIONS + "]").equals(matcher.group(6))) { //$NON-NLS-1$ //$NON-NLS-2$
+                    eventInfo.setExcludedEvents(LTTngControlServiceConstants.HAS_EXCLUSIONS);
+                }
+                if (("[" + LTTngControlServiceConstants.WITH_FILTER + "]").equals(matcher.group(7))) { //$NON-NLS-1$ //$NON-NLS-2$
+                    eventInfo.setFilterExpression(LTTngControlServiceConstants.WITH_FILTER);
                 }
                 events.add(eventInfo);
                 index++;
@@ -1358,9 +1350,11 @@ public class LTTngControlService implements ILttngControlService {
                 eventInfo.setLogLevel(TraceLogLevel.LEVEL_UNKNOWN);
                 eventInfo.setEventType(matcher2.group(2).trim());
                 eventInfo.setState(matcher2.group(3));
-                String filter = matcher2.group(4);
-                if (filter != null) {
-                    setFilterExpression(eventInfo, filter);
+                if (("[" + LTTngControlServiceConstants.HAS_EXCLUSIONS + "]").equals(matcher2.group(4))) { //$NON-NLS-1$ //$NON-NLS-2$
+                    eventInfo.setExcludedEvents(LTTngControlServiceConstants.HAS_EXCLUSIONS);
+                }
+                if (("[" + LTTngControlServiceConstants.WITH_FILTER + "]").equals(matcher2.group(5))) { //$NON-NLS-1$ //$NON-NLS-2$
+                    eventInfo.setFilterExpression(LTTngControlServiceConstants.WITH_FILTER);
                 }
 
                 if ((eventInfo.getEventType() == TraceEventType.PROBE) ||
