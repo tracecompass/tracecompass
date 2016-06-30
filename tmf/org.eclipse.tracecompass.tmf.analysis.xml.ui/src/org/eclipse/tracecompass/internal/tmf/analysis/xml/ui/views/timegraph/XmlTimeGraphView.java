@@ -31,7 +31,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readonly.TmfXmlReadOnlyModelFactory;
@@ -128,8 +130,13 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
                 }
             }
         });
-
         fFactory = TmfXmlReadOnlyModelFactory.getInstance();
+    }
+
+    @Override
+    public void createPartControl(Composite parent) {
+        super.createPartControl(parent);
+        fViewInfo.setName(NonNullUtils.checkNotNull(getViewSite().getSecondaryId()));
     }
 
     private void loadNewXmlView() {
@@ -223,6 +230,9 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
     @Override
     protected void buildEntryList(ITmfTrace trace, ITmfTrace parentTrace, IProgressMonitor monitor) {
 
+        if (!fViewInfo.waitForInitialization()) {
+            return;
+        }
         /*
          * Get the view element from the XML file. If the element can't be
          * found, return.

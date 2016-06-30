@@ -9,6 +9,7 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource;
@@ -21,6 +22,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.TmfXmlAnalys
 public abstract class AbstractXmlViewInfo {
 
     private final String fViewId;
+    private @Nullable String fViewName;
 
     /**
      * Constructor
@@ -30,11 +32,32 @@ public abstract class AbstractXmlViewInfo {
      */
     public AbstractXmlViewInfo(String viewId) {
         fViewId = viewId;
+        fViewName = null;
+    }
+
+    /**
+     * Set the view's name, which should correspond to a secondary ID
+     *
+     * @param name
+     *            The view's name
+     */
+    public void setName(@NonNull String name) {
+        fViewName = name;
+    }
+
+    /**
+     * Get the name of the view, which should correspond to the view's secondary
+     * ID. If this name is not null, it will never be null again
+     *
+     * @return The name of the view
+     */
+    protected @Nullable String getName() {
+        return fViewName;
     }
 
     /**
      * Get this view property section from the settings. The property section is
-     * per view ID.
+     * per view ID and view name if available.
      *
      * @return The property section
      */
@@ -44,10 +67,21 @@ public abstract class AbstractXmlViewInfo {
         if (section == null) {
             section = settings.addNewSection(fViewId);
             if (section == null) {
-                throw new IllegalStateException("The persistent property section could not be added"); //$NON-NLS-1$
+                throw new IllegalStateException("The persistent property section could not be added " + fViewId); //$NON-NLS-1$
             }
         }
-        return section;
+        if (fViewName == null) {
+            return section;
+        }
+        // FIXME: when a file is removed from TraceCompass, its view section should also be deleted
+        IDialogSettings subSection = section.getSection(fViewName);
+        if (subSection == null) {
+            subSection = section.addNewSection(fViewName);
+            if (subSection == null) {
+                throw new IllegalStateException("The persistent property section could not be added: " + fViewName); //$NON-NLS-1$
+            }
+        }
+        return subSection;
     }
 
     /**

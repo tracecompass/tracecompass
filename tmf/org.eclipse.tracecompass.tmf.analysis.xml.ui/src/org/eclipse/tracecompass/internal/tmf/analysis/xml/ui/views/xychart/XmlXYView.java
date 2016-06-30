@@ -17,6 +17,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
@@ -65,7 +66,6 @@ public class XmlXYView extends TmfChartView {
             }
 
         });
-        setViewTitle();
     }
 
     private void setViewTitle() {
@@ -89,6 +89,13 @@ public class XmlXYView extends TmfChartView {
                 setPartName(viewTitle);
             }
         });
+    }
+
+    @Override
+    public void createPartControl(@Nullable Composite parent) {
+        super.createPartControl(parent);
+        fViewInfo.setName(NonNullUtils.checkNotNull(getViewSite().getSecondaryId()));
+        setViewTitle();
     }
 
     @Override

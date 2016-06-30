@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -35,9 +36,13 @@ public class XmlViewInfo extends AbstractXmlViewInfo {
     private static final String XML_VIEW_ID_PROPERTY = "XmlViewId"; //$NON-NLS-1$
     private static final String XML_VIEW_FILE_PROPERTY = "XmlViewFile"; //$NON-NLS-1$
 
+    /* Initialization is completed when name is set */
+    private final CountDownLatch fInitialized = new CountDownLatch(1);
     /** This is the ID of the view described in the XML file */
     private @Nullable String fId = null;
     private @Nullable String fFilePath = null;
+    // If true, properties were set but not saved to persistent storage
+    private boolean fIsDirty = false;
 
     /**
      * Constructor
@@ -47,10 +52,22 @@ public class XmlViewInfo extends AbstractXmlViewInfo {
      */
     public XmlViewInfo(String viewId) {
         super(viewId);
+        /* Cannot get the properties yet, need to wait for the name */
+    }
 
-        IDialogSettings settings = getPersistentPropertyStore();
-        fId = settings.get(XML_VIEW_ID_PROPERTY);
-        fFilePath = settings.get(XML_VIEW_FILE_PROPERTY);
+    /**
+     * Waits for the view info's initialization to be completed. This happens
+     * once the name has been set
+     *
+     * @return Whether the initialization has completed successfully
+     */
+    public boolean waitForInitialization() {
+        try {
+            fInitialized.await();
+        } catch (InterruptedException e) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -63,11 +80,29 @@ public class XmlViewInfo extends AbstractXmlViewInfo {
      *            "path of the file containing the XML element"
      */
     @Override
-    public void setViewData(String data) {
+    public synchronized void setViewData(String data) {
         String[] idFile = data.split(TmfXmlAnalysisOutputSource.DATA_SEPARATOR);
         fId = (idFile.length > 0) ? idFile[0] : null;
         fFilePath = (idFile.length > 1) ? idFile[1] : null;
-        savePersistentData();
+        String viewName = getName();
+        if (viewName != null) {
+            savePersistentData();
+        } else {
+            fIsDirty = true;
+        }
+    }
+
+    @Override
+    public synchronized void setName(String name) {
+        super.setName(name);
+        if (fIsDirty) {
+            savePersistentData();
+        } else {
+            IDialogSettings settings = getPersistentPropertyStore();
+            fId = settings.get(XML_VIEW_ID_PROPERTY);
+            fFilePath = settings.get(XML_VIEW_FILE_PROPERTY);
+        }
+        fInitialized.countDown();
     }
 
     @Override
