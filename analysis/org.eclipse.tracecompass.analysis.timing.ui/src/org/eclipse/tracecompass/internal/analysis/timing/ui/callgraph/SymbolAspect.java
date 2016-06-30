@@ -1,0 +1,80 @@
+/*******************************************************************************
+ * Copyright (c) 2016 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
+
+package org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph;
+
+import java.util.Comparator;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CalledFunction;
+import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.Messages;
+import org.eclipse.tracecompass.segmentstore.core.ISegment;
+import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
+import org.eclipse.tracecompass.tmf.ui.symbols.SymbolProviderManager;
+
+/**
+ * An aspect used to get the function name of a call stack event or to compare
+ * the duration of two events
+ *
+ * @author Sonia Farrah
+ */
+public final class SymbolAspect implements ISegmentAspect {
+    /**
+     * A symbol aspect
+     */
+    public static final @NonNull ISegmentAspect SYMBOL_ASPECT = new SymbolAspect();
+
+    /**
+     * Constructor
+     */
+    public SymbolAspect() {
+    }
+
+    @Override
+    public @NonNull String getName() {
+        return NonNullUtils.nullToEmptyString(Messages.CallStack_FunctionName);
+    }
+
+    @Override
+    public @NonNull String getHelpText() {
+        return NonNullUtils.nullToEmptyString(Messages.CallStack_FunctionName);
+    }
+
+    @Override
+    public @Nullable Comparator<?> getComparator() {
+        return new Comparator<CalledFunction>() {
+            @Override
+            public int compare(@Nullable CalledFunction o1, @Nullable CalledFunction o2) {
+                if (o1 == null || o2 == null) {
+                    throw new IllegalArgumentException();
+                }
+                return Long.compare(o1.getLength(), o2.getLength());
+            }
+        };
+    }
+
+    @Override
+    public @Nullable Object resolve(@NonNull ISegment segment) {
+        if (segment instanceof CalledFunction) {
+            CalledFunction calledFunction = (CalledFunction) segment;
+            ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
+            if (trace != null) {
+                ISymbolProvider provider = SymbolProviderManager.getInstance().getSymbolProvider(trace);
+                String symbolText = provider.getSymbolText(calledFunction.getAddr());
+                return symbolText == null ? "0x" + calledFunction.getAddr() : symbolText; //$NON-NLS-1$
+            }
+        }
+        return null;
+    }
+}

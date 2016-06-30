@@ -492,8 +492,8 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
                     break;
                 }
 
-                fStats.put(Messages.SyncAlgorithmFullyIncremental_refhost, fReferenceHostName + " (" + fReferenceHost + ")");
-                fStats.put(Messages.SyncAlgorithmFullyIncremental_otherhost, fOtherHostName + " (" + fOtherHost + ")");
+                fStats.put(Messages.SyncAlgorithmFullyIncremental_refhost, fReferenceHostName + " (" + fReferenceHost + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+                fStats.put(Messages.SyncAlgorithmFullyIncremental_otherhost, fOtherHostName + " (" + fOtherHost + ")"); //$NON-NLS-1$ //$NON-NLS-2$
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_quality, syncQuality);
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_alpha, fAlpha);
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_beta, fBeta);
@@ -533,12 +533,11 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
             fStats = new LinkedHashMap<>();
         }
 
-        @SuppressWarnings("nls")
         @Override
         public String toString() {
             StringBuilder b = new StringBuilder();
-            b.append("Between " + fReferenceHost + " and " + fOtherHost + " [");
-            b.append(" alpha " + fAlpha + " beta " + fBeta + " ]");
+            b.append("Between " + fReferenceHost + " and " + fOtherHost + " ["); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            b.append(" alpha " + fAlpha + " beta " + fBeta + " ]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             return b.toString();
         }
 
