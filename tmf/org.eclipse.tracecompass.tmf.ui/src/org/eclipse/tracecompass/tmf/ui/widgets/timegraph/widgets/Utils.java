@@ -83,6 +83,14 @@ public class Utils {
         NANOSEC
     }
 
+    /**
+     * Ellipsis character, used to shorten strings that don't fit in their
+     * target area.
+     *
+     * @since 2.1
+     */
+    public static final String ELLIPSIS = "…"; //$NON-NLS-1$
+
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss"); //$NON-NLS-1$
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd"); //$NON-NLS-1$
     private static final long HOURS_PER_DAY = 24;
@@ -305,7 +313,9 @@ public class Utils {
      * @param isTransparent
      *            If <code>true</code> the background will be transparent, otherwise it will be opaque
      * @return The number of characters written
+     * @deprecated Use {@link #drawText(GC, String, int, int, int, int, boolean, boolean)} instead.
      */
+    @Deprecated
     public static int drawText(GC gc, String text, int x, int y, int width, boolean isCentered, boolean isTransparent) {
         if (width < 1) {
             return 0;
@@ -356,36 +366,64 @@ public class Utils {
      * @since 2.0
      */
     public static int drawText(GC gc, String text, int x, int y, int width, int height, boolean isCentered, boolean isTransparent) {
-        if (width < 1) {
+        if (width < 1 || text.isEmpty()) {
             return 0;
         }
 
-        int len = text.length();
-        int textWidth = 0;
+        String stringToDisplay;
+        int len;
+
         boolean isCenteredWidth = isCentered;
         int realX = x;
         int realY = y;
 
-        Point textExtent = null;
-        while (len > 0) {
-            textExtent = gc.textExtent(text.substring(0, len));
-            textWidth = textExtent.x;
-            if (textWidth <= width) {
-                break;
-            }
+        /* First check if the whole string fits */
+        Point textExtent = gc.textExtent(text);
+        if (textExtent.x <= width) {
+            len = text.length();
+            stringToDisplay = text;
+        } else {
+            /*
+             * The full string doesn't fit, try to find the longest one with
+             * "..." at the end that does fit.
+             *
+             * Iterate on the string length sizes, starting from 1 going up,
+             * until we find a string that does not fit. Once we do, we keep the
+             * one just before that did fit.
+             */
             isCenteredWidth = false;
-            len--;
-            textExtent = gc.textExtent(text.substring(0, len));
-        }
-        if (len > 0) {
-            if (isCenteredWidth) {
-                realX += (width - textWidth) / 2;
+            int prevLen = 0;
+            len = 1;
+            while (len <= text.length()) {
+                textExtent = gc.textExtent(text.substring(0, len) + ELLIPSIS);
+                if (textExtent.x > width) {
+                    /*
+                     * Here is the first length that does not fit, the one from
+                     * the previous iteration is the one we will use.
+                     */
+                    len = prevLen;
+                    break;
+                }
+                /* This string would fit, try the next one */
+                prevLen = len;
+                len++;
             }
-            if (isCentered && textExtent != null) {
-                realY += (height - textExtent.y) / 2 - 1;
-            }
-            gc.drawText(text.substring(0, len), realX, realY, isTransparent);
+            stringToDisplay = text.substring(0, len) + ELLIPSIS;
         }
+
+        if (len <= 0) {
+            /* Nothing fits, we end up drawing nothing */
+            return 0;
+        }
+
+        if (isCenteredWidth) {
+            realX += (width - textExtent.x) / 2;
+        }
+        if (isCentered) {
+            realY += (height - textExtent.y) / 2 - 1;
+        }
+        gc.drawText(stringToDisplay, realX, realY, isTransparent);
+
         return len;
     }
 

@@ -48,7 +48,12 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
 
     private CallStackView fView;
 
-    private Integer fAverageCharWidth;
+    /**
+     * Minimum width of a displayed state below which we will not print any text
+     * into it. It corresponds to the average width of 1 char, plus the width of
+     * the ellipsis characters.
+     */
+    private Integer fMinimumBarWidth;
 
     private final LoadingCache<CallStackEvent, Optional<String>> fTimeEventNames = CacheBuilder.newBuilder()
             .maximumSize(1000)
@@ -141,16 +146,27 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
 
     @Override
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
-        if (fAverageCharWidth == null) {
-            fAverageCharWidth = gc.getFontMetrics().getAverageCharWidth();
-        }
-        if (bounds.width <= fAverageCharWidth) {
-            return;
-        }
         if (!(event instanceof CallStackEvent)) {
             return;
         }
-        String name = fTimeEventNames.getUnchecked((CallStackEvent) event).orElse(null);
+
+        if (fMinimumBarWidth == null) {
+            fMinimumBarWidth = gc.getFontMetrics().getAverageCharWidth() + gc.stringExtent(Utils.ELLIPSIS).x;
+        }
+        if (bounds.width <= fMinimumBarWidth) {
+            /*
+             * Don't print anything if we cannot at least show one character and
+             * ellipses.
+             */
+            return;
+        }
+
+        String name = fTimeEventNames.getUnchecked((CallStackEvent) event).orElse(""); //$NON-NLS-1$
+        if (name.isEmpty()) {
+            /* No text to print */
+            return;
+        }
+
         gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
         Utils.drawText(gc, name, bounds.x, bounds.y, bounds.width, bounds.height, true, true);
     }
