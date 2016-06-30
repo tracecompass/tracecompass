@@ -63,7 +63,7 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            allowMultiple="false"
+            allowMultiple="true"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
             class="org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.timegraph.XmlTimeGraphView"
             id="org.eclipse.linuxtools.tmf.analysis.xml.ui.views.timegraph"
@@ -71,7 +71,7 @@
             restorable="true">
       </view>
       <view
-            allowMultiple="false"
+            allowMultiple="true"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
             class="org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.xychart.XmlXYView"
             id="org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.views.xyview"

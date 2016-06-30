@@ -20,6 +20,11 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.Tmf
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource.ViewType;
 import org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.w3c.dom.Element;
 
 /**
@@ -66,6 +71,14 @@ public class TmfXmlViewOutput extends TmfAnalysisViewOutput {
             return super.getName();
         }
         return fLabel;
+    }
+
+    @Override
+    protected IViewPart openView() throws PartInitException {
+        final IWorkbench wb = PlatformUI.getWorkbench();
+        final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+
+        return activePage.showView(getViewId(), getName(), IWorkbenchPage.VIEW_ACTIVATE);
     }
 
     @Override
