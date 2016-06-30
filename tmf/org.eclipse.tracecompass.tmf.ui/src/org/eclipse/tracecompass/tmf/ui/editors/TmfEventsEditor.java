@@ -42,9 +42,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
+import org.eclipse.tracecompass.internal.tmf.ui.editors.TmfTableColumnUtils;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
-import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
@@ -200,7 +201,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         if (propId == IEditorPart.PROP_INPUT && getEditorInput() instanceof TmfEditorInput) {
             if (fTrace != null) {
                 broadcast(new TmfTraceClosedSignal(this, fTrace));
-                TmfTraceColumnManager.saveColumnOrder(fTrace.getTraceTypeId(), fEventsTable.getColumnOrder());
+                saveState();
             }
             fEventsTable.dispose();
             fFile = ((TmfEditorInput) getEditorInput()).getFile();
@@ -216,6 +217,19 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             }
             fParent.layout();
         }
+    }
+
+    private void loadState() {
+        final @Nullable String traceTypeId = fTrace.getTraceTypeId();
+        fEventsTable.setColumnOrder(TmfTableColumnUtils.loadColumnOrder(traceTypeId));
+        fEventsTable.setColumnWidth(TmfTableColumnUtils.loadColumnWidth(traceTypeId), TmfTableColumnUtils.loadColumnResizable(traceTypeId));
+    }
+
+    private void saveState() {
+        final @Nullable String traceTypeId = fTrace.getTraceTypeId();
+        TmfTableColumnUtils.saveColumnOrder(traceTypeId, fEventsTable.getColumnOrder());
+        TmfTableColumnUtils.saveColumnWidth(traceTypeId, fEventsTable.getColumnWidth());
+        TmfTableColumnUtils.saveColumnResizability(traceTypeId, fEventsTable.getColumnResizable());
     }
 
     @Override
@@ -236,7 +250,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             setPartName(fTrace.getName());
             fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());
             fEventsTable.registerContextMenus(getSite());
-            fEventsTable.setColumnOrder(TmfTraceColumnManager.loadColumnOrder(fTrace.getTraceTypeId()));
+            loadState();
             fEventsTable.addSelectionChangedListener(this);
             fEventsTable.setTrace(fTrace, true);
             fEventsTable.refreshBookmarks(fFile);
@@ -274,7 +288,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         if (fTrace != null) {
             broadcast(new TmfTraceClosedSignal(this, fTrace));
             if (fEventsTable != null) {
-                TmfTraceColumnManager.saveColumnOrder(fTrace.getTraceTypeId(), fEventsTable.getColumnOrder());
+                saveState();
             }
         }
         super.dispose();

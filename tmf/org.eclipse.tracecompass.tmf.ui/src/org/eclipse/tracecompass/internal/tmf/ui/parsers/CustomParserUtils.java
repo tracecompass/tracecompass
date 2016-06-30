@@ -21,9 +21,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.internal.tmf.ui.editors.TmfTableColumnUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.project.operations.TmfWorkspaceModifyOperation;
 import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
-import org.eclipse.tracecompass.tmf.ui.editors.TmfTraceColumnManager;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
@@ -74,9 +74,11 @@ public class CustomParserUtils {
                 }
 
                 /*
-                 * Clear the column order for this trace type. Must be done after closing the editors.
+                 * Clear the column settings for this trace type. Must be done after closing the editors.
                  */
-                TmfTraceColumnManager.clearColumnOrder(traceTypeId);
+                TmfTableColumnUtils.clearColumnOrder(traceTypeId);
+                TmfTableColumnUtils.clearColumnWidth(traceTypeId);
+                TmfTableColumnUtils.clearColumnResizable(traceTypeId);
             }
         };
         try {
