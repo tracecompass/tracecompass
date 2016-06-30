@@ -108,6 +108,7 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.ui;x-friends:="org.eclipse
  org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets,
  org.eclipse.tracecompass.tmf.ui.widgets.virtualtable
 Import-Package: com.google.common.base,
+ com.google.common.cache,
  com.google.common.collect,
  org.eclipse.emf.common.util,
  org.eclipse.emf.ecore

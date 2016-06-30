@@ -361,7 +361,7 @@ public class CallStackView extends AbstractTimeGraphView {
      */
     public CallStackView() {
         super(ID, new CallStackPresentationProvider());
-        ((CallStackPresentationProvider) getPresentationProvider()).setCallStackView(this);
+        getPresentationProvider().setCallStackView(this);
         setTreeColumns(COLUMN_NAMES);
         setTreeLabelProvider(new CallStackTreeLabelProvider());
         setEntryComparator(new CallStackComparator());
@@ -500,6 +500,15 @@ public class CallStackView extends AbstractTimeGraphView {
     // ------------------------------------------------------------------------
     // Internal
     // ------------------------------------------------------------------------
+
+    /**
+     * @since 2.1
+     */
+    @Override
+    protected CallStackPresentationProvider getPresentationProvider() {
+        /* Set to this type by the constructor */
+        return (CallStackPresentationProvider) super.getPresentationProvider();
+    }
 
     @Override
     @TmfSignalHandler
@@ -1220,6 +1229,7 @@ public class CallStackView extends AbstractTimeGraphView {
             public void run() {
                 SymbolProviderConfigDialog dialog = new SymbolProviderConfigDialog(getSite().getShell(), getProviderPages());
                 if (dialog.open() == IDialogConstants.OK_ID) {
+                    getPresentationProvider().resetFunctionNames();
                     refresh();
                 }
             }

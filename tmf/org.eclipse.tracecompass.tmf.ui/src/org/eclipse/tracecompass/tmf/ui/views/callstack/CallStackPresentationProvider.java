@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.callstack;
 
+import java.util.Optional;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
@@ -29,6 +31,10 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 /**
  * Presentation provider for the Call Stack view, based on the generic TMF
  * presentation provider.
@@ -43,6 +49,28 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
     private CallStackView fView;
 
     private Integer fAverageCharWidth;
+
+    private final LoadingCache<CallStackEvent, Optional<String>> fTimeEventNames = CacheBuilder.newBuilder()
+            .maximumSize(1000)
+            .build(new CacheLoader<CallStackEvent, Optional<String>>() {
+                @Override
+                public Optional<String> load(CallStackEvent event) {
+                    CallStackEntry entry = event.getEntry();
+                    ITmfStateSystem ss = entry.getStateSystem();
+                    try {
+                        ITmfStateValue value = ss.querySingleState(event.getTime(), entry.getQuark()).getStateValue();
+                        if (!value.isNull()) {
+                            String name = fView.getFunctionName(entry.getTrace(), entry.getProcessId(), event.getTime(), value);
+                            return Optional.ofNullable(name);
+                        }
+                    } catch (TimeRangeException e) {
+                        Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
+                    } catch (StateSystemDisposedException e) {
+                        /* Ignored */
+                    }
+                    return Optional.empty();
+                }
+            });
 
     private enum State {
         MULTIPLE (new RGB(100, 100, 100)),
@@ -106,19 +134,7 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
     @Override
     public String getEventName(ITimeEvent event) {
         if (event instanceof CallStackEvent) {
-            CallStackEntry entry = (CallStackEntry) event.getEntry();
-            ITmfStateSystem ss = entry.getStateSystem();
-            try {
-                ITmfStateValue value = ss.querySingleState(event.getTime(), entry.getQuark()).getStateValue();
-                if (!value.isNull()) {
-                    return fView.getFunctionName(entry.getTrace(), entry.getProcessId(), event.getTime(), value);
-                }
-            } catch (TimeRangeException e) {
-                Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
-            } catch (StateSystemDisposedException e) {
-                /* Ignored */
-            }
-            return null;
+            return fTimeEventNames.getUnchecked((CallStackEvent) event).orElse(null);
         }
         return State.MULTIPLE.toString();
     }
@@ -134,20 +150,17 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
         if (!(event instanceof CallStackEvent)) {
             return;
         }
-        CallStackEntry entry = (CallStackEntry) event.getEntry();
-        ITmfStateSystem ss = entry.getStateSystem();
-        try {
-            ITmfStateValue value = ss.querySingleState(event.getTime(), entry.getQuark()).getStateValue();
-            if (!value.isNull()) {
-                String name = fView.getFunctionName(entry.getTrace(), entry.getProcessId(), event.getTime(), value);
-                gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
-                Utils.drawText(gc, name, bounds.x, bounds.y, bounds.width, bounds.height, true, true);
-            }
-        } catch (TimeRangeException e) {
-            Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
-        } catch (StateSystemDisposedException e) {
-            /* Ignored */
-        }
+        String name = fTimeEventNames.getUnchecked((CallStackEvent) event).orElse(null);
+        gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
+        Utils.drawText(gc, name, bounds.x, bounds.y, bounds.width, bounds.height, true, true);
+    }
+
+    /**
+     * Indicate that the provider of function names has changed, so any cached
+     * values must be reset.
+     */
+    void resetFunctionNames() {
+        fTimeEventNames.invalidateAll();
     }
 
 }

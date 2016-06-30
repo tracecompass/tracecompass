@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
+import java.util.Objects;
+
 /**
  * Generic TimeEvent implementation
  *
@@ -118,6 +120,29 @@ public class TimeEvent implements ITimeEvent {
                 new TimeEvent(fEntry, Math.max(fTime, splitTime), fDuration - Math.max(0, splitTime - fTime),
                         fValue) :
                 null);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fEntry, fTime, fDuration, fValue);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        TimeEvent other = (TimeEvent) obj;
+        return Objects.equals(fEntry, other.fEntry) &&
+                Objects.equals(fTime, other.fTime) &&
+                Objects.equals(fDuration, other.fDuration) &&
+                Objects.equals(fValue, other.fValue);
     }
 
     @Override

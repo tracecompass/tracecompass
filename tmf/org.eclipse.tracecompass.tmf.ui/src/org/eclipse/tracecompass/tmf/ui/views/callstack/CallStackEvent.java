@@ -36,4 +36,14 @@ public class CallStackEvent extends TimeEvent {
     public CallStackEvent(CallStackEntry entry, long time, long duration, int value) {
         super(entry, time, duration, value);
     }
+
+    /**
+     * @since 2.1
+     */
+    @Override
+    public CallStackEntry getEntry() {
+        /* Type enforced at constructor */
+        return (CallStackEntry) fEntry;
+    }
+
 }
