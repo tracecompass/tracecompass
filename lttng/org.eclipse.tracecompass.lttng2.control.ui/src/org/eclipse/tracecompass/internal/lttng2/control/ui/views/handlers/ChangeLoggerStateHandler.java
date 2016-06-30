@@ -23,7 +23,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
@@ -67,12 +69,16 @@ public abstract class ChangeLoggerStateHandler extends BaseControlViewHandler {
      *            domain of events to be enabled
      * @param loggerNames
      *            list logger names
+     * @param logLevel
+     *            the log level
+     * @param logLevelType
+     *            the log level type
      * @param monitor
      *            a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
-    protected abstract void changeState(TraceDomainComponent domain, List<String> loggerNames, IProgressMonitor monitor) throws ExecutionException;
+    protected abstract void changeState(TraceDomainComponent domain, List<String> loggerNames, TraceJulLogLevel logLevel, LogLevelType logLevelType, IProgressMonitor monitor) throws ExecutionException;
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -96,35 +102,26 @@ public abstract class ChangeLoggerStateHandler extends BaseControlViewHandler {
                     TraceSessionComponent session = null;
 
                     try {
-                        boolean isAll = false;
                         if (param.getLoggers() != null) {
                             session = param.getDomain().getSession();
                             List<String> loggerNames = new ArrayList<>();
                             List<TraceLoggerComponent> loggers = param.getLoggers();
 
-                            for (Iterator<TraceLoggerComponent> iterator = loggers.iterator(); iterator.hasNext();) {
-                                // Enable/disable all selected channels which are disabled
-                                TraceLoggerComponent traceLogger = iterator.next();
-
-                                // Workaround for wildcard handling in lttng-tools
-                                if ("*".equals(traceLogger.getName())) { //$NON-NLS-1$
-                                    isAll = true;
+                            for (TraceLoggerComponent logger : loggers) {
+                                if ("*".equals(logger.getName())) { //$NON-NLS-1$
+                                    changeState(param.getDomain(), null, param.getLogLevel(), param.getLogLevelType(), monitor);
                                 } else {
-                                    loggerNames.add(traceLogger.getName());
+                                    loggerNames.add(logger.getName());
                                 }
-                            }
-                            if (isAll) {
-                                changeState(param.getDomain(), null, monitor);
                             }
 
                             if (!loggerNames.isEmpty()) {
-                                changeState(param.getDomain(), loggerNames, monitor);
+                                changeState(param.getDomain(), loggerNames, param.getLogLevel(), param.getLogLevelType(), monitor);
                             }
 
-                            for (Iterator<TraceLoggerComponent> iterator = loggers.iterator(); iterator.hasNext();) {
+                            for (TraceLoggerComponent logger : loggers) {
                                 // Enable all selected channels which are disabled
-                                TraceLoggerComponent lg = iterator.next();
-                                lg.setState(getNewState());
+                                logger.setState(getNewState());
                             }
                         }
                     } catch (ExecutionException e) {
@@ -163,6 +160,8 @@ public abstract class ChangeLoggerStateHandler extends BaseControlViewHandler {
         ISelection selection = page.getSelection(ControlView.ID);
 
         TraceDomainComponent domain = null;
+        TraceJulLogLevel logLevel = null;
+        LogLevelType logLevelType = null;
         List<TraceLoggerComponent> loggers = new ArrayList<>();
 
         if (selection instanceof StructuredSelection) {
@@ -176,6 +175,13 @@ public abstract class ChangeLoggerStateHandler extends BaseControlViewHandler {
                 if (element instanceof TraceLoggerComponent) {
 
                     TraceLoggerComponent logger = (TraceLoggerComponent) element;
+
+                    // This is a work-around the a bug that destroys all the sessions, this bug was fixed in LTTng 2.8.1
+                    // https://github.com/lttng/lttng-tools/pull/75/commits/aae621cf9d9a078f40415495a77e07079690fea1
+                    if (logger.getName().equals("*") && !logger.getTargetNode().isVersionSupported("2.8.1")) { //$NON-NLS-1$ //$NON-NLS-2$
+                        return false;
+                    }
+
                     if (sessionName == null) {
                         sessionName = String.valueOf(logger.getSessionName());
                     }
@@ -188,9 +194,29 @@ public abstract class ChangeLoggerStateHandler extends BaseControlViewHandler {
                         domainName = logger.getDomain().name();
                     }
 
-                    // Enable command only for loggers of same session, same channel and domain
+                    if (logLevel == null) {
+                        logLevel = logger.getLogLevel();
+                    }
+
+                    if (logLevelType == null) {
+                        logLevelType = logger.getLogLevelType();
+                    }
+
+                    // Enable command only for loggers of same session and domain.
+                    // This is because when using the lttng enable-event command to re-enable disabled
+                    // loggers we need to pass all the options of the logger, this means that if two loggers are from
+                    // different session or domain they need to be enabled in two different lttng commands. At this moment,
+                    // it is simpler to disable the context menu. This issue will be addressed later as an enhancement.
                     if ((!sessionName.equals(logger.getSessionName())) ||
                         (!domain.getName().equals(logger.getDomain().name()))) {
+                        loggers.clear();
+                        break;
+                    }
+
+                    // Enable command only for loggers of same loglevel and loglevel type
+                    // Same reason as explained above.
+                    if ((!logLevel.equals(logger.getLogLevel())) ||
+                        (!logLevelType.equals(logger.getLogLevelType()))) {
                         loggers.clear();
                         break;
                     }
@@ -207,7 +233,7 @@ public abstract class ChangeLoggerStateHandler extends BaseControlViewHandler {
         try {
             fParam = null;
             if (isEnabled) {
-                fParam = new Parameter(domain, loggers);
+                fParam = new Parameter(domain, loggers, logLevel, logLevelType);
             }
         } finally {
             fLock.unlock();
@@ -223,11 +249,18 @@ public abstract class ChangeLoggerStateHandler extends BaseControlViewHandler {
          * Domain component reference.
          */
         private final TraceDomainComponent fDomain;
-
         /**
          * The list of kernel channel components the command is to be executed on.
          */
         private final List<TraceLoggerComponent> fLoggers = new ArrayList<>();
+        /**
+         * The log level.
+         */
+        private final TraceJulLogLevel fLogLevel;
+        /**
+         * The log level type.
+         */
+        private final LogLevelType fLogLevelType;
 
         /**
          * Constructor
@@ -236,10 +269,16 @@ public abstract class ChangeLoggerStateHandler extends BaseControlViewHandler {
          *            a domain component
          * @param loggers
          *            a list of logger components
+         * @param logLevel
+         *            the log level
+         * @param logLevelType
+         *            the log level type
          */
-        public Parameter(TraceDomainComponent domain, List<TraceLoggerComponent> loggers) {
+        public Parameter(TraceDomainComponent domain, List<TraceLoggerComponent> loggers, TraceJulLogLevel logLevel, LogLevelType logLevelType) {
             fDomain = domain;
             fLoggers.addAll(loggers);
+            fLogLevel = logLevel;
+            fLogLevelType = logLevelType;
         }
 
         /**
@@ -249,7 +288,7 @@ public abstract class ChangeLoggerStateHandler extends BaseControlViewHandler {
          *            a parameter to copy
          */
         public Parameter(Parameter other) {
-            this(other.fDomain, other.fLoggers);
+            this(other.fDomain, other.fLoggers, other.fLogLevel, other.fLogLevelType);
         }
 
         /**
@@ -264,6 +303,20 @@ public abstract class ChangeLoggerStateHandler extends BaseControlViewHandler {
          */
         public List<TraceLoggerComponent> getLoggers() {
             return fLoggers;
+        }
+
+        /**
+         * @return the log level type.
+         */
+        public LogLevelType getLogLevelType() {
+            return fLogLevelType;
+        }
+
+        /**
+         * @return the log level.
+         */
+        public TraceJulLogLevel getLogLevel() {
+            return fLogLevel;
         }
     }
 }
