@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,8 +15,10 @@ import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent;
 
 /**
@@ -42,7 +44,7 @@ public class DisableEventHandler extends ChangeEventStateHandler {
     // ------------------------------------------------------------------------
 
     @Override
-    protected void changeState(TraceChannelComponent channel, List<String> eventNames, TraceEventType eventType, IProgressMonitor monitor) throws ExecutionException{
+    protected void changeState(TraceChannelComponent channel, List<String> eventNames, TraceLogLevel logLevel, LogLevelType logLevelType, TraceEventType eventType, String probe, IProgressMonitor monitor) throws ExecutionException{
         channel.disableEvent(eventNames, monitor);
     }
 }

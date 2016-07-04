@@ -111,6 +111,14 @@ public class TraceProbeEventComponent extends TraceEventComponent {
         getEventInfo().setSymbol(symbol);
     }
 
+    /**
+     * @return the probe string whether it be an address or a symbol and an
+     *         offset
+     */
+    public String getProbeString() {
+        return getEventInfo().getProbeString();
+    }
+
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------

@@ -116,6 +116,20 @@ public class ProbeEventInfo extends EventInfo implements IProbeEventInfo {
         fSymbol = symbol;
     }
 
+    @Override
+    public String getProbeString() {
+        if (fAddress != null) {
+            return fAddress;
+        } else if (fSymbol != null) {
+            StringBuffer buffer = new StringBuffer(fSymbol);
+            if (fOffset != null) {
+                buffer.append('+').append(fOffset);
+            }
+            return buffer.toString();
+        }
+        return null;
+    }
+
     // ------------------------------------------------------------------------
     // Operation
     // ------------------------------------------------------------------------

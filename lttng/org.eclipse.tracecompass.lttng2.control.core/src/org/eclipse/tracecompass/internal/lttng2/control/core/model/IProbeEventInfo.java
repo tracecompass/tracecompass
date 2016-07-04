@@ -52,4 +52,10 @@ public interface IProbeEventInfo extends IEventInfo {
      * @param symbol - a symbol name ((null if not used))
      */
     void setSymbol(String symbol);
+
+    /**
+     * @return the probe string whether it be an address or a symbol and an
+     *         offset
+     */
+    String getProbeString();
 }

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,8 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Bruno Roy - Bug 486658: Support for enabling disabled events of types:
+ *      kernel dynamic probe, function probe, ust loglevel/loglevel-only
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers;
 
@@ -23,13 +25,16 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceEventComponent;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceProbeEventComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -67,11 +72,18 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
      * Change the state
      * @param channel - channel of events to be enabled
      * @param eventNames - list event names
+     * @param logLevel - the log level
+     * @param logLevelType - the log level type
      * @param eventType  - the event type ({@link TraceEventType})
+     * @param probe - The address or symbol of the probe or function
      * @param monitor - a progress monitor
      * @throws ExecutionException If the command fails
      */
-    protected abstract void changeState(TraceChannelComponent channel, List<String> eventNames, TraceEventType eventType, IProgressMonitor monitor) throws ExecutionException;
+    protected abstract void changeState(TraceChannelComponent channel, List<String> eventNames, TraceLogLevel logLevel, LogLevelType logLevelType,  TraceEventType eventType, String probe, IProgressMonitor monitor) throws ExecutionException;
+
+    private void changeState(final Parameter param, List<String> eventNames, IProgressMonitor monitor) throws ExecutionException {
+        changeState(param.getChannel(), eventNames, param.getLogLevel(), param.getLogLevelType(), param.getEventType(), param.getProbe(), monitor);
+    }
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -95,37 +107,25 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
                     TraceSessionComponent session = null;
 
                     try {
-                        boolean isAll = false;
                         if (param.getChannel() != null) {
                             session = param.getChannel().getSession();
                             List<String> eventNames = new ArrayList<>();
                             List<TraceEventComponent> events = param.getEvents();
-                            // Find the type of the events (all the events in the list are the same type)
-                            TraceEventType  eventType = !events.isEmpty() ? events.get(0).getEventType() : null;
 
-                            for (Iterator<TraceEventComponent> iterator = events.iterator(); iterator.hasNext();) {
-                                // Enable/disable all selected channels which are disabled
-                                TraceEventComponent traceEvent = iterator.next();
-
-                                // Workaround for wildcard handling in lttng-tools
+                            for (TraceEventComponent traceEvent : events) {
                                 if ("*".equals(traceEvent.getName())) { //$NON-NLS-1$
-                                    isAll = true;
+                                    changeState(param, null, monitor);
                                 } else {
                                     eventNames.add(traceEvent.getName());
                                 }
                             }
-                            if (isAll) {
-                                changeState(param.getChannel(), null, eventType, monitor);
-                            }
 
                             if (!eventNames.isEmpty()) {
-                                changeState(param.getChannel(), eventNames, eventType, monitor);
+                                changeState(param, eventNames, monitor);
                             }
 
-                            for (Iterator<TraceEventComponent> iterator = events.iterator(); iterator.hasNext();) {
-                                // Enable all selected channels which are disabled
-                                TraceEventComponent ev = iterator.next();
-                                ev.setState(getNewState());
+                            for (TraceEventComponent traceEvent : events) {
+                                traceEvent.setState(getNewState());
                             }
                         }
                     } catch (ExecutionException e) {
@@ -164,13 +164,16 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
         ISelection selection = page.getSelection(ControlView.ID);
 
         TraceChannelComponent channel = null;
+        TraceLogLevel logLevel = null;
+        LogLevelType logLevelType = null;
         List<TraceEventComponent> events = new ArrayList<>();
+        TraceEventType eventType = null;
+        String probe = null;
 
         if (selection instanceof StructuredSelection) {
             StructuredSelection structered = ((StructuredSelection) selection);
             String sessionName = null;
             String channelName = null;
-            TraceEventType eventType = null;
 
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
                 Object element = iterator.next();
@@ -190,6 +193,32 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
                         channelName = event.getChannelName();
                     }
 
+                    if (logLevel == null) {
+                        logLevel = event.getLogLevel();
+                    }
+
+                    if (logLevelType == null) {
+                        logLevelType = event.getLogLevelType();
+                    }
+
+                    // The events have to be the same type
+                    if (eventType == null) {
+                        eventType = event.getEventType();
+                    } else if (!eventType.equals(event.getEventType())) {
+                        events.clear();
+                        break;
+                    }
+
+                    // The probe or address
+                    if (probe == null) {
+                        if (event instanceof TraceProbeEventComponent) {
+                            probe = ((TraceProbeEventComponent) event).getProbeString();
+                        }
+                    } else {
+                        events.clear();
+                        break;
+                    }
+
                     // Enable command only for events of same session, same channel and domain
                     if ((!sessionName.equals(event.getSessionName())) ||
                         (!channelName.equals(event.getChannelName())) ||
@@ -198,10 +227,11 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
                         break;
                     }
 
-                    // The events have to be the same type
-                    if (eventType == null) {
-                        eventType = event.getEventType();
-                    } else if (!eventType.equals(event.getEventType())) {
+                    // Enable command only for events of same loglevel and loglevel type
+                    // (not applicable if the loglevel type is none)
+                    if ((!event.getLogLevelType().equals(LogLevelType.LOGLEVEL_NONE)) &&
+                        ((!logLevelType.equals(event.getLogLevelType())) ||
+                        (!logLevel.equals(event.getLogLevel())))) {
                         events.clear();
                         break;
                     }
@@ -218,7 +248,7 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
         try {
             fParam = null;
             if (isEnabled) {
-                fParam = new Parameter(channel, events);
+                fParam = new Parameter(channel, events, logLevel, logLevelType, eventType, probe);
             }
         } finally {
             fLock.unlock();
@@ -238,15 +268,39 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
          * The list of kernel channel components the command is to be executed on.
          */
         private final List<TraceEventComponent> fEvents = new ArrayList<>();
+        /**
+         * The log level.
+         */
+        private final TraceLogLevel fLogLevel;
+        /**
+         * The log level type.
+         */
+        private final LogLevelType fLogLevelType;
+        /**
+         * The event type.
+         */
+        private final TraceEventType fEventType;
+        /**
+         * The probe or address.
+         */
+        private final String fProbe;
 
         /**
          * Constructor
          * @param channel - a channel component
          * @param events - a list of event components
+         * @param logLevel - the log level
+         * @param logLevelType - the log level type
+         * @param eventType - the event type
+         * @param probe - the probe r address
          */
-        public Parameter(TraceChannelComponent channel, List<TraceEventComponent> events) {
+        public Parameter(TraceChannelComponent channel, List<TraceEventComponent> events, TraceLogLevel logLevel, LogLevelType logLevelType, TraceEventType eventType, String probe) {
             fChannel = channel;
             fEvents.addAll(events);
+            fLogLevel = logLevel;
+            fLogLevelType = logLevelType;
+            fEventType = eventType;
+            fProbe = probe;
         }
 
         /**
@@ -254,7 +308,7 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
          * @param other - a parameter to copy
          */
         public Parameter(Parameter other) {
-            this(other.fChannel, other.fEvents);
+            this(other.fChannel, other.fEvents, other.fLogLevel, other.fLogLevelType, other.fEventType, other.fProbe);
         }
 
         /**
@@ -269,6 +323,34 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
          */
         public List<TraceEventComponent> getEvents() {
             return fEvents;
+        }
+
+        /**
+         * @return the log level type.
+         */
+        public LogLevelType getLogLevelType() {
+            return fLogLevelType;
+        }
+
+        /**
+         * @return the log level.
+         */
+        public TraceLogLevel getLogLevel() {
+            return fLogLevel;
+        }
+
+        /**
+         * @return the event type.
+         */
+        public TraceEventType getEventType() {
+            return fEventType;
+        }
+
+        /**
+         * @return the probe or address.
+         */
+        public String getProbe() {
+            return fProbe;
         }
     }
 }
