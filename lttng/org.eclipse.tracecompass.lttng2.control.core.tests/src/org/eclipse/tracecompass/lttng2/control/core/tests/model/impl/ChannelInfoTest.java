@@ -87,6 +87,8 @@ public class ChannelInfoTest {
         assertEquals(0, result.getMaxSizeTraceFiles());
         assertEquals(0, result.getMaxNumberTraceFiles());
         assertEquals(BufferType.BUFFER_TYPE_UNKNOWN, result.getBufferType());
+        assertEquals(0, result.getNumberOfDiscardedEvents());
+        assertEquals(0, result.getNumberOfLostPackets());
     }
 
     /**
@@ -107,6 +109,8 @@ public class ChannelInfoTest {
         assertEquals(fChannelInfo1.getMaxSizeTraceFiles(), channelInfo.getMaxSizeTraceFiles());
         assertEquals(fChannelInfo1.getMaxNumberTraceFiles(), channelInfo.getMaxNumberTraceFiles());
         assertEquals(fChannelInfo1.getBufferType(), channelInfo.getBufferType());
+        assertEquals(fChannelInfo1.getNumberOfDiscardedEvents(), channelInfo.getNumberOfDiscardedEvents());
+        assertEquals(fChannelInfo1.getNumberOfLostPackets(), channelInfo.getNumberOfLostPackets());
 
         IEventInfo[] orignalEvents = fChannelInfo1.getEvents();
         IEventInfo[] resultEvents = channelInfo.getEvents();
@@ -174,6 +178,8 @@ public class ChannelInfoTest {
         fixture.setMaxNumberTraceFiles(20);
         fixture.setBufferType(BufferType.BUFFER_PER_UID);
         fixture.addEvent(new EventInfo("event"));
+        fixture.setNumberOfDiscardedEvents(42L);
+        fixture.setNumberOfLostPackets(84L);
 
         long switchTimer = fixture.getSwitchTimer();
         assertEquals(2L, switchTimer);
@@ -205,6 +211,12 @@ public class ChannelInfoTest {
         BufferType bufferType = fixture.getBufferType();
         assertTrue(bufferType == BufferType.BUFFER_PER_UID);
 
+        long numberOfDiscardedEvents = fixture.getNumberOfDiscardedEvents();
+        assertEquals(42L, numberOfDiscardedEvents);
+
+        long numberOfLostPackets = fixture.getNumberOfLostPackets();
+        assertEquals(84L, numberOfLostPackets);
+
         fixture.setSwitchTimer(5L);
         fixture.setOverwriteMode(false);
         fixture.setReadTimer(6L);
@@ -215,6 +227,8 @@ public class ChannelInfoTest {
         fixture.setMaxSizeTraceFiles(4096);
         fixture.setMaxNumberTraceFiles(10);
         fixture.setBufferType(BufferType.BUFFER_PER_PID);
+        fixture.setNumberOfDiscardedEvents(11L);
+        fixture.setNumberOfLostPackets(22L);
 
         switchTimer = fixture.getSwitchTimer();
         assertEquals(5L, switchTimer);
@@ -245,6 +259,12 @@ public class ChannelInfoTest {
 
         bufferType = fixture.getBufferType();
         assertTrue(bufferType == BufferType.BUFFER_PER_PID);
+
+        numberOfDiscardedEvents = fixture.getNumberOfDiscardedEvents();
+        assertEquals(11L, numberOfDiscardedEvents);
+
+        numberOfLostPackets = fixture.getNumberOfLostPackets();
+        assertEquals(22L, numberOfLostPackets);
     }
 
     /**
@@ -293,11 +313,13 @@ public class ChannelInfoTest {
         fixture.setNumberOfSubBuffers(1);
         fixture.setOutputType("splice()");
         fixture.setSubBufferSize(1L);
+        fixture.setNumberOfDiscardedEvents(42L);
+        fixture.setNumberOfLostPackets(84L);
 
         String result = fixture.toString();
 
         // add additional test code here
-        assertEquals("[ChannelInfo([TraceInfo(Name=channel)],State=DISABLED,OverwriteMode=true,SubBuffersSize=1,NumberOfSubBuffers=1,SwitchTimer=1,ReadTimer=1,output=splice(),Events=None)]", result);
+        assertEquals("[ChannelInfo([TraceInfo(Name=channel)],State=DISABLED,OverwriteMode=true,SubBuffersSize=1,NumberOfSubBuffers=1,SwitchTimer=1,ReadTimer=1,output=splice(),NumberOfDiscardedEvents=42,NumberOfLostPackets=84,Events=None)]", result);
     }
 
     /**
@@ -308,7 +330,7 @@ public class ChannelInfoTest {
         String result = fChannelInfo1.toString();
 
         // add additional test code here
-        assertEquals("[ChannelInfo([TraceInfo(Name=channel1)],State=DISABLED,OverwriteMode=true,SubBuffersSize=13,NumberOfSubBuffers=12,SwitchTimer=10,ReadTimer=11,output=splice(),Events=[EventInfo([BaseEventInfo([TraceInfo(Name=event1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED,levelType=LOGLEVEL_ONLY)])]", result);
+        assertEquals("[ChannelInfo([TraceInfo(Name=channel1)],State=DISABLED,OverwriteMode=true,SubBuffersSize=13,NumberOfSubBuffers=12,SwitchTimer=10,ReadTimer=11,output=splice(),NumberOfDiscardedEvents=14,NumberOfLostPackets=15,Events=[EventInfo([BaseEventInfo([TraceInfo(Name=event1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED,levelType=LOGLEVEL_ONLY)])]", result);
     }
 
     // ------------------------------------------------------------------------

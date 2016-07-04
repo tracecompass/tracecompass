@@ -113,6 +113,8 @@ public class ModelImplFactory {
         fChannelInfo1.setOutputType("splice()");
         fChannelInfo1.setSubBufferSize(13L);
         fChannelInfo1.addEvent(fEventInfo1);
+        fChannelInfo1.setNumberOfDiscardedEvents(14L);
+        fChannelInfo1.setNumberOfLostPackets(15L);
 
         fChannelInfo2 = new ChannelInfo("channel2");
         fChannelInfo2.setSwitchTimer(1L);
@@ -124,6 +126,8 @@ public class ModelImplFactory {
         fChannelInfo2.setSubBufferSize(4L);
         fChannelInfo2.addEvent(fEventInfo2);
         fChannelInfo2.addEvent(fEventInfo3);
+        fChannelInfo2.setNumberOfDiscardedEvents(5L);
+        fChannelInfo2.setNumberOfLostPackets(6L);
 
         fDomainInfo1 = new DomainInfo("test1");
         fDomainInfo1.addChannel(fChannelInfo1);

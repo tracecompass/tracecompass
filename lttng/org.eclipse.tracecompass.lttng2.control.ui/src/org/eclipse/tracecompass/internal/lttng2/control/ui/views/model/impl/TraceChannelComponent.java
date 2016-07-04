@@ -232,6 +232,19 @@ public class TraceChannelComponent extends TraceControlComponent {
     }
 
     /**
+     * @return number of discarded events
+     */
+    public long getNumberOfDiscardedEvents() {
+        return fChannelInfo.getNumberOfDiscardedEvents();
+    }
+    /**
+     * @return number of lost packets
+     */
+    public long getNumberOfLostPackets() {
+        return fChannelInfo.getNumberOfLostPackets();
+    }
+
+    /**
      * @return maximum size of trace files
      */
     public long getMaxSizeTraceFiles() {

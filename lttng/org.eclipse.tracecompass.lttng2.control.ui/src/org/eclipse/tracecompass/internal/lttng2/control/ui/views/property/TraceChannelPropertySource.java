@@ -72,6 +72,14 @@ public class TraceChannelPropertySource extends BasePropertySource {
      */
     public static final String TRACE_CHANNEL_TRACE_FILE_SIZE_PROPERTY_ID = "trace.channel.trace.file.size"; //$NON-NLS-1$
     /**
+     * The trace channel 'discarded events' property ID.
+     */
+    public static final String TRACE_CHANNEL_DISCARDED_EVENTS_PROPERTY_ID = "trace.channel.discarded.events"; //$NON-NLS-1$
+    /**
+     * The trace channel 'lost packets' property ID.
+     */
+    public static final String TRACE_CHANNEL_LOST_PACKETS_PROPERTY_ID = "trace.channel.lost.packets"; //$NON-NLS-1$
+    /**
      *  The trace channel 'name' property name.
      */
     public static final String TRACE_CHANNEL_NAME_PROPERTY_NAME = Messages.TraceControl_ChannelNamePropertyName;
@@ -111,6 +119,14 @@ public class TraceChannelPropertySource extends BasePropertySource {
      * The trace channel 'trace file size' property name.
      */
     public static final String TRACE_CHANNEL_TRACE_FILE_SIZE_PROPERTY_NAME = Messages.TraceControl_TraceFileSizePropertyName;
+    /**
+     * The trace channel 'discarded events' property name.
+     */
+    public static final String TRACE_CHANNEL_DISCARDED_EVENTS_PROPERTY_NAME = Messages.TraceControl_NumberOfDiscardedEventsPropertyName;
+    /**
+     * The trace channel 'lost packets' property name.
+     */
+    public static final String TRACE_CHANNEL_LOST_PACKETS_PROPERTY_NAME = Messages.TraceControl_NumberOfLostPacketsPropertyName;
 
     // Attributes
     // ------------------------------------------------------------------------
@@ -150,6 +166,10 @@ public class TraceChannelPropertySource extends BasePropertySource {
             properties.add(new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_TRACE_FILE_COUNT_PROPERTY_ID, TRACE_CHANNEL_TRACE_FILE_COUNT_PROPERTY_NAME));
             properties.add(new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_TRACE_FILE_SIZE_PROPERTY_ID, TRACE_CHANNEL_TRACE_FILE_SIZE_PROPERTY_NAME));
         }
+        if (fChannel.getTargetNode().isVersionSupported("2.8.0")) { //$NON-NLS-1$
+            properties.add(new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_DISCARDED_EVENTS_PROPERTY_ID, TRACE_CHANNEL_DISCARDED_EVENTS_PROPERTY_NAME));
+            properties.add(new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_LOST_PACKETS_PROPERTY_ID, TRACE_CHANNEL_LOST_PACKETS_PROPERTY_NAME));
+        }
         return properties.toArray(new IPropertyDescriptor[0]);
     }
 
@@ -185,6 +205,13 @@ public class TraceChannelPropertySource extends BasePropertySource {
         if (TRACE_CHANNEL_TRACE_FILE_SIZE_PROPERTY_ID.equals(id)) {
             return fChannel.getMaxSizeTraceFiles();
         }
+        if (TRACE_CHANNEL_DISCARDED_EVENTS_PROPERTY_ID.equals(id)) {
+            return fChannel.getNumberOfDiscardedEvents();
+        }
+        if (TRACE_CHANNEL_LOST_PACKETS_PROPERTY_ID.equals(id)) {
+            return fChannel.getNumberOfLostPackets();
+        }
+
         return null;
     }
 

@@ -154,4 +154,22 @@ public interface IChannelInfo extends ITraceInfo {
      * @return the value of buffersUID (enable or not)
      */
     BufferType getBufferType();
+    /**
+     * Sets number of discarded events
+     * @param numberOfDiscardedEvents - number of discarded events
+     */
+    void setNumberOfDiscardedEvents(long numberOfDiscardedEvents);
+    /**
+     * @return the number of discarded events
+     */
+    long getNumberOfDiscardedEvents();
+    /**
+     * Sets number of lost packets
+     * @param numberOfLostPackets - number of lost packets
+     */
+    void setNumberOfLostPackets(long numberOfLostPackets);
+    /**
+     * @return the number of lost packets
+     */
+    long getNumberOfLostPackets();
 }

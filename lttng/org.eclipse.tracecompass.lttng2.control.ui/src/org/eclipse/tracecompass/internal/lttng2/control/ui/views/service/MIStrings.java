@@ -482,6 +482,16 @@ public interface MIStrings {
      String LIVE_TIMER_INTERVAL = "live_timer_interval";
 
     /**
+     * Represent the number of discarded events
+     */
+    String DISCARDED_EVENTS = "discarded_events";
+
+    /**
+     * Represent the number of lost packets
+     */
+    String LOST_PACKETS = "lost_packets";
+
+    /**
      * Represent the type xml element
      */
      String TYPE = "type";

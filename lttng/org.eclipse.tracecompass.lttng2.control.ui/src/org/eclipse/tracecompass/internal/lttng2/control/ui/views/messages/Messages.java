@@ -288,6 +288,8 @@ public final class Messages extends NLS {
     public static String TraceControl_SubBufferSizePropertyName;
     public static String TraceControl_NbSubBuffersPropertyName;
     public static String TraceControl_SwitchTimerPropertyName;
+    public static String TraceControl_NumberOfDiscardedEventsPropertyName;
+    public static String TraceControl_NumberOfLostPacketsPropertyName;
 
     public static String TraceControl_ReadTimerPropertyName;
     public static String TraceControl_OutputTypePropertyName;

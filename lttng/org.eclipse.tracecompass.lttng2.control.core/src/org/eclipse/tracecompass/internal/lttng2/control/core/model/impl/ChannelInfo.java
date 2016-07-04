@@ -77,6 +77,14 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
      * The value of buffer type
      */
     private BufferType fBufferType = BufferType.BUFFER_TYPE_UNKNOWN;
+    /**
+     * The number of discarded events
+     */
+    private long fNumberOfDiscardedEvents;
+    /**
+     * The number of lost packets
+     */
+    private long fNumberOfLostPackets;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -109,6 +117,8 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
         fBufferType = other.fBufferType;
         fOutputType = (other.fOutputType == null ? null : other.fOutputType);
         fState = other.fState;
+        fNumberOfDiscardedEvents = other.fNumberOfDiscardedEvents;
+        fNumberOfLostPackets = other.fNumberOfLostPackets;
         for (Iterator<IEventInfo> iterator = other.fEvents.iterator(); iterator.hasNext();) {
             IEventInfo event = iterator.next();
             if (event instanceof EventInfo) {
@@ -235,6 +245,8 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
         result = prime * result + (int) (fSubBufferSize ^ (fSubBufferSize >>> 32));
         result = prime * result + (int) (fSwitchTimer ^ (fSwitchTimer >>> 32));
         result = prime * result + ((fBufferType == null) ? 0 : (fBufferType.ordinal() + 1));
+        result = prime * result + (int) (fNumberOfDiscardedEvents ^ (fNumberOfDiscardedEvents >>> 32));
+        result = prime * result + (int) (fNumberOfLostPackets ^ (fNumberOfLostPackets >>> 32));
         return result;
     }
 
@@ -281,6 +293,12 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
         if (fBufferType != other.fBufferType) {
             return false;
         }
+        if (fNumberOfDiscardedEvents != other.fNumberOfDiscardedEvents) {
+            return false;
+        }
+        if (fNumberOfLostPackets != other.fNumberOfLostPackets) {
+            return false;
+        }
         return true;
     }
 
@@ -304,6 +322,10 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
         output.append(fReadTimer);
         output.append(",output=");
         output.append(fOutputType.getInName());
+        output.append(",NumberOfDiscardedEvents=");
+        output.append(fNumberOfDiscardedEvents);
+        output.append(",NumberOfLostPackets=");
+        output.append(fNumberOfLostPackets);
         if ((fBufferType != null) && !fBufferType.equals(BufferType.BUFFER_TYPE_UNKNOWN) && !fBufferType.equals(BufferType.BUFFER_SHARED)) {
             output.append(",BufferType=");
             output.append(fBufferType);
@@ -349,5 +371,25 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
     @Override
     public BufferType getBufferType() {
         return fBufferType;
+    }
+
+    @Override
+    public void setNumberOfDiscardedEvents(long numberOfDiscardedEvents) {
+        fNumberOfDiscardedEvents = numberOfDiscardedEvents;
+    }
+
+    @Override
+    public long getNumberOfDiscardedEvents() {
+        return fNumberOfDiscardedEvents;
+    }
+
+    @Override
+    public void setNumberOfLostPackets(long numberOflostPackets) {
+        fNumberOfLostPackets = numberOflostPackets;
+    }
+
+    @Override
+    public long getNumberOfLostPackets() {
+        return fNumberOfLostPackets;
     }
 }

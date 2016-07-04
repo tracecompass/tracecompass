@@ -488,6 +488,12 @@ public class LTTngControlServiceMI extends LTTngControlService {
                             case MIStrings.LIVE_TIMER_INTERVAL:
                                 // TODO: currently not supported by tmf
                                 break;
+                            case MIStrings.DISCARDED_EVENTS:
+                                channel.setNumberOfDiscardedEvents(Long.parseLong(attribute.getTextContent()));
+                                break;
+                            case MIStrings.LOST_PACKETS:
+                                channel.setNumberOfLostPackets(Long.parseLong(attribute.getTextContent()));
+                                break;
                             default:
                                 break;
                             }

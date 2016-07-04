@@ -1667,6 +1667,8 @@ The Control View provides property information of selected tree component. Depen
 ** '''State''': The channel state ('''ENABLED''' or '''DISABLED''')
 ** '''Sub Buffer size''': The size of the sub-buffers of the channel (in bytes).
 ** '''Switch Timer Interval''': The switch timer interval.
+** '''Number of Discarded Events''': The number of discarded events of the channel.
+** '''Number of Lost Packets''': The number of lost packets of the channel.
 * '''Event''' Properties (Channel)
 ** '''Event Name''': The name of the event.
 ** '''Event Type''': The event type ('''TRACEPOINT''', '''SYSCALL''' or '''PROBE''').
