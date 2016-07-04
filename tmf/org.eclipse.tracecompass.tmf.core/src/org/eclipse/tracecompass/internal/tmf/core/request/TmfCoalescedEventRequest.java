@@ -244,7 +244,7 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
     }
 
     @Override
-    public void start() {
+    public synchronized void start() {
         for (ITmfEventRequest request : fRequests) {
             if (!request.isCompleted()) {
                 request.start();
@@ -254,7 +254,7 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
     }
 
     @Override
-    public void done() {
+    public synchronized void done() {
         for (ITmfEventRequest request : fRequests) {
             if (!request.isCompleted()) {
                 request.done();

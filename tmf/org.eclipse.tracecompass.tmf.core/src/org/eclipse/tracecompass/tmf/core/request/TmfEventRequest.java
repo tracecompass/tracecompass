@@ -94,13 +94,11 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
     /** The number of reads so far */
     private int fNbRead;
 
-    private final CountDownLatch startedLatch = new CountDownLatch(1);
-    private final CountDownLatch completedLatch = new CountDownLatch(1);
+    private final CountDownLatch fStartedLatch = new CountDownLatch(1);
+    private final CountDownLatch fCompletedLatch = new CountDownLatch(1);
 
-    private boolean fRequestRunning;
-    private boolean fRequestCompleted;
-    private boolean fRequestFailed;
-    private boolean fRequestCanceled;
+    private volatile boolean fRequestFailed = false;
+    private volatile boolean fRequestCanceled = false;
 
     private ITmfFilter fEventFilter;
 
@@ -206,11 +204,6 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
         fNbRead = 0;
         fDependencyLevel = dependencyLevel;
 
-        fRequestRunning = false;
-        fRequestCompleted = false;
-        fRequestFailed = false;
-        fRequestCanceled = false;
-
         /* Setup the request tracing if it's enabled */
         if (TmfCoreTracer.isRequestTraced()) {
             String type = getClass().getName();
@@ -257,12 +250,12 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
 
     @Override
     public synchronized boolean isRunning() {
-        return fRequestRunning;
+        return (fStartedLatch.getCount() <= 0 && fCompletedLatch.getCount() > 0);
     }
 
     @Override
     public synchronized boolean isCompleted() {
-        return fRequestCompleted;
+        return (fCompletedLatch.getCount() <= 0);
     }
 
     @Override
@@ -394,42 +387,24 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
      *             If the thread was interrupted while waiting
      */
     public void waitForStart() throws InterruptedException {
-        while (!fRequestRunning) {
-            startedLatch.await();
-        }
+        fStartedLatch.await();
     }
 
     @Override
     public void waitForCompletion() throws InterruptedException {
-        while (!fRequestCompleted) {
-            completedLatch.await();
-        }
+        fCompletedLatch.await();
     }
 
     @Override
-    public void start() {
-        synchronized (this) {
-            fRequestRunning = true;
-        }
+    public synchronized void start() {
         handleStarted();
-        startedLatch.countDown();
+        fStartedLatch.countDown();
     }
 
     @Override
-    public void done() {
-        synchronized (this) {
-            if (!fRequestCompleted) {
-                fRequestRunning = false;
-                fRequestCompleted = true;
-            } else {
-                return;
-            }
-        }
-        try {
-            handleCompleted();
-        } finally {
-            completedLatch.countDown();
-        }
+    public synchronized void done() {
+        handleCompleted();
+        fCompletedLatch.countDown();
     }
 
     /**
@@ -437,18 +412,14 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
      */
     @Override
     public void fail(Exception e) {
-        synchronized (this) {
-            fRequestFailed = true;
-        }
+        fRequestFailed = true;
         fFailureCause = e;
         done();
     }
 
     @Override
     public void cancel() {
-        synchronized (this) {
-            fRequestCanceled = true;
-        }
+        fRequestCanceled = true;
         done();
     }
 

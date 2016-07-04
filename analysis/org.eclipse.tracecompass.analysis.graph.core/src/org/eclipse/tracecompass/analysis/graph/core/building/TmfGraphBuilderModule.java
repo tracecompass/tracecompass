@@ -134,7 +134,7 @@ public abstract class TmfGraphBuilderModule extends TmfAbstractAnalysisModule {
         }
 
         @Override
-        public void done() {
+        public synchronized void done() {
             super.done();
             fProvider.done();
         }
