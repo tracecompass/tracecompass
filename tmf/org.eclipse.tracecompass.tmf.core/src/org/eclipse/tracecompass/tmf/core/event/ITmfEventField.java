@@ -17,6 +17,7 @@ package org.eclipse.tracecompass.tmf.core.event;
 import java.util.Collection;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * The generic event payload in TMF. Each field can be either a terminal or
@@ -81,5 +82,36 @@ public interface ITmfEventField {
      * @return a specific subfield by path (null if inexistent)
      */
     ITmfEventField getField(String @NonNull ... path);
+
+    /**
+     * Retrieve the value of a field, given an expected name/path and a value
+     * type.
+     *
+     * This is a utility method that will do the proper null and instanceof
+     * checks on the returned values of {@link #getField} and {@link #getValue}
+     * accordingly.
+     *
+     * @param type
+     *            The expected type of this field, to which the returned value
+     *            will then be cast to.
+     * @param fieldName
+     *            The name or path of the subfield to look for
+     * @return The value if a field with this name exists and the value is of
+     *         the correct type, or 'null' otherwise
+     * @since 2.1
+     */
+    default <T> @Nullable T getFieldValue(@NonNull Class<T> type, @NonNull String @NonNull ... fieldName) {
+        ITmfEventField field = getField(fieldName);
+        if (field == null) {
+            return null;
+        }
+        Object value = field.getValue();
+        if (value == null || !type.isAssignableFrom(value.getClass())) {
+            return null;
+        }
+        @SuppressWarnings("unchecked")
+        T ret = (T) value;
+        return ret;
+    }
 
 }

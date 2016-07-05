@@ -18,6 +18,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -354,5 +355,49 @@ public class TmfEventFieldTest {
         names = root.getFieldNames();
         assertEquals("getFieldNames length", 2, names.size());
         assertArrayEquals(fFieldNames, names.toArray(new String[names.size()]));
+    }
+
+    // ------------------------------------------------------------------------
+    // getFieldValue
+    // ------------------------------------------------------------------------
+
+    @Test
+    public void testGetFieldValueExists() {
+        String value = fRootField.getFieldValue(String.class, fFieldName1);
+        assertNotNull(value);
+        assertEquals(fValue1, value);
+    }
+
+    @Test
+    public void testGetFieldValueExistsButWrongType() {
+        Integer value = fRootField.getFieldValue(Integer.class, fFieldName1);
+        assertNull(value);
+    }
+
+    @Test
+    public void testGetFieldValueDoesntExist() {
+        String value = fRootField.getFieldValue(String.class, "no-field");
+        assertNull(value);
+    }
+
+    @Test
+    public void testGetFieldValueNullValue() {
+        ITmfEventField subField = new TmfEventField("subField", null, null);
+        ITmfEventField rootField = new TmfEventField("rootField", null,
+                new ITmfEventField[] { subField });
+
+        String value = rootField.getFieldValue(String.class, "subField");
+        assertNull(value);
+    }
+
+    @Test
+    public void testGetFieldValueAssignableValue() {
+        /*
+         * fValue2 is an Integer, but the method should allow us to use it as a
+         * Number for example.
+         */
+        Number value = fRootField.getFieldValue(Number.class, fFieldName2);
+        assertNotNull(value);
+        assertEquals(fValue2, value);
     }
 }
