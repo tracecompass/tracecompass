@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson
+ * Copyright (c) 2010, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,15 +13,13 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.parsers.custom;
 
-import java.util.List;
-
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfContentFieldAspect;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.Tag;
 
 import com.google.common.collect.ImmutableList;
 
@@ -39,47 +37,6 @@ import com.google.common.collect.ImmutableList;
 public class CustomEventAspects {
 
     /**
-     * Aspects for custom events, which use an integer ID to represent each
-     * field.
-     */
-    private static final class CustomEventFieldAspect implements ITmfEventAspect<String> {
-
-        private final @NonNull String fName;
-        private final int fIndex;
-
-        /**
-         * Constructor
-         *
-         * @param name
-         *            The name of this aspect
-         * @param idx
-         *            The index of this field in the event's content to display
-         */
-        public CustomEventFieldAspect(@NonNull String name, int idx) {
-            fName = name;
-            fIndex = idx;
-        }
-
-        @Override
-        public String getName() {
-            return fName;
-        }
-
-        @Override
-        public String getHelpText() {
-            return EMPTY_STRING;
-        }
-
-        @Override
-        public String resolve(ITmfEvent event) {
-            if (event instanceof CustomEvent) {
-                return NonNullUtils.nullToEmptyString(((CustomEvent) event).getEventString(fIndex));
-            }
-            return EMPTY_STRING;
-        }
-    }
-
-    /**
      * Build a set of event aspects for a given trace definition
      *
      * @param definition
@@ -89,10 +46,14 @@ public class CustomEventAspects {
      */
     public static @NonNull Iterable<ITmfEventAspect<?>> generateAspects(CustomTraceDefinition definition) {
         ImmutableList.Builder<ITmfEventAspect<?>> builder = new ImmutableList.Builder<>();
-        List<OutputColumn> outputs = definition.outputs;
-        for (int i = 0; i < outputs.size(); i++) {
-            String name = outputs.get(i).name;
-            builder.add(new CustomEventFieldAspect(name, i));
+        for (OutputColumn output : definition.outputs) {
+            if (output.tag.equals(Tag.TIMESTAMP) && definition.timeStampOutputFormat == null) {
+                builder.add(TmfBaseAspects.getTimestampAspect());
+            } else if (output.tag.equals(Tag.EVENT_TYPE)) {
+                builder.add(TmfBaseAspects.getEventTypeAspect());
+            } else {
+                builder.add(new TmfContentFieldAspect(output.name, output.name));
+            }
         }
         return builder.build();
     }

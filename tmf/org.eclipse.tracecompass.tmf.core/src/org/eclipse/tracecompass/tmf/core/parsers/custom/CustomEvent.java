@@ -12,8 +12,14 @@
 
 package org.eclipse.tracecompass.tmf.core.parsers.custom;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
+
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -30,6 +36,8 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+
+import com.google.common.collect.Iterables;
 
 /**
  * Base event for custom text parsers.
@@ -71,8 +79,6 @@ public class CustomEvent extends TmfEvent {
      * {@link Key#TIMESTAMP_INPUT_FORMAT}.
      */
     protected Map<Object, String> fData;
-
-    private TmfEventField[] fColumnData;
 
     /**
      * Basic constructor.
@@ -225,16 +231,16 @@ public class CustomEvent extends TmfEvent {
      *            The ID/index of the field to display. This corresponds to the
      *            index in the event content.
      * @return The String to display in the cell
+     * @deprecated Use {@link ITmfEventField#getField(String...)} instead.
      */
+    @Deprecated
     public String getEventString(int index) {
-        if (fData != null) {
-            processData();
-        }
-        if (index < 0 || index >= fColumnData.length) {
+        Collection<? extends ITmfEventField> fields = getContent().getFields();
+        if (index < 0 || index >= fields.size()) {
             return ""; //$NON-NLS-1$
         }
 
-        return fColumnData[index].getValue().toString();
+        return nullToEmptyString(checkNotNull(Iterables.get(fields, index)).getValue());
     }
 
     private void processData() {
@@ -261,19 +267,17 @@ public class CustomEvent extends TmfEvent {
             ((CustomEventType) type).setName(eventName);
         }
 
-        int i = 0;
-        fColumnData = new TmfEventField[fDefinition.outputs.size()];
+        List<ITmfEventField> fields = new ArrayList<>(fDefinition.outputs.size());
         for (OutputColumn outputColumn : fDefinition.outputs) {
             Object key = (outputColumn.tag.equals(Tag.OTHER) ? outputColumn.name : outputColumn.tag);
-            String value = fData.get(key);
             if (outputColumn.tag.equals(Tag.TIMESTAMP) && timestamp != null) {
                 TmfTimestampFormat timestampFormat = new TmfTimestampFormat(fDefinition.timeStampOutputFormat);
-                fColumnData[i++] = new TmfEventField(outputColumn.name, timestampFormat.format(timestamp.getValue()), null);
-            } else {
-                fColumnData[i++] = new TmfEventField(outputColumn.name, (value != null ? value : ""), null); //$NON-NLS-1$
+                fields.add(new TmfEventField(outputColumn.name, timestampFormat.format(timestamp.getValue()), null));
+            } else if (!outputColumn.tag.equals(Tag.EVENT_TYPE)){
+                fields.add(new TmfEventField(outputColumn.name, nullToEmptyString(fData.get(key)), null));
             }
         }
-        setContent(new CustomEventContent(customEventContent.getName(), customEventContent.getValue(), fColumnData));
+        setContent(new CustomEventContent(customEventContent.getName(), customEventContent.getValue(), fields.toArray(new ITmfEventField[0])));
         fData = null;
     }
 
