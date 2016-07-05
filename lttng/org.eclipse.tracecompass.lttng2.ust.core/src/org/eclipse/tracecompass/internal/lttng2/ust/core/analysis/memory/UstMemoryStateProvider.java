@@ -188,7 +188,7 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
 
     private void setMem(ITmfEvent event, Long ptr, Long size) {
         ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
-        long ts = event.getTimestamp().getValue();
+        long ts = event.getTimestamp().toNanos();
         Long tid = getVtid(event);
 
         Long memoryDiff = size;
