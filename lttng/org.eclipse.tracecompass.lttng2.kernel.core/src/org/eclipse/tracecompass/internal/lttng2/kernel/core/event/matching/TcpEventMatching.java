@@ -47,11 +47,12 @@ public class TcpEventMatching implements ITmfMatchEventDefinition {
     private static boolean canMatchPacket(final ITmfEvent event) {
         /* Make sure all required fields are present to match with this event */
         ITmfEventField content = event.getContent();
-        if ((content.getField(TcpEventStrings.SEQ) != null) &&
-                (content.getField(TcpEventStrings.ACKSEQ) != null) && (content.getField(TcpEventStrings.FLAGS) != null)) {
-            return true;
+        if ((content.getFieldValue(Long.class, TcpEventStrings.SEQ) == null) ||
+                (content.getFieldValue(Long.class, TcpEventStrings.ACKSEQ) == null) ||
+                (content.getFieldValue(Long.class, TcpEventStrings.FLAGS) == null)) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     /**
@@ -76,9 +77,17 @@ public class TcpEventMatching implements ITmfMatchEventDefinition {
 
     @Override
     public IEventMatchingKey getEventKey(ITmfEvent event) {
-        IEventMatchingKey key = new TcpEventKey((long) event.getContent().getField(TcpEventStrings.SEQ).getValue(),
-                (long) event.getContent().getField(TcpEventStrings.ACKSEQ).getValue(),
-                (long) event.getContent().getField(TcpEventStrings.FLAGS).getValue());
+        ITmfEventField content = event.getContent();
+        Long sequence = content.getFieldValue(Long.class, TcpEventStrings.SEQ);
+        Long ack = content.getFieldValue(Long.class, TcpEventStrings.ACKSEQ);
+        Long flags = content.getFieldValue(Long.class, TcpEventStrings.FLAGS);
+
+        if (sequence == null || ack == null || flags == null) {
+            /* Should have been caught by canMatchPacket() above. */
+            throw new IllegalArgumentException("Event does not have expected fields"); //$NON-NLS-1$
+        }
+
+        IEventMatchingKey key = new TcpEventKey(sequence, ack, flags);
         return key;
     }
 

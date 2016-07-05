@@ -154,11 +154,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
          * the analysis also needs the "ip" context, but the state provider part
          * does not.
          */
-        ITmfEventField vpidCtx = event.getContent().getField(fLayout.contextVpid());
-        if (vpidCtx == null) {
-            return;
-        }
-        final Long vpid = (Long) vpidCtx.getValue();
+        final Long vpid = event.getContent().getFieldValue(Long.class, fLayout.contextVpid());
         if (vpid == null) {
             return;
         }
