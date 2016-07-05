@@ -21,6 +21,13 @@
                class="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.CallGraphAnalysisUI">
          </analysisModuleClass>
       </output>
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph.flamegraphView">
+         <analysisModuleClass
+               class="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.CallGraphAnalysisUI">
+         </analysisModuleClass>
+      </output>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -31,6 +38,14 @@
             icon="icons/elcl16/funcdensity.png"
             id="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.callgraphDensity"
             name="%view.callgraphDensity"
+            restorable="true">
+      </view>
+      <view
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph.FlameGraphView"
+            icon="icons/elcl16/flame.png"
+            id="org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph.flamegraphView"
+            name="%view.flameGraph"
             restorable="true">
       </view>
    </extension>

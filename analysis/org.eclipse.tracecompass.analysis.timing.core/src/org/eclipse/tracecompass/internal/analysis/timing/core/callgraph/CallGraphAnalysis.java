@@ -85,6 +85,11 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
      * The sub attributes of a certain thread
      */
     private List<Integer> fCurrentQuarks = Collections.emptyList();
+    /**
+     * The List of thread nodes. Each thread has a virtual node having the root
+     * function as children
+     */
+    private List<AggregatedCalledFunction> fThreadNodes = new ArrayList<>();
 
     /**
      * Default constructor
@@ -199,6 +204,8 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
      * @return Boolean
      */
     private boolean iterateOverQuark(ITmfStateSystem stateSystem, int quark, String[] subAttributePath, IProgressMonitor monitor) {
+        String threadName = stateSystem.getAttributeName(quark);
+        AggregatedCalledFunction init = new AggregatedCalledFunction(threadName, 0L, 0, 0, null);
         try {
             long curTime = stateSystem.getStartTime();
             long limit = stateSystem.getCurrentEndTime();
@@ -222,10 +229,11 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
                     // Create the segment for the first call event.
                     AbstractCalledFunction segment = CalledFunctionFactory.create(intervalStart, intervalEnd + 1, depth, stateValue, null);
                     fRootFunctions.add(segment);
-                    if (!findChildren(segment, depth, stateSystem, fCurrentQuarks.size() + fCurrentQuarks.get(depth), monitor)) {
+                    AggregatedCalledFunction firstNode = new AggregatedCalledFunction(stateValue, intervalEnd - intervalStart + 1, segment.getDepth(), fCurrentQuarks.size(), null);
+                    if (!findChildren(segment, depth, stateSystem, fCurrentQuarks.size() + fCurrentQuarks.get(depth), firstNode, monitor)) {
                         return false;
                     }
-
+                    init.addChild(firstNode);
                 }
 
                 curTime = interval.getEndTime() + 1;
@@ -235,6 +243,7 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
             Activator.getInstance().logError(Messages.QueringStateSystemError, e);
             return false;
         }
+        fThreadNodes.add(init);
         return true;
     }
 
@@ -251,11 +260,13 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
      *            The quark of the segment parent ss The actual state system
      * @param maxQuark
      *            The last quark in the state system
+     * @param AggregatedCalledFunction
+     *            A node in the aggregation tree
      * @param monitor
      *            The progress monitor The progress monitor TODO: if stack size
      *            is an issue, convert to a stack instead of recursive function
      */
-    private boolean findChildren(AbstractCalledFunction node, int depth, ITmfStateSystem ss, int maxQuark, IProgressMonitor monitor) {
+    private boolean findChildren(AbstractCalledFunction node, int depth, ITmfStateSystem ss, int maxQuark, AggregatedCalledFunction aggregatedCalledFunction, IProgressMonitor monitor) {
         fStore.add(node);
         long curTime = node.getStart();
         long limit = node.getEnd();
@@ -282,8 +293,10 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
                     return true;
                 }
                 AbstractCalledFunction segment = CalledFunctionFactory.create(intervalStart, intervalEnd + 1, node.getDepth() + 1, stateValue, node);
+                AggregatedCalledFunction childNode = new AggregatedCalledFunction(stateValue, segment.getLength(), segment.getDepth(), aggregatedCalledFunction.getMaxDepth(), aggregatedCalledFunction);
                 // Search for the children with the next quark.
-                findChildren(segment, depth + 1, ss, maxQuark, monitor);
+                findChildren(segment, depth + 1, ss, maxQuark, childNode, monitor);
+                aggregatedCalledFunction.addChild(childNode);
                 node.addChild(segment);
             }
             curTime = interval.getEndTime() + 1;
@@ -340,6 +353,16 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
      */
     public List<ICalledFunction> getRootFunctions() {
         return ImmutableList.copyOf(fRootFunctions);
+    }
+
+    /**
+     * List of thread nodes. Each thread has a virtual node having the root
+     * functions called as children.
+     *
+     * @return The thread nodes
+     */
+    public List<AggregatedCalledFunction> getThreadNodes() {
+        return ImmutableList.copyOf(fThreadNodes);
     }
 
 }

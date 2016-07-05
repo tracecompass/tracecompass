@@ -6,34 +6,42 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;
+package org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 
 /**
- * Message bundle for the call stack analysis module
+ * Message bundle for the flame graph view
  *
  * @author Sonia Farrah
  */
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = Messages.class.getPackage().getName() + ".messages"; //$NON-NLS-1$
     /**
-     * Analysis description for the help
+     * The duration of a function
      */
-    public static @Nullable String CallGraphAnalysis_Description;
+    public static String FlameGraph_Duration;
     /**
-     * The call stack event's name
+     * The time percentage of a function
      */
-    public static @Nullable String CallStack_FunctionName;
+    public static String FlameGraph_Percentage;
     /**
-     * Querying state system error's message
+     * The number of calls of a function
      */
-    public static @Nullable String QueringStateSystemError;
+    public static String FlameGraph_NbCalls;
     /**
-     * Segment's start time exceeding its end time Error message
+     * The self time of a function
      */
-    public static @Nullable String TimeError;
+    public static String FlameGraph_SelfTime;
+    /**
+     * The depth of a function
+     */
+    public static String FlameGraph_Depth;
+    /**
+     * Execution of the callGraph Analysis
+     */
+    public static String CallGraphAnalysis_Execution;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
