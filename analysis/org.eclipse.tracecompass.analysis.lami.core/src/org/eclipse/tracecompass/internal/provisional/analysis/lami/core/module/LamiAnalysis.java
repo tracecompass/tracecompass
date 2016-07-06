@@ -23,9 +23,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.function.Predicate;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,8 +38,11 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.internal.analysis.lami.core.Activator;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.LamiStrings;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiDurationAspect;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiEmptyAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiGenericAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiIRQNameAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiIRQNumberAspect;
@@ -47,8 +51,6 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.L
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiProcessNameAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiProcessPIDAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiProcessTIDAspect;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiDurationAspect;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiEmptyAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiTableEntryAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiTimeRangeBeginAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiTimeRangeDurationAspect;
@@ -78,6 +80,8 @@ import com.google.common.collect.Multimap;
  */
 public class LamiAnalysis implements IOnDemandAnalysis {
 
+    private static final Logger LOGGER = TraceCompassLog.getLogger(LamiAnalysis.class);
+
     /**
      * Maximum major version of the LAMI protocol we support.
      *
@@ -92,9 +96,6 @@ public class LamiAnalysis implements IOnDemandAnalysis {
     private static final String PROGRESS_FLAG = "--output-progress"; //$NON-NLS-1$
     private static final String BEGIN_FLAG = "--begin"; //$NON-NLS-1$
     private static final String END_FLAG = "--end"; //$NON-NLS-1$
-
-    /** Log message for commands being run */
-    private static final String RUNNING_MESSAGE = "Running command:"; //$NON-NLS-1$
 
     private final List<String> fScriptCommand;
 
@@ -204,7 +205,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         List<String> command = ImmutableList.<@NonNull String> builder()
                 .addAll(fScriptCommand).add(METADATA_FLAG).build();
 
-        Activator.instance().logInfo(RUNNING_MESSAGE + ' ' + command.toString());
+        LOGGER.info(() -> "[LamiAnalysis:RunningMetadataCommand] command=" + command.toString()); //$NON-NLS-1$
 
         String output = getOutputFromCommand(command);
         if (output == null || output.isEmpty()) {
@@ -305,6 +306,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
 
         } catch (JSONException e) {
             /* Error in the parsing of the JSON, script is broken? */
+            LOGGER.severe(() -> "[LamiAnalysis:ErrorParsingMetadata] msg=" + e.getMessage()); //$NON-NLS-1$
             Activator.instance().logError(e.getMessage());
             return false;
         }
@@ -514,7 +516,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         builder.add(tracePath);
         List<String> command = builder.build();
 
-        Activator.instance().logInfo(RUNNING_MESSAGE + ' ' + command.toString());
+        LOGGER.info(() -> "[LamiAnalysis:RunningExecuteCommand] command=" + command.toString()); //$NON-NLS-1$
         String output = getResultsFromCommand(command, monitor);
 
         if (output.isEmpty()) {
@@ -661,6 +663,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
             }
 
         } catch (JSONException e) {
+            LOGGER.severe(() -> "[LamiAnalysis:ErrorParsingExecutionOutput] msg=" + e.getMessage()); //$NON-NLS-1$
             IStatus status = new Status(IStatus.ERROR, Activator.instance().getPluginId(), e.getMessage(), e);
             throw new CoreException(status);
         }
