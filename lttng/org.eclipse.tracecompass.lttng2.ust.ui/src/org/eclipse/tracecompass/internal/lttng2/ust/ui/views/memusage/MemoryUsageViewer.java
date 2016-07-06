@@ -24,7 +24,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryStrings;
-import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.internal.lttng2.ust.ui.Activator;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryAnalysisModule;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -44,7 +44,6 @@ import org.swtchart.Chart;
  *
  * @author Matthew Khouzam
  */
-@SuppressWarnings("restriction")
 public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
 
     private TmfStateSystemAnalysisModule fModule = null;
@@ -177,7 +176,7 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
                 updateDisplay();
             }
         } catch (AttributeNotFoundException | StateValueTypeException e) {
-            Activator.logError("Error updating the data of the Memory usage view", e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error updating the data of the Memory usage view", e); //$NON-NLS-1$
         } catch (StateSystemDisposedException e) {
             /* State system is closing down, no point continuing */
         }
