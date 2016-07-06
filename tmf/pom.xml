@@ -38,6 +38,10 @@
     <module>org.eclipse.tracecompass.tmf.analysis.xml.ui.tests</module>
     <module>org.eclipse.tracecompass.tmf.analysis.xml.ui.swtbot.tests</module>
 
+    <module>org.eclipse.tracecompass.tmf.chart.core</module>
+    <!-- <module>org.eclipse.tracecompass.tmf.chart.core.tests</module> -->
+    <module>org.eclipse.tracecompass.tmf.chart.ui</module>
+
     <module>org.eclipse.tracecompass.tmf.remote</module>
     <module>org.eclipse.tracecompass.tmf.remote.core</module>
     <module>org.eclipse.tracecompass.tmf.remote.core.tests</module>
