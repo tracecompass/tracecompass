@@ -214,6 +214,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
                 event = fEventsQueue.take();
             }
             /* We've received the last event, clean up */
+            done();
             closeStateSystem();
         }
 

@@ -112,4 +112,10 @@ public interface ITmfStateProvider {
      * and that it should close its current history.
      */
     void dispose();
+
+    /**
+     * Callback when trace has been fully read
+     * @since 2.1
+     */
+    default void done() {}
 }
