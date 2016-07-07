@@ -927,7 +927,7 @@ The '''New Custom Text Parser''' wizard can be used to create a custom parser fo
 Fill out the first wizard page with the following information:
 
 * '''Category:''' Enter a category name for the trace type.
-* '''Trace type:''' Enter a name for the trace type, which is also the name of the custom parser.
+* '''Trace type:''' Enter a name for the trace type, which is also the name of the custom parser. This will also be the default event type name.
 * '''Time Stamp format:''' Enter the date and time pattern that will be used to output the Time Stamp.<br>
 Note: information about date and time patterns can be found here: [http://archive.eclipse.org/tracecompass/doc/stable/org.eclipse.tracecompass.doc.user/reference/api/org/eclipse/tracecompass/tmf/core/timestamp/TmfTimestampFormat.html TmfTimestampFormat]
 
@@ -938,12 +938,15 @@ Note: information about regular expression patterns can be found here: [http://d
 
 * '''Cardinality:''' Enter the minimum and maximum number of lines matching this line's regular expression that must be found in the log. At least the minimum number of lines must be found before the parser will consider the next line. Child lines will always be considered first.
 
+* '''Event type:''' Optionally enable this text field to enter an event type name that will override the default (trace type) when this line matches.
+
 <u>Important note:</u> The custom parsers identify a log entry when the first line's regular expression matches (Root Line n). Each subsequent text line in the log is attempted to be matched against the regular expression of the parser's input lines in the order that they are defined (Line n.*). Only the first matching input line will be used to process the captured data to be stored in the log entry. When a text line matches a Root Line's regular expression, a new log entry is started.
 
 Click the '''Add group''' or '''Remove group''' buttons to define the data extracted from the capturing groups in the line's regular expression. For each group, enter the following information:
 
 * '''Name combo:''' Select a name for the extracted data:
-** '''Time Stamp''': Select this option to identify the time stamp data. The input's data and time pattern must be entered in the format: text box.
+** '''Timestamp''': Select this option to identify the timestamp data. The input's data and time pattern must be entered in the format: text box.
+** '''Event type''': Select this option to identify the event type name. This will override the default or line-specific event type name.
 ** '''Message''': Select this option to identify the main log entry's message. This is usually a group which could have text of greater length.
 ** '''Other''': Select this option to identify any non-standard data. The name must be entered in the name: text box.
 
@@ -995,7 +998,7 @@ The '''New Custom XML Parser''' wizard can be used to create a custom parser for
 Fill out the first wizard page with the following information:
 
 * '''Category:''' Enter a category name for the trace type.
-* '''Trace type:''' Enter a name for the trace type, which is also the name of the custom parser.
+* '''Trace type:''' Enter a name for the trace type, which is also the name of the custom parser. This will also be the default event type name.
 * '''Time Stamp format:''' Enter the date and time pattern that will be used to output the Time Stamp.<br>
 Note: information about date and time patterns can be found here: [http://archive.eclipse.org/tracecompass/doc/stable/org.eclipse.tracecompass.doc.user/reference/api/org/eclipse/tracecompass/tmf/core/timestamp/TmfTimestampFormat.html TmfTimestampFormat]
 
@@ -1007,13 +1010,15 @@ Click the '''Add child''' button to create a new element of input to the documen
 * '''Log entry:''' Select this checkbox to identify an element which represents a log entry. Each element with this name in the XML file will be parsed to a new log entry. At least one log entry element must be identified in the XML document. Log entry elements cannot be nested.
 * '''Name combo:''' Select a name for the extracted data:
 ** '''Ignore''': Select this option to ignore the extracted element's data at this level. It is still possible to extract data from this element's child elements.
-** '''Time Stamp''': Select this option to identify the time stamp data. The input's data and time pattern must be entered in the format: text box.
+** '''Event type''': Select this option to identify the event type name. This will override the default or element-specific event type name.
+** '''Timestamp''': Select this option to identify the timestamp data. The input's data and time pattern must be entered in the format: text box.
 ** '''Message''': Select this option to identify the main log entry's message. This is usually an input which could have text of greater length.
 ** '''Other''': Select this option to identify any non-standard data. The name must be entered in the name: text box. It does not have to match the element name.
 * '''Action combo:''' Select the action to be performed on the extracted data:
 ** '''Set''': Select this option to overwrite the data for the chosen name when there is a match for this element.
 ** '''Append''': Select this option to append to the data with the chosen name, if any, when there is a match for this element.
 ** '''Append with |''' : Select this option to append to the data with the chosen name, if any, when there is a match for this element, using a | separator between matches.
+* '''Event type:''' Optionally enable this text field to enter an event type name that will override the default (trace type) when this element is present.
 
 Note: An element's extracted data 'value' is a parsed string representation of all its attributes, children elements and their own values. To extract more specific information from an element, ignore its data value and extract the data from one or many of its attributes and children elements.
 
@@ -1021,7 +1026,8 @@ Click the '''Add attribute''' button to create a new attribute input from the do
 
 * '''Attribute name:''' Enter a name for the attribute that must match an attribute of this element in the XML file.
 * '''Name combo:''' Select a name for the extracted data:
-** '''Time Stamp''': Select this option to identify the time stamp data. The input's data and time pattern must be entered in the format: text box.
+** '''Timestamp''': Select this option to identify the timestamp data. The input's data and time pattern must be entered in the format: text box.
+** '''Event type''': Select this option to identify the event type name. This will override the default or element-specific event type name.
 ** '''Message''': Select this option to identify the main log entry's message. This is usually an input which could have text of greater length.
 ** '''Other''': Select this option to identify any non-standard data. The name must be entered in the name: text box. It does not have to match the element name.
 * '''Action combo:''' Select the action to be performed on the extracted data:
