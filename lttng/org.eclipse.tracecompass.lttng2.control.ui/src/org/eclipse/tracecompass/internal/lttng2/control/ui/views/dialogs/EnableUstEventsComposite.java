@@ -699,11 +699,11 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         @Override
         public String getText(Object element) {
             if ((element != null) && (element instanceof TraceProviderGroup)) {
-                return Messages.TraceControl_EnableEventsTracepointTreeAllLabel;
+                return Messages.TraceControl_EnableEventsTreeAllLabel;
             }
 
             if ((element != null) && (element instanceof UstProviderComponent)) {
-                return Messages.TraceControl_EnableEventsTracepointTreeAllLabel + " - " + ((UstProviderComponent)element).getName(); //$NON-NLS-1$
+                return Messages.TraceControl_EnableEventsTreeAllLabel + " - " + ((UstProviderComponent)element).getName(); //$NON-NLS-1$
             }
             return super.getText(element);
         }

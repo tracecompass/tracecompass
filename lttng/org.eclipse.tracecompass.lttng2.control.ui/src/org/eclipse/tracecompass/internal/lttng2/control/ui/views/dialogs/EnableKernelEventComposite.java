@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceControlComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.BaseEventComponent;
@@ -75,9 +76,13 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
      */
     private CheckboxTreeViewer fTracepointsViewer;
     /**
+     * A tree viewer for displaying and selection of available syscalls.
+     */
+    private CheckboxTreeViewer fSyscallsViewer;
+    /**
      * A button to enable/disable the syscalls group
      */
-    private Button fSysCallsActivateButton;
+    private Button fSyscallsActivateButton;
     /**
      * A Text field for the specific event name.
      */
@@ -130,7 +135,11 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     /**
      * The flag indicating that syscalls are selected.
      */
-    private boolean fIsSysCalls;
+    private boolean fIsSyscalls;
+    /**
+     * The flag indicating that all syscalls are selected.
+     */
+    private boolean fIsAllSyscalls;
     /**
      * The list of tracepoints to be enabled.
      */
@@ -201,13 +210,13 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     }
 
     @Override
-    public boolean isSysCalls() {
-        return fIsSysCalls;
+    public boolean isSyscalls() {
+        return fIsSyscalls;
     }
 
     @Override
-    public boolean isAllSysCalls() {
-        return fIsSysCalls;
+    public boolean isAllSyscalls() {
+        return fIsAllSyscalls;
     }
 
     @Override
@@ -266,7 +275,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
         createTracepointsGroup();
 
         // Syscalls Group
-        createSysCallsGroup();
+        createSyscallsGroup();
 
         // Dynamic Probe Group
         createDynamicProbeGroup();
@@ -288,7 +297,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     public boolean isValid() {
         fIsAllTracepointsAndSyscalls = fAllActivateButton.getSelection();
         fIsTracepoints = fTracepointsActivateButton.getSelection();
-        fIsSysCalls = fSysCallsActivateButton.getSelection();
+        fIsSyscalls = fSyscallsActivateButton.getSelection();
         fIsDynamicProbe = fProbeActivateButton.getSelection();
         fIsDynamicFunctionProbe = fFunctionActivateButton.getSelection();
 
@@ -308,7 +317,11 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
             int nbEvents = 0;
             List<ITraceControlComponent> comps = fProviderGroup.getChildren(KernelProviderComponent.class);
             for (ITraceControlComponent comp : comps) {
-                nbEvents += comp.getChildren().length;
+                for (ITraceControlComponent event : comp.getChildren()) {
+                    if (event instanceof BaseEventComponent && ((BaseEventComponent) event).getEventType() == TraceEventType.TRACEPOINT) {
+                        nbEvents++;
+                    }
+                }
             }
             fIsAllTracepoints = (nbEvents == fSelectedEvents.size());
             String tmpSpecificEvent = fSpecificEventText.getText();
@@ -320,6 +333,37 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
                 List<String> list = Arrays.asList(tmpSpecificEvent.split(",")); //$NON-NLS-1$
                 fSelectedEvents.addAll(list);
                 fSelectedEvents = fSelectedEvents.stream().distinct().collect(Collectors.toList());
+            }
+        }
+
+        fIsAllSyscalls = false;
+
+        if (fIsSyscalls) {
+            if (fSyscallsViewer != null) {
+                Object[] checkedElements = fSyscallsViewer.getCheckedElements();
+                for (int i = 0; i < checkedElements.length; i++) {
+                    ITraceControlComponent component = (ITraceControlComponent)checkedElements[i];
+                    if (component instanceof BaseEventComponent) {
+                        fSelectedEvents.add(component.getName());
+                    }
+                }
+                // verify if all events are selected
+                int nbSyscalls = 0;
+                List<ITraceControlComponent> comps = fProviderGroup.getChildren(KernelProviderComponent.class);
+                for (ITraceControlComponent comp : comps) {
+                    for (ITraceControlComponent syscall : comp.getChildren()) {
+                        if (syscall instanceof BaseEventComponent && ((BaseEventComponent) syscall).getEventType() == TraceEventType.SYSCALL) {
+                            nbSyscalls++;
+                        }
+                    }
+                }
+                fIsAllSyscalls = (nbSyscalls == fSelectedEvents.size());
+                if (!fIsAllSyscalls) {
+                    fSelectedEvents = fSelectedEvents.stream().distinct().collect(Collectors.toList());
+                }
+            } else {
+                // for version < LTTng 2.6.0 only all syscalls could be enabled
+                fIsAllSyscalls = true;
             }
         }
 
@@ -375,7 +419,6 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
      * Creates all tracepoints/syscalls group.
      */
     private void createAllTracepointsSyscallGroup() {
-
         GridLayout layout;
         GridData data;
         Group tpMainGroup = new Group(this, SWT.SHADOW_NONE);
@@ -408,7 +451,6 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
      * Creates tracepoints group.
      */
     private void createTracepointsGroup() {
-
         GridLayout layout;
         GridData data;
         Group tpMainGroup = new Group(this, SWT.SHADOW_NONE);
@@ -447,9 +489,9 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
                 fTracepointsViewer = new CheckboxTreeViewer(aparent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
                 fTracepointsViewer.getTree().setToolTipText(Messages.TraceControl_EnableEventsTracepointTreeTooltip);
 
-                fTracepointsViewer.setContentProvider(new KernelContentProvider());
+                fTracepointsViewer.setContentProvider(new KernelContentProvider(TraceEventType.TRACEPOINT));
                 fTracepointsViewer.setLabelProvider(new KernelLabelProvider());
-                fTracepointsViewer.addCheckStateListener(new KernelCheckListener());
+                fTracepointsViewer.addCheckStateListener(new KernelCheckListener(fTracepointsViewer));
                 fTracepointsViewer.setInput(fProviderGroup);
 
                 fTracepointsViewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -485,35 +527,64 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     /**
      * Creates syscalls group.
      */
-    private void createSysCallsGroup() {
+    private void createSyscallsGroup() {
         GridLayout layout;
         GridData data;
-        Group sysCallsMainGroup = new Group(this, SWT.SHADOW_NONE);
-        sysCallsMainGroup.setText(Messages.TraceControl_EnableEventsSyscallName);
-        sysCallsMainGroup.setToolTipText(Messages.TraceControl_EnableEventsSyscallTooltip);
+        Group syscallMainGroup = new Group(this, SWT.SHADOW_NONE);
+        syscallMainGroup.setText(Messages.TraceControl_EnableEventsSyscallName);
         layout = new GridLayout(2, false);
-        sysCallsMainGroup.setLayout(layout);
-        data = new GridData(GridData.FILL_HORIZONTAL);
-        sysCallsMainGroup.setLayoutData(data);
+        syscallMainGroup.setLayout(layout);
+        data = new GridData(GridData.FILL_BOTH);
+        syscallMainGroup.setLayoutData(data);
 
-        Composite buttonComposite = new Composite(sysCallsMainGroup, SWT.NONE);
-        layout = new GridLayout(1, false);
+        Composite buttonComposite = new Composite(syscallMainGroup, SWT.NONE);
+        layout = new GridLayout(1, true);
         buttonComposite.setLayout(layout);
         data = new GridData(SWT.BEGINNING, SWT.CENTER, false, true);
         buttonComposite.setLayoutData(data);
 
-        fSysCallsActivateButton = new Button(buttonComposite, SWT.RADIO);
-        fSysCallsActivateButton.setText(Messages.TraceControl_EnableGroupSelectionName);
-        fSysCallsActivateButton.setToolTipText(Messages.TraceControl_EnableEventsSyscallTooltip);
-        fSysCallsActivateButton.setSelection(false);
+        fSyscallsActivateButton = new Button(buttonComposite, SWT.RADIO);
+        fSyscallsActivateButton.setText(Messages.TraceControl_EnableGroupSelectionName);
+        fSyscallsActivateButton.setSelection(false);
         data = new GridData(GridData.FILL_HORIZONTAL);
-        fSysCallsActivateButton.setLayoutData(data);
-        fSysCallsActivateButton.addSelectionListener(new SelectionAdapter() {
+        fSyscallsActivateButton.setLayoutData(data);
+        fSyscallsActivateButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 setKernelEnablements(KernelGroupEnum.SYSCALLS);
             }
         });
+
+        if (fProviderGroup.isPerSyscallEventsSupported()) {
+            Group syscallGroup = new Group(syscallMainGroup, SWT.SHADOW_NONE);
+            layout = new GridLayout(1, true);
+            syscallGroup.setLayout(layout);
+            data = new GridData(GridData.FILL_BOTH);
+            syscallGroup.setLayoutData(data);
+
+            new FilteredTree(syscallGroup, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, new PatternFilter(), true) {
+                @Override
+                protected TreeViewer doCreateTreeViewer(Composite aparent, int style) {
+                    fSyscallsViewer = new CheckboxTreeViewer(aparent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+                    fSyscallsViewer.getTree().setToolTipText(Messages.TraceControl_EnableEventsSyscallTooltip);
+
+                    fSyscallsViewer.setContentProvider(new KernelContentProvider(TraceEventType.SYSCALL));
+                    fSyscallsViewer.setLabelProvider(new KernelLabelProvider());
+                    fSyscallsViewer.addCheckStateListener(new KernelCheckListener(fSyscallsViewer));
+                    fSyscallsViewer.setInput(fProviderGroup);
+
+                    fSyscallsViewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
+
+                    return fSyscallsViewer;
+                }
+
+                @Override
+                protected void updateToolbar(boolean visible) {
+                    super.updateToolbar(visible);
+                    treeViewer.expandAll();
+                }
+            };
+        }
     }
 
     /**
@@ -649,7 +720,10 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
         fTracepointsViewer.getTree().setEnabled(group == KernelGroupEnum.TRACEPOINTS);
         fSpecificEventText.setEnabled(group == KernelGroupEnum.TRACEPOINTS);
 
-        fSysCallsActivateButton.setSelection(group == KernelGroupEnum.SYSCALLS);
+        fSyscallsActivateButton.setSelection(group == KernelGroupEnum.SYSCALLS);
+        if (fProviderGroup.isPerSyscallEventsSupported()) {
+            fSyscallsViewer.getTree().setEnabled(group == KernelGroupEnum.SYSCALLS);
+        }
 
         fProbeActivateButton.setSelection(group == KernelGroupEnum.PROBE);
         fProbeEventNameText.setEnabled(group == KernelGroupEnum.PROBE);
@@ -680,9 +754,24 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
     // Local classes
     // ------------------------------------------------------------------------
     /**
-     * Content provider for the tracepoints tree.
+     * Content provider for the tracepoints and syscalls tree.
      */
     public static final class KernelContentProvider extends TraceControlContentProvider {
+        /**
+         * The type of event ({@link TraceEventType})
+         */
+        private final TraceEventType fEventType;
+
+        /**
+         * Constructor
+         *
+         * @param eventType
+         *            the type of event ({@link TraceEventType})
+         */
+        public KernelContentProvider(TraceEventType eventType) {
+            fEventType = eventType;
+        }
+
         @Override
         public Object[] getChildren(Object parentElement) {
             if (parentElement instanceof TraceProviderGroup) {
@@ -690,45 +779,67 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
                 return children.toArray(new ITraceControlComponent[children.size()]);
             }
             if (parentElement instanceof ITraceControlComponent) {
-                return ((ITraceControlComponent)parentElement).getChildren();
+                List<ITraceControlComponent> events = new ArrayList<>();
+                for (ITraceControlComponent event : ((ITraceControlComponent)parentElement).getChildren()) {
+                    if (event instanceof BaseEventComponent && ((BaseEventComponent) event).getEventType() == fEventType) {
+                        events.add(event);
+                    }
+                }
+                return events.toArray(new ITraceControlComponent[events.size()]);
             }
             return new Object[0];
         }
     }
 
     /**
-     * Content label for the tracepoints tree.
+     * Content label for the tracepoints and syscalls tree.
      */
     public static final class KernelLabelProvider extends TraceControlLabelProvider {
         @Override
         public Image getImage(Object element) {
             return null;
         }
+
         @Override
         public String getText(Object element) {
             if ((element != null) && (element instanceof KernelProviderComponent)) {
-                return Messages.TraceControl_EnableEventsTracepointTreeAllLabel;
+                return Messages.TraceControl_EnableEventsTreeAllLabel;
             }
             return super.getText(element);
         }
     }
 
     /**
-     * Check state listener for the tracepoints tree.
+     * Check state listener for the tracepoints and syscalls tree.
      */
     public final class KernelCheckListener implements ICheckStateListener {
+        /**
+         * The check box tree viewer.
+         */
+        private final CheckboxTreeViewer fCheckBoxTreeViewer;
+
+        /**
+         * Constructor
+         *
+         * @param checkBoxTreeViewer
+         *            the check box tree viewer.
+         */
+        public KernelCheckListener(CheckboxTreeViewer checkBoxTreeViewer) {
+            fCheckBoxTreeViewer = checkBoxTreeViewer;
+        }
+
         @Override
         public void checkStateChanged(CheckStateChangedEvent event) {
           if (event.getChecked()) {
               if (event.getElement() instanceof KernelProviderComponent) {
-                  fTracepointsViewer.setSubtreeChecked(event.getElement(), true);
+                  fCheckBoxTreeViewer.setSubtreeChecked(event.getElement(), true);
               }
           } else {
               if (event.getElement() instanceof KernelProviderComponent) {
-                  fTracepointsViewer.setSubtreeChecked(event.getElement(), false);
+                  fCheckBoxTreeViewer.setSubtreeChecked(event.getElement(), false);
               } else {
                   ITraceControlComponent component = (ITraceControlComponent) event.getElement();
-                  fTracepointsViewer.setChecked(component.getParent(), false);
+                  fCheckBoxTreeViewer.setChecked(component.getParent(), false);
               }
           }
         }

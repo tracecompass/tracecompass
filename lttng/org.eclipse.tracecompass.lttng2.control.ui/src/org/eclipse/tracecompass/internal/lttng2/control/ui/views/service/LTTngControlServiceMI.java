@@ -567,25 +567,42 @@ public class LTTngControlServiceMI extends LTTngControlService {
 
     @Override
     public List<IBaseEventInfo> getKernelProvider(IProgressMonitor monitor) throws ExecutionException {
-        ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_LIST, LTTngControlServiceConstants.OPTION_KERNEL);
-        ICommandResult result = executeCommand(command, monitor, false);
+        // Tracepoint events
+        ICommandInput tracepointCommand = createCommand(LTTngControlServiceConstants.COMMAND_LIST, LTTngControlServiceConstants.OPTION_KERNEL);
+        ICommandResult tracepointResult = executeCommand(tracepointCommand, monitor, false);
         List<IBaseEventInfo> events = new ArrayList<>();
 
-        if (isError(result)) {
+        if (isError(tracepointResult)) {
             // Ignore the following 2 cases:
             // Spawning a session daemon
             // Error: Unable to list kernel events
             // or:
             // Error: Unable to list kernel events
-            if (ignoredPattern(result.getErrorOutput(), LTTngControlServiceConstants.LIST_KERNEL_NO_KERNEL_PROVIDER_PATTERN)) {
+            if (ignoredPattern(tracepointResult.getErrorOutput(), LTTngControlServiceConstants.LIST_KERNEL_NO_KERNEL_PROVIDER_PATTERN)) {
                 return events;
             }
-            throw new ExecutionException(Messages.TraceControl_CommandError + command.toString());
+            throw new ExecutionException(Messages.TraceControl_CommandError + tracepointCommand.toString());
         }
 
-        Document document = getDocumentFromStrings(result.getOutput(), fDocumentBuilder);
-        NodeList rawEvents = document.getElementsByTagName(MIStrings.EVENT);
-        getBaseEventInfo(rawEvents, events);
+        Document tracepointDocument = getDocumentFromStrings(tracepointResult.getOutput(), fDocumentBuilder);
+        NodeList rawTracepointEvents = tracepointDocument.getElementsByTagName(MIStrings.EVENT);
+        getBaseEventInfo(rawTracepointEvents, events);
+
+        // Syscall events
+        ICommandInput syscallCommand = createCommand(LTTngControlServiceConstants.COMMAND_LIST, LTTngControlServiceConstants.OPTION_KERNEL, LTTngControlServiceConstants.OPTION_SYSCALL);
+        ICommandResult syscallResult = executeCommand(syscallCommand, monitor, false);
+        List<IBaseEventInfo> syscallEvents = new ArrayList<>();
+
+        if (isError(syscallResult)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + syscallCommand.toString());
+        }
+
+        Document syscallDocument = getDocumentFromStrings(syscallResult.getOutput(), fDocumentBuilder);
+        NodeList rawSyscallEvents = syscallDocument.getElementsByTagName(MIStrings.EVENT);
+        getBaseEventInfo(rawSyscallEvents, syscallEvents);
+
+        // Merge the tracepoint events with the syscall events (all under the Kernel provider)
+        events.addAll(syscallEvents);
         return events;
     }
 

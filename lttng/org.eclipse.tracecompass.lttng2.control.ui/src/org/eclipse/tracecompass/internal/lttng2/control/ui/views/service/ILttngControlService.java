@@ -261,13 +261,17 @@ public interface ILttngControlService {
      *            - a session name
      * @param channelName
      *            - a channel name or null for default channel
+     * @param eventNames
+     *            - a list of event names to be enabled, or null or empty List
+     *            for all events.
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
     void enableSyscalls(String sessionName, String channelName,
-            IProgressMonitor monitor) throws ExecutionException;
+            List<String> eventNames, IProgressMonitor monitor)
+            throws ExecutionException;
 
     /**
      * Enables a dynamic probe or dynamic function entry/return probe.

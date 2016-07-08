@@ -53,8 +53,8 @@ public class EnableEventOnSessionHandler extends BaseEnableEventHandler {
     }
 
     @Override
-    public void enableSyscalls(CommandParameter param, IProgressMonitor monitor) throws ExecutionException {
-        param.getSession().enableSyscalls(monitor);
+    public void enableSyscalls(CommandParameter param, List<String> syscallNames, IProgressMonitor monitor) throws ExecutionException {
+        param.getSession().enableSyscalls(syscallNames, monitor);
     }
 
     @Override

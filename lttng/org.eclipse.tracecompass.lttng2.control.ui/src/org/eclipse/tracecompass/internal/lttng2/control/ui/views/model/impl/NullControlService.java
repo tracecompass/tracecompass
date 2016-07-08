@@ -109,7 +109,7 @@ class NullControlService implements ILttngControlService {
     }
 
     @Override
-    public void enableSyscalls(String sessionName, String channelName, IProgressMonitor monitor) throws ExecutionException {
+    public void enableSyscalls(String sessionName, String channelName, List<String> eventNames, IProgressMonitor monitor) throws ExecutionException {
     }
 
     @Override

@@ -141,12 +141,12 @@ public class EnableEventsDialogStub implements IEnableEventsDialog {
     }
 
     @Override
-    public boolean isSysCalls() {
+    public boolean isSyscalls() {
         return fIsSysCalls;
     }
 
     @Override
-    public boolean isAllSysCalls() {
+    public boolean isAllSyscalls() {
         return fIsSysCalls;
     }
 

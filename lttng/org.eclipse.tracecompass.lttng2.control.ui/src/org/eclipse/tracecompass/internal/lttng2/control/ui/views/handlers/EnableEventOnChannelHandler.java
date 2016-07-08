@@ -55,9 +55,9 @@ public class EnableEventOnChannelHandler extends BaseEnableEventHandler {
     }
 
     @Override
-    public void enableSyscalls(CommandParameter param, IProgressMonitor monitor) throws ExecutionException {
+    public void enableSyscalls(CommandParameter param, List<String> syscallNames, IProgressMonitor monitor) throws ExecutionException {
         if (param instanceof ChannelCommandParameter) {
-            ((ChannelCommandParameter)param).getChannel().enableSyscalls(monitor);
+            ((ChannelCommandParameter)param).getChannel().enableSyscalls(syscallNames, monitor);
         }
     }
 

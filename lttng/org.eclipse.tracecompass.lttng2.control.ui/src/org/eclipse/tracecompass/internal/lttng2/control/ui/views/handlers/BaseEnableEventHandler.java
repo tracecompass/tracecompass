@@ -22,9 +22,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.window.Window;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.IEnableEventsDialog;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.TraceControlDialogFactory;
@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceCon
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceProviderGroup;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.ILttngControlService;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
@@ -83,12 +84,14 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
      *
      * @param param
      *            - a parameter instance with data for the command execution
+     * @param syscallNames
+     *            - a list of syscall names
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails for some reason
      */
-    public abstract void enableSyscalls(CommandParameter param, IProgressMonitor monitor) throws ExecutionException;
+    public abstract void enableSyscalls(CommandParameter param, List<String> syscallNames, IProgressMonitor monitor) throws ExecutionException;
 
     /**
      * Enables a dynamic probe.
@@ -195,8 +198,16 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
                         }
 
                         // Enable syscall events
-                        if (dialog.isAllSysCalls()) {
-                            enableSyscalls(param, monitor);
+                        if (dialog.isSyscalls()) {
+                            // Enable all syscall events
+                            if (dialog.isAllSyscalls()) {
+                                enableSyscalls(param, ILttngControlService.ALL_EVENTS, monitor);
+                            } else {
+                                List<String> syscallNames = dialog.getEventNames();
+                                if (!syscallNames.isEmpty()) {
+                                    enableSyscalls(param, syscallNames, monitor);
+                                }
+                            }
                         }
 
                         // Enable dynamic probe

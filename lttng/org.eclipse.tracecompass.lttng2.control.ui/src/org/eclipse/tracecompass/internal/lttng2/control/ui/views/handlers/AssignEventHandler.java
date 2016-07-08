@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.IGetEventInfoDialog;
@@ -101,6 +102,8 @@ public class AssignEventHandler extends BaseControlViewHandler {
                 try {
                     List<String> eventNames = new ArrayList<>();
                     List<BaseEventComponent> events = param.getEvents();
+                    // Find the type of the events (all the events in the list are the same type)
+                    TraceEventType  eventType = !events.isEmpty() ? events.get(0).getEventType() : null;
                     // Create list of event names
                     for (Iterator<BaseEventComponent> iterator = events.iterator(); iterator.hasNext();) {
                         BaseEventComponent baseEvent = iterator.next();
@@ -108,11 +111,19 @@ public class AssignEventHandler extends BaseControlViewHandler {
                     }
 
                     TraceChannelComponent channel = dialog.getChannel();
-                    if (channel == null) {
-                        // enable events on default channel (which will be created by lttng-tools)
-                        session.enableEvents(eventNames, param.getDomain(), dialog.getFilterExpression(), null, monitor);
-                    } else {
-                        channel.enableEvents(eventNames, dialog.getFilterExpression(), null, monitor);
+                    if (TraceEventType.TRACEPOINT.equals(eventType)) {
+                        if (channel == null) {
+                            // enable events on default channel (which will be created by lttng-tools)
+                            session.enableEvents(eventNames, param.getDomain(), dialog.getFilterExpression(), null, monitor);
+                        } else {
+                            channel.enableEvents(eventNames, dialog.getFilterExpression(), null, monitor);
+                        }
+                    } else if (TraceEventType.SYSCALL.equals(eventType)) {
+                        if (channel == null) {
+                            session.enableSyscalls(eventNames, monitor);
+                        } else {
+                            channel.enableSyscalls(eventNames, monitor);
+                        }
                     }
 
                 } catch (ExecutionException e) {
@@ -141,6 +152,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
         @NonNull ArrayList<@NonNull BaseEventComponent> events = new ArrayList<>();
         @NonNull TraceSessionComponent[] sessions = null;
         TraceDomainType domain = null;
+        TraceEventType eventType = null;
 
         // Get workbench page for the Control View
         IWorkbenchPage page = getWorkbenchPage();
@@ -176,6 +188,13 @@ public class AssignEventHandler extends BaseControlViewHandler {
                         if (!domain.equals(temp)) {
                             return false;
                         }
+                    }
+                    // The events have to be the same type
+                    if (eventType == null) {
+                        eventType = event.getEventType();
+                    } else if (!eventType.equals(event.getEventType())) {
+                        events.clear();
+                        break;
                     }
 
                     // Add BaseEventComponents

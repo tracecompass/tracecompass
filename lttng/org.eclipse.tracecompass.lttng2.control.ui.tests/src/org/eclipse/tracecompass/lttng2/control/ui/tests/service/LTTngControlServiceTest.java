@@ -1238,14 +1238,24 @@ public class LTTngControlServiceTest {
             // 1) session name, channel = null, 3 event names, kernel
             String sessionName = "mysession2";
             String channelName = "mychannel";
+            List<String> syscalls = new ArrayList<>();
 
             fShell.setScenario(SCEN_EVENT_HANDLING);
 
-            // 1) session name, channel = null
-            fService.enableSyscalls(sessionName, null, new NullProgressMonitor());
+            // 1) session name, channel = null, syscall = all
+            fService.enableSyscalls(sessionName, null, null, new NullProgressMonitor());
 
-            // 2) session name, channel = mychannel
-            fService.enableSyscalls(sessionName, channelName, new NullProgressMonitor());
+            // 2) session name, channel = mychannel, syscall = all
+            fService.enableSyscalls(sessionName, channelName, null, new NullProgressMonitor());
+
+            // 3) session name, channel = mychannel, syscall = close
+            syscalls.add("close");
+            fService.enableSyscalls(sessionName, channelName, syscalls, new NullProgressMonitor());
+
+            // 4) session name, channel = mychannel, syscall = close,read,write
+            syscalls.add("read");
+            syscalls.add("write");
+            fService.enableSyscalls(sessionName, channelName, syscalls, new NullProgressMonitor());
 
         } catch (ExecutionException e) {
             fail(e.toString());

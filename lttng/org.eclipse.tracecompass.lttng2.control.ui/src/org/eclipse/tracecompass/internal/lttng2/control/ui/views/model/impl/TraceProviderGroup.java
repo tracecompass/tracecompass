@@ -106,5 +106,14 @@ public class TraceProviderGroup extends TraceControlComponent {
     public boolean isEventFilteringSupported(TraceDomainType domain) {
         return ((TargetNodeComponent)getParent()).isEventFilteringSupported(domain);
     }
+
+    /**
+     * Checks if enabling of per syscall event is supported
+     *
+     * @return <code>true</code> if enabling of per syscall event is supported else <code>false</code>
+     */
+    public boolean isPerSyscallEventsSupported() {
+        return ((TargetNodeComponent) getParent()).isPerSyscallEventsSupported();
+    }
 }
 

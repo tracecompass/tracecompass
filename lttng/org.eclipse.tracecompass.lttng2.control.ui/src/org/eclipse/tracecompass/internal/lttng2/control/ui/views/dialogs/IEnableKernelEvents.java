@@ -44,12 +44,12 @@ public interface IEnableKernelEvents {
     /**
      * @return a flag whether the syscalls shall be configured.
      */
-    boolean isSysCalls();
+    boolean isSyscalls();
 
     /**
      * @return a flag indicating whether syscalls shall be enabled or not.
      */
-    boolean isAllSysCalls();
+    boolean isAllSyscalls();
 
     /**
      * @return a list of event names to be enabled.

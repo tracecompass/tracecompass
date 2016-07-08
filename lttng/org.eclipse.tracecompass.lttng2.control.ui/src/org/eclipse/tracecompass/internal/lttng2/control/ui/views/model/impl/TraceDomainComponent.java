@@ -248,16 +248,17 @@ public class TraceDomainComponent extends TraceControlComponent {
 
     /**
      * Enables all syscalls (for kernel domain)
-     *
+     * @param syscallNames
+     *            - a list of syscall names
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
 
-    public void enableSyscalls(IProgressMonitor monitor)
+    public void enableSyscalls(List<String> syscallNames, IProgressMonitor monitor)
             throws ExecutionException {
-        getControlService().enableSyscalls(getSessionName(), null, monitor);
+        getControlService().enableSyscalls(getSessionName(), null, syscallNames, monitor);
     }
 
     /**

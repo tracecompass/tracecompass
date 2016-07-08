@@ -168,17 +168,17 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
     }
 
     @Override
-    public boolean isSysCalls() {
+    public boolean isSyscalls() {
         if (fDomain.equals(TraceDomainType.KERNEL)) {
-            return fKernelComposite.isSysCalls();
+            return fKernelComposite.isSyscalls();
         }
         return false;
     }
 
     @Override
-    public boolean isAllSysCalls() {
+    public boolean isAllSyscalls() {
         if (fDomain.equals(TraceDomainType.KERNEL)) {
-            return fKernelComposite.isSysCalls();
+            return fKernelComposite.isAllSyscalls();
         }
         return false;
     }
@@ -491,7 +491,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         });
 
 
-        getShell().setMinimumSize(new Point(550, 750));
+        getShell().setMinimumSize(new Point(550, 850));
 
         return fDialogComposite;
     }

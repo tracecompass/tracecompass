@@ -298,7 +298,7 @@ public class ControlViewTest {
 
         shell.bot().radioInGroup(ControlViewSwtBotUtil.GROUP_SELECT_NAME, ControlViewSwtBotUtil.TRACEPOINTS_GROUP_NAME).click();
 
-        SWTBotTree tracepointsTree = shell.bot().tree();
+        SWTBotTree tracepointsTree = shell.bot().treeInGroup(ControlViewSwtBotUtil.TRACEPOINTS_GROUP_NAME);
         SWTBotTreeItem allItem = SWTBotUtils.getTreeItem(fBot, tracepointsTree, ControlViewSwtBotUtil.ALL_TREE_NODE);
         allItem.check();
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
@@ -335,19 +335,116 @@ public class ControlViewTest {
      * Test enable Event (syscall) on domain level
      */
     protected void testEnableSyscalls() {
+        // Case 1: Enabling all syscalls
+        SWTBotTreeItem sessionItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
+                ControlViewSwtBotUtil.SESSION_GROUP_NAME,
+                getSessionName());
+
+        sessionItem.select();
+        SWTBotMenu menuBot = sessionItem.contextMenu(ControlViewSwtBotUtil.ENABLE_EVENT_DEFAULT_CHANNEL_MENU_ITEM);
+        menuBot.click();
+
+        SWTBotShell shell = fBot.shell(ControlViewSwtBotUtil.ENABLE_EVENT_DIALOG_TITLE).activate();
+        shell.bot().radioInGroup(ControlViewSwtBotUtil.GROUP_SELECT_NAME, ControlViewSwtBotUtil.SYSCALL_GROUP_NAME).click();
+
+        SWTBotTree syscallsTree = shell.bot().treeInGroup(ControlViewSwtBotUtil.SYSCALL_GROUP_NAME);
+        SWTBotTreeItem allItem = SWTBotUtils.getTreeItem(fBot, syscallsTree, ControlViewSwtBotUtil.ALL_TREE_NODE);
+        allItem.check();
+        shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
+        SWTBotUtils.waitForJobs();
+
+        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
+
         SWTBotTreeItem kernelDomainItem = SWTBotUtils.getTreeItem(fBot, fTree,
                 getNodeName(),
                 ControlViewSwtBotUtil.SESSION_GROUP_NAME,
                 getSessionName(),
                 ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME);
-        kernelDomainItem.select();
-        SWTBotMenu menuBot = kernelDomainItem.contextMenu(ControlViewSwtBotUtil.ENABLE_EVENT_DEFAULT_CHANNEL_MENU_ITEM);
+        assertEquals(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, kernelDomainItem.getText());
+
+        SWTBotTreeItem channelItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
+                ControlViewSwtBotUtil.SESSION_GROUP_NAME,
+                getSessionName(),
+                ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME,
+                ControlViewSwtBotUtil.DEFAULT_CHANNEL_NAME);
+        assertEquals(ControlViewSwtBotUtil.DEFAULT_CHANNEL_NAME, channelItem.getText());
+
+        SWTBotTreeItem eventItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
+                ControlViewSwtBotUtil.SESSION_GROUP_NAME,
+                getSessionName(),
+                ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME,
+                ControlViewSwtBotUtil.DEFAULT_CHANNEL_NAME,
+                ControlViewSwtBotUtil.ALL_EVENTS_NAME);
+        assertEquals(ControlViewSwtBotUtil.ALL_EVENTS_NAME, eventItem.getText());
+
+        // Case 2: Enabling three syscalls (write, read, close) from the syscall tree
+        sessionItem.select();
+        menuBot = sessionItem.contextMenu(ControlViewSwtBotUtil.ENABLE_EVENT_DEFAULT_CHANNEL_MENU_ITEM);
         menuBot.click();
 
-        SWTBotShell shell = fBot.shell(ControlViewSwtBotUtil.ENABLE_EVENT_DIALOG_TITLE).activate();
+        shell = fBot.shell(ControlViewSwtBotUtil.ENABLE_EVENT_DIALOG_TITLE).activate();
         shell.bot().radioInGroup(ControlViewSwtBotUtil.GROUP_SELECT_NAME, ControlViewSwtBotUtil.SYSCALL_GROUP_NAME).click();
+        syscallsTree = shell.bot().treeInGroup(ControlViewSwtBotUtil.SYSCALL_GROUP_NAME);
+        allItem = SWTBotUtils.getTreeItem(fBot, syscallsTree, ControlViewSwtBotUtil.ALL_TREE_NODE);
+        allItem.expand();
+        // Enable 'write' syscall
+        SWTBotTreeItem writeItem = SWTBotUtils.getTreeItem(fBot, syscallsTree, ControlViewSwtBotUtil.ALL_TREE_NODE, ControlViewSwtBotUtil.SYSCALL_WRITE_EVENT);
+        writeItem.check();
+        // Enable 'read' syscall
+        SWTBotTreeItem readItem = SWTBotUtils.getTreeItem(fBot, syscallsTree, ControlViewSwtBotUtil.ALL_TREE_NODE, ControlViewSwtBotUtil.SYSCALL_READ_EVENT);
+        readItem.check();
+        // Enable 'close' syscall
+        SWTBotTreeItem closeItem = SWTBotUtils.getTreeItem(fBot, syscallsTree, ControlViewSwtBotUtil.ALL_TREE_NODE, ControlViewSwtBotUtil.SYSCALL_CLOSE_EVENT);
+        closeItem.check();
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
         SWTBotUtils.waitForJobs();
+
+        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
+
+        kernelDomainItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
+                ControlViewSwtBotUtil.SESSION_GROUP_NAME,
+                getSessionName(),
+                ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME);
+        assertEquals(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, kernelDomainItem.getText());
+
+        channelItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
+                ControlViewSwtBotUtil.SESSION_GROUP_NAME,
+                getSessionName(),
+                ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME,
+                ControlViewSwtBotUtil.DEFAULT_CHANNEL_NAME);
+        assertEquals(ControlViewSwtBotUtil.DEFAULT_CHANNEL_NAME, channelItem.getText());
+
+        eventItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
+                ControlViewSwtBotUtil.SESSION_GROUP_NAME,
+                getSessionName(),
+                ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME,
+                ControlViewSwtBotUtil.DEFAULT_CHANNEL_NAME,
+                ControlViewSwtBotUtil.SYSCALL_WRITE_EVENT);
+        assertEquals(ControlViewSwtBotUtil.SYSCALL_WRITE_EVENT, eventItem.getText());
+
+        eventItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
+                ControlViewSwtBotUtil.SESSION_GROUP_NAME,
+                getSessionName(),
+                ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME,
+                ControlViewSwtBotUtil.DEFAULT_CHANNEL_NAME,
+                ControlViewSwtBotUtil.SYSCALL_READ_EVENT);
+        assertEquals(ControlViewSwtBotUtil.SYSCALL_READ_EVENT, eventItem.getText());
+
+        eventItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
+                ControlViewSwtBotUtil.SESSION_GROUP_NAME,
+                getSessionName(),
+                ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME,
+                ControlViewSwtBotUtil.DEFAULT_CHANNEL_NAME,
+                ControlViewSwtBotUtil.SYSCALL_CLOSE_EVENT);
+        assertEquals(ControlViewSwtBotUtil.SYSCALL_CLOSE_EVENT, eventItem.getText());
     }
 
     /**

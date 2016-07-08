@@ -65,7 +65,10 @@ class ControlViewSwtBotUtil {
     public static final String ALL_EVENT_GROUP_NAME = "All Tracepoint Events and Syscalls";
     public static final String SPECIFIC_EVENT_GROUP_NAME = "Specific event";
     public static final String TRACEPOINTS_GROUP_NAME = "Tracepoint Events";
-    public static final String SYSCALL_GROUP_NAME = "All Syscalls";
+    public static final String SYSCALL_GROUP_NAME = "Syscall Events";
+    public static final String SYSCALL_WRITE_EVENT = "write";
+    public static final String SYSCALL_READ_EVENT = "read";
+    public static final String SYSCALL_CLOSE_EVENT = "close";
     public static final String GROUP_SELECT_NAME = "Select";
     public static final String ENABLE_CHANNEL_DIALOG_TITLE = "Enable Channel";
     public static final String DOMAIN_GROUP_NAME = "Domain";

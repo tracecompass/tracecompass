@@ -332,13 +332,15 @@ public class TraceChannelComponent extends TraceControlComponent {
     /**
      * Enables all syscalls (for kernel domain)
      *
+     * @param syscallNames
+     *            - a list of syscall to enable
      * @param monitor
      *            - a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
-    public void enableSyscalls(IProgressMonitor monitor) throws ExecutionException {
-        getControlService().enableSyscalls(getSessionName(), getName(), monitor);
+    public void enableSyscalls(List<String> syscallNames, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().enableSyscalls(getSessionName(), getName(), syscallNames, monitor);
     }
 
     /**

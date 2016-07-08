@@ -293,6 +293,15 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
     }
 
     /**
+     * Checks if enabling of per syscall event is supported
+     *
+     * @return <code>true</code> if enabling of per syscall event is supported else <code>false</code>
+     */
+    public boolean isPerSyscallEventsSupported() {
+        return getControlService().isVersionSupported("2.6.0"); //$NON-NLS-1$
+    }
+
+    /**
      * Checks if given version is supported by this ILTTngControlService implementation.
      *
      * @param version The version to check

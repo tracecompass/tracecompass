@@ -1363,11 +1363,11 @@ Upon successful operation, the domain '''Kernel''' will be created in the tree (
 
 [[Image:images/LTTng2EnabledKernelTracepoints.png]]
 
-To enable all '''Syscalls''', select the corresponding '''Select''' button and press '''Ok'''.
+To enable '''Syscall''' events, first select the corresponding '''Select''' button, then select either all syscalls (select '''All''') or select selectively one or more syscalls in the displayed tree of syscalls. You can also enter directly the name of the events you want to enable (comma separated list and wildcards are supported). Finally press '''Ok'''.
 
 [[Image:images/LTTng2SyscallsDialog.png]]
 
-Upon successful operation, the event with the name '''syscalls''' and event type '''SYSCALL''' will be added under the default channel (channel0). If necessary the domain '''Kernel''' and the channel '''channel0''' will be created.
+Upon successful operation, the domain '''Kernel''' will be created in the tree (if neccessary), the default channel with name "channel0" will be added under the domain (if necessary) as well as all requested events of type '''SYSCALL''' under the channel. The channel and events will be '''ENABLED'''.
 
 [[Image:images/LTTng2EnabledKernelSyscalls.png]]
 

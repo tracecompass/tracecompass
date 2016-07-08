@@ -808,11 +808,18 @@ public class LTTngControlService implements ILttngControlService {
     }
 
     @Override
-    public void enableSyscalls(String sessionName, String channelName, IProgressMonitor monitor) throws ExecutionException {
+    public void enableSyscalls(String sessionName, String channelName, List<String> syscallNames, IProgressMonitor monitor) throws ExecutionException {
 
         ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_ENABLE_EVENT);
 
-        command.add(LTTngControlServiceConstants.OPTION_ALL);
+        boolean isAllSyscalls = ALL_EVENTS.equals(syscallNames);
+
+        if (isAllSyscalls || (syscallNames == null) || (syscallNames.isEmpty())) {
+            command.add(LTTngControlServiceConstants.OPTION_ALL);
+        } else {
+            command.add(toCsv(syscallNames));
+        }
+
         command.add(LTTngControlServiceConstants.OPTION_KERNEL);
 
         command.add(LTTngControlServiceConstants.OPTION_SESSION);

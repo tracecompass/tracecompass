@@ -52,9 +52,9 @@ public class EnableEventOnDomainHandler extends BaseEnableEventHandler {
     }
 
     @Override
-    public void enableSyscalls(CommandParameter param, IProgressMonitor monitor) throws ExecutionException {
+    public void enableSyscalls(CommandParameter param, List<String> syscallNames, IProgressMonitor monitor) throws ExecutionException {
         if (param instanceof DomainCommandParameter) {
-            ((DomainCommandParameter)param).getDomain().enableSyscalls(monitor);
+            ((DomainCommandParameter)param).getDomain().enableSyscalls(syscallNames, monitor);
         }
     }
 

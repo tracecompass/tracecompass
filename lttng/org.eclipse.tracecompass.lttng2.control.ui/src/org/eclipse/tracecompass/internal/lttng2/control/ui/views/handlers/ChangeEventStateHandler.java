@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
@@ -66,10 +67,11 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
      * Change the state
      * @param channel - channel of events to be enabled
      * @param eventNames - list event names
+     * @param eventType  - the event type ({@link TraceEventType})
      * @param monitor - a progress monitor
      * @throws ExecutionException If the command fails
      */
-    protected abstract void changeState(TraceChannelComponent channel, List<String> eventNames, IProgressMonitor monitor) throws ExecutionException;
+    protected abstract void changeState(TraceChannelComponent channel, List<String> eventNames, TraceEventType eventType, IProgressMonitor monitor) throws ExecutionException;
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -98,6 +100,8 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
                             session = param.getChannel().getSession();
                             List<String> eventNames = new ArrayList<>();
                             List<TraceEventComponent> events = param.getEvents();
+                            // Find the type of the events (all the events in the list are the same type)
+                            TraceEventType  eventType = !events.isEmpty() ? events.get(0).getEventType() : null;
 
                             for (Iterator<TraceEventComponent> iterator = events.iterator(); iterator.hasNext();) {
                                 // Enable/disable all selected channels which are disabled
@@ -111,11 +115,11 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
                                 }
                             }
                             if (isAll) {
-                                changeState(param.getChannel(), null, monitor);
+                                changeState(param.getChannel(), null, eventType, monitor);
                             }
 
                             if (!eventNames.isEmpty()) {
-                                changeState(param.getChannel(), eventNames, monitor);
+                                changeState(param.getChannel(), eventNames, eventType, monitor);
                             }
 
                             for (Iterator<TraceEventComponent> iterator = events.iterator(); iterator.hasNext();) {
@@ -166,6 +170,7 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
             StructuredSelection structered = ((StructuredSelection) selection);
             String sessionName = null;
             String channelName = null;
+            TraceEventType eventType = null;
 
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
                 Object element = iterator.next();
@@ -189,6 +194,14 @@ public abstract class ChangeEventStateHandler extends BaseControlViewHandler {
                     if ((!sessionName.equals(event.getSessionName())) ||
                         (!channelName.equals(event.getChannelName())) ||
                         (!channel.getDomain().equals(event.getDomain()))) {
+                        events.clear();
+                        break;
+                    }
+
+                    // The events have to be the same type
+                    if (eventType == null) {
+                        eventType = event.getEventType();
+                    } else if (!eventType.equals(event.getEventType())) {
                         events.clear();
                         break;
                     }
