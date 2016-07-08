@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.common.core;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -55,7 +56,9 @@ public final class NonNullUtils {
      *            the second object to compare
      * @return true if o1.equals(o2) or o1 == o2
      * @since 1.0
+     * @deprecated use {@link Objects#equals(Object)} instead
      */
+    @Deprecated
     public static boolean equalsNullable(final @Nullable Object o1, final @Nullable Object o2) {
         if (o1 == o2) {
             return true;

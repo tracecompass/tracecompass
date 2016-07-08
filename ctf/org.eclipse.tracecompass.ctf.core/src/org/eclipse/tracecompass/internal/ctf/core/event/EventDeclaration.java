@@ -14,11 +14,11 @@ package org.eclipse.tracecompass.internal.ctf.core.event;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
@@ -422,16 +422,16 @@ public class EventDeclaration implements IEventDeclaration {
         if (fId != (other.fId)) {
             return false;
         }
-        if (!NonNullUtils.equalsNullable(fContext, other.fContext)) {
+        if (!Objects.equals(fContext, other.fContext)) {
             return false;
         }
-        if (!NonNullUtils.equalsNullable(fFields, other.fFields)) {
+        if (!Objects.equals(fFields, other.fFields)) {
             return false;
         }
-        if (!NonNullUtils.equalsNullable(fName, other.fName)) {
+        if (!Objects.equals(fName, other.fName)) {
             return false;
         }
-        if (!NonNullUtils.equalsNullable(fStream, other.fStream)) {
+        if (!Objects.equals(fStream, other.fStream)) {
             return false;
         }
         if (!fCustomAttributes.equals(other.fCustomAttributes)) {

@@ -13,9 +13,10 @@
 
 package org.eclipse.tracecompass.tmf.core.event;
 
+import java.util.Objects;
+
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
@@ -194,10 +195,10 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
         if (!getTimestamp().equals(other.getTimestamp())) {
             return false;
         }
-        if (!NonNullUtils.equalsNullable(getType(), other.getType())) {
+        if (!Objects.equals(getType(), other.getType())) {
             return false;
         }
-        if (!NonNullUtils.equalsNullable(getContent(), other.getContent())) {
+        if (!Objects.equals(getContent(), other.getContent())) {
             return false;
         }
         return true;

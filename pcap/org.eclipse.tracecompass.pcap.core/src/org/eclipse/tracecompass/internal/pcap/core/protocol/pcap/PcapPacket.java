@@ -15,9 +15,9 @@ package org.eclipse.tracecompass.internal.pcap.core.protocol.pcap;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
@@ -144,8 +144,8 @@ public class PcapPacket extends Packet {
     }
 
     /**
-     * Getter method that returns the timestamp of this packet, in microseconds/nanoseconds
-     * relative to epoch.
+     * Getter method that returns the timestamp of this packet, in
+     * microseconds/nanoseconds relative to epoch.
      *
      * @return The timestamp of the packet.
      */
@@ -193,9 +193,9 @@ public class PcapPacket extends Packet {
     @Override
     public String toString() {
         // TODO Decide if first capture is 0 or 1. Right now, it is 0.
-        String string = getProtocol().getName() + " " + fPacketIndex +  //$NON-NLS-1$
+        String string = getProtocol().getName() + " " + fPacketIndex + //$NON-NLS-1$
                 ": " + fOriginalLength + " bytes on wire, " + //$NON-NLS-1$ //$NON-NLS-2$
-                fIncludedLength + " bytes captured.\nArrival time: " +  //$NON-NLS-1$
+                fIncludedLength + " bytes captured.\nArrival time: " + //$NON-NLS-1$
                 ConversionHelper.toGMTTime(fTimestamp, getTimestampScale()) + "\n"; //$NON-NLS-1$
 
         final Packet child = fChildPacket;
@@ -322,7 +322,7 @@ public class PcapPacket extends Packet {
             return false;
         }
         PcapPacket other = (PcapPacket) obj;
-        if(!NonNullUtils.equalsNullable(fChildPacket, other.fChildPacket)){
+        if (!Objects.equals(fChildPacket, other.fChildPacket)) {
             return false;
         }
         if (fIncludedLength != other.fIncludedLength) {
@@ -334,7 +334,7 @@ public class PcapPacket extends Packet {
         if (fPacketIndex != other.fPacketIndex) {
             return false;
         }
-        if(!NonNullUtils.equalsNullable(fPayload, other.fPayload)) {
+        if (!Objects.equals(fPayload, other.fPayload)) {
             return false;
         }
         if (fTimestamp != other.fTimestamp) {

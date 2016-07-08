@@ -18,9 +18,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
@@ -261,13 +261,13 @@ public class EthernetIIPacket extends Packet {
             return false;
         }
         EthernetIIPacket other = (EthernetIIPacket) obj;
-        if(!NonNullUtils.equalsNullable(fChildPacket, other.fChildPacket)) {
+        if(!Objects.equals(fChildPacket, other.fChildPacket)) {
             return false;
         }
         if (!Arrays.equals(fDestinationMacAddress, other.fDestinationMacAddress)) {
             return false;
         }
-        if(!NonNullUtils.equalsNullable(fPayload, other.fPayload)) {
+        if(!Objects.equals(fPayload, other.fPayload)) {
             return false;
         }
 

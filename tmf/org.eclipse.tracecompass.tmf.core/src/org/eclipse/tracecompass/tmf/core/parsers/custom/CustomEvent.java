@@ -12,11 +12,10 @@
 
 package org.eclipse.tracecompass.tmf.core.parsers.custom;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
-
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
@@ -286,7 +285,7 @@ public class CustomEvent extends TmfEvent {
             return false;
         }
         CustomEvent other = (CustomEvent) obj;
-        if (!equalsNullable(fDefinition, other.fDefinition)) {
+        if (!Objects.equals(fDefinition, other.fDefinition)) {
             return false;
         }
 
@@ -294,11 +293,11 @@ public class CustomEvent extends TmfEvent {
             return false;
         }
 
-        if (!equalsNullable(customEventContent, other.customEventContent)) {
+        if (!Objects.equals(customEventContent, other.customEventContent)) {
             return false;
         }
 
-        if (!equalsNullable(customEventType, other.customEventType)) {
+        if (!Objects.equals(customEventType, other.customEventType)) {
             return false;
         }
         return true;

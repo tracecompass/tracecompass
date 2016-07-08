@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 
 import javax.xml.XMLConstants;
@@ -35,8 +36,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
@@ -47,6 +46,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISnapshotInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IUstProviderInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
@@ -1005,7 +1005,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
     private static @Nullable Node getFirstOf(NodeList nodeList, String tagName) {
         Node node = null;
         for (int i = 0; i < nodeList.getLength(); i++) {
-            if (NonNullUtils.equalsNullable(nodeList.item(i).getNodeName(), tagName)) {
+            if (Objects.equals(nodeList.item(i).getNodeName(), tagName)) {
                 node = nodeList.item(i);
                 break;
             }

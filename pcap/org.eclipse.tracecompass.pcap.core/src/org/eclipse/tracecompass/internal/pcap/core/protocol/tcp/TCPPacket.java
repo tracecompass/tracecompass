@@ -16,6 +16,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -620,7 +621,7 @@ public class TCPPacket extends Packet {
         if (fChecksum != other.fChecksum) {
             return false;
         }
-        if(!NonNullUtils.equalsNullable(fChildPacket, other.fChildPacket)){
+        if(!Objects.equals(fChildPacket, other.fChildPacket)){
             return false;
         }
         if (fDataOffset != other.fDataOffset) {
@@ -644,7 +645,7 @@ public class TCPPacket extends Packet {
         if (fPSHFlag != other.fPSHFlag) {
             return false;
         }
-        if(!NonNullUtils.equalsNullable(fPayload, other.fPayload)){
+        if(!Objects.equals(fPayload, other.fPayload)){
             return false;
         }
         if (fRSTFlag != other.fRSTFlag) {

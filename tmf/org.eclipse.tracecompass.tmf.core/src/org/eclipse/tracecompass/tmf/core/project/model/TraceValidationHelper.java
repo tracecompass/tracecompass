@@ -12,7 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.core.project.model;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
+import java.util.Objects;
 
 /**
  * Trace import helper class
@@ -72,10 +72,10 @@ public class TraceValidationHelper implements Comparable<TraceValidationHelper> 
             return false;
         }
         TraceValidationHelper other = (TraceValidationHelper) obj;
-        if (!equalsNullable(fTraceToScan, other.fTraceToScan)) {
+        if (!Objects.equals(fTraceToScan, other.fTraceToScan)) {
             return false;
         }
-        if(!equalsNullable(fTraceType, other.fTraceType)){
+        if(!Objects.equals(fTraceType, other.fTraceType)){
             return false;
         }
         return true;

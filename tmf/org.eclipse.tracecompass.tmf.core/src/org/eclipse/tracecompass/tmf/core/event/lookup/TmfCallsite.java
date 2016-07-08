@@ -12,7 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.core.event.lookup;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 
@@ -126,7 +126,7 @@ public class TmfCallsite implements ITmfCallsite {
             return false;
         }
 
-        if (!equalsNullable(fFunctionName, other.fFunctionName)) {
+        if (!Objects.equals(fFunctionName, other.fFunctionName)) {
             return false;
         }
         if (fLineNumber != other.fLineNumber) {

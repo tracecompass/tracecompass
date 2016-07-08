@@ -14,8 +14,9 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.tmf.core.util;
 
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 
 /**
  * Pair utility class, encapsulates a pair of objects.
@@ -95,10 +96,10 @@ public class Pair<A, B> {
             return false;
         }
         Pair<?, ?> other = (Pair<?, ?>) obj;
-        if (!NonNullUtils.equalsNullable(other.fFirst, fFirst)) {
+        if (!Objects.equals(other.fFirst, fFirst)) {
             return false;
         }
-        if (!NonNullUtils.equalsNullable(other.fSecond, fSecond)) {
+        if (!Objects.equals(other.fSecond, fSecond)) {
             return false;
         }
         return true;

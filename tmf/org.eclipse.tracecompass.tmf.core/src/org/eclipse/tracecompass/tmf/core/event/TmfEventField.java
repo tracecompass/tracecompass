@@ -20,10 +20,10 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.common.core.ObjectUtils;
 
 import com.google.common.base.Joiner;
@@ -184,7 +184,7 @@ public class TmfEventField implements ITmfEventField {
         final TmfEventField other = (TmfEventField) obj;
 
         /* Check that the field names are the same. */
-        if (!NonNullUtils.equalsNullable(getName(), other.getName())) {
+        if (!Objects.equals(getName(), other.getName())) {
             return false;
         }
 

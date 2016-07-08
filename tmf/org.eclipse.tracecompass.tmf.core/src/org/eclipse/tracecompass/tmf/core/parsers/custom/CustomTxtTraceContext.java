@@ -12,8 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.core.parsers.custom;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
-
+import java.util.Objects;
 import java.util.regex.Matcher;
 
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition.InputLine;
@@ -74,13 +73,13 @@ public class CustomTxtTraceContext extends TmfContext {
             return false;
         }
         CustomTxtTraceContext other = (CustomTxtTraceContext) obj;
-        if (!equalsNullable(firstLine, other.firstLine)) {
+        if (!Objects.equals(firstLine, other.firstLine)) {
             return false;
         }
-        if (!equalsNullable(firstLineMatcher, other.firstLineMatcher)) {
+        if (!Objects.equals(firstLineMatcher, other.firstLineMatcher)) {
             return false;
         }
-        if (!equalsNullable(inputLine, other.inputLine)) {
+        if (!Objects.equals(inputLine, other.inputLine)) {
             return false;
         }
         if (nextLineLocation != other.nextLineLocation) {

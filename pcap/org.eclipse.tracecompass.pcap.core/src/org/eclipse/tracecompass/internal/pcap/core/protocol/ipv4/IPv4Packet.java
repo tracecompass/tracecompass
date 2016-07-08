@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -565,7 +566,7 @@ public class IPv4Packet extends Packet {
             return false;
         }
         IPv4Packet other = (IPv4Packet) obj;
-        if (!NonNullUtils.equalsNullable(fChildPacket, other.fChildPacket)) {
+        if (!Objects.equals(fChildPacket, other.fChildPacket)) {
             return false;
         }
         if (fDSCP != other.fDSCP) {
@@ -601,7 +602,7 @@ public class IPv4Packet extends Packet {
         if (!Arrays.equals(fOptions, other.fOptions)) {
             return false;
         }
-        if (!NonNullUtils.equalsNullable(fPayload, other.fPayload)) {
+        if (!Objects.equals(fPayload, other.fPayload)) {
             return false;
         }
         if (fReservedFlag != other.fReservedFlag) {

@@ -17,10 +17,10 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.tracecompass.internal.pcap.core.trace.PcapFile;
@@ -192,7 +192,7 @@ public class UnknownPacket extends Packet {
             return false;
         }
         UnknownPacket other = (UnknownPacket) obj;
-        if (!NonNullUtils.equalsNullable(fChildPacket, other.fChildPacket)) {
+        if (!Objects.equals(fChildPacket, other.fChildPacket)) {
             return false;
         }
         if (!fPayload.equals(other.fPayload)) {

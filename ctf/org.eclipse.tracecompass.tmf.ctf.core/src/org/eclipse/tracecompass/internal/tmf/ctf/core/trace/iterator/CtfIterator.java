@@ -14,7 +14,8 @@
 package org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
+
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.CTFException;
@@ -350,10 +351,10 @@ public class CtfIterator extends CTFTraceReader
             return false;
         }
         CtfIterator other = (CtfIterator) obj;
-        if (!equalsNullable(fTrace, other.fTrace)) {
+        if (!Objects.equals(fTrace, other.fTrace)) {
             return false;
         }
-        if (!equalsNullable(fCurLocation, other.fCurLocation)) {
+        if (!Objects.equals(fCurLocation, other.fCurLocation)) {
             return false;
         }
         if (fCurRank != other.fCurRank) {

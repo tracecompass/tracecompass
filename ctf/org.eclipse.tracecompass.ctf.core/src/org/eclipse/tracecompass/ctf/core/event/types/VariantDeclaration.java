@@ -12,13 +12,12 @@
 
 package org.eclipse.tracecompass.ctf.core.event.types;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
@@ -201,14 +200,14 @@ public class VariantDeclaration extends Declaration {
         }
         VariantDeclaration other = (VariantDeclaration) obj;
 
-        if (!equalsNullable(fDeclarationToPopulate, other.fDeclarationToPopulate)) {
+        if (!Objects.equals(fDeclarationToPopulate, other.fDeclarationToPopulate)) {
             return false;
         }
         // do not check the order of the fields
-        if (!equalsNullable(fFields, other.fFields)) {
+        if (!Objects.equals(fFields, other.fFields)) {
             return false;
         }
-        if (!equalsNullable(fTag, other.fTag)) {
+        if (!Objects.equals(fTag, other.fTag)) {
             return false;
         }
         return true;
