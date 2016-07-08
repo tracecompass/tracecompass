@@ -1766,7 +1766,8 @@ The display of arrows is optional and can be toggled using the '''Hide Arrows'''
 The following mouse actions are available:
 
 * '''left-click''': select a time or time range begin time
-* '''Shift-left-click''': select a time range end time
+* '''Shift-left-click or drag''': Extend or shrink the selection range
+
 * '''left-drag horizontally''': select a time range or change the time range begin or end time
 * '''middle-drag or Ctrl-left-drag horizontally''': pan left or right
 * '''right-drag horizontally''': [[#Zoom region|zoom region]]
@@ -2097,7 +2098,8 @@ The CPU Usage Chart on the right side of the view, plots the total time spent on
 The CPU Usage chart is usable with the mouse. The following actions are set:
 
 * '''left-click''': select a time or time range begin time
-* '''Shift-left-click''': select a time range end time
+* '''Shift-left-click or drag''': Extend or shrink the selection range
+
 * '''left-drag horizontally''': select a time range or change the time range begin or end time
 * '''middle-drag or Ctrl-left-drag horizontally''': pan left or right
 * '''right-drag horizontally''': [[#Zoom region|zoom region]]
@@ -2160,7 +2162,8 @@ The Relative Kernel Memory Chart on the right side of the view, plots the relati
 The Relative Kernel Memory chart is usable with the mouse. The following actions are set:
 
 * '''left-click''': select a time or time range begin time
-* '''Shift-left-click''': select a time range end time
+* '''Shift-left-click or drag''': Extend or shrink the selection range
+
 * '''left-drag horizontally''': select a time range or change the time range begin or end time
 * '''middle-drag or Ctrl-left-drag horizontally''': pan left or right
 * '''right-drag horizontally''': [[#Zoom region|zoom region]]
@@ -2391,7 +2394,8 @@ Please note this view will not show shared memory or stack memory usage.
 The Memory Usage chart is usable with the mouse. The following actions are set:
 
 * '''left-click''': select a time or time range begin time
-* '''Shift-left-click''': select a time range end time
+* '''Shift-left-click or drag''': Extend or shrink the selection range
+
 * '''left-drag horizontally''': select a time range or change the time range begin or end time
 * '''middle-drag or Ctrl-left-drag horizontally''': pan left or right
 * '''right-drag horizontally''': [[#Zoom region|zoom region]]
