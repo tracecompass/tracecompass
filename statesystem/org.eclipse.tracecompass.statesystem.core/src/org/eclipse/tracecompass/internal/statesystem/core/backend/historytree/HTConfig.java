@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 import java.io.File;
 
 /**
- * Configuration object for the {@link HistoryTree}.
+ * Configuration object for the {@link IHistoryTree}.
  *
  * @author Alexandre Montplaisir
  */

@@ -22,7 +22,8 @@ import java.util.List;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.CoreNode;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTConfig;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTNode;
-import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HistoryTree;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HistoryTreeClassic;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.IHistoryTree;
 
 import com.google.common.collect.Iterables;
 
@@ -35,7 +36,12 @@ import com.google.common.collect.Iterables;
  *
  * @author Geneviève Bastien
  */
-public class HistoryTreeStub extends HistoryTree {
+public class HistoryTreeClassicStub extends HistoryTreeClassic {
+
+    /**
+     * Minimum size a block of this tree should have
+     */
+    public static final int MINIMUM_BLOCK_SIZE = IHistoryTree.TREE_HEADER_SIZE;
 
     /**
      * Constructor for this history tree stub
@@ -46,7 +52,7 @@ public class HistoryTreeStub extends HistoryTree {
      *             If an error happens trying to open/write to the file
      *             specified in the config
      */
-    public HistoryTreeStub(HTConfig conf) throws IOException {
+    public HistoryTreeClassicStub(HTConfig conf) throws IOException {
         super(conf);
     }
 
@@ -61,7 +67,7 @@ public class HistoryTreeStub extends HistoryTree {
      * @throws IOException
      *             If an error happens reading the file
      */
-    public HistoryTreeStub(File existingStateFile, int expProviderVersion) throws IOException {
+    public HistoryTreeClassicStub(File existingStateFile, int expProviderVersion) throws IOException {
         super(existingStateFile, expProviderVersion);
     }
 

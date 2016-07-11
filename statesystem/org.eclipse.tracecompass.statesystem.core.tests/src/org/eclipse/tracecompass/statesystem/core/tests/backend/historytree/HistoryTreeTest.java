@@ -22,9 +22,9 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTConfig;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTInterval;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTNode;
-import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HistoryTree;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.IHistoryTree;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.tests.stubs.backend.HistoryTreeStub;
+import org.eclipse.tracecompass.statesystem.core.tests.stubs.backend.HistoryTreeClassicStub;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public class HistoryTreeTest {
 
 
     /* Minimal allowed blocksize */
-    private static final int BLOCK_SIZE = HistoryTree.TREE_HEADER_SIZE;
+    private static final int BLOCK_SIZE = HistoryTreeClassicStub.MINIMUM_BLOCK_SIZE;
 
     private static final HTInterval NULL_INTERVAL = new HTInterval(10, 20, 1, TmfStateValue.nullValue());
 
@@ -84,8 +84,8 @@ public class HistoryTreeTest {
      *            The max number of children per node in the tree (tree config
      *            option)
      */
-    private HistoryTreeStub setupSmallTree(int maxChildren) {
-        HistoryTreeStub ht = null;
+    private HistoryTreeClassicStub setupSmallTree(int maxChildren) {
+        HistoryTreeClassicStub ht = null;
         try {
             File newFile = fTempFile;
             assertNotNull(newFile);
@@ -94,7 +94,7 @@ public class HistoryTreeTest {
                     maxChildren, /* Number of children */
                     1, /* Provider version */
                     1); /* Start time */
-            ht = new HistoryTreeStub(config);
+            ht = new HistoryTreeClassicStub(config);
 
         } catch (IOException e) {
             fail(e.getMessage());
@@ -107,11 +107,11 @@ public class HistoryTreeTest {
     /**
      * Setup a history tree with config MAX_CHILDREN = 3.
      */
-    private HistoryTreeStub setupSmallTree() {
+    private HistoryTreeClassicStub setupSmallTree() {
         return setupSmallTree(3);
     }
 
-    private static long fillValues(HistoryTree ht, TmfStateValue value, int nbValues, long start) {
+    private static long fillValues(IHistoryTree ht, TmfStateValue value, int nbValues, long start) {
         for (int i = 0; i < nbValues; i++) {
             ht.insertInterval(new HTInterval(start + i, start + i + 1, 1, value));
         }
@@ -130,7 +130,7 @@ public class HistoryTreeTest {
      *         greater than or equal to this to make sure the intervals go in
      *         the leaf node.
      */
-    private static long fillNextLeafNode(HistoryTreeStub ht, long leafNodeStart) {
+    private static long fillNextLeafNode(HistoryTreeClassicStub ht, long leafNodeStart) {
         int prevCount = ht.getNodeCount();
         int prevDepth = ht.getDepth();
 
@@ -156,7 +156,7 @@ public class HistoryTreeTest {
      */
     @Test
     public void testSequentialFill() {
-        HistoryTreeStub ht = setupSmallTree();
+        HistoryTreeClassicStub ht = setupSmallTree();
 
         HTNode node = ht.getLatestLeaf();
         assertEquals(0, node.getNodeUsagePercent());
@@ -197,7 +197,7 @@ public class HistoryTreeTest {
      */
     @Test
     public void testDepth() {
-        HistoryTreeStub ht = setupSmallTree();
+        HistoryTreeClassicStub ht = setupSmallTree();
 
         /* Fill a first node */
         HTNode node = ht.getLatestLeaf();
@@ -266,7 +266,7 @@ public class HistoryTreeTest {
         /* Represents the start time of the current leaf node */
         long start = 1;
 
-        HistoryTreeStub ht = setupSmallTree(2);
+        HistoryTreeClassicStub ht = setupSmallTree(2);
         start = fillNextLeafNode(ht, start);
 
         List<HTNode> branch = ht.getLatestBranch();

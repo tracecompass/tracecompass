@@ -13,22 +13,28 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTInterval;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTNode;
-import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HistoryTree;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HistoryTreeBackend;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.IHistoryTree;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.tests.stubs.backend.HistoryTreeBackendStub;
+import org.eclipse.tracecompass.statesystem.core.tests.stubs.backend.HistoryTreeBackendStub.HistoryTreeType;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test the {@link HistoryTreeBackend}-specific behavior and its interactions
- * with the {@link HistoryTree} class
+ * with the {@link IHistoryTree} classes.
  *
  * @author Geneviève Bastien
  */
+@RunWith(Parameterized.class)
 public class HistoryTreeWithBackendTest {
 
     /** State system ID */
@@ -40,6 +46,28 @@ public class HistoryTreeWithBackendTest {
     private static final int MAX_CHILDREN = 3;
     /** Default block size */
     private static final int BLOCK_SIZE = 4096;
+
+    private final HistoryTreeType fHtType;
+
+    /**
+     * @return The arrays of parameters
+     */
+    @Parameters(name = "{0}")
+    public static Iterable<Object[]> getParameters() {
+        return Arrays.asList(new Object[][] {
+                { HistoryTreeType.CLASSIC }
+        });
+    }
+
+    /**
+     * Constructor
+     *
+     * @param htType
+     *            The type of history tree to use
+     */
+    public HistoryTreeWithBackendTest(HistoryTreeType htType) {
+        fHtType = htType;
+    }
 
     /**
      * Test the behavior of the history tree after at least a depth of 3
@@ -53,6 +81,7 @@ public class HistoryTreeWithBackendTest {
 
             long startTime = 1;
             File historyTreeFile = NonNullUtils.checkNotNull(File.createTempFile("HistoryTreeBackendTest", ".ht"));
+            HistoryTreeBackendStub.setTreeType(fHtType);
             HistoryTreeBackendStub backend = new HistoryTreeBackendStub(SSID, historyTreeFile, PROVIDER_VERSION, startTime, BLOCK_SIZE, MAX_CHILDREN);
 
             int duration = nbAttr;
@@ -64,8 +93,8 @@ public class HistoryTreeWithBackendTest {
             backend.insertPastState(interval.getStartTime(), interval.getEndTime(), interval.getAttribute(), interval.getStateValue());
 
             /*
-             * insert cascading intervals to fill 2 levels of history
-             * tree, so that we start another branch
+             * insert cascading intervals to fill 2 levels of history tree, so
+             * that we start another branch
              */
             while (backend.getHistoryTree().getDepth() < depthToRead) {
                 backend.insertPastState(

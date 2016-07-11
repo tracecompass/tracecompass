@@ -13,16 +13,41 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTConfig;
-import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HistoryTree;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HistoryTreeBackend;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.IHistoryTree;
 
 /**
  * Stub class for the {@link HistoryTreeBackend}. It creates a
- * {@link HistoryTreeStub} to grant access to some protected methods.
+ * {@link HistoryTreeClassicStub} to grant access to some protected methods.
  *
  * @author Geneviève Bastien
  */
 public class HistoryTreeBackendStub extends HistoryTreeBackend {
+
+    private static HistoryTreeType HT_TYPE = HistoryTreeType.CLASSIC;
+
+    /**
+     * Sets the type of tree to build. Since the history tree is initialized in
+     * the parent's constructor, this stub class needs to know the type of tree
+     * to build.
+     *
+     * @param htType
+     *            The type of history tree to build for this backend
+     */
+    public static void setTreeType(HistoryTreeType htType) {
+        HT_TYPE = htType;
+    }
+
+    /**
+     * Enumeration of all history tree types implemented. This will be used to
+     * create the right type of history tree
+     */
+    public enum HistoryTreeType {
+        /**
+         * The classic history tree
+         */
+        CLASSIC
+    }
 
     /**
      * Constructor for new history files. Use this when creating a new history
@@ -76,13 +101,23 @@ public class HistoryTreeBackendStub extends HistoryTreeBackend {
     }
 
     @Override
-    protected HistoryTree initializeSHT(HTConfig conf) throws IOException {
-        return new HistoryTreeStub(conf);
+    protected IHistoryTree initializeSHT(HTConfig conf) throws IOException {
+        switch (HT_TYPE) {
+        case CLASSIC:
+            return new HistoryTreeClassicStub(conf);
+        default:
+            return new HistoryTreeClassicStub(conf);
+        }
     }
 
     @Override
-    protected HistoryTree initializeSHT(File existingStateFile, int providerVersion) throws IOException {
-        return new HistoryTreeStub(existingStateFile, providerVersion);
+    protected IHistoryTree initializeSHT(File existingStateFile, int providerVersion) throws IOException {
+        switch (HT_TYPE) {
+        case CLASSIC:
+            return new HistoryTreeClassicStub(existingStateFile, providerVersion);
+        default:
+            return new HistoryTreeClassicStub(existingStateFile, providerVersion);
+        }
     }
 
     /**
@@ -90,8 +125,8 @@ public class HistoryTreeBackendStub extends HistoryTreeBackend {
      *
      * @return The history tree
      */
-    public HistoryTreeStub getHistoryTree() {
-        return (HistoryTreeStub) super.getSHT();
+    public HistoryTreeClassicStub getHistoryTree() {
+        return (HistoryTreeClassicStub) super.getSHT();
     }
 
 }

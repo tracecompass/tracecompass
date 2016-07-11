@@ -40,14 +40,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Alexandre Montplaisir
  */
-public class HistoryTree {
-
-    /**
-     * Size of the "tree header" in the tree-file The nodes will use this offset
-     * to know where they should be in the file. This should always be a
-     * multiple of 4K.
-     */
-    public static final int TREE_HEADER_SIZE = 4096;
+public class HistoryTreeClassic implements IHistoryTree {
 
     /**
      * The magic number for this file format. Package-private for the factory
@@ -95,7 +88,7 @@ public class HistoryTree {
      *             If an error happens trying to open/write to the file
      *             specified in the config
      */
-    public HistoryTree(HTConfig conf) throws IOException {
+    public HistoryTreeClassic(HTConfig conf) throws IOException {
         /*
          * Simple check to make sure we have enough place in the 0th block for
          * the tree configuration
@@ -128,7 +121,7 @@ public class HistoryTree {
      * @throws IOException
      *             If an error happens reading the file
      */
-    public HistoryTree(File existingStateFile, int expProviderVersion) throws IOException {
+    public HistoryTreeClassic(File existingStateFile, int expProviderVersion) throws IOException {
         /*
          * Open the file ourselves, get the tree header information we need,
          * then pass on the descriptor to the TreeIO object.
@@ -236,15 +229,7 @@ public class HistoryTree {
         return Collections.synchronizedList(list);
     }
 
-    /**
-     * "Save" the tree to disk. This method will cause the treeIO object to
-     * commit all nodes to disk and then return the RandomAccessFile descriptor
-     * so the Tree object can save its configuration into the header of the
-     * file.
-     *
-     * @param requestedEndTime
-     *            The greatest timestamp present in the history tree
-     */
+    @Override
     public void closeTree(long requestedEndTime) {
         /* This is an important operation, queries can wait */
         synchronized (fLatestBranch) {
@@ -307,38 +292,22 @@ public class HistoryTree {
     // Accessors
     // ------------------------------------------------------------------------
 
-    /**
-     * Get the start time of this tree.
-     *
-     * @return The start time
-     */
+    @Override
     public long getTreeStart() {
         return fConfig.getTreeStart();
     }
 
-    /**
-     * Get the current end time of this tree.
-     *
-     * @return The end time
-     */
+    @Override
     public long getTreeEnd() {
         return fTreeEnd;
     }
 
-    /**
-     * Get the number of nodes in this tree.
-     *
-     * @return The number of nodes
-     */
+    @Override
     public int getNodeCount() {
         return fNodeCount;
     }
 
-    /**
-     * Get the current root node of this tree
-     *
-     * @return The root node
-     */
+    @Override
     public HTNode getRootNode() {
         return fLatestBranch.get(0);
     }
@@ -378,46 +347,23 @@ public class HistoryTree {
     // HT_IO interface
     // ------------------------------------------------------------------------
 
-    /**
-     * Return the FileInputStream reader with which we will read an attribute
-     * tree (it will be sought to the correct position).
-     *
-     * @return The FileInputStream indicating the file and position from which
-     *         the attribute tree can be read.
-     */
+    @Override
     public FileInputStream supplyATReader() {
         return fTreeIO.supplyATReader(getNodeCount());
     }
 
-    /**
-     * Return the file to which we will write the attribute tree.
-     *
-     * @return The file to which we will write the attribute tree
-     */
+    @Override
     public File supplyATWriterFile() {
         return fConfig.getStateFile();
     }
 
-    /**
-     * Return the position in the file (given by {@link #supplyATWriterFile})
-     * where to start writing the attribute tree.
-     *
-     * @return The position in the file where to start writing
-     */
+    @Override
     public long supplyATWriterFilePos() {
-        return HistoryTree.TREE_HEADER_SIZE
+        return IHistoryTree.TREE_HEADER_SIZE
                 + ((long) getNodeCount() * fConfig.getBlockSize());
     }
 
-    /**
-     * Read a node from the tree.
-     *
-     * @param seqNumber
-     *            The sequence number of the node to read
-     * @return The node
-     * @throws ClosedChannelException
-     *             If the tree IO is unavailable
-     */
+    @Override
     public HTNode readNode(int seqNumber) throws ClosedChannelException {
         /* Try to read the node from memory */
         synchronized (fLatestBranch) {
@@ -432,26 +378,17 @@ public class HistoryTree {
         return fTreeIO.readNode(seqNumber);
     }
 
-    /**
-     * Write a node object to the history file.
-     *
-     * @param node
-     *            The node to write to disk
-     */
+    @Override
     public void writeNode(HTNode node) {
         fTreeIO.writeNode(node);
     }
 
-    /**
-     * Close the history file.
-     */
+    @Override
     public void closeFile() {
         fTreeIO.closeFile();
     }
 
-    /**
-     * Delete the history file.
-     */
+    @Override
     public void deleteFile() {
         fTreeIO.deleteFile();
     }
@@ -460,14 +397,7 @@ public class HistoryTree {
     // Operations
     // ------------------------------------------------------------------------
 
-    /**
-     * Insert an interval in the tree.
-     *
-     * @param interval
-     *            The interval to be inserted
-     * @throws TimeRangeException
-     *             If the start of end time of the interval are invalid
-     */
+    @Override
     public void insertInterval(HTInterval interval) throws TimeRangeException {
         if (interval.getStartTime() < fConfig.getTreeStart()) {
             throw new TimeRangeException("Interval Start:" + interval.getStartTime() + ", Config Start:" + fConfig.getTreeStart()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -650,19 +580,7 @@ public class HistoryTree {
         return newNode;
     }
 
-    /**
-     * Inner method to select the next child of the current node intersecting
-     * the given timestamp. Useful for moving down the tree following one
-     * branch.
-     *
-     * @param currentNode
-     *            The node on which the request is made
-     * @param t
-     *            The timestamp to choose which child is the next one
-     * @return The child node intersecting t
-     * @throws ClosedChannelException
-     *             If the file channel was closed while we were reading the tree
-     */
+    @Override
     public HTNode selectNextChild(CoreNode currentNode, long t) throws ClosedChannelException {
         assert (currentNode.getNbChildren() > 0);
         int potentialNextSeqNb = currentNode.getSequenceNumber();
@@ -694,11 +612,7 @@ public class HistoryTree {
         return readNode(potentialNextSeqNb);
     }
 
-    /**
-     * Get the current size of the history file.
-     *
-     * @return The history file size
-     */
+    @Override
     public long getFileSize() {
         return fConfig.getStateFile().length();
     }
@@ -774,18 +688,7 @@ public class HistoryTree {
         }
     }
 
-    /**
-     * Print out the full tree for debugging purposes
-     *
-     * @param writer
-     *            PrintWriter in which to write the output
-     * @param printIntervals
-     *            Flag to enable full output of the interval information
-     * @param ts
-     *            The timestamp that nodes have to intersect for intervals to be
-     *            printed. A negative value will print intervals for all nodes.
-     *            The timestamp only applies if printIntervals is true.
-     */
+    @Override
     public void debugPrintFullTree(PrintWriter writer, boolean printIntervals, long ts) {
         /* Only used for debugging, shouldn't be externalized */
 

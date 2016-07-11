@@ -270,7 +270,7 @@ class HT_IO {
          * Cast to (long) is needed to make sure the result is a long too and
          * doesn't get truncated
          */
-        fc.position(HistoryTree.TREE_HEADER_SIZE
+        fc.position(IHistoryTree.TREE_HEADER_SIZE
                 + ((long) seqNumber) * fConfig.getBlockSize());
     }
 

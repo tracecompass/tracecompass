@@ -41,8 +41,8 @@ public final class HistoryTreeFactory {
      *             If an error happens trying to open/write to the file
      *             specified in the config
      */
-    public static HistoryTree createHistoryTree(HTConfig conf) throws IOException {
-        return new HistoryTree(conf);
+    public static IHistoryTree createHistoryTree(HTConfig conf) throws IOException {
+        return new HistoryTreeClassic(conf);
     }
 
     /**
@@ -57,8 +57,7 @@ public final class HistoryTreeFactory {
      * @throws IOException
      *             If an error happens reading the file
      */
-    public static HistoryTree createFromFile(Path existingStateFile, int expectedProviderVersion) throws IOException {
-
+    public static IHistoryTree createFromFile(Path existingStateFile, int expectedProviderVersion) throws IOException {
         /*
          * Check the file exists and has a positive length. These verifications
          * will also be done in the HT's constructor.
@@ -84,8 +83,8 @@ public final class HistoryTreeFactory {
          */
         int magicNumber = buffer.getInt();
         switch (magicNumber) {
-        case HistoryTree.HISTORY_FILE_MAGIC_NUMBER:
-            return new HistoryTree(existingStateFile.toFile(), expectedProviderVersion);
+        case HistoryTreeClassic.HISTORY_FILE_MAGIC_NUMBER:
+            return new HistoryTreeClassic(existingStateFile.toFile(), expectedProviderVersion);
         default:
             throw new IOException("Not a known history tree file"); //$NON-NLS-1$
         }
