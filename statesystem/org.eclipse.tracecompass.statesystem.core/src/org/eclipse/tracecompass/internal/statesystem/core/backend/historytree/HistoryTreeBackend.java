@@ -163,7 +163,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      */
     @VisibleForTesting
     protected @NonNull HistoryTree initializeSHT(@NonNull HTConfig conf) throws IOException {
-        return new HistoryTree(conf);
+        return HistoryTreeFactory.createHistoryTree(conf);
     }
 
     /**
@@ -180,7 +180,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      */
     @VisibleForTesting
     protected @NonNull HistoryTree initializeSHT(@NonNull File existingStateFile, int providerVersion) throws IOException {
-        return new HistoryTree(existingStateFile, providerVersion);
+        return HistoryTreeFactory.createFromFile(existingStateFile.toPath(), providerVersion);
     }
 
     /**

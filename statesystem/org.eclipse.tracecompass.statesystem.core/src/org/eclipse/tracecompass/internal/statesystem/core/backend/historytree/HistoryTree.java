@@ -49,7 +49,11 @@ public class HistoryTree {
      */
     public static final int TREE_HEADER_SIZE = 4096;
 
-    private static final int HISTORY_FILE_MAGIC_NUMBER = 0x05FFA900;
+    /**
+     * The magic number for this file format. Package-private for the factory
+     * class.
+     */
+    static final int HISTORY_FILE_MAGIC_NUMBER = 0x05FFA900;
 
     /** File format version. Increment when breaking compatibility. */
     private static final int FILE_VERSION = 7;
