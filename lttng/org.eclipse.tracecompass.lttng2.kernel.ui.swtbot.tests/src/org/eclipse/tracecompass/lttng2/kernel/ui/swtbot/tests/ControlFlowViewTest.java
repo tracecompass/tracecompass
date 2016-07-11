@@ -40,6 +40,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.ui.IWorkbenchPart;
@@ -131,8 +132,7 @@ public class ControlFlowViewTest extends KernelTestBase {
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
 
         /* select first item */
-        final SWTBotTree tree = fViewBot.bot().tree();
-        tree.pressShortcut(Keystrokes.HOME);
+        SWTBotUtils.pressShortcutGoToTreeTop(KEYBOARD);
         fViewBot.toolbarButton(SELECT_NEXT_PROCESS).click();
 
         /* set focus on time graph */
@@ -330,7 +330,7 @@ public class ControlFlowViewTest extends KernelTestBase {
 
         /* select first item */
         final SWTBotTree tree = fViewBot.bot().tree();
-        tree.pressShortcut(Keystrokes.HOME);
+        SWTBotUtils.pressShortcutGoToTreeTop(KEYBOARD);
         fViewBot.toolbarButton(SELECT_NEXT_PROCESS).click();
 
         /* set focus on time graph */
