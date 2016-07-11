@@ -1112,7 +1112,7 @@
       </handler>
 
       <handler
-            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.SnaphshotHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.SnapshotHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.snapshot">
          <activeWhen>
             <with

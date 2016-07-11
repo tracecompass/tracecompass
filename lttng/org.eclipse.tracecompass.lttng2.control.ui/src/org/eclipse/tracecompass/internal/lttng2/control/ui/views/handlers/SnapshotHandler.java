@@ -38,7 +38,7 @@ import org.eclipse.ui.IWorkbenchPage;
  *
  * @author Bernd Hufmann
  */
-public class SnaphshotHandler extends BaseControlViewHandler {
+public class SnapshotHandler extends BaseControlViewHandler {
 
     // ------------------------------------------------------------------------
     // Attributes
