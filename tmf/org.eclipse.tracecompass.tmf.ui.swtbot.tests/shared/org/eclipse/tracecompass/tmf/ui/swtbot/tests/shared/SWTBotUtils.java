@@ -47,6 +47,8 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
+import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
@@ -833,6 +835,21 @@ public final class SWTBotUtils {
         }
 
         return currentNode;
+    }
+
+    /**
+     * Press the keyboard shortcut that goes to the top of a tree widget. The
+     * key combination can differ on different platforms.
+     *
+     * @param keyboard
+     *            the keyboard to use
+     */
+    public static void pressShortcutGoToTreeTop(Keyboard keyboard) {
+        if (SWTUtils.isMac()) {
+            keyboard.pressShortcut(Keystrokes.ALT, Keystrokes.UP);
+        } else {
+            keyboard.pressShortcut(Keystrokes.HOME);
+        }
     }
 
     /**

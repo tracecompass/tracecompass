@@ -21,6 +21,7 @@ import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
 import org.eclipse.swtbot.swt.finder.keyboard.KeyboardFactory;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
+import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
@@ -34,6 +35,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
@@ -103,8 +105,12 @@ public abstract class FindDialogTestBase extends KernelTestBase {
 
     private static void openDialog(SWTBotView view) {
         view.setFocus();
-        KEYBOARD.pressShortcut(Keystrokes.HOME);
-        KEYBOARD.pressShortcut(Keystrokes.CTRL, KeyStroke.getInstance('F'));
+        SWTBotUtils.pressShortcutGoToTreeTop(KEYBOARD);
+        if (SWTUtils.isMac()) {
+            KEYBOARD.pressShortcut(Keystrokes.COMMAND, KeyStroke.getInstance('F'));
+        } else {
+            KEYBOARD.pressShortcut(Keystrokes.CTRL, KeyStroke.getInstance('F'));
+        }
         fBot.waitUntil(Conditions.shellIsActive(DIALOG_TITLE));
     }
 
