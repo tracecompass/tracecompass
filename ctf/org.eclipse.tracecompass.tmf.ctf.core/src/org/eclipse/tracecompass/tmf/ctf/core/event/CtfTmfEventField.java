@@ -50,6 +50,15 @@ import org.eclipse.tracecompass.tmf.ctf.core.CtfEnumPair;
  */
 public abstract class CtfTmfEventField extends TmfEventField {
 
+    /**
+     * Value that can be used in the {@link #getField(String...)} for variants.
+     * Using this field value means that the selected field will be returned
+     * whatever the selected choice for the event
+     *
+     * @since 2.1
+     */
+    public static final @NonNull String FIELD_VARIANT_SELECTED = "Any"; //$NON-NLS-1$
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -478,6 +487,18 @@ final class CTFVariantField extends CtfTmfEventField {
     @Override
     public CtfTmfEventField getValue() {
         return (CtfTmfEventField) super.getValue();
+    }
+
+    @Override
+    public ITmfEventField getField(final String... path) {
+        /*
+         * We use the == to make sure that this constant was used, otherwise, it
+         * could conflict with a field with the same name
+         */
+        if (path.length == 1 && path[0] == FIELD_VARIANT_SELECTED) {
+            return getFields().stream().findFirst().orElse(null);
+        }
+        return super.getField(path);
     }
 
 }
