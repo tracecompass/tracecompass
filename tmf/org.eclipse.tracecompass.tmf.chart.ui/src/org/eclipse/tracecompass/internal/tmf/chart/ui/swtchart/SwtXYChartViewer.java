@@ -86,7 +86,7 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
     /**
      * Ellipsis character
      */
-    private static final char ELLIPSIS = '…';
+    protected static final char ELLIPSIS = '…';
     /**
      * Time stamp formatter for intervals in the days range
      */
@@ -110,7 +110,6 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
 
     private static final int CLOSE_BUTTON_SIZE = 25;
     private static final int CLOSE_BUTTON_MARGIN = 5;
-
 
     // ------------------------------------------------------------------------
     // Members

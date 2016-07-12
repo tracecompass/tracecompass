@@ -38,7 +38,9 @@ public interface IDescriptorVisitor {
      * @param desc
      *            A duration descriptor
      */
-    void visit(DataChartDurationDescriptor<?, ? extends Number> desc);
+    default void visit(DataChartDurationDescriptor<?, ? extends Number> desc) {
+        visit((DataChartNumericalDescriptor<?, ? extends Number>) desc);
+    }
 
     /**
      * Method for visiting a {@link DataChartTimestampDescriptor}.
@@ -46,6 +48,8 @@ public interface IDescriptorVisitor {
      * @param desc
      *            A timestamp descriptor
      */
-    void visit(DataChartTimestampDescriptor<?> desc);
+    default void visit(DataChartTimestampDescriptor<?> desc) {
+        visit((DataChartNumericalDescriptor<?, Long>) desc);
+    }
 
 }
