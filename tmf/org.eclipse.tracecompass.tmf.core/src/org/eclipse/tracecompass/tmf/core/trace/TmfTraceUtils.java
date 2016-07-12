@@ -205,6 +205,10 @@ public final class TmfTraceUtils {
      */
     public static @Nullable ITmfEvent getNextEventMatching(ITmfTrace trace, long startRank,
             Predicate<ITmfEvent> predicate, @Nullable IProgressMonitor monitor) {
+        if (monitor != null && monitor.isCanceled()) {
+            return null;
+        }
+
         /* rank + 1 because we do not want to include the start event itself in the search */
         EventMatchingRequest req = new EventMatchingRequest(startRank + 1, predicate, false);
         trace.sendRequest(req);
@@ -244,6 +248,9 @@ public final class TmfTraceUtils {
      */
     public static @Nullable ITmfEvent getPreviousEventMatching(ITmfTrace trace, long startRank,
             Predicate<ITmfEvent> predicate, @Nullable IProgressMonitor monitor) {
+        if (monitor != null && monitor.isCanceled()) {
+            return null;
+        }
         /*
          * We are going to do a series of queries matching the trace's cache
          * size in length (which should minimize on-disk seeks), then iterate on
