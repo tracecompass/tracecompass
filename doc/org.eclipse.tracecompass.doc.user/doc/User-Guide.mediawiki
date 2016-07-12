@@ -3445,6 +3445,83 @@ The following tracepoints will be available
 
 Host and guests can now be traced together and their traces added to an experiment. Because each guest has a different clock than the host, it is necessary to synchronize the traces together. Unfortunately, automatic synchronization with the virtual machine events is not completely implemented yet, so another kind of synchronization needs to be done, with TCP packets for instance. See section on [[#Trace synchronization | trace synchronization]] for information on how to obtain synchronizable traces.
 
+= Java Logging =
+
+Trace Compass contains some Java Utility Logging (JUL) tracepoints in various places in the code. To diagnose issues with Trace Compass or when reporting problems with the application, a JUL trace may be useful to help pinpoint the problem. The following sections explain how to enable JUL logging in Trace Compass and use various handlers to handle the data.
+
+== Enable JUL Logging ==
+
+By default, all the logging of the Trace Compass namespace is disabled. To enable it, one needs to add the following property to the ''vmargs'': ''-Dorg.eclipse.tracecompass.logging=true''.
+
+The log levels and components can be controlled via a configuration file whose path is specified also in the ''vmargs'' like this: ''-Djava.util.logging.config.file=/path/to/logger.properties''. An example configuration file can be found in the next section.
+
+If running the RCP, these arguments can be appended at the end of the ''tracecompass.ini'' file located in the folder where the executable is located. If running from Eclipse in development mode, in the ''Run configurations...'', the arguments should be added in the ''Arguments'' tab in the ''VM args'' box.
+
+== Configuring JUL logging ==
+
+JUL logging can be fine-tuned to log only specific components, specific levels, but also to different log handlers, with different formats, etc. Or else, the default level is INFO and the default log handler is a ConsoleHandler which displays all log message to the Console, which can be quite cumbersome.
+
+Here is an example ''logger.properties'' file to control what is being logged and where.
+
+    # Specify the handlers to create in the root logger
+    # (all loggers are children of the root logger)
+    # These are example handlers
+
+    # Console handler
+    handlers = java.util.logging.ConsoleHandler
+    # Console and file handlers
+    #handlers = java.util.logging.ConsoleHandler, java.util.logging.FileHandler
+    # No handler
+    #handlers =
+
+    # Set the default logging level for the root logger
+    # Possible values: OFF, SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, ALL
+    .level = OFF
+
+    # Fine tune log levels for specific components
+    # Use the INFO level for all tracecompass, but FINEST for the StateSystem component
+    #org.eclipse.tracecompass.internal.statesystem.core.StateSystem.level = FINEST
+    org.eclipse.tracecompass.level = INFO
+
+== LTTng JUL log handler ==
+
+The various log handlers have an overhead on the application. The ConsoleHandler has a visible impact on Trace Compass performance. The FileHandler also has an overhead though less visible, but when logging from multiple threads at the same time, the file becomes a bottleneck, so that logging data cannot be used with accuracy for performance analysis. The [http://lttng.org/docs/#doc-java-application LTTng log handler] is much better in a multi-threads context.
+
+LTTng-UST comes with the Java JUL agent in most distros. Otherwise, it is possible to manually compile lttng-ust with options ''--enable-java-agent-jul'' and install it.
+
+    git clone git://git.lttng.org/lttng-ust.git
+    cd lttng-ust
+    ./bootstrap
+    ./configure --enable-java-agent-jul
+    make
+    sudo make install
+
+The necessary classes for the java agent will have been installed on the system. Since Equinox (the OSGi implementation used by Eclipse and thus Trace Compass) uses its own classpath and ignores any classpath entered on the command line for security reasons, one needs to specify the agent class path with the bootclasspath argument:
+
+    -Xbootclasspath/a:/usr/local/share/java/lttng-ust-agent-jul.jar:/usr/local/share/java/lttng-ust-agent-common.jar
+
+Note that unlike the -classpath argument, -Xbootsclasspath does not follow the dependencies specified by a jar's Manifest, thus it is required to list both the -jul and the -common jars here.
+
+These classes need to load the LTTng JNI library. Because they were loaded from the boot class path by the boot ClassLoader, the library path entered on the command line is ignored. A workaround is to manually copy the library to the jvm's main library path. For example
+
+    sudo cp /usr/local/lib/liblttng-ust-jul-jni.so /usr/lib/jvm/java-8-openjdk/jre/lib/amd64/
+
+Or to overwrite the JVM's library path with the following VM argument.
+
+    -Dsun.boot.library.path=/usr/local/lib
+
+''Disclaimer: this last method overwrites the main java library path. It may have unknown side-effects. None were found yet.''
+
+LTTng can now be used as a handler for Trace Compass's JUL, by adding the following line to the logger.properties file
+
+    handlers = org.lttng.ust.agent.jul.LttngLogHandler
+
+The tracepoints will be those logged by a previously defined configuration file. Here is how to setup LTTng to handle JUL logging:
+
+    lttng create
+    lttng enable-event -j -a
+    lttng start
+
 = Limitations =
 
 * When parsing text traces, the timestamps are assumed to be in the local time zone. This means that when combining it to CTF binary traces, there could be offsets by a few hours depending on where the traces were taken and where they were read.
