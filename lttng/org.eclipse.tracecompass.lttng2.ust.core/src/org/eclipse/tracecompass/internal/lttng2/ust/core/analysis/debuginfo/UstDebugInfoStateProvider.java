@@ -80,7 +80,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
     public static final String DEBUG_LINK_ATTRIB = "debug_link"; //$NON-NLS-1$
 
     /** Version of this state provider */
-    private static final int VERSION = 3;
+    private static final int VERSION = 4;
 
     private static final Logger LOGGER = TraceCompassLog.getLogger(UstDebugInfoStateProvider.class);
 
