@@ -104,7 +104,7 @@ public class TmfXmlPatternSegmentBuilder {
         long endValue = end.toNanos();
         String segmentName = getPatternSegmentName(event, scenarioInfo);
         Map<String, ITmfStateValue> fields = new HashMap<>();
-        setPatternSegmentContent(event, start, end, fields, scenarioInfo);
+        setPatternSegmentContent(event, fields, scenarioInfo);
         TmfXmlPatternSegment segment = new TmfXmlPatternSegment(startValue, endValue, scale, segmentName, fields);
         if (fContainer instanceof XmlPatternStateProvider) {
             ((XmlPatternStateProvider) fContainer).getListener().onNewSegment(segment);
@@ -132,17 +132,13 @@ public class TmfXmlPatternSegmentBuilder {
      *
      * @param event
      *            The current event
-     * @param start
-     *            The start timestamp of this segment
-     * @param end
-     *            The end timestamp of this segment
      * @param fields
      *            The map that will contained all the fields
      * @param scenarioInfo
      *            The active scenario details. Or <code>null</code> if there is
      *            no scenario.
      */
-    private void setPatternSegmentContent(ITmfEvent event, ITmfTimestamp start, ITmfTimestamp end, Map<String, ITmfStateValue> fields, @Nullable TmfXmlScenarioInfo scenarioInfo) {
+    private void setPatternSegmentContent(ITmfEvent event, Map<String, ITmfStateValue> fields, @Nullable TmfXmlScenarioInfo scenarioInfo) {
         for (TmfXmlPatternSegmentField field : fFields) {
             fields.put(field.getName().intern(), field.getValue(event, scenarioInfo));
         }
