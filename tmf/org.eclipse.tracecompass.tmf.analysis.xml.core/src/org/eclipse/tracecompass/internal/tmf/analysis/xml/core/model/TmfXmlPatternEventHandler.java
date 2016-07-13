@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public class TmfXmlPatternEventHandler {
     private final List<String> fInitialFsm;
     private final Map<String, TmfXmlTransitionValidator> fTestMap = new HashMap<>();
     private final Map<String, ITmfXmlAction> fActionMap = new HashMap<>();
-    private final Map<String, TmfXmlFsm> fFsmMap = new HashMap<>();
+    private final Map<String, TmfXmlFsm> fFsmMap = new LinkedHashMap<>();
     private final List<TmfXmlFsm> fActiveFsmList = new ArrayList<>();
 
     /**
