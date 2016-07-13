@@ -41,4 +41,19 @@
 		<xs:anyAttribute />
 	</xs:complexType>
 
+	<xs:complexType name="mappingGroup">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" name="entry" type="mapEntry" />
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="mapEntry">
+		<xs:annotation>
+			<xs:documentation>Define a handler for a state value. The second state value defined in the handler will be used instead of the first state one whenever it will be met.</xs:documentation></xs:annotation>
+		<xs:sequence maxOccurs="1" minOccurs="1">
+			<xs:element maxOccurs="2" minOccurs="2" name="stateValue" type="stateValue" />
+		</xs:sequence>
+	</xs:complexType>
+
 </xs:schema>

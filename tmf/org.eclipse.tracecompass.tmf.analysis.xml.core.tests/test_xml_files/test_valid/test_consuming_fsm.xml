@@ -10,6 +10,12 @@
 * http://www.eclipse.org/legal/epl-v10.html
 *************************************************************************** -->
 <pattern version="0" id="syscall.analysis">
+	<mappingGroup id="group">
+		<entry>
+			<stateValue type="int" value="1" />
+			<stateValue type="string" value="open" />
+		</entry>
+	</mappingGroup>
 	<patternHandler>
 		<action id="increment_counter_consuming">
 			<stateChange>
@@ -41,6 +47,23 @@
 			</state>
 			<state id="exit_state" >
 				<transition event="exit" target="end" action="increment_counter_non_consuming"/>
+			</state>
+			<final id="end"/>
+		</fsm>
+
+		<action id="segment_create">
+			<segment>
+				<segType>
+					<segName>
+						<stateValue mappingGroup="group" type="int" value="1"/>
+					</segName>
+				</segType>
+			</segment>
+		</action>
+
+		<fsm id="mapping" multiple="false">
+			<state id="start">
+				<transition event="entry" target="end" action="segment_create" />
 			</state>
 			<final id="end"/>
 		</fsm>

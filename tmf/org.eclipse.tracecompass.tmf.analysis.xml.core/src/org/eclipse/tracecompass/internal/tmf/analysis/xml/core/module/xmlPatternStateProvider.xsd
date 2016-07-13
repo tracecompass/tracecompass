@@ -25,6 +25,9 @@
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="location" type="location" >
 				<xs:annotation>
 					<xs:documentation>Declares shortcuts to frequently used attribute/data locations. For instance, if a path to an often-used attribute is CPUs/{event.some_field}/Threads/Status, it may be a good idea to put this path in a location and then use the location name in the event handlers.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="mappingGroup" type="mappingGroup" >
+						<xs:annotation>
+							<xs:documentation>Define a mapping group for state values.</xs:documentation></xs:annotation></xs:element>
 			<xs:element maxOccurs="1" minOccurs="1" name="patternHandler" type="patternHandler" >
 				<xs:annotation>
 					<xs:documentation>Describes the pattern behavior. It defines all the entities; i.e., all the transitions, actions and state machines that describe the pattern.</xs:documentation></xs:annotation></xs:element>

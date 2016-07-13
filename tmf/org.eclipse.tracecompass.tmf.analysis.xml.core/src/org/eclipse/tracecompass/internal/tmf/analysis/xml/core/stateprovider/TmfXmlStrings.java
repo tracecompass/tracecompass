@@ -166,4 +166,6 @@ public interface TmfXmlStrings {
     String ALIAS = "alias";
     String ABANDON = "abandon";
     String CONSUMING = "consuming";
+    String MAPPING_GROUP = "mappingGroup";
+    String ENTRY = "entry";
 }

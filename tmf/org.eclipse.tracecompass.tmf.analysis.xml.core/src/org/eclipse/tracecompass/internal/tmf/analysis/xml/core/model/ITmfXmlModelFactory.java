@@ -199,4 +199,15 @@ public interface ITmfXmlModelFactory {
      * @return The new {@link TmfXmlPatternSegmentBuilder}
      */
     TmfXmlPatternSegmentBuilder createPatternSegmentBuilder(Element node, IXmlStateSystemContainer container);
+
+    /**
+     * Create a new pattern map entry
+     *
+     * @param node
+     *            The XML map entry element
+     * @param container
+     *            The state system container this state value handler belongs to
+     * @return The new {@link TmfXmlMapEntry}
+     */
+    TmfXmlMapEntry createMapEntry(Element node, IXmlStateSystemContainer container);
 }

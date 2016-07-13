@@ -143,4 +143,30 @@ public class TmfStateValueTest {
         ITmfStateValue[] expectedValues = { TmfStateValue.newValueLong(1l), TmfStateValue.newValueLong(5l), TmfStateValue.newValueLong(1l) };
         XmlUtilsTest.verifyStackStateIntervals("testStateValueModify", ss, quark, expectedStarts, expectedValues);
     }
+
+    /**
+     * Test the mapping groups. This test verifies that, when needed, the mapped
+     * value is used. In this test, the mapping group is used on the 'entry'
+     * event.
+     *
+     * @throws StateSystemDisposedException
+     *             Exceptions thrown during state system verification
+     * @throws AttributeNotFoundException
+     *             Exceptions thrown during state system verification
+     */
+    @Test
+    public void testStateValueMapping() throws AttributeNotFoundException, StateSystemDisposedException {
+        XmlStateSystemModule module = fModule;
+        assertNotNull(module);
+
+        ITmfStateSystem ss = module.getStateSystem();
+        assertNotNull(ss);
+
+        int quark = ss.getQuarkAbsolute("mapped");
+
+        final int[] expectedStarts = { 1, 3, 5, 7, 7 };
+        ITmfStateValue[] expectedValues = { TmfStateValue.newValueString("TRUE"), TmfStateValue.newValueString("FALSE"), TmfStateValue.newValueString("TRUE"), TmfStateValue.newValueString("FALSE") };
+        XmlUtilsTest.verifyStateIntervals("testMappingGroups", ss, quark, expectedStarts, expectedValues);
+
+    }
 }

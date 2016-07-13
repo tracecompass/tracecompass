@@ -15,6 +15,12 @@
 
 	<stateProvider id="test.xml.attributes" version="1">
 
+		<mappingGroup id="operation">
+			<entry>
+				<stateValue type="string" value="read only" />
+				<stateValue type="string" value="op1" />
+			</entry>
+		</mappingGroup>
 		<!-- Test to see that state values are updated or modified depending on the requested state change -->
 		<eventHandler eventName="entry">
 			<stateChange>
@@ -30,6 +36,22 @@
 			<stateChange>
 				<stateAttribute type="constant" value="stack"/>
 				<stateValue stack="push" type="eventField" value="timestamp" />
+			</stateChange>
+			<stateChange>
+				<if>
+					<condition>
+						<field name="op"/>
+						<stateValue mappingGroup="operation" type="string" value="read only"/>
+					</condition>
+				</if>
+				<then>
+					<stateAttribute type="constant" value="mapped" />
+					<stateValue type="string" value="TRUE" />
+				</then>
+				<else>
+					<stateAttribute type="constant" value="mapped" />
+					<stateValue type="string" value="FALSE" />
+				</else>
 			</stateChange>
 		</eventHandler>
 		<eventHandler eventName="exit">
@@ -61,6 +83,22 @@
 					<stateAttribute type="constant" value="stack"/>
 					<stateValue stack="pop" type="long"/>
 				</then>
+			</stateChange>
+			<stateChange>
+				<if>
+					<condition>
+						<field name="op"/>
+						<stateValue type="string" value="read only"/>
+					</condition>
+				</if>
+				<then>
+					<stateAttribute type="constant" value="mapped" />
+					<stateValue type="string" value="TRUE" />
+				</then>
+				<else>
+					<stateAttribute type="constant" value="mapped" />
+					<stateValue type="string" value="FALSE" />
+				</else>
 			</stateChange>
 		</eventHandler>
 	</stateProvider>

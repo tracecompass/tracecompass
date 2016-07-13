@@ -8,6 +8,7 @@
  ******************************************************************************/
 package org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stubs;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -49,9 +50,15 @@ public class PatternSegmentFactoryStub {
      * end event for pattern segment TEST_2
      */
     public static final @NonNull ITmfEvent TEST_2_END_EVENT = new TmfEvent(null, ITmfContext.UNKNOWN_RANK, TmfTimestamp.fromNanos(10), null, null);
+    private static final String PATTERN_SEGMENT_PREFIX = "seg_";
 
     /**
      * The pattern segment TEST_2
      */
-    public static final @NonNull TmfXmlPatternSegment TEST_2 = new TmfXmlPatternSegment(TEST_2_START_EVENT.getTimestamp().getValue(), TEST_2_END_EVENT.getTimestamp().getValue(), ITmfTimestamp.NANOSECOND_SCALE, "seg_test2", TEST_2_CONTENT);
+    public static final @NonNull TmfXmlPatternSegment TEST_2 = new TmfXmlPatternSegment(TEST_2_START_EVENT.getTimestamp().getValue(), TEST_2_END_EVENT.getTimestamp().getValue(), ITmfTimestamp.NANOSECOND_SCALE, PATTERN_SEGMENT_PREFIX + "test2", TEST_2_CONTENT);
+
+    /**
+     * The pattern segment TEST_3
+     */
+    public static final @NonNull TmfXmlPatternSegment TEST_3 = new TmfXmlPatternSegment(TEST_2_START_EVENT.getTimestamp().getValue(), TEST_2_START_EVENT.getTimestamp().getValue(), ITmfTimestamp.NANOSECOND_SCALE, PATTERN_SEGMENT_PREFIX + "open", Collections.EMPTY_MAP);
 }

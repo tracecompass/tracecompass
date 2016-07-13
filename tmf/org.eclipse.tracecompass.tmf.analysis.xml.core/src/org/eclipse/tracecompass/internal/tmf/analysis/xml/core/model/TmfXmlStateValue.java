@@ -13,12 +13,15 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -64,6 +67,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
     private final ITmfStateValue.Type fForcedType;
 
     private final IXmlStateSystemContainer fContainer;
+
+    private final String fMappingGroup;
 
     /**
      * Different behaviors of an attribute that is to be stacked
@@ -157,6 +162,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
          */
         String stack = node.getAttribute(TmfXmlStrings.ATTRIBUTE_STACK);
         fStackType = ValueTypeStack.getTypeFromString(stack);
+
+        fMappingGroup = node.getAttribute(TmfXmlStrings.MAPPING_GROUP);
     }
 
     /**
@@ -232,7 +239,31 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
 
     @Override
     public ITmfStateValue getValue(@Nullable ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException {
-        return fStateValue.getValue(event, scenarioInfo);
+        return getMappedValue(event, scenarioInfo, fStateValue.getValue(event, scenarioInfo));
+    }
+
+    private ITmfStateValue getMappedValue(@Nullable ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo, ITmfStateValue value) {
+        try {
+            Set<TmfXmlMapEntry> group = null;
+            if (fContainer instanceof XmlPatternStateProvider) {
+                group = ((XmlPatternStateProvider) fContainer).getMappingGroup(fMappingGroup);
+            } else if (fContainer instanceof XmlStateProvider) {
+                group = ((XmlStateProvider) fContainer).getMappingGroup(fMappingGroup);
+            }
+            if (group != null) {
+                for (TmfXmlMapEntry entry : group) {
+                    if (entry.getKey().getValue(event, scenarioInfo).equals(value)) {
+                        return entry.getValue().getValue(event, scenarioInfo);
+                    }
+                }
+            }
+            return value;
+        } catch (AttributeNotFoundException e) {
+            Activator.logError("Unable to map the state value"); //$NON-NLS-1$
+            // FIXME maybe we should return the raw state value instead of a
+            // null state value
+            return TmfStateValue.nullValue();
+        }
     }
 
     /**

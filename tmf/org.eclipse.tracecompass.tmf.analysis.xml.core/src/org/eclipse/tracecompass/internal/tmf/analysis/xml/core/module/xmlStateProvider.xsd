@@ -28,6 +28,9 @@
 					<xs:element maxOccurs="unbounded" minOccurs="0" name="location" type="location" >
 						<xs:annotation>
 							<xs:documentation>Declare shortcuts to frequently used attribute/data locations. For instance, if a path to an often-used attribute is CPUs/{event.some_field}/Threads/Status, it may be a good idea to put this path in a location and then use the location name in the event handlers.</xs:documentation></xs:annotation></xs:element>
+					<xs:element maxOccurs="unbounded" minOccurs="0" name="mappingGroup" type="mappingGroup" >
+						<xs:annotation>
+							<xs:documentation>Define a mapping for a state value. A handler describe a state value V that will be use instead of a state value S.</xs:documentation></xs:annotation></xs:element>
 				</xs:choice>
 				<xs:element maxOccurs="unbounded" minOccurs="1" name="eventHandler" type="eventHandler" >
 					<xs:annotation>
@@ -324,6 +327,9 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+		<xs:attribute name="mappingGroup" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Indicate which mapping group to use for this state value.</xs:documentation></xs:annotation></xs:attribute>
 		<xs:attribute name="value" type="xs:string" >
 			<xs:annotation>
 				<xs:documentation>Indicate what the value is. A value should be specified only if the type is int, long, string or event_field. See the documentation on types for information on what to put for value.</xs:documentation></xs:annotation></xs:attribute>

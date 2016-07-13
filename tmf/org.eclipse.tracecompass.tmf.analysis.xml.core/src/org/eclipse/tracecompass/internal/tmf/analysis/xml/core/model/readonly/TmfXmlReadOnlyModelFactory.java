@@ -23,6 +23,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlActio
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlCondition;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlEventHandler;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlFsm;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlMapEntry;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternEventHandler;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternSegmentBuilder;
@@ -130,5 +131,10 @@ public class TmfXmlReadOnlyModelFactory implements ITmfXmlModelFactory {
     @Override
     public TmfXmlPatternSegmentBuilder createPatternSegmentBuilder(Element node, IXmlStateSystemContainer container) {
         return new TmfXmlPatternSegmentBuilder(this, node, container);
+    }
+
+    @Override
+    public @NonNull TmfXmlMapEntry createMapEntry(@NonNull Element node, @NonNull IXmlStateSystemContainer container) {
+        return new TmfXmlMapEntry(this, node, container);
     }
 }

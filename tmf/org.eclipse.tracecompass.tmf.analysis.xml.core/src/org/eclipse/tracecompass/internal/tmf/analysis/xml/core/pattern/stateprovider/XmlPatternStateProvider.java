@@ -20,6 +20,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlMapEntry;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternEventHandler;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioHistoryBuilder;
@@ -52,6 +53,8 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
     /** List of all Locations */
     private final @NonNull Set<@NonNull TmfXmlLocation> fLocations;
 
+    private final @NonNull Map<@NonNull String, @NonNull Set<@NonNull TmfXmlMapEntry>> fMappingGroups;
+
     /** Map for stored values */
     private final @NonNull Map<@NonNull String, @NonNull String> fStoredFields = new HashMap<>();
 
@@ -82,6 +85,7 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
         Element doc = XmlUtils.getElementInFile(pathString, TmfXmlStrings.PATTERN, fStateId);
         if (doc == null) {
             fLocations = new HashSet<>();
+            fMappingGroups = new HashMap<>();
             Activator.logError("Failed to find a pattern in " + pathString); //$NON-NLS-1$
             return;
         }
@@ -114,6 +118,31 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
             locations.add(location);
         }
         fLocations = Collections.unmodifiableSet(locations);
+
+        /* parser for the mapping groups */
+        final @NonNull Map<@NonNull String, @NonNull Set<@NonNull TmfXmlMapEntry>> mapGroups = new HashMap<>();
+        NodeList mapNodes = doc.getElementsByTagName(TmfXmlStrings.MAPPING_GROUP);
+        for (int i = 0; i < mapNodes.getLength(); i++) {
+            Element map = (Element) mapNodes.item(i);
+            String id = map.getAttribute(TmfXmlStrings.ID);
+
+            Set<@NonNull TmfXmlMapEntry> entrySet = mapGroups.get(id);
+            if (entrySet == null) {
+                entrySet = new HashSet<>();
+                mapGroups.put(id, entrySet);
+            }
+
+            NodeList entryNodes = map.getElementsByTagName(TmfXmlStrings.ENTRY);
+            for (int j = 0; j < entryNodes.getLength(); j++) {
+                Element entryElement = (Element) entryNodes.item(j);
+                if (entryElement == null) {
+                    continue;
+                }
+                TmfXmlMapEntry entry = modelFactory.createMapEntry(entryElement, this);
+                entrySet.add(entry);
+            }
+        }
+        fMappingGroups = Collections.unmodifiableMap(mapGroups);
 
         /* parser for the event handlers */
         NodeList nodes = doc.getElementsByTagName(TmfXmlStrings.PATTERN_HANDLER);
@@ -208,5 +237,16 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
      */
     public @NonNull TmfXmlScenarioHistoryBuilder getHistoryBuilder() {
         return fHistoryBuilder;
+    }
+
+    /**
+     * Get the list of state value handlers defined in this top level element
+     *
+     * @param id
+     *            The mapping group id
+     * @return The set of {@link TmfXmlMapEntry}
+     */
+    public @Nullable Set<@NonNull TmfXmlMapEntry> getMappingGroup(@NonNull String id) {
+        return fMappingGroups.get(id);
     }
 }
