@@ -117,4 +117,30 @@ public class TmfStateValueTest {
         XmlUtilsTest.verifyStateIntervals("testStateValueModify", ss, quark, expectedStarts, expectedValues);
 
     }
+
+    /**
+     *
+     * it tests that a state change on stack, with a peek() condition. This test
+     * verifies the value on the top of the stack and verifies that the peek
+     * operation do not remove the value on the top of the stack.
+     *
+     * @throws StateSystemDisposedException
+     *             Exceptions thrown during state system verification
+     * @throws AttributeNotFoundException
+     *             Exceptions thrown during state system verification
+     */
+    @Test
+    public void testStateValuePeek() throws AttributeNotFoundException, StateSystemDisposedException {
+        XmlStateSystemModule module = fModule;
+        assertNotNull(module);
+
+        ITmfStateSystem ss = module.getStateSystem();
+        assertNotNull(ss);
+
+        int quark = ss.getQuarkAbsolute("stack");
+
+        final int[] expectedStarts = { 1, 5, 7, 7 };
+        ITmfStateValue[] expectedValues = { TmfStateValue.newValueLong(1l), TmfStateValue.newValueLong(5l), TmfStateValue.newValueLong(1l) };
+        XmlUtilsTest.verifyStackStateIntervals("testStateValueModify", ss, quark, expectedStarts, expectedValues);
+    }
 }

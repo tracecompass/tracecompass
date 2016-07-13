@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
@@ -290,6 +291,41 @@ public class XmlUtilsTest {
             long actualEnd = (i == expectedCount - 1) ? (expectedStarts[i + 1]) : (expectedStarts[i + 1]) - 1;
             assertEquals(testId + ": End time of interval " + i, actualEnd, interval.getEndTime());
             assertEquals(testId + ": Expected value of interval " + i, expectedValues[i], interval.getStateValue());
+        }
+    }
+
+    /**
+     * This function test the data provided by the state intervals queried on a stack
+     *
+     * @param testId
+     *            The id of the test
+     * @param ss
+     *            The state system associated to this test
+     * @param quark
+     *            The quark we want to query
+     * @param expectedStarts
+     *            The expected start timestamps for the intervals generated for
+     *            this quark
+     * @param expectedValues
+     *            The expected content values for this quark
+     * @throws AttributeNotFoundException
+     *             If the quark we want to query is invalid
+     * @throws StateSystemDisposedException
+     *             If the state system has been disposed before the end of the
+     *             queries
+     */
+    public static void verifyStackStateIntervals(String testId, @NonNull ITmfStateSystem ss, Integer quark, int[] expectedStarts, ITmfStateValue[] expectedValues) throws AttributeNotFoundException, StateSystemDisposedException {
+        int expectedCount = expectedStarts.length - 1;
+        List<ITmfStateInterval> intervals = StateSystemUtils.queryHistoryRange(ss, quark, expectedStarts[0], expectedStarts[expectedCount]);
+        assertEquals(testId + ": Interval count", expectedCount, intervals.size());
+        for (int i = 0; i < expectedCount; i++) {
+            ITmfStateInterval interval = intervals.get(i);
+            assertEquals(testId + ": Start time of interval " + i, expectedStarts[i], interval.getStartTime());
+            long actualEnd = (i == expectedCount - 1) ? (expectedStarts[i + 1]) : (expectedStarts[i + 1]) - 1;
+            assertEquals(testId + ": End time of interval " + i, actualEnd, interval.getEndTime());
+            @Nullable ITmfStateInterval stackValueInterval = StateSystemUtils.querySingleStackTop(ss, interval.getStartTime(), quark);
+            assertNotNull(stackValueInterval);
+            assertEquals(testId + ": Expected value of interval " + i, expectedValues[i], stackValueInterval.getStateValue());
         }
     }
 

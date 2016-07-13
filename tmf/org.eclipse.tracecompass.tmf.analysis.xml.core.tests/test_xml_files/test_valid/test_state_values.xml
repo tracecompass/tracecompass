@@ -27,6 +27,10 @@
 				<stateAttribute type="eventField" value="cpu" />
 				<stateValue type="string" value="UNKNOWN" />
 			</stateChange>
+			<stateChange>
+				<stateAttribute type="constant" value="stack"/>
+				<stateValue stack="push" type="eventField" value="timestamp" />
+			</stateChange>
 		</eventHandler>
 		<eventHandler eventName="exit">
 			<stateChange>
@@ -43,6 +47,20 @@
 				<stateAttribute type="constant" value="modify" />
 				<stateAttribute type="eventField" value="cpu" />
 				<stateValue type="eventField" value="curState" />
+			</stateChange>
+			<stateChange>
+				<if>
+					<condition>
+						<stateValue type="long" stack="peek" >
+							<stateAttribute type="constant" value="stack" />
+						</stateValue>
+						<stateValue type="long" value="5" />
+					</condition>
+				</if>
+				<then>
+					<stateAttribute type="constant" value="stack"/>
+					<stateValue stack="pop" type="long"/>
+				</then>
 			</stateChange>
 		</eventHandler>
 	</stateProvider>

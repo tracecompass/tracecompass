@@ -28,9 +28,12 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.Tmf
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemBuilderUtils;
+import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
+import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -96,37 +99,54 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         /* Process the XML Element state value */
         String type = node.getAttribute(TmfXmlStrings.TYPE);
         String value = getSsContainer().getAttributeValue(node.getAttribute(TmfXmlStrings.VALUE));
-        if (value == null) {
+
+        if (value == null && getStackType().equals(ValueTypeStack.NULL)) {
             throw new IllegalStateException();
+        }
+
+        List<@Nullable Element> children = XmlUtils.getChildElements(node);
+        List<ITmfXmlStateAttribute> childAttributes = new ArrayList<>();
+        for (Element child : children) {
+            if (child == null) {
+                continue;
+            }
+            ITmfXmlStateAttribute queryAttribute = modelFactory.createStateAttribute(child, getSsContainer());
+            childAttributes.add(queryAttribute);
         }
 
         switch (type) {
         case TmfXmlStrings.TYPE_INT: {
             /* Integer value */
-            ITmfStateValue stateValue = TmfStateValue.newValueInt(Integer.parseInt(value));
-            stateValueType = new TmfXmlStateValueTmf(stateValue);
+            ITmfStateValue stateValue = value != null && !value.isEmpty() ?
+                    TmfStateValue.newValueInt(Integer.parseInt(value)) : TmfStateValue.nullValue();
+            stateValueType = new TmfXmlStateValueTmf(stateValue, childAttributes);
             break;
         }
         case TmfXmlStrings.TYPE_LONG: {
             /* Long value */
-            ITmfStateValue stateValue = TmfStateValue.newValueLong(Long.parseLong(value));
-            stateValueType = new TmfXmlStateValueTmf(stateValue);
+            ITmfStateValue stateValue = value != null && !value.isEmpty() ?
+                    TmfStateValue.newValueLong(Long.parseLong(value)) : TmfStateValue.nullValue();
+            stateValueType = new TmfXmlStateValueTmf(stateValue, childAttributes);
             break;
         }
         case TmfXmlStrings.TYPE_STRING: {
             /* String value */
-            ITmfStateValue stateValue = TmfStateValue.newValueString(value);
-            stateValueType = new TmfXmlStateValueTmf(stateValue);
+            ITmfStateValue stateValue = value != null ?
+                    TmfStateValue.newValueString(value) : TmfStateValue.nullValue();
+            stateValueType = new TmfXmlStateValueTmf(stateValue, childAttributes);
             break;
         }
         case TmfXmlStrings.TYPE_NULL: {
             /* Null value */
             ITmfStateValue stateValue = TmfStateValue.nullValue();
-            stateValueType = new TmfXmlStateValueTmf(stateValue);
+            stateValueType = new TmfXmlStateValueTmf(stateValue, childAttributes);
             break;
         }
         case TmfXmlStrings.EVENT_FIELD:
             /* Event field */
+            if (value == null) {
+                throw new IllegalStateException("Event field name cannot be null"); //$NON-NLS-1$
+            }
             stateValueType = new TmfXmlStateValueEventField(value);
             break;
         case TmfXmlStrings.TYPE_EVENT_NAME:
@@ -139,15 +159,6 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
             break;
         case TmfXmlStrings.TYPE_QUERY:
             /* Value is the result of a query */
-            List<@Nullable Element> children = XmlUtils.getChildElements(node);
-            List<ITmfXmlStateAttribute> childAttributes = new ArrayList<>();
-            for (Element child : children) {
-                if (child == null) {
-                    continue;
-                }
-                ITmfXmlStateAttribute queryAttribute = modelFactory.createStateAttribute(child, getSsContainer());
-                childAttributes.add(queryAttribute);
-            }
             stateValueType = new TmfXmlStateValueQuery(childAttributes);
             break;
         default:
@@ -241,14 +252,68 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
     private class TmfXmlStateValueTmf extends TmfXmlStateValueTypeReadWrite {
 
         private final ITmfStateValue fValue;
+        private final List<ITmfXmlStateAttribute> fAttributesValue;
 
-        public TmfXmlStateValueTmf(ITmfStateValue value) {
+        public TmfXmlStateValueTmf(ITmfStateValue value, List<ITmfXmlStateAttribute> attributes) {
             fValue = value;
+            fAttributesValue = attributes;
         }
 
         @Override
         public ITmfStateValue getValue(@Nullable ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) {
-            return fValue;
+            try {
+                switch (getStackType()) {
+                case PEEK:
+                    return peek(event, scenarioInfo);
+                case PUSH:
+                case NULL:
+                case POP:
+                default:
+                    return fValue;
+                }
+            } catch (AttributeNotFoundException | StateSystemDisposedException e) {
+                Activator.logError("Query stack failed"); //$NON-NLS-1$
+                return TmfStateValue.nullValue();
+            }
+        }
+
+        /**
+         * @param event
+         *            The ongoing event
+         * @param scenarioInfo
+         *            The active scenario details. The value should be null if
+         *            there no scenario.
+         * @return The value value at the top of the stack without removing it
+         * @throws AttributeNotFoundException
+         *             If the do not exist
+         * @throws StateSystemDisposedException
+         *             If the state system is disposed
+         */
+        private ITmfStateValue peek(@Nullable ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException, StateSystemDisposedException {
+            int quarkQuery = IXmlStateSystemContainer.ROOT_QUARK;
+            ITmfStateSystemBuilder ss = getStateSystem();
+            if (ss == null) {
+                throw new IllegalStateException(ILLEGAL_STATE_EXCEPTION_MESSAGE);
+            }
+
+            if (event == null) {
+                throw new IllegalStateException("The event should not be null at this point."); //$NON-NLS-1$
+            }
+
+            for (ITmfXmlStateAttribute attribute : fAttributesValue) {
+                quarkQuery = attribute.getAttributeQuark(event, quarkQuery, scenarioInfo);
+                if (quarkQuery == IXmlStateSystemContainer.ERROR_QUARK) {
+                    /*
+                     * the query is not valid, we stop the state change
+                     */
+                    return TmfStateValue.nullValue();
+                }
+            }
+
+            final long ts = event.getTimestamp().toNanos();
+            @Nullable ITmfStateInterval stackTopInterval = StateSystemUtils.querySingleStackTop(ss, ts, quarkQuery);
+            final ITmfStateValue value = stackTopInterval != null ? stackTopInterval.getStateValue() : null;
+            return value != null ? value : TmfStateValue.nullValue();
         }
 
         @Override
