@@ -22,6 +22,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEven
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.Messages;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -54,6 +55,17 @@ public class TidAnalysisModule extends TmfStateSystemAnalysisModule {
     @Override
     public @NonNull Iterable<@NonNull TmfAbstractAnalysisRequirement> getAnalysisRequirements() {
         return REQUIREMENTS;
+    }
+
+    @Override
+    public String getHelpText() {
+        String msg = Messages.TidAnalysisModule_Description;
+        return msg != null ? msg : super.getHelpText();
+    }
+
+    @Override
+    public @NonNull String getHelpText(@NonNull ITmfTrace trace) {
+        return getHelpText();
     }
 
     @Override
