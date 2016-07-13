@@ -29,6 +29,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.DefaultEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.Messages;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -57,6 +58,17 @@ public class KernelContextSwitchAnalysis extends TmfStateSystemAnalysisModule {
 
     /** Integer used to identify 'total' entries in the returned maps */
     public static final Integer TOTAL = -1;
+
+    @Override
+    public @NonNull String getHelpText() {
+        String msg = Messages.KernelContextSwitchAnalysis_Description;
+        return msg != null ? msg : super.getHelpText();
+    }
+
+    @Override
+    public @NonNull String getHelpText(@NonNull ITmfTrace trace) {
+        return getHelpText();
+    }
 
     @Override
     protected ITmfStateProvider createStateProvider() {

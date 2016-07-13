@@ -19,6 +19,11 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.core.messages"; //$NON-NLS-1$
 
     /**
+     * Description of the context swith analysis module for the help
+     */
+    public static @Nullable String KernelContextSwitchAnalysis_Description;
+
+    /**
      * Description of the TID analysis module for the help
      */
     public static @Nullable String TidAnalysisModule_Description;
