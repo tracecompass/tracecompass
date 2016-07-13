@@ -42,9 +42,11 @@ public class TmfXmlBasicTransition {
     public TmfXmlBasicTransition(Element element) {
         final @NonNull String events = element.getAttribute(TmfXmlStrings.EVENT);
         fAcceptedEvents = new ArrayList<>();
-        for (String eventName : Arrays.asList(events.split(TmfXmlStrings.OR_SEPARATOR))) {
-            String name = WILDCARD_PATTERN.matcher(eventName).replaceAll(".*"); //$NON-NLS-1$
-            fAcceptedEvents.add(Pattern.compile(name));
+        if (!events.isEmpty()) {
+            for (String eventName : Arrays.asList(events.split(TmfXmlStrings.OR_SEPARATOR))) {
+                String name = WILDCARD_PATTERN.matcher(eventName).replaceAll(".*"); //$NON-NLS-1$
+                fAcceptedEvents.add(Pattern.compile(name));
+            }
         }
         final @NonNull String conditions = element.getAttribute(TmfXmlStrings.COND);
         fCond = conditions.isEmpty() ? new ArrayList<>() : Arrays.asList(conditions.split(TmfXmlStrings.AND_SEPARATOR));
@@ -81,6 +83,9 @@ public class TmfXmlBasicTransition {
     private boolean validateEvent(ITmfEvent event) {
         String eventName = event.getName();
 
+        if (fAcceptedEvents.isEmpty()) {
+            return true;
+        }
         /*
          * This validates the event name with the accepted regular expressions
          */
