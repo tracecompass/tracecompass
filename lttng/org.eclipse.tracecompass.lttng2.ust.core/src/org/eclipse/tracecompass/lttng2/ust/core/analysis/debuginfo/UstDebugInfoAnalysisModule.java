@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
@@ -168,7 +169,7 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
             }
         } catch (AttributeNotFoundException e) {
             throw new IllegalStateException(e);
-        } catch (StateSystemDisposedException e) {
+        } catch (TimeRangeException | StateSystemDisposedException e) {
             /* Oh well, such is life. */
         }
         return files;
@@ -255,7 +256,7 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
             // TODO: that's probably not true anymore
             /* We're only using quarks we've checked for. */
             throw new IllegalStateException(e);
-        } catch (StateSystemDisposedException e) {
+        } catch (TimeRangeException | StateSystemDisposedException e) {
             return null;
         }
     }
