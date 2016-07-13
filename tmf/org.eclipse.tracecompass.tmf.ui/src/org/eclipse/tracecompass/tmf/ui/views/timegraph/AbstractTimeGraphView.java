@@ -1958,8 +1958,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @since 2.0
      */
     protected final void startZoomThread(long startTime, long endTime) {
-        long clampedStartTime = Math.min(Math.max(startTime, fStartTime), fEndTime);
-        long clampedEndTime = Math.max(Math.min(endTime, fEndTime), fStartTime);
+        long clampedStartTime = (fStartTime == Long.MAX_VALUE ? startTime : Math.min(Math.max(startTime, fStartTime), fEndTime));
+        long clampedEndTime = (fEndTime == Long.MIN_VALUE ? endTime : Math.max(Math.min(endTime, fEndTime), fStartTime));
         fDirty.incrementAndGet();
         boolean restart = false;
         if (fZoomThread != null) {
