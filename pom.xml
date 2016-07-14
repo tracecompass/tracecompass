@@ -50,7 +50,7 @@
     <target-platform>tracecompass-e4.6</target-platform>
     <help-docs-eclipserun-repo>http://download.eclipse.org/eclipse/updates/4.5</help-docs-eclipserun-repo>
 
-    <rcptt-version>2.1.0-SNAPSHOT</rcptt-version>
+    <rcptt-version>2.1.0</rcptt-version>
     <!-- Disable GTK3 because it's not quite usable yet and it can make the tests hang (bug in IcedTea http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1736) -->
     <SWT_GTK3>0</SWT_GTK3>
 
