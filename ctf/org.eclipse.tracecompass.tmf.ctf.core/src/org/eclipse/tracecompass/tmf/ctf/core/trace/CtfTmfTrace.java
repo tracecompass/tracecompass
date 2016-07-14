@@ -720,10 +720,13 @@ public class CtfTmfTrace extends TmfTrace
     @Override
     public int size() {
         long size = 0;
-        Iterable<ICTFStream> streams = fTrace.getStreams();
-        for (ICTFStream stream : streams) {
-            for (CTFStreamInput si : stream.getStreamInputs()) {
-                size += si.getFile().length();
+        CTFTrace trace = fTrace;
+        if (trace != null) {
+            Iterable<ICTFStream> streams = trace.getStreams();
+            for (ICTFStream stream : streams) {
+                for (CTFStreamInput si : stream.getStreamInputs()) {
+                    size += si.getFile().length();
+                }
             }
         }
         return (int) (size / REDUCTION_FACTOR / CTF_AVG_EVENT_SIZE);
