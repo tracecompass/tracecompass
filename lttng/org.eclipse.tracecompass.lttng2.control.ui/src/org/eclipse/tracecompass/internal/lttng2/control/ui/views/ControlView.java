@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -39,6 +40,8 @@ import org.eclipse.tracecompass.tmf.remote.core.proxy.TmfRemoteConnectionFactory
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.dialogs.FilteredTree;
+import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
@@ -62,6 +65,10 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
 
     private static final String KEY_REMOTE_CONNECTION_NAME = "rc_name_"; //$NON-NLS-1$
     private static final String KEY_REMOTE_PROVIDER = "rc_id_"; //$NON-NLS-1$
+    /**
+     * The default expand level.
+     */
+    private static final int DEFAULT_EXPAND_LEVEL = 3;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -71,7 +78,6 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
      * The tree viewer.
      */
     private TreeViewer fTreeViewer = null;
-
     /**
      * The trace control root node. This provides access to the whole model.
      */
@@ -98,8 +104,31 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
 
     @Override
     public void createPartControl(Composite parent) {
-        // Create tree viewer
-        fTreeViewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+        // Filter that shows all children of a match node
+        PatternFilter filter = new PatternFilter() {
+            @Override
+            protected boolean isLeafMatch(Viewer viewer, Object element) {
+                ITraceControlComponent parentElement = (ITraceControlComponent) element;
+                while (parentElement != null) {
+                    if (super.isLeafMatch(viewer, parentElement)) {
+                        return true;
+                    }
+                    parentElement = parentElement.getParent();
+                }
+                return false;
+            }
+        };
+
+        // Create filtered tree
+        FilteredTree filteredTree = new FilteredTree(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL, filter, true) {
+            @Override
+            protected void updateToolbar(boolean visible) {
+                super.updateToolbar(visible);
+                treeViewer.expandToLevel(DEFAULT_EXPAND_LEVEL);
+            }
+        };
+
+        fTreeViewer = filteredTree.getViewer();
         ColumnViewerToolTipSupport.enableFor(fTreeViewer);
 
         fTreeViewer.setContentProvider(new TraceControlContentProvider());
