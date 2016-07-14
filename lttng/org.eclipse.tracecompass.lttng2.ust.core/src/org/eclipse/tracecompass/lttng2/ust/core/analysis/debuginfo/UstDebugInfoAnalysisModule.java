@@ -114,7 +114,6 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
      * @return The binaries (executables or libraries) referred to in the trace.
      */
     public Collection<UstDebugInfoBinaryFile> getAllBinaries() {
-        waitForCompletion();
         ITmfStateSystem ss = getStateSystem();
         if (ss == null) {
             /* State system might not yet be initialized */
@@ -167,9 +166,7 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
                     interval = StateSystemUtils.queryUntilNonNullValue(ss, baddrQuark, ts, Long.MAX_VALUE);
                 }
             }
-        } catch (AttributeNotFoundException e) {
-            throw new IllegalStateException(e);
-        } catch (TimeRangeException | StateSystemDisposedException e) {
+        } catch (AttributeNotFoundException | TimeRangeException | StateSystemDisposedException e) {
             /* Oh well, such is life. */
         }
         return files;
@@ -194,7 +191,6 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
     @VisibleForTesting
     public @Nullable UstDebugInfoLoadedBinaryFile getMatchingFile(long ts, long vpid, long ip) {
         try {
-            waitForCompletion();
             final ITmfStateSystem ss = getStateSystem();
             if (ss == null) {
                 /* State system might not yet be initialized */
@@ -252,11 +248,8 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
 
             return new UstDebugInfoLoadedBinaryFile(baddr, filePath, buildId, debugLink, isPic);
 
-        } catch (AttributeNotFoundException e) {
-            // TODO: that's probably not true anymore
-            /* We're only using quarks we've checked for. */
-            throw new IllegalStateException(e);
-        } catch (TimeRangeException | StateSystemDisposedException e) {
+        } catch (AttributeNotFoundException | TimeRangeException | StateSystemDisposedException e) {
+            /* Either the data is not available yet, or incomplete. */
             return null;
         }
     }

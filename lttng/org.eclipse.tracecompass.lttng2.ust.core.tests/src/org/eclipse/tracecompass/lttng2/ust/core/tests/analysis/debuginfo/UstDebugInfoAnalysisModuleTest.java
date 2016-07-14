@@ -37,6 +37,7 @@ import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.junit.After;
@@ -163,6 +164,10 @@ public class UstDebugInfoAnalysisModuleTest {
          */
         TmfTraceOpenedSignal signal = new TmfTraceOpenedSignal(this, trace, null);
         TmfSignalManager.dispatchSignal(signal);
+
+        UstDebugInfoAnalysisModule module = TmfTraceUtils.getAnalysisModuleOfClass(trace, UstDebugInfoAnalysisModule.class, UstDebugInfoAnalysisModule.ID);
+        assertNotNull(module);
+        module.waitForCompletion();
 
         /* Send a request to get the 3 events we are interested in */
         List<@NonNull LttngUstEvent> events = new ArrayList<>();
