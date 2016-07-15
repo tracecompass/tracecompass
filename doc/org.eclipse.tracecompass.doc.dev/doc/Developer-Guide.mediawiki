@@ -1048,6 +1048,20 @@ Sent by the experiment after trace synchronization.
 
 Received by any component that needs to be notified of trace synchronization.
 
+=== TmfMarkerEventSourceUpdatedSignal ===
+
+''Purpose''
+
+This signal is used to indicate that a marker event source has been updated.
+
+''Senders''
+
+Sent by a component that has triggered a change in a marker event source.
+
+''Receivers''
+
+Received by any component that needs to refresh the markers due to the change in marker event source.
+
 == Debugging ==
 
 TMF has built-in Eclipse tracing support for the debugging of signal interaction between components. To enable it, open the '''Run/Debug Configuration...''' dialog, select a configuration, click the '''Tracing''' tab, select the plug-in '''org.eclipse.tracecompass.tmf.core''', and check the '''signal''' item.

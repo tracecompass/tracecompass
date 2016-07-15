@@ -119,6 +119,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                 markers.addAll(getTraceMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
                 applyResults(() -> {
                     getTimeGraphViewer().setLinks(links);
+                    getTimeGraphViewer().setMarkerCategories(getMarkerCategories());
                     getTimeGraphViewer().setMarkers(markers);
                 });
             } else {

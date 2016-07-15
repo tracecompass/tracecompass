@@ -82,6 +82,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
+import org.eclipse.tracecompass.tmf.core.signal.TmfMarkerEventSourceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
@@ -849,6 +850,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 if (events != null) {
                     fTimeGraphWrapper.getTimeGraphViewer().setLinks(events);
                 }
+                fTimeGraphWrapper.getTimeGraphViewer().setMarkerCategories(getMarkerCategories());
                 fTimeGraphWrapper.getTimeGraphViewer().setMarkers(markers);
                 redraw();
             });
@@ -1569,6 +1571,20 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         fTimeGraphWrapper.refresh();
     }
 
+    /**
+     * A marker event source has been updated
+     *
+     * @param signal
+     *            the signal
+     * @since 2.1
+     */
+    @TmfSignalHandler
+    public void markerEventSourceUpdated(final TmfMarkerEventSourceUpdatedSignal signal) {
+        getTimeGraphViewer().setMarkerCategories(getMarkerCategories());
+        getTimeGraphViewer().setMarkers(null);
+        refresh();
+    }
+
     // ------------------------------------------------------------------------
     // Internal
     // ------------------------------------------------------------------------
@@ -1778,9 +1794,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * Get the list of current marker categories.
      *
      * @return The list of marker categories
-     * @since 2.0
+     * @since 2.1
      */
-    private @NonNull List<String> getMarkerCategories() {
+    protected @NonNull List<String> getMarkerCategories() {
         Set<String> categories = new LinkedHashSet<>(getViewMarkerCategories());
         for (IMarkerEventSource markerEventSource : getMarkerEventSources(fTrace)) {
             categories.addAll(markerEventSource.getMarkerCategories());
