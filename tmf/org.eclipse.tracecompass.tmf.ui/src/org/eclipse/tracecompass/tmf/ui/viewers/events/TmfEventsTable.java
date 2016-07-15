@@ -664,6 +664,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
     private Composite fComposite;
     private SashForm fSashForm;
+    private Composite fTableComposite;
     private TmfRawEventViewer fRawViewer;
     private ITmfTrace fTrace;
     private volatile boolean fPackDone = false;
@@ -812,16 +813,16 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fSashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         // Create a composite for the table and its header bar
-        Composite tableComposite = new Composite(fSashForm, SWT.NONE);
-        tableComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        fTableComposite = new Composite(fSashForm, SWT.NONE);
+        fTableComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         gl = new GridLayout(1, false);
         gl.marginHeight = 0;
         gl.marginWidth = 0;
         gl.verticalSpacing = 0;
-        tableComposite.setLayout(gl);
+        fTableComposite.setLayout(gl);
 
         // Create an events table header bar
-        fHeaderBar = new TmfEventsTableHeader(tableComposite, SWT.NONE, new IEventsTableHeaderListener() {
+        fHeaderBar = new TmfEventsTableHeader(fTableComposite, SWT.NONE, new IEventsTableHeaderListener() {
             @Override
             public void filterSelected(ITmfFilter filter) {
                 if (filter instanceof TmfFilterMatchesNode) {
@@ -849,7 +850,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
         // Create a virtual table
         final int style = SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI | SWT.FULL_SELECTION;
-        fTable = new TmfVirtualTable(tableComposite, style);
+        fTable = new TmfVirtualTable(fTableComposite, style);
 
         // Set the table layout
         final GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -1048,7 +1049,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         final IAction showTableAction = new Action(Messages.TmfEventsTable_ShowTableActionText) {
             @Override
             public void run() {
-                fTable.setVisible(true);
+                fTableComposite.setVisible(true);
                 fSashForm.layout();
             }
         };
@@ -1056,7 +1057,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         final IAction hideTableAction = new Action(Messages.TmfEventsTable_HideTableActionText) {
             @Override
             public void run() {
-                fTable.setVisible(false);
+                fTableComposite.setVisible(false);
                 fSashForm.layout();
             }
         };
