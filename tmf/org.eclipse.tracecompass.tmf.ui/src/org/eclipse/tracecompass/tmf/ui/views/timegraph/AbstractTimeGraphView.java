@@ -150,6 +150,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private static final Pattern RGBA_PATTERN = Pattern.compile("RGBA \\{(\\d+), (\\d+), (\\d+), (\\d+)\\}"); //$NON-NLS-1$
 
     private static final Logger LOGGER = TraceCompassLog.getLogger(AbstractTimeGraphView.class);
+    private static final String LOG_STRING_WITH_PARAM = "[TimeGraphView:%s] viewId=%s, %s"; //$NON-NLS-1$
+    private static final String LOG_STRING = "[TimeGraphView:%s] viewId=%s"; //$NON-NLS-1$
 
     /**
      * Redraw state enum
@@ -703,14 +705,14 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
 
         public void run(IProgressMonitor monitor) {
-            LOGGER.info(() -> "[TimeGraphView:BuildJobStart] trace=" + fBuildTrace.getName()); //$NON-NLS-1$
+            LOGGER.info(() -> getLogMessage("BuildThreadStart", "trace=" + fBuildTrace.getName())); //$NON-NLS-1$ //$NON-NLS-2$
 
             buildEntryList(fBuildTrace, fParentTrace, NonNullUtils.checkNotNull(monitor));
             synchronized (fBuildJobMap) {
                 fBuildJobMap.remove(fBuildTrace);
             }
 
-            LOGGER.info(() -> "[TimeGraphView:BuildJobEnd]"); //$NON-NLS-1$
+            LOGGER.info(() -> getLogMessage("BuildThreadEnd", null)); //$NON-NLS-1$
         }
     }
 
@@ -779,12 +781,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         @Override
         public final void run() {
-            LOGGER.info(() -> "[TimeGraphView:ZoomThreadStart] start=" + fZoomStartTime + ", end=" + fZoomEndTime); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.info(() -> getLogMessage("ZoomThreadStart", "start=" + fZoomStartTime + ", end=" + fZoomEndTime)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
             doRun();
             fDirty.decrementAndGet();
 
-            LOGGER.info(() -> "[TimeGraphView:ZoomThreadEnd]"); //$NON-NLS-1$
+            LOGGER.info(() -> getLogMessage("ZoomThreadEnd", null)); //$NON-NLS-1$
         }
 
         /**
@@ -822,11 +824,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         @Override
         public void doRun() {
-            LOGGER.config(() -> "[TimeGraphView:ZoomThreadGettingStates]"); //$NON-NLS-1$
+            LOGGER.config(() -> getLogMessage("ZoomThreadGettingStates", null)); //$NON-NLS-1$
 
             for (TimeGraphEntry entry : fZoomEntryList) {
                 if (getMonitor().isCanceled()) {
-                    LOGGER.info(() -> "[TimeGraphView:ZoomThreadCanceled]"); //$NON-NLS-1$
+                    LOGGER.info(() -> getLogMessage("ZoomThreadCanceled", null)); //$NON-NLS-1$
                     return;
                 }
                 if (entry == null) {
@@ -835,11 +837,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 zoom(entry, getMonitor());
             }
             /* Refresh the arrows when zooming */
-            LOGGER.config(() -> "[TimeGraphView:ZoomThreadGettingLinks]"); //$NON-NLS-1$
+            LOGGER.config(() -> getLogMessage("ZoomThreadGettingLinks", null)); //$NON-NLS-1$
             List<ILinkEvent> events = getLinkList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
 
             /* Refresh the view-specific markers when zooming */
-            LOGGER.config(() -> "[TimeGraphView:ZoomThreadGettingMarkers]"); //$NON-NLS-1$
+            LOGGER.config(() -> getLogMessage("ZoomThreadGettingMarkers", null)); //$NON-NLS-1$
             List<IMarkerEvent> markers = new ArrayList<>(getViewMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
             /* Refresh the trace-specific markers when zooming */
             markers.addAll(getTraceMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
@@ -1259,6 +1261,25 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         return fFindTarget;
     }
 
+    /**
+     * Formats a log message for this class
+     *
+     * @param event
+     *            The event to log, that will be appended to the class name to
+     *            make the full event name
+     * @param parameters
+     *            The string of extra parameters to add to the log message, in
+     *            the format name=value[, name=value]*, or <code>null</code> for
+     *            no params
+     * @return The complete log message for this class
+     */
+    private String getLogMessage(String event, @Nullable String parameters) {
+        if (parameters == null) {
+            return String.format(LOG_STRING, event, getViewId());
+        }
+        return String.format(LOG_STRING_WITH_PARAM, event, getViewId(), parameters);
+    }
+
     // ------------------------------------------------------------------------
     // ViewPart
     // ------------------------------------------------------------------------
@@ -1598,7 +1619,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
         fTrace = trace;
 
-        LOGGER.info(() -> "[TimeGraphView:LoadingTrace] trace=" + trace.getName()); //$NON-NLS-1$
+        LOGGER.info(() -> getLogMessage("LoadingTrace", "trace=" + trace.getName())); //$NON-NLS-1$ //$NON-NLS-2$
 
         restoreViewContext();
         fEditorFile = TmfTraceManager.getInstance().getTraceEditorFile(trace);
@@ -1828,12 +1849,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * Refresh the display
      */
     protected void refresh() {
-        LOGGER.info(() -> "[TimeGraphView:RefreshRequested]"); //$NON-NLS-1$
+        LOGGER.info(() -> getLogMessage("RefreshRequested", null)); //$NON-NLS-1$
         final boolean zoomThread = Thread.currentThread() instanceof ZoomThread;
         TmfUiRefreshHandler.getInstance().queueUpdate(this, new Runnable() {
             @Override
             public void run() {
-                LOGGER.info(() -> "[TimeGraphView:RefreshStart]"); //$NON-NLS-1$
+                LOGGER.info(() -> getLogMessage("RefreshStart", null)); //$NON-NLS-1$
                 if (fTimeGraphWrapper.isDisposed()) {
                     return;
                 }
@@ -1918,7 +1939,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     startZoomThread(startTime, endTime);
                 }
                 fDirty.decrementAndGet();
-                LOGGER.info(() -> "[TimeGraphView:RefreshEnd]"); //$NON-NLS-1$
+                LOGGER.info(() -> getLogMessage("RefreshEnd", null)); //$NON-NLS-1$
             }
         });
     }
@@ -1935,11 +1956,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 return;
             }
         }
-        LOGGER.info(() -> "[TimeGraphView:RedrawRequested]"); //$NON-NLS-1$
+        LOGGER.info(() -> getLogMessage("RedrawRequested", null)); //$NON-NLS-1$
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                LOGGER.info(() -> "[TimeGraphView:RedrawStart]"); //$NON-NLS-1$
+                LOGGER.info(() -> getLogMessage("RedrawStart", null)); //$NON-NLS-1$
                 if (fTimeGraphWrapper.isDisposed()) {
                     return;
                 }
@@ -1953,7 +1974,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                         fRedrawState = State.IDLE;
                     }
                 }
-                LOGGER.info(() -> "[TimeGraphView:RedrawEnd]"); //$NON-NLS-1$
+                LOGGER.info(() -> getLogMessage("RedrawEnd", null)); //$NON-NLS-1$
             }
         });
     }

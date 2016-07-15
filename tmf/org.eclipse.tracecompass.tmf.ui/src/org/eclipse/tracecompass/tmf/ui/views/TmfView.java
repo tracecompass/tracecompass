@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
@@ -199,5 +200,21 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
      */
     public Composite getParentComposite() {
         return fParentComposite;
+    }
+
+    /**
+     * Return the Eclipse view ID in the format <Primary ID>:<Secondary ID> or
+     * simply <Primary ID> if secondary ID is null
+     *
+     * @return This view's view ID
+     * @since 2.1
+     */
+    protected String getViewId() {
+        IViewSite viewSite = getViewSite();
+        String secondaryId = viewSite.getSecondaryId();
+        if (secondaryId == null) {
+            return viewSite.getId();
+        }
+        return viewSite.getId() + ':' + secondaryId;
     }
 }
