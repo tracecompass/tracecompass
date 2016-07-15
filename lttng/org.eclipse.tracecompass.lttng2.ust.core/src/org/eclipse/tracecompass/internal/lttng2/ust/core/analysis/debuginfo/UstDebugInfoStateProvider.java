@@ -80,7 +80,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
     public static final String DEBUG_LINK_ATTRIB = "debug_link"; //$NON-NLS-1$
 
     /** Version of this state provider */
-    private static final int VERSION = 4;
+    private static final int VERSION = 5;
 
     private static final Logger LOGGER = TraceCompassLog.getLogger(UstDebugInfoStateProvider.class);
 
@@ -95,6 +95,11 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
 
     private final LttngUst28EventLayout fLayout;
     private final Map<String, Integer> fEventNames;
+
+    /**
+     * Map of the latest statedump's timestamps, per VPID: Map<vpid, timestamp>
+     */
+    private final Map<Long, Long> fLatestStatedumpStarts = new HashMap<>();
 
     /*
      * Store for data that is incomplete, for which we are waiting for some
@@ -212,23 +217,26 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
             break;
         }
 
+        case STATEDUMP_BIN_INFO_INDEX:
+            handleBinInfo(event, vpid, ss, true);
+            break;
         case DL_DLOPEN_INDEX:
-        case STATEDUMP_BIN_INFO_INDEX: {
-            handleOpen(event, vpid, ss);
+            handleBinInfo(event, vpid, ss, false);
             break;
-        }
 
+        case STATEDUMP_BUILD_ID_INDEX:
+            handleBuildId(event, vpid, ss, true);
+            break;
         case DL_BUILD_ID_INDEX:
-        case STATEDUMP_BUILD_ID_INDEX: {
-            handleBuildId(event, vpid, ss);
+            handleBuildId(event, vpid, ss, false);
             break;
-        }
 
-        case DL_DEBUG_LINK_INDEX:
-        case STATEDUMP_DEBUG_LINK_INDEX: {
-            handleDebugLink(event, vpid, ss);
+        case STATEDUMP_DEBUG_LINK_INDEX:
+            handleDebugLink(event, vpid, ss, true);
             break;
-        }
+        case DL_DEBUG_LINK_INDEX:
+            handleDebugLink(event, vpid, ss, false);
+            break;
 
         case DL_DLCLOSE_INDEX: {
             handleClose(event, vpid, ss);
@@ -326,11 +334,12 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
      * When a process does an exec, a new statedump is done and all previous
      * mappings are now invalid.
      */
-    private static void handleStatedumpStart(ITmfEvent event, final Long vpid, final ITmfStateSystemBuilder ss) {
-        try {
-            long ts = event.getTimestamp().getValue();
-            int vpidQuark = ss.getQuarkAbsolute(vpid.toString());
+    private void handleStatedumpStart(ITmfEvent event, final Long vpid, final ITmfStateSystemBuilder ss) {
+        long ts = event.getTimestamp().getValue();
+        fLatestStatedumpStarts.put(vpid, ts);
 
+        try {
+            int vpidQuark = ss.getQuarkAbsolute(vpid.toString());
             ss.removeAttribute(ts, vpidQuark);
         } catch (AttributeNotFoundException e) {
             /* We didn't know anything about this vpid yet, so there is nothing to remove. */
@@ -338,11 +347,18 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
     }
 
     /**
-     * Handle opening a shared library.
+     * Handle a bin_info event, which gives information about a binary or shared
+     * library loaded in the process's memory space.
+     *
      *
      * Uses fields: Long baddr, Long memsz, String path, Long is_pic
+     *
+     * @param statedump
+     *            Indicates if it comes from a statedump event, or a
+     *            dlopen/lib:load event.
      */
-    private void handleOpen(ITmfEvent event, final Long vpid, final ITmfStateSystemBuilder ss) {
+    private void handleBinInfo(ITmfEvent event, final Long vpid,
+            final ITmfStateSystemBuilder ss, boolean statedump) {
         Long baddr = event.getContent().getFieldValue(Long.class, fLayout.fieldBaddr());
         Long memsz = event.getContent().getFieldValue(Long.class, fLayout.fieldMemsz());
         String path = event.getContent().getFieldValue(String.class, fLayout.fieldPath());
@@ -354,29 +370,23 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
                 memsz == null ||
                 path == null ||
                 hasBuildIdValue == null ||
-                hasDebugLinkValue == null) {
-            LOGGER.warning(() -> "[UstDebugInfoStateProvider:InvalidDlOpenEvent] event=" + event.toString()); //$NON-NLS-1$
+                hasDebugLinkValue == null ||
+                (statedump && isPicValue == null)) {
+            LOGGER.warning(() -> "[UstDebugInfoStateProvider:InvalidBinInfoEvent] event=" + event.toString()); //$NON-NLS-1$
             return;
         }
 
         /*
-         * The is_pic field is only present in the lttng_ust_statedump:bin_info
-         * event. Binaries loaded with dlopen always have PIC. Therefore, we
-         * start assuming isPIC is true, and change our mind if the field is
-         * present and says the opposite.
+         * Dlopen/load events do not have an is_pic field, it is taken for
+         * granted.
          */
-        boolean isPic = true;
-        if (isPicValue != null) {
-            isPic = (isPicValue != 0);
-        }
+        boolean isPic = (statedump ? (checkNotNull(isPicValue).longValue() != 0) : true);
+        long ts = getBinInfoTimeStamp(event, vpid, statedump);
 
-        boolean hasBuildId = hasBuildIdValue != 0;
-        boolean hasDebugLink = hasDebugLinkValue != 0;
-
-        long ts = event.getTimestamp().getValue();
+        boolean hasBuildId = (hasBuildIdValue != 0);
+        boolean hasDebugLink = (hasDebugLinkValue != 0);
 
         PendingBinInfo p = new PendingBinInfo(hasBuildId, hasDebugLink, vpid, baddr, memsz, path, isPic);
-
         processPendingBinInfo(p, ts, ss);
     }
 
@@ -384,8 +394,13 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
      * Handle shared library build id
      *
      * Uses fields: Long baddr, long[] build_id
+     *
+     * @param statedump
+     *            Indicates if it comes from a statedump event, or a
+     *            dlopen/lib:build_id event.
      */
-    private void handleBuildId(ITmfEvent event, final Long vpid, final ITmfStateSystemBuilder ss) {
+    private void handleBuildId(ITmfEvent event, final Long vpid,
+            final ITmfStateSystemBuilder ss, boolean statedump) {
         long[] buildIdArray = event.getContent().getFieldValue(long[].class, fLayout.fieldBuildId());
         Long baddr = event.getContent().getFieldValue(Long.class, fLayout.fieldBaddr());
 
@@ -401,8 +416,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
          */
         String buildId = checkNotNull(BaseEncoding.base16().encode(longArrayToByteArray(buildIdArray)).toLowerCase());
 
-        long ts = event.getTimestamp().getValue();
-
+        long ts = getBinInfoTimeStamp(event, vpid, statedump);
         PendingBinInfo p = retrievePendingBinInfo(vpid, baddr);
 
         /*
@@ -414,11 +428,11 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
         }
 
         p.setBuildId(buildId);
-
         processPendingBinInfo(p, ts, ss);
     }
 
-    private void handleDebugLink(ITmfEvent event, final Long vpid, final ITmfStateSystemBuilder ss) {
+    private void handleDebugLink(ITmfEvent event, final Long vpid,
+            final ITmfStateSystemBuilder ss, boolean statedump) {
         Long baddr = event.getContent().getFieldValue(Long.class, fLayout.fieldBaddr());
         String debugLink = event.getContent().getFieldValue(String.class, fLayout.fieldDebugLinkFilename());
 
@@ -427,7 +441,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
             return;
         }
 
-        long ts = event.getTimestamp().getValue();
+        long ts = getBinInfoTimeStamp(event, vpid, statedump);
 
         PendingBinInfo pendingBinInfo = retrievePendingBinInfo(vpid, baddr);
         if (pendingBinInfo == null) {
@@ -462,6 +476,38 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
              * the trace, or that it was lost through lost events.
              */
         }
+    }
+
+    /**
+     * Get the effective timestamp of a bin_info/dlopen/lib:load event.
+     *
+     * This is used to consider bin_info events to all virtually happen at the
+     * statedump start, so that symbol mappings become available as soon as
+     * possible. The UST statedump happens while a libdl lock is taken, so no
+     * mapping change can happen while it is ongoing.
+     *
+     * dlopen/lib:load events directly use their own timestamp, since they
+     * happen independently of the statedump.
+     *
+     * @param event
+     *            The event, its timestamp will be used if we do not find a
+     *            statedump start
+     * @param vpid
+     *            The pid of the process
+     * @param statedump
+     *            True if the event is a statedump (aka bin_info) event, false
+     *            if it is a dlopen/lib:load event.
+     * @return The timestamp to use
+     */
+    private long getBinInfoTimeStamp(ITmfEvent event, final Long vpid, boolean statedump) {
+        if (statedump) {
+            Long statedumpStartTime = fLatestStatedumpStarts.get(vpid);
+            if (statedumpStartTime != null) {
+                return statedumpStartTime;
+            }
+        }
+
+        return event.getTimestamp().getValue();
     }
 
     /**
