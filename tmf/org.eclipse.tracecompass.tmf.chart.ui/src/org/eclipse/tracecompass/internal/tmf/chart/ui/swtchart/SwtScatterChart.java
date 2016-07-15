@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -51,6 +52,7 @@ import org.eclipse.tracecompass.internal.tmf.chart.ui.consumer.ScatterStringCons
 import org.eclipse.tracecompass.internal.tmf.chart.ui.consumer.XYChartConsumer;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.consumer.XYSeriesConsumer;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRangeMap;
+import org.eclipse.tracecompass.internal.tmf.chart.ui.dialog.Messages;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.format.LabelFormat;
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
@@ -234,6 +236,11 @@ public final class SwtScatterChart extends SwtXYChartViewer {
     @Override
     protected ISeries createSwtSeries(ChartSeries chartSeries, ISeriesSet swtSeriesSet, @NonNull Color color) {
         String title = chartSeries.getY().getName();
+
+        boolean multiSeries = (getXDescriptors().stream().distinct().count() > 1);
+        if (multiSeries) {
+            title = NLS.bind(Messages.ChartSeries_MultiSeriesTitle, title, chartSeries.getX().getLabel());
+        }
 
         ILineSeries swtSeries = (ILineSeries) swtSeriesSet.createSeries(SeriesType.LINE, title);
         swtSeries.setLineStyle(LineStyle.NONE);
