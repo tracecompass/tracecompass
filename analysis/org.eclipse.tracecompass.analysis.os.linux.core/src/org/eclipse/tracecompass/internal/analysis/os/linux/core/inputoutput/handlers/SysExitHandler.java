@@ -63,7 +63,6 @@ public class SysExitHandler extends KernelEventHandler {
             return;
         }
 
-        int ret = ((Long) content.getField(getLayout().fieldSyscallRet()).getValue()).intValue();
         /* TODO: Why save the syscall before if we have it in the sys_exit? */
         int syscallQuark = ss.optQuarkRelative(InputOutputStateProvider.getNodeSyscalls(ss), String.valueOf(tid));
         if (syscallQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
@@ -71,17 +70,21 @@ public class SysExitHandler extends KernelEventHandler {
         }
         ITmfStateValue currentSyscall = ss.queryOngoingState(syscallQuark);
         String syscallValue = currentSyscall.unboxStr();
-        if (ret >= 0) {
-            if (fSyscallReadPattern.matcher(syscallValue).matches()) {
-                int currentProcessNode = ss.getQuarkRelativeAndAdd(InputOutputStateProvider.getNodeThreads(ss), String.valueOf(tid));
-                int readQuark = ss.getQuarkRelativeAndAdd(currentProcessNode, Attributes.BYTES_READ);
-                ss.getQuarkRelativeAndAdd(currentProcessNode, Attributes.BYTES_WRITTEN);
-                StateSystemBuilderUtils.incrementAttributeInt(ss, ts, readQuark, ret);
-            } else if (fSyscallWritePattern.matcher(syscallValue).matches()) {
-                int currentProcessNode = ss.getQuarkRelativeAndAdd(InputOutputStateProvider.getNodeThreads(ss), String.valueOf(tid));
-                ss.getQuarkRelativeAndAdd(currentProcessNode, Attributes.BYTES_READ);
-                int writtenQuark = ss.getQuarkRelativeAndAdd(currentProcessNode, Attributes.BYTES_WRITTEN);
-                StateSystemBuilderUtils.incrementAttributeInt(ss, ts, writtenQuark, ret);
+        ITmfEventField syscallRetField = content.getField(getLayout().fieldSyscallRet());
+        if (syscallRetField != null) {
+            int ret = ((Long) syscallRetField.getValue()).intValue();
+            if (ret >= 0) {
+                if (fSyscallReadPattern.matcher(syscallValue).matches()) {
+                    int currentProcessNode = ss.getQuarkRelativeAndAdd(InputOutputStateProvider.getNodeThreads(ss), String.valueOf(tid));
+                    int readQuark = ss.getQuarkRelativeAndAdd(currentProcessNode, Attributes.BYTES_READ);
+                    ss.getQuarkRelativeAndAdd(currentProcessNode, Attributes.BYTES_WRITTEN);
+                    StateSystemBuilderUtils.incrementAttributeInt(ss, ts, readQuark, ret);
+                } else if (fSyscallWritePattern.matcher(syscallValue).matches()) {
+                    int currentProcessNode = ss.getQuarkRelativeAndAdd(InputOutputStateProvider.getNodeThreads(ss), String.valueOf(tid));
+                    ss.getQuarkRelativeAndAdd(currentProcessNode, Attributes.BYTES_READ);
+                    int writtenQuark = ss.getQuarkRelativeAndAdd(currentProcessNode, Attributes.BYTES_WRITTEN);
+                    StateSystemBuilderUtils.incrementAttributeInt(ss, ts, writtenQuark, ret);
+                }
             }
         }
         TmfStateValue value = TmfStateValue.nullValue();

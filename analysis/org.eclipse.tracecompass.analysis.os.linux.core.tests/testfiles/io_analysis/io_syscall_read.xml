@@ -38,6 +38,16 @@
 <field name="ret" value="36" type="long" />
 <field name="buf" value="123456" type="long" />
 </event>
+<!-- Verify that syscalls with no ret field are handled gracefully -->
+<event timestamp="28" name="syscall_exit_mmap2">
+<field name="cpu" value="0" type="int" />
+<field name="addr" value="3049263104" type="long" />
+<field name="len" value="0" type="long" />
+<field name="prot" value="4096" type="long" />
+<field name="flags" value="3" type="long" />
+<field name="fd" value="35" type="long" />
+<field name="pgoff" value="-1" type="long" />
+</event>
 <event timestamp="30" name="sched_switch">
 <field name="cpu" value="0" type="int" />
 <field name="prev_comm" value="proc2" type="string" />
