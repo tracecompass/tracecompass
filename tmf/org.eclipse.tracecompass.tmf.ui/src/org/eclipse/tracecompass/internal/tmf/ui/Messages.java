@@ -182,6 +182,7 @@ public class Messages extends NLS {
     public static String CustomTxtParserInputWizardPage_capturedGroup;
     public static String CustomTxtParserInputWizardPage_cardinality;
     public static String CustomTxtParserInputWizardPage_category;
+    public static String CustomTxtParserInputWizardPage_default;
     public static String CustomTxtParserInputWizardPage_desccriptionEdit;
     public static String CustomTxtParserInputWizardPage_descriptionNew;
     public static String CustomTxtParserInputWizardPage_eventType;
@@ -223,6 +224,7 @@ public class Messages extends NLS {
     public static String CustomTxtParserOutputWizardPage_moveAfter;
     public static String CustomTxtParserOutputWizardPage_moveBefore;
     public static String CustomTxtParserOutputWizardPage_visible;
+    public static String CustomXmlParserInputWizardPage_default;
     public static String CustomXmlParserInputWizardPage_emptyCategoryError;
     public static String CustomXmlParserInputWizardPage_emptyEventTypeError;
     public static String CustomXmlParserInputWizardPage_emptyLogTypeError;
@@ -231,7 +233,6 @@ public class Messages extends NLS {
     public static String CustomXmlParserInputWizardPage_duplicatelogTypeError;
     public static String CustomXmlParserInputWizardPage_noDocumentError;
     public static String CustomXmlParserInputWizardPage_missingLogEntryError;
-    public static String CustomXmlParserInputWizardPage_missingTimestampFmtError;
     public static String CustomXmlParserInputWizardPage_missingDocumentElementError;
     public static String CustomXmlParserInputWizardPage_noTimestampElementOrAttribute;
     public static String CustomXmlParserInputWizardPage_elementMissingNameError;

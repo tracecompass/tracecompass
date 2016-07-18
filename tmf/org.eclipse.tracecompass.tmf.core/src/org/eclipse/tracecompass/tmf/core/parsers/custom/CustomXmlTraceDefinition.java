@@ -195,9 +195,11 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             definitionElement.setAttribute(CATEGORY_ATTRIBUTE, categoryName);
             definitionElement.setAttribute(NAME_ATTRIBUTE, definitionName);
 
-            Element formatElement = doc.createElement(TIME_STAMP_OUTPUT_FORMAT_ELEMENT);
-            definitionElement.appendChild(formatElement);
-            formatElement.appendChild(doc.createTextNode(timeStampOutputFormat));
+            if (timeStampOutputFormat != null && !timeStampOutputFormat.isEmpty()) {
+                Element formatElement = doc.createElement(TIME_STAMP_OUTPUT_FORMAT_ELEMENT);
+                definitionElement.appendChild(formatElement);
+                formatElement.appendChild(doc.createTextNode(timeStampOutputFormat));
+            }
 
             if (rootInputElement != null) {
                 definitionElement.appendChild(createInputElementElement(rootInputElement, doc));

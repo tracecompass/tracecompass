@@ -124,6 +124,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     private static final Color COLOR_LIGHT_RED = new Color(Display.getDefault(), 255, 192, 192);
     private static final Color COLOR_TEXT_BACKGROUND = Display.getDefault().getSystemColor(SWT.COLOR_WHITE);
     private static final Color COLOR_WIDGET_BACKGROUND = Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+    private static final Color COLOR_GRAY = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
 
     private final ISelection selection;
     private CustomTxtTraceDefinition definition;
@@ -201,6 +202,13 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         timestampOutputFormatText = new Text(headerComposite, SWT.BORDER | SWT.SINGLE);
         timestampOutputFormatText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         timestampOutputFormatText.setText(DEFAULT_TIMESTAMP_FORMAT);
+        timestampOutputFormatText.addPaintListener(e -> {
+            if (!timestampOutputFormatText.isFocusControl() && timestampOutputFormatText.getText().trim().isEmpty()) {
+                e.gc.setForeground(COLOR_GRAY);
+                int borderWidth = timestampOutputFormatText.getBorderWidth();
+                e.gc.drawText(Messages.CustomTxtParserInputWizardPage_default, borderWidth, borderWidth);
+            }
+        });
 
         Button timeStampFormatHelpButton = new Button(headerComposite, SWT.PUSH);
         timeStampFormatHelpButton.setImage(HELP_IMAGE);
@@ -359,7 +367,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
         SashForm vSash = new SashForm(container, SWT.VERTICAL);
         vSash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        vSash.setBackground(vSash.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+        vSash.setBackground(COLOR_GRAY);
 
         SashForm hSash = new SashForm(vSash, SWT.HORIZONTAL);
         hSash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -551,7 +559,11 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     private void loadDefinition(CustomTxtTraceDefinition def) {
         categoryText.setText(def.categoryName);
         logtypeText.setText(def.definitionName);
-        timestampOutputFormatText.setText(def.timeStampOutputFormat);
+        if (def.timeStampOutputFormat != null) {
+            timestampOutputFormatText.setText(def.timeStampOutputFormat);
+        } else {
+            timestampOutputFormatText.setText(""); //$NON-NLS-1$
+        }
         treeViewer.setInput(def.inputs);
         if (def.inputs.size() > 0) {
             InputLine inputLine = def.inputs.get(0);
@@ -868,7 +880,11 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 try {
                     TmfTimestampFormat timestampFormat = new TmfTimestampFormat(firstEntryTimeStampInputFormat);
                     long timestamp = timestampFormat.parseValue(firstEntryTimeStamp);
-                    timestampFormat = new TmfTimestampFormat(timestampOutputFormatText.getText().trim());
+                    if (timestampOutputFormatText.getText().trim().isEmpty()) {
+                        timestampFormat = new TmfTimestampFormat();
+                    } else {
+                        timestampFormat = new TmfTimestampFormat(timestampOutputFormatText.getText().trim());
+                    }
                     timestampPreviewText.setText(timestampFormat.format(timestamp));
                 } catch (ParseException e) {
                     timestampPreviewText.setText("*parse exception* [" + firstEntryTimeStamp + "] <> [" + firstEntryTimeStampInputFormat + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -1581,20 +1597,14 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             String name = Integer.toString(i + 1);
             errors.append(validateLine(inputLine, name));
         }
-        if (timestampFound) {
-            if (definition.timeStampOutputFormat.length() == 0) {
-                errors.append("Enter the output format for the Time Stamp field. "); //$NON-NLS-1$
+        if (timestampFound && !definition.timeStampOutputFormat.isEmpty()) {
+            try {
+                new TmfTimestampFormat(definition.timeStampOutputFormat);
+                timestampOutputFormatText.setBackground(COLOR_TEXT_BACKGROUND);
+            } catch (IllegalArgumentException e) {
+                errors.append("Enter a valid output format for the Time Stamp field [" + e.getMessage() + "]."); //$NON-NLS-1$ //$NON-NLS-2$
                 timestampOutputFormatText.setBackground(COLOR_LIGHT_RED);
-            } else {
-                try {
-                    new TmfTimestampFormat(definition.timeStampOutputFormat);
-                    timestampOutputFormatText.setBackground(COLOR_TEXT_BACKGROUND);
-                } catch (IllegalArgumentException e) {
-                    errors.append("Enter a valid output format for the Time Stamp field [" + e.getMessage() + "]."); //$NON-NLS-1$ //$NON-NLS-2$
-                    timestampOutputFormatText.setBackground(COLOR_LIGHT_RED);
-                }
             }
-
         } else {
             timestampOutputFormatText.setBackground(COLOR_TEXT_BACKGROUND);
         }

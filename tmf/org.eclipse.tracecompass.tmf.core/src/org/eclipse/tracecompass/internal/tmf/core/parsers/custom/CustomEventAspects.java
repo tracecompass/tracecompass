@@ -47,7 +47,8 @@ public class CustomEventAspects {
     public static @NonNull Iterable<ITmfEventAspect<?>> generateAspects(CustomTraceDefinition definition) {
         ImmutableList.Builder<ITmfEventAspect<?>> builder = new ImmutableList.Builder<>();
         for (OutputColumn output : definition.outputs) {
-            if (output.tag.equals(Tag.TIMESTAMP) && definition.timeStampOutputFormat == null) {
+            if (output.tag.equals(Tag.TIMESTAMP) &&
+                    (definition.timeStampOutputFormat == null || definition.timeStampOutputFormat.isEmpty())) {
                 builder.add(TmfBaseAspects.getTimestampAspect());
             } else if (output.tag.equals(Tag.EVENT_TYPE)) {
                 builder.add(TmfBaseAspects.getEventTypeAspect());

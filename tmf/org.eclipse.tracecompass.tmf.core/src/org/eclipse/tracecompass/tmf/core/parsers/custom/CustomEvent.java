@@ -270,9 +270,11 @@ public class CustomEvent extends TmfEvent {
         List<ITmfEventField> fields = new ArrayList<>(fDefinition.outputs.size());
         for (OutputColumn outputColumn : fDefinition.outputs) {
             Object key = (outputColumn.tag.equals(Tag.OTHER) ? outputColumn.name : outputColumn.tag);
-            if (outputColumn.tag.equals(Tag.TIMESTAMP) && timestamp != null) {
-                TmfTimestampFormat timestampFormat = new TmfTimestampFormat(fDefinition.timeStampOutputFormat);
-                fields.add(new TmfEventField(outputColumn.name, timestampFormat.format(timestamp.getValue()), null));
+            if (outputColumn.tag.equals(Tag.TIMESTAMP)) {
+                if (timestamp != null && fDefinition.timeStampOutputFormat != null && !fDefinition.timeStampOutputFormat.isEmpty()) {
+                    TmfTimestampFormat timestampFormat = new TmfTimestampFormat(fDefinition.timeStampOutputFormat);
+                    fields.add(new TmfEventField(outputColumn.name, timestampFormat.format(timestamp.getValue()), null));
+                }
             } else if (!outputColumn.tag.equals(Tag.EVENT_TYPE)){
                 fields.add(new TmfEventField(outputColumn.name, nullToEmptyString(fData.get(key)), null));
             }

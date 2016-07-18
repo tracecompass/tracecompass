@@ -928,7 +928,7 @@ Fill out the first wizard page with the following information:
 
 * '''Category:''' Enter a category name for the trace type.
 * '''Trace type:''' Enter a name for the trace type, which is also the name of the custom parser. This will also be the default event type name.
-* '''Time Stamp format:''' Enter the date and time pattern that will be used to output the Time Stamp.<br>
+* '''Time Stamp format:''' Enter the date and time pattern that will be used to output the Time Stamp, or leave blank to use the default Time Format preference.<br>
 Note: information about date and time patterns can be found here: [http://archive.eclipse.org/tracecompass/doc/stable/org.eclipse.tracecompass.doc.user/reference/api/org/eclipse/tracecompass/tmf/core/timestamp/TmfTimestampFormat.html TmfTimestampFormat]
 
 Click the '''Add next line''', '''Add child line''' or '''Remove line''' buttons to create a new line of input or delete it. For each line of input, enter the following information:
@@ -999,7 +999,7 @@ Fill out the first wizard page with the following information:
 
 * '''Category:''' Enter a category name for the trace type.
 * '''Trace type:''' Enter a name for the trace type, which is also the name of the custom parser. This will also be the default event type name.
-* '''Time Stamp format:''' Enter the date and time pattern that will be used to output the Time Stamp.<br>
+* '''Time Stamp format:''' Enter the date and time pattern that will be used to output the Time Stamp, or leave blank to use the default Time Format preference.<br>
 Note: information about date and time patterns can be found here: [http://archive.eclipse.org/tracecompass/doc/stable/org.eclipse.tracecompass.doc.user/reference/api/org/eclipse/tracecompass/tmf/core/timestamp/TmfTimestampFormat.html TmfTimestampFormat]
 
 Click the '''Add document element''' button to create a new document element and enter a name for the root-level document element of the XML file.

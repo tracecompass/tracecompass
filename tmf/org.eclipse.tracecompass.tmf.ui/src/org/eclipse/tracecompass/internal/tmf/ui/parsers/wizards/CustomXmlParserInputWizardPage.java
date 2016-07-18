@@ -121,6 +121,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     private static final Color COLOR_LIGHT_RED = new Color(Display.getDefault(), 255, 192, 192);
     private static final Color COLOR_TEXT_BACKGROUND = Display.getDefault().getSystemColor(SWT.COLOR_WHITE);
     private static final Color COLOR_WIDGET_BACKGROUND = Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+    private static final Color COLOR_GRAY = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
 
     private final ISelection selection;
     private CustomXmlTraceDefinition definition;
@@ -207,6 +208,13 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         timeStampOutputFormatText = new Text(headerComposite, SWT.BORDER | SWT.SINGLE);
         timeStampOutputFormatText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         timeStampOutputFormatText.setText(DEFAULT_TIMESTAMP_FORMAT);
+        timeStampOutputFormatText.addPaintListener(e -> {
+            if (!timeStampOutputFormatText.isFocusControl() && timeStampOutputFormatText.getText().trim().isEmpty()) {
+                e.gc.setForeground(COLOR_GRAY);
+                int borderWidth = timeStampOutputFormatText.getBorderWidth();
+                e.gc.drawText(Messages.CustomXmlParserInputWizardPage_default, borderWidth, borderWidth);
+            }
+        });
 
         Button timeStampFormatHelpButton = new Button(headerComposite, SWT.PUSH);
         timeStampFormatHelpButton.setImage(HELP_IMAGE);
@@ -243,7 +251,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
         SashForm vSash = new SashForm(container, SWT.VERTICAL);
         vSash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        vSash.setBackground(vSash.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+        vSash.setBackground(COLOR_GRAY);
 
         SashForm hSash = new SashForm(vSash, SWT.HORIZONTAL);
         hSash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -620,7 +628,11 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     private void loadDefinition(CustomXmlTraceDefinition def) {
         categoryText.setText(def.categoryName);
         logtypeText.setText(def.definitionName);
-        timeStampOutputFormatText.setText(def.timeStampOutputFormat);
+        if (def.timeStampOutputFormat != null) {
+            timeStampOutputFormatText.setText(def.timeStampOutputFormat);
+        } else {
+            timeStampOutputFormatText.setText(""); //$NON-NLS-1$
+        }
         treeViewer.setInput(def);
 
         if (def.rootInputElement != null) {
@@ -807,7 +819,11 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             try {
                 TmfTimestampFormat timestampFormat = new TmfTimestampFormat(timeStampFormat);
                 long timestamp = timestampFormat.parseValue(timeStampValue);
-                timestampFormat = new TmfTimestampFormat(timeStampOutputFormatText.getText().trim());
+                if (timeStampOutputFormatText.getText().trim().isEmpty()) {
+                    timestampFormat = new TmfTimestampFormat();
+                } else {
+                    timestampFormat = new TmfTimestampFormat(timeStampOutputFormatText.getText().trim());
+                }
                 timeStampPreviewText.setText(timestampFormat.format(timestamp));
             } catch (ParseException e) {
                 timeStampPreviewText.setText("*parse exception* [" + timeStampValue + "] <> [" + timeStampFormat + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -1589,21 +1605,19 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     errors.add(Messages.CustomXmlParserInputWizardPage_missingLogEntryError);
                 }
 
-                if (timeStampFound) {
-                    if (timeStampOutputFormatText.getText().trim().length() == 0) {
-                        errors.add(Messages.CustomXmlParserInputWizardPage_missingTimestampFmtError);
+                if (timeStampFound && !definition.timeStampOutputFormat.isEmpty()) {
+                    try {
+                        new TmfTimestampFormat(timeStampOutputFormatText.getText().trim());
+                        timeStampOutputFormatText.setBackground(COLOR_TEXT_BACKGROUND);
+                    } catch (IllegalArgumentException e) {
+                        errors.add(Messages.CustomXmlParserInputWizardPage_elementInvalidTimestampFmtError);
                         timeStampOutputFormatText.setBackground(COLOR_LIGHT_RED);
-                    } else {
-                        try {
-                            new TmfTimestampFormat(timeStampOutputFormatText.getText().trim());
-                            timeStampOutputFormatText.setBackground(COLOR_TEXT_BACKGROUND);
-                        } catch (IllegalArgumentException e) {
-                            errors.add(Messages.CustomXmlParserInputWizardPage_elementInvalidTimestampFmtError);
-                            timeStampOutputFormatText.setBackground(COLOR_LIGHT_RED);
-                        }
                     }
                 } else {
-                    timeStampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_noTimestampElementOrAttribute);
+                    timeStampOutputFormatText.setBackground(COLOR_TEXT_BACKGROUND);
+                    if (!timeStampFound) {
+                        timeStampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_noTimestampElementOrAttribute);
+                    }
                 }
             }
         } else {
