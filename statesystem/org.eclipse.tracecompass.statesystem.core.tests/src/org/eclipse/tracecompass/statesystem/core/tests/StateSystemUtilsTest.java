@@ -13,9 +13,13 @@
 package org.eclipse.tracecompass.statesystem.core.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.Iterator;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -26,12 +30,15 @@ import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.Iterators;
 
 /**
  * Test the {@link StateSystemUtils} class
@@ -128,4 +135,113 @@ public class StateSystemUtilsTest {
 
     }
 
+    /**
+     * Test that iterator returns the correct intervals:
+     * <ul>
+     * <li>intervals for the correct quark</li>
+     * <li>ordered intervals</li>
+     * <li>intervals covering the correct time range</li>
+     * </ul>
+     */
+    @Test
+    public void testIteratorOverQuark() {
+        ITmfStateSystem ss = fStateSystem;
+        assertNotNull(ss);
+
+        for (int quark = 0; quark < ss.getNbAttributes(); quark++) {
+            Iterator<ITmfStateInterval> iterator = StateSystemUtils.getIteratorOverQuark(ss, quark, Long.MIN_VALUE, Long.MAX_VALUE);
+            ITmfStateInterval prevInterval = null;
+            ITmfStateInterval currInterval = null;
+
+            while (iterator.hasNext()) {
+                currInterval = iterator.next();
+
+                assertEquals(quark, currInterval.getAttribute());
+                if (prevInterval == null) {
+                    /* This is the first interval for this attribute */
+                    assertEquals(currInterval.getStartTime(), ss.getStartTime());
+                } else {
+                    assertEquals(prevInterval.getEndTime() + 1, currInterval.getStartTime());
+                }
+
+                prevInterval = currInterval;
+            }
+
+            assertNotNull("Iterator should have returned at least one interval", currInterval);
+            assertEquals(ss.getCurrentEndTime(), currInterval.getEndTime());
+        }
+    }
+
+    /**
+     * Test that the correct exception is thrown by getIteratorOverQuark when
+     * the lower bound argument is strictly greater than the upper bound
+     * argument
+     */
+    @Test(expected = TimeRangeException.class)
+    public void testIteratorOverQuarkTimeRangeException() {
+        ITmfStateSystem ss = fStateSystem;
+        assertNotNull(ss);
+        StateSystemUtils.getIteratorOverQuark(ss, 0, ss.getCurrentEndTime(), ss.getStartTime());
+    }
+
+    /**
+     * Test that getIteratorOverQuark returns the correct intervals for a range
+     * included in the state system range
+     */
+    @Test
+    public void testIteratorOverQuarkSubrange() {
+        ITmfStateSystem ss = fStateSystem;
+        assertNotNull(ss);
+
+        int quark;
+        try {
+            quark = ss.getQuarkAbsolute(DUMMY_STRING);
+
+            Iterator<ITmfStateInterval> iterator = StateSystemUtils.getIteratorOverQuark(ss, quark, 1200L, 1400L);
+
+            /* There should be a first interval ranging from 1200L to 1499L */
+            assertTrue(iterator.hasNext());
+            ITmfStateInterval interval = iterator.next();
+            assertNotNull(interval);
+            assertEquals(1200L, interval.getStartTime());
+            assertEquals(1499, interval.getEndTime());
+
+            /* There should not be a next interval */
+            assertFalse(iterator.hasNext());
+        } catch (AttributeNotFoundException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    /**
+     * With the query end > ss.end, query some intervals, then add a few
+     * intervals to the ss such that end now becomes < ss.end and make sure
+     * those new intervals are picked up
+     */
+    @Test
+    public void testIteratorOverQuarkAddMoreIntervals() {
+        try {
+            IStateHistoryBackend backend = StateHistoryBackendFactory.createInMemoryBackend(DUMMY_STRING, START_TIME);
+            ITmfStateSystemBuilder ss = StateSystemFactory.newStateSystem(backend);
+            int quark = ss.getQuarkAbsoluteAndAdd(DUMMY_STRING);
+
+            ss.modifyAttribute(1200L, TmfStateValue.newValueInt(10), quark);
+            ss.modifyAttribute(1500L, TmfStateValue.newValueInt(20), quark);
+
+            /* We should have 2 intervals if we iterate at this point */
+            Iterator<ITmfStateInterval> iterator = StateSystemUtils.getIteratorOverQuark(ss, quark, 0, 1700L);
+            assertEquals(2, Iterators.size(iterator));
+
+            /* Reset the iterator */
+            iterator = StateSystemUtils.getIteratorOverQuark(ss, quark, 0, 1700L);
+
+            /* Add an interval, updating the ss.end time */
+            ss.closeHistory(2000L);
+
+            /* We should have 3 intervals if we iterate at this point */
+            assertEquals(3, Iterators.size(iterator));
+        } catch (StateValueTypeException e) {
+            fail(e.getMessage());
+        }
+    }
 }

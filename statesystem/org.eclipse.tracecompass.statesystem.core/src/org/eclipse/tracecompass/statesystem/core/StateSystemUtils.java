@@ -15,8 +15,10 @@
 package org.eclipse.tracecompass.statesystem.core;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -277,6 +279,74 @@ public final class StateSystemUtils {
             /* Nothing to do */
         }
         return null;
+    }
+
+    /**
+     * Iterator over the intervals of a given attribute. Not thread-safe.
+     *
+     * @param ss
+     *            The state system on which to query intervals
+     *
+     * @param quark
+     *            The key to the attribute to iterate over
+     * @param start
+     *            The begin of the range of intervals to iterate over, if start
+     *            is before the state system's start time, the iteration will
+     *            begin at the state system's start time.
+     * @param end
+     *            The end of the range of intervals to iterate over, it can be
+     *            greater than the current state system's end time, iteration
+     *            will end at the smallest of the two.
+     * @return an Iterator over the intervals of a given attribute, with
+     *         intervals ordered
+     * @throws TimeRangeException
+     *             If end < start.
+     * @since 2.1
+     */
+    public static Iterator<ITmfStateInterval> getIteratorOverQuark(ITmfStateSystem ss, int quark, long start, long end) {
+        if (end < start) {
+            throw new TimeRangeException("iterateOverQuark: end < start !"); //$NON-NLS-1$
+        }
+
+        return new Iterator<ITmfStateInterval>() {
+            private @Nullable ITmfStateInterval fCurrent;
+
+            private long getNextQueryTime() {
+                if (fCurrent != null) {
+                    return fCurrent.getEndTime() + 1;
+                }
+                /* Iteration has not started yet */
+                return Long.max(start, ss.getStartTime());
+            }
+
+            @Override
+            public boolean hasNext() {
+                /*
+                 * Compute the query's real end time here, to update it if the
+                 * iterator is used during state system build
+                 */
+                long realEnd = Long.min(end, ss.getCurrentEndTime());
+
+                /*
+                 * Ensure that the next query time falls within state system and
+                 * query time range. By definition getNextQueryTime() is larger
+                 * than the state system's start time.
+                 */
+                return getNextQueryTime() <= realEnd;
+            }
+
+            @Override
+            public ITmfStateInterval next() {
+                if (hasNext()) {
+                    try {
+                        return fCurrent = ss.querySingleState(getNextQueryTime(), quark);
+                    } catch (StateSystemDisposedException e) {
+                        /* GOTO throw NoSuchElementException. */
+                    }
+                }
+                throw new NoSuchElementException();
+            }
+        };
     }
 
 }
