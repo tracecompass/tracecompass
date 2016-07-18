@@ -131,7 +131,7 @@ public class SyslogEvent extends TextTraceEvent implements ITmfCollapsibleEvent,
             } catch (NumberFormatException e) {
                 // ignore
             }
-            return new TmfCallsite((String) getContent().getField(Field.FILE).getValue(), null, lineNo);
+            return new TmfCallsite((String) getContent().getField(Field.FILE).getValue(), lineNo);
         }
         return null;
     }

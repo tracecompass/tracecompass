@@ -17,20 +17,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
-import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.SourceCallsite;
 import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 
 import com.google.common.base.Objects;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Iterables;
 
 /**
  * Utility class to get file name, function/symbol name and line number from a
@@ -96,32 +98,13 @@ public final class FileOffsetMapper {
         }
     }
 
-    /**
-     * Cache of all calls to 'addr2line', so that we can avoid recalling the
-     * external process repeatedly.
-     *
-     * It is static, meaning one cache for the whole application, since the
-     * symbols in a file on disk are independent from the trace referring to it.
-     */
-    private static final LoadingCache<FileOffset, @Nullable Iterable<SourceCallsite>> CALLSITE_CACHE;
-    static {
-        CALLSITE_CACHE = checkNotNull(CacheBuilder.newBuilder()
-            .maximumSize(CACHE_SIZE)
-            .build(new CacheLoader<FileOffset, @Nullable Iterable<SourceCallsite>>() {
-                @Override
-                public @Nullable Iterable<SourceCallsite> load(FileOffset fo) {
-                    LOGGER.fine(() -> "[FileOffsetMapper:CacheMiss] file/offset=" + fo.toString()); //$NON-NLS-1$
-                    return getCallsiteFromOffsetWithAddr2line(fo);
-                }
-            }));
-    }
 
     /**
-     * Generate the callsites from a given binary file and address offset.
+     * Generate the callsite from a given binary file and address offset.
      *
      * Due to function inlining, it is possible for one offset to actually have
-     * multiple call sites. This is why we can return more than one callsite per
-     * call.
+     * multiple call sites. We will return the most precise one (inner-most) we
+     * have available.
      *
      * @param file
      *            The binary file to look at
@@ -130,11 +113,100 @@ public final class FileOffsetMapper {
      *            the moment)
      * @param offset
      *            The memory offset in the file
-     * @return The list of callsites corresponding to the offset, reported from
-     *         the "highest" inlining location, down to the initial definition.
+     * @return The corresponding call site
      */
-    public static @Nullable Iterable<SourceCallsite> getCallsiteFromOffset(File file, @Nullable String buildId, long offset) {
-        LOGGER.finer(() -> String.format("[FileOffsetMapper:Request] file=%s, buildId=%s, offset=0x%h", //$NON-NLS-1$
+    public static @Nullable TmfCallsite getCallsiteFromOffset(File file, @Nullable String buildId, long offset) {
+       Iterable<Addr2lineInfo> output = getAddr2lineInfo(file, buildId, offset);
+       if (output == null || Iterables.isEmpty(output)) {
+           return null;
+       }
+       Addr2lineInfo info = Iterables.getLast(output);
+       String sourceFile = info.fSourceFileName;
+       Long sourceLine = info.fSourceLineNumber;
+
+       if (sourceFile == null) {
+           /* Not enough information to provide a callsite */
+           return null;
+       }
+       return new TmfCallsite(sourceFile, sourceLine);
+    }
+
+    /**
+     * Get the function/symbol name corresponding to binary file and offset.
+     *
+     * @param file
+     *            The binary file to look at
+     * @param buildId
+     *            The expected buildId of the binary file (is not verified at
+     *            the moment)
+     * @param offset
+     *            The memory offset in the file
+     * @return The corresponding function/symbol name
+     */
+    public static @Nullable String getFunctionNameFromOffset(File file, @Nullable String buildId, long offset) {
+        /*
+         * TODO We are currently also using 'addr2line' to resolve function
+         * names, which requires the binary's DWARF information to be available.
+         * A better approach would be to use the binary's symbol table (if it is
+         * not stripped), since this is usually more readily available than
+         * DWARF.
+         */
+        Iterable<Addr2lineInfo> output = getAddr2lineInfo(file, buildId, offset);
+        if (output == null || Iterables.isEmpty(output)) {
+            return null;
+        }
+        Addr2lineInfo info = Iterables.getLast(output);
+        return info.fFunctionName;
+    }
+
+    // ------------------------------------------------------------------------
+    // Utility methods making use of 'addr2line'
+    // ------------------------------------------------------------------------
+
+    /**
+     * Cache of all calls to 'addr2line', so that we can avoid recalling the
+     * external process repeatedly.
+     *
+     * It is static, meaning one cache for the whole application, since the
+     * symbols in a file on disk are independent from the trace referring to it.
+     */
+    private static final LoadingCache<FileOffset, @NonNull Iterable<Addr2lineInfo>> ADDR2LINE_INFO_CACHE;
+    static {
+        ADDR2LINE_INFO_CACHE = checkNotNull(CacheBuilder.newBuilder()
+            .maximumSize(CACHE_SIZE)
+            .build(new CacheLoader<FileOffset, @NonNull Iterable<Addr2lineInfo>>() {
+                @Override
+                public @NonNull Iterable<Addr2lineInfo> load(FileOffset fo) {
+                    LOGGER.fine(() -> "[FileOffsetMapper:CacheMiss] file/offset=" + fo.toString()); //$NON-NLS-1$
+                    return callAddr2line(fo);
+                }
+            }));
+    }
+
+    private static class Addr2lineInfo {
+
+        private final @Nullable String fSourceFileName;
+        private final @Nullable Long fSourceLineNumber;
+        private final @Nullable String fFunctionName;
+
+        public Addr2lineInfo(@Nullable String sourceFileName,  @Nullable String functionName, @Nullable Long sourceLineNumber) {
+            fSourceFileName = sourceFileName;
+            fSourceLineNumber = sourceLineNumber;
+            fFunctionName = functionName;
+        }
+
+        @Override
+        public String toString() {
+            return Objects.toStringHelper(this)
+                    .add("fSourceFileName", fSourceFileName) //$NON-NLS-1$
+                    .add("fSourceLineNumber", fSourceLineNumber) //$NON-NLS-1$
+                    .add("fFunctionName", fFunctionName) //$NON-NLS-1$
+                    .toString();
+        }
+    }
+
+    private static @Nullable Iterable<Addr2lineInfo> getAddr2lineInfo(File file, @Nullable String buildId, long offset) {
+        LOGGER.finer(() -> String.format("[FileOffsetMapper:Addr2lineRequest] file=%s, buildId=%s, offset=0x%h", //$NON-NLS-1$
                 file.toString(), buildId, offset));
 
         if (!Files.exists((file.toPath()))) {
@@ -145,16 +217,16 @@ public final class FileOffsetMapper {
         // the file we are attempting to open.
         FileOffset fo = new FileOffset(checkNotNull(file.toString()), buildId, offset);
 
-        Iterable<SourceCallsite> callsites = CALLSITE_CACHE.getUnchecked(fo);
+        @Nullable Iterable<Addr2lineInfo> callsites = ADDR2LINE_INFO_CACHE.getUnchecked(fo);
         LOGGER.finer(() -> String.format("[FileOffsetMapper:RequestComplete] callsites=%s", callsites)); //$NON-NLS-1$
         return callsites;
     }
 
-    private static @Nullable Iterable<SourceCallsite> getCallsiteFromOffsetWithAddr2line(FileOffset fo) {
+    private static Iterable<Addr2lineInfo> callAddr2line(FileOffset fo) {
         String filePath = fo.fFilePath;
         long offset = fo.fOffset;
 
-        List<SourceCallsite> callsites = new LinkedList<>();
+        List<Addr2lineInfo> callsites = new LinkedList<>();
 
         // FIXME Could eventually use CDT's Addr2line class once it implements --inlines
         List<String> output = getOutputFromCommand(Arrays.asList(
@@ -162,7 +234,7 @@ public final class FileOffsetMapper {
 
         if (output == null) {
             /* Command returned an error */
-            return null;
+            return Collections.EMPTY_SET;
         }
 
         /*
@@ -190,7 +262,7 @@ public final class FileOffsetMapper {
                 }
                 try {
                     long lineNumber = Long.parseLong(elems[1]);
-                    callsites.add(new SourceCallsite(fileName, currentFunctionName, lineNumber));
+                    callsites.add(new Addr2lineInfo(fileName, currentFunctionName, lineNumber));
 
                 } catch (NumberFormatException e) {
                     /*

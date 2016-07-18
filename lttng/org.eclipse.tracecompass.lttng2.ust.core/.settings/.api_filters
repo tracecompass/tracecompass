@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.eclipse.tracecompass.lttng2.ust.core" version="2">
+    <resource path="src/org/eclipse/tracecompass/lttng2/ust/core/analysis/debuginfo/UstDebugInfoSourceAspect.java" type="org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoSourceAspect">
+        <filter comment="Change return type from SourceCallsite to TmfCallsite, which are effectively identical." id="338792546">
+            <message_arguments>
+                <message_argument value="org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoSourceAspect"/>
+                <message_argument value="resolve(ITmfEvent)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>

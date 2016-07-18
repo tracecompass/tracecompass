@@ -11,7 +11,10 @@ package org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
+import java.io.File;
+
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo.FileOffsetMapper;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 
@@ -40,17 +43,35 @@ public class UstDebugInfoFunctionAspect implements ITmfEventAspect<FunctionLocat
 
     @Override
     public @Nullable FunctionLocation resolve(ITmfEvent event) {
-        SourceCallsite sc = UstDebugInfoSourceAspect.INSTANCE.resolve(event);
-        if (sc == null) {
+        /* Resolve the binary callsite first. */
+        BinaryCallsite bc = UstDebugInfoBinaryAspect.INSTANCE.resolve(event);
+        if (bc == null) {
             return null;
         }
 
-        String functionName = sc.getFunctionName();
+        return getFunctionFromBinaryLocation(bc);
+    }
+
+    /**
+     * Get a function location starting directly from a binary callsite, instead
+     * of from a trace event.
+     *
+     * @param bc
+     *            The binary callsite, representing a binary and offset within
+     *            this binary
+     * @return The corresponding function location
+     * @since 2.1
+     */
+    public static @Nullable FunctionLocation getFunctionFromBinaryLocation(BinaryCallsite bc) {
+        String functionName = FileOffsetMapper.getFunctionNameFromOffset(
+                new File(bc.getBinaryFilePath()),
+                bc.getBuildId(),
+                bc.getOffset());
         if (functionName == null) {
             return null;
         }
 
-        /* We do not track the offset in the function at this time */
+        /* We do not track the offset inside the function at this time */
         return new FunctionLocation(functionName, null);
     }
 

@@ -39,6 +39,26 @@ public class FunctionLocation {
         fOffset = offsetInFunction;
     }
 
+    /**
+     * Get the function name.
+     *
+     * @return The function name
+     * @since 2.1
+     */
+    public String getFunctionName() {
+        return fFunctionName;
+    }
+
+    /**
+     * Get the offset *within this function* represented by this location.
+     *
+     * @return The offset of this location, or 'null' if unavailable
+     * @since 2.1
+     */
+    public @Nullable Long getOffsetInFunction() {
+        return fOffset;
+    }
+
     @Override
     public String toString() {
         Long offset = fOffset;

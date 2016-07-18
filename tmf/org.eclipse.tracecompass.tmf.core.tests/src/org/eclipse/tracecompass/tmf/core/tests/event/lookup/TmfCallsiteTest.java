@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 import org.junit.Test;
@@ -29,26 +30,23 @@ public class TmfCallsiteTest {
     // ------------------------------------------------------------------------
     // Variables
     // ------------------------------------------------------------------------
-    private final static String fFileName1 = "filename1";
-    private final static String fFunctionName1 = "func1";
-    private final static long fLine1 = 10;
 
-    private final static String fFileName2 = "filename2";
-    private final static String fFunctionName2 = "func2";
-    private final static long fLine2 = 25;
+    private final static @NonNull String fFileName1 = "filename1";
+    private final static Long fLine1 = 10L;
 
-    private final static String fFileName3 = "filename3";
-    private final static String fFunctionName3 = null;
-    private final static long fLine3 = 123;
+    private final static @NonNull String fFileName2 = "filename2";
+    private final static Long fLine2 = 25L;
 
-    private final static String fFileName4 = "filename1";
-    private final static String fFunctionName4 = "func1";
-    private final static long fLine4 = 11;
+    private final static @NonNull String fFileName3 = "filename3";
+    private final static Long fLine3 = 123L;
 
-    private final static ITmfCallsite fCallsite1 = new TmfCallsite(fFileName1, fFunctionName1, fLine1);
-    private final static ITmfCallsite fCallsite2 = new TmfCallsite(fFileName2, fFunctionName2, fLine2);
-    private final static ITmfCallsite fCallsite3 = new TmfCallsite(fFileName3, fFunctionName3, fLine3);
-    private final static ITmfCallsite fCallsite4 = new TmfCallsite(fFileName4, fFunctionName4, fLine4);
+    private final static @NonNull String fFileName4 = "filename1";
+    private final static Long fLine4 = 11L;
+
+    private final static @NonNull ITmfCallsite fCallsite1 = new TmfCallsite(fFileName1, fLine1);
+    private final static @NonNull ITmfCallsite fCallsite2 = new TmfCallsite(fFileName2, fLine2);
+    private final static @NonNull ITmfCallsite fCallsite3 = new TmfCallsite(fFileName3, fLine3);
+    private final static @NonNull ITmfCallsite fCallsite4 = new TmfCallsite(fFileName4, fLine4);
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -57,8 +55,7 @@ public class TmfCallsiteTest {
     @Test
     public void testDefaultConstructor() {
         assertEquals(fFileName1, fCallsite1.getFileName());
-        assertEquals(fFunctionName1, fCallsite1.getFunctionName());
-        assertEquals(fLine1, fCallsite1.getLineNumber());
+        assertEquals(fLine1, fCallsite1.getLineNo());
     }
 
     @Test
@@ -66,18 +63,7 @@ public class TmfCallsiteTest {
         TmfCallsite copy = new TmfCallsite(fCallsite1);
 
         assertEquals(fFileName1, copy.getFileName());
-        assertEquals(fFunctionName1, copy.getFunctionName());
-        assertEquals(fLine1, copy.getLineNumber());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testCallsiteCopy2() {
-        new TmfCallsite(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testCallsiteFileNull() {
-        new TmfCallsite(null, fFunctionName1, fLine1);
+        assertEquals(fLine1, copy.getLineNo());
     }
 
     // ------------------------------------------------------------------------
@@ -145,21 +131,14 @@ public class TmfCallsiteTest {
         assertFalse("equals", fCallsite1.equals(fCallsite1.getFileName()));
     }
 
-    @Test
-    public void testNullElements() {
-        ITmfCallsite callsite = new TmfCallsite(fFileName1, null, fLine1);
-        assertFalse("equals", fCallsite1.equals(callsite));
-        assertFalse("equals", callsite.equals(fCallsite1));
-    }
-
     // ------------------------------------------------------------------------
     // toString
     // ------------------------------------------------------------------------
 
     @Test
     public void testToString() {
-        assertEquals("toString", "filename1:10 func1()", fCallsite1.toString());
-        assertEquals("toString", "filename2:25 func2()", fCallsite2.toString());
+        assertEquals("toString", "filename1:10", fCallsite1.toString());
+        assertEquals("toString", "filename2:25", fCallsite2.toString());
         assertEquals("toString", "filename3:123", fCallsite3.toString());
     }
 }

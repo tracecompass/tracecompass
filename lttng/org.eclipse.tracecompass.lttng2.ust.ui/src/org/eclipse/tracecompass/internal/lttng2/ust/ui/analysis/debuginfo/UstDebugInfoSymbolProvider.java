@@ -12,8 +12,10 @@ package org.eclipse.tracecompass.internal.lttng2.ust.ui.analysis.debuginfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.BinaryCallsite;
+import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.FunctionLocation;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoAnalysisModule;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoBinaryAspect;
+import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoFunctionAspect;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoSourceAspect;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
@@ -62,8 +64,8 @@ public class UstDebugInfoSymbolProvider extends DefaultSymbolProvider {
             return null;
         }
 
-        TmfCallsite callsite = UstDebugInfoSourceAspect.getSourceCallsite(getTrace(), bc);
-        return (callsite == null ? null : callsite.getFunctionName());
+        FunctionLocation loc = UstDebugInfoFunctionAspect.getFunctionFromBinaryLocation(bc);
+        return (loc == null ? null : loc.getFunctionName());
     }
 
     @Deprecated

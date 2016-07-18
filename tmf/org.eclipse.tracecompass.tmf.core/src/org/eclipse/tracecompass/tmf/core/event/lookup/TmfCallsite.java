@@ -12,9 +12,12 @@
 
 package org.eclipse.tracecompass.tmf.core.event.lookup;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * TMF call site information for source code lookup.
@@ -30,11 +33,8 @@ public class TmfCallsite implements ITmfCallsite {
     /** The file name string. */
     private final @NonNull String fFileName;
 
-    /** The function name. */
-    private final String fFunctionName;
-
     /** The line number. */
-    private final long fLineNumber;
+    private final @Nullable Long fLineNumber;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -49,13 +49,24 @@ public class TmfCallsite implements ITmfCallsite {
      *            - a function name
      * @param lineNumber
      *            - a line number
+     * @deprecated Use {@link #TmfCallsite(String, Long)} instead.
      */
+    @Deprecated
     public TmfCallsite(String fileName, String functionName, long lineNumber) {
-        if (fileName == null) {
-            throw new IllegalArgumentException();
-        }
+        this(checkNotNull(fileName), lineNumber);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param fileName
+     *            The source file's name
+     * @param lineNumber
+     *            The line number in the source file
+     * @since 2.1
+     */
+    public TmfCallsite(@NonNull String fileName, @Nullable Long lineNumber) {
         fFileName = fileName;
-        fFunctionName = functionName;
         fLineNumber = lineNumber;
     }
 
@@ -65,13 +76,9 @@ public class TmfCallsite implements ITmfCallsite {
      * @param other
      *            - An other call site implementation
      */
-    public TmfCallsite(ITmfCallsite other) {
-        if (other == null) {
-            throw new IllegalArgumentException();
-        }
+    public TmfCallsite(@NonNull ITmfCallsite other) {
         fFileName = other.getFileName();
-        fFunctionName = other.getFunctionName();
-        fLineNumber = other.getLineNumber();
+        fLineNumber = other.getLineNo();
     }
 
     // ------------------------------------------------------------------------
@@ -83,13 +90,25 @@ public class TmfCallsite implements ITmfCallsite {
         return fFileName;
     }
 
+    @Deprecated
     @Override
     public String getFunctionName() {
-        return fFunctionName;
+        return ""; //$NON-NLS-1$
     }
 
+    @Deprecated
     @Override
     public long getLineNumber() {
+        Long lineNumber = fLineNumber;
+        return (lineNumber == null ? -1 : lineNumber.longValue());
+    }
+
+
+    /**
+     * @since 2.1
+     */
+    @Override
+    public @Nullable Long getLineNo() {
         return fLineNumber;
     }
 
@@ -99,13 +118,7 @@ public class TmfCallsite implements ITmfCallsite {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        // fFileName cannot be null!
-        result = prime * result + fFileName.hashCode();
-        result = prime * result + ((fFunctionName == null) ? 0 : fFunctionName.hashCode());
-        result = prime * result + (int) (fLineNumber ^ (fLineNumber >>> 32));
-        return result;
+        return Objects.hash(fFileName, fLineNumber);
     }
 
     @Override
@@ -126,9 +139,6 @@ public class TmfCallsite implements ITmfCallsite {
             return false;
         }
 
-        if (!Objects.equals(fFunctionName, other.fFunctionName)) {
-            return false;
-        }
         if (fLineNumber != other.fLineNumber) {
             return false;
         }
@@ -137,13 +147,11 @@ public class TmfCallsite implements ITmfCallsite {
 
     @Override
     public String toString() {
+        Long lineNumber = fLineNumber;
+
         StringBuilder builder = new StringBuilder();
         builder.append(fFileName).append(':');
-        builder.append(Long.toString(fLineNumber));
-        if (fFunctionName != null) {
-            builder.append(' ');
-            builder.append(fFunctionName).append("()"); //$NON-NLS-1$
-        }
+        builder.append(lineNumber == null ? "??" : Long.toString(lineNumber)); //$NON-NLS-1$
         return builder.toString();
     }
 }

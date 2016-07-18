@@ -19,7 +19,9 @@ import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
  *
  * @author Alexandre Montplaisir
  * @since 2.0
+ * @deprecated No need for this anymore, use {@link TmfCallsite} directly.
  */
+@Deprecated
 public class SourceCallsite extends TmfCallsite {
 
     /**
@@ -33,7 +35,7 @@ public class SourceCallsite extends TmfCallsite {
      *            Line number
      */
     public SourceCallsite(String fileName, @Nullable String functionName, long lineNumber) {
-        super(fileName, functionName, lineNumber);
+        super(fileName, lineNumber);
     }
 
     @Override

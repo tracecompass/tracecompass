@@ -40,13 +40,28 @@ public interface ITmfCallsite {
      * Returns the function name of the call site.
      *
      * @return the function name or null
+     * @deprecated Should not be part of this interface anymore.
      */
+    @Deprecated
     @Nullable String getFunctionName();
 
     /**
      * Returns the line number of the call site.
      *
      * @return the line number
+     * @deprecated Use {@link #getLineNo()} instead, which can return null.
      */
+    @Deprecated
     long getLineNumber();
+
+    /**
+     * Returns the line number of the call site.
+     *
+     * @return The line number, or 'null' if unavailable
+     * @since 2.1
+     */
+    default @Nullable Long getLineNo() {
+        /* TODO Change to abstract method once getLineNumber() is removed */
+        return getLineNumber();
+    }
 }

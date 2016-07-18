@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.events;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -150,11 +152,9 @@ public class TmfEventPropertySource implements IPropertySource {
     private static class SourceLookupPropertySource implements IPropertySource {
 
         private static final String ID_FILE_NAME = "callsite_file"; //$NON-NLS-1$
-        private static final String ID_FUNCTION_NAME = "callsite_function"; //$NON-NLS-1$
         private static final String ID_LINE_NUMBER = "callsite_line"; //$NON-NLS-1$
 
         private static final String NAME_FILE_NAME = "File"; //$NON-NLS-1$
-        private static final String NAME_FUNCTION_NAME = "Function"; //$NON-NLS-1$
         private static final String NAME_LINE_NUMBER = "Line"; //$NON-NLS-1$
 
         private final ITmfSourceLookup fSourceLookup;
@@ -179,10 +179,6 @@ public class TmfEventPropertySource implements IPropertySource {
             if (cs != null) {
                 descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_FILE_NAME, NAME_FILE_NAME));
                 descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_LINE_NUMBER, NAME_LINE_NUMBER));
-                // only display function if available
-                if (cs.getFunctionName() != null) {
-                    descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_FUNCTION_NAME, NAME_FUNCTION_NAME));
-                }
             }
             return descriptors.toArray(new IPropertyDescriptor[0]);
         }
@@ -205,10 +201,8 @@ public class TmfEventPropertySource implements IPropertySource {
             switch ((String) id) {
             case ID_FILE_NAME:
                 return cs.getFileName();
-            case ID_FUNCTION_NAME:
-                return cs.getFunctionName();
             case ID_LINE_NUMBER:
-                return String.valueOf(cs.getLineNumber());
+                return nullToEmptyString(cs.getLineNo());
             default:
                 return null;
             }

@@ -1100,6 +1100,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 if (cs == null) {
                     return;
                 }
+                Long lineNo = cs.getLineNo();
+                if (lineNo == null) {
+                    /* Not enough information to provide a full callsite */
+                    return;
+                }
 
                 String fileName = cs.getFileName();
                 final String trimmedPath = fileName.replaceAll("\\.\\./", EMPTY_STRING); //$NON-NLS-1$
@@ -1121,7 +1126,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                              * the line number, then seek there.
                              */
                             ITextEditor textEditor = (ITextEditor) editor;
-                            int lineNumber = Long.valueOf(cs.getLineNumber()).intValue();
+                            int lineNumber = lineNo.intValue();
                             IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
 
                             IRegion region = document.getLineInformation(lineNumber - 1);
@@ -1170,7 +1175,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         }
                         if (file != null) {
                             marker = file.createMarker(IMarker.MARKER);
-                            marker.setAttribute(IMarker.LINE_NUMBER, Long.valueOf(cs.getLineNumber()).intValue());
+                            marker.setAttribute(IMarker.LINE_NUMBER, lineNo.intValue());
                             IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), marker);
                             marker.delete();
                         } else if (files.isEmpty()) {

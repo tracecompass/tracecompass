@@ -20,8 +20,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 
-import com.google.common.collect.Iterables;
-
 /**
  * Event aspect of UST traces to generate a {@link TmfCallsite} using the debug
  * info analysis and the IP (instruction pointer) context.
@@ -29,7 +27,7 @@ import com.google.common.collect.Iterables;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-public class UstDebugInfoSourceAspect implements ITmfEventAspect<SourceCallsite> {
+public class UstDebugInfoSourceAspect implements ITmfEventAspect<TmfCallsite> {
 
     /** Singleton instance */
     public static final UstDebugInfoSourceAspect INSTANCE = new UstDebugInfoSourceAspect();
@@ -46,8 +44,11 @@ public class UstDebugInfoSourceAspect implements ITmfEventAspect<SourceCallsite>
         return nullToEmptyString(Messages.UstDebugInfoAnalysis_SourceAspectHelpText);
     }
 
+    /**
+     * @since 2.1
+     */
     @Override
-    public @Nullable SourceCallsite resolve(ITmfEvent event) {
+    public @Nullable TmfCallsite resolve(ITmfEvent event) {
         /* This aspect only supports UST traces */
         if (!(event.getTrace() instanceof LttngUstTrace)) {
             return null;
@@ -63,7 +64,25 @@ public class UstDebugInfoSourceAspect implements ITmfEventAspect<SourceCallsite>
             return null;
         }
 
-        return getSourceCallsite(trace, bc);
+        TmfCallsite callsite = FileOffsetMapper.getCallsiteFromOffset(
+                new File(bc.getBinaryFilePath()),
+                bc.getBuildId(),
+                bc.getOffset());
+        if (callsite == null) {
+            return null;
+        }
+
+        /*
+         * Apply the path prefix again, this time on the path given from
+         * addr2line. If applicable.
+         */
+        String pathPrefix = trace.getSymbolProviderConfig().getActualRootDirPath();
+        if (pathPrefix.isEmpty()) {
+            return callsite;
+        }
+
+        String fullFileName = (pathPrefix + callsite.getFileName());
+        return new TmfCallsite(fullFileName, callsite.getLineNo());
     }
 
     /**
@@ -76,22 +95,23 @@ public class UstDebugInfoSourceAspect implements ITmfEventAspect<SourceCallsite>
      *            The binary callsite
      * @return The source callsite, which sould include file name, function name
      *         and line number
+     * @since 2.0
+     * @deprecated Should not be needed anymore, call aspects's resolve() method
+     *             directly. The SourceAspect does not include the function name
+     *             anymore.
      */
+    @Deprecated
     public static @Nullable SourceCallsite getSourceCallsite(LttngUstTrace trace, BinaryCallsite bc) {
-        Iterable<SourceCallsite> callsites = FileOffsetMapper.getCallsiteFromOffset(
+        TmfCallsite callsite = FileOffsetMapper.getCallsiteFromOffset(
                 new File(bc.getBinaryFilePath()),
                 bc.getBuildId(),
                 bc.getOffset());
-
-        if (callsites == null || Iterables.isEmpty(callsites)) {
+        if (callsite == null) {
             return null;
         }
-        /*
-         * TMF only supports the notion of one callsite per event at the moment.
-         * We will take the "deepest" one in the stack, which should refer to
-         * the initial, non-inlined location.
-         */
-        SourceCallsite callsite = Iterables.getLast(callsites);
+
+        Long callsiteLineNo = callsite.getLineNo();
+        long lineNo = (callsiteLineNo == null ? -1 : callsiteLineNo.longValue());
 
         /*
          * Apply the path prefix again, this time on the path given from
@@ -99,10 +119,10 @@ public class UstDebugInfoSourceAspect implements ITmfEventAspect<SourceCallsite>
          */
         String pathPrefix = trace.getSymbolProviderConfig().getActualRootDirPath();
         if (pathPrefix.isEmpty()) {
-            return callsite;
+            return new SourceCallsite(callsite.getFileName(), null, lineNo);
         }
 
         String fullFileName = (pathPrefix + callsite.getFileName());
-        return new SourceCallsite(fullFileName, callsite.getFunctionName(), callsite.getLineNumber());
+        return new SourceCallsite(fullFileName, null, lineNo);
     }
 }
