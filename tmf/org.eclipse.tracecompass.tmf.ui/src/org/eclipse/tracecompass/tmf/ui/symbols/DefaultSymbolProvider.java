@@ -72,6 +72,7 @@ public class DefaultSymbolProvider implements ISymbolProvider {
      *            the symbol address
      * @return always null
      */
+    @Deprecated
     @Override
     public @Nullable ITmfCallsite getSymbolInfo(long address) {
         return null;

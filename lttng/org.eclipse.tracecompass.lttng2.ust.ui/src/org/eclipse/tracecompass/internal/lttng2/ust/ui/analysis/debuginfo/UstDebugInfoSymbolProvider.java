@@ -57,10 +57,16 @@ public class UstDebugInfoSymbolProvider extends DefaultSymbolProvider {
 
     @Override
     public @Nullable String getSymbolText(int pid, long timestamp, long address) {
-        TmfCallsite callsite = getSymbolInfo(pid, timestamp, address);
+        BinaryCallsite bc = UstDebugInfoBinaryAspect.getBinaryCallsite(getTrace(), pid, timestamp, address);
+        if (bc == null) {
+            return null;
+        }
+
+        TmfCallsite callsite = UstDebugInfoSourceAspect.getSourceCallsite(getTrace(), bc);
         return (callsite == null ? null : callsite.getFunctionName());
     }
 
+    @Deprecated
     @Override
     public @Nullable TmfCallsite getSymbolInfo(int pid, long timestamp, long address) {
         BinaryCallsite bc = UstDebugInfoBinaryAspect.getBinaryCallsite(getTrace(), pid, timestamp, address);

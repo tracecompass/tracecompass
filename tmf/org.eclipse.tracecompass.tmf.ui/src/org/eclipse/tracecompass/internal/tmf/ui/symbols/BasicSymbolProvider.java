@@ -138,6 +138,7 @@ public class BasicSymbolProvider implements ISymbolProvider {
         return fMapping.get(Long.toHexString(address));
     }
 
+    @Deprecated
     @Override
     public @Nullable ITmfCallsite getSymbolInfo(long address) {
         loadConfiguration(null);

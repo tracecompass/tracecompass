@@ -62,7 +62,10 @@ public interface ISymbolProvider {
      *            the address of the symbol
      * @return the symbol {@link ITmfCallsite} information or null if the symbol
      *         cannot be found
+     * @deprecated This interface should only provide function/symbol names, not
+     *             full source locations.
      */
+    @Deprecated
     @Nullable ITmfCallsite getSymbolInfo(long address);
 
     /**
@@ -93,7 +96,10 @@ public interface ISymbolProvider {
      *            the address of the symbol
      * @return the symbol {@link ITmfCallsite} information or null if the symbol
      *         cannot be found
+     * @deprecated This interface should only provide function/symbol names, not
+     *             full source locations.
      */
+    @Deprecated
     default @Nullable ITmfCallsite getSymbolInfo(int pid, long timestamp, long address) {
         return getSymbolInfo(address);
     }
