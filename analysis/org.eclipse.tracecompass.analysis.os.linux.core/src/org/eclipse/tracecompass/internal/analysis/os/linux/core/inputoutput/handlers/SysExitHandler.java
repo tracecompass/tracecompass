@@ -35,8 +35,8 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  */
 public class SysExitHandler extends KernelEventHandler {
 
-    private static final String SYSCALL_READ_PATTERN = "_[p]?read.*"; //$NON-NLS-1$
-    private static final String SYSCALL_WRITE_PATTERN = "_[p]?write.*"; //$NON-NLS-1$
+    private static final String SYSCALL_READ_PATTERN = "[p]?read.*"; //$NON-NLS-1$
+    private static final String SYSCALL_WRITE_PATTERN = "[p]?write.*"; //$NON-NLS-1$
 
     private final Pattern fSyscallReadPattern;
     private final Pattern fSyscallWritePattern;

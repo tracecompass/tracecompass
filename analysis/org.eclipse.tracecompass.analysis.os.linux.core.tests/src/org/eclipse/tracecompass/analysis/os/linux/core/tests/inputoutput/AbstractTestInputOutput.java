@@ -56,22 +56,22 @@ public class AbstractTestInputOutput {
 
         @Override
         public @NonNull String eventSyscallEntryPrefix() {
-            return "syscall_entry";
+            return "syscall_entry_";
         }
 
         @Override
         public @NonNull String eventCompatSyscallEntryPrefix() {
-            return "syscall_compat_entry";
+            return "syscall_compat_entry_";
         }
 
         @Override
         public @NonNull String eventSyscallExitPrefix() {
-            return "syscall_exit";
+            return "syscall_exit_";
         }
 
         @Override
         public @NonNull String eventCompatSyscallExitPrefix() {
-            return "syscall_compat_exit";
+            return "syscall_compat_exit_";
         }
     }
 
