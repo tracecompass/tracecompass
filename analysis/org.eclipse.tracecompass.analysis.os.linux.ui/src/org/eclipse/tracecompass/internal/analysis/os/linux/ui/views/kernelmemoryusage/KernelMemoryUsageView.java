@@ -36,7 +36,7 @@ import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 public class KernelMemoryUsageView extends TmfChartView {
 
     /** ID string */
-    public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.ui.kernelmemoryusageview"; //$NON-NLS-1$
+    public static final @NonNull String ID = "org.eclipse.tracecompass.analysis.os.linux.ui.kernelmemoryusageview"; //$NON-NLS-1$
     /** ID of the Kernel Memory Usage view data in the data map of {@link TmfTraceContext} */
     public static final @NonNull String KERNEL_MEMORY = ID + ".KERNEL_MEMORY"; //$NON-NLS-1$
 

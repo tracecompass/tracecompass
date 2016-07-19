@@ -51,7 +51,7 @@ import com.google.common.collect.Iterables;
 public class CpuUsageView extends TmfChartView {
 
     /** ID string */
-    public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.views.cpuusage"; //$NON-NLS-1$
+    public static final @NonNull String ID = "org.eclipse.tracecompass.analysis.os.linux.views.cpuusage"; //$NON-NLS-1$
 
     /** ID of the selected thread in the map of data in {@link TmfTraceContext} */
     public static final @NonNull String CPU_USAGE_SELECTED_THREAD = ID + ".CPU_USAGE_SELECTED_TRHEAD"; //$NON-NLS-1$

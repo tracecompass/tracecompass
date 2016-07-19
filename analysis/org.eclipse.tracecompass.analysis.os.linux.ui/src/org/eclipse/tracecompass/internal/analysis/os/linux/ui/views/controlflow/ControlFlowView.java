@@ -100,7 +100,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
     /**
      * View ID.
      */
-    public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.views.controlflow"; //$NON-NLS-1$
+    public static final @NonNull String ID = "org.eclipse.tracecompass.analysis.os.linux.views.controlflow"; //$NON-NLS-1$
 
     private static final String ICONS_PATH = "icons/"; //$NON-NLS-1$
     private static final String OPTIMIZE_ICON = ICONS_PATH + "elcl16/Optimization.png"; //$NON-NLS-1$

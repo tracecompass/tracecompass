@@ -35,6 +35,7 @@ Import-Package: com.google.common.collect,
  org.eclipse.swtbot.swt.finder.widgets,
  org.swtchart
 Export-Package: org.eclipse.tracecompass.tmf.ui.swtbot.tests.parsers.custom;x-internal:=true,
+ org.eclipse.tracecompass.tmf.ui.swtbot.tests.perf.views,
  org.eclipse.tracecompass.tmf.ui.swtbot.tests.perspectives;x-internal:=true,
  org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared,
  org.eclipse.tracecompass.tmf.ui.swtbot.tests.viewers.events;x-internal:=true,

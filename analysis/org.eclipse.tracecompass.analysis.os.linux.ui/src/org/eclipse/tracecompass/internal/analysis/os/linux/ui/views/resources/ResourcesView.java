@@ -58,7 +58,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 public class ResourcesView extends AbstractStateSystemTimeGraphView {
 
     /** View ID. */
-    public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.views.resources"; //$NON-NLS-1$
+    public static final @NonNull String ID = "org.eclipse.tracecompass.analysis.os.linux.views.resources"; //$NON-NLS-1$
 
     /** ID of the followed CPU in the map data in {@link TmfTraceContext} */
     public static final @NonNull String RESOURCES_FOLLOW_CPU = ID + ".FOLLOW_CPU"; //$NON-NLS-1$
