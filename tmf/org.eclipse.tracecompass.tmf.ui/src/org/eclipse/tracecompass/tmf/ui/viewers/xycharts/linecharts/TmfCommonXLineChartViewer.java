@@ -15,13 +15,16 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
@@ -52,6 +55,9 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     /* The desired number of points per pixel */
     private static final double RESOLUTION = 1.0;
+    private static final Logger LOGGER = TraceCompassLog.getLogger(TmfCommonXLineChartViewer.class);
+    private static final String LOG_STRING_WITH_PARAM = "[TmfCommonXLineChart:%s] viewerId=%s, %s"; //$NON-NLS-1$
+    private static final String LOG_STRING = "[TmfCommonXLineChart:%s] viewerId=%s"; //$NON-NLS-1$
 
     private static final int[] LINE_COLORS = { SWT.COLOR_BLUE, SWT.COLOR_RED, SWT.COLOR_GREEN,
             SWT.COLOR_MAGENTA, SWT.COLOR_CYAN,
@@ -104,6 +110,25 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     }
 
     /**
+     * Formats a log message for this class
+     *
+     * @param event
+     *            The event to log, that will be appended to the class name to
+     *            make the full event name
+     * @param parameters
+     *            The string of extra parameters to add to the log message, in
+     *            the format name=value[, name=value]*, or <code>null</code> for
+     *            no params
+     * @return The complete log message for this class
+     */
+    private String getLogMessage(String event, @Nullable String parameters) {
+        if (parameters == null) {
+            return String.format(LOG_STRING, event, getClass().getName());
+        }
+        return String.format(LOG_STRING_WITH_PARAM, event, getClass().getName(), parameters);
+    }
+
+    /**
      * Forces a reinitialization of the data sources, even if it has already
      * been initialized for this trace before
      */
@@ -113,6 +138,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
             // Don't use TmfUiRefreshHandler (bug 467751)
             @Override
             public void run() {
+                LOGGER.info(() -> getLogMessage("InitializeThreadStart", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
                 initializeDataSource();
                 if (!getSwtChart().isDisposed()) {
                     getDisplay().asyncExec(new Runnable() {
@@ -126,6 +152,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                         }
                     });
                 }
+                LOGGER.info(() -> getLogMessage("InitializeThreadEnd", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
             }
         };
         thread.start();
@@ -152,16 +179,21 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
         @Override
         public void run() {
+            LOGGER.info(() -> getLogMessage("UpdateThreadStart", "numRequests=" + fNumRequests + ", tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
+                    LOGGER.info(() -> getLogMessage("UpdateDataStart", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
                     updateData(getWindowStartTime(), getWindowEndTime(), fNumRequests, fMonitor);
+                    LOGGER.info(() -> getLogMessage("UpdateDataEnd", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             });
             updateThreadFinished(this);
+            LOGGER.info(() -> getLogMessage("UpdateThreadEnd", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         public void cancel() {
+            LOGGER.info(() -> getLogMessage("UpdateThreadCanceled", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
             fMonitor.setCanceled(true);
         }
     }
