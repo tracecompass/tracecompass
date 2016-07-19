@@ -164,6 +164,12 @@ public final class FileOffsetMapper {
     // ------------------------------------------------------------------------
 
     /**
+     * Value used in addr2line output to represent unknown function names or
+     * source files.
+     */
+    private static final String UNKNOWN_VALUE = "??"; //$NON-NLS-1$
+
+    /**
      * Cache of all calls to 'addr2line', so that we can avoid recalling the
      * external process repeatedly.
      *
@@ -252,25 +258,26 @@ public final class FileOffsetMapper {
 
             if (oddLine) {
                 /* This is a line indicating the function name */
-                currentFunctionName = outputLine;
+                if (outputLine.equals(UNKNOWN_VALUE)) {
+                    currentFunctionName = null;
+                } else {
+                    currentFunctionName = outputLine;
+                }
             } else {
                 /* This is a line indicating a call site */
                 String[] elems = outputLine.split(":"); //$NON-NLS-1$
                 String fileName = elems[0];
-                if (fileName.equals("??")) { //$NON-NLS-1$
-                    continue;
+                if (fileName.equals(UNKNOWN_VALUE)) {
+                    fileName = null;
                 }
+                Long lineNumber;
                 try {
-                    long lineNumber = Long.parseLong(elems[1]);
-                    callsites.add(new Addr2lineInfo(fileName, currentFunctionName, lineNumber));
-
+                    lineNumber = Long.valueOf(elems[1]);
                 } catch (NumberFormatException e) {
-                    /*
-                     * Probably a '?' output, meaning unknown line number.
-                     * Ignore this entry.
-                     */
-                    continue;
+                    /* Probably a '?' output, meaning unknown line number. */
+                    lineNumber = null;
                 }
+                callsites.add(new Addr2lineInfo(fileName, currentFunctionName, lineNumber));
             }
         }
 
