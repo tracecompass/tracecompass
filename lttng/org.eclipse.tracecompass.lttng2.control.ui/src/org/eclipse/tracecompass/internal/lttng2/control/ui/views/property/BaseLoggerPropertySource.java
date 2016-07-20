@@ -36,9 +36,17 @@ public class BaseLoggerPropertySource extends BasePropertySource {
      */
     public static final String BASE_LOGGER_NAME_PROPERTY_ID = "base.logger.name"; //$NON-NLS-1$
     /**
+     * The base logger 'domain' property ID.
+     */
+    public static final String BASE_LOGGER_DOMAIN_PROPERTY_ID = "base.logger.domain"; //$NON-NLS-1$
+    /**
      *  The base logger 'name' property name.
      */
     public static final String BASE_LOGGER_NAME_PROPERTY_NAME = Messages.TraceControl_LoggerNamePropertyName;
+    /**
+     * The base logger 'domain' property name.
+     */
+    public static final String BASE_LOGGER_DOMAIN_PROPERTY_NAME = Messages.TraceControl_LoggerDomainPropertyName;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -69,6 +77,7 @@ public class BaseLoggerPropertySource extends BasePropertySource {
     public IPropertyDescriptor[] getPropertyDescriptors() {
         List<IPropertyDescriptor> list = new ArrayList<> ();
         list.add(new ReadOnlyTextPropertyDescriptor(BASE_LOGGER_NAME_PROPERTY_ID, BASE_LOGGER_NAME_PROPERTY_NAME));
+        list.add(new ReadOnlyTextPropertyDescriptor(BASE_LOGGER_DOMAIN_PROPERTY_ID, BASE_LOGGER_DOMAIN_PROPERTY_NAME));
         return list.toArray(new IPropertyDescriptor[list.size()]);
     }
 
@@ -76,6 +85,8 @@ public class BaseLoggerPropertySource extends BasePropertySource {
     public Object getPropertyValue(Object id) {
         if(BASE_LOGGER_NAME_PROPERTY_ID.equals(id)) {
             return fBaseLogger.getName();
+        } else if (BASE_LOGGER_DOMAIN_PROPERTY_ID.equals(id)) {
+            return fBaseLogger.getDomain().name();
         }
         return null;
     }

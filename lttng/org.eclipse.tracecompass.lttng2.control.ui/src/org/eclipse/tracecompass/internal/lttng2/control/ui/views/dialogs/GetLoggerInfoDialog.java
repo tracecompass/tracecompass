@@ -25,7 +25,11 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLog4jLogLevel;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 
@@ -54,11 +58,15 @@ public class GetLoggerInfoDialog extends BaseGetInfoDialog implements IGetLogger
     /**
      * The selected log level.
      */
-    private TraceJulLogLevel fLogLevel;
+    private ITraceLogLevel fLogLevel;
     /**
      * The type of the log level (loglevel or loglevel-only)
      */
     private LogLevelType fLogLevelType;
+    /**
+     * The logger domain type ({@link TraceDomainType})
+     */
+    private TraceDomainType fLoggerDomain = TraceDomainType.UNKNOWN;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -77,12 +85,18 @@ public class GetLoggerInfoDialog extends BaseGetInfoDialog implements IGetLogger
     // Accessors
     // ------------------------------------------------------------------------
     @Override
-    public TraceJulLogLevel getLogLevel() {
+    public ITraceLogLevel getLogLevel() {
         return fLogLevel;
     }
     @Override
     public LogLevelType getLogLevelType() {
         return fLogLevelType;
+    }
+
+    @Override
+    public void setLoggerDomain(TraceDomainType domain) {
+        fLoggerDomain = domain;
+
     }
 
     // ------------------------------------------------------------------------
@@ -138,14 +152,34 @@ public class GetLoggerInfoDialog extends BaseGetInfoDialog implements IGetLogger
         data = new GridData(GridData.FILL_BOTH);
         fLogLevelButton.setLayoutData(data);
 
-        TraceJulLogLevel[] levels = TraceJulLogLevel.values();
+        ITraceLogLevel[] levels = null;
+        String[] levelNames  = null;
+        switch (fLoggerDomain) {
+        case JUL:
+            levels = TraceJulLogLevel.values();
 
-        String[] levelNames = new String[levels.length - 1];
-        int k = 0;
-        for (int i = 0; i < levels.length; i++) {
-            if (levels[i] != TraceJulLogLevel.LEVEL_UNKNOWN) {
-                levelNames[k++] = levels[i].getInName();
+            levelNames = new String[levels.length - 1];
+            int k = 0;
+            for (int i = 0; i < levels.length; i++) {
+                if (levels[i] != TraceJulLogLevel.LEVEL_UNKNOWN) {
+                    levelNames[k++] = levels[i].getInName();
+                }
             }
+            break;
+        case LOG4J:
+            levels = TraceLog4jLogLevel.values();
+
+            levelNames = new String[levels.length - 1];
+            int l = 0;
+            for (int i = 0; i < levels.length; i++) {
+                if (levels[i] != TraceLog4jLogLevel.LEVEL_UNKNOWN) {
+                    levelNames[l++] = levels[i].getInName();
+                }
+            }
+            break;
+            //$CASES-OMITTED$
+        default:
+            break;
         }
 
         fLogLevelCombo = new CCombo(logLevelGroup, SWT.READ_ONLY);
@@ -159,7 +193,6 @@ public class GetLoggerInfoDialog extends BaseGetInfoDialog implements IGetLogger
         fLogLevelCombo.setEnabled(false);
         fLogLevelButton.setEnabled(false);
         fLogLevelOnlyButton.setEnabled(false);
-
 
         getShell().setMinimumSize(new Point(300, 200));
 
@@ -179,11 +212,23 @@ public class GetLoggerInfoDialog extends BaseGetInfoDialog implements IGetLogger
         fSessionIndex = fSessionsCombo.getSelectionIndex();
 
         fLogLevel = null;
-        // If nothing is selected in the combo box that means that all the
-        // loglevels should be enabled.
+        // If nothing is selected in the combo box that means that all the loglevels should be enabled.
         if (!fLogLevelCombo.getText().isEmpty()) {
-            TraceJulLogLevel[] levels = TraceJulLogLevel.values();
+            ITraceLogLevel[] levels;
             int id = fLogLevelCombo.getSelectionIndex();
+            switch (fLoggerDomain) {
+            case JUL:
+                levels = TraceJulLogLevel.values();
+                break;
+            case LOG4J:
+                levels = TraceLog4jLogLevel.values();
+                break;
+                //$CASES-OMITTED$
+            default:
+                levels = TraceLogLevel.values();
+                break;
+            }
+            fLogLevel = levels[id];
 
             if (id < 0) {
                 MessageDialog.openError(getShell(),
@@ -197,8 +242,6 @@ public class GetLoggerInfoDialog extends BaseGetInfoDialog implements IGetLogger
             } else if (fLogLevelOnlyButton.getSelection()) {
                 fLogLevelType = LogLevelType.LOGLEVEL_ONLY;
             }
-
-            fLogLevel = levels[id];
         }
         super.okPressed();
     }

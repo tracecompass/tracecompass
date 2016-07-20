@@ -92,8 +92,10 @@ public class EnableChannelOnDomainHandler extends BaseEnableChannelHandler {
 
         boolean isEnabled = domain != null;
 
-        // If it's a JUL domain, the enable channel is disabled.
-        if ((domain != null) && TraceDomainType.JUL.equals(domain.getDomain())) {
+        // If it's a logger domain (JUL, LOG4J, Python), the enable channel is disabled.
+        if ((domain != null) && (TraceDomainType.JUL.equals(domain.getDomain()) ||
+                                 TraceDomainType.LOG4J.equals(domain.getDomain()) ||
+                                 TraceDomainType.PYTHON.equals(domain.getDomain()))) {
             isEnabled = false;
         }
 

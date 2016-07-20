@@ -23,9 +23,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
@@ -78,7 +78,7 @@ public abstract class ChangeLoggerStateHandler extends BaseControlViewHandler {
      * @throws ExecutionException
      *             If the command fails
      */
-    protected abstract void changeState(TraceDomainComponent domain, List<String> loggerNames, TraceJulLogLevel logLevel, LogLevelType logLevelType, IProgressMonitor monitor) throws ExecutionException;
+    protected abstract void changeState(TraceDomainComponent domain, List<String> loggerNames, ITraceLogLevel logLevel, LogLevelType logLevelType, IProgressMonitor monitor) throws ExecutionException;
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -160,7 +160,7 @@ public abstract class ChangeLoggerStateHandler extends BaseControlViewHandler {
         ISelection selection = page.getSelection(ControlView.ID);
 
         TraceDomainComponent domain = null;
-        TraceJulLogLevel logLevel = null;
+        ITraceLogLevel logLevel = null;
         LogLevelType logLevelType = null;
         List<TraceLoggerComponent> loggers = new ArrayList<>();
 
@@ -256,7 +256,7 @@ public abstract class ChangeLoggerStateHandler extends BaseControlViewHandler {
         /**
          * The log level.
          */
-        private final TraceJulLogLevel fLogLevel;
+        private final ITraceLogLevel fLogLevel;
         /**
          * The log level type.
          */
@@ -274,7 +274,7 @@ public abstract class ChangeLoggerStateHandler extends BaseControlViewHandler {
          * @param logLevelType
          *            the log level type
          */
-        public Parameter(TraceDomainComponent domain, List<TraceLoggerComponent> loggers, TraceJulLogLevel logLevel, LogLevelType logLevelType) {
+        public Parameter(TraceDomainComponent domain, List<TraceLoggerComponent> loggers, ITraceLogLevel logLevel, LogLevelType logLevelType) {
             fDomain = domain;
             fLoggers.addAll(loggers);
             fLogLevel = logLevel;
@@ -315,7 +315,7 @@ public abstract class ChangeLoggerStateHandler extends BaseControlViewHandler {
         /**
          * @return the log level.
          */
-        public TraceJulLogLevel getLogLevel() {
+        public ITraceLogLevel getLogLevel() {
             return fLogLevel;
         }
     }

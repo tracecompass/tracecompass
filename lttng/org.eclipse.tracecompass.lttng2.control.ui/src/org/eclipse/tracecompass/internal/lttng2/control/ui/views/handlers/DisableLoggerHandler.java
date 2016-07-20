@@ -15,9 +15,9 @@ import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent;
 
 /**
@@ -43,7 +43,7 @@ public class DisableLoggerHandler extends ChangeLoggerStateHandler {
     // ------------------------------------------------------------------------
 
     @Override
-    protected void changeState(TraceDomainComponent domain, List<String> loggerNames, TraceJulLogLevel logLevel, LogLevelType logLevelType, IProgressMonitor monitor) throws ExecutionException {
+    protected void changeState(TraceDomainComponent domain, List<String> loggerNames, ITraceLogLevel logLevel, LogLevelType logLevelType, IProgressMonitor monitor) throws ExecutionException {
         domain.disableLoggers(loggerNames, monitor);
     }
 }

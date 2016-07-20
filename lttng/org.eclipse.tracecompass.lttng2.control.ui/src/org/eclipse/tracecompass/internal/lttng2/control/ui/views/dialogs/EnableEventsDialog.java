@@ -27,9 +27,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent;
@@ -71,7 +71,11 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
     /**
      * The composite with widgets for collecting information about JUL events.
      */
-    private EnableJulEventsComposite fJulComposite;
+    private EnableLoggersComposite fJulComposite;
+    /**
+     * The composite with widgets for collecting information about LOG4J events.
+     */
+    private EnableLoggersComposite fLog4jComposite;
     /**
      * Radio button for selecting kernel domain.
      */
@@ -84,6 +88,10 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
      * Radio button for selecting JUL domain.
      */
     private Button fJulButton;
+    /**
+     * Radio button for selecting LOG4J domain.
+     */
+    private Button fLog4jButton;
     /**
      * The referenced trace provider group containing the kernel provider and UST
      * provider component which contains a list of available tracepoints.
@@ -125,6 +133,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         case UST:
             return fUstComposite.isAllTracePoints();
         case LOG4J:
+            return fLog4jComposite.isAllTracePoints();
         case PYTHON:
         case UNKNOWN:
         default:
@@ -136,14 +145,14 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
     public boolean isTracepoints() {
         switch (fDomain) {
         case JUL:
+        case LOG4J:
+        case PYTHON:
             // Loggers are always TRACEPOINT
             return true;
         case KERNEL:
             return fKernelComposite.isTracepoints();
         case UST:
             return fUstComposite.isTracepoints();
-        case LOG4J:
-        case PYTHON:
         case UNKNOWN:
         default:
             return false;
@@ -160,6 +169,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         case JUL:
             return fJulComposite.isAllTracePoints();
         case LOG4J:
+            return fLog4jComposite.isAllTracePoints();
         case PYTHON:
         case UNKNOWN:
         default:
@@ -193,6 +203,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         case UST:
             return fUstComposite.getEventNames();
         case LOG4J:
+            return fLog4jComposite.getEventNames();
         case PYTHON:
         case UNKNOWN:
         default:
@@ -274,6 +285,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         case UST:
             return fUstComposite.isLogLevel();
         case LOG4J:
+            return fLog4jComposite.isLogLevel();
         case PYTHON:
         case UNKNOWN:
         default:
@@ -291,6 +303,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         case UST:
             return fUstComposite.getLogLevelType();
         case LOG4J:
+            return fLog4jComposite.getLogLevelType();
         case PYTHON:
         case UNKNOWN:
         default:
@@ -308,6 +321,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         case UST:
             return fUstComposite.getLogLevel();
         case LOG4J:
+            return fLog4jComposite.getLogLevel();
         case PYTHON:
         case UNKNOWN:
         default:
@@ -387,7 +401,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         // ------------------------------------------------------------------------
         Group domainGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
         domainGroup.setText(Messages.TraceControl_DomainDisplayName);
-        layout = new GridLayout(3, true);
+        layout = new GridLayout(4, true);
         domainGroup.setLayout(layout);
 
         fKernelButton = new Button(domainGroup, SWT.RADIO);
@@ -396,6 +410,8 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         fUstButton.setText(Messages.TraceControl_UstDisplayName);
         fJulButton = new Button(domainGroup, SWT.RADIO);
         fJulButton.setText(Messages.TraceControl_JULDomainDisplayName);
+        fLog4jButton = new Button(domainGroup, SWT.RADIO);
+        fLog4jButton.setText(Messages.TraceControl_LOG4JDomainDisplayName);
 
         switch (fDomain) {
         case KERNEL:
@@ -408,6 +424,8 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             fJulButton.setSelection(true);
             break;
         case LOG4J:
+            fLog4jButton.setSelection(true);
+            break;
         case PYTHON:
         case UNKNOWN:
         default:
@@ -418,10 +436,12 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             fKernelButton.setEnabled(false);
             fUstButton.setEnabled(false);
             fJulButton.setEnabled(false);
+            fLog4jButton.setEnabled(false);
         } else if ((fProviderGroup != null) && (!fProviderGroup.hasKernelProvider())) {
             fKernelButton.setEnabled(false);
             fUstButton.setEnabled(true);
             fJulButton.setEnabled(true);
+            fLog4jButton.setEnabled(true);
         }
 
         // layout widgets
@@ -439,6 +459,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         fUstComposite = null;
         fKernelComposite = null;
         fJulComposite = null;
+        fLog4jComposite = null;
 
         switch (fDomain) {
         case KERNEL:
@@ -451,6 +472,8 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             createJulComposite();
             break;
         case LOG4J:
+            createLog4jComposite();
+            break;
         case PYTHON:
         case UNKNOWN:
         default:
@@ -490,6 +513,16 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             }
         });
 
+        fLog4jButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (fLog4jButton.getSelection()) {
+                    disposeAllComposite();
+                    createLog4jComposite();
+                    fDialogComposite.layout();
+                }
+            }
+        });
 
         getShell().setMinimumSize(new Point(550, 850));
 
@@ -511,6 +544,8 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             fDomain = TraceDomainType.UST;
         } else if (fJulButton.getSelection()) {
             fDomain = TraceDomainType.JUL;
+        } else if (fLog4jButton.getSelection()) {
+            fDomain= TraceDomainType.LOG4J;
         }
 
         // Validate kernel composite in case of kernel domain
@@ -525,6 +560,11 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
         // Validate JUL composite in case of JUL domain
         if (fJulComposite != null && !fJulComposite.isValid()) {
+            return;
+        }
+
+        // Validate LOG4J composite in case of JUL domain
+        if (fLog4jComposite != null && !fLog4jComposite.isValid()) {
             return;
         }
 
@@ -543,6 +583,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         disposeKernelComposite();
         disposeUstComposite();
         disposeJulComposite();
+        disposeLog4jComposite();
     }
 
     /**
@@ -593,13 +634,12 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         }
     }
 
-
     /**
      * Creates the JUL composite (if not existing)
      */
     private void createJulComposite() {
         if (fJulComposite == null) {
-            fJulComposite = new EnableJulEventsComposite(fDialogComposite, SWT.NONE, fProviderGroup);
+            fJulComposite = new EnableLoggersComposite(fDialogComposite, SWT.NONE, fProviderGroup, TraceDomainType.JUL);
             GridLayout layout = new GridLayout(1, true);
             fJulComposite.setLayout(layout);
             fJulComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -618,4 +658,27 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         }
     }
 
+    /**
+     * Creates the LOG4J composite (if not existing)
+     */
+    private void createLog4jComposite() {
+        if (fLog4jComposite == null) {
+            fLog4jComposite = new EnableLoggersComposite(fDialogComposite, SWT.NONE, fProviderGroup, TraceDomainType.LOG4J);
+            GridLayout layout = new GridLayout(1, true);
+            fLog4jComposite.setLayout(layout);
+            fLog4jComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+            fLog4jComposite.createContent();
+        }
+    }
+
+    /**
+     * Disposes the LOG4J composite (if existing)
+     */
+    private void disposeLog4jComposite() {
+        if (fLog4jComposite != null) {
+            fLog4jComposite.dispose();
+            fLog4jComposite = null;
+        }
+    }
 }

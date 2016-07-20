@@ -76,10 +76,10 @@ public class AssignLoggerHandler extends BaseControlViewHandler {
         }
         final Parameter param = tmpParam;
 
-        // Open dialog box to retrieve the session and channel where the events
-        // should be enabled in.
+        // Open dialog box to retrieve the session and channel where the events should be enabled in.
         final GetLoggerInfoDialog dialog = TraceControlDialogFactory.getInstance().getGetLoggerInfoDialog();
         dialog.setSessions(param.getSessions());
+        dialog.setLoggerDomain(param.getLoggerDomain());
 
         if (dialog.open() != Window.OK) {
             return null;
@@ -101,9 +101,9 @@ public class AssignLoggerHandler extends BaseControlViewHandler {
 
                     // enable events on default channel
                     if (dialog.getLogLevel() != null) {
-                        session.enableLogLevel(loggerNames, dialog.getLogLevelType(), dialog.getLogLevel(), null, TraceDomainType.JUL, monitor);
+                        session.enableLogLevel(loggerNames, dialog.getLogLevelType(), dialog.getLogLevel(), null, param.getLoggerDomain(), monitor);
                     } else {
-                        session.enableEvents(loggerNames, TraceDomainType.JUL, null, null, monitor);
+                        session.enableEvents(loggerNames, param.getLoggerDomain(), null, null, monitor);
                     }
 
                 } catch (ExecutionException e) {
@@ -149,14 +149,13 @@ public class AssignLoggerHandler extends BaseControlViewHandler {
                 if (element instanceof BaseLoggerComponent) {
                     BaseLoggerComponent logger = (BaseLoggerComponent) element;
 
-                    // The domain is always going to be UST for loggers
-                    domain = TraceDomainType.UST;
-
-                    // TODO: Add some logic when more loggers are added to
-                    // determine if the multiple selection is OK, only loggers
-                    // from the same type should be able to be enabled at the
-                    // same time
-                    // check AssignEventHandler for reference
+                    // The loggers have to be the same domain (multiple selection)
+                    if (domain == null) {
+                        domain = logger.getDomain();
+                    } else if (!domain.equals(logger.getDomain())){
+                        loggers.clear();
+                        break;
+                    }
 
                     // Add BaseLoggerComponents
                     loggers.add(logger);
@@ -251,6 +250,15 @@ public class AssignLoggerHandler extends BaseControlViewHandler {
          */
         public List<BaseLoggerComponent> getLoggers() {
             return fLoggers;
+        }
+
+        /**
+         * Return the logger domain ({@link TraceDomainType})
+         *
+         * @return - the logger domain ({@link TraceDomainType})
+         */
+        public TraceDomainType getLoggerDomain() {
+            return fDomain;
         }
     }
 }

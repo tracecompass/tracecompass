@@ -84,9 +84,8 @@ public class TraceDomainComponent extends TraceControlComponent {
             addChild(channel);
         }
 
-        // Since the loggers are not in a channel in the JUL domain, the loggers
-        // won't be added by the previous loop.
-        if (TraceDomainType.JUL.equals(domainInfo.getDomain())) {
+        // Since the loggers are not in a channel, the loggers won't be added by the previous loop
+        if (TraceDomainType.JUL.equals(domainInfo.getDomain()) || TraceDomainType.LOG4J.equals(domainInfo.getDomain())) {
             List<ILoggerInfo> loggers = fDomainInfo.getLoggers();
             for (ILoggerInfo loggerInfo : loggers) {
                 TraceLoggerComponent logger = new TraceLoggerComponent(loggerInfo.getName(), this);

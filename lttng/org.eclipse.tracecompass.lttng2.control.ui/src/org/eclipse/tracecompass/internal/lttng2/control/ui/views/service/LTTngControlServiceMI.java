@@ -51,6 +51,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainTy
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLog4jLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BufferType;
@@ -385,13 +386,12 @@ public class LTTngControlServiceMI extends LTTngControlService {
             domain.setDomain(TraceDomainType.UST);
             break;
         case JUL:
-            /**
-             * TODO: Support for JUL JUL substructure and semantic is not the
-             * same as a regular UST or Kernel Domain There is no channel under
-             * JUL domain only events. The channel is activated in UST Channel
-             */
             domain = new DomainInfo(Messages.TraceControl_JULDomainDisplayName);
             domain.setDomain(TraceDomainType.JUL);
+            break;
+        case LOG4J:
+            domain = new DomainInfo(Messages.TraceControl_LOG4JDomainDisplayName);
+            domain.setDomain(TraceDomainType.LOG4J);
             break;
         case UNKNOWN:
             domain = new DomainInfo(Messages.TraceControl_UnknownDomainDisplayName);
@@ -661,41 +661,9 @@ public class LTTngControlServiceMI extends LTTngControlService {
             allProviders.add(providerInfo);
         }
 
-        // Getting the loggers information since those are under the UST provider
-        ICommandInput commandJul = createCommand(LTTngControlServiceConstants.COMMAND_LIST, LTTngControlServiceConstants.OPTION_JUL);
-        // Execute JUL listing
-        ICommandResult resultJul = executeCommand(commandJul, monitor, false);
+        getUstProviderLoggers(allProviders, TraceDomainType.JUL, monitor);
+        getUstProviderLoggers(allProviders, TraceDomainType.LOG4J, monitor);
 
-        if (isError(resultJul)) {
-            throw new ExecutionException(Messages.TraceControl_CommandError + commandJul.toString());
-        }
-
-        Document documentJul = getDocumentFromStrings(resultJul.getOutput(), fDocumentBuilder);
-        NodeList rawProvidersJul = documentJul.getElementsByTagName(MIStrings.PID);
-
-        for (int i = 0; i < rawProvidersJul.getLength(); i++) {
-            Node provider = rawProvidersJul.item(i);
-            Node name = getFirstOf(provider.getChildNodes(), MIStrings.NAME);
-            if (name == null) {
-                throw new ExecutionException(Messages.TraceControl_MiInvalidProviderError);
-            }
-
-            Node id = getFirstOf(provider.getChildNodes(), MIStrings.PID_ID);
-
-            if (id != null) {
-                for (int k = 0; k < allProviders.size(); k++) {
-                    if (allProviders.get(k).getPid() == Integer.parseInt(id.getTextContent())) {
-                        Node events = getFirstOf(provider.getChildNodes(), MIStrings.EVENTS);
-                        if (events != null) {
-                            List<ILoggerInfo> loggers = new ArrayList<>();
-                            NodeList rawEvents = events.getChildNodes();
-                            getLoggerInfo(rawEvents, loggers, TraceDomainType.JUL);
-                            allProviders.get(k).setLoggers(loggers);
-                        }
-                    }
-                }
-            }
-        }
         return allProviders;
     }
 
@@ -1042,7 +1010,17 @@ public class LTTngControlServiceMI extends LTTngControlService {
                         loggerInfo.setLogLevelType(LogLevelType.valueOfString(infoNode.getTextContent()));
                         break;
                     case MIStrings.LOGLEVEL:
-                        loggerInfo.setLogLevel(TraceJulLogLevel.valueOfString(infoNode.getTextContent()));
+                        switch (domain) {
+                        case JUL:
+                            loggerInfo.setLogLevel(TraceJulLogLevel.valueOfString(infoNode.getTextContent()));
+                            break;
+                        case LOG4J:
+                            loggerInfo.setLogLevel(TraceLog4jLogLevel.valueOfString(infoNode.getTextContent()));
+                            break;
+                            //$CASES-OMITTED$
+                        default:
+                            break;
+                        }
                         break;
                     case MIStrings.ENABLED:
                         loggerInfo.setState(TraceEnablement.valueOfString(infoNode.getTextContent()));
@@ -1113,6 +1091,72 @@ public class LTTngControlServiceMI extends LTTngControlService {
             }
         }
         return node;
+    }
+
+    /**
+     * Retrieve the loggers of a certain domain type for the UST provider.
+     *
+     * @param allProviders
+     *            the list of UST providers
+     * @param domain
+     *            the loggers domain
+     * @param monitor
+     *            progress monitor
+     * @throws ExecutionException
+     */
+    private void getUstProviderLoggers(List<IUstProviderInfo> allProviders, TraceDomainType domain, IProgressMonitor monitor) throws ExecutionException {
+        // Getting the loggers information since those are under the UST provider
+        ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_LIST);
+        switch (domain) {
+        case JUL:
+            command.add(LTTngControlServiceConstants.OPTION_JUL);
+            break;
+        case LOG4J:
+            command.add(LTTngControlServiceConstants.OPTION_LOG4J);
+            break;
+        case PYTHON:
+            command.add(LTTngControlServiceConstants.OPTION_PYTHON);
+            break;
+            //$CASES-OMITTED$
+        default:
+            break;
+        }
+        // Execute listing
+        ICommandResult result = executeCommand(command, monitor, false);
+
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + command.toString());
+        }
+
+        Document document = getDocumentFromStrings(result.getOutput(), fDocumentBuilder);
+        NodeList rawProviders = document.getElementsByTagName(MIStrings.PID);
+
+        for (int i = 0; i < rawProviders.getLength(); i++) {
+            Node provider = rawProviders.item(i);
+            Node name = getFirstOf(provider.getChildNodes(), MIStrings.NAME);
+            if (name == null) {
+                throw new ExecutionException(Messages.TraceControl_MiInvalidProviderError);
+            }
+
+            Node id = getFirstOf(provider.getChildNodes(), MIStrings.PID_ID);
+
+            if (id != null) {
+                for (int k = 0; k < allProviders.size(); k++) {
+                    if (allProviders.get(k).getPid() == Integer.parseInt(id.getTextContent())) {
+                        Node events = getFirstOf(provider.getChildNodes(), MIStrings.EVENTS);
+                        if (events != null) {
+                            List<ILoggerInfo> loggers = new ArrayList<>();
+                            NodeList rawEvents = events.getChildNodes();
+                            getLoggerInfo(rawEvents, loggers, domain);
+                            for (ILoggerInfo logger : loggers) {
+                                logger.setDomain(domain);
+                            }
+                            allProviders.get(k).setLoggers(loggers);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override

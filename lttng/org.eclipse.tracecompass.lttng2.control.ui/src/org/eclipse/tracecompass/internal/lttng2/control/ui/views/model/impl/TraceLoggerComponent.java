@@ -13,10 +13,10 @@ package org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ILoggerInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.LoggerInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
@@ -136,7 +136,7 @@ public class TraceLoggerComponent extends TraceControlComponent {
     /**
      * @return the trace logger log level
      */
-    public TraceJulLogLevel getLogLevel() {
+    public ITraceLogLevel getLogLevel() {
         return fLoggerInfo.getLogLevel();
     }
 
@@ -146,7 +146,7 @@ public class TraceLoggerComponent extends TraceControlComponent {
      * @param level
      *            logger log level to set
      */
-    public void setLogLevel(TraceJulLogLevel level) {
+    public void setLogLevel(ITraceLogLevel level) {
         fLoggerInfo.setLogLevel(level);
     }
 

@@ -180,6 +180,7 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
                 Exception error = null;
                 try {
                     String filter = dialog.getFilterExpression();
+                    List<String> eventNames = null;
                     switch (dialog.getDomain()) {
                     case KERNEL:
                     case UST:
@@ -190,7 +191,7 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
                             if (dialog.isAllTracePoints()) {
                                 enableEvents(param, null, dialog.getDomain(), filter, dialog.getExcludedEvents(), monitor);
                             } else {
-                                List<String> eventNames = dialog.getEventNames();
+                                eventNames = dialog.getEventNames();
                                 if (!eventNames.isEmpty()) {
                                     enableEvents(param, eventNames, dialog.getDomain(), filter, dialog.getExcludedEvents(), monitor);
                                 }
@@ -222,7 +223,7 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
 
                         // Enable event using a wildcard
                         if (dialog.isWildcard()) {
-                            List<String> eventNames = dialog.getEventNames();
+                            eventNames = dialog.getEventNames();
                             eventNames.add(dialog.getWildcard());
 
                             if (!eventNames.isEmpty()) {
@@ -236,8 +237,9 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
                         }
                         break;
                     case JUL:
-                        List<String> eventNames = dialog.getEventNames();
-                        if (dialog.isAllTracePoints()) {
+                    case LOG4J:
+                        eventNames = dialog.getEventNames();
+                        if (dialog.isAllEvents()) {
                             eventNames = null;
                         }
                         if (dialog.isLogLevel()) {
@@ -250,7 +252,6 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
                     default:
                         break;
                     }
-
                 } catch (ExecutionException e) {
                     error = e;
                 }

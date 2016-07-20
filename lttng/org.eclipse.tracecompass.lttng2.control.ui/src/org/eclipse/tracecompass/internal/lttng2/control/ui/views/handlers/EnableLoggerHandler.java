@@ -15,10 +15,9 @@ import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent;
 
 /**
@@ -42,13 +41,13 @@ public class EnableLoggerHandler extends ChangeLoggerStateHandler {
     // ------------------------------------------------------------------------
 
     @Override
-    protected void changeState(TraceDomainComponent domain, List<String> loggerNames, TraceJulLogLevel logLevel, LogLevelType logLevelType, IProgressMonitor monitor) throws ExecutionException {
+    protected void changeState(TraceDomainComponent domain, List<String> loggerNames, ITraceLogLevel logLevel, LogLevelType logLevelType, IProgressMonitor monitor) throws ExecutionException {
         // This conditional statement makes it possible to enable the same logger multiple
         // times with different log levels (with the right-click enable, directly on the logger)
         if (logLevelType.equals(LogLevelType.LOGLEVEL_ALL)) {
             domain.enableEvents(loggerNames, null, null, monitor);
         } else {
-            domain.enableLogLevel(loggerNames, logLevelType, logLevel, null, TraceDomainType.JUL, monitor);
+            domain.enableLogLevel(loggerNames, logLevelType, logLevel, null, domain.getDomain(), monitor);
         }
     }
 }

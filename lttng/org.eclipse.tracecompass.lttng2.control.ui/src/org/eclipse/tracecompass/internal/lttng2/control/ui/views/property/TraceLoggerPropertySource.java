@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLog4jLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceLoggerComponent;
 import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
@@ -89,7 +90,7 @@ public class TraceLoggerPropertySource extends BasePropertySource {
         List<IPropertyDescriptor> list = new ArrayList<>();
         list.add(new ReadOnlyTextPropertyDescriptor(TRACE_LOGGER_NAME_PROPERTY_ID, TRACE_LOGGER_NAME_PROPERTY_NAME));
         list.add(new ReadOnlyTextPropertyDescriptor(TRACE_LOGGER_STATE_PROPERTY_ID, TRACE_LOGGER_STATE_PROPERTY_NAME));
-        if (!fLogger.getLogLevel().equals(TraceJulLogLevel.LEVEL_UNKNOWN)) {
+        if (!fLogger.getLogLevel().equals(TraceJulLogLevel.LEVEL_UNKNOWN) || !fLogger.getLogLevel().equals(TraceLog4jLogLevel.LEVEL_UNKNOWN)) {
             list.add(new ReadOnlyTextPropertyDescriptor(TRACE_LOGGER_LOGLEVEL_PROPERTY_ID, TRACE_LOGGER_LOGLEVEL_PROPERTY_NAME));
         }
         return list.toArray(new IPropertyDescriptor[list.size()]);
@@ -99,16 +100,14 @@ public class TraceLoggerPropertySource extends BasePropertySource {
     public Object getPropertyValue(Object id) {
         if (TRACE_LOGGER_NAME_PROPERTY_ID.equals(id)) {
             return fLogger.getName();
-        }
-        if (TRACE_LOGGER_LOGLEVEL_PROPERTY_ID.equals(id)) {
+        } else if (TRACE_LOGGER_LOGLEVEL_PROPERTY_ID.equals(id)) {
             StringBuffer buffer = new StringBuffer();
-            if (fLogger.getLogLevelType() != LogLevelType.LOGLEVEL_NONE) {
+            if (!fLogger.getLogLevelType().equals(LogLevelType.LOGLEVEL_NONE)) {
                 buffer.append(fLogger.getLogLevelType().getShortName()).append(' ');
             }
-            buffer.append(fLogger.getLogLevel().name());
+            buffer.append(fLogger.getLogLevel().getInName());
             return buffer.toString();
-        }
-        if (TRACE_LOGGER_STATE_PROPERTY_ID.equals(id)) {
+        } else if (TRACE_LOGGER_STATE_PROPERTY_ID.equals(id)) {
             return fLogger.getState().name();
         }
         return null;

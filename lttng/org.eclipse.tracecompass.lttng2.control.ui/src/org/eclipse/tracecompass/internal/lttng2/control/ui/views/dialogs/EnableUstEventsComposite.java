@@ -300,7 +300,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
             List<ITraceControlComponent> comps = fProviderGroup.getChildren(UstProviderComponent.class);
             for (ITraceControlComponent comp : comps) {
                 List<ITraceControlComponent> children = comp.getChildren(BaseEventComponent.class);
-                nbUstEvents = children.size();
+                nbUstEvents += children.size();
             }
             fIsAllTracepoints = (nbUstEvents == totalNbEvents);
         }

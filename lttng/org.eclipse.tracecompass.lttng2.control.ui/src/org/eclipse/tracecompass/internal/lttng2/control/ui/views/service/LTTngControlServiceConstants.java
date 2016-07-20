@@ -199,6 +199,14 @@ public interface LTTngControlServiceConstants {
      */
     String OPTION_JUL = "-j"; //$NON-NLS-1$
     /**
+     * Command line option for log4j tracer.
+     */
+    String OPTION_LOG4J = "-l"; //$NON-NLS-1$
+    /**
+     * Command line option for python tracer.
+     */
+    String OPTION_PYTHON = "-p"; //$NON-NLS-1$
+    /**
      * Command line option for specifying a session.
      */
     String OPTION_SESSION = "-s";  //$NON-NLS-1$

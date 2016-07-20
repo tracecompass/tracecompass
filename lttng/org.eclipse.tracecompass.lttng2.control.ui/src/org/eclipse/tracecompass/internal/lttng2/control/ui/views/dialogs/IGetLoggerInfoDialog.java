@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs;
 
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 
 /**
  * Interface for a dialog box for collecting information about the loggers to enable.
@@ -34,4 +35,10 @@ public interface IGetLoggerInfoDialog  extends IBaseGetInfoDialog {
      * @return a log level
      */
     ITraceLogLevel getLogLevel();
+
+    /**
+     * Sets the logger domain type
+     * @param domain - the domain type ({@link TraceDomainType})
+     */
+    void setLoggerDomain(TraceDomainType domain);
 }

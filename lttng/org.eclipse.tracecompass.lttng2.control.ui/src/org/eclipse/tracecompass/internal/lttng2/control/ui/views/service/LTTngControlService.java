@@ -1074,7 +1074,9 @@ public class LTTngControlService implements ILttngControlService {
         case JUL:
             return LTTngControlServiceConstants.OPTION_JUL;
         case LOG4J:
+            return LTTngControlServiceConstants.OPTION_LOG4J;
         case PYTHON:
+            return LTTngControlServiceConstants.OPTION_PYTHON;
         case UNKNOWN:
         default:
             return TraceDomainType.UNKNOWN.name();

@@ -21,7 +21,7 @@ public interface IBaseLoggerInfo extends ITraceInfo {
     /**
      * @return the trace logger log level
      */
-    TraceJulLogLevel getLogLevel();
+    ITraceLogLevel getLogLevel();
 
     /**
      * Sets the trace logger log level to the given level
@@ -29,7 +29,7 @@ public interface IBaseLoggerInfo extends ITraceInfo {
      * @param level
      *            logger log level to set
      */
-    void setLogLevel(TraceJulLogLevel level);
+    void setLogLevel(ITraceLogLevel level);
 
     /**
      * Sets the trace logger log level to the level specified by the given name.

@@ -12,6 +12,7 @@
 package org.eclipse.tracecompass.internal.lttng2.control.core.model.impl;
 
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseLoggerInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
 
@@ -29,7 +30,7 @@ public class BaseLoggerInfo extends TraceInfo implements IBaseLoggerInfo {
     /**
      * The trace log level.
      */
-    private TraceJulLogLevel fLogLevel = TraceJulLogLevel.LEVEL_UNKNOWN;
+    private ITraceLogLevel fLogLevel = TraceJulLogLevel.LEVEL_UNKNOWN;
     /**
      * The logger domain.
      */
@@ -65,12 +66,12 @@ public class BaseLoggerInfo extends TraceInfo implements IBaseLoggerInfo {
     // ------------------------------------------------------------------------
 
     @Override
-    public TraceJulLogLevel getLogLevel() {
+    public ITraceLogLevel getLogLevel() {
         return fLogLevel;
     }
 
     @Override
-    public void setLogLevel(TraceJulLogLevel level) {
+    public void setLogLevel(ITraceLogLevel level) {
         fLogLevel = level;
     }
 
@@ -132,5 +133,4 @@ public class BaseLoggerInfo extends TraceInfo implements IBaseLoggerInfo {
     public void setDomain(TraceDomainType domain) {
         fDomain = domain;
     }
-
 }
