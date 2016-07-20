@@ -155,7 +155,7 @@ public class ColumnHeaderMenuTest {
         assertVisibleColumns(tableBot.widget, new String[] { "Timestamp" });
 
         headerBot.contextMenu("Timestamp").click();
-        assertVisibleColumns(tableBot.widget, new String[] { });
+        assertVisibleColumns(tableBot.widget, new String[] {});
 
         headerBot.contextMenu("Message").click();
         assertVisibleColumns(tableBot.widget, new String[] { "Message" });
@@ -180,6 +180,31 @@ public class ColumnHeaderMenuTest {
      * Test the Show All menu item
      */
     @Test
+    public void testPersistHiding() {
+        SWTBotTable tableBot = fEditorBot.bot().table();
+        SWTBotTableColumn headerBot = tableBot.header("");
+        assertVisibleColumns(tableBot.widget, new String[] { "Timestamp", "Host", "Logger", "File", "Line", "Message" });
+
+        headerBot.contextMenu("Timestamp").click();
+        headerBot.contextMenu("Host").click();
+        headerBot.contextMenu("Logger").click();
+        headerBot.contextMenu("File").click();
+        headerBot.contextMenu("Message").click();
+        assertVisibleColumns(tableBot.widget, new String[] { "Line" });
+        after();
+
+        before();
+        tableBot = fEditorBot.bot().table();
+        assertVisibleColumns(tableBot.widget, new String[] { "Line" });
+        headerBot = tableBot.header("");
+        headerBot.contextMenu("Show All").click();
+        assertVisibleColumns(tableBot.widget, new String[] { "Timestamp", "Host", "Logger", "File", "Line", "Message" });
+    }
+
+    /**
+     * Test the Show All menu item
+     */
+    @Test
     public void testShowAll() {
         final SWTBotTable tableBot = fEditorBot.bot().table();
         SWTBotTableColumn headerBot = tableBot.header("");
@@ -191,7 +216,7 @@ public class ColumnHeaderMenuTest {
         headerBot.contextMenu("File").click();
         headerBot.contextMenu("Line").click();
         headerBot.contextMenu("Message").click();
-        assertVisibleColumns(tableBot.widget, new String[] { });
+        assertVisibleColumns(tableBot.widget, new String[] {});
 
         headerBot.contextMenu("Show All").click();
         assertVisibleColumns(tableBot.widget, new String[] { "Timestamp", "Host", "Logger", "File", "Line", "Message" });
