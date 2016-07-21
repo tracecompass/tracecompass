@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.analysis.os.linux.core.trace;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -219,7 +220,6 @@ public interface IKernelAnalysisEventLayout {
      */
     String eventSchedProcessWakeupNew();
 
-
     /**
      * Starting the high resolution timer
      * <p>
@@ -287,8 +287,8 @@ public interface IKernelAnalysisEventLayout {
     /**
      * The kernel just allocated a page of memory.
      * <p>
-     * In Linux, this typically means a user space application just got a page of
-     * ram.
+     * In Linux, this typically means a user space application just got a page
+     * of ram.
      *
      * @return the event name
      * @since 2.0
@@ -304,6 +304,46 @@ public interface IKernelAnalysisEventLayout {
      * @since 2.0
      */
     String eventKmemPageFree();
+
+    /**
+     * <em>Interprocessor interrupts</em> (IPIs) are special types of interrupts by which
+     * one processor will interrupt another in a multi-core and multi-cpu system. They are
+     * typically used for
+     * <ol>
+     * <li>cache flushes</li>
+     * <li>shutdowns</li>
+     * <ol>
+     * They are not logged with standard events, but rather events looking like
+     * "x86_irq_vectors_thermal_apic_exit".
+     * <p>
+     * This event describes the entries into IPIs.
+     *
+     * @return the IPI list
+     * @since 2.1
+     */
+    default Collection<String> getIPIIrqVectorsEntries() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * <em>Interprocessor interrupts</em> (IPIs) are special types of interrupts by which
+     * one processor will interrupt another in a multi-core and multi-cpu system. They are
+     * typically used for
+     * <ol>
+     * <li>cache flushes</li>
+     * <li>shutdowns</li>
+     * <ol>
+     * They are not logged with standard events, but rather events looking like
+     * "x86_irq_vectors_thermal_apic_exit".
+     * <p>
+     * This event describes the exits into IPIs.
+     *
+     * @return the IPI list
+     * @since 2.1
+     */
+    default Collection<String> getIPIIrqVectorsExits() {
+        return Collections.emptyList();
+    }
 
     // ------------------------------------------------------------------------
     // Event field names
@@ -516,8 +556,8 @@ public interface IKernelAnalysisEventLayout {
     String fieldHRtimer();
 
     /**
-     * The field with the expires value. The expires field holds the expiry time.
-     * of the hrtimer.
+     * The field with the expires value. The expires field holds the expiry
+     * time. of the hrtimer.
      *
      * @return the name of the expires field
      * @since 2.0
@@ -525,8 +565,8 @@ public interface IKernelAnalysisEventLayout {
     String fieldHRtimerExpires();
 
     /**
-     * Gets the field name with the softexpires value. The softexpire value is the
-     * absolute earliest expiry time of the hrtimer.
+     * Gets the field name with the softexpires value. The softexpire value is
+     * the absolute earliest expiry time of the hrtimer.
      *
      * @return the name of the softexpires field
      * @since 2.0
@@ -705,6 +745,17 @@ public interface IKernelAnalysisEventLayout {
      */
     default String fieldDiskname() {
         return "diskname"; //$NON-NLS-1$
+    }
+
+    /**
+     * The field with the IRQ number. This is used in IPI handlers (entry and
+     * exit).
+     *
+     * @return the name of the field with the IRQ number
+     * @since 2.1
+     */
+    default String fieldIPIVector() {
+        return "vector"; //$NON-NLS-1$
     }
 
 }

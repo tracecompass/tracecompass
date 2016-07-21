@@ -14,6 +14,8 @@ package org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout;
 
 import java.util.Collection;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -228,6 +230,16 @@ public class Lttng27EventLayout extends Lttng26EventLayout {
 
     public Collection<String> getX86IrqVectorsExit() {
         return IPI_EXIT_SET;
+    }
+
+    @Override
+    public @NonNull Collection<@NonNull String> getIPIIrqVectorsEntries() {
+        return getX86IrqVectorsEntry();
+    }
+
+    @Override
+    public @NonNull Collection<@NonNull String> getIPIIrqVectorsExits() {
+        return getX86IrqVectorsExit();
     }
 
     // ------------------------------------------------------------------------

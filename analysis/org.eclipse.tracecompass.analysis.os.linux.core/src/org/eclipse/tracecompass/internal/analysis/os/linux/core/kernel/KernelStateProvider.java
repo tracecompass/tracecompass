@@ -18,6 +18,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.IPIEntryHandler;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.IPIExitHandler;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.IrqEntryHandler;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.IrqExitHandler;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.KernelEventHandler;
@@ -59,7 +61,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
      * Version number of this state provider. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
-    private static final int VERSION = 17;
+    private static final int VERSION = 18;
 
     // ------------------------------------------------------------------------
     // Fields
@@ -110,6 +112,12 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
         builder.put(layout.eventSchedProcessFork(), new ProcessForkHandler(layout));
         builder.put(layout.eventSchedProcessExit(), new ProcessExitHandler(layout));
         builder.put(layout.eventSchedProcessFree(), new ProcessFreeHandler(layout));
+        for( String s : layout.getIPIIrqVectorsEntries()) {
+            builder.put(s, new IPIEntryHandler(layout));
+        }
+        for( String s : layout.getIPIIrqVectorsExits()) {
+            builder.put(s, new IPIExitHandler(layout));
+        }
 
         final String eventStatedumpProcessState = layout.eventStatedumpProcessState();
         if (eventStatedumpProcessState != null) {
