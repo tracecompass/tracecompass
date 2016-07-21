@@ -46,7 +46,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     /**
      * The history tree that sits underneath.
      */
-    private final HistoryTree fSht;
+    private final @NonNull HistoryTree fSht;
 
     /** Indicates if the history tree construction is done */
     private volatile boolean fFinishedBuilding = false;
@@ -162,7 +162,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      *             If there was a problem during creation
      */
     @VisibleForTesting
-    protected HistoryTree initializeSHT(@NonNull HTConfig conf) throws IOException {
+    protected @NonNull HistoryTree initializeSHT(@NonNull HTConfig conf) throws IOException {
         return new HistoryTree(conf);
     }
 
@@ -179,7 +179,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      *             If there was a problem during creation
      */
     @VisibleForTesting
-    protected HistoryTree initializeSHT(@NonNull File existingStateFile, int providerVersion) throws IOException {
+    protected @NonNull HistoryTree initializeSHT(@NonNull File existingStateFile, int providerVersion) throws IOException {
         return new HistoryTree(existingStateFile, providerVersion);
     }
 
@@ -192,7 +192,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      *
      * @return The history tree
      */
-    protected final HistoryTree getSHT() {
+    protected final @NonNull HistoryTree getSHT() {
         return fSht;
     }
 
