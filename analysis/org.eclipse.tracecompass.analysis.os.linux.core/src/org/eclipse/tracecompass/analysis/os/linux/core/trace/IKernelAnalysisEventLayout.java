@@ -758,4 +758,62 @@ public interface IKernelAnalysisEventLayout {
         return "vector"; //$NON-NLS-1$
     }
 
+    // ------------------------------------------------------------------------
+    // Network events and fields
+    // ------------------------------------------------------------------------
+
+    /**
+     * An event indicating that a packet is sent on the network
+     *
+     * @return The name of the packet send event
+     * @since 2.1
+     */
+    default String eventNetworkSend() {
+        return "net_dev_queue"; //$NON-NLS-1$
+    }
+
+    /**
+     * Get the list of events indicating that a packet is received from the
+     * network
+     *
+     * @return The collection of names of the packet receive event
+     * @since 2.1
+     */
+    default Collection<String> eventNetworkReceive() {
+        return Collections.singleton("netif_receive_skb"); //$NON-NLS-1$
+    }
+
+    /**
+     * The path of the field corresponding to the sequence number field of a TCP
+     * header
+     *
+     * @return The path of the sequence number field in the TCP header of a
+     *         network packet
+     * @since 2.1
+     */
+    default String[] fieldPathTcpSeq() {
+        return new String[] { "seq" }; //$NON-NLS-1$
+    }
+
+    /**
+     * The path of the field corresponding to the acknowledgment number field of
+     * a TCP header
+     *
+     * @return The name of the acknowledgment number field in the TCP header of
+     *         a network packet
+     * @since 2.1
+     */
+    default String[] fieldPathTcpAckSeq() {
+        return new String[] { "ack_seq" }; //$NON-NLS-1$
+    }
+
+    /**
+     * The path of the field corresponding to the flags field of a TCP header
+     *
+     * @return The path of the flags field in the TCP header of a network packet
+     * @since 2.1
+     */
+    default String[] fieldPathTcpFlags() {
+        return new String[] { "flags" }; //$NON-NLS-1$
+    }
 }
