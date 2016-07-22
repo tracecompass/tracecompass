@@ -6,7 +6,7 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.tracecompass.internal.lttng2.ust.ui.analysis.callstack;
+package org.eclipse.tracecompass.internal.lttng2.ust.core.callstack;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 

@@ -59,6 +59,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
+import org.eclipse.tracecompass.tmf.core.callstack.CallStackAnalysis;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
@@ -541,7 +542,7 @@ public class CallStackView extends AbstractTimeGraphView {
         }
 
         /* Continue with the call stack view specific operations */
-        AbstractCallStackAnalysis module = getCallStackModule(trace);
+        CallStackAnalysis module = getCallStackModule(trace);
         if (module == null) {
             addUnavailableEntry(trace, parentTrace);
             return;
@@ -1057,14 +1058,14 @@ public class CallStackView extends AbstractTimeGraphView {
         return fPrevEventAction;
     }
 
-    private static @Nullable AbstractCallStackAnalysis getCallStackModule(@NonNull ITmfTrace trace) {
+    private static @Nullable CallStackAnalysis getCallStackModule(@NonNull ITmfTrace trace) {
         /*
          * Since we cannot know the exact analysis ID (in separate plugins), we
          * will search using the analysis type.
          */
-        Iterable<AbstractCallStackAnalysis> modules =
-                TmfTraceUtils.getAnalysisModulesOfClass(trace, AbstractCallStackAnalysis.class);
-        Iterator<AbstractCallStackAnalysis> it = modules.iterator();
+        Iterable<CallStackAnalysis> modules =
+                TmfTraceUtils.getAnalysisModulesOfClass(trace, CallStackAnalysis.class);
+        Iterator<CallStackAnalysis> it = modules.iterator();
         if (!it.hasNext()) {
             /* This trace does not provide a call-stack analysis */
             return null;
@@ -1076,7 +1077,7 @@ public class CallStackView extends AbstractTimeGraphView {
          * TODO Handle the advanced case where one trace provides more than one
          * call-stack analysis.
          */
-        AbstractCallStackAnalysis module = it.next();
+        CallStackAnalysis module = it.next();
         /* This analysis is not automatic, we need to schedule it on-demand */
         module.schedule();
         if (!module.waitForInitialization()) {

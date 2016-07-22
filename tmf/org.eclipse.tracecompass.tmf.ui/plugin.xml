@@ -1901,6 +1901,9 @@
                id="org.eclipse.linuxtools.tmf.core.statistics.analysis">
             </analysisId>
       </output>
+      <listener
+            class="org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackAnalysisListener">
+      </listener>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.ui.tracetypeui">

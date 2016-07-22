@@ -21,11 +21,10 @@ import org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput;
  * The base classes for analyses who want to populate the CallStack View.
  *
  * @author Alexandre Montplaisir
+ * @deprecated Use the {@link CallStackAnalysis} from the core plugins instead
+ *             of this class which was there only to register the view as output
  */
-/*
- * FIXME: deprecate at next release when we can move the callstack view to an
- * extension point
- */
+@Deprecated
 @NonNullByDefault
 public abstract class AbstractCallStackAnalysis extends CallStackAnalysis {
 

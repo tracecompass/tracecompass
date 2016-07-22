@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.ust.ui.tests.analysis.callstack;
+package org.eclipse.tracecompass.lttng2.ust.core.tests.callstack;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.lttng2.ust.ui.analysis.callstack.LttngUstCallStackAnalysisRequirement;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.callstack.LttngUstCallStackAnalysisRequirement;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventType;

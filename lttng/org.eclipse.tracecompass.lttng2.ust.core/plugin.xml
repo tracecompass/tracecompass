@@ -32,5 +32,15 @@
                class="org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace">
          </tracetype>
       </module>
+      <module
+            analysis_module="org.eclipse.tracecompass.internal.lttng2.ust.core.callstack.LttngUstCallStackAnalysis"
+            automatic="false"
+            id="org.eclipse.linuxtools.lttng2.ust.analysis.callstack"
+            name="%analysis.callstack">
+         <tracetype
+               applies="true"
+               class="org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace">
+         </tracetype>
+      </module>
    </extension>
 </plugin>
