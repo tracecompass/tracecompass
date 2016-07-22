@@ -77,6 +77,7 @@ public interface TmfXmlStrings {
     String TYPE_EVENT_NAME = "eventName";
     String TYPE_DELETE = "delete";
     String INCREMENT = "increment";
+    String UPDATE = "update";
     String FORCED_TYPE = "forcedType";
     String ATTRIBUTE_STACK = "stack";
     String STACK_POP = "pop";

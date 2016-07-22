@@ -55,6 +55,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
 
     /* Whether this state value is an increment of the previous value */
     private final boolean fIncrement;
+    /* Whether to update the current attribute or create a new state */
+    private final boolean fUpdate;
     /* Stack value */
     private final ValueTypeStack fStackType;
     /* Forced value type */
@@ -120,6 +122,9 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
 
         /* Check if there is an increment for the value */
         fIncrement = Boolean.parseBoolean(node.getAttribute(TmfXmlStrings.INCREMENT));
+
+        /* Check if this value is an update of the ongoing state */
+        fUpdate = Boolean.parseBoolean(node.getAttribute(TmfXmlStrings.UPDATE));
 
         /* Process the XML Element state value */
         fStateValue = initializeStateValue(modelFactory, node);
@@ -191,6 +196,16 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
      */
     protected boolean isIncrement() {
         return fIncrement;
+    }
+
+    /**
+     * Return whether this value should replace the current value of the
+     * attribute or if a new state should be created.
+     *
+     * @return <code>true</code> if the value is to replace the current one
+     */
+    protected boolean isUpdate() {
+        return fUpdate;
     }
 
     /**

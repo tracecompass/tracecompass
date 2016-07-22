@@ -284,6 +284,9 @@
 		<xs:attribute name="increment" type="xs:boolean" >
 			<xs:annotation>
 				<xs:documentation>Indicate that the current value will be added to any previously available value.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="update" type="xs:boolean" >
+			<xs:annotation>
+				<xs:documentation>Indicate that this value will replace the previous value for the attribute instead of changing its state.</xs:documentation></xs:annotation></xs:attribute>
 		<xs:attribute name="stack">
 			<xs:annotation>
 				<xs:documentation>Indicate that a stack operation will be performed with the value</xs:documentation></xs:annotation>

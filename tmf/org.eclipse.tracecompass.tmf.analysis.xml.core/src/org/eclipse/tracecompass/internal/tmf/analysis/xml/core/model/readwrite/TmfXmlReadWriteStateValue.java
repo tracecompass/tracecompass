@@ -192,7 +192,11 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
             case NULL:
             case PEEK:
             default:
-                ss.modifyAttribute(timestamp, value, quark);
+                if (isUpdate()) {
+                    ss.updateOngoingState(value, quark);
+                } else {
+                    ss.modifyAttribute(timestamp, value, quark);
+                }
                 break;
             }
         }
@@ -207,7 +211,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         }
     }
 
-    private static @Nullable ITmfStateValue incrementByType(int quark, ITmfStateSystem ss, ITmfStateValue stateValue) throws AttributeNotFoundException {
+    private static @Nullable ITmfStateValue incrementByType(int quark, ITmfStateSystem ss, ITmfStateValue stateValue) {
         ITmfStateValue value = null;
         switch (stateValue.getType()) {
         case LONG: {

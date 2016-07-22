@@ -38,6 +38,8 @@ public enum TmfXmlTestFiles {
     INVALID_FILE("test_xml_files/test_invalid/test_invalid.xml"),
     /** A valid file for state attribute tests */
     ATTRIBUTE_FILE("test_xml_files/test_valid/test_attributes.xml"),
+    /** A valid file for state value tests */
+    STATE_VALUE_FILE("test_xml_files/test_valid/test_state_values.xml"),
     /** A valid file for conditions tests */
     CONDITION_FILE("test_xml_files/test_valid/test_conditions.xml"),
     /** A valid file for doubles tests */
