@@ -18,7 +18,6 @@ import org.eclipse.tracecompass.analysis.graph.core.building.AbstractTraceEventH
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng27EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng28EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -174,15 +173,7 @@ public class BaseHandler extends AbstractTraceEventHandler {
         String eventName = event.getName();
         ITmfTrace trace = event.getTrace();
         IKernelAnalysisEventLayout layout = getProvider().getEventLayout(trace);
-        /* awkward downcast */
-        if (layout instanceof Lttng27EventLayout) {
-            Lttng27EventLayout layout27 = (Lttng27EventLayout) layout;
-            if (entry) {
-                return layout27.getX86IrqVectorsEntry().contains(eventName);
-            }
-            return layout27.getX86IrqVectorsExit().contains(eventName);
-        }
-        return false;
+        return entry ? layout.getIPIIrqVectorsEntries().contains(eventName) : layout.getIPIIrqVectorsExits().contains(eventName);
     }
 
     @Override

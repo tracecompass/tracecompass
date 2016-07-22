@@ -224,22 +224,14 @@ public class Lttng27EventLayout extends Lttng26EventLayout {
         return X86_IRQ_VECTORS_THERMAL_APIC_EXIT;
     }
 
-    public Collection<String> getX86IrqVectorsEntry() {
-        return IPI_ENTRY_SET;
-    }
-
-    public Collection<String> getX86IrqVectorsExit() {
-        return IPI_EXIT_SET;
-    }
-
     @Override
     public @NonNull Collection<@NonNull String> getIPIIrqVectorsEntries() {
-        return getX86IrqVectorsEntry();
+        return IPI_ENTRY_SET;
     }
 
     @Override
     public @NonNull Collection<@NonNull String> getIPIIrqVectorsExits() {
-        return getX86IrqVectorsExit();
+        return IPI_EXIT_SET;
     }
 
     // ------------------------------------------------------------------------
