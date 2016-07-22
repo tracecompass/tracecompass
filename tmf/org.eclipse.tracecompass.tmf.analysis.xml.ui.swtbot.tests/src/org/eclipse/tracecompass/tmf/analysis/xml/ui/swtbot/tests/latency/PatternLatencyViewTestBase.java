@@ -42,6 +42,7 @@ public abstract class PatternLatencyViewTestBase {
 
     private static final String PROJECT_NAME = "test";
     private static final String TRACE_TYPE = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
+    private static final String TRACE_NAME = "bug446190";
 
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
@@ -128,12 +129,9 @@ public abstract class PatternLatencyViewTestBase {
      */
     private static void openView(final String viewTitle) {
         SWTBotTreeItem treeItem = SWTBotUtils.selectTracesFolder(fBot, PROJECT_NAME);
-        treeItem = treeItem.expand();
-        treeItem = treeItem.getNode(0).expand();
-        treeItem = treeItem.expandNode("Views", "XML system call analysis");
-        treeItem = treeItem.getNode(viewTitle);
+        treeItem = SWTBotUtils.getTreeItem(fBot, treeItem, TRACE_NAME, "Views", "XML system call analysis", viewTitle);
+        treeItem.select();
         treeItem.doubleClick();
-        SWTBotUtils.waitForJobs();
     }
 
     /**

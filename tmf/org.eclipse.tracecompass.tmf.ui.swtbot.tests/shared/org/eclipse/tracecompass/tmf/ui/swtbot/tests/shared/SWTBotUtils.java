@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -817,7 +818,29 @@ public final class SWTBotUtils {
 
         bot.waitUntil(ConditionHelpers.IsTreeNodeAvailable(nodeNames[0], tree));
         SWTBotTreeItem currentNode = tree.getTreeItem(nodeNames[0]);
-        for (int i = 1; i < nodeNames.length; i++) {
+        return getTreeItem(bot, currentNode, Arrays.copyOfRange(nodeNames, 1, nodeNames.length));
+    }
+
+    /**
+     * Get the tree item from a parent tree item at the specified location
+     *
+     * @param bot
+     *            the SWTBot
+     * @param treeItem
+     *            the treeItem to find the tree item under
+     * @param nodeNames
+     *            the path to the tree item, in the form of node names (from
+     *            parent to child).
+     * @return the tree item
+     */
+    public static SWTBotTreeItem getTreeItem(SWTBot bot, SWTBotTreeItem treeItem, String... nodeNames) {
+        if (nodeNames.length == 0) {
+            return treeItem;
+        }
+
+        SWTBotTreeItem currentNode = treeItem;
+        for (int i = 0; i < nodeNames.length; i++) {
+            bot.waitUntil(ConditionHelpers.treeItemHasChildren(treeItem));
             currentNode.expand();
 
             String nodeName = nodeNames[i];

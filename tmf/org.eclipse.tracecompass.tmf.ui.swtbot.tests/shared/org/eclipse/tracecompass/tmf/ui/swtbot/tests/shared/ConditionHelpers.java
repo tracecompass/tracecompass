@@ -699,4 +699,33 @@ public final class ConditionHelpers {
     public static ICondition numberOfSeries(Chart chart, int numberOfSeries) {
         return new NumberOfSeries(chart, numberOfSeries);
     }
+
+    /**
+     * Condition to check if the tree item has children
+     *
+     * @param treeItem
+     *            the tree item that should have children
+     * @return ICondition for verification
+     */
+    public static ICondition treeItemHasChildren(SWTBotTreeItem treeItem) {
+        return new TreeItemHasChildren(treeItem);
+    }
+
+    private static final class TreeItemHasChildren extends DefaultCondition {
+        private SWTBotTreeItem fTreeItem;
+
+        public TreeItemHasChildren(SWTBotTreeItem treeItem) {
+            fTreeItem = treeItem;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            return fTreeItem.getItems().length > 0;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return NLS.bind("No child of tree item {0} found.", new String[] { fTreeItem.toString() });
+        }
+    }
 }
