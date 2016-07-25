@@ -16,11 +16,17 @@
 <Definition name="xmlevname">
 <TimeStampOutputFormat>HH:mm:ss:SSS</TimeStampOutputFormat>
 <InputElement name="trace">
-<InputElement logentry="true" name="element">
-<InputData action="0" name="Event type" tag="EVENT_TYPE"/>
+<InputElement eventtype="DefaultName" logentry="true" name="element">
+<InputData action="0" name="Ignore" tag="IGNORE"/>
 <Attribute name="time">
 <InputData action="0" format="Tn" name="Timestamp" tag="TIMESTAMP"/>
 </Attribute>
+<Attribute name="type">
+<InputData action="0" name="Event type" tag="EVENT_TYPE"/>
+</Attribute>
+<InputElement name="type">
+<InputData action="0" name="Event type" tag="EVENT_TYPE"/>
+</InputElement>
 </InputElement>
 </InputElement>
 <OutputColumn name="Timestamp" tag="TIMESTAMP"/>

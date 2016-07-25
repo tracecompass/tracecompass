@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 École Polytechnique de Montréal
+ * Copyright (c) 2016 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -98,8 +98,9 @@ public class CustomXmlTraceDataTest extends AbstractCustomTraceDataTest {
     private static final ICustomTestData CUSTOM_XML_EVENT_NAME = new ICustomTestData() {
 
         private static final int NB_EVENTS = 10;
-        private static final String ODD_EVENT = "OddName";
-        private static final String EVEN_EVENT = "EvenName";
+        private static final String DEFAULT_EVENT = "DefaultName";
+        private static final String ATTRIBUTE_EVENT = "AttributeName";
+        private static final String ELEMENT_EVENT = "ElementName";
         private CustomXmlTraceDefinition fDefinition;
 
         @Override
@@ -109,8 +110,9 @@ public class CustomXmlTraceDataTest extends AbstractCustomTraceDataTest {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file));) {
                 writer.write("<trace>");
                 for (int i = 0; i < NB_EVENTS; ++i) {
-                    String msg = (i % 2 == 0) ? EVEN_EVENT : ODD_EVENT;
-                    String eventStr = "<element time=\"" + i + "\">" + msg + "</element>\n";
+                    String attribute = (i % 5) != 0 ? String.format(" type=\"%s\"", ATTRIBUTE_EVENT) : "";
+                    String element = (i % 5) != 0 && i % 2 != 0 ? String.format("<type>%s</type>", ELEMENT_EVENT) : "";
+                    String eventStr = String.format("<element time=\"" + i + "\"%s>%s</element>\n", attribute, element);
                     writer.write(eventStr);
                 }
                 writer.write("</trace>");
@@ -122,10 +124,12 @@ public class CustomXmlTraceDataTest extends AbstractCustomTraceDataTest {
         public void validateEvent(ITmfEvent event) {
             assertTrue(event instanceof CustomXmlEvent);
             long ts = event.getTimestamp().getValue();
-            if (ts % 2 == 0) {
-                assertEquals("Event name", EVEN_EVENT, event.getName());
+            if (ts % 5 == 0) {
+                assertEquals("Event name", DEFAULT_EVENT, event.getName());
+            } else if (ts % 2 == 0) {
+                assertEquals("Event name", ATTRIBUTE_EVENT, event.getName());
             } else {
-                assertEquals("Event name", ODD_EVENT, event.getName());
+                assertEquals("Event name", ELEMENT_EVENT, event.getName());
             }
             assertEquals("Event name and type", event.getType().getName(), event.getName());
         }

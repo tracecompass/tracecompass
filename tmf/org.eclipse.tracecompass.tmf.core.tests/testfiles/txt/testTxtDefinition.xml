@@ -20,7 +20,8 @@
 <TimeStampOutputFormat>dd/MM/yyyy HH:mm:ss:SSS</TimeStampOutputFormat>
 <InputLine>
 <Cardinality max="2147483647" min="0"/>
-<RegEx>(\d*) (.*\S)</RegEx>
+<RegEx>(\d*) (.*\S)?</RegEx>
+<EventType>DefaultName</EventType>
 <InputData action="0" format="Tn" name="Timestamp" tag="TIMESTAMP"/>
 <InputData action="0" name="Event type" tag="EVENT_TYPE"/>
 <InputLine>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 École Polytechnique de Montréal
+ * Copyright (c) 2016 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -96,6 +96,7 @@ public class CustomTxtTraceDataTest extends AbstractCustomTraceDataTest {
     private static final ICustomTestData CUSTOM_TXT_EVENT_NAME = new ICustomTestData() {
 
         private static final int NB_EVENTS = 10;
+        private static final String DEFAULT_EVENT = "DefaultName";
         private static final String ODD_EVENT = "OddName";
         private static final String EVEN_EVENT = "EvenName";
         private CustomTxtTraceDefinition fDefinition;
@@ -106,7 +107,7 @@ public class CustomTxtTraceDataTest extends AbstractCustomTraceDataTest {
             final File file = new File(TRACE_PATH);
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file));) {
                 for (int i = 1; i <= NB_EVENTS; ++i) {
-                    String evName = ((i % 2) == 0) ? EVEN_EVENT : ODD_EVENT;
+                    String evName = (i % 5) == 0 ? DEFAULT_EVENT : ((i % 2) == 0) ? EVEN_EVENT : ODD_EVENT;
                     String eventStr = i + " " + evName + "\n";
                     writer.write(eventStr);
                     int extra = i % 3;
@@ -122,7 +123,9 @@ public class CustomTxtTraceDataTest extends AbstractCustomTraceDataTest {
         public void validateEvent(ITmfEvent event) {
             assertTrue(event instanceof CustomTxtEvent);
             long ts = event.getTimestamp().getValue();
-            if (ts % 2 == 0) {
+            if (ts % 5 == 0) {
+                assertEquals("Event name", DEFAULT_EVENT, event.getName());
+            } else if (ts % 2 == 0) {
                 assertEquals("Event name", EVEN_EVENT, event.getName());
             } else {
                 assertEquals("Event name", ODD_EVENT, event.getName());
