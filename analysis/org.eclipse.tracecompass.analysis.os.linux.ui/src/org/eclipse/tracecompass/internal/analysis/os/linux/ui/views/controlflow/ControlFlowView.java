@@ -16,6 +16,7 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -131,6 +133,8 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
 
     private static final Comparator<ITimeGraphEntry>[] COLUMN_COMPARATORS;
 
+    private final Function<Collection<ILinkEvent>, Map<Integer, Long>> UPDATE_SCHEDULING_COLUMN_ALGO = new OptimizationAlgorithm();
+
     private static final int INITIAL_SORT_COLUMN_INDEX = 3;
 
     static {
@@ -151,6 +155,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
         public boolean isConflicting(ISchedulingRule rule) {
             return (rule == this);
         }
+
         @Override
         public boolean contains(ISchedulingRule rule) {
             return (rule == this);
@@ -158,7 +163,6 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
     };
 
     private final Set<ITmfTrace> fFlatTraces = new HashSet<>();
-
 
     private IAction fFlatAction;
 
@@ -417,12 +421,30 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
     }
 
     /**
+     * Get the optimization function for the scheduling column. In the base
+     * implementation, this optimizes by Line arrows, but can be overidden.
+     * <p>
+     * It takes a collection of link events, looking at the entries being
+     * linked, and returns a list of the proposed order. The list of indexes
+     * should be in ascending order. There can be duplicates, but the values and
+     * order should always be the same for the same input.
+     *
+     * @return the returned column order, where the integer is the tid of the
+     *         entry, and the return value is the position, there can be
+     *         duplicates.
+     */
+    public Function<Collection<ILinkEvent>, Map<Integer, Long>> getUpdatedSchedulingColumn() {
+        return UPDATE_SCHEDULING_COLUMN_ALGO;
+    }
+
+    /**
      * This is an optimization action used to find cliques of entries due to
      * links and put them closer together
      *
      * @author Samuel Gagnon
      */
     private final class OptimizationAction extends Action {
+
         @Override
         public void runWithEvent(Event event) {
             ITmfTrace trace = getTrace();
@@ -433,22 +455,73 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
             createFlatAction().run();
 
             /*
-             * "transitions" contains the count of every arrows between
-             * two tids (Pair<Integer, Integer>). For constructing the
-             * Pair, we always put the smallest tid first
+             * This method only returns the arrows in the current time interval
+             * [a,b] of ControlFlowView. Thus, we only optimize for that time
+             * interval
+             */
+            List<ILinkEvent> arrows = getTimeGraphViewer().getTimeGraphControl().getArrows();
+            final ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
+            List<TimeGraphEntry> currentList = getEntryList(ss);
+
+            Map<Integer, Long> orderedTidMap = getUpdatedSchedulingColumn().apply(arrows);
+
+            /*
+             * Now that we have our list of ordered tid, it's time to assign a
+             * position for each threads in the view. For this, we assign a
+             * value to an invisible column and sort according to the values in
+             * this column.
+             */
+            for (TimeGraphEntry entry : currentList) {
+                if (entry instanceof TraceEntry) {
+                    for (TimeGraphEntry child : ((TraceEntry) entry).getChildren()) {
+                        if (child instanceof ControlFlowEntry) {
+                            ControlFlowEntry cEntry = (ControlFlowEntry) child;
+                            /*
+                             * If the thread is in our list, we give it a
+                             * position. Otherwise, it means there's no activity
+                             * in the current interval for that thread. We set
+                             * its position to Long.MAX_VALUE so it goes to the
+                             * bottom.
+                             */
+                            cEntry.setSchedulingPosition(orderedTidMap.getOrDefault(cEntry.getThreadId(), Long.MAX_VALUE));
+                        }
+                    }
+                }
+            }
+
+            setEntryComparator(ControlFlowColumnComparators.SCHEDULING_COLUMN_COMPARATOR);
+            refresh();
+        }
+
+    }
+
+    /**
+     * Optimization algorithm, overridable.
+     *
+     * @author Matthew Khouzam
+     * @author Samuel Gagnon
+     */
+    public static class OptimizationAlgorithm implements Function<Collection<ILinkEvent>, Map<Integer, Long>> {
+
+        /**
+         * Get the scheduling column order by arrows
+         *
+         * @param arrows
+         *            the list of visible links
+         * @return the list of weights, by thread ID
+         */
+        @Override
+        public Map<Integer, Long> apply(Collection<ILinkEvent> arrows) {
+            /*
+             * "transitions" contains the count of every arrows between two tids
+             * (Pair<Integer, Integer>). For constructing the Pair, we always
+             * put the smallest tid first
              */
             Map<Pair<Integer, Integer>, Integer> transitions = new HashMap<>();
 
             /*
-             * This method only returns the arrows in the current time
-             * interval [a,b] of ControlFlowView. Thus, we only optimize
-             * for that time interval
-             */
-            List<ILinkEvent> arrows = getTimeGraphViewer().getTimeGraphControl().getArrows();
-
-            /*
-             * We iterate in arrows to count the number of transitions
-             * between every pair (tid,tid) in the current view
+             * We iterate in arrows to count the number of transitions between
+             * every pair (tid,tid) in the current view
              */
             for (ILinkEvent arrow : arrows) {
                 ITimeGraphEntry from = arrow.getEntry();
@@ -466,22 +539,22 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
             }
 
             /*
-             * We now have a transition count for every pair (tid,tid).
-             * The next step is to sort every pair according to its
-             * count in decreasing order
+             * We now have a transition count for every pair (tid,tid). The next
+             * step is to sort every pair according to its count in decreasing
+             * order
              */
             List<Pair<Integer, Integer>> sortedTransitionsByCount = transitions.entrySet().stream().sorted(Map.Entry.<Pair<Integer, Integer>, Integer> comparingByValue().reversed()).map(Map.Entry::getKey).collect(Collectors.toList());
 
             /*
-             * Next, we find the order in which we want to display our
-             * threads. We simply iterate in every pair (tid,tid) in
-             * orderedTidList. Each time we see a new tid, we add it at
-             * the end of orderedTidList. This way, threads with lots of
-             * transitions will be grouped in the top. While very naive,
-             * this algorithm is fast, simple and gives decent results.
+             * Next, we find the order in which we want to display our threads.
+             * We simply iterate in every pair (tid,tid) in orderedTidList. Each
+             * time we see a new tid, we add it at the end of orderedTidList.
+             * This way, threads with lots of transitions will be grouped in the
+             * top. While very naive, this algorithm is fast, simple and gives
+             * decent results.
              */
-            Map<Integer, Integer> orderedTidMap = new LinkedHashMap<>();
-            int pos = 0;
+            Map<Integer, Long> orderedTidMap = new LinkedHashMap<>();
+            long pos = 0;
             for (Pair<Integer, Integer> threadPair : sortedTransitionsByCount) {
                 if (orderedTidMap.get(threadPair.getFirst()) == null) {
                     orderedTidMap.put(threadPair.getFirst(), pos);
@@ -493,39 +566,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                 }
             }
 
-            /*
-             * Now that we have our list of ordered tid, it's time to
-             * assign a position for each threads in the view. For this,
-             * we assign a value to an invisible column and sort
-             * according to the values in this column.
-             */
-            final ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
-            List<TimeGraphEntry> currentList = getEntryList(ss);
-            for (TimeGraphEntry entry : currentList) {
-                if (entry instanceof TraceEntry) {
-                    for (TimeGraphEntry child : ((TraceEntry) entry).getChildren()) {
-                        if (child instanceof ControlFlowEntry) {
-                            ControlFlowEntry cEntry = (ControlFlowEntry) child;
-                            /*
-                             * If the thread is in our list, we give it
-                             * a position. Otherwise, it means there's
-                             * no activity in the current interval for
-                             * that thread. We set its position to
-                             * Long.MAX_VALUE so it goes to the bottom.
-                             */
-                            Integer threadPos = orderedTidMap.get(cEntry.getThreadId());
-                            if (threadPos != null) {
-                                cEntry.setSchedulingPosition(threadPos);
-                            } else {
-                                cEntry.setSchedulingPosition(Long.MAX_VALUE);
-                            }
-                        }
-                    }
-                }
-            }
-
-            setEntryComparator(ControlFlowColumnComparators.SCHEDULING_COLUMN_COMPARATOR);
-            refresh();
+            return orderedTidMap;
         }
     }
 
