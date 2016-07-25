@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <CustomXMLTraceDefinitionList>
 <Definition name="myxml">
-<TimeStampOutputFormat>HH:mm:ss:SSS</TimeStampOutputFormat>
+<TimeStampOutputFormat>Tn</TimeStampOutputFormat>
 <InputElement name="trace">
 <InputElement logentry="true" name="element">
 <InputData action="0" name="Message" tag="MESSAGE"/>
@@ -14,7 +14,6 @@
 <OutputColumn name="Message" tag="MESSAGE"/>
 </Definition>
 <Definition name="xmlevname">
-<TimeStampOutputFormat>HH:mm:ss:SSS</TimeStampOutputFormat>
 <InputElement name="trace">
 <InputElement eventtype="DefaultName" logentry="true" name="element">
 <InputData action="0" name="Ignore" tag="IGNORE"/>

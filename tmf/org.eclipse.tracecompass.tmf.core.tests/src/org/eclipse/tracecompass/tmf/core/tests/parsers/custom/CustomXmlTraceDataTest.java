@@ -17,11 +17,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlEvent;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
@@ -30,6 +33,8 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import com.google.common.collect.Lists;
 
 /**
  * Test the events parsed by a custom XML trace
@@ -63,6 +68,7 @@ public class CustomXmlTraceDataTest extends AbstractCustomTraceDataTest {
 
         private static final int NB_EVENTS = 10;
         private CustomXmlTraceDefinition fDefinition;
+        private ITmfEventAspect<?> fTimestampAspect;
 
         @Override
         public ITmfTrace getTrace() throws IOException, TmfTraceException {
@@ -77,7 +83,10 @@ public class CustomXmlTraceDataTest extends AbstractCustomTraceDataTest {
                 }
                 writer.write("</trace>");
             }
-            return new CustomXmlTrace(null, fDefinition, file.getPath(), BLOCK_SIZE);
+            ITmfTrace trace = new CustomXmlTrace(null, fDefinition, file.getPath(), BLOCK_SIZE);
+            ArrayList<@NonNull ITmfEventAspect<?>> aspects = Lists.newArrayList(trace.getEventAspects());
+            fTimestampAspect = aspects.stream().filter(aspect -> aspect.getName().equals("Timestamp")).findFirst().get();
+            return trace;
         }
 
         @Override
@@ -86,6 +95,7 @@ public class CustomXmlTraceDataTest extends AbstractCustomTraceDataTest {
             String name = fDefinition.definitionName;
             assertEquals("Event name", name, event.getName());
             assertEquals("Event name and type", event.getType().getName(), event.getName());
+            assertEquals("Timestamp", Long.toString(event.getTimestamp().toNanos()), fTimestampAspect.resolve(event));
         }
 
         @Override
@@ -102,6 +112,7 @@ public class CustomXmlTraceDataTest extends AbstractCustomTraceDataTest {
         private static final String ATTRIBUTE_EVENT = "AttributeName";
         private static final String ELEMENT_EVENT = "ElementName";
         private CustomXmlTraceDefinition fDefinition;
+        private ITmfEventAspect<?> fTimestampAspect;
 
         @Override
         public ITmfTrace getTrace() throws IOException, TmfTraceException {
@@ -117,7 +128,10 @@ public class CustomXmlTraceDataTest extends AbstractCustomTraceDataTest {
                 }
                 writer.write("</trace>");
             }
-            return new CustomXmlTrace(null, fDefinition, file.getPath(), BLOCK_SIZE);
+            ITmfTrace trace = new CustomXmlTrace(null, fDefinition, file.getPath(), BLOCK_SIZE);
+            ArrayList<@NonNull ITmfEventAspect<?>> aspects = Lists.newArrayList(trace.getEventAspects());
+            fTimestampAspect = aspects.stream().filter(aspect -> aspect.getName().equals("Timestamp")).findFirst().get();
+            return trace;
         }
 
         @Override
@@ -132,6 +146,7 @@ public class CustomXmlTraceDataTest extends AbstractCustomTraceDataTest {
                 assertEquals("Event name", ELEMENT_EVENT, event.getName());
             }
             assertEquals("Event name and type", event.getType().getName(), event.getName());
+            assertEquals("Timestamp", TmfBaseAspects.getTimestampAspect().resolve(event), fTimestampAspect.resolve(event));
         }
 
         @Override

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <CustomTxtTraceDefinitionList>
 <Definition name="testtxt">
-<TimeStampOutputFormat>dd/MM/yyyy HH:mm:ss:SSS</TimeStampOutputFormat>
+<TimeStampOutputFormat>Tn</TimeStampOutputFormat>
 <InputLine>
 <Cardinality max="2147483647" min="0"/>
 <RegEx>(\S*\s\S*) (.*\S)</RegEx>
@@ -13,11 +13,10 @@
 <InputData action="2" tag="MESSAGE"/>
 </InputLine>
 </InputLine>
-<OutputColumn name="Time Stamp" tag="TIMESTAMP"/>
+<OutputColumn name="Timestamp" tag="TIMESTAMP"/>
 <OutputColumn name="Message" tag="MESSAGE"/>
 </Definition>
 <Definition name="testtxtevname">
-<TimeStampOutputFormat>dd/MM/yyyy HH:mm:ss:SSS</TimeStampOutputFormat>
 <InputLine>
 <Cardinality max="2147483647" min="0"/>
 <RegEx>(\d*) (.*\S)?</RegEx>
