@@ -816,4 +816,30 @@ public interface IKernelAnalysisEventLayout {
     default String[] fieldPathTcpFlags() {
         return new String[] { "flags" }; //$NON-NLS-1$
     }
+
+    // ------------------------------------------------------------------------
+    // VirtualMachine events : kvm entry/exit events
+    // ------------------------------------------------------------------------
+
+    /**
+     * KVM kernel event indicating that virtual machine code is being run
+     *
+     * @return The name of the kvm entry event
+     * @since 2.1
+     */
+    default Collection<String> eventsKVMEntry() {
+        return Collections.EMPTY_SET;
+    }
+
+    /**
+     * KVM kernel event indicating that virtual machine code is not run anymore,
+     * but rather hypervisor-specific code
+     *
+     * @return The name of the kvm exit event
+     * @since 2.1
+     */
+    default Collection<String> eventsKVMExit() {
+        return Collections.EMPTY_SET;
+    }
+
 }
