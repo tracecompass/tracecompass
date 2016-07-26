@@ -117,6 +117,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
@@ -230,7 +231,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private static final int FILTER_SUMMARY_INDEX = 1;
     private static final int EVENT_COLUMNS_START_INDEX = MARGIN_COLUMN_INDEX + 1;
 
-    private final class ColumnMovedListener extends ControlAdapter {
+    private final class ColumnListener extends ControlAdapter {
         /*
          * Make sure that the margin column is always first and keep the column
          * order variable up to date.
@@ -238,38 +239,27 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         @Override
         public void controlMoved(ControlEvent e) {
             int[] order = fTable.getColumnOrder();
-            if (order[0] == MARGIN_COLUMN_INDEX) {
-                fColumnOrder = order;
-                return;
-            }
-            for (int i = order.length - 1; i > 0; i--) {
-                if (order[i] == MARGIN_COLUMN_INDEX) {
-                    order[i] = order[i - 1];
-                    order[i - 1] = MARGIN_COLUMN_INDEX;
+            if (order[0] != MARGIN_COLUMN_INDEX) {
+                for (int i = order.length - 1; i > 0; i--) {
+                    if (order[i] == MARGIN_COLUMN_INDEX) {
+                        order[i] = order[i - 1];
+                        order[i - 1] = MARGIN_COLUMN_INDEX;
+                    }
                 }
+                fTable.setColumnOrder(order);
             }
-            fTable.setColumnOrder(order);
-            fColumnOrder = fTable.getColumnOrder();
+            fColumnOrder = order;
+            fTable.layout();
         }
 
         @Override
         public void controlResized(ControlEvent e) {
-            final int size = fTable.getColumns().length;
-            int[] width = new int[size];
-            boolean[] resizable = new boolean[size];
-            for (TableColumn column : fTable.getColumns()) {
+            TableColumn column = (TableColumn) e.widget;
+            if (column.getResizable() && !isExpanded(column)) {
                 int i = (int) column.getData(Key.INDEX);
-                resizable[i] = column.getResizable();
-                Object data = column.getData(Key.WIDTH);
-                if (data instanceof Integer) {
-                    width[i] = resizable[i] ? column.getWidth() : (Integer) data;
-                } else {
-                    width[i] = column.getWidth();
-                }
+                fColumnSize[i] = column.getWidth();
+                column.setData(Key.WIDTH, fColumnSize[i]);
             }
-            fColumnSize = width;
-            fColumnResizable = resizable;
-            super.controlResized(e);
         }
     }
 
@@ -698,6 +688,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private TmfRawEventViewer fRawViewer;
     private ITmfTrace fTrace;
     private volatile boolean fPackDone = false;
+    private volatile boolean fPackMarginDone = false;
     private HeaderState fHeaderState = HeaderState.NO_SEARCH;
     private long fSelectedRank = -1;
     private long fSelectedBeginRank = -1;
@@ -906,6 +897,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fColumns.add(MARGIN_COLUMN_INDEX, collapseCol);
 
         fHeaderMenu = new Menu(fTable);
+
+        fColumnSize = new int[fColumns.size()];
+        fColumnResizable = new boolean[fColumns.size()];
         int i = 0;
         // Create the UI columns in the table
         for (TmfEventTableColumn col : fColumns) {
@@ -914,15 +908,17 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             column.setToolTipText(col.getHeaderTooltip());
             column.setData(Key.ASPECT, col.getEventAspect());
             column.setData(Key.INDEX, i);
-            i++;
-            column.pack();
             if (col instanceof TmfMarginColumn) {
                 column.setResizable(false);
             } else {
+                column.pack();
                 column.setMoveable(true);
-                column.setData(Key.WIDTH, -1);
+                column.setData(Key.WIDTH, column.getWidth());
+                fColumnSize[i] = column.getWidth();
             }
-            column.addControlListener(new ColumnMovedListener());
+            column.addControlListener(new ColumnListener());
+            fColumnResizable[i] = column.getResizable();
+            i++;
         }
         fColumnOrder = fTable.getColumnOrder();
 
@@ -1004,19 +1000,19 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             @Override
             public void run() {
                 boolean isChecked = isChecked();
-                int width = column.getWidth();
                 if (isChecked) {
-                    int newWidth = (int) column.getData(Key.WIDTH);
-                    column.setWidth(newWidth);
+                    int width = (int) column.getData(Key.WIDTH);
                     column.setResizable(true);
-                    width = newWidth;
+                    if (width == 0) {
+                        column.pack();
+                    } else {
+                        column.setWidth(width);
+                    }
                 } else {
-                    column.setData(Key.WIDTH, column.getWidth());
-                    column.setWidth(0);
                     column.setResizable(false);
+                    column.setWidth(0);
                 }
                 int pos = (int) column.getData(Key.INDEX);
-                fColumnSize[pos] = width;
                 fColumnResizable[pos] = isChecked;
             }
         };
@@ -1029,22 +1025,15 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             @Override
             public void run() {
                 for (TableColumn column : fTable.getColumns()) {
-                    final Object widthVal = column.getData(Key.WIDTH);
-                    if (widthVal instanceof Integer) {
-                        column.setWidth((Integer) widthVal);
+                    int index = (int) column.getData(Key.INDEX);
+                    if (index != MARGIN_COLUMN_INDEX) {
+                        final int width = (int) column.getData(Key.WIDTH);
                         column.setResizable(true);
-                        /*
-                         * This is because Linux always resizes the last column
-                         * to fill in the void, this means that hiding a column
-                         * resizes others and we can have 10 columns that are
-                         * 1000 pixels wide by hiding the last one
-                         * progressively.
-                         */
-                        if (IS_LINUX) {
+                        if (width == 0) {
                             column.pack();
+                        } else {
+                            column.setWidth(width);
                         }
-                        int index = (int) column.getData(Key.INDEX);
-                        fColumnSize[index] = column.getWidth();
                         fColumnResizable[index] = true;
                     }
                 }
@@ -1732,6 +1721,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 item.setForeground(i, fGreenColor);
                 item.setFont(i, fBoldFont);
             }
+        }
+        if (!fPackMarginDone) {
+            packMarginColumn();
+            fPackMarginDone = true;
         }
     }
 
@@ -2644,22 +2637,25 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     private void packSingleColumn(int i, final TableColumn column) {
-        final int headerWidth = column.getWidth();
-        if (column.getWidth() <= 0) {
+        if (i != MARGIN_COLUMN_INDEX && !column.getResizable()) {
             return;
         }
+        Object data = column.getData(Key.WIDTH);
+        final int headerWidth = data instanceof Integer ? (int) data : -1;
         column.pack();
         /*
          * Workaround for Linux which doesn't consider the image width of
          * search/filter row in TableColumn.pack() after having executed
          * TableItem.setImage(null) for other rows than search/filter row.
          */
-        if (IS_LINUX && (i == 0) && fCollapseFilterEnabled) {
+        if (IS_LINUX && (i == MARGIN_COLUMN_INDEX) && fCollapseFilterEnabled) {
             column.setWidth(column.getWidth() + SEARCH_IMAGE.getBounds().width);
         }
 
         if (column.getWidth() < headerWidth) {
             column.setWidth(headerWidth);
+        } else if (i != MARGIN_COLUMN_INDEX) {
+            column.setData(Key.WIDTH, column.getWidth());
         }
     }
 
@@ -2679,6 +2675,32 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             return false;
         }
         return true;
+    }
+
+    /**
+     * Returns true if the column is expanded to take extra available space.
+     * This is the last non-zero-width visible column in the column order on
+     * Linux. This column's width should not be persisted.
+     *
+     * @param column
+     *            the column
+     * @return true if the column is expanded.
+     */
+    private static boolean isExpanded(TableColumn column) {
+        if (IS_LINUX) {
+            Table table = column.getParent();
+            int[] order = table.getColumnOrder();
+            for (int i = order.length - 1; i >= 0; i--) {
+                TableColumn col = table.getColumn(order[i]);
+                if (col == column) {
+                    return true;
+                }
+                if (col.getWidth() > 0) {
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -2804,13 +2826,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     public void setColumnWidth(int[] width, boolean[] resizable) {
         int length = fTable.getColumns().length;
         if (width == null || resizable == null || resizable.length != length || width.length != length) {
-            fColumnSize = null;
-            fColumnResizable = null;
             return;
         }
         int i = 0;
         for (TableColumn column : fTable.getColumns()) {
-            if (i != 0) {
+            if (i != MARGIN_COLUMN_INDEX) {
                 column.setData(Key.WIDTH, width[i]);
                 column.setResizable(resizable[i]);
                 if (column.getResizable()) {
@@ -2823,6 +2843,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         }
         fColumnSize = width;
         fColumnResizable = resizable;
+        /* Don't pack, it would override these settings */
+        fPackDone = true;
     }
 
     /**
@@ -2860,27 +2882,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      *            disposed
      */
     public void setTrace(final ITmfTrace trace, final boolean disposeOnClose) {
-        setTrace(trace, disposeOnClose, null);
-    }
-
-    /**
-     * Assign a new trace to this event table.
-     *
-     * @param trace
-     *            The trace to assign to this event table
-     * @param disposeOnClose
-     *            true if the trace should be disposed when the table is
-     *            disposed
-     * @param sizes
-     *            the column widths
-     * @since 2.1
-     */
-    public void setTrace(final ITmfTrace trace, final boolean disposeOnClose, final int[] sizes) {
         if ((fTrace != null) && fDisposeOnClose) {
             fTrace.dispose();
         }
         fTrace = trace;
-        fPackDone = sizes != null;
+        fPackDone = false;
         fDisposeOnClose = disposeOnClose;
 
         // Perform the updates on the UI thread
