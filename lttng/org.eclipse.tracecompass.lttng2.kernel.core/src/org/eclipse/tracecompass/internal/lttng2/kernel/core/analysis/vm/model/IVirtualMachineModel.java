@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
@@ -42,10 +43,11 @@ public interface IVirtualMachineModel {
      *
      * TODO: This should be updated to something else to fit the event layout
      * generic linux model
+     * @param layout The event layout
      *
      * @return The set of required events for this model
      */
-    Set<String> getRequiredEvents();
+    Set<String> getRequiredEvents(IKernelAnalysisEventLayout layout);
 
     /**
      * Get the virtual CPU that is entering hypervisor mode with this event.
@@ -60,11 +62,13 @@ public interface IVirtualMachineModel {
      *            The event being handled
      * @param ht
      *            The current thread this event belongs to
+     * @param layout
+     *             The event layout
      * @return The virtual CPU entering hypervisor mode or {@code null} if the
      *         hypervisor is not being entered with this event.
      */
     @Nullable
-    VirtualCPU getVCpuEnteringHypervisorMode(ITmfEvent event, HostThread ht);
+    VirtualCPU getVCpuEnteringHypervisorMode(ITmfEvent event, HostThread ht, IKernelAnalysisEventLayout layout);
 
     /**
      * Get the virtual CPU that is exiting hypervisor mode with this event.
@@ -79,11 +83,13 @@ public interface IVirtualMachineModel {
      *            The event being handled
      * @param ht
      *            The current thread this event belongs to
+     * @param layout
+     *             The event layout
      * @return The virutal CPU exiting hypervisor mode or {@code null} if the
      *         hypervisor is not exiting with this event.
      */
     @Nullable
-    VirtualCPU getVCpuExitingHypervisorMode(ITmfEvent event, HostThread ht);
+    VirtualCPU getVCpuExitingHypervisorMode(ITmfEvent event, HostThread ht, IKernelAnalysisEventLayout layout);
 
     /**
      * Get the virtual CPU from a guest that corresponds to a specific thread

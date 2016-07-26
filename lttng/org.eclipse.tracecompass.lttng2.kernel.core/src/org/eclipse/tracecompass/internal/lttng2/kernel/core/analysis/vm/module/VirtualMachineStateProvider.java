@@ -152,10 +152,17 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
 
         /* Is the event managed by this analysis */
         final String eventName = event.getName();
+        IKernelAnalysisEventLayout eventLayout = fLayouts.get(event.getTrace());
+        if (eventLayout == null) {
+            buildEventNames(event.getTrace());
+            eventLayout = fLayouts.get(event.getTrace());
+            if (eventLayout == null) {
+                return;
+            }
+        }
 
-        /* TODO When requirements work again, don't hardcode this */
-        if (!eventName.equals("sched_switch") && //$NON-NLS-1$
-                !fModel.getRequiredEvents().contains(eventName)) {
+        if (!eventName.equals(eventLayout.eventSchedSwitch()) &&
+                !fModel.getRequiredEvents(eventLayout).contains(eventName)) {
             return;
         }
 
@@ -197,9 +204,6 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
             fModel.handleEvent(event);
 
             /* Handle the event here */
-            if (!fEventNames.containsRow(event.getTrace())) {
-                buildEventNames(event.getTrace());
-            }
             Integer idx = fEventNames.get(event.getTrace(), eventName);
             int intval = (idx == null ? -1 : idx.intValue());
             switch (intval) {
@@ -209,10 +213,6 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
              * prev_state, string next_comm, int32 next_tid, int32 next_prio
              */
             {
-                final IKernelAnalysisEventLayout eventLayout = fLayouts.get(event.getTrace());
-                if (eventLayout == null) {
-                    return;
-                }
                 int prevTid = ((Long) content.getField(eventLayout.fieldPrevTid()).getValue()).intValue();
                 int nextTid = ((Long) content.getField(eventLayout.fieldNextTid()).getValue()).intValue();
 
@@ -301,7 +301,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
                  * Are we entering the hypervisor mode and if so, which virtual
                  * CPU is concerned?
                  */
-                VirtualCPU virtualCpu = fModel.getVCpuEnteringHypervisorMode(event, ht);
+                VirtualCPU virtualCpu = fModel.getVCpuEnteringHypervisorMode(event, ht, eventLayout);
                 if (virtualCpu != null) {
                     /* Add the hypervisor flag to the status */
                     VirtualMachine vm = virtualCpu.getVm();
@@ -319,7 +319,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
                  * Are we exiting the hypervisor mode and if so, which virtual
                  * CPU is concerned?
                  */
-                virtualCpu = fModel.getVCpuExitingHypervisorMode(event, ht);
+                virtualCpu = fModel.getVCpuExitingHypervisorMode(event, ht, eventLayout);
                 if (virtualCpu != null) {
                     /* Remove the hypervisor flag from the status */
                     VirtualMachine vm = virtualCpu.getVm();

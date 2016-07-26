@@ -56,17 +56,6 @@ public interface QemuKvmStrings {
      * guest on a host
      */
     String VM_UID_PAYLOAD = "vm_uid";
-
-    /* kvm entry/exit events */
-    /**
-     * KVM kernel event indicating that virtual machine code is being run
-     */
-    String KVM_ENTRY = "kvm_entry";
-    /**
-     * KVM kernel event indicating that virtual machine code is not run anymore,
-     * but rather hypervisor-specific code
-     */
-    String KVM_EXIT = "kvm_exit";
     /**
      * Field from kvm_entry event indicating which virtual CPU is being run
      */

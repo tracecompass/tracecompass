@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model.qemukvm;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -22,6 +23,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelThreadInformationProvider;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model.IVirtualMachineModel;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model.VirtualCPU;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model.VirtualMachine;
@@ -56,14 +58,13 @@ public class QemuKvmVmModel implements IVirtualMachineModel {
 
     private final TmfExperiment fExperiment;
 
-    static final ImmutableSet<String> REQUIRED_EVENTS = ImmutableSet.of(
-            QemuKvmStrings.KVM_ENTRY,
-            QemuKvmStrings.KVM_EXIT,
+    private Map<IKernelAnalysisEventLayout, Set<String>> fRequiredEvents = new HashMap<>();
+
+    private static final ImmutableSet<String> VMSYNC_EVENTS = ImmutableSet.of(
             QemuKvmStrings.VMSYNC_GH_GUEST,
             QemuKvmStrings.VMSYNC_GH_HOST,
             QemuKvmStrings.VMSYNC_HG_GUEST,
-            QemuKvmStrings.VMSYNC_HG_HOST
-            );
+            QemuKvmStrings.VMSYNC_HG_HOST);
 
     /**
      * Constructor
@@ -114,8 +115,16 @@ public class QemuKvmVmModel implements IVirtualMachineModel {
     }
 
     @Override
-    public Set<String> getRequiredEvents() {
-        return REQUIRED_EVENTS;
+    public Set<String> getRequiredEvents(IKernelAnalysisEventLayout layout) {
+        Set<String> events = fRequiredEvents.get(layout);
+        if (events == null) {
+            events = new HashSet<>();
+            events.addAll(layout.eventsKVMEntry());
+            events.addAll(layout.eventsKVMExit());
+            events.addAll(VMSYNC_EVENTS);
+            fRequiredEvents.put(layout, events);
+        }
+        return events;
     }
 
     private @Nullable VirtualMachine findVmFromParent(ITmfEvent event, HostThread ht) {
@@ -144,15 +153,13 @@ public class QemuKvmVmModel implements IVirtualMachineModel {
     }
 
     @Override
-    public @Nullable VirtualCPU getVCpuExitingHypervisorMode(ITmfEvent event, HostThread ht) {
+    public @Nullable VirtualCPU getVCpuExitingHypervisorMode(ITmfEvent event, HostThread ht, IKernelAnalysisEventLayout layout) {
         final String eventName = event.getName();
-
-        /* TODO: Use event layouts for this part also */
         /*
          * The KVM_ENTRY event means we are entering a virtual CPU, so exiting
          * hypervisor mode
          */
-        if (!eventName.equals(QemuKvmStrings.KVM_ENTRY)) {
+        if (!layout.eventsKVMEntry().contains(eventName)) {
             return null;
         }
 
@@ -178,13 +185,13 @@ public class QemuKvmVmModel implements IVirtualMachineModel {
     }
 
     @Override
-    public @Nullable VirtualCPU getVCpuEnteringHypervisorMode(ITmfEvent event, HostThread ht) {
+    public @Nullable VirtualCPU getVCpuEnteringHypervisorMode(ITmfEvent event, HostThread ht, IKernelAnalysisEventLayout layout) {
         final String eventName = event.getName();
         /*
          * The KVM_EXIT event means we are exiting a virtual CPU, so entering
          * hypervisor mode
          */
-        if (!eventName.equals(QemuKvmStrings.KVM_EXIT)) {
+        if (!layout.eventsKVMExit().contains(eventName)) {
             return null;
         }
 
@@ -205,7 +212,7 @@ public class QemuKvmVmModel implements IVirtualMachineModel {
         }
 
         final ITmfEventField content = event.getContent();
-        final long ts = event.getTimestamp().getValue();
+        final long ts = event.getTimestamp().toNanos();
         final String hostId = event.getTrace().getHostId();
 
         final Integer cpu = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
