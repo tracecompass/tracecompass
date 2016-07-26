@@ -87,7 +87,10 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.Multisets;
 
 /**
  * The Control Flow view main object
@@ -517,7 +520,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
              * (Pair<Integer, Integer>). For constructing the Pair, we always
              * put the smallest tid first
              */
-            Map<Pair<Integer, Integer>, Integer> transitions = new HashMap<>();
+            Multiset<Pair<Integer, Integer>> transitions = HashMultiset.<Pair<Integer,Integer>>create();
 
             /*
              * We iterate in arrows to count the number of transitions between
@@ -533,8 +536,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                 int toTid = ((ControlFlowEntry) to).getThreadId();
                 if (fromTid != toTid) {
                     Pair<Integer, Integer> key = new Pair<>(Math.min(fromTid, toTid), Math.max(fromTid, toTid));
-                    Integer count = transitions.getOrDefault(key, 0);
-                    transitions.put(key, count + 1);
+                    transitions.add(key);
                 }
             }
 
@@ -543,7 +545,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
              * step is to sort every pair according to its count in decreasing
              * order
              */
-            List<Pair<Integer, Integer>> sortedTransitionsByCount = transitions.entrySet().stream().sorted(Map.Entry.<Pair<Integer, Integer>, Integer> comparingByValue().reversed()).map(Map.Entry::getKey).collect(Collectors.toList());
+            List<Pair<Integer, Integer>> sortedTransitionsByCount = Multisets.copyHighestCountFirst(transitions).asList();
 
             /*
              * Next, we find the order in which we want to display our threads.
