@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseLoggerInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ILoggerInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IUstProviderInfo;
 
@@ -74,6 +73,14 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
                 fEvents.add(new BaseEventInfo((BaseEventInfo)event));
             } else {
                 fEvents.add(event);
+            }
+        }
+        for (Iterator<ILoggerInfo> iterator = other.fLoggers.iterator(); iterator.hasNext();) {
+            ILoggerInfo logger = iterator.next();
+            if (logger instanceof LoggerInfo) {
+                fLoggers.add(new LoggerInfo((LoggerInfo)logger));
+            } else {
+                fLoggers.add(logger);
             }
         }
     }
@@ -188,7 +195,7 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
             if (fLoggers.isEmpty()) {
                 output.append("None");
             } else {
-                for (IBaseLoggerInfo logger : fLoggers) {
+                for (ILoggerInfo logger : fLoggers) {
                     output.append(logger.toString());
                 }
             }

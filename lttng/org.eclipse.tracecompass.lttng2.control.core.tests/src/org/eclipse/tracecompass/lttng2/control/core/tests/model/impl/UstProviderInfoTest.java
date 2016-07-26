@@ -22,8 +22,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ILoggerInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IUstProviderInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BaseEventInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.LoggerInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.UstProviderInfo;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +46,9 @@ public class UstProviderInfoTest {
     private IBaseEventInfo fEventInfo1 = null;
     private IBaseEventInfo fEventInfo2 = null;
 
+    private ILoggerInfo fLoggerInfo1 = null;
+    private ILoggerInfo fLoggerInfo2 = null;
+
     // ------------------------------------------------------------------------
     // Housekeeping
     // ------------------------------------------------------------------------
@@ -58,6 +63,8 @@ public class UstProviderInfoTest {
         fUstProviderInfo2 = factory.getUstProviderInfo2();
         fEventInfo1 = factory.getBaseEventInfo1();
         fEventInfo2 = factory.getBaseEventInfo2();
+        fLoggerInfo1 = factory.getLoggerInfo1();
+        fLoggerInfo2 = factory.getLoggerInfo2();
     }
 
     // ------------------------------------------------------------------------
@@ -79,6 +86,7 @@ public class UstProviderInfoTest {
         assertEquals("test", result.getName());
         assertEquals(0, result.getPid());
         assertEquals(0, result.getEvents().length);
+        assertEquals(0, result.getLoggers().size());
     }
 
     /**
@@ -91,11 +99,18 @@ public class UstProviderInfoTest {
         assertEquals(fUstProviderInfo1.getName(), providerInf.getName());
         assertEquals(fUstProviderInfo1.getPid(), providerInf.getPid());
         assertEquals(fUstProviderInfo1.getEvents().length, providerInf.getEvents().length);
+        assertEquals(fUstProviderInfo1.getLoggers().size(), providerInf.getLoggers().size());
 
         IBaseEventInfo[] orignalEvents = fUstProviderInfo1.getEvents();
         IBaseEventInfo[] resultEvents = providerInf.getEvents();
         for (int i = 0; i < orignalEvents.length; i++) {
             assertEquals(orignalEvents[i], resultEvents[i]);
+        }
+
+        List<ILoggerInfo> originalLoggers = fUstProviderInfo1.getLoggers();
+        List<ILoggerInfo> resultLoggers = providerInf.getLoggers();
+        for (int i = 0; i < originalLoggers.size(); i++) {
+            assertEquals(originalLoggers.get(i), resultLoggers.get(i));
         }
     }
 
@@ -120,21 +135,31 @@ public class UstProviderInfoTest {
     @Test
     public void testGetAndSetters() {
         IUstProviderInfo fixture = new UstProviderInfo("test");
+
         fixture.setPid(2468);
+        assertEquals(2468, fixture.getPid());
 
         // add an event
         IBaseEventInfo event = new BaseEventInfo("event");
         fixture.addEvent(event);
 
-        // Verify the stored events
-        IBaseEventInfo[] result = fixture.getEvents();
+        // verify the stored events
+        IBaseEventInfo[] events = fixture.getEvents();
+        assertNotNull(events);
+        assertEquals(1, events.length);
+        assertNotNull(events[0]);
+        assertTrue(event.equals(events[0]));
 
-        assertNotNull(result);
-        assertEquals(1, result.length);
-        assertNotNull(result[0]);
-        assertTrue(event.equals(result[0]));
+        // add a logger
+        ILoggerInfo logger = new LoggerInfo("logger");
+        fixture.addLogger(logger);
 
-        assertEquals(2468, fixture.getPid());
+        // verify the stored loggers
+        List<ILoggerInfo> loggers = fixture.getLoggers();
+        assertNotNull(loggers);
+        assertEquals(1, loggers.size());
+        assertNotNull(loggers.get(0));
+        assertTrue(logger.equals(loggers.get(0)));
     }
 
     /**
@@ -143,7 +168,6 @@ public class UstProviderInfoTest {
     @Test
     public void testSetEvents_1() {
         UstProviderInfo fixture = new UstProviderInfo("test");
-        fixture.setPid(2468);
         List<IBaseEventInfo> events = new LinkedList<>();
         events.add(fEventInfo1);
         events.add(fEventInfo2);
@@ -155,6 +179,26 @@ public class UstProviderInfoTest {
 
         for (int i = 0; i < infos.length; i++) {
             assertEquals(events.get(i), infos[i]);
+        }
+    }
+
+    /**
+     * Run the void setLoggers(List<ILoggerInfo>) method test.
+     */
+    @Test
+    public void testSetLoggers_1() {
+        UstProviderInfo fixture = new UstProviderInfo("test");
+        List<ILoggerInfo> originalLoggers = new LinkedList<>();
+        originalLoggers.add(fLoggerInfo1);
+        originalLoggers.add(fLoggerInfo2);
+        fixture.setLoggers(originalLoggers);
+
+        List<ILoggerInfo> resultLoggers = fixture.getLoggers();
+
+        assertEquals(originalLoggers.size(), resultLoggers.size());
+
+        for (int i = 0; i < resultLoggers.size(); i++) {
+            assertEquals(originalLoggers.get(i), resultLoggers.get(i));
         }
     }
 
@@ -177,9 +221,11 @@ public class UstProviderInfoTest {
         String result = fUstProviderInfo2.toString();
 
         assertEquals("[UstProviderInfo([TraceInfo(Name=myUST2)],PID=2345,Events=[BaseEventInfo([TraceInfo(Name=event1)],"
-                + "type=UNKNOWN,level=TRACE_DEBUG,Fields=[FieldInfo([TraceInfo(Name=intfield)],"
-                + "type=int[FieldInfo([TraceInfo(Name=stringfield)],type=string,Filter=intField==10)][BaseEventInfo([TraceInfo(Name=event2)],"
-                + "type=TRACEPOINT,level=TRACE_DEBUG)],Loggers=None)]", result);
+                + "type=UNKNOWN,level=TRACE_ERR,Fields=[FieldInfo([TraceInfo(Name=intfield)],type=int[FieldInfo([TraceInfo(Name=stringfield)],"
+                + "type=string,Filter=intField==10)][BaseEventInfo([TraceInfo(Name=event2)],type=TRACEPOINT,level=TRACE_DEBUG)]"
+                + ",Loggers=[LoggerInfo([BaseLoggerInfo([TraceInfo(Name=logger1)],domain=JUL,level=JUL_INFO)],"
+                + "State=ENABLED,levelType=LOGLEVEL_ALL)][LoggerInfo([BaseLoggerInfo([TraceInfo(Name=logger2)],"
+                + "domain=LOG4J,level=LEVEL_UNKNOWN)],State=DISABLED,levelType=LOGLEVEL_ALL)])]", result);
     }
 
     // ------------------------------------------------------------------------

@@ -13,23 +13,29 @@
 package org.eclipse.tracecompass.lttng2.control.core.tests.model.impl;
 
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseLoggerInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IFieldInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ILoggerInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IProbeEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISnapshotInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IUstProviderInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BaseEventInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BaseLoggerInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.ChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.DomainInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.EventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.FieldInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.LoggerInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.ProbeEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.SessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.SnapshotInfo;
@@ -50,10 +56,14 @@ public class ModelImplFactory {
     private IEventInfo fEventInfo1 = null;
     private IEventInfo fEventInfo2 = null;
     private IEventInfo fEventInfo3 = null;
+    private ILoggerInfo fLoggerInfo1 = null;
+    private ILoggerInfo fLoggerInfo2 = null;
     private IFieldInfo fFieldInfo1 = null;
     private IFieldInfo fFieldInfo2 = null;
     private IBaseEventInfo fBaseEventInfo1 = null;
     private IBaseEventInfo fBaseEventInfo2 = null;
+    private IBaseLoggerInfo fBaseLoggerInfo1 = null;
+    private IBaseLoggerInfo fBaseLoggerInfo2 = null;
     private IUstProviderInfo fUstProviderInfo1 = null;
     private IUstProviderInfo fUstProviderInfo2 = null;
     private IProbeEventInfo fProbeEventInfo1 = null;
@@ -77,7 +87,15 @@ public class ModelImplFactory {
 
         fBaseEventInfo2 = new BaseEventInfo("event2");
         fBaseEventInfo2.setEventType(TraceEventType.TRACEPOINT);
-        fBaseEventInfo1.setLogLevel(TraceLogLevel.TRACE_DEBUG);
+        fBaseEventInfo2.setLogLevel(TraceLogLevel.TRACE_DEBUG);
+
+        fBaseLoggerInfo1 = new BaseLoggerInfo("logger1");
+        fBaseLoggerInfo1.setDomain(TraceDomainType.JUL);
+        fBaseLoggerInfo1.setLogLevel(TraceJulLogLevel.JUL_FINE);
+
+        fBaseLoggerInfo2 = new BaseLoggerInfo("logger2");
+        fBaseLoggerInfo2.setDomain(TraceDomainType.LOG4J);
+        fBaseLoggerInfo1.setLogLevel(TraceJulLogLevel.JUL_FINER);
 
         fEventInfo1 = new EventInfo("event1");
         fEventInfo1.setEventType(TraceEventType.TRACEPOINT);
@@ -95,14 +113,27 @@ public class ModelImplFactory {
         fEventInfo3.setEventType(TraceEventType.TRACEPOINT);
         fEventInfo3.setState(TraceEnablement.DISABLED);
 
+        fLoggerInfo1 = new LoggerInfo("logger1");
+        fLoggerInfo1.setDomain(TraceDomainType.JUL);
+        fLoggerInfo1.setLogLevel(TraceJulLogLevel.JUL_CONFIG);
+        fLoggerInfo1.setState("false");
+
+        fLoggerInfo2 = new LoggerInfo("logger2");
+        fLoggerInfo2.setDomain(TraceDomainType.LOG4J);
+        fLoggerInfo1.setLogLevel(TraceJulLogLevel.JUL_INFO);
+        fLoggerInfo1.setState("true");
+
         fUstProviderInfo1 = new UstProviderInfo("myUST1");
         fUstProviderInfo1.setPid(1234);
         fUstProviderInfo1.addEvent(fBaseEventInfo1);
+        fUstProviderInfo1.addLogger(fLoggerInfo1);
 
         fUstProviderInfo2 = new UstProviderInfo("myUST2");
         fUstProviderInfo2.setPid(2345);
         fUstProviderInfo2.addEvent(fBaseEventInfo1);
         fUstProviderInfo2.addEvent(fBaseEventInfo2);
+        fUstProviderInfo2.addLogger(fLoggerInfo1);
+        fUstProviderInfo2.addLogger(fLoggerInfo2);
 
         fChannelInfo1 = new ChannelInfo("channel1");
         fChannelInfo1.setSwitchTimer(10L);
@@ -212,6 +243,22 @@ public class ModelImplFactory {
 
     public IBaseEventInfo getBaseEventInfo2() {
         return fBaseEventInfo2;
+    }
+
+    public ILoggerInfo getLoggerInfo1() {
+        return fLoggerInfo1;
+    }
+
+    public ILoggerInfo getLoggerInfo2() {
+        return fLoggerInfo2;
+    }
+
+    public IBaseLoggerInfo getBaseLoggerInfo1() {
+        return fBaseLoggerInfo1;
+    }
+
+    public IBaseLoggerInfo getBaseLoggerInfo2() {
+        return fBaseLoggerInfo2;
     }
 
     public IUstProviderInfo getUstProviderInfo1() {

@@ -116,7 +116,7 @@ public class BaseLoggerInfo extends TraceInfo implements IBaseLoggerInfo {
         StringBuffer output = new StringBuffer();
         output.append("[BaseLoggerInfo(");
         output.append(super.toString());
-        output.append(",domain");
+        output.append(",domain=");
         output.append(fDomain);
         output.append(",level=");
         output.append(fLogLevel);

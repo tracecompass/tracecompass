@@ -17,18 +17,23 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IEventInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.ILoggerInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceChannelOutputType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.SessionInfo;
@@ -48,6 +53,7 @@ public class LTTngControlServiceMiTest extends LTTngControlServiceTest {
 
     private static final String SCEN_SESSION_WITH_SYSCALLS = "GetSessionWithSyscalls";
     private static final String SCEN_LIST_SESSION_2_7_COMPAT = "ListSession2.7Compat";
+    private static final String SCEN_ENABLING_JUL_LOGGERS = "EnableJulLoggers";
 
     @Override
     protected ILttngControlService getControlService() {
@@ -300,6 +306,55 @@ public class LTTngControlServiceMiTest extends LTTngControlServiceTest {
             assertEquals(TraceEventType.TRACEPOINT, ustEvents[0].getEventType());
             assertEquals(TraceEnablement.ENABLED, ustEvents[0].getState());
 
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+    @Override
+    public void testEnableJulLoggers() {
+        try {
+            String sessionName = "mysession";
+            // Lists
+            List<String> loggerList = new ArrayList<>();
+            // Events
+            String loggerName1 = "logger";
+            String loggerName2 = "anotherLogger";
+            String allLoggerName = "*";
+
+            fShell.setScenario(SCEN_ENABLING_JUL_LOGGERS);
+
+            // 1) Enabling all loggers
+            loggerList.add(allLoggerName);
+            fService.enableEvents(sessionName, null, loggerList, TraceDomainType.JUL, null, null, new NullProgressMonitor());
+            loggerList.clear();
+
+            // 2) Enabling one logger
+            loggerList.add(loggerName1);
+            fService.enableEvents(sessionName, null, loggerList, TraceDomainType.JUL, null, null, new NullProgressMonitor());
+
+            // 3) Enabling two loggers with loglevel-only JUL_WARNING and
+            //    verifying the attributes of one of them
+            loggerList.add(loggerName2);
+            fService.enableLogLevel(sessionName, null, loggerList, LogLevelType.LOGLEVEL_ONLY, TraceJulLogLevel.JUL_WARNING, null, TraceDomainType.JUL, new NullProgressMonitor());
+
+            @Nullable
+            ISessionInfo session = fService.getSession(sessionName, new NullProgressMonitor());
+            assertNotNull(session);
+            // Get the list of loggers
+            List<ILoggerInfo> loggers = session.getDomains()[1].getLoggers();
+            assertNotNull(loggers);
+            assertEquals(loggers.size(), 4);
+            // Get the "anotherLogger" logger
+            ILoggerInfo loggerInfo = loggers.stream()
+                    .filter(logger -> logger.getName().equals(loggerName2))
+                    .findFirst().get();
+            // Verify attributes
+            assertEquals(loggerName2, loggerInfo.getName());
+            assertEquals(TraceDomainType.JUL, loggerInfo.getDomain());
+            assertEquals(TraceJulLogLevel.JUL_WARNING, loggerInfo.getLogLevel());
+            assertEquals(LogLevelType.LOGLEVEL_ONLY, loggerInfo.getLogLevelType());
+            assertEquals(TraceEnablement.ENABLED, loggerInfo.getState());
         } catch (ExecutionException e) {
             fail(e.toString());
         }

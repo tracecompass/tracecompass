@@ -90,7 +90,7 @@ public enum TraceJulLogLevel implements ITraceLogLevel{
             throw new IllegalArgumentException();
         }
         for (TraceJulLogLevel tllevel : TraceJulLogLevel.values()) {
-            if (tllevel.name().equals(name)) {
+            if (tllevel.name().equals(name) || tllevel.getInName().equals(name)) {
                 return tllevel;
             }
         }

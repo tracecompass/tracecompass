@@ -1155,6 +1155,12 @@ public class LTTngControlServiceTest {
     }
 
     @Test
+    public void testEnableJulLoggers() {
+        // Trace Compass only supports JUL starting with LTTng 2.6 that supports MI.
+        // The implementation of this test is the LTTngControlServiceMiTest.java.
+    }
+
+    @Test
     public void testEventExcluded() {
         try {
             String sessionName = "mysession2";
