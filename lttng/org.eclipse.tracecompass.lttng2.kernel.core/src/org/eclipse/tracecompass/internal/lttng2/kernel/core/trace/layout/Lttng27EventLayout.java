@@ -50,6 +50,11 @@ public class Lttng27EventLayout extends Lttng26EventLayout {
     private static final String X86_IRQ_VECTORS_DEFERRED_ERROR_APIC_EXIT = "x86_irq_vectors_deferred_error_apic_exit";   //$NON-NLS-1$
     private static final String X86_IRQ_VECTORS_THERMAL_APIC_ENTRY = "x86_irq_vectors_thermal_apic_entry";  //$NON-NLS-1$
     private static final String X86_IRQ_VECTORS_THERMAL_APIC_EXIT = "x86_irq_vectors_thermal_apic_exit";  //$NON-NLS-1$
+    /* KVM events */
+    private static final String KVM_X86_ENTRY = "kvm_x86_entry";  //$NON-NLS-1$
+    private static final String KVM_X86_EXIT = "kvm_x86_exit";  //$NON-NLS-1$
+    private static final Collection<String> KVM_ENTRY_EVENTS = ImmutableSet.of(KVM_X86_ENTRY);
+    private static final Collection<String> KVM_EXIT_EVENTS = ImmutableSet.of(KVM_X86_EXIT);
 
     private static final Collection<String> IPI_ENTRY_SET = ImmutableSet.of(
             X86_IRQ_VECTORS_LOCAL_TIMER_ENTRY,
@@ -223,6 +228,16 @@ public class Lttng27EventLayout extends Lttng26EventLayout {
 
     public String x86IrqVectorsThermalApicExit() {
         return X86_IRQ_VECTORS_THERMAL_APIC_EXIT;
+    }
+
+    @Override
+    public @NonNull Collection<@NonNull String> eventsKVMEntry() {
+        return KVM_ENTRY_EVENTS;
+    }
+
+    @Override
+    public @NonNull Collection<@NonNull String> eventsKVMExit() {
+        return KVM_EXIT_EVENTS;
     }
 
     @Override

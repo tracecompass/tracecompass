@@ -19,6 +19,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * This file defines all the known event and field names for LTTng kernel
@@ -112,6 +113,12 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     private static final String[] TCP_SEQ_FIELD = { "transport_fields", "thtype_tcp", "seq" };
     private static final String[] TCP_ACK_FIELD = { "transport_fields", "thtype_tcp", "ack_seq" };
     private static final String[] TCP_FLAGS_FIELD = { "transport_fields", "thtype_tcp", "flags" };
+
+    /* KVM events */
+    private static final String KVM_ENTRY = "kvm_entry";  //$NON-NLS-1$
+    private static final String KVM_EXIT = "kvm_exit";  //$NON-NLS-1$
+    private static final Collection<String> KVM_ENTRY_EVENTS = ImmutableSet.of(KVM_ENTRY);
+    private static final Collection<String> KVM_EXIT_EVENTS = ImmutableSet.of(KVM_EXIT);
 
     /** All instances are the same. Only provide a static instance getter */
     protected LttngEventLayout() {
@@ -506,4 +513,17 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
         return TCP_FLAGS_FIELD;
     }
 
+    // ------------------------------------------------------------------------
+    // VirtualMachine events : kvm entry/exit events
+    // ------------------------------------------------------------------------
+
+    @Override
+    public @NonNull Collection<@NonNull String> eventsKVMEntry() {
+        return KVM_ENTRY_EVENTS;
+    }
+
+    @Override
+    public @NonNull Collection<@NonNull String> eventsKVMExit() {
+        return KVM_EXIT_EVENTS;
+    }
 }
