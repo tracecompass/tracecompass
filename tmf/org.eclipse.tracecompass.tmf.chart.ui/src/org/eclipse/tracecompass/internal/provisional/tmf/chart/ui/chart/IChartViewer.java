@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartData;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartModel;
+import org.eclipse.tracecompass.internal.tmf.chart.ui.swtchart.SwtBarChart;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.swtchart.SwtScatterChart;
 
 import com.google.common.collect.ImmutableList;
@@ -79,9 +80,7 @@ public interface IChartViewer {
     static @Nullable IChartViewer createChart(Composite parent, ChartData data, ChartModel model) {
         switch (model.getChartType()) {
         case BAR_CHART:
-            /**
-             * TODO
-             */
+            return new SwtBarChart(parent, data, model);
         case SCATTER_CHART:
             return new SwtScatterChart(parent, data, model);
         case PIE_CHART:
