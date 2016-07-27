@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
@@ -104,6 +105,13 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     private static final String NR_SECTOR="nr_sector";
     private static final String RQ_SECTOR= "rq_sector";
     private static final String NEXTRQ_SECTOR= "nextrq_sector";
+
+    /* Network events and field names */
+    private static final String EVENT_NETWORK_SEND = "net_dev_queue";
+    private static final String EVENT_NETWORK_RECEIVE = "netif_receive_skb";
+    private static final String[] TCP_SEQ_FIELD = { "transport_fields", "thtype_tcp", "seq" };
+    private static final String[] TCP_ACK_FIELD = { "transport_fields", "thtype_tcp", "ack_seq" };
+    private static final String[] TCP_FLAGS_FIELD = { "transport_fields", "thtype_tcp", "flags" };
 
     /** All instances are the same. Only provide a static instance getter */
     protected LttngEventLayout() {
@@ -471,6 +479,31 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     @Override
     public String fieldDiskname() {
         return DISKNAME;
+    }
+
+    @Override
+    public @NonNull String eventNetworkSend() {
+        return EVENT_NETWORK_SEND;
+    }
+
+    @Override
+    public @NonNull Collection<@NonNull String> eventNetworkReceive() {
+        return Collections.singleton(EVENT_NETWORK_RECEIVE);
+    }
+
+    @Override
+    public String @NonNull [] fieldPathTcpSeq() {
+        return TCP_SEQ_FIELD;
+    }
+
+    @Override
+    public String @NonNull [] fieldPathTcpAckSeq() {
+        return TCP_ACK_FIELD;
+    }
+
+    @Override
+    public String @NonNull [] fieldPathTcpFlags() {
+        return TCP_FLAGS_FIELD;
     }
 
 }

@@ -16,6 +16,7 @@ import java.util.Collection;
 
 import org.eclipse.jdt.annotation.NonNull;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -264,6 +265,11 @@ public class Lttng27EventLayout extends Lttng26EventLayout {
 
     public String fieldNSLevel() {
         return "ns_level"; //$NON-NLS-1$
+    }
+
+    @Override
+    public @NonNull Collection<@NonNull String> eventNetworkReceive() {
+        return ImmutableList.of("netif_receive_skb", "net_if_receive_skb"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
 }
