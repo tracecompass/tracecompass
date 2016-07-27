@@ -570,4 +570,13 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         return Collections.EMPTY_LIST;
     }
 
+    @Override
+    protected @NonNull Iterable<ITmfTrace> getTracesToBuild(@NonNull ITmfTrace trace) {
+        /*
+         * Return the current trace only. Experiments will return their
+         * children's analyses
+         */
+        return Collections.singleton(trace);
+    }
+
 }
