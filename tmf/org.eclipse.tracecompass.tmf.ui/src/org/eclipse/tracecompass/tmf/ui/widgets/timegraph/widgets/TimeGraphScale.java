@@ -507,8 +507,9 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     private int calculateDigits(long time0, long time1) {
         int numDigits = 5;
         long timeRange = time1 - time0;
+        TimeFormat timeFormat = fTimeProvider.getTimeFormat();
 
-        if (fTimeProvider.getTimeFormat() == TimeFormat.CALENDAR) {
+        if (timeFormat == TimeFormat.CALENDAR) {
             // Calculate the number of digits to represent the minutes provided
             // 11:222
             // HH:mm:ss
@@ -526,8 +527,10 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
             int thousandGroups = (numDigits - 1) / 3;
             numDigits += thousandGroups;
             numDigits += 12; // .000 000 000
-            if (fTimeProvider.getTimeFormat() == TimeFormat.CYCLES) {
+            if (timeFormat == TimeFormat.CYCLES) {
                 numDigits += Messages.Utils_ClockCyclesUnit.length();
+            } else if (fTimeProvider.getTimeFormat() == TimeFormat.RELATIVE) {
+                numDigits += 2; // " s"
             }
         }
 
@@ -734,7 +737,7 @@ class TimeDrawSec extends TimeDraw {
     @Override
     public int draw(GC gc, long nanosec, Rectangle rect) {
         long sec = nanosec / SEC_IN_NS;
-        return Utils.drawText(gc, sep(sec), rect, true);
+        return Utils.drawText(gc, sep(sec) + " s", rect, true); //$NON-NLS-1$
     }
 }
 
@@ -744,7 +747,7 @@ class TimeDrawMillisec extends TimeDraw {
         long millisec = nanosec / MILLISEC_IN_NS;
         long ms = millisec % PAD_1000;
         long sec = millisec / SEC_IN_MS;
-        return Utils.drawText(gc, sep(sec) + "." + pad(ms), rect, true); //$NON-NLS-1$
+        return Utils.drawText(gc, sep(sec) + "." + pad(ms) + " s", rect, true); //$NON-NLS-1$ //$NON-NLS-2$
     }
 }
 
@@ -756,7 +759,7 @@ class TimeDrawMicrosec extends TimeDraw {
         long millisec = microsec / MILLISEC_IN_US;
         long ms = millisec % PAD_1000;
         long sec = millisec / SEC_IN_MS;
-        return Utils.drawText(gc, sep(sec) + "." + pad(ms) + " " + pad(us), rect, true); //$NON-NLS-1$ //$NON-NLS-2$
+        return Utils.drawText(gc, sep(sec) + "." + pad(ms) + " " + pad(us) + " s", rect, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 }
 
@@ -769,7 +772,7 @@ class TimeDrawNanosec extends TimeDraw {
         long millisec = microsec / MILLISEC_IN_US;
         long ms = millisec % PAD_1000;
         long sec = millisec / SEC_IN_MS;
-        return Utils.drawText(gc, sep(sec) + "." + pad(ms) + " " + pad(us) + " " + pad(ns), rect, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        return Utils.drawText(gc, sep(sec) + "." + pad(ms) + " " + pad(us) + " " + pad(ns) + " s", rect, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 }
 
