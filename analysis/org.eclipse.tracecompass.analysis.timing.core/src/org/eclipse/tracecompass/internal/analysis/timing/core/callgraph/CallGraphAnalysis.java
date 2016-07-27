@@ -79,7 +79,7 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
     /**
      * The Trace's root functions list
      */
-    private final List<CalledFunction> fRootFunctions = new ArrayList<>();
+    private final List<ICalledFunction> fRootFunctions = new ArrayList<>();
 
     /**
      * The sub attributes of a certain thread
@@ -220,7 +220,7 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
                     long intervalStart = interval.getStartTime();
                     long intervalEnd = interval.getEndTime();
                     // Create the segment for the first call event.
-                    CalledFunction segment = new CalledFunction(intervalStart, intervalEnd + 1, stateValue.unboxLong(), depth);
+                    AbstractCalledFunction segment = CalledFunctionFactory.create(intervalStart, intervalEnd + 1, depth, stateValue, null);
                     fRootFunctions.add(segment);
                     if (!findChildren(segment, depth, stateSystem, fCurrentQuarks.size() + fCurrentQuarks.get(depth), monitor)) {
                         return false;
@@ -255,7 +255,7 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
      *            The progress monitor The progress monitor TODO: if stack size
      *            is an issue, convert to a stack instead of recursive function
      */
-    private boolean findChildren(CalledFunction node, int depth, ITmfStateSystem ss, int maxQuark, IProgressMonitor monitor) {
+    private boolean findChildren(AbstractCalledFunction node, int depth, ITmfStateSystem ss, int maxQuark, IProgressMonitor monitor) {
         fStore.add(node);
         long curTime = node.getStart();
         long limit = node.getEnd();
@@ -281,7 +281,7 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
                 if (intervalStart < node.getStart() || intervalEnd > limit) {
                     return true;
                 }
-                CalledFunction segment = new CalledFunction(intervalStart, intervalEnd + 1, stateValue.unboxLong(), node.getDepth() + 1);
+                AbstractCalledFunction segment = CalledFunctionFactory.create(intervalStart, intervalEnd + 1, node.getDepth() + 1, stateValue, node);
                 // Search for the children with the next quark.
                 findChildren(segment, depth + 1, ss, maxQuark, monitor);
                 node.addChild(segment);
@@ -338,7 +338,7 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
      *
      * @return Functions of the first level
      */
-    public List<CalledFunction> getThreads() {
+    public List<ICalledFunction> getRootFunctions() {
         return ImmutableList.copyOf(fRootFunctions);
     }
 

@@ -14,7 +14,7 @@ import java.util.Comparator;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CalledFunction;
+import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.ICalledFunction;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.Messages;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
@@ -53,9 +53,9 @@ public final class SymbolAspect implements ISegmentAspect {
 
     @Override
     public @Nullable Comparator<?> getComparator() {
-        return new Comparator<CalledFunction>() {
+        return new Comparator<ISegment>() {
             @Override
-            public int compare(@Nullable CalledFunction o1, @Nullable CalledFunction o2) {
+            public int compare(@Nullable ISegment o1, @Nullable ISegment o2) {
                 if (o1 == null || o2 == null) {
                     throw new IllegalArgumentException();
                 }
@@ -66,13 +66,22 @@ public final class SymbolAspect implements ISegmentAspect {
 
     @Override
     public @Nullable Object resolve(@NonNull ISegment segment) {
-        if (segment instanceof CalledFunction) {
-            CalledFunction calledFunction = (CalledFunction) segment;
+        if (segment instanceof ICalledFunction) {
+            ICalledFunction calledFunction = (ICalledFunction) segment;
             ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
             if (trace != null) {
-                ISymbolProvider provider = SymbolProviderManager.getInstance().getSymbolProvider(trace);
-                String symbolText = provider.getSymbolText(calledFunction.getAddr());
-                return symbolText == null ? "0x" + calledFunction.getAddr() : symbolText; //$NON-NLS-1$
+                String symbolText;
+                Object symbol = calledFunction.getSymbol();
+                if (symbol instanceof Long) {
+                    Long longAddress = (Long) symbol;
+                    ISymbolProvider provider = SymbolProviderManager.getInstance().getSymbolProvider(trace);
+                    symbolText = provider.getSymbolText(longAddress);
+                    if (symbolText == null) {
+                        return "0x" + Long.toHexString(longAddress); //$NON-NLS-1$
+                    }
+                    return symbolText;
+                }
+                return String.valueOf(symbol);
             }
         }
         return null;

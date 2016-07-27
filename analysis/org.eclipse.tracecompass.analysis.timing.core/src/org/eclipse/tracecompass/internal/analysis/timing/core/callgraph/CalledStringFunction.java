@@ -11,20 +11,22 @@ package org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.segmentstore.core.ISegment;
 
 /**
- * A Call stack function represented as an {@link ISegment}. It's used to build
- * a segments tree based on the state system. The parent represents the caller
- * of the function, and the children list represents its callees.
+ * Called Function with the symbol being a string, useful for name resolved
+ * ICalledFunction
  *
- * @author Sonia Farrah
+ * @author Matthew Khouzam
+ *
  */
-public class CalledFunction extends AbstractCalledFunction {
+public class CalledStringFunction extends AbstractCalledFunction {
 
-    private static final long serialVersionUID = 7594768649825490010L;
+    /**
+     * Default Serial ID
+     */
+    private static final long serialVersionUID = 2996033841349563006L;
 
-    private final Long fSymbol;
+    private final String fSymbol;
 
     /**
      * Create a new segment.
@@ -42,13 +44,13 @@ public class CalledFunction extends AbstractCalledFunction {
      * @param parent
      *            The caller, can be null for root elements
      */
-    protected CalledFunction(long start, long end, long symbol, int depth, @Nullable ICalledFunction parent) {
+    protected CalledStringFunction(long start, long end, String symbol, int depth, @Nullable ICalledFunction parent) {
         super(start, end, depth, parent);
         fSymbol = symbol;
     }
 
     @Override
-    public @NonNull Long getSymbol() {
+    public @NonNull String getSymbol() {
         return fSymbol;
     }
 
