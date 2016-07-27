@@ -27,6 +27,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 
 /**
  * This Class implements a pattern handler tree in the XML-defined state system.
@@ -40,8 +41,8 @@ public class TmfXmlPatternEventHandler {
     private final XmlPatternStateProvider fParent;
 
     private final List<String> fInitialFsm;
-    private final Map<String, TmfXmlTransitionValidator> fTestMap = new HashMap<>();
-    private final Map<String, ITmfXmlAction> fActionMap = new HashMap<>();
+    private final Map<String, TmfXmlTransitionValidator> fTestMap;
+    private final Map<String, ITmfXmlAction> fActionMap;
     private final Map<String, TmfXmlFsm> fFsmMap = new LinkedHashMap<>();
     private final List<TmfXmlFsm> fActiveFsmList = new ArrayList<>();
 
@@ -60,6 +61,7 @@ public class TmfXmlPatternEventHandler {
         String initialFsm = node.getAttribute(TmfXmlStrings.INITIAL);
         fInitialFsm = initialFsm.isEmpty() ? Collections.EMPTY_LIST : Arrays.asList(initialFsm.split(TmfXmlStrings.AND_SEPARATOR));
 
+        Map<String, TmfXmlTransitionValidator> testMap = new HashMap<>();
         NodeList nodesTest = node.getElementsByTagName(TmfXmlStrings.TEST);
         /* load transition input */
         for (int i = 0; i < nodesTest.getLength(); i++) {
@@ -68,9 +70,11 @@ public class TmfXmlPatternEventHandler {
                 throw new IllegalArgumentException();
             }
             TmfXmlTransitionValidator test = modelFactory.createTransitionValidator(element, fParent);
-            fTestMap.put(test.getId(), test);
+            testMap.put(test.getId(), test);
         }
+        fTestMap = Collections.unmodifiableMap(testMap);
 
+        @NonNull Builder<String, ITmfXmlAction> builder = ImmutableMap.builder();
         NodeList nodesAction = node.getElementsByTagName(TmfXmlStrings.ACTION);
         /* load actions */
         for (int i = 0; i < nodesAction.getLength(); i++) {
@@ -78,11 +82,12 @@ public class TmfXmlPatternEventHandler {
             if (element == null) {
                 throw new IllegalArgumentException();
             }
-            ITmfXmlAction action = modelFactory.createAction(element, fParent);
-            fActionMap.put(((TmfXmlAction) action).getId(), action);
+            TmfXmlAction action = modelFactory.createAction(element, fParent);
+            builder.put(action.getId(), action);
         }
-        fActionMap.put(TmfXmlStrings.CONSTANT_PREFIX + ITmfXmlAction.CLEAR_STORED_FIELDS_STRING, new ResetStoredFieldsAction(fParent));
-        fActionMap.put(TmfXmlStrings.CONSTANT_PREFIX + ITmfXmlAction.SAVE_STORED_FIELDS_STRING, new UpdateStoredFieldsAction(fParent));
+        builder.put(TmfXmlStrings.CONSTANT_PREFIX + ITmfXmlAction.CLEAR_STORED_FIELDS_STRING, new ResetStoredFieldsAction(fParent));
+        builder.put(TmfXmlStrings.CONSTANT_PREFIX + ITmfXmlAction.SAVE_STORED_FIELDS_STRING, new UpdateStoredFieldsAction(fParent));
+        fActionMap = builder.build();
 
         NodeList nodesFsm = node.getElementsByTagName(TmfXmlStrings.FSM);
         /* load fsm */
@@ -124,7 +129,7 @@ public class TmfXmlPatternEventHandler {
      * @return The tests in a map
      */
     public Map<String, TmfXmlTransitionValidator> getTestMap() {
-        return ImmutableMap.copyOf(fTestMap);
+        return fTestMap;
     }
 
     /**
@@ -133,7 +138,7 @@ public class TmfXmlPatternEventHandler {
      * @return The actions
      */
     public Map<String, ITmfXmlAction> getActionMap() {
-        return ImmutableMap.copyOf(fActionMap);
+        return fActionMap;
     }
 
     /**
