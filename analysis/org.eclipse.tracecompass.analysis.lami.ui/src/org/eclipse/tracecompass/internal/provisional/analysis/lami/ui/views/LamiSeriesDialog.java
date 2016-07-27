@@ -46,7 +46,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiTableEntryAspect;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel.ChartType;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel.LamiChartType;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiXYSeriesDescription;
 import org.eclipse.ui.dialogs.SelectionDialog;
 
@@ -102,7 +102,7 @@ public class LamiSeriesDialog extends SelectionDialog {
      * @param yLabelProvider
      *            The label provider for the Y axis set
      */
-    public LamiSeriesDialog(Shell parentShell, ChartType chartType, Object xInput,
+    public LamiSeriesDialog(Shell parentShell, LamiChartType chartType, Object xInput,
             Object yInput,
             IStructuredContentProvider xContentProvider,
             ILabelProvider xLabelProvider,

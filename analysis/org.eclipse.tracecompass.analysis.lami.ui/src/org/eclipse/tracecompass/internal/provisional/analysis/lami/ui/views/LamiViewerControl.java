@@ -115,7 +115,7 @@ public final class LamiViewerControl {
         }
     }
 
-    private static @Nullable ImageDescriptor getIconForGraphType(LamiChartModel.ChartType graphType) {
+    private static @Nullable ImageDescriptor getIconForGraphType(LamiChartModel.LamiChartType graphType) {
         switch (graphType) {
         case BAR_CHART:
             return Activator.getDefault().getImageDescripterFromPath("icons/histogram.gif"); //$NON-NLS-1$

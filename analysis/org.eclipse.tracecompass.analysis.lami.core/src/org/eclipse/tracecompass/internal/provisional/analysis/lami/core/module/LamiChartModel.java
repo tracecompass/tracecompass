@@ -25,7 +25,7 @@ public class LamiChartModel {
     /**
      * Supported types of charts
      */
-    public enum ChartType {
+    public enum LamiChartType {
         /** Bar chart */
         BAR_CHART("Bar"), //$NON-NLS-1$
 
@@ -40,7 +40,7 @@ public class LamiChartModel {
 
         private final String fText;
 
-        private ChartType(final String text) {
+        private LamiChartType(final String text) {
              fText = text;
         }
 
@@ -50,7 +50,7 @@ public class LamiChartModel {
         }
     }
 
-    private final ChartType fType;
+    private final LamiChartType fType;
     private final String fName;
     private final List<String> fXSeriesColumns;
     private final List<String> fYSeriesColumns;
@@ -74,7 +74,7 @@ public class LamiChartModel {
      * @param yAxisIsLog
      *            If the Y-axis is log scale or not
      */
-    public LamiChartModel(ChartType type, String name, List<String> xSeriesColumn, List<String> ySeriesColumns,
+    public LamiChartModel(LamiChartType type, String name, List<String> xSeriesColumn, List<String> ySeriesColumns,
             boolean xAxisIsLog, boolean yAxisIsLog) {
         fType = type;
         fName = name;
@@ -89,7 +89,7 @@ public class LamiChartModel {
      *
      * @return The chart type
      */
-    public ChartType getChartType() {
+    public LamiChartType getChartType() {
         return fType;
     }
 

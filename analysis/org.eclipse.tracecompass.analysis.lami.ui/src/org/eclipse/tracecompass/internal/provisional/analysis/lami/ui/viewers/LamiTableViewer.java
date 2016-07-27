@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.viewers;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import java.util.HashSet;
@@ -30,6 +31,7 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.L
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.signals.LamiSelectionUpdateSignal;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportView;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportViewTabPage;
+import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.signal.ChartSelectionUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.table.TmfSimpleTableViewer;
@@ -38,6 +40,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.table.TmfSimpleTableViewer;
  * Table viewer to use in {@link LamiReportView}s.
  *
  * @author Alexandre Montplaisir
+ * @author Gabriel-Andrew Pollo-Guilbert
  */
 public final class LamiTableViewer extends TmfSimpleTableViewer implements ILamiViewer {
 
@@ -47,6 +50,7 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
 
     private final LamiReportViewTabPage fPage;
     private Set<Integer> fSelections;
+    private Set<Object> fSelection;
 
     // ------------------------------------------------------------------------
     // Inner class definitions
@@ -54,10 +58,9 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
 
     /**
      * Abstract class for the column label provider for the latency analysis
-     * table viewer
+     * table viewer.
      */
     private static class LamiTableColumnLabelProvider extends ColumnLabelProvider {
-
         private final LamiTableEntryAspect fColumnAspect;
 
         public LamiTableColumnLabelProvider(LamiTableEntryAspect aspect) {
@@ -66,25 +69,25 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
 
         @Override
         public String getText(@Nullable Object input) {
+            /* Doubles as a null check */
             if (!(input instanceof LamiTableEntry)) {
-                /* Doubles as a null check */
                 return ""; //$NON-NLS-1$
             }
-            LamiTableEntry entry = (LamiTableEntry) input;
-            return nullToEmptyString(fColumnAspect.resolveString(entry));
+
+            return nullToEmptyString(fColumnAspect.resolveString((LamiTableEntry) input));
         }
     }
 
     /**
-     * Listener to update in other viewers when a cell of the latency
-     * table view is selected
+     * Listener to update in other viewers when a cell of the latency table view
+     * is selected.
      */
     private class LamiTableSelectionListener extends SelectionAdapter {
         @Override
-        public void widgetSelected(@Nullable SelectionEvent e) {
-
+        public void widgetSelected(@Nullable SelectionEvent event) {
             IStructuredSelection selections = getTableViewer().getStructuredSelection();
 
+            // Lami selections
             Set<Integer> selectionIndexes = new HashSet<>();
             for (Object selectedEntry : selections.toArray() ) {
                 selectionIndexes.add(fPage.getResultTable().getEntries().indexOf(selectedEntry));
@@ -95,11 +98,23 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
             /* Signal all Lami viewers & views of the selection */
             LamiSelectionUpdateSignal signal = new LamiSelectionUpdateSignal(LamiTableViewer.this, selectionIndexes, fPage);
             TmfSignalManager.dispatchSignal(signal);
+
+            /* Find all selected entries */
+            Set<Object> selectionSet = new HashSet<>();
+            for (Object selectedEntry : selections.toArray()) {
+                selectionSet.add(checkNotNull(selectedEntry));
+            }
+            fSelection = selectionSet;
+
+
+            /* Signal all Lami viewers & views of the selection */
+            ChartSelectionUpdateSignal customSignal = new ChartSelectionUpdateSignal(LamiTableViewer.this, fPage.getResultTable(), selectionSet);
+            TmfSignalManager.dispatchSignal(customSignal);
         }
     }
 
     // ------------------------------------------------------------------------
-    // Constructor
+    // Constructors
     // ------------------------------------------------------------------------
 
     /**
@@ -112,13 +127,13 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
      */
     public LamiTableViewer(TableViewer tableViewer, LamiReportViewTabPage page) {
         super(tableViewer);
-        /*
-         * The table viewer should always be the first element in the control.
-         */
+
+        /* The viewer should always be the first element in the control. */
         tableViewer.getTable().moveAbove(null);
 
         fPage = page;
         fSelections = new HashSet<>();
+        fSelection = new HashSet<>();
 
         /* Default sort order of the content provider is by its first column */
         getTableViewer().setContentProvider(new LamiTableContentProvider());
@@ -194,6 +209,21 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
                     getTableViewer().getTable().redraw();
                 });
             }
+            if (!fSelection.isEmpty()) {
+                LamiTableContentProvider provider = (LamiTableContentProvider) getTableViewer().getContentProvider();
+
+                /* Find the indexes in the UI table of the selected objects */
+                int[] selectionsIndexes = fSelection.stream()
+                        .map(obj -> (LamiTableEntry) obj)
+                        .mapToInt(entry -> provider.getIndexOf(checkNotNull(entry)))
+                        .toArray();
+
+                /* Update the selection in the UI table */
+                Display.getDefault().asyncExec(() -> {
+                    getTableViewer().getTable().setSelection(selectionsIndexes);
+                    getTableViewer().getTable().redraw();
+                });
+            }
         });
         Display.getDefault().asyncExec(() -> {
             if (tableViewer.getTable().isDisposed()) {
@@ -206,6 +236,10 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
             }
         });
     }
+
+    // ------------------------------------------------------------------------
+    // Signals
+    // ------------------------------------------------------------------------
 
     /**
      * The signal handler for selection update.
@@ -237,4 +271,40 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
             getTableViewer().getTable().redraw();
         });
     }
+
+    /**
+     * The signal handler for selection update.
+     *
+     * @param signal
+     *            The selection update signal
+     */
+    @TmfSignalHandler
+    public void updateCustomSelection(ChartSelectionUpdateSignal signal) {
+        /* Make sure we are not sending a signal to ourself */
+        if (signal.getSource() == this) {
+            return;
+        }
+
+        /* Make sure the signal comes from the data provider's scope */
+        if (fPage.getResultTable().hashCode() != signal.getDataProvider().hashCode()) {
+            return;
+        }
+
+        /* Get the set of selected objects */
+        fSelection = signal.getSelectedObject();
+
+        /* Get the selected index in the UI table */
+        LamiTableContentProvider tableContentProvider = (LamiTableContentProvider) getTableViewer().getContentProvider();
+        int[] tableSelection = fSelection.stream()
+                .map(obj -> (LamiTableEntry) obj)
+                .mapToInt(entry -> tableContentProvider.getIndexOf(checkNotNull(entry)))
+                .toArray();
+
+        /* Update the selection in the UI table */
+        Display.getDefault().asyncExec(() -> {
+            getTableViewer().getTable().setSelection(tableSelection);
+            getTableViewer().getTable().redraw();
+        });
+    }
+
 }

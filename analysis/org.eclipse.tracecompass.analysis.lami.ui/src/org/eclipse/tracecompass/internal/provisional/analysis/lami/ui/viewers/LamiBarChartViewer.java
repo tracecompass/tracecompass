@@ -37,7 +37,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiTableEntryAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel.ChartType;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel.LamiChartType;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiTableEntry;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.signals.LamiSelectionUpdateSignal;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportViewTabPage;
@@ -105,7 +105,7 @@ public class LamiBarChartViewer extends LamiXYChartViewer {
         List<LamiTableEntryAspect> yAxisAspects = getYAxisAspects();
 
         /* bar chart cannot deal with multiple X series */
-        if (getChartModel().getChartType() != ChartType.BAR_CHART && xAxisAspects.size() != 1) {
+        if (getChartModel().getChartType() != LamiChartType.BAR_CHART && xAxisAspects.size() != 1) {
             throw new IllegalArgumentException("Invalid configuration passed to a bar chart."); //$NON-NLS-1$
         }
 

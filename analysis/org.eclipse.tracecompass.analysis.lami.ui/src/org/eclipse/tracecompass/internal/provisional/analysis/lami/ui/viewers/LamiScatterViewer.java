@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiTableEntryAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel.ChartType;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel.LamiChartType;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiTableEntry;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.format.LamiLabelFormat;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.format.LamiTimeStampFormat;
@@ -93,7 +93,7 @@ public class LamiScatterViewer extends LamiXYChartViewer {
      */
     public LamiScatterViewer(Composite parent, LamiReportViewTabPage page, LamiChartModel graphModel) {
         super(parent, page, graphModel);
-        if (getChartModel().getChartType() != ChartType.XY_SCATTER) {
+        if (getChartModel().getChartType() != LamiChartType.XY_SCATTER) {
             throw new IllegalStateException("Chart type not a Scatter Chart " + getChartModel().getChartType().toString()); //$NON-NLS-1$
         }
 

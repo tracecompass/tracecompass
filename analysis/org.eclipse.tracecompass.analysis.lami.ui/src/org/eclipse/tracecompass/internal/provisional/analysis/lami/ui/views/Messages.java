@@ -29,6 +29,7 @@ public class Messages extends NLS {
     public static String LamiReportView_ToggleAction_ButtonNamePrefix;
     public static String LamiReportView_ToggleAction_ButtonTooltip;
 
+    public static String LamiReportView_NewCustomChart;
     public static String LamiReportView_NewCustomBarChart;
     public static String LamiReportView_NewCustomScatterChart;
     public static String LamiReportView_ClearAllCustomViews;

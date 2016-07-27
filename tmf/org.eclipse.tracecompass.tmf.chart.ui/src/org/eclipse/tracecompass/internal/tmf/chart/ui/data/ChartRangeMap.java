@@ -151,6 +151,10 @@ public class ChartRangeMap {
         ChartRange internal = getPlottedRange();
         ChartRange external = getInputDataRange();
 
+        if (external.getDelta().compareTo(BigDecimal.ZERO) == 0) {
+            return internal.getMinimum().doubleValue();
+        }
+
         /* Apply the formula */
         BigDecimal internalValue = value
                 .subtract(external.getMinimum())
@@ -176,6 +180,10 @@ public class ChartRangeMap {
     public BigDecimal getExternalValue(Number number) {
         ChartRange internal = getPlottedRange();
         ChartRange external = getInputDataRange();
+
+        if (internal.getDelta().compareTo(BigDecimal.ZERO) == 0) {
+            return external.getMinimum();
+        }
 
         /* Apply the formula in reverse */
         BigDecimal externalValue = (new BigDecimal(number.toString()))

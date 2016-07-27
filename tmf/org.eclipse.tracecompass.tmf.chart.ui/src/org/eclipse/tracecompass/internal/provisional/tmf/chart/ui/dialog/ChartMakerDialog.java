@@ -319,6 +319,7 @@ public class ChartMakerDialog extends Dialog {
     private void createSeriesCreatorGroup(GridData genericFillGridData) {
         GridLayout creatorLayout = new GridLayout();
         creatorLayout.numColumns = 2;
+        creatorLayout.makeColumnsEqualWidth = true;
 
         Group creatorGroup = new Group(fComposite, SWT.BORDER);
         creatorGroup.setText(Messages.ChartMakerDialog_SeriesCreator);
@@ -381,9 +382,6 @@ public class ChartMakerDialog extends Dialog {
         fWarningLabel.setVisible(false);
 
         /* Add button */
-        Label creatorLabelEmpty = new Label(creatorGroup, SWT.NONE);
-        creatorLabelEmpty.setText(""); //$NON-NLS-1$
-
         GridData creatorButtonGridData = new GridData();
         creatorButtonGridData.horizontalAlignment = SWT.RIGHT;
         creatorButtonGridData.widthHint = 30;
@@ -395,7 +393,6 @@ public class ChartMakerDialog extends Dialog {
         fAddButton.setImage(addImage);
         fAddButton.addListener(SWT.Selection, new AddButtonClickedEvent());
     }
-
 
     private void createOptionsGroup() {
         GridLayout optionsLayout = new GridLayout();
