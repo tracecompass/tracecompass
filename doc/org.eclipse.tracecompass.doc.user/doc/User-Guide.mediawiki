@@ -587,6 +587,8 @@ An event range can be selected by holding the '''Shift''' key while clicking ano
 
 The Events editor can be closed, disposing a trace. When this is done, all the views displaying the information will be updated with the trace data of the next event editor tab. If all the editor tabs are closed, then the views will display their empty states.
 
+Column order and size is preserved when changed. If a column is lost due to it being resized to 0 pixels, right click on the context menu and select '''Show All''', it will be restored to a visible size.
+
 === Searching and Filtering ===
 
 Searching and filtering of events in the table can be performed by entering matching conditions in one or multiple columns in the header row (the first row below the column header).
