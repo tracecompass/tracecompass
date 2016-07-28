@@ -18,6 +18,7 @@ package org.eclipse.tracecompass.tmf.core.timestamp;
 import java.nio.ByteBuffer;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.internal.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.internal.tmf.core.timestamp.TmfSecondTimestamp;
 
@@ -340,12 +341,12 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
                 if (getScale() < scale) {
                     value /= scalingFactor;
                 } else {
-                    value = saturatedMult(scalingFactor, value);
+                    value = SaturatedArithmetic.multiply(scalingFactor, value);
                 }
             }
         }
 
-        value = saturatedAdd(value, offset);
+        value = SaturatedArithmetic.add(value, offset);
 
         return create(value, scale);
     }
@@ -393,7 +394,7 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
             if (ts.getValue() == Long.MIN_VALUE) {
                 return 1;
             }
-            final long delta = saturatedAdd(getValue(), -ts.getValue());
+            final long delta = SaturatedArithmetic.add(getValue(), -ts.getValue());
             return Long.compare(delta, 0);
         }
         final ITmfTimestamp largerScale = (scale > ts.getScale()) ? this : ts;
@@ -422,27 +423,6 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
     }
 
     /**
-     * Saturated multiplication. It will not overflow but instead clamp the
-     * result to {@link Long#MAX_VALUE} and {@link Long#MIN_VALUE}.
-     *
-     * @param left
-     *            The left long to multiply
-     * @param right
-     *            The right long to multiply
-     * @return The saturated multiplication result. The mathematical, not Java
-     *         version of Min(Max(MIN_VALUE, left*right), MAX_VALUE).
-     * @see <a href="http://en.wikipedia.org/wiki/Saturation_arithmetic">
-     *      Saturation arithmetic</a>
-     */
-    private static long saturatedMult(long left, long right) {
-        long retVal = left * right;
-        if ((left != 0) && ((retVal / left) != right)) {
-            return (sameSign(left, right) ? Long.MAX_VALUE : Long.MIN_VALUE);
-        }
-        return retVal;
-    }
-
-    /**
      * Saturated addition. It will not overflow but instead clamp the result to
      * {@link Long#MAX_VALUE} and {@link Long#MIN_VALUE}.
      *
@@ -455,21 +435,13 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
      * @see <a href="http://en.wikipedia.org/wiki/Saturation_arithmetic">
      *      Saturation arithmetic</a>
      * @since 2.0
+     * @deprecated use {@link SaturatedArithmetic#add(long, long)} instead
      */
+    @Deprecated
     protected static final long saturatedAdd(final long left, final long right) {
-        long retVal = left + right;
-        if (sameSign(left, right) && !sameSign(left, retVal)) {
-            if (retVal > 0) {
-                return Long.MIN_VALUE;
-            }
-            return Long.MAX_VALUE;
-        }
-        return retVal;
+        return SaturatedArithmetic.add(left, right);
     }
 
-    private static boolean sameSign(final long left, final long right) {
-        return (left ^ right) >= 0;
-    }
 
     // ------------------------------------------------------------------------
     // Object
