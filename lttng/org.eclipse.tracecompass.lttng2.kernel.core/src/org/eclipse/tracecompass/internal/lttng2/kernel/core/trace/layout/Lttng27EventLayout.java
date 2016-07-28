@@ -13,10 +13,10 @@
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import org.eclipse.jdt.annotation.NonNull;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -50,11 +50,11 @@ public class Lttng27EventLayout extends Lttng26EventLayout {
     private static final String X86_IRQ_VECTORS_DEFERRED_ERROR_APIC_EXIT = "x86_irq_vectors_deferred_error_apic_exit";   //$NON-NLS-1$
     private static final String X86_IRQ_VECTORS_THERMAL_APIC_ENTRY = "x86_irq_vectors_thermal_apic_entry";  //$NON-NLS-1$
     private static final String X86_IRQ_VECTORS_THERMAL_APIC_EXIT = "x86_irq_vectors_thermal_apic_exit";  //$NON-NLS-1$
+    /* Network event */
+    private static final Collection<String> EVENTS_NETWORK_RECEIVE = Collections.singleton("net_if_receive_skb"); //$NON-NLS-1$
     /* KVM events */
-    private static final String KVM_X86_ENTRY = "kvm_x86_entry";  //$NON-NLS-1$
-    private static final String KVM_X86_EXIT = "kvm_x86_exit";  //$NON-NLS-1$
-    private static final Collection<String> KVM_ENTRY_EVENTS = ImmutableSet.of(KVM_X86_ENTRY);
-    private static final Collection<String> KVM_EXIT_EVENTS = ImmutableSet.of(KVM_X86_EXIT);
+    private static final Collection<String> KVM_ENTRY_EVENTS = Collections.singleton("kvm_x86_entry"); //$NON-NLS-1$
+    private static final Collection<String> KVM_EXIT_EVENTS = Collections.singleton("kvm_x86_exit"); //$NON-NLS-1$
 
     private static final Collection<String> IPI_ENTRY_SET = ImmutableSet.of(
             X86_IRQ_VECTORS_LOCAL_TIMER_ENTRY,
@@ -283,8 +283,8 @@ public class Lttng27EventLayout extends Lttng26EventLayout {
     }
 
     @Override
-    public @NonNull Collection<@NonNull String> eventNetworkReceive() {
-        return ImmutableList.of("netif_receive_skb", "net_if_receive_skb"); //$NON-NLS-1$ //$NON-NLS-2$
+    public Collection<String> eventsNetworkReceive() {
+        return EVENTS_NETWORK_RECEIVE;
     }
 
 }

@@ -763,13 +763,13 @@ public interface IKernelAnalysisEventLayout {
     // ------------------------------------------------------------------------
 
     /**
-     * An event indicating that a packet is sent on the network
+     * Get the list of events indicating that a packet is sent on the network
      *
      * @return The name of the packet send event
      * @since 2.1
      */
-    default String eventNetworkSend() {
-        return "net_dev_queue"; //$NON-NLS-1$
+    default Collection<String> eventsNetworkSend() {
+        return Collections.EMPTY_SET;
     }
 
     /**
@@ -779,8 +779,8 @@ public interface IKernelAnalysisEventLayout {
      * @return The collection of names of the packet receive event
      * @since 2.1
      */
-    default Collection<String> eventNetworkReceive() {
-        return Collections.singleton("netif_receive_skb"); //$NON-NLS-1$
+    default Collection<String> eventsNetworkReceive() {
+        return Collections.EMPTY_SET;
     }
 
     /**

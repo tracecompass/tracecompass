@@ -19,7 +19,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 
 /**
  * This file defines all the known event and field names for LTTng kernel
@@ -108,17 +107,15 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     private static final String NEXTRQ_SECTOR= "nextrq_sector";
 
     /* Network events and field names */
-    private static final String EVENT_NETWORK_SEND = "net_dev_queue";
-    private static final String EVENT_NETWORK_RECEIVE = "netif_receive_skb";
+    private static final Collection<String> EVENTS_NETWORK_SEND = Collections.singleton("net_dev_queue");
+    private static final Collection<String> EVENTS_NETWORK_RECEIVE = Collections.singleton("netif_receive_skb");
     private static final String[] TCP_SEQ_FIELD = { "transport_fields", "thtype_tcp", "seq" };
     private static final String[] TCP_ACK_FIELD = { "transport_fields", "thtype_tcp", "ack_seq" };
     private static final String[] TCP_FLAGS_FIELD = { "transport_fields", "thtype_tcp", "flags" };
 
     /* KVM events */
-    private static final String KVM_ENTRY = "kvm_entry";  //$NON-NLS-1$
-    private static final String KVM_EXIT = "kvm_exit";  //$NON-NLS-1$
-    private static final Collection<String> KVM_ENTRY_EVENTS = ImmutableSet.of(KVM_ENTRY);
-    private static final Collection<String> KVM_EXIT_EVENTS = ImmutableSet.of(KVM_EXIT);
+    private static final Collection<String> KVM_ENTRY_EVENTS = Collections.singleton("kvm_entry");
+    private static final Collection<String> KVM_EXIT_EVENTS = Collections.singleton("kvm_exit");
 
     /** All instances are the same. Only provide a static instance getter */
     protected LttngEventLayout() {
@@ -489,13 +486,13 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     }
 
     @Override
-    public @NonNull String eventNetworkSend() {
-        return EVENT_NETWORK_SEND;
+    public Collection<String> eventsNetworkSend() {
+        return EVENTS_NETWORK_SEND;
     }
 
     @Override
-    public @NonNull Collection<@NonNull String> eventNetworkReceive() {
-        return Collections.singleton(EVENT_NETWORK_RECEIVE);
+    public Collection<String> eventsNetworkReceive() {
+        return EVENTS_NETWORK_RECEIVE;
     }
 
     @Override
