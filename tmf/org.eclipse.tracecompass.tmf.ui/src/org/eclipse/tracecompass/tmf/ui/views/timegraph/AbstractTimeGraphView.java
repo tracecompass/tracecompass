@@ -1649,10 +1649,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * some of which may receive events in live streaming mode.
      *
      * @param trace
-     *            The trace associated with this view
+     *            The trace associated with this view, can be null
      * @return List of traces with data to display
      */
-    protected @NonNull Iterable<ITmfTrace> getTracesToBuild(@NonNull ITmfTrace trace) {
+    protected @NonNull Iterable<ITmfTrace> getTracesToBuild(@Nullable ITmfTrace trace) {
         return TmfTraceManager.getTraceSet(trace);
     }
 

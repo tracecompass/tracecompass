@@ -29,6 +29,7 @@ import java.util.TreeSet;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -571,12 +572,12 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
     }
 
     @Override
-    protected @NonNull Iterable<ITmfTrace> getTracesToBuild(@NonNull ITmfTrace trace) {
+    protected @NonNull Iterable<ITmfTrace> getTracesToBuild(@Nullable ITmfTrace trace) {
         /*
          * Return the current trace only. Experiments will return their
          * children's analyses
          */
-        return Collections.singleton(trace);
+        return (trace != null) ? Collections.singleton(trace) : Collections.EMPTY_LIST;
     }
 
 }
