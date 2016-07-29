@@ -165,4 +165,5 @@ public interface TmfXmlStrings {
     String AND_SEPARATOR = ":";
     String ALIAS = "alias";
     String ABANDON = "abandon";
+    String CONSUMING = "consuming";
 }

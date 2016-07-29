@@ -47,7 +47,9 @@ public enum TmfXmlTestFiles {
     /** A valid file for pattern tests */
     VALID_PATTERN_FILE("test_xml_files/test_valid/test_valid_pattern.xml"),
     /** A valid pattern file to test the pattern segment **/
-    VALID_PATTERN_SEGMENT("test_xml_files/test_valid/test_pattern_segment.xml");
+    VALID_PATTERN_SEGMENT("test_xml_files/test_valid/test_pattern_segment.xml"),
+    /** A valid file for consuming fsm test */
+    CONSUMING_FSM_TEST("test_xml_files/test_valid/test_consuming_fsm.xml");
 
     private final String fPath;
 

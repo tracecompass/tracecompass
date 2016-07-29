@@ -427,6 +427,9 @@
 		<xs:attribute name="multiple" type="xs:boolean" use="optional" default="true">
 			<xs:annotation>
 				<xs:documentation>ONLY USE for fsm. Specifies if this FSM allows multiple instance or only one instance. If not specified, this attribute will be set to 'true' by default.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="consuming" type="xs:boolean" use="optional" default="true">
+			<xs:annotation>
+				<xs:documentation>ONLY USE for fsm. Specifies if this FSM is consuming or not. If the FSM is consuming the ongoing event can be used by only one scenario of the FSM, if not, the ongoing scenario can be used in one or several scenario of the FSM. If not specified, this attribute will be set to 'true' by default.</xs:documentation></xs:annotation></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="transition">

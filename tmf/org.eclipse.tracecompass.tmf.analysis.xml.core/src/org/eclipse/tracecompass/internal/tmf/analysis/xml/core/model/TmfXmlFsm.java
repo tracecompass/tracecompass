@@ -48,6 +48,8 @@ public class TmfXmlFsm {
     private final String fAbandonStateId;
     private final boolean fInstanceMultipleEnabled;
     private final String fInitialStateId;
+    private final boolean fConsuming;
+    private boolean fEventConsumed;
     private int fTotalScenarios;
 
     /**
@@ -63,6 +65,7 @@ public class TmfXmlFsm {
      */
     public static TmfXmlFsm create(ITmfXmlModelFactory modelFactory, Element node, IXmlStateSystemContainer container) {
         String id = node.getAttribute(TmfXmlStrings.ID);
+        boolean consuming = node.getAttribute(TmfXmlStrings.CONSUMING).isEmpty() ? true : Boolean.parseBoolean(node.getAttribute(TmfXmlStrings.CONSUMING));
         boolean instanceMultipleEnabled = node.getAttribute(TmfXmlStrings.MULTIPLE).isEmpty() ? true : Boolean.parseBoolean(node.getAttribute(TmfXmlStrings.MULTIPLE));
         final List<@NonNull TmfXmlBasicTransition> preconditions = new ArrayList<>();
 
@@ -127,16 +130,17 @@ public class TmfXmlFsm {
                 statesMap.put(abandonState.getId(), abandonState);
             }
         }
-        return new TmfXmlFsm(modelFactory, container, id, instanceMultipleEnabled, initialState, finalStateId, abandonStateId, preconditions, statesMap);
+        return new TmfXmlFsm(modelFactory, container, id, consuming, instanceMultipleEnabled, initialState, finalStateId, abandonStateId, preconditions, statesMap);
     }
 
-    private TmfXmlFsm(ITmfXmlModelFactory modelFactory, IXmlStateSystemContainer container, String id, boolean multiple,
-            String initialState, String finalState, String abandonState, List<TmfXmlBasicTransition> preconditions,
+    private TmfXmlFsm(ITmfXmlModelFactory modelFactory, IXmlStateSystemContainer container, String id, boolean consuming,
+            boolean multiple, String initialState, String finalState, String abandonState, List<TmfXmlBasicTransition> preconditions,
             Map<String, TmfXmlState> states) {
         fModelFactory = modelFactory;
         fTotalScenarios = 0;
         fContainer = container;
         fId = id;
+        fConsuming = consuming;
         fInstanceMultipleEnabled = multiple;
         fInitialStateId = initialState;
         fFinalStateId = finalState;
@@ -189,6 +193,20 @@ public class TmfXmlFsm {
      */
     public Map<String, TmfXmlState> getStatesMap() {
         return Collections.unmodifiableMap(fStatesMap);
+    }
+
+    /**
+     * Set whether the ongoing was consumed by a scenario or not
+     *
+     * @param eventConsumed
+     *            The consumed state
+     */
+    public void setEventConsumed(boolean eventConsumed) {
+        fEventConsumed = eventConsumed;
+    }
+
+    private boolean isEventConsumed() {
+        return fEventConsumed;
     }
 
     /**
@@ -252,6 +270,7 @@ public class TmfXmlFsm {
      *            The transitions of the pattern
      */
     public void handleEvent(ITmfEvent event, Map<String, TmfXmlTransitionValidator> transitionMap) {
+        setEventConsumed(false);
         if (!validatePreconditions(event, transitionMap)) {
             return;
         }
@@ -262,6 +281,9 @@ public class TmfXmlFsm {
                 currentItr.remove();
             } else {
                 handleScenario(scenario, event);
+                if (fConsuming && isEventConsumed()) {
+                    return;
+                }
             }
         }
     }

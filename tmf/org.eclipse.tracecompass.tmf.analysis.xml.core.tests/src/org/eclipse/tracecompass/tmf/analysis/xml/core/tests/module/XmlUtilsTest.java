@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
@@ -259,6 +260,34 @@ public class XmlUtilsTest {
         module.setXmlFile(xmlAnalysisFile.getPath());
 
         return module;
+    }
+
+    /**
+     * Initialize a new pattern analysis using the xml file
+     *
+     * @param xmlAnalysisFile
+     *            The xml file used to initialize the pattern analysis
+     * @return The pattern analysis
+     */
+    public static @NonNull XmlPatternAnalysis initializePatternModule(TmfXmlTestFiles xmlAnalysisFile) {
+
+        /* Initialize the state provider module */
+        Document doc = xmlAnalysisFile.getXmlDocument();
+        assertNotNull(doc);
+
+        /* get State Providers modules */
+        NodeList patternNodes = doc.getElementsByTagName(TmfXmlStrings.PATTERN);
+        assertFalse(patternNodes.getLength() == 0);
+
+        Element node = (Element) patternNodes.item(0);
+        XmlPatternAnalysis analysis = new XmlPatternAnalysis();
+        String moduleId = node.getAttribute(TmfXmlStrings.ID);
+        assertNotNull(moduleId);
+        analysis.setId(moduleId);
+
+        analysis.setXmlFile(xmlAnalysisFile.getPath());
+
+        return analysis;
     }
 
     /**

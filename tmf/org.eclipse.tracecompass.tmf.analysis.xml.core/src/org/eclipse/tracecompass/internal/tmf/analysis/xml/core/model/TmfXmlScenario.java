@@ -99,6 +99,7 @@ public class TmfXmlScenario {
             return;
         }
 
+        fFsm.setEventConsumed(true);
         // Processing the actions in the transition
         final List<String> actions = out.getAction();
         for (String actionId : actions) {
