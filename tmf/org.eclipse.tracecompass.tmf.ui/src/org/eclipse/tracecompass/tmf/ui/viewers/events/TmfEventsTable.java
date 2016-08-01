@@ -238,18 +238,17 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         @Override
         public void controlMoved(ControlEvent e) {
             int[] order = fTable.getColumnOrder();
-            if (order[0] == MARGIN_COLUMN_INDEX) {
-                fColumnOrder = order;
-                return;
-            }
-            for (int i = order.length - 1; i > 0; i--) {
-                if (order[i] == MARGIN_COLUMN_INDEX) {
-                    order[i] = order[i - 1];
-                    order[i - 1] = MARGIN_COLUMN_INDEX;
+            if (order[0] != MARGIN_COLUMN_INDEX) {
+                for (int i = order.length - 1; i > 0; i--) {
+                    if (order[i] == MARGIN_COLUMN_INDEX) {
+                        order[i] = order[i - 1];
+                        order[i - 1] = MARGIN_COLUMN_INDEX;
+                    }
                 }
+                fTable.setColumnOrder(order);
             }
-            fTable.setColumnOrder(order);
-            fColumnOrder = fTable.getColumnOrder();
+            fColumnOrder = order;
+            fTable.layout();
         }
     }
 
