@@ -26,12 +26,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public final class CoreNode extends HTNode {
 
-    /** Number of bytes in a int */
-    private static final int SIZE_INT = 4;
-
-    /** Number of bytes in a long */
-    private static final int SIZE_LONG = 8;
-
     /** Nb. of children this node has */
     private int nbChildren;
 
@@ -236,14 +230,14 @@ public final class CoreNode extends HTNode {
     protected int getSpecificHeaderSize() {
         int maxChildren = getConfig().getMaxChildren();
         int specificSize =
-                  SIZE_INT /* 1x int (extension node) */
-                + SIZE_INT /* 1x int (nbChildren) */
+                  Integer.BYTES /* 1x int (extension node) */
+                + Integer.BYTES /* 1x int (nbChildren) */
 
                 /* MAX_NB * int ('children' table) */
-                + SIZE_INT * maxChildren
+                + Integer.BYTES * maxChildren
 
                 /* MAX_NB * Timevalue ('childStart' table) */
-                + SIZE_LONG * maxChildren;
+                + Long.BYTES * maxChildren;
 
         return specificSize;
     }

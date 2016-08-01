@@ -104,7 +104,10 @@ public abstract class HTNode {
      *  1 - byte (done or not)
      * </pre>
      */
-    private static final int COMMON_HEADER_SIZE = 34;
+    private static final int COMMON_HEADER_SIZE = Byte.BYTES
+            + 2 * Long.BYTES
+            + 4 * Integer.BYTES
+            + Byte.BYTES;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -445,7 +448,7 @@ public abstract class HTNode {
                  * null anyway).
                  */
                 ITmfStateInterval interval = fIntervals.get(i);
-                if (interval.getStartTime() <= t &&
+                if (t >= interval.getStartTime() &&
                         interval.getAttribute() < stateInfo.size()) {
                     stateInfo.set(interval.getAttribute(), interval);
                 }
