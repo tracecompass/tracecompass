@@ -22,6 +22,7 @@ import java.nio.ByteOrder;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -589,7 +590,7 @@ public class HistoryTreeClassic implements IHistoryTree {
     }
 
     @Override
-    public HTNode selectNextChild(CoreNode currentNode, long t) throws ClosedChannelException {
+    public Collection<HTNode> selectNextChildren(CoreNode currentNode, long t) throws ClosedChannelException {
         assert (currentNode.getNbChildren() > 0);
         int potentialNextSeqNb = currentNode.getSequenceNumber();
 
@@ -615,9 +616,9 @@ public class HistoryTreeClassic implements IHistoryTree {
          * node has to be on disk
          */
         if (currentNode.isOnDisk()) {
-            return fTreeIO.readNode(potentialNextSeqNb);
+            return Collections.singleton(fTreeIO.readNode(potentialNextSeqNb));
         }
-        return readNode(potentialNextSeqNb);
+        return Collections.singleton(readNode(potentialNextSeqNb));
     }
 
     @Override

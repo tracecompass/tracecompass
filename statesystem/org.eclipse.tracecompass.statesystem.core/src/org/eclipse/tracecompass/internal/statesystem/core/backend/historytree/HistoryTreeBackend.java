@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -265,14 +267,20 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
             throws TimeRangeException, StateSystemDisposedException {
         checkValidTime(t);
 
-        /* We start by reading the information in the root node */
-        HTNode currentNode = getSHT().getRootNode();
-        currentNode.writeInfoFromNode(stateInfo, t);
+        /* Queue is a stack of nodes containing nodes intersecting t */
+        Deque<HTNode> queue = new LinkedList<>();
 
-        /* Then we follow the branch down in the relevant children */
+        /* We start by reading the information in the root node */
+        queue.add(getSHT().getRootNode());
+
+        /* Then we follow the down in the relevant children */
         try {
-            while (currentNode.getNodeType() == HTNode.NodeType.CORE) {
-                currentNode = getSHT().selectNextChild((CoreNode) currentNode, t);
+            while (!queue.isEmpty()) {
+                HTNode currentNode = queue.pop();
+                if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
+                    /* Here we add the relevant children nodes for BFS */
+                    queue.addAll(getSHT().selectNextChildren((CoreNode) currentNode, t));
+                }
                 currentNode.writeInfoFromNode(stateInfo, t);
             }
         } catch (ClosedChannelException e) {
@@ -288,7 +296,11 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     @Override
     public ITmfStateInterval doSingularQuery(long t, int attributeQuark)
             throws TimeRangeException, StateSystemDisposedException {
-        return getRelevantInterval(t, attributeQuark);
+        try {
+            return getRelevantInterval(t, attributeQuark);
+        } catch (ClosedChannelException e) {
+            throw new StateSystemDisposedException(e);
+        }
     }
 
     private void checkValidTime(long t) {
@@ -303,25 +315,20 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     /**
      * Inner method to find the interval in the tree containing the requested
      * key/timestamp pair, wherever in which node it is.
-     *
-     * @param t
-     * @param key
-     * @return The node containing the information we want
      */
     private HTInterval getRelevantInterval(long t, int key)
-            throws TimeRangeException, StateSystemDisposedException {
+            throws TimeRangeException, ClosedChannelException {
         checkValidTime(t);
 
-        HTNode currentNode = getSHT().getRootNode();
-        HTInterval interval = currentNode.getRelevantInterval(key, t);
-
-        try {
-            while (interval == null && currentNode.getNodeType() == HTNode.NodeType.CORE) {
-                currentNode = getSHT().selectNextChild((CoreNode) currentNode, t);
-                interval = currentNode.getRelevantInterval(key, t);
+        Deque<HTNode> queue = new LinkedList<>();
+        queue.add(getSHT().getRootNode());
+        HTInterval interval = null;
+        while (interval == null && !queue.isEmpty()) {
+            HTNode currentNode = queue.pop();
+            if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
+                queue.addAll(getSHT().selectNextChildren((CoreNode) currentNode, t));
             }
-        } catch (ClosedChannelException e) {
-            throw new StateSystemDisposedException(e);
+            interval = currentNode.getRelevantInterval(key, t);
         }
         return interval;
     }
