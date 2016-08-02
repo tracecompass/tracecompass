@@ -43,7 +43,6 @@ public class AggregatedCalledFunction {
     private final Map<Object, AggregatedCalledFunction> fChildren = new HashMap<>();
     private final @Nullable AggregatedCalledFunction fParent;
     private final AggregatedCalledFunctionStatistics fStatistics;
-    private int fNbCalls = 0;
     private long fDuration;
     private long fSelfTime;
 
@@ -201,15 +200,8 @@ public class AggregatedCalledFunction {
      *
      * @return The number of calls of a function
      */
-    public int getNbCalls() {
-        return fNbCalls;
-    }
-
-    /**
-     * The number of calls of a function
-     */
-    public void incrementCalls() {
-        fNbCalls++;
+    public long getNbCalls() {
+        return fStatistics.getNbSegments();
     }
 
     /**
