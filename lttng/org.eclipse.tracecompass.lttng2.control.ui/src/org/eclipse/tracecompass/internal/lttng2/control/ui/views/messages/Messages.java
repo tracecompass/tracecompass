@@ -208,7 +208,9 @@ public final class Messages extends NLS {
     public static String TraceControl_EnableEventsAllEventsLabel;
     public static String TraceControl_EnableEventsAllEventsTooltip;
     public static String TraceControl_EnableEventsSpecificEventGroupName;
+    public static String TraceControl_EnableEventsSpecificLoggerGroupName;
     public static String TraceControl_EnableEventsSpecificEventTooltip;
+    public static String TraceControl_EnableEventsSpecificLoggerTooltip;
     public static String TraceControl_EnableEventsExcludedEventGroupName;
     public static String TraceControl_EnableEventsExcludedEventLabel;
     public static String TraceControl_EnableEventsExcludedEventTooltip;
@@ -218,7 +220,7 @@ public final class Messages extends NLS {
     public static String TraceControl_EnableEventsSyscallName;
     public static String TraceControl_EnableEventsSyscallTooltip;
     public static String TraceControl_EnableEventsProbeGroupName;
-    public static String TraceControl_EnableEventsEventNameLabel;
+    public static String TraceControl_EnableEventsNameLabel;
     public static String TraceControl_EnableEventsProbeEventNameTooltip;
     public static String TraceControl_EnableEventsProbeNameLabel;
     public static String TraceControl_EnableEventsProbeNameTooltip;

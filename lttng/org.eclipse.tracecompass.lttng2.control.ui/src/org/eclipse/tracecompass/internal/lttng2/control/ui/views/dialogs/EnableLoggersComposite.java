@@ -12,6 +12,7 @@
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +33,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
@@ -78,6 +81,10 @@ public class EnableLoggersComposite extends Composite implements IBaseEnableUstE
      * A tree viewer for displaying and selection of available loggers.
      */
     private CheckboxTreeViewer fLoggersViewer;
+    /**
+     * A Text field for the specific logger name.
+     */
+    private Text fSpecificLoggerText;
     /**
      * The flag indicating that loggers are selected.
      */
@@ -207,17 +214,16 @@ public class EnableLoggersComposite extends Composite implements IBaseEnableUstE
         if (fIsLoggers) {
             Set<String> set = new HashSet<>();
             Object[] checkedElements = fLoggersViewer.getCheckedElements();
-            int totalNbEvents = 0;
+            int totalNbLoggers = 0;
             for (int i = 0; i < checkedElements.length; i++) {
                 ITraceControlComponent component = (ITraceControlComponent) checkedElements[i];
                 if (component instanceof BaseLoggerComponent) {
-                    totalNbEvents++;
+                    totalNbLoggers++;
                     if (!set.contains(component.getName())) {
                         set.add(component.getName());
                         fLoggers.add(component.getName());
                     }
                 }
-
             }
 
             // verify if all events are selected
@@ -233,7 +239,17 @@ public class EnableLoggersComposite extends Composite implements IBaseEnableUstE
                 }
 
             }
-            fIsAllLoggers = nbLoggers == totalNbEvents;
+            fIsAllLoggers = (nbLoggers == totalNbLoggers);
+            String tmpSpecificLogger = fSpecificLoggerText.getText();
+            if (!fIsAllLoggers && !tmpSpecificLogger.trim().isEmpty()) {
+                // Format the text to a List<String>
+                // Removing all non visible characters
+                tmpSpecificLogger = tmpSpecificLogger.replaceAll("\\s", ""); //$NON-NLS-1$ //$NON-NLS-2$
+                // Splitting the different events that are separated by commas
+                List<String> specificLoggerList = Arrays.asList(tmpSpecificLogger.split(",")); //$NON-NLS-1$
+                fLoggers.addAll(specificLoggerList);
+                fLoggers = fLoggers.stream().distinct().collect(Collectors.toList());
+            }
         }
 
         // initialize log level event name string
@@ -339,6 +355,24 @@ public class EnableLoggersComposite extends Composite implements IBaseEnableUstE
                 return fLoggersViewer;
             }
         };
+
+        Group specificLoggerGroup = new Group(loggersGroup, SWT.SHADOW_NONE);
+        specificLoggerGroup.setText(Messages.TraceControl_EnableEventsSpecificLoggerGroupName);
+        layout = new GridLayout(4, true);
+        specificLoggerGroup.setLayout(layout);
+        specificLoggerGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label specificLoggerLabel = new Label(specificLoggerGroup, SWT.LEFT);
+        specificLoggerLabel.setText(Messages.TraceControl_EnableEventsNameLabel);
+        data = new GridData(GridData.FILL_HORIZONTAL);
+        data.horizontalSpan = 1;
+        specificLoggerLabel.setLayoutData(data);
+
+        fSpecificLoggerText = new Text(specificLoggerGroup, SWT.LEFT);
+        fSpecificLoggerText.setToolTipText(Messages.TraceControl_EnableEventsSpecificLoggerTooltip);
+        data = new GridData(GridData.FILL_HORIZONTAL);
+        data.horizontalSpan = 3;
+        fSpecificLoggerText.setLayoutData(data);
     }
 
     /**

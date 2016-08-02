@@ -581,7 +581,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         logLevelGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label logLevelEventNameLabel = new Label(logLevelGroup, SWT.LEFT);
-        logLevelEventNameLabel.setText(Messages.TraceControl_EnableEventsEventNameLabel);
+        logLevelEventNameLabel.setText(Messages.TraceControl_EnableEventsNameLabel);
 
         data = new GridData(GridData.FILL_BOTH);
         data.horizontalSpan = 1;

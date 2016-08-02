@@ -512,7 +512,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
         specificEventGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label specificEventLabel = new Label(specificEventGroup, SWT.LEFT);
-        specificEventLabel.setText(Messages.TraceControl_EnableEventsEventNameLabel);
+        specificEventLabel.setText(Messages.TraceControl_EnableEventsNameLabel);
         data = new GridData(GridData.FILL_HORIZONTAL);
         data.horizontalSpan = 1;
         specificEventLabel.setLayoutData(data);
@@ -624,7 +624,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
         probeGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label probeNameLabel = new Label(probeGroup, SWT.LEFT);
-        probeNameLabel.setText(Messages.TraceControl_EnableEventsEventNameLabel);
+        probeNameLabel.setText(Messages.TraceControl_EnableEventsNameLabel);
         data = new GridData(GridData.FILL_BOTH);
         data.horizontalSpan = 1;
         probeNameLabel.setLayoutData(data);
@@ -686,7 +686,7 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
         functionGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Label functionNameLabel = new Label(functionGroup, SWT.LEFT);
-        functionNameLabel.setText(Messages.TraceControl_EnableEventsEventNameLabel);
+        functionNameLabel.setText(Messages.TraceControl_EnableEventsNameLabel);
         data = new GridData(GridData.FILL_BOTH);
         data.horizontalSpan = 1;
         functionNameLabel.setLayoutData(data);
