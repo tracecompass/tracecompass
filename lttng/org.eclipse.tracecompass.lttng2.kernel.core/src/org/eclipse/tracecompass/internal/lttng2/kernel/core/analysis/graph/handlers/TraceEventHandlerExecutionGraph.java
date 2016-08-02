@@ -134,11 +134,11 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
             handleSchedSwitch(ev);
         } else if (eventName.equals(eventLayout.eventSoftIrqEntry())) {
             handleSoftirqEntry(ev);
-        } else if (eventName.equals(TcpEventStrings.INET_SOCK_LOCAL_IN) ||
-                eventName.equals(TcpEventStrings.NETIF_RECEIVE_SKB)) {
+        } else if (eventLayout.eventsNetworkReceive().contains(eventName) ||
+                eventName.equals(TcpEventStrings.INET_SOCK_LOCAL_IN)) {
             handleInetSockLocalIn(ev);
-        } else if (eventName.equals(TcpEventStrings.INET_SOCK_LOCAL_OUT) ||
-                eventName.equals(TcpEventStrings.NET_DEV_QUEUE)) {
+        } else if (eventLayout.eventsNetworkSend().contains(eventName) ||
+                eventName.equals(TcpEventStrings.INET_SOCK_LOCAL_OUT)) {
             handleInetSockLocalOut(ev);
         } else if (isWakeupEvent(ev)) {
             handleSchedWakeup(ev);

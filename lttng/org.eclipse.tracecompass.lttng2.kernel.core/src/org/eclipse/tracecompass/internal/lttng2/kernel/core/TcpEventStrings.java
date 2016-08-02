@@ -38,8 +38,6 @@ public interface TcpEventStrings {
     public static final String INET_SOCK_CLONE = "inet_sock_clone";
     public static final String INET_ACCEPT = "inet_accept";
     public static final String INET_SOCK_DELETE = "inet_sock_delete";
-    public static final String NETIF_RECEIVE_SKB = "netif_receive_skb";
-    public static final String NET_DEV_QUEUE = "net_dev_queue";
 
     /* Field names */
     public static final String SEQ = "seq";
@@ -54,7 +52,5 @@ public interface TcpEventStrings {
     public static final String CHECK = "check";
     public static final String WINDOW = "window";
     public static final String FLAGS = "flags";
-    public static final String TRANSPORT_FIELDS = "transport_fields";
-    public static final String TYPE_TCP = "thtype_tcp";
 
 }
