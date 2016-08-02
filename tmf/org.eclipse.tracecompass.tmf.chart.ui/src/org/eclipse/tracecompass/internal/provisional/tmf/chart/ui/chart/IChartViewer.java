@@ -92,4 +92,20 @@ public interface IChartViewer {
         }
     }
 
+    /**
+     * Get the dark color matching the light color
+     *
+     * @param color
+     *            A light color for which to get the dark color
+     * @return The corresponding dark color or the first color if the light
+     *         color was not found
+     */
+    static Color getCorrespondingColor(Color color) {
+        int index = COLORS_LIGHT.indexOf(color);
+        if (index < 0) {
+            return COLORS.get(0);
+        }
+        return COLORS.get(index);
+    }
+
 }

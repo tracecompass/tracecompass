@@ -13,10 +13,13 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.text.Format;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -24,6 +27,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
@@ -36,6 +40,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartData;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartSeries;
@@ -44,6 +49,8 @@ import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.descriptor.D
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.descriptor.IDescriptorVisitor;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.resolver.INumericalResolver;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.resolver.IStringResolver;
+import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.signal.ChartSelectionUpdateSignal;
+import org.eclipse.tracecompass.internal.provisional.tmf.chart.ui.chart.IChartViewer;
 import org.eclipse.tracecompass.internal.tmf.chart.core.aggregator.IConsumerAggregator;
 import org.eclipse.tracecompass.internal.tmf.chart.core.consumer.IDataConsumer;
 import org.eclipse.tracecompass.internal.tmf.chart.core.consumer.NumericalConsumer;
@@ -55,6 +62,7 @@ import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRangeMap;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.dialog.Messages;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.format.LabelFormat;
 import org.swtchart.Chart;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.swtchart.IAxis;
 import org.swtchart.IAxisSet;
 import org.swtchart.IAxisTick;
@@ -66,6 +74,7 @@ import org.swtchart.LineStyle;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Iterators;
 
 /**
  * Class for building a scatter chart.
@@ -149,6 +158,9 @@ public final class SwtScatterChart extends SwtXYChartViewer {
 
         /* Add the mouse exit listener */
         getChart().getPlotArea().addListener(SWT.MouseExit, new MouseExitListener());
+
+        /* Add the mouse click listener */
+        getChart().getPlotArea().addMouseListener(new MouseDownListener());
 
         /* Add the paint listener */
         getChart().getPlotArea().addPaintListener(new ScatterPainterListener());
@@ -437,6 +449,33 @@ public final class SwtScatterChart extends SwtXYChartViewer {
         gc.dispose();
     }
 
+    @Override
+    protected void setSelection(@NonNull Set<@NonNull Object> set) {
+        super.setSelection(set);
+
+        /* Set color of selected symbol */
+        Iterator<Color> colorsIt = Iterators.cycle(COLORS);
+        Iterator<Color> lightColorsIt = Iterators.cycle(COLORS_LIGHT);
+
+        for (ISeries series : getChart().getSeriesSet().getSeries()) {
+            /* Series color */
+            Color lightColor = NonNullUtils.checkNotNull(lightColorsIt.next());
+            Color color = NonNullUtils.checkNotNull(colorsIt.next());
+
+            if (set.isEmpty()) {
+                /* Put all symbols to the normal colors */
+                ((ILineSeries) series).setSymbolColor(color);
+            } else {
+                /*
+                 * Fill with light colors to represent the deselected state. The
+                 * paint listener is then responsible for drawing the cross and
+                 * the dark colors for the selection.
+                 */
+                ((ILineSeries) series).setSymbolColor(lightColor);
+            }
+        }
+    }
+
     // ------------------------------------------------------------------------
     // Util methods
     // ------------------------------------------------------------------------
@@ -527,6 +566,44 @@ public final class SwtScatterChart extends SwtXYChartViewer {
         }
     }
 
+    private final class MouseDownListener extends MouseAdapter {
+        @Override
+        public void mouseDown(@Nullable MouseEvent event) {
+            if (event == null || event.button != 1) {
+                return;
+            }
+
+            /* Check if a point is hovered */
+            SwtChartPoint selection = fHoveredPoint;
+            if (selection == null) {
+                getSelection().clear();
+            } else {
+                boolean ctrl = (event.stateMask & SWT.CTRL) != 0;
+                getSelection().touch(selection, ctrl);
+            }
+
+            /* Redraw the selected points */
+            refresh();
+
+            /* Find these points map to which objects */
+            Set<Object> set = new HashSet<>();
+            for (SwtChartPoint point : getSelection().getPoints()) {
+                Object[] objects = checkNotNull(getObjectMap().get(point.getSeries()));
+
+                /* Add objects to the set */
+                Object obj = objects[point.getIndex()];
+                if (obj != null) {
+                    set.add(obj);
+                }
+            }
+
+            /* Send the update signal */
+            setSelection(set);
+            ChartSelectionUpdateSignal signal = new ChartSelectionUpdateSignal(SwtScatterChart.this, getData().getDataProvider(), set);
+            TmfSignalManager.dispatchSignal(signal);
+        }
+    }
+
     private final class ScatterPainterListener implements PaintListener {
         @Override
         public void paintControl(@Nullable PaintEvent event) {
@@ -541,6 +618,13 @@ public final class SwtScatterChart extends SwtXYChartViewer {
 
             /* Draw the hovering cross */
             drawHoveringCross(gc);
+
+            /* Don't draw if there's no selection */
+            if (getSelection().getPoints().size() > 0) {
+                /* Draw the selected points */
+                drawSelectedDot(gc);
+            }
+
         }
 
         private void drawHoveringCross(GC gc) {
@@ -558,6 +642,34 @@ public final class SwtScatterChart extends SwtXYChartViewer {
 
             /* Horizontal line */
             gc.drawLine(0, fHoveringPoint.y, getChart().getPlotArea().getSize().x, fHoveringPoint.y);
+        }
+
+        private void drawSelectedDot(GC gc) {
+            for (SwtChartPoint point : getSelection().getPoints()) {
+                ISeries series = point.getSeries();
+                Point coor = series.getPixelCoordinates(point.getIndex());
+                int symbolSize = ((ILineSeries) series).getSymbolSize();
+
+                Color symbolColor = ((ILineSeries) series).getSymbolColor();
+                if (symbolColor == null) {
+                    continue;
+                }
+                Color darkColor = IChartViewer.getCorrespondingColor(symbolColor);
+                /* Create a colored dot for selection */
+                gc.setBackground(darkColor);
+                gc.fillOval(coor.x - symbolSize, coor.y - symbolSize, symbolSize * 2, symbolSize * 2);
+
+                /* Configure cross settings */
+                gc.setLineWidth(2);
+                gc.setLineStyle(SWT.LINE_SOLID);
+                int drawingDelta = 2 * symbolSize;
+
+                /* Vertical line */
+                gc.drawLine(coor.x, coor.y - drawingDelta, coor.x, coor.y + drawingDelta);
+
+                /* Horizontal line */
+                gc.drawLine(coor.x - drawingDelta, coor.y, coor.x + drawingDelta, coor.y);
+            }
         }
     }
 
