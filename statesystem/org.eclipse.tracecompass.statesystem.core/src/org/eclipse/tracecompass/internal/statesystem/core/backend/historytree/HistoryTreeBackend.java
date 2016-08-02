@@ -278,8 +278,8 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
             while (!queue.isEmpty()) {
                 HTNode currentNode = queue.pop();
                 if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
-                    /* Here we add the relevant children nodes for BFS */
-                    queue.addAll(getSHT().selectNextChildren((CoreNode) currentNode, t));
+                    /*Here we add the relevant children nodes for BFS*/
+                    queue.addAll(getSHT().selectNextChildren((ParentNode) currentNode, t));
                 }
                 currentNode.writeInfoFromNode(stateInfo, t);
             }
@@ -326,7 +326,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         while (interval == null && !queue.isEmpty()) {
             HTNode currentNode = queue.pop();
             if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
-                queue.addAll(getSHT().selectNextChildren((CoreNode) currentNode, t));
+                queue.addAll(getSHT().selectNextChildren((ParentNode) currentNode, t));
             }
             interval = currentNode.getRelevantInterval(key, t);
         }

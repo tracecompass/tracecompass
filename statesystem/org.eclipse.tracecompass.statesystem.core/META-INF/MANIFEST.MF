@@ -15,6 +15,7 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.statesystem.core.s
  org.eclipse.tracecompass.internal.statesystem.core;x-friends:="org.eclipse.tracecompass.statesystem.core.tests",
  org.eclipse.tracecompass.internal.statesystem.core.backend;x-internal:=true,
  org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;x-friends:="org.eclipse.tracecompass.statesystem.core.tests",
+ org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.classic;x-friends:="org.eclipse.tracecompass.statesystem.core.tests",
  org.eclipse.tracecompass.internal.statesystem.core.statevalue;x-friends:="org.eclipse.tracecompass.statesystem.core.tests",
  org.eclipse.tracecompass.statesystem.core,
  org.eclipse.tracecompass.statesystem.core.backend,

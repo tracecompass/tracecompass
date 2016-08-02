@@ -11,11 +11,15 @@
  *   Florian Wininger - Add Extension and Leaf Node
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
+package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.classic;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTConfig;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTNode;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.ParentNode;
 
 /**
  * A Core node is a first-level node of a History Tree which is not a leaf node.
@@ -24,7 +28,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *
  * @author Alexandre Montplaisir
  */
-public final class CoreNode extends HTNode {
+public final class CoreNode extends ParentNode {
 
     /** Nb. of children this node has */
     private int nbChildren;
@@ -120,11 +124,7 @@ public final class CoreNode extends HTNode {
         }
     }
 
-    /**
-     * Return the number of child nodes this node has.
-     *
-     * @return The number of child nodes
-     */
+    @Override
     public int getNbChildren() {
         rwl.readLock().lock();
         int ret = nbChildren;
@@ -132,12 +132,7 @@ public final class CoreNode extends HTNode {
         return ret;
     }
 
-    /**
-     * Get the child node corresponding to the specified index
-     *
-     * @param index The index of the child to lookup
-     * @return The child node
-     */
+    @Override
     public int getChild(int index) {
         rwl.readLock().lock();
         try {
@@ -147,11 +142,7 @@ public final class CoreNode extends HTNode {
         }
     }
 
-    /**
-     * Get the latest (right-most) child node of this node.
-     *
-     * @return The latest child node
-     */
+    @Override
     public int getLatestChild() {
         rwl.readLock().lock();
         try {
@@ -161,13 +152,7 @@ public final class CoreNode extends HTNode {
         }
     }
 
-    /**
-     * Get the start time of the specified child node.
-     *
-     * @param index
-     *            The index of the child node
-     * @return The start time of the that child node.
-     */
+    @Override
     public long getChildStart(int index) {
         rwl.readLock().lock();
         try {
@@ -177,11 +162,7 @@ public final class CoreNode extends HTNode {
         }
     }
 
-    /**
-     * Get the start time of the latest (right-most) child node.
-     *
-     * @return The start time of the latest child
-     */
+    @Override
     public long getLatestChildStart() {
         rwl.readLock().lock();
         try {
@@ -207,10 +188,13 @@ public final class CoreNode extends HTNode {
      * @param childNode
      *            The SHTNode object of the new child
      */
+    @Override
     public void linkNewChild(HTNode childNode) {
         rwl.writeLock().lock();
         try {
-            assert (nbChildren < getConfig().getMaxChildren());
+            if (nbChildren >= getConfig().getMaxChildren()) {
+                throw new IllegalStateException("Asked to link another child but parent already has maximum number of children"); //$NON-NLS-1$
+            }
 
             children[nbChildren] = childNode.getSequenceNumber();
             childStart[nbChildren] = childNode.getNodeStart();

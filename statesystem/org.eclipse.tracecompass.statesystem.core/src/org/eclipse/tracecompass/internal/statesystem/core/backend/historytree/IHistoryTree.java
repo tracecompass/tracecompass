@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.util.Collection;
 
@@ -21,8 +22,53 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
  * high-level data relevant to the tree.
  *
  * @author Alexandre Montplaisir
+ * @author Geneviève Bastien
  */
 public interface IHistoryTree {
+
+    /**
+     * Interface for history to create the various HTNodes
+     */
+    interface IHTNodeFactory {
+
+        /**
+         * Creates a new core node for the specific history tree
+         *
+         * @param config
+         *            Configuration of the History Tree
+         * @param seqNumber
+         *            The (unique) sequence number assigned to this particular
+         *            node
+         * @param parentSeqNumber
+         *            The sequence number of this node's parent node
+         * @param start
+         *            The earliest timestamp stored in this node
+         * @return The new core node
+         * @throws IOException
+         *             any exception occurring while trying to read/create the
+         *             node
+         */
+        HTNode createCoreNode(HTConfig config, int seqNumber, int parentSeqNumber, long start) throws IOException;
+
+        /**
+         * Creates a new core node for the specific history tree
+         *
+         * @param config
+         *            Configuration of the History Tree
+         * @param seqNumber
+         *            The (unique) sequence number assigned to this particular
+         *            node
+         * @param parentSeqNumber
+         *            The sequence number of this node's parent node
+         * @param start
+         *            The earliest timestamp stored in this node
+         * @return The new core node
+         * @throws IOException
+         *             any exception occurring while trying to read/create the
+         *             node
+         */
+        HTNode createLeafNode(HTConfig config, int seqNumber, int parentSeqNumber, long start) throws IOException;
+    }
 
     /**
      * Size of the "tree header" in the tree-file The nodes will use this offset
@@ -158,7 +204,7 @@ public interface IHistoryTree {
      * @throws ClosedChannelException
      *             If the file channel was closed while we were reading the tree
      */
-    Collection<HTNode> selectNextChildren(CoreNode currentNode, long t) throws ClosedChannelException;
+    Collection<HTNode> selectNextChildren(ParentNode currentNode, long t) throws ClosedChannelException;
 
     /**
      * Get the current size of the history file.

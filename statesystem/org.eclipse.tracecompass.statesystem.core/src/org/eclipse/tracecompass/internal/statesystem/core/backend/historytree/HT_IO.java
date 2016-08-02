@@ -23,12 +23,13 @@ import java.nio.channels.FileChannel;
 import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.IHistoryTree.IHTNodeFactory;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -100,7 +101,7 @@ public class HT_IO {
 
                     synchronized (io) {
                         io.seekFCToNodePos(io.fFileChannelIn, seqNb);
-                        return HTNode.readNode(io.fConfig, io.fFileChannelIn);
+                        return HTNode.readNode(io.fConfig, io.fFileChannelIn, key.fStateHistory.fNodeFactory);
                     }
                 }
             }));
@@ -119,6 +120,8 @@ public class HT_IO {
     private final FileChannel fFileChannelIn;
     private final FileChannel fFileChannelOut;
 
+    private final IHTNodeFactory fNodeFactory;
+
     // ------------------------------------------------------------------------
     // Methods
     // ------------------------------------------------------------------------
@@ -132,11 +135,13 @@ public class HT_IO {
      *            The configuration object for the StateHistoryTree
      * @param newFile
      *            Flag indicating that the file must be created from scratch
+     * @param nodeFactory
+     *            The factory to create new nodes for this tree
      *
      * @throws IOException
      *             An exception can be thrown when file cannot be accessed
      */
-    public HT_IO(HTConfig config, boolean newFile) throws IOException {
+    public HT_IO(HTConfig config, boolean newFile, IHTNodeFactory nodeFactory) throws IOException {
         fConfig = config;
 
         File historyTreeFile = config.getStateFile();
@@ -164,6 +169,7 @@ public class HT_IO {
         }
         fFileChannelIn = fFileInputStream.getChannel();
         fFileChannelOut = fFileOutputStream.getChannel();
+        fNodeFactory = nodeFactory;
     }
 
     /**

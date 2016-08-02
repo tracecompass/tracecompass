@@ -12,7 +12,7 @@
  *   Patrick Tasse - Add message to exceptions
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
+package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.classic;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,6 +27,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTConfig;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTInterval;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTNode;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HT_IO;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.IHistoryTree;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.LeafNode;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.ParentNode;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 
@@ -42,13 +49,26 @@ import com.google.common.collect.ImmutableList;
 public class HistoryTreeClassic implements IHistoryTree {
 
     /**
-     * The magic number for this file format. Package-private for the factory
-     * class.
+     * The magic number for this file format.
      */
-    static final int HISTORY_FILE_MAGIC_NUMBER = 0x05FFA900;
+    public static final int HISTORY_FILE_MAGIC_NUMBER = 0x05FFA900;
 
     /** File format version. Increment when breaking compatibility. */
     private static final int FILE_VERSION = 7;
+
+    private static final IHTNodeFactory CLASSIC_NODE_FACTORY = new IHTNodeFactory() {
+
+        @Override
+        public HTNode createCoreNode(HTConfig config, int seqNumber, int parentSeqNumber, long start) {
+            return new CoreNode(config, seqNumber, parentSeqNumber, start);
+        }
+
+        @Override
+        public HTNode createLeafNode(HTConfig config, int seqNumber, int parentSeqNumber, long start) {
+            return new LeafNode(config, seqNumber, parentSeqNumber, start);
+        }
+
+    };
 
     // ------------------------------------------------------------------------
     // Tree-specific configuration
@@ -102,7 +122,7 @@ public class HistoryTreeClassic implements IHistoryTree {
         fLatestBranch = Collections.synchronizedList(new ArrayList<>());
 
         /* Prepare the IO object */
-        fTreeIO = new HT_IO(fConfig, true);
+        fTreeIO = new HT_IO(fConfig, true, CLASSIC_NODE_FACTORY);
 
         /* Add the first node to the tree */
         LeafNode firstNode = initNewLeafNode(-1, conf.getTreeStart());
@@ -193,7 +213,7 @@ public class HistoryTreeClassic implements IHistoryTree {
          * file, not extremely elegant. But how to pass the information here to
          * the SHT otherwise?
          */
-        fTreeIO = new HT_IO(fConfig, false);
+        fTreeIO = new HT_IO(fConfig, false, CLASSIC_NODE_FACTORY);
 
         fLatestBranch = buildLatestBranch(rootNodeSeqNb);
         fTreeEnd = getRootNode().getNodeEnd();
@@ -486,7 +506,7 @@ public class HistoryTreeClassic implements IHistoryTree {
             }
 
             /* Check if we can indeed add a child to the target parent */
-            if (((CoreNode) fLatestBranch.get(indexOfNode - 1)).getNbChildren() == fConfig.getMaxChildren()) {
+            if (((ParentNode) fLatestBranch.get(indexOfNode - 1)).getNbChildren() == fConfig.getMaxChildren()) {
                 /* If not, add a branch starting one level higher instead */
                 addSiblingNode(indexOfNode - 1);
                 return;
@@ -497,7 +517,7 @@ public class HistoryTreeClassic implements IHistoryTree {
                 fLatestBranch.get(i).closeThisNode(splitTime);
                 fTreeIO.writeNode(fLatestBranch.get(i));
 
-                CoreNode prevNode = (CoreNode) fLatestBranch.get(i - 1);
+                ParentNode prevNode = (ParentNode) fLatestBranch.get(i - 1);
                 HTNode newNode;
 
                 switch (fLatestBranch.get(i).getNodeType()) {
@@ -525,7 +545,7 @@ public class HistoryTreeClassic implements IHistoryTree {
         final long splitTime = fTreeEnd;
 
         HTNode oldRootNode = fLatestBranch.get(0);
-        CoreNode newRootNode = initNewCoreNode(-1, fConfig.getTreeStart());
+        ParentNode newRootNode = initNewCoreNode(-1, fConfig.getTreeStart());
 
         /* Tell the old root node that it isn't root anymore */
         oldRootNode.setParentSequenceNumber(newRootNode.getSequenceNumber());
@@ -547,15 +567,15 @@ public class HistoryTreeClassic implements IHistoryTree {
 
         // Create new coreNode
         for (int i = 1; i < depth; i++) {
-            CoreNode prevNode = (CoreNode) fLatestBranch.get(i - 1);
-            CoreNode newNode = initNewCoreNode(prevNode.getSequenceNumber(),
+            ParentNode prevNode = (ParentNode) fLatestBranch.get(i - 1);
+            ParentNode newNode = initNewCoreNode(prevNode.getSequenceNumber(),
                     splitTime + 1);
             prevNode.linkNewChild(newNode);
             fLatestBranch.add(newNode);
         }
 
         // Create the new leafNode
-        CoreNode prevNode = (CoreNode) fLatestBranch.get(depth - 1);
+        ParentNode prevNode = (ParentNode) fLatestBranch.get(depth - 1);
         LeafNode newNode = initNewLeafNode(prevNode.getSequenceNumber(), splitTime + 1);
         prevNode.linkNewChild(newNode);
         fLatestBranch.add(newNode);
@@ -570,8 +590,8 @@ public class HistoryTreeClassic implements IHistoryTree {
      *            Start time of the new node
      * @return The newly created node
      */
-    private @NonNull CoreNode initNewCoreNode(int parentSeqNumber, long startTime) {
-        CoreNode newNode = new CoreNode(fConfig, fNodeCount, parentSeqNumber,
+    private @NonNull ParentNode initNewCoreNode(int parentSeqNumber, long startTime) {
+        ParentNode newNode = new CoreNode(fConfig, fNodeCount, parentSeqNumber,
                 startTime);
         fNodeCount++;
         return newNode;
@@ -594,7 +614,7 @@ public class HistoryTreeClassic implements IHistoryTree {
     }
 
     @Override
-    public Collection<HTNode> selectNextChildren(CoreNode currentNode, long t) throws ClosedChannelException {
+    public Collection<HTNode> selectNextChildren(ParentNode currentNode, long t) throws ClosedChannelException {
         assert (currentNode.getNbChildren() > 0);
         int potentialNextSeqNb = currentNode.getSequenceNumber();
 

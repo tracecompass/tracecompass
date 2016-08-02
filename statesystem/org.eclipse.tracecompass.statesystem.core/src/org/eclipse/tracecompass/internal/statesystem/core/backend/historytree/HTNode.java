@@ -168,11 +168,13 @@ public abstract class HTNode {
      * @param fc
      *            FileChannel to the history file, ALREADY SEEKED at the start
      *            of the node.
+     * @param nodeFactory
+     *            The factory to create the nodes for this tree
      * @return The node object
      * @throws IOException
      *             If there was an error reading from the file channel
      */
-    public static final @NonNull HTNode readNode(HTConfig config, FileChannel fc)
+    public static final @NonNull HTNode readNode(HTConfig config, FileChannel fc, IHistoryTree.IHTNodeFactory nodeFactory)
             throws IOException {
         HTNode newNode = null;
         int res, i;
@@ -198,13 +200,13 @@ public abstract class HTNode {
         switch (type) {
         case CORE:
             /* Core nodes */
-            newNode = new CoreNode(config, seqNb, parentSeqNb, start);
+            newNode = nodeFactory.createCoreNode(config, seqNb, parentSeqNb, start);
             newNode.readSpecificHeader(buffer);
             break;
 
         case LEAF:
             /* Leaf nodes */
-            newNode = new LeafNode(config, seqNb, parentSeqNb, start);
+            newNode = nodeFactory.createLeafNode(config, seqNb, parentSeqNb, start);
             newNode.readSpecificHeader(buffer);
             break;
 
@@ -610,8 +612,8 @@ public abstract class HTNode {
         writer.println("Intervals for node #" + fSequenceNumber + ":");
 
         /* Array of children */
-        if (getNodeType() == NodeType.CORE) { /* Only Core Nodes can have children */
-            CoreNode thisNode = (CoreNode) this;
+        if (getNodeType() != NodeType.LEAF) { /* Only Core Nodes can have children */
+            ParentNode thisNode = (ParentNode) this;
             writer.print("  " + thisNode.getNbChildren() + " children");
             if (thisNode.getNbChildren() >= 1) {
                 writer.print(": [ " + thisNode.getChild(0));

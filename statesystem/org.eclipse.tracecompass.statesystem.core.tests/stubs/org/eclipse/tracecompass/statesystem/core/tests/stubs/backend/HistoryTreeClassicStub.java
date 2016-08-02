@@ -20,11 +20,13 @@ import java.io.PrintWriter;
 import java.nio.channels.ClosedChannelException;
 import java.util.List;
 
-import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.CoreNode;
+import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTConfig;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTNode;
-import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HistoryTreeClassic;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.IHistoryTree;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.ParentNode;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.classic.CoreNode;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.classic.HistoryTreeClassic;
 
 import com.google.common.collect.Iterables;
 
@@ -178,6 +180,7 @@ public class HistoryTreeClassicStub extends HistoryTreeClassic {
                     preOrderPrint(writer, printIntervals, nextNode, curDepth + 1, ts);
                 }
             } catch (ClosedChannelException e) {
+                Activator.getDefault().logError(e.getMessage());
             }
             break;
 
@@ -212,8 +215,8 @@ public class HistoryTreeClassicStub extends HistoryTreeClassic {
      *            The node to check
      */
     private void assertNodeIntegrity(HTNode node) {
-        if (node instanceof CoreNode) {
-            assertChildrenIntegrity((CoreNode) node);
+        if (node instanceof ParentNode) {
+            assertChildrenIntegrity((ParentNode) node);
         }
 
         /* Check that all intervals are within the node's range */
@@ -221,7 +224,7 @@ public class HistoryTreeClassicStub extends HistoryTreeClassic {
 
     }
 
-    private void assertChildrenIntegrity(CoreNode node) {
+    private void assertChildrenIntegrity(ParentNode node) {
         try {
             /*
              * Test that this node's start and end times match the start of the

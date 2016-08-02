@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.classic.HistoryTreeClassic;
 
 /**
  * Class that contains factory methods to build different types of history trees
