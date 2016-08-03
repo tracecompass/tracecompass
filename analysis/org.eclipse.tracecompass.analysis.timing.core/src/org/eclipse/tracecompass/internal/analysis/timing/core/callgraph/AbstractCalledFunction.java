@@ -61,6 +61,8 @@ abstract class AbstractCalledFunction implements ICalledFunction {
         fEnd = end;
         fDepth = depth;
         fParent = parent;
+        // It'll be modified once we add a child to it
+        fSelfTime = fEnd - fStart;
     }
 
     @Override

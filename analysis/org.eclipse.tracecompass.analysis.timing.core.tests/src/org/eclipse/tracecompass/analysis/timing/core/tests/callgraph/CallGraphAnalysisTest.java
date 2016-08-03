@@ -9,7 +9,9 @@
 
 package org.eclipse.tracecompass.analysis.timing.core.tests.callgraph;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +22,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphAnalysis;
-import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CalledFunction;
+import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.ICalledFunction;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -113,14 +115,14 @@ public class CallGraphAnalysisTest {
         assertNotNull(segmentStore);
         Object[] segments = segmentStore.toArray();
         assertEquals("Number of segments Found", 3, segments.length);
-        CalledFunction f1 = (CalledFunction) segments[0];
-        CalledFunction f2 = (CalledFunction) segments[1];
-        CalledFunction f3 = (CalledFunction) segments[2];
-        assertEquals("Test the parenthood", NonNullUtils.checkNotNull(f2.getParent()).getAddr(), f1.getAddr());
+        ICalledFunction f1 = (ICalledFunction) segments[0];
+        ICalledFunction f2 = (ICalledFunction) segments[1];
+        ICalledFunction f3 = (ICalledFunction) segments[2];
+        assertEquals("Test the parenthood", NonNullUtils.checkNotNull(f2.getParent()).getSymbol(), f1.getSymbol());
         assertEquals("Children number:First parent", 1, f1.getChildren().size());
         assertEquals("Children number:Second parent", 1, f2.getChildren().size());
         assertTrue("Children number:Second parent", f3.getChildren().isEmpty());
-        assertTrue("Children number:Child(leaf)", ((CalledFunction) segments[2]).getChildren().isEmpty());
+        assertTrue("Children number:Child(leaf)", ((ICalledFunction) segments[2]).getChildren().isEmpty());
         assertEquals("Parent's self time", 2, f1.getSelfTime());
         assertEquals("Child's self time", 2, f2.getSelfTime());
         assertEquals("The leaf's self time", 994, f3.getSelfTime());
@@ -185,7 +187,7 @@ public class CallGraphAnalysisTest {
         ISegmentStore<@NonNull ISegment> segmentStore = cga.getSegmentStore();
         assertNotNull(segmentStore);
         Object[] segments = segmentStore.toArray();
-        CalledFunction f1 = (CalledFunction) segments[0];
+        ICalledFunction f1 = (ICalledFunction) segments[0];
         assertEquals("Number of segments Found", 1, segments.length);
         assertEquals("Callees number", 0, f1.getChildren().size());
         assertEquals("Function's self time", 10, f1.getSelfTime());
@@ -233,18 +235,18 @@ public class CallGraphAnalysisTest {
         // Test the segment store
         assertNotNull(segmentStore);
         Object[] segments = segmentStore.toArray();
-        List<@NonNull CalledFunction> threads = cga.getThreads();
+        List<@NonNull ICalledFunction> threads = cga.getRootFunctions();
         assertEquals("Number of root functions", 2, threads.size());
         assertEquals("Number of children: first root function", 1, threads.get(0).getChildren().size());
         assertEquals("Number of children: first root function", 1, threads.get(1).getChildren().size());
-        CalledFunction firstChild = threads.get(0).getChildren().get(0);
-        CalledFunction secondChild = threads.get(1).getChildren().get(0);
+        ICalledFunction firstChild = threads.get(0).getChildren().get(0);
+        ICalledFunction secondChild = threads.get(1).getChildren().get(0);
         assertEquals("Number of segments found", 4, segments.length);
         assertNotNull(firstChild.getParent());
         assertNotNull(secondChild.getParent());
 
-        assertEquals("Test of parenthood", NonNullUtils.checkNotNull(firstChild.getParent()).getAddr(), threads.get(0).getAddr());
-        assertEquals("Test of parenthood", NonNullUtils.checkNotNull(secondChild.getParent()).getAddr(), threads.get(1).getAddr());
+        assertEquals("Test of parenthood", NonNullUtils.checkNotNull(firstChild.getParent()).getSymbol(), threads.get(0).getSymbol());
+        assertEquals("Test of parenthood", NonNullUtils.checkNotNull(secondChild.getParent()).getSymbol(), threads.get(1).getSymbol());
 
     }
 
@@ -283,7 +285,7 @@ public class CallGraphAnalysisTest {
         Object[] segments = segmentStore.toArray();
         assertEquals("Number of segments found", LARGE_AMOUNT_OF_SEGMENTS, segments.length);
         for (int i = 1; i < LARGE_AMOUNT_OF_SEGMENTS; i++) {
-            assertEquals("Test parenthood", ((CalledFunction) segments[i - 1]).getAddr(), NonNullUtils.checkNotNull(((CalledFunction) segments[i]).getParent()).getAddr());
+            assertEquals("Test parenthood", ((ICalledFunction) segments[i - 1]).getSymbol(), NonNullUtils.checkNotNull(((ICalledFunction) segments[i]).getParent()).getSymbol());
         }
     }
 
@@ -352,22 +354,22 @@ public class CallGraphAnalysisTest {
         assertNotNull(segmentStore);
         Object[] segments = segmentStore.toArray();
         assertEquals("Number of segments found", 5, segments.length);
-        List<@NonNull CalledFunction> rootFunctions = cga.getThreads();
+        List<@NonNull ICalledFunction> rootFunctions = cga.getRootFunctions();
         assertEquals("Test the number of root functions found", 1, rootFunctions.size());
-        CalledFunction rootFunction = rootFunctions.get(0);
+        ICalledFunction rootFunction = rootFunctions.get(0);
 
         // Test the segments links
         assertEquals("Children number:First parent", 3, rootFunction.getChildren().size());
-        List<@NonNull CalledFunction> firstDepthFunctions = rootFunctions.get(0).getChildren();
-        CalledFunction firstChild = firstDepthFunctions.get(0);
-        CalledFunction secondChild = firstDepthFunctions.get(1);
-        CalledFunction thirdChild = firstDepthFunctions.get(2);
-        assertEquals("Test parenthood: First child", rootFunction.getAddr(), NonNullUtils.checkNotNull(firstChild.getParent()).getAddr());
-        assertEquals("Test parenthood: Second parent", rootFunction.getAddr(), NonNullUtils.checkNotNull(secondChild.getParent()).getAddr());
-        assertEquals("Test parenthood: Third parent", rootFunction.getAddr(), NonNullUtils.checkNotNull(thirdChild.getParent()).getAddr());
+        List<@NonNull ICalledFunction> firstDepthFunctions = rootFunctions.get(0).getChildren();
+        ICalledFunction firstChild = firstDepthFunctions.get(0);
+        ICalledFunction secondChild = firstDepthFunctions.get(1);
+        ICalledFunction thirdChild = firstDepthFunctions.get(2);
+        assertEquals("Test parenthood: First child", rootFunction.getSymbol(), NonNullUtils.checkNotNull(firstChild.getParent()).getSymbol());
+        assertEquals("Test parenthood: Second parent", rootFunction.getSymbol(), NonNullUtils.checkNotNull(secondChild.getParent()).getSymbol());
+        assertEquals("Test parenthood: Third parent", rootFunction.getSymbol(), NonNullUtils.checkNotNull(thirdChild.getParent()).getSymbol());
         assertEquals("Children number: First child", 1, firstChild.getChildren().size());
-        CalledFunction leaf = firstChild.getChildren().get(0);
-        assertEquals("Test parenthood: Third parent", firstChild.getAddr(), NonNullUtils.checkNotNull(leaf.getParent()).getAddr());
+        ICalledFunction leaf = firstChild.getChildren().get(0);
+        assertEquals("Test parenthood: Third parent", firstChild.getSymbol(), NonNullUtils.checkNotNull(leaf.getParent()).getSymbol());
         assertTrue("Children number:leaf", leaf.getChildren().isEmpty());
 
         // Test the segments self time
@@ -391,7 +393,7 @@ public class CallGraphAnalysisTest {
         assertEquals("Depth: Leaf", 2, leaf.getDepth());
 
         // Test if the first child and the third one have the same address
-        assertEquals("Test the address of two functions", firstChild.getAddr(), thirdChild.getAddr());
+        assertEquals("Test the address of two functions", firstChild.getSymbol(), thirdChild.getSymbol());
 
     }
 }
