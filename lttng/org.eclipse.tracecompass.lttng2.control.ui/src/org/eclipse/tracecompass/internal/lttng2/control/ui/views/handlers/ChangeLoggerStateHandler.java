@@ -208,7 +208,7 @@ public abstract class ChangeLoggerStateHandler extends BaseControlViewHandler {
                     // different session or domain they need to be enabled in two different lttng commands. At this moment,
                     // it is simpler to disable the context menu. This issue will be addressed later as an enhancement.
                     if ((!sessionName.equals(logger.getSessionName())) ||
-                        (!domain.getName().equals(logger.getDomain().name()))) {
+                        (!domain.getName().equalsIgnoreCase(logger.getDomain().name()))) {
                         loggers.clear();
                         break;
                     }

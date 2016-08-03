@@ -265,6 +265,7 @@ public final class Messages extends NLS {
     public static String TraceControl_UnknownDomainDisplayName;
     public static String TraceControl_JULDomainDisplayName;
     public static String TraceControl_LOG4JDomainDisplayName;
+    public static String TraceControl_PythonDomainDisplayName;
     public static String TraceControl_AllSessionsDisplayName;
     public static String TraceControl_SessionDisplayName;
     public static String TraceControl_DomainDisplayName;

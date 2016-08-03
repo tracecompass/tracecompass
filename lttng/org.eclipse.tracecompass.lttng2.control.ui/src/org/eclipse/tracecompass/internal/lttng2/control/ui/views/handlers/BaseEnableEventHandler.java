@@ -238,6 +238,7 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
                         break;
                     case JUL:
                     case LOG4J:
+                    case PYTHON:
                         eventNames = dialog.getEventNames();
                         if (dialog.isAllEvents()) {
                             eventNames = null;

@@ -53,6 +53,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventTyp
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLog4jLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TracePythonLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BufferType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.ChannelInfo;
@@ -393,6 +394,10 @@ public class LTTngControlServiceMI extends LTTngControlService {
             domain = new DomainInfo(Messages.TraceControl_LOG4JDomainDisplayName);
             domain.setDomain(TraceDomainType.LOG4J);
             break;
+        case PYTHON:
+            domain = new DomainInfo(Messages.TraceControl_PythonDomainDisplayName);
+            domain.setDomain(TraceDomainType.PYTHON);
+            break;
         case UNKNOWN:
             domain = new DomainInfo(Messages.TraceControl_UnknownDomainDisplayName);
             domain.setDomain(TraceDomainType.UNKNOWN);
@@ -663,6 +668,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
 
         getUstProviderLoggers(allProviders, TraceDomainType.JUL, monitor);
         getUstProviderLoggers(allProviders, TraceDomainType.LOG4J, monitor);
+        getUstProviderLoggers(allProviders, TraceDomainType.PYTHON, monitor);
 
         return allProviders;
     }
@@ -1016,6 +1022,9 @@ public class LTTngControlServiceMI extends LTTngControlService {
                             break;
                         case LOG4J:
                             loggerInfo.setLogLevel(TraceLog4jLogLevel.valueOfString(infoNode.getTextContent()));
+                            break;
+                        case PYTHON:
+                            loggerInfo.setLogLevel(TracePythonLogLevel.valueOfString(infoNode.getTextContent()));
                             break;
                             //$CASES-OMITTED$
                         default:

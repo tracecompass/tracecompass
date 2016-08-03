@@ -77,6 +77,10 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
      */
     private EnableLoggersComposite fLog4jComposite;
     /**
+     * The composite with widgets for collecting information about Python events.
+     */
+    private EnableLoggersComposite fPythonComposite;
+    /**
      * Radio button for selecting kernel domain.
      */
     private Button fKernelButton;
@@ -92,6 +96,10 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
      * Radio button for selecting LOG4J domain.
      */
     private Button fLog4jButton;
+    /**
+     * Radio button for selecting Python domain.
+     */
+    private Button fPythonButton;
     /**
      * The referenced trace provider group containing the kernel provider and UST
      * provider component which contains a list of available tracepoints.
@@ -135,6 +143,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         case LOG4J:
             return fLog4jComposite.isAllTracePoints();
         case PYTHON:
+            return fPythonComposite.isAllTracePoints();
         case UNKNOWN:
         default:
             return false;
@@ -171,6 +180,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         case LOG4J:
             return fLog4jComposite.isAllTracePoints();
         case PYTHON:
+            return fPythonComposite.isAllTracePoints();
         case UNKNOWN:
         default:
             return false;
@@ -205,6 +215,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         case LOG4J:
             return fLog4jComposite.getEventNames();
         case PYTHON:
+            return fPythonComposite.getEventNames();
         case UNKNOWN:
         default:
             return null;
@@ -287,6 +298,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         case LOG4J:
             return fLog4jComposite.isLogLevel();
         case PYTHON:
+            return fPythonComposite.isLogLevel();
         case UNKNOWN:
         default:
             return false;
@@ -305,6 +317,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         case LOG4J:
             return fLog4jComposite.getLogLevelType();
         case PYTHON:
+            return fPythonComposite.getLogLevelType();
         case UNKNOWN:
         default:
             return null;
@@ -323,6 +336,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         case LOG4J:
             return fLog4jComposite.getLogLevel();
         case PYTHON:
+            return fPythonComposite.getLogLevel();
         case UNKNOWN:
         default:
             return null;
@@ -401,7 +415,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         // ------------------------------------------------------------------------
         Group domainGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
         domainGroup.setText(Messages.TraceControl_DomainDisplayName);
-        layout = new GridLayout(4, true);
+        layout = new GridLayout(5, true);
         domainGroup.setLayout(layout);
 
         fKernelButton = new Button(domainGroup, SWT.RADIO);
@@ -412,6 +426,8 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         fJulButton.setText(Messages.TraceControl_JULDomainDisplayName);
         fLog4jButton = new Button(domainGroup, SWT.RADIO);
         fLog4jButton.setText(Messages.TraceControl_LOG4JDomainDisplayName);
+        fPythonButton = new Button(domainGroup, SWT.RADIO);
+        fPythonButton.setText(Messages.TraceControl_PythonDomainDisplayName);
 
         switch (fDomain) {
         case KERNEL:
@@ -427,6 +443,8 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             fLog4jButton.setSelection(true);
             break;
         case PYTHON:
+            fPythonButton.setSelection(true);
+            break;
         case UNKNOWN:
         default:
             break;
@@ -437,11 +455,13 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             fUstButton.setEnabled(false);
             fJulButton.setEnabled(false);
             fLog4jButton.setEnabled(false);
+            fPythonButton.setEnabled(false);
         } else if ((fProviderGroup != null) && (!fProviderGroup.hasKernelProvider())) {
             fKernelButton.setEnabled(false);
             fUstButton.setEnabled(true);
             fJulButton.setEnabled(true);
             fLog4jButton.setEnabled(true);
+            fPythonButton.setEnabled(true);
         }
 
         // layout widgets
@@ -460,6 +480,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         fKernelComposite = null;
         fJulComposite = null;
         fLog4jComposite = null;
+        fPythonComposite= null;
 
         switch (fDomain) {
         case KERNEL:
@@ -475,6 +496,8 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             createLog4jComposite();
             break;
         case PYTHON:
+            createPythonComposite();
+            break;
         case UNKNOWN:
         default:
             break;
@@ -524,7 +547,18 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             }
         });
 
-        getShell().setMinimumSize(new Point(550, 850));
+        fPythonButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (fPythonButton.getSelection()) {
+                    disposeAllComposite();
+                    createPythonComposite();
+                    fDialogComposite.layout();
+                }
+            }
+        });
+
+    getShell().setMinimumSize(new Point(550, 850));
 
         return fDialogComposite;
     }
@@ -546,6 +580,8 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             fDomain = TraceDomainType.JUL;
         } else if (fLog4jButton.getSelection()) {
             fDomain= TraceDomainType.LOG4J;
+        } else if (fPythonButton.getSelection()) {
+            fDomain = TraceDomainType.PYTHON;
         }
 
         // Validate kernel composite in case of kernel domain
@@ -563,8 +599,13 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             return;
         }
 
-        // Validate LOG4J composite in case of JUL domain
+        // Validate LOG4J composite in case of LOG4J domain
         if (fLog4jComposite != null && !fLog4jComposite.isValid()) {
+            return;
+        }
+
+        // Validate Python composite in case of Python domain
+        if (fPythonComposite != null && !fPythonComposite.isValid()) {
             return;
         }
 
@@ -584,6 +625,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         disposeUstComposite();
         disposeJulComposite();
         disposeLog4jComposite();
+        disposePythonComposite();
     }
 
     /**
@@ -622,7 +664,7 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
             fUstComposite.createContent();
         }
-    }
+  }
 
     /**
      * Disposes the UST composite (if existing)
@@ -679,6 +721,30 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         if (fLog4jComposite != null) {
             fLog4jComposite.dispose();
             fLog4jComposite = null;
+        }
+    }
+
+    /**
+     * Creates the Python composite (if not existing)
+     */
+    private void createPythonComposite() {
+        if (fPythonComposite == null) {
+            fPythonComposite = new EnableLoggersComposite(fDialogComposite, SWT.NONE, fProviderGroup, TraceDomainType.PYTHON);
+            GridLayout layout = new GridLayout(1, true);
+            fPythonComposite.setLayout(layout);
+            fPythonComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+            fPythonComposite.createContent();
+        }
+    }
+
+    /**
+     * Disposes the Python composite (if existing)
+     */
+    private void disposePythonComposite() {
+        if (fPythonComposite != null) {
+            fPythonComposite.dispose();
+            fPythonComposite = null;
         }
     }
 }

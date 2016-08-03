@@ -40,6 +40,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLog4jLogLevel;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TracePythonLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceControlComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.BaseLoggerComponent;
@@ -298,6 +299,8 @@ public class EnableLoggersComposite extends Composite implements IBaseEnableUstE
             return TraceJulLogLevel.values();
         case LOG4J:
             return TraceLog4jLogLevel.values();
+        case PYTHON:
+            return TracePythonLogLevel.values();
             //$CASES-OMITTED$
         default:
             return null;
@@ -431,7 +434,8 @@ public class EnableLoggersComposite extends Composite implements IBaseEnableUstE
             int k = 0;
             for (int i = 0; i < levels.length; i++) {
                 if (levels[i] != TraceJulLogLevel.LEVEL_UNKNOWN &&
-                    levels[i] != TraceLog4jLogLevel.LEVEL_UNKNOWN) {
+                    levels[i] != TraceLog4jLogLevel.LEVEL_UNKNOWN &&
+                    levels[i] != TracePythonLogLevel.LEVEL_UNKNOWN) {
                     levelNames[k++] = levels[i].getInName();
                 }
             }

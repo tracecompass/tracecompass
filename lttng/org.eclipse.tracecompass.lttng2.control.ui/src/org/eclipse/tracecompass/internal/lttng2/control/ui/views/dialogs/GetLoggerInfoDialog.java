@@ -29,6 +29,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainTy
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLog4jLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TracePythonLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
@@ -112,6 +113,8 @@ public class GetLoggerInfoDialog extends BaseGetInfoDialog implements IGetLogger
 
     @Override
     protected Control createDialogArea(Composite parent) {
+        fLogLevel = null;
+        fLogLevelType = null;
         super.createDialogArea(parent);
         // Main dialog panel
         Composite dialogComposite = new Composite(parent, SWT.NONE);
@@ -152,30 +155,16 @@ public class GetLoggerInfoDialog extends BaseGetInfoDialog implements IGetLogger
         data = new GridData(GridData.FILL_BOTH);
         fLogLevelButton.setLayoutData(data);
 
-        ITraceLogLevel[] levels = null;
         String[] levelNames  = null;
         switch (fLoggerDomain) {
         case JUL:
-            levels = TraceJulLogLevel.values();
-
-            levelNames = new String[levels.length - 1];
-            int k = 0;
-            for (int i = 0; i < levels.length; i++) {
-                if (levels[i] != TraceJulLogLevel.LEVEL_UNKNOWN) {
-                    levelNames[k++] = levels[i].getInName();
-                }
-            }
+            levelNames = findLoglevelNames(TraceJulLogLevel.class);
             break;
         case LOG4J:
-            levels = TraceLog4jLogLevel.values();
-
-            levelNames = new String[levels.length - 1];
-            int l = 0;
-            for (int i = 0; i < levels.length; i++) {
-                if (levels[i] != TraceLog4jLogLevel.LEVEL_UNKNOWN) {
-                    levelNames[l++] = levels[i].getInName();
-                }
-            }
+            levelNames = findLoglevelNames(TraceLog4jLogLevel.class);
+            break;
+        case PYTHON:
+            levelNames = findLoglevelNames(TracePythonLogLevel.class);
             break;
             //$CASES-OMITTED$
         default:
@@ -223,6 +212,9 @@ public class GetLoggerInfoDialog extends BaseGetInfoDialog implements IGetLogger
             case LOG4J:
                 levels = TraceLog4jLogLevel.values();
                 break;
+            case PYTHON:
+                levels = TracePythonLogLevel.values();
+                break;
                 //$CASES-OMITTED$
             default:
                 levels = TraceLogLevel.values();
@@ -244,6 +236,34 @@ public class GetLoggerInfoDialog extends BaseGetInfoDialog implements IGetLogger
             }
         }
         super.okPressed();
+    }
+
+    // ------------------------------------------------------------------------
+    // Helper methods
+    // ------------------------------------------------------------------------
+
+    /**
+     * Returns the values of a certain enum type.
+     *
+     * @param enumType
+     *            a value of an enum type, this is to determine the type of the enum
+     * @return an array of String of the values of the enum type
+     */
+    private static String[] findLoglevelNames(Class<? extends ITraceLogLevel> enumType) {
+        ITraceLogLevel[] levels = enumType.getEnumConstants();
+        if (levels == null) {
+            return new String[0];
+        }
+        String[] levelNames = new String[levels.length - 1];
+        int l = 0;
+        for (int i = 0; i < levels.length; i++) {
+            if ((!levels[i].equals(TraceLog4jLogLevel.LEVEL_UNKNOWN)) &&
+                    (!levels[i].equals(TracePythonLogLevel.LEVEL_UNKNOWN)) &&
+                    (!levels[i].equals(TraceJulLogLevel.LEVEL_UNKNOWN))) {
+                levelNames[l++] = levels[i].getInName();
+            }
+        }
+        return levelNames;
     }
 
 }

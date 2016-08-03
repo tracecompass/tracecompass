@@ -66,6 +66,10 @@ public class UstProviderComponent extends TraceControlComponent {
      * UST domain event created by a Java application.
      */
     private static final String LTTNG_LOG4J_EVENT = "lttng_log4j:event"; //$NON-NLS-1$
+    /**
+     * UST domain event created by a Python application.
+     */
+    private static final String LTTNG_PYTHON_EVENT = "lttng_python:event"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -111,7 +115,8 @@ public class UstProviderComponent extends TraceControlComponent {
                     !events[i].getName().equals(LTTNG_LOG4J_USER_EVENT) &&
                     !events[i].getName().equals(LTTNG_LOG4J_SYS_EVENT) &&
                     !events[i].getName().equals(LTTNG_JUL_EVENT) &&
-                    !events[i].getName().equals(LTTNG_LOG4J_EVENT) ) {
+                    !events[i].getName().equals(LTTNG_LOG4J_EVENT) &&
+                    !events[i].getName().equals(LTTNG_PYTHON_EVENT)) {
                 eventComponents.add(component);
             }
         }
