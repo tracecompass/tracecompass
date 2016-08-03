@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,10 +86,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 
-import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Multisets;
 
 /**
  * The Control Flow view main object
@@ -136,7 +132,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
 
     private static final Comparator<ITimeGraphEntry>[] COLUMN_COMPARATORS;
 
-    private final Function<Collection<ILinkEvent>, Map<Integer, Long>> UPDATE_SCHEDULING_COLUMN_ALGO = new OptimizationAlgorithm();
+    private final Function<Collection<ILinkEvent>, Map<Integer, Long>> UPDATE_SCHEDULING_COLUMN_ALGO = new NaiveOptimizationAlgorithm();
 
     private static final int INITIAL_SORT_COLUMN_INDEX = 3;
 
@@ -496,80 +492,6 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
             refresh();
         }
 
-    }
-
-    /**
-     * Optimization algorithm, overridable.
-     *
-     * @author Matthew Khouzam
-     * @author Samuel Gagnon
-     */
-    public static class OptimizationAlgorithm implements Function<Collection<ILinkEvent>, Map<Integer, Long>> {
-
-        /**
-         * Get the scheduling column order by arrows
-         *
-         * @param arrows
-         *            the list of visible links
-         * @return the list of weights, by thread ID
-         */
-        @Override
-        public Map<Integer, Long> apply(Collection<ILinkEvent> arrows) {
-            /*
-             * "transitions" contains the count of every arrows between two tids
-             * (Pair<Integer, Integer>). For constructing the Pair, we always
-             * put the smallest tid first
-             */
-            Multiset<Pair<Integer, Integer>> transitions = HashMultiset.<Pair<Integer,Integer>>create();
-
-            /*
-             * We iterate in arrows to count the number of transitions between
-             * every pair (tid,tid) in the current view
-             */
-            for (ILinkEvent arrow : arrows) {
-                ITimeGraphEntry from = arrow.getEntry();
-                ITimeGraphEntry to = arrow.getDestinationEntry();
-                if (!(from instanceof ControlFlowEntry) || !(to instanceof ControlFlowEntry)) {
-                    continue;
-                }
-                int fromTid = ((ControlFlowEntry) from).getThreadId();
-                int toTid = ((ControlFlowEntry) to).getThreadId();
-                if (fromTid != toTid) {
-                    Pair<Integer, Integer> key = new Pair<>(Math.min(fromTid, toTid), Math.max(fromTid, toTid));
-                    transitions.add(key);
-                }
-            }
-
-            /*
-             * We now have a transition count for every pair (tid,tid). The next
-             * step is to sort every pair according to its count in decreasing
-             * order
-             */
-            List<Pair<Integer, Integer>> sortedTransitionsByCount = Multisets.copyHighestCountFirst(transitions).asList();
-
-            /*
-             * Next, we find the order in which we want to display our threads.
-             * We simply iterate in every pair (tid,tid) in orderedTidList. Each
-             * time we see a new tid, we add it at the end of orderedTidList.
-             * This way, threads with lots of transitions will be grouped in the
-             * top. While very naive, this algorithm is fast, simple and gives
-             * decent results.
-             */
-            Map<Integer, Long> orderedTidMap = new LinkedHashMap<>();
-            long pos = 0;
-            for (Pair<Integer, Integer> threadPair : sortedTransitionsByCount) {
-                if (orderedTidMap.get(threadPair.getFirst()) == null) {
-                    orderedTidMap.put(threadPair.getFirst(), pos);
-                    pos++;
-                }
-                if (orderedTidMap.get(threadPair.getSecond()) == null) {
-                    orderedTidMap.put(threadPair.getSecond(), pos);
-                    pos++;
-                }
-            }
-
-            return orderedTidMap;
-        }
     }
 
     /**

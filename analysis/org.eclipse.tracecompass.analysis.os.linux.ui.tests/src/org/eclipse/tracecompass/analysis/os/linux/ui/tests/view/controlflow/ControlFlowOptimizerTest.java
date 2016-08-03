@@ -24,8 +24,7 @@ import java.util.function.Function;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.ControlFlowEntry;
-import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.ControlFlowView;
-import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.ControlFlowView.OptimizationAlgorithm;
+import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.NaiveOptimizationAlgorithm;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
@@ -58,8 +57,8 @@ public class ControlFlowOptimizerTest {
      *
      * @return the optimization method to test.
      */
-    protected OptimizationAlgorithm getOptimizationMethod() {
-        return new ControlFlowView.OptimizationAlgorithm();
+    protected Function<Collection<ILinkEvent>, Map<Integer, Long>> getOptimizationMethod() {
+        return new NaiveOptimizationAlgorithm();
     }
 
     /**
