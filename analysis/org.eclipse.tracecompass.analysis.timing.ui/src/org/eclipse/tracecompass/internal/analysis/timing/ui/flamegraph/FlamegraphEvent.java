@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph;
 
+import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.AggregatedCalledFunction;
+import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.AggregatedCalledFunctionStatistics;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 
@@ -21,9 +23,11 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
  */
 public class FlamegraphEvent extends TimeEvent {
 
+    private static final int MODULO = FlameGraphPresentationProvider.NUM_COLORS / 2;
+
     private final Object fSymbol;
-    private final int fNbCalls;
     private final long fSelfTime;
+    private final AggregatedCalledFunctionStatistics fStatistics;
 
     /**
      * Constructor
@@ -32,22 +36,14 @@ public class FlamegraphEvent extends TimeEvent {
      *            The Entry
      * @param beginTime
      *            The event's begin time
-     * @param totalTime
-     *            The event's total time
-     * @param value
-     *            The event's value
-     * @param symbol
-     *            The event's address or name
-     * @param nbCalls
-     *            The event's number of calls
-     * @param selfTime
-     *            The event's self time
+     * @param aggregatedFunction
+     *            The function the event's presenting
      */
-    public FlamegraphEvent(ITimeGraphEntry source, long beginTime, long totalTime, int value, Object symbol, int nbCalls, long selfTime) {
-        super(source, beginTime, totalTime, value);
-        fSymbol = symbol;
-        fNbCalls = nbCalls;
-        fSelfTime = selfTime;
+    public FlamegraphEvent(ITimeGraphEntry source, long beginTime, AggregatedCalledFunction aggregatedFunction) {
+        super(source, beginTime, aggregatedFunction.getDuration(), String.valueOf(aggregatedFunction.getSymbol()).hashCode() % MODULO + MODULO);
+        fSymbol = aggregatedFunction.getSymbol();
+        fStatistics = aggregatedFunction.getFunctionStatistics();
+        fSelfTime = aggregatedFunction.getSelfTime();
     }
 
     /**
@@ -60,12 +56,12 @@ public class FlamegraphEvent extends TimeEvent {
     }
 
     /**
-     * The event's number of calls
+     * The event's statistics
      *
-     * @return The event's number of a calls
+     * @return The event's statistics
      */
-    public int getNbCalls() {
-        return fNbCalls;
+    public AggregatedCalledFunctionStatistics getStatistics() {
+        return fStatistics;
     }
 
     /**

@@ -34,7 +34,6 @@ import com.google.common.collect.Lists;
  */
 public class FlameGraphContentProvider implements ITimeGraphContentProvider {
 
-    private static final int MODULO = FlameGraphPresentationProvider.NUM_COLORS / 2;
     private List<FlamegraphDepthEntry> fFlameGraphEntries = new ArrayList<>();
     private long fThreadDuration;
     private ITmfTrace fActiveTrace;
@@ -57,9 +56,8 @@ public class FlameGraphContentProvider implements ITimeGraphContentProvider {
                 childrenEntries.add(entry);
             }
         }
-        int value = String.valueOf(firstNode.getSymbol()).hashCode() % MODULO + MODULO;
         FlamegraphDepthEntry firstEntry = NonNullUtils.checkNotNull(childrenEntries.get(0));
-        firstEntry.addEvent(new FlamegraphEvent(firstEntry, timestampStack.peek(), firstNode.getDuration(), value, firstNode.getSymbol(), 1, firstNode.getSelfTime()));
+        firstEntry.addEvent(new FlamegraphEvent(firstEntry, timestampStack.peek(), firstNode));
         // Build the event list for next entries (next depth)
         addEvent(firstNode, childrenEntries, timestampStack);
     }
@@ -85,19 +83,14 @@ public class FlameGraphContentProvider implements ITimeGraphContentProvider {
                     .forEach(child -> {
                         addEvent(child, childrenEntries, timestampStack);
                     });
-            // Pop the children timestamps from the stack
             node.getChildren().stream().forEach(child -> {
                 timestampStack.pop();
             });
         }
         FlamegraphDepthEntry entry = NonNullUtils.checkNotNull(childrenEntries.get(node.getDepth()));
-        // Get the color of the event
-        int value = String.valueOf(node.getSymbol()).hashCode() % MODULO + MODULO;
         // Create the event corresponding to the function using the caller's
         // timestamp
-        entry.addEvent(new FlamegraphEvent(entry, timestampStack.peek(),
-                node.getDuration(), value, node.getSymbol(), node.getNbCalls(),
-                node.getSelfTime()));
+        entry.addEvent(new FlamegraphEvent(entry, timestampStack.peek(), node));
         timestampStack.push(timestampStack.peek() + node.getDuration());
     }
 

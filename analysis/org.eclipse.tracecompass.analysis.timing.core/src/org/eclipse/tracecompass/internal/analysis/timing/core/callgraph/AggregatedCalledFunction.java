@@ -17,8 +17,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 
 /**
- * This class represents a function call in a certain level in the call
- * stack. It's used to build an aggregation segment tree (aggregated by depth and
+ * This class represents a function call in a certain level in the call stack.
+ * It's used to build an aggregation segment tree (aggregated by depth and
  * callers). Per example,the two calls to the function A() in the call graph
  * below will be combined into one node in the generated tree:
  *
@@ -42,22 +42,24 @@ public class AggregatedCalledFunction {
     private final int fMaxDepth;
     private final Map<Object, AggregatedCalledFunction> fChildren = new HashMap<>();
     private final @Nullable AggregatedCalledFunction fParent;
+    private final AggregatedCalledFunctionStatistics fStatistics;
     private int fNbCalls = 0;
     private long fDuration;
     private long fSelfTime;
 
     /**
      * Constructor
+     *
      * @param symbol
-     *         The function's name or address
+     *            The function's name or address
      * @param duration
-     *          The function's duration
+     *            The function's duration
      * @param depth
-     *          The function's depth
+     *            The function's depth
      * @param maxDepth
-     *          The aggregation tree's maximum depth
+     *            The aggregation tree's maximum depth
      * @param parent
-     *          The function's caller
+     *            The function's caller
      */
     public AggregatedCalledFunction(Object symbol, long duration, int depth, int maxDepth, @Nullable AggregatedCalledFunction parent) {
         fSymbol = symbol;
@@ -66,6 +68,7 @@ public class AggregatedCalledFunction {
         fDepth = depth;
         fMaxDepth = maxDepth;
         fParent = parent;
+        fStatistics = new AggregatedCalledFunctionStatistics(duration, duration);
     }
 
     /**
@@ -106,13 +109,13 @@ public class AggregatedCalledFunction {
     public synchronized void addChild(AggregatedCalledFunction child) {
         AggregatedCalledFunction node = fChildren.get(child.getSymbol());
         if (node == null) {
-            child.incrementCalls();
             fChildren.put(child.getSymbol(), child);
         } else {
             merge(node, child);
             fChildren.replace(node.getSymbol(), node);
         }
         fSelfTime -= child.fDuration;
+        fStatistics.initializeMaxMinSelfTime(fSelfTime);
     }
 
     /**
@@ -157,9 +160,11 @@ public class AggregatedCalledFunction {
      *            the node to merge
      */
     private static void merge(AggregatedCalledFunction destination, AggregatedCalledFunction source) {
-        destination.addToDuration(source.getDuration());
-        destination.addToSelfTime(source.getSelfTime());
-        destination.incrementCalls();
+        long sourceDuration = source.getDuration();
+        long sourceSelfTime = source.getSelfTime();
+        destination.addToDuration(sourceDuration);
+        destination.addToSelfTime(sourceSelfTime);
+        destination.fStatistics.update(sourceDuration, sourceSelfTime);
         // merge the children callees.
         mergeChildren(destination, source);
     }
@@ -233,5 +238,14 @@ public class AggregatedCalledFunction {
      */
     public Boolean hasChildren() {
         return !fChildren.isEmpty();
+    }
+
+    /**
+     * The function's statistics
+     *
+     * @return The function's statistics
+     */
+    public AggregatedCalledFunctionStatistics getFunctionStatistics() {
+        return fStatistics;
     }
 }

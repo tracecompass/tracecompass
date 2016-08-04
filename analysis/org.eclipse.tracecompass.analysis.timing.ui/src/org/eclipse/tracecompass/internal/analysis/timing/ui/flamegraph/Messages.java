@@ -38,6 +38,38 @@ public class Messages extends NLS {
      */
     public static String FlameGraph_Depth;
     /**
+     * The maximum duration of a function
+     */
+    public static String FlameGraph_MaxDuration;
+    /**
+     * The minimum duration of a function
+     */
+    public static String FlameGraph_MinDuration;
+    /**
+     * The average duration of a function
+     */
+    public static String FlameGraph_AverageDuration;
+    /**
+     * The average self time of a function
+     */
+    public static String FlameGraph_AverageSelfTime;
+    /**
+     * The maximum self time of a function
+     */
+    public static String FlameGraph_MaxSelfTime;
+    /**
+     * The minimum self time of a function
+     */
+    public static String FlameGraph_MinSelfTime;
+    /**
+     * The standard deviation of a function
+     */
+    public static String FlameGraph_Deviation;
+    /**
+     * The standard deviation of a function's self time
+     */
+    public static String FlameGraph_SelfTimeDeviation;
+    /**
      * Execution of the callGraph Analysis
      */
     public static String CallGraphAnalysis_Execution;

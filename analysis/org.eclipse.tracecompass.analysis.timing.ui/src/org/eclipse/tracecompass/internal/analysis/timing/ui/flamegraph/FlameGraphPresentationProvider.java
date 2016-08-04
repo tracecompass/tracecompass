@@ -17,7 +17,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.AggregatedCalledFunctionStatistics;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -39,7 +39,6 @@ import com.google.common.collect.ImmutableMap;
  * @author Sonia Farrah
  */
 public class FlameGraphPresentationProvider extends TimeGraphPresentationProvider {
-
     /** Number of colors used for flameGraph events */
     public static final int NUM_COLORS = 360;
 
@@ -61,9 +60,9 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
 
     /**
      * Constructor
-     *
      */
     public FlameGraphPresentationProvider() {
+        // Do nothing
     }
 
     @Override
@@ -91,11 +90,21 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
 
     @Override
     public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime) {
-        return ImmutableMap.of(
-                NonNullUtils.checkNotNull(Messages.FlameGraph_Duration), String.format("%s", FORMATTER.format(event.getDuration())), //$NON-NLS-1$
-                NonNullUtils.checkNotNull(Messages.FlameGraph_SelfTime), String.format("%s", FORMATTER.format(((FlamegraphEvent) event).getSelfTime())), //$NON-NLS-1$
-                NonNullUtils.checkNotNull(Messages.FlameGraph_NbCalls), NonNullUtils.checkNotNull(NumberFormat.getIntegerInstance().format(((FlamegraphEvent) event).getNbCalls())) // $NON-NLS-1$
-        );
+        AggregatedCalledFunctionStatistics statistics = ((FlamegraphEvent) event).getStatistics();
+        ImmutableMap.Builder<String, String> builder = new ImmutableMap.Builder<>();
+        builder.put(String.valueOf(Messages.FlameGraph_Duration), String.format("%s", FORMATTER.format(event.getDuration()))); //$NON-NLS-1$
+        builder.put(String.valueOf(Messages.FlameGraph_SelfTime), String.format("%s", FORMATTER.format(((FlamegraphEvent) event).getSelfTime()))); //$NON-NLS-1$
+        builder.put(String.valueOf(Messages.FlameGraph_NbCalls), String.valueOf(NumberFormat.getIntegerInstance().format(statistics.getNbSegments()))); // $NON-NLS-1$
+        builder.put(String.valueOf(Messages.FlameGraph_AverageDuration), String.format("%s", FORMATTER.format(statistics.getAverage()))); // $NON-NLS-1$ //$NON-NLS-1$
+        builder.put(String.valueOf(Messages.FlameGraph_Deviation), String.format("%s", FORMATTER.format(statistics.getStdDev()))); //$NON-NLS-1$
+        builder.put(String.valueOf(Messages.FlameGraph_MaxDuration), String.format("%s", FORMATTER.format((statistics.getMax())))); // $NON-NLS-1$ //$NON-NLS-1$
+        builder.put(String.valueOf(Messages.FlameGraph_MinDuration), String.format("%s", FORMATTER.format(statistics.getMin()))); // $NON-NLS-1$ //$NON-NLS-1$
+        builder.put(String.valueOf(Messages.FlameGraph_AverageSelfTime), String.format("%s", FORMATTER.format(statistics.getAverageSelfTime()))); // $NON-NLS-1$ //$NON-NLS-1$
+        builder.put(String.valueOf(Messages.FlameGraph_SelfTimeDeviation), String.format("%s", FORMATTER.format(statistics.getStdDevSelfTime()))); //$NON-NLS-1$
+        builder.put(String.valueOf(Messages.FlameGraph_MaxSelfTime), String.format("%s", FORMATTER.format(statistics.getMaxSelfTime()))); // $NON-NLS-1$ //$NON-NLS-1$
+        builder.put(String.valueOf(Messages.FlameGraph_MinSelfTime), String.format("%s", FORMATTER.format(statistics.getMinSelfTime()))); // $NON-NLS-1$ //$NON-NLS-1$
+        return builder.build();
+
     }
 
     @Override
@@ -110,7 +119,7 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
     }
 
     /**
-     * Get the event's symbol. It could be an address or a name.
+     * Get the event's symbol.It could be an address or a name.
      *
      * @param fGEvent
      *            An event
