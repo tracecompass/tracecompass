@@ -56,7 +56,7 @@ public class HTIntervalStringReadWriteTest {
     /**
      * Parameter generator.
      *
-     * Generates a combination of all possible string lenghts and all possible
+     * Generates a combination of all possible string lengths and all possible
      * character lengths.
      *
      * @return The test parameters
