@@ -88,7 +88,7 @@ public enum TraceLog4jLogLevel implements ITraceLogLevel{
             throw new IllegalArgumentException();
         }
         for (TraceLog4jLogLevel tllevel : TraceLog4jLogLevel.values()) {
-            if (tllevel.name().equals(name)) {
+            if (tllevel.name().equals(name) || tllevel.getInName().equals(name)) {
                 return tllevel;
             }
         }

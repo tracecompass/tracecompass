@@ -31,6 +31,7 @@ class ControlViewSwtBotUtil {
     public static final String KERNEL_DOMAIN_NAME = "Kernel";
     public static final String UST_DOMAIN_NAME = "UST global";
     public static final String JUL_DOMAIN_NAME = "JUL";
+    public static final String LOG4J_DOMAIN_NAME = "LOG4J";
     public static final String SESSION_GROUP_NAME = "Sessions";
     public static final String PROVIDER_GROUP_NAME = "Provider";
     public static final String ALL_EVENTS_NAME = "*";
@@ -77,7 +78,7 @@ class ControlViewSwtBotUtil {
     public static final String ENABLE_CHANNEL_DIALOG_TITLE = "Enable Channel";
     public static final String DOMAIN_GROUP_NAME = "Domain";
     public static final String UST_GROUP_NAME = "UST";
-    public static final String JUL_APPLICATION_NAME = "All - ./client_bin/challenger [PID=14237] (With logger)";
+    public static final String JAVA_APPLICATION_NAME = "All - ./client_bin/challenger [PID=14237] (With logger)";
     public static final String BUFFERTYPE_GROUP_NAME = "Buffer Type";
     public static final String BUFFERTYPE_PER_UID = "Per UID buffers";
     public static final String FILTER_EXPRESSION_LABEL = "Filter Expression";

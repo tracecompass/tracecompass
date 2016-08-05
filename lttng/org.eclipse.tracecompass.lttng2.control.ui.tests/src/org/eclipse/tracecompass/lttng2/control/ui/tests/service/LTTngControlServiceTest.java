@@ -1161,6 +1161,12 @@ public class LTTngControlServiceTest {
     }
 
     @Test
+    public void testEnableLog4jLoggers() {
+        // Trace Compass only supports LOG4J starting with LTTng 2.6 that supports MI.
+        // The implementation of this test is the LTTngControlServiceMiTest.java.
+    }
+
+    @Test
     public void testEventExcluded() {
         try {
             String sessionName = "mysession2";

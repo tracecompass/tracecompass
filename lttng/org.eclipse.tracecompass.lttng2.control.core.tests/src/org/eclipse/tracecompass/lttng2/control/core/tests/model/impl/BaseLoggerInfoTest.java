@@ -19,6 +19,7 @@ import static org.junit.Assert.fail;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseLoggerInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLog4jLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BaseLoggerInfo;
 import org.junit.Before;
 import org.junit.Test;
@@ -117,21 +118,40 @@ public class BaseLoggerInfoTest {
 
         // Case 1 : JUL_ALL
         fixture.setLogLevel(TraceJulLogLevel.JUL_ALL);
-        TraceJulLogLevel result = (TraceJulLogLevel) fixture.getLogLevel();
-        assertNotNull(result);
-        assertEquals("All", result.getInName());
-        assertEquals("JUL_ALL", result.name());
-        assertEquals("JUL_ALL", result.toString());
-        assertEquals(8, result.ordinal());
+        TraceJulLogLevel resultJul = (TraceJulLogLevel) fixture.getLogLevel();
+        assertNotNull(resultJul);
+        assertEquals("All", resultJul.getInName());
+        assertEquals("JUL_ALL", resultJul.name());
+        assertEquals("JUL_ALL", resultJul.toString());
+        assertEquals(8, resultJul.ordinal());
 
         // Case 2 : JUL_WARNING
         fixture.setLogLevel(TraceJulLogLevel.JUL_WARNING);
-        result = (TraceJulLogLevel) fixture.getLogLevel();
-        assertNotNull(result);
-        assertEquals("Warning", result.getInName());
-        assertEquals("JUL_WARNING", result.name());
-        assertEquals("JUL_WARNING", result.toString());
-        assertEquals(2, result.ordinal());
+        resultJul = (TraceJulLogLevel) fixture.getLogLevel();
+        assertNotNull(resultJul);
+        assertEquals("Warning", resultJul.getInName());
+        assertEquals("JUL_WARNING", resultJul.name());
+        assertEquals("JUL_WARNING", resultJul.toString());
+        assertEquals(2, resultJul.ordinal());
+
+        // Case 3 : LOG4J_ALL
+        fixture.setDomain(TraceDomainType.LOG4J);
+        fixture.setLogLevel(TraceLog4jLogLevel.LOG4J_ALL);
+        TraceLog4jLogLevel resultLog4j = (TraceLog4jLogLevel) fixture.getLogLevel();
+        assertNotNull(resultLog4j);
+        assertEquals("All", resultLog4j.getInName());
+        assertEquals("LOG4J_ALL", resultLog4j.name());
+        assertEquals("LOG4J_ALL", resultLog4j.toString());
+        assertEquals(7, resultLog4j.ordinal());
+
+        // Case 4 : LOG4J_FATAL
+        fixture.setLogLevel(TraceLog4jLogLevel.LOG4J_FATAL);
+        resultLog4j = (TraceLog4jLogLevel) fixture.getLogLevel();
+        assertNotNull(resultLog4j);
+        assertEquals("Fatal", resultLog4j.getInName());
+        assertEquals("LOG4J_FATAL", resultLog4j.name());
+        assertEquals("LOG4J_FATAL", resultLog4j.toString());
+        assertEquals(1, resultLog4j.ordinal());
     }
 
     /**
@@ -142,94 +162,179 @@ public class BaseLoggerInfoTest {
     public void testSetLogLevel2() {
         BaseLoggerInfo fixture = new BaseLoggerInfo("logger");
 
+        // Case 1: JUL log level
+        fixture.setDomain(TraceDomainType.JUL);
         fixture.setLogLevel("Off");
 
-        TraceJulLogLevel result = (TraceJulLogLevel) fixture.getLogLevel();
-        assertNotNull(result);
-        assertEquals("Off", result.getInName());
-        assertEquals("JUL_OFF", result.name());
-        assertEquals(0, result.ordinal());
+        TraceJulLogLevel resultJul = (TraceJulLogLevel) fixture.getLogLevel();
+        assertNotNull(resultJul);
+        assertEquals("Off", resultJul.getInName());
+        assertEquals("JUL_OFF", resultJul.name());
+        assertEquals(0, resultJul.ordinal());
 
         //------------------------
         fixture.setLogLevel("Severe");
 
-        result = (TraceJulLogLevel) fixture.getLogLevel();
-        assertNotNull(result);
-        assertEquals("Severe", result.getInName());
-        assertEquals("JUL_SEVERE", result.name());
-        assertEquals(1, result.ordinal());
+        resultJul = (TraceJulLogLevel) fixture.getLogLevel();
+        assertNotNull(resultJul);
+        assertEquals("Severe", resultJul.getInName());
+        assertEquals("JUL_SEVERE", resultJul.name());
+        assertEquals(1, resultJul.ordinal());
 
         //------------------------
         fixture.setLogLevel("Warning");
 
-        result = (TraceJulLogLevel) fixture.getLogLevel();
-        assertNotNull(result);
-        assertEquals("Warning", result.getInName());
-        assertEquals("JUL_WARNING", result.name());
-        assertEquals(2, result.ordinal());
+        resultJul = (TraceJulLogLevel) fixture.getLogLevel();
+        assertNotNull(resultJul);
+        assertEquals("Warning", resultJul.getInName());
+        assertEquals("JUL_WARNING", resultJul.name());
+        assertEquals(2, resultJul.ordinal());
 
         //------------------------
         fixture.setLogLevel("Info");
 
-        result = (TraceJulLogLevel) fixture.getLogLevel();
-        assertNotNull(result);
-        assertEquals("Info", result.getInName());
-        assertEquals("JUL_INFO", result.name());
-        assertEquals(3, result.ordinal());
+        resultJul = (TraceJulLogLevel) fixture.getLogLevel();
+        assertNotNull(resultJul);
+        assertEquals("Info", resultJul.getInName());
+        assertEquals("JUL_INFO", resultJul.name());
+        assertEquals(3, resultJul.ordinal());
 
         //------------------------
         fixture.setLogLevel("Config");
 
-        result = (TraceJulLogLevel) fixture.getLogLevel();
-        assertNotNull(result);
-        assertEquals("Config", result.getInName());
-        assertEquals("JUL_CONFIG", result.name());
-        assertEquals(4, result.ordinal());
+        resultJul = (TraceJulLogLevel) fixture.getLogLevel();
+        assertNotNull(resultJul);
+        assertEquals("Config", resultJul.getInName());
+        assertEquals("JUL_CONFIG", resultJul.name());
+        assertEquals(4, resultJul.ordinal());
 
         //------------------------
         fixture.setLogLevel("Fine");
 
-        result = (TraceJulLogLevel) fixture.getLogLevel();
-        assertNotNull(result);
-        assertEquals("Fine", result.getInName());
-        assertEquals("JUL_FINE", result.name());
-        assertEquals(5, result.ordinal());
+        resultJul = (TraceJulLogLevel) fixture.getLogLevel();
+        assertNotNull(resultJul);
+        assertEquals("Fine", resultJul.getInName());
+        assertEquals("JUL_FINE", resultJul.name());
+        assertEquals(5, resultJul.ordinal());
 
         //------------------------
         fixture.setLogLevel("Finer");
 
-        result = (TraceJulLogLevel) fixture.getLogLevel();
-        assertNotNull(result);
-        assertEquals("Finer", result.getInName());
-        assertEquals("JUL_FINER", result.name());
-        assertEquals(6, result.ordinal());
+        resultJul = (TraceJulLogLevel) fixture.getLogLevel();
+        assertNotNull(resultJul);
+        assertEquals("Finer", resultJul.getInName());
+        assertEquals("JUL_FINER", resultJul.name());
+        assertEquals(6, resultJul.ordinal());
 
         //------------------------
         fixture.setLogLevel("Finest");
 
-        result = (TraceJulLogLevel) fixture.getLogLevel();
-        assertNotNull(result);
-        assertEquals("Finest", result.getInName());
-        assertEquals("JUL_FINEST", result.name());
-        assertEquals(7, result.ordinal());
+        resultJul = (TraceJulLogLevel) fixture.getLogLevel();
+        assertNotNull(resultJul);
+        assertEquals("Finest", resultJul.getInName());
+        assertEquals("JUL_FINEST", resultJul.name());
+        assertEquals(7, resultJul.ordinal());
 
         //------------------------
         fixture.setLogLevel("All");
 
-        result = (TraceJulLogLevel) fixture.getLogLevel();
-        assertNotNull(result);
-        assertEquals("All", result.getInName());
-        assertEquals("JUL_ALL", result.name());
-        assertEquals(8, result.ordinal());
+        resultJul = (TraceJulLogLevel) fixture.getLogLevel();
+        assertNotNull(resultJul);
+        assertEquals("All", resultJul.getInName());
+        assertEquals("JUL_ALL", resultJul.name());
+        assertEquals(8, resultJul.ordinal());
 
         //------------------------
         fixture.setLogLevel("LEVEL_UNKNOWN");
 
-        result = (TraceJulLogLevel) fixture.getLogLevel();
-        assertNotNull(result);
-        assertEquals("LEVEL_UNKNOWN", result.getInName());
-        assertEquals("LEVEL_UNKNOWN", result.name());
-        assertEquals(9, result.ordinal());
+        resultJul = (TraceJulLogLevel) fixture.getLogLevel();
+        assertNotNull(resultJul);
+        assertEquals("LEVEL_UNKNOWN", resultJul.getInName());
+        assertEquals("LEVEL_UNKNOWN", resultJul.name());
+        assertEquals(9, resultJul.ordinal());
+
+        // Case 2: LOG4J log level
+        fixture.setDomain(TraceDomainType.LOG4J);
+
+        fixture.setLogLevel("Off");
+
+        TraceLog4jLogLevel resultLog4j = (TraceLog4jLogLevel) fixture.getLogLevel();
+        assertNotNull(resultLog4j);
+        assertEquals("Off", resultLog4j.getInName());
+        assertEquals("LOG4J_OFF", resultLog4j.name());
+        assertEquals(0, resultLog4j.ordinal());
+
+        //------------------------
+        fixture.setLogLevel("Fatal");
+
+        resultLog4j = (TraceLog4jLogLevel) fixture.getLogLevel();
+        assertNotNull(resultLog4j);
+        assertEquals("Fatal", resultLog4j.getInName());
+        assertEquals("LOG4J_FATAL", resultLog4j.name());
+        assertEquals(1, resultLog4j.ordinal());
+
+        //------------------------
+        fixture.setLogLevel("Error");
+
+        resultLog4j = (TraceLog4jLogLevel) fixture.getLogLevel();
+        assertNotNull(resultLog4j);
+        assertEquals("Error", resultLog4j.getInName());
+        assertEquals("LOG4J_ERROR", resultLog4j.name());
+        assertEquals(2, resultLog4j.ordinal());
+
+        //------------------------
+        fixture.setLogLevel("Warn");
+
+        resultLog4j = (TraceLog4jLogLevel) fixture.getLogLevel();
+        assertNotNull(resultLog4j);
+        assertEquals("Warn", resultLog4j.getInName());
+        assertEquals("LOG4J_WARN", resultLog4j.name());
+        assertEquals(3, resultLog4j.ordinal());
+
+        //------------------------
+        fixture.setLogLevel("Info");
+
+        resultLog4j = (TraceLog4jLogLevel) fixture.getLogLevel();
+        assertNotNull(resultLog4j);
+        assertEquals("Info", resultLog4j.getInName());
+        assertEquals("LOG4J_INFO", resultLog4j.name());
+        assertEquals(4, resultLog4j.ordinal());
+
+        //------------------------
+        fixture.setLogLevel("Debug");
+
+        resultLog4j = (TraceLog4jLogLevel) fixture.getLogLevel();
+        assertNotNull(resultLog4j);
+        assertEquals("Debug", resultLog4j.getInName());
+        assertEquals("LOG4J_DEBUG", resultLog4j.name());
+        assertEquals(5, resultLog4j.ordinal());
+
+        //------------------------
+        fixture.setLogLevel("Trace");
+
+        resultLog4j = (TraceLog4jLogLevel) fixture.getLogLevel();
+        assertNotNull(resultLog4j);
+        assertEquals("Trace", resultLog4j.getInName());
+        assertEquals("LOG4J_TRACE", resultLog4j.name());
+        assertEquals(6, resultLog4j.ordinal());
+
+        //------------------------
+        fixture.setLogLevel("All");
+
+        resultLog4j = (TraceLog4jLogLevel) fixture.getLogLevel();
+        assertNotNull(resultLog4j);
+        assertEquals("All", resultLog4j.getInName());
+        assertEquals("LOG4J_ALL", resultLog4j.name());
+        assertEquals(7, resultLog4j.ordinal());
+
+        //------------------------
+        fixture.setLogLevel("LEVEL_UNKNOWN");
+
+        resultLog4j = (TraceLog4jLogLevel) fixture.getLogLevel();
+        assertNotNull(resultLog4j);
+        assertEquals("LEVEL_UNKNOWN", resultLog4j.getInName());
+        assertEquals("LEVEL_UNKNOWN", resultLog4j.name());
+        assertEquals(8, resultLog4j.ordinal());
     }
 
     /**
@@ -239,15 +344,16 @@ public class BaseLoggerInfoTest {
     public void testToString_1() {
         BaseLoggerInfo fixture = new BaseLoggerInfo("logger");
         fixture.setName("testName");
-        fixture.setLogLevel(TraceJulLogLevel.JUL_ALL);
 
         fixture.setDomain(TraceDomainType.JUL);
+        fixture.setLogLevel(TraceJulLogLevel.JUL_ALL);
         String result = fixture.toString();
         assertEquals("[BaseLoggerInfo([TraceInfo(Name=testName)],domain=JUL,level=JUL_ALL)]", result);
 
         fixture.setDomain(TraceDomainType.LOG4J);
+        fixture.setLogLevel(TraceLog4jLogLevel.LOG4J_ERROR);
         result = fixture.toString();
-        assertEquals("[BaseLoggerInfo([TraceInfo(Name=testName)],domain=LOG4J,level=JUL_ALL)]", result);
+        assertEquals("[BaseLoggerInfo([TraceInfo(Name=testName)],domain=LOG4J,level=LOG4J_ERROR)]", result);
     }
 
     // ------------------------------------------------------------------------

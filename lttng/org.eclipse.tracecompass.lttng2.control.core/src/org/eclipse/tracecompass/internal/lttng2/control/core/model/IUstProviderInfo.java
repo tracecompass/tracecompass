@@ -76,4 +76,12 @@ public interface IUstProviderInfo extends ITraceInfo {
      *            - logger information to add.
      */
     void addLogger(ILoggerInfo logger);
+
+    /**
+     * Adds a list of logger information to the UST provider.
+     *
+     * @param loggers
+     *            a list of logger information
+     */
+    void addLoggers(List<ILoggerInfo> loggers);
 }

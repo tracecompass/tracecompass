@@ -136,6 +136,11 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
         fLoggers.add(logger);
     }
 
+    @Override
+    public void addLoggers(List<ILoggerInfo> loggers) {
+        fLoggers.addAll(loggers);
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

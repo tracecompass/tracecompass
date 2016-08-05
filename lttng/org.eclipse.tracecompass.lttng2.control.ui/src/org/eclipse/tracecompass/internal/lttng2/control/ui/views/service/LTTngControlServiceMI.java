@@ -1160,7 +1160,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
                             for (ILoggerInfo logger : loggers) {
                                 logger.setDomain(domain);
                             }
-                            allProviders.get(k).setLoggers(loggers);
+                            allProviders.get(k).addLoggers(loggers);
                         }
                     }
                 }

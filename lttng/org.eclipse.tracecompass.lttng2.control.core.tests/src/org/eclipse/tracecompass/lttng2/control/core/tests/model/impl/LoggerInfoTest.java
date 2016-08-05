@@ -21,6 +21,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLog4jLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.LoggerInfo;
 import org.junit.Before;
 import org.junit.Test;
@@ -253,6 +254,14 @@ public class LoggerInfoTest {
         fixture.setState(TraceEnablement.ENABLED);
         result = fixture.toString();
         assertEquals("[LoggerInfo([BaseLoggerInfo([TraceInfo(Name=testName)],domain=JUL,level=JUL_FINE)],State=ENABLED,levelType=LOGLEVEL_ALL)]", result);
+
+        fixture.setDomain(TraceDomainType.LOG4J);
+        result = fixture.toString();
+        assertEquals("[LoggerInfo([BaseLoggerInfo([TraceInfo(Name=testName)],domain=LOG4J,level=JUL_FINE)],State=ENABLED,levelType=LOGLEVEL_ALL)]", result);
+
+        fixture.setLogLevel(TraceLog4jLogLevel.LOG4J_FATAL);
+        result = fixture.toString();
+        assertEquals("[LoggerInfo([BaseLoggerInfo([TraceInfo(Name=testName)],domain=LOG4J,level=LOG4J_FATAL)],State=ENABLED,levelType=LOGLEVEL_ALL)]", result);
     }
 
     // ------------------------------------------------------------------------

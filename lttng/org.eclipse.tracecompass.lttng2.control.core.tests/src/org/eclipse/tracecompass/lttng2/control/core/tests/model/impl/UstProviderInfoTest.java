@@ -222,10 +222,10 @@ public class UstProviderInfoTest {
 
         assertEquals("[UstProviderInfo([TraceInfo(Name=myUST2)],PID=2345,Events=[BaseEventInfo([TraceInfo(Name=event1)],"
                 + "type=UNKNOWN,level=TRACE_ERR,Fields=[FieldInfo([TraceInfo(Name=intfield)],type=int[FieldInfo([TraceInfo(Name=stringfield)],"
-                + "type=string,Filter=intField==10)][BaseEventInfo([TraceInfo(Name=event2)],type=TRACEPOINT,level=TRACE_DEBUG)]"
-                + ",Loggers=[LoggerInfo([BaseLoggerInfo([TraceInfo(Name=logger1)],domain=JUL,level=JUL_INFO)],"
-                + "State=ENABLED,levelType=LOGLEVEL_ALL)][LoggerInfo([BaseLoggerInfo([TraceInfo(Name=logger2)],"
-                + "domain=LOG4J,level=LEVEL_UNKNOWN)],State=DISABLED,levelType=LOGLEVEL_ALL)])]", result);
+                + "type=string,Filter=intField==10)][BaseEventInfo([TraceInfo(Name=event2)],type=TRACEPOINT,level=TRACE_DEBUG)],"
+                + "Loggers=[LoggerInfo([BaseLoggerInfo([TraceInfo(Name=logger1)],domain=JUL,level=LOG4J_INFO)],"
+                + "State=ENABLED,levelType=LOGLEVEL_ALL)][LoggerInfo([BaseLoggerInfo([TraceInfo(Name=logger2)],domain=LOG4J,level=LEVEL_UNKNOWN)],"
+                + "State=DISABLED,levelType=LOGLEVEL_ALL)])]", result);
     }
 
     // ------------------------------------------------------------------------

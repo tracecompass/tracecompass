@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainTy
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLog4jLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BaseEventInfo;
@@ -95,7 +96,7 @@ public class ModelImplFactory {
 
         fBaseLoggerInfo2 = new BaseLoggerInfo("logger2");
         fBaseLoggerInfo2.setDomain(TraceDomainType.LOG4J);
-        fBaseLoggerInfo1.setLogLevel(TraceJulLogLevel.JUL_FINER);
+        fBaseLoggerInfo1.setLogLevel(TraceLog4jLogLevel.LOG4J_FATAL);
 
         fEventInfo1 = new EventInfo("event1");
         fEventInfo1.setEventType(TraceEventType.TRACEPOINT);
@@ -120,7 +121,7 @@ public class ModelImplFactory {
 
         fLoggerInfo2 = new LoggerInfo("logger2");
         fLoggerInfo2.setDomain(TraceDomainType.LOG4J);
-        fLoggerInfo1.setLogLevel(TraceJulLogLevel.JUL_INFO);
+        fLoggerInfo1.setLogLevel(TraceLog4jLogLevel.LOG4J_INFO);
         fLoggerInfo1.setState("true");
 
         fUstProviderInfo1 = new UstProviderInfo("myUST1");

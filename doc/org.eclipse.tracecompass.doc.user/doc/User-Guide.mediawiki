@@ -1272,7 +1272,7 @@ A dialog box will open for entering information about the channel to be created.
 
 By default the domain '''Kernel''' is selected. To create a UST channel, select '''UST''' under the domain section. The label <Default> in any text box indicates that the default value of the tracer will be configured. To initialize the dialog box press button '''Default'''.
 
-'''Note''': You cannot create a channel under the '''JUL''' domain. Instead this domain uses a default channel of the '''UST global''' domain named '''lttng_jul_channel'''. This is the channel that LTTng uses to trace Java application (using '''JUL''') and you cannot add '''UST''' events to this channel.
+'''Note''': You cannot create a channel under the '''JUL''' and '''LOG4J''' domain. Instead those domains uses a default channel under the '''UST global''' domain named '''lttng_jul_channel''' or '''lttng_log4j_channel'''. Those are the channels that LTTng uses to trace Java application (using '''JUL''' or '''LOG4J''') and you cannot add '''UST''' events to those channels.
 
 If required update the following channel information and then press '''Ok'''.
 
@@ -1424,6 +1424,7 @@ For UST it is possible to enable '''Tracepoint''' events using log levels. To en
 Upon successful operation, the event with the given event name and event type '''TRACEPOINT''' will be added under the default channel (channel0). If necessary the domain '''UST global''' and the channel '''channel0''' will be created.
 
 [[Image:images/LTTng2EnabledUstLoglevelEvents.png]]
+
 === Enabling JUL Events On Session Level ===
 
 For enabling JUL loggers, first open the enable events dialog as described in section [[#Enabling Kernel Events On Session Level | Enabling Kernel Events On Session Level]] and select domain '''JUL'''.
@@ -1443,20 +1444,44 @@ For JUL it is possible to enable '''Logger''' events using log levels. To enable
 
 [[Image:images/LTTng2JulLoglevelEventsDialog.png]]
 
+=== Enabling LOG4J Events On Session Level ===
+
+For enabling LOG4J loggers, first open the enable events dialog as described in section [[#Enabling JUL Events On Session Level | Enabling JUL Events On Session Level]] and select domain '''LOG4J'''.
+
+To enable '''Loggers''', first select the corresponding '''Select''' button, then select either all loggers (select '''All''') or select selectively one or more loggers in the displayed tree of loggers and finally press '''Ok'''.
+
+[[Image:images/LTTng2Log4jLoggerEventsDialog.png]]
+
+Upon successful operation, the domain '''LOG4J''' will be created in the tree (if neccessary). With LOG4J loggers there is no channel, you see the enabled loggers directly under the '''LOG4J''' domain. Note that for the case that '''All''' loggers were selected the wildcard '''*''' is used which will be shown in the Control View as below.
+
+[[Image:images/LTTng2EnabledAllLog4jLoggers.png]]
+
+For LOG4J it is possible to enable '''Logger''' events using log levels. To enable '''Logger''' events using log levels, check the corresponding '''Select''' button, select a log level from the drop down menu, fill in the relevant information (see below) and press '''Ok'''.
+
+* '''loglevel''': To specify if a range of log levels (0 to selected log level) shall be configured
+* '''loglevel-only''': To specify that only the specified log level shall be configured
+
+[[Image:images/LTTng2Log4jLoglevelEventsDialog.png]]
+
 === Enabling Events On Domain Level ===
 
-Kernel events can also be enabled on the domain level. For that select the relevant domain tree node, click the right mouse button and the select '''Enable Event (default channel)...'''. A new dialog box will open for providing information about the events to be enabled. Depending on the domain, '''Kernel''', '''UST global''' or '''JUL''', the domain specifc fields are shown and the domain selector is preselected and read-only.
+Kernel events can also be enabled on the domain level. For that select the relevant domain tree node, click the right mouse button and the select '''Enable Event (default channel)...'''. A new dialog box will open for providing information about the events to be enabled. Depending on the domain, '''Kernel''', '''UST global''', '''JUL''' or '''LOG4J''', the domain specific fields are shown and the domain selector is preselected and read-only.
 
 [[Image:images/LTTng2EventOnDomainAction.png]]
 
-To enable events for domain '''Kernel''' follow the instructions in section [[#Enabling Kernel Events On Session Level | Enabling Kernel Events On Session Level]], for domain '''UST global''', see section [[#Enabling UST Events On Session Level | Enabling UST Events On Session Level]] and for the domain '''JUL''', see section [[#Enabling JUL Events On Session Level | Enabling JUL Events On Session Level]].
+Instructions for enalbing events for a particular domain can be found here:
+* '''Kernel''' domain: [[#Enabling Kernel Events On Session Level | Enabling Kernel Events On Session Level]]
+* '''UST global''' domain: [[#Enabling UST Events On Session Level | Enabling UST Events On Session Level]]
+* '''JUL''' domain: [[#Enabling JUL Events On Session Level | Enabling JUL Events On Session Level]]
+* '''LOG4J''' domain: [[#Enabling LOG4J Events On Session Level | Enabling LOG4J Events On Session Level]]
+
 The events will be add to the default channel '''channel0'''. This channel will be created by on the server side if neccessary.
 
 === Enabling Events On Channel Level ===
 
 Kernel events can also be enabled on the channel level. If necessary, create a channel as described in sections [[#Enabling Channels On Session Level | Enabling Channels On Session Level]] or [[#Enabling Channels On Domain Level | Enabling Channels On Domain Level]].
 
-Then select the relevant channel tree node, click the right mouse button and the select '''Enable Event...'''. A new dialog box will open for providing information about the events to be enabled. Depending on the domain, '''Kernel''' or '''UST global''', the domain specifc fields are shown and the domain selector is preselected and read-only. Since there is no channel under the '''JUL''' domain you cannot enable a '''JUL''' logger directly from a channel. 
+Then select the relevant channel tree node, click the right mouse button and the select '''Enable Event...'''. A new dialog box will open for providing information about the events to be enabled. Depending on the domain, '''Kernel''' or '''UST global''', the domain specifc fields are shown and the domain selector is preselected and read-only. Since there is no channel under the '''JUL''' or '''LOG4J''' domain you cannot enable those loggers directly from a channel. 
 
 [[Image:images/LTTng2EventOnChannelAction.png]]
 
