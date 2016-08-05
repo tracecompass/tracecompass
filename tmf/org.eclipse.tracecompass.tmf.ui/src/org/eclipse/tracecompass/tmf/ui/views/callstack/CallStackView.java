@@ -86,7 +86,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphSelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
@@ -118,9 +117,6 @@ public class CallStackView extends AbstractTimeGraphView {
 
     /** Timeout between updates in the build thread in ms */
     private static final long BUILD_UPDATE_TIMEOUT = 500;
-
-    // Fraction of a function duration to be added as spacing
-    private static final double SPACING_RATIO = 0.01;
 
     private static final Image PROCESS_IMAGE = Activator.getDefault().getImageFromPath("icons/obj16/process_obj.gif"); //$NON-NLS-1$
     private static final Image THREAD_IMAGE = Activator.getDefault().getImageFromPath("icons/obj16/thread_obj.gif"); //$NON-NLS-1$
@@ -394,9 +390,6 @@ public class CallStackView extends AbstractTimeGraphView {
                     if (entry.getFunctionName().length() > 0) {
                         long entryTime = entry.getFunctionEntryTime();
                         long exitTime = entry.getFunctionExitTime();
-                        long spacingTime = (long) ((exitTime - entryTime) * SPACING_RATIO);
-                        entryTime -= spacingTime;
-                        exitTime += spacingTime;
                         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.fromNanos(entryTime), TmfTimestamp.fromNanos(exitTime));
                         broadcast(new TmfWindowRangeUpdatedSignal(CallStackView.this, range));
                         getTimeGraphViewer().setStartFinishTime(entryTime, exitTime);
@@ -411,19 +404,18 @@ public class CallStackView extends AbstractTimeGraphView {
             public void mouseDoubleClick(MouseEvent e) {
                 TimeGraphControl timeGraphControl = getTimeGraphViewer().getTimeGraphControl();
                 ISelection selection = timeGraphControl.getSelection();
-                if (selection instanceof TimeGraphSelection) {
-                    Object o = ((TimeGraphSelection) selection).getFirstElement();
-                    if (o instanceof CallStackEvent) {
-                        CallStackEvent event = (CallStackEvent) o;
-                        long startTime = event.getTime();
-                        long endTime = startTime + event.getDuration();
-                        long spacingTime = (long) ((endTime - startTime) * SPACING_RATIO);
-                        startTime -= spacingTime;
-                        endTime += spacingTime;
-                        TmfTimeRange range = new TmfTimeRange(TmfTimestamp.fromNanos(startTime), TmfTimestamp.fromNanos(endTime));
-                        broadcast(new TmfWindowRangeUpdatedSignal(CallStackView.this, range));
-                        getTimeGraphViewer().setStartFinishTime(startTime, endTime);
-                        startZoomThread(startTime, endTime);
+                if (selection instanceof IStructuredSelection) {
+                    for (Object object : ((IStructuredSelection) selection).toList()) {
+                        if (object instanceof CallStackEvent) {
+                            CallStackEvent event = (CallStackEvent) object;
+                            long startTime = event.getTime();
+                            long endTime = startTime + event.getDuration();
+                            TmfTimeRange range = new TmfTimeRange(TmfTimestamp.fromNanos(startTime), TmfTimestamp.fromNanos(endTime));
+                            broadcast(new TmfWindowRangeUpdatedSignal(CallStackView.this, range));
+                            getTimeGraphViewer().setStartFinishTime(startTime, endTime);
+                            startZoomThread(startTime, endTime);
+                            break;
+                        }
                     }
                 }
             }

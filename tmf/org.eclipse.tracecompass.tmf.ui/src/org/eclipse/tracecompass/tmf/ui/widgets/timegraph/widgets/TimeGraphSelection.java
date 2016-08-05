@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2014 Intel Corporation, Ericsson
+ * Copyright (c) 2007, 2016 Intel Corporation, Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 
 /**
  * Selection object for the time graph scale
@@ -26,7 +27,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
  * @version 1.0
  * @author Alvaro Sanchez-Leon
  * @author Patrick Tasse
+ * @deprecated Use {@link StructuredSelection} instead.
  */
+@Deprecated
 public class TimeGraphSelection implements IStructuredSelection {
 
     private List<Object> list = new ArrayList<>();

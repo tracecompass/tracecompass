@@ -41,7 +41,9 @@ import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -843,19 +845,25 @@ public class TimeGraphControl extends TimeGraphBaseControl
         return super.setFocus();
     }
 
+    /**
+     * Returns the current selection for this time graph. If a time graph entry
+     * is selected, it will be the first element in the selection. If a time
+     * event is selected, it will be the second element in the selection.
+     *
+     * @return the current selection
+     */
     @Override
     public ISelection getSelection() {
-        TimeGraphSelection sel = new TimeGraphSelection();
-        ITimeGraphEntry trace = getSelectedTrace();
-        if (null != trace && null != fTimeProvider) {
+        ITimeGraphEntry entry = getSelectedTrace();
+        if (null != entry && null != fTimeProvider) {
             long selectedTime = fTimeProvider.getSelectionBegin();
-            ITimeEvent event = Utils.findEvent(trace, selectedTime, 0);
-            sel.add(trace);
-            if (event != null) {
-                sel.add(event);
+            ITimeEvent event = Utils.findEvent(entry, selectedTime, 0);
+            if (event == null) {
+                return new StructuredSelection(entry);
             }
+            return new StructuredSelection(new Object[] { entry, event });
         }
-        return sel;
+        return StructuredSelection.EMPTY;
     }
 
     /**
@@ -864,12 +872,11 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @return The selection
      */
     public ISelection getSelectionTrace() {
-        TimeGraphSelection sel = new TimeGraphSelection();
-        ITimeGraphEntry trace = getSelectedTrace();
-        if (null != trace) {
-            sel.add(trace);
+        ITimeGraphEntry entry = getSelectedTrace();
+        if (null != entry) {
+            return new StructuredSelection(entry);
         }
-        return sel;
+        return StructuredSelection.EMPTY;
     }
 
     /**
@@ -3108,12 +3115,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     @Override
     public void setSelection(ISelection selection) {
-        if (selection instanceof TimeGraphSelection) {
-            TimeGraphSelection sel = (TimeGraphSelection) selection;
-            Object ob = sel.getFirstElement();
+        if (selection instanceof IStructuredSelection) {
+            Object ob = ((IStructuredSelection) selection).getFirstElement();
             if (ob instanceof ITimeGraphEntry) {
-                ITimeGraphEntry trace = (ITimeGraphEntry) ob;
-                selectItem(trace, false);
+                selectItem((ITimeGraphEntry) ob, false);
             }
         }
 

@@ -12,7 +12,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.bindings.keys.KeyStroke;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
@@ -39,7 +38,6 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphSelection;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -307,10 +305,8 @@ public abstract class FindDialogTestBase extends KernelTestBase {
     private static String getTimegraphSelectionName(final SWTBotView view) {
         final TimeGraphControl timegraph = view.bot().widget(WidgetOfType.widgetOfType(TimeGraphControl.class));
         return UIThreadRunnable.syncExec(() -> {
-            ISelection selection = timegraph.getSelectionTrace();
-            if (selection instanceof TimeGraphSelection) {
-                TimeGraphSelection sel = (TimeGraphSelection) selection;
-                ITimeGraphEntry entry = (ITimeGraphEntry) sel.getFirstElement();
+            ITimeGraphEntry entry = timegraph.getSelectedTrace();
+            if (entry != null) {
                 return entry.getName();
             }
             return null;
