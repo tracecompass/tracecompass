@@ -47,6 +47,7 @@ public class AggregatedCalledFunctionStatistics extends SegmentStoreStatistics {
     public AggregatedCalledFunctionStatistics(long duration, long selfTime) {
         fMaxSelfTime = selfTime;
         fMinSelfTime = selfTime;
+        fSelfTimeAverage = selfTime;
         fVariance = 0.0;
         update(new BasicSegment(0, duration));
     }
