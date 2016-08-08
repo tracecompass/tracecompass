@@ -282,11 +282,11 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         if (fIsTracepoints) {
             Set<String> set = new HashSet<>();
             Object[] checkedElements = fTracepointsViewer.getCheckedElements();
-            int totalNbEvents = 0;
+            int checkedNbEvents = 0;
             for (int i = 0; i < checkedElements.length; i++) {
                 ITraceControlComponent component = (ITraceControlComponent) checkedElements[i];
                 if (component instanceof BaseEventComponent) {
-                    totalNbEvents++;
+                    checkedNbEvents++;
                     if (!set.contains(component.getName())) {
                         set.add(component.getName());
                         fSelectedEvents.add(component.getName());
@@ -296,13 +296,15 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
             }
 
             // verify if all events are selected
-            int nbUstEvents = 0;
+            int nbAvailableEvents = 0;
             List<ITraceControlComponent> comps = fProviderGroup.getChildren(UstProviderComponent.class);
             for (ITraceControlComponent comp : comps) {
                 List<ITraceControlComponent> children = comp.getChildren(BaseEventComponent.class);
-                nbUstEvents += children.size();
+                nbAvailableEvents += children.size();
             }
-            fIsAllTracepoints = (nbUstEvents == totalNbEvents);
+            // Either all available events are selected or no events are available but All checkbox is selected
+            fIsAllTracepoints = ((checkedNbEvents > 0) && (nbAvailableEvents == checkedNbEvents)) ||
+                                ((nbAvailableEvents == 0) && fTracepointsViewer.getCheckedElements().length == 1);
         }
 
         // Get the list of event(s) to exclude

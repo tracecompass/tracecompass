@@ -215,11 +215,11 @@ public class EnableLoggersComposite extends Composite implements IBaseEnableUstE
         if (fIsLoggers) {
             Set<String> set = new HashSet<>();
             Object[] checkedElements = fLoggersViewer.getCheckedElements();
-            int totalNbLoggers = 0;
+            int checkedNbLoggers = 0;
             for (int i = 0; i < checkedElements.length; i++) {
                 ITraceControlComponent component = (ITraceControlComponent) checkedElements[i];
                 if (component instanceof BaseLoggerComponent) {
-                    totalNbLoggers++;
+                    checkedNbLoggers++;
                     if (!set.contains(component.getName())) {
                         set.add(component.getName());
                         fLoggers.add(component.getName());
@@ -228,19 +228,22 @@ public class EnableLoggersComposite extends Composite implements IBaseEnableUstE
             }
 
             // verify if all events are selected
-            int nbLoggers = 0;
+            int nbAvailableLoggers = 0;
             List<ITraceControlComponent> comps = fProviderGroup.getChildren(UstProviderComponent.class);
             for (ITraceControlComponent comp : comps) {
                 // We want the children of each UST provider
                 ITraceControlComponent[] events = comp.getChildren();
                 for (ITraceControlComponent event : events) {
                     if (event instanceof BaseLoggerComponent && fDomain.equals(((BaseLoggerComponent)event).getDomain())) {
-                        nbLoggers++;
+                        nbAvailableLoggers++;
                     }
                 }
 
             }
-            fIsAllLoggers = (nbLoggers == totalNbLoggers);
+            // Either all available loggers are selected or no loggers are available but All checkbox is selected
+            fIsAllLoggers = ((checkedNbLoggers > 0) && (nbAvailableLoggers == checkedNbLoggers)) ||
+                            ((nbAvailableLoggers == 0) && fLoggersViewer.getCheckedElements().length == 1);
+
             String tmpSpecificLogger = fSpecificLoggerText.getText();
             if (!fIsAllLoggers && !tmpSpecificLogger.trim().isEmpty()) {
                 // Format the text to a List<String>
