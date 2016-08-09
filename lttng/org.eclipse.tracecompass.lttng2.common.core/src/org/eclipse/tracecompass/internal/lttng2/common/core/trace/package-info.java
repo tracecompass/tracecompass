@@ -8,4 +8,4 @@
  *******************************************************************************/
 
 @org.eclipse.jdt.annotation.NonNullByDefault
-package org.eclipse.tracecompass.internal.lttng2.common.core;
+package org.eclipse.tracecompass.internal.lttng2.common.core.trace;

@@ -17,6 +17,7 @@ import org.eclipse.osgi.util.NLS;
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.tmf.core.messages"; //$NON-NLS-1$
+    public static String CounterAspect_HelpPrefix;
     public static String TmfCheckpointIndexer_EventsPerSecond;
     public static String TmfCheckpointIndexer_Indexing;
 

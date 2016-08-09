@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 2.1.1.qualifier
+Bundle-Version: 2.2.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.lttng2.kernel.core;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator
@@ -16,7 +16,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.analysis.os.linux.core,
  org.eclipse.tracecompass.analysis.graph.core,
  org.eclipse.tracecompass.analysis.lami.core,
- org.eclipse.tracecompass.tmf.analysis.xml.core
+ org.eclipse.tracecompass.tmf.analysis.xml.core,
+ org.eclipse.tracecompass.lttng2.common.core
 Export-Package: org.eclipse.tracecompass.internal.lttng2.kernel.core;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui,org.eclipse.tracecompass.lttng2.kernel.core.tests",
  org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui,org.eclipse.tracecompass.lttng2.kernel.core.tests",
  org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.handlers;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui,org.eclipse.tracecompass.lttng2.kernel.core.tests",

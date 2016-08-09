@@ -22,10 +22,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelTidAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.ThreadPriorityAspect;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelTidAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
+import org.eclipse.tracecompass.internal.lttng2.common.core.trace.ILttngTrace;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng26EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng27EventLayout;
@@ -42,6 +43,8 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTraceValidationStatus;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfUtils;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -50,7 +53,7 @@ import com.google.common.collect.ImmutableSet;
  *
  * @author Alexandre Montplaisir
  */
-public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
+public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace, ILttngTrace {
 
     /**
      * Supported Linux kernel tracers
@@ -92,6 +95,9 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
     /** The tracer which originated this trace */
     private OriginTracer fOriginTracer = null;
 
+    /** Collection of aspects, default values */
+    private @NonNull Collection<ITmfEventAspect<?>> fAspects = ImmutableSet.copyOf(LTTNG_KERNEL_ASPECTS);
+
     /**
      * Default constructor
      */
@@ -112,6 +118,13 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
     public void initTrace(IResource resource, String path,
             Class<? extends ITmfEvent> eventType) throws TmfTraceException {
         super.initTrace(resource, path, eventType);
+        /*
+         * Add aspects
+         */
+        ImmutableList.Builder<ITmfEventAspect<?>> builder = new Builder<>();
+        builder.addAll(LTTNG_KERNEL_ASPECTS);
+        builder.addAll(createCounterAspects(this));
+        fAspects = builder.build();
         fOriginTracer = getTracerFromEnv();
     }
 
@@ -168,7 +181,7 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
 
     @Override
     public Iterable<ITmfEventAspect<?>> getEventAspects() {
-         return LTTNG_KERNEL_ASPECTS;
+        return fAspects;
     }
 
     /*

@@ -15,7 +15,6 @@
 package org.eclipse.tracecompass.lttng2.ust.core.trace;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
@@ -24,6 +23,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.lttng2.common.core.trace.ILttngTrace;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.ContextVtidAspect;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.DefaultUstEventLayout;
@@ -51,7 +51,7 @@ import com.google.common.collect.ImmutableSet;
  *
  * @author Matthew Khouzam
  */
-public class LttngUstTrace extends CtfTmfTrace {
+public class LttngUstTrace extends CtfTmfTrace implements ILttngTrace{
 
     /**
      * Name of the tracer that generates this trace type, as found in the CTF
@@ -74,7 +74,8 @@ public class LttngUstTrace extends CtfTmfTrace {
         LTTNG_UST_ASPECTS = builder.build();
     }
 
-    private @NonNull Collection<ITmfEventAspect<?>> fUstTraceAspects = new HashSet<>(LTTNG_UST_ASPECTS);
+    /** Default collections of aspects */
+    private @NonNull Collection<ITmfEventAspect<?>> fUstTraceAspects = ImmutableSet.copyOf(LTTNG_UST_ASPECTS);
 
     private @Nullable ILttngUstEventLayout fLayout = null;
 
@@ -124,6 +125,7 @@ public class LttngUstTrace extends CtfTmfTrace {
         ImmutableSet.Builder<ITmfEventAspect<?>> builder = ImmutableSet.builder();
         builder.addAll(LTTNG_UST_ASPECTS);
         builder.add(new ContextVtidAspect(fLayout));
+        builder.addAll(createCounterAspects(this));
         fUstTraceAspects = builder.build();
     }
 
