@@ -11,10 +11,8 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,12 +20,7 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.TmfAnalysisModuleHelperXml.XmlAnalysisModuleType;
@@ -35,7 +28,6 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.Tmf
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleSource;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
-import org.osgi.framework.Bundle;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -50,11 +42,6 @@ import org.xml.sax.SAXException;
  */
 public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
 
-    /** Extension point ID */
-    private static final String TMF_XML_BUILTIN_ID = "org.eclipse.linuxtools.tmf.analysis.xml.core.files"; //$NON-NLS-1$
-    private static final String XML_FILE_ELEMENT = "xmlfile"; //$NON-NLS-1$
-
-    private static final String XML_FILE_ATTRIB = "file"; //$NON-NLS-1$
 
     /*
      * Legacy (Linux Tools) XML directory.
@@ -117,39 +104,9 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
     }
 
     private static void populateBuiltinModules() {
-        /* Get the XML files advertised through the extension point */
-        IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(TMF_XML_BUILTIN_ID);
-        for (IConfigurationElement element : elements) {
-            if (element.getName().equals(XML_FILE_ELEMENT)) {
-                final String filename = element.getAttribute(XML_FILE_ATTRIB);
-                final String name = element.getContributor().getName();
-                // Run this in a safe runner in case there is an exception
-                // (IOException, FileNotFoundException, NPE, etc).
-                // This makes sure other extensions are not prevented from
-                // working if one is faulty.
-                SafeRunner.run(new ISafeRunnable() {
-
-                    @Override
-                    public void run() throws IOException {
-                        if (name != null) {
-                            Bundle bundle = Platform.getBundle(name);
-                            if (bundle != null) {
-                                URL xmlUrl = bundle.getResource(filename);
-                                if (xmlUrl == null) {
-                                    throw new FileNotFoundException(filename);
-                                }
-                                URL locatedURL = FileLocator.toFileURL(xmlUrl);
-                                processFile(new File(locatedURL.getFile()));
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void handleException(Throwable exception) {
-                        // Handled sufficiently in SafeRunner
-                    }
-                });
-            }
+        Map<String, IPath> files = XmlUtils.listBuiltinFiles();
+        for (IPath xmlPath : files.values()) {
+            processFile(xmlPath.toFile());
         }
     }
 

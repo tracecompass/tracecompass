@@ -15,7 +15,8 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -142,8 +143,14 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
 
     @Override
     public void moduleCreated(IAnalysisModule module) {
-        Map<String, File> files = XmlUtils.listFiles();
-        for (File xmlFile : files.values()) {
+        // Get all the XML files, builtin and not builtin
+        Set<File> files = XmlUtils.listBuiltinFiles().values().stream()
+                .map(p -> p.toFile())
+                .collect(Collectors.toSet());
+        XmlUtils.listFiles().values().stream()
+                .forEach(f -> files.add(f));
+
+        for (File xmlFile : files) {
             if (!XmlUtils.xmlValidate(xmlFile).isOK()) {
                 continue;
             }

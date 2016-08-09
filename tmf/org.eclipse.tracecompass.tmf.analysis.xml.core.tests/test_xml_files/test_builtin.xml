@@ -25,4 +25,14 @@
             </stateChange>
         </eventHandler>
     </stateProvider>
+
+    <timeGraphView id="test.builtin.sp.output">
+        <head>
+            <analysis id="test.builtin.sp" />
+            <label value="Test output of XML builtin module" />
+        </head>
+        <entry path="cpu">
+            <display type="self" />
+        </entry>
+    </timeGraphView>
 </tmfxml>

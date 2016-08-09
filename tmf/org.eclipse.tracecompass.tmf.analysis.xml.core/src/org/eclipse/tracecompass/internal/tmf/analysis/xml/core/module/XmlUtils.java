@@ -16,6 +16,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyStrin
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -35,15 +36,21 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
+import org.osgi.framework.Bundle;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -65,9 +72,13 @@ public class XmlUtils {
     /** Name of the XSD schema file */
     private static final String XSD = "xmlDefinition.xsd"; //$NON-NLS-1$
 
+    /** Extension point ID and attributes */
+    private static final String TMF_XML_BUILTIN_ID = "org.eclipse.linuxtools.tmf.analysis.xml.core.files"; //$NON-NLS-1$
+    private static final String XML_FILE_ELEMENT = "xmlfile"; //$NON-NLS-1$
+    private static final String XML_FILE_ATTRIB = "file"; //$NON-NLS-1$
+
     /**
      * Extension for XML files
-     * @since 2.0
      */
     public static final String XML_EXTENSION = "xml"; //$NON-NLS-1$
 
@@ -148,7 +159,6 @@ public class XmlUtils {
      * the key is the file name.
      *
      * @return A map with all the XML analysis files
-     * @since 2.0
      */
     public static synchronized @NonNull Map<String, File> listFiles() {
         IPath pathToFiles = XmlUtils.getXmlFilesPath();
@@ -172,11 +182,54 @@ public class XmlUtils {
     }
 
     /**
+     * List all files advertised through the builtin extension point. It returns a map where the key is the file name.
+     *
+     * @return A map with all the XMl analysis builtin files
+     */
+    public static synchronized @NonNull Map<String, IPath> listBuiltinFiles() {
+        /* Get the XML files advertised through the extension point */
+        IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(TMF_XML_BUILTIN_ID);
+        Map<String, IPath> map = new HashMap<>();
+        for (IConfigurationElement element : elements) {
+            if (element.getName().equals(XML_FILE_ELEMENT)) {
+                final String filename = element.getAttribute(XML_FILE_ATTRIB);
+                final String name = element.getContributor().getName();
+                // Run this in a safe runner in case there is an exception
+                // (IOException, FileNotFoundException, NPE, etc).
+                // This makes sure other extensions are not prevented from
+                // working if one is faulty.
+                SafeRunner.run(new ISafeRunnable() {
+
+                    @Override
+                    public void run() throws IOException {
+                        if (name != null) {
+                            Bundle bundle = Platform.getBundle(name);
+                            if (bundle != null) {
+                                URL xmlUrl = bundle.getResource(filename);
+                                if (xmlUrl == null) {
+                                    throw new FileNotFoundException(filename);
+                                }
+                                URL locatedURL = FileLocator.toFileURL(xmlUrl);
+                                map.put(filename, new Path(locatedURL.getPath()));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void handleException(Throwable exception) {
+                        // Handled sufficiently in SafeRunner
+                    }
+                });
+            }
+        }
+        return map;
+    }
+
+    /**
      * Delete an XML analysis file
      *
      * @param name
      *            The XML file to delete
-     * @since 2.0
      */
     public static void deleteFile(String name) {
         Map<String, File> files = listFiles();
@@ -195,7 +248,6 @@ public class XmlUtils {
      * @param to
      *            The full path of the file to write to
      * @return Whether the file was successfully exported
-     * @since 2.0
      */
     public static IStatus exportXmlFile(String from, String to) {
 
@@ -242,7 +294,6 @@ public class XmlUtils {
      * @param fileName
      *            The file name
      * @return The list of IDs
-     * @since 2.0
      */
     public static List<String> getAnalysisIdsFromFile(String fileName) {
         List<String> ids = new ArrayList<>();
@@ -281,7 +332,6 @@ public class XmlUtils {
      *             If any parse errors occur.
      * @throws IOException
      *             If any IO errors occur.
-     * @since 2.0
      */
     public static Document getDocumentFromFile(File file) throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
