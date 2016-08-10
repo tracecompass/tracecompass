@@ -24,6 +24,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
+import com.google.common.collect.ImmutableList;
+
 /**
  * This class offer services around the
  * <code>org.eclipse.tracecompass.tmf.ui.symbolProvider</code> extension point.
@@ -66,13 +68,38 @@ public final class SymbolProviderManager {
     }
 
     /**
-     *
+     * Get the instance of the {@link SymbolProviderManager}
      * @return the singleton instance of this class
      */
     @SuppressWarnings("null")
     public static synchronized @NonNull SymbolProviderManager getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new SymbolProviderManager();
+            List<@NonNull SymbolProviderFactoryWrapper> providers = new ArrayList<>();
+            IConfigurationElement[] configElements = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_POINT_ID);
+            for (IConfigurationElement element : configElements) {
+                if (ELEM_NAME_PROVIDER.equals(element.getName())) {
+                    try {
+                        Object extension = element.createExecutableExtension(ATTR_CLASS);
+                        int priority = 0;
+                        try {
+                            priority = Integer.parseInt(element.getAttribute(ATTR_PRIORITY));
+                        } catch (NumberFormatException e) {
+                            // safe to ignore
+                        }
+                        providers.add(new SymbolProviderFactoryWrapper((ISymbolProviderFactory) extension, priority));
+                    } catch (CoreException | ClassCastException e) {
+                        Activator.getDefault().logError("Exception while loading extensions", e); //$NON-NLS-1$
+                    }
+                }
+            }
+            /*
+             * Those with a higher priority need to be on top
+             *
+             * Note: we cannot simply sort by negative priority because
+             * (-Long.MIN_VAL) == Long.MIN_VAL
+             */
+            providers.sort(Comparator.<SymbolProviderFactoryWrapper> comparingLong(o -> o.priority).reversed());
+            INSTANCE = new SymbolProviderManager(providers);
         }
         return INSTANCE;
     }
@@ -80,27 +107,8 @@ public final class SymbolProviderManager {
     /**
      * The private constructor of this manager
      */
-    private SymbolProviderManager() {
-        fProviders = new ArrayList<>();
-        IConfigurationElement[] configElements = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_POINT_ID);
-        for (IConfigurationElement element : configElements) {
-            if (ELEM_NAME_PROVIDER.equals(element.getName())) {
-                try {
-                    Object extension = element.createExecutableExtension(ATTR_CLASS);
-                    int priority = 0;
-                    try {
-                        priority = Integer.parseInt(element.getAttribute(ATTR_PRIORITY));
-                    } catch (NumberFormatException e) {
-                        // safe to ignore
-                    }
-                    fProviders.add(new SymbolProviderFactoryWrapper((ISymbolProviderFactory) extension, priority));
-                } catch (CoreException | ClassCastException e) {
-                    Activator.getDefault().logError("Exception while loading extensions", e); //$NON-NLS-1$
-                }
-            }
-        }
-        // Those with a higher priority need to be on top
-        fProviders.sort(Comparator.comparingLong(o -> -o.priority));
+    private SymbolProviderManager(@NonNull List<@NonNull SymbolProviderFactoryWrapper> providers) {
+        fProviders = ImmutableList.copyOf(providers);
     }
 
     /**
