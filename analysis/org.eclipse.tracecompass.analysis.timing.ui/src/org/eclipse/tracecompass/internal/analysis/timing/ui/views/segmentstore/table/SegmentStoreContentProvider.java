@@ -33,7 +33,6 @@ import com.google.common.collect.Iterables;
  * Content provider for the latency table viewers.
  *
  * @author France Lapointe Nguyen
- * @since 2.0
  */
 public class SegmentStoreContentProvider implements ISortingLazyContentProvider {
 

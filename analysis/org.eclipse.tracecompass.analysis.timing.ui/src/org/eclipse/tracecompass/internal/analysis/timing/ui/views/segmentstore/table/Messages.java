@@ -17,11 +17,10 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * @author France Lapointe Nguyen
- * @since 2.0
  */
 @NonNullByDefault({})
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.table.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = Messages.class.getPackage().getName() + ".messages"; //$NON-NLS-1$
 
     /**
      * Name of the duration column
