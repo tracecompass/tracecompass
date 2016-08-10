@@ -96,9 +96,9 @@ public final class SymbolProviderManager {
              * Those with a higher priority need to be on top
              *
              * Note: we cannot simply sort by negative priority because
-             * (-Long.MIN_VAL) == Long.MIN_VAL
+             * (-Integer.MIN_VAL) == Integer.MIN_VAL
              */
-            providers.sort(Comparator.<SymbolProviderFactoryWrapper> comparingLong(o -> o.priority).reversed());
+            providers.sort(Comparator.<SymbolProviderFactoryWrapper> comparingInt(o -> o.priority).reversed());
             INSTANCE = new SymbolProviderManager(providers);
         }
         return INSTANCE;
