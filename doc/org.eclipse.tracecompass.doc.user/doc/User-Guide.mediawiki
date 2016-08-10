@@ -2449,6 +2449,88 @@ See Control Flow View's '''[[#Using_the_mouse | Using the mouse]]''', '''[[#Usin
 
 See Control Flow View's '''[[#Marker_Axis | Marker Axis]]'''.
 
+== Flame Graph View ==
+
+This is an aggregate view of the function calls from the '''Call Stack View'''. This shows a bird's eye view of what are the main
+time sinks in the traced applications. Each entry in the '''Flame Graph''' represents an aggregation of all the calls to a function
+in a certain depth of the call stack having the same caller. So, functions in the '''Flame Graph''' are aggregated by depth and
+caller. This enables the user to find the most executed code path easily.
+
+* In a '''Flame Graph''', each entry (box) represents a function in the stack.
+* If one takes a single vertical line in the view, it represents a full call stack with parents calling children.
+* The ''x-axis'' represents total duration (execution time) and not absolute time, so it is not aligned with the other views.
+* The width of an entry is the total time spent in that function, including time spent calling the children.
+* The total time can exceed the longest duration, if the program is pre-empted and not running during its trace time.
+* Each thread traced makes its own flame graph.
+
+The function name is visible on each Flame graph event if the size permits. Each box in the '''Flame Graph'''
+has the same color as the box representing the same function in the '''Call Stack'''.
+
+To open this view select a trace, expand it in the '''Project Explorer''' then expand the
+'''Call Graph Analysis''' (the trace must be loaded) and open the '''Flame Graph'''.
+It's also possible to go in '''Window''' -> '''Show View''' -> '''Tracing''' then
+select '''Flame Graph''' in the list.
+
+[[Image:images/Flame_Graph.png|Flame Graph View]]
+
+To use the '''Flame graph''', one can navigate it and find which function is consuming the most self-time.
+This can be seen as a large plateau. Then the entry can be inspected. At this point, the worst offender in
+terms of CPU usage will be highlighted, however, it is not a single call to investigate, but rather the
+aggregation of all the calls. Right mouse-clicking on that entry will open a context sensitive menu.
+Selecting '''Go to minimum''' or '''Go to maximum''' will take the user to the minimum or maximum
+recorded times in the trace. This is interesting to compare and contrast the two.
+
+Hovering over a function will show a tooltip with the statistics on a per-function basis. One can see the total and self times
+(''worst-case'', ''best-case'', ''average'', ''total time'', ''standard deviation'', ''number of calls'') for that function.
+
+=== How to use a Flame Graph ===
+
+Observing the time spent in each function can show where most of the time is spent and where one could optimize.
+An example in the image above: one can see that ''mp_sort'' is a recursive sort function, it takes approximately
+40% of the execution time of the program. That means that perfectly parallelizing it can yield a gain of 20% for 2 threads, 33% for 3
+and so forth. Looking at the function '''print_current_files''', it takes about 30% of the time, and it has a child ''print_many_per_line'' that has a large
+self time (above 10%). This could be another area that can be targeted for optimization. Knowing this in advance helps developers
+know where to aim their efforts.
+
+It is recommended to have a kernel trace as well as a user space trace in an experiment
+while using the '''Flame Graph''' as it will show what is causing the largest delays.
+When using the '''Flame Graph''' together with a call stack and a kernel trace,
+an example work flow would be to find the worst offender in terms of time taken for a function
+that seems to be taking too longThen, using the context menu '''Go to maximum''', one can navigate
+to the maximum duration and see if the OS is, for example, preempting the function for too long,
+or if the issue is in the code being executed.
+
+=== Using the mouse ===
+
+*'''Double-click on the duration ruler''' will zoom the graph to the selected duration range.
+*'''Shift-left-click or drag''': Extend or shrink the selection range
+*'''Mouse wheel up/down''': scroll up or down
+* '''Shift-mouse wheel up/down''': scroll left or right
+* '''Ctrl-mouse wheel up/down''': zoom in or out horizontally
+* '''Shift-Ctrl-mouse wheel up/down''': zoom in or out vertically
+
+When the mouse cursor is over entries (left pane):
+
+*'''-''': Collapse the '''Flame Graph''' of the selected thread
+*'''+''': Expand the '''Flame Graph''' of the selected thread
+
+=== Using the keyboard ===
+
+The following keyboard shortcuts are available:
+
+*'''Down Arrow''': selects the next stack depth
+*'''Up Arrow''': selects the previous stack depth
+*'''Home''': selects the first thread's '''Flame Graph'''
+*'''End''': selects the last thread's  '''Flame Graph''''s deepest depth
+*'''Enter''': toggles the expansion state of the current thread in the tree
+*'''Ctrl + +''': Zoom-in vertically
+*'''Ctrl + -''': Zoom-out vertically
+*'''Ctrl + 0''': Reset the vertical zoom
+
+=== Importing a binary or function name mapping file (for LTTng-UST <2.8 traces) ===
+
+See Call Stack View's '''[[#Call Stack View | Importing a binary or function name mapping file (for LTTng-UST <2.8 traces) ]]'''.
+
 == Memory Usage ==
 
 The Memory Usage view allows the user to visualize the active memory usage per thread over time, if the application and trace provide this information.
