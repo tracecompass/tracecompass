@@ -36,6 +36,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventTyp
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLog4jLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TracePythonLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.SessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.ILttngControlService;
@@ -56,6 +57,7 @@ public class LTTngControlServiceMiTest extends LTTngControlServiceTest {
     private static final String SCEN_LIST_SESSION_2_7_COMPAT = "ListSession2.7Compat";
     private static final String SCEN_ENABLING_JUL_LOGGERS = "EnableJulLoggers";
     private static final String SCEN_ENABLING_LOG4J_LOGGERS = "EnableLog4jLoggers";
+    private static final String SCEN_ENABLING_PYTHON_LOGGERS = "EnablePythonLoggers";
 
     @Override
     protected ILttngControlService getControlService() {
@@ -404,6 +406,55 @@ public class LTTngControlServiceMiTest extends LTTngControlServiceTest {
             assertEquals(loggerName2, loggerInfo.getName());
             assertEquals(TraceDomainType.LOG4J, loggerInfo.getDomain());
             assertEquals(TraceLog4jLogLevel.LOG4J_FATAL, loggerInfo.getLogLevel());
+            assertEquals(LogLevelType.LOGLEVEL_ONLY, loggerInfo.getLogLevelType());
+            assertEquals(TraceEnablement.ENABLED, loggerInfo.getState());
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+    @Override
+    public void testEnablePythonLoggers() {
+        try {
+            String sessionName = "mysession";
+            // Lists
+            List<String> loggerList = new ArrayList<>();
+            // Loggers
+            String loggerName1 = "logger";
+            String loggerName2 = "anotherLogger";
+            String allLoggerName = "*";
+
+            fShell.setScenario(SCEN_ENABLING_PYTHON_LOGGERS);
+
+            // 1) Enabling all loggers
+            loggerList.add(allLoggerName);
+            fService.enableEvents(sessionName, null, loggerList, TraceDomainType.PYTHON, null, null, new NullProgressMonitor());
+            loggerList.clear();
+
+            // 2) Enabling one logger
+            loggerList.add(loggerName1);
+            fService.enableEvents(sessionName, null, loggerList, TraceDomainType.PYTHON, null, null, new NullProgressMonitor());
+
+            // 3) Enabling two loggers with loglevel-only PYTHON_CRITICAL and
+            //    verifying the attributes of one of them
+            loggerList.add(loggerName2);
+            fService.enableLogLevel(sessionName, null, loggerList, LogLevelType.LOGLEVEL_ONLY, TracePythonLogLevel.PYTHON_CRITICAL, null, TraceDomainType.PYTHON, new NullProgressMonitor());
+
+            @Nullable
+            ISessionInfo session = fService.getSession(sessionName, new NullProgressMonitor());
+            assertNotNull(session);
+            // Get the list of loggers
+            List<ILoggerInfo> loggers = session.getDomains()[1].getLoggers();
+            assertNotNull(loggers);
+            assertEquals(4, loggers.size());
+            // Get the "anotherLogger" logger
+            ILoggerInfo loggerInfo = loggers.stream()
+                    .filter(logger -> logger.getName().equals(loggerName2))
+                    .findFirst().get();
+            // Verify attributes
+            assertEquals(loggerName2, loggerInfo.getName());
+            assertEquals(TraceDomainType.PYTHON, loggerInfo.getDomain());
+            assertEquals(TracePythonLogLevel.PYTHON_CRITICAL, loggerInfo.getLogLevel());
             assertEquals(LogLevelType.LOGLEVEL_ONLY, loggerInfo.getLogLevelType());
             assertEquals(TraceEnablement.ENABLED, loggerInfo.getState());
         } catch (ExecutionException e) {

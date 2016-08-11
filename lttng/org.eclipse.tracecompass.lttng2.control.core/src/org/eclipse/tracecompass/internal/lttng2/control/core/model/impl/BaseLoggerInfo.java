@@ -16,6 +16,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.ITraceLogLeve
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLog4jLogLevel;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TracePythonLogLevel;
 
 /**
  * Implementation of the basic trace logger interface (IBaseLoggerInfo) to store
@@ -86,7 +87,7 @@ public class BaseLoggerInfo extends TraceInfo implements IBaseLoggerInfo {
             fLogLevel = TraceLog4jLogLevel.valueOfString(levelName);
             break;
         case PYTHON:
-            // TODO: Add the Python log level
+            fLogLevel = TracePythonLogLevel.valueOfString(levelName);
             break;
             //$CASES-OMITTED$
         default:

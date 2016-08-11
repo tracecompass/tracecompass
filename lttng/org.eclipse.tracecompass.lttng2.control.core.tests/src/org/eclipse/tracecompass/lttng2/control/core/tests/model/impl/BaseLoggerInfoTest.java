@@ -20,6 +20,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseLoggerIn
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceJulLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLog4jLogLevel;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TracePythonLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BaseLoggerInfo;
 import org.junit.Before;
 import org.junit.Test;
@@ -152,6 +153,25 @@ public class BaseLoggerInfoTest {
         assertEquals("LOG4J_FATAL", resultLog4j.name());
         assertEquals("LOG4J_FATAL", resultLog4j.toString());
         assertEquals(1, resultLog4j.ordinal());
+
+        // Case 5 : PYTHON_NOTSET
+        fixture.setDomain(TraceDomainType.PYTHON);
+        fixture.setLogLevel(TracePythonLogLevel.PYTHON_NOTSET);
+        TracePythonLogLevel resultPython = (TracePythonLogLevel) fixture.getLogLevel();
+        assertNotNull(resultPython);
+        assertEquals("Notset", resultPython.getInName());
+        assertEquals("PYTHON_NOTSET", resultPython.name());
+        assertEquals("PYTHON_NOTSET", resultPython.toString());
+        assertEquals(5, resultPython.ordinal());
+
+        // Case 6 : LOG4J_FATAL
+        fixture.setLogLevel(TracePythonLogLevel.PYTHON_DEBUG);
+        resultPython = (TracePythonLogLevel) fixture.getLogLevel();
+        assertNotNull(resultPython);
+        assertEquals("Debug", resultPython.getInName());
+        assertEquals("PYTHON_DEBUG", resultPython.name());
+        assertEquals("PYTHON_DEBUG", resultPython.toString());
+        assertEquals(4, resultPython.ordinal());
     }
 
     /**
@@ -335,6 +355,71 @@ public class BaseLoggerInfoTest {
         assertEquals("LEVEL_UNKNOWN", resultLog4j.getInName());
         assertEquals("LEVEL_UNKNOWN", resultLog4j.name());
         assertEquals(8, resultLog4j.ordinal());
+
+        // Case 3: Python log level
+        fixture.setDomain(TraceDomainType.PYTHON);
+
+        fixture.setLogLevel("Critical");
+
+        TracePythonLogLevel resultPython = (TracePythonLogLevel) fixture.getLogLevel();
+        assertNotNull(resultPython);
+        assertEquals("Critical", resultPython.getInName());
+        assertEquals("PYTHON_CRITICAL", resultPython.name());
+        assertEquals(0, resultPython.ordinal());
+
+        //------------------------
+        fixture.setLogLevel("Error");
+
+        resultPython = (TracePythonLogLevel) fixture.getLogLevel();
+        assertNotNull(resultPython);
+        assertEquals("Error", resultPython.getInName());
+        assertEquals("PYTHON_ERROR", resultPython.name());
+        assertEquals(1, resultPython.ordinal());
+
+        //------------------------
+        fixture.setLogLevel("Warning");
+
+        resultPython = (TracePythonLogLevel) fixture.getLogLevel();
+        assertNotNull(resultPython);
+        assertEquals("Warning", resultPython.getInName());
+        assertEquals("PYTHON_WARNING", resultPython.name());
+        assertEquals(2, resultPython.ordinal());
+
+        //------------------------
+        fixture.setLogLevel("Info");
+
+        resultPython = (TracePythonLogLevel) fixture.getLogLevel();
+        assertNotNull(resultPython);
+        assertEquals("Info", resultPython.getInName());
+        assertEquals("PYTHON_INFO", resultPython.name());
+        assertEquals(3, resultPython.ordinal());
+
+        //------------------------
+        fixture.setLogLevel("Debug");
+
+        resultPython = (TracePythonLogLevel) fixture.getLogLevel();
+        assertNotNull(resultPython);
+        assertEquals("Debug", resultPython.getInName());
+        assertEquals("PYTHON_DEBUG", resultPython.name());
+        assertEquals(4, resultPython.ordinal());
+
+        //------------------------
+        fixture.setLogLevel("Notset");
+
+        resultPython = (TracePythonLogLevel) fixture.getLogLevel();
+        assertNotNull(resultPython);
+        assertEquals("Notset", resultPython.getInName());
+        assertEquals("PYTHON_NOTSET", resultPython.name());
+        assertEquals(5, resultPython.ordinal());
+
+        //------------------------
+        fixture.setLogLevel("LEVEL_UNKNOWN");
+
+        resultPython = (TracePythonLogLevel) fixture.getLogLevel();
+        assertNotNull(resultPython);
+        assertEquals("LEVEL_UNKNOWN", resultPython.getInName());
+        assertEquals("LEVEL_UNKNOWN", resultPython.name());
+        assertEquals(6, resultPython.ordinal());
     }
 
     /**
@@ -354,6 +439,11 @@ public class BaseLoggerInfoTest {
         fixture.setLogLevel(TraceLog4jLogLevel.LOG4J_ERROR);
         result = fixture.toString();
         assertEquals("[BaseLoggerInfo([TraceInfo(Name=testName)],domain=LOG4J,level=LOG4J_ERROR)]", result);
+
+        fixture.setDomain(TraceDomainType.PYTHON);
+        fixture.setLogLevel(TracePythonLogLevel.PYTHON_CRITICAL);
+        result = fixture.toString();
+        assertEquals("[BaseLoggerInfo([TraceInfo(Name=testName)],domain=PYTHON,level=PYTHON_CRITICAL)]", result);
     }
 
     // ------------------------------------------------------------------------

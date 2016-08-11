@@ -1157,13 +1157,19 @@ public class LTTngControlServiceTest {
     @Test
     public void testEnableJulLoggers() {
         // Trace Compass only supports JUL starting with LTTng 2.6 that supports MI.
-        // The implementation of this test is the LTTngControlServiceMiTest.java.
+        // The implementation of this test is in the LTTngControlServiceMiTest.java file.
     }
 
     @Test
     public void testEnableLog4jLoggers() {
         // Trace Compass only supports LOG4J starting with LTTng 2.6 that supports MI.
-        // The implementation of this test is the LTTngControlServiceMiTest.java.
+        // The implementation of this test is in the LTTngControlServiceMiTest.java file.
+    }
+
+    @Test
+    public void testEnablePythonLoggers() {
+        // LTTng only support Python logging starting with LTTng 2.7 that supports MI.
+        // The implementation of this test is in the LTTngControlServiceMiTest.java file.
     }
 
     @Test

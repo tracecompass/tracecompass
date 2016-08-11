@@ -83,7 +83,7 @@ public enum TracePythonLogLevel implements ITraceLogLevel{
             throw new IllegalArgumentException();
         }
         for (TracePythonLogLevel tllevel : TracePythonLogLevel.values()) {
-            if (tllevel.name().equals(name)) {
+            if (tllevel.name().equals(name) || tllevel.getInName().equals(name)) {
                 return tllevel;
             }
         }

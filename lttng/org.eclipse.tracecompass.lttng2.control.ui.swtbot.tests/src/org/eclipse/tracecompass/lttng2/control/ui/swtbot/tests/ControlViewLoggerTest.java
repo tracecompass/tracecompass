@@ -36,6 +36,7 @@ public class ControlViewLoggerTest extends ControlViewTest {
     private static final String TEST_STREAM = "CreateSessionTestLTTng2_8.cfg";
     private static final String CREATE_SESSION_JUL_SCENARIO_NAME = "JulLogger";
     private static final String CREATE_SESSION_LOG4J_SCENARIO_NAME = "Log4jLogger";
+    private static final String CREATE_SESSION_PYTHON_SCENARIO_NAME = "PythonLogger";
 
     private static final String SESSION_NAME = "mysession";
     private static final String PROPERTIES_VIEW = "Properties";
@@ -79,6 +80,15 @@ public class ControlViewLoggerTest extends ControlViewTest {
         // Verify that the Properties view shows to right logger log level
         testLoggerProperties(TraceDomainType.LOG4J);
 
+        // Enable Python loggers
+        fProxy.setScenario(CREATE_SESSION_PYTHON_SCENARIO_NAME);
+        testEnableLoggers(TraceDomainType.PYTHON);
+        testStartStopTracing(TraceSessionState.ACTIVE);
+        testStartStopTracing(TraceSessionState.INACTIVE);
+        // Verify that the Properties view shows to right logger log level
+        testLoggerProperties(TraceDomainType.PYTHON);
+
+
         // Clean session
         testDestroySession();
         testDisconnectFromNode();
@@ -101,6 +111,10 @@ public class ControlViewLoggerTest extends ControlViewTest {
         case LOG4J:
             domainName = ControlViewSwtBotUtil.LOG4J_DOMAIN_NAME;
             logLevel = "Fatal";
+            break;
+        case PYTHON:
+            domainName = ControlViewSwtBotUtil.PYTHON_DOMAIN_NAME;
+            logLevel = "Critical";
             break;
             //$CASES-OMITTED$
         default:
@@ -160,11 +174,11 @@ public class ControlViewLoggerTest extends ControlViewTest {
         // Expand the "All" and "All - application name" node
         SWTBotTreeItem allItem = loggersTree.getTreeItem(ControlViewSwtBotUtil.ALL_TREE_NODE);
         allItem.expand();
-        allItem = SWTBotUtils.getTreeItem(fBot, loggersTree, ControlViewSwtBotUtil.ALL_TREE_NODE, ControlViewSwtBotUtil.JAVA_APPLICATION_NAME);
+        allItem = SWTBotUtils.getTreeItem(fBot, loggersTree, ControlViewSwtBotUtil.ALL_TREE_NODE, ControlViewSwtBotUtil.LOGGER_APPLICATION_NAME);
         allItem.expand();
         treeItem = SWTBotUtils.getTreeItem(fBot, loggersTree,
                 ControlViewSwtBotUtil.ALL_TREE_NODE,
-                ControlViewSwtBotUtil.JAVA_APPLICATION_NAME,
+                ControlViewSwtBotUtil.LOGGER_APPLICATION_NAME,
                 ControlViewSwtBotUtil.LOGGER_NAME);
         treeItem.check();
 
@@ -239,15 +253,23 @@ public class ControlViewLoggerTest extends ControlViewTest {
      */
     protected void testLoggerProperties(TraceDomainType domain) {
         String domainName = new String();
-        String logLevel = new String();
+        String logLevel1 = new String();
+        String logLevel2 = new String();
         switch (domain) {
         case JUL:
             domainName = ControlViewSwtBotUtil.JUL_DOMAIN_NAME;
-            logLevel = "<= Warning";
+            logLevel1 = "All";
+            logLevel2 = "<= Warning";
             break;
         case LOG4J:
             domainName = ControlViewSwtBotUtil.LOG4J_DOMAIN_NAME;
-            logLevel = "<= Fatal";
+            logLevel1 = "All";
+            logLevel2 = "<= Fatal";
+            break;
+        case PYTHON:
+            domainName = ControlViewSwtBotUtil.PYTHON_DOMAIN_NAME;
+            logLevel1 = "Debug";
+            logLevel2 = "<= Critical";
             break;
             //$CASES-OMITTED$
         default:
@@ -279,7 +301,7 @@ public class ControlViewLoggerTest extends ControlViewTest {
 
         // Assert that the expression in the Properties view is the same as
         // the one we entered
-        assertEquals("All", loglevelExpression);
+        assertEquals(logLevel1, loglevelExpression);
 
         // Case 2: Select the "anotherLogger" logger in the Control view
         fBot.viewById(ControlView.ID).show();
@@ -303,7 +325,7 @@ public class ControlViewLoggerTest extends ControlViewTest {
 
         // Assert that the expression in the Properties view is the same as
         // the one we entered
-        assertEquals(logLevel, loglevelExpression);
+        assertEquals(logLevel2, loglevelExpression);
 
         // Close the Properties view
         SWTBotUtils.closeView(PROPERTIES_VIEW, fBot);
