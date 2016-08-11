@@ -147,35 +147,6 @@ public class BaseHandler extends AbstractTraceEventHandler {
         return false;
     }
 
-    /**
-     * Return true if this event is an IPI entry
-     *
-     * @param event
-     *            the event
-     * @return true of this is an IPI entry, false otherwise
-     */
-    public boolean isIpiEntry(ITmfEvent event) {
-        return layoutContainsEvent(event, true);
-    }
-
-    /**
-     * Return true if this event is an IPI exit
-     *
-     * @param event
-     *            the event
-     * @return true of this is an IPI exit, false otherwise
-     */
-    public boolean isIpiExit(ITmfEvent event) {
-        return layoutContainsEvent(event, false);
-    }
-
-    private boolean layoutContainsEvent(ITmfEvent event, boolean entry) {
-        String eventName = event.getName();
-        ITmfTrace trace = event.getTrace();
-        IKernelAnalysisEventLayout layout = getProvider().getEventLayout(trace);
-        return entry ? layout.getIPIIrqVectorsEntries().contains(eventName) : layout.getIPIIrqVectorsExits().contains(eventName);
-    }
-
     @Override
     public void handleEvent(ITmfEvent event) {
     }

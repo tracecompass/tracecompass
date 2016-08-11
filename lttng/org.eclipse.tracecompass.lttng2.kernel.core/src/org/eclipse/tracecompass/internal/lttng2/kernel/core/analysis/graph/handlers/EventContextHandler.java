@@ -9,6 +9,12 @@
 
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.handlers;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
+
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider;
@@ -27,6 +33,21 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  */
 public class EventContextHandler extends BaseHandler {
 
+    private final Map<String, Consumer<ITmfEvent>> fHandlers = new HashMap<>();
+    private final Set<IKernelAnalysisEventLayout> fLayouts = new HashSet<>();
+
+    private final Consumer<ITmfEvent> fDefault = event -> {
+        // Do nothing
+    };
+    private final Consumer<ITmfEvent> fSoftIrqEntryHandler = event -> pushInterruptContext(event, Context.SOFTIRQ);
+    private final Consumer<ITmfEvent> fSoftIrqExitHandler = event -> popInterruptContext(event, Context.SOFTIRQ);
+    private final Consumer<ITmfEvent> fHRTimerExpireEntry = event -> pushInterruptContext(event, Context.HRTIMER);
+    private final Consumer<ITmfEvent> fHRTimerExpireExit = event -> popInterruptContext(event, Context.HRTIMER);
+    private final Consumer<ITmfEvent> fIrqHandlerEntry = event -> pushInterruptContext(event, Context.IRQ);
+    private final Consumer<ITmfEvent> fIrqHandlerExit = event -> popInterruptContext(event, Context.IRQ);
+    private final Consumer<ITmfEvent> fIpiEntry = event -> pushInterruptContext(event, Context.IPI);
+    private final Consumer<ITmfEvent> fIpiExit = event -> popInterruptContext(event, Context.IPI);
+
     /**
      * Constructor
      *
@@ -39,24 +60,26 @@ public class EventContextHandler extends BaseHandler {
 
     @Override
     public void handleEvent(ITmfEvent event) {
-        String eventName = event.getName();
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
-        if (eventName.equals(eventLayout.eventSoftIrqEntry())) {
-            handleSoftirqEntry(event);
-        } else if (eventName.equals(eventLayout.eventSoftIrqExit())) {
-            handleSoftirqExit(event);
-        } else if (eventName.equals(eventLayout.eventHRTimerExpireEntry())) {
-            handleHrtimerExpireEntry(event);
-        } else if (eventName.equals(eventLayout.eventHRTimerExpireExit())) {
-            handleHrtimerExpireExit(event);
-        } else if (eventName.equals(eventLayout.eventIrqHandlerEntry())) {
-            handleIrqHandlerEntry(event);
-        } else if (eventName.equals(eventLayout.eventIrqHandlerExit())) {
-            handleIrqHandlerExit(event);
-        } else if (isIpiEntry(event)) {
-            handleIpiEntry(event);
-        } else if (isIpiExit(event)) {
-            handleIpiExit(event);
+        if (!fLayouts.contains(eventLayout)) {
+            populateHandlerMap(eventLayout);
+            fLayouts.add(eventLayout);
+        }
+        fHandlers.getOrDefault(event.getName(), fDefault).accept(event);
+    }
+
+    private void populateHandlerMap(IKernelAnalysisEventLayout eventLayout) {
+        fHandlers.put(eventLayout.eventSoftIrqEntry(), fSoftIrqEntryHandler);
+        fHandlers.put(eventLayout.eventSoftIrqExit(), fSoftIrqExitHandler);
+        fHandlers.put(eventLayout.eventHRTimerExpireEntry(), fHRTimerExpireEntry);
+        fHandlers.put(eventLayout.eventHRTimerExpireExit(), fHRTimerExpireExit);
+        fHandlers.put(eventLayout.eventIrqHandlerEntry(), fIrqHandlerEntry);
+        fHandlers.put(eventLayout.eventIrqHandlerExit(), fIrqHandlerExit);
+        for (String ipiName : eventLayout.getIPIIrqVectorsEntries()) {
+            fHandlers.put(ipiName, fIpiEntry);
+        }
+        for (String ipiName : eventLayout.getIPIIrqVectorsEntries()) {
+            fHandlers.put(ipiName, fIpiExit);
         }
     }
 
@@ -73,43 +96,12 @@ public class EventContextHandler extends BaseHandler {
         Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
         LttngSystemModel system = getProvider().getSystem();
 
-        /* TODO: add a warning bookmark if the interrupt context is not coherent */
+        /*
+         * TODO: add a warning bookmark if the interrupt context is not coherent
+         */
         LttngInterruptContext interruptCtx = system.peekContextStack(event.getTrace().getHostId(), cpu);
         if (interruptCtx.getContext() == ctx) {
             system.popContextStack(event.getTrace().getHostId(), cpu);
         }
     }
-
-    private void handleSoftirqEntry(ITmfEvent event) {
-        pushInterruptContext(event, Context.SOFTIRQ);
-    }
-
-    private void handleSoftirqExit(ITmfEvent event) {
-        popInterruptContext(event, Context.SOFTIRQ);
-    }
-
-    private void handleIrqHandlerEntry(ITmfEvent event) {
-        pushInterruptContext(event, Context.IRQ);
-    }
-
-    private void handleIrqHandlerExit(ITmfEvent event) {
-        popInterruptContext(event, Context.IRQ);
-    }
-
-    private void handleHrtimerExpireEntry(ITmfEvent event) {
-        pushInterruptContext(event, Context.HRTIMER);
-    }
-
-    private void handleHrtimerExpireExit(ITmfEvent event) {
-        popInterruptContext(event, Context.HRTIMER);
-    }
-
-    private void handleIpiEntry(ITmfEvent event) {
-        pushInterruptContext(event, Context.IPI);
-    }
-
-    private void handleIpiExit(ITmfEvent event) {
-        popInterruptContext(event, Context.IPI);
-    }
-
 }
