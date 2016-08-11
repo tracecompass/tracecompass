@@ -120,7 +120,10 @@ public class BaseHandler extends AbstractTraceEventHandler {
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
         String wakeupEventName = NonNullUtils.nullToEmptyString(fWakeupEventMap.get(trace));
 
-        /* First, check if sched_ttwu is the current wake-up event for this trace */
+        /*
+         * First, check if sched_ttwu is the current wake-up event for this
+         * trace
+         */
         if (eventLayout instanceof LttngEventLayout) {
             LttngEventLayout layoutDefault = (LttngEventLayout) eventLayout;
             if (wakeupEventName.equals(layoutDefault.eventSchedProcessTTWU())) {
@@ -138,13 +141,10 @@ public class BaseHandler extends AbstractTraceEventHandler {
         }
 
         /* Legacy support using built-in sched_wakeup and sched_wakeup_new */
-        if (eventLayout instanceof LttngEventLayout) {
-            LttngEventLayout layoutDefault = (LttngEventLayout) eventLayout;
-            if (wakeupEventName.equals(layoutDefault.eventSchedProcessWakeup())) {
-                return (eventName.equals(layoutDefault.eventSchedProcessWakeup()) ||
-                        eventName.equals(layoutDefault.eventSchedProcessWakeupNew()));
-            }
+        if (wakeupEventName.equals(eventLayout.eventSchedProcessWakeup())) {
+            return eventLayout.eventsSchedWakeup().contains(eventName);
         }
+
         return false;
     }
 
