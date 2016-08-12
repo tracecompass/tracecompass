@@ -15,22 +15,38 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.GroupMarker;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphAnalysis;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.CallGraphAnalysisUI;
+import org.eclipse.tracecompass.segmentstore.core.ISegment;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphViewer;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchActionConstants;
 
 /**
  * View to display the flame graph .This uses the flameGraphNode tree generated
@@ -52,6 +68,8 @@ public class FlameGraphView extends TmfView {
     private TimeGraphPresentationProvider fPresentationProvider;
 
     private ITmfTrace fTrace;
+
+    private final @NonNull MenuManager fEventMenuManager = new MenuManager();
 
     /**
      * Constructor
@@ -75,6 +93,8 @@ public class FlameGraphView extends TmfView {
                 traceSelected(new TmfTraceSelectedSignal(this, trace));
             }
         }
+        getSite().setSelectionProvider(fTimeGraphViewer.getSelectionProvider());
+        createTimeEventContextMenu();
     }
 
     /**
@@ -151,4 +171,78 @@ public class FlameGraphView extends TmfView {
         fTimeGraphViewer.setFocus();
     }
 
+    private void createTimeEventContextMenu() {
+        fEventMenuManager.setRemoveAllWhenShown(true);
+        TimeGraphControl timeGraphControl = fTimeGraphViewer.getTimeGraphControl();
+        final Menu timeEventMenu = fEventMenuManager.createContextMenu(timeGraphControl);
+
+        timeGraphControl.addTimeGraphEntryMenuListener(new MenuDetectListener() {
+            @Override
+            public void menuDetected(MenuDetectEvent event) {
+                /*
+                 * The TimeGraphControl will call the TimeGraphEntryMenuListener
+                 * before the TimeEventMenuListener. We need to clear the menu
+                 * for the case the selection was done on the namespace where
+                 * the time event listener below won't be called afterwards.
+                 */
+                timeGraphControl.setMenu(null);
+                event.doit = false;
+            }
+        });
+        timeGraphControl.addTimeEventMenuListener(new MenuDetectListener() {
+            @Override
+            public void menuDetected(MenuDetectEvent event) {
+                Menu menu = timeEventMenu;
+                if (event.data instanceof FlamegraphEvent) {
+                    timeGraphControl.setMenu(menu);
+                    return;
+                }
+                timeGraphControl.setMenu(null);
+                event.doit = false;
+            }
+        });
+
+        fEventMenuManager.addMenuListener(new IMenuListener() {
+            @Override
+            public void menuAboutToShow(IMenuManager manager) {
+                fillTimeEventContextMenu(fEventMenuManager);
+                fEventMenuManager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+            }
+        });
+        getSite().registerContextMenu(fEventMenuManager, fTimeGraphViewer.getSelectionProvider());
+    }
+
+    /**
+     * Fill context menu
+     *
+     * @param menuManager
+     *          a menuManager to fill
+     */
+    protected void fillTimeEventContextMenu(@NonNull IMenuManager menuManager) {
+        ISelection selection = getSite().getSelectionProvider().getSelection();
+        if (selection instanceof IStructuredSelection) {
+            for (Object object : ((IStructuredSelection) selection).toList()) {
+                if (object instanceof FlamegraphEvent) {
+                    final FlamegraphEvent flamegraphEvent = (FlamegraphEvent) object;
+                    menuManager.add(new Action(Messages.FlameGraphView_GotoMaxDuration) {
+                        @Override
+                        public void run() {
+                            ISegment maxSeg = flamegraphEvent.getStatistics().getMaxSegment();
+                            TmfSelectionRangeUpdatedSignal sig = new TmfSelectionRangeUpdatedSignal(this, TmfTimestamp.fromNanos(maxSeg.getStart()), TmfTimestamp.fromNanos(maxSeg.getEnd()));
+                            broadcast(sig);
+                        }
+                    });
+
+                    menuManager.add(new Action(Messages.FlameGraphView_GotoMinDuration) {
+                        @Override
+                        public void run() {
+                            ISegment minSeg = flamegraphEvent.getStatistics().getMinSegment();
+                            TmfSelectionRangeUpdatedSignal sig = new TmfSelectionRangeUpdatedSignal(this, TmfTimestamp.fromNanos(minSeg.getStart()), TmfTimestamp.fromNanos(minSeg.getEnd()));
+                            broadcast(sig);
+                        }
+                    });
+                }
+            }
+        }
+    }
 }
