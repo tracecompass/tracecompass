@@ -70,6 +70,14 @@ public class Messages extends NLS {
      */
     public static String FlameGraph_SelfTimeDeviation;
     /**
+     * The function's durations
+     */
+    public static String FlameGraph_Durations;
+    /**
+     * The function's self times
+     */
+    public static String FlameGraph_SelfTimes;
+    /**
      * Execution of the callGraph Analysis
      */
     public static String CallGraphAnalysis_Execution;
