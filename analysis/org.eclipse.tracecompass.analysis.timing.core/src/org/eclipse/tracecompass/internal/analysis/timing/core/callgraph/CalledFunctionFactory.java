@@ -97,9 +97,9 @@ public class CalledFunctionFactory {
      *            the symbol
      * @param parent
      *            the parent node
-     * @return an ICalledFunction with the specified propertiess
+     * @return an ICalledFunction with the specified properties
      */
-    private static CalledStringFunction create(long start, long end, int depth, String value, @Nullable ICalledFunction parent) {
+    public static CalledStringFunction create(long start, long end, int depth, String value, @Nullable ICalledFunction parent) {
         if (start > end) {
             throw new IllegalArgumentException(Messages.TimeError + '[' + start + ',' + end + ']');
         }

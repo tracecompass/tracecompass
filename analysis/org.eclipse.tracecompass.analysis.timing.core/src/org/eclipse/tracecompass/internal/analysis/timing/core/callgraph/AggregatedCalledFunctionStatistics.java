@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;
 
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
+import org.eclipse.tracecompass.segmentstore.core.ISegment;
 
 /**
  * Class to calculate statistics for an aggregated function.
@@ -35,6 +36,14 @@ public class AggregatedCalledFunctionStatistics extends SegmentStoreStatistics {
      * The variance of the self time
      */
     private double fVariance;
+    /**
+     * The segment with the longest duration
+     */
+    private ISegment fMaxSegment;
+    /**
+     * The segment with the shortest duration
+     */
+    private ISegment fMinSegment;
 
     /**
      * Constructor
@@ -44,25 +53,37 @@ public class AggregatedCalledFunctionStatistics extends SegmentStoreStatistics {
      * @param selfTime
      *            The function's self time
      */
-    public AggregatedCalledFunctionStatistics(long duration, long selfTime) {
-        fMaxSelfTime = selfTime;
-        fMinSelfTime = selfTime;
-        fSelfTimeAverage = selfTime;
+    public AggregatedCalledFunctionStatistics(ISegment duration, ISegment selfTime) {
+        fMaxSelfTime = selfTime.getLength();
+        fMinSelfTime = selfTime.getLength();
+        fSelfTimeAverage = selfTime.getLength();
         fVariance = 0.0;
-        update(new BasicSegment(0, duration));
+        fMinSegment = duration;
+        fMaxSegment = duration;
+        update(duration);
     }
 
     /**
      * Update the statistics, this is used while merging nodes for the
      * aggregation tree.
      *
+     * @param maxSegment
+     *            The longest segment of the function to be merged
+     * @param minSegment
+     *            The shortest segment of the function to be merged
      * @param duration
      *            The function to be merged duration
      * @param selfTime
      *            The function to be merged self time
      */
-    public void update(long duration, long selfTime) {
+    public void update(ISegment maxSegment, ISegment minSegment, long duration, long selfTime) {
         update(new BasicSegment(0, duration));
+        if (maxSegment.getLength() > fMaxSegment.getLength()) {
+            fMaxSegment = maxSegment;
+        }
+        if (minSegment.getLength() < fMinSegment.getLength()) {
+            fMinSegment = minSegment;
+        }
         if (fMaxSelfTime < selfTime) {
             fMaxSelfTime = selfTime;
         }
@@ -121,5 +142,15 @@ public class AggregatedCalledFunctionStatistics extends SegmentStoreStatistics {
         fMaxSelfTime = selfTime;
         fMinSelfTime = selfTime;
         fSelfTimeAverage = selfTime;
+    }
+
+    @Override
+    public ISegment getMaxSegment() {
+        return fMaxSegment;
+    }
+
+    @Override
+    public ISegment getMinSegment() {
+        return fMinSegment;
     }
 }

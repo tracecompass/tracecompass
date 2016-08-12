@@ -47,27 +47,40 @@ public class AggregatedCalledFunction {
     private long fSelfTime;
 
     /**
-     * Constructor
+     * Constructor, parent is not null
      *
-     * @param symbol
-     *            The function's name or address
-     * @param duration
-     *            The function's duration
-     * @param depth
-     *            The function's depth
-     * @param maxDepth
-     *            The aggregation tree's maximum depth
+     * @param calledFunction
+     *            called function
      * @param parent
-     *            The function's caller
+     *            the parent entry
+     *
      */
-    public AggregatedCalledFunction(Object symbol, long duration, int depth, int maxDepth, @Nullable AggregatedCalledFunction parent) {
-        fSymbol = symbol;
-        fDuration = duration;
-        fSelfTime = duration;
-        fDepth = depth;
-        fMaxDepth = maxDepth;
+    public AggregatedCalledFunction(AbstractCalledFunction calledFunction, AggregatedCalledFunction parent) {
+        fSymbol = calledFunction.getSymbol();
+        fDuration = calledFunction.getLength();
+        fSelfTime = calledFunction.getLength();
+        fDepth = calledFunction.getDepth();
+        fMaxDepth = parent.getMaxDepth();
         fParent = parent;
-        fStatistics = new AggregatedCalledFunctionStatistics(duration, duration);
+        fStatistics = new AggregatedCalledFunctionStatistics(calledFunction, calledFunction);
+    }
+
+    /**
+     * Root constructor, parent is null
+     *
+     * @param calledFunction
+     *            the called function
+     * @param maxDepth
+     *            the maximum depth
+     */
+    public AggregatedCalledFunction(AbstractCalledFunction calledFunction, int maxDepth) {
+        fSymbol = calledFunction.getSymbol();
+        fDuration = calledFunction.getLength();
+        fSelfTime = calledFunction.getLength();
+        fDepth = calledFunction.getDepth();
+        fMaxDepth = maxDepth;
+        fParent = null;
+        fStatistics = new AggregatedCalledFunctionStatistics(calledFunction, calledFunction);
     }
 
     /**
@@ -163,7 +176,7 @@ public class AggregatedCalledFunction {
         long sourceSelfTime = source.getSelfTime();
         destination.addToDuration(sourceDuration);
         destination.addToSelfTime(sourceSelfTime);
-        destination.fStatistics.update(sourceDuration, sourceSelfTime);
+        destination.fStatistics.update(source.fStatistics.getMaxSegment(), source.fStatistics.getMinSegment(), sourceDuration, sourceSelfTime);
         // merge the children callees.
         mergeChildren(destination, source);
     }

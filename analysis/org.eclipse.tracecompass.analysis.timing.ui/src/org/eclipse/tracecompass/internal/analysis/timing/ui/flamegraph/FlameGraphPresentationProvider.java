@@ -18,8 +18,6 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.AggregatedCalledFunctionStatistics;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
@@ -130,31 +128,14 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
      */
     private static String getFuntionSymbol(FlamegraphEvent event, ISymbolProvider symbolProvider) {
         String funcSymbol = ""; //$NON-NLS-1$
-        if (event.getSymbol() instanceof TmfStateValue) {
-            ITmfStateValue symbol = (ITmfStateValue) event.getSymbol();
-            switch (symbol.getType()) {
-            case LONG:
-                Long longAddress = symbol.unboxLong();
-                funcSymbol = symbolProvider.getSymbolText(longAddress);
-                if (funcSymbol == null) {
-                    return "0x" + Long.toHexString(longAddress); //$NON-NLS-1$
-                }
-                return funcSymbol;
-            case STRING:
-                return symbol.unboxStr();
-            case INTEGER:
-                Integer intAddress = symbol.unboxInt();
-                funcSymbol = symbolProvider.getSymbolText(intAddress);
-                if (funcSymbol == null) {
-                    return "0x" + Integer.toHexString(intAddress); //$NON-NLS-1$
-                }
-                return funcSymbol;
-            case CUSTOM:
-            case DOUBLE:
-            case NULL:
-            default:
-                break;
+        if (event.getSymbol() instanceof Long || event.getSymbol() instanceof Integer) {
+            long longAddress = ((Long) event.getSymbol()).longValue();
+            funcSymbol = symbolProvider.getSymbolText(longAddress);
+            if (funcSymbol == null) {
+                return "0x" + Long.toHexString(longAddress); //$NON-NLS-1$
             }
+        } else {
+            return event.getSymbol().toString();
         }
         return funcSymbol;
     }
