@@ -19,6 +19,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 public class FlamegraphDepthEntry extends TimeGraphEntry {
 
     private final int fDepth;
+    private final long fId;
 
     /**
      * Constructor
@@ -31,10 +32,13 @@ public class FlamegraphDepthEntry extends TimeGraphEntry {
      *            The end time of an entry
      * @param depth
      *            The Depth of an entry
+     * @param id
+     *            The id of an entry
      */
-    public FlamegraphDepthEntry(String name, long startTime, long endTime, int depth) {
+    public FlamegraphDepthEntry(String name, long startTime, long endTime, int depth, long id) {
         super(name, startTime, endTime);
         fDepth = depth;
+        fId = id;
     }
 
     /**
@@ -44,5 +48,14 @@ public class FlamegraphDepthEntry extends TimeGraphEntry {
      */
     public int getDepth() {
         return fDepth;
+    }
+
+    /**
+     * The id of an entry
+     *
+     * @return The id
+     */
+    public long getId() {
+        return fId;
     }
 }

@@ -18,6 +18,7 @@ import java.util.List;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.AggregatedCalledFunction;
+import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.ThreadNode;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphContentProvider;
@@ -52,7 +53,7 @@ public class FlameGraphContentProvider implements ITimeGraphContentProvider {
     private void setData(AggregatedCalledFunction firstNode, List<FlamegraphDepthEntry> childrenEntries, Deque<Long> timestampStack) {
         for (int i = 0; i < firstNode.getMaxDepth(); i++) {
             if (i >= childrenEntries.size()) {
-                FlamegraphDepthEntry entry = new FlamegraphDepthEntry(String.valueOf(i), 0, fActiveTrace.getEndTime().toNanos() - fActiveTrace.getStartTime().toNanos(), i);
+                FlamegraphDepthEntry entry = new FlamegraphDepthEntry(String.valueOf(i), 0, fActiveTrace.getEndTime().toNanos() - fActiveTrace.getStartTime().toNanos(), i, i);
                 childrenEntries.add(entry);
             }
         }
@@ -111,8 +112,8 @@ public class FlameGraphContentProvider implements ITimeGraphContentProvider {
         if (inputElement instanceof List<?>) {
             List<?> threadNodes = (List<?>) inputElement;
             for (Object object : threadNodes) {
-                if (object instanceof AggregatedCalledFunction) {
-                    buildChildrenEntries((AggregatedCalledFunction) object);
+                if (object instanceof ThreadNode) {
+                    buildChildrenEntries((ThreadNode) object);
                 }
             }
         }
@@ -127,8 +128,8 @@ public class FlameGraphContentProvider implements ITimeGraphContentProvider {
      * @param threadNode
      *            The node of the aggregation tree
      */
-    private void buildChildrenEntries(AggregatedCalledFunction threadNode) {
-        FlamegraphDepthEntry threadEntry = new FlamegraphDepthEntry("", 0, fActiveTrace.getEndTime().toNanos() - fActiveTrace.getStartTime().toNanos(), fFlameGraphEntries.size()); //$NON-NLS-1$
+    private void buildChildrenEntries(ThreadNode threadNode) {
+        FlamegraphDepthEntry threadEntry = new FlamegraphDepthEntry("", 0, fActiveTrace.getEndTime().toNanos() - fActiveTrace.getStartTime().toNanos(), fFlameGraphEntries.size(), threadNode.getId()); //$NON-NLS-1$
         List<FlamegraphDepthEntry> childrenEntries = new ArrayList<>();
         fThreadDuration = 0L;
         // Sort children by duration

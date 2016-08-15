@@ -32,6 +32,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.callstack.CallStackAnalysis;
@@ -89,7 +90,7 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
      * The List of thread nodes. Each thread has a virtual node having the root
      * function as children
      */
-    private List<AggregatedCalledFunction> fThreadNodes = new ArrayList<>();
+    private List<ThreadNode> fThreadNodes = new ArrayList<>();
 
     /**
      * Default constructor
@@ -205,12 +206,28 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
      */
     private boolean iterateOverQuark(ITmfStateSystem stateSystem, int quark, String[] subAttributePath, IProgressMonitor monitor) {
         String threadName = stateSystem.getAttributeName(quark);
-        AggregatedCalledFunction init = null;
+        long threadId = -1;
+        ITmfStateInterval interval = null;
+        try {
+            interval = stateSystem.querySingleState(stateSystem.getStartTime(), quark);
+            ITmfStateValue threadStateValue = interval.getStateValue();
+            if (threadStateValue.getType() == Type.LONG || threadStateValue.getType() == Type.INTEGER) {
+                threadId = threadStateValue.unboxLong();
+            } else {
+                try {
+                    threadId = Long.parseLong(threadName);
+                } catch (NumberFormatException e) {
+                    /* use default threadId */
+                }
+            }
+        } catch (StateSystemDisposedException error) {
+            Activator.getInstance().logError(Messages.QueringStateSystemError, error);
+        }
         try {
             long curTime = stateSystem.getStartTime();
             long limit = stateSystem.getCurrentEndTime();
             AbstractCalledFunction initSegment = CalledFunctionFactory.create(0, 0, 0, threadName, null);
-            init = new AggregatedCalledFunction(initSegment, 0);
+            ThreadNode init = new ThreadNode(initSegment, 0, threadId);
             while (curTime < limit) {
                 if (monitor.isCanceled()) {
                     return false;
@@ -222,7 +239,7 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
                 }
                 final int depth = 0;
                 int quarkParent = fCurrentQuarks.get(depth);
-                ITmfStateInterval interval = stateSystem.querySingleState(curTime, quarkParent);
+                interval = stateSystem.querySingleState(curTime, quarkParent);
                 ITmfStateValue stateValue = interval.getStateValue();
 
                 if (!stateValue.isNull()) {
@@ -240,12 +257,11 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
 
                 curTime = interval.getEndTime() + 1;
             }
-
+            fThreadNodes.add(init);
         } catch (AttributeNotFoundException | StateSystemDisposedException | TimeRangeException e) {
             Activator.getInstance().logError(Messages.QueringStateSystemError, e);
             return false;
         }
-        fThreadNodes.add(init);
         return true;
     }
 
@@ -363,7 +379,7 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
      *
      * @return The thread nodes
      */
-    public List<AggregatedCalledFunction> getThreadNodes() {
+    public List<ThreadNode> getThreadNodes() {
         return ImmutableList.copyOf(fThreadNodes);
     }
 
