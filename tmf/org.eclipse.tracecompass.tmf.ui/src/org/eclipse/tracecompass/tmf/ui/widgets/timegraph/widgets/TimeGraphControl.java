@@ -2801,6 +2801,14 @@ public class TimeGraphControl extends TimeGraphBaseControl
     @Override
     public void mouseUp(MouseEvent e) {
         if (fPendingMenuDetectEvent != null && e.button == 3) {
+            if ((fDragState == DRAG_ZOOM) && (fDragX0 == fDragX)) {
+                // Select entry and time event for single click
+                long time = getTimeAtX(e.x);
+                fTimeProvider.setSelectionRangeNotify(time, time, false);
+                int idx = getItemIndexAtY(e.y);
+                selectItem(idx, false);
+                fireSelectionChanged();
+            }
             menuDetected(fPendingMenuDetectEvent);
         }
         if (DRAG_NONE != fDragState) {
