@@ -9,14 +9,17 @@
 
 package org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
+
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.AggregatedCalledFunction;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.ThreadNode;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -24,8 +27,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphContentProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
-
-import com.google.common.collect.Lists;
 
 /**
  * Content provider for the flame graph view
@@ -38,6 +39,9 @@ public class FlameGraphContentProvider implements ITimeGraphContentProvider {
     private List<FlamegraphDepthEntry> fFlameGraphEntries = new ArrayList<>();
     private long fThreadDuration;
     private ITmfTrace fActiveTrace;
+    private SortOption fSortOption = SortOption.BY_NAME;
+    private @NonNull Comparator<FlamegraphDepthEntry> fThreadComparator = new ThreadNameComparator();
+
 
     /**
      * Parse the aggregated tree created by the callGraphAnalysis and creates
@@ -57,7 +61,7 @@ public class FlameGraphContentProvider implements ITimeGraphContentProvider {
                 childrenEntries.add(entry);
             }
         }
-        FlamegraphDepthEntry firstEntry = NonNullUtils.checkNotNull(childrenEntries.get(0));
+        FlamegraphDepthEntry firstEntry = checkNotNull(childrenEntries.get(0));
         firstEntry.addEvent(new FlamegraphEvent(firstEntry, timestampStack.peek(), firstNode));
         // Build the event list for next entries (next depth)
         addEvent(firstNode, childrenEntries, timestampStack);
@@ -88,7 +92,7 @@ public class FlameGraphContentProvider implements ITimeGraphContentProvider {
                 timestampStack.pop();
             });
         }
-        FlamegraphDepthEntry entry = NonNullUtils.checkNotNull(childrenEntries.get(node.getDepth()));
+        FlamegraphDepthEntry entry = checkNotNull(childrenEntries.get(node.getDepth()));
         // Create the event corresponding to the function using the caller's
         // timestamp
         entry.addEvent(new FlamegraphEvent(entry, timestampStack.peek(), node));
@@ -117,8 +121,8 @@ public class FlameGraphContentProvider implements ITimeGraphContentProvider {
                 }
             }
         }
-        // Reverse the order of threads
-        fFlameGraphEntries = Lists.reverse(fFlameGraphEntries);
+        // Sort the threads
+        fFlameGraphEntries.sort(fThreadComparator);
         return fFlameGraphEntries.toArray(new ITimeGraphEntry[fFlameGraphEntries.size()]);
     }
 
@@ -172,4 +176,40 @@ public class FlameGraphContentProvider implements ITimeGraphContentProvider {
         // Do nothing
     }
 
+
+    /**
+     * Get the sort option
+     *
+     * @return the sort option.
+     */
+    public SortOption getSortOption() {
+        return fSortOption;
+    }
+
+    /**
+     * Set the sort option for sorting the thread entries
+     *
+     * @param sortOption
+     *              the sort option to set
+     *
+     */
+    public void setSortOption(SortOption sortOption) {
+        fSortOption = sortOption;
+        switch (sortOption) {
+        case BY_NAME:
+            fThreadComparator = new ThreadNameComparator();
+            break;
+        case BY_NAME_REV:
+            fThreadComparator = checkNotNull(new ThreadNameComparator().reversed());
+            break;
+        case BY_ID:
+            fThreadComparator = new ThreadIdComparator();
+            break;
+        case BY_ID_REV:
+            fThreadComparator = checkNotNull(new ThreadIdComparator().reversed());
+            break;
+        default:
+            break;
+        }
+    }
 }

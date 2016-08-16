@@ -86,6 +86,14 @@ public class Messages extends NLS {
      */
     public static String FlameGraphView_GotoMinDuration;
     /**
+     * The action name for sorting by thread name
+     */
+    public static String FlameGraph_SortByThreadName;
+    /**
+     * The action name for sorting by thread name
+     */
+    public static String FlameGraph_SortByThreadId;
+    /**
      * Execution of the callGraph Analysis
      */
     public static String CallGraphAnalysis_Execution;
