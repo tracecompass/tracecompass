@@ -43,6 +43,8 @@ class ControlViewSwtBotUtil {
     public static final String SCHED_PROCESSEXEC_EVENT_NAME = "sched_process_exec";
     public static final String LOGGER_NAME = "logger";
     public static final String ANOTHER_LOGGER_NAME = "anotherLogger";
+    public static final String SPECIFIC_LOGGER_NAME1 = "specificLogger1";
+    public static final String SPECIFIC_LOGGER_NAME2 = "specificLogger2";
     public static final String PROFILE_SUFFIX = ".lttng";
     public static final String KERNEL_TRACE_NAME = "kernel";
 

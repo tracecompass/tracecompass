@@ -88,7 +88,6 @@ public class ControlViewLoggerTest extends ControlViewTest {
         // Verify that the Properties view shows to right logger log level
         testLoggerProperties(TraceDomainType.PYTHON);
 
-
         // Clean session
         testDestroySession();
         testDisconnectFromNode();
@@ -242,6 +241,46 @@ public class ControlViewLoggerTest extends ControlViewTest {
                 domainName,
                 ControlViewSwtBotUtil.ANOTHER_LOGGER_NAME);
         assertEquals(ControlViewSwtBotUtil.ANOTHER_LOGGER_NAME, loggerItem.getText());
+
+        // Case 4: Enabling a logger by specifying the name
+        sessionItem.select();
+        menuBot = sessionItem.contextMenu(ControlViewSwtBotUtil.ENABLE_EVENT_DEFAULT_CHANNEL_MENU_ITEM);
+        menuBot.click();
+        shell = fBot.shell(ControlViewSwtBotUtil.ENABLE_EVENT_DIALOG_TITLE).activate();
+        shell.bot().radioInGroup(domainName, ControlViewSwtBotUtil.DOMAIN_GROUP_NAME).click();
+        loggersTree = shell.bot().treeInGroup(ControlViewSwtBotUtil.LOGGERS_GROUP_NAME);
+        // Write a logger name in the Specific logger text field
+        shell.bot().textInGroup("Specific logger").setText(ControlViewSwtBotUtil.SPECIFIC_LOGGER_NAME1 + "," + ControlViewSwtBotUtil.SPECIFIC_LOGGER_NAME2);
+        // Click the Ok at the bottom of the dialog window
+        shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
+        SWTBotUtils.waitForJobs();
+        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(domainName, sessionItem));
+
+        // Assert that the domain is correct
+        domainItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
+                ControlViewSwtBotUtil.SESSION_GROUP_NAME,
+                getSessionName(),
+                domainName);
+        assertEquals(domainName, domainItem.getText());
+
+        // Assert that the logger type in the domain node are correct (all events = *)
+        loggerItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
+                ControlViewSwtBotUtil.SESSION_GROUP_NAME,
+                getSessionName(),
+                domainName,
+                ControlViewSwtBotUtil.SPECIFIC_LOGGER_NAME1);
+        assertEquals(ControlViewSwtBotUtil.SPECIFIC_LOGGER_NAME1, loggerItem.getText());
+
+        // Assert that the logger type in the domain node are correct (all events = *)
+        loggerItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
+                ControlViewSwtBotUtil.SESSION_GROUP_NAME,
+                getSessionName(),
+                domainName,
+                ControlViewSwtBotUtil.SPECIFIC_LOGGER_NAME2);
+        assertEquals(ControlViewSwtBotUtil.SPECIFIC_LOGGER_NAME2, loggerItem.getText());
     }
 
     /**
