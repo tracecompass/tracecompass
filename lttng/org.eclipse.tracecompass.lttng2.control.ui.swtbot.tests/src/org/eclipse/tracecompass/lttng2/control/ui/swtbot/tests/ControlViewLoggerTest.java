@@ -292,23 +292,19 @@ public class ControlViewLoggerTest extends ControlViewTest {
      */
     protected void testLoggerProperties(TraceDomainType domain) {
         String domainName = new String();
-        String logLevel1 = new String();
-        String logLevel2 = new String();
+        String logLevel = new String();
         switch (domain) {
         case JUL:
             domainName = ControlViewSwtBotUtil.JUL_DOMAIN_NAME;
-            logLevel1 = "All";
-            logLevel2 = "<= Warning";
+            logLevel = "<= Warning";
             break;
         case LOG4J:
             domainName = ControlViewSwtBotUtil.LOG4J_DOMAIN_NAME;
-            logLevel1 = "All";
-            logLevel2 = "<= Fatal";
+            logLevel = "<= Fatal";
             break;
         case PYTHON:
             domainName = ControlViewSwtBotUtil.PYTHON_DOMAIN_NAME;
-            logLevel1 = "Debug";
-            logLevel2 = "<= Critical";
+            logLevel = "<= Critical";
             break;
             //$CASES-OMITTED$
         default:
@@ -340,7 +336,7 @@ public class ControlViewLoggerTest extends ControlViewTest {
 
         // Assert that the expression in the Properties view is the same as
         // the one we entered
-        assertEquals(logLevel1, loglevelExpression);
+        assertEquals("All", loglevelExpression);
 
         // Case 2: Select the "anotherLogger" logger in the Control view
         fBot.viewById(ControlView.ID).show();
@@ -364,7 +360,7 @@ public class ControlViewLoggerTest extends ControlViewTest {
 
         // Assert that the expression in the Properties view is the same as
         // the one we entered
-        assertEquals(logLevel2, loglevelExpression);
+        assertEquals(logLevel, loglevelExpression);
 
         // Close the Properties view
         SWTBotUtils.closeView(PROPERTIES_VIEW, fBot);

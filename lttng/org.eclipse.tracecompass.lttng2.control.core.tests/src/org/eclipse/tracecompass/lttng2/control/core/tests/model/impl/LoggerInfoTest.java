@@ -84,7 +84,7 @@ public class LoggerInfoTest {
 
         // Log level type
         LogLevelType logType = fixture.getLogLevelType();
-        assertEquals("", logType.getShortName());
+        assertEquals("All", logType.getShortName());
         assertEquals("LOGLEVEL_ALL", logType.name());
         assertEquals("LOGLEVEL_ALL", logType.toString());
         assertEquals(0, state.ordinal());
@@ -193,9 +193,9 @@ public class LoggerInfoTest {
         assertEquals("LOGLEVEL", fixture.getLogLevelType().name());
         assertEquals("<=", fixture.getLogLevelType().getShortName());
 
-        fixture.setLogLevelType("");
+        fixture.setLogLevelType("All");
         assertEquals("LOGLEVEL_ALL", fixture.getLogLevelType().name());
-        assertEquals("", fixture.getLogLevelType().getShortName());
+        assertEquals("All", fixture.getLogLevelType().getShortName());
 
         fixture.setLogLevelType(LogLevelType.LOGLEVEL_ONLY);
         assertEquals("LOGLEVEL_ONLY", fixture.getLogLevelType().name());
@@ -207,7 +207,7 @@ public class LoggerInfoTest {
 
         fixture.setLogLevelType(LogLevelType.LOGLEVEL_ALL);
         assertEquals("LOGLEVEL_ALL", fixture.getLogLevelType().name());
-        assertEquals("", fixture.getLogLevelType().getShortName());
+        assertEquals("All", fixture.getLogLevelType().getShortName());
 
         fixture.setLogLevelType(LogLevelType.LOGLEVEL_NONE);
         assertEquals("LOGLEVEL_NONE", fixture.getLogLevelType().name());

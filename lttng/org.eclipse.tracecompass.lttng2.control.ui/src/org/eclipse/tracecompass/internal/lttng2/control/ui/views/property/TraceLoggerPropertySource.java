@@ -102,11 +102,12 @@ public class TraceLoggerPropertySource extends BasePropertySource {
             return fLogger.getName();
         } else if (TRACE_LOGGER_LOGLEVEL_PROPERTY_ID.equals(id)) {
             StringBuffer buffer = new StringBuffer();
-            if (!fLogger.getLogLevelType().equals(LogLevelType.LOGLEVEL_NONE) &&
-                !fLogger.getLogLevelType().equals(LogLevelType.LOGLEVEL_ALL)) {
+            if (fLogger.getLogLevelType().equals(LogLevelType.LOGLEVEL_ALL)) {
+                buffer.append(fLogger.getLogLevelType().getShortName());
+            } else {
                 buffer.append(fLogger.getLogLevelType().getShortName()).append(" "); //$NON-NLS-1$
+                buffer.append(fLogger.getLogLevel().getInName());
             }
-            buffer.append(fLogger.getLogLevel().getInName());
             return buffer.toString();
         } else if (TRACE_LOGGER_STATE_PROPERTY_ID.equals(id)) {
             return fLogger.getState().name();

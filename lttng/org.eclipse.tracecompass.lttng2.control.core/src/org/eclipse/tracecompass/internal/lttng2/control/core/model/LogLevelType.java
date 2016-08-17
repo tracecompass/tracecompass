@@ -26,7 +26,7 @@ public enum LogLevelType {
     LOGLEVEL("<=", "RANGE"), //$NON-NLS-1$ //$NON-NLS-2$
 
     /** all log level */
-    LOGLEVEL_ALL("", "ALL"), //$NON-NLS-1$//$NON-NLS-2$
+    LOGLEVEL_ALL("All", "ALL"), //$NON-NLS-1$//$NON-NLS-2$
 
     /** single log level */
     LOGLEVEL_ONLY("==", "SINGLE"), //$NON-NLS-1$ //$NON-NLS-2$

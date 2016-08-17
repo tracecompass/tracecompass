@@ -220,9 +220,9 @@ public class EventInfoTest {
         assertEquals("LOGLEVEL", fixture.getLogLevelType().name());
         assertEquals("<=", fixture.getLogLevelType().getShortName());
 
-        fixture.setLogLevelType("");
+        fixture.setLogLevelType("All");
         assertEquals("LOGLEVEL_ALL", fixture.getLogLevelType().name());
-        assertEquals("", fixture.getLogLevelType().getShortName());
+        assertEquals("All", fixture.getLogLevelType().getShortName());
 
         fixture.setLogLevelType(LogLevelType.LOGLEVEL_ONLY);
         assertEquals("LOGLEVEL_ONLY", fixture.getLogLevelType().name());
@@ -234,7 +234,7 @@ public class EventInfoTest {
 
         fixture.setLogLevelType(LogLevelType.LOGLEVEL_ALL);
         assertEquals("LOGLEVEL_ALL", fixture.getLogLevelType().name());
-        assertEquals("", fixture.getLogLevelType().getShortName());
+        assertEquals("All", fixture.getLogLevelType().getShortName());
 
         fixture.setLogLevelType(LogLevelType.LOGLEVEL_NONE);
         assertEquals("LOGLEVEL_NONE", fixture.getLogLevelType().name());
