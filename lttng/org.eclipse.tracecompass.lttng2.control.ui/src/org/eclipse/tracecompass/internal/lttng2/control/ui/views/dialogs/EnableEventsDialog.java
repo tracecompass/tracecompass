@@ -415,19 +415,85 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         // ------------------------------------------------------------------------
         Group domainGroup = new Group(fDialogComposite, SWT.SHADOW_NONE);
         domainGroup.setText(Messages.TraceControl_DomainDisplayName);
-        layout = new GridLayout(5, true);
-        domainGroup.setLayout(layout);
 
         fKernelButton = new Button(domainGroup, SWT.RADIO);
         fKernelButton.setText(Messages.TraceControl_KernelDomainDisplayName);
         fUstButton = new Button(domainGroup, SWT.RADIO);
         fUstButton.setText(Messages.TraceControl_UstDisplayName);
-        fJulButton = new Button(domainGroup, SWT.RADIO);
-        fJulButton.setText(Messages.TraceControl_JULDomainDisplayName);
-        fLog4jButton = new Button(domainGroup, SWT.RADIO);
-        fLog4jButton.setText(Messages.TraceControl_LOG4JDomainDisplayName);
-        fPythonButton = new Button(domainGroup, SWT.RADIO);
-        fPythonButton.setText(Messages.TraceControl_PythonDomainDisplayName);
+        int nbColumns = 2;
+
+        fKernelButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (fKernelButton.getSelection()) {
+                    disposeAllComposite();
+                    createKernelComposite();
+                    fDialogComposite.layout();
+                }
+            }
+        });
+
+        fUstButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (fUstButton.getSelection()) {
+                    disposeAllComposite();
+                    createUstComposite();
+                    fDialogComposite.layout();
+                }
+            }
+        });
+
+        if (fProviderGroup.isJulLoggingSupported()) {
+            fJulButton = new Button(domainGroup, SWT.RADIO);
+            fJulButton.setText(Messages.TraceControl_JULDomainDisplayName);
+            nbColumns++;
+            fJulButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    if (fJulButton.getSelection()) {
+                        disposeAllComposite();
+                        createJulComposite();
+                        fDialogComposite.layout();
+                    }
+                }
+            });
+        }
+
+        if (fProviderGroup.isLog4jLoggingSupported()) {
+            fLog4jButton = new Button(domainGroup, SWT.RADIO);
+            fLog4jButton.setText(Messages.TraceControl_LOG4JDomainDisplayName);
+            nbColumns++;
+            fLog4jButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    if (fLog4jButton.getSelection()) {
+                        disposeAllComposite();
+                        createLog4jComposite();
+                        fDialogComposite.layout();
+                    }
+                }
+            });
+        }
+
+        if (fProviderGroup.isPythonLoggingSupported()) {
+            fPythonButton = new Button(domainGroup, SWT.RADIO);
+            fPythonButton.setText(Messages.TraceControl_PythonDomainDisplayName);
+            nbColumns++;
+            fPythonButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    if (fPythonButton.getSelection()) {
+                        disposeAllComposite();
+                        createPythonComposite();
+                        fDialogComposite.layout();
+                    }
+                }
+            });
+        }
+
+        layout = new GridLayout(nbColumns, true);
+        domainGroup.setLayout(layout);
 
         switch (fDomain) {
         case KERNEL:
@@ -448,20 +514,6 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
         case UNKNOWN:
         default:
             break;
-        }
-
-        if (fDomainComponent != null) {
-            fKernelButton.setEnabled(false);
-            fUstButton.setEnabled(false);
-            fJulButton.setEnabled(false);
-            fLog4jButton.setEnabled(false);
-            fPythonButton.setEnabled(false);
-        } else if ((fProviderGroup != null) && (!fProviderGroup.hasKernelProvider())) {
-            fKernelButton.setEnabled(false);
-            fUstButton.setEnabled(true);
-            fJulButton.setEnabled(true);
-            fLog4jButton.setEnabled(true);
-            fPythonButton.setEnabled(true);
         }
 
         // layout widgets
@@ -503,60 +555,31 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             break;
         }
 
-        fKernelButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (fKernelButton.getSelection()) {
-                    disposeAllComposite();
-                    createKernelComposite();
-                    fDialogComposite.layout();
-                }
+        if (fDomainComponent != null) {
+            fKernelButton.setEnabled(false);
+            fUstButton.setEnabled(false);
+            if (fProviderGroup.isJulLoggingSupported()) {
+                fJulButton.setEnabled(false);
             }
-        });
-
-        fUstButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (fUstButton.getSelection()) {
-                    disposeAllComposite();
-                    createUstComposite();
-                    fDialogComposite.layout();
-                }
+            if (fProviderGroup.isLog4jLoggingSupported()) {
+                fLog4jButton.setEnabled(false);
             }
-        });
-
-        fJulButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (fJulButton.getSelection()) {
-                    disposeAllComposite();
-                    createJulComposite();
-                    fDialogComposite.layout();
-                }
+            if (fProviderGroup.isPythonLoggingSupported()) {
+                fPythonButton.setEnabled(false);
             }
-        });
-
-        fLog4jButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (fLog4jButton.getSelection()) {
-                    disposeAllComposite();
-                    createLog4jComposite();
-                    fDialogComposite.layout();
-                }
+        } else if ((fProviderGroup != null) && (!fProviderGroup.hasKernelProvider())) {
+            fKernelButton.setEnabled(false);
+            fUstButton.setEnabled(true);
+            if (fProviderGroup.isJulLoggingSupported()) {
+                fJulButton.setEnabled(true);
             }
-        });
-
-        fPythonButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (fPythonButton.getSelection()) {
-                    disposeAllComposite();
-                    createPythonComposite();
-                    fDialogComposite.layout();
-                }
+            if (fProviderGroup.isLog4jLoggingSupported()) {
+                fLog4jButton.setEnabled(true);
             }
-        });
+            if (fProviderGroup.isPythonLoggingSupported()) {
+                fPythonButton.setEnabled(true);
+            }
+        }
 
     getShell().setMinimumSize(new Point(550, 850));
 

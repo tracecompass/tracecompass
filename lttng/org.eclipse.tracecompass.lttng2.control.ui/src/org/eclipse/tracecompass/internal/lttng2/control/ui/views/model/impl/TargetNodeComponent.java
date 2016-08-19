@@ -300,6 +300,30 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
     public boolean isPerSyscallEventsSupported() {
         return getControlService().isVersionSupported("2.6.0"); //$NON-NLS-1$
     }
+    /**
+     * Returns if node supports JUL logging or not
+     * @return <code>true</code> if it supports JUL logging else <code>false</code>
+     *
+     */
+    public boolean isJulLoggingSupported() {
+        return getControlService().isVersionSupported("2.6.0"); //$NON-NLS-1$
+    }
+    /**
+     * Returns if node supports LOG4J logging or not
+     * @return <code>true</code> if it supports LOG4J logging else <code>false</code>
+     *
+     */
+    public boolean isLog4jLoggingSupported() {
+        return getControlService().isVersionSupported("2.6.0"); //$NON-NLS-1$
+    }
+    /**
+     * Returns if node supports Python logging or not
+     * @return <code>true</code> if it supports Python logging else <code>false</code>
+     *
+     */
+    public boolean isPythonLoggingSupported() {
+        return getControlService().isVersionSupported("2.7.0"); //$NON-NLS-1$
+    }
 
     /**
      * Checks if given version is supported by this ILTTngControlService implementation.

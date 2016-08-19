@@ -115,5 +115,30 @@ public class TraceProviderGroup extends TraceControlComponent {
     public boolean isPerSyscallEventsSupported() {
         return ((TargetNodeComponent) getParent()).isPerSyscallEventsSupported();
     }
+
+    /**
+     * Returns if node supports JUL logging or not
+     * @return <code>true</code> if it supports JUL logging else <code>false</code>
+     *
+     */
+    public boolean isJulLoggingSupported() {
+        return ((TargetNodeComponent) getParent()).isJulLoggingSupported();
+    }
+    /**
+     * Returns if node supports LOG4J logging or not
+     * @return <code>true</code> if it supports LOG4J logging else <code>false</code>
+     *
+     */
+    public boolean isLog4jLoggingSupported() {
+        return ((TargetNodeComponent) getParent()).isLog4jLoggingSupported();
+    }
+    /**
+     * Returns if node supports Python logging or not
+     * @return <code>true</code> if it supports Python logging else <code>false</code>
+     *
+     */
+    public boolean isPythonLoggingSupported() {
+        return ((TargetNodeComponent) getParent()).isPythonLoggingSupported();
+    }
 }
 

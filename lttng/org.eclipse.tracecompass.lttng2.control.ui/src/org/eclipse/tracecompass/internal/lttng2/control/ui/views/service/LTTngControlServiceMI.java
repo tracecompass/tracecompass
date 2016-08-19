@@ -666,9 +666,13 @@ public class LTTngControlServiceMI extends LTTngControlService {
             allProviders.add(providerInfo);
         }
 
-        getUstProviderLoggers(allProviders, TraceDomainType.JUL, monitor);
-        getUstProviderLoggers(allProviders, TraceDomainType.LOG4J, monitor);
-        getUstProviderLoggers(allProviders, TraceDomainType.PYTHON, monitor);
+        if (isVersionSupported("2.6")) { //$NON-NLS-1$
+            getUstProviderLoggers(allProviders, TraceDomainType.JUL, monitor);
+            getUstProviderLoggers(allProviders, TraceDomainType.LOG4J, monitor);
+            if (isVersionSupported("2.7")) { //$NON-NLS-1$
+                getUstProviderLoggers(allProviders, TraceDomainType.PYTHON, monitor);
+            }
+        }
 
         return allProviders;
     }
