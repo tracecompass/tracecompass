@@ -20,13 +20,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphAnalysis;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.CallGraphAnalysisUI;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
@@ -76,21 +74,6 @@ public class FlameGraphView extends TmfView {
             if (trace != null) {
                 traceSelected(new TmfTraceSelectedSignal(this, trace));
             }
-        }
-    }
-
-    /**
-     * Signal updated
-     *
-     * @param sig
-     *            signal
-     */
-    @TmfSignalHandler
-    public void selectionUpdated(TmfSelectionRangeUpdatedSignal sig) {
-        fTrace = TmfTraceManager.getInstance().getActiveTrace();
-        if (fTrace != null) {
-            CallGraphAnalysis flamegraphModule = TmfTraceUtils.getAnalysisModuleOfClass(fTrace, CallGraphAnalysis.class, CallGraphAnalysisUI.ID);
-            buildFlameGraph(flamegraphModule);
         }
     }
 
