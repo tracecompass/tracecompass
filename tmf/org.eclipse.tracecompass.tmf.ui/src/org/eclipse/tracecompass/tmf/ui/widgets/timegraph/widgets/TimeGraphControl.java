@@ -111,6 +111,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
     /** Constant indicating that all levels of the time graph should be expanded */
     public static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
 
+    private static final int DRAG_MARGIN = 5;
+
     private static final int DRAG_NONE = 0;
     private static final int DRAG_TRACE_ITEM = 1;
     private static final int DRAG_SPLIT_LINE = 2;
@@ -2801,9 +2803,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
     @Override
     public void mouseUp(MouseEvent e) {
         if (fPendingMenuDetectEvent != null && e.button == 3) {
-            if ((fDragState == DRAG_ZOOM) && (fDragX0 == fDragX)) {
+            if ((fDragState == DRAG_ZOOM) && isInDragZoomMargin()) {
                 // Select entry and time event for single click
-                long time = getTimeAtX(e.x);
+                long time = getTimeAtX(fDragX0);
                 fTimeProvider.setSelectionRangeNotify(time, time, false);
                 int idx = getItemIndexAtY(e.y);
                 selectItem(idx, false);
@@ -2835,7 +2837,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 fTimeGraphScale.setDragRange(-1, -1);
             } else if (e.button == fDragButton && DRAG_ZOOM == fDragState) {
                 int nameWidth = fTimeProvider.getNameSpace();
-                if (Math.max(fDragX, fDragX0) > nameWidth && fDragX != fDragX0) {
+                if ((Math.max(fDragX, fDragX0) > nameWidth) && !isInDragZoomMargin()) {
                     long time0 = getTimeAtX(fDragX0);
                     long time1 = getTimeAtX(fDragX);
                     if (time0 < time1) {
@@ -3365,7 +3367,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 return;
             }
             fPendingMenuDetectEvent = null;
-            if ((p.x >= fTimeProvider.getNameSpace()) && (fDragState != DRAG_ZOOM || fDragX != fDragX0)) {
+            if ((p.x >= fTimeProvider.getNameSpace()) && (fDragState != DRAG_ZOOM || !isInDragZoomMargin())) {
                 return;
             }
         } else {
@@ -3429,5 +3431,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
      */
     public TmfTimeViewAlignmentInfo getTimeViewAlignmentInfo() {
         return new TmfTimeViewAlignmentInfo(getShell(), toDisplay(0, 0), fTimeProvider.getNameSpace());
+    }
+
+    private boolean isInDragZoomMargin() {
+        return (Math.abs(fDragX - fDragX0) < DRAG_MARGIN);
     }
 }
