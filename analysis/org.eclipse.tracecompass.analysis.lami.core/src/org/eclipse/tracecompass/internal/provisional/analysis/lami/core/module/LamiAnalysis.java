@@ -486,6 +486,10 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         if (range != null) {
             begin = range.getStartTime().getValue();
             end = range.getEndTime().getValue();
+            if (range.getStartTime().compareTo(range.getEndTime()) > 0) {
+                begin = range.getEndTime().getValue();
+                end = range.getStartTime().getValue();
+            }
         }
 
         ImmutableList.Builder<String> builder = ImmutableList.builder();
