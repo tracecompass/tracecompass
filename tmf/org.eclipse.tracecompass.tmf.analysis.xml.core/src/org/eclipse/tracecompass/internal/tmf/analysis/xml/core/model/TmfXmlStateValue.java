@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -397,7 +398,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
             quark = attribute.getAttributeQuark(event, quark, scenarioInfo);
             /* the query is not valid, we stop the state change */
             if (quark == IXmlStateSystemContainer.ERROR_QUARK) {
-                throw new AttributeNotFoundException("Not found XML attribute " + attribute); //$NON-NLS-1$
+                Activator.logError("Not found XML attribute " + attribute); //$NON-NLS-1$
+                return;
             }
         }
 
