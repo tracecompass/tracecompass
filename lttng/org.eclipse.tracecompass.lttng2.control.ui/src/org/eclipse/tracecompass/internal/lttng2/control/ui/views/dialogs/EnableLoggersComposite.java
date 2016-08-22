@@ -276,7 +276,7 @@ public class EnableLoggersComposite extends Composite implements IBaseEnableUstE
                 return false;
             }
 
-            if (fLoggers.isEmpty()) {
+            if (fLoggers.isEmpty() && !fIsAllLoggers) {
                 MessageDialog.openError(getShell(),
                         Messages.TraceControl_EnableLoggersDialogTitle,
                         Messages.TraceControl_InvalidLogger);
