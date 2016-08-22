@@ -185,7 +185,7 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
                     case KERNEL:
                     case UST:
                         if (dialog.isAllEvents()) {
-                            enableEvents(param, null, dialog.getDomain(), filter, dialog.getExcludedEvents(), monitor);
+                            enableEvents(param, ILttngControlService.ALL_EVENTS, dialog.getDomain(), filter, dialog.getExcludedEvents(), monitor);
                         } else if (dialog.isTracepoints()) {
                             // Enable tracepoint events
                             if (dialog.isAllTracePoints()) {
