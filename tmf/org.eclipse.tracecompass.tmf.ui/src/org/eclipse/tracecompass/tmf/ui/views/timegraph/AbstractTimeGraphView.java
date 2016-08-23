@@ -41,9 +41,10 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -691,7 +692,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     }
 
-    private class BuildRunnable implements ICoreRunnable {
+    // TODO: This can implement ICoreRunnable once support for Eclipse 4.5. is not necessary anymore.
+    private class BuildRunnable {
         private final @NonNull ITmfTrace fBuildTrace;
         private final @NonNull ITmfTrace fParentTrace;
 
@@ -700,8 +702,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             fParentTrace = parentTrace;
         }
 
-        @Override
-        public void run(IProgressMonitor monitor) throws CoreException {
+        public void run(IProgressMonitor monitor) {
             LOGGER.info(() -> "[TimeGraphView:BuildJobStart] trace=" + fBuildTrace.getName()); //$NON-NLS-1$
 
             buildEntryList(fBuildTrace, fParentTrace, NonNullUtils.checkNotNull(monitor));
@@ -1633,7 +1634,14 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     break;
                 }
                 markerEventSources.addAll(TmfTraceAdapterManager.getAdapters(trace, IMarkerEventSource.class));
-                Job buildJob = Job.create(getTitle() + Messages.AbstractTimeGraphView_BuildJob, new BuildRunnable(trace, viewTrace));
+                Job buildJob = new Job(getTitle() + Messages.AbstractTimeGraphView_BuildJob) {
+                    @Override
+                    protected IStatus run(IProgressMonitor monitor) {
+                        new BuildRunnable(trace, viewTrace).run(monitor);
+                        monitor.done();
+                        return Status.OK_STATUS;
+                    }
+                };
                 fBuildJobMap.put(trace, buildJob);
                 buildJob.schedule();
             }
