@@ -2816,14 +2816,15 @@ public class TimeGraphControl extends TimeGraphBaseControl
         if (DRAG_NONE != fDragState) {
             setCapture(false);
             if (e.button == fDragButton && DRAG_TRACE_ITEM == fDragState) {
+                fDragState = DRAG_NONE;
                 if (fDragX != fDragX0) {
                     fTimeProvider.notifyStartFinishTime();
                 }
-                fDragState = DRAG_NONE;
             } else if (e.button == fDragButton && DRAG_SPLIT_LINE == fDragState) {
                 fDragState = DRAG_NONE;
                 redraw();
             }  else if (e.button == fDragButton && DRAG_SELECTION == fDragState) {
+                fDragState = DRAG_NONE;
                 if (fDragX == fDragX0) { // click without selecting anything
                     long time = getTimeAtX(e.x);
                     fTimeProvider.setSelectedTimeNotify(time, false);
@@ -2832,10 +2833,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
                     long time1 = fDragBeginMarker ? fDragTime0 : getTimeAtX(fDragX);
                     fTimeProvider.setSelectionRangeNotify(time0, time1, false);
                 }
-                fDragState = DRAG_NONE;
                 redraw();
                 fTimeGraphScale.setDragRange(-1, -1);
             } else if (e.button == fDragButton && DRAG_ZOOM == fDragState) {
+                fDragState = DRAG_NONE;
                 int nameWidth = fTimeProvider.getNameSpace();
                 if ((Math.max(fDragX, fDragX0) > nameWidth) && !isInDragZoomMargin()) {
                     long time0 = getTimeAtX(fDragX0);
@@ -2848,7 +2849,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 } else {
                     redraw();
                 }
-                fDragState = DRAG_NONE;
                 fTimeGraphScale.setDragRange(-1, -1);
             }
         }
