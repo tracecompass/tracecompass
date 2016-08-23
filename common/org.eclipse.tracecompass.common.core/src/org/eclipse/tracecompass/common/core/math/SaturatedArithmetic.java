@@ -24,6 +24,27 @@ public final class SaturatedArithmetic {
 
     /**
      * Saturated multiplication. It will not overflow but instead clamp the
+     * result to {@link Integer#MAX_VALUE} and {@link Integer#MIN_VALUE}.
+     *
+     * @param left
+     *            The left int to multiply
+     * @param right
+     *            The right int to multiply
+     * @return The saturated multiplication result. The mathematical, not Java
+     *         version of Min(Max(MIN_VALUE, left*right), MAX_VALUE).
+     * @see <a href="http://en.wikipedia.org/wiki/Saturation_arithmetic">
+     *      Saturation arithmetic</a>
+     */
+    public static int multiply(int left, int right) {
+        int retVal = left * right;
+        if ((left != 0) && ((retVal / left) != right)) {
+            return (sameSign(left, right) ? Integer.MAX_VALUE : Integer.MIN_VALUE);
+        }
+        return retVal;
+    }
+
+    /**
+     * Saturated multiplication. It will not overflow but instead clamp the
      * result to {@link Long#MAX_VALUE} and {@link Long#MIN_VALUE}.
      *
      * @param left
@@ -45,6 +66,30 @@ public final class SaturatedArithmetic {
 
     /**
      * Saturated addition. It will not overflow but instead clamp the result to
+     * {@link Integer#MAX_VALUE} and {@link Integer#MIN_VALUE}.
+     *
+     * @param left
+     *            The left int to add
+     * @param right
+     *            The right int to add
+     * @return The saturated addition result. The mathematical, not Java version
+     *         of Min(Max(MIN_VALUE, left+right), MAX_VALUE).
+     * @see <a href="http://en.wikipedia.org/wiki/Saturation_arithmetic">
+     *      Saturation arithmetic</a>
+     */
+    public static final int add(final int left, final int right) {
+        int retVal = left + right;
+        if (sameSign(left, right) && !sameSign(left, retVal)) {
+            if (retVal > 0 || left == Integer.MIN_VALUE) {
+                return Integer.MIN_VALUE;
+            }
+            return Integer.MAX_VALUE;
+        }
+        return retVal;
+    }
+
+    /**
+     * Saturated addition. It will not overflow but instead clamp the result to
      * {@link Long#MAX_VALUE} and {@link Long#MIN_VALUE}.
      *
      * @param left
@@ -55,7 +100,6 @@ public final class SaturatedArithmetic {
      *         of Min(Max(MIN_VALUE, left+right), MAX_VALUE).
      * @see <a href="http://en.wikipedia.org/wiki/Saturation_arithmetic">
      *      Saturation arithmetic</a>
-     * @since 2.0
      */
     public static final long add(final long left, final long right) {
         long retVal = left + right;
