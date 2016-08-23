@@ -12,7 +12,7 @@
 # default. This sets the preference through plugin_customization.ini
 # See https://bugs.eclipse.org/bugs/show_bug.cgi?id=499247
 
-PATH_TO_PREFERENCE_FILE="../rcp/org.eclipse.tracecompass.rcp.branding/plugin_customization.ini"
+PATH_TO_PREFERENCE_FILE="../../rcp/org.eclipse.tracecompass.rcp.branding/plugin_customization.ini"
 
 OUTPUT=$(cat $PATH_TO_PREFERENCE_FILE  | grep org.eclipse.equinox.p2.ui.sdk.scheduler | grep enabled)
 if [[ -z "$OUTPUT" ]];

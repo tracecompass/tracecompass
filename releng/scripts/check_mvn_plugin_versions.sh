@@ -14,7 +14,7 @@
 
 # Point ourselves to the script's directory (so it can be run "out-of-tree")
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-output=`mvn versions:display-plugin-updates -U -f $DIR/../pom.xml`
+output=`mvn versions:display-plugin-updates -U -f $DIR/../../pom.xml`
 
 #filter only updates and show unique
 summary=`echo "${output}" | grep "\\->" | sort | uniq`

@@ -12,7 +12,7 @@
 # meant to be used when the master branch is being branched into a stable
 # branch.
 
-PATH_TO_PRODUCT_FILE="../rcp/org.eclipse.tracecompass.rcp.product/tracing.product"
+PATH_TO_PRODUCT_FILE="../../rcp/org.eclipse.tracecompass.rcp.product/tracing.product"
 
 OUTPUT=$(cat $PATH_TO_PRODUCT_FILE  | grep "<repository.*stable.*")
 if [[ -z "$OUTPUT" ]];
