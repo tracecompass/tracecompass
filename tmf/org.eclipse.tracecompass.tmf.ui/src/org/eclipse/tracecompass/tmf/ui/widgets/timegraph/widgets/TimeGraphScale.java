@@ -33,6 +33,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -366,8 +367,8 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
             int x2;
             long selectionBegin = fTimeProvider.getSelectionBegin();
             long selectionEnd = fTimeProvider.getSelectionEnd();
-            x1 = leftSpace + (int) ((selectionBegin - time0) * pixelsPerNanoSec);
-            x2 = leftSpace + (int) ((selectionEnd - time0) * pixelsPerNanoSec);
+            x1 = SaturatedArithmetic.add(leftSpace, (int) ((selectionBegin - time0) * pixelsPerNanoSec));
+            x2 = SaturatedArithmetic.add(leftSpace, (int) ((selectionEnd - time0) * pixelsPerNanoSec));
             drawRangeDecorators(rect0, gc, x1, x2);
         }
 
@@ -398,7 +399,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
 
         List<Integer> tickList = new ArrayList<>();
         while (true) {
-            int x = rect.x + leftSpace + (int) (Math.floor((time - time0) * pixelsPerNanoSec));
+            int x = SaturatedArithmetic.add(rect.x + leftSpace, (int) (Math.floor((time - time0) * pixelsPerNanoSec)));
             if (x >= rect.x + leftSpace + rect.width - rect0.width) {
                 break;
             }

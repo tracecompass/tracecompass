@@ -76,6 +76,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
@@ -1465,7 +1466,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         int width = getSize().x;
         int nameSpace = fTimeProvider.getNameSpace();
         double pixelsPerNanoSec = (width - nameSpace <= RIGHT_MARGIN) ? 0 : (double) (width - nameSpace - RIGHT_MARGIN) / (time1 - time0);
-        int x = getBounds().x + nameSpace + (int) ((time - time0) * pixelsPerNanoSec);
+        int x = SaturatedArithmetic.add(getBounds().x + nameSpace, (int) ((time - time0) * pixelsPerNanoSec));
         return x;
     }
 
@@ -1669,8 +1670,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
         long selectionBegin = fTimeProvider.getSelectionBegin();
         long selectionEnd = fTimeProvider.getSelectionEnd();
         double pixelsPerNanoSec = (bounds.width - nameSpace <= RIGHT_MARGIN) ? 0 : (double) (bounds.width - nameSpace - RIGHT_MARGIN) / (time1 - time0);
-        int x0 = bounds.x + nameSpace + (int) ((selectionBegin - time0) * pixelsPerNanoSec);
-        int x1 = bounds.x + nameSpace + (int) ((selectionEnd - time0) * pixelsPerNanoSec);
+        int x0 = SaturatedArithmetic.add(bounds.x + nameSpace, (int) ((selectionBegin - time0) * pixelsPerNanoSec));
+        int x1 = SaturatedArithmetic.add(bounds.x + nameSpace, (int) ((selectionEnd - time0) * pixelsPerNanoSec));
 
         // draw selection lines
         if (fDragState != DRAG_SELECTION) {
@@ -1961,8 +1962,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
             int lastX = -1;
             while (iterator.hasNext()) {
                 ITimeEvent event = iterator.next();
-                int x = rect.x + (int) ((event.getTime() - time0) * pixelsPerNanoSec);
-                int xEnd = rect.x + (int) ((event.getTime() + event.getDuration() - time0) * pixelsPerNanoSec);
+                int x = SaturatedArithmetic.add(rect.x, (int) ((event.getTime() - time0) * pixelsPerNanoSec));
+                int xEnd = SaturatedArithmetic.add(rect.x, (int) ((event.getTime() + event.getDuration() - time0) * pixelsPerNanoSec));
                 if (x >= rect.x + rect.width || xEnd < rect.x) {
                     // event is out of bounds
                     continue;
