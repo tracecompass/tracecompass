@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.viewers;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.math.BigDecimal;
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -119,6 +120,11 @@ public class LamiBarChartViewer extends LamiXYChartViewer {
         fEntryToCategoriesMap = new HashMap<>();
 
         /* Categories index mapping */
+        Format formatter = null;
+        if (xAxisAspect.isContinuous()) {
+            formatter = getContinuousAxisFormatter(xAxisAspects, entries, null, null);
+        }
+
         List<@Nullable String> xCategories = new ArrayList<>();
         for (int i = 0; i < entries.size(); i++) {
             String string = xAxisAspect.resolveString(entries.get(i));
@@ -126,7 +132,12 @@ public class LamiBarChartViewer extends LamiXYChartViewer {
                 fEntryToCategoriesMap.put(entries.get(i), new Mapping(null, i));
                 continue;
             }
+
             fEntryToCategoriesMap.put(entries.get(i), new Mapping(xCategories.size(), i));
+            if (formatter != null) {
+                string = formatter.format(xAxisAspect.resolveNumber(entries.get(i)));
+            }
+
             xCategories.add(string);
 
         }
