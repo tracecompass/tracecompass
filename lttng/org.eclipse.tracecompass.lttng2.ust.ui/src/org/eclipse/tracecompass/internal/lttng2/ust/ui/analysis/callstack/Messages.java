@@ -19,53 +19,6 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.lttng2.ust.ui.analysis.callstack.messages"; //$NON-NLS-1$
 
-    /**
-     * Self time of a function
-     */
-    public static String SegmentStoreStaticsViewer_selfTime;
-    /**
-    * Total time of a function
-    */
-    public static String SegmentStoreStaticsViewer_totalTime;
-
-    /**
-    * Adress of a function
-    */
-    public static String Function_address;
-    /**
-     * Total self Time of a function
-     */
-    public static String SegmentStoreStaticsViewer_totalSelfTime;
-
-    /**
-     * Total calls of a function
-     */
-    public static String SegmentStoreStaticsViewer_totalCalls;
-    /**
-     *The callers of a function
-     */
-    public static String SegmentStoreStaticsViewer_Callers;
-    /**
-     *The callees of a function
-     */
-    public static String SegmentStoreStaticsViewer_Callees;
-    /**
-     *The depth of a function
-     */
-    public static String SegmentStoreStaticsViewer_Depth;
-    /**
-     *The duration of a function
-     */
-    public static String FlameGraph_Duration;
-    /**
-     *The time percentage of a function
-     */
-    public static String FlameGraph_Percentage;
-    /**
-     *The number of calls of a function
-     */
-    public static String FlameGraph_NbreCalls;
-
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
