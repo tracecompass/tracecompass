@@ -166,6 +166,7 @@ public class FlameGraphView extends TmfView {
                 callGraphAnalysis.waitForCompletion(monitor);
                 Display.getDefault().asyncExec(() -> {
                     fTimeGraphViewer.setInput(callGraphAnalysis.getThreadNodes());
+                    fTimeGraphViewer.resetStartFinishTime();
                 });
                 return Status.OK_STATUS;
             }
