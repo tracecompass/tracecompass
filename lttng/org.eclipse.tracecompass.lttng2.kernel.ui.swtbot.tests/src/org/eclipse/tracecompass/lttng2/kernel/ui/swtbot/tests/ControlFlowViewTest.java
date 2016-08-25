@@ -31,7 +31,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.tracecompass.ctf.core.tests.shared.LttngKernelTraceGenerator;
+import org.eclipse.tracecompass.ctf.core.tests.shared.LttngTraceGenerator;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
@@ -275,7 +275,7 @@ public class ControlFlowViewTest extends KernelTestBase {
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
         assertEquals(UNCHECK_INACTIVE, 69, checked.intValue());
         // test check selected
-        treeBot.getTreeItem(LttngKernelTraceGenerator.getName()).select("gnuplot");
+        treeBot.getTreeItem(LttngTraceGenerator.getName()).select("gnuplot");
         bot.button(UNCHECK_ALL).click();
         bot.button(CHECK_SELECTED).click();
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
@@ -300,7 +300,7 @@ public class ControlFlowViewTest extends KernelTestBase {
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
         assertEquals(0, checked.intValue());
         bot.text().setText("half-life 3");
-        SWTBotTreeItem treeItem = treeBot.getTreeItem(LttngKernelTraceGenerator.getName());
+        SWTBotTreeItem treeItem = treeBot.getTreeItem(LttngTraceGenerator.getName());
         treeItem.rowCount();
         fBot.waitUntil(ConditionHelpers.treeItemCount(treeItem, 25));
         bot.button(CHECK_ALL).click();
@@ -308,7 +308,7 @@ public class ControlFlowViewTest extends KernelTestBase {
         assertEquals("Filtered", 26, checked.intValue());
         bot.button("OK").click();
         treeBot = fViewBot.bot().tree();
-        treeItem = treeBot.getTreeItem(LttngKernelTraceGenerator.getName());
+        treeItem = treeBot.getTreeItem(LttngTraceGenerator.getName());
         for (int i = 0; i < 25; i++) {
             assertEquals("Filtered Control flow view", "Half-life 3", treeItem.cell(i, 0));
         }

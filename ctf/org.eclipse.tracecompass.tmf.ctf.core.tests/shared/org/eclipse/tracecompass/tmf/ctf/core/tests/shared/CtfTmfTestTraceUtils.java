@@ -15,7 +15,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.tracecompass.ctf.core.tests.shared.LttngKernelTraceGenerator;
+import org.eclipse.tracecompass.ctf.core.tests.shared.LttngTraceGenerator;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
@@ -87,7 +87,7 @@ public final class CtfTmfTestTraceUtils {
     public static CtfTmfTrace getSyntheticTrace() {
         CtfTmfTrace trace = new CtfTmfTrace();
         try {
-            trace.initTrace(null, LttngKernelTraceGenerator.getPath(), CtfTmfEvent.class);
+            trace.initTrace(null, LttngTraceGenerator.getPath(), CtfTmfEvent.class);
         } catch (TmfTraceException e) {
             throw new IllegalStateException();
         }

@@ -40,7 +40,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.tracecompass.ctf.core.tests.shared.LttngKernelTraceGenerator;
+import org.eclipse.tracecompass.ctf.core.tests.shared.LttngTraceGenerator;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.stubs.service.TestRemoteSystemProxy;
@@ -651,7 +651,7 @@ public class ControlViewTest {
     private static void generateTrace(IPath path) {
         File traceParent = path.toFile();
         traceParent.mkdirs();
-        LttngKernelTraceGenerator.generateLttngKernelTrace(path.append(ControlViewSwtBotUtil.KERNEL_TRACE_NAME).toFile());
+        LttngTraceGenerator.generateLttngTrace(path.append(ControlViewSwtBotUtil.KERNEL_TRACE_NAME).toFile());
     }
 
     private static void closeImportWizard(SWTBotShell shell, String buttonName) {

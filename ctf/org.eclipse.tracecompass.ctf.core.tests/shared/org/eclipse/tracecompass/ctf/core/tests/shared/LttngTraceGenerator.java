@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -33,13 +33,13 @@ import java.util.Random;
 import org.eclipse.tracecompass.ctf.core.tests.CtfCoreTestPlugin;
 
 /**
- * Generate a kernel trace
+ * Generate a lttng trace (kernel or ust)
  *
  * @author Matthew Khouzam
  */
-public class LttngKernelTraceGenerator {
+public class LttngTraceGenerator {
 
-    private static final String metadata = "/* CTF 1.8 */ \n" +
+    private static final String metadataKernel = "/* CTF 1.8 */ \n" +
             "typealias integer { size = 8; align = 8; signed = false; } := uint8_t;\n" +
             "typealias integer { size = 16; align = 8; signed = false; } := uint16_t;\n" +
             "typealias integer { size = 32; align = 8; signed = false; } := uint32_t;\n" +
@@ -158,6 +158,8 @@ public class LttngKernelTraceGenerator {
     private final long fNbEvents;
     private final int fNbChans;
 
+    private final String metadata;
+
     private static final String[] sfProcesses = {
             "IDLE",
             "gnuplot",
@@ -183,7 +185,7 @@ public class LttngKernelTraceGenerator {
     public static void main(String[] args) {
         // not using createTempFile as this is a directory
         String path = CtfCoreTestPlugin.getTemporaryDirPath() + File.separator + TRACE_NAME;
-        generateLttngKernelTrace(new File(path));
+        generateLttngTrace(new File(path));
     }
 
     /**
@@ -208,7 +210,7 @@ public class LttngKernelTraceGenerator {
         Path tracePath = Paths.get("..", "..", "ctf", "org.eclipse.tracecompass.ctf.core.tests", TRACES_DIRECTORY, TRACE_NAME);
         tracePath = tracePath.toAbsolutePath();
         File file = tracePath.toFile();
-        generateLttngKernelTrace(file);
+        generateLttngTrace(file);
         return file.getAbsolutePath();
     }
 
@@ -218,14 +220,14 @@ public class LttngKernelTraceGenerator {
      * @param file
      *            the file to write the trace to
      */
-    public static void generateLttngKernelTrace(File file) {
+    public static void generateLttngTrace(File file) {
         final int cpus = 25;
-        LttngKernelTraceGenerator gt = new LttngKernelTraceGenerator(2l * Integer.MAX_VALUE - 100, 500000, cpus);
+        LttngTraceGenerator gt = new LttngTraceGenerator(2l * Integer.MAX_VALUE - 100, 500000, cpus);
         gt.writeTrace(file);
     }
 
     /**
-     * Make a kernel trace
+     * Make a lttng trace
      *
      * @param duration
      *            the duration of the trace
@@ -234,11 +236,28 @@ public class LttngKernelTraceGenerator {
      * @param nbChannels
      *            the number of channels in the trace
      */
-    public LttngKernelTraceGenerator(long duration, long events, int nbChannels) {
+    public LttngTraceGenerator(long duration, long events, int nbChannels) {
+        this(duration, events, nbChannels, true);
+    }
+
+    /**
+     * Make a lttng trace
+     *
+     * @param duration
+     *            the duration of the trace
+     * @param events
+     *            the number of events in a trace
+     * @param nbChannels
+     *            the number of channels in the trace
+     * @param isKernel
+     *            true for kernel, false for ust
+     */
+    public LttngTraceGenerator(long duration, long events, int nbChannels, boolean isKernel) {
         fProcesses = Arrays.asList(sfProcesses);
         fDuration = duration;
         fNbEvents = events;
         fNbChans = nbChannels;
+        metadata = isKernel ? metadataKernel : getMetadataUST();
     }
 
     /**
@@ -390,6 +409,11 @@ public class LttngKernelTraceGenerator {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static String getMetadataUST() {
+        String metadata = metadataKernel.replace("\"kernel\"", "\"ust\"");
+        return metadata.replace("lttng-modules", "lttng-ust");
     }
 
     private class EventWriter {

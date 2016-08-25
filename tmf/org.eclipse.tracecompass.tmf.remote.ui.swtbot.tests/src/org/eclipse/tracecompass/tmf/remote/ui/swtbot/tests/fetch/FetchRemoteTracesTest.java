@@ -42,7 +42,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.tracecompass.ctf.core.tests.shared.LttngKernelTraceGenerator;
+import org.eclipse.tracecompass.ctf.core.tests.shared.LttngTraceGenerator;
 import org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests.TmfRemoteUISWTBotTestPlugin;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
@@ -87,7 +87,7 @@ public class FetchRemoteTracesTest {
 
             IPath generatedTraceFullPath = subDirFullPath.append("synthetic-trace");
             File generatedTraceFile = new File(generatedTraceFullPath.toOSString());
-            LttngKernelTraceGenerator.generateLttngKernelTrace(generatedTraceFile);
+            LttngTraceGenerator.generateLttngTrace(generatedTraceFile);
             traceLocation = new Path(resourcesFile.getAbsolutePath()).toString();
         } catch (IOException e) {
             e.printStackTrace();
