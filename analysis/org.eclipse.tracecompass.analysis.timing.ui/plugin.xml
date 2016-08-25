@@ -5,7 +5,7 @@
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <module
             analysis_module="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.CallGraphAnalysisUI"
-            automatic="true"
+            automatic="false"
             icon="icons/elcl16/callgraph.png"
             id="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.callgraphanalysis"
             name="%callgraph.analysis">
