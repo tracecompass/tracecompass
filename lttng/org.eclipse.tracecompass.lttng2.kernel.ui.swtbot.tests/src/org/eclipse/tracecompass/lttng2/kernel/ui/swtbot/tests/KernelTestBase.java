@@ -30,7 +30,7 @@ import org.eclipse.swtbot.swt.finder.results.BoolResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-import org.eclipse.tracecompass.ctf.core.tests.shared.LttngKernelTraceGenerator;
+import org.eclipse.tracecompass.ctf.core.tests.shared.LttngTraceGenerator;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.ui.PlatformUI;
@@ -125,8 +125,8 @@ public abstract class KernelTestBase {
      */
     @Before
     public void before() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, LttngKernelTraceGenerator.getPath(), KERNEL_TRACE_TYPE);
-        SWTBotUtils.activateEditor(fBot, LttngKernelTraceGenerator.getName());
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, LttngTraceGenerator.getPath(), KERNEL_TRACE_TYPE);
+        SWTBotUtils.activateEditor(fBot, LttngTraceGenerator.getName());
     }
 
     /**
