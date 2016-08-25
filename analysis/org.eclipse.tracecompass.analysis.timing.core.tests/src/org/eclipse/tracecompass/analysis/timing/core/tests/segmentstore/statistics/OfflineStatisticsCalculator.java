@@ -12,7 +12,6 @@ package org.eclipse.tracecompass.analysis.timing.core.tests.segmentstore.statist
 import java.util.Collection;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 
 /**
@@ -23,7 +22,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
  *
  */
 public class OfflineStatisticsCalculator {
-    private final Collection<@NonNull BasicSegment> fSs;
+    private final Collection<@NonNull ISegment> fSs;
 
     /**
      * Constructor
@@ -31,7 +30,7 @@ public class OfflineStatisticsCalculator {
      * @param ss
      *            segment store, fully build
      */
-    public OfflineStatisticsCalculator(Collection<@NonNull BasicSegment> ss) {
+    public OfflineStatisticsCalculator(Collection<@NonNull ISegment> ss) {
         fSs = ss;
     }
 
@@ -75,7 +74,7 @@ public class OfflineStatisticsCalculator {
     }
 
     /**
-     * Get the standard deviation for a window.
+     * Get the standard deviation.
      *
      * @return the standard deviation
      */
@@ -91,5 +90,26 @@ public class OfflineStatisticsCalculator {
             totalVariance += result * result / (fSs.size() - 1);
         }
         return Math.sqrt(totalVariance);
+    }
+
+    /**
+     * Get the total
+     *
+     * @return the total
+     */
+    public long getTotal() {
+        long total = 0;
+        for (ISegment interval : fSs) {
+            total += interval.getLength();
+        }
+        return total;
+    }
+
+    /**
+     * Get the # of intervals
+     * @return the # of intervals
+     */
+    public int count() {
+        return fSs.size();
     }
 }
