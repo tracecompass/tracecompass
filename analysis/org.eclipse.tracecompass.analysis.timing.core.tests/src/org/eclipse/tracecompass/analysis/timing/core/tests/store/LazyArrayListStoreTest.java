@@ -10,20 +10,19 @@
 package org.eclipse.tracecompass.analysis.timing.core.tests.store;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.analysis.timing.core.store.ArrayListStore;
+import org.eclipse.tracecompass.internal.analysis.timing.core.store.LazyArrayListStore;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 
 /**
- * Unit tests for intersecting elements in an ArrayListStore
+ * Unit tests for intersecting elements in an LazyArrayListStore
  *
- * @author France Lapointe Nguyen
  * @author Matthew Khouzam
  */
-public class ArrayListStoreTest extends AbstractTestSegmentStore {
+public class LazyArrayListStoreTest extends AbstractTestSegmentStore {
 
     @Override
     protected ISegmentStore<@NonNull ISegment> getSegmentStore() {
-        return new ArrayListStore<>();
+        return new LazyArrayListStore<>();
     }
 }
