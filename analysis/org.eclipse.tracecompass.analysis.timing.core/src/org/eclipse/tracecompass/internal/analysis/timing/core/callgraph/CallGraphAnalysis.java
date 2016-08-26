@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgr
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.common.core.StreamUtils;
 import org.eclipse.tracecompass.internal.analysis.timing.core.Activator;
-import org.eclipse.tracecompass.internal.analysis.timing.core.store.ArrayListStore;
+import org.eclipse.tracecompass.internal.analysis.timing.core.store.LazyArrayListStore;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -70,7 +70,7 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
     /**
      * Segment store
      */
-    private final ISegmentStore<@NonNull ISegment> fStore = new ArrayListStore<>();
+    private final ISegmentStore<@NonNull ISegment> fStore = new LazyArrayListStore<>();
 
     /**
      * Listeners
