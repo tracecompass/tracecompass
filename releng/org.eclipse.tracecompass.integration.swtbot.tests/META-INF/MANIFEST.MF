@@ -7,3 +7,6 @@ Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.integration.swtbot.tests;singleton:=true
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: org.eclipse.tracecompass.integration.swtbot.tests.projectexplorer
+Require-Bundle:  org.eclipse.tracecompass.ctf.core.tests,
+ org.junit
