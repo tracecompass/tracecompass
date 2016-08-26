@@ -26,6 +26,7 @@
 
   <modules>
     <module>org.eclipse.tracecompass.alltests</module>
+    <module>org.eclipse.tracecompass.integration.swtbot.tests</module>
     <module>org.eclipse.tracecompass.releng-site</module>
     <module>org.eclipse.tracecompass.target</module>
     <module>org.eclipse.tracecompass.testing</module>

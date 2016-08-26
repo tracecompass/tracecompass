@@ -7,34 +7,25 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.swtbot.tests.projectexplorer;
+package org.eclipse.tracecompass.integration.swtbot.tests.projectexplorer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.finders.ContextMenuFinder;
-import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
@@ -44,13 +35,12 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.statistics.TmfStatisticsView;
 import org.eclipse.ui.IEditorReference;
-import org.hamcrest.core.IsAnything;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -64,11 +54,10 @@ import com.google.common.collect.ImmutableList;
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class ProjectExplorerTraceActionsTest {
+    private static @NonNull TestTraceInfo CUSTOM_TEXT_LOG = new TestTraceInfo("ExampleCustomTxt.log", "Custom Text : TmfGeneric", 10, "29:52.034");
     private static final String TRACE_PROJECT_NAME = "test";
-    private static final String TRACE_NAME = "syslog_collapse";
+    private static final String TRACE_NAME = CUSTOM_TEXT_LOG.getTraceName();
     private static final String RENAMED_TRACE_NAME = TRACE_NAME + 2;
-    private static final String TRACE_PATH = "testfiles/" + TRACE_NAME;
-    private static final String TRACE_TYPE = "org.eclipse.linuxtools.tmf.tests.stubs.trace.text.testsyslog";
 
     private static File fTestFile = null;
 
@@ -76,25 +65,29 @@ public class ProjectExplorerTraceActionsTest {
 
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
-    private static final long NB_EVENTS = 22;
+
+    private static final File TEST_TRACES_PATH = new File(new Path(TmfTraceManager.getTemporaryDirPath()).append("testtraces").toOSString());
+    private static String getPath(String relativePath) {
+        return new Path(TEST_TRACES_PATH.getAbsolutePath()).append(relativePath).toOSString();
+    }
 
     /**
      * Test Class setup
+     *
+     * @throws IOException
+     *             on error
      */
     @BeforeClass
-    public static void init() {
+    public static void init() throws IOException {
+        TestDirectoryStructureUtil.generateTraceStructure(TEST_TRACES_PATH);
+
         SWTBotUtils.initialize();
 
+        // FIXME: We can't use Manage Custom Parsers > Import because it uses a native dialog. We'll still check that they show up in the dialog
+        CustomTxtTraceDefinition[] txtDefinitions = CustomTxtTraceDefinition.loadAll(getPath("customParsers/ExampleCustomTxtParser.xml"));
+        txtDefinitions[0].save();
         /* set up test trace */
-        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TRACE_PATH), null);
-        URI uri;
-        try {
-            uri = FileLocator.toFileURL(location).toURI();
-            fTestFile = new File(uri);
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
-            fail();
-        }
+        fTestFile = new File(getPath(new Path("import").append(CUSTOM_TEXT_LOG.getTracePath()).toString()));
 
         assertTrue(fTestFile.exists());
 
@@ -137,21 +130,13 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_01ContextMenuPresence() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), TRACE_TYPE);
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
 
-        final List<String> EXPECTED_MENU_LABELS = ImmutableList.of(
-                "&Open\tShift+Ctrl+R", "Open With", "&Copy...\tCtrl+C", "Rena&me...\tF2", "&Delete\tDelete", "Delete &Supplementary Files...", "&Export Trace Package...", "Select &Trace Type...", "Apply Time Offset...", "Clear Time Offset",
-                "Refresh\tF5");
-
-        // TODO: SWTBot needs a better way to do this
-        ContextMenuFinder finder = new ContextMenuFinder(fBot.tree().widget);
-        List<MenuItem> menuItems = finder.findMenus(traceItem.contextMenu().widget, new IsAnything<>(), false);
-        @NonNull
-        List<String> menuLabels = menuItems.stream().map((item) -> {
-            return UIThreadRunnable.syncExec(() -> item.getText());
-        }).collect(Collectors.toList());
-        assertEquals(EXPECTED_MENU_LABELS, menuLabels);
+        final List<String> EXPECTED_MENU_LABELS = ImmutableList.of("Open", "Open With", "", "Copy...", "Rename...", "Delete", "", "Delete Supplementary Files...", "", "Export Trace Package...", "", "Select Trace Type...", "", "Apply Time Offset...",
+                "Clear Time Offset", "", "Refresh");
+        List<String> menuItems = traceItem.contextMenu().menuItems();
+        assertEquals(EXPECTED_MENU_LABELS, menuItems);
 
         fBot.closeAllEditors();
     }
@@ -168,7 +153,7 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_02Open() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), TRACE_TYPE);
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
 
         traceItem.contextMenu().menu("Open").click();
@@ -189,7 +174,7 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_03Copy() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), TRACE_TYPE);
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
 
         createCopy(traceItem);
@@ -213,7 +198,7 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_04Rename() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), TRACE_TYPE);
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
 
         traceItem.contextMenu().menu("Rename...").click();
@@ -245,7 +230,7 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_05Delete() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), TRACE_TYPE);
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
 
         traceItem.contextMenu().menu("Delete").click();
@@ -273,7 +258,7 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_06OpenKeyboard() throws WidgetNotFoundException {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), TRACE_TYPE);
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
         traceItem.select();
         fBot.activeShell().pressShortcut(Keystrokes.CR);
@@ -294,7 +279,7 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_07DeleteKeyboard() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), TRACE_TYPE);
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
         traceItem.select();
         fBot.activeShell().pressShortcut(Keystrokes.DELETE);
@@ -321,7 +306,7 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_08OpenDoubleClick() throws WidgetNotFoundException {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), TRACE_TYPE);
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
         traceItem.select();
         traceItem.doubleClick();
@@ -342,7 +327,7 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_09BringToTop() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), TRACE_TYPE);
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
         traceItem.select();
         traceItem.doubleClick();
@@ -379,7 +364,7 @@ public class ProjectExplorerTraceActionsTest {
 
     private static void testEventsTable(String editorName) {
         SWTBotEditor editor = SWTBotUtils.activeEventsEditor(fBot, editorName);
-        fBot.waitUntil(ConditionHelpers.numberOfEventsInTrace(TmfTraceManager.getInstance().getActiveTrace(), NB_EVENTS));
+        fBot.waitUntil(ConditionHelpers.numberOfEventsInTrace(TmfTraceManager.getInstance().getActiveTrace(), CUSTOM_TEXT_LOG.getNbEvents()));
 
         SWTBotTable table = editor.bot().table();
         fBot.waitUntil(new DefaultCondition() {
@@ -399,7 +384,7 @@ public class ProjectExplorerTraceActionsTest {
         editor.bot().waitUntil(new DefaultCondition() {
             @Override
             public boolean test() throws Exception {
-                return table.selection().rowCount() == 1 && table.selection().get(0).toString().contains("01:01");
+                return table.selection().rowCount() == 1 && table.selection().get(0).toString().contains(CUSTOM_TEXT_LOG.getFirstEventTimestamp());
             }
 
             @Override
@@ -413,7 +398,7 @@ public class ProjectExplorerTraceActionsTest {
         SWTBotUtils.openView(TmfStatisticsView.ID);
         SWTBotView view = fBot.viewById(TmfStatisticsView.ID);
         assertTrue(view.bot().tree().hasItems());
-        view.bot().tree().cell(0, 1).equals(Long.toString(NB_EVENTS));
+        view.bot().tree().cell(0, 1).equals(Long.toString(CUSTOM_TEXT_LOG.getNbEvents()));
     }
 
     private final class TraceDeletedCondition extends DefaultCondition {
