@@ -644,6 +644,26 @@ public final class SWTBotUtils {
     }
 
     /**
+     * Clear the trace folder (using the UI)
+     *
+     * @param bot
+     *            a given workbench bot
+     * @param projectName
+     *            the name of the project (needs to exist)
+     */
+    public static void clearTracesFolderUI(SWTWorkbenchBot bot, String projectName) {
+        SWTBotTreeItem tracesFolder = selectTracesFolder(bot, projectName);
+        tracesFolder.contextMenu().menu("Clear").click();
+        String CONFIRM_CLEAR_DIALOG_TITLE = "Confirm Clear";
+        bot.waitUntil(Conditions.shellIsActive(CONFIRM_CLEAR_DIALOG_TITLE));
+
+        SWTBotShell shell = bot.shell(CONFIRM_CLEAR_DIALOG_TITLE);
+        shell.bot().button("Yes").click();
+        bot.waitUntil(Conditions.shellCloses(shell));
+        bot.waitWhile(ConditionHelpers.treeItemHasChildren(tracesFolder));
+    }
+
+    /**
      * Clear the experiment folder
      *
      * @param bot
