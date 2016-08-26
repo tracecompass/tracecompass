@@ -13,14 +13,12 @@
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.parsers.custom;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -74,20 +72,7 @@ public class TestCustomXmlWizard extends AbstractCustomParserWizard {
     public void testNew() throws FileNotFoundException, IOException {
         File xmlFile = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(".metadata/.plugins/org.eclipse.tracecompass.tmf.core/custom_xml_parsers.xml").toFile();
         SWTBotUtils.createProject(PROJECT_NAME);
-        SWTBotView proejctExplorerBot = fBot.viewByTitle("Project Explorer");
-        proejctExplorerBot.show();
-        SWTBotTreeItem treeItem = proejctExplorerBot.bot().tree().getTreeItem(PROJECT_NAME);
-        treeItem.select();
-        treeItem.expand();
-        SWTBotTreeItem treeNode = null;
-        for (String node : treeItem.getNodes()) {
-            if (node.startsWith("Trace")) {
-                treeNode = treeItem.getNode(node);
-                break;
-            }
-
-        }
-        assertNotNull(treeNode);
+        SWTBotTreeItem treeNode = SWTBotUtils.selectTracesFolder(fBot, PROJECT_NAME);
         treeNode.contextMenu("Manage Custom Parsers...").click();
         fBot.waitUntil(Conditions.shellIsActive(MANAGE_CUSTOM_PARSERS_SHELL_TITLE));
         fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).setFocus();
