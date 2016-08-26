@@ -46,11 +46,27 @@ public class TraceUtils {
      *            The error message to display
      */
     public static void displayErrorMsg(final String boxTitle, final String errorMsg) {
+        displayErrorMsg(boxTitle, errorMsg, null);
+    }
+
+    /**
+     * Displays an error message in a box
+     *
+     * @param boxTitle
+     *            The message box title
+     * @param errorMsg
+     *            The error message to display
+     * @param exception
+     *            the exception or null if the error does not originate from an
+     *            exception
+     * @since 2.2
+     */
+    public static void displayErrorMsg(final String boxTitle, final String errorMsg, Throwable exception) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
                 final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-                Activator.getDefault().logError(errorMsg);
+                Activator.getDefault().logError(errorMsg, exception);
                 MessageDialog.openError(shell, boxTitle, errorMsg);
             }
         });
