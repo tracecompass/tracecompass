@@ -184,7 +184,7 @@ public class ProjectExplorerTraceActionsTest {
         copiedItem.contextMenu().menu("Open").click();
         testEventsTable(RENAMED_TRACE_NAME);
         fBot.closeAllEditors();
-        SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
     }
 
     /**
@@ -215,7 +215,7 @@ public class ProjectExplorerTraceActionsTest {
         copiedItem.contextMenu().menu("Open").click();
         testEventsTable(RENAMED_TRACE_NAME);
         fBot.closeAllEditors();
-        SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
     }
 
     /**
@@ -348,7 +348,7 @@ public class ProjectExplorerTraceActionsTest {
         assertTrue(originalEditor == fBot.activeEditor().getReference());
 
         fBot.closeAllEditors();
-        SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
     }
 
     private static void createCopy(SWTBotTreeItem traceItem) {
