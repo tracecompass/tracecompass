@@ -58,12 +58,20 @@ At present, the LTTng plug-ins support the following kernel-oriented views:
 
 * ''Control Flow'' - to visualize processes state transitions
 * ''Resources'' - to visualize system resources state transitions
-* ''CPU usage'' - to visualize the usage of the processor with respect to the time in traces
+* ''CPU Usage'' - to visualize the usage of the processor with respect to the time in traces
+* ''Kernel Memory Usage'' - to visualize the relative usage of system memory
+* ''IO Usage'' - to visualize the usage of input/output devices
+* ''System Calls'' - presents all the system calls in a table view
+* ''System Call Statistics'' - present all the system calls statistics
+* ''System Call Density'' - to visualize the system calls displayed by duration
+* ''System Call vs Time'' - to visualize when system calls occur
 
 Also, the LTTng plug-ins supports the following User Space traces views:
 
 * ''Memory Usage'' - to visualize the memory usage per thread with respect to time in the traces
 * ''Call Stack'' - to visualize the call stack's evolution over time
+* ''Function Density'' - to visualize function calls displayed by duration
+* ''Flame Graph'' - to visualize why the CPU is busy
 
 Finally, the LTTng plug-ins supports the following Control views:
 * ''Control'' - to control the tracer and configure the tracepoints
