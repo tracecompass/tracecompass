@@ -20,7 +20,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioHistoryBuilder.ScenarioStatusType;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -51,6 +50,7 @@ public class TmfXmlFsm {
     private final boolean fConsuming;
     private boolean fEventConsumed;
     private int fTotalScenarios;
+    private @Nullable TmfXmlScenario fPendingScenario;
 
     /**
      * Factory to create a {@link TmfXmlFsm}
@@ -76,19 +76,31 @@ public class TmfXmlFsm {
         }
 
         // Get the initial state and the preconditions
+        Map<@NonNull String, @NonNull TmfXmlState> statesMap = new HashMap<>();
         String initialState = node.getAttribute(TmfXmlStrings.INITIAL);
-        if (initialState.isEmpty()) {
-            NodeList nodesInitialState = node.getElementsByTagName(TmfXmlStrings.INITIAL);
-            if (nodesInitialState.getLength() == 1) {
-                NodeList nodesTransition = ((Element) nodesInitialState.item(0)).getElementsByTagName(TmfXmlStrings.TRANSITION);
-                if (nodesInitialState.getLength() != 1) {
-                    throw new IllegalArgumentException("initial state : there should be one and only one initial state."); //$NON-NLS-1$
-                }
-                initialState = ((Element) nodesTransition.item(0)).getAttribute(TmfXmlStrings.TARGET);
+        NodeList nodesInitialElement = node.getElementsByTagName(TmfXmlStrings.INITIAL);
+        NodeList nodesInitialStateElement = node.getElementsByTagName(TmfXmlStrings.INITIAL_STATE);
+        if (nodesInitialStateElement.getLength() > 0) {
+            if (!initialState.isEmpty() || nodesInitialElement.getLength() > 0) {
+                Activator.logWarning("Fsm " + id + ": the 'initial' attribute was set or an <initial> element was defined. Only one of the 3 should be used."); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            @NonNull TmfXmlState initial = modelFactory.createState((Element) nodesInitialStateElement.item(0), container, null);
+            statesMap.put(TmfXmlState.INITIAL_STATE_ID, initial);
+            initialState = TmfXmlState.INITIAL_STATE_ID;
+        } else {
+            if (!initialState.isEmpty() && nodesInitialElement.getLength() > 0) {
+                Activator.logWarning("Fsm " + id + " was declared with both 'initial' attribute and <initial> element. Only the 'initial' attribute will be used"); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            if (initialState.isEmpty() && nodesInitialElement.getLength() > 0) {
+                    NodeList nodesTransition = ((Element) nodesInitialElement.item(0)).getElementsByTagName(TmfXmlStrings.TRANSITION);
+                    if (nodesInitialElement.getLength() != 1) {
+                        throw new IllegalArgumentException("initial element : there should be one and only one initial state."); //$NON-NLS-1$
+                    }
+                    initialState = ((Element) nodesTransition.item(0)).getAttribute(TmfXmlStrings.TARGET);
             }
         }
 
-        Map<@NonNull String, @NonNull TmfXmlState> statesMap = new HashMap<>();
+
         // Get the FSM states
         NodeList nodesState = node.getElementsByTagName(TmfXmlStrings.STATE);
         for (int i = 0; i < nodesState.getLength(); i++) {
@@ -266,14 +278,30 @@ public class TmfXmlFsm {
      *
      * @param event
      *            The current event
-     * @param transitionMap
+     * @param testMap
      *            The transitions of the pattern
      */
-    public void handleEvent(ITmfEvent event, Map<String, TmfXmlTransitionValidator> transitionMap) {
+    public void handleEvent(ITmfEvent event, Map<String, TmfXmlTransitionValidator> testMap) {
         setEventConsumed(false);
-        if (!validatePreconditions(event, transitionMap)) {
-            return;
+        boolean isValidInput = handleActiveScenarios(event, testMap);
+        handlePendingScenario(event, isValidInput);
+    }
+
+    /**
+     * Process the active scenario with the ongoing event
+     *
+     * @param event
+     *            The ongoing event
+     * @param testMap
+     *            The map of transition
+     * @return True if the ongoing event validates the preconditions, false otherwise
+     */
+    private boolean handleActiveScenarios(ITmfEvent event, Map<String, TmfXmlTransitionValidator> testMap) {
+        if (!validatePreconditions(event, testMap)) {
+            return false;
         }
+
+        // The event is valid, we can handle the active scenario
         for (Iterator<TmfXmlScenario> currentItr = fActiveScenariosList.iterator(); currentItr.hasNext();) {
             TmfXmlScenario scenario = currentItr.next();
             // Remove inactive scenarios or handle the active ones.
@@ -282,8 +310,33 @@ public class TmfXmlFsm {
             } else {
                 handleScenario(scenario, event);
                 if (fConsuming && isEventConsumed()) {
-                    return;
+                    return true;
                 }
+            }
+        }
+        // The event is valid but hasn't been consumed. We return true.
+        return true;
+    }
+
+    /**
+     * Handle the pending scenario.
+     *
+     * @param event
+     *            The ongoing event
+     * @param isInputValid
+     *            Either the ongoing event validated the preconditions or not
+     */
+    private void handlePendingScenario(ITmfEvent event, boolean isInputValid) {
+        if (fConsuming && isEventConsumed()) {
+            return;
+        }
+
+        TmfXmlScenario scenario = fPendingScenario;
+        if ((fInitialStateId.equals(TmfXmlState.INITIAL_STATE_ID) || isInputValid) && scenario != null) {
+            handleScenario(scenario, event);
+            if (!scenario.isPending()) {
+                addActiveScenario(scenario);
+                fPendingScenario = null;
             }
         }
     }
@@ -300,7 +353,7 @@ public class TmfXmlFsm {
     }
 
     private static void handleScenario(TmfXmlScenario scenario, ITmfEvent event) {
-        if (scenario.isActive()) {
+        if (scenario.isActive() || scenario.isPending()) {
             scenario.handleEvent(event);
         }
     }
@@ -317,10 +370,19 @@ public class TmfXmlFsm {
      */
     public synchronized void createScenario(@Nullable ITmfEvent event, TmfXmlPatternEventHandler eventHandler, boolean force) {
         if (force || isNewScenarioAllowed()) {
-            TmfXmlScenario scenario = new TmfXmlScenario(event, eventHandler, fId, fContainer, fModelFactory);
+            fPendingScenario = new TmfXmlScenario(event, eventHandler, fId, fContainer, fModelFactory);
             fTotalScenarios++;
-            fActiveScenariosList.add(scenario);
         }
+    }
+
+    /**
+     * Add a scenario to the active scenario list
+     *
+     * @param scenario
+     *            The scenario
+     */
+    private void addActiveScenario(TmfXmlScenario scenario) {
+        fActiveScenariosList.add(scenario);
     }
 
     /**
@@ -331,8 +393,7 @@ public class TmfXmlFsm {
      * @return True if the start of a new scenario is allowed, false otherwise
      */
     public synchronized boolean isNewScenarioAllowed() {
-        return fTotalScenarios > 0
-                && !fActiveScenariosList.get(fActiveScenariosList.size() - 1).getScenarioInfos().getStatus().equals(ScenarioStatusType.PENDING)
-                && fInstanceMultipleEnabled;
+        return fTotalScenarios > 0 && fInstanceMultipleEnabled
+                && fPendingScenario == null;
     }
 }

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+<!-- ***************************************************************************
+* Copyright (c) 2016 Ericsson
+*
+* All rights reserved. This program and the accompanying materials are
+* made available under the terms of the Eclipse Public License v1.0 which
+* accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*************************************************************************** -->
+<pattern version="0" id="test.analysis.1">
+	<head>
+		<traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
+		<label value="XML test analysis 1" />
+	</head>
+
+	<patternHandler>
+
+<!-- 	This condition check if the current running thread PID is 496 -->
+		<test id="curState">
+			<if>
+				<condition>
+					<field name="curState" />
+					<stateValue type="string" value="GOOD" />
+				</condition>
+			</if>
+		</test>
+
+		<action id="increment_fsm1_counter">
+			<stateChange>
+				<stateAttribute type="constant" value="fsm1" />
+				<stateValue type="long" value="1" increment="true" />
+			</stateChange>
+		</action>
+
+		<action id="increment_fsm2_counter">
+			<stateChange>
+				<stateAttribute type="constant" value="fsm2" />
+				<stateValue type="long" value="1" increment="true" />
+			</stateChange>
+		</action>
+
+		<action id="increment_fsm3_counter">
+			<stateChange>
+				<stateAttribute type="constant" value="fsm3" />
+				<stateValue type="long" value="1" increment="true" />
+			</stateChange>
+		</action>
+
+		<fsm id="fsm1">
+			<initial>
+				<transition cond="curState" target="state1"/>
+			</initial>
+			<state id="state1">
+				<transition event="exit" target="end" action="increment_fsm1_counter" />
+			</state>
+			<final id="end" />
+		</fsm>
+
+		<fsm id="fsm2">
+			<initialState>
+				<transition event="exit" target="end" action="increment_fsm2_counter" />
+			</initialState>
+			<final id="end" />
+		</fsm>
+
+		<fsm id="fsm3">
+			<initialState>
+				<transition event="exit" cond="curState" target="end" action="increment_fsm3_counter"/>
+			</initialState>
+			<final id="end" />
+		</fsm>
+	</patternHandler>
+</pattern>
+</tmfxml>
