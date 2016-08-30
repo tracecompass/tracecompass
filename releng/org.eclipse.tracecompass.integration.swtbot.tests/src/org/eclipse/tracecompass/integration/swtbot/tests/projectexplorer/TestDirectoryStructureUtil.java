@@ -57,6 +57,7 @@ public class TestDirectoryStructureUtil {
             + "<OutputColumn name=\"Rec Num\"/><OutputColumn name=\"Message\"/>"
             + "</Definition></CustomXMLTraceDefinitionList>";
 
+    private static final String CUSTOM_TEXT_LAST_LINE = "[1371742192.049] [TID=001] [SIG] Sig=TmfEndSynchSignal Target=(end)\n";
     private static final String CUSTOM_TEXT_CONTENT = "[1371742192.034] [TID=001] [SIG] Sig=TmfStartSynchSignal Target=(start)\n" +
             "[1371742192.048] [TID=001] [SIG] Sig=TmfStartSynchSignal Target=(end)\n" +
             "[1371742192.048] [TID=001] [SIG] Sig=TmfStartSynchSignal Target=(start)\n" +
@@ -66,8 +67,11 @@ public class TestDirectoryStructureUtil {
             "[1371742192.049] [TID=001] [SIG] Sig=TmfTimestampFormatUpdateSignal Target=(start)\n" +
             "[1371742192.049] [TID=001] [SIG] Sig=TmfTimestampFormatUpdateSignal Target=(end)\n" +
             "[1371742192.049] [TID=001] [SIG] Sig=TmfEndSynchSignal Target=(start)\n" +
-            "[1371742192.049] [TID=001] [SIG] Sig=TmfEndSynchSignal Target=(end)\n";
+            CUSTOM_TEXT_LAST_LINE;
 
+    private static final String CUSTOM_XML_PARSER_LAST_LINE = ""
+            + "<Record number = \"6\">" + "<Time>" + "<year> 2011 </year> <month> 10 </month> <day> 26 </day>" + "<hour> 22 </hour> <minute> 18 </minute> <second> 32 </second>" + "</Time>" + "<Content>" + "<Message>This is the message</Message>"
+            + "<Level>The Log Level</Level>" + "</Content>" + "</Record>";
     private static final String CUSTOM_XML_CONTENT = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"
             + "<!DOCTYPE Log SYSTEM \"ExampleXMLLog.dtd\">\r\n\r\n<Log>" + "<LogCreated>" + "<LogName> Example XML Log </LogName>" + "<Time>" + "<year> 2011 </year> <month> 10 </month> <day> 26 </day>"
             + "<hour> 22 </hour> <minute> 0 </minute> <second> 25 </second>" + "</Time>" + "</LogCreated>"
@@ -86,9 +90,7 @@ public class TestDirectoryStructureUtil {
             + ""
             + "<Record number = \"5\">" + "<Time>" + "<year> 2011 </year> <month> 10 </month> <day> 26 </day>" + "<hour> 22 </hour> <minute> 5 </minute> <second> 17 </second>" + "</Time>" + "<Content>" + "<Message>This is the message</Message>"
             + "<Level>The Log Level</Level>" + "</Content>" + "</Record>"
-            + ""
-            + "<Record number = \"6\">" + "<Time>" + "<year> 2011 </year> <month> 10 </month> <day> 26 </day>" + "<hour> 22 </hour> <minute> 18 </minute> <second> 32 </second>" + "</Time>" + "<Content>" + "<Message>This is the message</Message>"
-            + "<Level>The Log Level</Level>" + "</Content>" + "</Record>";
+            + CUSTOM_XML_PARSER_LAST_LINE;
 
     private static final String UNRECOGNIZED_LOG_CONTENT = "Hi mom!";
 
@@ -105,7 +107,7 @@ public class TestDirectoryStructureUtil {
      *  │   ├── ExampleCustomTxtParser.xml
      *  │   └── ExampleCustomXmlParser.xml
      *  └── import
-     *      ├── clashes
+     *      ├── z-clashes
      *      │   ├── ExampleCustomTxt.log
      *      │   ├── ExampleCustomXml.xml
      *      │   ├── kernel-overlap-testing
@@ -158,9 +160,14 @@ public class TestDirectoryStructureUtil {
         createFile(importDir, "ExampleCustomTxt.log", CUSTOM_TEXT_CONTENT);
         createFile(importDir, "ExampleCustomXml.xml", CUSTOM_XML_CONTENT);
         createFile(importDir, "unrecognized.log", UNRECOGNIZED_LOG_CONTENT);
-        File theClash = createDir(importDir, "clashes");
-        createFile(theClash, "ExampleCustomTxt.log", CUSTOM_TEXT_CONTENT);
-        createFile(theClash, "ExampleCustomXml.xml", CUSTOM_XML_CONTENT);
+        // Using the z- prefix so that the traces in this folder are imported
+        // last by the import wizard
+        final String CLASHES_DIR_NAME = "z-clashes";
+        File theClash = createDir(importDir, CLASHES_DIR_NAME);
+
+        // We're making the clash version of each trace slightly different in content to help differentiate them
+        createFile(theClash, "ExampleCustomTxt.log", CUSTOM_TEXT_CONTENT + CUSTOM_TEXT_LAST_LINE);
+        createFile(theClash, "ExampleCustomXml.xml", CUSTOM_XML_CONTENT + CUSTOM_XML_PARSER_LAST_LINE);
 
         LttngTraceGenerator kernelGenerator = new LttngTraceGenerator(1000, 1000, 1);
         LttngTraceGenerator ustGenerator = new LttngTraceGenerator(1000, 1000, 1, false);
@@ -169,10 +176,12 @@ public class TestDirectoryStructureUtil {
         ustGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + "simple_server-thread1"));
         ustGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + "simple_server-thread2"));
 
-        kernelGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + "clashes" + File.separator + "kernel-overlap-testing"));
-        ustGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + "clashes" + File.separator + "ust-overlap-testing"));
-        ustGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + "clashes" + File.separator + "simple_server-thread1"));
-        ustGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + "clashes" + File.separator + "simple_server-thread2"));
+        kernelGenerator = new LttngTraceGenerator(1000, 1001, 1);
+        ustGenerator = new LttngTraceGenerator(1000, 1001, 1, false);
+        kernelGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + CLASHES_DIR_NAME + File.separator + "kernel-overlap-testing"));
+        ustGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + CLASHES_DIR_NAME + File.separator + "ust-overlap-testing"));
+        ustGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + CLASHES_DIR_NAME + File.separator + "simple_server-thread1"));
+        ustGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + CLASHES_DIR_NAME + File.separator + "simple_server-thread2"));
 
         assertTrue(parent.listFiles().length > 0);
 
