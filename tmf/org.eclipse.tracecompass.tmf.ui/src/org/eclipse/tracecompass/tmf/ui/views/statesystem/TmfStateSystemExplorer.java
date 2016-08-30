@@ -95,6 +95,7 @@ public class TmfStateSystemExplorer extends TmfView {
 
     @Override
     public void setFocus() {
+        fViewer.getControl().setFocus();
     }
 
     @Override
