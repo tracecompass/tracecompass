@@ -54,4 +54,11 @@ public interface IFileSystemObject {
      * @return whether or not the file system object exists
      */
     boolean exists();
+
+    /**
+     * Returns whether or not this object represents a directory.
+     *
+     * @return whether or not this object represents a directory.
+     */
+    boolean isDirectory();
 }

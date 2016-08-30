@@ -85,4 +85,9 @@ class FileFileSystemObject implements IFileSystemObject {
     public Object getRawFileSystemObject() {
         return fFileSystemObject;
     }
+
+    @Override
+    public boolean isDirectory() {
+        return fFileSystemObject.isDirectory();
+    }
 }
