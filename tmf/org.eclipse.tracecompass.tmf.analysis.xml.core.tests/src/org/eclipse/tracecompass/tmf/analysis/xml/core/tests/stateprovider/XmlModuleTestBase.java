@@ -127,7 +127,7 @@ public abstract class XmlModuleTestBase {
      *            The analysis element
      * @return The name
      */
-    public @NonNull String getName(Element element) {
+    public static @NonNull String getName(Element element) {
         String name = null;
         List<Element> head = XmlUtils.getChildElements(element, TmfXmlStrings.HEAD);
         if (head.size() == 1) {

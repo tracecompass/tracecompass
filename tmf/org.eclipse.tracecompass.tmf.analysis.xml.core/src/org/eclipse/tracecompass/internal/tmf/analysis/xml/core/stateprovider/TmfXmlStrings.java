@@ -168,4 +168,5 @@ public interface TmfXmlStrings {
     String CONSUMING = "consuming";
     String MAPPING_GROUP = "mappingGroup";
     String ENTRY = "entry";
+    String INITIAL_STATE = "initialState";
 }

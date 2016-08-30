@@ -407,7 +407,10 @@
 					<xs:documentation>Declares a precondition for this fsm. At least one of the preconditions needs to be validated before being able to activate process the fsm. A precondition is a special transition with no target or action. It should contains only conditions that needs to be validated. Only used for fsm.</xs:documentation></xs:annotation></xs:element>
 			<xs:element maxOccurs="1" minOccurs="0" name="initial" type="initialState">
 				<xs:annotation>
-					<xs:documentation>Declares the default initial state of this complex state. Must not be specified for an atomic state</xs:documentation></xs:annotation></xs:element>
+					<xs:documentation>Declares the default initial state of this complex state. Must not be specified for an atomic state. When define, the scenario will start at the state declared in the target attribute of this initial state's transition.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="initialState" type="initialState">
+				<xs:annotation>
+					<xs:documentation>Declares the default initial state of this complex state. Must not be specified for an atomic state. When define this initial state is the starting state of the scenario. The scenario will stay at this state until one of its transition is validated.</xs:documentation></xs:annotation></xs:element>
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="state" type="state">
 				<xs:annotation>
 					<xs:documentation>Declares an state as children of this declared state state.</xs:documentation></xs:annotation></xs:element>

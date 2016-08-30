@@ -83,7 +83,16 @@ public class TmfXmlScenario {
      * @return True if the scenario is active, false otherwise
      */
     public boolean isActive() {
-        return fScenarioInfo.getStatus().equals(ScenarioStatusType.PENDING) || fScenarioInfo.getStatus().equals(ScenarioStatusType.IN_PROGRESS);
+        return fScenarioInfo.getStatus() == ScenarioStatusType.IN_PROGRESS;
+    }
+
+    /**
+     * Test if the scenario is pending or not
+     *
+     * @return True if the scenario is pending, false otherwise
+     */
+    public boolean isPending() {
+        return fScenarioInfo.getStatus() == ScenarioStatusType.PENDING;
     }
 
     /**

@@ -30,6 +30,8 @@ import org.w3c.dom.NodeList;
  */
 public class TmfXmlState {
 
+    /** The initial state ID */
+    public static final String INITIAL_STATE_ID = "#initial"; //$NON-NLS-1$
     private final String fId;
     private final IXmlStateSystemContainer fContainer;
     private final List<TmfXmlStateTransition> fTransitions;

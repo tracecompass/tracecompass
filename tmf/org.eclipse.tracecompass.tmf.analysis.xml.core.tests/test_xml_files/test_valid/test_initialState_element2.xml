@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+<!-- ***************************************************************************
+* Copyright (c) 2016 Ericsson
+*
+* All rights reserved. This program and the accompanying materials are
+* made available under the terms of the Eclipse Public License v1.0 which
+* accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*************************************************************************** -->
+<pattern version="0" id="test.analysis.2">
+	<head>
+		<traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
+		<label value="XML test analysis 2" />
+	</head>
+
+	<patternHandler>
+
+		<action id="increment_counter_new">
+			<stateChange>
+				<stateAttribute type="constant" value="count_new"/>
+				<stateValue type="int" value="1" increment="true" />
+			</stateChange>
+		</action>
+
+		<action id="increment_counter_precond">
+			<stateChange>
+				<stateAttribute type="constant" value="precond"/>
+				<stateValue type="int" value="1" increment="true" />
+			</stateChange>
+		</action>
+
+		<action id="generate_old_segment">
+			<segment>
+				<segType segName="OLD"/>
+			</segment>
+		</action>
+
+		<action id="generate_new_segment">
+			<segment>
+				<segType segName="NEW"/>
+			</segment>
+		</action>
+
+		<fsm id="test" initial="state_old" multiple="false">
+			<initial>
+				<transition target="state_old" />
+			</initial>
+			<initialState>
+				<transition target="state_new" />
+			</initialState>
+			<state id="state_old">
+				<transition target="end" action="generate_old_segment"/>
+			</state>
+			<state id="state_new">
+				<transition target="end" action="generate_new_segment"/>
+			</state>
+			<final id="end"/>
+		</fsm>
+
+		<fsm id="test1" multiple="false">
+			<precondition event="wrong_event" />
+			<initialState>
+				<transition target="state_new" action="increment_counter_new"/>
+			</initialState>
+			<state id="state_new">
+				<transition target="state_2" action="increment_counter_precond"/>
+			</state>
+			<state id="state_2">
+				<transition target="end" action="increment_counter_precond"/>
+			</state>
+
+			<final id="end"/>
+		</fsm>
+	</patternHandler>
+</pattern>
+</tmfxml>
