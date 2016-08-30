@@ -221,6 +221,8 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      * starts at the same time as the event to add, it is replaced by the new
      * event. If the new event starts before the zoomed event list's last event,
      * the new event is ignored and is assumed to be already part of the list.
+     * If the new event starts before the zoomed event list's first event, the
+     * list is assumed to be incomplete and is cleared, and the event is added.
      *
      * @param event
      *            The time event to add
@@ -235,6 +237,9 @@ public class TimeGraphEntry implements ITimeGraphEntry {
             fZoomedEventList.add(event);
         } else if (start == lastStart) {
             fZoomedEventList.set(lastIndex, event);
+        } else if (start < fZoomedEventList.get(0).getTime()) {
+            fZoomedEventList.clear();
+            fZoomedEventList.add(event);
         }
         if (event instanceof NullTimeEvent) {
             /* A NullTimeEvent should not affect the entry bounds */
