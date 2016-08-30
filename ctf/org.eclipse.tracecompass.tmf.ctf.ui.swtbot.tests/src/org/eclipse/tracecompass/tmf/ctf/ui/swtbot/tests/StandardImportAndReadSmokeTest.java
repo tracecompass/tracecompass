@@ -48,11 +48,7 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -324,9 +320,9 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         String testArchivePath = createEmptyArchive();
 
         openImportWizard();
-        selectImportFromArchive(testArchivePath);
+        SWTBotImportWizardUtils.selectImportFromArchive(fBot, testArchivePath);
         selectFolder(ARCHIVE_ROOT_ELEMENT_NAME);
-        setOptions(0, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
+        SWTBotImportWizardUtils.setOptions(fBot, 0, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
         importFinish();
 
         assertNoTraces();
@@ -347,9 +343,9 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         String testDirectoryPath = emptyDirectory.getLocation().toOSString();
 
         openImportWizard();
-        selectImportFromDirectory(testDirectoryPath);
+        SWTBotImportWizardUtils.selectImportFromDirectory(fBot, testDirectoryPath);
         selectFolder(EMPTY_ARCHIVE_FOLDER);
-        setOptions(0, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
+        SWTBotImportWizardUtils.setOptions(fBot, 0, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
         importFinish();
 
         assertNoTraces();
@@ -371,9 +367,9 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         createEmptyFile(folder);
         String testDirectoryPath = folder.getLocation().toOSString();
         openImportWizard();
-        selectImportFromDirectory(testDirectoryPath);
-        selectFile(EMPTY_FILE_NAME, EMPTY_ARCHIVE_FOLDER);
-        setOptions(ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
+        SWTBotImportWizardUtils.selectImportFromDirectory(fBot, testDirectoryPath);
+        SWTBotImportWizardUtils.selectFile(fBot, EMPTY_FILE_NAME, EMPTY_ARCHIVE_FOLDER);
+        SWTBotImportWizardUtils.setOptions(fBot, ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
         importFinish();
 
         assertNoTraces();
@@ -393,9 +389,9 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         String testArchivePath = createEmptyArchive();
 
         openImportWizard();
-        selectImportFromDirectory(getProjectResource().getLocation().toOSString());
-        selectFile(GENERATED_ARCHIVE_NAME, TRACE_PROJECT_NAME);
-        setOptions(0, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
+        SWTBotImportWizardUtils.selectImportFromDirectory(fBot, getProjectResource().getLocation().toOSString());
+        SWTBotImportWizardUtils.selectFile(fBot, GENERATED_ARCHIVE_NAME, TRACE_PROJECT_NAME);
+        SWTBotImportWizardUtils.setOptions(fBot, 0, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
         importFinish();
 
         assertNoTraces();
@@ -430,9 +426,9 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         renamedArchiveFile.delete(true, null);
 
         openImportWizard();
-        selectImportFromArchive(testArchivePath);
+        SWTBotImportWizardUtils.selectImportFromArchive(fBot, testArchivePath);
         selectFolder(ARCHIVE_ROOT_ELEMENT_NAME);
-        setOptions(0, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
+        SWTBotImportWizardUtils.setOptions(fBot, 0, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
         importFinish();
 
         assertNoTraces();
@@ -471,18 +467,18 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         openImportWizard();
         if (fromArchive) {
             expectedSourceLocation = URI_JAR_FILE_SCHEME + URI_DEVICE_SEPARATOR + new Path(new File(TRACE_ARCHIVE_PATH).getCanonicalPath()) + "!" + URI_SEPARATOR + TRACE_FOLDER + URI_SEPARATOR + TRACE_NAME + URI_SEPARATOR;
-            selectImportFromArchive(TRACE_ARCHIVE_PATH);
+            SWTBotImportWizardUtils.selectImportFromArchive(fBot, TRACE_ARCHIVE_PATH);
             selectFolder(ARCHIVE_ROOT_ELEMENT_NAME);
             SWTBotCheckBox checkBox = fBot.checkBox(Messages.ImportTraceWizard_CreateLinksInWorkspace);
             assertFalse(checkBox.isEnabled());
         } else {
             String sourcePath = TRACE_FOLDER_PARENT_PATH + File.separator + TRACE_FOLDER + File.separator + TRACE_NAME;
             expectedSourceLocation = URI_FILE_SCHEME + URI_DEVICE_SEPARATOR + new Path(new File(sourcePath).getCanonicalPath()) + URI_SEPARATOR;
-            selectImportFromDirectory(TRACE_FOLDER_PARENT_PATH);
+            SWTBotImportWizardUtils.selectImportFromDirectory(fBot, TRACE_FOLDER_PARENT_PATH);
             selectFolder(new String [] {TRACE_FOLDER_PARENT_NAME, TRACE_FOLDER });
         }
 
-        setOptions(options, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
+        SWTBotImportWizardUtils.setOptions(fBot, options, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
 
         if (!defaultExperiment) {
             experimentName = verifyExperimentNameHandling(experimentName);
@@ -523,16 +519,16 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         if (fromArchive) {
             testArchivePath = createNestedArchive();
             openImportWizard();
-            selectImportFromArchive(testArchivePath);
-            selectFile(ARCHIVE_FILE_NAME, ARCHIVE_ROOT_ELEMENT_NAME, TRACE_PROJECT_NAME, TRACE_FOLDER_PARENT_NAME);
+            SWTBotImportWizardUtils.selectImportFromArchive(fBot, testArchivePath);
+            SWTBotImportWizardUtils.selectFile(fBot, ARCHIVE_FILE_NAME, ARCHIVE_ROOT_ELEMENT_NAME, TRACE_PROJECT_NAME, TRACE_FOLDER_PARENT_NAME);
 
             expectedSourceLocation = URI_JAR_FILE_SCHEME + URI_DEVICE_SEPARATOR + new Path(new File(testArchivePath).getCanonicalPath()) + "!" + URI_SEPARATOR + TRACE_PROJECT_NAME + URI_SEPARATOR + TRACE_FOLDER_PARENT_NAME + URI_SEPARATOR + ARCHIVE_FILE_NAME
                     + URI_SEPARATOR + TRACE_FOLDER + URI_SEPARATOR + TRACE_NAME + URI_SEPARATOR;
             expectedElementPath = new Path(TRACE_PROJECT_NAME).append(TRACE_FOLDER_PARENT_NAME).append(ARCHIVE_FILE_NAME).append(TRACE_FOLDER).append(TRACE_NAME);
         } else {
             openImportWizard();
-            selectImportFromDirectory(TRACE_FOLDER_PARENT_PATH);
-            selectFile(ARCHIVE_FILE_NAME, TRACE_FOLDER_PARENT_NAME);
+            SWTBotImportWizardUtils.selectImportFromDirectory(fBot, TRACE_FOLDER_PARENT_PATH);
+            SWTBotImportWizardUtils.selectFile(fBot, ARCHIVE_FILE_NAME, TRACE_FOLDER_PARENT_NAME);
             expectedElementPath = new Path(ARCHIVE_FILE_NAME).append(TRACE_FOLDER).append(TRACE_NAME);
             expectedSourceLocation = URI_FILE_SCHEME + URI_DEVICE_SEPARATOR + new Path(new File(TRACE_FOLDER_PARENT_PATH).getCanonicalPath()) + URI_SEPARATOR + ARCHIVE_FILE_NAME + URI_SEPARATOR + TRACE_FOLDER + URI_SEPARATOR + TRACE_NAME + URI_SEPARATOR;
         }
@@ -541,7 +537,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
             expectedElementPath = new Path(TRACE_NAME);
         }
 
-        setOptions(options, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
+        SWTBotImportWizardUtils.setOptions(fBot, options, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
         importFinish();
         // Archives should never be imported as links
         int expectedOptions = options & ~ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
@@ -627,7 +623,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         if (sourceResource instanceof IFile) {
             String[] folderPath = exportedPath.removeLastSegments(1).segments();
             String fileName = exportedPath.lastSegment();
-            selectFile(fileName, folderPath);
+            SWTBotImportWizardUtils.selectFile(fBot, fileName, folderPath);
         } else {
             selectFolder(exportedPath.segments());
         }
@@ -668,99 +664,10 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         fBot.waitUntil(ConditionHelpers.isWizardReady(fWizard));
     }
 
-    private static void selectImportFromDirectory(String directoryPath) {
-        SWTBotRadio button = fBot.radio("Select roo&t directory:");
-        button.click();
 
-        SWTBotCombo sourceCombo = fBot.comboBox();
-        File traceFolderParent = new File(directoryPath);
-        sourceCombo.setText(traceFolderParent.getAbsolutePath());
-
-        SWTBotText text = fBot.text();
-        text.setFocus();
-    }
-
-    private static void selectImportFromArchive(String archivePath) {
-        SWTBotRadio button = fBot.radio("Select &archive file:");
-        button.click();
-
-        SWTBotCombo sourceCombo = fBot.comboBox(1);
-
-        sourceCombo.setText(new File(archivePath).getAbsolutePath());
-
-        SWTBotText text = fBot.text();
-        text.setFocus();
-    }
 
     private static void selectFolder(String... treePath) {
-        selectFolder(true, treePath);
-    }
-
-    private static void selectFolder(boolean check, String... treePath) {
-        SWTBotTree tree = fBot.tree();
-        fBot.waitUntil(Conditions.widgetIsEnabled(tree));
-        SWTBotTreeItem folderNode = SWTBotUtils.getTreeItem(fBot, tree, treePath);
-        if (check) {
-            folderNode.check();
-        } else {
-            folderNode.select();
-        }
-    }
-
-    private static void selectFile(String fileName, String... folderTreePath) {
-        selectFolder(false, folderTreePath);
-
-        SWTBotTable fileTable = fBot.table();
-        fBot.waitUntil(Conditions.widgetIsEnabled(fileTable));
-        fBot.waitUntil(ConditionHelpers.isTableItemAvailable(fileName, fileTable));
-        SWTBotTableItem tableItem = fileTable.getTableItem(fileName);
-        tableItem.check();
-    }
-
-    private static void setOptions(int optionFlags, String traceTypeName) {
-        SWTBotCheckBox checkBox = fBot.checkBox(Messages.ImportTraceWizard_CreateLinksInWorkspace);
-        if (checkBox.isEnabled()) {
-            if ((optionFlags & ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE) != 0) {
-                checkBox.select();
-            } else {
-                checkBox.deselect();
-            }
-        }
-
-        checkBox = fBot.checkBox(Messages.ImportTraceWizard_PreserveFolderStructure);
-        if ((optionFlags & ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE) != 0) {
-            checkBox.select();
-        } else {
-            checkBox.deselect();
-        }
-
-        checkBox = fBot.checkBox(Messages.ImportTraceWizard_ImportUnrecognized);
-        if ((optionFlags & ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES) != 0) {
-            checkBox.select();
-        } else {
-            checkBox.deselect();
-        }
-
-        checkBox = fBot.checkBox(Messages.ImportTraceWizard_OverwriteExistingTrace);
-        if ((optionFlags & ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES) != 0) {
-            checkBox.select();
-        } else {
-            checkBox.deselect();
-        }
-
-        checkBox = fBot.checkBox(Messages.ImportTraceWizard_CreateExperiment);
-        if ((optionFlags & ImportTraceWizardPage.OPTION_CREATE_EXPERIMENT) != 0) {
-            checkBox.select();
-        } else {
-            checkBox.deselect();
-        }
-
-        SWTBotCombo comboBox = fBot.comboBoxWithLabel(Messages.ImportTraceWizard_TraceType);
-        if (traceTypeName != null && !traceTypeName.isEmpty()) {
-            comboBox.setSelection(traceTypeName);
-        } else {
-            comboBox.setSelection(ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
-        }
+        SWTBotImportWizardUtils.selectFolder(fBot, true, treePath);
     }
 
     private static void checkOptions(int optionFlags, String expectedSourceLocation, IPath expectedElementPath) throws CoreException {
