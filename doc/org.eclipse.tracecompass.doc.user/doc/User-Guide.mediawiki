@@ -2535,6 +2535,18 @@ The following keyboard shortcuts are available:
 *'''Ctrl + -''': Zoom-out vertically
 *'''Ctrl + 0''': Reset the vertical zoom
 
+=== Toolbar ===
+
+{|
+| [[Image:images/sort_alpha.gif]]
+| Sort by thread name
+| Sort the threads by thread name. Clicking the icon a second time will sort the threads by name in reverse order and change the icon to [[Image:images/sort_alpha_rev.gif]]
+|-
+| [[Image:images/sort_num.gif]]
+| Sort by thread id
+| Sort the threads by thread ID. Clicking the icon a second time will sort the threads by ID in reverse order and change the icon to [[Image:images/sort_num_rev.gif]].
+|}
+
 === Importing a binary or function name mapping file (for LTTng-UST <2.8 traces) ===
 
 See Call Stack View's '''[[#Call Stack View | Importing a binary or function name mapping file (for LTTng-UST <2.8 traces) ]]'''.
