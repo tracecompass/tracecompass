@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 
@@ -44,6 +45,23 @@ public class FileSystemObjectImportStructureProvider implements IImportStructure
         fArchivePath = archivePath;
     }
 
+    /**
+     * This orders by files first then the folders. Then by lexical order.
+     */
+    private final class FileObjectPathComparator implements Comparator<IFileSystemObject> {
+        @Override
+        public int compare(IFileSystemObject o1, IFileSystemObject o2) {
+            if (o1.isDirectory() != o2.isDirectory()) {
+                if (o1.isDirectory()) {
+                    return 1;
+                }
+                return -1;
+            }
+
+            return o1.getName().compareToIgnoreCase(o2.getName());
+        }
+    }
+
     @Override
     public List<IFileSystemObject> getChildren(Object element) {
         @SuppressWarnings("rawtypes")
@@ -52,6 +70,8 @@ public class FileSystemObjectImportStructureProvider implements IImportStructure
         for (Object o : children) {
             adapted.add(getIFileSystemObject(o));
         }
+
+        adapted.sort(new FileObjectPathComparator());
         return adapted;
     }
 
