@@ -32,7 +32,7 @@
     <dependency>
       <groupId>org.eclipse.tracecompass.testtraces</groupId>
       <artifactId>tracecompass-test-traces-ctf</artifactId>
-      <version>1.2.0</version>
+      <version>1.6.0</version>
     </dependency>
   </dependencies>
   <repositories>
