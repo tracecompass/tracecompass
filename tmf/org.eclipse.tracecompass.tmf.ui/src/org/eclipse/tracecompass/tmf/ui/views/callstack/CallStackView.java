@@ -836,10 +836,10 @@ public class CallStackView extends AbstractTimeGraphView {
                             if (time == stackInterval.getStartTime()) {
                                 ITmfStateValue stackLevelState = stackInterval.getStateValue();
                                 if (stackLevelState.unboxInt() == callStackEntry.getStackLevel() || stackLevelState.isNull()) {
+                                    fSyncSelection = false;
                                     Display.getDefault().asyncExec(() -> {
                                         getTimeGraphCombo().setSelection(callStackEntry);
                                         getTimeGraphViewer().getTimeGraphControl().fireSelectionChanged();
-                                        fSyncSelection = false;
                                     });
                                 }
                             }
