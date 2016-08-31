@@ -79,6 +79,15 @@ public final class SymbolAspect implements ISegmentAspect {
                     if (symbolText == null) {
                         return "0x" + Long.toHexString(longAddress); //$NON-NLS-1$
                     }
+                    // take the start time in the query for the symbol name
+                    long time = segment.getStart();
+                    int pid = calledFunction.getProcessId();
+                    if (pid > 0) {
+                        String text = provider.getSymbolText(pid, time, longAddress);
+                        if (text != null) {
+                            return text;
+                        }
+                    }
                     return symbolText;
                 }
                 return String.valueOf(symbol);

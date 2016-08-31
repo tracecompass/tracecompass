@@ -39,11 +39,13 @@ public class CalledFunction extends AbstractCalledFunction {
      *            The symbol of the call stack function
      * @param depth
      *            The depth in the call stack of a function
+     * @param processId
+     *            The process ID of the traced application
      * @param parent
      *            The caller, can be null for root elements
      */
-    protected CalledFunction(long start, long end, long symbol, int depth, @Nullable ICalledFunction parent) {
-        super(start, end, depth, parent);
+    protected CalledFunction(long start, long end, long symbol, int depth, int processId, @Nullable ICalledFunction parent) {
+        super(start, end, depth, processId, parent);
         fSymbol = symbol;
     }
 

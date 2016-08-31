@@ -61,4 +61,11 @@ public interface ICalledFunction extends ISegment {
      */
     int getDepth();
 
+    /**
+     * The process ID of the traced application
+     *
+     * @return The process ID
+     */
+    int getProcessId();
+
 }

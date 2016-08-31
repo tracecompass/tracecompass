@@ -27,6 +27,7 @@ public class FlamegraphEvent extends TimeEvent {
 
     private final Object fSymbol;
     private final long fSelfTime;
+    private final int fProcessId;
     private final AggregatedCalledFunctionStatistics fStatistics;
 
     /**
@@ -43,6 +44,7 @@ public class FlamegraphEvent extends TimeEvent {
         super(source, beginTime, aggregatedFunction.getDuration(), String.valueOf(aggregatedFunction.getSymbol()).hashCode() % MODULO + MODULO);
         fSymbol = aggregatedFunction.getSymbol();
         fStatistics = aggregatedFunction.getFunctionStatistics();
+        fProcessId = aggregatedFunction.getProcessId();
         fSelfTime = aggregatedFunction.getSelfTime();
     }
 
@@ -71,5 +73,14 @@ public class FlamegraphEvent extends TimeEvent {
      */
     public long getSelfTime() {
         return fSelfTime;
+    }
+
+    /**
+     * The process ID of the traced application
+     *
+     * @return process id
+     */
+    public int getProcessId() {
+        return fProcessId;
     }
 }
