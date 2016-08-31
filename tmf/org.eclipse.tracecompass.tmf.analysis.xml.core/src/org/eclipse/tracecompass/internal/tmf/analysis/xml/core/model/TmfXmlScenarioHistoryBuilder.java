@@ -433,5 +433,6 @@ public class TmfXmlScenarioHistoryBuilder {
         long ts = getTimestamp(event, ss);
         TmfAttributePool pool = getPoolFor(container, info.getFsmId());
         pool.recycle(info.getQuark(), ts);
+        info.recycleAttributes(ts);
     }
 }

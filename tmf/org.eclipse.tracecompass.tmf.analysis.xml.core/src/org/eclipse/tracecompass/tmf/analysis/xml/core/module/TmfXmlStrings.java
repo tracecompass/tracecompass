@@ -163,6 +163,10 @@ public interface TmfXmlStrings {
      * @since 2.3
      */
     String SCRIPT_ENGINE = "scriptEngine";
+    /**
+     * @since 2.3
+     */
+    String TYPE_POOL = "pool";
     String INCREMENT = "increment";
     String UPDATE = "update";
     String FORCED_TYPE = "forcedType";

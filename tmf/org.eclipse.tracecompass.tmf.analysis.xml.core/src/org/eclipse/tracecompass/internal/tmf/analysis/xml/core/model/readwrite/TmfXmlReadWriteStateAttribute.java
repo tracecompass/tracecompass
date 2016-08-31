@@ -12,11 +12,16 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readwrite;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlStateAttribute;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
+import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
+import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool.QueueType;
 import org.w3c.dom.Element;
 
 /**
@@ -29,6 +34,8 @@ import org.w3c.dom.Element;
  * @author Geneviève Bastien
  */
 public class TmfXmlReadWriteStateAttribute extends TmfXmlStateAttribute {
+
+    private final Map<Integer, TmfAttributePool> fAttributePools = new HashMap<>();
 
     /**
      * Constructor
@@ -65,6 +72,20 @@ public class TmfXmlReadWriteStateAttribute extends TmfXmlStateAttribute {
             throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
         }
         return ss.getQuarkRelativeAndAdd(startNodeQuark, path);
+    }
+
+    @Override
+    protected @Nullable TmfAttributePool getAttributePool(int startNodeQuark) {
+        ITmfStateSystemBuilder ss = getStateSystem();
+        if (ss == null) {
+            throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+        }
+        TmfAttributePool pool = fAttributePools.get(startNodeQuark);
+        if (pool == null) {
+            pool = new TmfAttributePool(ss, startNodeQuark, QueueType.PRIORITY);
+            fAttributePools.put(startNodeQuark, pool);
+        }
+        return pool;
     }
 
 }

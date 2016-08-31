@@ -8,7 +8,13 @@
  ******************************************************************************/
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioHistoryBuilder.ScenarioStatusType;
+import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
 
 /**
  * This class gives basic details about a scenario (quark, scenarioName, ...)
@@ -22,6 +28,7 @@ public class TmfXmlScenarioInfo {
     private final int fStatusQuark;
     private String fActiveState;
     private ScenarioStatusType fStatus;
+    private final Map<@NonNull TmfAttributePool, Integer> fPoolAttributes = new HashMap<>();
 
     /**
      * Constructor
@@ -109,4 +116,38 @@ public class TmfXmlScenarioInfo {
     public String getFsmId() {
         return fFsm.getId();
     }
+
+    /**
+     * Get the state system quark of the attribute that was assigned to this
+     * scenario from the given attribute pool. If no attribute was assigned to
+     * this scenario, it will get one.
+     *
+     * @param pool
+     *            The attribute pool from which to get an attribute for this
+     *            scenario.
+     * @return The quark of the attribute from a pool for the given state system
+     *         path, or <code>null</code> if no attribute was assigned yet at
+     *         this path.
+     */
+    public Integer getAttributeFromPool(TmfAttributePool pool) {
+        Integer quark = fPoolAttributes.get(pool);
+        if (quark == null) {
+            quark = pool.getAvailable();
+            fPoolAttributes.put(pool, quark);
+        }
+        return quark;
+    }
+
+    /**
+     * Recycle all attributes taken from attribute pools
+     *
+     * @param ts
+     *            The timestamp at which to close the attributes
+     */
+    public void recycleAttributes(long ts) {
+        fPoolAttributes.entrySet().forEach(e -> {
+            NonNullUtils.checkNotNull(e.getKey()).recycle(e.getValue(), ts);
+        });
+    }
+
 }

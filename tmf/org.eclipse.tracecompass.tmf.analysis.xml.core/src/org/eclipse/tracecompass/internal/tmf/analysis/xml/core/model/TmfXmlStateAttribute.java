@@ -32,6 +32,7 @@ import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
+import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.w3c.dom.Element;
 
@@ -60,7 +61,8 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
         QUERY,
         LOCATION,
         SELF,
-        EVENTNAME
+        EVENTNAME,
+        POOL
     }
 
     private final String CURRENT_STATE = "#currentState"; //$NON-NLS-1$
@@ -128,6 +130,10 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
             fType = StateAttributeType.SELF;
             fName = null;
             break;
+        case TmfXmlStrings.TYPE_POOL:
+            fType = StateAttributeType.POOL;
+            fName = null;
+            break;
         default:
             throw new IllegalArgumentException("TmfXmlStateAttribute constructor: The XML element is not of the right type"); //$NON-NLS-1$
         }
@@ -174,6 +180,15 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
      *             The attribute does not exist and cannot be added
      */
     protected abstract int getQuarkRelativeAndAdd(int startNodeQuark, String... path) throws AttributeNotFoundException;
+
+    /**
+     * Get an attribute pool starting at the requested quark
+     *
+     * @param startNodeQuark
+     *            The quark of the attribute to get the pool for
+     * @return The attribute pool starting at the requested quark
+     */
+    protected abstract @Nullable TmfAttributePool getAttributePool(int startNodeQuark);
 
     /**
      * Get the state system associated with this attribute's container
@@ -329,6 +344,19 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
             }
             case SELF:
                 return startQuark;
+            case POOL: {
+                if (scenarioInfo == null) {
+                    Activator.logError("Attribute type pool: attribute pools can only be used in a context of scenarios."); //$NON-NLS-1$
+                    return IXmlStateSystemContainer.ERROR_QUARK;
+                }
+                TmfAttributePool pool = getAttributePool(startQuark);
+                if (pool == null) {
+                    Activator.logWarning("Attribute type pool: No pool was assigned for quark"); //$NON-NLS-1$
+                    return IXmlStateSystemContainer.ERROR_QUARK;
+                }
+                int quark = scenarioInfo.getAttributeFromPool(pool);
+                return quark;
+            }
             case NONE:
             default:
                 return startQuark;

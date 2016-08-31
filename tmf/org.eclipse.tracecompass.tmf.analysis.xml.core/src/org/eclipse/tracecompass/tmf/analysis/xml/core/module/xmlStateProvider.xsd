@@ -241,6 +241,9 @@
 					<xs:enumeration value="query" >
 						<xs:annotation>
 							<xs:documentation>This type indicates that the path to the attribute is the result of a query. If this type is selected, a sequence of stateAttribute elements needs to be specified for this state attribute. The result of the query is the attribute name of the current element. For example, if the attribute we want is the PID of the current process on CPU 0, that PID can be found through the query "CPUs/0/CurrentThread". The value of this attribute would be, for example, 1234, the attribute we are looking for.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="pool" >
+						<xs:annotation>
+							<xs:documentation>This type indicates that an attribute taken from an attribute pool is used for this attribute. This type of attribute is only valid in pattern analysis and will be recycled at the end of the scenario.</xs:documentation></xs:annotation></xs:enumeration>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>

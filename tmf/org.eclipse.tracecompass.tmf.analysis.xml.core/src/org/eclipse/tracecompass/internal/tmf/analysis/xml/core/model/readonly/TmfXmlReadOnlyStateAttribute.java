@@ -12,10 +12,12 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readonly;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlStateAttribute;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
+import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
 import org.w3c.dom.Element;
 
 /**
@@ -59,6 +61,12 @@ public class TmfXmlReadOnlyStateAttribute extends TmfXmlStateAttribute {
             throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
         }
         return ss.getQuarkRelative(startNodeQuark, path);
+    }
+
+    @Override
+    protected @Nullable TmfAttributePool getAttributePool(int startNodeQuark) {
+        // There should not be any attribute pools for a read-only state system
+        return null;
     }
 
 }
