@@ -24,6 +24,14 @@ Import-Package: com.google.common.collect,
  org.eclipse.tracecompass.statesystem.core.tests.shared.utils,
  org.eclipse.tracecompass.testtraces.ctf
 Export-Package: org.eclipse.tracecompass.analysis.os.linux.core.tests,
+ org.eclipse.tracecompass.analysis.os.linux.core.tests.contextswitch,
  org.eclipse.tracecompass.analysis.os.linux.core.tests.cpuusage,
+ org.eclipse.tracecompass.analysis.os.linux.core.tests.inputoutput,
+ org.eclipse.tracecompass.analysis.os.linux.core.tests.kernel,
+ org.eclipse.tracecompass.analysis.os.linux.core.tests.kernelmemoryusage,
+ org.eclipse.tracecompass.analysis.os.linux.core.tests.latency,
+ org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs,
+ org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.inputoutput,
+ org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.kernel,
  org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace
 Bundle-Activator: org.eclipse.tracecompass.analysis.os.linux.core.tests.Activator

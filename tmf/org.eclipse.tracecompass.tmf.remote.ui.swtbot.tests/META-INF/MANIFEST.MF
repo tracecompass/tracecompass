@@ -35,5 +35,6 @@ Import-Package: org.apache.log4j,
  org.eclipse.swtbot.swt.finder.utils,
  org.eclipse.swtbot.swt.finder.waits,
  org.eclipse.swtbot.swt.finder.widgets
-Export-Package: org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests
+Export-Package: org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests,
+ org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests.fetch
 Bundle-Activator: org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests.TmfRemoteUISWTBotTestPlugin
