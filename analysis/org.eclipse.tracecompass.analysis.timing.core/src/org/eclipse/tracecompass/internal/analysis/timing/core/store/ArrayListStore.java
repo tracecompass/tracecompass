@@ -121,6 +121,7 @@ public class ArrayListStore<@NonNull E extends ISegment> implements ISegmentStor
             for (int i = size() - 1; i > 0 && COMPARATOR.compare(val, fStore.get(i - 1)) < 0; i--) {
                 Collections.swap(fStore, i, i - 1);
             }
+            fLastSnapshot = null;
             return true;
         } finally {
             fLock.writeLock().unlock();

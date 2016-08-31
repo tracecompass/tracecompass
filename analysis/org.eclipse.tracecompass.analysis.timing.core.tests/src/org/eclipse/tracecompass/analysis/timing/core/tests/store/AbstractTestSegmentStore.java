@@ -14,7 +14,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -301,6 +304,56 @@ public abstract class AbstractTestSegmentStore {
         store.add(SEGMENT_2_6);
         store.dispose();
         assertEquals(0, store.size());
+    }
+
+    /**
+     * Test iterating over a store being built.
+     *
+     * bug 500607
+     */
+    @Test
+    public void testIterator() {
+        Collection<@NonNull ISegment> beforeExpected = ImmutableList.of(SEGMENT_2_6);
+        Collection<@NonNull ISegment> afterExpected = ImmutableList.of(SEGMENT_2_6, SEGMENT_4_8);
+        Collection<@NonNull ISegment> lastExpected = ImmutableList.of(SEGMENT_2_6, SEGMENT_4_8, SEGMENT_6_8);
+        Collection<@NonNull ISegment> fixture = new ArrayList<>();
+        ISegmentStore<@NonNull ISegment> store = getSegmentStore();
+
+        // Add one segment to the segment store and iterate
+        store.add(SEGMENT_2_6);
+        for (ISegment item : store) {
+            fixture.add(item);
+        }
+        assertEquals(beforeExpected, fixture);
+
+        // Add a second segment to the store and iterate
+        fixture.clear();
+        store.add(SEGMENT_4_8);
+        for (ISegment item : store) {
+            fixture.add(item);
+        }
+        assertEquals(afterExpected, fixture);
+
+        fixture.clear();
+        // Take an iterator
+        Iterator<@NonNull ISegment> iter = store.iterator();
+
+        // Add a third segment to the store and iterate
+        store.add(SEGMENT_6_8);
+        Iterator<@NonNull ISegment> iter2 = store.iterator();
+        fixture.clear();
+
+        // Make sure the first iterator take has only 2 elements and the second
+        // has 3 elements
+        while (iter.hasNext()) {
+            fixture.add(iter.next());
+        }
+        assertEquals(afterExpected, fixture);
+        fixture.clear();
+        while (iter2.hasNext()) {
+            fixture.add(iter2.next());
+        }
+        assertEquals(lastExpected, fixture);
     }
 
 }
