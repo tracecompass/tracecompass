@@ -52,8 +52,9 @@ abstract class AbstractCalledFunction implements ICalledFunction {
     private final List<ICalledFunction> fChildren = new ArrayList<>();
     private final @Nullable ICalledFunction fParent;
     protected long fSelfTime = 0;
+    private final int fProcessId;
 
-    public AbstractCalledFunction(long start, long end, int depth, @Nullable ICalledFunction parent) {
+    public AbstractCalledFunction(long start, long end, int depth, int processId, @Nullable ICalledFunction parent) {
         if (start > end) {
             throw new IllegalArgumentException(Messages.TimeError + "[" + start + "," + end + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
@@ -63,6 +64,7 @@ abstract class AbstractCalledFunction implements ICalledFunction {
         fParent = parent;
         // It'll be modified once we add a child to it
         fSelfTime = fEnd - fStart;
+        fProcessId = processId;
     }
 
     @Override
@@ -119,6 +121,11 @@ abstract class AbstractCalledFunction implements ICalledFunction {
     @Override
     public int getDepth() {
         return fDepth;
+    }
+
+    @Override
+    public int getProcessId() {
+        return fProcessId;
     }
 
     @Override

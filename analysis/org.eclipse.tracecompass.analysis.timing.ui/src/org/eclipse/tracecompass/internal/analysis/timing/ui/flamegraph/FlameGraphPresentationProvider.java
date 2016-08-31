@@ -134,6 +134,15 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
             if (funcSymbol == null) {
                 return "0x" + Long.toHexString(longAddress); //$NON-NLS-1$
             }
+            // take time of max segment for time a query the symbol name
+            long time = event.getStatistics().getMaxSegment().getStart();
+            int pid = event.getProcessId();
+            if (pid > 0) {
+                String text = symbolProvider.getSymbolText(pid, time, longAddress);
+                if (text != null) {
+                    return text;
+                }
+            }
         } else {
             return event.getSymbol().toString();
         }

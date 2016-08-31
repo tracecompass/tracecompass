@@ -37,24 +37,26 @@ public class CalledFunctionFactory {
      *            the depth
      * @param stateValue
      *            the symbol
+     * @param processId
+     *            The process ID of the traced application
      * @param parent
      *            the parent node
-     * @return an ICalledFunction with the specified propertiess
+     * @return an ICalledFunction with the specified properties
      */
-    public static AbstractCalledFunction create(long start, long end, int depth, ITmfStateValue stateValue, @Nullable ICalledFunction parent) {
+    public static AbstractCalledFunction create(long start, long end, int depth, ITmfStateValue stateValue, int processId, @Nullable ICalledFunction parent) {
         switch (stateValue.getType()) {
         case CUSTOM:
             throw new IllegalArgumentException(ERROR_MSG + stateValue.getType() + SEPARATOR + stateValue.toString());
         case DOUBLE:
             throw new IllegalArgumentException(ERROR_MSG + stateValue.getType() + SEPARATOR + stateValue.toString());
         case INTEGER:
-            return create(start, end, depth, stateValue.unboxInt(), parent);
+            return create(start, end, depth, stateValue.unboxInt(), processId, parent);
         case LONG:
-            return create(start, end, depth, stateValue.unboxLong(), parent);
+            return create(start, end, depth, stateValue.unboxLong(), processId, parent);
         case NULL:
             throw new IllegalArgumentException(ERROR_MSG + stateValue.getType() + SEPARATOR + stateValue.toString());
         case STRING:
-            return create(start, end, depth, stateValue.unboxStr(), parent);
+            return create(start, end, depth, stateValue.unboxStr(), processId, parent);
         default:
             throw new IllegalArgumentException(ERROR_MSG + stateValue.getType() + SEPARATOR + stateValue.toString());
         }
@@ -72,15 +74,17 @@ public class CalledFunctionFactory {
      *            the depth
      * @param value
      *            the symbol
+     * @param processId
+     *            The process ID of the traced application
      * @param parent
      *            the parent node
      * @return an ICalledFunction with the specified propertiess
      */
-    private static CalledFunction create(long start, long end, int depth, long value, @Nullable ICalledFunction parent) {
+    private static CalledFunction create(long start, long end, int depth, long value, int processId, @Nullable ICalledFunction parent) {
         if (start > end) {
             throw new IllegalArgumentException(Messages.TimeError + '[' + start + ',' + end + ']');
         }
-        return new CalledFunction(start, end, value, depth, parent);
+        return new CalledFunction(start, end, value, depth, processId, parent);
     }
 
     /**
@@ -95,14 +99,16 @@ public class CalledFunctionFactory {
      *            the depth
      * @param value
      *            the symbol
+     * @param processId
+     *            The process ID of the traced application
      * @param parent
      *            the parent node
      * @return an ICalledFunction with the specified properties
      */
-    public static CalledStringFunction create(long start, long end, int depth, String value, @Nullable ICalledFunction parent) {
+    public static CalledStringFunction create(long start, long end, int depth, String value, int processId,  @Nullable ICalledFunction parent) {
         if (start > end) {
             throw new IllegalArgumentException(Messages.TimeError + '[' + start + ',' + end + ']');
         }
-        return new CalledStringFunction(start, end, value, depth, parent);
+        return new CalledStringFunction(start, end, value, depth, processId, parent);
     }
 }

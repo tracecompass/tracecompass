@@ -45,6 +45,7 @@ public class AggregatedCalledFunction {
     private final AggregatedCalledFunctionStatistics fStatistics;
     private long fDuration;
     private long fSelfTime;
+    private final int fProcessId;
 
     /**
      * Constructor, parent is not null
@@ -60,6 +61,7 @@ public class AggregatedCalledFunction {
         fDuration = calledFunction.getLength();
         fSelfTime = calledFunction.getLength();
         fDepth = calledFunction.getDepth();
+        fProcessId = calledFunction.getProcessId();
         fMaxDepth = parent.getMaxDepth();
         fParent = parent;
         fStatistics = new AggregatedCalledFunctionStatistics(calledFunction, calledFunction);
@@ -78,6 +80,7 @@ public class AggregatedCalledFunction {
         fDuration = calledFunction.getLength();
         fSelfTime = calledFunction.getLength();
         fDepth = calledFunction.getDepth();
+        fProcessId = calledFunction.getProcessId();
         fMaxDepth = maxDepth;
         fParent = null;
         fStatistics = new AggregatedCalledFunctionStatistics(calledFunction, calledFunction);
@@ -234,6 +237,14 @@ public class AggregatedCalledFunction {
      */
     public void addToSelfTime(long selfTime) {
         fSelfTime += selfTime;
+    }
+
+    /**
+     * The process ID of the trace application.
+     * @return The process Id
+     */
+    public int getProcessId() {
+        return fProcessId;
     }
 
     /**
