@@ -308,7 +308,6 @@ public class ProjectExplorerTraceActionsTest {
     public void test4_08OpenDoubleClick() throws WidgetNotFoundException {
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
-        traceItem.select();
         traceItem.doubleClick();
 
         testEventsTable(TRACE_NAME);
@@ -329,7 +328,6 @@ public class ProjectExplorerTraceActionsTest {
     public void test4_09BringToTop() {
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
-        traceItem.select();
         traceItem.doubleClick();
         fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, TRACE_NAME));
         IEditorReference originalEditor = fBot.activeEditor().getReference();
@@ -337,12 +335,9 @@ public class ProjectExplorerTraceActionsTest {
         createCopy(traceItem);
 
         SWTBotTreeItem copiedItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), RENAMED_TRACE_NAME);
-        copiedItem.select();
-        copiedItem.doubleClick();
         copiedItem.doubleClick();
         fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, RENAMED_TRACE_NAME));
         SWTBotUtils.delay(1000);
-        traceItem.select();
         traceItem.doubleClick();
         fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, TRACE_NAME));
         assertTrue(originalEditor == fBot.activeEditor().getReference());

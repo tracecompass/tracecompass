@@ -549,7 +549,6 @@ public final class SWTBotUtils {
         SWTBotTreeItem currentItem = tracesNode;
         for (String segment : elementPath.segments()) {
             currentItem = getTraceProjectItem(projectExplorerBot, currentItem, segment);
-            currentItem.select();
             currentItem.doubleClick();
         }
 

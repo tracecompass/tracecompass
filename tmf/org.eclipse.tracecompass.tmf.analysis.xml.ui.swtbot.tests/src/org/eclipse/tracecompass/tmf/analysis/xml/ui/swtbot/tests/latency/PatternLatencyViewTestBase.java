@@ -130,7 +130,6 @@ public abstract class PatternLatencyViewTestBase {
     private static void openView(final String viewTitle) {
         SWTBotTreeItem treeItem = SWTBotUtils.selectTracesFolder(fBot, PROJECT_NAME);
         treeItem = SWTBotUtils.getTreeItem(fBot, treeItem, TRACE_NAME, "Views", "XML system call analysis", viewTitle);
-        treeItem.select();
         treeItem.doubleClick();
     }
 
