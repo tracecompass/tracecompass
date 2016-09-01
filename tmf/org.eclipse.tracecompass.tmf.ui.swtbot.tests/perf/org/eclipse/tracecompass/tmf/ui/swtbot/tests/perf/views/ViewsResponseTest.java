@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.perf.views;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 import java.util.Collection;
 
@@ -207,6 +209,7 @@ public abstract class ViewsResponseTest {
 
         // Set the time range to the full trace range
         ITmfTrace activeTrace = TmfTraceManager.getInstance().getActiveTrace();
+        assertNotNull(activeTrace);
         TmfTimeRange fullRange = new TmfTimeRange(activeTrace.getStartTime(), activeTrace.getEndTime());
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, fullRange));
         waitViewReady(part, selectionRange, fullRange.getEndTime());

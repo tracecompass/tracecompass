@@ -33,6 +33,7 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
@@ -127,7 +128,9 @@ public class TestImportExportPackageWizard {
         SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotUtils.openTrace(PROJECT_NAME, f.getAbsolutePath(), XMLSTUB_ID);
         WaitUtils.waitForJobs();
-        assertEquals("Incorrect opened trace!", f.getAbsolutePath(), (new File(TmfTraceManager.getInstance().getActiveTrace().getPath())).getAbsolutePath());
+        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
+        assertNotNull(trace);
+        assertEquals("Incorrect opened trace!", f.getAbsolutePath(), (new File(trace.getPath())).getAbsolutePath());
         SWTBotView projectExplorerBot = fBot.viewByTitle(PROJECT_EXPLORER);
         assertNotNull("Cannot find " + PROJECT_EXPLORER, projectExplorerBot);
         projectExplorerBot.show();
@@ -177,8 +180,10 @@ public class TestImportExportPackageWizard {
         fBot.waitUntil(Conditions.shellCloses(shell));
         fBot = new SWTWorkbenchBot();
         SWTBotUtils.openEditor(fBot, PROJECT_NAME, new Path(f.getName()));
-        assertEquals("Test if import matches", f.getName(), TmfTraceManager.getInstance().getActiveTrace().getName());
-        assertFalse("Test if import files don't match", f.getAbsolutePath().equals(TmfTraceManager.getInstance().getActiveTrace().getPath()));
+        trace = TmfTraceManager.getInstance().getActiveTrace();
+        assertNotNull(trace);
+        assertEquals("Test if import matches", f.getName(), trace.getName());
+        assertFalse("Test if import files don't match", f.getAbsolutePath().equals(trace.getPath()));
         SWTBotUtils.deleteProject(PROJECT_NAME, fBot);
         WaitUtils.waitForJobs();
     }

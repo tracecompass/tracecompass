@@ -35,6 +35,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
@@ -65,6 +66,7 @@ import com.google.common.collect.ImmutableSet;
  *
  * @author Alexandre Montplaisir
  */
+@NonNullByDefault
 public final class TmfTraceManager {
 
     // ------------------------------------------------------------------------
@@ -74,7 +76,7 @@ public final class TmfTraceManager {
     private final Map<ITmfTrace, TmfTraceContext> fTraces;
 
     /** The currently-selected trace. Should always be part of the trace map */
-    private ITmfTrace fCurrentTrace = null;
+    private @Nullable ITmfTrace fCurrentTrace = null;
 
     private static final String TEMP_DIR_NAME = ".temp"; //$NON-NLS-1$
 
@@ -88,7 +90,7 @@ public final class TmfTraceManager {
     }
 
     /** Singleton instance */
-    private static TmfTraceManager tm = null;
+    private static @Nullable TmfTraceManager tm = null;
 
     /**
      * Get an instance of the trace manager.
@@ -96,10 +98,12 @@ public final class TmfTraceManager {
      * @return The trace manager
      */
     public static synchronized TmfTraceManager getInstance() {
-        if (tm == null) {
-            tm = new TmfTraceManager();
+        TmfTraceManager mgr = tm;
+        if (mgr == null) {
+            mgr = new TmfTraceManager();
+            tm = mgr;
         }
-        return tm;
+        return mgr;
     }
 
     // ------------------------------------------------------------------------
@@ -109,19 +113,21 @@ public final class TmfTraceManager {
     /**
      * Get the currently selected trace (normally, the focused editor).
      *
-     * @return The active trace
+     * @return The active trace, or <code>null</code> if there is no active
+     *         trace
      */
-    public synchronized ITmfTrace getActiveTrace() {
+    public synchronized @Nullable ITmfTrace getActiveTrace() {
         return fCurrentTrace;
     }
 
     /**
      * Get the trace set of the currently active trace.
      *
-     * @return The active trace set
+     * @return The active trace set. Empty (but non-null) if there is no
+     *         currently active trace.
      * @see #getTraceSet(ITmfTrace)
      */
-    public synchronized @NonNull Collection<ITmfTrace> getActiveTraceSet() {
+    public synchronized Collection<ITmfTrace> getActiveTraceSet() {
         final ITmfTrace trace = fCurrentTrace;
         return getTraceSet(trace);
     }
@@ -142,7 +148,7 @@ public final class TmfTraceManager {
      *            the trace
      * @return the editor file or null if the trace is not opened
      */
-    public synchronized IFile getTraceEditorFile(ITmfTrace trace) {
+    public synchronized @Nullable IFile getTraceEditorFile(ITmfTrace trace) {
         TmfTraceContext ctx = fTraces.get(trace);
         if (ctx != null) {
             return ctx.getEditorFile();
@@ -176,10 +182,11 @@ public final class TmfTraceManager {
      * all the traces contained in this experiment.
      *
      * @param trace
-     *            The trace or experiment
+     *            The trace or experiment. If it is null, an empty collection
+     *            will be returned.
      * @return The corresponding trace set.
      */
-    public static @NonNull Collection<@NonNull ITmfTrace> getTraceSet(ITmfTrace trace) {
+    public static Collection<ITmfTrace> getTraceSet(@Nullable ITmfTrace trace) {
         if (trace == null) {
             return ImmutableSet.of();
         }
@@ -197,10 +204,11 @@ public final class TmfTraceManager {
      * this experiment, along with the experiment.
      *
      * @param trace
-     *            The trace or experiment
+     *            The trace or experiment. If it is null, an empty collection
+     *            will be returned.
      * @return The corresponding trace set, including the experiment.
      */
-    public static @NonNull Collection<ITmfTrace> getTraceSetWithExperiment(ITmfTrace trace) {
+    public static Collection<ITmfTrace> getTraceSetWithExperiment(@Nullable ITmfTrace trace) {
         if (trace == null) {
             return ImmutableSet.of();
         }
@@ -315,11 +323,13 @@ public final class TmfTraceManager {
 
     /**
      * Signal propagator
-     * @param signal any signal
+     *
+     * @param signal
+     *            any signal
      * @since 2.0
      */
     @TmfSignalHandler
-    public synchronized void signalReceived(final @NonNull TmfTraceModelSignal signal) {
+    public synchronized void signalReceived(final TmfTraceModelSignal signal) {
         fTraces.forEach((t, u) -> u.receive(signal));
     }
 

@@ -27,6 +27,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.ControlFlowView;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.junit.Before;
@@ -83,7 +84,9 @@ public class CriticalPathTest extends KernelTestBase {
             assertEquals(0, allItems[i].getNodes().size());
         }
 
-        SWTBotTreeItem item = treeCfv.getTreeItem(TmfTraceManager.getInstance().getActiveTrace().getName());
+        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
+        assertNotNull(trace);
+        SWTBotTreeItem item = treeCfv.getTreeItem(trace.getName());
         assertNotNull(item);
         item = item.getNode("systemd");
         assertNotNull(item);

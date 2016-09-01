@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.viewers.events;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -105,6 +107,7 @@ public class TestRefreshTextTrace {
     @Test
     public void testRefresh() throws IOException {
         ITmfTrace activeTrace = TmfTraceManager.getInstance().getActiveTrace();
+        assertNotNull(activeTrace);
 
         fBot.waitUntil(new NumberOfEventsCondition(activeTrace, INITIAL_NB_EVENTS));
 
