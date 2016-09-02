@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.core.callstack;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 
 /**
@@ -25,7 +26,7 @@ public class Messages extends NLS {
      * The value popped from a 'func_exit' event doesn't match the current
      * function name.
      */
-    public static String CallStackStateProvider_UnmatchedPoppedValue;
+    public static @Nullable String CallStackStateProvider_UnmatchedPoppedValue;
 
     static {
         // initialize resource bundle

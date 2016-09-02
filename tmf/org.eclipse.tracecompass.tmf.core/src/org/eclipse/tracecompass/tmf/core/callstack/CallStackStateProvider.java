@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.tmf.core.callstack;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
@@ -72,7 +71,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  *
  * @author Patrick Tasse
  */
-@NonNullByDefault
 public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
 
     /**

@@ -8,7 +8,6 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.tmf.core.callstack;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 
 /**
@@ -18,7 +17,6 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModul
  * @author Matthew Khouzam
  * @since 2.1
  */
-@NonNullByDefault
 public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule {
 
     private static final String[] DEFAULT_PROCESSES_PATTERN = new String[] { CallStackStateProvider.PROCESSES, "*" }; //$NON-NLS-1$
