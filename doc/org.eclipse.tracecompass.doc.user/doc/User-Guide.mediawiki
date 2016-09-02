@@ -70,7 +70,7 @@ Also, the LTTng plug-ins supports the following User Space traces views:
 
 * ''Memory Usage'' - to visualize the memory usage per thread with respect to time in the traces
 * ''Call Stack'' - to visualize the call stack's evolution over time
-* ''Function Density'' - to visualize function calls displayed by duration
+* ''Function Duration Density'' - to visualize function calls displayed by duration
 * ''Flame Graph'' - to visualize why the CPU is busy
 
 Finally, the LTTng plug-ins supports the following Control views:
@@ -2357,6 +2357,10 @@ A time aligned XY chart of the read and write speed for the different disks on t
 
  [[Image:images/io/diskIoActivity.png| Disk I/O Activity Example]]
 
+== System Call Latency Analysis ==
+
+The '''System Call Latency Analysis''' measures the system call latency between system call entry and exit per type of system call. The durations are visualized using the '''Latency''' views. For more information about the '''Latency''' views see chapter [[#Latency_Analyses | Latency Analyses]].
+
 == LTTng Kernel Events Editor ==
 
 The LTTng Kernel Events editor '''is''' the plain TMF [[#Events_Editor | Events Editor]], except that it provides its own specialized viewer to replace the standard one. In short, it has exactly the same behaviour but the layout is slightly different:
@@ -2550,6 +2554,13 @@ The following keyboard shortcuts are available:
 === Importing a binary or function name mapping file (for LTTng-UST <2.8 traces) ===
 
 See Call Stack View's '''[[#Call Stack View | Importing a binary or function name mapping file (for LTTng-UST <2.8 traces) ]]'''.
+
+== Function Duration Density ==
+The '''Function Duration Density''' view shows the function duration of function displayed by duration for the current active time window range. This is useful to find global outliers.
+
+[[Image:images/FunctionDensityView.png|Function Duration Density View]]
+
+Using the right mouse button to drag horizontally it will update the table and graph to show only the density for the selected durations. Durations outside the selection range will be filtered out. Using the toolbar button [[Image:images/zoomout_nav.gif]] the zoom range will be reset.
 
 == Memory Usage ==
 
@@ -3539,11 +3550,12 @@ Right-clicking on an entry of the table and select '''Go to maximum''' allows to
 
 [[Image:images/LatenciesStatistics.png| Latency Statistics example - System Call Latency Statistics]]
 
-
 * System Call Density
-A '''density''' view, analyzing the current time range. This is useful to find global outliers.
+A '''density''' view, analyzing the current time range. This is useful to find global outliers. Selecting a duration in the table it will synchronize other views to this time range.
 
 [[Image:images/LatenciesDensity.png| Latency Densities example - System Call Density]]
+
+Using the right mouse button to drag horizontally it will update the table and graph to show only the density for the selected durations. Durations outside the selection range will be filtered out. Using the toolbar button [[Image:images/zoomout_nav.gif]] the zoom range will be reset. 
 
 = Virtual Machine Analysis =
 
