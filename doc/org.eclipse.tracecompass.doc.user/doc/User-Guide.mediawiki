@@ -1786,9 +1786,34 @@ To configure the LTTng command execution timeout, select '''Tracing -> Remote Co
 
 = LTTng Kernel Analysis =
 
-Historically, LTTng was developped to trace the Linux kernel and, over time, a number of kernel-oriented analysis views were developped and organized in a perspective.
+Historically, LTTng was developed to trace the Linux kernel and, over time, a number of kernel-oriented analysis views were developed and organized in a perspective.
 
-This section presents a description of the LTTng Kernel Perspective.
+This section presents a description of the '''OS Tracing Overview''' perspective and the '''LTTng Kernel''' perspective.
+
+== OS Tracing Overview Perspective ==
+
+The '''OS Tracing Overview''' perspective groups the following views:
+
+* [[#Project Explorer_View | Project Explorer View]]
+* [[#Events_Editor | Events Editor]]
+* [[#Histogram_View | Histogram View]]
+* [[#LTTng CPU Usage View | CPU Usage View]]
+* [[#Disk I/O Activity View | Disk I/O Activity View]]
+* [[#Kernel Memory Usage View | Kernel Memory Usage View]]
+
+The perspective can be opened from the Eclipse Open Perspective dialog ('''Window > Open Perspective... > Other''').
+
+[[Image:images/osOverview/select_os_overview.png]]
+
+This perspective is intended to be used to locate performance issues by observing resource usage.
+
+The perspective can show times resource usage is anomalous. This can help locating the causes of system slowdowns in throughput or response time.
+
+An example can be program that is doing a lot of processing then slows down due to a database access. The user will see a dip in CPU usage and maybe a slight rise in I/O access. The user should consider both spike and slums to be an indication of an area worth investigating.
+
+[[Image:images/osOverview/os_overview_perspective.png]]
+
+Once a performance issue has been localized, it can be further investigated with the #LTTng kernel Perspective.
 
 == LTTng Kernel Perspective ==
 
@@ -2220,7 +2245,7 @@ The CPU Usage View '''toolbar''', located at the top right of the view, has shor
 ==== CPU Filtering ====
 [[#Follow CPU | Follow a CPU]] will filter the CPU Usage View and will display only usage for the followed CPU.
 
-== Kernel Memory Usage ==
+== Kernel Memory Usage View ==
 
 The Kernel Memory Usage and view is specific to kernel traces. To open the view, double-click on the '''Kernel Memory Usage Analysis''' tree element under the '''Kernel''' tree element of the Project Explorer.
 
@@ -2352,7 +2377,7 @@ And enable the following tracepoint
 
 The following views are available for input/output analyses:
 
-* Disk I/O Activity
+==== Disk I/O Activity View ====
 A time aligned XY chart of the read and write speed for the different disks on the system. This view is useful to see where there was more activity on the disks and whether it was mostly reads or writes.
 
  [[Image:images/io/diskIoActivity.png| Disk I/O Activity Example]]
