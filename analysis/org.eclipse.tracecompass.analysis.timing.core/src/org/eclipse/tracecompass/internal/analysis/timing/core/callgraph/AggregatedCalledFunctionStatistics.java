@@ -10,7 +10,6 @@
 package org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;
 
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
-import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 
 /**
@@ -67,23 +66,15 @@ public class AggregatedCalledFunctionStatistics extends SegmentStoreStatistics {
      * Update the statistics, this is used while merging nodes for the
      * aggregation tree.
      *
-     * @param maxSegment
-     *            The longest segment of the function to be merged
-     * @param minSegment
-     *            The shortest segment of the function to be merged
+     * @param statisticsNode
+     *            The statistics node to be merged
      * @param duration
      *            The function to be merged duration
      * @param selfTime
      *            The function to be merged self time
      */
-    public void update(ISegment maxSegment, ISegment minSegment, long duration, long selfTime) {
-        update(new BasicSegment(0, duration));
-        if (maxSegment.getLength() > fMaxSegment.getLength()) {
-            fMaxSegment = maxSegment;
-        }
-        if (minSegment.getLength() < fMinSegment.getLength()) {
-            fMinSegment = minSegment;
-        }
+    public void update(SegmentStoreStatistics statisticsNode, long duration, long selfTime) {
+        merge(statisticsNode);
         if (fMaxSelfTime < selfTime) {
             fMaxSelfTime = selfTime;
         }

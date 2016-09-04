@@ -179,7 +179,7 @@ public class AggregatedCalledFunction {
         long sourceSelfTime = source.getSelfTime();
         destination.addToDuration(sourceDuration);
         destination.addToSelfTime(sourceSelfTime);
-        destination.fStatistics.update(source.fStatistics.getMaxSegment(), source.fStatistics.getMinSegment(), sourceDuration, sourceSelfTime);
+        destination.getFunctionStatistics().update(source.getFunctionStatistics(), sourceDuration, sourceSelfTime);
         // merge the children callees.
         mergeChildren(destination, source);
     }
