@@ -8,13 +8,14 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
@@ -22,6 +23,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.ImmutableList;
@@ -37,7 +39,7 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
 
     private @Nullable SegmentStoreStatistics fTotalStats;
 
-    private @Nullable Map<String, SegmentStoreStatistics> fPerSegmentTypeStats;
+    private Map<String, SegmentStoreStatistics> fPerSegmentTypeStats = new HashMap<>();
 
     @Override
     protected Iterable<IAnalysisModule> getDependentAnalyses() {
@@ -54,52 +56,130 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
 
     @Override
     protected boolean executeAnalysis(IProgressMonitor monitor) throws TmfAnalysisException {
-        IAnalysisModule segmentStoreProviderModule = fSegmentStoreProviderModule;
-        ITmfTrace trace = getTrace();
-        if (!(segmentStoreProviderModule instanceof ISegmentStoreProvider) || (trace == null)) {
+        if (monitor.isCanceled()) {
             return false;
+        }
+        @Nullable SegmentStoreStatistics totalStats = getTotalStats(TmfTimeRange.ETERNITY.getStartTime().toNanos(), TmfTimeRange.ETERNITY.getEndTime().toNanos(), monitor);
+        if (totalStats == null) {
+            return false;
+        }
+
+        @Nullable Map<@NonNull String, @NonNull SegmentStoreStatistics> perTypeStats = getPerTypeStats(TmfTimeRange.ETERNITY.getStartTime().toNanos(), TmfTimeRange.ETERNITY.getEndTime().toNanos(), monitor);
+        if (perTypeStats == null) {
+            return false;
+        }
+        fTotalStats = totalStats;
+        fPerSegmentTypeStats = perTypeStats;
+        return true;
+    }
+
+    private @Nullable SegmentStoreStatistics getTotalStats(long start, long end , IProgressMonitor monitor) {
+        Collection<@NonNull ISegment> store = getSegmentStore(start, end);
+        if (store == null) {
+            return null;
+        }
+        if (monitor.isCanceled()) {
+            return null;
+        }
+        return calculateTotalManual(store, monitor);
+    }
+
+    /**
+     * Get the total statistics for a specific range. If the range start is
+     * TmfTimeRange.ETERNITY.getStartTime().toNanos() and the range end is
+     * TmfTimeRange.ETERNITY.getEndTime().toNanos(), it will return the
+     * statistics for the whole trace.
+     *
+     * @param start
+     *            The start time of the range
+     * @param end
+     *            The end time of the range
+     * @param monitor
+     *            The progress monitor
+     * @return The total statistics, or null if segment store is not valid or if
+     *         the request is canceled
+     * @since 1.2
+     */
+    public @Nullable SegmentStoreStatistics getTotalStatsForRange(long start, long end, IProgressMonitor monitor) {
+        @Nullable ITmfTrace trace = getTrace();
+        if (trace != null && (start == TmfTimeRange.ETERNITY.getStartTime().toNanos() && end == TmfTimeRange.ETERNITY.getEndTime().toNanos())) {
+            waitForCompletion();
+            return getTotalStats();
+        }
+        return getTotalStats(start, end, monitor);
+    }
+
+    private @Nullable Map<@NonNull String, @NonNull SegmentStoreStatistics> getPerTypeStats(long start, long end , IProgressMonitor monitor) {
+        Collection<@NonNull ISegment> store = getSegmentStore(start, end);
+        if (monitor.isCanceled()) {
+            return Collections.EMPTY_MAP;
+        }
+        return calculateTotalPerType(store, monitor);
+    }
+
+    /**
+     * Get the per segment type statistics for a specific range. If the range
+     * start is TmfTimeRange.ETERNITY.getStartTime().toNanos() and the range end
+     * is TmfTimeRange.ETERNITY.getEndTime().toNanos(), it will return the
+     * statistics for the whole trace.
+     *
+     * @param start
+     *            The start time of the range
+     * @param end
+     *            The end time of the range
+     * @param monitor
+     *            The progress monitor
+     * @return The per segment type statistics, or null if segment store is not
+     *         valid or if the request is canceled
+     * @since 1.2
+     */
+    public @Nullable Map<@NonNull String, @NonNull SegmentStoreStatistics> getPerSegmentTypeStatsForRange(long start, long end, IProgressMonitor monitor) {
+        @Nullable ITmfTrace trace = getTrace();
+        if (trace != null && (start == TmfTimeRange.ETERNITY.getStartTime().toNanos() && end == TmfTimeRange.ETERNITY.getEndTime().toNanos())) {
+            waitForCompletion();
+            return getPerSegmentTypeStats();
+        }
+        return getPerTypeStats(start, end, monitor);
+    }
+
+    /**
+     * Get the segment store from which we want the statistics
+     *
+     * @return The segment store
+     */
+    private @Nullable Collection<@NonNull ISegment> getSegmentStore(long start, long end) {
+        IAnalysisModule segmentStoreProviderModule = fSegmentStoreProviderModule;
+        if (!(segmentStoreProviderModule instanceof ISegmentStoreProvider)) {
+            return null;
         }
         segmentStoreProviderModule.waitForCompletion();
 
-        ISegmentStore<ISegment> segStore = ((ISegmentStoreProvider) segmentStoreProviderModule).getSegmentStore();
-
-        if (segStore != null) {
-
-            boolean result = calculateTotalManual(segStore, monitor);
-
-            if (!result) {
-                return false;
-            }
-
-            result = calculateTotalPerType(segStore, monitor);
-            if (!result) {
-                return false;
-            }
-        }
-        return true;
+        @Nullable ISegmentStore<@NonNull ISegment> segmentStore = ((ISegmentStoreProvider) segmentStoreProviderModule).getSegmentStore();
+        return segmentStore != null ?
+                    start != TmfTimeRange.ETERNITY.getStartTime().toNanos() || end != TmfTimeRange.ETERNITY.getEndTime().toNanos() ? (Collection<@NonNull ISegment>) segmentStore.getIntersectingElements(start, end) : segmentStore
+                    : Collections.EMPTY_LIST;
     }
 
-    private boolean calculateTotalManual(ISegmentStore<ISegment> store, IProgressMonitor monitor) {
+    private static @Nullable SegmentStoreStatistics calculateTotalManual(Collection<@NonNull ISegment> segments, IProgressMonitor monitor) {
         SegmentStoreStatistics total = new SegmentStoreStatistics();
-        Iterator<ISegment> iter = store.iterator();
+        Iterator<@NonNull ISegment> iter = segments.iterator();
         while (iter.hasNext()) {
             if (monitor.isCanceled()) {
-                return false;
+                return null;
             }
-            ISegment segment = iter.next();
-            total.update(checkNotNull(segment));
+            @NonNull ISegment segment = iter.next();
+            total.update(segment);
         }
-        fTotalStats = total;
-        return true;
+        return total;
     }
 
-    private boolean calculateTotalPerType(ISegmentStore<ISegment> store, IProgressMonitor monitor) {
+    private Map<@NonNull String, @NonNull SegmentStoreStatistics> calculateTotalPerType(Collection<ISegment> segments, IProgressMonitor monitor) {
         Map<String, SegmentStoreStatistics> perSegmentTypeStats = new HashMap<>();
 
-        Iterator<ISegment> iter = store.iterator();
+        Iterator<ISegment> iter = segments.iterator();
         while (iter.hasNext()) {
             if (monitor.isCanceled()) {
-                return false;
+                return Collections.EMPTY_MAP;
             }
             ISegment segment = iter.next();
             String segmentType = getSegmentType(segment);
@@ -112,8 +192,7 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
                 perSegmentTypeStats.put(segmentType, values);
             }
         }
-        fPerSegmentTypeStats = perSegmentTypeStats;
-        return true;
+        return perSegmentTypeStats;
     }
 
     /**

@@ -194,7 +194,6 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
         assertEquals("175.875 ms", fTreeBot.cell(0, STDEV_COL));
         assertEquals("1801", fTreeBot.cell(0, COUNT_COL));
         SWTBotTreeItem treeItem = fTreeBot.getTreeItem("Total");
-        treeItem = treeItem.getNode(0);
         assertEquals(55, treeItem.getNodes().size());
         validate(treeItem.getNode(2), "select", "13.600 µs", "1.509 s", "192.251 ms", "386.369 ms", "58");
         validate(treeItem.getNode(3), "poll", "6.300 µs", "6.800 µs", "6.550 µs", "---", "2");

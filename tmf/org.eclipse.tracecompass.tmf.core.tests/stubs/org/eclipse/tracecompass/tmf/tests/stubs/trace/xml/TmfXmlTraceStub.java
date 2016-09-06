@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
@@ -36,18 +38,20 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.DefaultLocation;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
-import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfContentFieldAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -67,6 +71,7 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 /**
  * An XML development trace using a custom XML trace definition and schema.
@@ -106,6 +111,7 @@ public class TmfXmlTraceStub extends TmfTrace {
 
     private Collection<ITmfEventAspect<?>> fAspects = TmfTrace.BASE_ASPECTS;
     private final Collection<ITmfEventAspect<?>> fAdditionalAspects = new HashSet<>();
+    private final Collection<IAnalysisModule> fAdditionalModules = new HashSet<>();
 
     /**
      * Validate and initialize a {@link TmfXmlTraceStub} object
@@ -402,4 +408,26 @@ public class TmfXmlTraceStub extends TmfTrace {
         fAdditionalAspects.add(aspect);
     }
 
+    /**
+     * Add an additional new module
+     *
+     * @param module
+     *            The new module
+     */
+    public void addAnalysisModule(IAnalysisModule module) {
+        fAdditionalModules.add(module);
+    }
+
+    @Override
+    public Iterable<@NonNull IAnalysisModule> getAnalysisModules() {
+        @NonNull Iterable<IAnalysisModule> modules = super.getAnalysisModules();
+        return checkNotNull(Iterables.concat(modules, fAdditionalModules));
+    }
+
+    @Override
+    public @Nullable IAnalysisModule getAnalysisModule(@Nullable String analysisId) {
+        Iterable<@NonNull IAnalysisModule> modules = getAnalysisModules();
+        Optional<IAnalysisModule> opt = StreamSupport.stream(modules.spliterator(), false).filter(analysis -> analysis.getId().equals(analysisId)).findFirst();
+        return opt.isPresent() ? opt.get() : null;
+    }
 }
