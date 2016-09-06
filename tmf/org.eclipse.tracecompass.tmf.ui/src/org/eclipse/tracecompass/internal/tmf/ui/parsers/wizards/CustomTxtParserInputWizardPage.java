@@ -261,6 +261,10 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 if (inputLine.parentInput == null) {
                     definition.inputs.remove(inputLine);
                 } else {
+                    int index = inputLine.parentInput.childrenInputs.indexOf(inputLine);
+                    if (index > 0) {
+                        inputLine.parentInput.childrenInputs.get(index - 1).nextInput = inputLine.nextInput;
+                    }
                     inputLine.parentInput.childrenInputs.remove(inputLine);
                 }
                 treeViewer.refresh();
