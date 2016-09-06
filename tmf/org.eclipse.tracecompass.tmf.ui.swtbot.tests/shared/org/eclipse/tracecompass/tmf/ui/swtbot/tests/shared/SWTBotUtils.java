@@ -397,6 +397,10 @@ public final class SWTBotUtils {
         String gtkVersion = System.getProperty("org.eclipse.swt.internal.gtk.version");
         if (gtkVersion != null) {
             System.out.println("GTK version=" + gtkVersion);
+            // Try to print the GTK theme information as behavior can change depending on the theme
+            String gtkTheme = System.getProperty("org.eclipse.swt.internal.gtk.theme");
+            System.out.println("GTK theme=" + (gtkTheme == null ? "unknown" : gtkTheme));
+
             String overlayScrollbar = System.getenv("LIBOVERLAY_SCROLLBAR");
             if (overlayScrollbar != null) {
                 System.out.println("LIBOVERLAY_SCROLLBAR=" + overlayScrollbar);
