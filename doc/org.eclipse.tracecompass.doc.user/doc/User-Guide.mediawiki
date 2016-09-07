@@ -2042,6 +2042,14 @@ The Control Flow View '''toolbar''', located at the top right of the view, has s
 | [[Image:images/follow_arrow_fwd.gif]]
 | Follow CPU Forward
 | Selects the next state following CPU execution across processes. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
+|-
+| [[Image:images/shift_l_edit.gif]]
+| Go to previous event of the selected thread
+| Move to the closest previous event belonging to the selected thread. This action looks through all trace events, unlike the ''Select Previous State Change'' action which only stops at state changes.
+|-
+| [[Image:images/shift_r_edit.gif]]
+| Go to next event of the selected thread
+| Move to the closest following event belonging to the selected thread. This action looks through all trace events, unlike the ''Select Next State Change'' action which only stops at state changes.
 |}
 
 View Menu
