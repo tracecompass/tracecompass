@@ -50,7 +50,7 @@ public class SegmentStoreStatisticsTest {
      */
     @Test
     public void climbTest() {
-        List<@NonNull ISegment> fixture = new ArrayList<>();
+        List<@NonNull ISegment> fixture = new ArrayList<>(MEDIUM_AMOUNT_OF_SEGMENTS);
         for (int i = 0; i < MEDIUM_AMOUNT_OF_SEGMENTS; i++) {
             fixture.add(createDummySegment(i, i * 2));
         }
@@ -77,7 +77,7 @@ public class SegmentStoreStatisticsTest {
      */
     @Test
     public void decrementingTest() {
-        List<@NonNull ISegment> fixture = new ArrayList<>();
+        List<@NonNull ISegment> fixture = new ArrayList<>(MEDIUM_AMOUNT_OF_SEGMENTS);
         for (int i = MEDIUM_AMOUNT_OF_SEGMENTS; i >= 0; i--) {
             fixture.add(createDummySegment(i, i * 2));
         }
@@ -108,7 +108,7 @@ public class SegmentStoreStatisticsTest {
      */
     @Test
     public void largeTest() {
-        List<@NonNull ISegment> fixture = new ArrayList<>();
+        List<@NonNull ISegment> fixture = new ArrayList<>(LARGE_AMOUNT_OF_SEGMENTS);
         for (int i = 1; i <= LARGE_AMOUNT_OF_SEGMENTS; i++) {
             fixture.add(createDummySegment(i, i * 2));
         }
@@ -122,7 +122,7 @@ public class SegmentStoreStatisticsTest {
     public void noiseTest() {
         Random rnd = new Random();
         rnd.setSeed(1234);
-        List<@NonNull ISegment> fixture = new ArrayList<>();
+        List<@NonNull ISegment> fixture = new ArrayList<>(LARGE_AMOUNT_OF_SEGMENTS);
         for (int i = 1; i <= LARGE_AMOUNT_OF_SEGMENTS; i++) {
             int start = Math.abs(rnd.nextInt(100000000));
             int end = start + Math.abs(rnd.nextInt(1000000));
@@ -138,7 +138,7 @@ public class SegmentStoreStatisticsTest {
     public void gaussianNoiseTest() {
         Random rnd = new Random();
         rnd.setSeed(1234);
-        List<@NonNull ISegment> fixture = new ArrayList<>();
+        List<@NonNull ISegment> fixture = new ArrayList<>(LARGE_AMOUNT_OF_SEGMENTS);
         for (int i = 1; i <= LARGE_AMOUNT_OF_SEGMENTS; i++) {
             int start = Math.abs(rnd.nextInt(100000000));
             final int delta = Math.abs(rnd.nextInt(1000));
@@ -146,6 +146,38 @@ public class SegmentStoreStatisticsTest {
             fixture.add(createDummySegment(start, end));
         }
         testOnlineVsOffline(fixture);
+    }
+
+    /**
+     * Test building a statistics store with streams
+     */
+    @Test
+    public void streamBuildingTest() {
+        SegmentStoreStatistics expected = new SegmentStoreStatistics();
+        List<@NonNull ISegment> fixture = new ArrayList<>(LARGE_AMOUNT_OF_SEGMENTS);
+        for (long i = 0; i < LARGE_AMOUNT_OF_SEGMENTS; i++) {
+            fixture.add(new BasicSegment(i, i + 2));
+        }
+        fixture.forEach(e -> expected.update(e));
+        SegmentStoreStatistics actual = fixture.stream()
+                .<@NonNull SegmentStoreStatistics> collect(SegmentStoreStatistics::new, SegmentStoreStatistics::update, SegmentStoreStatistics::merge);
+        validate(expected, actual);
+    }
+
+    /**
+     * Test building a statistics store with parallel streams
+     */
+    @Test
+    public void parallelStreamBuildingTest() {
+        SegmentStoreStatistics expected = new SegmentStoreStatistics();
+        List<@NonNull ISegment> fixture = new ArrayList<>(LARGE_AMOUNT_OF_SEGMENTS);
+        for (long i = 0; i < LARGE_AMOUNT_OF_SEGMENTS; i++) {
+            fixture.add(new BasicSegment(i, i + 2));
+        }
+        fixture.forEach(e -> expected.update(e));
+        SegmentStoreStatistics actual = fixture.parallelStream()
+                .<@NonNull SegmentStoreStatistics> collect(SegmentStoreStatistics::new, SegmentStoreStatistics::update, SegmentStoreStatistics::merge);
+        validate(expected, actual);
     }
 
     /**
