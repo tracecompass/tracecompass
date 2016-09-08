@@ -96,10 +96,10 @@ public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile
     @Override
     public String toString() {
         return com.google.common.base.Objects.toStringHelper(this)
-            .add("path", fFilePath)
-            .add("build_id", fBuildId)
-            .add("debug_link", fDebugLink)
-            .add("is_pic", fIsPic)
+            .add("path", fFilePath) //$NON-NLS-1$
+            .add("build_id", fBuildId) //$NON-NLS-1$
+            .add("debug_link", fDebugLink) //$NON-NLS-1$
+            .add("is_pic", fIsPic) //$NON-NLS-1$
             .toString();
     }
 
