@@ -10,8 +10,14 @@ package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
@@ -19,9 +25,12 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
 import org.eclipse.swtbot.swt.finder.keyboard.KeyboardFactory;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
+import org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
+import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.waits.WaitForObjectCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
@@ -38,6 +47,7 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -109,6 +119,7 @@ public abstract class FindDialogTestBase extends KernelTestBase {
         } else {
             KEYBOARD.pressShortcut(Keystrokes.CTRL, KeyStroke.getInstance('F'));
         }
+        fBot.waitUntil(new WaitForShell(WidgetMatcherFactory.withText(DIALOG_TITLE)));
         fBot.waitUntil(Conditions.shellIsActive(DIALOG_TITLE));
     }
 
@@ -205,9 +216,7 @@ public abstract class FindDialogTestBase extends KernelTestBase {
      */
     @Test
     public void testOpenCloseDialog() {
-        SWTBotShell shell = getDialogShell();
         closeDialog(getDialogBot());
-        fBot.waitUntil(Conditions.shellCloses(shell));
         openDialog(fViewBot);
     }
 
@@ -226,17 +235,60 @@ public abstract class FindDialogTestBase extends KernelTestBase {
         return getDialogShell().bot();
     }
 
+    static class WaitForShell extends WaitForObjectCondition<Shell> {
+
+        private Shell[] fShells;
+
+        WaitForShell(Matcher<Shell> matcher) {
+            super(matcher);
+        }
+
+        @Override
+        public String getFailureMessage() {
+            String shellTitles = UIThreadRunnable.syncExec(new Result<String>() {
+                @Override
+                public String run() {
+                    return String.join(", ", Arrays.asList(fShells).stream().map(s -> "\"" + s.hashCode() + ": " + s.getText() + "\"").collect(Collectors.toList()));
+                }
+            });
+            return "Could not find shell matching: " + matcher + ". Found shell with titles: " + shellTitles; //$NON-NLS-1$
+        }
+
+        @Override
+        protected List<Shell> findMatches() {
+            fShells = findShells();
+            ArrayList<Shell> matchingShells = new ArrayList<>();
+            for (Shell shell : fShells) {
+                if (!shell.isDisposed() && matcher.matches(shell)) {
+                    matchingShells.add(shell);
+                }
+            }
+            return matchingShells;
+        }
+
+        /**
+         * Subclasses may override to find other shells.
+         */
+        Shell[] findShells() {
+            return bot.getFinder().getShells();
+        }
+
+    }
+
     /**
      * Get the find dialog shell bot
      *
      * @return The shell bot
      */
     private static SWTBotShell getDialogShell() {
+        fBot.waitUntil(new WaitForShell(WidgetMatcherFactory.withText(DIALOG_TITLE)));
         return fBot.shell(DIALOG_TITLE);
     }
 
     private static void closeDialog(SWTBot bot) {
+        SWTBotShell shell = getDialogShell();
         bot.button("Close").click();
+        fBot.waitUntil(Conditions.shellCloses(shell));
     }
 
     private static void search(String findText, SearchOptions options, SWTBotButton findButton, SWTBot bot) {

@@ -230,7 +230,9 @@ class TimeGraphFindDialog extends Dialog {
             shell.setBounds(fDialogPositionInit);
         }
 
+        System.out.println("Setting title \"" + Messages.TimeGraphFindDialog_FindTitle + "\" for Shell " + shell.hashCode());
         shell.setText(Messages.TimeGraphFindDialog_FindTitle);
+        System.out.println("Title is now \"" + shell.getText() + "\"");
     }
 
     /**
