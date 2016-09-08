@@ -15,7 +15,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -88,10 +87,8 @@ public final class KernelEventHandlerUtils {
      *            the state system
      *
      * @return the current thread node quark
-     * @throws AttributeNotFoundException
-     *             current cpu node not found
      */
-    public static int getCurrentThreadNode(Integer cpuNumber, ITmfStateSystemBuilder ss) throws AttributeNotFoundException {
+    public static int getCurrentThreadNode(Integer cpuNumber, ITmfStateSystemBuilder ss) {
         /*
          * Shortcut for the "current thread" attribute node. It requires
          * querying the current CPU's current thread.
@@ -114,15 +111,13 @@ public final class KernelEventHandlerUtils {
      *            The current thread node
      * @param ssb
      *            the state system
-     * @throws AttributeNotFoundException
-     *             an attribute does not exists yet
      * @throws TimeRangeException
      *             the time is out of range
      * @throws StateValueTypeException
      *             the attribute was not set with int values
      */
     public static void setProcessToRunning(long timestamp, int currentThreadNode, ITmfStateSystemBuilder ssb)
-            throws AttributeNotFoundException, TimeRangeException,
+            throws TimeRangeException,
             StateValueTypeException {
         int quark;
         ITmfStateValue value;
@@ -199,14 +194,11 @@ public final class KernelEventHandlerUtils {
      *            State system
      * @throws StateValueTypeException
      *             the attribute is not set as an int
-     * @throws AttributeNotFoundException
-     *             the attribute was not created yet
      * @throws TimeRangeException
      *             the time is out of range
      */
     public static void cpuExitInterrupt(long timestamp, Integer cpuNumber, ITmfStateSystemBuilder ssb)
-            throws StateValueTypeException, AttributeNotFoundException,
-            TimeRangeException {
+            throws StateValueTypeException, TimeRangeException {
         int quark;
         int currentCPUNode = getCurrentCPUNode(cpuNumber, ssb);
 
@@ -235,10 +227,8 @@ public final class KernelEventHandlerUtils {
      *            The *quark* of the CPU we are looking for. Careful, this is
      *            NOT the CPU number (or attribute name)!
      * @return The state value that represents the status of the given CPU
-     * @throws AttributeNotFoundException
      */
-    private static ITmfStateValue getCpuStatus(ITmfStateSystemBuilder ssb, int cpuQuark)
-            throws AttributeNotFoundException {
+    private static ITmfStateValue getCpuStatus(ITmfStateSystemBuilder ssb, int cpuQuark) {
 
         /* Check if there is a IRQ running */
         int irqQuarks = ssb.getQuarkRelativeAndAdd(cpuQuark, Attributes.IRQS);
@@ -274,8 +264,6 @@ public final class KernelEventHandlerUtils {
             return StateValues.CPU_STATUS_IDLE_VALUE;
         }
         int threadSystemCallQuark = ssb.getQuarkAbsoluteAndAdd(Attributes.THREADS, Integer.toString(tid), Attributes.SYSTEM_CALL);
-        return (ssb.queryOngoingState(threadSystemCallQuark).isNull() ?
-                StateValues.CPU_STATUS_RUN_USERMODE_VALUE :
-                StateValues.CPU_STATUS_RUN_SYSCALL_VALUE);
+        return (ssb.queryOngoingState(threadSystemCallQuark).isNull() ? StateValues.CPU_STATUS_RUN_USERMODE_VALUE : StateValues.CPU_STATUS_RUN_SYSCALL_VALUE);
     }
 }

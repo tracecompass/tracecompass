@@ -95,7 +95,7 @@ public class SchedSwitchHandler extends KernelEventHandler {
         setCpuStatus(ss, nextTid, newCurrentThreadNode, timestamp, currentCPUNode);
     }
 
-    private static void setOldProcessStatus(ITmfStateSystemBuilder ss, Long prevState, Integer formerThreadNode, long timestamp) throws AttributeNotFoundException {
+    private static void setOldProcessStatus(ITmfStateSystemBuilder ss, Long prevState, Integer formerThreadNode, long timestamp) {
         ITmfStateValue value;
         /*
          * Empirical observations and look into the linux code have
@@ -137,7 +137,7 @@ public class SchedSwitchHandler extends KernelEventHandler {
         return state == 0;
     }
 
-    private static void setCpuStatus(ITmfStateSystemBuilder ss, Integer nextTid, Integer newCurrentThreadNode, long timestamp, int currentCPUNode) throws AttributeNotFoundException {
+    private static void setCpuStatus(ITmfStateSystemBuilder ss, Integer nextTid, Integer newCurrentThreadNode, long timestamp, int currentCPUNode) {
         int quark;
         ITmfStateValue value;
         if (nextTid > 0) {
@@ -156,7 +156,7 @@ public class SchedSwitchHandler extends KernelEventHandler {
         ss.modifyAttribute(timestamp, value, quark);
     }
 
-    private static void setCpuProcess(ITmfStateSystemBuilder ss, Integer nextTid, long timestamp, int currentCPUNode) throws AttributeNotFoundException {
+    private static void setCpuProcess(ITmfStateSystemBuilder ss, Integer nextTid, long timestamp, int currentCPUNode) {
         int quark;
         ITmfStateValue value;
         quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.CURRENT_THREAD);
@@ -164,7 +164,7 @@ public class SchedSwitchHandler extends KernelEventHandler {
         ss.modifyAttribute(timestamp, value, quark);
     }
 
-    private static void setProcessPrio(ITmfStateSystemBuilder ss, Integer prio, Integer threadNode, long timestamp) throws AttributeNotFoundException {
+    private static void setProcessPrio(ITmfStateSystemBuilder ss, Integer prio, Integer threadNode, long timestamp) {
         int quark;
         ITmfStateValue value;
         quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.PRIO);
@@ -172,7 +172,7 @@ public class SchedSwitchHandler extends KernelEventHandler {
         ss.modifyAttribute(timestamp, value, quark);
     }
 
-    private static void setProcessExecName(ITmfStateSystemBuilder ss, String processName, Integer threadNode, long timestamp) throws AttributeNotFoundException {
+    private static void setProcessExecName(ITmfStateSystemBuilder ss, String processName, Integer threadNode, long timestamp) {
         int quark;
         ITmfStateValue value;
         quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.EXEC_NAME);

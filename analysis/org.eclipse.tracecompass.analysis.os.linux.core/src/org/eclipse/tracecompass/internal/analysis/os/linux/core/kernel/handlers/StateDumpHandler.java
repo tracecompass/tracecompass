@@ -71,7 +71,7 @@ public class StateDumpHandler extends KernelEventHandler {
         setStatus(ss, status, curThreadNode, timestamp);
     }
 
-    private static void setStatus(ITmfStateSystemBuilder ss, int status, int curThreadNode, long timestamp) throws AttributeNotFoundException {
+    private static void setStatus(ITmfStateSystemBuilder ss, int status, int curThreadNode, long timestamp) {
         ITmfStateValue value;
         int quark;
         quark = ss.getQuarkRelativeAndAdd(curThreadNode, Attributes.STATUS);
@@ -96,7 +96,7 @@ public class StateDumpHandler extends KernelEventHandler {
         }
     }
 
-    private static void setPpid(ITmfStateSystemBuilder ss, int tid, int pid, int ppid, int curThreadNode, long timestamp) throws AttributeNotFoundException {
+    private static void setPpid(ITmfStateSystemBuilder ss, int tid, int pid, int ppid, int curThreadNode, long timestamp) {
         ITmfStateValue value;
         int quark;
         quark = ss.getQuarkRelativeAndAdd(curThreadNode, Attributes.PPID);
@@ -112,7 +112,7 @@ public class StateDumpHandler extends KernelEventHandler {
         }
     }
 
-    private static void setProcessName(ITmfStateSystemBuilder ss, String name, int curThreadNode, long timestamp) throws AttributeNotFoundException {
+    private static void setProcessName(ITmfStateSystemBuilder ss, String name, int curThreadNode, long timestamp) {
         ITmfStateValue value;
         int quark = ss.getQuarkRelativeAndAdd(curThreadNode, Attributes.EXEC_NAME);
         if (ss.queryOngoingState(quark).isNull()) {
