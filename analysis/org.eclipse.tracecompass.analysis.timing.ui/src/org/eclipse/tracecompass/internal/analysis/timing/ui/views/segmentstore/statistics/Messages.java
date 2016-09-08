@@ -22,6 +22,11 @@ public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics.messages"; //$NON-NLS-1$
 
+    /** Default "total" label in statistics viewer */
+    public static String AbstractSegmentStoreStatisticsViewer_total;
+    /** Default "category" label in statistics viewer */
+    public static String AbstractSegmentStoreStatisticsViewer_types;
+
     /** Name of level column */
     public static String SegmentStoreStatistics_LevelLabel;
     /** Name of the minimum column */

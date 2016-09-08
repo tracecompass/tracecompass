@@ -16,6 +16,8 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.text.Format;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
@@ -30,6 +32,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
@@ -41,6 +44,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
 
@@ -302,13 +306,14 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
 
     /**
      * Method to add commands to the context sensitive menu.
+     *
      * @param manager
-     *          the menu manager
+     *            the menu manager
      * @param sel
-     *          the current selection
+     *            the current selection
      */
     protected void appendToTablePopupMenu(IMenuManager manager, IStructuredSelection sel) {
-        Object element =  sel.getFirstElement();
+        Object element = sel.getFirstElement();
         if ((element instanceof SegmentStoreStatisticsEntry) && !(element instanceof HiddenTreeViewerEntry)) {
             final SegmentStoreStatisticsEntry segment = (SegmentStoreStatisticsEntry) element;
             IAction gotoStartTime = new Action(Messages.SegmentStoreStatisticsViewer_GotoMinAction) {
@@ -378,6 +383,63 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
             return fEntry;
         }
 
+    }
+
+    @Override
+    protected @Nullable ITmfTreeViewerEntry updateElements(long start, long end, boolean isSelection) {
+        if (isSelection || (start == end)) {
+            return null;
+        }
+
+        TmfAbstractAnalysisModule analysisModule = getStatisticsAnalysisModule();
+
+        if (getTrace() == null || !(analysisModule instanceof AbstractSegmentStatisticsAnalysis)) {
+            return null;
+        }
+
+        AbstractSegmentStatisticsAnalysis module = (AbstractSegmentStatisticsAnalysis) analysisModule;
+
+        module.waitForCompletion();
+
+        TmfTreeViewerEntry root = new TmfTreeViewerEntry(""); //$NON-NLS-1$
+        final SegmentStoreStatistics entry = module.getTotalStats();
+        if (entry != null) {
+
+            List<ITmfTreeViewerEntry> entryList = root.getChildren();
+
+            TmfTreeViewerEntry aggregateEntry = new SegmentStoreStatisticsEntry(getTotalLabel(), entry);
+            entryList.add(aggregateEntry);
+            HiddenTreeViewerEntry category = new HiddenTreeViewerEntry(getTypeLabel());
+            aggregateEntry.addChild(category);
+
+            Map<String, SegmentStoreStatistics> perSegmentStats = module.getPerSegmentTypeStats();
+            if (perSegmentStats != null) {
+                for (Entry<String, SegmentStoreStatistics> statsEntry : perSegmentStats.entrySet()) {
+                    category.addChild(new SegmentStoreStatisticsEntry(statsEntry.getKey(), statsEntry.getValue()));
+                }
+            }
+        }
+        return root;
+    }
+
+    /**
+     * Get the type label
+     *
+     * @return the label
+     * @since 1.1
+     */
+    protected String getTypeLabel() {
+        return checkNotNull(Messages.AbstractSegmentStoreStatisticsViewer_types);
+    }
+
+    /**
+     * Get the total column label
+     *
+     * @return the totals column label
+     * @since 1.1
+     */
+    protected String getTotalLabel() {
+        return checkNotNull(Messages.AbstractSegmentStoreStatisticsViewer_total);
     }
 
     /**

@@ -13,18 +13,12 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.sta
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentStoreStatisticsViewer;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.statistics.SystemCallLatencyStatisticsAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
-import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
-import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
 
 /**
  * A tree viewer implementation for displaying latency statistics
@@ -58,40 +52,15 @@ public class SystemCallLatencyStatisticsViewer extends AbstractSegmentStoreStati
     }
 
     @Override
-    protected @Nullable ITmfTreeViewerEntry updateElements(long start, long end, boolean isSelection) {
-        if (isSelection || (start == end)) {
-            return null;
-        }
-
-        TmfAbstractAnalysisModule analysisModule = getStatisticsAnalysisModule();
-
-        if (getTrace() == null || !(analysisModule instanceof SystemCallLatencyStatisticsAnalysisModule)) {
-            return null;
-        }
-
-        SystemCallLatencyStatisticsAnalysisModule module = (SystemCallLatencyStatisticsAnalysisModule) analysisModule;
-
-        module.waitForCompletion();
-
-        TmfTreeViewerEntry root = new TmfTreeViewerEntry(""); //$NON-NLS-1$
-        final SegmentStoreStatistics entry = module.getTotalStats();
-        if (entry != null) {
-
-            List<ITmfTreeViewerEntry> entryList = root.getChildren();
-
-            TmfTreeViewerEntry child = new SegmentStoreStatisticsEntry(checkNotNull(Messages.LatencyStatistics_TotalLabel), entry);
-            entryList.add(child);
-            HiddenTreeViewerEntry syscalls = new HiddenTreeViewerEntry(SYSCALL_LEVEL);
-            child.addChild(syscalls);
-
-            Map<String, SegmentStoreStatistics> perSyscallStats = module.getPerSegmentTypeStats();
-            if (perSyscallStats != null) {
-                for (Entry<String, SegmentStoreStatistics> statsEntry : perSyscallStats.entrySet()) {
-                    syscalls.addChild(new SegmentStoreStatisticsEntry(statsEntry.getKey(), statsEntry.getValue()));
-                }
-            }
-        }
-        return root;
+    protected @NonNull final String getTotalLabel() {
+        return checkNotNull(Messages.LatencyStatistics_TotalLabel);
     }
+
+    @Override
+    protected @NonNull final String getTypeLabel() {
+        return SYSCALL_LEVEL;
+    }
+
+
 
 }
