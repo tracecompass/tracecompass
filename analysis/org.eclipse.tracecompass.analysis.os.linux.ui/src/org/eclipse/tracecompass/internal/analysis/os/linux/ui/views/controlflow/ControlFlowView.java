@@ -387,8 +387,11 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                     fFlatTraces.add(parentTrace);
                     for (ITmfTrace trace : TmfTraceManager.getTraceSet(parentTrace)) {
                         final ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
-                        for (TimeGraphEntry traceEntry : getEntryList(ss)) {
-                            hierarchicalToFlatTree(traceEntry);
+                        List<@NonNull TimeGraphEntry> entryList = getEntryList(ss);
+                        if (entryList != null) {
+                            for (TimeGraphEntry traceEntry : entryList) {
+                                hierarchicalToFlatTree(traceEntry);
+                            }
                         }
                     }
                 }
