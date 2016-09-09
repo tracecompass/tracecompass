@@ -651,19 +651,16 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                             continue;
                         }
 
-                        int execNameQuark;
-                        int ppidQuark;
-                        try {
-                            execNameQuark = ssq.getQuarkRelative(threadQuark, Attributes.EXEC_NAME);
-                            ppidQuark = ssq.getQuarkRelative(threadQuark, Attributes.PPID);
-                        } catch (AttributeNotFoundException e) {
+                        int execNameQuark = ssq.optQuarkRelative(threadQuark, Attributes.EXEC_NAME);
+                        int ppidQuark = ssq.optQuarkRelative(threadQuark, Attributes.PPID);
+                        if (execNameQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
                             /* No information on this thread (yet?), skip it for now */
                             continue;
                         }
                         ITmfStateInterval lastExecNameInterval = prevFullState == null || execNameQuark >= prevFullState.size() ? null : prevFullState.get(execNameQuark);
                         long lastExecNameStartTime = lastExecNameInterval == null ? -1 : lastExecNameInterval.getStartTime();
                         long lastExecNameEndTime = lastExecNameInterval == null ? -1 : lastExecNameInterval.getEndTime() + 1;
-                        long lastPpidStartTime = prevFullState == null || ppidQuark >= prevFullState.size() ? -1 : prevFullState.get(ppidQuark).getStartTime();
+                        long lastPpidStartTime = prevFullState == null || ppidQuark >= prevFullState.size() || ppidQuark == ITmfStateSystem.INVALID_ATTRIBUTE ? -1 : prevFullState.get(ppidQuark).getStartTime();
                         for (List<ITmfStateInterval> fullState : fullStates) {
                             if (monitor.isCanceled()) {
                                 return;
@@ -673,10 +670,10 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                                 continue;
                             }
                             ITmfStateInterval execNameInterval = fullState.get(execNameQuark);
-                            ITmfStateInterval ppidInterval = fullState.get(ppidQuark);
+                            ITmfStateInterval ppidInterval = ppidQuark == ITmfStateSystem.INVALID_ATTRIBUTE ? null : fullState.get(ppidQuark);
                             long startTime = execNameInterval.getStartTime();
                             long endTime = execNameInterval.getEndTime() + 1;
-                            if (startTime == lastExecNameStartTime && ppidInterval.getStartTime() == lastPpidStartTime) {
+                            if (startTime == lastExecNameStartTime && ppidInterval != null && ppidInterval.getStartTime() == lastPpidStartTime) {
                                 continue;
                             }
                             boolean isNull = execNameInterval.getStateValue().isNull();
@@ -687,7 +684,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                                  */
                                 try {
                                     execNameInterval = ssq.querySingleState(startTime - 1, execNameQuark);
-                                    ppidInterval = ssq.querySingleState(startTime - 1, ppidQuark);
+                                    ppidInterval = ppidQuark == ITmfStateSystem.INVALID_ATTRIBUTE ? null : ssq.querySingleState(startTime - 1, ppidQuark);
                                     startTime = execNameInterval.getStartTime();
                                     endTime = execNameInterval.getEndTime() + 1;
                                 } catch (StateSystemDisposedException e) {
@@ -697,7 +694,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                             if (!execNameInterval.getStateValue().isNull() &&
                                     execNameInterval.getStateValue().getType() == ITmfStateValue.Type.STRING) {
                                 String execName = execNameInterval.getStateValue().unboxStr();
-                                int ppid = ppidInterval.getStateValue().unboxInt();
+                                int ppid = ppidInterval == null ? -1 : ppidInterval.getStateValue().unboxInt();
                                 ControlFlowEntry entry = entryMap.get(entryKey);
                                 if (entry == null) {
                                     entry = new ControlFlowEntry(threadQuark, trace, execName, threadId, ppid, startTime, endTime);
@@ -719,7 +716,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                             }
                             lastExecNameStartTime = startTime;
                             lastExecNameEndTime = endTime;
-                            lastPpidStartTime = ppidInterval.getStartTime();
+                            lastPpidStartTime = ppidInterval == null ? -1 : ppidInterval.getStartTime();
                         }
                     }
                     synchronized (fFlatTraces) {

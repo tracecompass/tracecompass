@@ -83,10 +83,6 @@ public class SchedSwitchHandler extends KernelEventHandler {
         /* Set the current prio for the new process */
         setProcessPrio(ss, nextPrio, newCurrentThreadNode, timestamp);
 
-        /* Make sure the PPID and system_call sub-attributes exist */
-        ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.SYSTEM_CALL);
-        ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.PPID);
-
         /* Set the current scheduled process on the relevant CPU */
         int currentCPUNode = KernelEventHandlerUtils.getCurrentCPUNode(cpu, ss);
         setCpuProcess(ss, nextTid, timestamp, currentCPUNode);

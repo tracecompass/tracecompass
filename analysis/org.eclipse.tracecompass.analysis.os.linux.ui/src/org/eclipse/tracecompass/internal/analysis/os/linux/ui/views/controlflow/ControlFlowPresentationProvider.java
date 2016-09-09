@@ -174,15 +174,18 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         }
         int status = ((TimeEvent) event).getValue();
         if (status == StateValues.PROCESS_STATUS_RUN_SYSCALL) {
+            int syscallQuark = ssq.optQuarkRelative(entry.getThreadQuark(), Attributes.SYSTEM_CALL);
+            if (syscallQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+                return retMap;
+            }
             try {
-                int syscallQuark = ssq.getQuarkRelative(entry.getThreadQuark(), Attributes.SYSTEM_CALL);
                 ITmfStateInterval value = ssq.querySingleState(event.getTime(), syscallQuark);
                 if (!value.getStateValue().isNull()) {
                     ITmfStateValue state = value.getStateValue();
                     retMap.put(Messages.ControlFlowView_attributeSyscallName, state.toString());
                 }
 
-            } catch (AttributeNotFoundException | TimeRangeException e) {
+            } catch (TimeRangeException e) {
                 Activator.getDefault().logError("Error in ControlFlowPresentationProvider", e); //$NON-NLS-1$
             } catch (StateSystemDisposedException e) {
                 /* Ignored */
@@ -213,8 +216,11 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         if (status != StateValues.PROCESS_STATUS_RUN_SYSCALL) {
             return;
         }
+        int syscallQuark = ss.optQuarkRelative(entry.getThreadQuark(), Attributes.SYSTEM_CALL);
+        if (syscallQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+            return;
+        }
         try {
-            int syscallQuark = ss.getQuarkRelative(entry.getThreadQuark(), Attributes.SYSTEM_CALL);
             ITmfStateInterval value = ss.querySingleState(event.getTime(), syscallQuark);
             if (!value.getStateValue().isNull()) {
                 ITmfStateValue state = value.getStateValue();
@@ -233,7 +239,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
 
                 Utils.drawText(gc, state.toString().substring(beginIndex), bounds.x, bounds.y, bounds.width, bounds.height, true, true);
             }
-        } catch (AttributeNotFoundException | TimeRangeException e) {
+        } catch (TimeRangeException e) {
             Activator.getDefault().logError("Error in ControlFlowPresentationProvider", e); //$NON-NLS-1$
         } catch (StateSystemDisposedException e) {
             /* Ignored */

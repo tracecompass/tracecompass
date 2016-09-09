@@ -244,7 +244,10 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                                     retMap.put(Messages.ResourcesView_attributeProcessName, value.unboxStr());
                                 }
                                 if (status == StateValues.CPU_STATUS_RUN_SYSCALL) {
-                                    int syscallQuark = ss.getQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), Attributes.SYSTEM_CALL);
+                                    int syscallQuark = ss.optQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), Attributes.SYSTEM_CALL);
+                                    if (syscallQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+                                        return retMap;
+                                    }
                                     interval = ss.querySingleState(hoverTime, syscallQuark);
                                     if (!interval.getStateValue().isNull()) {
                                         value = interval.getStateValue();
@@ -340,7 +343,10 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                                 }
                             }
                             if (attribute != null) {
-                                int quark = ss.getQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), attribute);
+                                int quark = ss.optQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), attribute);
+                                if (quark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+                                    return;
+                                }
                                 ITmfStateInterval interval = ss.querySingleState(time, quark);
                                 if (!interval.getStateValue().isNull()) {
                                     value = interval.getStateValue();
