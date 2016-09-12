@@ -111,7 +111,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
                 layout = trace.getKernelEventLayout();
                 fLayout = layout;
             }
-            final String eventName = event.getType().getName();
+            final String eventName = event.getName();
 
             if (eventName.startsWith(layout.eventSyscallEntryPrefix()) ||
                     eventName.startsWith(layout.eventCompatSyscallEntryPrefix())) {
@@ -130,7 +130,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
 
                 /* Record the event's data into the intial system call info */
                 // String syscallName = fLayout.getSyscallNameFromEvent(event);
-                long startTime = event.getTimestamp().getValue();
+                long startTime = event.getTimestamp().toNanos();
                 String syscallName = eventName.substring(layout.eventSyscallEntryPrefix().length());
 
                 SystemCall.InitialInfo newSysCall = new SystemCall.InitialInfo(startTime, syscallName.intern());
@@ -158,7 +158,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
                     return;
                 }
 
-                long endTime = event.getTimestamp().getValue();
+                long endTime = event.getTimestamp().toNanos();
                 ISegment syscall = new SystemCall(info, endTime);
                 getSegmentStore().add(syscall);
             }
