@@ -1701,8 +1701,29 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * Build the entry list to show in this time graph view.
      * <p>
      * Called from the BuildJob for each trace returned by
-     * {@link #getTracesToBuild(ITmfTrace)}. The full event list is also
-     * normally computed for every entry that is created.
+     * {@link #getTracesToBuild(ITmfTrace)}.
+     * <p>
+     * Root entries must be added to the entry list by calling the
+     * {@link #addToEntryList(ITmfTrace, List)} method with the list of entries
+     * to add and where the trace in parameter should be the parentTrace.
+     * Entries that are children of other entries will be automatically picked
+     * up after refreshing the root entries.
+     * <p>
+     * The full event list is also normally computed for every entry that is
+     * created. It should be set for each entry by calling the
+     * {@link TimeGraphEntry#setEventList(List)}. These full event lists will be
+     * used to display something while the zoomed event lists are being
+     * calculated when the window range is updated. Also, when fully zoomed out,
+     * it is this list of events that is displayed.
+     * <p>
+     * Also, when all the entries have been added and their events set, this
+     * method can finish by calling the refresh() method like this:
+     *
+     * <pre>
+     * if (parentTrace.equals(getTrace())) {
+     *     refresh();
+     * }
+     * </pre>
      *
      * @param trace
      *            The trace being built
