@@ -22,9 +22,9 @@ import java.util.zip.ZipFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.ui.internal.wizards.datatransfer.TarEntry;
-import org.eclipse.ui.internal.wizards.datatransfer.TarException;
-import org.eclipse.ui.internal.wizards.datatransfer.TarFile;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.TarEntry;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.TarException;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.TarFile;
 
 /**
  * An abstract operation containing common code useful for other trace package
@@ -32,7 +32,6 @@ import org.eclipse.ui.internal.wizards.datatransfer.TarFile;
  *
  * @author Marc-Andre Laperle
  */
-@SuppressWarnings("restriction")
 public abstract class AbstractTracePackageOperation {
     private IStatus fStatus;
     // Result of this operation, if any
