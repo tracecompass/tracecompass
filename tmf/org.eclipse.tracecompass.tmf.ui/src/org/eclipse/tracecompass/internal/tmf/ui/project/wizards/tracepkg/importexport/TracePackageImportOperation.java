@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.TarException;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.AbstractTracePackageOperation;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageBookmarkElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageElement;
@@ -60,7 +61,6 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.ui.dialogs.IOverwriteQuery;
 import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.internal.wizards.datatransfer.TarException;
 import org.eclipse.ui.wizards.datatransfer.IImportStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
@@ -69,7 +69,6 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
  *
  * @author Marc-Andre Laperle
  */
-@SuppressWarnings("restriction")
 public class TracePackageImportOperation extends AbstractTracePackageOperation implements IOverwriteQuery {
 
     private final TracePackageElement[] fImportTraceElements;
