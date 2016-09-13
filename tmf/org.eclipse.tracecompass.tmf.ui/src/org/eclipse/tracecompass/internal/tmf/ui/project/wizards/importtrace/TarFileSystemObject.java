@@ -19,13 +19,11 @@ import java.net.URI;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.URIUtil;
-import org.eclipse.ui.internal.wizards.datatransfer.TarEntry;
 
 /**
  * The "Tar" implementation of an IFileSystemObject, entries can also be Gzipped
  * and are uncompressed transparently.
  */
-@SuppressWarnings("restriction")
 class TarFileSystemObject implements IFileSystemObject {
 
     private TarEntry fFileSystemObject;

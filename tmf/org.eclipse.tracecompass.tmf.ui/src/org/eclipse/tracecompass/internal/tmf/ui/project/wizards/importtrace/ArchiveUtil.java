@@ -20,9 +20,6 @@ import java.util.zip.ZipFile;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.ui.internal.wizards.datatransfer.ArchiveFileManipulations;
-import org.eclipse.ui.internal.wizards.datatransfer.TarException;
-import org.eclipse.ui.internal.wizards.datatransfer.TarFile;
-import org.eclipse.ui.internal.wizards.datatransfer.TarLeveledStructureProvider;
 import org.eclipse.ui.internal.wizards.datatransfer.ZipLeveledStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
 
@@ -113,16 +110,26 @@ public class ArchiveUtil {
         return ArchiveFileManipulations.closeZipFile(specifiedFile, shell);
     }
 
-    static boolean ensureTarSourceIsValid(String archivePath, Shell shell) {
+    static boolean ensureTarSourceIsValid(String archivePath) {
         TarFile specifiedFile = getSpecifiedTarSourceFile(archivePath);
         if (specifiedFile == null) {
             return false;
         }
-        return ArchiveFileManipulations.closeTarFile(specifiedFile, shell);
+        return closeTarFile(specifiedFile);
     }
 
     static boolean ensureGzipSourceIsValid(String archivePath) {
         return isGzipFile(archivePath);
+    }
+
+    static boolean closeTarFile(TarFile file) {
+        try {
+            file.close();
+        } catch (IOException e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -154,7 +161,7 @@ public class ArchiveUtil {
             FileSystemObjectLeveledImportStructureProvider leveledImportStructureProvider = null;
             String archivePath = sourceFile.getAbsolutePath();
             if (isTarFile(archivePath)) {
-                if (ensureTarSourceIsValid(archivePath, shell)) {
+                if (ensureTarSourceIsValid(archivePath)) {
                     // We close the file when we dispose the import provider,
                     // see disposeSelectionGroupRoot
                     TarFile tarFile = getSpecifiedTarSourceFile(archivePath);

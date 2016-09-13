@@ -18,14 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 
-import org.eclipse.ui.internal.wizards.datatransfer.TarEntry;
 import org.eclipse.ui.wizards.datatransfer.IImportStructureProvider;
 
 /**
  * An import provider that makes use of the IFileSystemObject abstraction
  * instead of using plain file system objects (File, TarEntry, ZipEntry, etc)
  */
-@SuppressWarnings("restriction")
 public class FileSystemObjectImportStructureProvider implements IImportStructureProvider {
 
     private IImportStructureProvider fImportProvider;
