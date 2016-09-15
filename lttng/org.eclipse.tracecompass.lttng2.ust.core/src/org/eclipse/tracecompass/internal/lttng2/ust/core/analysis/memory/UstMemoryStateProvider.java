@@ -37,6 +37,14 @@ import com.google.common.collect.ImmutableMap;
  * State provider to track the memory of the threads using the UST libc wrapper
  * memory events.
  *
+ * Attribute tree:
+ *
+ * <pre>
+ * |- <TID number>
+ * |  |- UST_MEMORY_MEMORY_ATTRIBUTE -> Memory Usage
+ * |  |- UST_MEMORY_PROCNAME_ATTRIBUTE -> Process name
+ * </pre>
+ *
  * @author Matthew Khouzam
  * @author Geneviève Bastien
  */
