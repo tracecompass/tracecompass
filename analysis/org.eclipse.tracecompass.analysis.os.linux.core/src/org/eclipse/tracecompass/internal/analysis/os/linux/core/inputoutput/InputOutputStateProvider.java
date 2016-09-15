@@ -41,6 +41,35 @@ import com.google.common.collect.ImmutableMap;
 /**
  * State provider for the I/O analysis
  *
+ * Attribute tree:
+ *
+ * <pre>
+ * |- SYSTEM_CALLS
+ * |  |- <TID> -> System Call Name
+ * |- THREADS
+ * |  |- <TID number>
+ * |  |  |- BYTES_READ
+ * |  |  |- BYTES_WRITTEN
+ * |- Disks
+ * |  |- <Disk number> -> Disk Name
+ * |  |  |- SECTORS_READ
+ * |  |  |- SECTORS_WRITTEN
+ * |  |  |- WAITING_QUEUE -> Root for the Attribute pool for waiting queue
+ * |  |  |  |- <slot #1> -> Status
+ * |  |  |  |  |- CURRENT_REQUEST
+ * |  |  |  |  |- REQUEST_SIZE
+ * |  |  |  |  |- MERGED_IN
+ * |  |  |  |- <slot #2>
+ * |  |  |- WAITING_QUEUE_LENGTH
+ * |  |  |- DRIVER_QUEUE -> Root for the Attribute pool for driver queue
+ * |  |  |  |- <slot #1> -> Status
+ * |  |  |  |  |- CURRENT_REQUEST
+ * |  |  |  |  |- REQUEST_SIZE
+ * |  |  |  |  |- ISSUED_FROM
+ * |  |  |  |- <slot #2>
+ * |  |  |- DRIVER_QUEUE_LENGTH
+ * </pre>
+ *
  * @author Houssem Daoud
  * @since 2.0
  */

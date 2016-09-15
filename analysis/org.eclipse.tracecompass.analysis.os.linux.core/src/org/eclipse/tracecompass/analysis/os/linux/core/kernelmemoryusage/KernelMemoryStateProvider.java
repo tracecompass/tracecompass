@@ -31,6 +31,13 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  *
  * The state provider also contains code that can query the state system.
  *
+ * Attribute tree:
+ *
+ * <pre>
+ * |- <TID number> -> current memory usage
+ * |  |- THREAD_LOWEST_MEMORY_VALUE -> lowest memory value for thread
+ * </pre>
+ *
  * @author Samuel Gagnon
  * @since 2.0
  */

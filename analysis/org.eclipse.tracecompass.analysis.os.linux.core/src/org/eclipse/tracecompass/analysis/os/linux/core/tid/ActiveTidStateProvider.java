@@ -36,6 +36,12 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  *
  * Note 2: this is deliberately only package visible.
  *
+ * Attribute tree:
+ *
+ * <pre>
+ * |- <CPU number> -> Active TID number
+ * </pre>
+ *
  * @author Matthew Khouzam
  */
 class ActiveTidStateProvider extends AbstractTmfStateProvider {

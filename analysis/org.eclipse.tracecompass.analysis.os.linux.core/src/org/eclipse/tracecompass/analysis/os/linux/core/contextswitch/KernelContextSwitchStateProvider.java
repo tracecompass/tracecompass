@@ -32,6 +32,13 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 /**
  * Class used to build a state system of the context switches of a trace
  *
+ * Attribute tree:
+ *
+ * <pre>
+ * |- CPUs
+ * |  |- <CPU number> -> Number of context switches
+ * </pre>
+ *
  * @author Alexis Cabana-Loriaux
  * @since 2.0
  */

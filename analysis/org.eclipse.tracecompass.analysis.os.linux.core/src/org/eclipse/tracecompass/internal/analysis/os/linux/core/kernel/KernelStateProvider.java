@@ -49,6 +49,24 @@ import com.google.common.collect.ImmutableMap;
  * This is the state change input plugin for the state system which handles the
  * kernel traces.
  *
+ * Attribute tree:
+ *
+ * <pre>
+ * |- CPUs
+ * |  |- <CPU number> -> CPU Status
+ * |  |  |- CURRENT_THREAD
+ * |  |  |- SOFT_IRQS
+ * |  |  |  |- <Soft IRQ number> -> Soft IRQ Status
+ * |  |  |- IRQS
+ * |  |  |  |- <IRQ number> -> IRQ Status
+ * |- THREADS
+ * |  |- <Thread number> -> Thread Status
+ * |  |  |- PPID
+ * |  |  |- EXEC_NAME
+ * |  |  |- PRIO
+ * |  |  |- SYSTEM_CALL
+ * </pre>
+ *
  * @author Alexandre Montplaisir
  */
 public class KernelStateProvider extends AbstractTmfStateProvider {

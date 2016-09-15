@@ -43,6 +43,14 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  *
  * It requires only the 'sched_switch' events enabled on the trace.
  *
+ * Attribute tree:
+ *
+ * <pre>
+ * |- CPUS
+ * |  |- <CPU number>
+ * |  |  |- <TID> -> cumulative time spent on the source CPU by the currently running thread (ns)
+ * </pre>
+ *
  * @author François Rajotte
  */
 public class KernelCpuUsageStateProvider extends AbstractTmfStateProvider {
