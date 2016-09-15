@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.timing.core.tests.store;
+package org.eclipse.tracecompass.segmentstore.core.tests;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.junit.Assert.assertEquals;
@@ -42,7 +42,10 @@ import com.google.common.collect.Lists;
  */
 public abstract class AbstractTestSegmentStore {
 
-    private ISegmentStore<@NonNull ISegment> fSegmentStore;
+    /**
+     * The segment store
+     */
+    protected ISegmentStore<@NonNull ISegment> fSegmentStore;
 
     /**
      * Get the segment store to test
@@ -56,7 +59,10 @@ public abstract class AbstractTestSegmentStore {
     private static final @NonNull ISegment SEGMENT_4_8 = new BasicSegment(4, 8);
     private static final @NonNull ISegment SEGMENT_6_8 = new BasicSegment(6, 8);
     private static final @NonNull ISegment SEGMENT_10_14 = new BasicSegment(10, 14);
-    private static final @NonNull List<@NonNull ISegment> SEGMENTS = ImmutableList.of(SEGMENT_2_6, SEGMENT_4_6, SEGMENT_4_8, SEGMENT_6_8, SEGMENT_10_14);
+    /**
+     * A sample segment list
+     */
+    protected static final List<@NonNull ISegment> SEGMENTS = ImmutableList.of(SEGMENT_2_6, SEGMENT_4_6, SEGMENT_4_8, SEGMENT_6_8, SEGMENT_10_14);
     private static final List<@NonNull ISegment> REVERSE_SEGMENTS = Lists.reverse(SEGMENTS);
 
     /**

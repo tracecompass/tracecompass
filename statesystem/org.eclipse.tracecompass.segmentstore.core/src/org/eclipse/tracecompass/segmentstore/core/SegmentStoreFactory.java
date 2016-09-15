@@ -1,0 +1,153 @@
+/*******************************************************************************
+ * Copyright (c) 2016 Polytechnique
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Loïc Prieur-Drevon - Initial API and implementation
+ ******************************************************************************/
+
+package org.eclipse.tracecompass.segmentstore.core;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.ArrayListStore;
+import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.LazyArrayListStore;
+import org.eclipse.tracecompass.internal.segmentstore.core.treemap.TreeMapStore;
+
+/**
+ * Factory to create Segment Stores.
+ *
+ * Since segment stores are meant to be accessed using the {@link ISegmentStore}
+ * interface, you can use this factory to instantiate new ones.
+ *
+ * @author Loïc Prieur-Drevon
+ * @param <E>
+ *            The type of segment held in this store
+ * @since 1.1
+ */
+public final class SegmentStoreFactory<E> {
+    /**
+     * Flags to determine the type of SegmentStore to use.
+     */
+    public enum SegmentStoreType {
+        /**
+         * Segment Store should be as fast as possible to build and read.
+         * Performance of individual operations may be slower, but overall the
+         * speed should be faster.
+         */
+        Fast,
+        /**
+         * Segment Store based should have predictable performance. This does
+         * not mean it's faster, it should not give a surprise random slow down
+         * though. If it slows down, it will be on the {@link ISegment} that
+         * slows it down.
+         */
+        Stable,
+        /**
+         * Segment Store should contain no duplicate segments
+         */
+        Distinct
+    }
+
+    private SegmentStoreFactory() {
+        // Do nothing
+    }
+
+    /**
+     * New SegmentStore factory method
+     *
+     * @param segmentTypes
+     *            Flags used to determine the type of Segment Store that will be
+     *            created
+     *
+     * @return a new {@link ISegmentStore}
+     */
+    public static <E extends ISegment> ISegmentStore<E> createSegmentStore(@Nullable SegmentStoreType... segmentTypes) {
+        Set<@NonNull SegmentStoreType> segments = getListOfFlags(segmentTypes);
+        if (segments.contains(SegmentStoreType.Distinct)) {
+            return createTreeMapStore();
+        }
+        if (segments.contains(SegmentStoreType.Stable)) {
+            return createArrayListStore();
+        }
+        // default option is the fastest
+        return createLazyArrayListStore();
+
+    }
+
+    /**
+     * New SegmentStore factory method to create store from an array of Objects
+     *
+     * @param segmentTypes
+     *            Flags used to determine the type of Segment Store that will be
+     *            created
+     * @param array
+     *            the {@link Object} array we want the returned segment store to
+     *            contain, {@link Object} are only inserted if they extend
+     *            {@link ISegment}
+     * @return an {@link ISegmentStore} containing the {@link ISegment}s from
+     *         array.
+     */
+    public static <E extends ISegment> ISegmentStore<E> createSegmentStore(Object[] array, SegmentStoreType... segmentTypes) {
+        Set<@NonNull SegmentStoreType> segments = getListOfFlags(segmentTypes);
+        if (segments.contains(SegmentStoreType.Distinct)) {
+            ISegmentStore<E> store = createTreeMapStore();
+            for (Object elem : array) {
+                if (elem instanceof ISegment) {
+                    store.add((E) elem); // warning from type, it should be fine
+                }
+            }
+            return store;
+        }
+        if (segments.contains(SegmentStoreType.Stable)) {
+            return new ArrayListStore<>(array);
+        }
+        // default option is the fastest
+        return new LazyArrayListStore<>(array);
+    }
+
+    private static Set<@NonNull SegmentStoreType> getListOfFlags(SegmentStoreType... segmentTypes) {
+        Set<@NonNull SegmentStoreType> segments = new HashSet<>();
+        for(@Nullable SegmentStoreType segmentType : segmentTypes ) {
+            if(segmentType != null) {
+                segments.add(segmentType);
+            }
+        }
+        return segments;
+    }
+
+    /**
+     * New {@link TreeMapStore} factory method
+     *
+     * @return the new Segment Store
+     */
+    private static <E extends ISegment> ISegmentStore<E> createTreeMapStore() {
+        return new TreeMapStore<>();
+    }
+
+    /**
+     * New {@link ArrayListStore} factory method
+     *
+     * @return the new Segment Store
+     */
+    private static <E extends ISegment> ISegmentStore<E> createArrayListStore() {
+        return new ArrayListStore<>();
+    }
+
+    /**
+     * New {@link LazyArrayListStore} factory method
+     *
+     * @return the new Segment Store
+     */
+    private static <E extends ISegment> ISegmentStore<E> createLazyArrayListStore() {
+        return new LazyArrayListStore<>();
+    }
+
+}

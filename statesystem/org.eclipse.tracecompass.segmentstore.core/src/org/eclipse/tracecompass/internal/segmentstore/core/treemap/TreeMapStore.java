@@ -10,7 +10,7 @@
  *    Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.segmentstore.core.treemap;
+package org.eclipse.tracecompass.internal.segmentstore.core.treemap;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
@@ -25,7 +25,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
-import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -53,9 +52,7 @@ import com.google.common.collect.TreeMultimap;
  *            The type of segment held in this store
  *
  * @author Alexandre Montplaisir
- * @deprecated Use the {@link SegmentStoreFactory} to create a new segment store
  */
-@Deprecated
 public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<E> {
 
     private final ReadWriteLock fLock = new ReentrantReadWriteLock(false);

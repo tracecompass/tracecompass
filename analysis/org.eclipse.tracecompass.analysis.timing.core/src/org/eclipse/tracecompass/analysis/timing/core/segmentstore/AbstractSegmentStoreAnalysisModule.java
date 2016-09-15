@@ -24,9 +24,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.internal.analysis.timing.core.store.ArrayListStore;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
+import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
@@ -147,7 +147,7 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
                 /* Attempt to read the existing file */
                 try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(file))) {
                     Object[] segmentArray = readObject(ois);
-                    ISegmentStore<ISegment> store = new ArrayListStore<>(NonNullUtils.checkNotNullContents(segmentArray));
+                    ISegmentStore<ISegment> store = SegmentStoreFactory.createSegmentStore(NonNullUtils.checkNotNullContents(segmentArray));
                     fSegmentStore = store;
                     sendUpdate(store);
                     return true;
@@ -164,7 +164,7 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
             }
         }
 
-        ISegmentStore<ISegment> segmentStore = new ArrayListStore<>();
+        ISegmentStore<ISegment> segmentStore = SegmentStoreFactory.createSegmentStore();
         boolean completed = buildAnalysisSegments(segmentStore, monitor);
         if (!completed) {
             return false;

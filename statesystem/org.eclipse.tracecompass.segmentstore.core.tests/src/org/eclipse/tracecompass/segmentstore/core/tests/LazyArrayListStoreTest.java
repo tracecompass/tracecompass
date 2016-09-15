@@ -7,10 +7,10 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.timing.core.tests.store;
+package org.eclipse.tracecompass.segmentstore.core.tests;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.analysis.timing.core.store.LazyArrayListStore;
+import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.LazyArrayListStore;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 
@@ -25,4 +25,5 @@ public class LazyArrayListStoreTest extends AbstractTestSegmentStore {
     protected ISegmentStore<@NonNull ISegment> getSegmentStore() {
         return new LazyArrayListStore<>();
     }
+
 }

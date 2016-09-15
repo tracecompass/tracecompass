@@ -23,9 +23,10 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgr
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.common.core.StreamUtils;
 import org.eclipse.tracecompass.internal.analysis.timing.core.Activator;
-import org.eclipse.tracecompass.internal.analysis.timing.core.store.LazyArrayListStore;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
+import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory;
+import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory.SegmentStoreType;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -70,7 +71,7 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
     /**
      * Segment store
      */
-    private final ISegmentStore<@NonNull ISegment> fStore = new LazyArrayListStore<>();
+    private final ISegmentStore<@NonNull ISegment> fStore;
 
     /**
      * Listeners
@@ -97,6 +98,7 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
      */
     public CallGraphAnalysis() {
         super();
+        fStore = SegmentStoreFactory.createSegmentStore(SegmentStoreType.Fast);
     }
 
     @Override

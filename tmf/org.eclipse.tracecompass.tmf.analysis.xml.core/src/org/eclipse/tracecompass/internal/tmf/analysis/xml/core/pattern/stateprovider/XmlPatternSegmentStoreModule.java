@@ -19,9 +19,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisModule;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
-import org.eclipse.tracecompass.internal.analysis.timing.core.store.ArrayListStore;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
+import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
@@ -38,7 +38,7 @@ public class XmlPatternSegmentStoreModule extends AbstractSegmentStoreAnalysisMo
      * Fake segment indicated that the last segment have been received
      */
     public static final @NonNull EndSegment END_SEGMENT = new EndSegment();
-    private final ISegmentStore<@NonNull ISegment> fSegments = new ArrayListStore<>();
+    private final ISegmentStore<@NonNull ISegment> fSegments = SegmentStoreFactory.createSegmentStore();
     private final CountDownLatch fFinished = new CountDownLatch(1);
     private final @NonNull XmlPatternAnalysis fParent;
     private boolean fSegmentStoreCompleted;

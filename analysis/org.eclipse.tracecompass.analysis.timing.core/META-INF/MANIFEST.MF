@@ -17,8 +17,7 @@ Require-Bundle: org.eclipse.ui,
 Export-Package: org.eclipse.tracecompass.analysis.timing.core.segmentstore,
  org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics,
  org.eclipse.tracecompass.internal.analysis.timing.core,
- org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;x-friends:="org.eclipse.tracecompass.analysis.timing.ui,org.eclipse.tracecompass.analysis.timing.core.tests",
- org.eclipse.tracecompass.internal.analysis.timing.core.store;x-friends:="org.eclipse.tracecompass.analysis.timing.core.tests,org.eclipse.tracecompass.tmf.analysis.xml.core"
+ org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;x-friends:="org.eclipse.tracecompass.analysis.timing.ui,org.eclipse.tracecompass.analysis.timing.core.tests"
 Import-Package: com.google.common.annotations;version="15.0.0",
  com.google.common.collect,
  com.google.common.hash

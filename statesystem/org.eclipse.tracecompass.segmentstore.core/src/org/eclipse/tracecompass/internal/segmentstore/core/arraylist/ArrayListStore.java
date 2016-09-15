@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.analysis.timing.core.store;
+package org.eclipse.tracecompass.internal.segmentstore.core.arraylist;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
@@ -26,8 +26,10 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
+import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Ordering;
 
 /**
  * Implementation of an {@link ISegmentStore} using one in-memory
@@ -53,13 +55,8 @@ import com.google.common.collect.ImmutableList;
  */
 public class ArrayListStore<@NonNull E extends ISegment> implements ISegmentStore<E> {
 
-    private final Comparator<E> COMPARATOR = (o1, o2) -> {
-        int ret = Long.compare(o1.getStart(), o2.getStart());
-        if (ret == 0) {
-            return Long.compare(o1.getEnd(), o2.getEnd());
-        }
-        return ret;
-    };
+    private final Comparator<E> COMPARATOR = Ordering.from(SegmentComparators.INTERVAL_START_COMPARATOR)
+            .compound(SegmentComparators.INTERVAL_END_COMPARATOR);
 
     private final ReadWriteLock fLock = new ReentrantReadWriteLock(false);
 

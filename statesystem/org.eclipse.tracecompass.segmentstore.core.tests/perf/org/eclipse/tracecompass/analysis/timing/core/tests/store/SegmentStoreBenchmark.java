@@ -14,12 +14,12 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Random;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.analysis.timing.core.store.ArrayListStore;
-import org.eclipse.tracecompass.internal.analysis.timing.core.store.LazyArrayListStore;
+import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.ArrayListStore;
+import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.LazyArrayListStore;
+import org.eclipse.tracecompass.internal.segmentstore.core.treemap.TreeMapStore;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
-import org.eclipse.tracecompass.segmentstore.core.treemap.TreeMapStore;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
