@@ -26,6 +26,7 @@
       <module
             analysis_module="org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.SystemCallLatencyAnalysis"
             automatic="false"
+            icon="icons/systemcalls.png"
             id="org.eclipse.tracecompass.analysis.os.linux.latency.syscall"
             name="%analysis.latency">
          <tracetype
