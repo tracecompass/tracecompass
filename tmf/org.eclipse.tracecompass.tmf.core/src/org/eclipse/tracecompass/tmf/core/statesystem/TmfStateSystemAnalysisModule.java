@@ -67,7 +67,6 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     private final Object fRequestSyncObj = new Object();
 
     private @Nullable ITmfStateSystemBuilder fStateSystem;
-    private @Nullable IStateHistoryBackend fHtBackend;
     private @Nullable ITmfEventRequest fRequest;
     private @Nullable TmfTimeRange fTimeRange = null;
 
@@ -301,7 +300,6 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             try {
                 IStateHistoryBackend backend = StateHistoryBackendFactory.createHistoryTreeBackendExistingFile(
                         id, htFile, version);
-                fHtBackend = backend;
                 fStateSystem = StateSystemFactory.newStateSystem(backend, false);
                 analysisReady(true);
                 return;
@@ -320,7 +318,6 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         try {
             IStateHistoryBackend backend = StateHistoryBackendFactory.createHistoryTreeBackendNewFile(
                     id, htFile, provider.getVersion(), provider.getStartTime(), QUEUE_SIZE);
-            fHtBackend = backend;
             fStateSystem = StateSystemFactory.newStateSystem(backend);
             provider.assignTargetStateSystem(fStateSystem);
             build(provider);
@@ -401,7 +398,6 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         provider.assignTargetStateSystem(realSS);
 
         /* 7 */
-        fHtBackend = partialBackend;
         fStateSystem = realSS;
 
         build(provider);
@@ -414,7 +410,6 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      */
     private void createNullHistory(String id, ITmfStateProvider provider) {
         IStateHistoryBackend backend = StateHistoryBackendFactory.createNullBackend(id);
-        fHtBackend = backend;
         fStateSystem = StateSystemFactory.newStateSystem(backend);
         provider.assignTargetStateSystem(fStateSystem);
         build(provider);
@@ -427,7 +422,6 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      */
     private void createInMemoryHistory(String id, ITmfStateProvider provider) {
         IStateHistoryBackend backend = StateHistoryBackendFactory.createInMemoryBackend(id, provider.getStartTime());
-        fHtBackend = backend;
         fStateSystem = StateSystemFactory.newStateSystem(backend);
         provider.assignTargetStateSystem(fStateSystem);
         build(provider);
@@ -439,13 +433,13 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             provider.dispose();
         }
         fStateProvider = null;
-        if (deleteFiles && (fHtBackend != null)) {
-            fHtBackend.removeFiles();
+        if (deleteFiles && (fStateSystem != null)) {
+            fStateSystem.removeFiles();
         }
     }
 
     private void build(ITmfStateProvider provider) {
-        if ((fStateSystem == null) || (fHtBackend == null)) {
+        if (fStateSystem == null) {
             throw new IllegalArgumentException();
         }
 

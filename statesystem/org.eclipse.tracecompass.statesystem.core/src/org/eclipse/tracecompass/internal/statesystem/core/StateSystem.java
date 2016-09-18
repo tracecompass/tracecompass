@@ -602,6 +602,11 @@ public class StateSystem implements ITmfStateSystemBuilder {
         return ret;
     }
 
+    @Override
+    public void removeFiles() {
+        backend.removeFiles();
+    }
+
     //--------------------------------------------------------------------------
     //        Debug methods
     //--------------------------------------------------------------------------
