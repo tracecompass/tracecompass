@@ -54,12 +54,12 @@ public class IPIEntryHandler extends KernelEventHandler {
         ss.modifyAttribute(timestamp, value, quark);
 
         /* Change the status of the running process to interrupted */
-        quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getCurrentThreadNode(cpu, ss));
+        quark = KernelEventHandlerUtils.getCurrentThreadNode(cpu, ss);
         value = StateValues.PROCESS_STATUS_INTERRUPTED_VALUE;
         ss.modifyAttribute(timestamp, value, quark);
 
         /* Change the status of the CPU to interrupted */
-        quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getCurrentCPUNode(cpu, ss));
+        quark = KernelEventHandlerUtils.getCurrentCPUNode(cpu, ss);
         value = StateValues.CPU_STATUS_IRQ_VALUE;
         ss.modifyAttribute(timestamp, value, quark);
     }
