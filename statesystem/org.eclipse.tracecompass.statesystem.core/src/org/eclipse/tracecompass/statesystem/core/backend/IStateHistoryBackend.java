@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.statesystem.core.backend;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.PrintWriter;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -182,11 +181,4 @@ public interface IStateHistoryBackend {
     ITmfStateInterval doSingularQuery(long t, int attributeQuark)
             throws TimeRangeException, StateSystemDisposedException;
 
-    /**
-     * Debug method to print the contents of the history backend.
-     *
-     * @param writer
-     *            The PrintWriter where to write the output
-     */
-    void debugPrint(PrintWriter writer);
 }

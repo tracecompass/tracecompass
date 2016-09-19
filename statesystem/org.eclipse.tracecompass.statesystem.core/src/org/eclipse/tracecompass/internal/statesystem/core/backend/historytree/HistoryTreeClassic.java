@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.ClosedChannelException;
@@ -27,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 
@@ -59,7 +57,7 @@ public class HistoryTreeClassic implements IHistoryTree {
     private final HTConfig fConfig;
 
     /** Reader/writer object */
-    private final HT_IO fTreeIO;
+    private final @NonNull HT_IO fTreeIO;
 
     // ------------------------------------------------------------------------
     // Variable Fields (will change throughout the existence of the SHT)
@@ -341,6 +339,16 @@ public class HistoryTreeClassic implements IHistoryTree {
             }
         }
         return fTreeIO.readNode(seqNum);
+    }
+
+    /**
+     * Retrieve the TreeIO object. Should only be used for testing.
+     *
+     * @return The TreeIO
+     */
+    @VisibleForTesting
+    protected @NonNull HT_IO getTreeIO() {
+        return fTreeIO;
     }
 
     // ------------------------------------------------------------------------
@@ -634,70 +642,6 @@ public class HistoryTreeClassic implements IHistoryTree {
                 + fLatestBranch.get(0).getSequenceNumber() + "\n"
                 + "'Latest leaf' has sequence number: "
                 + fLatestBranch.get(fLatestBranch.size() - 1).getSequenceNumber();
-    }
-
-    /**
-     * Start at currentNode and print the contents of all its children, in
-     * pre-order. Give the root node in parameter to visit the whole tree, and
-     * have a nice overview.
-     */
-    /* Only used for debugging, shouldn't be externalized */
-    @SuppressWarnings("nls")
-    private void preOrderPrint(PrintWriter writer, boolean printIntervals,
-            HTNode currentNode, int curDepth, long ts) {
-
-        writer.println(currentNode.toString());
-        /* Print intervals only if timestamp is negative or within the range of the node */
-        if (printIntervals &&
-                (ts <= 0 ||
-                (ts >= currentNode.getNodeStart() && ts <= currentNode.getNodeEnd()))) {
-            currentNode.debugPrintIntervals(writer);
-        }
-
-        switch (currentNode.getNodeType()) {
-        case LEAF:
-            /* Stop if it's the leaf node */
-            return;
-
-        case CORE:
-            try {
-                final CoreNode node = (CoreNode) currentNode;
-                /* Print the extensions, if any */
-                int extension = node.getExtensionSequenceNumber();
-                while (extension != -1) {
-                    HTNode nextNode = fTreeIO.readNode(extension);
-                    preOrderPrint(writer, printIntervals, nextNode, curDepth, ts);
-                }
-
-                /* Print the child nodes */
-                for (int i = 0; i < node.getNbChildren(); i++) {
-                    HTNode nextNode = fTreeIO.readNode(node.getChild(i));
-                    for (int j = 0; j < curDepth; j++) {
-                        writer.print("  ");
-                    }
-                    writer.print("+-");
-                    preOrderPrint(writer, printIntervals, nextNode, curDepth + 1, ts);
-                }
-            } catch (ClosedChannelException e) {
-                Activator.getDefault().logError(e.getMessage());
-            }
-            break;
-
-        default:
-            break;
-        }
-    }
-
-    @Override
-    public void debugPrintFullTree(PrintWriter writer, boolean printIntervals, long ts) {
-        /* Only used for debugging, shouldn't be externalized */
-
-        preOrderPrint(writer, false, fLatestBranch.get(0), 0, ts);
-
-        if (printIntervals) {
-            preOrderPrint(writer, true, fLatestBranch.get(0), 0, ts);
-        }
-        writer.println('\n');
     }
 
 }

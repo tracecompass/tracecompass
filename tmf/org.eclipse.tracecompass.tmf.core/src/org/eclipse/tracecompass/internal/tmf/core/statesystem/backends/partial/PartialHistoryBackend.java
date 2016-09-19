@@ -17,7 +17,6 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNullCont
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -277,11 +276,6 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
 
     private boolean checkValidTime(long t) {
         return (t >= getStartTime() && t <= getEndTime());
-    }
-
-    @Override
-    public void debugPrint(PrintWriter writer) {
-        // TODO Auto-generated method stub
     }
 
     private void waitForCheckpoints() {

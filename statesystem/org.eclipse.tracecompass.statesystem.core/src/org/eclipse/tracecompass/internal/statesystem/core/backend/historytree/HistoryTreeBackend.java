@@ -18,7 +18,6 @@ package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.channels.ClosedChannelException;
 import java.util.List;
 
@@ -363,36 +362,4 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         return (int) ret;
     }
 
-    @Override
-    public void debugPrint(PrintWriter writer) {
-        /* By default don't print out all the intervals */
-        debugPrint(writer, false, -1);
-    }
-
-    /**
-     * The basic debugPrint method will print the tree structure, but not their
-     * contents.
-     *
-     * This method here print the contents (the intervals) as well.
-     *
-     * @param writer
-     *            The PrintWriter to which the debug info will be written
-     * @param printIntervals
-     *            Should we also print every contained interval individually?
-     * @param ts
-     *            The timestamp that nodes have to intersect for intervals to be
-     *            printed. A negative value will print intervals for all nodes.
-     *            The timestamp only applies if printIntervals is true.
-     */
-    public void debugPrint(PrintWriter writer, boolean printIntervals, long ts) {
-        /* Only used for debugging, shouldn't be externalized */
-        writer.println("------------------------------"); //$NON-NLS-1$
-        writer.println("State History Tree:\n"); //$NON-NLS-1$
-        writer.println(getSHT().toString());
-        writer.println("Average node utilization: " //$NON-NLS-1$
-                + getAverageNodeUsage());
-        writer.println(""); //$NON-NLS-1$
-
-        getSHT().debugPrintFullTree(writer, printIntervals, ts);
-    }
 }

@@ -16,7 +16,6 @@ package org.eclipse.tracecompass.internal.statesystem.core.backend;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.PrintWriter;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -222,13 +221,6 @@ public class InMemoryBackend implements IStateHistoryBackend {
     @Override
     public void dispose() {
         /* Nothing to do */
-    }
-
-    @Override
-    public void debugPrint(PrintWriter writer) {
-        synchronized (intervals) {
-            writer.println(intervals.toString());
-        }
     }
 
     private static Iterator<ITmfStateInterval> searchforEndTime(NavigableSet<ITmfStateInterval> tree, long time) {

@@ -11,7 +11,6 @@ package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.PrintWriter;
 import java.nio.channels.ClosedChannelException;
 
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -166,19 +165,5 @@ public interface IHistoryTree {
      * @return The history file size
      */
     long getFileSize();
-
-    /**
-     * Print out the full tree for debugging purposes
-     *
-     * @param writer
-     *            PrintWriter in which to write the output
-     * @param printIntervals
-     *            Flag to enable full output of the interval information
-     * @param ts
-     *            The timestamp that nodes have to intersect for intervals to be
-     *            printed. A negative value will print intervals for all nodes.
-     *            The timestamp only applies if printIntervals is true.
-     */
-    void debugPrintFullTree(PrintWriter writer, boolean printIntervals, long ts);
 
 }

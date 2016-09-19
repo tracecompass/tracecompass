@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.internal.statesystem.core.backend;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.PrintWriter;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -116,10 +115,5 @@ public class NullBackend implements IStateHistoryBackend {
     public ITmfStateInterval doSingularQuery(long t, int attributeQuark) {
         /* Cannot do past queries */
         return null;
-    }
-
-    @Override
-    public void debugPrint(PrintWriter writer) {
-        writer.println("Null history backend"); //$NON-NLS-1$
     }
 }

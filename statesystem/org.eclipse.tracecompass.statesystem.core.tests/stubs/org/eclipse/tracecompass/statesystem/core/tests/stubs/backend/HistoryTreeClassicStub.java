@@ -16,6 +16,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.channels.ClosedChannelException;
 import java.util.List;
 
@@ -71,8 +72,13 @@ public class HistoryTreeClassicStub extends HistoryTreeClassic {
         super(existingStateFile, expProviderVersion);
     }
 
+    // ------------------------------------------------------------------------
+    // Extra test accessors
+    // ------------------------------------------------------------------------
+
     @Override
     public List<HTNode> getLatestBranch() {
+        /* Super method is not public */
         return checkNotNull(super.getLatestBranch());
     }
 
@@ -106,6 +112,118 @@ public class HistoryTreeClassicStub extends HistoryTreeClassic {
      */
     public int getDepth() {
         return getLatestBranch().size();
+    }
+
+    // ------------------------------------------------------------------------
+    // Debug printing methods
+    // ------------------------------------------------------------------------
+
+    /**
+     * Print out the full tree for debugging purposes
+     *
+     * @param writer
+     *            PrintWriter in which to write the output
+     * @param printIntervals
+     *            Flag to enable full output of the interval information
+     * @param ts
+     *            The timestamp that nodes have to intersect for intervals to be
+     *            printed. A negative value will print intervals for all nodes.
+     *            The timestamp only applies if printIntervals is true.
+     */
+    public void debugPrintFullTree(PrintWriter writer, boolean printIntervals, long ts) {
+        preOrderPrint(writer, false, getLatestBranch().get(0), 0, ts);
+
+        if (printIntervals) {
+            preOrderPrint(writer, true, getLatestBranch().get(0), 0, ts);
+        }
+        writer.println('\n');
+    }
+
+    /**
+     * Start at currentNode and print the contents of all its children, in
+     * pre-order. Give the root node in parameter to visit the whole tree, and
+     * have a nice overview.
+     */
+    private void preOrderPrint(PrintWriter writer, boolean printIntervals,
+            HTNode currentNode, int curDepth, long ts) {
+
+        writer.println(currentNode.toString());
+        /*
+         * Print intervals only if timestamp is negative or within the range of
+         * the node
+         */
+        if (printIntervals &&
+                (ts <= 0 ||
+                        (ts >= currentNode.getNodeStart() && ts <= currentNode.getNodeEnd()))) {
+            currentNode.debugPrintIntervals(writer);
+        }
+
+        switch (currentNode.getNodeType()) {
+        case LEAF:
+            /* Stop if it's the leaf node */
+            return;
+
+        case CORE:
+            try {
+                final CoreNode node = (CoreNode) currentNode;
+                /* Print the extensions, if any */
+                int extension = node.getExtensionSequenceNumber();
+                while (extension != -1) {
+                    HTNode nextNode = getTreeIO().readNode(extension);
+                    preOrderPrint(writer, printIntervals, nextNode, curDepth, ts);
+                }
+
+                /* Print the child nodes */
+                for (int i = 0; i < node.getNbChildren(); i++) {
+                    HTNode nextNode = getTreeIO().readNode(node.getChild(i));
+                    for (int j = 0; j < curDepth; j++) {
+                        writer.print("  ");
+                    }
+                    writer.print("+-");
+                    preOrderPrint(writer, printIntervals, nextNode, curDepth + 1, ts);
+                }
+            } catch (ClosedChannelException e) {
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // Assertion methods, for use with JUnit tests
+    // ------------------------------------------------------------------------
+
+    /**
+     * Check the integrity of all the nodes in the tree. Calls
+     * {@link #assertNodeIntegrity} for every node in the tree.
+     */
+    public void assertIntegrity() {
+        try {
+            for (int i = 0; i < getNodeCount(); i++) {
+                assertNodeIntegrity(getNode(i));
+            }
+        } catch (ClosedChannelException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Debugging method to make sure all intervals contained in the given node
+     * have valid start and end times.
+     *
+     * @param node
+     *            The node to check
+     */
+    private void assertNodeIntegrity(HTNode node) {
+        if (node instanceof CoreNode) {
+            assertChildrenIntegrity((CoreNode) node);
+        }
+
+        /* Check that all intervals are within the node's range */
+        // TODO: Get the intervals of a node
+
     }
 
     private void assertChildrenIntegrity(CoreNode node) {
@@ -143,37 +261,6 @@ public class HistoryTreeClassicStub extends HistoryTreeClassic {
                 }
             }
 
-        } catch (ClosedChannelException e) {
-            fail(e.getMessage());
-        }
-    }
-
-    /**
-     * Debugging method to make sure all intervals contained in the given node
-     * have valid start and end times.
-     *
-     * @param node
-     *            The node to check
-     */
-    private void assertNodeIntegrity(HTNode node) {
-        if (node instanceof CoreNode) {
-            assertChildrenIntegrity((CoreNode) node);
-        }
-
-        /* Check that all intervals are within the node's range */
-        // TODO: Get the intervals of a node
-
-    }
-
-    /**
-     * Check the integrity of all the nodes in the tree. Calls
-     * {@link #assertNodeIntegrity} for every node in the tree.
-     */
-    public void assertIntegrity() {
-        try {
-            for (int i = 0; i < getNodeCount(); i++) {
-                assertNodeIntegrity(getNode(i));
-            }
         } catch (ClosedChannelException e) {
             fail(e.getMessage());
         }

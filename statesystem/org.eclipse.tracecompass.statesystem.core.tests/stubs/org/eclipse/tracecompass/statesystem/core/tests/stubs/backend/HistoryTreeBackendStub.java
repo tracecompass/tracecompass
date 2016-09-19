@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.statesystem.core.tests.stubs.backend;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTConfig;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HistoryTreeBackend;
@@ -129,4 +130,41 @@ public class HistoryTreeBackendStub extends HistoryTreeBackend {
         return (HistoryTreeClassicStub) super.getSHT();
     }
 
+    /**
+     * Debug method to print the contents of the history backend.
+     *
+     * @param writer
+     *            The PrintWriter where to write the output
+     */
+    public void debugPrint(PrintWriter writer) {
+        /* By default don't print out all the intervals */
+        debugPrint(writer, false, -1);
+    }
+
+    /**
+     * The basic debugPrint method will print the tree structure, but not their
+     * contents.
+     *
+     * This method here print the contents (the intervals) as well.
+     *
+     * @param writer
+     *            The PrintWriter to which the debug info will be written
+     * @param printIntervals
+     *            Should we also print every contained interval individually?
+     * @param ts
+     *            The timestamp that nodes have to intersect for intervals to be
+     *            printed. A negative value will print intervals for all nodes.
+     *            The timestamp only applies if printIntervals is true.
+     */
+    public void debugPrint(PrintWriter writer, boolean printIntervals, long ts) {
+        /* Only used for debugging, shouldn't be externalized */
+        writer.println("------------------------------"); //$NON-NLS-1$
+        writer.println("State History Tree:\n"); //$NON-NLS-1$
+        writer.println(getSHT().toString());
+        writer.println("Average node utilization: " //$NON-NLS-1$
+                + getAverageNodeUsage());
+        writer.println(""); //$NON-NLS-1$
+
+        getHistoryTree().debugPrintFullTree(writer, printIntervals, ts);
+    }
 }

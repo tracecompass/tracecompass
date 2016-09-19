@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.internal.statesystem.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -612,17 +611,4 @@ public class StateSystem implements ITmfStateSystemBuilder {
                 attribute + " at time " + timestamp + //$NON-NLS-1$
                 ", returning dummy interval"); //$NON-NLS-1$
     }
-
-    /**
-     * Print out the contents of the inner structures.
-     *
-     * @param writer
-     *            The PrintWriter in which to print the output
-     */
-    public void debugPrint(@NonNull PrintWriter writer) {
-        getAttributeTree().debugPrint(writer);
-        transState.debugPrint(writer);
-        backend.debugPrint(writer);
-    }
-
 }

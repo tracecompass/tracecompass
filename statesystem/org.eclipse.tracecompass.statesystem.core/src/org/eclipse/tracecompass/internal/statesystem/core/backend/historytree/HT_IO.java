@@ -45,7 +45,7 @@ import com.google.common.cache.LoadingCache;
  *
  * @author Alexandre Montplaisir
  */
-class HT_IO {
+public class HT_IO {
 
     private static final Logger LOGGER = TraceCompassLog.getLogger(HT_IO.class);
 
@@ -198,6 +198,12 @@ class HT_IO {
         }
     }
 
+    /**
+     * Write the given node to disk.
+     *
+     * @param node
+     *            The node to write.
+     */
     public void writeNode(HTNode node) {
         try {
             int seqNumber = node.getSequenceNumber();
@@ -217,10 +223,23 @@ class HT_IO {
         }
     }
 
+    /**
+     * Get the output file channel, used for writing.
+     *
+     * @return The output file channel
+     */
     public FileChannel getFcOut() {
         return fFileChannelOut;
     }
 
+    /**
+     * Retrieve the input stream with which to write the attribute tree.
+     *
+     * @param nodeOffset
+     *            The offset in the file, in number of nodes. This should be
+     *            after all the nodes.
+     * @return The correctly-seeked input stream
+     */
     public FileInputStream supplyATReader(int nodeOffset) {
         try {
             /*
@@ -234,6 +253,9 @@ class HT_IO {
         return fFileInputStream;
     }
 
+    /**
+     * Close all file channels and streams.
+     */
     public synchronized void closeFile() {
         try {
             fFileInputStream.close();
@@ -243,6 +265,9 @@ class HT_IO {
         }
     }
 
+    /**
+     * Delete the history tree file
+     */
     public synchronized void deleteFile() {
         closeFile();
 
