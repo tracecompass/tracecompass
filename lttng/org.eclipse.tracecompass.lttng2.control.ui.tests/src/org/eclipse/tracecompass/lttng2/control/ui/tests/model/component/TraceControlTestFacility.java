@@ -18,13 +18,13 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.common.NotDefinedException;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceControlComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.JobUtils;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -182,9 +182,7 @@ public class TraceControlTestFacility {
      * Waits for all Eclipse jobs to finish
      */
     public void waitForJobs() {
-        while (!Job.getJobManager().isIdle()) {
-            delay(WAIT_FOR_JOBS_DELAY);
-        }
+        JobUtils.waitForJobs();
     }
 
     private IViewPart showView(String viewId) throws PartInitException {

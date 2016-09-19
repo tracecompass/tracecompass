@@ -30,7 +30,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.jface.bindings.keys.KeyStroke;
@@ -76,6 +75,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers.ProjectElementHasChild;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.JobUtils;
 import org.eclipse.tracecompass.tmf.ui.views.TracingPerspectiveFactory;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -109,61 +109,11 @@ public final class SWTBotUtils {
      * Waits for all Eclipse jobs to finish. Times out after
      * SWTBotUtils#MAX_JOBS_WAIT_TIME by default.
      *
-     * @throws TimeoutException
+     * @throws RuntimeException
      *             once the waiting time passes the default maximum value
      */
     public static void waitForJobs() {
-        waitForJobs(MAX_JOBS_WAIT_TIME);
-    }
-
-    /**
-     * Waits for all Eclipse jobs to finish
-     *
-     * @param maxWait
-     *            the maximum time to wait, in milliseconds. Once the waiting
-     *            time passes the maximum value, a TimeoutException is thrown
-     * @throws TimeoutException
-     *             once the waiting time passes the maximum value
-     */
-    public static void waitForJobs(long maxWait) {
-        long waitStart = System.currentTimeMillis();
-        while (!Job.getJobManager().isIdle()) {
-            if (System.currentTimeMillis() - waitStart > maxWait) {
-                printJobs();
-                throw new TimeoutException("Timed out waiting for jobs to finish.");
-            }
-
-            delay(100);
-        }
-    }
-
-    private static void printJobs() {
-        Job[] jobs = Job.getJobManager().find(null);
-        for (Job job : jobs) {
-            System.err.println(job.toString() + " state: " + jobStateToString(job.getState()));
-            Thread thread = job.getThread();
-            if (thread != null) {
-                for (StackTraceElement stractTraceElement : thread.getStackTrace()) {
-                    System.err.println("  " + stractTraceElement);
-                }
-            }
-            System.err.println();
-        }
-    }
-
-    private static String jobStateToString(int jobState) {
-        switch (jobState) {
-        case Job.RUNNING:
-            return "RUNNING";
-        case Job.WAITING:
-            return "WAITING";
-        case Job.SLEEPING:
-            return "SLEEPING";
-        case Job.NONE:
-            return "NONE";
-        default:
-            return "UNKNOWN";
-        }
+        JobUtils.waitForJobs(MAX_JOBS_WAIT_TIME);
     }
 
     /**
