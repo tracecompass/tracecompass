@@ -38,7 +38,7 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -94,10 +94,10 @@ public abstract class FindDialogTestBase extends KernelTestBase {
     }
 
     /**
-     * After class method to close the dialog
+     * After method to close the dialog
      */
-    @AfterClass
-    public static void afterTest() {
+    @After
+    public void afterTest() {
         closeDialog(getDialogBot());
     }
 

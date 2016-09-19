@@ -128,6 +128,7 @@ public class ColumnHeaderMenuTest {
     @After
     public void after() {
         fBot.closeAllEditors();
+        SWTBotUtils.closeSecondaryShells(fBot);
     }
 
     /**

@@ -190,6 +190,7 @@ public class TestInvalidCtfTrace {
     @After
     public void teardown() {
         SWTBotUtils.clearTracesFolder(fBot, PROJET_NAME);
+        SWTBotUtils.closeSecondaryShells(fBot);
     }
 
     /**

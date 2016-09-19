@@ -135,6 +135,7 @@ public abstract class KernelTestBase {
     @After
     public void after() {
         fBot.closeAllEditors();
+        SWTBotUtils.closeSecondaryShells(fBot);
     }
 
     /**

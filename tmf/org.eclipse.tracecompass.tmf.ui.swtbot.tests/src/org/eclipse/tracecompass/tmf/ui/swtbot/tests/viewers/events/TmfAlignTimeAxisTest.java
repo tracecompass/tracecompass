@@ -148,6 +148,7 @@ public class TmfAlignTimeAxisTest {
         SWTBotUtils.activeEventsEditor(bot).close();
         /* Switch back to Tracing perspective since several tests change the perspective */
         SWTBotUtils.switchToTracingPerspective();
+        SWTBotUtils.closeSecondaryShells(fBot);
     }
 
     /**

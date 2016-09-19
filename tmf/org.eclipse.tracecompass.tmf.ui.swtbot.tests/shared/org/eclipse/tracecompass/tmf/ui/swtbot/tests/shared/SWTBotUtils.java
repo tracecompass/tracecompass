@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -52,6 +53,7 @@ import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
+import org.eclipse.swtbot.swt.finder.utils.MessageFormat;
 import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
@@ -95,8 +97,10 @@ public final class SWTBotUtils {
     private static final String WINDOW_MENU = "Window";
     private static final String PREFERENCES_MENU_ITEM = "Preferences";
     private static boolean fPrintedEnvironment = false;
+    private static Logger log = Logger.getLogger(SWTBotUtils.class);
 
     private SWTBotUtils() {
+
     }
 
     private static final String TRACING_PERSPECTIVE_ID = TracingPerspectiveFactory.ID;
@@ -218,6 +222,9 @@ public final class SWTBotUtils {
 
         SWTBotUtils.waitForJobs();
 
+        closeSecondaryShells(bot);
+        SWTBotUtils.waitForJobs();
+
         final SWTBotView projectViewBot = bot.viewById(IPageLayout.ID_PROJECT_EXPLORER);
         projectViewBot.setFocus();
 
@@ -292,11 +299,42 @@ public final class SWTBotUtils {
      *            swtbotshells for all the shells
      */
     public static void focusMainWindow(SWTBotShell[] shellBots) {
+        SWTBotShell mainShell = getMainShell(shellBots);
+        if (mainShell != null) {
+            mainShell.activate();
+        }
+    }
+
+    private static SWTBotShell getMainShell(SWTBotShell[] shellBots) {
+        SWTBotShell mainShell = null;
         for (SWTBotShell shellBot : shellBots) {
             if (shellBot.getText().toLowerCase().contains("eclipse")) {
-                shellBot.activate();
+                mainShell = shellBot;
             }
         }
+        return mainShell;
+    }
+
+    /**
+     * Close all non-main shells that are visible.
+     *
+     * @param bot
+     *            the workbench bot
+     */
+    public static void closeSecondaryShells(SWTWorkbenchBot bot) {
+        SWTBotShell[] shells = bot.shells();
+        SWTBotShell mainShell = getMainShell(shells);
+        if (mainShell == null) {
+            return;
+        }
+
+        // Close all non-main shell but make sure we don't close an invisible
+        // shell such the special "limbo shell" that Eclipse needs to work
+        Arrays.stream(shells)
+                .filter(shell -> shell != mainShell)
+                .filter(SWTBotShell::isVisible)
+                .peek(shell -> log.debug(MessageFormat.format("Closing ligering shell with title {0}", shell.getText())))
+                .forEach(SWTBotShell::close);
     }
 
     /**
