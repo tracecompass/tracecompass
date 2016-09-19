@@ -17,10 +17,12 @@ import java.io.IOException;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceCoreUtils;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.ui.internal.wizards.datatransfer.ArchiveFileManipulations;
-import org.eclipse.ui.internal.wizards.datatransfer.ZipLeveledStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
 
 /**
@@ -171,7 +173,7 @@ public class ArchiveUtil {
                 // We close the file when we dispose the import provider, see
                 // disposeSelectionGroupRoot
                 ZipFile zipFile = getSpecifiedZipSourceFile(archivePath);
-                leveledImportStructureProvider = new FileSystemObjectLeveledImportStructureProvider(new ZipLeveledStructureProvider(zipFile), archivePath);
+                leveledImportStructureProvider = new FileSystemObjectLeveledImportStructureProvider(new SafePathZipLeveledStructureProvider(zipFile), archivePath);
             } else if (ensureGzipSourceIsValid(archivePath)) {
                 // We close the file when we dispose the import provider, see
                 // disposeSelectionGroupRoot
@@ -195,5 +197,28 @@ public class ArchiveUtil {
         }
 
         return new Pair<>(rootElement, importStructureProvider);
+    }
+
+    /**
+     * Convert a string path to a path containing valid names. See
+     * {@link TmfTraceCoreUtils#validateName(String)}.
+     *
+     * @param path
+     *            the string path to convert
+     * @return the path contains valid segment names
+     */
+    public static IPath toValidNamesPath(String path) {
+        IPath newSafePath = TmfTraceCoreUtils.newSafePath(path);
+        IPath newFullPath = newSafePath;
+        String[] segments = newSafePath.segments();
+        for (int i = 0; i < segments.length; i++) {
+            String segment = TmfTraceCoreUtils.validateName(TmfTraceCoreUtils.safePathToString(segments[i]));
+            if (i == 0) {
+                newFullPath = new Path(segment);
+            } else {
+                newFullPath = newFullPath.append(segment);
+            }
+        }
+        return newFullPath;
     }
 }

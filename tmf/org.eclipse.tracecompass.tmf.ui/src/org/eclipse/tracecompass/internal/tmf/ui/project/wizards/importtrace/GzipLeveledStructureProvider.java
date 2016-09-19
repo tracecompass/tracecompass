@@ -61,7 +61,8 @@ public class GzipLeveledStructureProvider implements ILeveledImportStructureProv
 
     @Override
     public String getFullPath(Object element) {
-        return ((GzipEntry) element).getName();
+        String name = ((GzipEntry) element).getName();
+        return ArchiveUtil.toValidNamesPath(name).toOSString();
     }
 
     @Override
@@ -69,7 +70,12 @@ public class GzipLeveledStructureProvider implements ILeveledImportStructureProv
         if (element != root && element != fEntry) {
             throw new IllegalArgumentException();
         }
-        return ((GzipEntry) element).getName();
+        String name = ((GzipEntry) element).getName();
+        if (element.equals(root)) {
+            return name;
+        }
+
+        return ArchiveUtil.toValidNamesPath(name).lastSegment();
     }
 
     /**

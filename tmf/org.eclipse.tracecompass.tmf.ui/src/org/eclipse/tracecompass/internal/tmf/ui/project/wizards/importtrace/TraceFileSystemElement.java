@@ -103,7 +103,7 @@ public class TraceFileSystemElement extends FileSystemElement {
      */
     public String getLabel() {
         if (fLabel == null) {
-            return getFileSystemObject().getName();
+            return getProvider().getLabel(this.getFileSystemObject());
         }
         return fLabel;
     }
