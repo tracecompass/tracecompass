@@ -437,6 +437,34 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         Files.delete(Paths.get(testArchivePath));
     }
 
+    /**
+     * Test importing an archive with colons in the names. Those are invalid
+     * characters in Windows paths so this test makes sure that they are
+     * replaced properly with '_'
+     */
+    @Test
+    public void testArchiveWithColons() {
+        openImportWizard();
+        IPath absolutePath = Activator.getAbsolutePath(new Path("testfiles/testcolon.zip"));
+
+        SWTBotImportWizardUtils.selectImportFromArchive(fBot, absolutePath.toOSString());
+        String subFolderName = IS_WIN32 ? "folder_colon" : "folder:colon";
+        selectFolder(ARCHIVE_ROOT_ELEMENT_NAME, subFolderName);
+        SWTBotImportWizardUtils.setOptions(fBot, 0, "Test trace : XML Trace Stub");
+        importFinish();
+
+        TmfProjectElement tmfProject = TmfProjectRegistry.getProject(getProjectResource(), true);
+        assertNotNull(tmfProject);
+        TmfTraceFolder tracesFolder = tmfProject.getTracesFolder();
+        assertNotNull(tracesFolder);
+        List<TmfTraceElement> traces = tracesFolder.getTraces();
+        assertTrue(traces.size() == 1);
+        String traceName = IS_WIN32 ? "trace_colon.xml" : "trace:colon.xml";
+        assertEquals(traceName, traces.get(0).getName());
+
+        SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
+    }
+
     private static void assertNoTraces() {
         TmfProjectElement tmfProject = TmfProjectRegistry.getProject(getProjectResource(), true);
         assertNotNull(tmfProject);

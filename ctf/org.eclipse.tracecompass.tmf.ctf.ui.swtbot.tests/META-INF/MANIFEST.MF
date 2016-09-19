@@ -34,3 +34,4 @@ Import-Package: org.apache.log4j,
  org.eclipse.swtbot.swt.finder.waits,
  org.eclipse.swtbot.swt.finder.widgets,
  org.eclipse.tracecompass.testtraces.ctf;version="1.0.0"
+Bundle-Activator: org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests.Activator

@@ -36,223 +36,225 @@ import org.eclipse.ui.internal.wizards.datatransfer.ILeveledImportStructureProvi
  */
 @SuppressWarnings("restriction")
 public class TarLeveledStructureProvider implements
-		ILeveledImportStructureProvider {
-	private TarFile tarFile;
+        ILeveledImportStructureProvider {
+    private TarFile tarFile;
 
-	private TarEntry root = new TarEntry("/");//$NON-NLS-1$
+    private TarEntry root = new TarEntry("/");//$NON-NLS-1$
 
-	private Map<TarEntry, List<TarEntry>> children;
+    private Map<TarEntry, List<TarEntry>> children;
 
-	private Map<IPath, TarEntry> directoryEntryCache = new HashMap<>();
+    private Map<IPath, TarEntry> directoryEntryCache = new HashMap<>();
 
-	private int stripLevel;
+    private int stripLevel;
 
-	/**
-	 * Creates a <code>TarFileStructureProvider</code>, which will operate on
-	 * the passed tar file.
-	 *
-	 * @param sourceFile
-	 *            the source TarFile
-	 */
-	public TarLeveledStructureProvider(TarFile sourceFile) {
-		super();
-		tarFile = sourceFile;
-		root.setFileType(TarEntry.DIRECTORY);
-	}
+    /**
+     * Creates a <code>TarFileStructureProvider</code>, which will operate on
+     * the passed tar file.
+     *
+     * @param sourceFile
+     *            the source TarFile
+     */
+    public TarLeveledStructureProvider(TarFile sourceFile) {
+        super();
+        tarFile = sourceFile;
+        root.setFileType(TarEntry.DIRECTORY);
+    }
 
-	/**
-	 * Creates a new container tar entry with the specified name, iff it has
-	 * not already been created. If the parent of the given element does not
-	 * already exist it will be recursively created as well.
-	 * @param pathname The path representing the container
-	 * @return The element represented by this pathname (it may have already existed)
-	 */
-	protected TarEntry createContainer(IPath pathname) {
-		TarEntry existingEntry = directoryEntryCache.get(pathname);
-		if (existingEntry != null) {
-			return existingEntry;
-		}
+    /**
+     * Creates a new container tar entry with the specified name, iff it has
+     * not already been created. If the parent of the given element does not
+     * already exist it will be recursively created as well.
+     * @param pathname The path representing the container
+     * @return The element represented by this pathname (it may have already existed)
+     */
+    protected TarEntry createContainer(IPath pathname) {
+        TarEntry existingEntry = directoryEntryCache.get(pathname);
+        if (existingEntry != null) {
+            return existingEntry;
+        }
 
-		TarEntry parent;
-		if (pathname.segmentCount() == 1) {
-			parent = root;
-		} else {
-			parent = createContainer(pathname.removeLastSegments(1));
-		}
-		TarEntry newEntry = new TarEntry(pathname.toString());
-		newEntry.setFileType(TarEntry.DIRECTORY);
-		directoryEntryCache.put(pathname, newEntry);
-		List<TarEntry> childList = new ArrayList<>();
-		children.put(newEntry, childList);
+        TarEntry parent;
+        if (pathname.segmentCount() == 1) {
+            parent = root;
+        } else {
+            parent = createContainer(pathname.removeLastSegments(1));
+        }
+        TarEntry newEntry = new TarEntry(pathname.toString());
+        newEntry.setFileType(TarEntry.DIRECTORY);
+        directoryEntryCache.put(pathname, newEntry);
+        List<TarEntry> childList = new ArrayList<>();
+        children.put(newEntry, childList);
 
-		List<TarEntry> parentChildList = children.get(parent);
-		NonNullUtils.checkNotNull(parentChildList).add(newEntry);
-		return newEntry;
-	}
+        List<TarEntry> parentChildList = children.get(parent);
+        NonNullUtils.checkNotNull(parentChildList).add(newEntry);
+        return newEntry;
+    }
 
-	/**
-	 * Creates a new tar file entry with the specified name.
-	 * @param entry the entry to create the file for
-	 */
-	protected void createFile(TarEntry entry) {
-		IPath pathname = new Path(entry.getName());
-		TarEntry parent;
-		if (pathname.segmentCount() == 1) {
-			parent = root;
-		} else {
-			parent = directoryEntryCache.get(pathname
-					.removeLastSegments(1));
-		}
+    /**
+     * Creates a new tar file entry with the specified name.
+     * @param entry the entry to create the file for
+     */
+    protected void createFile(TarEntry entry) {
+        IPath pathname = new Path(entry.getName());
+        TarEntry parent;
+        if (pathname.segmentCount() == 1) {
+            parent = root;
+        } else {
+            parent = directoryEntryCache.get(pathname
+                    .removeLastSegments(1));
+        }
 
-		List<TarEntry> childList = children.get(parent);
-		NonNullUtils.checkNotNull(childList).add(entry);
-	}
-
-	@Override
-	public List getChildren(Object element) {
-		if (children == null) {
-			initialize();
-		}
-
-		return (children.get(element));
-	}
+        List<TarEntry> childList = children.get(parent);
+        NonNullUtils.checkNotNull(childList).add(entry);
+    }
 
     @Override
-	public InputStream getContents(Object element) {
-		try {
-			return tarFile.getInputStream((TarEntry) element);
-		} catch (TarException e) {
-			IDEWorkbenchPlugin.log(e.getLocalizedMessage(), e);
-			return null;
-		} catch (IOException e) {
-			IDEWorkbenchPlugin.log(e.getLocalizedMessage(), e);
-			return null;
-		}
-	}
+    public List getChildren(Object element) {
+        if (children == null) {
+            initialize();
+        }
 
-	/**
-	 * Returns the resource attributes for this file.
-	 *
-	 * @param element the element to get the attributes from
-	 * @return the attributes of the file
-	 */
-	public ResourceAttributes getResourceAttributes(Object element) {
-		ResourceAttributes attributes = new ResourceAttributes();
-		TarEntry entry = (TarEntry) element;
-		attributes.setExecutable((entry.getMode() & 0100) != 0);
-		attributes.setReadOnly((entry.getMode() & 0200) == 0);
-		return attributes;
-	}
+        return (children.get(element));
+    }
 
-	@Override
-	public String getFullPath(Object element) {
-		return stripPath(((TarEntry) element).getName());
-	}
+    @Override
+    public InputStream getContents(Object element) {
+        try {
+            return tarFile.getInputStream((TarEntry) element);
+        } catch (TarException e) {
+            IDEWorkbenchPlugin.log(e.getLocalizedMessage(), e);
+            return null;
+        } catch (IOException e) {
+            IDEWorkbenchPlugin.log(e.getLocalizedMessage(), e);
+            return null;
+        }
+    }
 
-	@Override
-	public String getLabel(Object element) {
-		if (element.equals(root)) {
-			return ((TarEntry) element).getName();
-		}
+    /**
+     * Returns the resource attributes for this file.
+     *
+     * @param element the element to get the attributes from
+     * @return the attributes of the file
+     */
+    public ResourceAttributes getResourceAttributes(Object element) {
+        ResourceAttributes attributes = new ResourceAttributes();
+        TarEntry entry = (TarEntry) element;
+        attributes.setExecutable((entry.getMode() & 0100) != 0);
+        attributes.setReadOnly((entry.getMode() & 0200) == 0);
+        return attributes;
+    }
 
-		return stripPath(new Path(((TarEntry) element).getName()).lastSegment());
-	}
+    @Override
+    public String getFullPath(Object element) {
+        String name = stripPath(((TarEntry) element).getName());
+        return ArchiveUtil.toValidNamesPath(name).toOSString();
+    }
 
-	/**
-	 * Returns the entry that this importer uses as the root sentinel.
-	 *
-	 * @return TarEntry entry
-	 */
-	@Override
-	public Object getRoot() {
-		return root;
-	}
+    @Override
+    public String getLabel(Object element) {
+        if (element.equals(root)) {
+            return ((TarEntry) element).getName();
+        }
 
-	/**
-	 * Returns the tar file that this provider provides structure for.
-	 *
-	 * @return TarFile file
-	 */
-	public TarFile getTarFile() {
-		return tarFile;
-	}
+        String name = ((TarEntry) element).getName();
+        return stripPath(ArchiveUtil.toValidNamesPath(name).lastSegment());
+    }
 
-	@Override
-	public boolean closeArchive(){
-		try {
-			getTarFile().close();
-		} catch (IOException e) {
-			IDEWorkbenchPlugin.log(DataTransferMessages.ZipImport_couldNotClose
-					+ getTarFile().getName(), e);
-			return false;
-		}
-		return true;
-	}
+    /**
+     * Returns the entry that this importer uses as the root sentinel.
+     *
+     * @return TarEntry entry
+     */
+    @Override
+    public Object getRoot() {
+        return root;
+    }
 
-	/**
-	 * Initializes this object's children table based on the contents of the
-	 * specified source file.
-	 */
-	protected void initialize() {
-		children = new HashMap<>(1000);
+    /**
+     * Returns the tar file that this provider provides structure for.
+     *
+     * @return TarFile file
+     */
+    public TarFile getTarFile() {
+        return tarFile;
+    }
 
-		children.put(root, new ArrayList<>());
-		Enumeration<TarEntry> entries = tarFile.entries();
-		while (entries.hasMoreElements()) {
-			TarEntry entry = entries.nextElement();
-			IPath path = new Path(entry.getName()).addTrailingSeparator();
+    @Override
+    public boolean closeArchive(){
+        try {
+            getTarFile().close();
+        } catch (IOException e) {
+            IDEWorkbenchPlugin.log(DataTransferMessages.ZipImport_couldNotClose
+                    + getTarFile().getName(), e);
+            return false;
+        }
+        return true;
+    }
 
-			if (entry.getFileType() == TarEntry.DIRECTORY) {
-				createContainer(path);
-			} else
-			{
-				// Ensure the container structure for all levels above this is initialized
-				// Once we hit a higher-level container that's already added we need go no further
-				int pathSegmentCount = path.segmentCount();
-				if (pathSegmentCount > 1) {
-					createContainer(path.uptoSegment(pathSegmentCount - 1));
-				}
-				createFile(entry);
-			}
-		}
-	}
+    /**
+     * Initializes this object's children table based on the contents of the
+     * specified source file.
+     */
+    protected void initialize() {
+        children = new HashMap<>(1000);
 
-	@Override
-	public boolean isFolder(Object element) {
-		return (((TarEntry) element).getFileType() == TarEntry.DIRECTORY);
-	}
+        children.put(root, new ArrayList<>());
+        Enumeration<TarEntry> entries = tarFile.entries();
+        while (entries.hasMoreElements()) {
+            TarEntry entry = entries.nextElement();
+            IPath path = new Path(entry.getName()).addTrailingSeparator();
 
-	/*
-	 * Strip the leading directories from the path
-	 */
-	private String stripPath(String path) {
-	    String strippedPath = path;
-		String pathOrig = strippedPath;
-		for (int i = 0; i < stripLevel; i++) {
-			int firstSep = strippedPath.indexOf('/');
-			// If the first character was a seperator we must strip to the next
-			// seperator as well
-			if (firstSep == 0) {
-			    strippedPath = strippedPath.substring(1);
-				firstSep = strippedPath.indexOf('/');
-			}
-			// No seperator wasw present so we're in a higher directory right
-			// now
-			if (firstSep == -1) {
-				return pathOrig;
-			}
-			strippedPath = strippedPath.substring(firstSep);
-		}
-		return strippedPath;
-	}
+            if (entry.getFileType() == TarEntry.DIRECTORY) {
+                createContainer(path);
+            } else
+            {
+                // Ensure the container structure for all levels above this is initialized
+                // Once we hit a higher-level container that's already added we need go no further
+                int pathSegmentCount = path.segmentCount();
+                if (pathSegmentCount > 1) {
+                    createContainer(path.uptoSegment(pathSegmentCount - 1));
+                }
+                createFile(entry);
+            }
+        }
+    }
 
-	@Override
-	public void setStrip(int level) {
-		stripLevel = level;
-	}
+    @Override
+    public boolean isFolder(Object element) {
+        return (((TarEntry) element).getFileType() == TarEntry.DIRECTORY);
+    }
 
-	@Override
-	public int getStrip() {
-		return stripLevel;
-	}
+    /*
+     * Strip the leading directories from the path
+     */
+    private String stripPath(String path) {
+        String strippedPath = path;
+        String pathOrig = strippedPath;
+        for (int i = 0; i < stripLevel; i++) {
+            int firstSep = strippedPath.indexOf('/');
+            // If the first character was a seperator we must strip to the next
+            // seperator as well
+            if (firstSep == 0) {
+                strippedPath = strippedPath.substring(1);
+                firstSep = strippedPath.indexOf('/');
+            }
+            // No seperator wasw present so we're in a higher directory right
+            // now
+            if (firstSep == -1) {
+                return pathOrig;
+            }
+            strippedPath = strippedPath.substring(firstSep);
+        }
+        return strippedPath;
+    }
+
+    @Override
+    public void setStrip(int level) {
+        stripLevel = level;
+    }
+
+    @Override
+    public int getStrip() {
+        return stripLevel;
+    }
 }
