@@ -2432,7 +2432,7 @@ Double-clicking on a call stack event will zoom the time graph to the selected f
 
 Clicking the '''Select Next State Change''' or '''Select Previous State Change''' or using the left and right arrows will navigate to the next or previous call stack event, and select the function currently at the top of the call stack. Note that pressing the '''Shift''' key at the same time will update the selection end time of the current selection.
 
-Clicking the '''Import Mapping File''' ([[Image:images/import.gif]]) icon will open a file selection dialog, allowing you to import a text file containing mappings from function addresses to function names. If the callstack provider for the current trace type only provides function addresses, a mapping file will be required to get the function names in the view. See the following sections for an example with LTTng-UST traces.
+Clicking the '''Configure symbol providers''' ([[Image:images/binaries_obj.gif]]) icon will open a file selection dialog, allowing you to import a text file containing mappings from function addresses to function names. If the callstack provider for the current trace type only provides function addresses, a mapping file will be required to get the function names in the view. See the following sections for an example with LTTng-UST traces.
 
 === Using the Callstack View with LTTng-UST traces ===
 
@@ -2465,12 +2465,14 @@ the binary file or mapping manually:
 
 === Importing a binary or function name mapping file (for LTTng-UST <2.8 traces) ===
 
+''For LTTng-UST 2.8+, if it doesn't resolve symbols automatically, see the [[#Binary file location configuration | Source Lookup's Binary file location configuration]].''
+
 If you followed the steps in the previous section, you should have a Callstack
 View populated with function entries and exits. However, the view will display
 the function addresses instead of names in the intervals, which are not very
 useful by themselves. To get the actual function names, you need to:
 
-* Click the '''Import Mapping File''' ([[Image:images/import.gif]]) button in the Callstack View.
+* Click the '''Configure symbol providers''' ([[Image:images/binaries_obj.gif]]) button in the Callstack View.
 
 Then either:
 * Point to the binary that was used for taking the trace
