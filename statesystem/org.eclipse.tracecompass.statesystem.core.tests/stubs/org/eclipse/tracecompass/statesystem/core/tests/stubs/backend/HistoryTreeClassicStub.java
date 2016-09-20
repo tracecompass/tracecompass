@@ -166,12 +166,7 @@ public class HistoryTreeClassicStub extends HistoryTreeClassic {
         case CORE:
             try {
                 final CoreNode node = (CoreNode) currentNode;
-                /* Print the extensions, if any */
-                int extension = node.getExtensionSequenceNumber();
-                while (extension != -1) {
-                    HTNode nextNode = getTreeIO().readNode(extension);
-                    preOrderPrint(writer, printIntervals, nextNode, curDepth, ts);
-                }
+                /* If node extensions were used, they would be printed here. */
 
                 /* Print the child nodes */
                 for (int i = 0; i < node.getNbChildren(); i++) {
