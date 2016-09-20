@@ -141,10 +141,14 @@ public class HistoryTreeClassic implements IHistoryTree {
                 FileChannel fc = fis.getChannel();) {
 
             ByteBuffer buffer = ByteBuffer.allocate(TREE_HEADER_SIZE);
-
             buffer.order(ByteOrder.LITTLE_ENDIAN);
             buffer.clear();
-            fc.read(buffer);
+
+            res = fc.read(buffer);
+            if (res != TREE_HEADER_SIZE) {
+                throw new IOException("Invalid header size"); //$NON-NLS-1$
+            }
+
             buffer.flip();
 
             /*
