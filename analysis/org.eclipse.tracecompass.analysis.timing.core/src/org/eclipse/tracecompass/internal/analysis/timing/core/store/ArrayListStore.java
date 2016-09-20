@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 
@@ -116,11 +117,9 @@ public class ArrayListStore<@NonNull E extends ISegment> implements ISegmentStor
 
         fLock.writeLock().lock();
         try {
-            fStore.add(val);
-            // Go backwards to "sift up" like a priority queue
-            for (int i = size() - 1; i > 0 && COMPARATOR.compare(val, fStore.get(i - 1)) < 0; i--) {
-                Collections.swap(fStore, i, i - 1);
-            }
+            int insertPoint = Collections.binarySearch(fStore, val);
+            insertPoint = insertPoint >= 0 ? insertPoint : -insertPoint - 1;
+            fStore.add(insertPoint, val);
             fLastSnapshot = null;
             return true;
         } finally {
@@ -240,7 +239,13 @@ public class ArrayListStore<@NonNull E extends ISegment> implements ISegmentStor
          */
         fLock.readLock().lock();
         try {
-            return fStore.stream().filter(element -> position >= element.getStart() && position <= element.getEnd()).collect(Collectors.toList());
+            /*
+             * as fStore is sorted by start then end times, restrict sub array
+             * to elements whose start times <= t as stream.filter won't do it.
+             */
+            int index = Collections.binarySearch(fStore, new BasicSegment(position, Long.MAX_VALUE));
+            index = (index >= 0) ? index : -index - 1;
+            return fStore.subList(0, index).stream().filter(element -> position >= element.getStart() && position <= element.getEnd()).collect(Collectors.toList());
         } finally {
             fLock.readLock().unlock();
         }
@@ -250,7 +255,9 @@ public class ArrayListStore<@NonNull E extends ISegment> implements ISegmentStor
     public Iterable<E> getIntersectingElements(long start, long end) {
         fLock.readLock().lock();
         try {
-            return fStore.stream().filter(element -> !(start > element.getEnd() || end < element.getStart())).collect(Collectors.toList());
+            int index = Collections.binarySearch(fStore, new BasicSegment(end, Long.MAX_VALUE));
+            index = (index >= 0) ? index : -index - 1;
+            return fStore.subList(0, index).stream().filter(element -> !(start > element.getEnd() || end < element.getStart())).collect(Collectors.toList());
         } finally {
             fLock.readLock().unlock();
         }

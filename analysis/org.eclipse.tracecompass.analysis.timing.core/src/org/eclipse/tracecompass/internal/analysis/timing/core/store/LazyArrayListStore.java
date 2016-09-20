@@ -13,6 +13,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 
@@ -272,7 +274,13 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
          * *lower* than 't' AND 2) end time is *higher* than 't'.
          */
         try {
-            return fStore.stream().filter(element -> position >= element.getStart() && position <= element.getEnd()).collect(Collectors.toList());
+            /*
+             * as fStore is sorted by start then end times, restrict sub array
+             * to elements whose start times <= t as stream.filter won't do it.
+             */
+            int index = Collections.binarySearch(fStore, new BasicSegment(position, Long.MAX_VALUE));
+            index = (index >= 0) ? index : -index - 1;
+            return fStore.subList(0, index).stream().filter(element -> position >= element.getStart() && position <= element.getEnd()).collect(Collectors.toList());
         } finally {
             fLock.unlock();
         }
@@ -285,7 +293,9 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
             sortStore();
         }
         try {
-            return fStore.stream().filter(element -> !(start > element.getEnd() || end < element.getStart())).collect(Collectors.toList());
+            int index = Collections.binarySearch(fStore, new BasicSegment(end, Long.MAX_VALUE));
+            index = (index >= 0) ? index : -index - 1;
+            return fStore.subList(0, index).stream().filter(element -> !(start > element.getEnd() || end < element.getStart())).collect(Collectors.toList());
         } finally {
             fLock.unlock();
         }
