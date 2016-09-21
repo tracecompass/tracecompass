@@ -42,6 +42,8 @@ import org.w3c.dom.Element;
  */
 public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPropertiesProvider {
 
+    private static final String ICON_ANALYSIS = "/icons/analysis.png"; //$NON-NLS-1$
+
     /**
      * The types of analysis that can be XML-defined
      */
@@ -129,7 +131,7 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
 
     @Override
     public String getIcon() {
-        return null;
+        return ICON_ANALYSIS;
     }
 
     @Override
