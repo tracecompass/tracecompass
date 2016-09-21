@@ -426,7 +426,7 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
      * Get the type label
      *
      * @return the label
-     * @since 1.1
+     * @since 1.2
      */
     protected String getTypeLabel() {
         return checkNotNull(Messages.AbstractSegmentStoreStatisticsViewer_types);
@@ -436,7 +436,7 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
      * Get the total column label
      *
      * @return the totals column label
-     * @since 1.1
+     * @since 1.2
      */
     protected String getTotalLabel() {
         return checkNotNull(Messages.AbstractSegmentStoreStatisticsViewer_total);

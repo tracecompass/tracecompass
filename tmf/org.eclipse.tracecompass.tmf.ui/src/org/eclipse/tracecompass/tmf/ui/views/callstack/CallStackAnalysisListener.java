@@ -20,7 +20,7 @@ import org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput;
  * extension to add the view, but the listener fixes the issue.
  *
  * @author Geneviève Bastien
- * @since 2.1
+ * @since 2.2
  */
 public class CallStackAnalysisListener implements ITmfNewAnalysisModuleListener {
 

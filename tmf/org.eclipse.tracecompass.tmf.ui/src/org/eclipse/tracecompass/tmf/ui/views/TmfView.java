@@ -207,7 +207,7 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
      * simply <Primary ID> if secondary ID is null
      *
      * @return This view's view ID
-     * @since 2.1
+     * @since 2.2
      */
     protected String getViewId() {
         IViewSite viewSite = getViewSite();

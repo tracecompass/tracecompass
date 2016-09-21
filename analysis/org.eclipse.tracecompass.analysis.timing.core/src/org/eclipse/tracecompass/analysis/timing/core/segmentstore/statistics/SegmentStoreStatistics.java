@@ -154,7 +154,7 @@ public class SegmentStoreStatistics {
      *
      * @param other
      *            The other segment store statistics
-     * @since 1.1
+     * @since 1.2
      */
     public void merge(SegmentStoreStatistics other) {
         if (other.fNbSegments == 0) {
