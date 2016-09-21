@@ -25,6 +25,7 @@
       <module
             analysis_module="org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoAnalysisModule"
             automatic="true"
+            icon="icons/debug_exc.png"
             id="org.eclipse.linuxtools.lttng2.ust.analysis.debuginfo"
             name="Debug Info">
          <tracetype
