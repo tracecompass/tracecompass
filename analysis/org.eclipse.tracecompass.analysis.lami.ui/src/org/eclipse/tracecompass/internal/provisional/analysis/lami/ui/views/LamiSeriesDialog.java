@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.IntStream;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.Dialog;
@@ -457,8 +456,8 @@ public class LamiSeriesDialog extends SelectionDialog {
      */
     public boolean[] getXCheckBoxOptionValues() {
         boolean[] selections = new boolean[fXCheckBoxOptions.size()];
-        if (selections.length != 0) {
-            IntStream.range(0, selections.length).forEach(i -> selections[i] = fXCheckBoxOptions.get(i).getValue());
+        for (int i = 0; i < selections.length; i++) {
+            selections[i] = fXCheckBoxOptions.get(i).getValue();
         }
         return selections;
     }
@@ -468,8 +467,8 @@ public class LamiSeriesDialog extends SelectionDialog {
      */
     public boolean[] getYCheckBoxOptionValues() {
         boolean[] selections = new boolean[fYCheckBoxOptions.size()];
-        if (selections.length != 0) {
-            IntStream.range(0, selections.length).forEach(i -> selections[i] = fYCheckBoxOptions.get(i).getValue());
+        for (int i = 0; i < selections.length; i++) {
+            selections[i] = fYCheckBoxOptions.get(i).getValue();
         }
         return selections;
     }
