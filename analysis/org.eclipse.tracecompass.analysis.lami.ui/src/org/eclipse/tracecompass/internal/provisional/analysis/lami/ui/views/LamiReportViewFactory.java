@@ -36,7 +36,7 @@ public final class LamiReportViewFactory {
      *
      * @return The current report
      */
-    public static @Nullable LamiAnalysisReport getCurrentReport() {
+    public static synchronized @Nullable LamiAnalysisReport getCurrentReport() {
         return currentReport;
     }
 
