@@ -15,8 +15,9 @@ package org.eclipse.tracecompass.tmf.core.signal;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.component.ITmfComponent;
-import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 
 /**
  * "Buffer" between a TmfComponent and the signal manager. You can use this if
@@ -34,31 +35,40 @@ import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
  *
  * @author Alexandre Montplaisir
  */
+@NonNullByDefault
 public class TmfSignalThrottler {
 
-    private final ITmfComponent fComponent;
+    private final @Nullable ITmfComponent fComponent;
     private final long fDelay;
     private final Timer fTimer;
+
     private TimerTask fCurrentTask;
 
     /**
      * Constructor
      *
      * @param component
-     *            The source component of the signals
+     *            The optional source component of the signals. If non-null, its
+     *            {@link ITmfComponent#broadcast} method will be used to finally
+     *            send the signal. If null, the generic
+     *            {@link TmfSignalManager#dispatchSignal} is used.
      * @param delay
      *            Time to wait before actually sending signals (in ms)
      */
-    public TmfSignalThrottler(ITmfComponent component, long delay) {
+    public TmfSignalThrottler(@Nullable ITmfComponent component, long delay) {
         this.fComponent = component;
         this.fDelay = delay;
         this.fTimer = new Timer();
 
         /*
          * Initialize currentTask to something, so we don't have to do a null
-         * check every time
+         * check every time.
          */
-        fCurrentTask = new TimerTask() { @Override public void run() {} };
+        fCurrentTask = new TimerTask() {
+            @Override
+            public void run() {
+            }
+        };
     }
 
     /**
@@ -66,7 +76,8 @@ public class TmfSignalThrottler {
      * signal handler if 'delay' elapses without another signal being sent
      * through this method.
      *
-     * You call this instead of calling {@link TmfComponent#broadcast}.
+     * You call this instead of {@link ITmfComponent#broadcast} or
+     * {@link TmfSignalManager#dispatchSignal}.
      *
      * @param signal
      *            The signal to queue for broadcasting
@@ -96,7 +107,12 @@ public class TmfSignalThrottler {
 
         @Override
         public void run() {
-            fComponent.broadcast(signal);
+            if (fComponent != null) {
+                fComponent.broadcast(signal);
+            } else {
+                TmfSignalManager.dispatchSignal(signal);
+            }
         }
     }
+
 }
