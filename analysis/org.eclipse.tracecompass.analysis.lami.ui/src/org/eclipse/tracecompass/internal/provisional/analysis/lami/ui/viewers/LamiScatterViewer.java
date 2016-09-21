@@ -688,6 +688,10 @@ public class LamiScatterViewer extends LamiXYChartViewer {
             Color lightColor = lightColorsIt.next();
             Color color = colorsIt.next();
             Color[] colors = ((ILineSeries) series).getSymbolColors();
+            if (colors == null) {
+                /* Should never happen */
+                continue;
+            }
 
             if (currentSelections.isEmpty()) {
                 /* Put all symbols to the normal colors */
