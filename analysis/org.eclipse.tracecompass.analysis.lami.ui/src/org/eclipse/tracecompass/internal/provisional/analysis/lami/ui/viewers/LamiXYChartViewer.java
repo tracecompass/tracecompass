@@ -875,7 +875,7 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
         }
 
         if (clampToZero) {
-            min.min(BigDecimal.ZERO);
+            min = min.min(BigDecimal.ZERO);
         }
 
         /* Do not allow a range with a zero delta default to 1 */
