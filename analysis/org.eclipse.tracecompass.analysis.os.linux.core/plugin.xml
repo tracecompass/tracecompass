@@ -47,6 +47,7 @@
       </module>
       <module
             analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage.KernelMemoryAnalysisModule"
+            icon="icons/memusage.png"
             id="org.eclipse.tracecompass.analysis.os.linux.core.kernelmemory"
             name="%analysis.kernelmemory">
          <tracetype
