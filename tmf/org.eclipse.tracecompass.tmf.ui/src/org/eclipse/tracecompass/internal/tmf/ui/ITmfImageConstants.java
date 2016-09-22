@@ -50,7 +50,7 @@ public interface ITmfImageConstants {
     String IMG_UI_FOLLOW_ARROW_BACKWARD = ICONS_PATH + "elcl16/follow_arrow_bwd.gif";
     String IMG_UI_SHOW_LOST_EVENTS = ICONS_PATH + "elcl16/hide_lost_events.gif";
     String IMG_UI_SHOW_HIST_TRACES = ICONS_PATH + "elcl16/show_hist_traces.gif";
-    String IMG_UI_LINK = ICONS_PATH + "elcl16/link.gif";
+    String IMG_UI_LINK = ICONS_PATH + "elcl16/link_obj.png";
 
     /* eview16 */
     String IMG_UI_SEQ_DIAGRAM_OBJ = ICONS_PATH + "eview16/sequencediagram_view.gif";
