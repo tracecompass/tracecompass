@@ -29,6 +29,9 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.ExportToTsvAction;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -78,10 +81,18 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
 
     @Override
     public void createPartControl(@Nullable Composite parent) {
+        super.createPartControl(parent);
         SashForm sf = new SashForm(parent, SWT.NONE);
         TableViewer tableViewer = new TableViewer(sf, SWT.FULL_SELECTION | SWT.VIRTUAL);
         fSegmentStoreViewer = createSegmentStoreViewer(tableViewer);
         getViewSite().getActionBars().getMenuManager().add(fExportAction);
+        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
+        if (trace != null) {
+            TmfTraceSelectedSignal signal = new TmfTraceSelectedSignal(this, trace);
+            if (fSegmentStoreViewer != null) {
+                fSegmentStoreViewer.traceSelected(signal);
+            }
+        }
         setInitialData();
     }
 

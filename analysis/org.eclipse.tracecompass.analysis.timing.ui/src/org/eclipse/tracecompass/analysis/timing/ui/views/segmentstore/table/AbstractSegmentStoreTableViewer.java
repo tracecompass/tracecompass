@@ -144,10 +144,6 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         super(tableViewer);
         // Sort order of the content provider is by start time by default
         getTableViewer().setContentProvider(new SegmentStoreContentProvider());
-        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
-        if (trace != null) {
-            fSegmentProvider = getSegmentStoreProvider(trace);
-        }
         createColumns();
         getTableViewer().getTable().addSelectionListener(new TableSelectionListener());
         addPackListener();

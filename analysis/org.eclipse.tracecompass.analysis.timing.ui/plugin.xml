@@ -48,5 +48,13 @@
             name="%view.flameGraph"
             restorable="true">
       </view>
+      <view
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.SegmentStoreTableView"
+            icon="icons/eview16/latency.png"
+            id="org.eclipse.tracecompass.analysis.timing.ui.segstore.table"
+            name="%view.segstore.table"
+            restorable="true">
+      </view>
    </extension>
 </plugin>
