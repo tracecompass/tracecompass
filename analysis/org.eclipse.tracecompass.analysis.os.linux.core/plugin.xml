@@ -67,6 +67,7 @@
       </module>
       <module
             analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.InputOutputAnalysisModule"
+            icon="icons/ioanalysis.png"
             id="org.eclipse.tracecompass.analysis.os.linux.inputoutput"
             name="%analysis.io">
          <tracetype
