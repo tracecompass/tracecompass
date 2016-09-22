@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
@@ -80,6 +81,7 @@ import org.eclipse.tracecompass.tmf.ui.views.TracingPerspectiveFactory;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
@@ -761,12 +763,28 @@ public final class SWTBotUtils {
      *            view id.
      */
     public static void openView(final String id) {
+        openView(id, null);
+    }
+
+    /**
+     * Open a view by id and secondary id
+     *
+     * @param id
+     *            view id.
+     * @param secondaryId
+     *            The secondary ID
+     */
+    public static void openView(final String id, final @Nullable String secondaryId) {
         final PartInitException res[] = new PartInitException[1];
         UIThreadRunnable.syncExec(new VoidResult() {
             @Override
             public void run() {
                 try {
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(id);
+                    if (secondaryId == null) {
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(id);
+                    } else {
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(id, secondaryId, IWorkbenchPage.VIEW_ACTIVATE);
+                    }
                 } catch (PartInitException e) {
                     res[0] = e;
                 }

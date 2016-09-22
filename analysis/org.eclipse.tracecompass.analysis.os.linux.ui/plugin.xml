@@ -31,12 +31,11 @@
             restorable="true">
       </view>
       <view
-            allowMultiple="false"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyView"
+            class="org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.SegmentStoreTableView"
             icon="icons/eview16/latency.png"
-            id="org.eclipse.tracecompass.analysis.os.linux.views.latency"
-            name="%latency.view.name"
+            id="org.eclipse.tracecompass.analysis.timing.ui.segstore.table:org.eclipse.tracecompass.analysis.os.linux.latency.syscall"
+            name="%latency.table.view.name"
             restorable="true">
       </view>
       <view
@@ -107,7 +106,7 @@
       </output>
       <output
             class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
-            id="org.eclipse.tracecompass.analysis.os.linux.views.latency">
+            id="org.eclipse.tracecompass.analysis.timing.ui.segstore.table:org.eclipse.tracecompass.analysis.os.linux.latency.syscall">
          <analysisModuleClass
                class="org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.SystemCallLatencyAnalysis">
          </analysisModuleClass>

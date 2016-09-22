@@ -31,9 +31,9 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreP
 import org.eclipse.tracecompass.analysis.timing.ui.swtbot.tests.table.SegmentTableTest;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableView;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.SegmentStoreTableView;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.SystemCall;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
-import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyView;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
@@ -56,7 +56,9 @@ public class SystemCallLatencyTableAnalysisTest extends SegmentTableTest {
 
     private static final String TRACE_TYPE = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
     private static final String PROJECT_NAME = "test";
-    static final String VIEW_ID = SystemCallLatencyView.ID;
+
+    private static final String PRIMARY_VIEW_ID = SegmentStoreTableView.ID;
+    private static final String SECONDARY_VIEW_ID = SystemCallLatencyAnalysis.ID;
     private static final SystemCallLatencyAnalysis fSystemCallLatencyAnalysis = new SystemCallLatencyAnalysis();
 
     @Override
@@ -77,9 +79,9 @@ public class SystemCallLatencyTableAnalysisTest extends SegmentTableTest {
         /*
          * Open latency view
          */
-        SWTBotUtils.openView(VIEW_ID);
+        SWTBotUtils.openView(PRIMARY_VIEW_ID, SECONDARY_VIEW_ID);
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        SWTBotView viewBot = bot.viewById(VIEW_ID);
+        SWTBotView viewBot = bot.viewById(PRIMARY_VIEW_ID);
         final IViewReference viewReference = viewBot.getViewReference();
         IViewPart viewPart = UIThreadRunnable.syncExec(new Result<IViewPart>() {
             @Override
@@ -88,10 +90,10 @@ public class SystemCallLatencyTableAnalysisTest extends SegmentTableTest {
             }
         });
         assertNotNull(viewPart);
-        if (!(viewPart instanceof SystemCallLatencyView)) {
+        if (!(viewPart instanceof SegmentStoreTableView)) {
             fail("Could not instanciate view");
         }
-        return (SystemCallLatencyView) viewPart;
+        return (SegmentStoreTableView) viewPart;
     }
 
     @Override
@@ -136,7 +138,7 @@ public class SystemCallLatencyTableAnalysisTest extends SegmentTableTest {
         String tracePath;
         tracePath = FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).getPath();
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        SWTBotView view = bot.viewById(VIEW_ID);
+        SWTBotView view = bot.viewById(PRIMARY_VIEW_ID);
         view.close();
         bot.waitUntil(ConditionHelpers.ViewIsClosed(view));
         SWTBotUtils.createProject(PROJECT_NAME);
