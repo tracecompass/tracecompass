@@ -15,6 +15,7 @@ import java.io.ObjectOutputStream;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
+import org.eclipse.tracecompass.segmentstore.core.segment.interfaces.INamedSegment;
 
 /**
  * A linux kernel system call, represented as an {@link ISegment}.
@@ -22,7 +23,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-public final class SystemCall implements ISegment {
+public final class SystemCall implements INamedSegment {
 
     private static final long serialVersionUID = 1554494342105208730L;
 
@@ -93,13 +94,14 @@ public final class SystemCall implements ISegment {
      *
      * @return Name
      */
+    @Override
     public String getName() {
         return fName;
     }
 
     @Override
     public int compareTo(@NonNull ISegment o) {
-        int ret = ISegment.super.compareTo(o);
+        int ret = INamedSegment.super.compareTo(o);
         if (ret != 0) {
             return ret;
         }

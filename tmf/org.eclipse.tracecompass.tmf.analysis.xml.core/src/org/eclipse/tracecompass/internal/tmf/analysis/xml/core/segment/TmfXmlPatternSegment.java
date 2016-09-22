@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
+import org.eclipse.tracecompass.segmentstore.core.segment.interfaces.INamedSegment;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -28,7 +29,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
  *
  * @author Jean-Christian Kouame
  */
-public class TmfXmlPatternSegment implements ISegment {
+public class TmfXmlPatternSegment implements INamedSegment {
 
     /**
      * The serial version UID
@@ -95,10 +96,7 @@ public class TmfXmlPatternSegment implements ISegment {
         return fContent;
     }
 
-    /**
-     * Get the name of pattern segment
-     * @return The name
-     */
+    @Override
     public String getName() {
         return fSegmentName;
     }
@@ -113,7 +111,7 @@ public class TmfXmlPatternSegment implements ISegment {
 
     @Override
     public int compareTo(@NonNull ISegment o) {
-        int ret = ISegment.super.compareTo(o);
+        int ret = INamedSegment.super.compareTo(o);
         if (ret != 0) {
             return ret;
         }

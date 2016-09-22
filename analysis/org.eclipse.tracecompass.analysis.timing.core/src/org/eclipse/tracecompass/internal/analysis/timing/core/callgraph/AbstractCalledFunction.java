@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 
@@ -85,6 +86,11 @@ abstract class AbstractCalledFunction implements ICalledFunction {
     @Override
     public @Nullable ICalledFunction getParent() {
         return fParent;
+    }
+
+    @Override
+    public String getName() {
+        return NonNullUtils.nullToEmptyString(getSymbol().toString());
     }
 
     /**

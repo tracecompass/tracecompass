@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
+import org.eclipse.tracecompass.segmentstore.core.segment.interfaces.INamedSegment;
 
 /**
  * CalledFunction Interface
@@ -20,7 +21,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
  * @author Matthew Khouzam
  * @author Sonia Farrah
  */
-public interface ICalledFunction extends ISegment {
+public interface ICalledFunction extends INamedSegment {
 
     /**
      * The symbol of the call stack function.
