@@ -37,7 +37,6 @@ Export-Package: org.eclipse.tracecompass.internal.analysis.os.linux.ui;x-friends
  org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.io.diskioactivity;x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.kernelmemoryusage;x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency;x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests",
- org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics;x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources;
   x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests,
    org.eclipse.tracecompass.analysis.os.linux.ui.tests,

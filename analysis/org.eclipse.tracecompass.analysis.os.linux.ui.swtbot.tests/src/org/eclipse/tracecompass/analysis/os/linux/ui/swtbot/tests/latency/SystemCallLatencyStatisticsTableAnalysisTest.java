@@ -38,7 +38,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentsStatisticsView;
-import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics.SystemCallLatencyStatisticsView;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.SegmentStoreStatisticsView;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
@@ -65,7 +66,8 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
     private static final int COUNT_COL = 5;
     private static final String TRACE_TYPE = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
     private static final String PROJECT_NAME = "test";
-    private static final String VIEW_ID = SystemCallLatencyStatisticsView.ID;
+    private static final String PRIMARY_VIEW_ID = SegmentStoreStatisticsView.ID;
+    private static final String SECONDARY_VIEW_ID = SystemCallLatencyAnalysis.ID;
 
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
@@ -101,9 +103,9 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
         /*
          * Open latency view
          */
-        SWTBotUtils.openView(VIEW_ID);
+        SWTBotUtils.openView(PRIMARY_VIEW_ID, SECONDARY_VIEW_ID);
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        SWTBotView viewBot = bot.viewById(VIEW_ID);
+        SWTBotView viewBot = bot.viewById(PRIMARY_VIEW_ID);
         final IViewReference viewReference = viewBot.getViewReference();
         IViewPart viewPart = UIThreadRunnable.syncExec(new Result<IViewPart>() {
             @Override
@@ -112,7 +114,7 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
             }
         });
         assertNotNull(viewPart);
-        if (!(viewPart instanceof SystemCallLatencyStatisticsView)) {
+        if (!(viewPart instanceof SegmentStoreStatisticsView)) {
             fail("Could not instanciate view");
         }
         fTreeBot = viewBot.bot().tree();
@@ -124,7 +126,7 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
      */
     @After
     public void closeTree() {
-        SWTBotUtils.closeViewById(VIEW_ID, fBot);
+        SWTBotUtils.closeViewById(PRIMARY_VIEW_ID, fBot);
     }
 
     /**
@@ -146,8 +148,10 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
     public void testWithTrace() throws IOException, NoSuchMethodException, SecurityException, IllegalArgumentException {
         String tracePath;
         tracePath = FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).getPath();
-        SWTBotView view = fBot.viewById(VIEW_ID);
-        SWTBotUtils.closeViewById(VIEW_ID, fBot);
+        SWTWorkbenchBot bot = new SWTWorkbenchBot();
+        SWTBotView view = bot.viewById(PRIMARY_VIEW_ID);
+        SWTBotUtils.closeViewById(PRIMARY_VIEW_ID, fBot);
+
         SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotUtils.openTrace(PROJECT_NAME, tracePath, TRACE_TYPE);
         WaitUtils.waitForJobs();
@@ -177,14 +181,14 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         assertNotNull(os);
         IViewPart viewPart = view.getReference().getView(true);
-        assertTrue(viewPart instanceof SystemCallLatencyStatisticsView);
+        assertTrue(viewPart instanceof AbstractSegmentsStatisticsView);
         Class<@NonNull AbstractSegmentsStatisticsView> clazz = AbstractSegmentsStatisticsView.class;
         Method method = clazz.getDeclaredMethod("exportToTsv", java.io.OutputStream.class);
         method.setAccessible(true);
         final Exception[] except = new Exception[1];
         UIThreadRunnable.syncExec(() -> {
             try {
-                method.invoke((SystemCallLatencyStatisticsView) viewPart, os);
+                method.invoke((AbstractSegmentsStatisticsView) viewPart, os);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 except[0] = e;
             }
