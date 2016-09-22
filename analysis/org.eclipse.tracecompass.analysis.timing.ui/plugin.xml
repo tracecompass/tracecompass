@@ -45,5 +45,13 @@
             name="%view.segstore.table"
             restorable="true">
       </view>
+      <view
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.SegmentStoreStatisticsView"
+            icon="icons/eview16/statistics_view.gif"
+            id="org.eclipse.tracecompass.analysis.timing.ui.segstore.statistics"
+            name="%view.segstore.statistics"
+            restorable="true">
+      </view>
    </extension>
 </plugin>
