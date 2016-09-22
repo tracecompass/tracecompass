@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.statesystem.core.tests.backend;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -89,7 +91,7 @@ public class HistoryTreeBackendTest extends StateHistoryBackendTestBase {
 
     @Override
     protected IStateHistoryBackend getBackendForBuilding(long startTime) throws IOException {
-        File historyTreeFile = File.createTempFile("HistoryTreeBackendTest", ".ht");
+        File historyTreeFile = checkNotNull(File.createTempFile("HistoryTreeBackendTest", ".ht"));
         fHistoryTreeFiles.add(historyTreeFile);
         HistoryTreeBackend backend = new HistoryTreeBackend(SSID, historyTreeFile, PROVIDER_VERSION, startTime, fBlockSize, fMaxChildren);
         fBackendMap.put(backend, historyTreeFile);
@@ -101,7 +103,13 @@ public class HistoryTreeBackendTest extends StateHistoryBackendTestBase {
         if (!fReOpen) {
             return backend;
         }
+
         File historyTreeFile = fBackendMap.remove(backend);
+
+        if (historyTreeFile == null) {
+            throw new IllegalStateException();
+        }
+
         backend.dispose();
         HistoryTreeBackend reOpenedBackend = new HistoryTreeBackend(SSID, historyTreeFile, PROVIDER_VERSION);
         fBackendMap.put(reOpenedBackend, historyTreeFile);
