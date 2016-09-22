@@ -5,6 +5,7 @@
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <module
             analysis_module="org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathModule"
+            icon="icons/critical-path.png"
             id="org.eclipse.tracecompass.analysis.graph.core.criticalpath"
             name="Critical Path">
          <parameter
