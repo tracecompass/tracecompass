@@ -27,6 +27,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -292,6 +293,7 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
         for (IMarkerEvent markerEvent : fMarkers.get(category)) {
             Color color = getColorScheme().getColor(markerEvent.getColor());
             gc.setForeground(color);
+            gc.setBackground(color);
             int x1 = getXForTime(rect, time0, pixelsPerNanoSec, markerEvent.getTime());
             if (x1 > rect.x + rect.width) {
                 return;
@@ -312,17 +314,31 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
                     }
                 }
                 gc.fillRectangle(x1, rect.y, width, rect.height - 1);
-                Utils.drawText(gc, label, x1 + TEXT_MARGIN, rect.y, true);
                 gc.drawRectangle(x1, rect.y, width, rect.height - 1);
                 if (x2 > x1 + width) {
                     int y = rect.y + rect.height / 2;
                     gc.drawLine(x1 + width, y, x2, y);
                 }
+                gc.setForeground(getDistinctForeground(color.getRGB()));
+                Utils.drawText(gc, label, x1 + TEXT_MARGIN, rect.y, true);
             } else {
                 int y = rect.y + rect.height / 2;
                 gc.drawLine(x1, y, x2, y);
             }
         }
+    }
+
+    private static Color getDistinctForeground(RGB rgb) {
+        /* Calculate the relative luminance of the color, high value is bright */
+        final int luminanceThreshold = 128;
+        /* Relative luminance (Y) coefficients as defined in ITU.R Rec. 709 */
+        final double redCoefficient = 0.2126;
+        final double greenCoefficient = 0.7152;
+        final double blueCoefficient = 0.0722;
+        int luminance = (int) (redCoefficient * rgb.red + greenCoefficient * rgb.green + blueCoefficient * rgb.blue);
+        /* Use black over bright colors and white over dark colors */
+        return Display.getDefault().getSystemColor(
+                luminance > luminanceThreshold ? SWT.COLOR_BLACK : SWT.COLOR_WHITE);
     }
 
     /**
