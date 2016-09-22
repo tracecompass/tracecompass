@@ -75,6 +75,7 @@
             allowMultiple="true"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
             class="org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.xychart.XmlXYView"
+            icon="icons/eview16/linechartxml.png"
             id="org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.views.xyview"
             name="%xmlxychart.view.name"
             restorable="true">
