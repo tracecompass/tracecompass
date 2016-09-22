@@ -36,6 +36,7 @@
       </module>
       <module
             analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.contextswitch.KernelContextSwitchAnalysis"
+            icon="icons/contextswitch.png"
             id="org.eclipse.tracecompass.analysis.os.linux.contextswitch"
             name="%analysis.contextswitch">
          <tracetype
