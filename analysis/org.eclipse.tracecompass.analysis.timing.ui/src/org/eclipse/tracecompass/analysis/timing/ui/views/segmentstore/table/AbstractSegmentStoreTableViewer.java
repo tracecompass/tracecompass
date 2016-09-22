@@ -62,7 +62,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.table.TmfSimpleTableViewer;
  */
 public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableViewer {
 
-    private static final Format FORMATTER = new DecimalFormat("###,###.##");
+    private static final Format FORMATTER = new DecimalFormat("###,###.##"); //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
