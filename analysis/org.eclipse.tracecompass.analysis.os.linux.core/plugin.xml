@@ -6,6 +6,7 @@
       <module
             analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule"
             automatic="true"
+            icon="icons/tux-by-lewing_at_isc.tamu.edu.png"
             id="org.eclipse.tracecompass.analysis.os.linux.kernel"
             name="%analysis.linuxkernel">
          <tracetype
