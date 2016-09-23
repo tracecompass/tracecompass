@@ -71,6 +71,7 @@ public class SystemCallLatencyScatterChartViewTest {
 
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
+    private static SWTWorkbenchBot fBot;
     private Chart fScatterChart;
     private SystemCallLatencyScatterView fSystemCallLatencyScatterView = null;
 
@@ -87,8 +88,8 @@ public class SystemCallLatencyScatterChartViewTest {
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         fLogger.removeAllAppenders();
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        SWTBotUtils.closeView("welcome", bot);
+        fBot = new SWTWorkbenchBot();
+        SWTBotUtils.closeView("welcome", fBot);
         /* Switch perspectives */
         SWTBotUtils.switchToTracingPerspective();
         /* Finish waiting for eclipse to load */
@@ -115,8 +116,7 @@ public class SystemCallLatencyScatterChartViewTest {
          * Open latency view
          */
         SWTBotUtils.openView(VIEW_ID);
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        SWTBotView viewBot = bot.viewById(VIEW_ID);
+        SWTBotView viewBot = fBot.viewById(VIEW_ID);
         final IViewReference viewReference = viewBot.getViewReference();
         IViewPart viewPart = UIThreadRunnable.syncExec(new Result<IViewPart>() {
             @Override
@@ -138,9 +138,7 @@ public class SystemCallLatencyScatterChartViewTest {
      */
     @After
     public void closeDensityViewer() {
-        final SWTWorkbenchBot swtWorkbenchBot = new SWTWorkbenchBot();
-        SWTBotView viewBot = swtWorkbenchBot.viewById(VIEW_ID);
-        viewBot.close();
+        SWTBotUtils.closeViewById(VIEW_ID, fBot);
     }
 
     /**
@@ -164,10 +162,7 @@ public class SystemCallLatencyScatterChartViewTest {
     public void testWithTrace() throws IOException, SecurityException, IllegalArgumentException {
         String tracePath;
         tracePath = FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).getPath();
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        SWTBotView view = bot.viewById(VIEW_ID);
-        view.close();
-        bot.waitUntil(ConditionHelpers.ViewIsClosed(view));
+        SWTBotUtils.closeViewById(VIEW_ID, fBot);
         SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotUtils.openTrace(PROJECT_NAME, tracePath, TRACE_TYPE);
         WaitUtils.waitForJobs();
@@ -176,7 +171,7 @@ public class SystemCallLatencyScatterChartViewTest {
 
         final Chart scatterChart = fScatterChart;
         assertNotNull(scatterChart);
-        bot.waitUntil(ConditionHelpers.numberOfSeries(scatterChart, 1));
+        fBot.waitUntil(ConditionHelpers.numberOfSeries(scatterChart, 1));
 
         SWTBotChart chartBot = new SWTBotChart(scatterChart);
         assertVisible(chartBot);
@@ -196,7 +191,7 @@ public class SystemCallLatencyScatterChartViewTest {
         TmfTimeRange windowRange = new TmfTimeRange(TmfTimestamp.fromNanos(noDataStart), TmfTimestamp.fromNanos(noDataEnd));
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, windowRange));
 
-        bot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(fSystemCallLatencyScatterView.getChartViewer()));
+        fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(fSystemCallLatencyScatterView.getChartViewer()));
 
         range = scatterChart.getAxisSet().getXAxes()[0].getRange();
         assertEquals(noDataEnd - noDataStart, range.upper - range.lower, 0);
@@ -207,8 +202,8 @@ public class SystemCallLatencyScatterChartViewTest {
         for (int i = 0; i < series.length; i++) {
             assertTrue(series[i] instanceof ILineSeries);
         }
-        bot.closeAllEditors();
-        SWTBotUtils.deleteProject(PROJECT_NAME, bot);
+        fBot.closeAllEditors();
+        SWTBotUtils.deleteProject(PROJECT_NAME, fBot);
     }
 
     private static class SWTBotChart extends AbstractSWTBotControl<Chart> {

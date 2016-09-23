@@ -34,7 +34,6 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.eclipse.swtbot.swt.finder.results.BoolResult;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -49,7 +48,6 @@ import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IEditorPart;
@@ -57,7 +55,6 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.WorkbenchException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -95,15 +92,9 @@ public class ImportAndReadPcapTest {
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
         fBot = new SWTWorkbenchBot();
 
-        final List<SWTBotView> openViews = fBot.views();
-        for (SWTBotView view : openViews) {
-            if (view.getTitle().equals("Welcome")) {
-                view.close();
-                fBot.waitUntil(ConditionHelpers.ViewIsClosed(view));
-            }
-        }
+        SWTBotUtils.closeView("welcome", fBot);
         /* Switch perspectives */
-        switchNetworkPerspective();
+        SWTBotUtils.switchToPerspective(NETWORK_PERSPECTIVE_ID);
         /* Finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
     }
@@ -114,26 +105,6 @@ public class ImportAndReadPcapTest {
     @AfterClass
     public static void terminate() {
         fLogger.removeAllAppenders();
-    }
-
-    private static void switchNetworkPerspective() {
-        final Exception retE[] = new Exception[1];
-        if (!UIThreadRunnable.syncExec(new BoolResult() {
-            @Override
-            public Boolean run() {
-                try {
-                    PlatformUI.getWorkbench().showPerspective(NETWORK_PERSPECTIVE_ID,
-                            PlatformUI.getWorkbench().getActiveWorkbenchWindow());
-                } catch (WorkbenchException e) {
-                    retE[0] = e;
-                    return false;
-                }
-                return true;
-            }
-        })) {
-            fail(retE[0].getMessage());
-        }
-
     }
 
     /**

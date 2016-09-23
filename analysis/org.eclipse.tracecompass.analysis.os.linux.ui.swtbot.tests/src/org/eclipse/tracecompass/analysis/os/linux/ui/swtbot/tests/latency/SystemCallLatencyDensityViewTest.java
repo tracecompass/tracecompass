@@ -69,6 +69,7 @@ public class SystemCallLatencyDensityViewTest {
     private AbstractSegmentStoreDensityView fDensityView;
     private AbstractSegmentStoreTableViewer fDensityViewer;
     private Chart fDensityChart;
+    private static SWTWorkbenchBot fBot;
 
     /**
      * Things to setup
@@ -83,8 +84,8 @@ public class SystemCallLatencyDensityViewTest {
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         fLogger.removeAllAppenders();
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        SWTBotUtils.closeView("welcome", bot);
+        fBot = new SWTWorkbenchBot();
+        SWTBotUtils.closeView("welcome", fBot);
         /* Switch perspectives */
         SWTBotUtils.switchToTracingPerspective();
         /* Finish waiting for eclipse to load */
@@ -115,8 +116,7 @@ public class SystemCallLatencyDensityViewTest {
          * Open latency view
          */
         SWTBotUtils.openView(VIEW_ID);
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        SWTBotView viewBot = bot.viewById(VIEW_ID);
+        SWTBotView viewBot = fBot.viewById(VIEW_ID);
         final IViewReference viewReference = viewBot.getViewReference();
         IViewPart viewPart = UIThreadRunnable.syncExec(new Result<IViewPart>() {
             @Override
@@ -145,9 +145,7 @@ public class SystemCallLatencyDensityViewTest {
      */
     @After
     public void closeDensityViewer() {
-        final SWTWorkbenchBot swtWorkbenchBot = new SWTWorkbenchBot();
-        SWTBotView viewBot = swtWorkbenchBot.viewById(VIEW_ID);
-        viewBot.close();
+        SWTBotUtils.closeViewById(VIEW_ID, fBot);
     }
 
     /**
@@ -176,9 +174,7 @@ public class SystemCallLatencyDensityViewTest {
         String tracePath;
         tracePath = FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).getPath();
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        SWTBotView view = bot.viewById(VIEW_ID);
-        view.close();
-        bot.waitUntil(ConditionHelpers.ViewIsClosed(view));
+        SWTBotUtils.closeViewById(VIEW_ID, fBot);
         SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotUtils.openTrace(PROJECT_NAME, tracePath, TRACE_TYPE);
         WaitUtils.waitForJobs();

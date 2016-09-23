@@ -14,28 +14,18 @@
 
 package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
-import static org.junit.Assert.fail;
-
-import java.util.List;
-
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.eclipse.swtbot.swt.finder.results.BoolResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.tracecompass.ctf.core.tests.shared.LttngTraceGenerator;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.WorkbenchException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -76,16 +66,9 @@ public abstract class KernelTestBase {
         fLogger.removeAllAppenders();
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
         fBot = new SWTWorkbenchBot();
-
-        final List<SWTBotView> openViews = fBot.views();
-        for (SWTBotView view : openViews) {
-            if (view.getTitle().equals("Welcome")) {
-                view.close();
-                fBot.waitUntil(ConditionHelpers.ViewIsClosed(view));
-            }
-        }
+        SWTBotUtils.closeView("welcome", fBot);
         /* Switch perspectives */
-        switchKernelPerspective();
+        SWTBotUtils.switchToPerspective(KERNEL_PERSPECTIVE_ID);
         /* Create the trace project */
         SWTBotUtils.createProject(TRACE_PROJECT_NAME);
         /* Finish waiting for eclipse to load */
@@ -99,26 +82,6 @@ public abstract class KernelTestBase {
     public static void afterClass() {
         SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
         fLogger.removeAllAppenders();
-    }
-
-    private static void switchKernelPerspective() {
-        final Exception retE[] = new Exception[1];
-        if (!UIThreadRunnable.syncExec(new BoolResult() {
-            @Override
-            public Boolean run() {
-                try {
-                    PlatformUI.getWorkbench().showPerspective(KERNEL_PERSPECTIVE_ID,
-                            PlatformUI.getWorkbench().getActiveWorkbenchWindow());
-                } catch (WorkbenchException e) {
-                    retE[0] = e;
-                    return false;
-                }
-                return true;
-            }
-        })) {
-            fail(retE[0].getMessage());
-        }
-
     }
 
     /**

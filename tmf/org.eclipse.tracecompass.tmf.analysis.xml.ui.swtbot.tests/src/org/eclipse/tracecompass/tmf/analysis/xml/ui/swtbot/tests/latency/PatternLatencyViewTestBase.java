@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -117,9 +116,7 @@ public abstract class PatternLatencyViewTestBase {
         fBot.closeAllEditors();
         SWTBotUtils.deleteProject(PROJECT_NAME, fBot);
 
-        final SWTWorkbenchBot swtWorkbenchBot = new SWTWorkbenchBot();
-        SWTBotView viewBot = swtWorkbenchBot.viewById(getViewId());
-        viewBot.close();
+        SWTBotUtils.closeViewById(getViewId(), fBot);
     }
 
     /**

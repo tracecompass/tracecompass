@@ -22,7 +22,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
@@ -33,7 +32,6 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.eclipse.swtbot.swt.finder.results.BoolResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
@@ -42,13 +40,10 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentsStatisticsView;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics.SystemCallLatencyStatisticsView;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.WorkbenchException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -71,11 +66,11 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
     private static final String TRACE_TYPE = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
     private static final String PROJECT_NAME = "test";
     private static final String VIEW_ID = SystemCallLatencyStatisticsView.ID;
-    private static final String TRACING_PERSPECTIVE_ID = "org.eclipse.linuxtools.tmf.ui.perspective";
 
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
     private SWTBotTree fTreeBot;
+    private static SWTWorkbenchBot fBot;
 
     /**
      * Things to setup
@@ -89,16 +84,10 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         fLogger.removeAllAppenders();
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        final List<SWTBotView> openViews = bot.views();
-        for (SWTBotView view : openViews) {
-            if (view.getTitle().equals("Welcome")) {
-                view.close();
-                bot.waitUntil(ConditionHelpers.ViewIsClosed(view));
-            }
-        }
+        fBot = new SWTWorkbenchBot();
+        SWTBotUtils.closeView("welcome", fBot);
         /* Switch perspectives */
-        switchTracingPerspective();
+        SWTBotUtils.switchToTracingPerspective();
         /* Finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
 
@@ -135,29 +124,7 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
      */
     @After
     public void closeTree() {
-        final SWTWorkbenchBot swtWorkbenchBot = new SWTWorkbenchBot();
-        SWTBotView viewBot = swtWorkbenchBot.viewById(VIEW_ID);
-        viewBot.close();
-    }
-
-    private static void switchTracingPerspective() {
-        final Exception retE[] = new Exception[1];
-        if (!UIThreadRunnable.syncExec(new BoolResult() {
-            @Override
-            public Boolean run() {
-                try {
-                    PlatformUI.getWorkbench().showPerspective(TRACING_PERSPECTIVE_ID,
-                            PlatformUI.getWorkbench().getActiveWorkbenchWindow());
-                } catch (WorkbenchException e) {
-                    retE[0] = e;
-                    return false;
-                }
-                return true;
-            }
-        })) {
-            fail(retE[0].getMessage());
-        }
-
+        SWTBotUtils.closeViewById(VIEW_ID, fBot);
     }
 
     /**
@@ -179,10 +146,8 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
     public void testWithTrace() throws IOException, NoSuchMethodException, SecurityException, IllegalArgumentException {
         String tracePath;
         tracePath = FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).getPath();
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        SWTBotView view = bot.viewById(VIEW_ID);
-        view.close();
-        bot.waitUntil(ConditionHelpers.ViewIsClosed(view));
+        SWTBotView view = fBot.viewById(VIEW_ID);
+        SWTBotUtils.closeViewById(VIEW_ID, fBot);
         SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotUtils.openTrace(PROJECT_NAME, tracePath, TRACE_TYPE);
         WaitUtils.waitForJobs();
@@ -204,8 +169,8 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
         assertTrue(menuBot.isEnabled());
         assertTrue(menuBot.isVisible());
 
-        bot.closeAllEditors();
-        SWTBotUtils.deleteProject(PROJECT_NAME, bot);
+        fBot.closeAllEditors();
+        SWTBotUtils.deleteProject(PROJECT_NAME, fBot);
     }
 
     private static void testToTsv(SWTBotView view) throws NoSuchMethodException {

@@ -35,7 +35,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.Result;
@@ -154,6 +153,10 @@ public class SegmentTableTest {
     private AbstractSegmentStoreTableViewer fTable;
     private ISegmentStoreProvider fSsp;
     private final ISegmentStore<@NonNull ISegment> fSs = SegmentStoreFactory.createSegmentStore(SegmentStoreType.Fast);
+    /**
+     * The workbench bot used during the test
+     */
+    protected static SWTWorkbenchBot fBot;
 
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
@@ -171,14 +174,8 @@ public class SegmentTableTest {
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         fLogger.removeAllAppenders();
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        final List<SWTBotView> openViews = bot.views();
-        for (SWTBotView view : openViews) {
-            if (view.getTitle().equals("Welcome")) {
-                view.close();
-                bot.waitUntil(ConditionHelpers.ViewIsClosed(view));
-            }
-        }
+        fBot = new SWTWorkbenchBot();
+        SWTBotUtils.closeView("welcome", fBot);
         /* Switch perspectives */
         SWTBotUtils.switchToTracingPerspective();
         /* Finish waiting for eclipse to load */
@@ -265,12 +262,11 @@ public class SegmentTableTest {
         assertNotNull(getTable());
         getTable().updateModel(fixture);
         SWTBotTable tableBot = new SWTBotTable(getTable().getTableViewer().getTable());
-        SWTBot bot = new SWTBot();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "99", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "99", 0, 2));
     }
 
     /**
@@ -289,12 +285,11 @@ public class SegmentTableTest {
         assertNotNull(getTable());
         getTable().updateModel(fixture);
         SWTBotTable tableBot = new SWTBotTable(getTable().getTableViewer().getTable());
-        SWTBot bot = new SWTBot();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "100", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "100", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "100", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "100", 0, 2));
     }
 
     /**
@@ -311,12 +306,11 @@ public class SegmentTableTest {
         assertNotNull(getTable());
         getTable().updateModel(fixture);
         SWTBotTable tableBot = new SWTBotTable(getTable().getTableViewer().getTable());
-        SWTBot bot = new SWTBot();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1", 0, 2));
     }
 
     /**
@@ -334,12 +328,11 @@ public class SegmentTableTest {
         assertNotNull(getTable());
         getTable().updateModel(fixture);
         SWTBotTable tableBot = new SWTBotTable(getTable().getTableViewer().getTable());
-        SWTBot bot = new SWTBot();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "999,999", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "999,999", 0, 2));
     }
 
     /**
@@ -363,12 +356,11 @@ public class SegmentTableTest {
         assertNotNull(getTable());
         getTable().updateModel(fixture);
         SWTBotTable tableBot = new SWTBotTable(getTable().getTableViewer().getTable());
-        SWTBot bot = new SWTBot();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "894,633", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "894,633", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "999,999", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "999,999", 0, 2));
     }
 
     /**
@@ -392,12 +384,11 @@ public class SegmentTableTest {
         assertNotNull(getTable());
         getTable().updateModel(fixture);
         SWTBotTable tableBot = new SWTBotTable(getTable().getTableViewer().getTable());
-        SWTBot bot = new SWTBot();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "400,689", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "400,689", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "998,001", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "998,001", 0, 2));
     }
 
     /**
@@ -421,8 +412,7 @@ public class SegmentTableTest {
         assertNotNull(getTable());
         getTable().updateModel(fixture);
         SWTBotTable tableBot = new SWTBotTable(getTable().getTableViewer().getTable());
-        SWTBot bot = new SWTBot();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1", 0, 2));
         SWTWorkbenchBot swtWorkbenchBot = new SWTWorkbenchBot();
         SWTBotView viewBot = swtWorkbenchBot.viewById(getTableView().getSite().getId());
         String[] lines = extractTsv(viewBot);

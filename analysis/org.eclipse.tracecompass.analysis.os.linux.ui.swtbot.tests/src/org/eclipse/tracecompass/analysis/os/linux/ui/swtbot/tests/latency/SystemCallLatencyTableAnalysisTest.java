@@ -21,7 +21,6 @@ import java.io.IOException;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
@@ -80,8 +79,7 @@ public class SystemCallLatencyTableAnalysisTest extends SegmentTableTest {
          * Open latency view
          */
         SWTBotUtils.openView(PRIMARY_VIEW_ID, SECONDARY_VIEW_ID);
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        SWTBotView viewBot = bot.viewById(PRIMARY_VIEW_ID);
+        SWTBotView viewBot = fBot.viewById(PRIMARY_VIEW_ID);
         final IViewReference viewReference = viewBot.getViewReference();
         IViewPart viewPart = UIThreadRunnable.syncExec(new Result<IViewPart>() {
             @Override
@@ -106,22 +104,21 @@ public class SystemCallLatencyTableAnalysisTest extends SegmentTableTest {
     @Override
     public void climbTest() {
         super.climbTest();
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
         SWTBotTable tableBot = new SWTBotTable(getTable().getTableViewer().getTable());
         tableBot.header("System Call").click();
         // this is an assert in the sense that it will timeout if it is not true
         // FIXME: The first one should be leftpad, but because of preceding
         // sorts, it first sort descending in this case
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "rightpad", 0, 3));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "rightpad", 0, 3));
         tableBot.header("System Call").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "leftpad", 0, 3));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "leftpad", 0, 3));
         // Test that duration still works after having tested System Call
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "99", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "99", 0, 2));
         tableBot.header("Start Time").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "99", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "99", 0, 2));
     }
 
     /**
@@ -137,10 +134,7 @@ public class SystemCallLatencyTableAnalysisTest extends SegmentTableTest {
     public void testWithTrace() throws IOException {
         String tracePath;
         tracePath = FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).getPath();
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        SWTBotView view = bot.viewById(PRIMARY_VIEW_ID);
-        view.close();
-        bot.waitUntil(ConditionHelpers.ViewIsClosed(view));
+        SWTBotUtils.closeViewById(PRIMARY_VIEW_ID, fBot);
         SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotUtils.openTrace(PROJECT_NAME, tracePath, TRACE_TYPE);
         WaitUtils.waitForJobs();
@@ -151,13 +145,13 @@ public class SystemCallLatencyTableAnalysisTest extends SegmentTableTest {
         setTable(table);
         WaitUtils.waitForJobs();
         SWTBotTable tableBot = new SWTBotTable(table.getTableViewer().getTable());
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "24,100", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "24,100", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1,000", 0, 2));
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1,000", 0, 2));
         tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "5,904,091,700", 0, 2));
-        bot.closeAllEditors();
-        SWTBotUtils.deleteProject(PROJECT_NAME, bot);
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "5,904,091,700", 0, 2));
+        fBot.closeAllEditors();
+        SWTBotUtils.deleteProject(PROJECT_NAME, fBot);
     }
 
     @Override
