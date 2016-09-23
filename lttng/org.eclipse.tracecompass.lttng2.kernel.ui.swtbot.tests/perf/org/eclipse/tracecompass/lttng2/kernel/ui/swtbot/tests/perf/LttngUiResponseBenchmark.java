@@ -30,7 +30,7 @@ import org.junit.runner.RunWith;
  * @author Geneviève Bastien
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
-public class LttngUiResponseTest extends UiResponseTest {
+public class LttngUiResponseBenchmark extends UiResponseTest {
 
     private static final String TRACE_TYPE = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
 
