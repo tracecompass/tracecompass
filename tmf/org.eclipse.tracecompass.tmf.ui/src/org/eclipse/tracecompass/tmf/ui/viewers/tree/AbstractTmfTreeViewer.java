@@ -489,7 +489,7 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
     @TmfSignalHandler
     public void selectionRangeUpdated(TmfSelectionRangeUpdatedSignal signal) {
         super.selectionRangeUpdated(signal);
-        if ((signal.getSource() != this) && (getTrace() != null)) {
+        if (signal != null && (signal.getSource() != this) && (getTrace() != null)) {
             updateContent(this.getSelectionBeginTime(), this.getSelectionEndTime(), true);
         }
     }

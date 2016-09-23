@@ -319,7 +319,7 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     @TmfSignalHandler
     public void selectionRangeUpdated(TmfSelectionRangeUpdatedSignal signal) {
         super.selectionRangeUpdated(signal);
-        if ((signal.getSource() != this) && (getTrace() != null)) {
+        if (signal != null && (signal.getSource() != this) && (getTrace() != null)) {
             if (fMouseSelectionProvider != null) {
                 fMouseSelectionProvider.refresh();
             }
