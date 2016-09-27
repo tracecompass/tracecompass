@@ -31,6 +31,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -74,7 +76,6 @@ public class FlameGraphView extends TmfView {
     private static final ImageDescriptor SORT_BY_ID_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_num.gif"); //$NON-NLS-1$
     private static final ImageDescriptor SORT_BY_ID_REV_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_num_rev.gif"); //$NON-NLS-1$
 
-
     private TimeGraphViewer fTimeGraphViewer;
 
     private FlameGraphContentProvider fTimeGraphContentProvider;
@@ -114,9 +115,29 @@ public class FlameGraphView extends TmfView {
 
         getSite().setSelectionProvider(fTimeGraphViewer.getSelectionProvider());
         createTimeEventContextMenu();
+        fTimeGraphViewer.getTimeGraphControl().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+                TimeGraphControl timeGraphControl = getTimeGraphViewer().getTimeGraphControl();
+                ISelection selection = timeGraphControl.getSelection();
+                if (selection instanceof IStructuredSelection) {
+                    for (Object object : ((IStructuredSelection) selection).toList()) {
+                        if (object instanceof FlamegraphEvent) {
+                            FlamegraphEvent event = (FlamegraphEvent) object;
+                            long startTime = event.getTime();
+                            long endTime = startTime + event.getDuration();
+                            getTimeGraphViewer().setStartFinishTime(startTime, endTime);
+                            break;
+                        }
+                    }
+                }
+            }
+        });
     }
 
-
+    private TimeGraphViewer getTimeGraphViewer() {
+        return fTimeGraphViewer;
+    }
     /**
      * Handler for the trace opened signal
      *
@@ -241,7 +262,7 @@ public class FlameGraphView extends TmfView {
      * Fill context menu
      *
      * @param menuManager
-     *          a menuManager to fill
+     *            a menuManager to fill
      */
     protected void fillTimeEventContextMenu(@NonNull IMenuManager menuManager) {
         ISelection selection = getSite().getSelectionProvider().getSelection();
