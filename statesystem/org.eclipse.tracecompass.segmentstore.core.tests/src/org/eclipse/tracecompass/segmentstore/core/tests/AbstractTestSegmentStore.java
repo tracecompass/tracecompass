@@ -17,13 +17,17 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
+import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -362,4 +366,40 @@ public abstract class AbstractTestSegmentStore {
         assertEquals(lastExpected, fixture);
     }
 
+    /**
+     * Test to check ordered iterators
+     */
+    @Test
+    public void testSortedIterator() {
+        List<@NonNull Comparator<ISegment>> comparators = new LinkedList<>();
+        comparators.add(SegmentComparators.INTERVAL_END_COMPARATOR);
+        comparators.add(NonNullUtils.checkNotNull(SegmentComparators.INTERVAL_END_COMPARATOR.reversed()));
+        comparators.add(SegmentComparators.INTERVAL_START_COMPARATOR);
+        comparators.add(NonNullUtils.checkNotNull(SegmentComparators.INTERVAL_START_COMPARATOR.reversed()));
+        comparators.add(SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
+        comparators.add(NonNullUtils.checkNotNull(SegmentComparators.INTERVAL_LENGTH_COMPARATOR.reversed()));
+
+        Iterable<ISegment> iterable;
+        for (Comparator<ISegment> comparator : comparators) {
+            iterable = fSegmentStore.iterator(comparator);
+            verifySortedIterable(iterable, 5, comparator);
+            iterable = fSegmentStore.getIntersectingElements(5, comparator);
+            verifySortedIterable(iterable, 3, comparator);
+            iterable = fSegmentStore.getIntersectingElements(7, 14, comparator);
+            verifySortedIterable(iterable, 3, comparator);
+        }
+    }
+
+    private static void verifySortedIterable(Iterable<ISegment> iterable, int expectedSize, Comparator<ISegment> comparator) {
+        // check its size
+        assertEquals(expectedSize, Iterables.size(iterable));
+        Iterator<ISegment> iterator = iterable.iterator();
+        // check the order
+        ISegment prev, current = iterator.next();
+        while (iterator.hasNext()) {
+            prev = current;
+            current = iterator.next();
+            assertTrue(comparator.compare(prev, current) <= 0);
+        }
+    }
 }

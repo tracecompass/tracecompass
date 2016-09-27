@@ -266,29 +266,6 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
     // ------------------------------------------------------------------------
 
     @Override
-    public Iterable<E> getIntersectingElements(long position) {
-        fLock.lock();
-        if (fDirty) {
-            sortStore();
-        }
-        /*
-         * The intervals intersecting 't' are those whose 1) start time is
-         * *lower* than 't' AND 2) end time is *higher* than 't'.
-         */
-        try {
-            /*
-             * as fStore is sorted by start then end times, restrict sub array
-             * to elements whose start times <= t as stream.filter won't do it.
-             */
-            int index = Collections.binarySearch(fStore, new BasicSegment(position, Long.MAX_VALUE));
-            index = (index >= 0) ? index : -index - 1;
-            return fStore.subList(0, index).stream().filter(element -> position >= element.getStart() && position <= element.getEnd()).collect(Collectors.toList());
-        } finally {
-            fLock.unlock();
-        }
-    }
-
-    @Override
     public Iterable<E> getIntersectingElements(long start, long end) {
         fLock.lock();
         if (fDirty) {

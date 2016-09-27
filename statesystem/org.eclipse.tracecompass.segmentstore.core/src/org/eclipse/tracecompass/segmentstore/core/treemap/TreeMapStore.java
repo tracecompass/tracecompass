@@ -141,4 +141,5 @@ public class TreeMapStore<@NonNull E extends ISegment> extends org.eclipse.trace
     public void dispose() {
         super.dispose();
     }
+
 }

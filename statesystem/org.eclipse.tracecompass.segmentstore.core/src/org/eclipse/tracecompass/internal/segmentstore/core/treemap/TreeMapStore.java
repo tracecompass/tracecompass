@@ -232,22 +232,6 @@ public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<
     // ------------------------------------------------------------------------
 
     @Override
-    public Iterable<E> getIntersectingElements(long position) {
-        /*
-         * The intervals intersecting 't' are those whose 1) start time is
-         * *lower* than 't' AND 2) end time is *higher* than 't'.
-         */
-        fLock.readLock().lock();
-        try {
-            Iterable<E> matchStarts = Iterables.concat(fStartTimesIndex.asMap().headMap(position, true).values());
-            Iterable<E> matchEnds = Iterables.concat(fEndTimesIndex.asMap().tailMap(position, true).values());
-            return checkNotNull(Sets.intersection(Sets.newHashSet(matchStarts), Sets.newHashSet(matchEnds)));
-        } finally {
-            fLock.readLock().unlock();
-        }
-    }
-
-    @Override
     public Iterable<E> getIntersectingElements(long start, long end) {
         fLock.readLock().lock();
         try {
