@@ -12,10 +12,12 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests.latency;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -33,7 +35,9 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.BoolResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableView;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyView;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
@@ -283,6 +287,58 @@ public class SystemCallLatencyTableAnalysisTest {
         bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
         bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "998,001", 0, 2));
+    }
+
+    /**
+     * Test creating a tsv
+     *
+     * @throws NoSuchMethodException
+     *             Error creating the tsv
+     */
+    @Test
+    public void testWriteToTsv() throws NoSuchMethodException {
+        List<@NonNull BasicSegment> fixture = new ArrayList<>();
+        for (int i = 1; i <= 20; i++) {
+            int start = i;
+            final int delta = i;
+            int end = start + delta * delta;
+            fixture.add(new BasicSegment(start, end));
+        }
+        assertNotNull(fTable);
+        fTable.updateModel(fixture);
+        SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
+        SWTBot bot = new SWTBot();
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1", 0, 2));
+        SWTWorkbenchBot swtWorkbenchBot = new SWTWorkbenchBot();
+        SWTBotView viewBot = swtWorkbenchBot.viewById(VIEW_ID);
+        testToTsv(viewBot);
+        SWTBotMenu menuBot = viewBot.viewMenu().menu("Export to TSV");
+        assertTrue(menuBot.isEnabled());
+        assertTrue(menuBot.isVisible());
+    }
+
+    private void testToTsv(SWTBotView view) throws NoSuchMethodException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        assertNotNull(os);
+        Class<@NonNull AbstractSegmentStoreTableView> clazz = AbstractSegmentStoreTableView.class;
+        Method method = clazz.getDeclaredMethod("exportToTsv", java.io.OutputStream.class);
+        method.setAccessible(true);
+        final Exception[] except = new Exception[1];
+        UIThreadRunnable.syncExec(() -> {
+            try {
+                method.invoke(fLatencyView, os);
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                except[0] = e;
+            }
+        });
+        assertNull(except[0]);
+        @SuppressWarnings("null")
+        String[] lines = String.valueOf(os).split(System.getProperty("line.separator"));
+        assertNotNull(lines);
+        assertEquals("number of lines", 21, lines.length);
+        assertEquals("header", "Start Time\tEnd Time\tDuration", lines[0]);
+        // not a straight up string compare due to time zones. Kathmandu and Eucla have 15 minute time zones.
+        assertTrue("line 1", lines[1].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s001\\t\\d\\d:\\d\\d:00.000 000 002\\t1"));
     }
 
     /**

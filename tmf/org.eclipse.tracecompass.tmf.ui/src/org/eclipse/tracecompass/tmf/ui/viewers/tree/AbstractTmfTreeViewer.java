@@ -192,6 +192,7 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
         fTreeViewer.setLabelProvider(new TreeLabelProvider());
         List<TmfTreeColumnData> columns = getColumnDataProvider().getColumnData();
         this.setTreeColumns(columns);
+
     }
 
     /**
@@ -277,8 +278,9 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
      * Get the tree viewer object
      *
      * @return The tree viewer object displayed by this viewer
+     * @since 2.2
      */
-    protected TreeViewer getTreeViewer() {
+    public TreeViewer getTreeViewer() {
         return fTreeViewer;
     }
 

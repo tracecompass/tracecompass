@@ -13,12 +13,26 @@
 
 package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table;
 
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.ExportToTsvAction;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
 
 /**
  * View for displaying a segment store analysis in a table.
@@ -31,6 +45,19 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+
+    private final Action fExportAction = new ExportToTsvAction() {
+        @Override
+        protected void exportToTsv(@Nullable OutputStream stream) {
+            AbstractSegmentStoreTableView.this.exportToTsv(stream);
+
+        }
+
+        @Override
+        protected @Nullable Shell getShell() {
+            return getViewSite().getShell();
+        }
+    };
 
     private @Nullable AbstractSegmentStoreTableViewer fSegmentStoreViewer;
 
@@ -54,6 +81,7 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
         SashForm sf = new SashForm(parent, SWT.NONE);
         TableViewer tableViewer = new TableViewer(sf, SWT.FULL_SELECTION | SWT.VIRTUAL);
         fSegmentStoreViewer = createSegmentStoreViewer(tableViewer);
+        getViewSite().getActionBars().getMenuManager().add(fExportAction);
         setInitialData();
     }
 
@@ -101,6 +129,50 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
     private void setInitialData() {
         if (fSegmentStoreViewer != null) {
             fSegmentStoreViewer.setData(fSegmentStoreViewer.getSegmentProvider());
+        }
+    }
+
+    /**
+     * Export a given items's TSV
+     *
+     * @param stream
+     *            an output stream to write the TSV to
+     * @since 1.2
+     */
+    @VisibleForTesting
+    protected void exportToTsv(@Nullable OutputStream stream) {
+        try (PrintWriter pw = new PrintWriter(stream)) {
+            AbstractSegmentStoreTableViewer segmentStoreViewer = getSegmentStoreViewer();
+            if (segmentStoreViewer == null) {
+                return;
+            }
+            Table table = segmentStoreViewer.getTableViewer().getTable();
+            int size = table.getItemCount();
+            List<String> columns = new ArrayList<>();
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                TableColumn column = table.getColumn(i);
+                if (column == null) {
+                    return;
+                }
+                String columnName = String.valueOf(column.getText());
+                if (columnName.isEmpty() && i == table.getColumnCount() - 1) {
+                    // Linux GTK2 undocumented feature
+                    break;
+                }
+                columns.add(columnName);
+            }
+            pw.println(Joiner.on('\t').join(columns));
+            for (int i = 0; i < size; i++) {
+                TableItem item = table.getItem(i);
+                if (item == null) {
+                    continue;
+                }
+                List<String> data = new ArrayList<>();
+                for (int col = 0; col < columns.size(); col++) {
+                    data.add(String.valueOf(item.getText(col)));
+                }
+                pw.println(Joiner.on('\t').join(data));
+            }
         }
     }
 }

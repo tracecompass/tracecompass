@@ -14,15 +14,21 @@ package org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests.latency;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
@@ -30,8 +36,10 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.BoolResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentStoreStatisticsView;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics.SystemCallLatencyStatisticsView;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
@@ -159,9 +167,15 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
      *
      * @throws IOException
      *             trace not found?
+     * @throws SecurityException
+     *             Reflection error
+     * @throws NoSuchMethodException
+     *             Reflection error
+     * @throws IllegalArgumentException
+     *             Reflection error
      */
     @Test
-    public void testWithTrace() throws IOException {
+    public void testWithTrace() throws IOException, NoSuchMethodException, SecurityException, IllegalArgumentException {
         String tracePath;
         tracePath = FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).getPath();
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
@@ -185,9 +199,38 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
         validate(treeItem.getNode(3), "poll", "6.300 µs", "6.800 µs", "6.550 µs", "---", "2");
         validate(treeItem.getNode(5), "set_tid_address", "2.300 µs", "2.300 µs", "2.300 µs", "---", "1");
         validate(treeItem.getNode(7), "pipe", "27.900 µs", "29.700 µs", "28.800 µs", "---", "2");
+        testToTsv(view);
+        SWTBotMenu menuBot = view.viewMenu().menu("Export to TSV");
+        assertTrue(menuBot.isEnabled());
+        assertTrue(menuBot.isVisible());
 
         bot.closeAllEditors();
         SWTBotUtils.deleteProject(PROJECT_NAME, bot);
+    }
+
+    private static void testToTsv(SWTBotView view) throws NoSuchMethodException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        assertNotNull(os);
+        IViewPart viewPart = view.getReference().getView(true);
+        assertTrue(viewPart instanceof SystemCallLatencyStatisticsView);
+        Class<@NonNull AbstractSegmentStoreStatisticsView> clazz = AbstractSegmentStoreStatisticsView.class;
+        Method method = clazz.getDeclaredMethod("exportToTsv", java.io.OutputStream.class);
+        method.setAccessible(true);
+        final Exception[] except = new Exception[1];
+        UIThreadRunnable.syncExec(() -> {
+            try {
+                method.invoke((SystemCallLatencyStatisticsView) viewPart, os);
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                except[0] = e;
+            }
+        });
+        assertNull(except[0]);
+        @SuppressWarnings("null")
+        String[] lines = String.valueOf(os).split(System.getProperty("line.separator"));
+        assertNotNull(lines);
+        assertEquals("header", "Level\tMinimum\tMaximum\tAverage\tStandard Deviation\tCount\tTotal", lines[0]);
+        assertEquals("line 1", "Total\t1.000 µs\t5.904 s\t15.628 ms\t175.875 ms\t1801\t28.146 s", lines[1]);
+
     }
 
     private static void validate(SWTBotTreeItem treeItem, final String nodeName, final String min, final String max, final String avg, final String stdev, final String count) {
