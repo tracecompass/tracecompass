@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.ctf.core.event;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
 
 /**
@@ -89,5 +90,15 @@ public interface IEventDefinition {
      * @return the packet attributes, such as "device" and "timestamp_begin"
      */
     @NonNull Map<@NonNull String, @NonNull Object> getPacketAttributes();
+
+    /**
+     * Gets the stream context of a given event
+     *
+     * @return the stream context
+     * @since 4.0
+     */
+    default @Nullable ICompositeDefinition getStreamContext() {
+        return null;
+    }
 
 }

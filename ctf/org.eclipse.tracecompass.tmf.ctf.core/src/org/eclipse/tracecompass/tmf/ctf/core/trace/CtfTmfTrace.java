@@ -50,6 +50,10 @@ import org.eclipse.tracecompass.ctf.core.trace.CTFTraceWriter;
 import org.eclipse.tracecompass.ctf.core.trace.ICTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.Metadata;
 import org.eclipse.tracecompass.internal.tmf.ctf.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.ctf.core.event.aspect.CtfEventContextAspect;
+import org.eclipse.tracecompass.internal.tmf.ctf.core.event.aspect.CtfPacketContextAspect;
+import org.eclipse.tracecompass.internal.tmf.ctf.core.event.aspect.CtfPacketHeaderAspect;
+import org.eclipse.tracecompass.internal.tmf.ctf.core.event.aspect.CtfStreamContextAspect;
 import org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator.CtfIterator;
 import org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator.CtfIteratorManager;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -125,7 +129,11 @@ public class CtfTmfTrace extends TmfTrace
             new CtfChannelAspect(),
             new CtfCpuAspect(),
             TmfBaseAspects.getEventTypeAspect(),
-            TmfBaseAspects.getContentsAspect());
+            TmfBaseAspects.getContentsAspect(),
+            CtfPacketHeaderAspect.getInstance(),
+            CtfPacketContextAspect.getInstance(),
+            CtfStreamContextAspect.getInstance(),
+            CtfEventContextAspect.getInstance());
 
     /**
      * The Ctf clock unique identifier field
@@ -172,10 +180,7 @@ public class CtfTmfTrace extends TmfTrace
      * Default constructor
      */
     public CtfTmfTrace() {
-        super();
-
-        /* Use default event factory */
-        fEventFactory = CtfTmfEventFactory.instance();
+        this(CtfTmfEventFactory.instance());
     }
 
     /**

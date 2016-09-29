@@ -161,6 +161,11 @@ public final class EventDefinition implements IDefinitionScope, IEventDefinition
     }
 
     @Override
+    public ICompositeDefinition getStreamContext() {
+        return fStreamContext;
+    }
+
+    @Override
     public ICompositeDefinition getContext() {
 
         /* Most common case so far */
