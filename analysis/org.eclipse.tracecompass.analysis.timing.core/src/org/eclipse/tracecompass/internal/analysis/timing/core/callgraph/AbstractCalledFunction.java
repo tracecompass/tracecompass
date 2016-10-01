@@ -138,21 +138,12 @@ abstract class AbstractCalledFunction implements ICalledFunction {
 
     @Override
     public String toString() {
-        return new String("[" + String.valueOf(fStart) + ", " + String.valueOf(fEnd) + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        return '[' + String.valueOf(fStart) + ", " + String.valueOf(fEnd) + ']'; //$NON-NLS-1$
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + fDepth;
-        result = prime * result + (int) (fEnd ^ (fEnd >>> 32));
-        ICalledFunction parent = fParent;
-        result = prime * result + ((parent == null) ? 0 : parent.hashCode());
-        result = prime * result + (int) (fSelfTime ^ (fSelfTime >>> 32));
-        result = prime * result + (int) (fStart ^ (fStart >>> 32));
-        result = prime * result + getSymbol().hashCode();
-        return result;
+        return Objects.hash(fDepth, fEnd, fParent, fSelfTime, fStart, getSymbol());
     }
 
     @Override
@@ -173,17 +164,13 @@ abstract class AbstractCalledFunction implements ICalledFunction {
         if (fEnd != other.fEnd) {
             return false;
         }
-        if (fParent == null) {
-            if (other.fParent != null) {
-                return false;
-            }
-        } else if (!Objects.equals(fParent, other.fParent)) {
-            return false;
-        }
         if (fSelfTime != other.fSelfTime) {
             return false;
         }
         if (fStart != other.fStart) {
+            return false;
+        }
+        if (!Objects.equals(fParent, other.getParent())) {
             return false;
         }
         if (!Objects.equals(getSymbol(), other.getSymbol())) {
