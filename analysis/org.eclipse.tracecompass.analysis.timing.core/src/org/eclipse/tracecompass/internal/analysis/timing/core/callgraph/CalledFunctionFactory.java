@@ -17,7 +17,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
  *
  * @author Matthew Khouzam
  */
-public class CalledFunctionFactory {
+public final class CalledFunctionFactory {
 
     private static final String SEPARATOR = ": "; //$NON-NLS-1$
     private static final String ERROR_MSG = "Cannot create a called function of type : "; //$NON-NLS-1$
@@ -45,18 +45,18 @@ public class CalledFunctionFactory {
      */
     public static AbstractCalledFunction create(long start, long end, int depth, ITmfStateValue stateValue, int processId, @Nullable ICalledFunction parent) {
         switch (stateValue.getType()) {
-        case CUSTOM:
-            throw new IllegalArgumentException(ERROR_MSG + stateValue.getType() + SEPARATOR + stateValue.toString());
-        case DOUBLE:
-            throw new IllegalArgumentException(ERROR_MSG + stateValue.getType() + SEPARATOR + stateValue.toString());
         case INTEGER:
             return create(start, end, depth, stateValue.unboxInt(), processId, parent);
         case LONG:
             return create(start, end, depth, stateValue.unboxLong(), processId, parent);
-        case NULL:
-            throw new IllegalArgumentException(ERROR_MSG + stateValue.getType() + SEPARATOR + stateValue.toString());
         case STRING:
             return create(start, end, depth, stateValue.unboxStr(), processId, parent);
+        case CUSTOM:
+            // Fall through
+        case DOUBLE:
+            // Fall through
+        case NULL:
+            // Fall through
         default:
             throw new IllegalArgumentException(ERROR_MSG + stateValue.getType() + SEPARATOR + stateValue.toString());
         }
@@ -105,7 +105,7 @@ public class CalledFunctionFactory {
      *            the parent node
      * @return an ICalledFunction with the specified properties
      */
-    public static CalledStringFunction create(long start, long end, int depth, String value, int processId,  @Nullable ICalledFunction parent) {
+    public static CalledStringFunction create(long start, long end, int depth, String value, int processId, @Nullable ICalledFunction parent) {
         if (start > end) {
             throw new IllegalArgumentException(Messages.TimeError + '[' + start + ',' + end + ']');
         }
