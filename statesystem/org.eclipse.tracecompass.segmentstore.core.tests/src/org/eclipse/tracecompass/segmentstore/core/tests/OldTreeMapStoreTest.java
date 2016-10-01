@@ -12,11 +12,13 @@ package org.eclipse.tracecompass.segmentstore.core.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+import java.util.Arrays;
+
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.segmentstore.core.treemap.TreeMapStore;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
+import org.eclipse.tracecompass.segmentstore.core.treemap.TreeMapStore;
 import org.junit.Test;
 
 /**
@@ -31,6 +33,13 @@ public class OldTreeMapStoreTest extends AbstractTestSegmentStore {
     @Override
     protected ISegmentStore<@NonNull ISegment> getSegmentStore() {
         return new TreeMapStore<>();
+    }
+
+    @Override
+    protected ISegmentStore<@NonNull ISegment> getSegmentStore(@NonNull ISegment @NonNull [] data) {
+        TreeMapStore<@NonNull ISegment> treeMapStore = new TreeMapStore<>();
+        treeMapStore.addAll(Arrays.asList(data));
+        return treeMapStore;
     }
 
     /**

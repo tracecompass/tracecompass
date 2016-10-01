@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -57,6 +58,16 @@ public abstract class AbstractTestSegmentStore {
      * @return the segment store
      */
     protected abstract ISegmentStore<@NonNull ISegment> getSegmentStore();
+
+    /**
+     * Get the segment store to test with initial data
+     *
+     * @param data
+     *            the data
+     *
+     * @return the segment store
+     */
+    protected abstract ISegmentStore<@NonNull ISegment> getSegmentStore(@NonNull ISegment @NonNull [] data);
 
     private static final @NonNull ISegment SEGMENT_2_6 = new BasicSegment(2, 6);
     private static final @NonNull ISegment SEGMENT_4_6 = new BasicSegment(4, 6);
@@ -104,6 +115,62 @@ public abstract class AbstractTestSegmentStore {
     }
 
     /**
+     * Testing isEmpty() method
+     */
+    @Test
+    public void testIsEmpty() {
+        assertFalse(fSegmentStore.isEmpty());
+        fSegmentStore.clear();
+        assertTrue(fSegmentStore.isEmpty());
+    }
+
+    /**
+     * Testing adding a collection with the addAll method
+     */
+    @Test
+    public void testAddAll() {
+        assertFalse(fSegmentStore.isEmpty());
+        fSegmentStore.clear();
+        assertTrue(fSegmentStore.isEmpty());
+        fSegmentStore.addAll(SEGMENTS);
+        assertTrue(fSegmentStore.containsAll(SEGMENTS));
+    }
+
+    /**
+     * Testing "copy" constructor
+     */
+    @Test
+    public void testAddAllConstructor() {
+        @SuppressWarnings("null")
+        ISegmentStore<@NonNull ISegment> other = getSegmentStore(fSegmentStore.toArray(new ISegment[fSegmentStore.size()]));
+        assertTrue(fSegmentStore.containsAll(other));
+        assertTrue(other.containsAll(fSegmentStore));
+    }
+
+    /**
+     * Testing "copy" constructor out of order
+     */
+    @Test
+    public void testAddAllConstructorOutOfOrder() {
+        @SuppressWarnings("null")
+        ISegmentStore<@NonNull ISegment> other = getSegmentStore(REVERSE_SEGMENTS.toArray(new ISegment[fSegmentStore.size()]));
+        assertTrue(fSegmentStore.containsAll(other));
+        assertTrue(other.containsAll(fSegmentStore));
+    }
+
+    /**
+     * Testing adding an out of order collection with the addAll method
+     */
+    @Test
+    public void testAddAllOutOfOrder() {
+        assertFalse(fSegmentStore.isEmpty());
+        fSegmentStore.clear();
+        assertTrue(fSegmentStore.isEmpty());
+        fSegmentStore.addAll(REVERSE_SEGMENTS);
+        assertTrue(fSegmentStore.containsAll(SEGMENTS));
+    }
+
+    /**
      * Test the contains() method.
      */
     @Test
@@ -113,6 +180,18 @@ public abstract class AbstractTestSegmentStore {
         assertTrue(fSegmentStore.contains(SEGMENT_2_6));
         assertTrue(fSegmentStore.contains(SEGMENT_4_8));
         assertFalse(fSegmentStore.contains(otherSegment));
+    }
+
+    /**
+     * Test containsAll() method
+     */
+    public void testContainsAll() {
+        ISegmentStore<@NonNull ISegment> store = getSegmentStore();
+
+        store.add(SEGMENT_2_6);
+        assertTrue(store.containsAll(Collections.emptyList()));
+        assertTrue(store.containsAll(Collections.singleton(SEGMENT_2_6)));
+        assertFalse(store.containsAll(Collections.singleton(SEGMENT_4_6)));
     }
 
     /**
@@ -367,7 +446,7 @@ public abstract class AbstractTestSegmentStore {
     }
 
     /**
-     * Test to check ordered iterators
+     *  Test to check ordered iterators
      */
     @Test
     public void testSortedIterator() {
@@ -401,5 +480,38 @@ public abstract class AbstractTestSegmentStore {
             current = iterator.next();
             assertTrue(comparator.compare(prev, current) <= 0);
         }
+    }
+
+    /**
+     * Test retainAll() contract
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void testRetainAll() {
+        ISegmentStore<@NonNull ISegment> store = getSegmentStore();
+
+        store.add(SEGMENT_2_6);
+        store.retainAll(Collections.emptyList());
+    }
+
+    /**
+     * Test remove() contract
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void testRemove() {
+        ISegmentStore<@NonNull ISegment> store = getSegmentStore();
+
+        store.add(SEGMENT_2_6);
+        store.remove(SEGMENT_2_6);
+    }
+
+    /**
+     * Test removeAll() contract
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void testRemoveAll() {
+        ISegmentStore<@NonNull ISegment> store = getSegmentStore();
+
+        store.add(SEGMENT_2_6);
+        store.removeAll(Collections.emptyList());
     }
 }

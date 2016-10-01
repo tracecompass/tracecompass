@@ -26,4 +26,8 @@ public class LazyArrayListStoreTest extends AbstractTestSegmentStore {
         return new LazyArrayListStore<>();
     }
 
+    @Override
+    protected ISegmentStore<@NonNull ISegment> getSegmentStore(@NonNull ISegment @NonNull [] data) {
+        return new LazyArrayListStore<>(data);
+    }
 }

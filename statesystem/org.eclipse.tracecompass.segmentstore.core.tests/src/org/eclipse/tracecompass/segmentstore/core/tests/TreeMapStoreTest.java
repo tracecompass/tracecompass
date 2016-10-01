@@ -12,6 +12,8 @@ package org.eclipse.tracecompass.segmentstore.core.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+import java.util.Arrays;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.segmentstore.core.treemap.TreeMapStore;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
@@ -29,6 +31,16 @@ public class TreeMapStoreTest extends AbstractTestSegmentStore {
     @Override
     protected ISegmentStore<@NonNull ISegment> getSegmentStore() {
         return new TreeMapStore<>();
+    }
+
+    /**
+     * The TreeMapStore does not have a bulk loader, if it ever gets one, it should be tested here.
+     */
+    @Override
+    protected ISegmentStore<@NonNull ISegment> getSegmentStore(@NonNull ISegment @NonNull [] data) {
+        TreeMapStore<@NonNull ISegment> treeMapStore = new TreeMapStore<>();
+        treeMapStore.addAll(Arrays.asList(data));
+        return treeMapStore;
     }
 
     /**

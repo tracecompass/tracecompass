@@ -26,4 +26,9 @@ public class ArrayListStoreTest extends AbstractTestSegmentStore {
     protected ISegmentStore<@NonNull ISegment> getSegmentStore() {
         return new ArrayListStore<>();
     }
+
+    @Override
+    protected ISegmentStore<@NonNull ISegment> getSegmentStore(@NonNull ISegment @NonNull [] data) {
+        return new ArrayListStore<>(data);
+    }
 }
