@@ -275,7 +275,8 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
             return null;
         }
         TextTraceContext context = tmfContext;
-        if (context.getLocation() == null || !(context.getLocation().getLocationInfo() instanceof Long) || NULL_LOCATION.equals(context.getLocation())) {
+        ITmfLocation location = context.getLocation();
+        if (location == null || !(location.getLocationInfo() instanceof Long) || NULL_LOCATION.equals(location)) {
             return null;
         }
 

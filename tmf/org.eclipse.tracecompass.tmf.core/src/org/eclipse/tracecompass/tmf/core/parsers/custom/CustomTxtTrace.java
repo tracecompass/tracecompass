@@ -264,7 +264,8 @@ public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexabl
         }
 
         final CustomTxtTraceContext context = (CustomTxtTraceContext) tmfContext;
-        if (context.getLocation() == null || !(context.getLocation().getLocationInfo() instanceof Long) || NULL_LOCATION.equals(context.getLocation())) {
+        ITmfLocation location = context.getLocation();
+        if (location == null || !(location.getLocationInfo() instanceof Long) || NULL_LOCATION.equals(location)) {
             return null;
         }
 

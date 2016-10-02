@@ -299,9 +299,7 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
         int length = getNbChildren();
 
         // Initialize the location array if necessary
-        TmfLocationArray locationArray = ((location == null) ?
-                new TmfLocationArray(length) :
-                ((TmfExperimentLocation) location).getLocationInfo());
+        TmfLocationArray locationArray = ((location == null) ? new TmfLocationArray(length) : ((TmfExperimentLocation) location).getLocationInfo());
 
         ITmfLocation[] locations = locationArray.getLocations();
         long[] ranks = locationArray.getRanks();
@@ -424,10 +422,13 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
                 }
 
                 // Update the experiment location
-                TmfLocationArray locationArray = new TmfLocationArray(
-                        ((TmfExperimentLocation) expContext.getLocation()).getLocationInfo(),
-                        trace, traceContext.getLocation(), traceContext.getRank());
-                expContext.setLocation(new TmfExperimentLocation(locationArray));
+                ITmfLocation location = expContext.getLocation();
+                if (location instanceof TmfExperimentLocation) {
+                    TmfLocationArray locationArray = new TmfLocationArray(
+                            ((TmfExperimentLocation) location).getLocationInfo(),
+                            trace, traceContext.getLocation(), traceContext.getRank());
+                    expContext.setLocation(new TmfExperimentLocation(locationArray));
+                }
             }
         }
 
@@ -610,8 +611,7 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
                         }
                         safeTimestamp = endTimestamp;
                         if (timeRange != null) {
-                            final TmfTraceRangeUpdatedSignal signal =
-                                    new TmfTraceRangeUpdatedSignal(TmfExperiment.this, TmfExperiment.this, timeRange);
+                            final TmfTraceRangeUpdatedSignal signal = new TmfTraceRangeUpdatedSignal(TmfExperiment.this, TmfExperiment.this, timeRange);
                             broadcast(signal);
                         }
                     }

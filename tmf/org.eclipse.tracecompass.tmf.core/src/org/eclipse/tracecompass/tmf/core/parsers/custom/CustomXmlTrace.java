@@ -266,15 +266,16 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
         }
 
         final CustomXmlTraceContext context = (CustomXmlTraceContext) tmfContext;
-        if (context.getLocation() == null || !(context.getLocation().getLocationInfo() instanceof Long) || NULL_LOCATION.equals(context.getLocation())) {
+        ITmfLocation location = context.getLocation();
+        if (location == null || !(location.getLocationInfo() instanceof Long) || NULL_LOCATION.equals(location)) {
             return null;
         }
 
         CustomXmlEvent event = null;
         try {
             // Below +1 for the <
-            if (fFile.getFilePointer() != (Long) context.getLocation().getLocationInfo() + 1) {
-                fFile.seek((Long) context.getLocation().getLocationInfo() + 1);
+            if (fFile.getFilePointer() != (Long) location.getLocationInfo() + 1) {
+                fFile.seek((Long) location.getLocationInfo() + 1);
             }
             final StringBuffer elementBuffer = new StringBuffer("<"); //$NON-NLS-1$
             readElement(elementBuffer, fFile);

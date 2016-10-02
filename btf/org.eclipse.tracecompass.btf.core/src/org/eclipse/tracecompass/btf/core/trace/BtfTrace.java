@@ -144,7 +144,8 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
                 fProperties.put(CREATIONDATE, fCreationDate);
 
                 try {
-                    // DateFormats are inherently unsafe for multithreaded use so we can't make this a field. Just in case.
+                    // DateFormats are inherently unsafe for multithreaded use
+                    // so we can't make this a field. Just in case.
                     final SimpleDateFormat ISO8601DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX"); //$NON-NLS-1$
                     Date dateTime = ISO8601DATEFORMAT.parse(fCreationDate);
                     fTsOffset = dateTime.getTime() * MICROSECONDS_IN_A_SECOND;
@@ -363,9 +364,10 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
         }
 
         final TmfContext context = (TmfContext) tmfContext;
-        if (context.getLocation() == null
-                || !(context.getLocation().getLocationInfo() instanceof Long)
-                || NULL_LOCATION.equals(context.getLocation())) {
+        ITmfLocation location = context.getLocation();
+        if (location == null
+                || !(location.getLocationInfo() instanceof Long)
+                || NULL_LOCATION.equals(location)) {
             return null;
         }
 
@@ -381,21 +383,24 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
      * @return the event from a given line
      */
     private ITmfEvent parseLine(TmfContext context) {
-        try {
-            if (!context.getLocation().getLocationInfo().equals(fFileInput.getFilePointer())) {
-                seekEvent(context.getLocation());
+        ITmfLocation location = context.getLocation();
+        if (location != null) {
+            try {
+                if (!location.getLocationInfo().equals(fFileInput.getFilePointer())) {
+                    seekEvent(location);
+                }
+            } catch (IOException e1) {
+                seekEvent(location);
             }
-        } catch (IOException e1) {
-            seekEvent(context.getLocation());
-        }
-        String line;
-        try {
-            line = fFileInput.readLine();
-            return parseLine(context.getRank(), line);
+            String line;
+            try {
+                line = fFileInput.readLine();
+                return parseLine(context.getRank(), line);
 
-        } catch (IOException e) {
+            } catch (IOException e) {
+                Activator.logError(e.getMessage(), e);
+            }
         }
-
         return null;
     }
 
@@ -502,9 +507,11 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
         if (signal.getTrace() == this) {
             try {
                 synchronized (this) {
-                    // Reset the file handle in case it has reached the end of the
-                    // file already. Otherwise, it will not be able to read new data
-                    // pass the previous end.
+                    /*
+                     * Reset the file handle in case it has reached the end of
+                     * the file already. Otherwise, it will not be able to read
+                     * new data pass the previous end.
+                     */
                     initFile();
                 }
             } catch (TmfTraceException e) {

@@ -14,6 +14,9 @@
 
 package org.eclipse.tracecompass.tmf.core.trace;
 
+import java.util.Objects;
+
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 
 /**
@@ -33,7 +36,7 @@ public class TmfContext implements ITmfContext {
     // ------------------------------------------------------------------------
 
     // The trace location
-    private ITmfLocation fLocation;
+    private @Nullable ITmfLocation fLocation;
 
     // The event rank
     private long fRank;
@@ -87,7 +90,7 @@ public class TmfContext implements ITmfContext {
     // ------------------------------------------------------------------------
 
     @Override
-    public ITmfLocation getLocation() {
+    public @Nullable ITmfLocation getLocation() {
         return fLocation;
     }
 
@@ -128,11 +131,7 @@ public class TmfContext implements ITmfContext {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((fLocation == null) ? 0 : fLocation.hashCode());
-        result = prime * result + (int) (fRank ^ (fRank >>> 32));
-        return result;
+        return Objects.hash(fRank, fLocation);
     }
 
     @Override
@@ -147,14 +146,10 @@ public class TmfContext implements ITmfContext {
             return false;
         }
         final TmfContext other = (TmfContext) obj;
-        if (fLocation == null) {
-            if (other.fLocation != null) {
-                return false;
-            }
-        } else if (!fLocation.equals(other.fLocation)) {
+        if (fRank != other.fRank) {
             return false;
         }
-        if (fRank != other.fRank) {
+        if (!Objects.equals(fLocation, other.fLocation)) {
             return false;
         }
         return true;
