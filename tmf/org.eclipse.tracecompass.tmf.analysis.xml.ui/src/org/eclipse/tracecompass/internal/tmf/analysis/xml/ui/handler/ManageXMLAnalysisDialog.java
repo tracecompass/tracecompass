@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlAnalysisModuleSource;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
+import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfCommonProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectModelElement;
@@ -264,7 +265,7 @@ public class ManageXMLAnalysisDialog extends Dialog {
     }
 
     private void importAnalysis() {
-        FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
+        FileDialog dialog = TmfFileDialogFactory.create(Display.getCurrent().getActiveShell(), SWT.OPEN);
         dialog.setText(Messages.ManageXMLAnalysisDialog_SelectFileImport);
         dialog.setFilterNames(new String[] { Messages.ManageXMLAnalysisDialog_ImportXmlFile + " (*.xml)" }); //$NON-NLS-1$
         dialog.setFilterExtensions(new String[] { XML_FILTER_EXTENSION });
@@ -306,7 +307,7 @@ public class ManageXMLAnalysisDialog extends Dialog {
     }
 
     private void exportAnalysis() {
-        FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
+        FileDialog dialog = TmfFileDialogFactory.create(Display.getCurrent().getActiveShell(), SWT.SAVE);
         dialog.setText(NLS.bind(Messages.ManageXMLAnalysisDialog_SelectFileExport, fAnalysesList.getSelection()[0]));
         dialog.setFilterExtensions(new String[] { XML_FILTER_EXTENSION, "*" }); //$NON-NLS-1$
         String selection = createXmlFileString(fAnalysesList.getSelection()[0]);

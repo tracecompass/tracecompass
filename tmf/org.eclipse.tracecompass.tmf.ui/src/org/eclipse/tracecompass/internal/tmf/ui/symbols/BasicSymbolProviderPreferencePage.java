@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.internal.tmf.ui.symbols.BasicSymbolProvider.SourceKind;
+import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.symbols.AbstractSymbolProviderPreferencePage;
 
 /**
@@ -119,7 +120,7 @@ public class BasicSymbolProviderPreferencePage extends AbstractSymbolProviderPre
     }
 
     private void browseForFile(Text fileField, String dialogTitle) {
-        FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
+        FileDialog fileDialog = TmfFileDialogFactory.create(getShell(), SWT.OPEN);
         fileDialog.setText(dialogTitle);
         String filePath = fileDialog.open();
         if (filePath != null) {

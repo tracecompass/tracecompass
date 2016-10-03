@@ -63,6 +63,7 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.ui;x-friends:="org.eclipse
    org.eclipse.tracecompass.lttng2.kernel.ui",
  org.eclipse.tracecompass.tmf.ui,
  org.eclipse.tracecompass.tmf.ui.analysis,
+ org.eclipse.tracecompass.tmf.ui.dialog,
  org.eclipse.tracecompass.tmf.ui.editors,
  org.eclipse.tracecompass.tmf.ui.markers,
  org.eclipse.tracecompass.tmf.ui.project.model,
@@ -108,7 +109,8 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.ui;x-friends:="org.eclipse
  org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model,
  org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets,
  org.eclipse.tracecompass.tmf.ui.widgets.virtualtable
-Import-Package: com.google.common.base,
+Import-Package: com.google.common.annotations,
+ com.google.common.base,
  com.google.common.cache,
  com.google.common.collect,
  org.eclipse.emf.common.util,

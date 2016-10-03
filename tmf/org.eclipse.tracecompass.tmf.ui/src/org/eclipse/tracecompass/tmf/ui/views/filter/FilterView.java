@@ -43,6 +43,7 @@ import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterRootNode;
 import org.eclipse.tracecompass.tmf.core.filter.xml.TmfFilterXMLParser;
 import org.eclipse.tracecompass.tmf.core.filter.xml.TmfFilterXMLWriter;
+import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import org.eclipse.ui.IActionBars;
 import org.xml.sax.SAXException;
@@ -266,7 +267,7 @@ public class FilterView extends TmfView {
         @Override
         public void run() {
             try {
-                FileDialog dlg = new FileDialog(new Shell(), SWT.SAVE);
+                FileDialog dlg = TmfFileDialogFactory.create(new Shell(), SWT.SAVE);
                 dlg.setFilterNames(new String[] { Messages.FilterView_FileDialogFilterName + " (*.xml)" }); //$NON-NLS-1$
                 dlg.setFilterExtensions(new String[] { "*.xml" }); //$NON-NLS-1$
 
@@ -288,7 +289,7 @@ public class FilterView extends TmfView {
             if (fViewer != null) {
                 ITmfFilterTreeNode root = null;
                 try {
-                    FileDialog dlg = new FileDialog(new Shell(), SWT.OPEN);
+                    FileDialog dlg = TmfFileDialogFactory.create(new Shell(), SWT.OPEN);
                     dlg.setFilterNames(new String[] { Messages.FilterView_FileDialogFilterName + " (*.xml)" }); //$NON-NLS-1$
                     dlg.setFilterExtensions(new String[] { "*.xml" }); //$NON-NLS-1$
 

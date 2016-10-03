@@ -18,6 +18,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
+import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 
 /**
  * The export to TSV abstract action
@@ -55,7 +56,7 @@ public abstract class ExportToTsvAction extends Action {
         if (shell == null) {
             return;
         }
-        FileDialog fd = new FileDialog(shell);
+        FileDialog fd = TmfFileDialogFactory.create(shell);
         fd.setFilterExtensions(getExtension());
         String fileName = fd.open();
         if (fileName == null) {

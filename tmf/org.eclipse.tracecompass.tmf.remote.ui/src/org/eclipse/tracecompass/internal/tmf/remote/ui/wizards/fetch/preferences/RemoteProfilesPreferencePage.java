@@ -89,6 +89,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePa
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageTraceElement;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.remote.core.proxy.TmfRemoteConnectionFactory;
+import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchCommandConstants;
@@ -585,7 +586,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
         fImportButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
+                FileDialog dialog = TmfFileDialogFactory.create(Display.getCurrent().getActiveShell(), SWT.OPEN);
                 dialog.setText(RemoteMessages.RemoteProfilesPreferencePage_ImportFileDialogTitle);
                 dialog.setFilterExtensions(new String[] { "*.xml", "*" }); //$NON-NLS-1$ //$NON-NLS-2$
                 String path = dialog.open();
@@ -606,7 +607,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
         fExportButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
+                FileDialog dialog = TmfFileDialogFactory.create(Display.getCurrent().getActiveShell(), SWT.SAVE);
                 dialog.setText(RemoteMessages.RemoteProfilesPreferencePage_ExportFileDialogTitle);
                 dialog.setFilterExtensions(new String[] { "*.xml", "*" }); //$NON-NLS-1$ //$NON-NLS-2$
                 String path = dialog.open();

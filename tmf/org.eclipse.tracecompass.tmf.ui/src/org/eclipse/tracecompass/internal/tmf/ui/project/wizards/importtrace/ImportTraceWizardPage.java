@@ -79,6 +79,7 @@ import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
+import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
@@ -627,7 +628,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
      *            file extensions used to filter files shown to the user
      */
     protected void handleArchiveBrowseButtonPressed(String[] extensions) {
-        FileDialog dialog = new FileDialog(fArchiveNameField.getShell(), SWT.SHEET);
+        FileDialog dialog = TmfFileDialogFactory.create(fArchiveNameField.getShell(), SWT.SHEET);
         dialog.setFilterExtensions(extensions);
         dialog.setText(Messages.ImportTraceWizard_SelectTraceArchiveTitle);
         String fileName = fArchiveNameField.getText().trim();

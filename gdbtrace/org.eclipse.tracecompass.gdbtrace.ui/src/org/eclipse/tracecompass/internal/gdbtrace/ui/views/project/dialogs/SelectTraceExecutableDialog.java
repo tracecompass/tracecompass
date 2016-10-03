@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.internal.gdbtrace.ui.GdbTraceUIPlugin;
+import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
 
 /**
@@ -139,7 +140,7 @@ public class SelectTraceExecutableDialog extends SelectionStatusDialog {
         browseExecutableButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                FileDialog dlg = new FileDialog(shell);
+                FileDialog dlg = TmfFileDialogFactory.create(shell);
                 String workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
                 dlg.setFilterPath(workspacePath);
                 dlg.setText(Messages.SelectTraceExecutableDialog_ExecutablePrompt);

@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.tracecompass.internal.lttng2.control.core.LttngProfileManager;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
+import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.FilteredTree;
@@ -146,7 +147,7 @@ public class ControlRemoteProfilesPreferencePage extends PreferencePage implemen
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
+                FileDialog dialog = TmfFileDialogFactory.create(Display.getCurrent().getActiveShell(), SWT.OPEN);
                 dialog.setText(Messages.TraceControl_ImportProfileTitle);
                 dialog.setFilterExtensions(new String[] { "*.lttng", "*" }); //$NON-NLS-1$ //$NON-NLS-2$
                 String sourceFile = dialog.open();

@@ -44,6 +44,7 @@ import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
+import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 
 /**
  * Dialog for custom text parsers.
@@ -243,7 +244,7 @@ public class ManageCustomParsersDialog extends Dialog {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
+                FileDialog dialog = TmfFileDialogFactory.create(Display.getCurrent().getActiveShell(), SWT.OPEN);
                 dialog.setText(Messages.ManageCustomParsersDialog_ImportParserSelection);
                 dialog.setFilterExtensions(new String[] { "*.xml", "*" }); //$NON-NLS-1$ //$NON-NLS-2$
                 String path = dialog.open();
@@ -281,7 +282,7 @@ public class ManageCustomParsersDialog extends Dialog {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
+                FileDialog dialog = TmfFileDialogFactory.create(Display.getCurrent().getActiveShell(), SWT.SAVE);
                 dialog.setText(NLS.bind(Messages.ManageCustomParsersDialog_ExportParserSelection, parserList.getSelection()[0]));
                 dialog.setFilterExtensions(new String[] { "*.xml", "*" }); //$NON-NLS-1$ //$NON-NLS-2$
                 String path = dialog.open();

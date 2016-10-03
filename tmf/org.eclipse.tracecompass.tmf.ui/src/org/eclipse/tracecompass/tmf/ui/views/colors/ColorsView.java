@@ -55,6 +55,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
+import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import org.eclipse.tracecompass.tmf.ui.views.filter.FilterDialog;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
@@ -346,7 +347,7 @@ public class ColorsView extends TmfView {
     private class ExportAction extends Action {
         @Override
         public void run() {
-            FileDialog fileDialog = new FileDialog(fShell, SWT.SAVE);
+            FileDialog fileDialog = TmfFileDialogFactory.create(fShell, SWT.SAVE);
             fileDialog.setFilterExtensions(new String[] {"*.xml"}); //$NON-NLS-1$
             fileDialog.setOverwrite(true);
             String pathName = fileDialog.open();
@@ -359,7 +360,7 @@ public class ColorsView extends TmfView {
     private class ImportAction extends Action {
         @Override
         public void run() {
-            FileDialog fileDialog = new FileDialog(fShell, SWT.OPEN);
+            FileDialog fileDialog = TmfFileDialogFactory.create(fShell, SWT.OPEN);
             fileDialog.setFilterExtensions(new String[] {"*.xml"}); //$NON-NLS-1$
             String pathName = fileDialog.open();
             if (pathName != null) {

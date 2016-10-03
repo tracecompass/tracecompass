@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 
 /**
  * An abstract wizard page containing common code useful for both import and
@@ -499,7 +500,7 @@ public abstract class AbstractTracePackageWizardPage extends WizardPage {
      * @param fileDialogStyle
      */
     private void handleFilePathBrowseButtonPressed(int fileDialogStyle) {
-        FileDialog dialog = new FileDialog(getContainer().getShell(), fileDialogStyle | SWT.SHEET);
+        FileDialog dialog = TmfFileDialogFactory.create(getContainer().getShell(), fileDialogStyle | SWT.SHEET);
         dialog.setFilterExtensions(new String[] { "*.zip;*.tar.gz;*.tar;*.tgz", "*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
         dialog.setText(Messages.TracePackage_FileDialogTitle);
         String currentSourceString = getFilePathValue();

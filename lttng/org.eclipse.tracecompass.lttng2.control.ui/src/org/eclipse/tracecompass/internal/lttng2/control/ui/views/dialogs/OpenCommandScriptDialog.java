@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
+import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 
 import com.google.common.collect.ImmutableList;
 
@@ -228,7 +229,7 @@ public class OpenCommandScriptDialog extends Dialog implements ISelectCommandScr
     }
 
     private void handleFilePathBrowseButtonPressed(int fileDialogStyle) {
-        FileDialog dialog = new FileDialog(getShell(), fileDialogStyle | SWT.SHEET);
+        FileDialog dialog = TmfFileDialogFactory.create(getShell(), fileDialogStyle | SWT.SHEET);
         dialog.setFilterExtensions(new String[] { "*.*", "*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
         dialog.setText(Messages.TraceControl_ExecuteScriptDialogTitle);
         String selectedFileName = dialog.open();

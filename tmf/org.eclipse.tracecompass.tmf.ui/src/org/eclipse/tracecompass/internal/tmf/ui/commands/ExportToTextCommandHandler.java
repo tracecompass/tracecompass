@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 import org.eclipse.ui.PlatformUI;
 
@@ -54,7 +55,7 @@ public class ExportToTextCommandHandler extends AbstractHandler {
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         ITmfFilter filter = TmfTraceManager.getInstance().getCurrentTraceContext().getFilter();
         if (trace != null) {
-            FileDialog fd = new FileDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.SAVE);
+            FileDialog fd = TmfFileDialogFactory.create(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.SAVE);
             fd.setFilterExtensions(new String[] { "*.csv", "*.*", "*" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             fd.setOverwrite(true);
             final String s = fd.open();
