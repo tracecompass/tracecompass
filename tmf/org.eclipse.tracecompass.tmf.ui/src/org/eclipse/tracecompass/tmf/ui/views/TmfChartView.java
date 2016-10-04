@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.tmf.ui.views;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.MouseAdapter;
@@ -199,6 +200,12 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
             setTrace(trace);
             loadTrace();
         }
+    }
+
+    @Override
+    protected IAction createSaveAction() {
+        // FIXME export tree viewer or legend.
+        return SaveImageUtil.createSaveAction(getName(), this::getChartViewer);
     }
 
     @Override

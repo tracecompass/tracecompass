@@ -146,7 +146,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
      * @param style
      *            The style to add to the view, can be {@link SWT#TOP} or
      *            {@link SWT#BOTTOM}
-     * @since 3.2
+     * @since 3.3
      */
     public TimeGraphScale(Composite parent, TimeGraphColorScheme colors, int style) {
         super(parent, colors, SWT.NO_BACKGROUND | SWT.NO_FOCUS | SWT.DOUBLE_BUFFERED);

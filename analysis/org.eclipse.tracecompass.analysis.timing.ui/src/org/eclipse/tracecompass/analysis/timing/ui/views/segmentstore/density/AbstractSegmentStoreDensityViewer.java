@@ -46,6 +46,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.viewers.IImageSave;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
@@ -66,7 +67,7 @@ import com.google.common.annotations.VisibleForTesting;
  *
  * @since 2.0
  */
-public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
+public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implements IImageSave {
 
     private static final Format DENSITY_TIME_FORMATTER = new SubSecondTimeWithUnitFormat();
     private static final RGB BAR_COLOR = new RGB(0x42, 0x85, 0xf4);

@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -21,6 +22,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.views.SaveImageUtil;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -76,7 +78,6 @@ public abstract class AbstractSegmentStoreDensityView extends TmfView {
     @Override
     public void createPartControl(@Nullable Composite parent) {
         super.createPartControl(parent);
-
         final SashForm sashForm = new SashForm(parent, SWT.NONE);
 
         fTableViewer = createSegmentStoreTableViewer(sashForm);
@@ -98,6 +99,11 @@ public abstract class AbstractSegmentStoreDensityView extends TmfView {
                 fTableViewer.traceSelected(signal);
             }
         }
+    }
+
+    @Override
+    protected @NonNull IAction createSaveAction() {
+        return SaveImageUtil.createSaveAction(getName(), this::getDensityViewer);
     }
 
     /**

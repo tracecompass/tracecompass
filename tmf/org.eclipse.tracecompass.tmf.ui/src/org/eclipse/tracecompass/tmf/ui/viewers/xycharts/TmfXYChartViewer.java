@@ -35,6 +35,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.viewers.IImageSave;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
@@ -58,7 +59,7 @@ import com.google.common.annotations.VisibleForTesting;
  *
  * @author Bernd Hufmann
  */
-public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChartTimeProvider {
+public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChartTimeProvider, IImageSave {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -570,5 +571,10 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      */
     public boolean isSendTimeAlignSignals() {
         return fSendTimeAlignSignals;
+    }
+
+    @Override
+    public void saveImage(String filename, int format) {
+        getSwtChart().save(filename, format);
     }
 }

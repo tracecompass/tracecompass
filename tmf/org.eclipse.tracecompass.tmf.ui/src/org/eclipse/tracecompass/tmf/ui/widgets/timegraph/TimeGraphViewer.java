@@ -78,6 +78,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.internal.tmf.ui.dialogs.AddBookmarkDialog;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
+import org.eclipse.tracecompass.tmf.ui.viewers.IImageSave;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.views.ResetUtil;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ShowFilterDialogAction;
@@ -104,7 +105,7 @@ import org.eclipse.ui.PlatformUI;
  *
  * @author Patrick Tasse, and others
  */
-public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarkerAxisListener, SelectionListener {
+public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarkerAxisListener, SelectionListener, IImageSave {
 
     /** Constant indicating that all levels of the time graph should be expanded */
     public static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;

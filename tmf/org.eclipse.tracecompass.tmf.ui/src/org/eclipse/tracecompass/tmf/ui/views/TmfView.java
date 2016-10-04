@@ -18,6 +18,8 @@ import java.text.MessageFormat;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener2;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -44,14 +46,12 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 
 /**
- * Basic abstract TMF view class implementation.
- * <br>
+ * Basic abstract TMF view class implementation. <br>
  * It registers any sub class to the signal manager for receiving and sending
- * TMF signals.
- * <br>
+ * TMF signals. <br>
  * Subclasses may optionally implement the {@link ITmfTimeAligned},
- * {@link ITmfAllowMultiple} and {@link ITmfPinnable} interfaces to enable
- * those features.
+ * {@link ITmfAllowMultiple} and {@link ITmfPinnable} interfaces to enable those
+ * features.
  *
  * @author Francois Chouinard
  */
@@ -69,6 +69,9 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
     protected PinTmfViewAction fPinAction;
 
     private static TimeAlignViewsAction fAlignViewsAction;
+
+    /** The save action */
+    private IAction fSaveAction;
 
     /**
      * The separator used between the primary and secondary id of a view id.
@@ -141,11 +144,11 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
     }
 
     /**
-     * Method adds a pin action to the TmfView. For example, this action can be
-     * used to ignore time synchronization signals from other TmfViews. <br>
+     * Method adds a pin action to the TmfView. For example, this action can be used
+     * to ignore time synchronization signals from other TmfViews. <br>
      *
-     * Uses {@link ITmfPinnable#setPinned(ITmfTrace)} to propagate the state of
-     * the action button.
+     * Uses {@link ITmfPinnable#setPinned(ITmfTrace)} to propagate the state of the
+     * action button.
      */
     protected void contributePinActionToToolBar() {
         if (fPinAction == null && this instanceof ITmfPinnable) {
@@ -166,7 +169,16 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
         if (this instanceof ITmfAllowMultiple) {
             contributeNewViewActionToLocalMenu(menuManager);
         }
-
+        IAction saveAction = fSaveAction;
+        if (saveAction == null) {
+            saveAction = createSaveAction();
+            fSaveAction = saveAction;
+        }
+        if (saveAction != null) {
+            menuManager.add(new Separator());
+            menuManager.add(saveAction);
+            menuManager.add(new Separator());
+        }
         if (this instanceof ITmfTimeAligned) {
             contributeAlignViewsActionToLocalMenu(menuManager);
 
@@ -174,9 +186,9 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
                 @Override
                 public void controlResized(ControlEvent e) {
                     /*
-                     * When switching perspective, the view can be resized just
-                     * before it is made visible. Queue the time alignment to
-                     * ensure it occurs when the parent composite is visible.
+                     * When switching perspective, the view can be resized just before it is made
+                     * visible. Queue the time alignment to ensure it occurs when the parent
+                     * composite is visible.
                      */
                     e.display.asyncExec(() -> {
                         TIME_ALIGNMENT_SYNCHRONIZER.handleViewResized(TmfView.this);
@@ -232,8 +244,18 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
     }
 
     /**
-     * Add the "New view" action to the view menu. This action spawns a new view
-     * of the same type as the caller.
+     * Get the save action
+     *
+     * @return the save action
+     * @since 3.3
+     */
+    protected @Nullable IAction createSaveAction() {
+        return null;
+    }
+
+    /**
+     * Add the "New view" action to the view menu. This action spawns a new view of
+     * the same type as the caller.
      */
     private void contributeNewViewActionToLocalMenu(IMenuManager menuManager) {
         if (!menuManager.isEmpty()) {
@@ -276,7 +298,6 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
         if (fAlignViewsAction == null) {
             fAlignViewsAction = new TimeAlignViewsAction();
         }
-
         if (!menuManager.isEmpty()) {
             menuManager.add(new Separator());
         }
