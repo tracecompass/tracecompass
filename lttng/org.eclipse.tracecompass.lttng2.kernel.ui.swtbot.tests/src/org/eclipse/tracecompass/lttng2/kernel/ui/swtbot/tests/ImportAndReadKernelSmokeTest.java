@@ -20,8 +20,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -58,6 +61,8 @@ import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * SWTBot Smoke test for LTTng Kernel UI.
  *
@@ -66,9 +71,18 @@ import org.junit.runner.RunWith;
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class ImportAndReadKernelSmokeTest extends KernelTestBase {
 
-    private static final @NonNull List<String> EXPECTED_ANALYSES = Arrays.asList("org.eclipse.tracecompass.analysis.os.linux.inputoutput", "org.eclipse.linuxtools.tmf.statistics.totals", "org.eclipse.linuxtools.tmf.statistics.types",
-            "org.eclipse.tracecompass.analysis.os.linux.kernel.tid", "org.eclipse.tracecompass.analysis.os.linux.kernel", "org.eclipse.tracecompass.analysis.os.linux.contextswitch", "org.eclipse.tracecompass.analysis.os.linux.core.kernelmemory",
-            "org.eclipse.tracecompass.analysis.os.linux.cpuusage");
+    private static final @NonNull Map<String, Set<String>> EXPECTED_ANALYSES = new HashMap<>();
+
+    static {
+        EXPECTED_ANALYSES.put("Input/Output", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.inputoutput"));
+        EXPECTED_ANALYSES.put("Tmf Statistics", ImmutableSet.of("org.eclipse.linuxtools.tmf.statistics.totals", "org.eclipse.linuxtools.tmf.statistics.types"));
+        EXPECTED_ANALYSES.put("Active Thread", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.kernel.tid"));
+        EXPECTED_ANALYSES.put("Linux Kernel", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.kernel"));
+        EXPECTED_ANALYSES.put("Context switch", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.contextswitch"));
+        EXPECTED_ANALYSES.put("Kernel memory usage", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.core.kernelmemory"));
+        EXPECTED_ANALYSES.put("CPU usage", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.cpuusage"));
+    }
+
     private ITmfEvent fDesired1;
     private ITmfEvent fDesired2;
 
@@ -78,26 +92,28 @@ public class ImportAndReadKernelSmokeTest extends KernelTestBase {
     @Test
     public void test() {
         CtfTmfTrace trace = CtfTmfTestTraceUtils.getSyntheticTrace();
-        Matcher<IEditorReference> matcher = WidgetMatcherFactory.withPartName(trace.getName());
-        IEditorPart iep = fBot.editor(matcher).getReference().getEditor(true);
-        final TmfEventsEditor tmfEd = (TmfEventsEditor) iep;
+        try {
+            Matcher<IEditorReference> matcher = WidgetMatcherFactory.withPartName(trace.getName());
+            IEditorPart iep = fBot.editor(matcher).getReference().getEditor(true);
+            final TmfEventsEditor tmfEd = (TmfEventsEditor) iep;
 
-        fDesired1 = getEvent(trace, 100);
-        fDesired2 = getEvent(trace, 10000);
+            fDesired1 = getEvent(trace, 100);
+            fDesired2 = getEvent(trace, 10000);
 
-        UIThreadRunnable.syncExec(new VoidResult() {
-            @Override
-            public void run() {
-                tmfEd.setFocus();
-                tmfEd.selectionChanged(new SelectionChangedEvent(tmfEd, new StructuredSelection(fDesired1)));
-            }
-        });
-        testHV(getViewPart("Histogram"));
-        testCFV((ControlFlowView) getViewPart("Control Flow"));
-        testRV((ResourcesView) getViewPart("Resources"));
-        testStateSystemExplorer();
-
-        trace.dispose();
+            UIThreadRunnable.syncExec(new VoidResult() {
+                @Override
+                public void run() {
+                    tmfEd.setFocus();
+                    tmfEd.selectionChanged(new SelectionChangedEvent(tmfEd, new StructuredSelection(fDesired1)));
+                }
+            });
+            testHV(getViewPart("Histogram"));
+            testCFV((ControlFlowView) getViewPart("Control Flow"));
+            testRV((ResourcesView) getViewPart("Resources"));
+            testStateSystemExplorer();
+        } finally {
+            trace.dispose();
+        }
     }
 
     private static void testCFV(ControlFlowView vp) {
@@ -176,15 +192,13 @@ public class ImportAndReadKernelSmokeTest extends KernelTestBase {
     private void testStateSystemExplorer() {
         // Set up
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        List<String> expectedAnalyses = new ArrayList<>();
-        expectedAnalyses.addAll(EXPECTED_ANALYSES);
         // Open the view
         SWTBotUtils.openView(TmfStateSystemExplorer.ID);
         SWTBotView sseBot = bot.viewByTitle("State System Explorer");
         sseBot.show();
         // get the list and compare it.
         List<String> actual = getSSNames(sseBot);
-        assertTrue("State systems are not what expected : " + EXPECTED_ANALYSES + " instead " + actual, actual.containsAll(EXPECTED_ANALYSES));
+        assertTrue("State systems are not what expected : " + EXPECTED_ANALYSES.keySet() + " instead " + actual, actual.containsAll(EXPECTED_ANALYSES.keySet()));
         // Re-open the view and make sure it has the same results
         sseBot.close();
         SWTBotUtils.openView(TmfStateSystemExplorer.ID);

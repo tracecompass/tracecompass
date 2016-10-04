@@ -208,16 +208,13 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
         for (IAnalysisModule module : modules) {
             if (module instanceof ITmfAnalysisModuleWithStateSystems) {
                 ITmfAnalysisModuleWithStateSystems moduleWithStateSystem = (ITmfAnalysisModuleWithStateSystems) module;
-                /*
-                 * Just schedule the module, the data will be filled when
-                 * available
-                 */
-                moduleWithStateSystem.schedule();
-                if (!moduleWithStateSystem.waitForInitialization()) {
-                    continue;
-                }
+                // Add the module as an entry to the trace
+                TmfTreeViewerEntry moduleEntry = new ModuleEntry(moduleWithStateSystem);
+                traceEntry.addChild(moduleEntry);
+                // Add the state system as children of the module, they may not
+                // be initialized yet, the list will be empty in that case
                 for (ITmfStateSystem ss : moduleWithStateSystem.getStateSystems()) {
-                    traceEntry.addChild(new StateSystemEntry(ss));
+                    moduleEntry.addChild(new StateSystemEntry(ss));
                 }
             }
         }
@@ -235,17 +232,26 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
     private boolean updateStateSystemEntries(ITmfTreeViewerEntry root, long timestamp) {
         boolean changed = false;
         for (ITmfTreeViewerEntry traceEntry : root.getChildren()) {
-            for (ITmfTreeViewerEntry ssEntry : traceEntry.getChildren()) {
-                StateSystemEntry stateSystemEntry = (StateSystemEntry) ssEntry;
-                ITmfStateSystem ss = stateSystemEntry.getSS();
-                try {
-                    List<ITmfStateInterval> fullState = ss.queryFullState(timestamp);
-                    changed |= updateStateEntries(ss, fullState, stateSystemEntry, -1, timestamp);
-                } catch (TimeRangeException e) {
-                    markOutOfRange(stateSystemEntry);
-                    changed = true;
-                } catch (StateSystemDisposedException e) {
-                    /* Ignored */
+            for (ITmfTreeViewerEntry moduleEntry : traceEntry.getChildren()) {
+                // If there are no children, see if new state systems are
+                // available now
+                if (moduleEntry.getChildren().isEmpty()) {
+                    for (ITmfStateSystem ss : ((ModuleEntry) moduleEntry).getModule().getStateSystems()) {
+                        ((ModuleEntry) moduleEntry).addChild(new StateSystemEntry(ss));
+                    }
+                }
+                for (ITmfTreeViewerEntry ssEntry : moduleEntry.getChildren()) {
+                    StateSystemEntry stateSystemEntry = (StateSystemEntry) ssEntry;
+                    ITmfStateSystem ss = stateSystemEntry.getSS();
+                    try {
+                        List<ITmfStateInterval> fullState = ss.queryFullState(timestamp);
+                        changed |= updateStateEntries(ss, fullState, stateSystemEntry, -1, timestamp);
+                    } catch (TimeRangeException e) {
+                        markOutOfRange(stateSystemEntry);
+                        changed = true;
+                    } catch (StateSystemDisposedException e) {
+                        /* Ignored */
+                    }
                 }
             }
         }
@@ -357,6 +363,19 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
 
         public @NonNull ITmfStateSystem getSS() {
             return fSS;
+        }
+    }
+
+    private static class ModuleEntry extends TmfTreeViewerEntry {
+        private final @NonNull ITmfAnalysisModuleWithStateSystems fModule;
+
+        public ModuleEntry(@NonNull ITmfAnalysisModuleWithStateSystems moduleWithStateSystem) {
+            super(moduleWithStateSystem.getName());
+            fModule = moduleWithStateSystem;
+        }
+
+        public @NonNull ITmfAnalysisModuleWithStateSystems getModule() {
+            return fModule;
         }
     }
 
