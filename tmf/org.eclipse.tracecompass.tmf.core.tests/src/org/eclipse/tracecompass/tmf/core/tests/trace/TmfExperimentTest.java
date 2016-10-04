@@ -25,20 +25,27 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.component.TmfProviderManager;
+import org.eclipse.tracecompass.internal.tmf.core.synchronization.SyncAlgorithmFullyIncremental;
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentContext;
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentLocation;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
+import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationAlgorithm;
+import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.tests.analysis.AnalysisManagerTest;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
@@ -53,9 +60,12 @@ import org.eclipse.tracecompass.tmf.core.trace.location.TmfLongLocation;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestExperimentAnalysis;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfExperimentStub;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
+import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Test suite for the TmfExperiment class (single trace).
@@ -994,6 +1004,136 @@ public class TmfExperimentTest {
         assertEquals("nbEvents",  limit, requestedEvents.size());
         assertTrue("isCompleted", request.isCompleted());
         assertTrue("isCancelled", request.isCancelled());
+    }
+
+    private static abstract class TestTrace extends TmfXmlTraceStub implements ITmfPropertiesProvider {
+
+    }
+
+    /**
+     * Tests that experiment with traces from the same host and a clock offset
+     * are well synchronized
+     */
+    @Test
+    public void testWithSingleHostClockOffset() {
+        // Data for this specific test
+        String hostId = "Test Host 1";
+        long minOffset = 2000;
+        long offset = 1000;
+        String clockOffset = "clock_offset";
+
+        ITmfTrace t1 = new TestTrace() {
+            @Override
+            public @NonNull String getHostId() {
+                return hostId;
+            }
+            @Override
+            public @NonNull Map<@NonNull String, @NonNull String> getProperties() {
+                return ImmutableMap.of(clockOffset, String.valueOf(minOffset));
+            }
+        };
+
+        ITmfTrace t2 = new TestTrace() {
+            @Override
+            public @NonNull String getHostId() {
+                return hostId;
+            }
+            @Override
+            public @NonNull Map<@NonNull String, @NonNull String> getProperties() {
+                return ImmutableMap.of(clockOffset, String.valueOf(minOffset + offset));
+            }
+        };
+
+        TmfExperiment exp = new TmfExperimentStub(EXPERIMENT, new ITmfTrace[] { t1, t2 }, BLOCK_SIZE);
+
+        try {
+            assertEquals(TimestampTransformFactory.createWithOffset(offset / 2), t1.getTimestampTransform());
+            assertEquals(TimestampTransformFactory.createWithOffset(-offset / 2), t2.getTimestampTransform());
+
+        } finally {
+            exp.dispose();
+        }
+    }
+
+    /**
+     * Tests that opening an experiment whose traces already have a
+     * synchronization formula will not eliminate that formula. This test makes
+     * the supposition that the experiment was synchronized and the
+     * synchronization added the clock offset correction to the total formula.
+     */
+    @Test
+    public void testWithMultiHostClockOffset() {
+        // Data for this specific test
+        String hostId = "Test Host 1";
+        String hostId2 = "Test Host 2";
+        long minOffset = 2000;
+        long offset = 1000;
+        String clockOffset = "clock_offset";
+
+        ITmfTimestampTransform tt1 = TimestampTransformFactory.createLinear(2.0, offset / 2);
+        ITmfTimestampTransform tt2 = TimestampTransformFactory.createLinear(2.0, -offset / 2);
+        ITmfTimestampTransform tt3 = TimestampTransformFactory.createWithOffset(offset);
+
+        ITmfTrace t1 = new TestTrace() {
+            @Override
+            public @NonNull String getHostId() {
+                return hostId;
+            }
+            @Override
+            public @NonNull Map<@NonNull String, @NonNull String> getProperties() {
+                return ImmutableMap.of(clockOffset, String.valueOf(minOffset));
+            }
+
+        };
+        t1.setTimestampTransform(tt1);
+
+        ITmfTrace t2 = new TestTrace() {
+            @Override
+            public @NonNull String getHostId() {
+                return hostId;
+            }
+            @Override
+            public @NonNull Map<@NonNull String, @NonNull String> getProperties() {
+                return ImmutableMap.of(clockOffset, String.valueOf(minOffset + offset));
+            }
+        };
+        t2.setTimestampTransform(tt2);
+
+        ITmfTrace t3 = new TmfXmlTraceStub() {
+            @Override
+            public @NonNull String getHostId() {
+                return hostId2;
+            }
+        };
+        t3.setTimestampTransform(tt3);
+
+        TmfExperiment exp = new TmfExperimentStub(EXPERIMENT, new ITmfTrace[] { t1, t2, t3 }, BLOCK_SIZE) {
+
+            @Override
+            public SynchronizationAlgorithm synchronizeTraces() {
+                return new SyncAlgorithmFullyIncremental() {
+
+                    private static final long serialVersionUID = 4206172498287480153L;
+
+                    @Override
+                    public ITmfTimestampTransform getTimestampTransform(String h) {
+                        if (hostId.equals(h)) {
+                            return TimestampTransformFactory.createLinear(2.0, 0);
+                        }
+                        return tt3;
+                    }
+                };
+            }
+        };
+
+        try {
+            assertEquals(tt1, t1.getTimestampTransform());
+            assertEquals(tt2, t2.getTimestampTransform());
+            assertEquals(tt3, t3.getTimestampTransform());
+
+        } finally {
+            exp.dispose();
+        }
     }
 
 }

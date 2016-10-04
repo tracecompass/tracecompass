@@ -18,12 +18,18 @@
 
 package org.eclipse.tracecompass.tmf.core.trace.experiment;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.File;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -34,19 +40,23 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfTimestampTransform;
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentContext;
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentLocation;
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfLocationArray;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSynchronizedSignal;
+import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationAlgorithm;
 import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationManager;
+import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -58,6 +68,9 @@ import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfPersistentlyIndexable
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.TmfBTreeTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * TmfExperiment presents a time-ordered, unified view of a set of ITmfTrace:s
@@ -95,6 +108,16 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
      * The default index page size
      */
     public static final int DEFAULT_INDEX_PAGE_SIZE = 5000;
+
+    /**
+     * Property name for traces defining a clock offset.
+     */
+    private static final String CLOCK_OFFSET_PROPERTY = "clock_offset"; //$NON-NLS-1$
+
+    /**
+     * If the automatic clock offset is higher than this value, emit a warning.
+     */
+    private static final long CLOCK_OFFSET_THRESHOLD_NS = 500000;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -208,11 +231,14 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
         setCacheSize(indexPageSize);
         setStreamingInterval(0);
 
+        Multimap<String, ITmfTrace> tracesPerHost = HashMultimap.create();
+
         // traces have to be set before super.initialize()
         if (traces != null) {
             // initialize
             for (ITmfTrace trace : traces) {
                 if (trace != null) {
+                    tracesPerHost.put(trace.getHostId(), trace);
                     addChild(trace);
                 }
             }
@@ -225,7 +251,81 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
         }
 
         if (resource != null) {
-            this.synchronizeTraces();
+            synchronizeTraces();
+        }
+
+        /*
+         * For all traces on the same host, if two or more specify different
+         * clock offsets, adjust their clock offset by the average of all of them.
+         *
+         * See https://bugs.eclipse.org/bugs/show_bug.cgi?id=484620
+         */
+        Function<ITmfPropertiesProvider, @Nullable Long> offsetGetter = trace -> {
+            String offset = trace.getProperties().get(CLOCK_OFFSET_PROPERTY);
+            if (offset == null) {
+                return null;
+            }
+            try {
+                return Long.parseLong(offset);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        };
+
+        for (String host : tracesPerHost.keySet()) {
+            /*
+             * Only attempt to synchronize traces that provide a clock_offset
+             * property.
+             */
+            Collection<ITmfPropertiesProvider> tracesToSynchronize = tracesPerHost.get(host).stream()
+                    .filter(trace -> trace instanceof ITmfPropertiesProvider)
+                    .map(trace -> (ITmfPropertiesProvider) trace)
+                    .filter(trace -> offsetGetter.apply(trace) != null)
+                    .collect(Collectors.toList());
+
+            if (tracesToSynchronize.size() < 2) {
+                continue;
+            }
+
+            /* Only synchronize traces if they haven't previously been synchronized */
+            if (tracesToSynchronize.stream()
+                    .map(trace -> ((ITmfTrace) trace).getTimestampTransform())
+                    .anyMatch(transform -> !transform.equals(TmfTimestampTransform.IDENTITY))) {
+                continue;
+            }
+
+            /* Calculate the average of all clock offsets */
+            BigInteger sum = BigInteger.ZERO;
+            for (ITmfPropertiesProvider trace : tracesToSynchronize) {
+                long offset = checkNotNull(offsetGetter.apply(trace));
+                sum = sum.add(BigInteger.valueOf(offset));
+            }
+            long average = sum.divide(BigInteger.valueOf(tracesToSynchronize.size())).longValue();
+
+            if (average > CLOCK_OFFSET_THRESHOLD_NS) {
+                Activator.logWarning("Average clock correction (" + average + ") is higher than threshold of " + //$NON-NLS-1$ //$NON-NLS-2$
+                        CLOCK_OFFSET_THRESHOLD_NS + " ns for experiment " + this.toString()); //$NON-NLS-1$
+            }
+
+            /*
+             * Apply the offset correction to all identified traces, but only if
+             * they do not already have an equivalent one (for example, closing
+             * and re-opening the same experiment should not retrigger building
+             * all supplementary files).
+             */
+            tracesToSynchronize.forEach(t -> {
+                long offset = checkNotNull(offsetGetter.apply(t));
+                long delta = average - offset;
+
+                ITmfTrace trace = (ITmfTrace) t;
+                ITmfTimestampTransform currentTransform = trace.getTimestampTransform();
+                ITmfTimestampTransform newTransform = TimestampTransformFactory.createWithOffset(delta);
+
+                if (!newTransform.equals(currentTransform)) {
+                    TmfTraceManager.deleteSupplementaryFiles(trace);
+                    trace.setTimestampTransform(newTransform);
+                }
+            });
         }
     }
 

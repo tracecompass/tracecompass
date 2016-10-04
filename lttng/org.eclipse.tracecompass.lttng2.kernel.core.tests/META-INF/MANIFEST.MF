@@ -38,4 +38,4 @@ Export-Package: org.eclipse.tracecompass.lttng2.kernel.core.tests,
  org.eclipse.tracecompass.lttng2.lttng.kernel.core.tests.shared.vm
 Import-Package: com.google.common.collect,
  org.eclipse.test.performance,
- org.eclipse.tracecompass.testtraces.ctf
+ org.eclipse.tracecompass.testtraces.ctf;version="1.6.0"
