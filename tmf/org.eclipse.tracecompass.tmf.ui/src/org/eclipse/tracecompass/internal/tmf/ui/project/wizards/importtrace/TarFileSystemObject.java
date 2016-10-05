@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.URIUtil;
@@ -26,10 +27,10 @@ import org.eclipse.core.runtime.URIUtil;
  */
 class TarFileSystemObject implements IFileSystemObject {
 
-    private TarEntry fFileSystemObject;
+    private TarArchiveEntry fFileSystemObject;
     private String fArchivePath;
 
-    TarFileSystemObject(TarEntry fileSystemObject, String archivePath) {
+    TarFileSystemObject(TarArchiveEntry fileSystemObject, String archivePath) {
         fFileSystemObject = fileSystemObject;
         fArchivePath = archivePath;
     }
@@ -71,6 +72,6 @@ class TarFileSystemObject implements IFileSystemObject {
 
     @Override
     public boolean isDirectory() {
-        return fFileSystemObject.getFileType() == TarEntry.DIRECTORY;
+        return fFileSystemObject.isDirectory();
     }
 }

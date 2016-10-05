@@ -7,11 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Red Hat, Inc - Was TarFileStructureProvider, performed changes from
+ *     Red Hat, Inc - Was ZipFileStructureProvider, performed changes from
  *     IImportStructureProvider to ILeveledImportStructureProvider
  *     Mickael Istria (Red Hat Inc.) - Bug 486901
- *     Marc-Andre Laperle <marc-andre.laperle@ericsson.com> - Copied to Trace Compass to work around bug 501379
- *     Marc-Andre Laperle <marc-andre.laperle@ericsson.com> - Adapted to use Apache Common Compress
+ *     Marc-Andre Laperle <marc-andre.laperle@ericsson.com> - Copied to Trace
+ *     Compass to use Apache Common Compress and fix bug 501664
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace;
 
@@ -23,10 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.eclipse.core.resources.ResourceAttributes;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.wizards.datatransfer.DataTransferMessages;
@@ -34,72 +35,77 @@ import org.eclipse.ui.internal.wizards.datatransfer.ILeveledImportStructureProvi
 
 /**
  * This class provides information regarding the context structure and content
- * of specified tar file entry objects.
+ * of specified zip file entry objects.
+ *
+ * This structure provider also makes sure to return safe paths. For example,
+ * if a Zip entry contains a ':' and is extracted on Windows, it will be changed
+ * to a '_'
  */
 @SuppressWarnings("restriction")
-public class TarLeveledStructureProvider implements
+public class ZipLeveledStructureProvider implements
         ILeveledImportStructureProvider {
-    private TarFile tarFile;
+    private ZipFile zipFile;
 
-    private TarArchiveEntry root = new TarArchiveEntry("/", true);//$NON-NLS-1$
+    private ZipArchiveEntry root = new ZipArchiveEntry("/");//$NON-NLS-1$
 
-    private Map<TarArchiveEntry, List<TarArchiveEntry>> children;
+    private Map<ZipArchiveEntry, List<ZipArchiveEntry>> children;
 
-    private Map<IPath, TarArchiveEntry> directoryEntryCache = new HashMap<>();
+    private Map<IPath, ZipArchiveEntry> directoryEntryCache = new HashMap<>();
 
     private int stripLevel;
 
     /**
-     * Creates a <code>TarFileStructureProvider</code>, which will operate on
-     * the passed tar file.
+     * Creates a <code>ZipFileStructureProvider</code>, which will operate on
+     * the passed zip file.
      *
      * @param sourceFile
-     *            the source TarFile
+     *            The source file to create the ZipLeveledStructureProvider
+     *            around
      */
-    public TarLeveledStructureProvider(TarFile sourceFile) {
+    public ZipLeveledStructureProvider(ZipFile sourceFile) {
         super();
-        tarFile = sourceFile;
+        zipFile = sourceFile;
+        stripLevel = 0;
     }
 
     /**
-     * Creates a new container tar entry with the specified name, iff it has
+     * Creates a new container zip entry with the specified name, iff it has
      * not already been created. If the parent of the given element does not
      * already exist it will be recursively created as well.
-     * @param pathName The path representing the container
+     * @param pathname The path representing the container
      * @return The element represented by this pathname (it may have already existed)
      */
-    protected TarArchiveEntry createContainer(IPath pathName) {
-        IPath newPathName = pathName;
-        TarArchiveEntry existingEntry = directoryEntryCache.get(newPathName);
+    protected ZipArchiveEntry createContainer(IPath pathname) {
+        ZipArchiveEntry existingEntry = directoryEntryCache.get(pathname);
         if (existingEntry != null) {
             return existingEntry;
         }
 
-        TarArchiveEntry parent;
-        if (newPathName.segmentCount() == 1) {
+        ZipArchiveEntry parent;
+        if (pathname.segmentCount() == 0) {
+            return null;
+        } else if (pathname.segmentCount() == 1) {
             parent = root;
         } else {
-            parent = createContainer(newPathName.removeLastSegments(1));
+            parent = createContainer(pathname.removeLastSegments(1));
         }
-        // Add trailing / so that the entry knows it's a folder
-        newPathName = newPathName.addTrailingSeparator();
-        TarArchiveEntry newEntry = new TarArchiveEntry(newPathName.toString());
-        directoryEntryCache.put(newPathName, newEntry);
-        List<TarArchiveEntry> childList = new ArrayList<>();
+        ZipArchiveEntry newEntry = new ZipArchiveEntry(pathname.toString());
+        directoryEntryCache.put(pathname, newEntry);
+        List<ZipArchiveEntry> childList = new ArrayList<>();
         children.put(newEntry, childList);
 
-        List<TarArchiveEntry> parentChildList = children.get(parent);
+        List<ZipArchiveEntry> parentChildList = children.get(parent);
         NonNullUtils.checkNotNull(parentChildList).add(newEntry);
         return newEntry;
     }
 
     /**
-     * Creates a new tar file entry with the specified name.
+     * Creates a new file zip entry with the specified name.
      * @param entry the entry to create the file for
      */
-    protected void createFile(TarArchiveEntry entry) {
+    protected void createFile(ZipArchiveEntry entry) {
         IPath pathname = new Path(entry.getName());
-        TarArchiveEntry parent;
+        ZipArchiveEntry parent;
         if (pathname.segmentCount() == 1) {
             parent = root;
         } else {
@@ -107,7 +113,7 @@ public class TarLeveledStructureProvider implements
                     .removeLastSegments(1));
         }
 
-        List<TarArchiveEntry> childList = children.get(parent);
+        @Nullable List<ZipArchiveEntry> childList = children.get(parent);
         NonNullUtils.checkNotNull(childList).add(entry);
     }
 
@@ -123,47 +129,56 @@ public class TarLeveledStructureProvider implements
     @Override
     public InputStream getContents(Object element) {
         try {
-            return tarFile.getInputStream((TarArchiveEntry) element);
+            return zipFile.getInputStream((ZipArchiveEntry) element);
         } catch (IOException e) {
             IDEWorkbenchPlugin.log(e.getLocalizedMessage(), e);
             return null;
         }
     }
 
-    /**
-     * Returns the resource attributes for this file.
-     *
-     * @param element the element to get the attributes from
-     * @return the attributes of the file
+    /*
+     * Strip the leading directories from the path
      */
-    public ResourceAttributes getResourceAttributes(Object element) {
-        ResourceAttributes attributes = new ResourceAttributes();
-        TarArchiveEntry entry = (TarArchiveEntry) element;
-        attributes.setExecutable((entry.getMode() & 0100) != 0);
-        attributes.setReadOnly((entry.getMode() & 0200) == 0);
-        return attributes;
+    private String stripPath(String path) {
+        String strippedPath = path;
+        String pathOrig = strippedPath;
+        for (int i = 0; i < stripLevel; i++) {
+            int firstSep = strippedPath.indexOf('/');
+            // If the first character was a separator we must strip to the next
+            // separator as well
+            if (firstSep == 0) {
+                strippedPath = strippedPath.substring(1);
+                firstSep = strippedPath.indexOf('/');
+            }
+            // No separator was present so we're in a higher directory right
+            // now
+            if (firstSep == -1) {
+                return pathOrig;
+            }
+            strippedPath = strippedPath.substring(firstSep);
+        }
+        return strippedPath;
     }
 
     @Override
     public String getFullPath(Object element) {
-        String name = stripPath(((TarArchiveEntry) element).getName());
+        String name = ((ZipArchiveEntry) element).getName();
         return ArchiveUtil.toValidNamesPath(name).toOSString();
     }
 
     @Override
     public String getLabel(Object element) {
-        if (element.equals(root)) {
-            return ((TarArchiveEntry) element).getName();
+        if (element.equals(getRoot())) {
+            return ((ZipArchiveEntry) element).getName();
         }
-
-        String name = ((TarArchiveEntry) element).getName();
+        String name = ((ZipArchiveEntry) element).getName();
         return stripPath(ArchiveUtil.toValidNamesPath(name).lastSegment());
     }
 
     /**
      * Returns the entry that this importer uses as the root sentinel.
      *
-     * @return TarArchiveEntry entry
+     * @return ZipArchiveEntry
      */
     @Override
     public Object getRoot() {
@@ -171,21 +186,22 @@ public class TarLeveledStructureProvider implements
     }
 
     /**
-     * Returns the tar file that this provider provides structure for.
+     * Returns the zip file that this provider provides structure for.
      *
-     * @return TarFile file
+     * @return The zip file
      */
-    public TarFile getTarFile() {
-        return tarFile;
+    public ZipFile getZipFile() {
+        return zipFile;
     }
+
 
     @Override
     public boolean closeArchive(){
         try {
-            getTarFile().close();
+            getZipFile().close();
         } catch (IOException e) {
             IDEWorkbenchPlugin.log(DataTransferMessages.ZipImport_couldNotClose
-                    + getTarFile().getName(), e);
+                    + getZipFile(), e);
             return false;
         }
         return true;
@@ -199,9 +215,9 @@ public class TarLeveledStructureProvider implements
         children = new HashMap<>(1000);
 
         children.put(root, new ArrayList<>());
-        Enumeration<TarArchiveEntry> entries = tarFile.entries();
+        Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
         while (entries.hasMoreElements()) {
-            TarArchiveEntry entry = entries.nextElement();
+            ZipArchiveEntry entry = entries.nextElement();
             IPath path = new Path(entry.getName()).addTrailingSeparator();
 
             if (entry.isDirectory()) {
@@ -221,31 +237,7 @@ public class TarLeveledStructureProvider implements
 
     @Override
     public boolean isFolder(Object element) {
-        return (((TarArchiveEntry) element).isDirectory());
-    }
-
-    /*
-     * Strip the leading directories from the path
-     */
-    private String stripPath(String path) {
-        String strippedPath = path;
-        String pathOrig = strippedPath;
-        for (int i = 0; i < stripLevel; i++) {
-            int firstSep = strippedPath.indexOf('/');
-            // If the first character was a seperator we must strip to the next
-            // seperator as well
-            if (firstSep == 0) {
-                strippedPath = strippedPath.substring(1);
-                firstSep = strippedPath.indexOf('/');
-            }
-            // No seperator wasw present so we're in a higher directory right
-            // now
-            if (firstSep == -1) {
-                return pathOrig;
-            }
-            strippedPath = strippedPath.substring(firstSep);
-        }
-        return strippedPath;
+        return ((ZipArchiveEntry) element).isDirectory();
     }
 
     @Override

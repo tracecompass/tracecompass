@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -133,6 +134,51 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
         fSelectedFileSystemElements = traceFileSystemElements;
     }
 
+    /**
+     * This orders by files first then the folders. Then by lexical order.
+     * This comparator handles full paths.
+     * Example of ordering:
+     *
+     * /trace.txt
+     * /folderA/trace.txt
+     * /folderA/folderB/trace.txt
+     * /folderZ/trace.txt
+     */
+    private final class FileObjectPathComparator implements Comparator<TraceFileSystemElement> {
+        @Override
+        public int compare(TraceFileSystemElement e1, TraceFileSystemElement e2) {
+            IFileSystemObject o1 = e1.getFileSystemObject();
+            IFileSystemObject o2 = e2.getFileSystemObject();
+            IPath p1 = new Path(e1.getProvider().getFullPath(o1));
+            IPath p2 = new Path(e2.getProvider().getFullPath(o2));
+            int segmentCount1 = p1.segmentCount();
+            int segmentCount2 = p2.segmentCount();
+
+            int commonParentSegmentCount = Math.min(segmentCount1, segmentCount2) - 1;
+            // Compare parents that are common (in terms of segment number).
+            // If one of them is different, we do not need to worry about any
+            // children, we already know in which order they are going to be.
+            for (int i = 0; i < commonParentSegmentCount; i++) {
+                int compare = p1.segment(i).compareToIgnoreCase(p2.segment(i));
+                if (compare != 0) {
+                    return compare;
+                }
+            }
+
+            // At this point, we know all the common parent folders are the same.
+            // Either:
+            // - One of them is shorter which means it should be processed first because files are processed before sub-folders.
+            // or
+            // - They are the same level so only the name matters.
+            if (segmentCount1 != segmentCount2) {
+                return Integer.compare(segmentCount1, segmentCount2);
+            }
+
+            //
+            return o1.getName().compareToIgnoreCase(o2.getName());
+        }
+    }
+
     @Override
     protected void execute(IProgressMonitor progressMonitor) throws CoreException, InvocationTargetException, InterruptedException {
         try {
@@ -246,6 +292,10 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
     private void importFileSystemElements(IProgressMonitor monitor, List<TraceFileSystemElement> fileSystemElements)
             throws InterruptedException, TmfTraceImportException, CoreException, InvocationTargetException {
         SubMonitor subMonitor = SubMonitor.convert(monitor, fileSystemElements.size());
+        // Sort the elements in a sensible order to make it more predictable to
+        // the user when there can be name clashes. Otherwise, the order can
+        // seem pretty random depending on the OS/Filesystem.
+        fileSystemElements.sort(new FileObjectPathComparator());
 
         ListIterator<TraceFileSystemElement> fileSystemElementsIter = fileSystemElements.listIterator();
 

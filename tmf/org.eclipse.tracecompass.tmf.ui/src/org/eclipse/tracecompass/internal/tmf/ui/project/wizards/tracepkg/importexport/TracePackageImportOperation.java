@@ -42,7 +42,6 @@ import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
-import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.TarException;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.AbstractTracePackageOperation;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageBookmarkElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageElement;
@@ -107,8 +106,6 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
                 inputStream = ((ArchiveProviderElement) element).getContents();
             } catch (IOException e) {
                 fException = e;
-            } catch (TarException e) {
-                fException = e;
             }
             return inputStream;
         }
@@ -148,7 +145,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
             this.fEntry = entry;
         }
 
-        public InputStream getContents() throws TarException, IOException {
+        public InputStream getContents() throws IOException {
             return fArchiveFile.getInputStream(fEntry);
         }
 

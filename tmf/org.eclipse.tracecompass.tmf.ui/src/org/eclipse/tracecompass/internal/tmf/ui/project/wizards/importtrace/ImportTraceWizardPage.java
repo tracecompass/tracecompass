@@ -943,7 +943,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             return false;
         }
 
-        if (!isImportFromDirectory() && !ArchiveUtil.ensureTarSourceIsValid(source.getAbsolutePath()) && !ArchiveUtil.ensureZipSourceIsValid(source.getAbsolutePath(), getContainer().getShell())
+        if (!isImportFromDirectory() && !ArchiveUtil.ensureTarSourceIsValid(source.getAbsolutePath()) && !ArchiveUtil.ensureZipSourceIsValid(source.getAbsolutePath())
                 && !ArchiveUtil.ensureGzipSourceIsValid(source.getAbsolutePath())) {
             setMessage(null);
             setErrorMessage(Messages.ImportTraceWizard_BadArchiveFormat);

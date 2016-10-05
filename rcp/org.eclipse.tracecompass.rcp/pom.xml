@@ -36,6 +36,7 @@
             </goals>
             <configuration>
               <excludes>
+                <plugin id="org.apache.commons.compress"/>
                 <plugin id="org.apache.xerces"/>
                 <plugin id="org.apache.xml.resolver"/>
                 <plugin id="org.apache.xml.serializer"/>
