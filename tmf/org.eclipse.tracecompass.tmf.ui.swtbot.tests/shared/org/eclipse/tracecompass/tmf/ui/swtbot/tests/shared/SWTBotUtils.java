@@ -247,7 +247,6 @@ public final class SWTBotUtils {
         });
     }
 
-
     /**
      * Focus on the main window
      *
@@ -316,7 +315,8 @@ public final class SWTBotUtils {
      * Close a view with an id
      *
      * @param viewId
-     *            the view id, like "org.eclipse.linuxtools.tmf.ui.views.histogram"
+     *            the view id, like
+     *            "org.eclipse.linuxtools.tmf.ui.views.histogram"
      * @param bot
      *            the workbench bot
      */
@@ -364,7 +364,8 @@ public final class SWTBotUtils {
             printEnvironment();
 
             // There seems to be problems on some system where the main shell is
-            // not in focus initially. This was seen using Xvfb and Xephyr on some occasions.
+            // not in focus initially. This was seen using Xvfb and Xephyr on
+            // some occasions.
             focusMainWindow(bot.shells());
 
             Shell shell = bot.activeShell().widget;
@@ -381,7 +382,8 @@ public final class SWTBotUtils {
             return;
         }
 
-        // Print some information about the environment that could affect test outcome
+        // Print some information about the environment that could affect test
+        // outcome
         Rectangle bounds = Display.getDefault().getBounds();
         System.out.println("Display size: " + bounds.width + "x" + bounds.height);
 
@@ -392,7 +394,8 @@ public final class SWTBotUtils {
         String gtkVersion = System.getProperty("org.eclipse.swt.internal.gtk.version");
         if (gtkVersion != null) {
             System.out.println("GTK version=" + gtkVersion);
-            // Try to print the GTK theme information as behavior can change depending on the theme
+            // Try to print the GTK theme information as behavior can change
+            // depending on the theme
             String gtkTheme = System.getProperty("org.eclipse.swt.internal.gtk.theme");
             System.out.println("GTK theme=" + (gtkTheme == null ? "unknown" : gtkTheme));
 
@@ -734,7 +737,8 @@ public final class SWTBotUtils {
      * @param bot
      *            a given workbench bot
      * @param projectName
-     *            the name of the project (it needs to exist or else it would time out)
+     *            the name of the project (it needs to exist or else it would
+     *            time out)
      * @return a {@link SWTBotTreeItem} of the project
      */
     public static SWTBotTreeItem selectProject(SWTWorkbenchBot bot, String projectName) {
@@ -885,7 +889,8 @@ public final class SWTBotUtils {
             try {
                 bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(nodeName, currentNode));
             } catch (TimeoutException e) {
-                //FIXME: Sometimes in a JFace TreeViewer, it expands to nothing. Need to find out why.
+                // FIXME: Sometimes in a JFace TreeViewer, it expands to
+                // nothing. Need to find out why.
                 currentNode.collapse();
                 currentNode.expand();
                 bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(nodeName, currentNode));

@@ -12,15 +12,24 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests.latency;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
@@ -42,6 +51,8 @@ import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.Abst
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyView;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
@@ -295,9 +306,12 @@ public class SystemCallLatencyTableAnalysisTest {
      *
      * @throws NoSuchMethodException
      *             Error creating the tsv
+     * @throws IOException
+     *             no such file or the file is locked.
      */
     @Test
-    public void testWriteToTsv() throws NoSuchMethodException {
+    public void testWriteToTsv() throws NoSuchMethodException, IOException {
+
         List<@NonNull BasicSegment> fixture = new ArrayList<>();
         for (int i = 1; i <= 20; i++) {
             int start = i;
@@ -312,13 +326,26 @@ public class SystemCallLatencyTableAnalysisTest {
         bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1", 0, 2));
         SWTWorkbenchBot swtWorkbenchBot = new SWTWorkbenchBot();
         SWTBotView viewBot = swtWorkbenchBot.viewById(VIEW_ID);
-        testToTsv(viewBot);
+        List<String> actionResult = Arrays.asList(testToTsv(viewBot));
+        String absolutePath = TmfTraceManager.getTemporaryDirPath() + File.separator + "syscallLatencyTest.testWriteToTsv.tsv";
+        TmfFileDialogFactory.setOverrideFiles(absolutePath);
         SWTBotMenu menuBot = viewBot.viewMenu().menu("Export to TSV");
-        assertTrue(menuBot.isEnabled());
-        assertTrue(menuBot.isVisible());
+        try {
+            assertTrue(menuBot.isEnabled());
+            assertTrue(menuBot.isVisible());
+            menuBot.click();
+
+            try (BufferedReader br = new BufferedReader(new FileReader(absolutePath))) {
+                List<String> lines = br.lines().collect(Collectors.toList());
+                assertEquals("Both reads", actionResult, lines);
+            }
+        } finally {
+            new File(absolutePath).delete();
+        }
+
     }
 
-    private void testToTsv(SWTBotView view) throws NoSuchMethodException {
+    private String[] testToTsv(SWTBotView view) throws NoSuchMethodException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         assertNotNull(os);
         Class<@NonNull AbstractSegmentStoreTableView> clazz = AbstractSegmentStoreTableView.class;
@@ -338,8 +365,10 @@ public class SystemCallLatencyTableAnalysisTest {
         assertNotNull(lines);
         assertEquals("number of lines", 21, lines.length);
         assertEquals("header", "Start Time\tEnd Time\tDuration", lines[0]);
-        // not a straight up string compare due to time zones. Kathmandu and Eucla have 15 minute time zones.
+        // not a straight up string compare due to time zones. Kathmandu and
+        // Eucla have 15 minute time zones.
         assertTrue("line 1", lines[1].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s001\\t\\d\\d:\\d\\d:00.000 000 002\\t1"));
+        return lines;
     }
 
     /**
