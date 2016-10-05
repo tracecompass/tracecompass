@@ -15,8 +15,8 @@ package org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.zip.ZipEntry;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.URIUtil;
@@ -26,10 +26,10 @@ import org.eclipse.core.runtime.URIUtil;
  */
 class ZipFileSystemObject implements IFileSystemObject {
 
-    private ZipEntry fFileSystemObject;
+    private ZipArchiveEntry fFileSystemObject;
     private String fArchivePath;
 
-    ZipFileSystemObject(ZipEntry fileSystemObject, String archivePath) {
+    ZipFileSystemObject(ZipArchiveEntry fileSystemObject, String archivePath) {
         fFileSystemObject = fileSystemObject;
         fArchivePath = archivePath;
     }

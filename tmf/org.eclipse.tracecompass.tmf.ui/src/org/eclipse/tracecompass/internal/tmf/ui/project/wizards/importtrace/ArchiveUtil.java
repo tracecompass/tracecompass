@@ -14,22 +14,19 @@ package org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
 
+import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceCoreUtils;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
-import org.eclipse.ui.internal.wizards.datatransfer.ArchiveFileManipulations;
 import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
 
 /**
  * Various utilities for dealing with archives in the context of importing
  * traces.
  */
-@SuppressWarnings({"restriction" })
 public class ArchiveUtil {
 
     /**
@@ -42,7 +39,21 @@ public class ArchiveUtil {
      */
     public static boolean isArchiveFile(File sourceFile) {
         String absolutePath = sourceFile.getAbsolutePath();
-        return isTarFile(absolutePath) || ArchiveFileManipulations.isZipFile(absolutePath) || isGzipFile(absolutePath);
+        return isTarFile(absolutePath) || isZipFile(absolutePath) || isGzipFile(absolutePath);
+    }
+
+    private static boolean isZipFile(String fileName) {
+        ZipFile specifiedZipSourceFile = getSpecifiedZipSourceFile(fileName);
+        if (specifiedZipSourceFile != null) {
+            try {
+                specifiedZipSourceFile.close();
+                return true;
+            } catch (IOException e) {
+                // ignore
+            }
+        }
+
+        return false;
     }
 
     private static boolean isTarFile(String fileName) {
@@ -73,10 +84,13 @@ public class ArchiveUtil {
             return null;
         }
 
+        File file = new File(fileName);
+        if (file.isDirectory()) {
+            return null;
+        }
+
         try {
-            return new ZipFile(fileName);
-        } catch (ZipException e) {
-            // ignore
+            return new ZipFile(file);
         } catch (IOException e) {
             // ignore
         }
@@ -96,20 +110,29 @@ public class ArchiveUtil {
 
         try {
             return new TarFile(fileName);
-        } catch (TarException | IOException e) {
+        } catch (IOException e) {
             // ignore
         }
 
         return null;
     }
 
-    @SuppressWarnings("resource")
-    static boolean ensureZipSourceIsValid(String archivePath, Shell shell) {
+    static boolean ensureZipSourceIsValid(String archivePath) {
         ZipFile specifiedFile = getSpecifiedZipSourceFile(archivePath);
         if (specifiedFile == null) {
             return false;
         }
-        return ArchiveFileManipulations.closeZipFile(specifiedFile, shell);
+        return closeZipFile(specifiedFile);
+    }
+
+    static boolean closeZipFile(ZipFile file) {
+        try {
+            file.close();
+        } catch (IOException e) {
+            return false;
+        }
+
+        return true;
     }
 
     static boolean ensureTarSourceIsValid(String archivePath) {
@@ -169,11 +192,11 @@ public class ArchiveUtil {
                     TarFile tarFile = getSpecifiedTarSourceFile(archivePath);
                     leveledImportStructureProvider = new FileSystemObjectLeveledImportStructureProvider(new TarLeveledStructureProvider(tarFile), archivePath);
                 }
-            } else if (ensureZipSourceIsValid(archivePath, shell)) {
+            } else if (ensureZipSourceIsValid(archivePath)) {
                 // We close the file when we dispose the import provider, see
                 // disposeSelectionGroupRoot
                 ZipFile zipFile = getSpecifiedZipSourceFile(archivePath);
-                leveledImportStructureProvider = new FileSystemObjectLeveledImportStructureProvider(new SafePathZipLeveledStructureProvider(zipFile), archivePath);
+                leveledImportStructureProvider = new FileSystemObjectLeveledImportStructureProvider(new ZipLeveledStructureProvider(zipFile), archivePath);
             } else if (ensureGzipSourceIsValid(archivePath)) {
                 // We close the file when we dispose the import provider, see
                 // disposeSelectionGroupRoot

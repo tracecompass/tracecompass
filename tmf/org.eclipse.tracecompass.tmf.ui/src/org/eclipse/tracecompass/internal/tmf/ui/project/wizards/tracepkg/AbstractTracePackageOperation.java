@@ -12,18 +12,18 @@
 
 package org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Vector;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.TarEntry;
-import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.TarException;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.TarFile;
 
 /**
@@ -120,15 +120,20 @@ public abstract class AbstractTracePackageOperation {
             return null;
         }
 
+        File file = new File(fFileName);
+        if (file.isDirectory()) {
+            return null;
+        }
+
         try {
-            return new ZipArchiveFile(new ZipFile(fFileName));
+            return new ZipArchiveFile(new ZipFile(file));
         } catch (IOException e) {
             // ignore
         }
 
         try {
-            return new TarArchiveFile(new TarFile(fFileName));
-        } catch (TarException | IOException e) {
+            return new TarArchiveFile(new TarFile(file));
+        } catch (IOException e) {
             // ignore
         }
 
@@ -176,7 +181,7 @@ public abstract class AbstractTracePackageOperation {
     }
 
     /**
-     * Common interface between ZipEntry and TarEntry
+     * Common interface between ZipArchiveEntry and TarArchiveEntry
      */
     protected interface ArchiveEntry {
         /**
@@ -211,10 +216,9 @@ public abstract class AbstractTracePackageOperation {
          * @param entry
          *            the given file
          * @return an input stream for the given file
-         * @throws TarException
          * @throws IOException
          */
-        InputStream getInputStream(ArchiveEntry entry) throws TarException, IOException;
+        InputStream getInputStream(ArchiveEntry entry) throws IOException;
     }
 
     /**
@@ -238,7 +242,7 @@ public abstract class AbstractTracePackageOperation {
         public Enumeration<@NonNull ? extends ArchiveEntry> entries() {
             Vector<@NonNull ArchiveEntry> v = new Vector<>();
             for (Enumeration<?> e = fTarFile.entries(); e.hasMoreElements();) {
-                v.add(new TarArchiveEntry((TarEntry) e.nextElement()));
+                v.add(new TarArchiveEntryAdapter((TarArchiveEntry) e.nextElement()));
             }
 
             return v.elements();
@@ -250,24 +254,24 @@ public abstract class AbstractTracePackageOperation {
         }
 
         @Override
-        public InputStream getInputStream(ArchiveEntry entry) throws TarException, IOException {
-            return fTarFile.getInputStream(((TarArchiveEntry) entry).getTarEntry());
+        public InputStream getInputStream(ArchiveEntry entry) throws IOException {
+            return fTarFile.getInputStream(((TarArchiveEntryAdapter) entry).getTarEntry());
         }
     }
 
     /**
-     * Adapter for TarEntry to ArchiveEntry
+     * Adapter for TarArchiveEntry to ArchiveEntry
      */
-    protected class TarArchiveEntry implements ArchiveEntry {
-        private TarEntry fTarEntry;
+    protected class TarArchiveEntryAdapter implements ArchiveEntry {
+        private TarArchiveEntry fTarEntry;
 
         /**
-         * Constructs a TarArchiveEntry for a TarEntry
+         * Constructs a TarArchiveEntry for a TarArchiveEntry
          *
          * @param tarEntry
-         *            the TarEntry
+         *            the TarArchiveEntry
          */
-        public TarArchiveEntry(TarEntry tarEntry) {
+        public TarArchiveEntryAdapter(TarArchiveEntry tarEntry) {
             this.fTarEntry = tarEntry;
         }
 
@@ -277,11 +281,11 @@ public abstract class AbstractTracePackageOperation {
         }
 
         /**
-         * Get the corresponding TarEntry
+         * Get the corresponding TarArchiveEntry
          *
-         * @return the corresponding TarEntry
+         * @return the corresponding TarArchiveEntry
          */
-        public TarEntry getTarEntry() {
+        public TarArchiveEntry getTarEntry() {
             return fTarEntry;
         }
 
@@ -294,17 +298,17 @@ public abstract class AbstractTracePackageOperation {
     /**
      * Adapter for ArchiveEntry to ArchiveEntry
      */
-    protected class ZipAchiveEntry implements ArchiveEntry {
+    protected class ZipAchiveEntryAdapter implements ArchiveEntry {
 
-        private ZipEntry fZipEntry;
+        private ZipArchiveEntry fZipEntry;
 
         /**
-         * Constructs a ZipAchiveEntry for a ZipEntry
+         * Constructs a ZipAchiveEntryAdapter for a ZipArchiveEntry
          *
          * @param zipEntry
-         *            the ZipEntry
+         *            the ZipArchiveEntry
          */
-        public ZipAchiveEntry(ZipEntry zipEntry) {
+        public ZipAchiveEntryAdapter(ZipArchiveEntry zipEntry) {
             this.fZipEntry = zipEntry;
         }
 
@@ -314,11 +318,11 @@ public abstract class AbstractTracePackageOperation {
         }
 
         /**
-         * Get the corresponding ZipEntry
+         * Get the corresponding ZipArchiveEntry
          *
-         * @return the corresponding ZipEntry
+         * @return the corresponding ZipArchiveEntry
          */
-        public ZipEntry getZipEntry() {
+        public ZipArchiveEntry getZipEntry() {
             return fZipEntry;
         }
 
@@ -348,8 +352,8 @@ public abstract class AbstractTracePackageOperation {
         @Override
         public Enumeration<@NonNull ? extends ArchiveEntry> entries() {
             Vector<@NonNull ArchiveEntry> v = new Vector<>();
-            for (Enumeration<?> e = fZipFile.entries(); e.hasMoreElements();) {
-                v.add(new ZipAchiveEntry((ZipEntry) e.nextElement()));
+            for (Enumeration<ZipArchiveEntry> e = fZipFile.getEntries(); e.hasMoreElements();) {
+                v.add(new ZipAchiveEntryAdapter(e.nextElement()));
             }
 
             return v.elements();
@@ -361,8 +365,8 @@ public abstract class AbstractTracePackageOperation {
         }
 
         @Override
-        public InputStream getInputStream(ArchiveEntry entry) throws TarException, IOException {
-            return fZipFile.getInputStream(((ZipAchiveEntry) entry).getZipEntry());
+        public InputStream getInputStream(ArchiveEntry entry) throws IOException {
+            return fZipFile.getInputStream(((ZipAchiveEntryAdapter) entry).getZipEntry());
         }
     }
 
