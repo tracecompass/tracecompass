@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="tracecompass-eStaging" sequenceNumber="75">
+<?pde version="3.8"?><target name="tracecompass-eStaging" sequenceNumber="76">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.cdt.gnu.dsf.feature.group" version="0.0.0"/>
@@ -36,11 +36,8 @@
 <unit id="org.swtchart" version="0.7.0.v201201201914"/>
 <unit id="com.google.guava" version="15.0.0.v201403281430"/>
 <unit id="org.json" version="0.0.0"/>
+<unit id="org.apache.derby" version="0.0.0"/>
 <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20160520211859/repository/"/>
-</location>
-<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.apache.derby.core.feature.feature.group" version="0.0.0"/>
-<repository location="http://build.eclipse.org/eclipse/buildtools/derbyCore-10.11.1.1-B"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.license.feature.group" version="0.0.0"/>
@@ -53,9 +50,10 @@
 <unit id="org.eclipse.pde.junit.runtime" version="0.0.0"/>
 <unit id="org.eclipse.test.feature.group" version="0.0.0"/>
 <unit id="org.eclipse.jdt.annotation" version="0.0.0"/>
+<unit id="org.eclipse.swt.tools.spies" version="0.0.0"/>
 <unit id="org.eclipse.ui.trace" version="0.0.0"/>
 <unit id="org.eclipse.ui.views.log" version="0.0.0"/>
-<repository location="http://download.eclipse.org/eclipse/updates/4.7milestones/"/>
+<repository location="http://download.eclipse.org/eclipse/updates/4.7-I-builds/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf" version="1.5.0"/>
