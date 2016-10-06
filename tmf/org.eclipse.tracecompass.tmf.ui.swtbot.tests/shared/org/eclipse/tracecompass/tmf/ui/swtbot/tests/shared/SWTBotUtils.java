@@ -333,7 +333,7 @@ public final class SWTBotUtils {
         Arrays.stream(shells)
                 .filter(shell -> shell != mainShell)
                 .filter(SWTBotShell::isVisible)
-                .peek(shell -> log.debug(MessageFormat.format("Closing ligering shell with title {0}", shell.getText())))
+                .peek(shell -> log.debug(MessageFormat.format("Closing lingering shell with title {0}", shell.getText())))
                 .forEach(SWTBotShell::close);
     }
 
