@@ -8,7 +8,8 @@ Bundle-SymbolicName: org.eclipse.tracecompass.integration.swtbot.tests;singleton
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: org.eclipse.tracecompass.integration.swtbot.tests.projectexplorer
-Require-Bundle: org.apache.log4j,
+Require-Bundle: org.apache.commons.compress,
+ org.apache.log4j,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.swtbot.eclipse.finder,

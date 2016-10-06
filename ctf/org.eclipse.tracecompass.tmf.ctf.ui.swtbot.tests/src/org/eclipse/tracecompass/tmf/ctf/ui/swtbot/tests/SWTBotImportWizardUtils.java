@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests;
 
 import java.io.File;
+import java.util.Arrays;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
@@ -73,6 +74,46 @@ public final class SWTBotImportWizardUtils {
 
         SWTBotText text = bot.text();
         text.setFocus();
+    }
+
+    /**
+     * While in the import wizard, select an item in the file selection control.
+     * The item can be a folder in the left tree or a file in the right table.
+     * The item will be checked.
+     *
+     * @param bot
+     *            the SWTBot
+     * @param treePath
+     *            the path to the item, ending with a file or folder
+     */
+    public static void selectItem(SWTBot bot, String... treePath) {
+        SWTBotTree tree = bot.tree();
+        bot.waitUntil(Conditions.widgetIsEnabled(tree));
+        if (treePath.length == 0) {
+            return;
+        }
+        if (treePath.length == 1) {
+            SWTBotTreeItem rootNode = SWTBotUtils.getTreeItem(bot, tree, treePath);
+            rootNode.select();
+            rootNode.check();
+            return;
+        }
+        String[] parentPath = Arrays.copyOf(treePath, treePath.length - 1);
+        String itemName = treePath[treePath.length - 1];
+        SWTBotTreeItem folderNode = SWTBotUtils.getTreeItem(bot, tree, parentPath);
+        folderNode.expand();
+        if (folderNode.getNodes().contains(itemName)) {
+            folderNode = folderNode.getNode(itemName);
+            folderNode.select();
+            folderNode.check();
+        } else {
+            folderNode.select();
+            SWTBotTable fileTable = bot.table();
+            bot.waitUntil(Conditions.widgetIsEnabled(fileTable));
+            bot.waitUntil(ConditionHelpers.isTableItemAvailable(itemName, fileTable));
+            SWTBotTableItem tableItem = fileTable.getTableItem(itemName);
+            tableItem.check();
+        }
     }
 
     /**

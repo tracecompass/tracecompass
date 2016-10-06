@@ -560,6 +560,26 @@ public final class SWTBotUtils {
     }
 
     /**
+     * Returns the child tree item of the specified item at the given sub-path.
+     * The project element labels may have a count suffix in the format ' [n]'.
+     *
+     * @param bot
+     *            a given workbench bot
+     * @param parentItem
+     *            the parent tree item
+     * @param path
+     *            the desired child element sub-path (without suffix)
+     * @return the a {@link SWTBotTreeItem} with the specified name
+     */
+    public static SWTBotTreeItem getTraceProjectItem(SWTBot bot, final SWTBotTreeItem parentItem, final String... path) {
+        SWTBotTreeItem item = parentItem;
+        for (String name : path) {
+            item = getTraceProjectItem(bot, item, name);
+        }
+        return item;
+    }
+
+    /**
      * Returns the child tree item of the specified item with the given name.
      * The project element label may have a count suffix in the format ' [n]'.
      *
