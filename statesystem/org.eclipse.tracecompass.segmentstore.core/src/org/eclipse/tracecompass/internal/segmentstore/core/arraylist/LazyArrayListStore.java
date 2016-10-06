@@ -150,7 +150,12 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
 
     @Override
     public int size() {
-        return fStore.size();
+        fLock.lock();
+        try {
+            return fStore.size();
+        } finally {
+            fLock.unlock();
+        }
     }
 
     @Override

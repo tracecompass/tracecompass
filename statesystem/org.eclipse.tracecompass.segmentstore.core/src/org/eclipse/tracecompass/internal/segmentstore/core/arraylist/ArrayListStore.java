@@ -126,7 +126,12 @@ public class ArrayListStore<@NonNull E extends ISegment> implements ISegmentStor
 
     @Override
     public int size() {
-        return fStore.size();
+        fLock.readLock().lock();
+        try {
+            return fStore.size();
+        } finally {
+            fLock.readLock().unlock();
+        }
     }
 
     @Override
