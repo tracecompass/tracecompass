@@ -12,11 +12,17 @@ package org.eclipse.tracecompass.integration.swtbot.tests.projectexplorer;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.eclipse.tracecompass.ctf.core.tests.shared.LttngTraceGenerator;
 
 /**
@@ -103,6 +109,9 @@ public class TestDirectoryStructureUtil {
      *
      * <pre>
      * parentDir
+     *  ├── archives
+     *  │   ├── traces.zip
+     *  │   └── traces.tar.gz
      *  ├── customParsers
      *  │   ├── ExampleCustomTxtParser.xml
      *  │   └── ExampleCustomXmlParser.xml
@@ -185,6 +194,15 @@ public class TestDirectoryStructureUtil {
 
         assertTrue(parent.listFiles().length > 0);
 
+        File archivesDir = createDir(parent, "archives");
+        File zipFile = new File(archivesDir.getAbsolutePath() + File.separator + "traces.zip");
+        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile))) {
+            addToArchive(zos, importDir, importDir);
+        }
+        File targzFile = new File(archivesDir.getAbsolutePath() + File.separator + "traces.tar.gz");
+        try (TarArchiveOutputStream tgzos = new TarArchiveOutputStream(new GZIPOutputStream(new FileOutputStream(targzFile)))) {
+            addToArchive(tgzos, importDir, importDir);
+        }
         return parent;
     }
 
@@ -200,5 +218,57 @@ public class TestDirectoryStructureUtil {
             pw.write(content);
         }
         return child;
+    }
+
+    private static void addToArchive(ZipOutputStream zos, File dir, File root) throws IOException {
+        byte[] buffer = new byte[1024];
+        int length;
+        int index = root.getAbsolutePath().length();
+        for (File file : dir.listFiles()) {
+            String name = file.getAbsolutePath().substring(index);
+            if (file.isDirectory()) {
+                if (file.listFiles().length != 0) {
+                    addToArchive(zos, file, root);
+                } else {
+                    zos.putNextEntry(new ZipEntry(name + File.separator));
+                    zos.closeEntry();
+                }
+            } else {
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    zos.putNextEntry(new ZipEntry(name));
+                    while ((length = fis.read(buffer)) > 0) {
+                        zos.write(buffer, 0, length);
+                    }
+                    zos.closeEntry();
+                }
+            }
+        }
+    }
+
+    private static void addToArchive(TarArchiveOutputStream taos, File dir, File root) throws IOException {
+        byte[] buffer = new byte[1024];
+        int length;
+        int index = root.getAbsolutePath().length();
+        for (File file : dir.listFiles()) {
+            String name = file.getAbsolutePath().substring(index);
+            if (file.isDirectory()) {
+                if (file.listFiles().length != 0) {
+                    addToArchive(taos, file, root);
+                } else {
+                    taos.putArchiveEntry(new TarArchiveEntry(name + File.separator));
+                    taos.closeArchiveEntry();
+                }
+            } else {
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    TarArchiveEntry entry = new TarArchiveEntry(name);
+                    entry.setSize(file.length());
+                    taos.putArchiveEntry(entry);
+                    while ((length = fis.read(buffer)) > 0) {
+                        taos.write(buffer, 0, length);
+                    }
+                    taos.closeArchiveEntry();
+                }
+            }
+        }
     }
 }

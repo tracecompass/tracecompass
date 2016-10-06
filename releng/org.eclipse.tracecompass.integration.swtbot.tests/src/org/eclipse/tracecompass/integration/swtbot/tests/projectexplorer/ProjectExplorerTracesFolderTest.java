@@ -91,6 +91,7 @@ public class ProjectExplorerTracesFolderTest {
             LTTNG_KERNEL_TRACE.getFirstEventTimestamp());
     private static final @NonNull TestTraceInfo UNRECOGNIZED_LOG = new TestTraceInfo("unrecognized.log", "", 0, "");
     private static final @NonNull TestTraceInfo CUSTOM_XML_LOG_AS_TEXT = new TestTraceInfo("ExampleCustomXml.xml", CUSTOM_TEXT_TRACE_TYPE, 0, "");
+    private static final @NonNull TestTraceInfo CLASHES_CUSTOM_XML_LOG_AS_TEXT = new TestTraceInfo("ExampleCustomXml.xml", CLASHES_DIR_NAME + "/ExampleCustomXml.xml", CUSTOM_TEXT_TRACE_TYPE, 0, "");
 
     private static final TestTraceInfo[] ALL_TRACEINFOS = new TestTraceInfo[] {
             CUSTOM_TEXT_LOG,
@@ -699,7 +700,7 @@ public class ProjectExplorerTracesFolderTest {
      * type "Generic CTF Trace" . Make sure that these traces can be opened
      */
     @Test
-    public void test3_17ImportRecursiveSpecityTraceTypeCTF() {
+    public void test3_17ImportRecursiveSpecifyTraceTypeCTF() {
         SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
 
         int optionFlags = ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
@@ -738,7 +739,7 @@ public class ProjectExplorerTracesFolderTest {
      * trace type "LTTng Kernel Trace". Make sure that this trace can be opened.
      */
     @Test
-    public void test3_18ImportRecursiveSpecityTraceTypeKernel() {
+    public void test3_18ImportRecursiveSpecifyTraceTypeKernel() {
         SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
 
         int optionFlags = ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
@@ -769,7 +770,7 @@ public class ProjectExplorerTracesFolderTest {
      * trace type "LTTng UST Trace". Make sure that these traces can be opened.
      */
     @Test
-    public void test3_19ImportRecursiveSpecityTraceTypeUST() {
+    public void test3_19ImportRecursiveSpecifyTraceTypeUST() {
         SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
 
         int optionFlags = ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
@@ -809,7 +810,7 @@ public class ProjectExplorerTracesFolderTest {
      * show any events in the table.
      */
     @Test
-    public void test3_20ImportRecursiveSpecityTraceTypeCustomText() {
+    public void test3_20ImportRecursiveSpecifyTraceTypeCustomText() {
         SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
 
         int optionFlags = ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
@@ -833,12 +834,333 @@ public class ProjectExplorerTracesFolderTest {
         verifyTrace(traceInfo, importOptionFlags, traceInfo.getTraceName());
     }
 
+    /**
+     * <p>
+     * Action : Recursive import with preserved folder structure
+     * <p>
+     *
+     * <pre>
+     * Procedure : 0) Delete all traces in project
+     *             1) Open Import wizard
+     *             2) Browse to directory ${local}/traces/import/
+     *             3) Select directory import
+     *             4) Select trace type "Tmf Generic", unselect "Overwrite existing without warning", select "Create Links to workspace" and select "Preserve Folder Structure"
+     *             5) press Finish
+     * </pre>
+     * <p>
+     * Expected Results: All matching traces are imported with trace type set.
+     * The folder "clashes" is imported with traces inside. Make sure that the
+     * traces can be opened.
+     */
+    @Test
+    public void test3_29ImportRecursivePreserve() {
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        int optionFlags = ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE | ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE;
+        importTrace(CUSTOM_TEXT_TRACE_TYPE, optionFlags, ImportConfirmation.CONTINUE, "");
+
+        verifyTrace(CUSTOM_TEXT_LOG, optionFlags, CUSTOM_TEXT_LOG.getTraceName(), CUSTOM_TEXT_TRACE_TYPE);
+        verifyTrace(CUSTOM_XML_LOG_AS_TEXT, optionFlags, CUSTOM_XML_LOG_AS_TEXT.getTraceName(), CUSTOM_TEXT_TRACE_TYPE);
+        verifyTrace(UNRECOGNIZED_LOG, optionFlags, UNRECOGNIZED_LOG.getTraceName(), CUSTOM_TEXT_TRACE_TYPE);
+        verifyTrace(CLASHES_CUSTOM_TEXT_LOG, optionFlags, CLASHES_CUSTOM_TEXT_LOG.getTracePath(), CUSTOM_TEXT_TRACE_TYPE);
+        verifyTrace(CLASHES_CUSTOM_XML_LOG_AS_TEXT, optionFlags, CLASHES_CUSTOM_XML_LOG_AS_TEXT.getTracePath(), CUSTOM_TEXT_TRACE_TYPE);
+
+        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        assertEquals(4, tracesFolderItem.getItems().length);
+        SWTBotTreeItem clashesFolderItem = SWTBotUtils.getTraceProjectItem(fBot, tracesFolderItem, CLASHES_DIR_NAME);
+        assertEquals(2, clashesFolderItem.getItems().length);
+    }
+
+    /**
+     * <p>
+     * Action : Recursive import with preserved folder structure (Skip All)
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) Open Import wizard
+     *             2) Browse to directory ${local}/traces/import/
+     *             3) Select directory import
+     *             4) Select trace type "Tmf Generic", unselect "Overwrite existing without warning", select "Create Links to workspace" and select "Preserve Folder Structure"
+     *             5) press Finish
+     *             6) When dialog appears select "Skip All"
+     * </pre>
+     * <p>
+     * Expected Results: The wizard should finish quickly as no trace will be
+     * imported. Make sure that the traces can be opened.
+     */
+    @Test
+    public void test3_30ImportRecursivePreserveSkipAll() {
+        int optionFlags = ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE | ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE;
+        importTrace(CUSTOM_TEXT_TRACE_TYPE, optionFlags, ImportConfirmation.SKIP_ALL, "");
+
+        verifyTrace(CUSTOM_TEXT_LOG, optionFlags, CUSTOM_TEXT_LOG.getTraceName(), CUSTOM_TEXT_TRACE_TYPE);
+        verifyTrace(CUSTOM_XML_LOG_AS_TEXT, optionFlags, CUSTOM_XML_LOG_AS_TEXT.getTraceName(), CUSTOM_TEXT_TRACE_TYPE);
+        verifyTrace(UNRECOGNIZED_LOG, optionFlags, UNRECOGNIZED_LOG.getTraceName(), CUSTOM_TEXT_TRACE_TYPE);
+        verifyTrace(CLASHES_CUSTOM_TEXT_LOG, optionFlags, CLASHES_CUSTOM_TEXT_LOG.getTracePath(), CUSTOM_TEXT_TRACE_TYPE);
+        verifyTrace(CLASHES_CUSTOM_XML_LOG_AS_TEXT, optionFlags, CLASHES_CUSTOM_XML_LOG_AS_TEXT.getTracePath(), CUSTOM_TEXT_TRACE_TYPE);
+
+        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        assertEquals(4, tracesFolderItem.getItems().length);
+        SWTBotTreeItem clashesFolderItem = SWTBotUtils.getTraceProjectItem(fBot, tracesFolderItem, CLASHES_DIR_NAME);
+        assertEquals(2, clashesFolderItem.getItems().length);
+        //TOOD: verify that traces were actually skipped
+    }
+
+    /**
+     * <p>
+     * Action : Recursive import with preserved folder structure (Rename All)
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) Open Import wizard
+     *             2) Browse to directory ${local}/traces/import/
+     *             3) Select directory import
+     *             4) Select trace type "Tmf Generic", unselect "Overwrite existing without warning", select "Create Links to workspace" and select "Preserve Folder Structure"
+     *             5) press Finish
+     *             6) When dialog appears select "Rename All"
+     * </pre>
+     * <p>
+     * Expected Results: All matching traces are imported with trace type set.
+     * The traces are renamed with suffix (2). The folder "clashes" is imported
+     * with traces inside. Make sure that the traces can be opened.
+     */
+    @Test
+    public void test3_31ImportRecursivePreserveRenameAll() {
+        int optionFlags = ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE | ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE;
+        importTrace(CUSTOM_TEXT_TRACE_TYPE, optionFlags, ImportConfirmation.RENAME_ALL, "");
+
+        verifyTrace(CUSTOM_TEXT_LOG, optionFlags, toRenamedName(CUSTOM_TEXT_LOG.getTraceName()), CUSTOM_TEXT_TRACE_TYPE);
+        verifyTrace(CUSTOM_XML_LOG_AS_TEXT, optionFlags, toRenamedName(CUSTOM_XML_LOG_AS_TEXT.getTraceName()), CUSTOM_TEXT_TRACE_TYPE);
+        verifyTrace(UNRECOGNIZED_LOG, optionFlags, toRenamedName(UNRECOGNIZED_LOG.getTraceName()), CUSTOM_TEXT_TRACE_TYPE);
+        verifyTrace(CLASHES_CUSTOM_TEXT_LOG, optionFlags, toRenamedName(CLASHES_CUSTOM_TEXT_LOG.getTracePath()), CUSTOM_TEXT_TRACE_TYPE);
+        verifyTrace(CLASHES_CUSTOM_XML_LOG_AS_TEXT, optionFlags, toRenamedName(CLASHES_CUSTOM_XML_LOG_AS_TEXT.getTracePath()), CUSTOM_TEXT_TRACE_TYPE);
+
+        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        assertEquals(7, tracesFolderItem.getItems().length);
+        SWTBotTreeItem clashesFolderItem = SWTBotUtils.getTraceProjectItem(fBot, tracesFolderItem, CLASHES_DIR_NAME);
+        assertEquals(4, clashesFolderItem.getItems().length);
+    }
+
+    /**
+     * <p>
+     * Action : Import from zip archive with preserved folder structure
+     * <p>
+     *
+     * <pre>
+     * Procedure : 0) Delete all traces in project
+     *             1) Open Import wizard
+     *             2) Select archive file: traces.zip
+     *             3) Select archive root directory
+     *             4) Select trace type "Automatic", unselect "Overwrite existing without warning", and select "Preserve Folder Structure"
+     *             5) press Finish
+     * </pre>
+     * <p>
+     * Expected Results: All traces are imported with trace type set. The folder
+     * "clashes" is imported with traces inside. Make sure that the traces can
+     * be opened.
+     */
+    @Test
+    public void test3_36ImportZipArchivePreserve() {
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        int optionFlags = ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE;
+        importTrace("traces.zip", null, optionFlags, ImportConfirmation.CONTINUE, "");
+
+        for (TestTraceInfo info : ALL_TRACEINFOS) {
+            verifyTrace(info, optionFlags, info.getTracePath());
+        }
+
+        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        assertEquals(7, tracesFolderItem.getItems().length);
+        SWTBotTreeItem clashesFolderItem = SWTBotUtils.getTraceProjectItem(fBot, tracesFolderItem, CLASHES_DIR_NAME);
+        assertEquals(6, clashesFolderItem.getItems().length);
+    }
+
+    /**
+     * <p>
+     * Action : Import from zip archive without preserved folder structure
+     * (Rename All)
+     * <p>
+     *
+     * <pre>
+     * Procedure : 0) Delete all traces in project
+     *             1) Open Import wizard
+     *             2) Select archive file: traces.zip
+     *             3) Select archive root directory
+     *             4) Select trace type "Automatic", unselect "Overwrite existing without warning", and unselect "Preserve Folder Structure"
+     *             5) press Finish
+     *             6) When dialog appears select "Rename All"
+     * </pre>
+     * <p>
+     * Expected Results: All traces are imported with trace type set. The traces
+     * from folder "clashes" are renamed with suffix (2). Make sure that the
+     * traces can be opened.
+     */
+    @Test
+    public void test3_37ImportZipArchiveNoPreserve() {
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        int optionFlags = 0;
+        importTrace("traces.zip", null, optionFlags, ImportConfirmation.RENAME_ALL, "");
+
+        for (TestTraceInfo info : ALL_TRACEINFOS) {
+            String traceName = info.getTraceName();
+            if (CLASHING_TRACEINFOS.contains(info)) {
+                traceName = toRenamedName(traceName);
+            }
+            verifyTrace(info, optionFlags, traceName);
+        }
+
+        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        assertEquals(12, tracesFolderItem.getItems().length);
+    }
+
+    /**
+     * <p>
+     * Action : Import from zip archive specific traces
+     * <p>
+     *
+     * <pre>
+     * Procedure : 0) Delete all traces in project
+     *             1) Open Import wizard
+     *             2) Select archive file: traces.zip
+     *             3) Select file z-clashes/ExampleCustomTxt.log and directory kernel-overlap-testing/
+     *             4) Select trace type "Automatic", unselect "Overwrite existing without warning", and select "Preserve Folder Structure"
+     *             5) press Finish
+     * </pre>
+     * <p>
+     * Expected Results: The specified traces are imported with trace type set.
+     * Make sure that the traces can be opened.
+     */
+    @Test
+    public void test3_38ImportZipArchiveSpecificTraces() {
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        int optionFlags = ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE;
+        importTrace("traces.zip", null, optionFlags, ImportConfirmation.CONTINUE, "z-clashes/ExampleCustomTxt.log", "kernel-overlap-testing/");
+
+        verifyTrace(CLASHES_CUSTOM_TEXT_LOG, optionFlags, CLASHES_CUSTOM_TEXT_LOG.getTracePath());
+        verifyTrace(LTTNG_KERNEL_TRACE, optionFlags, LTTNG_KERNEL_TRACE.getTracePath());
+
+        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        assertEquals(2, tracesFolderItem.getItems().length);
+        SWTBotTreeItem clashesFolderItem = SWTBotUtils.getTraceProjectItem(fBot, tracesFolderItem, CLASHES_DIR_NAME);
+        assertEquals(1, clashesFolderItem.getItems().length);
+    }
+
+    /**
+     * <p>
+     * Action : Import from tar.gz archive with preserved folder structure
+     * <p>
+     *
+     * <pre>
+     * Procedure : 0) Delete all traces in project
+     *             1) Open Import wizard
+     *             2) Select archive file: traces.tar.gz
+     *             3) Select archive root directory
+     *             4) Select trace type "Automatic", unselect "Overwrite existing without warning", and select "Preserve Folder Structure"
+     *             5) press Finish
+     * </pre>
+     * <p>
+     * Expected Results: All traces are imported with trace type set. The folder
+     * "clashes" is imported with traces inside. Make sure that the traces can
+     * be opened.
+     */
+    @Test
+    public void test3_39ImportTarGzipArchivePreserve() {
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        int optionFlags = ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE;
+        importTrace("traces.tar.gz", null, optionFlags, ImportConfirmation.CONTINUE, "");
+
+        for (TestTraceInfo info : ALL_TRACEINFOS) {
+            verifyTrace(info, optionFlags, info.getTracePath());
+        }
+
+        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        assertEquals(7, tracesFolderItem.getItems().length);
+        SWTBotTreeItem clashesFolderItem = SWTBotUtils.getTraceProjectItem(fBot, tracesFolderItem, CLASHES_DIR_NAME);
+        assertEquals(6, clashesFolderItem.getItems().length);
+    }
+
+    /**
+     * <p>
+     * Action : Import from tar.gz archive without preserved folder structure (Rename All)
+     * <p>
+     *
+     * <pre>
+     * Procedure : 0) Delete all traces in project
+     *             1) Open Import wizard
+     *             2) Select archive file: traces.tar.gz
+     *             3) Select archive root directory
+     *             4) Select trace type "Automatic", unselect "Overwrite existing without warning", and unselect "Preserve Folder Structure"
+     *             5) press Finish
+     *             6) When dialog appears select "Rename All"
+     * </pre>
+     * <p>
+     * Expected Results: All traces are imported with trace type set. The traces
+     * from folder "clashes" are renamed with suffix (2). Make sure that the
+     * traces can be opened.
+     */
+    @Test
+    public void test3_40ImportTarGzipArchiveNoPreserve() {
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        int optionFlags = 0;
+        importTrace("traces.tar.gz", null, optionFlags, ImportConfirmation.RENAME_ALL, "");
+
+        for (TestTraceInfo info : ALL_TRACEINFOS) {
+            String traceName = info.getTraceName();
+            if (CLASHING_TRACEINFOS.contains(info)) {
+                traceName = toRenamedName(traceName);
+            }
+            verifyTrace(info, optionFlags, traceName);
+        }
+
+        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        assertEquals(12, tracesFolderItem.getItems().length);
+    }
+
+    /**
+     * <p>
+     * Action : Import from tar.gz archive specific traces
+     * <p>
+     *
+     * <pre>
+     * Procedure : 0) Delete all traces in project
+     *             1) Open Import wizard
+     *             2) Select archive file: traces.tar.gz
+     *             3) Select file z-clashes/ExampleCustomTxt.log and directory kernel-overlap-testing/
+     *             4) Select trace type "Automatic", unselect "Overwrite existing without warning", and select "Preserve Folder Structure"
+     *             5) press Finish
+     * </pre>
+     * <p>
+     * Expected Results: The specified traces are imported with trace type set.
+     * Make sure that the traces can be opened.
+     */
+    @Test
+    public void test3_41ImportTarGzipArchiveSpecificTraces() {
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        int optionFlags = ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE;
+        importTrace("traces.tar.gz", null, optionFlags, ImportConfirmation.CONTINUE, "z-clashes/ExampleCustomTxt.log", "kernel-overlap-testing/");
+
+        verifyTrace(CLASHES_CUSTOM_TEXT_LOG, optionFlags, CLASHES_CUSTOM_TEXT_LOG.getTracePath());
+        verifyTrace(LTTNG_KERNEL_TRACE, optionFlags, LTTNG_KERNEL_TRACE.getTracePath());
+
+        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        assertEquals(2, tracesFolderItem.getItems().length);
+        SWTBotTreeItem clashesFolderItem = SWTBotUtils.getTraceProjectItem(fBot, tracesFolderItem, CLASHES_DIR_NAME);
+        assertEquals(1, clashesFolderItem.getItems().length);
+    }
+
     private static void verifyTrace(TestTraceInfo traceInfo, int importOptionFlags, String traceName) {
         verifyTrace(traceInfo, importOptionFlags, traceName, traceInfo.getTraceType());
     }
 
     private static void verifyTrace(TestTraceInfo traceInfo, int importOptionFlags, String traceName, String traceType) {
-        SWTBotTreeItem traceItem = SWTBotUtils.getTreeItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), traceName);
+        String[] tracePath = new Path(traceName).segments();
+        SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), tracePath);
         checkTraceType(traceItem, traceType);
         openTrace(traceItem);
         if (traceType != null && !traceType.isEmpty()) {
@@ -875,7 +1197,11 @@ public class ProjectExplorerTracesFolderTest {
     }
 
     private static void importTrace(String traceType, int optionFlags, ImportConfirmation confirmationMode, String ... tracePaths) {
-        importTrace(traceType, optionFlags, new Supplier<ImportConfirmation>() {
+        importTrace(null, traceType, optionFlags, confirmationMode, tracePaths);
+    }
+
+    private static void importTrace(String archiveFile, String traceType, int optionFlags, ImportConfirmation confirmationMode, String ... tracePaths) {
+        importTrace(archiveFile, traceType, optionFlags, new Supplier<ImportConfirmation>() {
             boolean fDone = false;
             @Override
             public ImportConfirmation get() {
@@ -889,31 +1215,38 @@ public class ProjectExplorerTracesFolderTest {
     }
 
     private static void importTrace(int optionFlags, Supplier<ImportConfirmation> confirmationSuplier, String ... tracePaths) {
-        importTrace(null, optionFlags, confirmationSuplier, tracePaths);
+        importTrace(null, null, optionFlags, confirmationSuplier, tracePaths);
     }
 
     /**
-     * @param tracePath relative to parent test traces folder
+     * @param tracePaths relative to parent test traces folder
      */
-    private static void importTrace(String traceType, int optionFlags, Supplier<ImportConfirmation> confirmationSuplier, String ... tracePaths) {
+    private static void importTrace(String archiveFile, String traceType, int optionFlags, Supplier<ImportConfirmation> confirmationSuplier, String ... tracePaths) {
         SWTBotTreeItem traceFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
 
         SWTBotShell shell = openTraceFoldersImport(traceFolder);
         SWTBot bot = shell.bot();
-        final String importDirectoryRelativePath = "import";
-        String importDirectoryFullPath = getPath(importDirectoryRelativePath);
+        String rootFolderName;
+        if (archiveFile == null) {
+            rootFolderName = "import";
+            String importDirectoryFullPath = getPath(rootFolderName);
+            SWTBotImportWizardUtils.selectImportFromDirectory(bot, importDirectoryFullPath);
+        } else {
+            rootFolderName = "/";
+            String importArchiveFullPath = getPath("archives" + File.separator + archiveFile);
+            SWTBotImportWizardUtils.selectImportFromArchive(bot, importArchiveFullPath);
+        }
 
         for (String tracePath : tracePaths) {
-            IPath somePath = new Path(importDirectoryRelativePath).append(tracePath);
-            IPath fullParentPath = somePath.removeLastSegments(1);
-            boolean isDirectory = new Path(importDirectoryFullPath).append(tracePath).toFile().isDirectory();
-
-            SWTBotImportWizardUtils.selectImportFromDirectory(bot, importDirectoryFullPath);
-            if (isDirectory) {
-                SWTBotImportWizardUtils.selectFolder(fBot, true, somePath.segments());
-            } else {
-                SWTBotImportWizardUtils.selectFile(bot, new Path(tracePath).lastSegment(), fullParentPath.segments());
+            IPath somePath = new Path(rootFolderName).append(tracePath);
+            String[] treePath = somePath.segments();
+            if (archiveFile != null) {
+                String[] newPath = new String[treePath.length + 1];
+                newPath[0] = "/";
+                System.arraycopy(treePath, 0, newPath, 1, treePath.length);
+                treePath = newPath;
             }
+            SWTBotImportWizardUtils.selectItem(fBot, treePath);
         }
 
         SWTBotImportWizardUtils.setOptions(bot, optionFlags, traceType);

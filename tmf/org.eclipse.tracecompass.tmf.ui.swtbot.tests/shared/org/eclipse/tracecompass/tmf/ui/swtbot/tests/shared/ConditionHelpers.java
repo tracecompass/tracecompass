@@ -18,6 +18,7 @@ import static org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory.wi
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -132,7 +133,7 @@ public final class ConditionHelpers {
 
             @Override
             public String getFailureMessage() {
-                return NLS.bind("No child of table {0} found with text '{1}'.", table, name);
+                return NLS.bind("No child of table {0} found with text ''{1}''.", table, name);
             }
         };
     }
@@ -159,7 +160,7 @@ public final class ConditionHelpers {
 
             @Override
             public String getFailureMessage() {
-                return NLS.bind("No child of tree item {0} found with text '{1}'. Child items: {2}",
+                return NLS.bind("No child of tree item {0} found with text ''{1}''. Child items: {2}",
                         new String[] { treeItem.toString(), name, Arrays.toString(treeItem.getItems()) });
             }
         };
@@ -187,7 +188,7 @@ public final class ConditionHelpers {
 
             @Override
             public String getFailureMessage() {
-                return NLS.bind("Child of tree item {0} found with text '{1}' not removed. Child items: {2}",
+                return NLS.bind("Child of tree item {0} found with text ''{1}'' not removed. Child items: {2}",
                         new String[] { treeItem.toString(), String.valueOf(length), Arrays.toString(treeItem.getItems()) });
             }
         };
@@ -334,7 +335,7 @@ public final class ConditionHelpers {
             fParentItem = parentItem;
             fName = name;
             /* Project element labels may have count suffix */
-            fRegex = name + "(\\s\\[(\\d)+\\])?";
+            fRegex = Pattern.quote(name) + "(\\s\\[(\\d)+\\])?";
         }
 
         @Override
