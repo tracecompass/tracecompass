@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.tmf.core.tests.synchronization;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfConstantTransform;
 import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfTimestampTransform;
 import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfTimestampTransformLinear;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
@@ -107,7 +109,20 @@ public class TsTransformTest {
 
         assertFalse(ti.equals(ttl));
         assertFalse(ttl.equals(ti));
+    }
 
+    /**
+     * Test the equality of {@link TmfConstantTransform} objects.
+     */
+    @Test
+    public void testEqualityConstantTransform() {
+        ITmfTimestampTransform tt1 = new TmfConstantTransform(50L);
+        ITmfTimestampTransform tt2 = new TmfConstantTransform(50L);
+        ITmfTimestampTransform tt3 = new TmfConstantTransform(-10L);
+
+        assertEquals(tt1, tt2);
+        assertNotEquals(tt1, tt3);
+        assertNotEquals(tt2, tt3);
     }
 
     /**

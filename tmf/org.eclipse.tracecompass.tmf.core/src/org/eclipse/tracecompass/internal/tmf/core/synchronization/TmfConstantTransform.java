@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.synchronization;
 
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
@@ -99,17 +101,37 @@ public class TmfConstantTransform implements ITmfTimestampTransformInvertible {
     }
 
     @Override
+    public ITmfTimestampTransform inverse() {
+        return TimestampTransformFactory.createWithOffset(-1 * fOffset);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fOffset);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        TmfConstantTransform other = (TmfConstantTransform) obj;
+        return (fOffset == other.fOffset);
+    }
+
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("TmfConstantTransform [ offset = "); //$NON-NLS-1$
         builder.append(fOffset);
         builder.append(" ]"); //$NON-NLS-1$
         return builder.toString();
-    }
-
-    @Override
-    public ITmfTimestampTransform inverse() {
-        return TimestampTransformFactory.createWithOffset(-1 * fOffset);
     }
 
 }
