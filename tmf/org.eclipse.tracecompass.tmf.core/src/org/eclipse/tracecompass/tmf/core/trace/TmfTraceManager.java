@@ -17,6 +17,7 @@ package org.eclipse.tracecompass.tmf.core.trace;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -264,6 +266,22 @@ public final class TmfTraceManager {
                 }
             }
         }
+    }
+
+    /**
+     * Delete the supplementary files of a given trace.
+     *
+     * @param trace
+     *            The trace for which the supplementary files are to be deleted
+     * @since 2.2
+     */
+    public static void deleteSupplementaryFiles(ITmfTrace trace) {
+        try {
+            FileUtils.cleanDirectory(new File(TmfTraceManager.getSupplementaryFileDir(trace)));
+        } catch (IOException e) {
+            Activator.logError("Error deleting supplementary files for trace " + trace.getName(), e); //$NON-NLS-1$
+        }
+        refreshSupplementaryFiles(trace);
     }
 
     // ------------------------------------------------------------------------

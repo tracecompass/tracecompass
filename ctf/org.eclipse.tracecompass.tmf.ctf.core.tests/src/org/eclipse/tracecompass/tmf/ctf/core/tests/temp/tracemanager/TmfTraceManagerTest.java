@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
@@ -227,26 +226,6 @@ public class TmfTraceManagerTest {
         actual = TmfTraceManager.getTraceSetWithExperiment(exp);
         assertEquals(3, actual.size());
         assertEquals(expected, actual);
-    }
-
-    /**
-     * Test the {@link TmfTraceManager#getSupplementaryFileDir} method.
-     */
-    @Test
-    public void testSupplementaryFileDir() {
-        final ITmfTrace localTrace1 = trace1;
-        final ITmfTrace localTrace2 = trace2;
-        assertNotNull(localTrace1);
-        assertNotNull(localTrace2);
-        String name1 = localTrace1.getName();
-        String name2 = localTrace2.getName();
-        String basePath = TmfTraceManager.getTemporaryDirPath() + File.separator;
-
-        String expected1 = basePath + name1 + File.separator;
-        String expected2 = basePath + name2 + File.separator;
-
-        assertEquals(expected1, TmfTraceManager.getSupplementaryFileDir(localTrace1));
-        assertEquals(expected2, TmfTraceManager.getSupplementaryFileDir(localTrace2));
     }
 
     // ------------------------------------------------------------------------
