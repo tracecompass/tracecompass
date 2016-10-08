@@ -34,7 +34,20 @@
     <module>org.eclipse.tracecompass.tmf.ctf</module>
     <module>org.eclipse.tracecompass.tmf.ctf.core</module>
     <module>org.eclipse.tracecompass.tmf.ctf.core.tests</module>
-    <module>org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>automated-ui-tests</id>
+      <activation>
+        <property>
+          <name>!skip-automated-ui-tests</name>
+        </property>
+      </activation>
+      <modules>
+        <module>org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>

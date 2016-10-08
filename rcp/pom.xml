@@ -33,6 +33,19 @@
 
   <profiles>
     <profile>
+      <id>run-rcp-tests</id>
+      <activation>
+        <property>
+          <name>!skip-automated-ui-tests</name>
+        </property>
+      </activation>
+      <modules>
+        <module>org.eclipse.tracecompass.rcp.product</module>
+        <module>org.eclipse.tracecompass.rcp.rcptt.tests</module>
+      </modules>
+    </profile>
+
+    <profile>
       <id>build-rcp</id>
       <activation>
         <property>
@@ -41,7 +54,6 @@
       </activation>
       <modules>
         <module>org.eclipse.tracecompass.rcp.product</module>
-        <module>org.eclipse.tracecompass.rcp.rcptt.tests</module>
       </modules>
     </profile>
   </profiles>

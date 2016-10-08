@@ -35,10 +35,23 @@
     <module>org.eclipse.tracecompass.analysis.os.linux.core.tests</module>
     <module>org.eclipse.tracecompass.analysis.os.linux.ui</module>
     <module>org.eclipse.tracecompass.analysis.os.linux.ui.tests</module>
-    <module>org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests</module>
     <module>org.eclipse.tracecompass.analysis.timing.core</module>
     <module>org.eclipse.tracecompass.analysis.timing.core.tests</module>
     <module>org.eclipse.tracecompass.analysis.timing.ui</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>automated-ui-tests</id>
+      <activation>
+        <property>
+          <name>!skip-automated-ui-tests</name>
+        </property>
+      </activation>
+      <modules>
+        <module>org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>

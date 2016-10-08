@@ -30,13 +30,11 @@
     <module>org.eclipse.tracecompass.tmf.core.tests</module>
     <module>org.eclipse.tracecompass.tmf.ui</module>
     <module>org.eclipse.tracecompass.tmf.ui.tests</module>
-    <module>org.eclipse.tracecompass.tmf.ui.swtbot.tests</module>
 
     <module>org.eclipse.tracecompass.tmf.analysis.xml.core</module>
     <module>org.eclipse.tracecompass.tmf.analysis.xml.core.tests</module>
     <module>org.eclipse.tracecompass.tmf.analysis.xml.ui</module>
     <module>org.eclipse.tracecompass.tmf.analysis.xml.ui.tests</module>
-    <module>org.eclipse.tracecompass.tmf.analysis.xml.ui.swtbot.tests</module>
 
     <module>org.eclipse.tracecompass.tmf.chart.core</module>
     <!-- <module>org.eclipse.tracecompass.tmf.chart.core.tests</module> -->
@@ -47,7 +45,22 @@
     <module>org.eclipse.tracecompass.tmf.remote.core.tests</module>
     <module>org.eclipse.tracecompass.tmf.remote.ui</module>
     <module>org.eclipse.tracecompass.tmf.remote.ui.tests</module>
-    <module>org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>automated-ui-tests</id>
+      <activation>
+        <property>
+          <name>!skip-automated-ui-tests</name>
+        </property>
+      </activation>
+      <modules>
+        <module>org.eclipse.tracecompass.tmf.ui.swtbot.tests</module>
+        <module>org.eclipse.tracecompass.tmf.analysis.xml.ui.swtbot.tests</module>
+        <module>org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>

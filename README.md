@@ -70,9 +70,15 @@ the build system. You can set them by using `-P[profile name]` and
   stable platform. To use the staging target for example, use
   `-Dtarget-platform=tracecompass-eStaging`.
 
+* `-Dskip-automated-ui-tests`
+
+  Skips the automated UI integration tests. Not required when using
+  `-Dmaven.test.skip=true`, which already skips all the tests.
+
 * `-Dskip-rcp`
 
-  Skips building the RCP archives and related deployment targets.
+  Skips building the RCP archives and related deployment targets. Only works in
+  conjunction with `-Dskip-automated-ui-tests`, due to a limitation in Maven.
 
 * `-Pctf-grammar`
 
