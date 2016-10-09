@@ -190,22 +190,15 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
         @Override
         public void run() {
             LOGGER.info(() -> getLogMessage("UpdateThreadStart", "numRequests=" + fNumRequests + ", tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            Display.getDefault().syncExec(new Runnable() {
-                @Override
-                public void run() {
-                    LOGGER.info(() -> getLogMessage("UpdateDataStart", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
-                    try {
-                        updateData(getWindowStartTime(), getWindowEndTime(), fNumRequests, fMonitor);
-                    } finally {
-                        /*
-                         * fDirty should have been incremented before creating
-                         * the thread, so we decrement it once it is finished
-                         */
-                        fDirty.decrementAndGet();
-                        LOGGER.info(() -> getLogMessage("UpdateDataEnd", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
-                    }
-                }
-            });
+            try {
+                updateData(getWindowStartTime(), getWindowEndTime(), fNumRequests, fMonitor);
+            } finally {
+                /*
+                 * fDirty should have been incremented before creating the
+                 * thread, so we decrement it once it is finished
+                 */
+                fDirty.decrementAndGet();
+            }
             updateThreadFinished(this);
             LOGGER.info(() -> getLogMessage("UpdateThreadEnd", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
         }
@@ -399,6 +392,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
             @Override
             public void run() {
                 try {
+                    LOGGER.info(() -> getLogMessage("UpdateDisplayStart", null)); //$NON-NLS-1$
                     if (!getSwtChart().isDisposed()) {
                         double[] xValues = fXValues;
                         double maxy = DEFAULT_MAXY;
@@ -445,10 +439,12 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                             TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(TmfCommonXLineChartViewer.this, timeAlignmentInfo, true));
                         }
                     }
+                    LOGGER.info(() -> getLogMessage("UpdateDisplayEnd", null)); //$NON-NLS-1$
                 } finally {
                     /* Content has been updated, decrement dirtiness */
                     fDirty.decrementAndGet();
                 }
+
             }
         });
     }
