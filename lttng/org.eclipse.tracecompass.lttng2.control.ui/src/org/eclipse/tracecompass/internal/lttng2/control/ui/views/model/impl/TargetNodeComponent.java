@@ -34,8 +34,8 @@ import org.eclipse.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.remote.core.RemoteConnectionChangeEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceControlComponent;
@@ -427,16 +427,19 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
                     // Get provider information from node
                     TraceProviderGroup providerGroup = new TraceProviderGroup(Messages.TraceControl_ProviderDisplayName, TargetNodeComponent.this);
                     addChild(providerGroup);
+                    providerGroup.getProviderFromNode(monitor);
 
                     // Get session information from node
                     TraceSessionGroup sessionGroup = new TraceSessionGroup(Messages.TraceControl_AllSessionsDisplayName, TargetNodeComponent.this);
                     addChild(sessionGroup);
-
-                    providerGroup.getProviderFromNode(monitor);
                     sessionGroup.getSessionsFromNode(monitor);
                 } catch (ExecutionException e) {
                     removeAllChildren();
                     return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_RetrieveNodeConfigurationFailure, e);
+                } finally {
+                    if (getTargetNodeState() == TargetNodeState.CONNECTING) {
+                        setTargetNodeState(TargetNodeState.CONNECTED);
+                    }
                 }
 
                 return Status.OK_STATUS;
@@ -484,8 +487,7 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
             createControlService();
             getConfigurationFromNode();
             // Set connected only after the control service has been created and the jobs for creating the
-            // sub-nodes are scheduled.
-            setTargetNodeState(TargetNodeState.CONNECTED);
+            // sub-nodes are completed.
         } catch (final ExecutionException e) {
             // Disconnect only if no control service, otherwise stay connected.
             if (getControlService() == NULL_CONTROL_SERVICE) {

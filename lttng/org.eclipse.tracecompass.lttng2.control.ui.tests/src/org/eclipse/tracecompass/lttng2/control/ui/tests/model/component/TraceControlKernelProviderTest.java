@@ -45,6 +45,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.Trac
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceProviderGroup;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 import org.eclipse.tracecompass.tmf.remote.core.proxy.TmfRemoteConnectionFactory;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -120,11 +121,7 @@ public class TraceControlKernelProviderTest {
         fFacility.waitForJobs();
 
         fFacility.executeCommand(node, "connect");
-        int i = 0;
-        while ((i < 20) && (node.getTargetNodeState() != TargetNodeState.CONNECTED)) {
-            i++;
-            fFacility.delay(TraceControlTestFacility.GUI_REFESH_DELAY);
-        }
+        WaitUtils.waitUntil(new TargetNodeConnectedCondition(node));
 
         // Verify that node is connected
         assertEquals(TargetNodeState.CONNECTED, node.getTargetNodeState());

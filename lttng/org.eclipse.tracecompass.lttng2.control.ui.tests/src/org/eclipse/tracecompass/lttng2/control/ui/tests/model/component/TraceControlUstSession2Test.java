@@ -24,8 +24,8 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.remote.core.IRemoteConnection;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BufferType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.ChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.stubs.dialogs.CreateSessionDialogStub;
@@ -40,6 +40,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.Trac
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 import org.eclipse.tracecompass.tmf.remote.core.proxy.TmfRemoteConnectionFactory;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -116,11 +117,7 @@ public class TraceControlUstSession2Test {
         fFacility.waitForJobs();
 
         fFacility.executeCommand(node, "connect");
-        int i = 0;
-        while ((i < 10) && (node.getTargetNodeState() != TargetNodeState.CONNECTED)) {
-            i++;
-            fFacility.delay(TraceControlTestFacility.GUI_REFESH_DELAY);
-        }
+        WaitUtils.waitUntil(new TargetNodeConnectedCondition(node));
 
         // Get provider groups
         ITraceControlComponent[] groups = node.getChildren();

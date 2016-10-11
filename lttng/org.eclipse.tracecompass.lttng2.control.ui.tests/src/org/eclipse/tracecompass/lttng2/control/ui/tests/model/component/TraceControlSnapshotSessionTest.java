@@ -38,6 +38,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.Targ
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.property.TraceSessionPropertySource;
 import org.eclipse.tracecompass.tmf.remote.core.proxy.TmfRemoteConnectionFactory;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.junit.After;
@@ -115,11 +116,7 @@ public class TraceControlSnapshotSessionTest {
         fFacility.waitForJobs();
 
         fFacility.executeCommand(node, "connect");
-        int i = 0;
-        while ((i < 10) && (node.getTargetNodeState() != TargetNodeState.CONNECTED)) {
-            i++;
-            fFacility.delay(TraceControlTestFacility.GUI_REFESH_DELAY);
-        }
+        WaitUtils.waitUntil(new TargetNodeConnectedCondition(node));
 
         // Get provider groups
         ITraceControlComponent[] groups = node.getChildren();

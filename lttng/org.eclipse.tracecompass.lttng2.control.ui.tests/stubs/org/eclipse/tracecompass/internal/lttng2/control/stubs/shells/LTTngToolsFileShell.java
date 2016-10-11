@@ -58,10 +58,10 @@ public class LTTngToolsFileShell extends TestCommandShell {
     private final static String COMMENT_KEY = "#.*";
 
     private final static Pattern LTTNG_LIST_SESSION_PATTERN = Pattern.compile("lttng\\s+list\\s+(.+)");
-    private final static String LTTNG_LIST_PROVIDER_PATTERN = "lttng\\s+list\\s+(-u|-k)";
+    private final static String LTTNG_LIST_PROVIDER_PATTERN = "lttng\\s+list\\s+(-u|-k|-j|-l|-p).*";
 
     private final static Pattern LTTNG_LIST_SESSION_MI_PATTERN = Pattern.compile("lttng\\s+--mi xml\\s+list\\s+(.+)");
-    private final static String LTTNG_LIST_PROVIDER_MI_PATTERN = "lttng\\s+--mi xml\\s+list\\s+(-u|-k)";
+    private final static String LTTNG_LIST_PROVIDER_MI_PATTERN = "lttng\\s+--mi xml\\s+list\\s+(-u|-k|-j|-l|-p).*";
 
     private final static String LTTNG_USER_HOME_PATTERN = "\\$\\{userhome\\}";
     private final static String LTTNG_WORKSPACE_PATTERN = "\\$\\{workspace\\}";
@@ -201,14 +201,14 @@ public class LTTngToolsFileShell extends TestCommandShell {
                             input = strLine;
 
                             // Update userhome
-                            input = input.replaceAll(LTTNG_USER_HOME_PATTERN, USER_HOME);
+                            input = input.replaceAll(LTTNG_USER_HOME_PATTERN, Matcher.quoteReplacement(USER_HOME));
 
                             // Update workspace
-                            input = input.replaceAll(LTTNG_WORKSPACE_PATTERN, WORKSPACE_HOME);
+                            input = input.replaceAll(LTTNG_WORKSPACE_PATTERN, Matcher.quoteReplacement(WORKSPACE_HOME));
 
                             // Update session variable
                             if (fSessionName != null) {
-                                input = input.replaceAll(SESSION_NAME_PATTERN, fSessionName);
+                                input = input.replaceAll(SESSION_NAME_PATTERN, Matcher.quoteReplacement(fSessionName));
                             }
 
                             // Handle instances of 'lttng list
@@ -257,14 +257,14 @@ public class LTTngToolsFileShell extends TestCommandShell {
                             }
 
                             // Update userhome
-                            strLine = strLine.replaceAll(LTTNG_USER_HOME_PATTERN, USER_HOME);
+                            strLine = strLine.replaceAll(LTTNG_USER_HOME_PATTERN, Matcher.quoteReplacement(USER_HOME));
 
                             // Update workspace
-                            strLine = strLine.replaceAll(LTTNG_WORKSPACE_PATTERN, WORKSPACE_HOME);
+                            strLine = strLine.replaceAll(LTTNG_WORKSPACE_PATTERN, Matcher.quoteReplacement(WORKSPACE_HOME));
 
                             // Update session variable
                             if (fSessionName != null) {
-                                strLine = strLine.replaceAll(SESSION_NAME_PATTERN, fSessionName);
+                                strLine = strLine.replaceAll(SESSION_NAME_PATTERN, Matcher.quoteReplacement(fSessionName));
                             }
 
                             // lines of output/error output

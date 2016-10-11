@@ -241,12 +241,13 @@ public class ControlViewTest {
         nodeItem.select();
         SWTBotMenu menuBot = nodeItem.contextMenu(ControlViewSwtBotUtil.CONNECT_MENU_ITEM);
         menuBot.click();
-        WaitUtils.waitForJobs();
 
         fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.SESSION_GROUP_NAME, nodeItem));
 
         // Verify that node is connected
         fBot.waitUntil(ControlViewSwtBotUtil.isStateChanged(fNode, TargetNodeState.CONNECTED));
+        // Wait for node configuration jobs
+        WaitUtils.waitForJobs();
         assertEquals(TargetNodeState.CONNECTED, fNode.getTargetNodeState());
     }
 
