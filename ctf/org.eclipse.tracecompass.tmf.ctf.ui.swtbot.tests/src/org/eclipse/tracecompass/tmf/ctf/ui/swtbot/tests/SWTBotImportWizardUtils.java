@@ -50,8 +50,10 @@ public final class SWTBotImportWizardUtils {
 
         SWTBotCombo sourceCombo = bot.comboBox();
         File traceFolderParent = new File(directoryPath);
+        sourceCombo.setFocus();
         sourceCombo.setText(traceFolderParent.getAbsolutePath());
 
+        /* the resource tree gets updated when the combo loses focus */
         SWTBotText text = bot.text();
         text.setFocus();
     }
@@ -70,8 +72,10 @@ public final class SWTBotImportWizardUtils {
 
         SWTBotCombo sourceCombo = bot.comboBox(1);
 
+        sourceCombo.setFocus();
         sourceCombo.setText(new File(archivePath).getAbsolutePath());
 
+        /* the resource tree gets updated when the combo loses focus */
         SWTBotText text = bot.text();
         text.setFocus();
     }

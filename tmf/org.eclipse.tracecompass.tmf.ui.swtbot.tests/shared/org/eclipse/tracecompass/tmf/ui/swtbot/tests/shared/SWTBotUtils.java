@@ -177,6 +177,10 @@ public final class SWTBotUtils {
         closeSecondaryShells(bot);
         WaitUtils.waitForJobs();
 
+        if (!ResourcesPlugin.getWorkspace().getRoot().getProject(projectName).exists()) {
+            return;
+        }
+
         final SWTBotView projectViewBot = bot.viewById(IPageLayout.ID_PROJECT_EXPLORER);
         projectViewBot.setFocus();
 

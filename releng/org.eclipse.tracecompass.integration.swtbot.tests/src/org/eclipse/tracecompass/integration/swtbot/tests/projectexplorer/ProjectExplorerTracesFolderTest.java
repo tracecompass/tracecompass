@@ -32,6 +32,7 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportConfirmation;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportTraceWizardPage;
@@ -53,6 +54,7 @@ import org.junit.runners.MethodSorters;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 /**
  * SWTBot test for testing Project Explorer trace folders (context-menu,
@@ -62,6 +64,19 @@ import com.google.common.collect.ImmutableSet;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @SuppressWarnings({"restriction", "javadoc"})
 public class ProjectExplorerTracesFolderTest {
+
+    private static final class ImportConfirmationSupplier implements Supplier<ImportConfirmation> {
+        List<ImportConfirmation> fConfirmations = Lists.newArrayList(ImportConfirmation.CONTINUE);
+
+        public ImportConfirmationSupplier(ImportConfirmation... confirmations) {
+            fConfirmations = Lists.newArrayList(confirmations);
+        }
+
+        @Override
+        public ImportConfirmation get() {
+            return fConfirmations.isEmpty() ? null : fConfirmations.remove(0);
+        }
+    }
 
     private static final String PROP_LAST_MODIFIED_PROPERTY = "last modified";
     private static final String TEXT_EDITOR_ID = "org.eclipse.ui.DefaultTextEditor";
@@ -123,6 +138,7 @@ public class ProjectExplorerTracesFolderTest {
 
 
     private static final File TEST_TRACES_PATH = new File(new Path(TmfTraceManager.getTemporaryDirPath()).append("testtraces").toOSString());
+    private static final String DEFAULT_PROJECT_NAME = "Tracing";
     private static final String TRACE_PROJECT_NAME = "test";
     private static final String MANAGE_CUSTOM_PARSERS_SHELL_TITLE = "Manage Custom Parsers";
 
@@ -168,6 +184,7 @@ public class ProjectExplorerTracesFolderTest {
     @AfterClass
     public static void tearDown() {
         SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
+        SWTBotUtils.deleteProject(DEFAULT_PROJECT_NAME, fBot);
         fLogger.removeAllAppenders();
     }
 
@@ -179,7 +196,7 @@ public class ProjectExplorerTracesFolderTest {
         SWTBotUtils.closeSecondaryShells(fBot);
     }
 
-    private static void test3_01Preparation() {
+    private static void test3_00Preparation() {
         // FIXME: We can't use Manage Custom Parsers > Import because it uses a native dialog. We'll still check that they show up in the dialog
         CustomTxtTraceDefinition[] txtDefinitions = CustomTxtTraceDefinition.loadAll(getPath("customParsers/ExampleCustomTxtParser.xml"));
         txtDefinitions[0].save();
@@ -213,7 +230,7 @@ public class ProjectExplorerTracesFolderTest {
      */
     @Test
     public void test3_01ContextMenuPresence() {
-        test3_01Preparation();
+        test3_00Preparation();
 
         SWTBotTreeItem traceItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
 
@@ -655,21 +672,8 @@ public class ProjectExplorerTracesFolderTest {
     public void test3_16ImportRecursiveAutoRenameOverwriteSkip() {
         SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
 
-        Supplier<ImportConfirmation> confirmationSupplier = new Supplier<ImportConfirmation>() {
-            final ImportConfirmation dialogConfirmationOrder[] = new ImportConfirmation[] { ImportConfirmation.RENAME, ImportConfirmation.OVERWRITE, ImportConfirmation.SKIP };
-            int fRsponseNum = 0;
-
-            @Override
-            public ImportConfirmation get() {
-                if (fRsponseNum >= dialogConfirmationOrder.length) {
-                    return null;
-                }
-
-                ImportConfirmation confirmation = dialogConfirmationOrder[fRsponseNum];
-                fRsponseNum++;
-                return confirmation;
-            }
-        };
+        Supplier<ImportConfirmation> confirmationSupplier = new ImportConfirmationSupplier(
+                ImportConfirmation.RENAME, ImportConfirmation.OVERWRITE, ImportConfirmation.SKIP);
         int optionFlags = ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES | ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
         importTrace(optionFlags, confirmationSupplier, LTTNG_KERNEL_TRACE.getTracePath(), CLASHES_LTTNG_KERNEL_TRACE.getTracePath(), SIMPLE_SERVER1_UST_TRACE.getTracePath(), CLASHES_SIMPLE_SERVER1_UST_TRACE.getTracePath(),
                 SIMPLE_SERVER2_UST_TRACE.getTracePath(), CLASHES_SIMPLE_SERVER2_UST_TRACE.getTracePath(), UNRECOGNIZED_LOG.getTracePath());
@@ -839,8 +843,58 @@ public class ProjectExplorerTracesFolderTest {
         assertEquals(TEXT_BASED_TRACEINFOS.length, tracesFolderItem.getItems().length);
     }
 
-    private static void verifyTrace(TestTraceInfo traceInfo, int importOptionFlags) {
-        verifyTrace(traceInfo, importOptionFlags, traceInfo.getTraceName());
+    /**
+     * Action : Test the import wizard from workbench menu with project selected
+     * <p>
+     * <pre>
+     * Procedure : 1) Select Project "Test" in Project Explorer view
+     *             2) Open import wizard from menu File > Import... > Tracing > Trace Import
+     *             3) Browse to directory ${local}/traces/import/
+     *             4) Select trace ExampleCustomTxt.log
+     *             5) Keep <Auto Detection>, select "Create Links to workspace" and
+     *             6) press Finish
+     * </pre>
+     * <p>
+     * Expected Results: Verify that trace is imported to "Test" project and can be opened.
+     */
+    @Test
+    public void test3_21ImportFromMenuProjectSelected() {
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME);
+        SWTBotShell shell = openWorkbenchMenuImport();
+        int optionFlags = ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
+        importTrace(shell, null, null, optionFlags, new ImportConfirmationSupplier(), CUSTOM_TEXT_LOG.getTracePath());
+        verifyTrace(CUSTOM_TEXT_LOG, optionFlags);
+    }
+
+    /**
+     * Action : Test the import wizard from workbench menu with no project selected
+     * <p>
+     * <pre>
+     * Procedure : 1) Clear selection in Project Explorer view
+     *             2) Open import wizard from menu File > Import... > Tracing > Trace Import
+     *             3) Browse to directory ${local}/traces/import/
+     *             4) Select trace ExampleCustomTxt.log
+     *             5) Keep <Auto Detection>, select "Create Links to workspace" and
+     *             6) press Finish
+     * </pre>
+     * <p>
+     * Expected Results: Verify that trace is imported to default "Tracing" project and can be opened.
+     */
+    @Test
+    public void test3_22ImportFromMenuProjectNotSelected() {
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        SWTBotView projectExplorerBot = fBot.viewByTitle("Project Explorer");
+        projectExplorerBot.show();
+        projectExplorerBot.bot().waitUntil(Conditions.widgetIsEnabled(projectExplorerBot.bot().tree()));
+        projectExplorerBot.bot().tree().unselect();
+        SWTBotShell shell = openWorkbenchMenuImport();
+        int optionFlags = ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
+        importTrace(shell, null, null, optionFlags, new ImportConfirmationSupplier(), CUSTOM_TEXT_LOG.getTracePath());
+        verifyTrace(CUSTOM_TEXT_LOG, optionFlags, CUSTOM_TEXT_LOG.getTraceName(), CUSTOM_TEXT_LOG.getTraceType(), DEFAULT_PROJECT_NAME);
+        SWTBotUtils.deleteProject(DEFAULT_PROJECT_NAME, fBot);
     }
 
     /**
@@ -948,6 +1002,200 @@ public class ProjectExplorerTracesFolderTest {
         assertEquals(7, tracesFolderItem.getItems().length);
         SWTBotTreeItem clashesFolderItem = SWTBotUtils.getTraceProjectItem(fBot, tracesFolderItem, CLASHES_DIR_NAME);
         assertEquals(4, clashesFolderItem.getItems().length);
+    }
+
+    /**
+     * <p>
+     * Action : Delete with mixed selection of traces and folder
+     * <p>
+     *
+     * <pre>
+     * Procedure : 0) Delete all traces in project
+     *             1) Create two trace folders under the "Traces" folder
+     *             2) Import 2 traces under each folder
+     *             3) Open all 4 traces.
+     *             4) Select the trace in the first folder and the second folder in the Project Explorer view
+     *             5) Right-click, Delete. Click Yes.
+     * </pre>
+     * <p>
+     * Expected Results: A dialog should ask the user to confirm deletion of the
+     * selected elements. Clicking OK should remove all that was selected. The
+     * editor of the 3 deleted traces should be closed automatically with one
+     * remaining editor opened.
+     */
+    @Test
+    public void test3_32DeleteTraceAndFolder() {
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        SWTBotTreeItem tracesFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        tracesFolder.contextMenu().menu("New Folder...").click();
+        SWTBot newFolderShellBot = fBot.shell("New Folder").bot();
+        newFolderShellBot.text().setText("FolderA");
+        newFolderShellBot.button("OK").click();
+        tracesFolder.contextMenu().menu("New Folder...").click();
+        newFolderShellBot = fBot.shell("New Folder").bot();
+        newFolderShellBot.text().setText("FolderB");
+        newFolderShellBot.button("OK").click();
+
+        int optionFlags = ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
+        SWTBotTreeItem traceFolder = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, "FolderA");
+        SWTBotShell shell = openTraceFoldersImport(traceFolder);
+        importTrace(shell, null, null, optionFlags, new ImportConfirmationSupplier(), CUSTOM_TEXT_LOG.getTracePath(), LTTNG_KERNEL_TRACE.getTracePath());
+        verifyTrace(CUSTOM_TEXT_LOG, optionFlags, "FolderA/" + CUSTOM_TEXT_LOG.getTraceName(), CUSTOM_TEXT_TRACE_TYPE);
+        verifyTrace(LTTNG_KERNEL_TRACE, optionFlags, "FolderA/" + LTTNG_KERNEL_TRACE.getTraceName(), LTTNG_KERNEL_TRACE_TYPE);
+
+        traceFolder = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, "FolderB");
+        shell = openTraceFoldersImport(traceFolder);
+        importTrace(shell, null, null, optionFlags, new ImportConfirmationSupplier(), CUSTOM_TEXT_LOG.getTracePath(), LTTNG_KERNEL_TRACE.getTracePath());
+        verifyTrace(CUSTOM_TEXT_LOG, optionFlags, "FolderB/" + CUSTOM_TEXT_LOG.getTraceName(), CUSTOM_TEXT_TRACE_TYPE);
+        verifyTrace(LTTNG_KERNEL_TRACE, optionFlags, "FolderB/" + LTTNG_KERNEL_TRACE.getTraceName(), LTTNG_KERNEL_TRACE_TYPE);
+
+        SWTBotTree tree = fBot.viewByTitle("Project Explorer").bot().tree();
+        SWTBotTreeItem folderAItem = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, "FolderA");
+        SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, folderAItem, CUSTOM_TEXT_LOG.getTraceName());
+        SWTBotTreeItem folderBItem = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, "FolderB");
+        tree.select(traceItem, folderBItem);
+        tree.contextMenu().menu("Delete").click();
+        SWTBot deleteConfirmationShellBot = fBot.shell("Confirm Delete").bot();
+        deleteConfirmationShellBot.button("Yes").click();
+        fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, "FolderA/" + CUSTOM_TEXT_LOG.getTraceName()));
+        fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, "FolderB/" + CUSTOM_TEXT_LOG.getTraceName()));
+        fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, "FolderB/" + LTTNG_KERNEL_TRACE.getTraceName()));
+        fBot.waitUntil(ConditionHelpers.isEditorOpened(fBot, "FolderA/" + LTTNG_KERNEL_TRACE.getTraceName()));
+        assertEquals(1, tracesFolder.getNodes().size());
+        assertEquals(1, folderAItem.getNodes().size());
+    }
+
+    /**
+     * <p>
+     * Action : Delete with multiple folders
+     * <p>
+     *
+     * <pre>
+     * Procedure : 0) Delete all traces in project
+     *             1) Create two trace folders under the "Traces" folder
+     *             2) Import a trace under each folder
+     *             3) Open both traces.
+     *             4) Select both folders in the Project Explorer view
+     *             5) Right-click, Delete. Click Yes.
+     * </pre>
+     * <p>
+     * Expected Results: A dialog should ask the user to confirm deletion of the
+     * selected elements. Clicking OK should remove all that was selected. The
+     * editor of the 3 deleted traces should be closed automatically with one
+     * remaining editor opened.
+     */
+    @Test
+    public void test3_33DeleteMultipleFolders() {
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        SWTBotTreeItem tracesFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        tracesFolder.contextMenu().menu("New Folder...").click();
+        SWTBot newFolderShellBot = fBot.shell("New Folder").bot();
+        newFolderShellBot.text().setText("FolderA");
+        newFolderShellBot.button("OK").click();
+        tracesFolder.contextMenu().menu("New Folder...").click();
+        newFolderShellBot = fBot.shell("New Folder").bot();
+        newFolderShellBot.text().setText("FolderB");
+        newFolderShellBot.button("OK").click();
+
+        int optionFlags = ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
+        SWTBotTreeItem traceFolder = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, "FolderA");
+        SWTBotShell shell = openTraceFoldersImport(traceFolder);
+        importTrace(shell, null, null, optionFlags, new ImportConfirmationSupplier(), CUSTOM_TEXT_LOG.getTracePath());
+        verifyTrace(CUSTOM_TEXT_LOG, optionFlags, "FolderA/" + CUSTOM_TEXT_LOG.getTraceName(), CUSTOM_TEXT_TRACE_TYPE);
+
+        traceFolder = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, "FolderB");
+        shell = openTraceFoldersImport(traceFolder);
+        importTrace(shell, null, null, optionFlags, new ImportConfirmationSupplier(), LTTNG_KERNEL_TRACE.getTracePath());
+        verifyTrace(LTTNG_KERNEL_TRACE, optionFlags, "FolderB/" + LTTNG_KERNEL_TRACE.getTraceName(), LTTNG_KERNEL_TRACE_TYPE);
+
+        SWTBotTree tree = fBot.viewByTitle("Project Explorer").bot().tree();
+        SWTBotTreeItem folderAItem = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, "FolderA");
+        SWTBotTreeItem folderBItem = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, "FolderB");
+        tree.select(folderAItem, folderBItem);
+        tree.contextMenu().menu("Delete").click();
+        SWTBot deleteConfirmationShellBot = fBot.shell("Confirm Delete").bot();
+        deleteConfirmationShellBot.button("Yes").click();
+        fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, "FolderA/" + CUSTOM_TEXT_LOG.getTraceName()));
+        fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, "FolderB/" + LTTNG_KERNEL_TRACE.getTraceName()));
+        assertEquals(0, tracesFolder.getNodes().size());
+    }
+
+    /**
+     * <p>
+     * Action : Clear single Traces folder
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) Import 2 traces from different folders preserving folder structure
+     *             2) Open both traces.
+     *             3) Select the Traces folder
+     *             4) Right-click, Clear. Click Yes.
+     * </pre>
+     * <p>
+     * Expected Results: A dialog should ask the user to confirm clearing of the
+     * folder. Clicking Yes should remove everything under the selected folder
+     * and close the traces.
+     */
+    @Test
+    public void test3_34ClearSingleTracesFolder() {
+        int optionFlags = ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE | ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE;
+        importTrace(CUSTOM_TEXT_TRACE_TYPE, optionFlags, ImportConfirmation.CONTINUE, CUSTOM_TEXT_LOG.getTraceName(), CLASHES_CUSTOM_TEXT_LOG.getTracePath());
+
+        verifyTrace(CUSTOM_TEXT_LOG, optionFlags, CUSTOM_TEXT_LOG.getTraceName(), CUSTOM_TEXT_TRACE_TYPE);
+        verifyTrace(CLASHES_CUSTOM_TEXT_LOG, optionFlags, CLASHES_CUSTOM_TEXT_LOG.getTracePath(), CUSTOM_TEXT_TRACE_TYPE);
+
+        SWTBotTreeItem tracesFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        tracesFolder.contextMenu().menu("Clear").click();
+        SWTBot deleteConfirmationShellBot = fBot.shell("Confirm Clear").bot();
+        deleteConfirmationShellBot.button("Yes").click();
+        fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, CUSTOM_TEXT_LOG.getTraceName()));
+        fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, CLASHES_CUSTOM_TEXT_LOG.getTracePath()));
+        assertEquals(0, tracesFolder.getNodes().size());
+    }
+
+    /**
+     * <p>
+     * Action : Clear multiple Traces folder
+     * <p>
+     *
+     * <pre>
+     * Procedure : 1) Import 2 traces to different projects
+     *             2) Open both traces.
+     *             3) Select both Traces folders
+     *             4) Right-click, Clear. Click Yes.
+     * </pre>
+     * <p>
+     * Expected Results: A dialog should ask the user to confirm clearing of the
+     * folders. Clicking Yes should remove everything under the selected folders
+     * and close the traces.
+     */
+    @Test
+    public void test3_35ClearMultipleTracesFolder() {
+        int optionFlags = ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
+        SWTBotTreeItem tracesFolder1 = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        SWTBotShell shell = openTraceFoldersImport(tracesFolder1);
+        importTrace(shell, null, null, optionFlags, new ImportConfirmationSupplier(), CUSTOM_TEXT_LOG.getTracePath());
+        verifyTrace(CUSTOM_TEXT_LOG, optionFlags, CUSTOM_TEXT_LOG.getTraceName(), CUSTOM_TEXT_TRACE_TYPE, TRACE_PROJECT_NAME);
+
+        SWTBotUtils.createProject(DEFAULT_PROJECT_NAME);
+        SWTBotTreeItem tracesFolder2 = SWTBotUtils.selectTracesFolder(fBot, DEFAULT_PROJECT_NAME);
+        shell = openTraceFoldersImport(tracesFolder2);
+        importTrace(shell, null, null, optionFlags, new ImportConfirmationSupplier(), LTTNG_KERNEL_TRACE.getTracePath());
+        verifyTrace(LTTNG_KERNEL_TRACE, optionFlags, LTTNG_KERNEL_TRACE.getTraceName(), LTTNG_KERNEL_TRACE_TYPE, DEFAULT_PROJECT_NAME);
+
+        SWTBotTree tree = fBot.viewByTitle("Project Explorer").bot().tree();
+        tree.select(tracesFolder1, tracesFolder2);
+        tree.contextMenu().menu("Clear").click();
+        SWTBot deleteConfirmationShellBot = fBot.shell("Confirm Clear").bot();
+        deleteConfirmationShellBot.button("Yes").click();
+        fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, CUSTOM_TEXT_LOG.getTraceName()));
+        fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, LTTNG_KERNEL_TRACE.getTraceName()));
+        assertEquals(0, tracesFolder1.getNodes().size());
+        assertEquals(0, tracesFolder2.getNodes().size());
+
+        SWTBotUtils.deleteProject(DEFAULT_PROJECT_NAME, fBot);
     }
 
     /**
@@ -1163,13 +1411,21 @@ public class ProjectExplorerTracesFolderTest {
         assertEquals(1, clashesFolderItem.getItems().length);
     }
 
+    private static void verifyTrace(TestTraceInfo traceInfo, int importOptionFlags) {
+        verifyTrace(traceInfo, importOptionFlags, traceInfo.getTraceName());
+    }
+
     private static void verifyTrace(TestTraceInfo traceInfo, int importOptionFlags, String traceName) {
         verifyTrace(traceInfo, importOptionFlags, traceName, traceInfo.getTraceType());
     }
 
     private static void verifyTrace(TestTraceInfo traceInfo, int importOptionFlags, String traceName, String traceType) {
+        verifyTrace(traceInfo, importOptionFlags, traceName, traceType, TRACE_PROJECT_NAME);
+    }
+
+    private static void verifyTrace(TestTraceInfo traceInfo, int importOptionFlags, String traceName, String traceType, String projectName) {
         String[] tracePath = new Path(traceName).segments();
-        SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), tracePath);
+        SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, projectName), tracePath);
         checkTraceType(traceItem, traceType);
         openTrace(traceItem);
         if (traceType != null && !traceType.isEmpty()) {
@@ -1210,30 +1466,23 @@ public class ProjectExplorerTracesFolderTest {
     }
 
     private static void importTrace(String archiveFile, String traceType, int optionFlags, ImportConfirmation confirmationMode, String ... tracePaths) {
-        importTrace(archiveFile, traceType, optionFlags, new Supplier<ImportConfirmation>() {
-            boolean fDone = false;
-            @Override
-            public ImportConfirmation get() {
-                if (fDone) {
-                    return null;
-                }
-                fDone = true;
-                return confirmationMode;
-            }
-        }, tracePaths);
+        importTrace(archiveFile, traceType, optionFlags, new ImportConfirmationSupplier(confirmationMode), tracePaths);
     }
 
     private static void importTrace(int optionFlags, Supplier<ImportConfirmation> confirmationSuplier, String ... tracePaths) {
         importTrace(null, null, optionFlags, confirmationSuplier, tracePaths);
     }
 
+    private static void importTrace(String archiveFile, String traceType, int optionFlags, Supplier<ImportConfirmation> confirmationSuplier, String ... tracePaths) {
+        SWTBotTreeItem traceFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        SWTBotShell shell = openTraceFoldersImport(traceFolder);
+        importTrace(shell, archiveFile, traceType, optionFlags, confirmationSuplier, tracePaths);
+    }
+
     /**
      * @param tracePaths relative to parent test traces folder
      */
-    private static void importTrace(String archiveFile, String traceType, int optionFlags, Supplier<ImportConfirmation> confirmationSuplier, String ... tracePaths) {
-        SWTBotTreeItem traceFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
-
-        SWTBotShell shell = openTraceFoldersImport(traceFolder);
+    private static void importTrace(SWTBotShell shell, String archiveFile, String traceType, int optionFlags, Supplier<ImportConfirmation> confirmationSuplier, String ... tracePaths) {
         SWTBot bot = shell.bot();
         String rootFolderName;
         if (archiveFile == null) {
@@ -1296,6 +1545,18 @@ public class ProjectExplorerTracesFolderTest {
         traceItem.contextMenu().menu("Import...").click();
         fBot.waitUntil(Conditions.shellIsActive("Trace Import"));
 
+        SWTBotShell shell = fBot.shell("Trace Import");
+        return shell;
+    }
+
+    private static SWTBotShell openWorkbenchMenuImport() {
+        fBot.menu().menu("File", "Import...").click();
+        fBot.waitUntil(Conditions.shellIsActive("Import"));
+
+        SWTBot shellBot = fBot.shell("Import").bot();
+        SWTBotTree tree = shellBot.tree();
+        SWTBotUtils.getTreeItem(fBot, tree, "Tracing", "Trace Import").select();
+        shellBot.button("Next >").click();
         SWTBotShell shell = fBot.shell("Trace Import");
         return shell;
     }
