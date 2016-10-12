@@ -46,6 +46,7 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -113,7 +114,7 @@ public class CopyToClipboardTest {
         SWTBotUtils.switchToTracingPerspective();
 
         /* Finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         SWTBotUtils.createProject(TRACE_PROJECT_NAME);
     }

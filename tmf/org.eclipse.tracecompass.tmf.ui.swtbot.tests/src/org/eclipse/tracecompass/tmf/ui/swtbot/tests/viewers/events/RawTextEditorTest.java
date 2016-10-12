@@ -33,6 +33,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -72,7 +73,7 @@ public class RawTextEditorTest {
 
         SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     /**
@@ -85,7 +86,7 @@ public class RawTextEditorTest {
     public void before() throws Exception {
         SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotUtils.openTrace(PROJECT_NAME, createTrace(INITIAL_NB_EVENTS), getTraceType());
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     /**

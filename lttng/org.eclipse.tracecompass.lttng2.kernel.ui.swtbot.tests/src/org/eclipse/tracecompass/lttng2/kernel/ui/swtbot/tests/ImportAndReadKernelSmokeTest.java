@@ -37,6 +37,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.histogram.HistogramView;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -100,17 +101,17 @@ public class ImportAndReadKernelSmokeTest extends KernelTestBase {
         final TmfSelectionRangeUpdatedSignal signal = new TmfSelectionRangeUpdatedSignal(hv, fDesired1.getTimestamp());
         final TmfSelectionRangeUpdatedSignal signal2 = new TmfSelectionRangeUpdatedSignal(hv, fDesired2.getTimestamp());
         hv.updateTimeRange(100000);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         hv.selectionRangeUpdated(signal);
         hv.broadcast(signal);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         SWTBotUtils.delay(1000);
 
         hv.updateTimeRange(1000000000);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         hv.selectionRangeUpdated(signal2);
         hv.broadcast(signal2);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         SWTBotUtils.delay(1000);
         assertNotNull(hv);
     }

@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
@@ -73,7 +74,7 @@ public class MemoryUsageViewTest {
         SWTBotUtils.switchToTracingPerspective();
 
         /* finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     /**
@@ -88,7 +89,7 @@ public class MemoryUsageViewTest {
         final File file = new File(CtfTmfTestTraceUtils.getTrace(cygProfile).getPath());
         SWTBotUtils.openTrace(PROJECT_NAME, file.getAbsolutePath(), UST_ID);
         SWTBotUtils.openView(MemoryUsageView.ID);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     /**

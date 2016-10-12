@@ -21,6 +21,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionS
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.Test;
 
 /**
@@ -143,7 +144,7 @@ public class ControlViewLoggerTest extends ControlViewTest {
 
         // Click the Ok at the bottom of the dialog window
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(domainName, sessionItem));
 
         // Assert that the domain is correct
@@ -183,7 +184,7 @@ public class ControlViewLoggerTest extends ControlViewTest {
 
         // Click the Ok at the bottom of the dialog window
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(domainName, sessionItem));
 
         // Assert that the domain is correct
@@ -222,7 +223,7 @@ public class ControlViewLoggerTest extends ControlViewTest {
         shell.bot().ccomboBoxInGroup(LOGLEVEL_PROPERTY_NAME).setSelection(logLevel);
         // Click the Ok at the bottom of the dialog window
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(domainName, sessionItem));
 
         // Assert that the domain is correct
@@ -253,7 +254,7 @@ public class ControlViewLoggerTest extends ControlViewTest {
         shell.bot().textInGroup("Specific logger").setText(ControlViewSwtBotUtil.SPECIFIC_LOGGER_NAME1 + "," + ControlViewSwtBotUtil.SPECIFIC_LOGGER_NAME2);
         // Click the Ok at the bottom of the dialog window
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(domainName, sessionItem));
 
         // Assert that the domain is correct

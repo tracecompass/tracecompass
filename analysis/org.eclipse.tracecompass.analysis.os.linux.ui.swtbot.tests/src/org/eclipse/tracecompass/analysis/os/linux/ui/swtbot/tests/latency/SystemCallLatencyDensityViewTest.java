@@ -41,6 +41,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.Syst
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.junit.After;
@@ -87,7 +88,7 @@ public class SystemCallLatencyDensityViewTest {
         /* Switch perspectives */
         SWTBotUtils.switchToTracingPerspective();
         /* Finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
     }
 
@@ -180,9 +181,9 @@ public class SystemCallLatencyDensityViewTest {
         bot.waitUntil(ConditionHelpers.ViewIsClosed(view));
         SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotUtils.openTrace(PROJECT_NAME, tracePath, TRACE_TYPE);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         createDensityViewer();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         SWTBotTable tableBot = new SWTBotTable(fDensityViewer.getTableViewer().getTable());
         bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1,600", 0, 2));
         tableBot.header("Duration").click();

@@ -43,6 +43,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -98,7 +99,7 @@ public class FontEventEditorTest {
         SWTBotUtils.switchToTracingPerspective();
 
         /* Finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     /**

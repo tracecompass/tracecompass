@@ -25,6 +25,7 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -136,7 +137,7 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
         // Set the regular expression for each event line
         fBot.styledText().setText("12 Hello\nWorld\n23 Goodbye\ncruel world");
         eventLine[0].select();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         fBot.textWithLabel("Regular expression:").setText("\\s*(\\d\\d)\\s(.*\\S)");
         eventLine[1].select();
         fBot.textWithLabel("Regular expression:").setText("([^0-9]*)");
@@ -235,7 +236,7 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
         assertNotNull(eventLine[1]);
         fBot.styledText().setText("12 Hello\nWorld\n23 Goodbye\ncruel world");
         eventLine[0].select();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         fBot.textWithLabel("Regular expression:").setText("\\s*(\\d\\d)\\s(.*\\S)");
         eventLine[1].select();
         fBot.textWithLabel("Regular expression:").setText("([^0-9]*)");

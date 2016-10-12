@@ -44,6 +44,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.stat
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.PlatformUI;
@@ -99,7 +100,7 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
         /* Switch perspectives */
         switchTracingPerspective();
         /* Finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
     }
 
@@ -184,9 +185,9 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
         bot.waitUntil(ConditionHelpers.ViewIsClosed(view));
         SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotUtils.openTrace(PROJECT_NAME, tracePath, TRACE_TYPE);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         createTree();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         assertEquals("1.000 µs", fTreeBot.cell(0, MIN_COL));
         assertEquals("5.904 s", fTreeBot.cell(0, MAX_COL));
         assertEquals("15.628 ms", fTreeBot.cell(0, AVERAGE_COL)); // double

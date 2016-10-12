@@ -41,6 +41,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackView;
 import org.junit.After;
 import org.junit.Before;
@@ -156,7 +157,7 @@ public class CallStackViewTest {
 
         SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     /**
@@ -171,7 +172,7 @@ public class CallStackViewTest {
         final File file = new File(CtfTmfTestTraceUtils.getTrace(cygProfile).getPath());
         SWTBotUtils.openTrace(PROJECT_NAME, file.getAbsolutePath(), UST_ID);
         SWTBotUtils.openView(CallStackView.ID);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     /**
@@ -212,7 +213,7 @@ public class CallStackViewTest {
 
         final SWTBotView viewBot = fBot.viewById(CallStackView.ID);
         viewBot.setFocus();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         List<String> names = getVisibleStackFrames(viewBot);
         assertArrayEquals(STACK_FRAMES[0], names.toArray());
     }
@@ -231,7 +232,7 @@ public class CallStackViewTest {
             viewBot.toolbarPushButton(SELECT_NEXT_STATE_CHANGE).click();
             currentEventOffset++;
             fBot.waitUntil(ConditionHelpers.selectionInEventsTable(fBot, TIMESTAMPS[currentEventOffset]));
-            SWTBotUtils.waitForJobs();
+            WaitUtils.waitForJobs();
             assertArrayEquals(STACK_FRAMES[currentEventOffset], getVisibleStackFrames(viewBot).toArray());
 
         }
@@ -240,20 +241,20 @@ public class CallStackViewTest {
             viewBot.toolbarPushButton(SELECT_PREVIOUS_STATE_CHANGE).click();
             currentEventOffset--;
             fBot.waitUntil(ConditionHelpers.selectionInEventsTable(fBot, TIMESTAMPS[currentEventOffset]));
-            SWTBotUtils.waitForJobs();
+            WaitUtils.waitForJobs();
             assertArrayEquals(STACK_FRAMES[currentEventOffset], getVisibleStackFrames(viewBot).toArray());
         }
         // move up and down once to make sure it doesn't explode
         viewBot.toolbarPushButton(SELECT_PREVIOUS_ITEM).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         viewBot.toolbarPushButton(SELECT_NEXT_ITEM).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         // Zoom in and out too
         viewBot.toolbarPushButton(ZOOM_IN).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         viewBot.toolbarPushButton(ZOOM_OUT).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     /**
@@ -269,7 +270,7 @@ public class CallStackViewTest {
         viewBot.toolbarToggleButton(SORT_BY_ID).click();
         viewBot.toolbarToggleButton(SORT_BY_START).click();
         viewBot.setFocus();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         List<String> names = getVisibleStackFrames(viewBot);
         assertArrayEquals(STACK_FRAMES[0], names.toArray());
     }
@@ -305,7 +306,7 @@ public class CallStackViewTest {
         viewBot.setFocus();
         // no way to load mappings yet! :(
         SWTBotTree tree = viewBot.bot().tree();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         List<String> names = new ArrayList<>();
         for (SWTBotTreeItem swtBotTreeItem : tree.getAllItems()) {
             for (SWTBotTreeItem items : swtBotTreeItem.getItems()) {

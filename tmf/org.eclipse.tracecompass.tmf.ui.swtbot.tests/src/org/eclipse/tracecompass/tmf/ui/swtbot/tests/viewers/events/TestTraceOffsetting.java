@@ -42,6 +42,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -98,7 +99,7 @@ public class TestTraceOffsetting {
 
         SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         fLocation = File.createTempFile("sample", ".xml");
         try (BufferedRandomAccessFile braf = new BufferedRandomAccessFile(fLocation, "rw")) {
             braf.writeBytes(TRACE_START);
@@ -143,7 +144,7 @@ public class TestTraceOffsetting {
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, traceFolderItem, fLocation.getName());
         traceItem.select();
         traceItem.contextMenu("Apply Time Offset...").click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         // set offset to 99 ns
         SWTBotShell shell = fBot.shell("Apply time offset");
         shell.setFocus();
@@ -154,7 +155,7 @@ public class TestTraceOffsetting {
         swtBotTreeItem.pressShortcut(KeyStroke.getInstance('9'));
         swtBotTreeItem.pressShortcut(KeyStroke.getInstance('9'));
         swtBotTreeItem.pressShortcut(KeyStroke.getInstance('\n'));
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         fBot.button("OK").click();
 
         // wait for trace to close

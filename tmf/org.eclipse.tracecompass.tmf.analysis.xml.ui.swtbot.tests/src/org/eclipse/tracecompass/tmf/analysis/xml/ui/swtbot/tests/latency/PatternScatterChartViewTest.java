@@ -24,7 +24,7 @@ import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternScatterGraphView;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.junit.Test;
@@ -70,7 +70,7 @@ public class PatternScatterChartViewTest extends PatternLatencyViewTestBase {
     @Test
     public void testWithTrace() {
         setChart();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         final Chart scatterChart = fScatterChart;
         assertNotNull(scatterChart);
         fBot.waitUntil(ConditionHelpers.numberOfSeries(scatterChart, 1));

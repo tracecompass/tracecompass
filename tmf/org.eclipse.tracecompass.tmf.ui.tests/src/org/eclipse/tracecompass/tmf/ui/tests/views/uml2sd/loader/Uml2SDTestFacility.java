@@ -34,7 +34,7 @@ import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.TmfCheckpointIndexer;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
-import org.eclipse.tracecompass.tmf.ui.tests.shared.JobUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.uml2sd.trace.TmfUml2SDTestTrace;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.dialogs.Criteria;
@@ -238,7 +238,7 @@ public class Uml2SDTestFacility {
      * Waits for all Eclipse jobs to finish
      */
     public void waitForJobs() {
-        JobUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     /**

@@ -41,6 +41,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests.SWTBotImportWizardUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IPageLayout;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -155,7 +156,7 @@ public class ProjectExplorerTracesFolderTest {
         SWTBotUtils.switchToTracingPerspective();
 
         /* Finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         SWTBotUtils.createProject(TRACE_PROJECT_NAME);
     }
 

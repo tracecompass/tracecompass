@@ -24,7 +24,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceControlComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
-import org.eclipse.tracecompass.tmf.ui.tests.shared.JobUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -182,7 +182,7 @@ public class TraceControlTestFacility {
      * Waits for all Eclipse jobs to finish
      */
     public void waitForJobs() {
-        JobUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     private IViewPart showView(String viewId) throws PartInitException {

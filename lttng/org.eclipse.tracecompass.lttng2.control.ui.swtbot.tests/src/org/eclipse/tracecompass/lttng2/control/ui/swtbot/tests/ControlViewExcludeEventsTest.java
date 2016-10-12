@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceCon
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceEventComponent;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -117,7 +118,7 @@ public class ControlViewExcludeEventsTest extends ControlViewTest {
 
         // Click the Ok at the bottom of the dialog window
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.UST_DOMAIN_NAME, sessionItem));
 

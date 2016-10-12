@@ -39,6 +39,7 @@ import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.statistics.TmfStatisticsView;
 import org.eclipse.ui.IEditorReference;
 import org.junit.After;
@@ -106,7 +107,7 @@ public class ProjectExplorerTraceActionsTest {
         SWTBotUtils.switchToTracingPerspective();
 
         /* Finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         SWTBotUtils.createProject(TRACE_PROJECT_NAME);
     }
 

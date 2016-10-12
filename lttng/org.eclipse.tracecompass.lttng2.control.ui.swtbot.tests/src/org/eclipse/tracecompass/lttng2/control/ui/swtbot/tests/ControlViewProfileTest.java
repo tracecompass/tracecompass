@@ -20,6 +20,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -94,7 +95,7 @@ public class ControlViewProfileTest extends ControlViewTest {
 
         SWTBotShell shell = fBot.shell(ControlViewSwtBotUtil.SAVE_DIALOG_TITLE).activate();
         shell.bot().button(ControlViewSwtBotUtil.CONFIRM_DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     /**
@@ -120,7 +121,7 @@ public class ControlViewProfileTest extends ControlViewTest {
         profileItem.click();
 
         shell.bot().button(ControlViewSwtBotUtil.CONFIRM_DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         sessionGroupItem = SWTBotUtils.getTreeItem(fBot, fTree,
                 getNodeName(), ControlViewSwtBotUtil.SESSION_GROUP_NAME);

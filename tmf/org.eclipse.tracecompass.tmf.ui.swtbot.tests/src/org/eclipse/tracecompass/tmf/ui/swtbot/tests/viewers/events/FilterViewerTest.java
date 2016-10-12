@@ -40,6 +40,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.filter.FilterView;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -108,7 +109,7 @@ public class FilterViewerTest {
 
         SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         fFileLocation = File.createTempFile("sample", ".xml");
         try (BufferedRandomAccessFile braf = new BufferedRandomAccessFile(fFileLocation, "rw")) {
             braf.writeBytes(TRACE_START);
@@ -324,7 +325,7 @@ public class FilterViewerTest {
     }
 
     private static String applyFilter(SWTWorkbenchBot bot, final String filterName) {
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         final SWTBotTable eventsTable = SWTBotUtils.activeEventsEditor(bot).bot().table();
         SWTBotTableItem tableItem = eventsTable.getTableItem(2);
         tableItem.contextMenu(filterName).click();

@@ -32,6 +32,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.SDView;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.Frame;
 import org.junit.After;
@@ -94,7 +95,7 @@ public class SDViewTest {
 
         SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         fFileLocation = File.createTempFile("sample", ".xml");
         String eventNames[] = { "test:SEND", "test:RECEIVE" };
         String targets[] = { "peer1", "peer2" };
@@ -148,7 +149,7 @@ public class SDViewTest {
 
         assertNotNull(viewBot);
         viewBot.setFocus();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         List<SWTBotToolbarButton> viewButtons = viewBot.getToolbarButtons();
         List<String> titles = new ArrayList<>();
         for (SWTBotToolbarButton buttonBot : viewButtons) {

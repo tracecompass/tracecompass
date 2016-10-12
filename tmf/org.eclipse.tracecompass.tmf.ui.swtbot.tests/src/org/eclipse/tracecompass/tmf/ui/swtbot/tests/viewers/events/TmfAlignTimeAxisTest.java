@@ -36,6 +36,7 @@ import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.ui.project.wizards.NewTmfProjectWizard;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotSash;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackView;
 import org.eclipse.tracecompass.tmf.ui.views.histogram.HistogramView;
 import org.eclipse.tracecompass.tmf.ui.views.timechart.TimeChartView;
@@ -108,7 +109,7 @@ public class TmfAlignTimeAxisTest {
 
         SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         fLocation = File.createTempFile("sample", ".xml");
         try (BufferedRandomAccessFile braf = new BufferedRandomAccessFile(fLocation, "rw")) {
             braf.writeBytes(TRACE_START);
@@ -227,7 +228,7 @@ public class TmfAlignTimeAxisTest {
         final int offset = 100;
         // switch to the proper perspective and wait for views to align
         SWTBotUtils.switchToPerspective(AlignPerspectiveFactory3.ID);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         SWTBotUtils.delay(SYNC_DELAY);
         // get views
         SWTBotView masterView = fBot.viewById(vId1);
@@ -237,7 +238,7 @@ public class TmfAlignTimeAxisTest {
         Point before = slaveSashBot.getPoint();
         // move master and wait for slaves to follow
         drag(masterView, offset);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         SWTBotUtils.delay(SYNC_DELAY);
         // verify that the slave did not follow
         assertEquals(before, slaveSashBot.getPoint());
@@ -307,7 +308,7 @@ public class TmfAlignTimeAxisTest {
         final int offset = 100;
         final int delta = offset / 2;
         // wait for the perspective switch to propagate alignments
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         SWTBotUtils.delay(SYNC_DELAY);
         // select master and slave parts to observe
         SWTBotView masterViewBot = fBot.viewById(masterView);
@@ -323,7 +324,7 @@ public class TmfAlignTimeAxisTest {
         assertEquals("Approx align", masterOriginalSashX, slaveSashBot.getPoint().x, delta);
         // move sash and wait for alignment
         drag(masterViewBot, offset);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         SWTBotUtils.delay(SYNC_DELAY);
         // check results
         double masterNewSashX = masterSashBot.getPoint().x;

@@ -23,6 +23,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -153,7 +154,7 @@ public class ControlViewSpecificEventTest extends ControlViewTest {
 
         // Click Ok to quit the dialog window
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         // Wait until the child of Sessions is activated
         fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));

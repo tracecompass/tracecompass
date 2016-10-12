@@ -38,6 +38,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSetting;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSettingsManager;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorsView;
@@ -176,7 +177,7 @@ public class ColorsViewTest {
 
         SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         fFileLocation = File.createTempFile("sample", ".xml");
         try (BufferedRandomAccessFile braf = new BufferedRandomAccessFile(fFileLocation, "rw")) {
             braf.writeBytes(TRACE_START);
@@ -254,7 +255,7 @@ public class ColorsViewTest {
         });
         final SWTBotTable eventsEditor = SWTBotUtils.activeEventsEditor(fBot).bot().table();
         // should fix race condition of loading the trace
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         eventsEditor.select(2);
         final SWTBotTableItem tableItem = eventsEditor.getTableItem(2);
         RGB fgc = UIThreadRunnable.syncExec(new Result<RGB>() {

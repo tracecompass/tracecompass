@@ -32,6 +32,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
@@ -105,7 +106,7 @@ public class ResourcesAndCpuViewTest extends KernelTestBase {
 
     private static void broadcast(TmfCpuSelectedSignal signal) {
         UIThreadRunnable.syncExec(() -> TmfSignalManager.dispatchSignal(signal));
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     private String getTitle() {

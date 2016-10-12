@@ -25,6 +25,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceCon
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceEventComponent;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -117,7 +118,7 @@ public class ControlViewKernelFilterTest extends ControlViewTest {
         SWTBotText filterText = shell.bot().textInGroup(ControlViewSwtBotUtil.FILTER_EXPRESSION_LABEL);
         filterText.setText(FILTER_EXPRESSION);
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
 
@@ -174,7 +175,7 @@ public class ControlViewKernelFilterTest extends ControlViewTest {
         SWTBotText filterText = shell.bot().textInGroup(ControlViewSwtBotUtil.FILTER_EXPRESSION_LABEL);
         filterText.setText(FILTER_EXPRESSION);
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         SWTBotTreeItem sessionItem = SWTBotUtils.getTreeItem(fBot, fTree,
                 getNodeName(),

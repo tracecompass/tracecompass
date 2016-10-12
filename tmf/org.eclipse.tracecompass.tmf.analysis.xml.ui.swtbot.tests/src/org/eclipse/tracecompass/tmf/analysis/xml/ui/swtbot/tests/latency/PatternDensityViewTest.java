@@ -29,7 +29,7 @@ import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.Ab
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternDensityView;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.junit.Test;
@@ -114,7 +114,7 @@ public class PatternDensityViewTest extends PatternLatencyViewTestBase {
     @Test
     public void testWithTrace() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         setDensityViewer();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         //Test the table content
         SWTBotTable tableBot = new SWTBotTable(fDensityViewer.getTableViewer().getTable());

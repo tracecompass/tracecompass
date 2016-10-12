@@ -44,6 +44,7 @@ import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.PlatformUI;
@@ -96,7 +97,7 @@ public class SystemCallLatencyTableAnalysisTest {
         /* Switch perspectives */
         switchTracingPerspective();
         /* Finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
     }
 
@@ -360,9 +361,9 @@ public class SystemCallLatencyTableAnalysisTest {
         bot.waitUntil(ConditionHelpers.ViewIsClosed(view));
         SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotUtils.openTrace(PROJECT_NAME, tracePath, TRACE_TYPE);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         createTable();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
         bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "24,100", 0, 2));
         tableBot.header("Duration").click();

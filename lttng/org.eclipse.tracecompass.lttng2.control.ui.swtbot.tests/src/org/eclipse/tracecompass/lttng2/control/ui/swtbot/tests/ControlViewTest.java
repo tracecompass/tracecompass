@@ -55,6 +55,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IViewPart;
 import org.junit.After;
 import org.junit.Before;
@@ -126,7 +127,7 @@ public class ControlViewTest {
         SWTBotUtils.closeView("welcome", fBot);
 
         /* finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         SWTBotUtils.switchToPerspective(PERSPECTIVE_ID);
     }
@@ -140,7 +141,7 @@ public class ControlViewTest {
     @Before
     public void beforeTest() throws Exception {
         SWTBotUtils.openView(ControlView.ID);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path("testfiles" + File.separator + getTestStream()), null);
         File testfile = new File(FileLocator.toFileURL(location).toURI());
         fTestFile = testfile.getAbsolutePath();
@@ -240,7 +241,7 @@ public class ControlViewTest {
         nodeItem.select();
         SWTBotMenu menuBot = nodeItem.contextMenu(ControlViewSwtBotUtil.CONNECT_MENU_ITEM);
         menuBot.click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.SESSION_GROUP_NAME, nodeItem));
 
@@ -267,7 +268,7 @@ public class ControlViewTest {
         sessionText.setText(SESSION_NAME);
 
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         sessionGroupItem.expand();
 
@@ -302,7 +303,7 @@ public class ControlViewTest {
         SWTBotTreeItem allItem = SWTBotUtils.getTreeItem(fBot, tracepointsTree, ControlViewSwtBotUtil.ALL_TREE_NODE);
         allItem.check();
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
 
@@ -352,7 +353,7 @@ public class ControlViewTest {
         SWTBotTreeItem allItem = SWTBotUtils.getTreeItem(fBot, syscallsTree, ControlViewSwtBotUtil.ALL_TREE_NODE);
         allItem.check();
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
 
@@ -400,7 +401,7 @@ public class ControlViewTest {
         SWTBotTreeItem closeItem = SWTBotUtils.getTreeItem(fBot, syscallsTree, ControlViewSwtBotUtil.ALL_TREE_NODE, ControlViewSwtBotUtil.SYSCALL_CLOSE_EVENT);
         closeItem.check();
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
 
@@ -466,7 +467,7 @@ public class ControlViewTest {
         shell.bot().radioInGroup(ControlViewSwtBotUtil.UST_GROUP_NAME, ControlViewSwtBotUtil.DOMAIN_GROUP_NAME).click();
         shell.bot().radioInGroup(ControlViewSwtBotUtil.BUFFERTYPE_PER_UID, ControlViewSwtBotUtil.BUFFERTYPE_GROUP_NAME).click();
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.UST_DOMAIN_NAME, sessionItem));
     }
 
@@ -489,7 +490,7 @@ public class ControlViewTest {
         SWTBotTree tracepointsTree = shell.bot().tree();
         tracepointsTree.select(ControlViewSwtBotUtil.ALL_TREE_NODE);
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         SWTBotTreeItem eventItem = SWTBotUtils.getTreeItem(fBot, fTree,
                 getNodeName(),
@@ -517,11 +518,11 @@ public class ControlViewTest {
         if (state == TraceSessionState.ACTIVE) {
             SWTBotMenu menuBot = sessionItem.contextMenu(ControlViewSwtBotUtil.START_MENU_ITEM);
             menuBot.click();
-            SWTBotUtils.waitForJobs();
+            WaitUtils.waitForJobs();
         } else {
             SWTBotMenu menuBot = sessionItem.contextMenu(ControlViewSwtBotUtil.STOP_MENU_ITEM);
             menuBot.click();
-            SWTBotUtils.waitForJobs();
+            WaitUtils.waitForJobs();
         }
         TraceSessionComponent sessionComp = ControlViewSwtBotUtil.getSessionComponent(fNode, getSessionName());
 
@@ -544,7 +545,7 @@ public class ControlViewTest {
 
         SWTBotShell shell = fBot.shell(ControlViewSwtBotUtil.DESTROY_CONFIRM_DIALOG_TITLE).activate();
         shell.bot().button(ControlViewSwtBotUtil.CONFIRM_DIALOG_OK_BUTTON).click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         SWTBotTreeItem sessionGroupItem = SWTBotUtils.getTreeItem(fBot, fTree,
                 getNodeName(), ControlViewSwtBotUtil.SESSION_GROUP_NAME);
@@ -561,7 +562,7 @@ public class ControlViewTest {
         nodeItem.select();
         SWTBotMenu menuBot = nodeItem.contextMenu(ControlViewSwtBotUtil.DISCONNECT_MENU_ITEM);
         menuBot.click();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         // Verify that node is connected
         fBot.waitUntil(ControlViewSwtBotUtil.isStateChanged(fNode, TargetNodeState.DISCONNECTED));
@@ -659,7 +660,7 @@ public class ControlViewTest {
         shell.bot().waitUntil(Conditions.widgetIsEnabled(button));
         button.click();
         fBot.waitUntil(Conditions.shellCloses(shell));
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     private static String prepareAndVerifyExperimentHandling(SWTBot bot, boolean createExperiment, boolean defaultExperiment, IPath path) {

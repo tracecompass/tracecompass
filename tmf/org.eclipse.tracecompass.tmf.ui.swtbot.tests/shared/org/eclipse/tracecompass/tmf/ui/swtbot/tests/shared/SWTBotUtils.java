@@ -75,7 +75,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers.ProjectElementHasChild;
-import org.eclipse.tracecompass.tmf.ui.tests.shared.JobUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.TracingPerspectiveFactory;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -93,7 +93,6 @@ import org.hamcrest.Matcher;
 @SuppressWarnings("restriction")
 public final class SWTBotUtils {
 
-    private static final long MAX_JOBS_WAIT_TIME = 300000;
     private static final String WINDOW_MENU = "Window";
     private static final String PREFERENCES_MENU_ITEM = "Preferences";
     private static boolean fPrintedEnvironment = false;
@@ -107,13 +106,16 @@ public final class SWTBotUtils {
 
     /**
      * Waits for all Eclipse jobs to finish. Times out after
-     * SWTBotUtils#MAX_JOBS_WAIT_TIME by default.
+     * WaitUtils#MAX_JOBS_WAIT_TIME by default.
      *
      * @throws RuntimeException
      *             once the waiting time passes the default maximum value
+     *
+     * @deprecated Use {@link WaitUtils#waitForJobs()} instead
      */
+    @Deprecated
     public static void waitForJobs() {
-        JobUtils.waitForJobs(MAX_JOBS_WAIT_TIME);
+        WaitUtils.waitForJobs();
     }
 
     /**
@@ -148,7 +150,7 @@ public final class SWTBotUtils {
             }
         });
 
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     /**
@@ -164,16 +166,16 @@ public final class SWTBotUtils {
     public static void deleteProject(final String projectName, boolean deleteResources, SWTWorkbenchBot bot) {
         // Wait for any analysis to complete because it might create
         // supplementary files
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         try {
             ResourcesPlugin.getWorkspace().getRoot().getProject(projectName).refreshLocal(IResource.DEPTH_INFINITE, null);
         } catch (CoreException e) {
         }
 
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         closeSecondaryShells(bot);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         final SWTBotView projectViewBot = bot.viewById(IPageLayout.ID_PROJECT_EXPLORER);
         projectViewBot.setFocus();
@@ -194,7 +196,7 @@ public final class SWTBotUtils {
         bot.waitUntil(Conditions.widgetIsEnabled(okButton));
         okButton.click();
 
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     /**
@@ -482,7 +484,7 @@ public final class SWTBotUtils {
 
         if (delay) {
             delay(1000);
-            waitForJobs();
+            WaitUtils.waitForJobs();
         }
     }
 
@@ -508,7 +510,7 @@ public final class SWTBotUtils {
             }
         });
 
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         SWTBotUtils.delay(1000);
         assertNotNull(tmfEd);
         return editorBot;
@@ -744,7 +746,7 @@ public final class SWTBotUtils {
         if (res[0] != null) {
             fail(res[0].getMessage());
         }
-        waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     /**

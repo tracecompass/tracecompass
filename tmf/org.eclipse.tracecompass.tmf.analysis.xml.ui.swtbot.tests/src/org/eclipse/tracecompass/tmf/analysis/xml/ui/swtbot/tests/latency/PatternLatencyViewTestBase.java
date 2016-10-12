@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -69,7 +70,7 @@ public abstract class PatternLatencyViewTestBase {
         /* Switch perspectives */
         SWTBotUtils.switchToTracingPerspective();
         /* Finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         fBot = new SWTWorkbenchBot();
 
@@ -85,7 +86,7 @@ public abstract class PatternLatencyViewTestBase {
             String tracePath = FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).getPath();
             SWTBotUtils.createProject(PROJECT_NAME);
             SWTBotUtils.openTrace(PROJECT_NAME, tracePath, TRACE_TYPE);
-            SWTBotUtils.waitForJobs();
+            WaitUtils.waitForJobs();
         } catch (IOException e) {
             fail("Failed to get the trace.");
         }

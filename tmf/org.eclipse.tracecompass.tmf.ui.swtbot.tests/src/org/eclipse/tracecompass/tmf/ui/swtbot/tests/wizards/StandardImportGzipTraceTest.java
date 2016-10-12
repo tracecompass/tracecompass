@@ -51,6 +51,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.Mess
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -165,7 +166,7 @@ public class StandardImportGzipTraceTest {
          */
         SWTBotTreeItem treeItem = SWTBotUtils.getTreeItem(projectExplorer.bot(), tree, PROJECT_NAME, tracesNode, traceName);
         treeItem.doubleClick();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         /*
          * Check results
          */
@@ -248,6 +249,6 @@ public class StandardImportGzipTraceTest {
         final SWTBotButton finishButton = fBot.button("Finish");
         finishButton.click();
         fBot.waitUntil(Conditions.shellCloses(shell));
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 }

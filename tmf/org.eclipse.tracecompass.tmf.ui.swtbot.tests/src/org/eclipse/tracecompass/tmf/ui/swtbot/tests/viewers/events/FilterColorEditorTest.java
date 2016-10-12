@@ -51,6 +51,7 @@ import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ImageHelper;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.PlatformUI;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -125,7 +126,7 @@ public class FilterColorEditorTest {
         SWTBotUtils.switchToTracingPerspective();
 
         /* Finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
         fHighlight = ImageHelper.adjustExpectedColor(colorRegistry.get(HIGHLIGHT_COLOR_DEFINITION_ID).getRGB());
@@ -164,7 +165,7 @@ public class FilterColorEditorTest {
     @After
     public void cleanup() {
         SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     /**

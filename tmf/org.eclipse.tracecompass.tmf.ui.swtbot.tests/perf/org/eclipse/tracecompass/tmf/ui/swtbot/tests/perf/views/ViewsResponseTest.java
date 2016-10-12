@@ -30,6 +30,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.ui.IWorkbenchPart;
 import org.junit.After;
@@ -77,7 +78,7 @@ public abstract class ViewsResponseTest {
         /* Prepare the workspace */
         prepareWorkspace();
         /* Finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         /* Create project */
         SWTBotUtils.createProject(PROJECT_NAME);
@@ -132,7 +133,7 @@ public abstract class ViewsResponseTest {
         // Make sure all the analyses we'll need are done
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         beforeRunningTest(trace);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         SWTBotView view;
 
@@ -194,7 +195,7 @@ public abstract class ViewsResponseTest {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
         }
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     // TODO: Add some vertical scrollings. With eventual 2D queries, that will

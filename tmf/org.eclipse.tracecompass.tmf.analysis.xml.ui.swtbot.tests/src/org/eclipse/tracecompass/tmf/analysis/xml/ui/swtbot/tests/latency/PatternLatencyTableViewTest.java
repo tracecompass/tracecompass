@@ -18,7 +18,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternLatencyTableView;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.junit.Test;
@@ -43,7 +43,7 @@ public class PatternLatencyTableViewTest extends PatternLatencyViewTestBase {
     @Test
     public void testData() {
         getTable();
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         assertNotNull(fTable);
 
         SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());

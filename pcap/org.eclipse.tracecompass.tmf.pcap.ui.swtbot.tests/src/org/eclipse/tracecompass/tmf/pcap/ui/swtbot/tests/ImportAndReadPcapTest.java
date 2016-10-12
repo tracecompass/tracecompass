@@ -51,6 +51,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewPart;
@@ -104,7 +105,7 @@ public class ImportAndReadPcapTest {
         /* Switch perspectives */
         switchNetworkPerspective();
         /* Finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     /**
@@ -158,7 +159,7 @@ public class ImportAndReadPcapTest {
         assertNotNull(botTree);
         final TmfSelectionRangeUpdatedSignal signal = new TmfSelectionRangeUpdatedSignal(slv, fDesired1.getTimestamp());
         slv.broadcast(signal);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         // FIXME This is a race condition:
         // TmfEventsTable launches an async exec that may be run after the wait
         // for jobs. This last delay catches it.
@@ -187,7 +188,7 @@ public class ImportAndReadPcapTest {
         }
 
         SWTBotUtils.delay(1000);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     private void openEditor() {
@@ -219,7 +220,7 @@ public class ImportAndReadPcapTest {
             }
         });
 
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         SWTBotUtils.delay(1000);
         assertNotNull(tmfEd);
     }

@@ -49,6 +49,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -115,7 +116,7 @@ public class FetchRemoteTracesTest {
 
         SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
     }
 
     private static class TraceCountCondition extends DefaultCondition {
@@ -329,7 +330,7 @@ public class FetchRemoteTracesTest {
 
     private static void testImport(Runnable selectionFunctor, Runnable verifyTracesFunctor) {
         SWTBotUtils.createProject(PROJECT_NAME);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         SWTBotView projectExplorerBot = fBot.viewByTitle(PROJECT_EXPLORER);
         assertNotNull("Cannot find " + PROJECT_EXPLORER, projectExplorerBot);
         projectExplorerBot.show();
@@ -367,7 +368,7 @@ public class FetchRemoteTracesTest {
         fBot.waitUntil(Conditions.widgetIsEnabled(button));
         button.click();
         fBot.waitUntil(Conditions.shellCloses(shell));
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
 
         verifyTracesFunctor.run();
         fBot.closeAllEditors();

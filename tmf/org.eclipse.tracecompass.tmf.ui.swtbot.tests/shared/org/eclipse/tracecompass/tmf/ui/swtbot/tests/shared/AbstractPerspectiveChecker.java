@@ -25,6 +25,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IViewReference;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -84,7 +85,7 @@ public abstract class AbstractPerspectiveChecker {
     @Test
     public void testPerspectiveForViews() {
         SWTBotUtils.switchToPerspective(fPerspectiveId);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         for (final String viewID : fViewIds) {
             List<SWTBotView> view = fBot.views(new BaseMatcher<String>() {
 
@@ -113,7 +114,7 @@ public abstract class AbstractPerspectiveChecker {
     @Test
     public void testPerspectiveComplete() {
         SWTBotUtils.switchToPerspective(fPerspectiveId);
-        SWTBotUtils.waitForJobs();
+        WaitUtils.waitForJobs();
         for (SWTBotView view : fBot.views()) {
             assertTrue("view " + view.getViewReference().getId() + " is present", fViewIds.contains(view.getViewReference().getId()));
         }
