@@ -18,8 +18,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.concurrent.TimeoutException;
-
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
@@ -106,11 +104,7 @@ public class TraceAndExperimentTypeTest {
         }
 
         TmfOpenTraceHelper.openTraceFromElement(fExperiment);
-        try {
-            ProjectModelTestData.delayUntilTraceOpened(fExperiment);
-        } catch (TimeoutException e1) {
-            fail (e1.getMessage());
-        }
+        ProjectModelTestData.delayUntilTraceOpened(fExperiment);
 
         ITmfTrace trace = fExperiment.getTrace();
         assertTrue(trace instanceof TmfExperimentStub);
@@ -124,11 +118,7 @@ public class TraceAndExperimentTypeTest {
     public void testNoExperimentTypeChildren() {
         TmfOpenTraceHelper.openTraceFromElement(fExperiment);
 
-        try {
-            ProjectModelTestData.delayUntilTraceOpened(fExperiment);
-        } catch (TimeoutException e1) {
-            fail (e1.getMessage());
-        }
+        ProjectModelTestData.delayUntilTraceOpened(fExperiment);
 
         final IWorkbench wb = PlatformUI.getWorkbench();
         final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();

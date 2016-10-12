@@ -18,7 +18,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.tracecompass.tmf.ui.project.model.ITmfProjectModelElement;
@@ -26,7 +25,10 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisOutputElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.IWaitCondition;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.ProjectModelTestData;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitTimeoutException;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.stubs.analysis.TestAnalysisUi;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
@@ -108,11 +110,12 @@ public class ProjectModelOutputTest {
         analysis.activateParentTrace();
         try {
             ProjectModelTestData.delayUntilTraceOpened(analysis.getParent());
-        } catch (TimeoutException e) {
+        } catch (WaitTimeoutException e) {
             fail("The analysis parent did not open in a reasonable time");
         }
 
         /* Make sure the output list is not empty */
+        WaitUtils.waitUntil(new ConditionTraceChildrenElements(analysis, 1));
         List<TmfAnalysisOutputElement> outputList = analysis.getAvailableOutputs();
         assertFalse(outputList.isEmpty());
         boolean found = false;
@@ -137,10 +140,11 @@ public class ProjectModelOutputTest {
         analysis.activateParentTrace();
         try {
             ProjectModelTestData.delayUntilTraceOpened(analysis.getParent());
-        } catch (TimeoutException e) {
+        } catch (WaitTimeoutException e) {
             fail("The analysis parent did not open in a reasonable time");
         }
 
+        WaitUtils.waitUntil(new ConditionTraceChildrenElements(analysis, 1));
         List<TmfAnalysisOutputElement> outputList = analysis.getAvailableOutputs();
         assertFalse(outputList.isEmpty());
 
@@ -167,5 +171,27 @@ public class ProjectModelOutputTest {
         ProjectModelTestData.delayThread(1000);
         view = activePage.findView(TestAnalysisUi.VIEW_ID);
         assertNotNull(view);
+    }
+
+    private static final class ConditionTraceChildrenElements implements IWaitCondition {
+        private final ITmfProjectModelElement fProjectElement;
+        private int fCurNumChildren;
+        private int fExpectedChildNum;
+
+        private ConditionTraceChildrenElements(ITmfProjectModelElement projectElement, int childNum) {
+            fProjectElement = projectElement;
+            fExpectedChildNum = childNum;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            fCurNumChildren = fProjectElement.getChildren().size();
+            return fCurNumChildren == fExpectedChildNum;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return "Timeout while waiting for " + fProjectElement + " to have number of children. Expected: " + fExpectedChildNum + " Actual: " + fCurNumChildren;
+        }
     }
 }

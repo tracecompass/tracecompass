@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.tmf.ui.tests.shared;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -45,11 +44,6 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
  * @author Geneviève Bastien
  */
 public class ProjectModelTestData {
-
-    /* Maximum number of thread delays the main thread will do before timing out */
-    private static final int DELAY_COUNTER = 1000;
-    /* Default delay time when having the main thread sleep. */
-    private static final long DEFAULT_DELAY = 500;
 
     /** Default test project name */
     public static final String PROJECT_NAME = "Test_Project";
@@ -238,28 +232,28 @@ public class ProjectModelTestData {
      * longer delays in those cases, it is preferable to use the
      * {@link ProjectModelTestData#delayThread(long)} instead.
      *
-     * Timeout is DELAY_COUNTER * DEFAULT_DELAY ms
-     *
      * @param projectElement
      *            The trace element we are waiting for. If the element if not of
      *            type TmfTraceElement, the thread is delayed only once.
-     * @throws TimeoutException
+     * @throws WaitTimeoutException
      *             If after the maximum number of delays the trace is still
      *             null, we throw a timeout exception, the trace has not opened.
      */
-    public static void delayUntilTraceOpened(final ITmfProjectModelElement projectElement) throws TimeoutException {
+    public static void delayUntilTraceOpened(final ITmfProjectModelElement projectElement) throws WaitTimeoutException {
         if (projectElement instanceof TmfCommonProjectElement) {
             TmfCommonProjectElement traceElement = (TmfCommonProjectElement) projectElement;
-            final long deadline = System.nanoTime() + (DELAY_COUNTER * DEFAULT_DELAY * 1000000L);
-            do {
-                delayThread(DEFAULT_DELAY);
-                if (traceElement.getTrace() != null) {
-                    return;
+            WaitUtils.waitUntil(new IWaitCondition() {
+                @Override
+                public boolean test() throws Exception {
+                    return traceElement.getTrace() != null;
                 }
-            } while (System.nanoTime() < deadline);
-            throw new TimeoutException("Timeout while waiting for " + traceElement);
-        }
-        delayThread(DEFAULT_DELAY);
-    }
 
+                @Override
+                public String getFailureMessage() {
+                    return "Timeout while waiting for " + traceElement;
+                }
+            });
+        }
+
+    }
 }

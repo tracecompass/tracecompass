@@ -17,8 +17,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.concurrent.TimeoutException;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -26,6 +24,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.ProjectModelTestData;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitTimeoutException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,7 +78,7 @@ public class ProjectModelTraceTest {
         /* Give the trace a chance to open */
         try {
             ProjectModelTestData.delayUntilTraceOpened(traceElement);
-        } catch (TimeoutException e) {
+        } catch (WaitTimeoutException e) {
             fail("The trace did not open in a reasonable delay");
         }
 
@@ -93,7 +92,7 @@ public class ProjectModelTraceTest {
         TmfOpenTraceHelper.openTraceFromElement(traceElement);
         try {
             ProjectModelTestData.delayUntilTraceOpened(traceElement);
-        } catch (TimeoutException e) {
+        } catch (WaitTimeoutException e) {
             fail("The trace did not open in a reasonable delay");
         }
 

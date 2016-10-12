@@ -20,7 +20,6 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -30,6 +29,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfViewsElement;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.ProjectModelTestData;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitTimeoutException;
 import org.eclipse.tracecompass.tmf.ui.tests.stubs.analysis.TestAnalysisUi;
 import org.junit.After;
 import org.junit.Before;
@@ -147,7 +147,7 @@ public class ProjectModelAnalysisTest {
 
         try {
             ProjectModelTestData.delayUntilTraceOpened(traceElement);
-        } catch (TimeoutException e) {
+        } catch (WaitTimeoutException e) {
             fail("The analysis parent did not open in a reasonable time");
         }
         ITmfTrace trace = traceElement.getTrace();
