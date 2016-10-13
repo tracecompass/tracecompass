@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
@@ -236,7 +237,20 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
                 ITmfTimestamp ts = data.getTimestamp();
                 if (request.getRange().contains(ts)) {
                     if (request.getDataType().isInstance(data)) {
-                        request.handleData(data);
+                        try {
+                            request.handleData(data);
+                        } catch (Exception e) {
+                            /*
+                             * We don't usually catch all exception, but here it
+                             * is important because this will cause the request
+                             * thread to hang forever and the other requests to
+                             * be stopped. This should properly cancel the
+                             * request with the exception and let the rest
+                             * continue.
+                             */
+                            Activator.logError("An uncaught exception happened on request " + request + ": " + e.getMessage());  //$NON-NLS-1$//$NON-NLS-2$
+                            request.fail(e);
+                        }
                     }
                 }
             }
