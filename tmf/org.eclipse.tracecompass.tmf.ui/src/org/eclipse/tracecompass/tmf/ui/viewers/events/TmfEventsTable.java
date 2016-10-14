@@ -53,10 +53,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EValidator;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
@@ -230,6 +232,20 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private static final int MARGIN_COLUMN_INDEX = 0;
     private static final int FILTER_SUMMARY_INDEX = 1;
     private static final int EVENT_COLUMNS_START_INDEX = MARGIN_COLUMN_INDEX + 1;
+
+    private final ISchedulingRule fTimeSelectMutexRule = new ISchedulingRule() {
+        @Override
+        public boolean isConflicting(ISchedulingRule rule) {
+            return (rule == this);
+        }
+
+        @Override
+        public boolean contains(ISchedulingRule rule) {
+            return (rule == this);
+        }
+    };
+
+    private Job fTimeSelectJob = null;
 
     private final class ColumnListener extends ControlAdapter {
         /*
@@ -3312,143 +3328,167 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     public void selectionRangeUpdated(final TmfSelectionRangeUpdatedSignal signal) {
         if ((signal.getSource() != this) && (fTrace != null) && (!fTable.isDisposed())) {
 
-            /*
-             * Create a request for one event that will be queued after other
-             * ongoing requests. When this request is completed do the work to
-             * select the actual event with the timestamp specified in the
-             * signal. This procedure prevents the method fTrace.getRank() from
-             * interfering and delaying ongoing requests.
-             */
-            final TmfEventRequest subRequest = new TmfEventRequest(ITmfEvent.class,
-                    TmfTimeRange.ETERNITY, 0, 1, ExecutionType.FOREGROUND) {
-
-                ITmfTimestamp ts = signal.getBeginTime();
-                ITmfTimestamp tf = signal.getEndTime();
-
-                @Override
-                public void handleSuccess() {
-                    super.handleSuccess();
-                    if (fTrace == null) {
-                        return;
-                    }
-
-                    final Pair<Long, Long> selection = getSelectedRanks();
-                    updateDisplayWithSelection(selection.getFirst().longValue(), selection.getSecond().longValue());
+            Job timeSelectJob;
+            synchronized (fTimeSelectMutexRule) {
+                timeSelectJob = fTimeSelectJob;
+                if (timeSelectJob != null) {
+                    timeSelectJob.cancel();
                 }
 
-                /**
-                 * Verify if the event is within the trace range and adjust if
-                 * necessary.
-                 *
-                 * @return A pair of rank representing the selected area
-                 **/
-                private Pair<Long, Long> getSelectedRanks() {
+                /*
+                 * Run in separate thread to not block UI thread for too long.
+                 */
+                timeSelectJob = new Job("Events table selection job") { //$NON-NLS-1$
+                    ITmfTimestamp ts = signal.getBeginTime();
+                    ITmfTimestamp tf = signal.getEndTime();
 
-                    /* Clamp the timestamp value to fit inside of the trace */
-                    ITmfTimestamp timestampBegin = ts;
-                    if (timestampBegin.compareTo(fTrace.getStartTime()) < 0) {
-                        timestampBegin = fTrace.getStartTime();
-                    }
-                    if (timestampBegin.compareTo(fTrace.getEndTime()) > 0) {
-                        timestampBegin = fTrace.getEndTime();
-                    }
-
-                    ITmfTimestamp timestampEnd = tf;
-                    if (timestampEnd.compareTo(fTrace.getStartTime()) < 0) {
-                        timestampEnd = fTrace.getStartTime();
-                    }
-                    if (timestampEnd.compareTo(fTrace.getEndTime()) > 0) {
-                        timestampEnd = fTrace.getEndTime();
-                    }
-
-                    ITmfTimestamp tb;
-                    ITmfTimestamp te;
-                    long rankBegin;
-                    long rankEnd;
-                    ITmfContext contextBegin;
-                    ITmfContext contextEnd;
-
-                    /* Adjust the rank of the selection to the right range */
-                    if (timestampBegin.compareTo(timestampEnd) > 0) {
-                        te = timestampEnd;
-                        contextEnd = fTrace.seekEvent(te);
-                        rankEnd = contextEnd.getRank();
-                        contextEnd.dispose();
-                        /*
-                         * To include all events at the begin time, seek at the
-                         * next nanosecond and then use the previous rank
-                         */
-                        tb = timestampBegin.normalize(1, ITmfTimestamp.NANOSECOND_SCALE);
-                        if (tb.compareTo(fTrace.getEndTime()) <= 0) {
-                            contextBegin = fTrace.seekEvent(tb);
-                            rankBegin = contextBegin.getRank();
-                            contextBegin.dispose();
-                        } else {
-                            rankBegin = ITmfContext.UNKNOWN_RANK;
+                    @Override
+                    protected IStatus run(IProgressMonitor monitor) {
+                        if (fTrace == null) {
+                            return Status.OK_STATUS;
                         }
-                        rankBegin = (rankBegin == ITmfContext.UNKNOWN_RANK ? fTrace.getNbEvents() : rankBegin) - 1;
-                        /*
-                         * If no events in selection range, select only the next
-                         * event
-                         */
-                        rankBegin = rankBegin >= rankEnd ? rankBegin : rankEnd;
-                    } else {
-                        tb = timestampBegin;
-                        contextBegin = fTrace.seekEvent(tb);
-                        rankBegin = contextBegin.getRank();
-                        contextBegin.dispose();
-                        /*
-                         * To include all events at the end time, seek at the
-                         * next nanosecond and then use the previous rank
-                         */
-                        te = timestampEnd.normalize(1, ITmfTimestamp.NANOSECOND_SCALE);
-                        if (te.compareTo(fTrace.getEndTime()) <= 0) {
+
+                        final Pair<Long, Long> selection = getSelectedRanks(monitor);
+
+                        if (monitor.isCanceled() || (selection == null)) {
+                            return Status.CANCEL_STATUS;
+                        }
+                        updateDisplayWithSelection(selection.getFirst().longValue(), selection.getSecond().longValue());
+                        return Status.OK_STATUS;
+                    }
+
+                    /**
+                     * Verify if the event is within the trace range and adjust if
+                     * necessary.
+                     * @param monitor
+                     *                a progress monitor
+                     * @return A pair of rank representing the selected area
+                     **/
+                    @Nullable
+                    private Pair<Long, Long> getSelectedRanks(IProgressMonitor monitor) {
+
+                        /* Clamp the timestamp value to fit inside of the trace */
+                        ITmfTimestamp timestampBegin = ts;
+                        if (timestampBegin.compareTo(fTrace.getStartTime()) < 0) {
+                            timestampBegin = fTrace.getStartTime();
+                        }
+                        if (timestampBegin.compareTo(fTrace.getEndTime()) > 0) {
+                            timestampBegin = fTrace.getEndTime();
+                        }
+
+                        ITmfTimestamp timestampEnd = tf;
+                        if (timestampEnd.compareTo(fTrace.getStartTime()) < 0) {
+                            timestampEnd = fTrace.getStartTime();
+                        }
+                        if (timestampEnd.compareTo(fTrace.getEndTime()) > 0) {
+                            timestampEnd = fTrace.getEndTime();
+                        }
+
+                        ITmfTimestamp tb;
+                        ITmfTimestamp te;
+                        long rankBegin;
+                        long rankEnd;
+                        ITmfContext contextBegin;
+                        ITmfContext contextEnd;
+                        if (monitor.isCanceled()) {
+                            return null;
+                        }
+
+                        /* Adjust the rank of the selection to the right range */
+                        if (timestampBegin.compareTo(timestampEnd) > 0) {
+                            te = timestampEnd;
                             contextEnd = fTrace.seekEvent(te);
                             rankEnd = contextEnd.getRank();
                             contextEnd.dispose();
+
+                            if (monitor.isCanceled()) {
+                                return null;
+                            }
+                            /*
+                             * To include all events at the begin time, seek at the
+                             * next nanosecond and then use the previous rank
+                             */
+                            tb = timestampBegin.normalize(1, ITmfTimestamp.NANOSECOND_SCALE);
+                            if (tb.compareTo(fTrace.getEndTime()) <= 0) {
+                                contextBegin = fTrace.seekEvent(tb);
+                                rankBegin = contextBegin.getRank();
+                                contextBegin.dispose();
+                            } else {
+                                rankBegin = ITmfContext.UNKNOWN_RANK;
+                            }
+                            rankBegin = (rankBegin == ITmfContext.UNKNOWN_RANK ? fTrace.getNbEvents() : rankBegin) - 1;
+                            /*
+                             * If no events in selection range, select only the next
+                             * event
+                             */
+                            rankBegin = rankBegin >= rankEnd ? rankBegin : rankEnd;
                         } else {
-                            rankEnd = ITmfContext.UNKNOWN_RANK;
+                            tb = timestampBegin;
+                            contextBegin = fTrace.seekEvent(tb);
+                            rankBegin = contextBegin.getRank();
+                            contextBegin.dispose();
+                            if (monitor.isCanceled()) {
+                                return null;
+                            }
+                            /*
+                             * To include all events at the end time, seek at the
+                             * next nanosecond and then use the previous rank
+                             */
+                            te = timestampEnd.normalize(1, ITmfTimestamp.NANOSECOND_SCALE);
+                            if (te.compareTo(fTrace.getEndTime()) <= 0) {
+                                contextEnd = fTrace.seekEvent(te);
+                                rankEnd = contextEnd.getRank();
+                                contextEnd.dispose();
+                            } else {
+                                rankEnd = ITmfContext.UNKNOWN_RANK;
+                            }
+                            rankEnd = (rankEnd == ITmfContext.UNKNOWN_RANK ? fTrace.getNbEvents() : rankEnd) - 1;
+                            /*
+                             * If no events in selection range, select only the next
+                             * event
+                             */
+                            rankEnd = rankEnd >= rankBegin ? rankEnd : rankBegin;
                         }
-                        rankEnd = (rankEnd == ITmfContext.UNKNOWN_RANK ? fTrace.getNbEvents() : rankEnd) - 1;
-                        /*
-                         * If no events in selection range, select only the next
-                         * event
-                         */
-                        rankEnd = rankEnd >= rankBegin ? rankEnd : rankBegin;
+                        return new Pair<>(Long.valueOf(rankBegin), Long.valueOf(rankEnd));
                     }
-                    return new Pair<>(Long.valueOf(rankBegin), Long.valueOf(rankEnd));
-                }
 
-                private void updateDisplayWithSelection(final long rankBegin, final long rankEnd) {
-                    PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            // Return if table is disposed
-                            if (fTable.isDisposed()) {
-                                return;
+                    private void updateDisplayWithSelection(final long rankBegin, final long rankEnd) {
+                        PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Return if table is disposed
+                                if (fTable.isDisposed()) {
+                                    return;
+                                }
+
+                                fSelectedRank = rankEnd;
+                                long toReveal = fSelectedBeginRank != rankBegin ? rankBegin : rankEnd;
+                                fSelectedBeginRank = rankBegin;
+                                int indexBegin = (int) rankBegin;
+                                int indexEnd = (int) rankEnd;
+
+                                if (fTable.getData(Key.FILTER_OBJ) != null) {
+                                    /* +1 for top filter status row */
+                                    indexBegin = fCache.getFilteredEventIndex(rankBegin) + 1;
+                                    indexEnd = rankEnd == rankBegin ? indexBegin : fCache.getFilteredEventIndex(rankEnd) + 1;
+                                }
+                                /* +1 for header row */
+                                fTable.setSelectionRange(indexBegin + 1, indexEnd + 1);
+                                fRawViewer.selectAndReveal(toReveal);
+                                updateStatusLine(null);
                             }
-
-                            fSelectedRank = rankEnd;
-                            long toReveal = fSelectedBeginRank != rankBegin ? rankBegin : rankEnd;
-                            fSelectedBeginRank = rankBegin;
-                            int indexBegin = (int) rankBegin;
-                            int indexEnd = (int) rankEnd;
-
-                            if (fTable.getData(Key.FILTER_OBJ) != null) {
-                                /* +1 for top filter status row */
-                                indexBegin = fCache.getFilteredEventIndex(rankBegin) + 1;
-                                indexEnd = rankEnd == rankBegin ? indexBegin : fCache.getFilteredEventIndex(rankEnd) + 1;
-                            }
-                            /* +1 for header row */
-                            fTable.setSelectionRange(indexBegin + 1, indexEnd + 1);
-                            fRawViewer.selectAndReveal(toReveal);
-                            updateStatusLine(null);
-                        }
-                    });
-                }
-            };
-
-            ((ITmfEventProvider) fTrace).sendRequest(subRequest);
+                        });
+                    }
+                };
+                timeSelectJob.setSystem(true);
+                /*
+                 *  Make subsequent jobs not run concurrently so that they are
+                 *  executed in order.
+                 */
+                timeSelectJob.setRule(fTimeSelectMutexRule);
+                timeSelectJob.schedule();
+                fTimeSelectJob = timeSelectJob;
+            }
         }
     }
 
