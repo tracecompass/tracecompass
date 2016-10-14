@@ -23,6 +23,8 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Instead of using IStateChangeInput directly, one can extend this class, which
  * defines a lot of the common functions of the state change input plugin.
@@ -60,13 +62,44 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
      *            Name given to this state change input. Only used internally.
      */
     public AbstractTmfStateProvider(ITmfTrace trace, String id) {
-        fTrace = trace;
-        fEventsQueue = new BufferedBlockingQueue<>(DEFAULT_EVENTS_QUEUE_SIZE, DEFAULT_EVENTS_CHUNK_SIZE);
-        fStateSystemAssigned = false;
-        // set the safe time to before the trace start, the analysis has not yet started
-        fSafeTime = trace.getStartTime().toNanos() - 1;
+        this(trace, id, DEFAULT_EVENTS_QUEUE_SIZE, DEFAULT_EVENTS_CHUNK_SIZE);
+    }
 
+    /**
+     * Instantiate a new state provider. This constructor allows to fine-tune
+     * the size of the event processing queue. This can be useful to unit tests
+     * various situations.
+     *
+     * @param trace
+     *            The trace
+     * @param id
+     *            Name given to this state change input. Only used internally.
+     * @param queueSize
+     *            The size of the queue, a.k.a the number of chunks that fit
+     *            into the buffered queue.
+     * @param chunkSize
+     *            The number of events that fit inside a single chunk of the
+     *            queue
+     * @since 2.3
+     */
+    @VisibleForTesting
+    protected AbstractTmfStateProvider(ITmfTrace trace, String id, int queueSize, int chunkSize) {
+        if (queueSize <= 0 || chunkSize <= 0) {
+            throw new IllegalArgumentException("Cannot have negative sized buffer" + //$NON-NLS-1$
+                    formatError("queueSize", queueSize) + //$NON-NLS-1$
+                    formatError("chunkSize", chunkSize)); //$NON-NLS-1$
+        }
+        fTrace = trace;
+        fEventsQueue = new BufferedBlockingQueue<>(queueSize, chunkSize);
+        fStateSystemAssigned = false;
+        // set the safe time to before the trace start, the analysis has not yet
+        // started
+        fSafeTime = trace.getStartTime().toNanos() - 1;
         fEventHandlerThread = new Thread(new EventProcessor(), id + " Event Handler"); //$NON-NLS-1$
+    }
+
+    private static String formatError(String name, int value) {
+        return (value <= 0) ? " " + name + " = " + value : ""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     /**
@@ -110,7 +143,9 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
 
     @Override
     public void dispose() {
-        /* Insert a null event in the queue to stop the event handler's thread. */
+        /*
+         * Insert a null event in the queue to stop the event handler's thread.
+         */
         try {
             fEventsQueue.put(END_EVENT);
             fEventsQueue.flushInputBuffer();
@@ -158,7 +193,9 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
     // Special event types
     // ------------------------------------------------------------------------
 
-    /** Fake event indicating the build is over, and the provider should close */
+    /**
+     * Fake event indicating the build is over, and the provider should close
+     */
     private static class EndEvent extends TmfEvent {
         public EndEvent() {
             super(null, ITmfContext.UNKNOWN_RANK, null, null, null);
@@ -194,7 +231,6 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
                 return;
             }
 
-
             /*
              * We never insert null in the queue. Cannot be checked at
              * compile-time until Java 8 annotations...
@@ -219,8 +255,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
 
         private void closeStateSystem() {
             ITmfEvent event = currentEvent;
-            final long endTime = (event == null) ? 0 :
-                    event.getTimestamp().toNanos();
+            final long endTime = (event == null) ? 0 : event.getTimestamp().toNanos();
 
             if (fSS != null) {
                 fSS.closeHistory(endTime);
