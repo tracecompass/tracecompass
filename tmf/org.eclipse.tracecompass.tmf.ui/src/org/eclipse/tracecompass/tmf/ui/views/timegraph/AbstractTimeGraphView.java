@@ -1462,12 +1462,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             long resolution, @NonNull IProgressMonitor monitor) {
         List<IMarkerEvent> markers = new ArrayList<>();
         for (IMarkerEventSource markerEventSource : getMarkerEventSources(fTrace)) {
-            for (String category : markerEventSource.getMarkerCategories()) {
-                if (monitor.isCanceled()) {
-                    break;
-                }
-                markers.addAll(markerEventSource.getMarkerList(category, startTime, endTime, resolution, monitor));
-            }
+            markers.addAll(markerEventSource.getMarkerList(startTime, endTime, resolution, monitor));
         }
         return markers;
     }
