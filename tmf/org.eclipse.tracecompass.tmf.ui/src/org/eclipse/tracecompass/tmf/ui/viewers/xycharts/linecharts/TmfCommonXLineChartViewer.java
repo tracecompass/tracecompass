@@ -323,8 +323,8 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      *            The array of values for the series
      */
     protected void setSeries(String seriesName, double[] seriesValues) {
-        if (fXValues.length > seriesValues.length) {
-            throw new IllegalStateException();
+        if (fXValues.length != seriesValues.length) {
+            throw new IllegalStateException("All series in list must be of length : " + fXValues.length); //$NON-NLS-1$
         }
         fSeriesValues.put(seriesName, seriesValues);
     }
@@ -400,9 +400,8 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                     IAxisTick xTick = getSwtChart().getAxisSet().getXAxis(0).getTick();
                     xTick.setFormat(tmfChartTimeStampFormat);
 
-                    final double start = xValues[0];
-                    int lastX = xValues.length - 1;
-                    double end = (start == xValues[lastX]) ? start + 1 : xValues[lastX];
+                    final double start = 0.0;
+                    double end = getWindowEndTime() - getWindowStartTime();
                     getSwtChart().getAxisSet().getXAxis(0).setRange(new Range(start, end));
                     if (maxy > miny) {
                         getSwtChart().getAxisSet().getYAxis(0).setRange(new Range(miny, maxy));
