@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
@@ -40,7 +39,6 @@ import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
@@ -48,19 +46,14 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
-import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfChartTimeStampFormat;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
-import org.swtchart.Chart;
-import org.swtchart.IAxis;
-import org.swtchart.IAxisTick;
 import org.swtchart.ILineSeries;
 import org.swtchart.ILineSeries.PlotSymbolType;
 import org.swtchart.ISeries.SeriesType;
 import org.swtchart.ISeriesSet;
 import org.swtchart.LineStyle;
-import org.swtchart.Range;
+
+import com.google.common.primitives.Doubles;
 
 /**
  * Displays the segment store provider data in a scatter graph
@@ -321,55 +314,19 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             return;
         }
 
-        final double[] xSeries = new double[dataSize];
-        final double[] ySeries = new double[dataSize];
+        List<Double> xSeries = new ArrayList<>(dataSize);
+        List<Double> ySeries = new ArrayList<>(dataSize);
         // For each visible segments, add start time to x value and duration
         // for y value
         Iterator<ISegment> modelIter = data.iterator();
-        long maxTempY = 1;
-        for (int i = 0; i < dataSize; i++) {
-            if (modelIter.hasNext()) {
-                ISegment segment = modelIter.next();
-                xSeries[i] = segment.getStart() - start;
-                ySeries[i] = segment.getLength();
-                maxTempY = Math.max(maxTempY, segment.getLength());
-            }
+        while (modelIter.hasNext()) {
+            ISegment segment = modelIter.next();
+            xSeries.add((double) (segment.getStart() - start));
+            ySeries.add((double) segment.getLength());
         }
-        final long maxY = maxTempY;
-        setXAxis(xSeries);
-        final Chart swtChart = getSwtChart();
-        if (swtChart.isDisposed() || xSeries.length < 1) {
-            return;
-        }
-        swtChart.updateLayout();
-        setSeries(Messages.SegmentStoreScatterGraphViewer_legend, ySeries); // $NON-NLS-1$
-        final TmfChartTimeStampFormat tmfChartTimeStampFormat = new TmfChartTimeStampFormat(getTimeOffset());
-        ILineSeries series = (ILineSeries) swtChart.getSeriesSet().getSeries(Messages.SegmentStoreScatterGraphViewer_legend);
-        if (series == null) {
-            series = addSeries(Messages.SegmentStoreScatterGraphViewer_legend);
-        }
-        series.setXSeries(xSeries);
-        /* Find the minimal and maximum values in this series */
-        series.setYSeries(ySeries);
-
-        final IAxis xAxis = swtChart.getAxisSet().getXAxis(0);
-        IAxisTick xTick = xAxis.getTick();
-        xTick.setFormat(tmfChartTimeStampFormat);
-        xAxis.setRange(new Range(0.0, end - start));
-        if (maxY > 0.0) {
-            swtChart.getAxisSet().getYAxis(0).setRange(new Range(0.0, maxY));
-        }
-        swtChart.redraw();
-
-        if (isSendTimeAlignSignals()) {
-            // The width of the chart might have changed and its
-            // time axis might be misaligned with the other views
-            Point viewPos = AbstractSegmentStoreScatterGraphViewer.this.getParent().getParent().toDisplay(0, 0);
-            int axisPos = swtChart.toDisplay(0, 0).x + getPointAreaOffset();
-            int timeAxisOffset = axisPos - viewPos.x;
-            TmfTimeViewAlignmentInfo timeAlignmentInfo = new TmfTimeViewAlignmentInfo(getControl().getShell(), viewPos, timeAxisOffset);
-            TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(AbstractSegmentStoreScatterGraphViewer.this, timeAlignmentInfo, true));
-        }
+        setXAxis(Doubles.toArray(xSeries));
+        setSeries(Messages.SegmentStoreScatterGraphViewer_legend, Doubles.toArray(ySeries)); // $NON-NLS-1$
+        updateDisplay();
     }
 
     @Override
