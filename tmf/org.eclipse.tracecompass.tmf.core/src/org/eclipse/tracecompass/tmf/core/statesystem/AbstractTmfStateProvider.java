@@ -12,7 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.core.statesystem;
 
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.collect.BufferedBlockingQueue;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
@@ -49,9 +50,21 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
     private boolean fStateSystemAssigned;
     /** State system in which to insert the state changes */
     private @Nullable ITmfStateSystemBuilder fSS = null;
+    private @Nullable Throwable fFailureCause = null;
 
     /* The last safe time at which this state provider can be queried */
     private volatile long fSafeTime;
+
+    /*
+     * An exception propagation runnable. If an exception occurred in Event
+     * Processor thread, this field should be updated so that the "main" thread
+     * will propagate the exception
+     */
+    private Runnable fPropagateExceptions = () -> {
+        // Do nothing, a new Runnable will be defined if exceptions occur in the
+        // threads
+    };
+
 
     /**
      * Instantiate a new state provider plugin.
@@ -95,7 +108,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         // set the safe time to before the trace start, the analysis has not yet
         // started
         fSafeTime = trace.getStartTime().toNanos() - 1;
-        fEventHandlerThread = new Thread(new EventProcessor(), id + " Event Handler"); //$NON-NLS-1$
+        fEventHandlerThread = new Thread(() -> SafeRunner.run(new EventProcessor()), id + " Event Handler"); //$NON-NLS-1$
     }
 
     private static String formatError(String name, int value) {
@@ -151,7 +164,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
             fEventsQueue.flushInputBuffer();
             fEventHandlerThread.join();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Activator.logError("Error disposing state provider", e); //$NON-NLS-1$
         }
         fStateSystemAssigned = false;
         fSS = null;
@@ -163,10 +176,27 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         if (!fStateSystemAssigned) {
             throw new IllegalStateException("Cannot process event without a target state system. ID: " + getClass().getSimpleName()); //$NON-NLS-1$
         }
+        fPropagateExceptions.run();
 
         /* Insert the event we're received into the events queue */
         ITmfEvent curEvent = event;
         fEventsQueue.put(curEvent);
+    }
+
+    /**
+     * @since 2.3
+     */
+    @Override
+    public void fail(Throwable cause) {
+        fFailureCause = cause;
+    }
+
+    /**
+     * @since 2.3
+     */
+    @Override
+    public @Nullable Throwable getFailureCause() {
+        return fFailureCause;
     }
 
     /**
@@ -220,9 +250,10 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
      * This is the runner class for the second thread, which will take the
      * events from the queue and pass them through the state system.
      */
-    private class EventProcessor implements Runnable {
+    private class EventProcessor implements ISafeRunnable {
 
         private @Nullable ITmfEvent currentEvent;
+        private boolean fDone = false;
 
         @Override
         public void run() {
@@ -235,7 +266,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
              * We never insert null in the queue. Cannot be checked at
              * compile-time until Java 8 annotations...
              */
-            @NonNull ITmfEvent event = fEventsQueue.take();
+            ITmfEvent event = fEventsQueue.take();
             /* This is a singleton, we want to do != instead of !x.equals */
             while (event != END_EVENT) {
                 if (event == EMPTY_QUEUE_EVENT) {
@@ -248,6 +279,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
                 eventHandle(event);
                 event = fEventsQueue.take();
             }
+            fDone = true;
             /* We've received the last event, clean up */
             done();
             closeStateSystem();
@@ -260,6 +292,38 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
             if (fSS != null) {
                 fSS.closeHistory(endTime);
             }
+        }
+
+        @Override
+        public void handleException(@Nullable Throwable exception) {
+            // Update the propagation runnable
+            final RuntimeException rException = (exception instanceof RuntimeException) ? (RuntimeException) exception : new RuntimeException("Error in threaded state history backend", exception); //$NON-NLS-1$
+            fail(rException);
+            fPropagateExceptions = () -> {
+                // This exception should be caught by the thread that does the
+                // insertions and trigger the cancellation mechanism
+                throw rException;
+            };
+            if (fDone) {
+                /*
+                 * The last event was already processed, the exception was
+                 * thrown from the closing of the state system, just return
+                 */
+                return;
+            }
+            /* drain */
+            ITmfEvent event = fEventsQueue.take();
+            while (event != END_EVENT) {
+                if (event == EMPTY_QUEUE_EVENT) {
+                    /* Synchronization event, should be ignored */
+                    event = fEventsQueue.take();
+                    continue;
+                }
+                event = fEventsQueue.take();
+            }
+
+            /* We've received the last event, clean up */
+            closeStateSystem();
         }
     }
 

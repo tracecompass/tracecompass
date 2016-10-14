@@ -91,10 +91,25 @@ public class TestStateSystemProvider extends AbstractTmfStateProvider {
      * Constructor
      *
      * @param trace
-     *            The LTTng 2.0 kernel trace directory
+     *            The trace this state provider is for
      */
     public TestStateSystemProvider(@NonNull ITmfTrace trace) {
         super(trace, "Stub State System");
+    }
+
+    /**
+     * Constructor
+     *
+     * @param trace
+     *            The trace this state provider is for
+     * @param size
+     *            The size of the queue, a.k.a the number of chunks that fit
+     *            into the buffered queue.
+     * @param chunk
+     *            the size of a events that fit inside a chunk of the queue
+     */
+    public TestStateSystemProvider(@NonNull ITmfTrace trace, int size, int chunk) {
+        super(trace, "Stub State System", size, chunk);
     }
 
     @Override

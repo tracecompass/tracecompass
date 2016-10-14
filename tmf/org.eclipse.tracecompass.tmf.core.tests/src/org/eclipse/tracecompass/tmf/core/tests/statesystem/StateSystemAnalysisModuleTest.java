@@ -22,10 +22,13 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.Messages;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
@@ -48,6 +51,27 @@ import org.junit.rules.Timeout;
  * @author Geneviève Bastien
  */
 public class StateSystemAnalysisModuleTest {
+
+    private final class BreakingTest extends TestStateSystemProvider {
+
+        private final int fEventNo;
+        private int fEventCount = 0;
+        private String fExceptionMessage;
+
+        private BreakingTest(@NonNull ITmfTrace trace, int eventToFail, String msg) {
+            super(trace, 1, 2);
+            fEventNo = eventToFail;
+            fExceptionMessage = msg;
+        }
+
+        @Override
+        protected void eventHandle(@NonNull ITmfEvent event) {
+            fEventCount++;
+            if (fEventCount == fEventNo) {
+                throw new IllegalArgumentException(fExceptionMessage);
+            }
+        }
+    }
 
     /** Time-out tests after 1 minute. */
     @Rule
@@ -329,6 +353,72 @@ public class StateSystemAnalysisModuleTest {
             module.schedule();
             assertFalse(module.waitForCompletion());
 
+        } finally {
+            module.dispose();
+        }
+    }
+
+    /**
+     * Test the behavior of a state provider that causes a runtime exception at
+     * different moments of the analysis. The analyses should be marked as
+     * failed
+     *
+     * @throws TmfAnalysisException
+     *             An exception when setting the trace
+     */
+    @Test
+    public void testFaultyStateProvider() throws TmfAnalysisException {
+        ITmfTrace trace = fTrace;
+        assertNotNull(trace);
+
+        // Test failure on the last event
+        TmfStateSystemAnalysisModule module = new TestStateSystemModule() {
+
+            @Override
+            protected @NonNull ITmfStateProvider createStateProvider() {
+                return new BreakingTest(trace, 7, "Expected exception: should be caught by the analysis itself");
+            }
+
+        };
+        try {
+            module.setTrace(trace);
+            module.schedule();
+            assertFalse(module.waitForCompletion());
+        } finally {
+            module.dispose();
+        }
+
+        // Test failure when the analysis the request finishes before the queue
+        // is full
+        module = new TestStateSystemModule() {
+
+            @Override
+            protected @NonNull ITmfStateProvider createStateProvider() {
+                return new BreakingTest(trace, 5, "Expected exception: should be caught by either the analysis or the event request");
+            }
+
+        };
+        try {
+            module.setTrace(trace);
+            module.schedule();
+            assertFalse(module.waitForCompletion());
+        } finally {
+            module.dispose();
+        }
+
+        // Test failure when the queue should be full
+        module = new TestStateSystemModule() {
+
+            @Override
+            protected @NonNull ITmfStateProvider createStateProvider() {
+                return new BreakingTest(trace, 1, "Expected exception: should be caught by the event request thread");
+            }
+
+        };
+        try {
+            module.setTrace(trace);
+            module.schedule();
+            assertFalse(module.waitForCompletion());
         } finally {
             module.dispose();
         }

@@ -436,11 +436,21 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
 
     private void disposeProvider(boolean deleteFiles) {
         ITmfStateProvider provider = fStateProvider;
+        boolean shouldDeleteFiles = deleteFiles;
         if (provider != null) {
             provider.dispose();
+            Throwable failureCause = provider.getFailureCause();
+            /*
+             * Fail the analysis if the provider failed and force the
+             * file deletion
+             */
+            if (failureCause != null) {
+                fail(failureCause);
+                shouldDeleteFiles = true;
+            }
         }
         fStateProvider = null;
-        if (deleteFiles && (fStateSystem != null)) {
+        if (shouldDeleteFiles && (fStateSystem != null)) {
             fStateSystem.removeFiles();
         }
     }

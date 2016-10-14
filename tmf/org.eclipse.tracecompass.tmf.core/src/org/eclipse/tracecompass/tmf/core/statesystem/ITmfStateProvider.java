@@ -118,4 +118,24 @@ public interface ITmfStateProvider {
      * @since 2.1
      */
     default void done() {}
+
+    /**
+     * Makes the state provider fail with a cause
+     *
+     * @param cause The cause of the failure
+     * @since 2.3
+     */
+    default void fail(Throwable cause) {
+        // Do nothing by default.
+    }
+
+    /**
+     * Get the cause of failure, or <code>null</code> if there is no failure.
+     *
+     * @return The failure cause
+     * @since 2.3
+     */
+    default @Nullable Throwable getFailureCause() {
+        return null;
+    }
 }

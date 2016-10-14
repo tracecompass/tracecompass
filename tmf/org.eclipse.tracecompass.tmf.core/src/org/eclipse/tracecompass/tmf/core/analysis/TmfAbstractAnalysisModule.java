@@ -369,6 +369,12 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
                     TmfCoreTracer.traceAnalysis(TmfAbstractAnalysisModule.this.getId(), TmfAbstractAnalysisModule.this.getTrace(), "finished"); //$NON-NLS-1$
                 } catch (TmfAnalysisException e) {
                     Activator.logError("Error executing analysis with trace " + trace.getName(), e); //$NON-NLS-1$
+                } catch (Exception e) {
+                    Activator.logError("Unexpected error executing analysis with trace " + trace.getName(), e); //$NON-NLS-1$
+                    fail(e);
+                    // Reset analysis so that it can be executed again.
+                    resetAnalysis();
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.OK, "Exception executing analysis", e); //$NON-NLS-1$
                 } finally {
                     synchronized (syncObj) {
                         mon.done();
