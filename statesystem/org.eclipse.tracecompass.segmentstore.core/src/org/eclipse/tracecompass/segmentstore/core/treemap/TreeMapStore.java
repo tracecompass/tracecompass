@@ -12,26 +12,15 @@
 
 package org.eclipse.tracecompass.segmentstore.core.treemap;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.TreeMap;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
-import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
-import com.google.common.collect.TreeMultimap;
 
 /**
  * Implementation of a {@link ISegmentStore} using in-memory {@link TreeMap}'s.
@@ -56,42 +45,13 @@ import com.google.common.collect.TreeMultimap;
  * @deprecated Use the {@link SegmentStoreFactory} to create a new segment store
  */
 @Deprecated
-public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<E> {
-
-    private final ReadWriteLock fLock = new ReentrantReadWriteLock(false);
-
-    private final TreeMultimap<Long, E> fStartTimesIndex;
-    private final TreeMultimap<Long, E> fEndTimesIndex;
-
-    private volatile long fSize;
-
-    private @Nullable transient Iterable<E> fLastSnapshot = null;
+public class TreeMapStore<@NonNull E extends ISegment> extends org.eclipse.tracecompass.internal.segmentstore.core.treemap.TreeMapStore<E> {
 
     /**
      * Constructor
      */
     public TreeMapStore() {
-        /*
-         * For the start times index, the "key comparator" will compare the
-         * start times as longs directly. This is the primary comparator for its
-         * tree map.
-         *
-         * The secondary "value" comparator will check the end times first, and
-         * in the event of a tie, defer to the ISegment's Comparable
-         * implementation, a.k.a. its natural ordering.
-         *
-         * The same is done for the end times index, but swapping the first two
-         * comparators instead.
-         */
-        fStartTimesIndex = TreeMultimap.create(
-                SegmentComparators.LONG_COMPARATOR,
-                Ordering.from(SegmentComparators.INTERVAL_END_COMPARATOR).compound(Ordering.natural()));
-
-        fEndTimesIndex = TreeMultimap.create(
-                SegmentComparators.LONG_COMPARATOR,
-                Ordering.from(SegmentComparators.INTERVAL_START_COMPARATOR).compound(Ordering.natural()));
-
-        fSize = 0;
+        super();
     }
 
     // ------------------------------------------------------------------------
@@ -100,134 +60,67 @@ public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<
 
     @Override
     public Iterator<E> iterator() {
-        fLock.readLock().lock();
-        try {
-            Iterable<E> lastSnapshot = fLastSnapshot;
-            if (lastSnapshot == null) {
-                lastSnapshot = ImmutableList.copyOf(fStartTimesIndex.values());
-                fLastSnapshot = lastSnapshot;
-            }
-            return checkNotNull(lastSnapshot.iterator());
-        } finally {
-            fLock.readLock().unlock();
-        }
+        return super.iterator();
     }
 
     @Override
     public boolean add(@Nullable E val) {
-        if (val == null) {
-            throw new IllegalArgumentException();
-        }
-
-        fLock.writeLock().lock();
-        try {
-            if (fStartTimesIndex.put(Long.valueOf(val.getStart()), val)) {
-                fEndTimesIndex.put(Long.valueOf(val.getEnd()), val);
-                fSize++;
-                fLastSnapshot = null;
-                return true;
-            }
-            return false;
-        } finally {
-            fLock.writeLock().unlock();
-        }
+        return super.add(val);
     }
 
     @Override
     public int size() {
-        return Long.valueOf(fSize).intValue();
+        return super.size(); // me
     }
 
     @Override
     public boolean isEmpty() {
-        return (fSize == 0);
+        return super.isEmpty();
     }
 
     @Override
     public boolean contains(@Nullable Object o) {
-        fLock.readLock().lock();
-        try {
-            return fStartTimesIndex.containsValue(o);
-        } finally {
-            fLock.readLock().unlock();
-        }
+        return super.contains(o);
     }
 
     @Override
     public boolean containsAll(@Nullable Collection<?> c) {
-        fLock.readLock().lock();
-        try {
-            return fStartTimesIndex.values().containsAll(c);
-        } finally {
-            fLock.readLock().unlock();
-        }
+        return super.containsAll(c);
     }
 
     @Override
     public Object[] toArray() {
-        fLock.readLock().lock();
-        try {
-            return fStartTimesIndex.values().toArray();
-        } finally {
-            fLock.readLock().unlock();
-        }
+        return super.toArray();
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        fLock.readLock().lock();
-        try {
-            return fStartTimesIndex.values().toArray(a);
-        } finally {
-            fLock.readLock().unlock();
-        }
+        return super.toArray(a);
     }
 
     @Override
     public boolean remove(@Nullable Object o) {
-        throw new UnsupportedOperationException();
+        return super.remove(o);
     }
 
     @Override
     public boolean addAll(@Nullable Collection<? extends E> c) {
-        if (c == null) {
-            throw new IllegalArgumentException();
-        }
-
-        fLock.writeLock().lock();
-        try {
-            boolean changed = false;
-            for (E elem : c) {
-                if (this.add(elem)) {
-                    changed = true;
-                }
-            }
-            return changed;
-        } finally {
-            fLock.writeLock().unlock();
-        }
+        return super.addAll(c);
     }
 
     @Override
     public boolean removeAll(@Nullable Collection<?> c) {
-        throw new UnsupportedOperationException();
+        return super.removeAll(c);
     }
 
     @Override
     public boolean retainAll(@Nullable Collection<?> c) {
-        throw new UnsupportedOperationException();
+        return super.retainAll(c);
     }
 
     @Override
     public void clear() {
-        fLock.writeLock().lock();
-        try {
-            fSize = 0;
-            fEndTimesIndex.clear();
-            fStartTimesIndex.clear();
-        } finally {
-            fLock.writeLock().unlock();
-        }
+        super.clear();
     }
 
     // ------------------------------------------------------------------------
@@ -236,41 +129,16 @@ public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<
 
     @Override
     public Iterable<E> getIntersectingElements(long position) {
-        /*
-         * The intervals intersecting 't' are those whose 1) start time is
-         * *lower* than 't' AND 2) end time is *higher* than 't'.
-         */
-        fLock.readLock().lock();
-        try {
-            Iterable<E> matchStarts = Iterables.concat(fStartTimesIndex.asMap().headMap(position, true).values());
-            Iterable<E> matchEnds = Iterables.concat(fEndTimesIndex.asMap().tailMap(position, true).values());
-            return checkNotNull(Sets.intersection(Sets.newHashSet(matchStarts), Sets.newHashSet(matchEnds)));
-        } finally {
-            fLock.readLock().unlock();
-        }
+        return super.getIntersectingElements(position);
     }
 
     @Override
     public Iterable<E> getIntersectingElements(long start, long end) {
-        fLock.readLock().lock();
-        try {
-            Iterable<E> matchStarts = Iterables.concat(fStartTimesIndex.asMap().headMap(end, true).values());
-            Iterable<E> matchEnds = Iterables.concat(fEndTimesIndex.asMap().tailMap(start, true).values());
-            return checkNotNull(Sets.intersection(Sets.newHashSet(matchStarts), Sets.newHashSet(matchEnds)));
-        } finally {
-            fLock.readLock().unlock();
-        }
+        return super.getIntersectingElements(start, end);
     }
 
     @Override
     public void dispose() {
-        fLock.writeLock().lock();
-        try {
-            fStartTimesIndex.clear();
-            fEndTimesIndex.clear();
-            fSize = 0;
-        } finally {
-            fLock.writeLock().unlock();
-        }
+        super.dispose();
     }
 }
