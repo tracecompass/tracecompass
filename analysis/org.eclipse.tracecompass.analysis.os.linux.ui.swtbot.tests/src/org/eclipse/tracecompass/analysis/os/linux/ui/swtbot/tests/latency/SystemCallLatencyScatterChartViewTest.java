@@ -35,6 +35,10 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyScatterView;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
@@ -66,6 +70,7 @@ public class SystemCallLatencyScatterChartViewTest {
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
     private Chart fScatterChart;
+    private SystemCallLatencyScatterView fSystemCallLatencyScatterView = null;
 
     /**
      * Things to setup
@@ -121,6 +126,7 @@ public class SystemCallLatencyScatterChartViewTest {
         if (!(viewPart instanceof SystemCallLatencyScatterView)) {
             fail("Could not instanciate view");
         }
+        fSystemCallLatencyScatterView = (SystemCallLatencyScatterView) viewPart;
         fScatterChart = viewBot.bot().widget(WidgetOfType.widgetOfType(Chart.class));
         assertNotNull(fScatterChart);
     }
@@ -173,12 +179,23 @@ public class SystemCallLatencyScatterChartViewTest {
         SWTBotChart chartBot = new SWTBotChart(scatterChart);
         assertVisible(chartBot);
         assertEquals("", chartBot.getToolTipText());
-        final Range range = scatterChart.getAxisSet().getXAxes()[0].getRange();
+        Range range = scatterChart.getAxisSet().getXAxes()[0].getRange();
         assertEquals(100000000, range.upper - range.lower, 0);
         ISeriesSet seriesSet = fScatterChart.getSeriesSet();
         assertNotNull(seriesSet);
         ISeries[] series = seriesSet.getSeries();
         assertNotNull(series);
+
+        // Update the time range to a range where there is no data
+        long noDataStart = 1412670961274443542L;
+        long noDataEnd = 1412670961298823940L;
+        TmfTimeRange windowRange = new TmfTimeRange(TmfTimestamp.fromNanos(noDataStart), TmfTimestamp.fromNanos(noDataEnd));
+        TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, windowRange));
+
+        bot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(fSystemCallLatencyScatterView.getChartViewer()));
+
+        range = scatterChart.getAxisSet().getXAxes()[0].getRange();
+        assertEquals(noDataEnd - noDataStart, range.upper - range.lower, 0);
 
         // Verify that the chart has 1 series
         assertEquals(1, series.length);

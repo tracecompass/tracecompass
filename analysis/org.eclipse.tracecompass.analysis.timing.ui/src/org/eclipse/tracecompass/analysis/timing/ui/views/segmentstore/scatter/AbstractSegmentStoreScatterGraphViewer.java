@@ -310,7 +310,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
         Collection<ISegment> data = fDisplayData;
 
         final int dataSize = (nb == 0) ? data.size() : nb;
-        if (dataSize == 0 || end == start) {
+        if (end == start) {
             return;
         }
 
@@ -325,7 +325,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             ySeries.add((double) segment.getLength());
         }
         setXAxis(Doubles.toArray(xSeries));
-        setSeries(Messages.SegmentStoreScatterGraphViewer_legend, Doubles.toArray(ySeries)); // $NON-NLS-1$
+        setSeries(Messages.SegmentStoreScatterGraphViewer_legend, Doubles.toArray(ySeries));
         updateDisplay();
     }
 

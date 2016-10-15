@@ -18,6 +18,8 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Some stuff
  *
@@ -52,6 +54,12 @@ public class SystemCallLatencyScatterView extends TmfChartView {
         fScatterViewer = new SystemCallLatencyScatterGraphViewer(NonNullUtils.checkNotNull(parent), nullToEmptyString(Messages.SystemCallLatencyScatterView_title), nullToEmptyString(Messages.SystemCallLatencyScatterView_xAxis),
                 nullToEmptyString(Messages.SystemCallLatencyScatterView_yAxis));
         return fScatterViewer;
+    }
+
+    @VisibleForTesting
+    @Override
+    public TmfXYChartViewer getChartViewer() {
+        return super.getChartViewer();
     }
 
 }

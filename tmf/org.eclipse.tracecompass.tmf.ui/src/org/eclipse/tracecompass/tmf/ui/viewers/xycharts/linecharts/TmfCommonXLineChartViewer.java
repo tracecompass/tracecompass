@@ -382,9 +382,6 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
             public void run() {
                 if (!getSwtChart().isDisposed()) {
                     double[] xValues = fXValues;
-                    if (xValues.length < 1) {
-                        return;
-                    }
                     double maxy = DEFAULT_MAXY;
                     double miny = DEFAULT_MINY;
                     for (Entry<String, double[]> entry : fSeriesValues.entrySet()) {
