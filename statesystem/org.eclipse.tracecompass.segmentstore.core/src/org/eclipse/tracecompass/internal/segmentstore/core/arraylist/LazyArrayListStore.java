@@ -56,8 +56,6 @@ import com.google.common.collect.Ordering;
  */
 public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegmentStore<E> {
 
-    private static final String ERROR_MESSAGE = "Cannot remove from a segment store"; //$NON-NLS-1$
-
     private final Comparator<E> COMPARATOR = Ordering.from(SegmentComparators.INTERVAL_START_COMPARATOR)
             .compound(SegmentComparators.INTERVAL_END_COMPARATOR);
 
@@ -232,21 +230,6 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
         } finally {
             fLock.unlock();
         }
-    }
-
-    @Override
-    public boolean removeAll(@Nullable Collection<?> c) {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
-    }
-
-    @Override
-    public boolean retainAll(@Nullable Collection<?> c) {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
-    }
-
-    @Override
-    public boolean remove(@Nullable Object o) {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
     }
 
     @Override

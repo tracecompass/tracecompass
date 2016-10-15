@@ -22,8 +22,17 @@ import org.eclipse.jdt.annotation.NonNull;
 
 import com.google.common.collect.Lists;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * Interface for segment-storing backends.
+ *
+ * Common contract (what should not be implemented) for a segment store.
+ * <ol>
+ * <li>no remove</li>
+ * <li>no removeAll</li>
+ * <li>no retainall</li>
+ * </ol>
  *
  * @param <E>
  *            The type of {@link ISegment} element that will be stored in this
@@ -134,5 +143,20 @@ public interface ISegmentStore<E extends ISegment> extends Collection<E> {
      */
     default void close(boolean deleteFiles) {
 
+    }
+
+    @Override
+    default boolean remove(@Nullable Object o) {
+        throw new UnsupportedOperationException("Segment stores does not support \"remove\""); //$NON-NLS-1$
+    }
+
+    @Override
+    default boolean removeAll(@Nullable Collection<?> c) {
+        throw new UnsupportedOperationException("Segment stores does not support \"removeAll\""); //$NON-NLS-1$
+    }
+
+    @Override
+    default boolean retainAll(@Nullable Collection<?> c) {
+        throw new UnsupportedOperationException("Segment stores does not support \"retainAll\""); //$NON-NLS-1$
     }
 }

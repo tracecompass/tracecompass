@@ -185,11 +185,6 @@ public class ArrayListStore<@NonNull E extends ISegment> implements ISegmentStor
     }
 
     @Override
-    public boolean remove(@Nullable Object o) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public boolean addAll(@Nullable Collection<? extends E> c) {
         if (c == null) {
             throw new IllegalArgumentException();
@@ -207,16 +202,6 @@ public class ArrayListStore<@NonNull E extends ISegment> implements ISegmentStor
         } finally {
             fLock.writeLock().unlock();
         }
-    }
-
-    @Override
-    public boolean removeAll(@Nullable Collection<?> c) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean retainAll(@Nullable Collection<?> c) {
-        throw new UnsupportedOperationException();
     }
 
     @Override
