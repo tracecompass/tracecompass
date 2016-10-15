@@ -37,6 +37,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -113,6 +114,7 @@ public class TestImportExportPackageWizard {
      *             won't happen
      */
     @Test
+    @Ignore
     public void test() throws IOException {
         File f = File.createTempFile("temp", ".xml").getCanonicalFile();
         try (FileWriter fw = new FileWriter(f)) {
