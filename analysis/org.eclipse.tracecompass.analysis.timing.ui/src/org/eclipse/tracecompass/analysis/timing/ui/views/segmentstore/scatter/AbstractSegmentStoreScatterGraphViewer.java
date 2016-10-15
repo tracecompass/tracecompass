@@ -108,7 +108,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             final long startTime = fCurrentRange.getStartTime().getValue();
             final long endTime = fCurrentRange.getEndTime().getValue();
             fPixelStart = startTime;
-            fPixelSize = (endTime - startTime) / MAX_POINTS;
+            fPixelSize = Math.max(1, (endTime - startTime) / MAX_POINTS);
             final Iterable<ISegment> intersectingElements = segStore.getIntersectingElements(startTime, endTime);
 
             final List<ISegment> list = convertIterableToList(intersectingElements, statusMonitor);
