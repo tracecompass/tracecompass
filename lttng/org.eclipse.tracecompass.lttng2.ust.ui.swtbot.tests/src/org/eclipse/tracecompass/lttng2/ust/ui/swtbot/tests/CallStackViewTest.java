@@ -12,11 +12,12 @@
 
 package org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,11 +26,15 @@ import java.util.stream.Collectors;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -39,6 +44,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
+import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
@@ -46,7 +52,6 @@ import org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackView;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -69,7 +74,7 @@ public class CallStackViewTest {
     /**
      * Timestamps of consecutive events in the trace
      */
-    private static final long TIMESTAMPS[] =  new long[] {
+    private static final long TIMESTAMPS[] = new long[] {
             1378850463804898643l,
             1378850463804899057l,
             1378850463804900219l,
@@ -87,17 +92,17 @@ public class CallStackViewTest {
      * Stack frames of consecutive events in the trace
      */
     private static final String[] STACK_FRAMES[] = new String[][] {
-        {"0x40472b", "0x4045c8", "0x404412", "", ""},
-        {"0x40472b", "0x4045c8", "0x404412", "0x40392b", ""},
-        {"0x40472b", "0x4045c8", "0x404412", "", ""},
-        {"0x40472b", "0x4045c8", "", "", ""},
-        {"0x40472b", "0x4045c8", "0x404412", "", ""},
-        {"0x40472b", "0x4045c8", "0x404412", "0x40392b", ""},
-        {"0x40472b", "0x4045c8", "0x404412", "", ""},
-        {"0x40472b", "0x4045c8", "", "", ""},
-        {"0x40472b", "0x4045c8", "0x404412", "", ""},
-        {"0x40472b", "0x4045c8", "0x404412", "0x40392b", ""},
-        {"0x40472b", "0x4045c8", "0x404412", "", ""},
+            { "0x40472b", "0x4045c8", "0x404412", "", "" },
+            { "0x40472b", "0x4045c8", "0x404412", "0x40392b", "" },
+            { "0x40472b", "0x4045c8", "0x404412", "", "" },
+            { "0x40472b", "0x4045c8", "", "", "" },
+            { "0x40472b", "0x4045c8", "0x404412", "", "" },
+            { "0x40472b", "0x4045c8", "0x404412", "0x40392b", "" },
+            { "0x40472b", "0x4045c8", "0x404412", "", "" },
+            { "0x40472b", "0x4045c8", "", "", "" },
+            { "0x40472b", "0x4045c8", "0x404412", "", "" },
+            { "0x40472b", "0x4045c8", "0x404412", "0x40392b", "" },
+            { "0x40472b", "0x4045c8", "0x404412", "", "" },
     };
 
     /** Tooltips of the toolbar buttons */
@@ -297,14 +302,33 @@ public class CallStackViewTest {
 
     /**
      * Test check callstack at a time with function map
+     *
+     * @throws URISyntaxException
+     *             Malformed url
+     * @throws IOException
+     *             Missing file
      */
-    @Ignore
     @Test
-    public void testGoToTimeAndCheckStackWithNames() {
+    public void testGoToTimeAndCheckStackWithNames() throws URISyntaxException, IOException {
         goToTime(TIMESTAMPS[0]);
         final SWTBotView viewBot = fBot.viewById(CallStackView.ID);
         viewBot.setFocus();
-        // no way to load mappings yet! :(
+        Object mapObj = CtfTmfTestTraceUtils.class.getResource("cyg-profile-mapping.txt");
+        assertTrue(mapObj instanceof URL);
+        URL mapUrl = (URL) mapObj;
+
+        String absoluteFile = FileLocator.toFileURL(mapUrl).getFile();
+        TmfFileDialogFactory.setOverrideFiles(absoluteFile);
+        viewBot.toolbarButton("Configure how the addresses are mapped to function names").click();
+        String shellTitle = "Symbol mapping";
+        fBot.waitUntil(Conditions.shellIsActive(shellTitle));
+        SWTBot shellBot = fBot.shell(shellTitle).bot();
+        SWTBotShell activeShell = shellBot.activeShell();
+        shellBot.radio(1).click();
+        shellBot.button("Browse...", 1).click();
+        shellBot.button("OK").click();
+        shellBot.waitUntil(Conditions.shellCloses(activeShell));
+
         SWTBotTree tree = viewBot.bot().tree();
         WaitUtils.waitForJobs();
         List<String> names = new ArrayList<>();
@@ -315,6 +339,7 @@ public class CallStackViewTest {
                 }
             }
         }
+        assertEquals(names, ImmutableList.of("glxgears-16073"));
     }
 
     /**
