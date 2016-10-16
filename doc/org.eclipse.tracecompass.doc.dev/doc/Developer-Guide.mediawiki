@@ -1034,6 +1034,20 @@ Sent by any component that allows the user to select a thread.
 
 Received by viewers that show information specific to a selected thread.
 
+=== TmfSymbolProviderUpdatedSignal ===
+
+''Purpose''
+
+This signal is used to indicate that the user has updated the symbol mapping.
+
+''Senders''
+
+Sent by symbol providers or managers when more information is available.
+
+''Receivers''
+
+Received by viewers that show information specific to mapped symbol, typically a function call.
+
 === TmfTraceSynchronizedSignal ===
 
 ''Purpose''

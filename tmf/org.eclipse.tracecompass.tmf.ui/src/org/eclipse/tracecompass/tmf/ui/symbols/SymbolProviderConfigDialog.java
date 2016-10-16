@@ -29,6 +29,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
@@ -166,6 +167,7 @@ public class SymbolProviderConfigDialog extends TitleAreaDialog implements IPref
         if (!cancel) {
             super.okPressed();
         }
+        TmfSignalManager.dispatchSignal(new TmfSymbolProviderUpdatedSignal(this));
     }
 
     @Override

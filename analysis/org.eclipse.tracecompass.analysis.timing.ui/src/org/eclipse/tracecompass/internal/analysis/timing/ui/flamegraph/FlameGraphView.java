@@ -44,12 +44,14 @@ import org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.CallGraphA
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor;
+import org.eclipse.tracecompass.tmf.ui.symbols.TmfSymbolProviderUpdatedSignal;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphViewer;
@@ -120,7 +122,7 @@ public class FlameGraphView extends TmfView {
         }
         contributeToActionBars();
         loadSortOption();
-
+        TmfSignalManager.register(this);
         getSite().setSelectionProvider(fTimeGraphViewer.getSelectionProvider());
         createTimeEventContextMenu();
         fTimeGraphViewer.getTimeGraphControl().addMouseListener(new MouseAdapter() {
@@ -430,6 +432,19 @@ public class FlameGraphView extends TmfView {
             return;
         }
         setSortOption(SortOption.fromName(sortOption));
+    }
+
+    /**
+     * Symbol map provider updated
+     *
+     * @param signal
+     *            the signal
+     */
+    @TmfSignalHandler
+    public void symbolMapUpdated(TmfSymbolProviderUpdatedSignal signal) {
+        if (signal.getSource() != this) {
+            fTimeGraphViewer.refresh();
+        }
     }
 
 }
