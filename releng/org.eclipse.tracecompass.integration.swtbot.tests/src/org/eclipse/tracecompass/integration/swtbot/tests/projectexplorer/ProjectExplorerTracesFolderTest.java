@@ -43,6 +43,7 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IPageLayout;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -168,6 +169,14 @@ public class ProjectExplorerTracesFolderTest {
     public static void tearDown() {
         SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
         fLogger.removeAllAppenders();
+    }
+
+    /**
+     * Test tear down method.
+     */
+    @After
+    public void afterTest() {
+        SWTBotUtils.closeSecondaryShells(fBot);
     }
 
     private static void test3_01Preparation() {

@@ -284,6 +284,7 @@ public final class SWTBotUtils {
         // shell such the special "limbo shell" that Eclipse needs to work
         Arrays.stream(shells)
                 .filter(shell -> shell != mainShell)
+                .filter(s -> !s.widget.isDisposed())
                 .filter(SWTBotShell::isVisible)
                 .peek(shell -> log.debug(MessageFormat.format("Closing lingering shell with title {0}", shell.getText())))
                 .forEach(SWTBotShell::close);
