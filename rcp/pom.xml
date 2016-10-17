@@ -35,7 +35,9 @@
     <profile>
       <id>build-rcp</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>!skip-rcp</name>
+        </property>
       </activation>
       <modules>
         <module>org.eclipse.tracecompass.rcp.product</module>

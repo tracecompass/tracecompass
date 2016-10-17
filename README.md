@@ -70,14 +70,14 @@ the build system. You can set them by using `-P[profile name]` and
   stable platform. To use the staging target for example, use
   `-Dtarget-platform=tracecompass-eStaging`.
 
+* `-Dskip-rcp`
+
+  Skips building the RCP archives and related deployment targets.
+
 * `-Pctf-grammar`
 
   Re-compiles the CTF grammar files. This should be enabled if you modify the
   `.g` files in the `ctf.parser` plugin.
-
-* `-P -build-rcp`
-
-  Disables the "build-rcp" profile to skip building the RCP archives.
 
 * `-Prun-custom-test-suite`
 
@@ -91,7 +91,6 @@ the build system. You can set them by using `-P[profile name]` and
   the RCP-specific update site, to the paths specified by
   `-DrcpDestination=/absolute/path/to/destination` and
   `-DrcpSiteDestination=/absolute/path/to/destination`, respectively.
-  Must be used with `-Pbuild-rcp`!
 
 * `-Pdeploy-update-site`
 
