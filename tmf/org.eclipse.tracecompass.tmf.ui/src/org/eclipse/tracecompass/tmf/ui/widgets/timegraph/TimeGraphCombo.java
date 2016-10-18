@@ -1380,18 +1380,6 @@ public class TimeGraphCombo extends Composite {
                 tree.removePaintListener(this);
                 doAlignTreeItems();
                 redraw();
-                /*
-                 * Bug in GTK. Calling setTopItem() can scroll to the wrong item
-                 * when the 'tree view' is dirty. Set it again once it is clean.
-                 */
-                if (SWT.getPlatform().equals("gtk")) { //$NON-NLS-1$
-                    tree.getDisplay().asyncExec(() -> {
-                        TreeItem topItem = tree.getTopItem();
-                        if (!tree.isDisposed() && topItem != null && !topItem.isDisposed()) {
-                            tree.setTopItem(topItem);
-                        }
-                    });
-                }
             }
         });
         /* Make sure the paint event is triggered. */
