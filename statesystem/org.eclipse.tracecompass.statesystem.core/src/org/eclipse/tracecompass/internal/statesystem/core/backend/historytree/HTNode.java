@@ -99,14 +99,13 @@ public abstract class HTNode {
      * <pre>
      *  1 - byte (type)
      * 16 - 2x long (start time, end time)
-     * 16 - 4x int (seq number, parent seq number, intervalcount,
-     *              strings section pos.)
+     * 16 - 3x int (seq number, parent seq number, intervalcount)
      *  1 - byte (done or not)
      * </pre>
      */
     private static final int COMMON_HEADER_SIZE = Byte.BYTES
             + 2 * Long.BYTES
-            + 4 * Integer.BYTES
+            + 3 * Integer.BYTES
             + Byte.BYTES;
 
     // ------------------------------------------------------------------------
@@ -268,7 +267,9 @@ public abstract class HTNode {
 
             /* Back to us, we write the intervals */
             fIntervals.forEach(i -> i.writeInterval(buffer));
-
+            if (blockSize - buffer.position() != getNodeFreeSpace()) {
+                throw new IllegalStateException("Wrong free space: Actual: " + (blockSize - buffer.position()) + ", Expected: " + getNodeFreeSpace()); //$NON-NLS-1$ //$NON-NLS-2$
+            }
             /*
              * Fill the rest with zeros
              */
