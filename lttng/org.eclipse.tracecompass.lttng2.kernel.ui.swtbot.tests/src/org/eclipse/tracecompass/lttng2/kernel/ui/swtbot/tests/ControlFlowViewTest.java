@@ -13,10 +13,8 @@
 package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,7 +29,6 @@ import org.eclipse.swtbot.swt.finder.keyboard.KeyboardFactory;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -58,9 +55,8 @@ import org.junit.runner.RunWith;
  * @author Patrick Tasse
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
-public class ControlFlowViewTest extends KernelTestBase {
+public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
 
-    private static final String SEPARATOR = "";
     private static final String CHECK_SELECTED = "Check selected";
     private static final String CHECK_ALL = "Check all";
     private static final String CHECK_SUBTREE = "Check subtree";
@@ -91,30 +87,25 @@ public class ControlFlowViewTest extends KernelTestBase {
 
     private SWTBotView fViewBot;
 
-    /**
-     * Get the legend text values in order (override if you subclass the test)
-     *
-     * @return the legend text values in order
-     */
-    protected List<String> getLegendValues() {
-        String[] labelValues = { "UNKNOWN", "WAIT_UNKNOWN", "WAIT_BLOCKED", "WAIT_FOR_CPU", "USERMODE", "SYSCALL", "INTERRUPTED" };
-        return Arrays.asList(labelValues);
+    @Override
+    protected SWTBotView getViewBot() {
+        return fViewBot;
     }
 
-    /**
-     * Get the tool bar tool tip text values in order (override if you subclass the test)
-     *
-     * @return the tool bar tool tip text values in order
-     */
+    @Override
+    protected List<String> getLegendValues() {
+        return Arrays.asList("UNKNOWN", "WAIT_UNKNOWN", "WAIT_BLOCKED", "WAIT_FOR_CPU", "USERMODE", "SYSCALL", "INTERRUPTED");
+    }
+
+    @Override
     protected List<String> getToolbarTooltips() {
-        String[] tooltipsArray = { "Align Views", "Optimize", SEPARATOR,
+        return Arrays.asList("Align Views", "Optimize", SEPARATOR,
                 "Show View Filters", "Show Legend", SEPARATOR,
                 "Reset the Time Scale to Default", "Select Previous State Change", "Select Next State Change", SEPARATOR,
                 "Add Bookmark...", "Previous Marker", "Next Marker", SEPARATOR,
                 "Select Previous Process", "Select Next Process", "Zoom In", "Zoom Out", SEPARATOR,
                 "Hide Arrows", "Follow CPU Backward", "Follow CPU Forward",
-                "Go to previous event of the selected thread", "Go to next event of the selected thread" };
-        return Arrays.asList(tooltipsArray);
+                "Go to previous event of the selected thread", "Go to next event of the selected thread" );
     }
 
     /**
@@ -250,40 +241,6 @@ public class ControlFlowViewTest extends KernelTestBase {
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(START_TIME, START_TIME)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(START_TIME));
-    }
-
-    /**
-     * Test toolbar button order and that all buttons are enabled and visible
-     */
-    @Test
-    public void testToolbar() {
-        List<SWTBotToolbarButton> buttons = fViewBot.getToolbarButtons();
-        List<String> tooltipsExpected = getToolbarTooltips();
-        List<String> tooltips = new ArrayList<>();
-        for (SWTBotToolbarButton button : buttons) {
-            tooltips.add(button.getToolTipText());
-            assertTrue(button.getText() + " enabled", button.isEnabled());
-            assertTrue(button.getText() + " visible", button.isVisible());
-        }
-        assertEquals(tooltipsExpected, tooltips);
-    }
-
-    /**
-     * Test the legend content
-     */
-    @Test
-    public void testLegend() {
-        List<String> labelValues = getLegendValues();
-        SWTBotToolbarButton legendButton = fViewBot.toolbarButton("Show Legend");
-        legendButton.click();
-        fBot.waitUntil(org.eclipse.swtbot.swt.finder.waits.Conditions.shellIsActive("States Transition Visualizer"));
-        SWTBot bot = fBot.activeShell().bot();
-        for (int i = 1; i <= labelValues.size(); i++) {
-            SWTBotLabel label = bot.label(i);
-            assertNotNull(label);
-            assertEquals(labelValues.get(i - 1), label.getText());
-        }
-        bot.button("OK").click();
     }
 
     /**

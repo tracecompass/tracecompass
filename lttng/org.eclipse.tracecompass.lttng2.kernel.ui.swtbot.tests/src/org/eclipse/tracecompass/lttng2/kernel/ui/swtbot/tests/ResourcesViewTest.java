@@ -16,6 +16,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swt.SWT;
@@ -50,7 +53,7 @@ import org.junit.Test;
  *
  * @author Patrick Tasse
  */
-public class ResourcesViewTest extends KernelTestBase {
+public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
 
     private static final String NEXT_MARKER = "Next Marker";
     private static final String PREVIOUS_MARKER = "Previous Marker";
@@ -79,6 +82,24 @@ public class ResourcesViewTest extends KernelTestBase {
     private static final Point HIDE_SIZE = new Point(16, 16);
 
     private SWTBotView fViewBot;
+
+    @Override
+    protected SWTBotView getViewBot() {
+        return fViewBot;
+    }
+
+    @Override
+    protected List<String> getLegendValues() {
+        return Arrays.asList("IDLE", "USERMODE", "SYSCALL", "IRQ", "SOFT_IRQ", "IRQ_ACTIVE", "SOFT_IRQ_RAISED", "SOFT_IRQ_ACTIVE");
+    }
+
+    @Override
+    protected List<String> getToolbarTooltips() {
+        return Arrays.asList("Align Views", "Show View Filters", "Show Legend", SEPARATOR,
+                "Reset the Time Scale to Default", "Select Previous State Change", "Select Next State Change", SEPARATOR,
+                "Add Bookmark...", "Previous Marker", "Next Marker", SEPARATOR,
+                "Select Previous Resource", "Select Next Resource", "Zoom In", "Zoom Out" );
+    }
 
     /**
      * Before Test
@@ -247,7 +268,10 @@ public class ResourcesViewTest extends KernelTestBase {
         dialogBot.text().setText("B1");
         dialogBot.button(OK).click();
 
-        /* click "Select Next State Change" 2 times and shift-click "Select Next State Change*/
+        /*
+         * click "Select Next State Change" 2 times and shift-click "Select Next
+         * State Change
+         */
         fViewBot.toolbarButton(SELECT_NEXT_STATE_CHANGE).click();
         timeGraphIsReadyCondition(new TmfTimeRange(CPU0_TIME3, CPU0_TIME3), CPU0_TIME3);
         fViewBot.toolbarButton(SELECT_NEXT_STATE_CHANGE).click();
@@ -314,17 +338,25 @@ public class ResourcesViewTest extends KernelTestBase {
         final Point size2 = getSize(markerAxis);
         final int rowHeight = size2.y - size1.y;
 
-        /* get the state area bounds, since we don't know the name space width */
+        /*
+         * get the state area bounds, since we don't know the name space width
+         */
         final TimeGraphControl timeGraph = fViewBot.bot().widget(WidgetOfType.widgetOfType(TimeGraphControl.class));
         int x0 = getXForTime(timeGraph, startTime.toNanos());
         int x1 = getXForTime(timeGraph, endTime.toNanos());
 
-        /* click at the center of the marker axis width and first row height, it should be within the lost event range */
+        /*
+         * click at the center of the marker axis width and first row height, it
+         * should be within the lost event range
+         */
         final SWTBotCanvas markerAxisCanvas = new SWTBotCanvas(markerAxis);
         markerAxisCanvas.click((x0 + x1) / 2, TOP_MARGIN + rowHeight / 2);
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(LOST_EVENT_TIME1, LOST_EVENT_END1)));
 
-        /* click near the left of the marker axis width and center of second row height, it should be on the bookmark label */
+        /*
+         * click near the left of the marker axis width and center of second row
+         * height, it should be on the bookmark label
+         */
         markerAxisCanvas.click(x0 + 2, TOP_MARGIN + rowHeight + rowHeight / 2);
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(startTime, startTime)));
 
