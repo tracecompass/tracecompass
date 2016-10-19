@@ -31,7 +31,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter.Messages;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter.SegmentStoreScatterGraphTooltipProvider;
@@ -43,7 +42,6 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
-import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -71,11 +69,13 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
 
     private final class CompactingSegmentStoreQuery extends Job {
         private static final long MAX_POINTS = 1000;
-        private final TmfTimeRange fCurrentRange;
+        private final long fStart;
+        private final long fEnd;
 
-        private CompactingSegmentStoreQuery(TmfTimeRange currentRange) {
+        private CompactingSegmentStoreQuery(long start, long end) {
             super(Messages.SegmentStoreScatterGraphViewer_compactTitle);
-            fCurrentRange = currentRange;
+            fStart = start;
+            fEnd = end;
         }
 
         @Override
@@ -87,31 +87,25 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
                 }
 
                 ISegmentStoreProvider segmentProvider = getSegmentProvider();
-                final long startTimeInNanos = fCurrentRange.getStartTime().toNanos();
-                final long endTimeInNanos = fCurrentRange.getEndTime().toNanos();
+                final long startTime = fStart;
+                final long endTime = fEnd;
                 if (segmentProvider == null) {
-                    setWindowRange(startTimeInNanos, endTimeInNanos);
-                    redraw(statusMonitor, startTimeInNanos, startTimeInNanos, Collections.EMPTY_LIST);
+                    redraw(statusMonitor, startTime, startTime, Collections.EMPTY_LIST);
                     return new Status(IStatus.WARNING, Activator.PLUGIN_ID, "segment provider not available"); //$NON-NLS-1$
                 }
 
                 final ISegmentStore<ISegment> segStore = segmentProvider.getSegmentStore();
                 if (segStore == null) {
-                    setWindowRange(startTimeInNanos, endTimeInNanos);
-                    redraw(statusMonitor, startTimeInNanos, startTimeInNanos, Collections.EMPTY_LIST);
+                    redraw(statusMonitor, startTime, startTime, Collections.EMPTY_LIST);
                     return new Status(IStatus.INFO, Activator.PLUGIN_ID, "Segment provider does not have segments"); //$NON-NLS-1$
                 }
 
-                final long startTime = fCurrentRange.getStartTime().getValue();
-                final long endTime = fCurrentRange.getEndTime().getValue();
                 fPixelStart = startTime;
                 fPixelSize = Math.max(1, (endTime - startTime) / MAX_POINTS);
                 final Iterable<ISegment> intersectingElements = segStore.getIntersectingElements(startTime, endTime);
-
                 final List<ISegment> list = convertIterableToList(intersectingElements, statusMonitor);
                 final List<ISegment> displayData = (!list.isEmpty()) ? compactList(startTime, list, statusMonitor) : list;
 
-                setWindowRange(startTimeInNanos, endTimeInNanos);
                 redraw(statusMonitor, startTime, endTime, displayData);
 
                 if (statusMonitor.isCanceled()) {
@@ -310,7 +304,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             fDisplayData = list;
         }
         setWindowRange(currentStart, currentEnd);
-        updateRange(currentRange);
+        updateContent();
     }
 
     @Override
@@ -425,7 +419,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
                     timeRange.getStartTime().toNanos(),
                     timeRange.getEndTime().toNanos());
             setData(getSegmentStoreProvider(trace));
-            updateRange(timeRange);
+            updateContent();
         }
     }
 
@@ -454,9 +448,10 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
 
     }
 
-    private void updateRange(final @Nullable TmfTimeRange timeRange) {
+    @Override
+    protected void updateContent() {
         /*
-         * Update is request, content is not up to date, fDirty will be
+         * Update is requested, content is not up to date, fDirty will be
          * decremented in the compacting job
          */
         fDirty.incrementAndGet();
@@ -464,7 +459,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
         if (compactingJob != null && compactingJob.getState() == Job.RUNNING) {
             compactingJob.cancel();
         }
-        compactingJob = new CompactingSegmentStoreQuery(NonNullUtils.checkNotNull(timeRange));
+        compactingJob = new CompactingSegmentStoreQuery(getWindowStartTime(), getWindowEndTime());
         fCompactingJob = compactingJob;
         compactingJob.schedule();
     }
@@ -488,25 +483,6 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             }
         }
         refresh();
-    }
-
-    /**
-     * @param signal
-     *            Signal received when window range is updated
-     */
-    @Override
-    @TmfSignalHandler
-    public void windowRangeUpdated(@Nullable TmfWindowRangeUpdatedSignal signal) {
-        super.windowRangeUpdated(signal);
-        if (signal == null) {
-            return;
-        }
-        if (getTrace() != null) {
-            final TmfTimeRange currentRange = signal.getCurrentRange();
-            updateRange(currentRange);
-        } else {
-            Activator.getDefault().logInfo("No Trace to update"); //$NON-NLS-1$
-        }
     }
 
     private @Nullable ISegmentStoreProvider getSegmentProvider() {
