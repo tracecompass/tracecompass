@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.math.Fraction;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -44,7 +45,7 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
         public static final Reference ZERO = new Reference(0L, 0);
 
         private final long time;
-        private final int index;
+        private final long index;
 
         /**
          * Constructor
@@ -58,11 +59,32 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
             this.time = time;
             this.index = index;
         }
+
+        /**
+         * Constructor
+         *
+         * @param time
+         *            the reference marker time in time units
+         * @param index
+         *            the reference marker index
+         * @since 2.2
+         */
+        public Reference(long time, long index) {
+            this.time = time;
+            this.index = index;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("[%d, %d]", time, index); //$NON-NLS-1$
+        }
     }
 
     private final String fCategory;
     private final Reference fReference;
     private final double fPeriod;
+    private final long fPeriodInteger;
+    private @Nullable Fraction fPeriodFraction;
     private final long fRollover;
     private final RGBA fColor;
     private final @Nullable RGBA fOddColor;
@@ -133,6 +155,13 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
         fCategory = category;
         fReference = reference;
         fPeriod = period;
+        fPeriodInteger = (long) period;
+        try {
+            fPeriodFraction = Fraction.getFraction(fPeriod - fPeriodInteger);
+        } catch (ArithmeticException e) {
+            /* can't convert to fraction, use floating-point arithmetic */
+            fPeriodFraction = null;
+        }
         fRollover = rollover;
         fColor = evenColor;
         fOddColor = oddColor;
@@ -150,14 +179,14 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
             return Collections.emptyList();
         }
         List<IMarkerEvent> markers = new ArrayList<>();
-        long time = startTime;
-        if (Math.round((Math.round((time - fReference.time) / fPeriod)) * fPeriod + fReference.time) >= time) {
-            /* Subtract one period to ensure previous marker is included */
-            time -= Math.max(fPeriod, resolution);
-        }
+        /* Subtract 1.5 periods to ensure previous marker is included */
+        long time = startTime - Math.max(Math.round(1.5 * fPeriod), resolution);
+        Reference reference = adjustReference(fReference, time);
+        IMarkerEvent markerEvent = null;
         while (true) {
-            long index = Math.round((time - fReference.time) / fPeriod) + fReference.index;
-            time = Math.round((index - fReference.index) * fPeriod) + fReference.time;
+            long index = Math.round((time - reference.time) / fPeriod) + reference.index;
+            time = Math.round((index - reference.index) * fPeriod) + reference.time;
+            long duration = (fOddColor == null) ? 0 : Math.round((index + 1 - reference.index) * fPeriod) + reference.time - time;
             long labelIndex = index;
             if (fRollover != 0) {
                 labelIndex %= fRollover;
@@ -165,20 +194,47 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
                     labelIndex += fRollover;
                 }
             }
-            if (fOddColor == null) {
-                markers.add(new MarkerEvent(null, time, 0, fCategory, fColor, getMarkerLabel(labelIndex), fForeground));
-            } else {
-                RGBA color = index % 2 == 0 ? fColor : fOddColor;
-                long duration = Math.round((index + 1 - fReference.index) * fPeriod + fReference.time) - time;
-                markers.add(new MarkerEvent(null, time, duration, fCategory, color, getMarkerLabel(labelIndex), fForeground));
+            /* Add previous marker if current is visible */
+            if ((time >= startTime || time + duration > startTime) && markerEvent != null) {
+                markers.add(markerEvent);
             }
+            RGBA color = (fOddColor == null) ? fColor : (index % 2 == 0) ? fColor : fOddColor;
+            markerEvent = new MarkerEvent(null, time, duration, fCategory, color, getMarkerLabel(labelIndex), fForeground);
             if (time > endTime) {
                 /* The next marker out of range is included */
+                markers.add(markerEvent);
                 break;
             }
-            time += Math.max(fPeriod, resolution);
+            time += Math.max(Math.round(fPeriod), resolution);
         }
         return markers;
+    }
+
+    /*
+     * Adjust to a reference that is closer to the start time, to avoid rounding
+     * errors in floating point calculations with large numbers.
+     */
+    private Reference adjustReference(Reference baseReference, long time) {
+        long offsetIndex = (long) ((time - baseReference.time) / fPeriod);
+        long offsetTime = 0;
+        Fraction fraction = fPeriodFraction;
+        if (fraction != null) {
+            /*
+             * If period = int num/den, find an offset index that is an exact
+             * multiple of den and calculate index * period = (index * int) +
+             * (index / den * num), all exact calculations.
+             */
+            offsetIndex = offsetIndex - offsetIndex % fraction.getDenominator();
+            offsetTime = offsetIndex * fPeriodInteger + offsetIndex / fraction.getDenominator() * fraction.getNumerator();
+        } else {
+            /*
+             * Couldn't compute fractional part as fraction, use simple
+             * multiplication but with possible rounding error.
+             */
+            offsetTime = Math.round(offsetIndex * fPeriod);
+        }
+        Reference reference = new Reference(baseReference.time + offsetTime, baseReference.index + offsetIndex);
+        return reference;
     }
 
     /**

@@ -76,6 +76,7 @@ public class PeriodicMarkerEventSourceTest {
         IMarkerEventSource source = new PeriodicMarkerEventSource(CATEGORY, Reference.ZERO, 100L, 0, EVEN_COLOR, ODD_COLOR, false);
         assertEquals(Arrays.asList(CATEGORY), source.getMarkerCategories());
         List<IMarkerEvent> expected = Arrays.asList(
+                new MarkerEvent(null, -100L, 100L, CATEGORY, ODD_COLOR, "-1", false),
                 new MarkerEvent(null, 0L, 100L, CATEGORY, EVEN_COLOR, "0", false),
                 new MarkerEvent(null, 100L, 100L, CATEGORY, ODD_COLOR, "1", false),
                 new MarkerEvent(null, 200L, 100L, CATEGORY, EVEN_COLOR, "2", false),
