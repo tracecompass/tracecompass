@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph;
 
+import java.util.concurrent.Semaphore;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -43,7 +45,6 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -56,6 +57,8 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphContro
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * View to display the flame graph .This uses the flameGraphNode tree generated
@@ -87,6 +90,11 @@ public class FlameGraphView extends TmfView {
     private final @NonNull MenuManager fEventMenuManager = new MenuManager();
     private Action fSortByNameAction;
     private Action fSortByIdAction;
+    /**
+     * A plain old semaphore is used since different threads will be competing
+     * for the same resource.
+     */
+    private final Semaphore fLock = new Semaphore(1);
 
     /**
      * Constructor
@@ -135,22 +143,14 @@ public class FlameGraphView extends TmfView {
         });
     }
 
-    private TimeGraphViewer getTimeGraphViewer() {
-        return fTimeGraphViewer;
-    }
     /**
-     * Handler for the trace opened signal
+     * Get the time graph viewer
      *
-     * @param signal
-     *            The incoming signal
+     * @return the time graph viewer
      */
-    @TmfSignalHandler
-    public void TraceOpened(TmfTraceOpenedSignal signal) {
-        fTrace = signal.getTrace();
-        if (fTrace != null) {
-            CallGraphAnalysis flamegraphModule = TmfTraceUtils.getAnalysisModuleOfClass(fTrace, CallGraphAnalysis.class, CallGraphAnalysisUI.ID);
-            buildFlameGraph(flamegraphModule);
-        }
+    @VisibleForTesting
+    public TimeGraphViewer getTimeGraphViewer() {
+        return fTimeGraphViewer;
     }
 
     /**
@@ -171,28 +171,70 @@ public class FlameGraphView extends TmfView {
     /**
      * Get the necessary data for the flame graph and display it
      *
-     * @param flamegraphModule
+     * @param callGraphAnalysis
      *            the callGraphAnalysis
      */
-    private void buildFlameGraph(CallGraphAnalysis callGraphAnalysis) {
-        fTimeGraphViewer.setInput(null);
+    @VisibleForTesting
+    public void buildFlameGraph(CallGraphAnalysis callGraphAnalysis) {
+        /*
+         * Note for synchronization:
+         *
+         * Acquire the lock at entry. then we have 4 places to release it
+         *
+         * 1- if the lock failed
+         *
+         * 2- if the data is null and we have no UI to update
+         *
+         * 3- if the request is cancelled before it gets to the display
+         *
+         * 4- on a clean execution
+         */
+        try {
+            fLock.acquire();
+        } catch (InterruptedException e) {
+            Activator.getDefault().logError(e.getMessage(), e);
+            fLock.release();
+        }
+        if (callGraphAnalysis == null) {
+            fTimeGraphViewer.setInput(null);
+            fLock.release();
+            return;
+        }
+        fTimeGraphViewer.setInput(callGraphAnalysis.getSegmentStore());
         callGraphAnalysis.schedule();
         Job j = new Job(Messages.CallGraphAnalysis_Execution) {
 
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 if (monitor.isCanceled()) {
+                    fLock.release();
                     return Status.CANCEL_STATUS;
                 }
                 callGraphAnalysis.waitForCompletion(monitor);
                 Display.getDefault().asyncExec(() -> {
                     fTimeGraphViewer.setInput(callGraphAnalysis.getThreadNodes());
                     fTimeGraphViewer.resetStartFinishTime();
+                    fLock.release();
                 });
                 return Status.OK_STATUS;
             }
         };
         j.schedule();
+    }
+
+    /**
+     * Await the next refresh
+     *
+     * @throws InterruptedException
+     *             something took too long
+     */
+    @VisibleForTesting
+    public void waitForUpdate() throws InterruptedException {
+        /*
+         * wait for the semaphore to be available, then release it immediately
+         */
+        fLock.acquire();
+        fLock.release();
     }
 
     /**

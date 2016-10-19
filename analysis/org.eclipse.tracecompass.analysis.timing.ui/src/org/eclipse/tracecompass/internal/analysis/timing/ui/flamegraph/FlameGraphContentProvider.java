@@ -13,17 +13,15 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.Viewer;
-
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.AggregatedCalledFunction;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.ThreadNode;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphContentProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
@@ -37,10 +35,8 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 public class FlameGraphContentProvider implements ITimeGraphContentProvider {
 
     private final List<FlamegraphDepthEntry> fFlameGraphEntries = new ArrayList<>();
-    private ITmfTrace fActiveTrace;
     private SortOption fSortOption = SortOption.BY_NAME;
     private @NonNull Comparator<FlamegraphDepthEntry> fThreadComparator = new ThreadNameComparator();
-
 
     /**
      * Parse the aggregated tree created by the callGraphAnalysis and creates
@@ -110,19 +106,17 @@ public class FlameGraphContentProvider implements ITimeGraphContentProvider {
     public ITimeGraphEntry[] getElements(Object inputElement) {
         fFlameGraphEntries.clear();
         // Get the root of each thread
-        fActiveTrace = TmfTraceManager.getInstance().getActiveTrace();
-        if (fActiveTrace == null) {
-            return new ITimeGraphEntry[0];
-        }
-
-        if (inputElement instanceof List<?>) {
-            List<?> threadNodes = (List<?>) inputElement;
+        if (inputElement instanceof Collection<?>) {
+            Collection<?> threadNodes = (Collection<?>) inputElement;
             for (Object object : threadNodes) {
                 if (object instanceof ThreadNode) {
                     buildChildrenEntries((ThreadNode) object);
                 }
             }
+        } else {
+            return new ITimeGraphEntry[0];
         }
+
         // Sort the threads
         fFlameGraphEntries.sort(fThreadComparator);
         return fFlameGraphEntries.toArray(new ITimeGraphEntry[fFlameGraphEntries.size()]);
@@ -178,7 +172,6 @@ public class FlameGraphContentProvider implements ITimeGraphContentProvider {
         // Do nothing
     }
 
-
     /**
      * Get the sort option
      *
@@ -192,7 +185,7 @@ public class FlameGraphContentProvider implements ITimeGraphContentProvider {
      * Set the sort option for sorting the thread entries
      *
      * @param sortOption
-     *              the sort option to set
+     *            the sort option to set
      *
      */
     public void setSortOption(SortOption sortOption) {
