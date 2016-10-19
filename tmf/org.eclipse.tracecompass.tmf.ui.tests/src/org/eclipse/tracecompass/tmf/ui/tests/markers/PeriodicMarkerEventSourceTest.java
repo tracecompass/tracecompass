@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -178,6 +178,28 @@ public class PeriodicMarkerEventSourceTest {
                 new MarkerEvent(null, 100L, 10L, CATEGORY, EVEN_COLOR, "10", false),
                 new MarkerEvent(null, 130L, 10L, CATEGORY, ODD_COLOR, "13", false));
         assertMarkerListEquals(expected, source.getMarkerList(CATEGORY, 0L, 100L, 25, new NullProgressMonitor()));
+    }
+
+    /**
+     * Test a marker event source with a filtering implementation.
+     */
+    @Test
+    public void testIsApplicable() {
+        IMarkerEventSource source = new PeriodicMarkerEventSource(CATEGORY, Reference.ZERO, 100L, 0, COLOR, false) {
+            @Override
+            public boolean isApplicable(long index) {
+                return (index % 2 == 0);
+            }
+        };
+        assertEquals(Arrays.asList(CATEGORY), source.getMarkerCategories());
+        List<IMarkerEvent> expected = Arrays.asList(
+                new MarkerEvent(null, 0L, 0L, CATEGORY, COLOR, "0", false),
+                new MarkerEvent(null, 200L, 0L, CATEGORY, COLOR, "2", false),
+                new MarkerEvent(null, 400L, 0L, CATEGORY, COLOR, "4", false),
+                new MarkerEvent(null, 600L, 0L, CATEGORY, COLOR, "6", false),
+                new MarkerEvent(null, 800L, 0L, CATEGORY, COLOR, "8", false),
+                new MarkerEvent(null, 1000L, 0L, CATEGORY, COLOR, "10", false));
+        assertMarkerListEquals(expected, source.getMarkerList(CATEGORY, 0L, 1000L, 1, new NullProgressMonitor()));
     }
 
     private static void assertMarkerListEquals(@NonNull List<IMarkerEvent> expectedList, @NonNull List<@NonNull IMarkerEvent> markerList) {

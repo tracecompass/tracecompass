@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -86,8 +86,8 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
     private final long fPeriodInteger;
     private @Nullable Fraction fPeriodFraction;
     private final long fRollover;
-    private final RGBA fColor;
-    private final @Nullable RGBA fOddColor;
+    private final RGBA fColor1;
+    private final @Nullable RGBA fColor2;
     private final boolean fForeground;
 
     /**
@@ -119,10 +119,11 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
      * Constructs a periodic marker event source with alternating shading
      * markers.
      * <p>
-     * The markers will have the given category. Periods with even index will be
-     * shaded with the even color. Periods with odd index will be shaded with
-     * the odd color. The reference defines the marker with the given index to
-     * be at the specified time.
+     * The markers will have the given category. Periods will be shaded with the
+     * first and second colors alternatively. The reference defines the marker
+     * with the given index to be at the specified time. The reference will be
+     * shaded with the first color if its index is even, or the second color
+     * if it is odd.
      *
      * @param category
      *            the marker category
@@ -133,19 +134,19 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
      * @param rollover
      *            the number of periods before the index rolls-over to 0, or 0
      *            for no roll-over
-     * @param evenColor
-     *            the even marker color
-     * @param oddColor
-     *            the odd marker color
+     * @param color1
+     *            the first marker color
+     * @param color2
+     *            the second marker color
      * @param foreground
      *            true if the marker is drawn in foreground, and false otherwise
      */
-    public PeriodicMarkerEventSource(String category, Reference reference, double period, long rollover, RGBA evenColor, RGBA oddColor, boolean foreground) {
-        this(category, reference, period, rollover, foreground, evenColor, oddColor);
+    public PeriodicMarkerEventSource(String category, Reference reference, double period, long rollover, RGBA color1, RGBA color2, boolean foreground) {
+        this(category, reference, period, rollover, foreground, color1, color2);
     }
 
     /* Private constructor. The order of parameters is changed to make it unique. */
-    private PeriodicMarkerEventSource(String category, Reference reference, double period, long rollover, boolean foreground, RGBA evenColor, @Nullable RGBA oddColor) {
+    private PeriodicMarkerEventSource(String category, Reference reference, double period, long rollover, boolean foreground, RGBA color1, @Nullable RGBA color2) {
         if (period <= 0) {
             throw new IllegalArgumentException("period cannot be less than or equal to zero"); //$NON-NLS-1$
         }
@@ -163,8 +164,8 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
             fPeriodFraction = null;
         }
         fRollover = rollover;
-        fColor = evenColor;
-        fOddColor = oddColor;
+        fColor1 = color1;
+        fColor2 = color2;
         fForeground = foreground;
     }
 
@@ -186,7 +187,7 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
         while (true) {
             long index = Math.round((time - reference.time) / fPeriod) + reference.index;
             time = Math.round((index - reference.index) * fPeriod) + reference.time;
-            long duration = (fOddColor == null) ? 0 : Math.round((index + 1 - reference.index) * fPeriod) + reference.time - time;
+            long duration = (fColor2 == null) ? 0 : Math.round((index + 1 - reference.index) * fPeriod) + reference.time - time;
             long labelIndex = index;
             if (fRollover != 0) {
                 labelIndex %= fRollover;
@@ -198,11 +199,17 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
             if ((time >= startTime || time + duration > startTime) && markerEvent != null) {
                 markers.add(markerEvent);
             }
-            RGBA color = (fOddColor == null) ? fColor : (index % 2 == 0) ? fColor : fOddColor;
-            markerEvent = new MarkerEvent(null, time, duration, fCategory, color, getMarkerLabel(labelIndex), fForeground);
+            if (isApplicable(labelIndex)) {
+                RGBA color = (fColor2 == null) ? fColor1 : (index % 2 == 0) ? fColor1 : fColor2;
+                markerEvent = new MarkerEvent(null, time, duration, fCategory, color, getMarkerLabel(labelIndex), fForeground);
+            } else {
+                markerEvent = null;
+            }
             if (time > endTime) {
-                /* The next marker out of range is included */
-                markers.add(markerEvent);
+                if (markerEvent != null) {
+                    /* The next marker out of range is included */
+                    markers.add(markerEvent);
+                }
                 break;
             }
             time += Math.max(Math.round(fPeriod), resolution);
@@ -248,5 +255,20 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
      */
     public String getMarkerLabel(long index) {
         return checkNotNull(Long.toString(index));
+    }
+
+    /**
+     * Returns true if the marker is applicable at the specified index.
+     * <p>
+     * This method can be overridden by clients. Returning false will
+     * essentially filter-out the marker.
+     *
+     * @param index
+     *            the marker index
+     * @return true if the marker is applicable
+     * @since 2.3
+     */
+    public boolean isApplicable(long index) {
+        return true;
     }
 }
