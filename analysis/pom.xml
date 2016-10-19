@@ -38,6 +38,7 @@
     <module>org.eclipse.tracecompass.analysis.timing.core</module>
     <module>org.eclipse.tracecompass.analysis.timing.core.tests</module>
     <module>org.eclipse.tracecompass.analysis.timing.ui</module>
+    <module>org.eclipse.tracecompass.analysis.timing.ui.swtbot.tests</module>
   </modules>
 
   <profiles>
