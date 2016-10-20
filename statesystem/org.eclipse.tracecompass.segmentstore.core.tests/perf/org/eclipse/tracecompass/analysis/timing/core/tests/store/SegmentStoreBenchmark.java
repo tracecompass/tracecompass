@@ -14,6 +14,7 @@ import static org.junit.Assert.assertNotNull;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Random;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -23,6 +24,7 @@ import org.eclipse.tracecompass.internal.segmentstore.core.treemap.TreeMapStore;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
+import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -193,6 +195,71 @@ public class SegmentStoreBenchmark {
         runIterateAddIterate(size, fuzz, name);
     }
 
+    /**
+     * Test adding elements in a random order then iterate over the list, this
+     * is an atypical degenerate use case.
+     */
+    @Test
+    public void test8AddFuzzyOrderThenIterateByStartTime() {
+        int size = 1000;
+        int[] fuzz = new int[size];
+        Random rng = new Random(10);
+        for (int i = 0; i < size; i++) {
+            fuzz[i] = rng.nextInt(1000);
+        }
+        String name = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        assertNotNull(name);
+        runIterateCompare(size, fuzz, name, SegmentComparators.INTERVAL_START_COMPARATOR);
+    }
+
+    /**
+     * Test adding elements in a random order then iterate over the list, this
+     * is an atypical degenerate use case.
+     */
+    @Test
+    public void test9AddFuzzyOrderThenIterateByEndTime() {
+        int size = 1000;
+        int[] fuzz = new int[size];
+        Random rng = new Random(10);
+        for (int i = 0; i < size; i++) {
+            fuzz[i] = rng.nextInt(1000);
+        }
+        String name = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        assertNotNull(name);
+        runIterateCompare(size, fuzz, name, SegmentComparators.INTERVAL_END_COMPARATOR);
+    }
+
+    /**
+     * Test adding elements in a random order then iterate over the list, this
+     * is an atypical degenerate use case.
+     */
+    @Test
+    public void testAAddFuzzyOrderThenIterateByDuration() {
+        int size = 1000;
+        int[] fuzz = new int[size];
+        Random rng = new Random(10);
+        for (int i = 0; i < size; i++) {
+            fuzz[i] = rng.nextInt(1000);
+        }
+        String name = new Object() {
+        }.getClass().getEnclosingMethod().getName();
+        assertNotNull(name);
+        runIterateCompare(size, fuzz, name, SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
+    }
+
+    private void runIterateCompare(int size, int[] fuzz, String method, @NonNull Comparator<@NonNull ISegment> comparator) {
+        long start = System.nanoTime();
+        populate(size, fuzz, fSegStore);
+        long startTime = fuzz[0];
+        long endTime = fSegStore.size() - 1 + fuzz[fSegStore.size() % size];
+        iterateCompare(startTime, endTime, fSegStore, comparator);
+        long end = System.nanoTime();
+        long duration = end - start;
+        outputResults(duration, method);
+    }
+
     private void run(int size, int[] fuzz, String method) {
         long duration = populate(size, fuzz, fSegStore);
         outputResults(duration, method);
@@ -245,6 +312,14 @@ public class SegmentStoreBenchmark {
     private static Object iterate(ISegmentStore<@NonNull ISegment> store) {
         Object shutupCompilerWarnings = null;
         for (ISegment elem : store) {
+            shutupCompilerWarnings = elem;
+        }
+        return shutupCompilerWarnings;
+    }
+
+    private static Object iterateCompare(long startTime, long endTime, ISegmentStore<@NonNull ISegment> store, @NonNull Comparator<@NonNull ISegment> comparator) {
+        Object shutupCompilerWarnings = null;
+        for (ISegment elem : store.getIntersectingElements(startTime, endTime, comparator)) {
             shutupCompilerWarnings = elem;
         }
         return shutupCompilerWarnings;
