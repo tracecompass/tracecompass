@@ -77,6 +77,15 @@ public class SegmentStoreBenchmark {
     }
 
     /**
+     * Get the number of segments to add to the segment store
+     *
+     * @return The number of segments to add to the segment store
+     */
+    protected long getSegmentStoreSize() {
+        return 1000000;
+    }
+
+    /**
      * Add elements in order
      */
     @Test
@@ -265,10 +274,11 @@ public class SegmentStoreBenchmark {
         outputResults(duration, method);
     }
 
-    private static long populate(int size, int[] fuzz, ISegmentStore<@NonNull ISegment> store) {
+
+    private long populate(int size, int[] fuzz, ISegmentStore<@NonNull ISegment> store) {
         store.clear();
         long start = System.nanoTime();
-        populate(size, fuzz, store, 1000000);
+        populate(size, fuzz, store, getSegmentStoreSize());
         long end = System.nanoTime();
         return end - start;
     }
@@ -279,7 +289,7 @@ public class SegmentStoreBenchmark {
         outputResults(duration, method);
     }
 
-    private static long addAndIterate(int size, int[] fuzz, ISegmentStore<@NonNull ISegment> store) {
+    private long addAndIterate(int size, int[] fuzz, ISegmentStore<@NonNull ISegment> store) {
         long start = System.nanoTime();
         populate(size, fuzz, store);
         iterate(store);
@@ -325,9 +335,9 @@ public class SegmentStoreBenchmark {
         return shutupCompilerWarnings;
     }
 
-    private static void populate(int size, int[] fuzz, ISegmentStore<@NonNull ISegment> store, int count) {
+    private static void populate(int size, int[] fuzz, ISegmentStore<@NonNull ISegment> store, long count) {
         for (int i = 0; i < count; i++) {
-            long start = i + fuzz[i % size];
+            long start = (long) i + fuzz[i % size];
             store.add(new BasicSegment(start, start + 10));
         }
     }
