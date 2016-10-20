@@ -24,12 +24,16 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
 import org.swtchart.ISeries;
 import org.swtchart.ISeriesSet;
 import org.swtchart.Range;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Base class for a XY-Chart based on SWT chart. It provides a methods to define
@@ -304,6 +308,32 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      * Method to implement to update the chart content.
      */
     protected abstract void updateContent();
+
+    /**
+     * Returns whether or not this chart viewer is dirty. The viewer is
+     * considered dirty if it has yet to completely update its model.
+     *
+     * This method is meant to be used by tests in order to know when it is safe
+     * to proceed.
+     *
+     * @return true if the time graph view has yet to completely update its
+     *         model, false otherwise
+     * @since 2.2
+     */
+    @VisibleForTesting
+    public boolean isDirty() {
+        if (getTrace() == null) {
+            return false;
+        }
+
+        TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+        long startTime = ctx.getWindowRange().getStartTime().toNanos();
+        long endTime = ctx.getWindowRange().getEndTime().toNanos();
+
+        // If the chart viewer hasn't updated all the way to the end of
+        // the window range then it's dirty. A refresh should happen later.
+        return (getWindowStartTime() != startTime || getWindowEndTime() != endTime);
+    }
 
     // ------------------------------------------------------------------------
     // Signal Handler

@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -71,6 +72,8 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     private double fResolution;
 
     private UpdateThread fUpdateThread;
+
+    private volatile AtomicInteger fDirty = new AtomicInteger();
 
     /**
      * Constructor
@@ -134,6 +137,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      */
     protected void reinitialize() {
         fSeriesValues.clear();
+        fDirty.incrementAndGet();
         Thread thread = new Thread() {
             // Don't use TmfUiRefreshHandler (bug 467751)
             @Override
@@ -148,6 +152,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                                 /* Delete the old series */
                                 clearContent();
                                 createSeries();
+                                fDirty.decrementAndGet();
                             }
                         }
                     });
@@ -185,6 +190,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                 public void run() {
                     LOGGER.info(() -> getLogMessage("UpdateDataStart", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
                     updateData(getWindowStartTime(), getWindowEndTime(), fNumRequests, fMonitor);
+                    fDirty.decrementAndGet();
                     LOGGER.info(() -> getLogMessage("UpdateDataEnd", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             });
@@ -227,6 +233,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     @Override
     protected void updateContent() {
+        fDirty.incrementAndGet();
         getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -436,6 +443,18 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     protected void clearContent() {
         getSwtChart().getAxisSet().getXAxis(0).getTick().setFormat(null);
         super.clearContent();
+    }
+
+    @Override
+    public boolean isDirty() {
+        boolean dirty = super.isDirty();
+
+        if (dirty) {
+            return dirty;
+        }
+
+        // Check the specific dirtiness of this view
+        return fDirty.get() != 0;
     }
 
 }

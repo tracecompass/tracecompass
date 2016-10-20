@@ -45,6 +45,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.ui.IEditorReference;
 import org.hamcrest.Matcher;
@@ -570,6 +571,44 @@ public final class ConditionHelpers {
      */
     public static ICondition timeGraphIsReadyCondition(AbstractTimeGraphView view, @NonNull TmfTimeRange selectionRange, @NonNull ITmfTimestamp visibleTime) {
         return new TimeGraphIsReadyCondition(view, selectionRange, visibleTime);
+    }
+
+    private static class XYViewerIsReadyCondition extends DefaultCondition  {
+
+        private TmfXYChartViewer fViewer;
+        private String fFailureMessage;
+
+        private XYViewerIsReadyCondition(TmfXYChartViewer view) {
+            fViewer = view;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+
+            if (fViewer.isDirty()) {
+                fFailureMessage = "Time graph is dirty";
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return fFailureMessage;
+        }
+    }
+
+    /**
+     *
+     * Wait until the XY chart viewer is ready. The XY chart viewer is
+     * considered ready when it is not updating.
+     *
+     * @param viewer
+     *            the XY chart viewer
+     * @return ICondition for verification
+     */
+    public static ICondition xyViewerIsReadyCondition(TmfXYChartViewer viewer) {
+        return new XYViewerIsReadyCondition(viewer);
     }
 
     private static class NumberOfEventsCondition extends DefaultCondition {
