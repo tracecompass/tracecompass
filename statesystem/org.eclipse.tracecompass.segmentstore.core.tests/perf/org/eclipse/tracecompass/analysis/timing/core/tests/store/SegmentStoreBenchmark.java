@@ -11,6 +11,9 @@ package org.eclipse.tracecompass.analysis.timing.core.tests.store;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.text.DecimalFormat;
+import java.text.Format;
+import java.util.Arrays;
 import java.util.Random;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -22,7 +25,10 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Segmentstore benchmarks, tests the performance for loads and reads.
@@ -36,11 +42,37 @@ import org.junit.runners.MethodSorters;
  *
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@RunWith(Parameterized.class)
 public class SegmentStoreBenchmark {
 
-    private ISegmentStore<@NonNull ISegment> fALS = new ArrayListStore<>();
-    private ISegmentStore<@NonNull ISegment> fLALS = new LazyArrayListStore<>();
-    private ISegmentStore<@NonNull ISegment> fTMS = new TreeMapStore<>();
+    private final ISegmentStore<@NonNull ISegment> fSegStore;
+    private final String fName;
+    private static final Format FORMAT = new DecimalFormat("###,###.##"); //$NON-NLS-1$
+
+    /**
+     * @return The arrays of parameters
+     */
+    @Parameters(name = "{index}: {0}")
+    public static Iterable<Object[]> getParameters() {
+        return Arrays.asList(new Object[][] {
+                { "Array list store", new ArrayListStore<>() },
+                { "Lazy array list store", new LazyArrayListStore<>() },
+                { "Treemap store", new TreeMapStore<>() },
+        });
+    }
+
+    /**
+     * Constructor
+     *
+     * @param name
+     *            The name of this test
+     * @param segStore
+     *            The segment store to fill for the benchmarks
+     */
+    public SegmentStoreBenchmark(String name, ISegmentStore<@NonNull ISegment> segStore) {
+        fSegStore = segStore;
+        fName = name;
+    }
 
     /**
      * Add elements in order
@@ -117,7 +149,7 @@ public class SegmentStoreBenchmark {
         int[] fuzz = new int[size];
         Random rng = new Random(10);
         for (int i = 0; i < size; i++) {
-            fuzz[i] = rng.nextInt();
+            fuzz[i] = Math.abs(rng.nextInt());
         }
         String name = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -135,7 +167,7 @@ public class SegmentStoreBenchmark {
         int[] fuzz = new int[size];
         Random rng = new Random(10);
         for (int i = 0; i < size; i++) {
-            fuzz[i] = rng.nextInt();
+            fuzz[i] = Math.abs(rng.nextInt());
         }
         String name = new Object() {
         }.getClass().getEnclosingMethod().getName();
@@ -162,10 +194,8 @@ public class SegmentStoreBenchmark {
     }
 
     private void run(int size, int[] fuzz, String method) {
-        long durationA = populate(size, fuzz, fALS);
-        long durationL = populate(size, fuzz, fLALS);
-        long durationT = populate(size, fuzz, fTMS);
-        outputResults(durationA, durationL, durationT, method);
+        long duration = populate(size, fuzz, fSegStore);
+        outputResults(duration, method);
     }
 
     private static long populate(int size, int[] fuzz, ISegmentStore<@NonNull ISegment> store) {
@@ -177,11 +207,9 @@ public class SegmentStoreBenchmark {
     }
 
     private void runIterate(int size, int[] fuzz, String method) {
-        long durationA = addAndIterate(size, fuzz, fALS);
-        long durationL = addAndIterate(size, fuzz, fLALS);
-        long durationT = addAndIterate(size, fuzz, fTMS);
+        long duration = addAndIterate(size, fuzz, fSegStore);
 
-        outputResults(durationA, durationL, durationT, method);
+        outputResults(duration, method);
     }
 
     private static long addAndIterate(int size, int[] fuzz, ISegmentStore<@NonNull ISegment> store) {
@@ -193,10 +221,8 @@ public class SegmentStoreBenchmark {
     }
 
     private void runIterateAddIterate(int size, int[] fuzz, String method) {
-        long durationA = runIterateAddIterate(size, fuzz, fALS);
-        long durationL = runIterateAddIterate(size, fuzz, fLALS);
-        long durationT = runIterateAddIterate(size, fuzz, fTMS);
-        outputResults(durationA, durationL, durationT, method);
+        long duration = runIterateAddIterate(size, fuzz, fSegStore);
+        outputResults(duration, method);
     }
 
     private static long runIterateAddIterate(int size, int[] fuzz, ISegmentStore<@NonNull ISegment> store) {
@@ -226,12 +252,12 @@ public class SegmentStoreBenchmark {
 
     private static void populate(int size, int[] fuzz, ISegmentStore<@NonNull ISegment> store, int count) {
         for (int i = 0; i < count; i++) {
-            int start = i + fuzz[i % size];
+            long start = i + fuzz[i % size];
             store.add(new BasicSegment(start, start + 10));
         }
     }
 
-    private static void outputResults(long durationA, long durationL, long durationT, String method) {
-        System.out.println("Time taken for test " + method + "\n ArrayList     " + String.format("%12d", durationA) + "\n LazyArrayList " + String.format("%12d", durationL) + "\n TreeMapStore  " + String.format("%12d", durationT));
+    private void outputResults(long duration, String method) {
+        System.out.println(fName + ": Time taken for test " + method + ": " + FORMAT.format(duration));
     }
 }
