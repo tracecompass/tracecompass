@@ -273,18 +273,19 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         checkValidTime(t);
 
         /* Queue is a stack of nodes containing nodes intersecting t */
-        Deque<HTNode> queue = new LinkedList<>();
+        Deque<Integer> queue = new LinkedList<>();
 
         /* We start by reading the information in the root node */
-        queue.add(getSHT().getRootNode());
+        queue.add(getSHT().getRootNode().getSequenceNumber());
 
         /* Then we follow the down in the relevant children */
         try {
             while (!queue.isEmpty()) {
-                HTNode currentNode = queue.pop();
+                int sequenceNumber = queue.pop();
+                HTNode currentNode = getSHT().readNode(sequenceNumber);
                 if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
-                    /*Here we add the relevant children nodes for BFS*/
-                    queue.addAll(getSHT().selectNextChildren((ParentNode) currentNode, t));
+                    /* Here we add the relevant children nodes for BFS */
+                    queue.addAll(((ParentNode) currentNode).selectNextChildren(t));
                 }
                 currentNode.writeInfoFromNode(stateInfo, t);
             }
@@ -325,13 +326,15 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
             throws TimeRangeException, ClosedChannelException {
         checkValidTime(t);
 
-        Deque<HTNode> queue = new LinkedList<>();
-        queue.add(getSHT().getRootNode());
+        Deque<Integer> queue = new LinkedList<>();
+        queue.add(getSHT().getRootNode().getSequenceNumber());
         HTInterval interval = null;
         while (interval == null && !queue.isEmpty()) {
-            HTNode currentNode = queue.pop();
+            int sequenceNumber = queue.pop();
+            HTNode currentNode = getSHT().readNode(sequenceNumber);
             if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
-                queue.addAll(getSHT().selectNextChildren((ParentNode) currentNode, t));
+                /* Here we add the relevant children nodes for BFS */
+                queue.addAll(((ParentNode) currentNode).selectNextChildren(t));
             }
             interval = currentNode.getRelevantInterval(key, t);
         }

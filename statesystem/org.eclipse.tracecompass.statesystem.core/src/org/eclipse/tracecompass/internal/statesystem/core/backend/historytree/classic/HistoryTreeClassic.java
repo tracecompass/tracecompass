@@ -22,7 +22,6 @@ import java.nio.ByteOrder;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -611,38 +610,6 @@ public class HistoryTreeClassic implements IHistoryTree {
                 startTime);
         fNodeCount++;
         return newNode;
-    }
-
-    @Override
-    public Collection<HTNode> selectNextChildren(ParentNode currentNode, long t) throws ClosedChannelException {
-        assert (currentNode.getNbChildren() > 0);
-        int potentialNextSeqNb = currentNode.getSequenceNumber();
-
-        for (int i = 0; i < currentNode.getNbChildren(); i++) {
-            if (t >= currentNode.getChildStart(i)) {
-                potentialNextSeqNb = currentNode.getChild(i);
-            } else {
-                break;
-            }
-        }
-
-        /*
-         * Once we exit this loop, we should have found a children to follow. If
-         * we didn't, there's a problem.
-         */
-        if (potentialNextSeqNb == currentNode.getSequenceNumber()) {
-            throw new IllegalStateException("No next child node found"); //$NON-NLS-1$
-        }
-
-        /*
-         * Since this code path is quite performance-critical, avoid iterating
-         * through the whole latestBranch array if we know for sure the next
-         * node has to be on disk
-         */
-        if (currentNode.isOnDisk()) {
-            return Collections.singleton(fTreeIO.readNode(potentialNextSeqNb));
-        }
-        return Collections.singleton(readNode(potentialNextSeqNb));
     }
 
     @Override

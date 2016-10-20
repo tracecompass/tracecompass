@@ -15,11 +15,14 @@ package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.c
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTConfig;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTNode;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.ParentNode;
+import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 
 /**
  * A Core node is a first-level node of a History Tree which is not a leaf node.
@@ -127,9 +130,11 @@ public final class CoreNode extends ParentNode {
     @Override
     public int getNbChildren() {
         rwl.readLock().lock();
-        int ret = nbChildren;
-        rwl.readLock().unlock();
-        return ret;
+        try {
+            return nbChildren;
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     @Override
@@ -162,16 +167,6 @@ public final class CoreNode extends ParentNode {
         }
     }
 
-    @Override
-    public long getLatestChildStart() {
-        rwl.readLock().lock();
-        try {
-            return childStart[nbChildren - 1];
-        } finally {
-            rwl.readLock().unlock();
-        }
-    }
-
     /**
      * Get the sequence number of the extension to this node (if there is one).
      *
@@ -179,15 +174,14 @@ public final class CoreNode extends ParentNode {
      *         there is no extension node.
      */
     public int getExtensionSequenceNumber() {
-        return extension;
+        rwl.readLock().lock();
+        try {
+            return extension;
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
-    /**
-     * Tell this node that it has a new child (Congrats!)
-     *
-     * @param childNode
-     *            The SHTNode object of the new child
-     */
     @Override
     public void linkNewChild(HTNode childNode) {
         rwl.writeLock().lock();
@@ -202,6 +196,31 @@ public final class CoreNode extends ParentNode {
 
         } finally {
             rwl.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public Collection<Integer> selectNextChildren(long t) throws TimeRangeException {
+        if (t < getNodeStart() || (isOnDisk() && t > getNodeEnd())) {
+            throw new TimeRangeException("Requesting children outside the node's range: " + t); //$NON-NLS-1$
+        }
+        rwl.readLock().lock();
+        try {
+            int potentialNextSeqNb = -1;
+            for (int i = 0; i < nbChildren; i++) {
+                if (t >= childStart[i]) {
+                    potentialNextSeqNb = children[i];
+                } else {
+                    break;
+                }
+            }
+
+            if (potentialNextSeqNb == -1) {
+                throw new IllegalStateException("No next child node found"); //$NON-NLS-1$
+            }
+            return Collections.singleton(potentialNextSeqNb);
+        } finally {
+            rwl.readLock().unlock();
         }
     }
 

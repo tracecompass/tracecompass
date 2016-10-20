@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.channels.ClosedChannelException;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
@@ -257,10 +258,22 @@ public class HistoryTreeClassicStub extends HistoryTreeClassic {
                     assertTrue("Child at index " + i + " of parent " + node.getSequenceNumber() + " has correct start time",
                             childNode.getNodeEnd() <= childNode.getNodeEnd());
                 }
+                testIntersectingChildren(node, childNode);
             }
 
         } catch (ClosedChannelException e) {
             fail(e.getMessage());
+        }
+    }
+
+    private static void testIntersectingChildren(ParentNode parent, HTNode child) {
+        int childSequence = child.getSequenceNumber();
+        boolean shouldBeInCollection;
+        Collection<Integer> nextChildren;
+        for (long t = parent.getNodeStart(); t < parent.getNodeEnd(); t++) {
+            shouldBeInCollection = (t >= child.getNodeStart() && t <= child.getNodeEnd());
+            nextChildren = parent.selectNextChildren(t);
+            assertEquals(shouldBeInCollection, nextChildren.contains(childSequence));
         }
     }
 

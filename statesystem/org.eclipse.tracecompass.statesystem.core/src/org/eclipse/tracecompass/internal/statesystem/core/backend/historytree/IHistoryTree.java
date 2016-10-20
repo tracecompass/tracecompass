@@ -13,8 +13,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
-import java.util.Collection;
-
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 
 /**
@@ -190,21 +188,6 @@ public interface IHistoryTree {
      *             If the start of end time of the interval are invalid
      */
     void insertInterval(HTInterval interval) throws TimeRangeException;
-
-    /**
-     * Inner method to select the next children of the current node intersecting
-     * the given timestamp. Useful for moving down the tree following one
-     * branch.
-     *
-     * @param currentNode
-     *            The node on which the request is made
-     * @param t
-     *            The timestamp to choose which child is the next one
-     * @return The child nodes intersecting t
-     * @throws ClosedChannelException
-     *             If the file channel was closed while we were reading the tree
-     */
-    Collection<HTNode> selectNextChildren(ParentNode currentNode, long t) throws ClosedChannelException;
 
     /**
      * Get the current size of the history file.

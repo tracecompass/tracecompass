@@ -9,6 +9,10 @@
 
 package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 
+import java.util.Collection;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
+
 /**
  * A Core node is a first-level node of a History Tree which is not a leaf node.
  *
@@ -68,18 +72,25 @@ public abstract class ParentNode extends HTNode {
     public abstract long getChildStart(int index);
 
     /**
-     * Get the start time of the latest (right-most) child node.
-     *
-     * @return The start time of the latest child
-     */
-    public abstract long getLatestChildStart();
-
-    /**
      * Tell this node that it has a new child (Congrats!)
      *
      * @param childNode
      *            The SHTNode object of the new child
      */
     public abstract void linkNewChild(HTNode childNode);
+
+    /**
+     * Inner method to select the sequence numbers for the children of the
+     * current node that intersect the given timestamp. Useful for moving down
+     * the tree.
+     *
+     * @param t
+     *            The timestamp to choose which child is the next one
+     * @return Collection of sequence numbers of the child nodes that intersect
+     *         t, non-null empty collection if this is a Leaf Node
+     * @throws TimeRangeException
+     *             If t is out of the node's range
+     */
+    public abstract @NonNull Collection<@NonNull Integer> selectNextChildren(long t);
 
 }
