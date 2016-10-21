@@ -16,9 +16,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
@@ -407,11 +410,28 @@ public final class SWTBotUtils {
             if (ubuntuMenuProxy != null) {
                 System.out.println("UBUNTU_MENUPROXY=" + ubuntuMenuProxy);
             }
+
+            // Try to print the GTK theme information as behavior can change depending on the theme
+            executeCommandWithOutput("gsettings", "get", "org.gnome.desktop.interface", "gtk-theme");
+            executeCommandWithOutput("gsettings", "get", "org.gnome.desktop.wm.preferences", "theme");
         }
 
         System.out.println("Time zone: " + TimeZone.getDefault().getDisplayName());
 
         fPrintedEnvironment = true;
+    }
+
+    private static void executeCommandWithOutput(String ... command) {
+        ProcessBuilder pb = new ProcessBuilder(command);
+        pb.redirectOutput(Redirect.INHERIT);
+        try {
+            System.out.print(String.join(" ", pb.command()) + " -> ");
+            Process process = pb.start();
+            process.waitFor(1, TimeUnit.MINUTES);
+        } catch (IOException | InterruptedException e) {
+            System.out.print("unknown");
+        }
+        System.out.println();
     }
 
     /**
