@@ -30,6 +30,7 @@ Require-Bundle: org.apache.log4j,
  org.junit,
  org.eclipse.tracecompass.analysis.timing.core.tests,
  org.eclipse.tracecompass.tmf.ui.tests,
- org.eclipse.tracecompass.segmentstore.core
+ org.eclipse.tracecompass.segmentstore.core,
+ org.eclipse.tracecompass.datastore.core
 Import-Package: com.google.common.collect,
  org.swtchart

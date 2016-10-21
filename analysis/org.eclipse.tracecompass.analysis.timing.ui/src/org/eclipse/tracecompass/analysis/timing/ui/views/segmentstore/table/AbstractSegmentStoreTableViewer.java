@@ -269,7 +269,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
                     addPackListener();
                     tableViewer.setInput(dataInput);
                     SegmentStoreContentProvider contentProvider = (SegmentStoreContentProvider) getTableViewer().getContentProvider();
-                    tableViewer.setItemCount(contentProvider.getSegmentCount());
+                    tableViewer.setItemCount((int) Math.min(Integer.MAX_VALUE, contentProvider.getSegmentCount()));
                 }
             }
         });

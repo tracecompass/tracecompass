@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
@@ -54,6 +55,7 @@ public abstract class AbstractSegmentStoreDensityView extends TmfView {
      * Used to keep the table in sync with the density viewer.
      */
     private final class DataChangedListener implements ISegmentStoreDensityViewerDataListener {
+        @Deprecated
         @Override
         public void dataChanged(List<ISegment> data) {
             updateTableModel(data);
@@ -62,14 +64,33 @@ public abstract class AbstractSegmentStoreDensityView extends TmfView {
         private void updateTableModel(@Nullable List<ISegment> data) {
             final AbstractSegmentStoreTableViewer viewer = fTableViewer;
             if (viewer != null && data != null) {
-                viewer.updateModel(data.toArray(new ISegment[] {}));
+                viewer.updateModel(data);
             }
         }
 
+        private void updateTableModel(@Nullable Iterable<? extends ISegment> data) {
+            final AbstractSegmentStoreTableViewer viewer = fTableViewer;
+            if (viewer != null && data != null) {
+                viewer.updateModel(data);
+            }
+        }
+
+        @Deprecated
         @Override
         public void dataSelectionChanged(@Nullable List<ISegment> data) {
             updateTableModel(data);
         }
+
+        @Override
+        public void viewDataChanged(@NonNull Iterable<? extends @NonNull ISegment> newData) {
+            updateTableModel(newData);
+        }
+
+        @Override
+        public void selectedDataChanged(@Nullable Iterable<? extends @NonNull ISegment> newSelectionData) {
+            updateTableModel(newSelectionData);
+        }
+
     }
 
     @Override

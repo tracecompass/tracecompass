@@ -14,11 +14,11 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyStrin
 import java.text.Format;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -32,6 +32,7 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density.MouseDragZoomProvider;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density.MouseSelectionProvider;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density.SimpleTooltipProvider;
+import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.table.SegmentStoreContentProvider.SegmentStoreWithRange;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
@@ -56,9 +57,6 @@ import org.swtchart.LineStyle;
 import org.swtchart.Range;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 
 /**
  * Displays the segment store provider data in a density chart.
@@ -126,10 +124,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
         return TmfTraceManager.getInstance().getActiveTrace();
     }
 
-    private void updateDisplay(List<ISegment> data) {
-        if (data.isEmpty()) {
-            return;
-        }
+    private void updateDisplay(SegmentStoreWithRange<ISegment> data) {
         IBarSeries series = (IBarSeries) fChart.getSeriesSet().createSeries(SeriesType.BAR, Messages.AbstractSegmentStoreDensityViewer_SeriesLabel);
         series.setVisible(true);
         series.setBarPadding(0);
@@ -140,7 +135,12 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
         double[] xOrigSeries = new double[width];
         double[] yOrigSeries = new double[width];
         Arrays.fill(yOrigSeries, 1.0);
-        long maxLength = data.get(data.size() - 1).getLength();
+        data.setComparator(SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
+        ISegment maxSegment = data.getElement(SegmentStoreWithRange.LAST);
+        long maxLength = Long.MAX_VALUE;
+        if (maxSegment != null) {
+            maxLength = maxSegment.getLength();
+        }
         double maxFactor = 1.0 / (maxLength + 1.0);
         long minX = Long.MAX_VALUE;
         for (ISegment segment : data) {
@@ -192,7 +192,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
     public void select(Range durationRange) {
         computeDataAsync(fCurrentTimeRange, durationRange).thenAccept((data) -> {
             for (ISegmentStoreDensityViewerDataListener listener : fListeners) {
-                listener.dataSelectionChanged(data);
+                listener.selectedDataChanged(data);
             }
         });
     }
@@ -207,11 +207,11 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
         computeDataAsync(fCurrentTimeRange, durationRange).thenAccept((data) -> applyData(data));
     }
 
-    private CompletableFuture<@Nullable List<ISegment>> computeDataAsync(final TmfTimeRange timeRange, final Range durationRange) {
+    private CompletableFuture<@Nullable SegmentStoreWithRange<ISegment>> computeDataAsync(final TmfTimeRange timeRange, final Range durationRange) {
         return CompletableFuture.supplyAsync(() -> computeData(timeRange, durationRange));
     }
 
-    private @Nullable List<ISegment> computeData(final TmfTimeRange timeRange, final Range durationRange) {
+    private @Nullable SegmentStoreWithRange<ISegment> computeData(final TmfTimeRange timeRange, final Range durationRange) {
         final ISegmentStoreProvider segmentProvider = fSegmentStoreProvider;
         if (segmentProvider == null) {
             return null;
@@ -221,27 +221,27 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
             return null;
         }
 
-        Iterator<ISegment> intersectingElements = segStore.getIntersectingElements(timeRange.getStartTime().getValue(), timeRange.getEndTime().getValue()).iterator();
-
+        // Filter on the segment duration if necessary
         if (durationRange.lower > Double.MIN_VALUE || durationRange.upper < Double.MAX_VALUE) {
-            Predicate<? super ISegment> predicate = new Predicate<ISegment>() {
+            Predicate<ISegment> predicate = new Predicate<ISegment>() {
                 @Override
-                public boolean apply(@Nullable ISegment input) {
-                    return input != null && input.getLength() >= durationRange.lower && input.getLength() <= durationRange.upper;
+                public boolean test(@NonNull ISegment segment) {
+                    return segment.getLength() >= durationRange.lower && segment.getLength() <= durationRange.upper;
                 }
             };
-            intersectingElements = Iterators.filter(intersectingElements, predicate);
+            return new SegmentStoreWithRange<>(segStore, timeRange, predicate);
         }
 
-        return Lists.newArrayList(intersectingElements);
+        return new SegmentStoreWithRange<>(segStore, timeRange);
+
     }
 
-    private void applyData(final @Nullable List<ISegment> data) {
+    private void applyData(final @Nullable SegmentStoreWithRange<ISegment> data) {
         if (data != null) {
-            Collections.sort(data, SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
+            data.setComparator(SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
             Display.getDefault().asyncExec(() -> updateDisplay(data));
             for (ISegmentStoreDensityViewerDataListener l : fListeners) {
-                l.dataChanged(data);
+                l.viewDataChanged(data);
             }
         }
     }

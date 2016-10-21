@@ -24,7 +24,9 @@ public interface ISegmentStoreDensityViewerDataListener {
      *
      * @param newData
      *            the new data
+     * @deprecated Use {@link #viewDataChanged(Iterable)} instead
      */
+    @Deprecated
     void dataChanged(List<ISegment> newData);
 
     /**
@@ -32,6 +34,30 @@ public interface ISegmentStoreDensityViewerDataListener {
      *
      * @param newSelectionData
      *            the new selection of the data
+     * @deprecated Use {@link #selectedDataChanged(Iterable)} instead
      */
+    @Deprecated
     void dataSelectionChanged(@Nullable List<ISegment> newSelectionData);
+
+    /**
+     * Notification that the data changed in the viewer.
+     *
+     * @param newData
+     *            the new data
+     * @since 1.4
+     */
+    default void viewDataChanged(Iterable<? extends ISegment> newData) {
+        // To be implemented by children
+    }
+
+    /**
+     * Notification that the selection of the data changed in the viewer.
+     *
+     * @param newSelectionData
+     *            the new selection of the data
+     * @since 1.4
+     */
+    default void selectedDataChanged(@Nullable Iterable<? extends ISegment> newSelectionData) {
+        // To be implemented in children
+    }
 }

@@ -1,0 +1,4 @@
+class com/google/common/collect/Iterables
+filter
+ <T:Ljava/lang/Object;>(Ljava/lang/Iterable<TT;>;Lcom/google/common/base/Predicate<-TT;>;)Ljava/lang/Iterable<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/lang/Iterable<TT;>;Lcom/google/common/base/Predicate<-TT;>;)L1java/lang/Iterable<TT;>;

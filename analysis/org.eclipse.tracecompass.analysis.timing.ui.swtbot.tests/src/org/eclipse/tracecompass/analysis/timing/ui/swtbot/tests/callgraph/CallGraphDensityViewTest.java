@@ -66,13 +66,25 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
     private static final String CALLGRAPHDENSITY_ID = CallGraphDensityView.ID;
 
     private final @NonNull ISegmentStoreDensityViewerDataListener fSyncListener = new ISegmentStoreDensityViewerDataListener() {
+        @Deprecated
         @Override
         public void dataChanged(List<ISegment> newData) {
             fLatch.countDown();
         }
 
+        @Deprecated
         @Override
         public void dataSelectionChanged(@Nullable List<@NonNull ISegment> newSelectionData) {
+            // do nothing
+        }
+
+        @Override
+        public void viewDataChanged(@NonNull Iterable<? extends @NonNull ISegment> newData) {
+            fLatch.countDown();
+        }
+
+        @Override
+        public void selectedDataChanged(@Nullable Iterable<? extends @NonNull ISegment> newSelectionData) {
             // do nothing
         }
 

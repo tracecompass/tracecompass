@@ -1,0 +1,4 @@
+class java/util/Comparator
+reversed
+ ()Ljava/util/Comparator<TT;>;
+ ()L1java/util/Comparator<TT;>;

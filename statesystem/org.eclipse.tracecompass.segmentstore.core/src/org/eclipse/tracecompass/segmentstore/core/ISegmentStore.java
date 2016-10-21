@@ -17,9 +17,9 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import org.eclipse.jdt.annotation.Nullable;
+
+import com.google.common.collect.Lists;
 
 /**
  * Interface for segment-storing backends.
