@@ -112,6 +112,7 @@ public abstract class FindDialogTestBase extends KernelTestBase {
     }
 
     private static void openDialog(SWTBotView view) {
+        SWTBotUtils.delay(5000);
         view.setFocus();
         SWTBotUtils.pressShortcutGoToTreeTop(KEYBOARD);
         if (SWTUtils.isMac()) {
@@ -286,9 +287,11 @@ public abstract class FindDialogTestBase extends KernelTestBase {
     }
 
     private static void closeDialog(SWTBot bot) {
+        SWTBotUtils.delay(5000);
         SWTBotShell shell = getDialogShell();
         bot.button("Close").click();
         fBot.waitUntil(Conditions.shellCloses(shell));
+        SWTBotUtils.delay(5000);
     }
 
     private static void search(String findText, SearchOptions options, SWTBotButton findButton, SWTBot bot) {
