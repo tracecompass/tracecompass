@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 public class CallGraphDensityView extends AbstractSegmentStoreDensityView {
 
     /** The view's ID */
-    public static final @NonNull String ID = CallGraphDensityView.class.getPackage().getName() + ".callgraphkDensity"; //$NON-NLS-1$
+    public static final @NonNull String ID = CallGraphDensityView.class.getPackage().getName() + ".callgraphDensity"; //$NON-NLS-1$
 
     /**
      * Constructs a new density view.
