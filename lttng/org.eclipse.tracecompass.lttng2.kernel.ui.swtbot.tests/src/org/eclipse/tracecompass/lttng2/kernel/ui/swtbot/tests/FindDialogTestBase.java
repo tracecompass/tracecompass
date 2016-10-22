@@ -112,6 +112,7 @@ public abstract class FindDialogTestBase extends KernelTestBase {
     }
 
     private static void openDialog(SWTBotView view) {
+        System.out.println("openDialog");
         SWTBotUtils.delay(5000);
         view.setFocus();
         SWTBotUtils.pressShortcutGoToTreeTop(KEYBOARD);
@@ -287,8 +288,10 @@ public abstract class FindDialogTestBase extends KernelTestBase {
     }
 
     private static void closeDialog(SWTBot bot) {
+        System.out.println("closeDialog");
         SWTBotUtils.delay(5000);
         SWTBotShell shell = getDialogShell();
+        System.out.println("about to close " + shell.widget.hashCode());
         bot.button("Close").click();
         fBot.waitUntil(Conditions.shellCloses(shell));
         SWTBotUtils.delay(5000);
