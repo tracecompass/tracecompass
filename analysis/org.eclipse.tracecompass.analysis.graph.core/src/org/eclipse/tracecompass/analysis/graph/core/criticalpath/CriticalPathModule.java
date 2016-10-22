@@ -110,7 +110,7 @@ public class CriticalPathModule extends TmfAbstractAnalysisModule {
     }
 
     @Override
-    public @Nullable Object getParameter(String name) {
+    public @Nullable synchronized Object getParameter(String name) {
         if (name.equals(PARAM_GRAPH)) {
             return getGraph();
         }

@@ -43,25 +43,26 @@ public class TestAnalysis extends TmfAbstractAnalysisModule {
 
     @Override
     protected boolean executeAnalysis(final IProgressMonitor monitor) {
-        if (getParameter(PARAM_TEST) == null) {
+        Object parameter = getParameter(PARAM_TEST);
+        if (!(parameter instanceof Integer)) {
             throw new RuntimeException("The parameter should be set");
         }
+        int integer = ((Integer) parameter).intValue();
         /* If PARAM_TEST is set to 0, simulate cancellation */
-        if ((Integer) getParameter(PARAM_TEST) == 0) {
-            fOutput = 0;
+        fOutput = integer;
+        if (integer == 0) {
             return false;
-        } else if ((Integer) getParameter(PARAM_TEST) == 999) {
+        } else if (integer == 999) {
             /* just stay in an infinite loop until cancellation */
             while (!monitor.isCanceled()) {
-
+                try {
+                    Thread.sleep(0);
+                } catch (InterruptedException e) {
+                    break;
+                }
             }
             return !monitor.isCanceled();
         }
-        Object obj = getParameter(PARAM_TEST);
-        if (obj == null) {
-            throw new IllegalStateException();
-        }
-        fOutput = (Integer) obj;
         return true;
     }
 
@@ -71,7 +72,7 @@ public class TestAnalysis extends TmfAbstractAnalysisModule {
     }
 
     @Override
-    public Object getParameter(String name) {
+    public synchronized Object getParameter(String name) {
         Object value = super.getParameter(name);
         if ((value != null) && name.equals(PARAM_TEST) && (value instanceof String)) {
             return Integer.decode((String) value);

@@ -194,7 +194,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
     }
 
     @Override
-    public @Nullable Object getParameter(String name) {
+    public @Nullable synchronized Object getParameter(String name) {
         Object paramValue = fParameters.get(name);
         /* The parameter is not set, maybe it can be provided by someone else */
         if ((paramValue == null) && (fTrace != null)) {
