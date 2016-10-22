@@ -414,6 +414,7 @@ public final class SWTBotUtils {
             // Try to print the GTK theme information as behavior can change depending on the theme
             executeCommandWithOutput("gsettings", "get", "org.gnome.desktop.interface", "gtk-theme");
             executeCommandWithOutput("gsettings", "get", "org.gnome.desktop.wm.preferences", "theme");
+            executeCommandWithOutput("gsettings", "get", "org.gnome.metacity", "theme");
             executeCommandWithOutput("bash", "-c", "ps aux | grep metacity");
             executeCommandWithOutput("env");
             executeCommandWithOutput("locate", "gtkrc");
