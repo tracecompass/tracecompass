@@ -191,6 +191,7 @@ public class ProjectModelOutputTest {
 
         @Override
         public String getFailureMessage() {
+            WaitUtils.printJobs();
             return "Timeout while waiting for " + fProjectElement + " to have number of children. Expected: " + fExpectedChildNum + " Actual: " + fCurNumChildren;
         }
     }
