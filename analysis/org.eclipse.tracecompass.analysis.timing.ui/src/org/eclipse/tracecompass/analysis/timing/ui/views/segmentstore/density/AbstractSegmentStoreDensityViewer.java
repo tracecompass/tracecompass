@@ -55,6 +55,7 @@ import org.swtchart.ISeriesSet;
 import org.swtchart.LineStyle;
 import org.swtchart.Range;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
@@ -246,6 +247,19 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
     }
 
     /**
+     * Sets the segment store provider
+     *
+     * @param ssp
+     *            The segment store provider to give to this view
+     *
+     * @since 1.2
+     */
+    @VisibleForTesting
+    public void setSegmentProvider(@Nullable ISegmentStoreProvider ssp) {
+        fSegmentStoreProvider = ssp;
+    }
+
+    /**
      * Signal handler for handling of the window range signal.
      *
      * @param signal
@@ -265,7 +279,15 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
         updateWithRange(fCurrentTimeRange);
     }
 
-    private void updateWithRange(final TmfTimeRange range) {
+    /**
+     * Update the display range
+     *
+     * @param range
+     *            the range
+     * @since 1.2
+     */
+    @VisibleForTesting
+    public void updateWithRange(final TmfTimeRange range) {
         computeDataAsync(range, new Range(Double.MIN_VALUE, Double.MAX_VALUE)).thenAccept((data) -> applyData(data));
     }
 
@@ -352,7 +374,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
             if (provider != null) {
                 fListener = (segmentProvider, data) -> updateWithRange(windowRange);
                 provider.addListener(fListener);
-                if( provider instanceof IAnalysisModule) {
+                if (provider instanceof IAnalysisModule) {
                     ((IAnalysisModule) provider).schedule();
                 }
             }

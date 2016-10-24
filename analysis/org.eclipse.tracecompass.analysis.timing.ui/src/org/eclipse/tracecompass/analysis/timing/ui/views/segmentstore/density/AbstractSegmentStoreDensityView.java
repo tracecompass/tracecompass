@@ -24,6 +24,8 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Displays the segment store analysis data in a density chart and a table
  * corresponding to the selected latencies.
@@ -139,9 +141,25 @@ public abstract class AbstractSegmentStoreDensityView extends TmfView {
         super.dispose();
     }
 
-    // Package-visible on purpose for ZoomOutAction
-    @Nullable
-    AbstractSegmentStoreDensityViewer getDensityViewer() {
+    /**
+     * Get the density viewer
+     *
+     * @return the density viewer
+     * @since 1.2
+     */
+    @VisibleForTesting
+    public @Nullable AbstractSegmentStoreDensityViewer getDensityViewer() {
         return fDensityViewer;
+    }
+
+    /**
+     * Get the table viewer
+     *
+     * @return the table viewer
+     * @since 1.2
+     */
+    @VisibleForTesting
+    public @Nullable AbstractSegmentStoreTableViewer getTableViewer() {
+        return fTableViewer;
     }
 }

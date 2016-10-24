@@ -24,12 +24,7 @@ import java.util.stream.StreamSupport;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.NotEnabledException;
-import org.eclipse.core.commands.NotHandledException;
-import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
@@ -46,9 +41,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchCommandConstants;
-import org.eclipse.ui.IWorkbenchPartSite;
-import org.eclipse.ui.handlers.IHandlerService;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -106,31 +98,8 @@ public class FlameGraphTest extends AggregationTreeTest {
         assertNotNull(flamegraph);
         fTimeGraphViewer = flamegraph.getTimeGraphViewer();
         assertNotNull(fTimeGraphViewer);
-        maximize(flamegraph);
+        SWTBotUtils.maximize(flamegraph);
         fFg = flamegraph;
-    }
-
-    /**
-     * Maximize a view by reference
-     * <p>
-     * TODO: if this is useful, maybe uplift to SWTViewBot
-     *
-     * @param view
-     *            the view reference
-     */
-    private static void maximize(@NonNull IViewPart view) {
-        assertNotNull(view);
-        IWorkbenchPartSite site = view.getSite();
-        assertNotNull(site);
-        // The annotation is to make the compiler not complain.
-        @Nullable Object handlerServiceObject = site.getService(IHandlerService.class);
-        assertTrue(handlerServiceObject instanceof IHandlerService);
-        IHandlerService handlerService = (IHandlerService) handlerServiceObject;
-        try {
-            handlerService.executeCommand(IWorkbenchCommandConstants.WINDOW_MAXIMIZE_ACTIVE_VIEW_OR_EDITOR, null);
-        } catch (ExecutionException | NotDefinedException | NotEnabledException | NotHandledException e) {
-            fail(e.getMessage());
-        }
     }
 
     private void loadFlameGraph() {

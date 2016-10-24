@@ -22,6 +22,10 @@ import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.NotEnabledException;
+import org.eclipse.core.commands.NotHandledException;
+import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -81,10 +85,14 @@ import org.eclipse.tracecompass.tmf.ui.views.TracingPerspectiveFactory;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.hamcrest.Matcher;
 
 /**
@@ -990,5 +998,29 @@ public final class SWTBotUtils {
 
         bot.waitUntil(Conditions.shellIsActive(PREFERENCES_MENU_ITEM));
         return bot.activeShell();
+    }
+
+    /**
+     * Maximize a view by reference. Calling this a second time will "un-maximize" a view.
+     * <p>
+     * TODO: if this is useful, maybe uplift to SWTViewBot
+     *
+     * @param view
+     *            the view reference
+     */
+    public static void maximize(@NonNull IViewPart view) {
+        assertNotNull(view);
+        IWorkbenchPartSite site = view.getSite();
+        assertNotNull(site);
+        // The annotation is to make the compiler not complain.
+        @Nullable
+        Object handlerServiceObject = site.getService(IHandlerService.class);
+        assertTrue(handlerServiceObject instanceof IHandlerService);
+        IHandlerService handlerService = (IHandlerService) handlerServiceObject;
+        try {
+            handlerService.executeCommand(IWorkbenchCommandConstants.WINDOW_MAXIMIZE_ACTIVE_VIEW_OR_EDITOR, null);
+        } catch (ExecutionException | NotDefinedException | NotEnabledException | NotHandledException e) {
+            fail(e.getMessage());
+        }
     }
 }
