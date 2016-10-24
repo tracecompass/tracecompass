@@ -187,10 +187,10 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
         // add "Check active" Button to TimeGraphFilterDialog
-        super.getTimeGraphCombo().addTimeGraphFilterCheckActiveButton(
+        getTimeGraphViewer().getShowFilterDialogAction().getFilterDialog().addTimeGraphFilterCheckActiveButton(
                 new ControlFlowCheckActiveProvider(Messages.ControlFlowView_checkActiveLabel, Messages.ControlFlowView_checkActiveToolTip));
         // add "Uncheck inactive" Button to TimeGraphFilterDialog
-        super.getTimeGraphCombo().addTimeGraphFilterUncheckInactiveButton(
+        getTimeGraphViewer().getShowFilterDialogAction().getFilterDialog().addTimeGraphFilterUncheckInactiveButton(
                 new ControlFlowCheckActiveProvider(Messages.ControlFlowView_uncheckInactiveLabel, Messages.ControlFlowView_uncheckInactiveToolTip));
     }
 
@@ -225,15 +225,15 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
             section = settings.addNewSection(getClass().getName());
         }
 
-        IAction hideArrowsAction = getTimeGraphCombo().getTimeGraphViewer().getHideArrowsAction(section);
+        IAction hideArrowsAction = getTimeGraphViewer().getHideArrowsAction(section);
         manager.add(hideArrowsAction);
 
-        IAction followArrowBwdAction = getTimeGraphCombo().getTimeGraphViewer().getFollowArrowBwdAction();
+        IAction followArrowBwdAction = getTimeGraphViewer().getFollowArrowBwdAction();
         followArrowBwdAction.setText(Messages.ControlFlowView_followCPUBwdText);
         followArrowBwdAction.setToolTipText(Messages.ControlFlowView_followCPUBwdText);
         manager.add(followArrowBwdAction);
 
-        IAction followArrowFwdAction = getTimeGraphCombo().getTimeGraphViewer().getFollowArrowFwdAction();
+        IAction followArrowFwdAction = getTimeGraphViewer().getFollowArrowFwdAction();
         followArrowFwdAction.setText(Messages.ControlFlowView_followCPUFwdText);
         followArrowFwdAction.setToolTipText(Messages.ControlFlowView_followCPUFwdText);
         manager.add(followArrowFwdAction);
@@ -952,7 +952,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                 if (element instanceof ControlFlowEntry) {
                     ControlFlowEntry entry = (ControlFlowEntry) element;
                     if (entry.getThreadId() == selected) {
-                        getTimeGraphCombo().setSelection(entry);
+                        getTimeGraphViewer().setSelection(entry, true);
                         break;
                     }
                 }

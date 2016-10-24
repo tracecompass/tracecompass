@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
@@ -110,9 +111,10 @@ public class SWTBotTimeGraphEntry extends AbstractSWTBotControl<TimeGraphControl
         return syncExec(new Result<SWTBotTimeGraphEntry>() {
             @Override
             public SWTBotTimeGraphEntry run() {
+                ITableLabelProvider labelProvider = widget.getLabelProvider();
                 for (ITimeGraphEntry entry : widget.getExpandedElements()) {
                     if (fEntry.equals(entry.getParent())) {
-                        String label = entry.getName();
+                        String label = labelProvider == null ? entry.getName() : labelProvider.getColumnText(entry, 0);
                         if (name.equals(label)) {
                             return new SWTBotTimeGraphEntry(widget, entry);
                         }
@@ -130,7 +132,19 @@ public class SWTBotTimeGraphEntry extends AbstractSWTBotControl<TimeGraphControl
      */
     @Override
     public String getText() {
-        return fEntry.getName();
+        return getText(0);
+    }
+
+    /**
+     * Get the text of this entry for the given column index
+     *
+     * @param column
+     *            the column index
+     * @return the column text
+     */
+    public String getText(int column) {
+        ITableLabelProvider labelProvider = widget.getLabelProvider();
+        return labelProvider != null ? labelProvider.getColumnText(fEntry, column) : column == 0 ? fEntry.getName() : "";
     }
 
     /**

@@ -333,7 +333,6 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
 
         SWTBotView viewBot = getViewBot();
-        final SWTBotTree tree = viewBot.bot().tree();
 
         /* set focus on time graph */
         SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(viewBot.bot());
@@ -352,7 +351,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         viewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME2));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME2, TID2_TIME2)));
-        fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "2"));
+        fBot.waitUntil(ConditionHelpers.timeGraphSelectionContains(timeGraph, 1, "2"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID2_TIME2));
 
         /* shift-click "Follow CPU Forward" 3 times */
@@ -363,7 +362,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         viewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME4));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME2, TID5_TIME1)));
-        fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "5"));
+        fBot.waitUntil(ConditionHelpers.timeGraphSelectionContains(timeGraph, 1, "5"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID5_TIME1));
 
         /* shift-click "Follow CPU Backward" 4 times */
@@ -376,7 +375,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         viewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME1));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME2, TID2_TIME1)));
-        fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "2"));
+        fBot.waitUntil(ConditionHelpers.timeGraphSelectionContains(timeGraph, 1, "2"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID2_TIME1));
 
         /* click "Follow CPU Forward" 2 times */
@@ -385,7 +384,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         viewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME3));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME3, TID2_TIME3)));
-        fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "2"));
+        fBot.waitUntil(ConditionHelpers.timeGraphSelectionContains(timeGraph, 1, "2"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID2_TIME3));
 
         /* shift-click "Follow CPU Backward" 3 times */
@@ -396,7 +395,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         viewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID1_TIME1));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME3, TID1_TIME1)));
-        fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "1"));
+        fBot.waitUntil(ConditionHelpers.timeGraphSelectionContains(timeGraph, 1, "1"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME1));
 
         /* shift-click "Follow CPU Forward" 4 times */
@@ -409,7 +408,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         viewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME4));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME3, TID2_TIME4)));
-        fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "2"));
+        fBot.waitUntil(ConditionHelpers.timeGraphSelectionContains(timeGraph, 1, "2"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID2_TIME4));
 
         /* click "Follow CPU Backward" 5 times */

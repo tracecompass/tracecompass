@@ -57,7 +57,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         MouseListener, MouseMoveListener {
 
     private static final int BASE_10 = 10;
-    private static final int X_OFFSET = 4;
     private static final int Y_OFFSET = 4;
 
     private static final int MIN_SECOND_FACTOR = 20;
@@ -317,25 +316,12 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
 
         long time0 = fTimeProvider.getTime0();
         long time1 = fTimeProvider.getTime1();
-        int leftSpace = fTimeProvider.getNameSpace();
         int timeSpace = fTimeProvider.getTimeSpace();
 
         gc.setBackground(getColorScheme().getColor(TimeGraphColorScheme.TOOL_BACKGROUND));
         gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
         Rectangle rect0 = new Rectangle(0, 0, 0, 0);
         Utils.init(rect0, rect);
-
-        // draw top left area
-        rect0.width = leftSpace;
-        rect0.x += X_OFFSET;
-        rect0.width -= X_OFFSET;
-        Rectangle absHeaderRect = new Rectangle(rect0.x, rect0.y, rect0.width, rect0.height);
-        rect0.x -= X_OFFSET;
-        rect0.width += X_OFFSET;
-
-        // prepare and draw right rect of the timescale
-        rect0.x += leftSpace;
-        rect0.width = rect.width - leftSpace;
 
         // draw bottom border and erase all other area
         gc.drawLine(rect.x, rect.y + rect.height - 1, rect.x + rect.width - 1,
@@ -359,21 +345,15 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
 
         // draw range decorators
         if (DRAG_EXTERNAL == fDragState) {
-            int x1 = leftSpace + fDragX0;
-            int x2 = leftSpace + fDragX;
+            int x1 = fDragX0;
+            int x2 = fDragX;
             drawRangeDecorators(rect0, gc, x1, x2);
         } else {
-            int x1;
-            int x2;
             long selectionBegin = fTimeProvider.getSelectionBegin();
             long selectionEnd = fTimeProvider.getSelectionEnd();
-            x1 = SaturatedArithmetic.add(leftSpace, (int) ((selectionBegin - time0) * pixelsPerNanoSec));
-            x2 = SaturatedArithmetic.add(leftSpace, (int) ((selectionEnd - time0) * pixelsPerNanoSec));
+            int x1 = (int) ((selectionBegin - time0) * pixelsPerNanoSec);
+            int x2 = (int) ((selectionEnd - time0) * pixelsPerNanoSec);
             drawRangeDecorators(rect0, gc, x1, x2);
-        }
-
-        if (rect0.isEmpty()) {
-            return;
         }
 
         // draw time scale ticks
@@ -393,23 +373,19 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
 
         int y = rect0.y + rect0.height;
 
-        if (fTimeProvider != null && fTimeProvider.getTimeFormat() == TimeFormat.CALENDAR) {
-            timeDraw.drawAbsHeader(gc, time, absHeaderRect);
-        }
-
         List<Integer> tickList = new ArrayList<>();
         while (true) {
-            int x = SaturatedArithmetic.add(rect.x + leftSpace, (int) (Math.floor((time - time0) * pixelsPerNanoSec)));
-            if (x >= rect.x + leftSpace + rect.width - rect0.width) {
+            int x = SaturatedArithmetic.add(rect.x, (int) (Math.floor((time - time0) * pixelsPerNanoSec)));
+            if (x >= rect.x + rect.width - rect0.width) {
                 break;
             }
-            if (x >= rect.x + leftSpace) {
+            if (x >= rect.x) {
                 gc.drawLine(x, y, x, y + Y_OFFSET);
                 rect0.x = x;
                 if (x + rect0.width <= rect.x + rect.width) {
                     timeDraw.draw(gc, time, rect0);
                 }
-                tickList.add(x);
+                tickList.add(x + fTimeProvider.getNameSpace());
             }
             if (pixelsPerNanoSec == 0 || time > Long.MAX_VALUE - timeDelta || timeDelta == 0) {
                 break;

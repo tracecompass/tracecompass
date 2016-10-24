@@ -76,10 +76,10 @@ public class CriticalPathTest extends KernelTestBase {
      */
     @Test
     public void testFull() {
-        SWTBotTree treeCfv = fViewBotCfv.bot().tree();
+        SWTBotTimeGraph timeGraphCfv = new SWTBotTimeGraph(fViewBotCfv.bot());
         SWTBotTree treeCp = fViewBotCp.bot().tree();
         SWTBotTimeGraph timeGraphCp = new SWTBotTimeGraph(fViewBotCp.bot());
-        assertNotNull(treeCfv.widget);
+        assertNotNull(timeGraphCfv.widget);
         assertNotNull(treeCp.widget);
         SWTBotTreeItem[] allItems = treeCp.getAllItems();
         for (int i = 0; i < allItems.length; i++) {
@@ -88,7 +88,7 @@ public class CriticalPathTest extends KernelTestBase {
 
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         assertNotNull(trace);
-        SWTBotTreeItem entry = treeCfv.expandNode(trace.getName(), "systemd", "we", PROCESS);
+        SWTBotTimeGraphEntry entry = timeGraphCfv.getEntry(trace.getName(), "systemd", "we", PROCESS);
         assertNotNull(entry);
         entry.select();
 

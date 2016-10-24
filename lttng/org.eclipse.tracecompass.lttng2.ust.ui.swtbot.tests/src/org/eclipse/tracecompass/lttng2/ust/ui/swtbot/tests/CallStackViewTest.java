@@ -38,7 +38,6 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
@@ -279,10 +278,10 @@ public class CallStackViewTest {
     }
 
     private static List<String> getVisibleStackFrames(final SWTBotView viewBot) {
-        SWTBotTree tree = viewBot.bot().tree();
+        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(viewBot.bot());
         List<String> stackFrames = new ArrayList<>();
-        for (SWTBotTreeItem treeItem : tree.expandNode(TRACE, PROCESS, THREAD).getItems()) {
-            String name = treeItem.cell(0);
+        for (SWTBotTimeGraphEntry entry : timeGraph.getEntry(TRACE, PROCESS, THREAD).getEntries()) {
+            String name = entry.getText();
             if (!name.isEmpty()) {
                 stackFrames.add(name);
             }
@@ -332,7 +331,7 @@ public class CallStackViewTest {
         SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(viewBot.bot());
         SWTBotTimeGraphEntry[] threads = timeGraph.getEntry(TRACE, PROCESS).getEntries();
         assertEquals(1, threads.length);
-        assertEquals(THREAD, threads[0].getText());
+        assertEquals(THREAD, threads[0].getText(0));
         assertEquals(Arrays.asList("main", "event_loop", "handle_event"), getVisibleStackFrames(viewBot));
     }
 

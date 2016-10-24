@@ -87,7 +87,9 @@ import com.google.common.collect.Iterables;
  * on the right)
  *
  * @author Patrick Tasse
+ * @deprecated Use {@link #getTimeGraphViewer()} instead.
  */
+@Deprecated
 public class TimeGraphCombo extends Composite {
 
     // ------------------------------------------------------------------------
@@ -508,6 +510,9 @@ public class TimeGraphCombo extends Composite {
         tree.setLinesVisible(true);
 
         fTimeGraphViewer = new TimeGraphViewerExtension(fSashForm, SWT.NONE, tree);
+        fTimeGraphViewer.setColumns(new String[0]);
+        fTimeGraphViewer.setNameWidthPref(0);
+        fTimeGraphViewer.setWeights(new int[] { 0, 1 } );
 
         if (fScrollBarsInTreeWorkaround) {
             // Feature in Windows. The tree vertical bar reappears when
@@ -615,7 +620,7 @@ public class TimeGraphCombo extends Composite {
             if (treeItems.isEmpty()) {
                 event.doit = false;
                 fTreeViewer.setSelection(new StructuredSelection());
-                fTimeGraphViewer.setSelection(null);
+                fTimeGraphViewer.setSelection(null, false);
                 return;
             }
             TreeItem lastTreeItem = treeItems.get(treeItems.size() - 1);
@@ -650,7 +655,7 @@ public class TimeGraphCombo extends Composite {
             }
             if (event.keyCode == SWT.ARROW_DOWN) {
                 int index = Math.min(fTimeGraphViewer.getSelectionIndex() + 1, treeItems.size() - 1);
-                fTimeGraphViewer.setSelection((ITimeGraphEntry) treeItems.get(index).getData());
+                fTimeGraphViewer.setSelection((ITimeGraphEntry) treeItems.get(index).getData(), true);
                 event.doit = false;
             } else if (event.keyCode == SWT.PAGE_DOWN) {
                 int height = tree.getSize().y - tree.getHeaderHeight() - tree.getHorizontalBar().getSize().y;
@@ -697,7 +702,7 @@ public class TimeGraphCombo extends Composite {
             if (event.getSelection() instanceof IStructuredSelection) {
                 Object selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
                 if (selection instanceof ITimeGraphEntry) {
-                    fTimeGraphViewer.setSelection((ITimeGraphEntry) selection);
+                    fTimeGraphViewer.setSelection((ITimeGraphEntry) selection, true);
                 }
                 alignTreeItems(false);
             }
@@ -1174,7 +1179,7 @@ public class TimeGraphCombo extends Composite {
      *            the new selection
      */
     public void setSelection(ITimeGraphEntry selection) {
-        fTimeGraphViewer.setSelection(selection);
+        fTimeGraphViewer.setSelection(selection, true);
         setSelectionInTree(selection);
     }
 

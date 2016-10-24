@@ -235,8 +235,8 @@ public class TmfAlignTimeAxisTest {
         SWTBotView viewBot = fBot.viewById(viewId);
         switch (viewId) {
         case HistogramView.ID:
-        case CallStackView.ID:
             return new SWTBotSash(viewBot.bot().widget(WidgetOfType.widgetOfType(Sash.class)));
+        case CallStackView.ID:
         case TimeChartView.ID:
             return new SWTBotTimeGraph(viewBot.bot().widget(WidgetOfType.widgetOfType(TimeGraphControl.class)));
         default:

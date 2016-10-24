@@ -34,9 +34,14 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -47,6 +52,8 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -63,6 +70,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Slider;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
@@ -93,13 +102,13 @@ import org.eclipse.ui.PlatformUI;
  *
  * @author Patrick Tasse, and others
  */
-public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, SelectionListener {
+public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarkerAxisListener, SelectionListener {
 
     /** Constant indicating that all levels of the time graph should be expanded */
     public static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
 
     private static final int DEFAULT_NAME_WIDTH = 200;
-    private static final int MIN_NAME_WIDTH = 6;
+    private static final int MIN_NAME_WIDTH = 3;
     private static final int MAX_NAME_WIDTH = 1000;
     private static final int DEFAULT_HEIGHT = 22;
     private static final String HIDE_ARROWS_KEY = "hide.arrows"; //$NON-NLS-1$
@@ -127,9 +136,11 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
     private int fNameWidthPref = DEFAULT_NAME_WIDTH;
     private int fMinNameWidth = MIN_NAME_WIDTH;
     private int fNameWidth;
+    private int[] fWeights;
     private Composite fDataViewer;
 
     private TimeGraphControl fTimeGraphCtrl;
+    private Tree fTree;
     private TimeGraphScale fTimeScaleCtrl;
     private TimeGraphMarkerAxis fMarkerAxisCtrl;
     private Slider fHorizontalScrollBar;
@@ -138,6 +149,7 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
     private Object fInputElement;
     private ITimeGraphContentProvider fTimeGraphContentProvider;
     private ITimeGraphPresentationProvider fTimeGraphProvider;
+    private ITableLabelProvider fLabelProvider;
     private @NonNull ITimeDataProvider fTimeDataProvider = this;
     private TimeGraphTooltipHandler fToolTipHandler;
 
@@ -317,6 +329,19 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
     }
 
     /**
+     * Sets the tree label provider used for the name space
+     *
+     * @param labelProvider the tree label provider
+     * @since 2.3
+     */
+    public void setTimeGraphLabelProvider(ITableLabelProvider labelProvider) {
+        fLabelProvider = labelProvider;
+        if (fTimeGraphCtrl != null) {
+            fTimeGraphCtrl.setLabelProvider(labelProvider);
+        }
+    }
+
+    /**
      * Sets the tree columns for this time graph combo's filter dialog.
      *
      * @param columnNames the tree column names
@@ -346,14 +371,10 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         getShowFilterDialogAction().getFilterDialog().setLabelProvider(labelProvider);
     }
 
-    /**
-     * Sets or clears the input for this time graph viewer.
-     *
-     * @param inputElement
-     *            The input of this time graph viewer, or <code>null</code> if
-     *            none
-     */
+    @Override
     public void setInput(Object inputElement) {
+        Object oldInput = fInputElement;
+        fTimeGraphContentProvider.inputChanged(this, oldInput, inputElement);
         fInputElement = inputElement;
         ITimeGraphEntry[] input = fTimeGraphContentProvider.getElements(inputElement);
         fListenerNotifier = null;
@@ -368,11 +389,7 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         }
     }
 
-    /**
-     * Gets the input for this time graph viewer.
-     *
-     * @return The input of this time graph viewer, or <code>null</code> if none
-     */
+    @Override
     public Object getInput() {
         return fInputElement;
     }
@@ -389,9 +406,7 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         }
     }
 
-    /**
-     * Refresh the view
-     */
+    @Override
     public void refresh() {
         ITimeGraphEntry[] input = fTimeGraphContentProvider.getElements(fInputElement);
         setTimeRange(input);
@@ -458,6 +473,7 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         fDataViewer = new Composite(parent, style) {
             @Override
             public void redraw() {
+                fTree.redraw();
                 fTimeScaleCtrl.redraw();
                 fTimeGraphCtrl.redraw();
                 fMarkerAxisCtrl.redraw();
@@ -483,13 +499,37 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
                 super.redraw();
             }
         };
-        GridLayout gl2 = new GridLayout(1, false);
+        GridLayout gl2 = new GridLayout(2, false);
         gl2.marginHeight = fBorderWidth;
         gl2.marginWidth = 0;
         gl2.verticalSpacing = 0;
         gl2.horizontalSpacing = 0;
         fTimeAlignedComposite.setLayout(gl2);
         fTimeAlignedComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+        fTree = new Tree(fTimeAlignedComposite, SWT.NO_SCROLL);
+        fTree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+        fTree.setHeaderVisible(true);
+        // add a default column
+        TreeColumn column = new TreeColumn(fTree, SWT.LEFT);
+        column.setResizable(false);
+
+        /*
+         * Bug in Linux. The tree header height is 0 in constructor, so we need
+         * to reset it later when the control is painted. This work around used
+         * to be done on control resized but the header height was not
+         * initialized on the initial resize on GTK3.
+         */
+        fTree.addPaintListener(new PaintListener() {
+            @Override
+            public void paintControl(PaintEvent e) {
+                int headerHeight = fTree.getHeaderHeight();
+                if (headerHeight > 0) {
+                    fTree.removePaintListener(this);
+                    setHeaderHeight(headerHeight);
+                }
+            }
+        });
 
         fTimeScaleCtrl = new TimeGraphScale(fTimeAlignedComposite, fColorScheme);
         fTimeScaleCtrl.setTimeProvider(fTimeDataProvider);
@@ -512,9 +552,11 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         fTimeGraphCtrl = createTimeGraphControl(fTimeAlignedComposite, fColorScheme);
 
         fTimeGraphCtrl.setTimeProvider(this);
+        fTimeGraphCtrl.setLabelProvider(fLabelProvider);
+        fTimeGraphCtrl.setTree(fTree);
         fTimeGraphCtrl.setTimeGraphScale(fTimeScaleCtrl);
         fTimeGraphCtrl.addSelectionListener(this);
-        fTimeGraphCtrl.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        fTimeGraphCtrl.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
         fTimeGraphCtrl.addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseScrolled(MouseEvent e) {
@@ -568,7 +610,7 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         });
 
         fMarkerAxisCtrl = createTimeGraphMarkerAxis(fTimeAlignedComposite, fColorScheme, this);
-        fMarkerAxisCtrl.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
+        fMarkerAxisCtrl.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 2, 1));
         fMarkerAxisCtrl.addMarkerAxisListener(this);
         fMarkerAxisCtrl.addMouseWheelListener(new MouseWheelListener() {
             @Override
@@ -700,12 +742,19 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
             return;
         }
 
+        if (fWeights != null) {
+            setWeights(fWeights);
+            fWeights = null;
+        }
         int width = r.width;
         if (fNameWidth > width - fMinNameWidth) {
             fNameWidth = width - fMinNameWidth;
         }
         if (fNameWidth < fMinNameWidth) {
             fNameWidth = fMinNameWidth;
+        }
+        if (fTree.getColumnCount() == 1) {
+            fTree.getColumn(0).setWidth(fNameWidth);
         }
         adjustHorizontalScrollBar();
         adjustVerticalScrollBar();
@@ -839,6 +888,7 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
      *
      * @return The entry that is selected
      */
+    @Override
     public ITimeGraphEntry getSelection() {
         return fTimeGraphCtrl.getSelectedTrace();
     }
@@ -867,6 +917,28 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         return fMinTimeInterval;
     }
 
+    /**
+     * Sets the relative horizontal weight of each part of the time graph
+     * viewer. The first number is the name space weight, and the second number
+     * is the time space weight.
+     *
+     * @param weights
+     *            The array of relative weights of each part of the viewer
+     * @since 2.3
+     */
+    public void setWeights(final int[] weights) {
+        if (weights.length != 2) {
+            return;
+        }
+        int width = fTimeAlignedComposite.getSize().x;
+        if (width == 0) {
+            /* the weigths will be applied when the control is resized */
+            fWeights = weights;
+            return;
+        }
+        setNameSpace(width * weights[0] / (weights[0] + weights[1]));
+    }
+
     @Override
     public int getNameSpace() {
         return fNameWidth;
@@ -882,6 +954,13 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         if (fNameWidth < MIN_NAME_WIDTH) {
             fNameWidth = MIN_NAME_WIDTH;
         }
+        GridData gd = (GridData) fTree.getLayoutData();
+        gd.widthHint = fNameWidth;
+        if (fTree.getColumnCount() == 1) {
+            fTree.getColumn(0).setWidth(fNameWidth);
+        }
+        fTimeAlignedComposite.layout();
+        fTree.redraw();
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
         fMarkerAxisCtrl.redraw();
@@ -1196,6 +1275,9 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         for (ITimeGraphSelectionListener listener : fSelectionListeners) {
             listener.selectionChanged(event);
         }
+
+        ISelection structuredSelection = (selection == null) ? StructuredSelection.EMPTY : new StructuredSelection(selection);
+        fireSelectionChanged(new SelectionChangedEvent(this, structuredSelection));
     }
 
     /**
@@ -1441,18 +1523,33 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
     }
 
     /**
-     * Callback for a trace selection
+     * Sets a new selection for this viewer and makes it visible.
      *
-     * @param trace
-     *            The trace that was selected
+     * @param entry
+     *            The entry to select
+     * @deprecated Use {@link #setSelection(ISelection, boolean)} instead.
      */
-    public void setSelection(ITimeGraphEntry trace) {
+    @Deprecated
+    public void setSelection(ITimeGraphEntry entry) {
+        setSelection(entry, true);
+    }
+
+    @Override
+    public void setSelection(ISelection selection, boolean reveal) {
         /* if there is a pending selection, ignore this one */
         if (fListenerNotifier != null && fListenerNotifier.hasSelectionChanged()) {
             return;
         }
-        fSelectedEntry = trace;
-        fTimeGraphCtrl.selectItem(trace, false);
+        Object element = selection;
+        if (selection instanceof IStructuredSelection) {
+            element = ((IStructuredSelection) selection).getFirstElement();
+        }
+        if (!(element instanceof ITimeGraphEntry)) {
+            return;
+        }
+        ITimeGraphEntry entry = (ITimeGraphEntry) element;
+        fSelectedEntry = entry;
+        fTimeGraphCtrl.selectItem(entry, false, reveal);
         adjustVerticalScrollBar();
     }
 
@@ -1633,11 +1730,7 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         return fNameWidthPref;
     }
 
-    /**
-     * Returns the primary control associated with this viewer.
-     *
-     * @return the SWT control which displays this viewer's content
-     */
+    @Override
     public Control getControl() {
         return fDataViewer;
     }
@@ -1649,6 +1742,28 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
      */
     public TimeGraphControl getTimeGraphControl() {
         return fTimeGraphCtrl;
+    }
+
+    /**
+     * Returns the tree control associated with this viewer. The tree is only
+     * used for column handling of the name space and contains no tree items.
+     *
+     * @return the tree control
+     * @since 2.3
+     */
+    public Tree getTree() {
+        return fTree;
+    }
+
+    /**
+     * Sets the columns for this time graph viewer's name space.
+     *
+     * @param columnNames
+     *            the column names
+     * @since 2.3
+     */
+    public void setColumns(String[] columnNames) {
+        fTimeGraphCtrl.setColumns(columnNames);
     }
 
     /**

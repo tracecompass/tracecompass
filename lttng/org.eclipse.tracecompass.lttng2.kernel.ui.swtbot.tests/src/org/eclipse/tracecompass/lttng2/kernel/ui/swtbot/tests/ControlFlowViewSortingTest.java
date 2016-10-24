@@ -40,6 +40,8 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers.SWTBotTestCondition;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
@@ -144,13 +146,14 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
         // Create a known state
         applyFilter();
         final SWTBotTree tree = fViewBot.bot().tree();
-        SWTBotTreeItem item = SWTBotUtils.getTreeItem(fBot, tree, TRACE_NAME, SYSTEMD_PROCESS_NAME);
-        item.select();
+        final SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(fViewBot.bot());
+        final SWTBotTimeGraphEntry timeGraphEntry = timeGraph.getEntry(TRACE_NAME, SYSTEMD_PROCESS_NAME);
+        timeGraphEntry.select();
 
-        testProcessSorting(tree);
-        testTidSorting(tree);
-        testPidSorting(tree);
-        testBirthtimeSorting(tree);
+        testProcessSorting(tree, timeGraph);
+        testTidSorting(tree, timeGraph);
+        testPidSorting(tree, timeGraph);
+        testBirthtimeSorting(tree, timeGraph);
     }
 
     // ------------------------------------------------------------------------
@@ -186,28 +189,28 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
         UIThreadRunnable.syncExec(treeCheckCounter);
     }
 
-    private static void testProcessSorting(final SWTBotTree tree) {
+    private static void testProcessSorting(final SWTBotTree tree, final SWTBotTimeGraph timeGraph) {
         SWTBotTreeColumn column = tree.header(PROCESS_COLUMN);
         String[] expected = { KTHREAD_PROCESS_NAME, LTTNG_CONSUMER_PROCESS_NAME, SYSTEMD_PROCESS_NAME };
 
         /* Sort direction Up */
-        SWTBotTestCondition condition = getSortCondition(PROCESS_COLUMN, PROCESS_COLUMN_ID, expected, tree, false);
+        SWTBotTestCondition condition = getSortCondition(PROCESS_COLUMN, PROCESS_COLUMN_ID, expected, timeGraph, false);
         clickColumn(tree, column, condition);
 
         /* Sort direction Down */
-        condition = getSortCondition(PROCESS_COLUMN, 0, expected, tree, true);
+        condition = getSortCondition(PROCESS_COLUMN, 0, expected, timeGraph, true);
         clickColumn(tree, column, condition);
     }
 
-    private static void testTidSorting(final SWTBotTree tree) {
+    private static void testTidSorting(final SWTBotTree tree, final SWTBotTimeGraph timeGraph) {
         String[] expected = { SYSTEMD_TID, KTHREAD_TID, LTTNG_CONSUMER_TID };
         SWTBotTreeColumn column = tree.header(TID_COLUMN);
         /* Sort direction Up */
-        SWTBotTestCondition condition = getSortCondition(TID_COLUMN, TID_COLUMN_ID, expected, tree, false);
+        SWTBotTestCondition condition = getSortCondition(TID_COLUMN, TID_COLUMN_ID, expected, timeGraph, false);
         clickColumn(tree, column, condition);
 
         /* Sort direction Down */
-        condition = getSortCondition(TID_COLUMN, TID_COLUMN_ID, expected, tree, true);
+        condition = getSortCondition(TID_COLUMN, TID_COLUMN_ID, expected, timeGraph, true);
         clickColumn(tree, column, condition);
     }
 
@@ -216,20 +219,20 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
      * lttng-consumerd has PTID -1 that is unknown. Currently
      * in CFV PTID is only shown when it's greater than 0.
      */
-    private static void testPidSorting(final SWTBotTree tree) {
+    private static void testPidSorting(final SWTBotTree tree, final SWTBotTimeGraph timeGraph) {
         SWTBotTreeColumn column = tree.header(PTID_COLUMN);
         String[] expected = { LTTNG_CONSUMER_PROCESS_NAME, SYSTEMD_PROCESS_NAME, KTHREAD_PROCESS_NAME };
         /* Sort direction Up */
-        SWTBotTestCondition condition = getSortCondition(PTID_COLUMN, PROCESS_COLUMN_ID, expected, tree, false);
+        SWTBotTestCondition condition = getSortCondition(PTID_COLUMN, PROCESS_COLUMN_ID, expected, timeGraph, false);
         clickColumn(tree, column, condition);
 
         /* Sort direction Down */
         String[] expected2 = { SYSTEMD_PROCESS_NAME, KTHREAD_PROCESS_NAME, LTTNG_CONSUMER_PROCESS_NAME };
-        condition = getSortCondition(PTID_COLUMN, PROCESS_COLUMN_ID, expected2, tree, false);
+        condition = getSortCondition(PTID_COLUMN, PROCESS_COLUMN_ID, expected2, timeGraph, false);
         clickColumn(tree, column, condition);
     }
 
-    private static void testBirthtimeSorting(final SWTBotTree tree) {
+    private static void testBirthtimeSorting(final SWTBotTree tree, final SWTBotTimeGraph timeGraph) {
         SWTBotTreeColumn column = tree.header(BIRTH_COLUMN);
         String[] expected = {
                 Utils.formatTime(LTTNG_CONSUMER_BIRTHTIME, TimeFormat.CALENDAR, Resolution.NANOSEC),
@@ -237,11 +240,11 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
                 Utils.formatTime(KTHREAD_BIRTHTIME, TimeFormat.CALENDAR, Resolution.NANOSEC) };
 
         /* Sort direction Up */
-        SWTBotTestCondition condition = getSortCondition(BIRTH_COLUMN, BIRTH_COLUMN_ID, expected, tree, false);
+        SWTBotTestCondition condition = getSortCondition(BIRTH_COLUMN, BIRTH_COLUMN_ID, expected, timeGraph, false);
         clickColumn(tree, column, condition);
 
         /* Sort direction Down */
-        condition = getSortCondition(BIRTH_COLUMN, BIRTH_COLUMN_ID, expected, tree, true);
+        condition = getSortCondition(BIRTH_COLUMN, BIRTH_COLUMN_ID, expected, timeGraph, true);
         clickColumn(tree, column, condition);
     }
 
@@ -250,20 +253,20 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
         fBot.waitUntil(condition);
     }
 
-    private static SWTBotTestCondition getSortCondition(final String testCase, final int cell, final String[] expected, final SWTBotTree tree, final boolean reverse) {
+    private static SWTBotTestCondition getSortCondition(final String testCase, final int column, final String[] expected, final SWTBotTimeGraph timeGraph, final boolean reverse) {
         return new SWTBotTestCondition() {
             @Override
             public boolean test() throws Exception {
-                SWTBotTreeItem[] items = tree.getTreeItem(TRACE_NAME).getItems();
+                SWTBotTimeGraphEntry[] entries = timeGraph.getEntry(TRACE_NAME).getEntries();
                 if (reverse) {
                     for (int i = expected.length - 1; i > 0; i--) {
-                        if (!expected[i].equals(items[expected.length - (i + 1)].cell(cell))) {
+                        if (!expected[i].equals(entries[expected.length - (i + 1)].getText(column))) {
                             return false;
                         }
                     }
                 } else {
                     for (int i = 0; i < expected.length; i++) {
-                        if (!expected[i].equals(items[i].cell(cell))) {
+                        if (!expected[i].equals(entries[i].getText(column))) {
                             return false;
                         }
                     }

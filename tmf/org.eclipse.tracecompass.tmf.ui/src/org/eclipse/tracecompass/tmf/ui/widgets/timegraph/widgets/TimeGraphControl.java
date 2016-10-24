@@ -42,11 +42,14 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
@@ -76,6 +79,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
@@ -126,8 +131,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private static final double ZOOM_IN_FACTOR = 0.8;
     private static final double ZOOM_OUT_FACTOR = 1.25;
 
-    private static final int SNAP_WIDTH = 2;
+    private static final int SNAP_WIDTH = 3;
     private static final int ARROW_HOVER_MAX_DIST = 5;
+
+    private static double ARROW_RATIO = Math.sqrt(3) / 2; // base to height ratio
 
     private static final int NO_STATUS = -1;
     private static final int STATUS_WITHOUT_CURSOR_TIME = -2;
@@ -139,6 +146,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     private static final int VERTICAL_ZOOM_DELAY = 400;
 
+    private static final String PREFERRED_WIDTH = "width"; //$NON-NLS-1$
+
     /** Resource manager */
     private LocalResourceManager fResourceManager = new LocalResourceManager(JFaceResources.getResources());
 
@@ -146,7 +155,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private Color[] fEventColorMap = null;
 
     private ITimeDataProvider fTimeProvider;
+    private ITableLabelProvider fLabelProvider;
     private IStatusLineManager fStatusLineManager = null;
+    private Tree fTree = null;
     private TimeGraphScale fTimeGraphScale = null;
 
     private boolean fIsInFocus = false;
@@ -165,6 +176,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private boolean fHasNamespaceFocus = false;
     private long fDragTime0 = 0; // used to preserve accuracy of modified selection
     private int fIdealNameSpace = 0;
+    private boolean fAutoResizeColumns = true;
     private long fTime0bak;
     private long fTime1bak;
     private ITimeGraphPresentationProvider fTimeGraphProvider = null;
@@ -280,6 +292,28 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
+     * Set the label provider for the name space
+     *
+     * @param labelProvider
+     *            The label provider
+     * @since 2.3
+     */
+    public void setLabelProvider(ITableLabelProvider labelProvider) {
+        fLabelProvider = labelProvider;
+        redraw();
+    }
+
+    /**
+     * Get the label provider for the name space
+     *
+     * @return The label provider
+     * @since 2.3
+     */
+    public ITableLabelProvider getLabelProvider() {
+        return fLabelProvider;
+    }
+
+    /**
      * Assign the status line manager
      *
      * @param statusLineManager
@@ -290,6 +324,63 @@ public class TimeGraphControl extends TimeGraphBaseControl
             fStatusLineManager.setMessage(""); //$NON-NLS-1$
         }
         fStatusLineManager = statusLineManager;
+    }
+
+    /**
+     * Assign the tree that represents the name space header
+     *
+     * @param tree
+     *            The tree
+     * @since 2.3
+     */
+    public void setTree(Tree tree) {
+        fTree = tree;
+    }
+
+    /**
+     * Returns the tree control associated with this time graph control. The
+     * tree is only used for column handling of the name space and contains no
+     * tree items.
+     *
+     * @return the tree control
+     * @since 2.3
+     */
+    public Tree getTree() {
+        return fTree;
+    }
+
+    /**
+     * Sets the columns for this time graph control's name space.
+     *
+     * @param columnNames
+     *            the column names
+     * @since 2.3
+     */
+    public void setColumns(String[] columnNames) {
+        for (TreeColumn column : fTree.getColumns()) {
+            column.dispose();
+        }
+        ControlListener controlListener = new ControlListener() {
+            @Override
+            public void controlResized(ControlEvent e) {
+                if (fAutoResizeColumns && ((TreeColumn) e.widget).getWidth() < (Integer) e.widget.getData(PREFERRED_WIDTH)) {
+                    fAutoResizeColumns = false;
+                }
+                redraw();
+            }
+            @Override
+            public void controlMoved(ControlEvent e) {
+                redraw();
+            }
+        };
+        for (String columnName : columnNames) {
+            TreeColumn column = new TreeColumn(fTree, SWT.LEFT);
+            column.setMoveable(true);
+            column.setText(columnName);
+            column.pack();
+            column.setData(PREFERRED_WIDTH, column.getWidth());
+            column.addControlListener(controlListener);
+        }
     }
 
     /**
@@ -1405,7 +1496,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             return false;
         }
         int nameWidth = fTimeProvider.getNameSpace();
-        return Math.abs(x - nameWidth) < SNAP_WIDTH;
+        return Math.abs(x - nameWidth) <= SNAP_WIDTH;
     }
 
     boolean isOverTimeSpace(int x, int y) {
@@ -1499,6 +1590,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     void selectItem(int idx, boolean addSelection) {
+        selectItem(idx, addSelection, true);
+    }
+
+    void selectItem(int idx, boolean addSelection, boolean reveal) {
         boolean changed = false;
         if (addSelection) {
             if (idx >= 0 && idx < fItemData.fExpandedItems.length) {
@@ -1515,23 +1610,44 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 item.fSelected = i == idx;
             }
         }
-        changed |= ensureVisibleItem(idx, true);
+        if (reveal) {
+            changed |= ensureVisibleItem(idx, true);
+        }
         if (changed) {
             redraw();
         }
     }
 
     /**
-     * Callback for item selection
+     * Select an entry and make it visible
      *
-     * @param trace
-     *            The entry matching the trace
+     * @param entry
+     *            The entry to select
      * @param addSelection
-     *            If the selection is added or removed
+     *            <code>true</code> to add the entry to the current selection,
+     *            or <code>false</code> to set a new selection
      */
-    public void selectItem(ITimeGraphEntry trace, boolean addSelection) {
-        int idx = fItemData.findItemIndex(trace);
+    public void selectItem(ITimeGraphEntry entry, boolean addSelection) {
+        int idx = fItemData.findItemIndex(entry);
         selectItem(idx, addSelection);
+    }
+
+    /**
+     * Select an entry
+     *
+     * @param entry
+     *            The entry to select
+     * @param addSelection
+     *            <code>true</code> to add the entry to the current selection,
+     *            or <code>false</code> to set a new selection
+     * @param reveal
+     *            <code>true</code> if the selection is to be made visible, and
+     *            <code>false</code> otherwise
+     * @since 2.3
+     */
+    public void selectItem(ITimeGraphEntry entry, boolean addSelection, boolean reveal) {
+        int idx = fItemData.findItemIndex(entry);
+        selectItem(idx, addSelection, reveal);
     }
 
     /**
@@ -1727,11 +1843,16 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
         }
 
-        // draw drag line
-        if (DRAG_SPLIT_LINE == fDragState) {
-            gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.BLACK));
-            gc.drawLine(bounds.x + nameSpace, bounds.y, bounds.x + nameSpace, bounds.y + bounds.height - 1);
-        } else if (DRAG_ZOOM == fDragState && Math.max(fDragX, fDragX0) > nameSpace) {
+        // draw split line
+        if (DRAG_SPLIT_LINE == fDragState ||
+                (DRAG_NONE == fDragState && fMouseOverSplitLine && fTimeProvider.getNameSpace() > 0)) {
+            gc.setBackground(getColorScheme().getColor(TimeGraphColorScheme.DARK_GRAY));
+        } else {
+            gc.setBackground(getColorScheme().getColor(TimeGraphColorScheme.GRAY));
+        }
+        gc.fillRectangle(bounds.x + nameSpace - SNAP_WIDTH, bounds.y, SNAP_WIDTH, bounds.height);
+
+        if (DRAG_ZOOM == fDragState && Math.max(fDragX, fDragX0) > nameSpace) {
             gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
             gc.drawLine(fDragX0, bounds.y, fDragX0, bounds.y + bounds.height - 1);
             if (fDragX != fDragX0) {
@@ -1743,9 +1864,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
             if (fDragX != fDragX0) {
                 gc.drawLine(fDragX, bounds.y, fDragX, bounds.y + bounds.height - 1);
             }
-        } else if (DRAG_NONE == fDragState && fMouseOverSplitLine && fTimeProvider.getNameSpace() > 0) {
-            gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.RED));
-            gc.drawLine(bounds.x + nameSpace, bounds.y, bounds.x + nameSpace, bounds.y + bounds.height - 1);
         }
 
         gc.setAlpha(alpha);
@@ -1789,12 +1907,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 gc.setBackground(getColorScheme().getBkColor(true, fIsInFocus, false));
                 gc.fillRectangle(nameSpace, itemRect.y, itemRect.width - nameSpace, itemRect.height);
             }
-            // draw the name and middle line
-            if (! item.fEntry.hasTimeEvents()) {
-                drawName(item, itemRect, gc);
-            } else {
-                Rectangle nameRect = new Rectangle(itemRect.x, itemRect.y, nameSpace, itemRect.height);
-                drawName(item, nameRect, gc);
+            // draw the name space
+            Rectangle nameRect = new Rectangle(itemRect.x, itemRect.y, nameSpace, itemRect.height);
+            drawName(item, nameRect, gc);
+            if (item.fEntry.hasTimeEvents()) {
                 Rectangle rect = new Rectangle(nameSpace, itemRect.y, itemRect.width - nameSpace, itemRect.height);
                 drawMidLine(rect, gc);
             }
@@ -2151,7 +2267,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Draw the name of an item.
+     * Draw the name space of an item.
      *
      * @param item
      *            Item object
@@ -2161,82 +2277,96 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *            Graphics context
      */
     protected void drawName(Item item, Rectangle bounds, GC gc) {
-        boolean hasTimeEvents = item.fEntry.hasTimeEvents();
-
-        // No name to be drawn
+        // No name space to be drawn
         if (fTimeProvider.getNameSpace() == 0) {
             return;
+        }
+
+        boolean hasTimeEvents = item.fEntry.hasTimeEvents();
+        if (hasTimeEvents) {
+            gc.setClipping(bounds);
         }
 
         int height = bounds.height - getMarginForHeight(bounds.height);
         setFontForHeight(height, gc);
 
-        int leftMargin = MARGIN + item.fLevel * EXPAND_SIZE;
-        if (item.fHasChildren) {
-            gc.setForeground(getColorScheme().getFgColorGroup(false, false));
-            gc.setBackground(getColorScheme().getBkColor(false, false, false));
-            Rectangle rect = Utils.clone(bounds);
-            rect.x += leftMargin;
-            rect.y += (bounds.height - EXPAND_SIZE) / 2;
-            rect.width = EXPAND_SIZE;
-            rect.height = EXPAND_SIZE;
-            gc.fillRectangle(rect);
-            gc.drawRectangle(rect.x, rect.y, rect.width - 1, rect.height - 1);
-            int midy = rect.y + rect.height / 2;
-            gc.drawLine(rect.x + 2, midy, rect.x + rect.width - 3, midy);
-            if (!item.fExpanded) {
-                int midx = rect.x + rect.width / 2;
-                gc.drawLine(midx, rect.y + 2, midx, rect.y + rect.height - 3);
-            }
-        }
-        leftMargin += EXPAND_SIZE + MARGIN;
-
-        Image img = fTimeGraphProvider.getItemImage(item.fEntry);
-        if (img != null) {
-            // draw icon
-            int imgHeight = img.getImageData().height;
-            int imgWidth = img.getImageData().width;
-            int x = leftMargin;
-            int y = bounds.y + (bounds.height - imgHeight) / 2;
-            gc.drawImage(img, x, y);
-            leftMargin += imgWidth + MARGIN;
-        }
-        String name = item.fName;
-        Point size = gc.stringExtent(name);
-        if (fIdealNameSpace < leftMargin + size.x + MARGIN) {
-            fIdealNameSpace = leftMargin + size.x + MARGIN;
-        }
-        if (hasTimeEvents) {
-            // cut long string with "..."
-            int width = bounds.width - leftMargin;
-            int cuts = 0;
-            while (size.x > width && name.length() > 1) {
-                cuts++;
-                name = name.substring(0, name.length() - 1);
-                size = gc.stringExtent(name + "..."); //$NON-NLS-1$
-            }
-            if (cuts > 0) {
-                name += "..."; //$NON-NLS-1$
-            }
-        }
+        String name = fLabelProvider == null ? item.fName : fLabelProvider.getColumnText(item.fEntry, 0);
         Rectangle rect = Utils.clone(bounds);
-        rect.x += leftMargin;
-        rect.width -= leftMargin;
-        // draw text
-        if (rect.width > 0) {
-            rect.y += (bounds.height - gc.stringExtent(name).y) / 2;
-            gc.setForeground(getColorScheme().getFgColor(item.fSelected, fIsInFocus));
-            int textWidth = Utils.drawText(gc, name, rect, true);
-            leftMargin += textWidth + MARGIN;
+        rect.y += (bounds.height - gc.stringExtent(name).y) / 2;
+        TreeColumn[] columns = fTree.getColumns();
+        int idealNameSpace = 0;
+        for (int i = 0; i < columns.length; i++) {
+            int columnIndex = fTree.getColumnOrder()[i];
+            TreeColumn column = columns[columnIndex];
+            rect.width = column.getWidth();
+            gc.setClipping(rect.x, bounds.y, Math.min(rect.width, bounds.x + bounds.width - rect.x - SNAP_WIDTH), bounds.height);
+            int width = MARGIN;
+            if (i == 0) {
+                // first visible column
+                width += item.fLevel * EXPAND_SIZE;
+                if (item.fHasChildren) {
+                    // draw expand/collapse arrow
+                    gc.setBackground(getColorScheme().getColor(TimeGraphColorScheme.DARK_GRAY));
+                    int arrowHeightHint = (height < 4) ? height : (height < 6) ? height - 1 : height - 2;
+                    int arrowHalfHeight = Math.max(1, Math.min(arrowHeightHint, (int) Math.round((EXPAND_SIZE - 2) / ARROW_RATIO))) / 2;
+                    int arrowHalfWidth = (Math.max(1, Math.min(EXPAND_SIZE - 2, (int) Math.round(arrowHeightHint * ARROW_RATIO))) + 1) / 2;
+                    int x1 = bounds.x + width + 1;
+                    int x2 = x1 + 2 * arrowHalfWidth;
+                    int midy = bounds.y + bounds.height / 2;
+                    int y1 = midy - arrowHalfHeight;
+                    int y2 = midy + arrowHalfHeight;
+                    if (!item.fExpanded) { // >
+                        gc.fillPolygon(new int[] { x1, y1, x2, midy, x1, y2 });
+                    } else { // v
+                        int midx = x1 + arrowHalfWidth;
+                        gc.fillPolygon(new int[] { x1, y1, x2, y1, midx, y2 });
+                    }
+                }
+                width += EXPAND_SIZE + MARGIN;
 
-            if (hasTimeEvents) {
-                // draw middle line
-                rect.x = bounds.x + leftMargin;
-                rect.y = bounds.y;
-                rect.width = bounds.width - rect.x;
-                drawMidLine(rect, gc);
+                Image img = fLabelProvider != null ? fLabelProvider.getColumnImage(item.fEntry, columnIndex)
+                        : columnIndex == 0 ? fTimeGraphProvider.getItemImage(item.fEntry) : null;
+                if (img != null) {
+                    // draw icon
+                    int imgHeight = img.getImageData().height;
+                    int imgWidth = img.getImageData().width;
+                    int x = width;
+                    int y = bounds.y + (bounds.height - imgHeight) / 2;
+                    gc.drawImage(img, x, y);
+                    width += imgWidth + MARGIN;
+                }
+            } else {
+                if (fLabelProvider == null) {
+                    break;
+                }
             }
+            String label = fLabelProvider != null ? fLabelProvider.getColumnText(item.fEntry, columnIndex)
+                    : columnIndex == 0 ? item.fName : ""; //$NON-NLS-1$
+            gc.setForeground(getColorScheme().getFgColor(item.fSelected, fIsInFocus));
+            Rectangle textRect = new Rectangle(rect.x + width, rect.y, rect.width - width, rect.height);
+            int textWidth = Utils.drawText(gc, label, textRect, true);
+            width += textWidth + MARGIN;
+            if (textWidth > 0) {
+                idealNameSpace = rect.x + width;
+            }
+            if (columns.length == 1) {
+                drawMidLine(new Rectangle(bounds.x + width, bounds.y, bounds.x + bounds.width, bounds.height), gc);
+            }
+            if (fAutoResizeColumns && width > column.getWidth()) {
+                column.setData(PREFERRED_WIDTH, width);
+                column.setWidth(width);
+            }
+            gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.MID_LINE));
+            if (i < columns.length - 1) {
+                // not the last visible column: draw the vertical cell border
+                int x = rect.x + rect.width - 1;
+                gc.drawLine(x, bounds.y, x, bounds.y + bounds.height);
+            }
+            rect.x += rect.width;
         }
+        fIdealNameSpace = Math.max(fIdealNameSpace, idealNameSpace);
+
+        gc.setClipping((Rectangle) null);
     }
 
     /**
@@ -2711,12 +2841,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     @Override
     public void mouseDown(MouseEvent e) {
-        if (fDragState != DRAG_NONE || null == fTimeProvider ||
-                fTimeProvider.getTime0() == fTimeProvider.getTime1() ||
-                getSize().x - fTimeProvider.getNameSpace() <= 0) {
+        if (fDragState != DRAG_NONE) {
             return;
         }
-        int idx;
         if (1 == e.button && (e.stateMask & SWT.MODIFIER_MASK) == 0) {
             int nameSpace = fTimeProvider.getNameSpace();
             if (nameSpace != 0 && isOverSplitLine(e.x)) {
@@ -2724,13 +2851,17 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 fDragButton = e.button;
                 fDragX = e.x;
                 fDragX0 = fDragX;
-                fTime0bak = fTimeProvider.getTime0();
-                fTime1bak = fTimeProvider.getTime1();
                 redraw();
                 updateCursor(e.x, e.stateMask);
                 return;
             }
         }
+        if (fTimeProvider == null ||
+                fTimeProvider.getTime0() == fTimeProvider.getTime1() ||
+                getSize().x - fTimeProvider.getNameSpace() <= 0) {
+            return;
+        }
+        int idx;
         if (1 == e.button && ((e.stateMask & SWT.MODIFIER_MASK) == 0 || (e.stateMask & SWT.MODIFIER_MASK) == SWT.SHIFT)) {
             int nameSpace = fTimeProvider.getNameSpace();
             idx = getItemIndexAtY(e.y);

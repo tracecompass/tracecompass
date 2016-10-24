@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
@@ -92,11 +93,12 @@ public class SWTBotTimeGraph extends AbstractSWTBotControl<TimeGraphControl> {
      */
     public SWTBotTimeGraphEntry getEntry(String... names) throws WidgetNotFoundException {
         List<ITimeGraphEntry> entries = Arrays.asList(widget.getExpandedElements());
+        ITableLabelProvider labelProvider = widget.getLabelProvider();
         ITimeGraphEntry parent = null;
         for (String name : names) {
             boolean found = false;
             for (ITimeGraphEntry entry : entries) {
-                String label = entry.getName();
+                String label = labelProvider == null ? entry.getName() : labelProvider.getColumnText(entry, 0);
                 if (Objects.equals(entry.getParent(), parent) && name.equals(label)) {
                     parent = entry;
                     found = true;
@@ -126,7 +128,9 @@ public class SWTBotTimeGraph extends AbstractSWTBotControl<TimeGraphControl> {
                     if (element instanceof ITimeGraphEntry) {
                         TableRow tableRow = new TableRow();
                         SWTBotTimeGraphEntry entry = new SWTBotTimeGraphEntry(widget, (ITimeGraphEntry) element);
-                        tableRow.add(entry.getText());
+                        for (int i = 0; i < widget.getTree().getColumnCount(); i++) {
+                            tableRow.add(entry.getText(i));
+                        }
                         collection.add(tableRow);
                     }
                 }

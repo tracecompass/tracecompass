@@ -37,8 +37,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -382,10 +380,10 @@ public class CallStackView extends AbstractTimeGraphView {
             }
         });
 
-        getTimeGraphCombo().getTreeViewer().addDoubleClickListener(new IDoubleClickListener() {
+        getTimeGraphViewer().getTimeGraphControl().addMouseListener(new MouseAdapter() {
             @Override
-            public void doubleClick(DoubleClickEvent event) {
-                Object selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
+            public void mouseDoubleClick(MouseEvent event) {
+                Object selection = getTimeGraphViewer().getSelection();
                 if (selection instanceof CallStackEntry) {
                     CallStackEntry entry = (CallStackEntry) selection;
                     if (entry.getFunctionName().length() > 0) {
@@ -455,7 +453,7 @@ public class CallStackView extends AbstractTimeGraphView {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                if (getTimeGraphCombo().isDisposed()) {
+                if (getTimeGraphViewer().getControl().isDisposed()) {
                     return;
                 }
                 if (beginTime == endTime) {
@@ -850,7 +848,7 @@ public class CallStackView extends AbstractTimeGraphView {
                                 if (stackLevelState.unboxInt() == callStackEntry.getStackLevel() || stackLevelState.isNull()) {
                                     fSyncSelection = false;
                                     Display.getDefault().asyncExec(() -> {
-                                        getTimeGraphCombo().setSelection(callStackEntry);
+                                        getTimeGraphViewer().setSelection(callStackEntry, true);
                                         getTimeGraphViewer().getTimeGraphControl().fireSelectionChanged();
                                     });
                                 }
@@ -875,7 +873,7 @@ public class CallStackView extends AbstractTimeGraphView {
         };
         traceEntries.forEach(consumer);
         if (Display.getCurrent() != null) {
-            getTimeGraphCombo().refresh();
+            getTimeGraphViewer().refresh();
         }
     }
 
@@ -953,7 +951,7 @@ public class CallStackView extends AbstractTimeGraphView {
         manager.add(getSortByIdAction());
         manager.add(getSortByTimeAction());
         manager.add(new Separator());
-        manager.add(getTimeGraphCombo().getShowFilterDialogAction());
+        manager.add(getTimeGraphViewer().getShowFilterDialogAction());
         manager.add(new Separator());
         manager.add(getTimeGraphViewer().getResetScaleAction());
         manager.add(getPreviousEventAction());
@@ -1005,7 +1003,7 @@ public class CallStackView extends AbstractTimeGraphView {
                             stackInterval = ss.querySingleState(Math.min(ss.getCurrentEndTime(), newTime), quark);
                             int stackLevel = stackInterval.getStateValue().unboxInt();
                             ITimeGraphEntry selectedEntry = parentEntry.getChildren().get(Math.max(0, stackLevel - 1));
-                            getTimeGraphCombo().setSelection(selectedEntry);
+                            viewer.setSelection(selectedEntry, true);
                             viewer.getTimeGraphControl().fireSelectionChanged();
                             startZoomThread(viewer.getTime0(), viewer.getTime1());
 
@@ -1034,7 +1032,7 @@ public class CallStackView extends AbstractTimeGraphView {
             fPrevEventAction = new Action() {
                 @Override
                 public void run() {
-                    TimeGraphViewer viewer = getTimeGraphCombo().getTimeGraphViewer();
+                    TimeGraphViewer viewer = getTimeGraphViewer();
                     ITimeGraphEntry entry = viewer.getSelection();
                     if (entry instanceof CallStackEntry) {
                         try {
@@ -1050,7 +1048,7 @@ public class CallStackView extends AbstractTimeGraphView {
                             viewer.setSelectedTimeNotify(stackInterval.getStartTime(), true);
                             int stackLevel = stackInterval.getStateValue().unboxInt();
                             ITimeGraphEntry selectedEntry = parentEntry.getChildren().get(Math.max(0, stackLevel - 1));
-                            getTimeGraphCombo().setSelection(selectedEntry);
+                            viewer.setSelection(selectedEntry, true);
                             viewer.getTimeGraphControl().fireSelectionChanged();
                             startZoomThread(viewer.getTime0(), viewer.getTime1());
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2009, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jface.viewers.ISelection;
 
 /**
  * Interface for an entry (row) in the time graph view
@@ -25,7 +26,7 @@ import org.eclipse.jdt.annotation.NonNull;
  * @author Alvaro Sanchez-Leon
  * @author Patrick Tasse
  */
-public interface ITimeGraphEntry {
+public interface ITimeGraphEntry extends ISelection {
 
     /**
      * Returns the parent of this entry, or <code>null</code> if it has none.
@@ -114,4 +115,9 @@ public interface ITimeGraphEntry {
      * @since 2.0
      */
     boolean matches(@NonNull Pattern pattern);
+
+    @Override
+    default boolean isEmpty() {
+        return false;
+    }
 }

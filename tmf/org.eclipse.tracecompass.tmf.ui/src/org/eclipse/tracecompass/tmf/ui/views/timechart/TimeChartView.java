@@ -673,7 +673,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
             ITmfTrace trace = signal.getTrace();
             for (int i = 0; i < fTimeAnalysisEntries.size(); i++) {
                 if (fTimeAnalysisEntries.get(i).getTrace().equals(trace)) {
-                    fViewer.setSelection(fTimeAnalysisEntries.get(i));
+                    fViewer.setSelection(fTimeAnalysisEntries.get(i), true);
                     break;
                 }
             }
