@@ -22,7 +22,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.junit.Test;
 
 /**
- * Test the staticsmodule. This is done with two tests.
+ * Test the segment store statistics calculations. This is done with two tests.
  * <ol>
  * <li>test the values vs some sample points calculated by hand (sanity test)
  * </li>
@@ -30,7 +30,6 @@ import org.junit.Test;
  * </ol>
  *
  * @author Matthew Khouzam
- *
  */
 public class SegmentStoreStatisticsTest {
 
@@ -73,7 +72,7 @@ public class SegmentStoreStatisticsTest {
     }
 
     /**
-     * Test decrementing
+     * Test with segments of decrementing size
      */
     @Test
     public void decrementingTest() {
@@ -92,7 +91,7 @@ public class SegmentStoreStatisticsTest {
     }
 
     /**
-     * Test small
+     * Test a data set with a small number of segments
      */
     @Test
     public void smallTest() {
@@ -104,7 +103,7 @@ public class SegmentStoreStatisticsTest {
     }
 
     /**
-     * Test large
+     * Test a data set with a large number of segments
      */
     @Test
     public void largeTest() {
@@ -116,7 +115,7 @@ public class SegmentStoreStatisticsTest {
     }
 
     /**
-     * Test noise
+     * Test a random dataset where the distribution follows white noise
      */
     @Test
     public void noiseTest() {
@@ -132,7 +131,7 @@ public class SegmentStoreStatisticsTest {
     }
 
     /**
-     * Test gaussian noise
+     * Test a random dataset where the distribution follows gaussian noise
      */
     @Test
     public void gaussianNoiseTest() {
@@ -293,10 +292,10 @@ public class SegmentStoreStatisticsTest {
     }
 
     /**
-     * Test statistics nodes being merged. corner cases.
+     * Test corner cases when merging statistics nodes
      */
     @Test
-    public void mergeStatisticsCorenerCaseNodesTest() {
+    public void mergeStatisticsCornerCaseNodesTest() {
         ISegment segment = new BasicSegment(1, 5);
 
         // Control statistics, not to be modified
