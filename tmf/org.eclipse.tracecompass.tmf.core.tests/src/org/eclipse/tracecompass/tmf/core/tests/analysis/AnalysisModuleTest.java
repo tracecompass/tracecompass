@@ -234,7 +234,8 @@ public class AnalysisModuleTest {
             fail(e.getMessage());
         }
 
-        assertEquals(Status.OK_STATUS, module.schedule());
+        IStatus schedule = module.schedule();
+        assertEquals(Status.OK_STATUS, schedule);
 
         /* Give the job a chance to start */
         try {

@@ -223,8 +223,10 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
      */
     protected void resetAnalysis() {
         TmfCoreTracer.traceAnalysis(getId(), getTrace(), "reset: ready for execution"); //$NON-NLS-1$
-        fFinishedLatch.countDown();
-        fFinishedLatch = new CountDownLatch(1);
+        synchronized (syncObj) {
+            fFinishedLatch.countDown();
+            fFinishedLatch = new CountDownLatch(1);
+        }
     }
 
     /**
@@ -266,7 +268,9 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
     public final void cancel() {
         synchronized (syncObj) {
             TmfCoreTracer.traceAnalysis(getId(), getTrace(), "cancelled by application"); //$NON-NLS-1$
-            if (fJob != null && fJob.cancel()) {
+            Job job = fJob;
+            if (job != null) {
+                job.cancel();
                 fAnalysisCancelled = true;
                 setAnalysisCompleted();
             }
@@ -408,8 +412,16 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
 
     @Override
     public boolean waitForCompletion() {
+        CountDownLatch finishedLatch;
+        boolean started;
+        synchronized (syncObj) {
+            finishedLatch = fFinishedLatch;
+            started = fStarted;
+        }
         try {
-            fFinishedLatch.await();
+            if (started) {
+                finishedLatch.await();
+            }
         } catch (InterruptedException e) {
             Activator.logError("Error while waiting for module completion", e); //$NON-NLS-1$
         }
