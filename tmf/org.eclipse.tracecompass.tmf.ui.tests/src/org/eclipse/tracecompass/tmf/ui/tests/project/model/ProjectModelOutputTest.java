@@ -17,6 +17,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -113,6 +115,14 @@ public class ProjectModelOutputTest {
         } catch (WaitTimeoutException e) {
             fail("The analysis parent did not open in a reasonable time");
         }
+
+        String property = System.getProperty("user.dir");
+        File f = new File(property);
+        assertTrue("working dir", f.exists());
+        System.out.println(Arrays.toString(f.list()));
+        File target = new File(property + "/target");
+        assertTrue("target dir", target.exists());
+        System.out.println(Arrays.toString(target.list()));
 
         /* Make sure the output list is not empty */
         WaitUtils.waitUntil(new ConditionTraceChildrenElements(analysis, 1));
