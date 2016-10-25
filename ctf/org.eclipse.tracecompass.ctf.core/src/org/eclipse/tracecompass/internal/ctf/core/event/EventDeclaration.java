@@ -12,7 +12,11 @@
 
 package org.eclipse.tracecompass.internal.ctf.core.event;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -21,6 +25,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
+import org.eclipse.tracecompass.ctf.core.event.CTFCallsite;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
@@ -36,11 +41,15 @@ import org.eclipse.tracecompass.ctf.core.trace.ICTFPacketDescriptor;
 import org.eclipse.tracecompass.internal.ctf.core.event.types.composite.EventHeaderDefinition;
 import org.eclipse.tracecompass.internal.ctf.core.trace.CTFStream;
 
+import com.google.common.collect.ImmutableList;
+
 /**
  * Representation of one type of event. A bit like "int" or "long" but for trace
  * events.
  */
 public class EventDeclaration implements IEventDeclaration {
+
+    private static final Comparator<CTFCallsite> CS_COMPARATOR = (o1, o2) -> Long.compareUnsigned(o1.getIp(), o2.getIp());
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -73,6 +82,8 @@ public class EventDeclaration implements IEventDeclaration {
 
     /** Map of this event type's custom CTF attributes */
     private final Map<String, String> fCustomAttributes = new HashMap<>();
+
+    private final @NonNull List<@NonNull CTFCallsite> fCallsites = new ArrayList<>();
 
     private int fId = (int) UNSET_EVENT_ID;
 
@@ -453,6 +464,22 @@ public class EventDeclaration implements IEventDeclaration {
         result = (prime * result) + ((stream == null) ? 0 : stream.hashCode());
         result = (prime * result) + fCustomAttributes.hashCode();
         return result;
+    }
+
+    /**
+     * Add static callsites to an event
+     *
+     * @param callsites
+     *            the callsites to add
+     */
+    public void addCallsites(List<@NonNull CTFCallsite> callsites) {
+        fCallsites.addAll(callsites);
+        Collections.sort(fCallsites, CS_COMPARATOR);
+    }
+
+    @Override
+    public List<@NonNull CTFCallsite> getCallsites() {
+        return ImmutableList.copyOf(fCallsites);
     }
 
 }

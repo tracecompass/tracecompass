@@ -243,6 +243,21 @@ public class IOstructgenTest {
                     "};\n " +
                     "\n";
 
+    private static final String callsiteMD =
+            "callsite {\n"
+                    + "    name = \"ust_tests_demo2:loop\";\n"
+                    + "    func = \"main\";\n" + "    ip = 0x400a29;\n"
+                    + "    file = \"demo.c\";\n" + "    line = 59;\n" + "};\n" + "\n"
+                    + "callsite {\n" + "    name = \"ust_tests_demo3:done\";\n"
+                    + "    func = \"main\";\n" + "    ip = 0x400a6c;\n"
+                    + "    file = \"demo.c\";\n" + "    line = 62;\n" + "};\n" + "\n"
+                    + "callsite {\n" + "    name = \"ust_tests_demo:done\";\n"
+                    + "    func = \"main\";\n" + "    ip = 0x400aaf;\n"
+                    + "    file = \"demo.c\";\n" + "    line = 61;\n" + "};\n" + "\n"
+                    + "callsite {\n" + "    name = \"ust_tests_demo:starting\";\n"
+                    + "    func = \"main\";\n" + "    ip = 0x400af2;\n"
+                    + "    file = \"demo.c\";\n" + "    line = 55;\n" + "};\n";
+
     private static final String simpleTSDL = metadataDecs + ctfStart + ctfHeaders
             + ctfBody;
     private static final String enumTSDL = metadataDecs + ctfStart + ctfHeaders
@@ -253,8 +268,10 @@ public class IOstructgenTest {
             + ctfHeaders + ctfBody;
     private static final String contextTSDL = metadataDecs + environmentMD + ctfStart
             + ctfHeaders + ctfBody + contextMD;
+    private static final String callsiteTSDL = metadataDecs + ctfStart + ctfHeaders
+            + ctfBody + callsiteMD;
     private static final String allDressedTSDL = metadataDecs + environmentMD + clockMD
-            + ctfStart + ctfHeaders + ctfBody + enumMd;
+            + ctfStart + ctfHeaders + ctfBody + enumMd + callsiteMD;
 
     static final String tempTraceDir = CtfCoreTestPlugin.getTemporaryDirPath()
             + File.separator + "tempTrace";
@@ -456,6 +473,19 @@ public class IOstructgenTest {
     @Test
     public void TSDLContextTest() throws CTFException {
         createDummyTrace(contextTSDL);
+        trace = new CTFTrace(tempTraceDir);
+        assertNotNull(trace);
+    }
+
+    /**
+     * Test with Callsites
+     *
+     * @throws CTFException
+     *             something wrong happened
+     */
+    @Test
+    public void TSDLCallsiteTest() throws CTFException {
+        createDummyTrace(callsiteTSDL);
         trace = new CTFTrace(tempTraceDir);
         assertNotNull(trace);
     }

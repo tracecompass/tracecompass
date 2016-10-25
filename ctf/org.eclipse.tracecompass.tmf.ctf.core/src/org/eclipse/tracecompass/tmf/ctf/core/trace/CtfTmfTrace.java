@@ -25,7 +25,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.StreamSupport;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -33,7 +36,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFException;
+import org.eclipse.tracecompass.ctf.core.event.CTFCallsite;
 import org.eclipse.tracecompass.ctf.core.event.CTFClock;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
@@ -75,6 +80,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventFactory;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventType;
 import org.eclipse.tracecompass.tmf.ctf.core.event.aspect.CtfChannelAspect;
 import org.eclipse.tracecompass.tmf.ctf.core.event.aspect.CtfCpuAspect;
+import org.eclipse.tracecompass.tmf.ctf.core.event.lookup.CtfTmfCallsite;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -455,6 +461,51 @@ public class CtfTmfTrace extends TmfTrace
             }
         }
         return super.getHostId();
+    }
+
+    /**
+     * Get the first callsite that matches the event name
+     *
+     * @param eventName
+     *            The event name to look for
+     * @return The best callsite candidate
+     * @since 2.1
+     */
+    public @Nullable CtfTmfCallsite getCallsite(String eventName) {
+        Optional<@NonNull CTFCallsite> callsite = StreamSupport.stream(fTrace.getStreams().spliterator(), false)
+                .<@NonNull IEventDeclaration> flatMap(s -> s.getEventDeclarations().stream())
+                .filter(event -> Objects.equals(event.getName(), eventName))
+                .flatMap(ev -> ev.getCallsites().stream())
+                .findFirst();
+        if (callsite.isPresent()) {
+            return new CtfTmfCallsite(callsite.get());
+        }
+        return null;
+    }
+
+    /**
+     * Get the closest matching callsite for given event name and instruction
+     * pointer
+     *
+     * @param eventName
+     *            The event name
+     * @param ip
+     *            The instruction pointer
+     * @return The closest matching callsite
+     * @since 2.1
+     */
+    public @Nullable CtfTmfCallsite getCallsite(String eventName, long ip) {
+        Optional<@NonNull CTFCallsite> callsite = StreamSupport.stream(fTrace.getStreams().spliterator(), false)
+                .<@NonNull IEventDeclaration> flatMap(s -> s.getEventDeclarations().stream())
+                .filter(event -> Objects.equals(event.getName(), eventName))
+                .flatMap(ev -> ev.getCallsites().stream())
+                .filter(cs -> cs.getIp() > ip)
+                .sorted((o1, o2) -> (Long.compareUnsigned(o1.getIp(), o2.getIp())))
+                .findFirst();
+        if (callsite.isPresent()) {
+            return new CtfTmfCallsite(callsite.get());
+        }
+        return null;
     }
 
     /**

@@ -15,7 +15,6 @@ import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoSourceAspect;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
-import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
@@ -27,7 +26,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  * @since 2.0
  */
 @NonNullByDefault
-public class LttngUstEvent extends CtfTmfEvent implements ITmfSourceLookup {
+public class LttngUstEvent extends CtfTmfEvent {
 
     /**
      * Default constructor. Only for use by extension points, should not be

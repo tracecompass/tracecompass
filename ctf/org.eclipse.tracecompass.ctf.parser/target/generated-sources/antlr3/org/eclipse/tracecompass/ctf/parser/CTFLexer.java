@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 org/eclipse/tracecompass/ctf/parser/CTFLexer.g 2015-08-06 19:37:53
+// $ANTLR 3.5.2 org/eclipse/tracecompass/ctf/parser/CTFLexer.g 2015-07-09 14:10:51
 
 /*******************************************************************************
  * Copyright (c) 2010, 2015 Ericsson, Ecole Polytechnique de Montréal and others
@@ -35,78 +35,79 @@ public class CTFLexer extends Lexer {
 	public static final int ASSIGNMENT=6;
 	public static final int BACKSLASH=7;
 	public static final int BOOLTOK=8;
-	public static final int CHARACTER_LITERAL=9;
-	public static final int CHARTOK=10;
-	public static final int CHAR_CONTENT=11;
-	public static final int CLOCKTOK=12;
-	public static final int CLOSEBRAC=13;
-	public static final int COLON=14;
-	public static final int COMMENT=15;
-	public static final int COMMENT_CLOSE=16;
-	public static final int COMMENT_OPEN=17;
-	public static final int COMPLEXTOK=18;
-	public static final int CONSTTOK=19;
-	public static final int DECIMAL_LITERAL=20;
-	public static final int DIGIT=21;
-	public static final int DOT=22;
-	public static final int DOUBLEQUOTE=23;
-	public static final int DOUBLETOK=24;
-	public static final int ELIPSES=25;
-	public static final int ENUMTOK=26;
-	public static final int ENVTOK=27;
-	public static final int ESCAPE_SEQUENCE=28;
-	public static final int EVENTTOK=29;
-	public static final int FLOATINGPOINTTOK=30;
-	public static final int FLOATTOK=31;
-	public static final int GT=32;
-	public static final int HEXADECIMAL_ESCAPE=33;
-	public static final int HEX_DIGIT=34;
-	public static final int HEX_LITERAL=35;
-	public static final int HEX_PREFIX=36;
-	public static final int IDENTIFIER=37;
-	public static final int IMAGINARYTOK=38;
-	public static final int INFINITYTOK=39;
-	public static final int INTEGERTOK=40;
-	public static final int INTEGER_TYPES_SUFFIX=41;
-	public static final int INTTOK=42;
-	public static final int LCURL=43;
-	public static final int LINE_COMMENT=44;
-	public static final int LONGTOK=45;
-	public static final int LPAREN=46;
-	public static final int LT=47;
-	public static final int NANNUMBERTOK=48;
-	public static final int NINFINITYTOK=49;
-	public static final int NONDIGIT=50;
-	public static final int NONZERO_DIGIT=51;
-	public static final int OCTAL_ESCAPE=52;
-	public static final int OCTAL_LITERAL=53;
-	public static final int OCT_DIGIT=54;
-	public static final int OCT_PREFIX=55;
-	public static final int OPENBRAC=56;
-	public static final int POINTER=57;
-	public static final int RCURL=58;
-	public static final int RPAREN=59;
-	public static final int SEPARATOR=60;
-	public static final int SHORTTOK=61;
-	public static final int SIGN=62;
-	public static final int SIGNEDTOK=63;
-	public static final int SINGLEQUOTE=64;
-	public static final int STREAMTOK=65;
-	public static final int STRINGPREFIX=66;
-	public static final int STRINGTOK=67;
-	public static final int STRING_CONTENT=68;
-	public static final int STRING_LITERAL=69;
-	public static final int STRUCTTOK=70;
-	public static final int TERM=71;
-	public static final int TRACETOK=72;
-	public static final int TYPEALIASTOK=73;
-	public static final int TYPEDEFTOK=74;
-	public static final int TYPE_ASSIGNMENT=75;
-	public static final int UNICODE_ESCAPE=76;
-	public static final int UNSIGNEDTOK=77;
-	public static final int VARIANTTOK=78;
-	public static final int VOIDTOK=79;
-	public static final int WS=80;
+	public static final int CALLSITETOK=9;
+	public static final int CHARACTER_LITERAL=10;
+	public static final int CHARTOK=11;
+	public static final int CHAR_CONTENT=12;
+	public static final int CLOCKTOK=13;
+	public static final int CLOSEBRAC=14;
+	public static final int COLON=15;
+	public static final int COMMENT=16;
+	public static final int COMMENT_CLOSE=17;
+	public static final int COMMENT_OPEN=18;
+	public static final int COMPLEXTOK=19;
+	public static final int CONSTTOK=20;
+	public static final int DECIMAL_LITERAL=21;
+	public static final int DIGIT=22;
+	public static final int DOT=23;
+	public static final int DOUBLEQUOTE=24;
+	public static final int DOUBLETOK=25;
+	public static final int ELIPSES=26;
+	public static final int ENUMTOK=27;
+	public static final int ENVTOK=28;
+	public static final int ESCAPE_SEQUENCE=29;
+	public static final int EVENTTOK=30;
+	public static final int FLOATINGPOINTTOK=31;
+	public static final int FLOATTOK=32;
+	public static final int GT=33;
+	public static final int HEXADECIMAL_ESCAPE=34;
+	public static final int HEX_DIGIT=35;
+	public static final int HEX_LITERAL=36;
+	public static final int HEX_PREFIX=37;
+	public static final int IDENTIFIER=38;
+	public static final int IMAGINARYTOK=39;
+	public static final int INFINITYTOK=40;
+	public static final int INTEGERTOK=41;
+	public static final int INTEGER_TYPES_SUFFIX=42;
+	public static final int INTTOK=43;
+	public static final int LCURL=44;
+	public static final int LINE_COMMENT=45;
+	public static final int LONGTOK=46;
+	public static final int LPAREN=47;
+	public static final int LT=48;
+	public static final int NANNUMBERTOK=49;
+	public static final int NINFINITYTOK=50;
+	public static final int NONDIGIT=51;
+	public static final int NONZERO_DIGIT=52;
+	public static final int OCTAL_ESCAPE=53;
+	public static final int OCTAL_LITERAL=54;
+	public static final int OCT_DIGIT=55;
+	public static final int OCT_PREFIX=56;
+	public static final int OPENBRAC=57;
+	public static final int POINTER=58;
+	public static final int RCURL=59;
+	public static final int RPAREN=60;
+	public static final int SEPARATOR=61;
+	public static final int SHORTTOK=62;
+	public static final int SIGN=63;
+	public static final int SIGNEDTOK=64;
+	public static final int SINGLEQUOTE=65;
+	public static final int STREAMTOK=66;
+	public static final int STRINGPREFIX=67;
+	public static final int STRINGTOK=68;
+	public static final int STRING_CONTENT=69;
+	public static final int STRING_LITERAL=70;
+	public static final int STRUCTTOK=71;
+	public static final int TERM=72;
+	public static final int TRACETOK=73;
+	public static final int TYPEALIASTOK=74;
+	public static final int TYPEDEFTOK=75;
+	public static final int TYPE_ASSIGNMENT=76;
+	public static final int UNICODE_ESCAPE=77;
+	public static final int UNSIGNEDTOK=78;
+	public static final int VARIANTTOK=79;
+	public static final int VOIDTOK=80;
+	public static final int WS=81;
 
 	// delegates
 	// delegators
@@ -690,13 +691,34 @@ public class CTFLexer extends Lexer {
 	}
 	// $ANTLR end "CLOCKTOK"
 
+	// $ANTLR start "CALLSITETOK"
+	public final void mCALLSITETOK() throws RecognitionException {
+		try {
+			int _type = CALLSITETOK;
+			int _channel = DEFAULT_TOKEN_CHANNEL;
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:62:18: ( 'callsite' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:62:20: 'callsite'
+			{
+			match("callsite"); 
+
+			}
+
+			state.type = _type;
+			state.channel = _channel;
+		}
+		finally {
+			// do for sure before leaving
+		}
+	}
+	// $ANTLR end "CALLSITETOK"
+
 	// $ANTLR start "NANNUMBERTOK"
 	public final void mNANNUMBERTOK() throws RecognitionException {
 		try {
 			int _type = NANNUMBERTOK;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:65:15: ( 'NaN' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:65:17: 'NaN'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:69:15: ( 'NaN' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:69:17: 'NaN'
 			{
 			match("NaN"); 
 
@@ -716,8 +738,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = INFINITYTOK;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:66:15: ( '+inf' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:66:17: '+inf'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:70:15: ( '+inf' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:70:17: '+inf'
 			{
 			match("+inf"); 
 
@@ -737,8 +759,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = NINFINITYTOK;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:67:15: ( '-inf' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:67:17: '-inf'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:71:15: ( '-inf' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:71:17: '-inf'
 			{
 			match("-inf"); 
 
@@ -758,8 +780,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = SEPARATOR;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:72:20: ( ',' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:72:22: ','
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:76:20: ( ',' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:76:22: ','
 			{
 			match(','); 
 			}
@@ -778,8 +800,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = COLON;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:73:20: ( ':' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:73:22: ':'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:77:20: ( ':' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:77:22: ':'
 			{
 			match(':'); 
 			}
@@ -798,8 +820,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = ELIPSES;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:74:20: ( '...' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:74:22: '...'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:78:20: ( '...' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:78:22: '...'
 			{
 			match("..."); 
 
@@ -819,8 +841,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = ASSIGNMENT;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:75:20: ( '=' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:75:22: '='
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:79:20: ( '=' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:79:22: '='
 			{
 			match('='); 
 			}
@@ -839,8 +861,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = TYPE_ASSIGNMENT;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:76:20: ( ':=' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:76:22: ':='
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:80:20: ( ':=' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:80:22: ':='
 			{
 			match(":="); 
 
@@ -860,8 +882,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = LT;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:77:20: ( '<' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:77:22: '<'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:81:20: ( '<' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:81:22: '<'
 			{
 			match('<'); 
 			}
@@ -880,8 +902,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = GT;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:78:20: ( '>' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:78:22: '>'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:82:20: ( '>' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:82:22: '>'
 			{
 			match('>'); 
 			}
@@ -900,8 +922,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = OPENBRAC;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:79:20: ( '[' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:79:22: '['
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:83:20: ( '[' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:83:22: '['
 			{
 			match('['); 
 			}
@@ -920,8 +942,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = CLOSEBRAC;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:80:20: ( ']' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:80:22: ']'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:84:20: ( ']' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:84:22: ']'
 			{
 			match(']'); 
 			}
@@ -940,8 +962,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = LPAREN;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:81:20: ( '(' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:81:22: '('
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:85:20: ( '(' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:85:22: '('
 			{
 			match('('); 
 			}
@@ -960,8 +982,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = RPAREN;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:82:20: ( ')' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:82:22: ')'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:86:20: ( ')' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:86:22: ')'
 			{
 			match(')'); 
 			}
@@ -980,8 +1002,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = LCURL;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:83:20: ( '{' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:83:22: '{'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:87:20: ( '{' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:87:22: '{'
 			{
 			match('{'); 
 			}
@@ -1000,8 +1022,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = RCURL;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:84:20: ( '}' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:84:22: '}'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:88:20: ( '}' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:88:22: '}'
 			{
 			match('}'); 
 			}
@@ -1020,8 +1042,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = TERM;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:85:20: ( ';' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:85:22: ';'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:89:20: ( ';' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:89:22: ';'
 			{
 			match(';'); 
 			}
@@ -1040,8 +1062,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = POINTER;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:86:20: ( '*' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:86:22: '*'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:90:20: ( '*' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:90:22: '*'
 			{
 			match('*'); 
 			}
@@ -1060,7 +1082,7 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = SIGN;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:87:20: ( '+' | '-' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:91:20: ( '+' | '-' )
 			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:
 			{
 			if ( input.LA(1)=='+'||input.LA(1)=='-' ) {
@@ -1087,8 +1109,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = ARROW;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:88:20: ( '->' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:88:22: '->'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:92:20: ( '->' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:92:22: '->'
 			{
 			match("->"); 
 
@@ -1108,8 +1130,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = DOT;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:89:20: ( '.' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:89:22: '.'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:93:20: ( '.' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:93:22: '.'
 			{
 			match('.'); 
 			}
@@ -1126,8 +1148,8 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "BACKSLASH"
 	public final void mBACKSLASH() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:90:20: ( '\\\\' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:90:22: '\\\\'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:94:20: ( '\\\\' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:94:22: '\\\\'
 			{
 			match('\\'); 
 			}
@@ -1142,7 +1164,7 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "DIGIT"
 	public final void mDIGIT() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:93:16: ( '0' .. '9' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:97:16: ( '0' .. '9' )
 			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:
 			{
 			if ( (input.LA(1) >= '0' && input.LA(1) <= '9') ) {
@@ -1165,7 +1187,7 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "OCT_DIGIT"
 	public final void mOCT_DIGIT() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:94:20: ( '0' .. '7' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:98:20: ( '0' .. '7' )
 			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:
 			{
 			if ( (input.LA(1) >= '0' && input.LA(1) <= '7') ) {
@@ -1188,8 +1210,8 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "OCT_PREFIX"
 	public final void mOCT_PREFIX() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:95:21: ( '0' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:95:23: '0'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:99:21: ( '0' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:99:23: '0'
 			{
 			match('0'); 
 			}
@@ -1204,7 +1226,7 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "NONZERO_DIGIT"
 	public final void mNONZERO_DIGIT() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:96:24: ( '1' .. '9' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:100:24: ( '1' .. '9' )
 			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:
 			{
 			if ( (input.LA(1) >= '1' && input.LA(1) <= '9') ) {
@@ -1227,7 +1249,7 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "HEX_DIGIT"
 	public final void mHEX_DIGIT() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:97:20: ( DIGIT | ( 'a' .. 'f' ) | ( 'A' .. 'F' ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:101:20: ( DIGIT | ( 'a' .. 'f' ) | ( 'A' .. 'F' ) )
 			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:
 			{
 			if ( (input.LA(1) >= '0' && input.LA(1) <= '9')||(input.LA(1) >= 'A' && input.LA(1) <= 'F')||(input.LA(1) >= 'a' && input.LA(1) <= 'f') ) {
@@ -1250,8 +1272,8 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "HEX_PREFIX"
 	public final void mHEX_PREFIX() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:98:21: ( '0' ( 'x' | 'X' ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:98:23: '0' ( 'x' | 'X' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:102:21: ( '0' ( 'x' | 'X' ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:102:23: '0' ( 'x' | 'X' )
 			{
 			match('0'); 
 			if ( input.LA(1)=='X'||input.LA(1)=='x' ) {
@@ -1276,12 +1298,12 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = OCTAL_LITERAL;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:103:15: ( OCT_PREFIX ( OCT_DIGIT )+ ( INTEGER_TYPES_SUFFIX )? )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:103:17: OCT_PREFIX ( OCT_DIGIT )+ ( INTEGER_TYPES_SUFFIX )?
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:107:15: ( OCT_PREFIX ( OCT_DIGIT )+ ( INTEGER_TYPES_SUFFIX )? )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:107:17: OCT_PREFIX ( OCT_DIGIT )+ ( INTEGER_TYPES_SUFFIX )?
 			{
 			mOCT_PREFIX(); 
 
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:103:28: ( OCT_DIGIT )+
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:107:28: ( OCT_DIGIT )+
 			int cnt1=0;
 			loop1:
 			while (true) {
@@ -1314,7 +1336,7 @@ public class CTFLexer extends Lexer {
 				cnt1++;
 			}
 
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:103:41: ( INTEGER_TYPES_SUFFIX )?
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:107:41: ( INTEGER_TYPES_SUFFIX )?
 			int alt2=2;
 			int LA2_0 = input.LA(1);
 			if ( (LA2_0=='L'||LA2_0=='U'||LA2_0=='l'||LA2_0=='u') ) {
@@ -1322,7 +1344,7 @@ public class CTFLexer extends Lexer {
 			}
 			switch (alt2) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:103:41: INTEGER_TYPES_SUFFIX
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:107:41: INTEGER_TYPES_SUFFIX
 					{
 					mINTEGER_TYPES_SUFFIX(); 
 
@@ -1347,10 +1369,10 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = DECIMAL_LITERAL;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:104:17: ( ( DIGIT )+ ( INTEGER_TYPES_SUFFIX )? )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:104:19: ( DIGIT )+ ( INTEGER_TYPES_SUFFIX )?
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:108:17: ( ( DIGIT )+ ( INTEGER_TYPES_SUFFIX )? )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:108:19: ( DIGIT )+ ( INTEGER_TYPES_SUFFIX )?
 			{
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:104:19: ( DIGIT )+
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:108:19: ( DIGIT )+
 			int cnt3=0;
 			loop3:
 			while (true) {
@@ -1383,7 +1405,7 @@ public class CTFLexer extends Lexer {
 				cnt3++;
 			}
 
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:104:26: ( INTEGER_TYPES_SUFFIX )?
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:108:26: ( INTEGER_TYPES_SUFFIX )?
 			int alt4=2;
 			int LA4_0 = input.LA(1);
 			if ( (LA4_0=='L'||LA4_0=='U'||LA4_0=='l'||LA4_0=='u') ) {
@@ -1391,7 +1413,7 @@ public class CTFLexer extends Lexer {
 			}
 			switch (alt4) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:104:26: INTEGER_TYPES_SUFFIX
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:108:26: INTEGER_TYPES_SUFFIX
 					{
 					mINTEGER_TYPES_SUFFIX(); 
 
@@ -1416,12 +1438,12 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = HEX_LITERAL;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:105:13: ( HEX_PREFIX ( HEX_DIGIT )+ ( INTEGER_TYPES_SUFFIX )? )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:105:15: HEX_PREFIX ( HEX_DIGIT )+ ( INTEGER_TYPES_SUFFIX )?
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:109:13: ( HEX_PREFIX ( HEX_DIGIT )+ ( INTEGER_TYPES_SUFFIX )? )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:109:15: HEX_PREFIX ( HEX_DIGIT )+ ( INTEGER_TYPES_SUFFIX )?
 			{
 			mHEX_PREFIX(); 
 
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:105:26: ( HEX_DIGIT )+
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:109:26: ( HEX_DIGIT )+
 			int cnt5=0;
 			loop5:
 			while (true) {
@@ -1454,7 +1476,7 @@ public class CTFLexer extends Lexer {
 				cnt5++;
 			}
 
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:105:37: ( INTEGER_TYPES_SUFFIX )?
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:109:37: ( INTEGER_TYPES_SUFFIX )?
 			int alt6=2;
 			int LA6_0 = input.LA(1);
 			if ( (LA6_0=='L'||LA6_0=='U'||LA6_0=='l'||LA6_0=='u') ) {
@@ -1462,7 +1484,7 @@ public class CTFLexer extends Lexer {
 			}
 			switch (alt6) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:105:37: INTEGER_TYPES_SUFFIX
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:109:37: INTEGER_TYPES_SUFFIX
 					{
 					mINTEGER_TYPES_SUFFIX(); 
 
@@ -1485,7 +1507,7 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "INTEGER_TYPES_SUFFIX"
 	public final void mINTEGER_TYPES_SUFFIX() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:113:3: ( ( 'l' ( 'l' )? | 'L' ( 'L' )? ) | ( 'u' | 'U' ) | ( 'u' | 'U' ) ( 'l' ( 'l' )? | 'L' ( 'L' )? ) | ( 'l' ( 'l' )? | 'L' ( 'L' )? ) ( 'u' | 'U' ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:117:3: ( ( 'l' ( 'l' )? | 'L' ( 'L' )? ) | ( 'u' | 'U' ) | ( 'u' | 'U' ) ( 'l' ( 'l' )? | 'L' ( 'L' )? ) | ( 'l' ( 'l' )? | 'L' ( 'L' )? ) ( 'u' | 'U' ) )
 			int alt16=4;
 			switch ( input.LA(1) ) {
 			case 'l':
@@ -1563,9 +1585,9 @@ public class CTFLexer extends Lexer {
 			}
 			switch (alt16) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:113:5: ( 'l' ( 'l' )? | 'L' ( 'L' )? )
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:117:5: ( 'l' ( 'l' )? | 'L' ( 'L' )? )
 					{
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:113:5: ( 'l' ( 'l' )? | 'L' ( 'L' )? )
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:117:5: ( 'l' ( 'l' )? | 'L' ( 'L' )? )
 					int alt9=2;
 					int LA9_0 = input.LA(1);
 					if ( (LA9_0=='l') ) {
@@ -1583,10 +1605,10 @@ public class CTFLexer extends Lexer {
 
 					switch (alt9) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:113:6: 'l' ( 'l' )?
+							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:117:6: 'l' ( 'l' )?
 							{
 							match('l'); 
-							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:113:10: ( 'l' )?
+							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:117:10: ( 'l' )?
 							int alt7=2;
 							int LA7_0 = input.LA(1);
 							if ( (LA7_0=='l') ) {
@@ -1594,7 +1616,7 @@ public class CTFLexer extends Lexer {
 							}
 							switch (alt7) {
 								case 1 :
-									// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:113:11: 'l'
+									// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:117:11: 'l'
 									{
 									match('l'); 
 									}
@@ -1605,10 +1627,10 @@ public class CTFLexer extends Lexer {
 							}
 							break;
 						case 2 :
-							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:113:19: 'L' ( 'L' )?
+							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:117:19: 'L' ( 'L' )?
 							{
 							match('L'); 
-							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:113:23: ( 'L' )?
+							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:117:23: ( 'L' )?
 							int alt8=2;
 							int LA8_0 = input.LA(1);
 							if ( (LA8_0=='L') ) {
@@ -1616,7 +1638,7 @@ public class CTFLexer extends Lexer {
 							}
 							switch (alt8) {
 								case 1 :
-									// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:113:24: 'L'
+									// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:117:24: 'L'
 									{
 									match('L'); 
 									}
@@ -1632,7 +1654,7 @@ public class CTFLexer extends Lexer {
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:114:5: ( 'u' | 'U' )
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:118:5: ( 'u' | 'U' )
 					{
 					if ( input.LA(1)=='U'||input.LA(1)=='u' ) {
 						input.consume();
@@ -1645,7 +1667,7 @@ public class CTFLexer extends Lexer {
 					}
 					break;
 				case 3 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:115:5: ( 'u' | 'U' ) ( 'l' ( 'l' )? | 'L' ( 'L' )? )
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:119:5: ( 'u' | 'U' ) ( 'l' ( 'l' )? | 'L' ( 'L' )? )
 					{
 					if ( input.LA(1)=='U'||input.LA(1)=='u' ) {
 						input.consume();
@@ -1655,7 +1677,7 @@ public class CTFLexer extends Lexer {
 						recover(mse);
 						throw mse;
 					}
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:115:17: ( 'l' ( 'l' )? | 'L' ( 'L' )? )
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:119:17: ( 'l' ( 'l' )? | 'L' ( 'L' )? )
 					int alt12=2;
 					int LA12_0 = input.LA(1);
 					if ( (LA12_0=='l') ) {
@@ -1673,10 +1695,10 @@ public class CTFLexer extends Lexer {
 
 					switch (alt12) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:115:18: 'l' ( 'l' )?
+							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:119:18: 'l' ( 'l' )?
 							{
 							match('l'); 
-							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:115:22: ( 'l' )?
+							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:119:22: ( 'l' )?
 							int alt10=2;
 							int LA10_0 = input.LA(1);
 							if ( (LA10_0=='l') ) {
@@ -1684,7 +1706,7 @@ public class CTFLexer extends Lexer {
 							}
 							switch (alt10) {
 								case 1 :
-									// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:115:23: 'l'
+									// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:119:23: 'l'
 									{
 									match('l'); 
 									}
@@ -1695,10 +1717,10 @@ public class CTFLexer extends Lexer {
 							}
 							break;
 						case 2 :
-							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:115:31: 'L' ( 'L' )?
+							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:119:31: 'L' ( 'L' )?
 							{
 							match('L'); 
-							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:115:35: ( 'L' )?
+							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:119:35: ( 'L' )?
 							int alt11=2;
 							int LA11_0 = input.LA(1);
 							if ( (LA11_0=='L') ) {
@@ -1706,7 +1728,7 @@ public class CTFLexer extends Lexer {
 							}
 							switch (alt11) {
 								case 1 :
-									// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:115:36: 'L'
+									// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:119:36: 'L'
 									{
 									match('L'); 
 									}
@@ -1722,9 +1744,9 @@ public class CTFLexer extends Lexer {
 					}
 					break;
 				case 4 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:116:5: ( 'l' ( 'l' )? | 'L' ( 'L' )? ) ( 'u' | 'U' )
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:120:5: ( 'l' ( 'l' )? | 'L' ( 'L' )? ) ( 'u' | 'U' )
 					{
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:116:5: ( 'l' ( 'l' )? | 'L' ( 'L' )? )
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:120:5: ( 'l' ( 'l' )? | 'L' ( 'L' )? )
 					int alt15=2;
 					int LA15_0 = input.LA(1);
 					if ( (LA15_0=='l') ) {
@@ -1742,10 +1764,10 @@ public class CTFLexer extends Lexer {
 
 					switch (alt15) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:116:6: 'l' ( 'l' )?
+							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:120:6: 'l' ( 'l' )?
 							{
 							match('l'); 
-							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:116:10: ( 'l' )?
+							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:120:10: ( 'l' )?
 							int alt13=2;
 							int LA13_0 = input.LA(1);
 							if ( (LA13_0=='l') ) {
@@ -1753,7 +1775,7 @@ public class CTFLexer extends Lexer {
 							}
 							switch (alt13) {
 								case 1 :
-									// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:116:11: 'l'
+									// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:120:11: 'l'
 									{
 									match('l'); 
 									}
@@ -1764,10 +1786,10 @@ public class CTFLexer extends Lexer {
 							}
 							break;
 						case 2 :
-							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:116:19: 'L' ( 'L' )?
+							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:120:19: 'L' ( 'L' )?
 							{
 							match('L'); 
-							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:116:23: ( 'L' )?
+							// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:120:23: ( 'L' )?
 							int alt14=2;
 							int LA14_0 = input.LA(1);
 							if ( (LA14_0=='L') ) {
@@ -1775,7 +1797,7 @@ public class CTFLexer extends Lexer {
 							}
 							switch (alt14) {
 								case 1 :
-									// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:116:24: 'L'
+									// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:120:24: 'L'
 									{
 									match('L'); 
 									}
@@ -1810,7 +1832,7 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "ESCAPE_SEQUENCE"
 	public final void mESCAPE_SEQUENCE() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:123:3: ( BACKSLASH ( '\\'' | '\"' | '?' | BACKSLASH | 'a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' ) | OCTAL_ESCAPE | UNICODE_ESCAPE | HEXADECIMAL_ESCAPE )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:127:3: ( BACKSLASH ( '\\'' | '\"' | '?' | BACKSLASH | 'a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' ) | OCTAL_ESCAPE | UNICODE_ESCAPE | HEXADECIMAL_ESCAPE )
 			int alt17=4;
 			int LA17_0 = input.LA(1);
 			if ( (LA17_0=='\\') ) {
@@ -1874,7 +1896,7 @@ public class CTFLexer extends Lexer {
 
 			switch (alt17) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:123:5: BACKSLASH ( '\\'' | '\"' | '?' | BACKSLASH | 'a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' )
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:127:5: BACKSLASH ( '\\'' | '\"' | '?' | BACKSLASH | 'a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' )
 					{
 					mBACKSLASH(); 
 
@@ -1889,21 +1911,21 @@ public class CTFLexer extends Lexer {
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:124:5: OCTAL_ESCAPE
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:128:5: OCTAL_ESCAPE
 					{
 					mOCTAL_ESCAPE(); 
 
 					}
 					break;
 				case 3 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:125:5: UNICODE_ESCAPE
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:129:5: UNICODE_ESCAPE
 					{
 					mUNICODE_ESCAPE(); 
 
 					}
 					break;
 				case 4 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:126:5: HEXADECIMAL_ESCAPE
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:130:5: HEXADECIMAL_ESCAPE
 					{
 					mHEXADECIMAL_ESCAPE(); 
 
@@ -1921,7 +1943,7 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "OCTAL_ESCAPE"
 	public final void mOCTAL_ESCAPE() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:133:3: ( BACKSLASH ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | BACKSLASH ( '0' .. '7' ) ( '0' .. '7' ) | BACKSLASH ( '0' .. '7' ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:137:3: ( BACKSLASH ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | BACKSLASH ( '0' .. '7' ) ( '0' .. '7' ) | BACKSLASH ( '0' .. '7' ) )
 			int alt18=3;
 			int LA18_0 = input.LA(1);
 			if ( (LA18_0=='\\') ) {
@@ -1979,7 +2001,7 @@ public class CTFLexer extends Lexer {
 
 			switch (alt18) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:133:5: BACKSLASH ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:137:5: BACKSLASH ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
 					{
 					mBACKSLASH(); 
 
@@ -2010,7 +2032,7 @@ public class CTFLexer extends Lexer {
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:134:5: BACKSLASH ( '0' .. '7' ) ( '0' .. '7' )
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:138:5: BACKSLASH ( '0' .. '7' ) ( '0' .. '7' )
 					{
 					mBACKSLASH(); 
 
@@ -2033,7 +2055,7 @@ public class CTFLexer extends Lexer {
 					}
 					break;
 				case 3 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:135:5: BACKSLASH ( '0' .. '7' )
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:139:5: BACKSLASH ( '0' .. '7' )
 					{
 					mBACKSLASH(); 
 
@@ -2059,13 +2081,13 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "HEXADECIMAL_ESCAPE"
 	public final void mHEXADECIMAL_ESCAPE() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:141:29: ( BACKSLASH 'x' ( HEX_DIGIT )+ )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:141:31: BACKSLASH 'x' ( HEX_DIGIT )+
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:145:29: ( BACKSLASH 'x' ( HEX_DIGIT )+ )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:145:31: BACKSLASH 'x' ( HEX_DIGIT )+
 			{
 			mBACKSLASH(); 
 
 			match('x'); 
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:141:45: ( HEX_DIGIT )+
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:145:45: ( HEX_DIGIT )+
 			int cnt19=0;
 			loop19:
 			while (true) {
@@ -2110,7 +2132,7 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "UNICODE_ESCAPE"
 	public final void mUNICODE_ESCAPE() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:147:3: ( BACKSLASH 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT | BACKSLASH 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:151:3: ( BACKSLASH 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT | BACKSLASH 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT )
 			int alt20=2;
 			int LA20_0 = input.LA(1);
 			if ( (LA20_0=='\\') ) {
@@ -2144,7 +2166,7 @@ public class CTFLexer extends Lexer {
 
 			switch (alt20) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:147:5: BACKSLASH 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:151:5: BACKSLASH 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
 					{
 					mBACKSLASH(); 
 
@@ -2160,7 +2182,7 @@ public class CTFLexer extends Lexer {
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:148:5: BACKSLASH 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:152:5: BACKSLASH 'U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
 					{
 					mBACKSLASH(); 
 
@@ -2195,8 +2217,8 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "STRINGPREFIX"
 	public final void mSTRINGPREFIX() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:153:23: ( 'L' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:153:25: 'L'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:157:23: ( 'L' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:157:25: 'L'
 			{
 			match('L'); 
 			}
@@ -2213,10 +2235,10 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = CHARACTER_LITERAL;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:158:19: ( ( STRINGPREFIX )? SINGLEQUOTE ( CHAR_CONTENT )+ SINGLEQUOTE )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:158:21: ( STRINGPREFIX )? SINGLEQUOTE ( CHAR_CONTENT )+ SINGLEQUOTE
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:162:19: ( ( STRINGPREFIX )? SINGLEQUOTE ( CHAR_CONTENT )+ SINGLEQUOTE )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:162:21: ( STRINGPREFIX )? SINGLEQUOTE ( CHAR_CONTENT )+ SINGLEQUOTE
 			{
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:158:21: ( STRINGPREFIX )?
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:162:21: ( STRINGPREFIX )?
 			int alt21=2;
 			int LA21_0 = input.LA(1);
 			if ( (LA21_0=='L') ) {
@@ -2241,7 +2263,7 @@ public class CTFLexer extends Lexer {
 
 			mSINGLEQUOTE(); 
 
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:158:47: ( CHAR_CONTENT )+
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:162:47: ( CHAR_CONTENT )+
 			int cnt22=0;
 			loop22:
 			while (true) {
@@ -2253,7 +2275,7 @@ public class CTFLexer extends Lexer {
 
 				switch (alt22) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:158:47: CHAR_CONTENT
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:162:47: CHAR_CONTENT
 					{
 					mCHAR_CONTENT(); 
 
@@ -2284,10 +2306,10 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "CHAR_CONTENT"
 	public final void mCHAR_CONTENT() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:159:23: ( ( ESCAPE_SEQUENCE |~ ( BACKSLASH | SINGLEQUOTE ) ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:159:25: ( ESCAPE_SEQUENCE |~ ( BACKSLASH | SINGLEQUOTE ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:163:23: ( ( ESCAPE_SEQUENCE |~ ( BACKSLASH | SINGLEQUOTE ) ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:163:25: ( ESCAPE_SEQUENCE |~ ( BACKSLASH | SINGLEQUOTE ) )
 			{
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:159:25: ( ESCAPE_SEQUENCE |~ ( BACKSLASH | SINGLEQUOTE ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:163:25: ( ESCAPE_SEQUENCE |~ ( BACKSLASH | SINGLEQUOTE ) )
 			int alt23=2;
 			int LA23_0 = input.LA(1);
 			if ( (LA23_0=='\\') ) {
@@ -2305,14 +2327,14 @@ public class CTFLexer extends Lexer {
 
 			switch (alt23) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:159:26: ESCAPE_SEQUENCE
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:163:26: ESCAPE_SEQUENCE
 					{
 					mESCAPE_SEQUENCE(); 
 
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:159:44: ~ ( BACKSLASH | SINGLEQUOTE )
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:163:44: ~ ( BACKSLASH | SINGLEQUOTE )
 					{
 					if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&')||(input.LA(1) >= '(' && input.LA(1) <= '[')||(input.LA(1) >= ']' && input.LA(1) <= '\uFFFF') ) {
 						input.consume();
@@ -2339,8 +2361,8 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "SINGLEQUOTE"
 	public final void mSINGLEQUOTE() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:160:22: ( '\\'' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:160:24: '\\''
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:164:22: ( '\\'' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:164:24: '\\''
 			{
 			match('\''); 
 			}
@@ -2357,10 +2379,10 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = STRING_LITERAL;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:165:16: ( ( STRINGPREFIX )? DOUBLEQUOTE ( STRING_CONTENT )* DOUBLEQUOTE )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:165:18: ( STRINGPREFIX )? DOUBLEQUOTE ( STRING_CONTENT )* DOUBLEQUOTE
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:169:16: ( ( STRINGPREFIX )? DOUBLEQUOTE ( STRING_CONTENT )* DOUBLEQUOTE )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:169:18: ( STRINGPREFIX )? DOUBLEQUOTE ( STRING_CONTENT )* DOUBLEQUOTE
 			{
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:165:18: ( STRINGPREFIX )?
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:169:18: ( STRINGPREFIX )?
 			int alt24=2;
 			int LA24_0 = input.LA(1);
 			if ( (LA24_0=='L') ) {
@@ -2385,7 +2407,7 @@ public class CTFLexer extends Lexer {
 
 			mDOUBLEQUOTE(); 
 
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:165:44: ( STRING_CONTENT )*
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:169:44: ( STRING_CONTENT )*
 			loop25:
 			while (true) {
 				int alt25=2;
@@ -2396,7 +2418,7 @@ public class CTFLexer extends Lexer {
 
 				switch (alt25) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:165:44: STRING_CONTENT
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:169:44: STRING_CONTENT
 					{
 					mSTRING_CONTENT(); 
 
@@ -2424,10 +2446,10 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "STRING_CONTENT"
 	public final void mSTRING_CONTENT() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:166:25: ( ( ESCAPE_SEQUENCE |~ ( BACKSLASH | DOUBLEQUOTE ) ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:166:27: ( ESCAPE_SEQUENCE |~ ( BACKSLASH | DOUBLEQUOTE ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:170:25: ( ( ESCAPE_SEQUENCE |~ ( BACKSLASH | DOUBLEQUOTE ) ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:170:27: ( ESCAPE_SEQUENCE |~ ( BACKSLASH | DOUBLEQUOTE ) )
 			{
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:166:27: ( ESCAPE_SEQUENCE |~ ( BACKSLASH | DOUBLEQUOTE ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:170:27: ( ESCAPE_SEQUENCE |~ ( BACKSLASH | DOUBLEQUOTE ) )
 			int alt26=2;
 			int LA26_0 = input.LA(1);
 			if ( (LA26_0=='\\') ) {
@@ -2445,14 +2467,14 @@ public class CTFLexer extends Lexer {
 
 			switch (alt26) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:166:28: ESCAPE_SEQUENCE
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:170:28: ESCAPE_SEQUENCE
 					{
 					mESCAPE_SEQUENCE(); 
 
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:166:46: ~ ( BACKSLASH | DOUBLEQUOTE )
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:170:46: ~ ( BACKSLASH | DOUBLEQUOTE )
 					{
 					if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '!')||(input.LA(1) >= '#' && input.LA(1) <= '[')||(input.LA(1) >= ']' && input.LA(1) <= '\uFFFF') ) {
 						input.consume();
@@ -2479,8 +2501,8 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "DOUBLEQUOTE"
 	public final void mDOUBLEQUOTE() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:167:22: ( '\"' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:167:24: '\"'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:171:22: ( '\"' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:171:24: '\"'
 			{
 			match('\"'); 
 			}
@@ -2497,8 +2519,8 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = WS;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:172:4: ( ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:172:6: ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:176:4: ( ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:176:6: ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )
 			{
 			if ( (input.LA(1) >= '\t' && input.LA(1) <= '\n')||(input.LA(1) >= '\f' && input.LA(1) <= '\r')||input.LA(1)==' ' ) {
 				input.consume();
@@ -2525,12 +2547,12 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = COMMENT;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:179:9: ( COMMENT_OPEN ( . )* COMMENT_CLOSE )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:179:11: COMMENT_OPEN ( . )* COMMENT_CLOSE
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:183:9: ( COMMENT_OPEN ( . )* COMMENT_CLOSE )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:183:11: COMMENT_OPEN ( . )* COMMENT_CLOSE
 			{
 			mCOMMENT_OPEN(); 
 
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:179:24: ( . )*
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:183:24: ( . )*
 			loop27:
 			while (true) {
 				int alt27=2;
@@ -2551,7 +2573,7 @@ public class CTFLexer extends Lexer {
 
 				switch (alt27) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:179:24: .
+					// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:183:24: .
 					{
 					matchAny(); 
 					}
@@ -2579,8 +2601,8 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "COMMENT_OPEN"
 	public final void mCOMMENT_OPEN() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:180:23: ( '/*' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:180:25: '/*'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:184:23: ( '/*' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:184:25: '/*'
 			{
 			match("/*"); 
 
@@ -2596,8 +2618,8 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "COMMENT_CLOSE"
 	public final void mCOMMENT_CLOSE() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:181:24: ( '*/' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:181:26: '*/'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:185:24: ( '*/' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:185:26: '*/'
 			{
 			match("*/"); 
 
@@ -2615,12 +2637,12 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = LINE_COMMENT;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:186:14: ( '//' (~ ( '\\n' ) )* '\\n' )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:186:16: '//' (~ ( '\\n' ) )* '\\n'
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:190:14: ( '//' (~ ( '\\n' ) )* '\\n' )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:190:16: '//' (~ ( '\\n' ) )* '\\n'
 			{
 			match("//"); 
 
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:186:21: (~ ( '\\n' ) )*
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:190:21: (~ ( '\\n' ) )*
 			loop28:
 			while (true) {
 				int alt28=2;
@@ -2667,12 +2689,12 @@ public class CTFLexer extends Lexer {
 		try {
 			int _type = IDENTIFIER;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:191:12: ( NONDIGIT ( NONDIGIT | DIGIT )* )
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:191:14: NONDIGIT ( NONDIGIT | DIGIT )*
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:195:12: ( NONDIGIT ( NONDIGIT | DIGIT )* )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:195:14: NONDIGIT ( NONDIGIT | DIGIT )*
 			{
 			mNONDIGIT(); 
 
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:191:23: ( NONDIGIT | DIGIT )*
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:195:23: ( NONDIGIT | DIGIT )*
 			loop29:
 			while (true) {
 				int alt29=2;
@@ -2715,7 +2737,7 @@ public class CTFLexer extends Lexer {
 	// $ANTLR start "NONDIGIT"
 	public final void mNONDIGIT() throws RecognitionException {
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:192:19: ( ( '_' ) | ( 'A' .. 'Z' ) | ( 'a' .. 'z' ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:196:19: ( ( '_' ) | ( 'A' .. 'Z' ) | ( 'a' .. 'z' ) )
 			// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:
 			{
 			if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z')||input.LA(1)=='_'||(input.LA(1) >= 'a' && input.LA(1) <= 'z') ) {
@@ -2737,8 +2759,8 @@ public class CTFLexer extends Lexer {
 
 	@Override
 	public void mTokens() throws RecognitionException {
-		// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:8: ( ALIGNTOK | CONSTTOK | CHARTOK | DOUBLETOK | ENUMTOK | EVENTTOK | FLOATINGPOINTTOK | FLOATTOK | INTEGERTOK | INTTOK | LONGTOK | SHORTTOK | SIGNEDTOK | STREAMTOK | STRINGTOK | STRUCTTOK | TRACETOK | TYPEALIASTOK | TYPEDEFTOK | UNSIGNEDTOK | VARIANTTOK | VOIDTOK | BOOLTOK | COMPLEXTOK | IMAGINARYTOK | ENVTOK | CLOCKTOK | NANNUMBERTOK | INFINITYTOK | NINFINITYTOK | SEPARATOR | COLON | ELIPSES | ASSIGNMENT | TYPE_ASSIGNMENT | LT | GT | OPENBRAC | CLOSEBRAC | LPAREN | RPAREN | LCURL | RCURL | TERM | POINTER | SIGN | ARROW | DOT | OCTAL_LITERAL | DECIMAL_LITERAL | HEX_LITERAL | CHARACTER_LITERAL | STRING_LITERAL | WS | COMMENT | LINE_COMMENT | IDENTIFIER )
-		int alt30=57;
+		// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:8: ( ALIGNTOK | CONSTTOK | CHARTOK | DOUBLETOK | ENUMTOK | EVENTTOK | FLOATINGPOINTTOK | FLOATTOK | INTEGERTOK | INTTOK | LONGTOK | SHORTTOK | SIGNEDTOK | STREAMTOK | STRINGTOK | STRUCTTOK | TRACETOK | TYPEALIASTOK | TYPEDEFTOK | UNSIGNEDTOK | VARIANTTOK | VOIDTOK | BOOLTOK | COMPLEXTOK | IMAGINARYTOK | ENVTOK | CLOCKTOK | CALLSITETOK | NANNUMBERTOK | INFINITYTOK | NINFINITYTOK | SEPARATOR | COLON | ELIPSES | ASSIGNMENT | TYPE_ASSIGNMENT | LT | GT | OPENBRAC | CLOSEBRAC | LPAREN | RPAREN | LCURL | RCURL | TERM | POINTER | SIGN | ARROW | DOT | OCTAL_LITERAL | DECIMAL_LITERAL | HEX_LITERAL | CHARACTER_LITERAL | STRING_LITERAL | WS | COMMENT | LINE_COMMENT | IDENTIFIER )
+		int alt30=58;
 		alt30 = dfa30.predict(input);
 		switch (alt30) {
 			case 1 :
@@ -2931,210 +2953,217 @@ public class CTFLexer extends Lexer {
 				}
 				break;
 			case 28 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:276: NANNUMBERTOK
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:276: CALLSITETOK
+				{
+				mCALLSITETOK(); 
+
+				}
+				break;
+			case 29 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:288: NANNUMBERTOK
 				{
 				mNANNUMBERTOK(); 
 
 				}
 				break;
-			case 29 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:289: INFINITYTOK
+			case 30 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:301: INFINITYTOK
 				{
 				mINFINITYTOK(); 
 
 				}
 				break;
-			case 30 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:301: NINFINITYTOK
+			case 31 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:313: NINFINITYTOK
 				{
 				mNINFINITYTOK(); 
 
 				}
 				break;
-			case 31 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:314: SEPARATOR
+			case 32 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:326: SEPARATOR
 				{
 				mSEPARATOR(); 
 
 				}
 				break;
-			case 32 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:324: COLON
+			case 33 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:336: COLON
 				{
 				mCOLON(); 
 
 				}
 				break;
-			case 33 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:330: ELIPSES
+			case 34 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:342: ELIPSES
 				{
 				mELIPSES(); 
 
 				}
 				break;
-			case 34 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:338: ASSIGNMENT
+			case 35 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:350: ASSIGNMENT
 				{
 				mASSIGNMENT(); 
 
 				}
 				break;
-			case 35 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:349: TYPE_ASSIGNMENT
+			case 36 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:361: TYPE_ASSIGNMENT
 				{
 				mTYPE_ASSIGNMENT(); 
 
 				}
 				break;
-			case 36 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:365: LT
+			case 37 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:377: LT
 				{
 				mLT(); 
 
 				}
 				break;
-			case 37 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:368: GT
+			case 38 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:380: GT
 				{
 				mGT(); 
 
 				}
 				break;
-			case 38 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:371: OPENBRAC
+			case 39 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:383: OPENBRAC
 				{
 				mOPENBRAC(); 
 
 				}
 				break;
-			case 39 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:380: CLOSEBRAC
+			case 40 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:392: CLOSEBRAC
 				{
 				mCLOSEBRAC(); 
 
 				}
 				break;
-			case 40 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:390: LPAREN
+			case 41 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:402: LPAREN
 				{
 				mLPAREN(); 
 
 				}
 				break;
-			case 41 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:397: RPAREN
+			case 42 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:409: RPAREN
 				{
 				mRPAREN(); 
 
 				}
 				break;
-			case 42 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:404: LCURL
+			case 43 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:416: LCURL
 				{
 				mLCURL(); 
 
 				}
 				break;
-			case 43 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:410: RCURL
+			case 44 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:422: RCURL
 				{
 				mRCURL(); 
 
 				}
 				break;
-			case 44 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:416: TERM
+			case 45 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:428: TERM
 				{
 				mTERM(); 
 
 				}
 				break;
-			case 45 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:421: POINTER
+			case 46 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:433: POINTER
 				{
 				mPOINTER(); 
 
 				}
 				break;
-			case 46 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:429: SIGN
+			case 47 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:441: SIGN
 				{
 				mSIGN(); 
 
 				}
 				break;
-			case 47 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:434: ARROW
+			case 48 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:446: ARROW
 				{
 				mARROW(); 
 
 				}
 				break;
-			case 48 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:440: DOT
+			case 49 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:452: DOT
 				{
 				mDOT(); 
 
 				}
 				break;
-			case 49 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:444: OCTAL_LITERAL
+			case 50 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:456: OCTAL_LITERAL
 				{
 				mOCTAL_LITERAL(); 
 
 				}
 				break;
-			case 50 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:458: DECIMAL_LITERAL
+			case 51 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:470: DECIMAL_LITERAL
 				{
 				mDECIMAL_LITERAL(); 
 
 				}
 				break;
-			case 51 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:474: HEX_LITERAL
+			case 52 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:486: HEX_LITERAL
 				{
 				mHEX_LITERAL(); 
 
 				}
 				break;
-			case 52 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:486: CHARACTER_LITERAL
+			case 53 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:498: CHARACTER_LITERAL
 				{
 				mCHARACTER_LITERAL(); 
 
 				}
 				break;
-			case 53 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:504: STRING_LITERAL
+			case 54 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:516: STRING_LITERAL
 				{
 				mSTRING_LITERAL(); 
 
 				}
 				break;
-			case 54 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:519: WS
+			case 55 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:531: WS
 				{
 				mWS(); 
 
 				}
 				break;
-			case 55 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:522: COMMENT
+			case 56 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:534: COMMENT
 				{
 				mCOMMENT(); 
 
 				}
 				break;
-			case 56 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:530: LINE_COMMENT
+			case 57 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:542: LINE_COMMENT
 				{
 				mLINE_COMMENT(); 
 
 				}
 				break;
-			case 57 :
-				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:543: IDENTIFIER
+			case 58 :
+				// org/eclipse/tracecompass/ctf/parser/CTFLexer.g:1:555: IDENTIFIER
 				{
 				mIDENTIFIER(); 
 
@@ -3147,63 +3176,63 @@ public class CTFLexer extends Lexer {
 
 	protected DFA30 dfa30 = new DFA30(this);
 	static final String DFA30_eotS =
-		"\1\uffff\15\45\2\75\1\uffff\1\101\1\103\13\uffff\1\37\1\uffff\1\45\5\uffff"+
-		"\26\45\11\uffff\1\142\2\uffff\6\45\1\151\2\45\1\155\14\45\1\174\3\142"+
-		"\1\uffff\2\45\1\u0084\2\45\1\u0087\1\uffff\3\45\1\uffff\1\u008b\11\45"+
-		"\1\u0096\3\45\1\uffff\1\142\1\uffff\3\142\1\u009c\1\u009d\1\uffff\1\u009e"+
-		"\1\45\1\uffff\1\u00a0\1\u00a2\1\45\1\uffff\1\u00a4\4\45\1\u00a9\4\45\1"+
-		"\uffff\1\u00ae\2\45\5\uffff\1\u00b1\1\uffff\1\45\1\uffff\1\45\1\uffff"+
-		"\1\u00b4\1\u00b5\1\u00b6\1\u00b7\1\uffff\4\45\1\uffff\2\45\1\uffff\1\45"+
-		"\1\u00bf\4\uffff\1\45\1\u00c1\1\45\1\u00c3\3\45\1\uffff\1\45\1\uffff\1"+
-		"\u00c8\1\uffff\1\u00c9\2\45\1\u00cc\2\uffff\2\45\1\uffff\1\u00cf\1\45"+
-		"\1\uffff\2\45\1\u00d3\1\uffff";
+		"\1\uffff\15\45\2\76\1\uffff\1\102\1\104\13\uffff\1\37\1\uffff\1\45\5\uffff"+
+		"\27\45\11\uffff\1\144\2\uffff\7\45\1\154\2\45\1\160\14\45\1\177\3\144"+
+		"\1\uffff\2\45\1\u0087\3\45\1\u008b\1\uffff\3\45\1\uffff\1\u008f\11\45"+
+		"\1\u009a\3\45\1\uffff\1\144\1\uffff\3\144\1\u00a0\1\u00a1\1\uffff\1\u00a2"+
+		"\2\45\1\uffff\1\u00a5\1\u00a7\1\45\1\uffff\1\u00a9\4\45\1\u00ae\4\45\1"+
+		"\uffff\1\u00b3\2\45\5\uffff\1\45\1\u00b7\1\uffff\1\45\1\uffff\1\45\1\uffff"+
+		"\1\u00ba\1\u00bb\1\u00bc\1\u00bd\1\uffff\4\45\1\uffff\3\45\1\uffff\1\45"+
+		"\1\u00c6\4\uffff\1\45\1\u00c8\1\45\1\u00ca\2\45\1\u00cd\1\45\1\uffff\1"+
+		"\45\1\uffff\1\u00d0\1\uffff\1\u00d1\1\45\1\uffff\1\45\1\u00d4\2\uffff"+
+		"\2\45\1\uffff\1\u00d7\1\45\1\uffff\2\45\1\u00db\1\uffff";
 	static final String DFA30_eofS =
-		"\u00d4\uffff";
+		"\u00dc\uffff";
 	static final String DFA30_minS =
-		"\1\11\1\154\1\150\1\157\1\156\1\154\1\156\1\157\1\150\1\162\1\156\1\141"+
+		"\1\11\1\154\1\141\1\157\1\156\1\154\1\156\1\157\1\150\1\162\1\156\1\141"+
 		"\1\102\1\141\1\151\1\76\1\uffff\1\75\1\56\13\uffff\1\60\1\uffff\1\42\3"+
-		"\uffff\1\52\1\uffff\1\151\1\156\1\141\1\157\2\165\1\145\1\157\1\164\1"+
-		"\156\1\157\1\147\1\162\1\141\1\160\1\163\1\162\1\151\2\157\1\155\1\116"+
-		"\11\uffff\1\60\2\uffff\1\147\1\163\1\162\1\143\1\142\1\155\1\60\1\156"+
-		"\1\141\1\60\1\147\1\162\1\156\1\145\1\143\1\145\2\151\1\144\1\157\1\155"+
-		"\1\141\1\60\1\125\2\114\1\uffff\1\156\1\164\1\60\1\153\1\154\1\60\1\uffff"+
-		"\2\164\1\147\1\uffff\1\60\1\164\1\145\1\141\1\156\1\143\1\145\1\141\1"+
-		"\147\1\141\1\60\1\154\1\160\1\147\1\uffff\1\125\1\uffff\1\125\1\154\1"+
-		"\114\2\60\1\uffff\1\60\1\145\1\uffff\2\60\1\145\1\uffff\1\60\1\144\1\155"+
-		"\1\147\1\164\1\60\1\154\1\145\2\156\1\uffff\1\60\1\154\1\151\5\uffff\1"+
-		"\60\1\uffff\1\156\1\uffff\1\162\1\uffff\4\60\1\uffff\1\151\1\146\1\145"+
-		"\1\164\1\uffff\1\145\1\156\1\uffff\1\147\1\60\4\uffff\1\141\1\60\1\144"+
-		"\1\60\1\170\1\141\1\137\1\uffff\1\163\1\uffff\1\60\1\uffff\1\60\1\162"+
-		"\1\160\1\60\2\uffff\1\171\1\157\1\uffff\1\60\1\151\1\uffff\1\156\1\164"+
-		"\1\60\1\uffff";
+		"\uffff\1\52\1\uffff\1\151\1\156\1\141\1\157\1\154\2\165\1\145\1\157\1"+
+		"\164\1\156\1\157\1\147\1\162\1\141\1\160\1\163\1\162\1\151\2\157\1\155"+
+		"\1\116\11\uffff\1\60\2\uffff\1\147\1\163\1\162\1\143\1\154\1\142\1\155"+
+		"\1\60\1\156\1\141\1\60\1\147\1\162\1\156\1\145\1\143\1\145\2\151\1\144"+
+		"\1\157\1\155\1\141\1\60\1\125\2\114\1\uffff\1\156\1\164\1\60\1\153\1\163"+
+		"\1\154\1\60\1\uffff\2\164\1\147\1\uffff\1\60\1\164\1\145\1\141\1\156\1"+
+		"\143\1\145\1\141\1\147\1\141\1\60\1\154\1\160\1\147\1\uffff\1\125\1\uffff"+
+		"\1\125\1\154\1\114\2\60\1\uffff\1\60\1\151\1\145\1\uffff\2\60\1\145\1"+
+		"\uffff\1\60\1\144\1\155\1\147\1\164\1\60\1\154\1\145\2\156\1\uffff\1\60"+
+		"\1\154\1\151\5\uffff\1\164\1\60\1\uffff\1\156\1\uffff\1\162\1\uffff\4"+
+		"\60\1\uffff\1\151\1\146\1\145\1\164\1\uffff\1\145\1\156\1\145\1\uffff"+
+		"\1\147\1\60\4\uffff\1\141\1\60\1\144\1\60\1\170\1\141\1\60\1\137\1\uffff"+
+		"\1\163\1\uffff\1\60\1\uffff\1\60\1\162\1\uffff\1\160\1\60\2\uffff\1\171"+
+		"\1\157\1\uffff\1\60\1\151\1\uffff\1\156\1\164\1\60\1\uffff";
 	static final String DFA30_maxS =
 		"\1\175\1\154\2\157\1\166\1\154\1\156\1\157\1\164\1\171\1\156\1\157\1\111"+
 		"\1\141\2\151\1\uffff\1\75\1\56\13\uffff\1\170\1\uffff\1\47\3\uffff\1\57"+
-		"\1\uffff\1\151\1\156\1\141\1\157\1\165\1\166\1\145\1\157\1\164\1\156\1"+
-		"\157\1\147\1\162\1\141\1\160\1\163\1\162\1\151\2\157\1\155\1\116\11\uffff"+
-		"\1\165\2\uffff\1\147\1\163\1\162\1\143\1\142\1\155\1\172\1\156\1\141\1"+
-		"\172\1\147\1\162\1\156\1\165\1\143\1\145\2\151\1\144\1\157\1\155\1\141"+
-		"\1\172\2\165\1\154\1\uffff\1\156\1\164\1\172\1\153\1\154\1\172\1\uffff"+
-		"\2\164\1\147\1\uffff\1\172\1\164\1\145\1\141\1\156\1\143\1\145\1\144\1"+
-		"\147\1\141\1\172\1\154\1\160\1\147\1\uffff\1\165\1\uffff\1\165\1\154\1"+
-		"\114\2\172\1\uffff\1\172\1\145\1\uffff\2\172\1\145\1\uffff\1\172\1\144"+
-		"\1\155\1\147\1\164\1\172\1\154\1\145\2\156\1\uffff\1\172\1\154\1\151\5"+
-		"\uffff\1\172\1\uffff\1\156\1\uffff\1\162\1\uffff\4\172\1\uffff\1\151\1"+
-		"\146\1\145\1\164\1\uffff\1\145\1\156\1\uffff\1\147\1\172\4\uffff\1\141"+
-		"\1\172\1\144\1\172\1\170\1\141\1\137\1\uffff\1\163\1\uffff\1\172\1\uffff"+
-		"\1\172\1\162\1\160\1\172\2\uffff\1\171\1\157\1\uffff\1\172\1\151\1\uffff"+
-		"\1\156\1\164\1\172\1\uffff";
+		"\1\uffff\1\151\1\156\1\141\1\157\1\154\1\165\1\166\1\145\1\157\1\164\1"+
+		"\156\1\157\1\147\1\162\1\141\1\160\1\163\1\162\1\151\2\157\1\155\1\116"+
+		"\11\uffff\1\165\2\uffff\1\147\1\163\1\162\1\143\1\154\1\142\1\155\1\172"+
+		"\1\156\1\141\1\172\1\147\1\162\1\156\1\165\1\143\1\145\2\151\1\144\1\157"+
+		"\1\155\1\141\1\172\2\165\1\154\1\uffff\1\156\1\164\1\172\1\153\1\163\1"+
+		"\154\1\172\1\uffff\2\164\1\147\1\uffff\1\172\1\164\1\145\1\141\1\156\1"+
+		"\143\1\145\1\144\1\147\1\141\1\172\1\154\1\160\1\147\1\uffff\1\165\1\uffff"+
+		"\1\165\1\154\1\114\2\172\1\uffff\1\172\1\151\1\145\1\uffff\2\172\1\145"+
+		"\1\uffff\1\172\1\144\1\155\1\147\1\164\1\172\1\154\1\145\2\156\1\uffff"+
+		"\1\172\1\154\1\151\5\uffff\1\164\1\172\1\uffff\1\156\1\uffff\1\162\1\uffff"+
+		"\4\172\1\uffff\1\151\1\146\1\145\1\164\1\uffff\1\145\1\156\1\145\1\uffff"+
+		"\1\147\1\172\4\uffff\1\141\1\172\1\144\1\172\1\170\1\141\1\172\1\137\1"+
+		"\uffff\1\163\1\uffff\1\172\1\uffff\1\172\1\162\1\uffff\1\160\1\172\2\uffff"+
+		"\1\171\1\157\1\uffff\1\172\1\151\1\uffff\1\156\1\164\1\172\1\uffff";
 	static final String DFA30_acceptS =
-		"\20\uffff\1\37\2\uffff\1\42\1\44\1\45\1\46\1\47\1\50\1\51\1\52\1\53\1"+
-		"\54\1\55\1\uffff\1\62\1\uffff\1\64\1\65\1\66\1\uffff\1\71\26\uffff\1\35"+
-		"\1\56\1\36\1\57\1\43\1\40\1\41\1\60\1\63\1\uffff\1\67\1\70\32\uffff\1"+
-		"\61\6\uffff\1\32\3\uffff\1\12\16\uffff\1\34\1\uffff\1\61\5\uffff\1\3\2"+
-		"\uffff\1\5\3\uffff\1\13\12\uffff\1\26\3\uffff\2\61\1\1\1\2\1\33\1\uffff"+
-		"\1\6\1\uffff\1\10\1\uffff\1\14\4\uffff\1\21\4\uffff\1\27\2\uffff\1\4\2"+
-		"\uffff\1\15\1\16\1\17\1\20\7\uffff\1\11\1\uffff\1\23\1\uffff\1\25\4\uffff"+
-		"\1\24\1\30\2\uffff\1\22\2\uffff\1\31\3\uffff\1\7";
+		"\20\uffff\1\40\2\uffff\1\43\1\45\1\46\1\47\1\50\1\51\1\52\1\53\1\54\1"+
+		"\55\1\56\1\uffff\1\63\1\uffff\1\65\1\66\1\67\1\uffff\1\72\27\uffff\1\36"+
+		"\1\57\1\37\1\60\1\44\1\41\1\42\1\61\1\64\1\uffff\1\70\1\71\33\uffff\1"+
+		"\62\7\uffff\1\32\3\uffff\1\12\16\uffff\1\35\1\uffff\1\62\5\uffff\1\3\3"+
+		"\uffff\1\5\3\uffff\1\13\12\uffff\1\26\3\uffff\2\62\1\1\1\2\1\33\2\uffff"+
+		"\1\6\1\uffff\1\10\1\uffff\1\14\4\uffff\1\21\4\uffff\1\27\3\uffff\1\4\2"+
+		"\uffff\1\15\1\16\1\17\1\20\10\uffff\1\11\1\uffff\1\23\1\uffff\1\25\2\uffff"+
+		"\1\34\2\uffff\1\24\1\30\2\uffff\1\22\2\uffff\1\31\3\uffff\1\7";
 	static final String DFA30_specialS =
-		"\u00d4\uffff}>";
+		"\u00dc\uffff}>";
 	static final String[] DFA30_transitionS = {
 			"\2\43\1\uffff\2\43\22\uffff\1\43\1\uffff\1\42\4\uffff\1\41\1\30\1\31"+
 			"\1\35\1\16\1\20\1\17\1\22\1\44\1\36\11\37\1\21\1\34\1\24\1\23\1\25\2"+
@@ -3211,26 +3240,23 @@ public class CTFLexer extends Lexer {
 			"\1\1\1\45\1\2\1\3\1\4\1\5\2\45\1\6\2\45\1\7\6\45\1\10\1\11\1\12\1\13"+
 			"\4\45\1\32\1\uffff\1\33",
 			"\1\46",
-			"\1\50\3\uffff\1\51\2\uffff\1\47",
-			"\1\52",
-			"\1\53\7\uffff\1\54",
-			"\1\55",
+			"\1\52\6\uffff\1\50\3\uffff\1\51\2\uffff\1\47",
+			"\1\53",
+			"\1\54\7\uffff\1\55",
 			"\1\56",
 			"\1\57",
-			"\1\60\1\61\12\uffff\1\62",
-			"\1\63\6\uffff\1\64",
-			"\1\65",
-			"\1\66\15\uffff\1\67",
-			"\1\70\1\71\5\uffff\1\72",
-			"\1\73",
+			"\1\60",
+			"\1\61\1\62\12\uffff\1\63",
+			"\1\64\6\uffff\1\65",
+			"\1\66",
+			"\1\67\15\uffff\1\70",
+			"\1\71\1\72\5\uffff\1\73",
 			"\1\74",
-			"\1\77\52\uffff\1\76",
+			"\1\75",
+			"\1\100\52\uffff\1\77",
 			"",
-			"\1\100",
-			"\1\102",
-			"",
-			"",
-			"",
+			"\1\101",
+			"\1\103",
 			"",
 			"",
 			"",
@@ -3239,22 +3265,24 @@ public class CTFLexer extends Lexer {
 			"",
 			"",
 			"",
-			"\10\105\40\uffff\1\104\37\uffff\1\104",
+			"",
+			"",
+			"",
+			"\10\106\40\uffff\1\105\37\uffff\1\105",
 			"",
 			"\1\42\4\uffff\1\41",
 			"",
 			"",
 			"",
-			"\1\106\4\uffff\1\107",
+			"\1\107\4\uffff\1\110",
 			"",
-			"\1\110",
 			"\1\111",
 			"\1\112",
 			"\1\113",
 			"\1\114",
-			"\1\115\1\116",
-			"\1\117",
-			"\1\120",
+			"\1\115",
+			"\1\116",
+			"\1\117\1\120",
 			"\1\121",
 			"\1\122",
 			"\1\123",
@@ -3269,6 +3297,8 @@ public class CTFLexer extends Lexer {
 			"\1\134",
 			"\1\135",
 			"\1\136",
+			"\1\137",
+			"\1\140",
 			"",
 			"",
 			"",
@@ -3278,148 +3308,155 @@ public class CTFLexer extends Lexer {
 			"",
 			"",
 			"",
-			"\10\105\2\37\22\uffff\1\140\10\uffff\1\141\26\uffff\1\137\10\uffff\1"+
-			"\141",
+			"\10\106\2\37\22\uffff\1\142\10\uffff\1\143\26\uffff\1\141\10\uffff\1"+
+			"\143",
 			"",
 			"",
-			"\1\143",
-			"\1\144",
 			"\1\145",
 			"\1\146",
 			"\1\147",
 			"\1\150",
-			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"\1\151",
 			"\1\152",
 			"\1\153",
-			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\4\45\1\154\25\45",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"\1\155",
 			"\1\156",
-			"\1\157",
-			"\1\160",
-			"\1\161\3\uffff\1\162\13\uffff\1\163",
-			"\1\164",
-			"\1\165",
-			"\1\166",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\4\45\1\157\25\45",
+			"\1\161",
+			"\1\162",
+			"\1\163",
+			"\1\164\3\uffff\1\165\13\uffff\1\166",
 			"\1\167",
 			"\1\170",
 			"\1\171",
 			"\1\172",
 			"\1\173",
+			"\1\174",
+			"\1\175",
+			"\1\176",
 			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
-			"\1\176\26\uffff\1\175\10\uffff\1\176",
-			"\1\177\10\uffff\1\176\37\uffff\1\176",
-			"\1\u0081\37\uffff\1\u0080",
+			"\1\u0081\26\uffff\1\u0080\10\uffff\1\u0081",
+			"\1\u0082\10\uffff\1\u0081\37\uffff\1\u0081",
+			"\1\u0084\37\uffff\1\u0083",
 			"",
-			"\1\u0082",
-			"\1\u0083",
-			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
 			"\1\u0085",
 			"\1\u0086",
 			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
-			"",
 			"\1\u0088",
 			"\1\u0089",
 			"\1\u008a",
-			"",
 			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"",
 			"\1\u008c",
 			"\1\u008d",
 			"\1\u008e",
-			"\1\u008f",
+			"",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
 			"\1\u0090",
 			"\1\u0091",
-			"\1\u0092\2\uffff\1\u0093",
+			"\1\u0092",
+			"\1\u0093",
 			"\1\u0094",
 			"\1\u0095",
-			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
-			"\1\u0097",
+			"\1\u0096\2\uffff\1\u0097",
 			"\1\u0098",
 			"\1\u0099",
-			"",
-			"\1\176\37\uffff\1\176",
-			"",
-			"\1\176\37\uffff\1\176",
-			"\1\u009a",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
 			"\1\u009b",
-			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
-			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"\1\u009c",
+			"\1\u009d",
 			"",
-			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"\1\u0081\37\uffff\1\u0081",
+			"",
+			"\1\u0081\37\uffff\1\u0081",
+			"\1\u009e",
 			"\1\u009f",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
 			"",
 			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
-			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\10\45\1\u00a1\21\45",
 			"\1\u00a3",
+			"\1\u00a4",
 			"",
 			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
-			"\1\u00a5",
-			"\1\u00a6",
-			"\1\u00a7",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\10\45\1\u00a6\21\45",
 			"\1\u00a8",
+			"",
 			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
 			"\1\u00aa",
 			"\1\u00ab",
 			"\1\u00ac",
 			"\1\u00ad",
-			"",
 			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
 			"\1\u00af",
 			"\1\u00b0",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
-			"",
+			"\1\u00b1",
 			"\1\u00b2",
 			"",
-			"\1\u00b3",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"\1\u00b4",
+			"\1\u00b5",
 			"",
-			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
-			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
-			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"",
+			"",
+			"",
+			"",
+			"\1\u00b6",
 			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
 			"",
 			"\1\u00b8",
-			"\1\u00b9",
-			"\1\u00ba",
-			"\1\u00bb",
 			"",
-			"\1\u00bc",
-			"\1\u00bd",
+			"\1\u00b9",
+			"",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
 			"",
 			"\1\u00be",
-			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
-			"",
-			"",
-			"",
-			"",
+			"\1\u00bf",
 			"\1\u00c0",
-			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"\1\u00c1",
+			"",
 			"\1\u00c2",
-			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"\1\u00c3",
 			"\1\u00c4",
+			"",
 			"\1\u00c5",
-			"\1\u00c6",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"",
+			"",
+			"",
 			"",
 			"\1\u00c7",
-			"",
 			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
-			"",
+			"\1\u00c9",
 			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
-			"\1\u00ca",
 			"\1\u00cb",
+			"\1\u00cc",
 			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
-			"",
-			"",
-			"\1\u00cd",
 			"\1\u00ce",
 			"",
-			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
-			"\1\u00d0",
+			"\1\u00cf",
 			"",
-			"\1\u00d1",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
 			"\1\u00d2",
+			"",
+			"\1\u00d3",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"",
+			"",
+			"\1\u00d5",
+			"\1\u00d6",
+			"",
+			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
+			"\1\u00d8",
+			"",
+			"\1\u00d9",
+			"\1\u00da",
 			"\12\45\7\uffff\32\45\4\uffff\1\45\1\uffff\32\45",
 			""
 	};
@@ -3455,7 +3492,7 @@ public class CTFLexer extends Lexer {
 		}
 		@Override
 		public String getDescription() {
-			return "1:1: Tokens : ( ALIGNTOK | CONSTTOK | CHARTOK | DOUBLETOK | ENUMTOK | EVENTTOK | FLOATINGPOINTTOK | FLOATTOK | INTEGERTOK | INTTOK | LONGTOK | SHORTTOK | SIGNEDTOK | STREAMTOK | STRINGTOK | STRUCTTOK | TRACETOK | TYPEALIASTOK | TYPEDEFTOK | UNSIGNEDTOK | VARIANTTOK | VOIDTOK | BOOLTOK | COMPLEXTOK | IMAGINARYTOK | ENVTOK | CLOCKTOK | NANNUMBERTOK | INFINITYTOK | NINFINITYTOK | SEPARATOR | COLON | ELIPSES | ASSIGNMENT | TYPE_ASSIGNMENT | LT | GT | OPENBRAC | CLOSEBRAC | LPAREN | RPAREN | LCURL | RCURL | TERM | POINTER | SIGN | ARROW | DOT | OCTAL_LITERAL | DECIMAL_LITERAL | HEX_LITERAL | CHARACTER_LITERAL | STRING_LITERAL | WS | COMMENT | LINE_COMMENT | IDENTIFIER );";
+			return "1:1: Tokens : ( ALIGNTOK | CONSTTOK | CHARTOK | DOUBLETOK | ENUMTOK | EVENTTOK | FLOATINGPOINTTOK | FLOATTOK | INTEGERTOK | INTTOK | LONGTOK | SHORTTOK | SIGNEDTOK | STREAMTOK | STRINGTOK | STRUCTTOK | TRACETOK | TYPEALIASTOK | TYPEDEFTOK | UNSIGNEDTOK | VARIANTTOK | VOIDTOK | BOOLTOK | COMPLEXTOK | IMAGINARYTOK | ENVTOK | CLOCKTOK | CALLSITETOK | NANNUMBERTOK | INFINITYTOK | NINFINITYTOK | SEPARATOR | COLON | ELIPSES | ASSIGNMENT | TYPE_ASSIGNMENT | LT | GT | OPENBRAC | CLOSEBRAC | LPAREN | RPAREN | LCURL | RCURL | TERM | POINTER | SIGN | ARROW | DOT | OCTAL_LITERAL | DECIMAL_LITERAL | HEX_LITERAL | CHARACTER_LITERAL | STRING_LITERAL | WS | COMMENT | LINE_COMMENT | IDENTIFIER );";
 		}
 	}
 

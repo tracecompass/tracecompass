@@ -35,11 +35,14 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfModelLookup;
+import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.ctf.core.CtfConstants;
+import org.eclipse.tracecompass.tmf.ctf.core.event.lookup.CtfTmfCallsite;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
 /**
@@ -50,7 +53,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  */
 @NonNullByDefault
 public class CtfTmfEvent extends TmfEvent
-        implements ITmfModelLookup, ITmfCustomAttributes {
+        implements ITmfSourceLookup, ITmfModelLookup, ITmfCustomAttributes {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -333,6 +336,36 @@ public class CtfTmfEvent extends TmfEvent
         }
         return declaration.getCustomAttribute(name);
     }
+
+    // ------------------------------------------------------------------------
+    // ITmfSourceLookup
+    // ------------------------------------------------------------------------
+
+    /**
+     * Get the call site for this event.
+     *
+     * @return the call site information, or null if there is none
+     * @since 2.1
+     */
+    @Override
+    public @Nullable ITmfCallsite getCallsite() {
+        CtfTmfCallsite callsite = null;
+
+        ITmfEventField ipField = getContent().getField(CtfConstants.CONTEXT_FIELD_PREFIX + CtfConstants.IP_KEY);
+        if (ipField != null && ipField.getValue() instanceof Long) {
+            long ip = (Long) ipField.getValue();
+            callsite = getTrace().getCallsite(fEventName, ip);
+        }
+
+        if (callsite == null) {
+            callsite = getTrace().getCallsite(fEventName);
+        }
+        return callsite;
+    }
+
+    // ------------------------------------------------------------------------
+    // ITmfModelLookup
+    // ------------------------------------------------------------------------
 
     @Override
     public @Nullable String getModelUri() {

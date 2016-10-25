@@ -112,6 +112,7 @@ public class CtfLexerTest {
         checkSingle(CTFLexer.IMAGINARYTOK, "_Imaginary");
         checkSingle(CTFLexer.ENVTOK, "env");
         checkSingle(CTFLexer.CLOCKTOK, "clock");
+        checkSingle(CTFLexer.CALLSITETOK, "callsite");
         checkSingle(CTFLexer.NANNUMBERTOK, "NaN");
         checkSingle(CTFLexer.INFINITYTOK,  "+inf");
         checkSingle(CTFLexer.NINFINITYTOK, "-inf");

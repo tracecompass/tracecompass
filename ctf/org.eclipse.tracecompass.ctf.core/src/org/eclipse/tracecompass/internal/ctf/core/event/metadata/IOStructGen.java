@@ -15,19 +15,24 @@
 package org.eclipse.tracecompass.internal.ctf.core.event.metadata;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.ctf.core.event.CTFCallsite;
 import org.eclipse.tracecompass.ctf.core.event.CTFClock;
 import org.eclipse.tracecompass.ctf.core.event.metadata.DeclarationScope;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.parser.CTFParser;
+import org.eclipse.tracecompass.internal.ctf.core.event.EventDeclaration;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.ClockParser;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.TypeAliasParser;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.TypeSpecifierListParser;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.TypedefParser;
+import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.callsite.CallSiteParser;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.environment.EnvironmentParser;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.event.EventParser;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.stream.StreamParser;
@@ -130,6 +135,7 @@ public class IOStructGen {
         CommonTree traceNode = null;
         boolean hasStreams = false;
         List<CommonTree> events = new ArrayList<>();
+        Collection<CTFCallsite> callsites = new ArrayList<>();
         for (CommonTree child : children) {
             final int type = child.getType();
             switch (type) {
@@ -158,6 +164,9 @@ public class IOStructGen {
             case CTFParser.ENV:
                 fTrace.setEnvironment(EnvironmentParser.INSTANCE.parse(child, null));
                 break;
+            case CTFParser.CALLSITE:
+                callsites.add(CallSiteParser.INSTANCE.parse(child, null));
+                break;
             default:
                 throw childTypeError(child);
             }
@@ -165,17 +174,20 @@ public class IOStructGen {
         if (traceNode == null) {
             throw new ParseException("Missing trace block"); //$NON-NLS-1$
         }
-        parseEvents(events, hasStreams);
+        parseEvents(events, callsites, hasStreams);
         fHasBeenParsed = true;
     }
 
-    private void parseEvents(List<CommonTree> events, boolean hasStreams) throws ParseException {
+    private void parseEvents(List<CommonTree> events, Collection<CTFCallsite> staticCallsites, boolean hasStreams) throws ParseException {
         if (!hasStreams && !events.isEmpty()) {
             /* Add an empty stream that will have a null id */
             fTrace.addStream(new CTFStream(fTrace));
         }
         for (CommonTree event : events) {
-            EventParser.INSTANCE.parse(event, new EventParser.Param(fTrace, fRoot));
+            EventDeclaration ev = EventParser.INSTANCE.parse(event, new EventParser.Param(fTrace, fRoot));
+            List<CTFCallsite> callsites = staticCallsites.stream().filter(cs -> ev.getName().equals(cs.getEventName())).collect(Collectors.toList());
+            ev.addCallsites(callsites);
+
         }
     }
 
@@ -185,6 +197,7 @@ public class IOStructGen {
         }
         List<CommonTree> children = root.getChildren();
         List<CommonTree> events = new ArrayList<>();
+        Collection<CTFCallsite> callsites = new ArrayList<>();
         for (CommonTree child : children) {
             final int type = child.getType();
             switch (type) {
@@ -207,11 +220,14 @@ public class IOStructGen {
             case CTFParser.ENV:
                 fTrace.setEnvironment(EnvironmentParser.INSTANCE.parse(child, null));
                 break;
+            case CTFParser.CALLSITE:
+                callsites.add(CallSiteParser.INSTANCE.parse(child, null));
+                break;
             default:
                 throw childTypeError(child);
             }
         }
-        parseEvents(events, !Iterables.isEmpty(fTrace.getStreams()));
+        parseEvents(events, callsites, !Iterables.isEmpty(fTrace.getStreams()));
     }
 
     private void parseTrace(CommonTree traceNode) throws ParseException {

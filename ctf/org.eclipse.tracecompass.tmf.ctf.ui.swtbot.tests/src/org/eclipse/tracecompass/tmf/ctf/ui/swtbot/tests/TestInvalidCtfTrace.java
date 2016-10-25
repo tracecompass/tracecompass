@@ -70,11 +70,11 @@ public class TestInvalidCtfTrace {
     private static final Map<String, String> ERRORS = new HashMap<>();
     static {
         // metadata
-        ERRORS.put("array-redefinition", "MismatchedTokenException(56!=71)");
+        ERRORS.put("array-redefinition", "MismatchedTokenException(57!=72)");
         ERRORS.put("array-size-identifier", "Is not an integer: x");
-        ERRORS.put("array-size-keyword", "NoViableAltException(74@[])");
+        ERRORS.put("array-size-keyword", "NoViableAltException(75@[])");
         ERRORS.put("array-size-negative", "Array length is negative");
-        ERRORS.put("array-size-not-present", "NoViableAltException(13@[])");
+        ERRORS.put("array-size-not-present", "NoViableAltException(14@[])");
         ERRORS.put("array-size-string", "Is not an integer: x");
         ERRORS.put("array-size-type-field", "Is not an integer: uint32_t");
         ERRORS.put("array-size-type", "Is not an integer: uint32_t");
@@ -93,7 +93,7 @@ public class TestInvalidCtfTrace {
         ERRORS.put("struct-align-zero", "Invalid value for alignment : 0");
         ERRORS.put("struct-duplicate-field-name", "Identifier has already been defined:xxx");
         ERRORS.put("struct-duplicate-struct-name", "struct a already defined.");
-        ERRORS.put("struct-field-name-keyword", "NoViableAltException(72@[])");
+        ERRORS.put("struct-field-name-keyword", "NoViableAltException(73@[])");
         // streams
         ERRORS.put("content-size-larger-than-packet-size", "UNKNOWN"); //FIXME
         ERRORS.put("cross-packet-event-alignment-empty-struct", "UNKNOWN"); //FIXME

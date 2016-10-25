@@ -11,6 +11,8 @@
 
 package org.eclipse.tracecompass.ctf.core.event;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -103,7 +105,8 @@ public interface IEventDeclaration {
      *
      * @return The set of custom attributes
      */
-    @NonNull Set<@NonNull String> getCustomAttributes();
+    @NonNull
+    Set<@NonNull String> getCustomAttributes();
 
     /**
      * Get the value of a given CTF attribute.
@@ -113,5 +116,15 @@ public interface IEventDeclaration {
      * @return the CTF attribute
      */
     String getCustomAttribute(String key);
+
+    /**
+     * Gets the potential static call sites of an event
+     *
+     * @return the collection of call sites of an event
+     * @since 2.1
+     */
+    default @NonNull List<@NonNull CTFCallsite> getCallsites() {
+        return Collections.emptyList();
+    }
 
 }
