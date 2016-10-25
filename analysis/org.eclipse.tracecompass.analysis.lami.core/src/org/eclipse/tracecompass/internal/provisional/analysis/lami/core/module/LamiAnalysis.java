@@ -13,10 +13,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNullContents;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -35,11 +32,12 @@ import java.util.stream.Stream;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.process.ProcessUtils;
+import org.eclipse.tracecompass.common.core.process.ProcessUtils.OutputReaderFunction;
 import org.eclipse.tracecompass.internal.analysis.lami.core.Activator;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.LamiStrings;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.ShellUtils;
@@ -830,21 +828,11 @@ public class LamiAnalysis implements IOnDemandAnalysis {
     @VisibleForTesting
     protected @Nullable String getOutputFromCommand(List<String> command) {
         LOGGER.info(() -> LOG_RUNNING_MESSAGE + ' ' + command.toString());
-
-        try {
-            ProcessBuilder builder = new ProcessBuilder(command);
-            builder.redirectErrorStream(true);
-
-            Process p = builder.start();
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));) {
-                int ret = p.waitFor();
-                String output = br.lines().collect(Collectors.joining());
-
-                return (ret == 0 ? output : null);
-            }
-        } catch (IOException | InterruptedException e) {
+        List<String> lines = ProcessUtils.getOutputFromCommand(command);
+        if (lines == null) {
             return null;
         }
+        return String.join("", lines); //$NON-NLS-1$
     }
 
     /**
@@ -865,165 +853,69 @@ public class LamiAnalysis implements IOnDemandAnalysis {
     @VisibleForTesting
     protected String getResultsFromCommand(List<String> command, IProgressMonitor monitor)
             throws CoreException {
+        List<String> lines = ProcessUtils.getOutputFromCommandCancellable(command, monitor, nullToEmptyString(Messages.LamiAnalysis_MainTaskName), OUTPUT_READER);
+        return checkNotNull(String.join("", lines)); //$NON-NLS-1$
+    }
 
-        final int scale = 1000;
+    private static final OutputReaderFunction OUTPUT_READER = (reader, monitor) -> {
         double workedSoFar = 0.0;
 
-        ProcessCanceller cancellerRunnable = null;
-        Thread cancellerThread = null;
+        String line = reader.readLine();
+        while (line != null && !line.matches("\\s*\\{.*")) { //$NON-NLS-1$
+            /*
+             * This is a line indicating progress, it has the form:
+             *
+             * 0.123 3000 of 5000 events processed
+             *
+             * The first part indicates the estimated fraction (out of 1.0) of
+             * work done. The second part is status text.
+             */
 
-        try {
-            monitor.beginTask(Messages.LamiAnalysis_MainTaskName, scale);
+            // Trim the line first to make sure the first character is
+            // significant
+            line = line.trim();
 
-            ProcessBuilder builder = new ProcessBuilder(command);
-            builder.redirectErrorStream(false);
+            // Split at the first space
+            String[] elems = line.split(" ", 2); //$NON-NLS-1$
 
-            Process p = checkNotNull(builder.start());
-
-            cancellerRunnable = new ProcessCanceller(p, monitor);
-            cancellerThread = new Thread(cancellerRunnable);
-            cancellerThread.start();
-
-            List<String> results = new ArrayList<>();
-
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));) {
-                String line = in.readLine();
-                while (line != null && !line.matches("\\s*\\{.*")) { //$NON-NLS-1$
-                    /*
-                     * This is a line indicating progress, it has the form:
-                     *
-                     * 0.123 3000 of 5000 events processed
-                     *
-                     * The first part indicates the estimated fraction (out of
-                     * 1.0) of work done. The second part is status text.
-                     */
-
-                    // Trim the line first to make sure the first character is
-                    // significant
-                    line = line.trim();
-
-                    // Split at the first space
-                    String[] elems = line.split(" ", 2); //$NON-NLS-1$
-
-                    if (elems[0].matches("\\d.*")) { //$NON-NLS-1$
-                        // It looks like we have a progress indication
-                        try {
-                            // Try parsing the number
-                            double cumulativeWork = Double.parseDouble(elems[0]) * scale;
-                            double workedThisLoop = cumulativeWork - workedSoFar;
-
-                            // We're going backwards? Do not update the
-                            // monitor's value
-                            if (workedThisLoop > 0) {
-                                monitor.internalWorked(workedThisLoop);
-                                workedSoFar = cumulativeWork;
-                            }
-
-                            // There is a message: update the monitor's task name
-                            if (elems.length >= 2) {
-                                monitor.setTaskName(elems[1].trim());
-                            }
-                        } catch (NumberFormatException e) {
-                            // Continue reading progress lines anyway
-                        }
-                    }
-
-                    line = in.readLine();
-                }
-                while (line != null) {
-                    /*
-                     * We have seen the first line containing a '{', this is our
-                     * JSON output!
-                     */
-                    results.add(line);
-                    line = in.readLine();
-                }
-            }
-            int ret = p.waitFor();
-
-            if (monitor.isCanceled()) {
-                /* We were interrupted by the canceller thread. */
-                IStatus status = new Status(IStatus.CANCEL, Activator.instance().getPluginId(), null);
-                throw new CoreException(status);
-            }
-
-            if (ret != 0) {
-                /*
-                 * Something went wrong running the external script. We will
-                 * gather the stderr and report it to the user.
-                 */
-                BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-                List<String> stdErrOutput = br.lines().collect(Collectors.toList());
-
-                MultiStatus status = new MultiStatus(Activator.instance().getPluginId(),
-                        IStatus.ERROR, Messages.LamiAnalysis_ErrorDuringExecution, null);
-                for (String str : stdErrOutput) {
-                    status.add(new Status(IStatus.ERROR, Activator.instance().getPluginId(), str));
-                }
-                if (stdErrOutput.isEmpty()) {
-                    /*
-                     * At least say "no output", so an error message actually
-                     * shows up.
-                     */
-                    status.add(new Status(IStatus.ERROR, Activator.instance().getPluginId(), Messages.LamiAnalysis_ErrorNoOutput));
-                }
-                throw new CoreException(status);
-            }
-
-            /* External script ended successfully, all is fine! */
-            String resultsStr = results.stream().collect(Collectors.joining());
-            return checkNotNull(resultsStr);
-
-        } catch (IOException | InterruptedException e) {
-            IStatus status = new Status(IStatus.ERROR, Activator.instance().getPluginId(), Messages.LamiAnalysis_ExecutionInterrupted, e);
-            throw new CoreException(status);
-
-        } finally {
-            if (cancellerRunnable != null) {
-                cancellerRunnable.setFinished();
-            }
-            if (cancellerThread != null) {
+            if (elems[0].matches("\\d.*")) { //$NON-NLS-1$
+                // It looks like we have a progress indication
                 try {
-                    cancellerThread.join();
-                } catch (InterruptedException e) {
-                }
-            }
+                    // Try parsing the number
+                    double cumulativeWork = Double.parseDouble(elems[0]) * 1000;
+                    double workedThisLoop = cumulativeWork - workedSoFar;
 
-            monitor.done();
-        }
-    }
-
-    private static class ProcessCanceller implements Runnable {
-
-        private final Process fProcess;
-        private final IProgressMonitor fMonitor;
-
-        private boolean fIsFinished = false;
-
-        public ProcessCanceller(Process process, IProgressMonitor monitor) {
-            fProcess = process;
-            fMonitor = monitor;
-        }
-
-        public void setFinished() {
-            fIsFinished = true;
-        }
-
-        @Override
-        public void run() {
-            try {
-                while (!fIsFinished) {
-                    Thread.sleep(500);
-                    if (fMonitor.isCanceled()) {
-                        fProcess.destroy();
-                        return;
+                    // We're going backwards? Do not update the
+                    // monitor's value
+                    if (workedThisLoop > 0) {
+                        monitor.internalWorked(workedThisLoop);
+                        workedSoFar = cumulativeWork;
                     }
+
+                    // There is a message: update the monitor's task name
+                    if (elems.length >= 2) {
+                        monitor.setTaskName(elems[1].trim());
+                    }
+                } catch (NumberFormatException e) {
+                    // Continue reading progress lines anyway
                 }
-            } catch (InterruptedException e) {
             }
+
+            line = reader.readLine();
         }
 
-    }
+        List<String> results = new ArrayList<>();
+        while (line != null) {
+            /*
+             * We have seen the first line containing a '{', this is our JSON
+             * output!
+             */
+            results.add(line);
+            line = reader.readLine();
+        }
+        return results;
+    };
+
 
     @Override
     public @NonNull String getName() {

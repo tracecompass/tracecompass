@@ -11,21 +11,18 @@ package org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.process.ProcessUtils;
 import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 
 import com.google.common.base.Objects;
@@ -235,8 +232,8 @@ public final class FileOffsetMapper {
         List<Addr2lineInfo> callsites = new LinkedList<>();
 
         // FIXME Could eventually use CDT's Addr2line class once it implements --inlines
-        List<String> output = getOutputFromCommand(Arrays.asList(
-                ADDR2LINE_EXECUTABLE, "-i", "-f", "-C", "-e", filePath, "0x" + Long.toHexString(offset)));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+        List<String> command = Arrays.asList(ADDR2LINE_EXECUTABLE, "-i", "-f", "-C", "-e", filePath, "0x" + Long.toHexString(offset)); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+        List<String> output = ProcessUtils.getOutputFromCommand(command);
 
         if (output == null) {
             /* Command returned an error */
@@ -282,22 +279,5 @@ public final class FileOffsetMapper {
         }
 
         return callsites;
-    }
-
-    private static @Nullable List<String> getOutputFromCommand(List<String> command) {
-        try {
-            ProcessBuilder builder = new ProcessBuilder(command);
-            builder.redirectErrorStream(true);
-
-            Process p = builder.start();
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));) {
-                int ret = p.waitFor();
-                List<String> lines = br.lines().collect(Collectors.toList());
-
-                return (ret == 0 ? lines : null);
-            }
-        } catch (IOException | InterruptedException e) {
-            return null;
-        }
     }
 }
