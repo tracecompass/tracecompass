@@ -810,6 +810,33 @@ When the throttler is no longer needed, it should be disposed:
 throttler.dispose();
 </pre>
 
+== Ignoring inbound/outbound signals ==
+
+It is possible to stop certain signals from being sent or received.
+
+To block all incoming signals to an object:
+
+<pre>
+    TmfSignalManager.addIgnoredInboundSignal(objectInstance, TmfSignal.class);
+</pre>
+
+To block all outgoing signals originating from an object:
+
+<pre>
+    TmfSignalManager.addIgnoredOutboundSignal(objectInstance, TmfSignal.class);
+</pre>
+
+The blocked signal filtering is based on type hierarchy. Blocking <code>TmfSignal.class</code> will result in blocking all signals derived from TmfSignal. Blocking <code>TmfTraceSelectedSignal</code> will block all signals of this type and derived signals from <code>TmfTraceSelectedSignal</code>
+
+To remove an ignore rule or clear them all:
+<pre>
+    TmfSignalManager.removeIgnoredOutboundSignal(Object source, Class<? extends TmfSignal> signal)
+    TmfSignalManager.removeIgnoredInboundSignal(Object listener, Class<? extends TmfSignal> signal)
+    TmfSignalManager.clearIgnoredOutboundSignalList(Object source)
+    TmfSignalManager.clearIgnoredInboundSignalList(Object listener)
+</pre>
+
+
 == Signal Reference ==
 
 The following is a list of built-in signals defined in the framework.

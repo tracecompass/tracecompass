@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2017 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,9 +16,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
@@ -26,7 +28,6 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfStartSynchSignal;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -36,15 +37,7 @@ import org.junit.Test;
  */
 public class TmfSignalManagerTest {
 
-    private TestSignalSender signalSender;
-
-    /**
-     * Pre-test setup
-     */
-    @Before
-    public void setUp() {
-        signalSender = new TestSignalSender();
-    }
+    private final @NonNull TestSignalSender signalSender = new TestSignalSender();
 
     /**
      * After-test cleanup
@@ -102,6 +95,95 @@ public class TmfSignalManagerTest {
                 signalReceivers[i].dispose();
             }
         }
+    }
+
+    /**
+     * Test inbound blacklisting
+     */
+    @Test
+    public void testInboundBlacklisting() {
+        testInboundBlacklisting(Arrays.asList(),
+                Arrays.asList(
+                        TmfStartSynchSignal.class, TestSignal1.class, TmfEndSynchSignal.class,
+                        TmfStartSynchSignal.class, TestSignal2.class, TmfEndSynchSignal.class));
+        testInboundBlacklisting(Arrays.asList(TestSignal1.class),
+                Arrays.asList(
+                        TmfStartSynchSignal.class, TmfEndSynchSignal.class,
+                        TmfStartSynchSignal.class, TestSignal2.class, TmfEndSynchSignal.class));
+        testInboundBlacklisting(Arrays.asList(TestSignal2.class),
+                Arrays.asList(
+                        TmfStartSynchSignal.class, TestSignal1.class, TmfEndSynchSignal.class,
+                        TmfStartSynchSignal.class, TmfEndSynchSignal.class));
+        testInboundBlacklisting(Arrays.asList(TestSignal1.class, TestSignal2.class),
+                Arrays.asList(
+                        TmfStartSynchSignal.class, TmfEndSynchSignal.class,
+                        TmfStartSynchSignal.class, TmfEndSynchSignal.class));
+        testInboundBlacklisting(Arrays.asList(TmfSignal.class),
+                Arrays.asList());
+    }
+
+    private void testInboundBlacklisting(List<@NonNull Class<? extends TmfSignal>> ignoredSignals, List<Class<? extends TmfSignal>> expectedSignals) {
+        TestSignalHandler receiver = new TestSignalHandler();
+
+        /* Set the inbound blacklisting */
+        for (@NonNull Class<? extends TmfSignal> ignoredSignal : ignoredSignals) {
+            TmfSignalManager.addIgnoredInboundSignal(receiver, ignoredSignal);
+        }
+
+        /* Send signals */
+        signalSender.sendSignal(new TestSignal1(signalSender));
+        signalSender.sendSignal(new TestSignal2(signalSender));
+
+        /* Check received signals */
+        assertEquals(expectedSignals.size(), receiver.receivedSignals.size());
+        for (int i = 0; i < expectedSignals.size(); i++) {
+            assertEquals(expectedSignals.get(i), receiver.receivedSignals.get(i).getClass());
+        }
+
+        receiver.dispose();
+    }
+
+    /**
+     * Test outbound blacklisting
+     */
+    @Test
+    public void testOutboundBlacklisting() {
+        testOutboundBlacklisting(Arrays.asList(),
+                Arrays.asList(
+                        TmfStartSynchSignal.class, TestSignal1.class, TmfEndSynchSignal.class,
+                        TmfStartSynchSignal.class, TestSignal2.class, TmfEndSynchSignal.class));
+        testOutboundBlacklisting(Arrays.asList(TestSignal1.class),
+                Arrays.asList(
+                        TmfStartSynchSignal.class, TestSignal2.class, TmfEndSynchSignal.class));
+        testOutboundBlacklisting(Arrays.asList(TestSignal2.class),
+                Arrays.asList(
+                        TmfStartSynchSignal.class, TestSignal1.class, TmfEndSynchSignal.class));
+        testOutboundBlacklisting(Arrays.asList(TestSignal1.class, TestSignal2.class),
+                Arrays.asList());
+        testOutboundBlacklisting(Arrays.asList(TmfSignal.class),
+                Arrays.asList());
+    }
+
+    private void testOutboundBlacklisting(List<@NonNull Class<? extends TmfSignal>> blockedSignals, List<Class<? extends TmfSignal>> expectedSignals) {
+        TestSignalHandler receiver = new TestSignalHandler();
+
+        /* Set the outbound blacklisting */
+        for (@NonNull Class<? extends TmfSignal> blockedSignal : blockedSignals) {
+            TmfSignalManager.addIgnoredOutboundSignal(signalSender, blockedSignal);
+        }
+
+        /* Send signals */
+        signalSender.sendSignal(new TestSignal1(signalSender));
+        signalSender.sendSignal(new TestSignal2(signalSender));
+
+        /* Check received signals */
+        assertEquals(expectedSignals.size(), receiver.receivedSignals.size());
+        for (int i = 0; i < expectedSignals.size(); i++) {
+            assertEquals(expectedSignals.get(i), receiver.receivedSignals.get(i).getClass());
+        }
+
+        receiver.dispose();
+        TmfSignalManager.clearIgnoredOutboundSignalList(signalSender);
     }
 
     /**

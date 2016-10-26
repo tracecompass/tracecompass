@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2009, 2017 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.tmf.core.signal;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -23,8 +25,13 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * This class manages the set of signal listeners and the signals they are
@@ -43,6 +50,11 @@ public class TmfSignalManager {
     private static Map<Object, Method[]> fListeners = new HashMap<>();
     private static Map<Object, Method[]> fVIPListeners = new HashMap<>();
     private static Map<Object, Throwable> fContexts = new HashMap<>();
+
+    /** The outbound blacklist of pair <source, signal> */
+    private static Multimap<@NonNull Object, @NonNull Class<? extends TmfSignal>> fOutboundSignalBlacklist = HashMultimap.create();
+    /** The inbound blacklist of pair <listener, signal> */
+    private static Multimap<@NonNull Object, @NonNull Class<? extends TmfSignal>> fInboundSignalBlacklist = HashMultimap.create();
 
     // The signal executor for asynchronous signals
     private static final ExecutorService fExecutor = Executors.newSingleThreadExecutor();
@@ -77,6 +89,87 @@ public class TmfSignalManager {
     }
 
     /**
+     * Ignore the outbound signal type from the specified source.
+     * One can ignore all signals by passing TmfSignal.class as the signal class.
+     *
+     * @param source
+     *            The source object
+     * @param signal
+     *            The signal class to ignore
+     * @since 3.2
+     */
+    @NonNullByDefault
+    public static synchronized void addIgnoredOutboundSignal(Object source, Class<? extends TmfSignal> signal) {
+        fOutboundSignalBlacklist.put(source, signal);
+    }
+
+    /**
+     * Ignore the inbound signal type for the specified listener.
+     * All signals can be ignored by passing TmfSignal.class.
+     *
+     * @param listener
+     *            The listener object for which the signal must be ignored
+     * @param signal
+     *            The signal class to ignore
+     * @since 3.2
+     */
+    @NonNullByDefault
+    public static synchronized void addIgnoredInboundSignal(Object listener, Class<? extends TmfSignal> signal) {
+        fInboundSignalBlacklist.put(listener, signal);
+    }
+
+    /**
+     * Remove the signal from the list of ignored outbound signal for the
+     * specified source if present.
+     *
+     * @param source
+     *            The source object
+     * @param signal
+     *            The signal class to remove from the ignore list
+     * @since 3.2
+     */
+    public static synchronized void removeIgnoredOutboundSignal(Object source, Class<? extends TmfSignal> signal) {
+        fOutboundSignalBlacklist.remove(source, signal);
+    }
+
+    /**
+     * Remove the signal from the list of inbound ignored signals for the
+     * specified listener if present.
+     *
+     * @param listener
+     *            The listener object
+     * @param signal
+     *            The signal class to remove from the ignore list
+     * @since 3.2
+     */
+    public static synchronized void removeIgnoredInboundSignal(Object listener, Class<? extends TmfSignal> signal) {
+        fInboundSignalBlacklist.remove(listener, signal);
+    }
+
+
+    /**
+     * Clear the list of ignored outbound signals for the source.
+     *
+     * @param source
+     *            The source object
+     * @since 3.2
+     */
+    public static synchronized void clearIgnoredOutboundSignalList(Object source) {
+        fOutboundSignalBlacklist.removeAll(source);
+    }
+
+    /**
+     * Clear the list of ignored inbound signals for the listener.
+     *
+     * @param listener
+     *            The listener object
+     * @since 3.2
+     */
+    public static synchronized void clearIgnoredInboundSignalList(Object listener) {
+        fInboundSignalBlacklist.removeAll(listener);
+    }
+
+    /**
      * Register an object to the signal manager as a "VIP" listener. All VIP
      * listeners will all receive the signal before the manager moves on to the
      * lowly, non-VIP listeners.
@@ -104,6 +197,8 @@ public class TmfSignalManager {
         fVIPListeners.remove(listener);
         fListeners.remove(listener);
         fContexts.remove(listener);
+        fInboundSignalBlacklist.removeAll(listener);
+        fOutboundSignalBlacklist.removeAll(listener);
     }
 
     /**
@@ -142,6 +237,17 @@ public class TmfSignalManager {
      *            the signal to dispatch
      */
     public static synchronized void dispatchSignal(TmfSignal signal) {
+
+        /* Check if the source,signal tuple is blacklisted */
+        Object source = signal.getSource();
+        if (source != null) {
+            boolean isBlackListed = fOutboundSignalBlacklist.get(source).stream()
+                    .anyMatch(x -> x.isAssignableFrom(signal.getClass()));
+            if (isBlackListed) {
+                return;
+            }
+        }
+
         int signalId = fSignalId++;
         sendSignal(new TmfStartSynchSignal(signalId));
         signal.setReference(signalId);
@@ -203,12 +309,23 @@ public class TmfSignalManager {
         // Build the list of listener methods that are registered for this
         // signal
         Class<?> signalClass = signal.getClass();
+
         Map<Object, List<Method>> targets = new HashMap<>();
         targets.clear();
         for (Map.Entry<Object, Method[]> entry : listeners.entrySet()) {
             List<Method> matchingMethods = new ArrayList<>();
             for (Method method : entry.getValue()) {
-                if (method.getParameterTypes()[0].isAssignableFrom(signalClass)) {
+                Class<?> classParam = method.getParameterTypes()[0];
+                if (classParam.isAssignableFrom(signalClass)) {
+                    if (fInboundSignalBlacklist.containsKey(entry.getKey())) {
+                        /* Check if any of the ignore rule apply to the signal */
+                        boolean isBlackListed = fInboundSignalBlacklist.get(checkNotNull(entry.getKey())).stream()
+                                .anyMatch( x ->  x.isAssignableFrom(classParam));
+                        if (isBlackListed) {
+                            continue;
+                        }
+                    }
+                    /* No rules apply add it */
                     matchingMethods.add(method);
                 }
             }
