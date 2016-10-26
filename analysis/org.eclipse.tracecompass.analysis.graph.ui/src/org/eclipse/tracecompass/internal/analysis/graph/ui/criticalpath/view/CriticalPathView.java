@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016 École Polytechnique de Montréal
+ * Copyright (c) 2015, 2017 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -51,6 +51,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
+import org.eclipse.ui.IWorkbenchActionConstants;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Iterables;
@@ -642,12 +643,12 @@ public class CriticalPathView extends AbstractTimeGraphView {
         IAction followArrowBwdAction = getTimeGraphViewer().getFollowArrowBwdAction();
         followArrowBwdAction.setText(Messages.CriticalPathView_followArrowBwdText);
         followArrowBwdAction.setToolTipText(Messages.CriticalPathView_followArrowBwdText);
-        manager.add(followArrowBwdAction);
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, followArrowBwdAction);
 
         IAction followArrowFwdAction = getTimeGraphViewer().getFollowArrowFwdAction();
         followArrowFwdAction.setText(Messages.CriticalPathView_followArrowFwdText);
         followArrowFwdAction.setToolTipText(Messages.CriticalPathView_followArrowFwdText);
-        manager.add(followArrowFwdAction);
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, followArrowFwdAction);
     }
 
 }

@@ -1917,34 +1917,35 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     /**
-     * Add actions to local tool bar manager
+     * Add contributions to the local tool bar manager. The contributions should be
+     * appended to the {@link IWorkbenchActionConstants#MB_ADDITIONS} group.
      *
      * @param manager
      *            the tool bar manager
      */
     protected void fillLocalToolBar(IToolBarManager manager) {
         if (fFilterColumns != null && fFilterLabelProvider != null && fFilterColumns.length > 0) {
-            manager.add(fTimeGraphViewer.getShowFilterDialogAction());
+            manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fTimeGraphViewer.getShowFilterDialogAction());
         }
-        manager.add(fTimeGraphViewer.getShowLegendAction());
-        manager.add(new Separator());
-        manager.add(fTimeGraphViewer.getResetScaleAction());
-        manager.add(fTimeGraphViewer.getPreviousEventAction());
-        manager.add(fTimeGraphViewer.getNextEventAction());
-        manager.add(new Separator());
-        manager.add(fTimeGraphViewer.getToggleBookmarkAction());
-        manager.add(fTimeGraphViewer.getPreviousMarkerAction());
-        manager.add(fTimeGraphViewer.getNextMarkerAction());
-        manager.add(new Separator());
-        manager.add(fPreviousResourceAction);
-        manager.add(fNextResourceAction);
-        manager.add(fTimeGraphViewer.getZoomInAction());
-        manager.add(fTimeGraphViewer.getZoomOutAction());
-        manager.add(new Separator());
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fTimeGraphViewer.getShowLegendAction());
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, new Separator());
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fTimeGraphViewer.getResetScaleAction());
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fTimeGraphViewer.getPreviousEventAction());
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fTimeGraphViewer.getNextEventAction());
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, new Separator());
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fTimeGraphViewer.getToggleBookmarkAction());
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fTimeGraphViewer.getPreviousMarkerAction());
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fTimeGraphViewer.getNextMarkerAction());
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, new Separator());
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fPreviousResourceAction);
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fNextResourceAction);
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fTimeGraphViewer.getZoomInAction());
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fTimeGraphViewer.getZoomOutAction());
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, new Separator());
     }
 
     /**
-     * Add actions to local menu manager
+     * Add contributions to the local menu manager.
      *
      * @param manager
      *            the tool bar manager

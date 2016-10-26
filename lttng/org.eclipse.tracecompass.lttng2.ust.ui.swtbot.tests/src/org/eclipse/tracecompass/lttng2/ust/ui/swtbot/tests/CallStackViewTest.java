@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016 Ericsson
+ * Copyright (c) 2015, 2017 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -139,7 +139,8 @@ public class CallStackViewTest {
     private static final @NonNull String ZOOM_IN = "Zoom In";
     private static final @NonNull String ZOOM_OUT = "Zoom Out";
     // Separator
-    private static final String PIN_VIEW = "Pin View";
+    private static final @NonNull String PIN_VIEW = "Pin View";
+
     private static final List<String> TOOLBAR_BUTTONS_TOOLTIPS = ImmutableList.of(
             CONFIGURE_SYMBOL_PROVIDERS,
             "",
@@ -438,10 +439,10 @@ public class CallStackViewTest {
     }
 
     /**
-     * Test check callstack toolbar buttons
+     * Test Call Stack tool bar
      */
     @Test
-    public void testCallstackNavigation() {
+    public void testCallStackToolBar() {
         SWTBotView viewBot = fBot.viewById(CallStackView.ID);
         viewBot.setFocus();
         List<String> buttons = new ArrayList<>();

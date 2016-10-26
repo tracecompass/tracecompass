@@ -19,6 +19,8 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -40,8 +42,9 @@ import org.eclipse.ui.part.ViewPart;
  * It registers any sub class to the signal manager for receiving and sending
  * TMF signals.
  * <br>
- * Subclasses may optionally implement the {@link ITmfTimeAligned} and
- * {@link ITmfAllowMultiple} interfaces to enable those features.
+ * Subclasses may optionally implement the {@link ITmfTimeAligned},
+ * {@link ITmfAllowMultiple} and {@link ITmfPinnable} interfaces to enable
+ * those features.
  *
  * @author Francois Chouinard
  */
@@ -122,28 +125,46 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
     // ------------------------------------------------------------------------
 
     /**
-     * Returns whether the pin flag is set.
-     * For example, this flag can be used to ignore time synchronization signals from other TmfViews.
+     * Returns whether the view is pinned.
      *
-     * @return pin flag
+     * @return if the view is pinned
      */
     public boolean isPinned() {
         return ((fPinAction != null) && (fPinAction.isChecked()));
     }
 
     /**
-     * Method adds a pin action to the TmfView. The pin action allows to toggle the <code>fIsPinned</code> flag.
-     * For example, this flag can be used to ignore time synchronization signals from other TmfViews.
+     * Method adds a pin action to the TmfView. For example, this action can be
+     * used to ignore time synchronization signals from other TmfViews. <br>
+     *
+     * Uses {@link ITmfPinnable#setPinned(boolean)} to propagate the state of the
+     * action button.
      */
     protected void contributePinActionToToolBar() {
         if (fPinAction == null) {
             fPinAction = new PinTmfViewAction();
 
-            IToolBarManager toolBarManager = getViewSite().getActionBars()
-                    .getToolBarManager();
-            toolBarManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+            IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
+            toolBarManager.add(new Separator(IWorkbenchActionConstants.PIN_GROUP));
             toolBarManager.add(fPinAction);
         }
+
+        fPinAction.addPropertyChangeListener(new IPropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent event) {
+                if (IAction.CHECKED.equals(event.getProperty())) {
+                    /* Take action on the pin state */
+                    Object value = event.getNewValue();
+                    if (!(value instanceof Boolean)) {
+                        throw new IllegalStateException();
+                    }
+                    if (TmfView.this instanceof ITmfPinnable) {
+                        ITmfPinnable view = (ITmfPinnable) TmfView.this;
+                        view.setPinned((Boolean) value);
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -209,6 +230,14 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
 
         if (!menuManager.isEmpty()) {
             menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        }
+
+        IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
+        toolBarManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        /* Subclass tool bar contributions should be added to this group */
+
+        if (this instanceof ITmfPinnable) {
+            contributePinActionToToolBar();
         }
     }
 

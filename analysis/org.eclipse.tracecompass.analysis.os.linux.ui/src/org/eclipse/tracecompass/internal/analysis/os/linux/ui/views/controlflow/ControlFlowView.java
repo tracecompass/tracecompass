@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 Ericsson, École Polytechnique de Montréal and others.
+ * Copyright (c) 2012, 2017 Ericsson, École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -88,6 +88,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphContro
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
+import org.eclipse.ui.IWorkbenchActionConstants;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
@@ -227,10 +228,10 @@ public class ControlFlowView extends AbstractTimeGraphView {
     protected void fillLocalToolBar(IToolBarManager manager) {
         // add "Optimization" Button to local tool bar of Controlflow
         IAction optimizationAction = getOptimizationAction();
-        manager.add(optimizationAction);
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, optimizationAction);
 
         // add a separator to local tool bar
-        manager.add(new Separator());
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, new Separator());
 
         super.fillLocalToolBar(manager);
         IDialogSettings settings = Activator.getDefault().getDialogSettings();
@@ -240,29 +241,29 @@ public class ControlFlowView extends AbstractTimeGraphView {
         }
 
         IAction hideArrowsAction = getTimeGraphViewer().getHideArrowsAction(section);
-        manager.add(hideArrowsAction);
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, hideArrowsAction);
 
         IAction followArrowBwdAction = getTimeGraphViewer().getFollowArrowBwdAction();
         followArrowBwdAction.setText(Messages.ControlFlowView_followCPUBwdText);
         followArrowBwdAction.setToolTipText(Messages.ControlFlowView_followCPUBwdText);
-        manager.add(followArrowBwdAction);
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, followArrowBwdAction);
 
         IAction followArrowFwdAction = getTimeGraphViewer().getFollowArrowFwdAction();
         followArrowFwdAction.setText(Messages.ControlFlowView_followCPUFwdText);
         followArrowFwdAction.setToolTipText(Messages.ControlFlowView_followCPUFwdText);
-        manager.add(followArrowFwdAction);
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, followArrowFwdAction);
 
         IAction previousEventAction = new SearchEventAction(false, PackageMessages.ControlFlowView_PreviousEventJobName);
         previousEventAction.setText(PackageMessages.ControlFlowView_PreviousEventActionName);
         previousEventAction.setToolTipText(PackageMessages.ControlFlowView_PreviousEventActionTooltip);
         previousEventAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(PREV_EVENT_ICON_PATH));
-        manager.add(previousEventAction);
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, previousEventAction);
 
         IAction nextEventAction = new SearchEventAction(true, PackageMessages.ControlFlowView_NextEventJobName);
         nextEventAction.setText(PackageMessages.ControlFlowView_NextEventActionName);
         nextEventAction.setToolTipText(PackageMessages.ControlFlowView_NextEventActionTooltip);
         nextEventAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(NEXT_EVENT_ICON_PATH));
-        manager.add(nextEventAction);
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, nextEventAction);
     }
 
     private IAction getOptimizationAction() {
