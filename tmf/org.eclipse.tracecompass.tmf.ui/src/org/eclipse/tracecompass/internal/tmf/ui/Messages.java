@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2017 Ericsson
+ * Copyright (c) 2012, 2017 Ericsson and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -318,10 +318,11 @@ public class Messages extends NLS {
     public static String FilterViewer_ValueHint;
     public static String FilterViewer_ValueLabel;
 
-    public static String TmfView_PinActionNameText;
-    public static String TmfView_PinActionToolTipText;
     public static String TmfView_AlignViewsActionNameText;
     public static String TmfView_AlignViewsActionToolTipText;
+    public static String TmfView_NewTmfViewNameText;
+    public static String TmfView_PinActionNameText;
+    public static String TmfView_PinActionToolTipText;
 
     public static String CallStackPresentationProvider_Thread;
     public static String CallStackView_FunctionColumn;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2011, 2017 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.ITmfViewer;
+import org.eclipse.tracecompass.tmf.ui.views.ITmfAllowMultiple;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import org.eclipse.tracecompass.tmf.ui.widgets.tabsview.TmfViewerFolder;
 
@@ -41,7 +42,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.tabsview.TmfViewerFolder;
  *
  * @author Mathieu Denis
  */
-public class TmfStatisticsViewImpl extends TmfView {
+public class TmfStatisticsViewImpl extends TmfView implements ITmfAllowMultiple {
 
     /**
      * The view name.
@@ -82,6 +83,7 @@ public class TmfStatisticsViewImpl extends TmfView {
 
     @Override
     public void createPartControl(Composite parent) {
+        super.createPartControl(parent);
         fStatsViewers.setParent(parent);
         createStatisticsViewers();
 

@@ -2198,19 +2198,18 @@ The Control Flow View '''toolbar''', located at the top right of the view, has s
 View Menu
 
 {|
-|
+| New Control Flow view
+| Spawn a new control flow view.
+|-
 | Align Views
 | Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
 |-
-|
 | Show Markers
 | A marker highlights a time interval. A marker can be used for instance to indicate a time range where lost events occurred or to bookmark an interesting interval for future reference. Selecting a category name will toggle the visibility of markers of that category.
 |-
-|
 | Marker Set
 | The user can select from one of the configured market sets, or choose '''None''' to use no marker set. The setting applies to all views that support marker sets. The marker set configuration can be edited by selecting the '''Edit...''' menu item (see [[#Marker Set Configuration XML Format]]). After saving the changes in the opened editor, the marker set should then be re-selected to update the view.
 |-
-|
 | Thread Presentation
 | Select the threads layout. Two layouts are available. '''Flat''' layout lists the threads in a flat list per trace. '''Hierarchical''' layout shows the threads in a parent-child tree per trace.
 |}
@@ -2332,15 +2331,15 @@ The Resources View '''toolbar''', located at the top right of the view, has shor
 View Menu
 
 {|
-|
+| New Resources view
+| Spawn a new resources view.
+|-
 | Align Views
 | Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
 |-
-|
 | Show Markers
 | A marker highlights a time interval. A marker can be used for instance to indicate a time range where lost events occurred or to bookmark an interesting interval for future reference. Selecting a category name will toggle the visibility of markers of that category.
 |-
-|
 | Marker Set
 | The user can select from one of the configured market sets, or choose '''None''' to use no marker set. The setting applies to all views that support marker sets. The marker set configuration can be edited by selecting the '''Edit...''' menu item (see [[#Marker Set Configuration XML Format]]). After saving the changes in the opened editor, the marker set should then be re-selected to update the view.
 |}

@@ -31,6 +31,13 @@
         name="Test Analysis View"
         restorable="true">
   </view>
+  <view
+        category="org.eclipse.linuxtools.tmf.ui.stubs"
+        class="org.eclipse.tracecompass.tmf.ui.tests.stubs.views.TmfViewStub"
+        id="org.eclipse.tracecompass.tmf.ui.tests.stubs.views.TmfViewStub"
+        name="Tmf View Stub"
+        restorable="true">
+  </view>
  </extension>
  <extension
        point="org.eclipse.linuxtools.tmf.ui.uml2SDLoader">

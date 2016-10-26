@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2017 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2017 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -22,6 +22,7 @@ import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
+import org.eclipse.tracecompass.tmf.ui.views.TmfViewFactory;
 import org.w3c.dom.Element;
 
 /**
@@ -93,6 +94,9 @@ public class XmlXYView extends TmfChartView {
     @Override
     public void createPartControl(@Nullable Composite parent) {
         String name = getViewSite().getSecondaryId();
+        if (name != null) {
+            name = TmfViewFactory.getBaseSecId(name);
+        }
         if (name != null) {
             /* must initialize view info before calling super */
             fViewInfo.setName(name);

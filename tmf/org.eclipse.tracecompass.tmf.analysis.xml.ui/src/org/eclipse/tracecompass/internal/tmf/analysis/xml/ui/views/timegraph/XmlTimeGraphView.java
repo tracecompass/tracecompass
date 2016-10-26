@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2017 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2017 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -58,6 +58,7 @@ import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithState
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+import org.eclipse.tracecompass.tmf.ui.views.TmfViewFactory;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
@@ -146,6 +147,9 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
     @Override
     public void createPartControl(Composite parent) {
         String name = getViewSite().getSecondaryId();
+        if (name != null) {
+            name = TmfViewFactory.getBaseSecId(name);
+        }
         if (name != null) {
             /* must initialize view info before calling super */
             fViewInfo.setName(name);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 Ericsson
+ * Copyright (c) 2009, 2017 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,6 +15,7 @@
 package org.eclipse.tracecompass.tmf.ui.views;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -35,9 +36,12 @@ import org.eclipse.ui.part.ViewPart;
 
 /**
  * Basic abstract TMF view class implementation.
- *
+ * <br>
  * It registers any sub class to the signal manager for receiving and sending
  * TMF signals.
+ * <br>
+ * Subclasses may optionally implement the {@link ITmfTimeAligned} and
+ * {@link ITmfAllowMultiple} interfaces to enable those features.
  *
  * @author Francois Chouinard
  */
@@ -53,7 +57,15 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
      * Action class for pinning of TmfView.
      */
     protected PinTmfViewAction fPinAction;
+
     private static TimeAlignViewsAction fAlignViewsAction;
+
+    /**
+     * The separator used between the primary and secondary id of a view id.
+     *
+     * @since 3.2
+     */
+    public static final String VIEW_ID_SEPARATOR = ":"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -137,8 +149,15 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
     @Override
     public void createPartControl(final Composite parent) {
         fParentComposite = parent;
+
+        IMenuManager menuManager = getViewSite().getActionBars().getMenuManager();
+
+        if (this instanceof ITmfAllowMultiple) {
+            contributeNewViewActionToLocalMenu(menuManager);
+        }
+
         if (this instanceof ITmfTimeAligned) {
-            contributeAlignViewsActionToLocalMenu();
+            contributeAlignViewsActionToLocalMenu(menuManager);
 
             fControlListener = new ControlAdapter() {
                 @Override
@@ -187,17 +206,36 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
                 }
             });
         }
+
+        if (!menuManager.isEmpty()) {
+            menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        }
     }
 
-    private void contributeAlignViewsActionToLocalMenu() {
+    /**
+     * Add the "New view" action to the view menu. This action spawns a new view
+     * of the same type as the caller.
+     */
+    private void contributeNewViewActionToLocalMenu(IMenuManager menuManager) {
+        IAction newViewAction = new NewTmfViewAction(TmfView.this);
+
+        if (!menuManager.isEmpty()) {
+            menuManager.add(new Separator());
+        }
+        menuManager.add(newViewAction);
+    }
+
+    private static void contributeAlignViewsActionToLocalMenu(IMenuManager menuManager) {
         if (fAlignViewsAction == null) {
             fAlignViewsAction = new TimeAlignViewsAction();
         }
 
-        IMenuManager menuManager = getViewSite().getActionBars().getMenuManager();
-        menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        if (!menuManager.isEmpty()) {
+            menuManager.add(new Separator());
+        }
         menuManager.add(fAlignViewsAction);
     }
+
     /**
      * Returns the parent control of the view
      *
@@ -210,8 +248,8 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
     }
 
     /**
-     * Return the Eclipse view ID in the format <Primary ID>:<Secondary ID> or
-     * simply <Primary ID> if secondary ID is null
+     * Return the Eclipse view ID in the format 'Primary ID':'Secondary ID' or
+     * simply 'Primary ID' if secondary ID is null
      *
      * @return This view's view ID
      * @since 2.2
@@ -222,6 +260,6 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
         if (secondaryId == null) {
             return String.valueOf(viewSite.getId());
         }
-        return viewSite.getId() + ':' + secondaryId;
+        return viewSite.getId() + VIEW_ID_SEPARATOR + secondaryId;
     }
 }
