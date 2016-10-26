@@ -176,6 +176,7 @@ public class ProjectExplorerTracesFolderTest {
         /* Finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
         SWTBotUtils.createProject(TRACE_PROJECT_NAME);
+        importCustomParsers();
     }
 
     /**
@@ -196,7 +197,7 @@ public class ProjectExplorerTracesFolderTest {
         SWTBotUtils.closeSecondaryShells(fBot);
     }
 
-    private static void test3_00Preparation() {
+    private static void importCustomParsers() {
         // FIXME: We can't use Manage Custom Parsers > Import because it uses a native dialog. We'll still check that they show up in the dialog
         CustomTxtTraceDefinition[] txtDefinitions = CustomTxtTraceDefinition.loadAll(getPath("customParsers/ExampleCustomTxtParser.xml"));
         txtDefinitions[0].save();
@@ -230,8 +231,6 @@ public class ProjectExplorerTracesFolderTest {
      */
     @Test
     public void test3_01ContextMenuPresence() {
-        test3_00Preparation();
-
         SWTBotTreeItem traceItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
 
         final List<String> EXPECTED_MENU_LABELS = ImmutableList.of(

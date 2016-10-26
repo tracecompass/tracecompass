@@ -247,10 +247,10 @@ public final class SWTBotImportWizardUtils {
             return;
         }
 
-        SWTBotTable table = editor.bot().table();
         bot.waitUntil(new DefaultCondition() {
             @Override
             public boolean test() throws Exception {
+                SWTBotTable table = editor.bot().table();
                 return table.rowCount() > 1;
             }
 
@@ -259,17 +259,20 @@ public final class SWTBotImportWizardUtils {
                 return "No items in table";
             }
         });
+        SWTBotTable table = editor.bot().table();
         // Select first event (skip filter/search row)
         table.getTableItem(1).select();
 
         editor.bot().waitUntil(new DefaultCondition() {
             @Override
             public boolean test() throws Exception {
-                boolean ret = table.selection().rowCount() == 1 && table.selection().get(0).toString().contains(firstEventStr);
+                // Get the table again since it can get re-created
+                SWTBotTable curTable = editor.bot().table();
+                boolean ret = curTable.selection().rowCount() == 1 && curTable.selection().get(0).toString().contains(firstEventStr);
                 if (!ret) {
                     // FIXME: Not sure why, sometimes the first select() ends up
                     // selecting an empty item. Retry selecting here.
-                    table.getTableItem(1).select();
+                    curTable.getTableItem(1).select();
                 }
                 return ret;
             }
