@@ -716,10 +716,14 @@ Trace Compass provides base implementations for timing views and viewers for gen
 * Statistics Table
 ** ''org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics'': Base classes for Statistics Tables
 
+A default implementation of some of those views can be used by analyzes without requiring to extend existing classes. It just needs to use the default view's ID as primary ID and the analysis ID as the secondary ID.
+
+* Table view: It will use the segment aspects as supplementary columns. In the plugin.xml, a view extension shoud be defined with class ''org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.SegmentStoreTableView'' and ID ''org.eclipse.tracecompass.analysis.timing.ui.segstore.table:<my.analysis.ID>'' where ''<my.analysis.ID>'' should be replaced by the segment store provider's analysis ID. This ID can then be used as view ID in the module's output.
+* Statistics view: It will create a segment store statistics analysis and the type of segment is defined by its name, so this view applies only for segments implementing INamedSegment. In the plugin.xml, a view extension shoud be defined with class ''org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.SegmentStoreStatisticsView'' and ID ''org.eclipse.tracecompass.analysis.timing.ui.segstore.statistics:<my.analysis.ID>'' where ''<my.analysis.ID>'' should be replaced by the segment store provider's analysis ID. This ID can then be used as view ID in the module's output.
+
 Several features in Trace Compass are using this framework and can be used as example for further development:
 
 * Latency Table
-** ''org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyView.java''
 ** ''org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternLatencyTableView.java''
 * Scatter Chart
 ** ''org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyScatterView.java''
@@ -727,9 +731,7 @@ Several features in Trace Compass are using this framework and can be used as ex
 * Density Graph
 ** ''org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyDensityView.java''
 ** ''org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternDensityView.java''
-
 * Statistics Table
-** ''org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics.SystemCallLatencyStatisticsView.java''
 ** ''org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternStatisticsView.java''
 
 = Component Interaction =
