@@ -63,6 +63,7 @@ import org.eclipse.ui.WorkbenchException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -309,6 +310,7 @@ public class SystemCallLatencyTableAnalysisTest {
      * @throws IOException
      *             no such file or the file is locked.
      */
+    @Ignore
     @Test
     public void testWriteToTsv() throws NoSuchMethodException, IOException {
 
