@@ -73,7 +73,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     private UpdateThread fUpdateThread;
 
-    private volatile AtomicInteger fDirty = new AtomicInteger();
+    private final AtomicInteger fDirty = new AtomicInteger();
 
     /**
      * Constructor
@@ -137,6 +137,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      */
     protected void reinitialize() {
         fSeriesValues.clear();
+        /* Initializing data: the content is not current */
         fDirty.incrementAndGet();
         Thread thread = new Thread() {
             // Don't use TmfUiRefreshHandler (bug 467751)
@@ -150,9 +151,13 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                         public void run() {
                             if (!getSwtChart().isDisposed()) {
                                 /* Delete the old series */
-                                clearContent();
-                                createSeries();
-                                fDirty.decrementAndGet();
+                                try {
+                                    clearContent();
+                                    createSeries();
+                                } finally {
+                                    /* View is cleared, decrement fDirty */
+                                    fDirty.decrementAndGet();
+                                }
                             }
                         }
                     });
@@ -189,9 +194,16 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                 @Override
                 public void run() {
                     LOGGER.info(() -> getLogMessage("UpdateDataStart", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
-                    updateData(getWindowStartTime(), getWindowEndTime(), fNumRequests, fMonitor);
-                    fDirty.decrementAndGet();
-                    LOGGER.info(() -> getLogMessage("UpdateDataEnd", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
+                    try {
+                        updateData(getWindowStartTime(), getWindowEndTime(), fNumRequests, fMonitor);
+                    } finally {
+                        /*
+                         * fDirty should have been incremented before creating
+                         * the thread, so we decrement it once it is finished
+                         */
+                        fDirty.decrementAndGet();
+                        LOGGER.info(() -> getLogMessage("UpdateDataEnd", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
+                    }
                 }
             });
             updateThreadFinished(this);
@@ -233,6 +245,10 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     @Override
     protected void updateContent() {
+        /*
+         * Content is not up to date, so we increment fDirty. It will be
+         * decremented at the end of the update thread
+         */
         fDirty.incrementAndGet();
         getDisplay().asyncExec(new Runnable() {
             @Override
@@ -375,52 +391,63 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      * Update the chart's values before refreshing the viewer
      */
     protected void updateDisplay() {
+        /* Content is not up to date, increment dirtiness */
+        fDirty.incrementAndGet();
         Display.getDefault().asyncExec(new Runnable() {
             final TmfChartTimeStampFormat tmfChartTimeStampFormat = new TmfChartTimeStampFormat(getTimeOffset());
 
             @Override
             public void run() {
-                if (!getSwtChart().isDisposed()) {
-                    double[] xValues = fXValues;
-                    double maxy = DEFAULT_MAXY;
-                    double miny = DEFAULT_MINY;
-                    for (Entry<String, double[]> entry : fSeriesValues.entrySet()) {
-                        ILineSeries series = (ILineSeries) getSwtChart().getSeriesSet().getSeries(entry.getKey());
-                        if (series == null) {
-                            series = addSeries(entry.getKey());
+                try {
+                    if (!getSwtChart().isDisposed()) {
+                        double[] xValues = fXValues;
+                        double maxy = DEFAULT_MAXY;
+                        double miny = DEFAULT_MINY;
+                        for (Entry<String, double[]> entry : fSeriesValues.entrySet()) {
+                            ILineSeries series = (ILineSeries) getSwtChart().getSeriesSet().getSeries(entry.getKey());
+                            if (series == null) {
+                                series = addSeries(entry.getKey());
+                            }
+                            series.setXSeries(xValues);
+                            /*
+                             * Find the minimal and maximum values in this
+                             * series
+                             */
+                            for (double value : entry.getValue()) {
+                                maxy = Math.max(maxy, value);
+                                miny = Math.min(miny, value);
+                            }
+                            series.setYSeries(entry.getValue());
                         }
-                        series.setXSeries(xValues);
-                        /* Find the minimal and maximum values in this series */
-                        for (double value : entry.getValue()) {
-                            maxy = Math.max(maxy, value);
-                            miny = Math.min(miny, value);
+                        if (maxy == DEFAULT_MAXY) {
+                            maxy = 1.0;
                         }
-                        series.setYSeries(entry.getValue());
-                    }
-                    if (maxy == DEFAULT_MAXY) {
-                        maxy = 1.0;
-                    }
 
-                    IAxisTick xTick = getSwtChart().getAxisSet().getXAxis(0).getTick();
-                    xTick.setFormat(tmfChartTimeStampFormat);
+                        IAxisTick xTick = getSwtChart().getAxisSet().getXAxis(0).getTick();
+                        xTick.setFormat(tmfChartTimeStampFormat);
 
-                    final double start = 0.0;
-                    double end = getWindowEndTime() - getWindowStartTime();
-                    getSwtChart().getAxisSet().getXAxis(0).setRange(new Range(start, end));
-                    if (maxy > miny) {
-                        getSwtChart().getAxisSet().getYAxis(0).setRange(new Range(miny, maxy));
-                    }
-                    getSwtChart().redraw();
+                        final double start = 0.0;
+                        double end = getWindowEndTime() - getWindowStartTime();
+                        getSwtChart().getAxisSet().getXAxis(0).setRange(new Range(start, end));
+                        if (maxy > miny) {
+                            getSwtChart().getAxisSet().getYAxis(0).setRange(new Range(miny, maxy));
+                        }
+                        getSwtChart().redraw();
 
-                    if (isSendTimeAlignSignals()) {
-                        // The width of the chart might have changed and its
-                        // time axis might be misaligned with the other views
-                        Point viewPos = TmfCommonXLineChartViewer.this.getParent().getParent().toDisplay(0, 0);
-                        int axisPos = getSwtChart().toDisplay(0, 0).x + getPointAreaOffset();
-                        int timeAxisOffset = axisPos - viewPos.x;
-                        TmfTimeViewAlignmentInfo timeAlignmentInfo = new TmfTimeViewAlignmentInfo(getControl().getShell(), viewPos, timeAxisOffset);
-                        TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(TmfCommonXLineChartViewer.this, timeAlignmentInfo, true));
+                        if (isSendTimeAlignSignals()) {
+                            // The width of the chart might have changed and its
+                            // time axis might be misaligned with the other
+                            // views
+                            Point viewPos = TmfCommonXLineChartViewer.this.getParent().getParent().toDisplay(0, 0);
+                            int axisPos = getSwtChart().toDisplay(0, 0).x + getPointAreaOffset();
+                            int timeAxisOffset = axisPos - viewPos.x;
+                            TmfTimeViewAlignmentInfo timeAlignmentInfo = new TmfTimeViewAlignmentInfo(getControl().getShell(), viewPos, timeAxisOffset);
+                            TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(TmfCommonXLineChartViewer.this, timeAlignmentInfo, true));
+                        }
                     }
+                } finally {
+                    /* Content has been updated, decrement dirtiness */
+                    fDirty.decrementAndGet();
                 }
             }
         });
@@ -444,14 +471,8 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     @Override
     public boolean isDirty() {
-        boolean dirty = super.isDirty();
-
-        if (dirty) {
-            return dirty;
-        }
-
-        // Check the specific dirtiness of this view
-        return fDirty.get() != 0;
+        /* Check the parent's or this view's own dirtiness */
+        return super.isDirty() || (fDirty.get() != 0);
     }
 
 }

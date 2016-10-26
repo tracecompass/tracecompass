@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -66,6 +67,8 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
 
     private static final Format FORMAT = new SubSecondTimeWithUnitFormat();
 
+    private final AtomicInteger fDirty = new AtomicInteger();
+
     private final class CompactingSegmentStoreQuery extends Job {
         private static final long MAX_POINTS = 1000;
         private final TmfTimeRange fCurrentRange;
@@ -78,52 +81,70 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
         @Override
         protected IStatus run(@Nullable IProgressMonitor monitor) {
             final IProgressMonitor statusMonitor = monitor;
-            if (statusMonitor == null) {
-                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Monitor is null"); //$NON-NLS-1$
-            }
+            try {
+                if (statusMonitor == null) {
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Monitor is null"); //$NON-NLS-1$
+                }
 
-            ISegmentStoreProvider segmentProvider = getSegmentProvider();
-            final long startTimeInNanos = fCurrentRange.getStartTime().toNanos();
-            final long endTimeInNanos = fCurrentRange.getEndTime().toNanos();
-            if (segmentProvider == null) {
+                ISegmentStoreProvider segmentProvider = getSegmentProvider();
+                final long startTimeInNanos = fCurrentRange.getStartTime().toNanos();
+                final long endTimeInNanos = fCurrentRange.getEndTime().toNanos();
+                if (segmentProvider == null) {
+                    setWindowRange(startTimeInNanos, endTimeInNanos);
+                    redraw(statusMonitor, startTimeInNanos, startTimeInNanos, Collections.EMPTY_LIST);
+                    return new Status(IStatus.WARNING, Activator.PLUGIN_ID, "segment provider not available"); //$NON-NLS-1$
+                }
+
+                final ISegmentStore<ISegment> segStore = segmentProvider.getSegmentStore();
+                if (segStore == null) {
+                    setWindowRange(startTimeInNanos, endTimeInNanos);
+                    redraw(statusMonitor, startTimeInNanos, startTimeInNanos, Collections.EMPTY_LIST);
+                    return new Status(IStatus.INFO, Activator.PLUGIN_ID, "Segment provider does not have segments"); //$NON-NLS-1$
+                }
+
+                final long startTime = fCurrentRange.getStartTime().getValue();
+                final long endTime = fCurrentRange.getEndTime().getValue();
+                fPixelStart = startTime;
+                fPixelSize = Math.max(1, (endTime - startTime) / MAX_POINTS);
+                final Iterable<ISegment> intersectingElements = segStore.getIntersectingElements(startTime, endTime);
+
+                final List<ISegment> list = convertIterableToList(intersectingElements, statusMonitor);
+                final List<ISegment> displayData = (!list.isEmpty()) ? compactList(startTime, list, statusMonitor) : list;
+
                 setWindowRange(startTimeInNanos, endTimeInNanos);
-                redraw(statusMonitor, startTimeInNanos, startTimeInNanos, Collections.EMPTY_LIST);
-                return new Status(IStatus.WARNING, Activator.PLUGIN_ID, "segment provider not available"); //$NON-NLS-1$
+                redraw(statusMonitor, startTime, endTime, displayData);
+
+                if (statusMonitor.isCanceled()) {
+                    return Status.CANCEL_STATUS;
+                }
+                return Status.OK_STATUS;
+            } finally {
+                /*
+                 * fDirty should have been incremented before creating a job, so
+                 * we decrement it once the job is done
+                 */
+                fDirty.decrementAndGet();
             }
-
-            final ISegmentStore<ISegment> segStore = segmentProvider.getSegmentStore();
-            if (segStore == null) {
-                setWindowRange(startTimeInNanos, endTimeInNanos);
-                redraw(statusMonitor, startTimeInNanos, startTimeInNanos, Collections.EMPTY_LIST);
-                return new Status(IStatus.INFO, Activator.PLUGIN_ID, "Segment provider does not have segments"); //$NON-NLS-1$
-            }
-
-            final long startTime = fCurrentRange.getStartTime().getValue();
-            final long endTime = fCurrentRange.getEndTime().getValue();
-            fPixelStart = startTime;
-            fPixelSize = Math.max(1, (endTime - startTime) / MAX_POINTS);
-            final Iterable<ISegment> intersectingElements = segStore.getIntersectingElements(startTime, endTime);
-
-            final List<ISegment> list = convertIterableToList(intersectingElements, statusMonitor);
-            final List<ISegment> displayData = (!list.isEmpty()) ? compactList(startTime, list, statusMonitor) : list;
-
-            setWindowRange(startTimeInNanos, endTimeInNanos);
-            redraw(statusMonitor, startTime, endTime, displayData);
-
-            if (statusMonitor.isCanceled()) {
-                return Status.CANCEL_STATUS;
-            }
-            return Status.OK_STATUS;
 
         }
 
         private void redraw(final IProgressMonitor statusMonitor, final long startTime, final long endTime, final List<ISegment> displayData) {
             fDisplayData = displayData;
+            /*
+             * Increment at every redraw, since the content of the view is not
+             * current
+             */
+            fDirty.incrementAndGet();
             Display.getDefault().asyncExec(new Runnable() {
 
                 @Override
                 public void run() {
-                    updateData(startTime, endTime, displayData.size(), statusMonitor);
+                    try {
+                        updateData(startTime, endTime, displayData.size(), statusMonitor);
+                    } finally {
+                        /* Decrement once the redraw is done */
+                        fDirty.decrementAndGet();
+                    }
                 }
             });
         }
@@ -195,7 +216,6 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             // Only update the model if trace that was analyzed is active trace
             if (segmentProvider.equals(getSegmentProvider())) {
                 updateModel(segmentStore);
-                updateRange(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange());
             }
         }
     }
@@ -252,7 +272,6 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             if (segmentStoreProvider != null) {
                 segmentStoreProvider.addListener(fListener);
                 setData(segmentStoreProvider);
-                updateRange(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange());
             }
         }
     }
@@ -436,6 +455,11 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
     }
 
     private void updateRange(final @Nullable TmfTimeRange timeRange) {
+        /*
+         * Update is request, content is not up to date, fDirty will be
+         * decremented in the compacting job
+         */
+        fDirty.incrementAndGet();
         Job compactingJob = fCompactingJob;
         if (compactingJob != null && compactingJob.getState() == Job.RUNNING) {
             compactingJob.cancel();
@@ -491,5 +515,11 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
 
     private void setSegmentProvider(ISegmentStoreProvider provider) {
         fSegmentProvider = provider;
+    }
+
+    @Override
+    public boolean isDirty() {
+        /* Check the parent's or this view's own dirtiness */
+        return super.isDirty() || (fDirty.get() != 0);
     }
 }
