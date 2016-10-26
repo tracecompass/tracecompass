@@ -262,9 +262,8 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      *            The child entry
      */
     public synchronized void addChild(@NonNull TimeGraphEntry child) {
-        child.setParent(this);
         if (fComparator == null) {
-            fChildren.add(child);
+            addChild(fChildren.size(), child);
         } else {
             int i;
             for (i = 0; i < fChildren.size(); i++) {
@@ -273,7 +272,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
                     break;
                 }
             }
-            fChildren.add(i, child);
+            addChild(i, child);
         }
     }
 
@@ -287,6 +286,12 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      * @since 2.0
      */
     public synchronized void addChild(int index, @NonNull TimeGraphEntry child) {
+        if (child.getParent() == this) {
+            return;
+        }
+        if (child.getParent() != null) {
+            child.getParent().removeChild(child);
+        }
         child.setParent(this);
         fChildren.add(index, child);
     }
@@ -299,7 +304,9 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      * @since 2.0
      */
     public synchronized void removeChild(@NonNull TimeGraphEntry child) {
-        child.setParent(null);
+        if (child.getParent() == this) {
+            child.setParent(null);
+        }
         fChildren.remove(child);
     }
 

@@ -806,11 +806,11 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                     if (parent.getThreadId() == entry.getParentThreadId() &&
                             !(entry.getStartTime() > parent.getEndTime() ||
                             entry.getEndTime() < parent.getStartTime())) {
-                        parent.addChild(entry);
                         root = false;
                         if (rootList.contains(entry)) {
                             traceEntry.removeChild(entry);
                         }
+                        parent.addChild(entry);
                         break;
                     }
                 }

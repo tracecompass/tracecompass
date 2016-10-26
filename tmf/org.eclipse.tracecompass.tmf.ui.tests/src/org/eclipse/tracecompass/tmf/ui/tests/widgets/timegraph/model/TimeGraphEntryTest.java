@@ -16,6 +16,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 
 import org.eclipse.swt.SWT;
@@ -225,6 +227,156 @@ public class TimeGraphEntryTest {
         assertEquals(0, entry.getStartTime());
         assertEquals(30, entry.getEndTime());
         assertIteratorsEqual(Iterators.forArray(event1s, event2a, event2b, event3s), entry.getTimeEventsIterator());
+    }
+
+    /**
+     * Test method addChild.
+     */
+    @Test
+    public void testAddChild() {
+        TimeGraphEntry parent = new TimeGraphEntry("parent", SWT.DEFAULT, SWT.DEFAULT);
+        TimeGraphEntry child = new TimeGraphEntry("child", SWT.DEFAULT, SWT.DEFAULT);
+        parent.addChild(child);
+        assertEquals(null, parent.getParent());
+        assertEquals(Arrays.asList(child), parent.getChildren());
+        assertEquals(parent, child.getParent());
+        assertEquals(Arrays.asList(), child.getChildren());
+    }
+
+    /**
+     * Test method addChild at specific position.
+     */
+    @Test
+    public void testAddChildAtPosition() {
+        TimeGraphEntry parent = new TimeGraphEntry("parent", SWT.DEFAULT, SWT.DEFAULT);
+        TimeGraphEntry child1 = new TimeGraphEntry("child1", SWT.DEFAULT, SWT.DEFAULT);
+        TimeGraphEntry child2 = new TimeGraphEntry("child2", SWT.DEFAULT, SWT.DEFAULT);
+        parent.addChild(0, child1);
+        parent.addChild(0, child2);
+        assertEquals(null, parent.getParent());
+        assertEquals(Arrays.asList(child2, child1), parent.getChildren());
+        assertEquals(parent, child1.getParent());
+        assertEquals(Arrays.asList(), child1.getChildren());
+        assertEquals(parent, child2.getParent());
+        assertEquals(Arrays.asList(), child2.getChildren());
+    }
+
+    /**
+     * Test method addChild to same parent.
+     */
+    @Test
+    public void testAddChildSameParent() {
+        TimeGraphEntry parent = new TimeGraphEntry("parent", SWT.DEFAULT, SWT.DEFAULT);
+        TimeGraphEntry child = new TimeGraphEntry("child", SWT.DEFAULT, SWT.DEFAULT);
+        parent.addChild(child);
+        parent.addChild(child);
+        assertEquals(null, parent.getParent());
+        assertEquals(Arrays.asList(child), parent.getChildren());
+        assertEquals(parent, child.getParent());
+        assertEquals(Arrays.asList(), child.getChildren());
+    }
+
+    /**
+     * Test method addChild to an other parent.
+     */
+    @Test
+    public void testAddChildOtherParent() {
+        TimeGraphEntry parent1 = new TimeGraphEntry("parent1", SWT.DEFAULT, SWT.DEFAULT);
+        TimeGraphEntry parent2 = new TimeGraphEntry("parent2", SWT.DEFAULT, SWT.DEFAULT);
+        TimeGraphEntry child = new TimeGraphEntry("child", SWT.DEFAULT, SWT.DEFAULT);
+        parent1.addChild(child);
+        parent2.addChild(child);
+        assertEquals(null, parent1.getParent());
+        assertEquals(Arrays.asList(), parent1.getChildren());
+        assertEquals(null, parent2.getParent());
+        assertEquals(Arrays.asList(child), parent2.getChildren());
+        assertEquals(parent2, child.getParent());
+        assertEquals(Arrays.asList(), child.getChildren());
+    }
+
+    /**
+     * Test method removeChild.
+     */
+    @Test
+    public void testRemoveChild() {
+        TimeGraphEntry parent = new TimeGraphEntry("parent", SWT.DEFAULT, SWT.DEFAULT);
+        TimeGraphEntry child = new TimeGraphEntry("child", SWT.DEFAULT, SWT.DEFAULT);
+        parent.addChild(child);
+        parent.removeChild(child);
+        assertEquals(null, parent.getParent());
+        assertEquals(Arrays.asList(), parent.getChildren());
+        assertEquals(null, child.getParent());
+        assertEquals(Arrays.asList(), child.getChildren());
+    }
+
+    /**
+     * Test method removeChild with child that has no parent.
+     */
+    @Test
+    public void testRemoveChildNoParent() {
+        TimeGraphEntry parent = new TimeGraphEntry("parent", SWT.DEFAULT, SWT.DEFAULT);
+        TimeGraphEntry child = new TimeGraphEntry("child", SWT.DEFAULT, SWT.DEFAULT);
+        parent.removeChild(child);
+        assertEquals(null, parent.getParent());
+        assertEquals(Arrays.asList(), parent.getChildren());
+        assertEquals(null, child.getParent());
+        assertEquals(Arrays.asList(), child.getChildren());
+    }
+
+    /**
+     * Test method removeChild with child that has an other parent.
+     */
+    @Test
+    public void testRemoveChildOtherParent() {
+        TimeGraphEntry parent1 = new TimeGraphEntry("parent1", SWT.DEFAULT, SWT.DEFAULT);
+        TimeGraphEntry parent2 = new TimeGraphEntry("parent2", SWT.DEFAULT, SWT.DEFAULT);
+        TimeGraphEntry child = new TimeGraphEntry("child", SWT.DEFAULT, SWT.DEFAULT);
+        parent1.addChild(child);
+        parent2.removeChild(child);
+        assertEquals(null, parent1.getParent());
+        assertEquals(Arrays.asList(child), parent1.getChildren());
+        assertEquals(null, parent2.getParent());
+        assertEquals(Arrays.asList(), parent2.getChildren());
+        assertEquals(parent1, child.getParent());
+        assertEquals(Arrays.asList(), child.getChildren());
+    }
+
+    /**
+     * Test method sortChildren.
+     */
+    @Test
+    public void testSortChildren() {
+        TimeGraphEntry parent = new TimeGraphEntry("parent", SWT.DEFAULT, SWT.DEFAULT);
+        TimeGraphEntry child1 = new TimeGraphEntry("child1", 2, 2);
+        TimeGraphEntry child2 = new TimeGraphEntry("child2", 1, 1);
+        parent.addChild(child1);
+        parent.addChild(child2);
+        parent.sortChildren(Comparator.comparingLong(entry -> entry.getStartTime()));
+        assertEquals(null, parent.getParent());
+        assertEquals(Arrays.asList(child2, child1), parent.getChildren());
+        assertEquals(parent, child1.getParent());
+        assertEquals(Arrays.asList(), child1.getChildren());
+        assertEquals(parent, child2.getParent());
+        assertEquals(Arrays.asList(), child2.getChildren());
+    }
+
+    /**
+     * Test method sortChildren followed by addChild.
+     */
+    @Test
+    public void testSortChildrenThenAdd() {
+        TimeGraphEntry parent = new TimeGraphEntry("parent", SWT.DEFAULT, SWT.DEFAULT);
+        TimeGraphEntry child1 = new TimeGraphEntry("child1", 2, 2);
+        TimeGraphEntry child2 = new TimeGraphEntry("child2", 1, 1);
+        parent.sortChildren(Comparator.comparingLong(entry -> entry.getStartTime()));
+        parent.addChild(child1);
+        parent.addChild(child2);
+        assertEquals(null, parent.getParent());
+        assertEquals(Arrays.asList(child2, child1), parent.getChildren());
+        assertEquals(parent, child1.getParent());
+        assertEquals(Arrays.asList(), child1.getChildren());
+        assertEquals(parent, child2.getParent());
+        assertEquals(Arrays.asList(), child2.getChildren());
     }
 
     private static void assertIteratorsEqual(Iterator<ITimeEvent> expected, Iterator<ITimeEvent> actual) {
