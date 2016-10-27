@@ -16,12 +16,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStateStatistics;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsEventTypesModule;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsTotalsModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -76,6 +78,7 @@ public class TmfStateStatisticsTest extends TmfStatisticsTest {
     public void tearDown() {
         fTotalsMod.dispose();
         fEventTypesMod.dispose();
+        TmfTraceManager.deleteSupplementaryFiles(NonNullUtils.checkNotNull(fTrace));
         fTrace.dispose();
     }
 }
