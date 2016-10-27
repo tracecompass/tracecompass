@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,8 +28,8 @@ import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
 
 /**
  * This class manages the set of signal listeners and the signals they are
- * interested in. When a signal is broadcasted, the appropriate listeners
- * signal handlers are invoked.
+ * interested in. When a signal is broadcasted, the appropriate listeners signal
+ * handlers are invoked.
  *
  * @version 1.0
  * @author Francois Chouinard
@@ -41,6 +42,7 @@ public class TmfSignalManager {
     // the signal data type.
     private static Map<Object, Method[]> fListeners = new HashMap<>();
     private static Map<Object, Method[]> fVIPListeners = new HashMap<>();
+    private static Map<Object, Throwable> fContexts = new HashMap<>();
 
     // The signal executor for asynchronous signals
     private static final ExecutorService fExecutor = Executors.newSingleThreadExecutor();
@@ -69,6 +71,7 @@ public class TmfSignalManager {
         deregister(listener); // make sure that listener is only registered once
         Method[] methods = getSignalHandlerMethods(listener);
         if (methods.length > 0) {
+            fContexts.put(listener, new Throwable());
             fListeners.put(listener, methods);
         }
     }
@@ -85,6 +88,7 @@ public class TmfSignalManager {
         deregister(listener); // make sure that listener is only registered once
         Method[] methods = getSignalHandlerMethods(listener);
         if (methods.length > 0) {
+            fContexts.put(listener, new Throwable());
             fVIPListeners.put(listener, methods);
         }
     }
@@ -99,6 +103,7 @@ public class TmfSignalManager {
     public static synchronized void deregister(Object listener) {
         fVIPListeners.remove(listener);
         fListeners.remove(listener);
+        fContexts.remove(listener);
     }
 
     /**
@@ -145,12 +150,12 @@ public class TmfSignalManager {
     }
 
     /**
-     * Invokes the handling methods that listens to signals of a given type
-     * in a separate thread which will call
+     * Invokes the handling methods that listens to signals of a given type in a
+     * separate thread which will call
      * {@link TmfSignalManager#dispatchSignal(TmfSignal)}.
      *
-     * If a signal is already processed the signal will be queued and
-     * dispatched after the ongoing signal finishes.
+     * If a signal is already processed the signal will be queued and dispatched
+     * after the ongoing signal finishes.
      *
      * @param signal
      *            the signal to dispatch
@@ -170,7 +175,18 @@ public class TmfSignalManager {
      * Disposes the signal manager
      */
     public static void dispose() {
+        for (Entry<Object, Throwable> entry : fContexts.entrySet()) {
+            System.err.println(getWarningMessage(entry.getKey()));
+            StackTraceElement[] stackTrace = entry.getValue().getStackTrace();
+            for (StackTraceElement elem : stackTrace) {
+                System.err.println("\t" + elem); //$NON-NLS-1$
+            }
+        }
         fExecutor.shutdown();
+    }
+
+    private static String getWarningMessage(Object listener) {
+        return "Resource leak: " + listener + " was not deregistered."; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private static void sendSignal(TmfSignal signal) {
@@ -184,7 +200,8 @@ public class TmfSignalManager {
             TmfCoreTracer.traceSignal(signal, "(start)"); //$NON-NLS-1$
         }
 
-        // Build the list of listener methods that are registered for this signal
+        // Build the list of listener methods that are registered for this
+        // signal
         Class<?> signalClass = signal.getClass();
         Map<Object, List<Method>> targets = new HashMap<>();
         targets.clear();
@@ -208,7 +225,7 @@ public class TmfSignalManager {
                     if (TmfCoreTracer.isSignalTraced()) {
                         Object key = entry.getKey();
                         String hash = String.format("%1$08X", entry.getKey().hashCode()); //$NON-NLS-1$
-                        String target = "[" + hash + "] " + key.getClass().getSimpleName() + ":" + method.getName();   //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+                        String target = "[" + hash + "] " + key.getClass().getSimpleName() + ":" + method.getName(); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
                         TmfCoreTracer.traceSignal(signal, target);
                     }
                 } catch (IllegalArgumentException e) {
