@@ -311,7 +311,6 @@ public class CallStackViewTest {
      */
     @Test
     public void testManipulatingMappingFiles() throws IOException {
-        openSymbolProviderDialog();
 
         // 1- Open valid mapping files and invalid mapping file
         Object mapObjA = CtfTmfTestTraceUtils.class.getResource("cyg-profile-mapping.txt");
@@ -332,7 +331,8 @@ public class CallStackViewTest {
         String[] overrideFiles = { absoluteFileA, absoluteFileA, absoluteFileB, absoluteFileC, absoluteFileD, absoluteFileE };
         TmfFileDialogFactory.setOverrideFiles(overrideFiles);
 
-        final SWTBot symbolDialog = fBot.shell("Symbol mapping").bot();
+        SWTBotShell shell = openSymbolProviderDialog();
+        final SWTBot symbolDialog = shell.bot();
         symbolDialog.button("Add...").click();
         final SWTBot errorDialog = fBot.shell("Import failure").bot();
         errorDialog.button("OK").click();
@@ -373,7 +373,6 @@ public class CallStackViewTest {
      */
     @Test
     public void testLoadingMappingFiles() throws IOException {
-        openSymbolProviderDialog();
 
         // 1- Open conflicting mapping files
         Object mapObjA = CtfTmfTestTraceUtils.class.getResource("cyg-profile-mapping.txt");
@@ -384,7 +383,9 @@ public class CallStackViewTest {
         String absoluteFileB = FileLocator.toFileURL(mapUrlB).getFile();
         String[] overrideFiles = { absoluteFileA, absoluteFileB };
         TmfFileDialogFactory.setOverrideFiles(overrideFiles);
-        final SWTBot symbolDialog = fBot.shell("Symbol mapping").bot();
+
+        SWTBotShell shell = openSymbolProviderDialog();
+        final SWTBot symbolDialog = shell.bot();
         symbolDialog.button("Add...").click();
         symbolDialog.button("OK").click();
 
@@ -393,11 +394,11 @@ public class CallStackViewTest {
         assertEquals(Arrays.asList("main", "event_loop", "draw_frame", "draw_gears", "drawB"), getVisibleStackFrames(fBot.viewById(CallStackView.ID)));
     }
 
-    private static void openSymbolProviderDialog() {
+    private static SWTBotShell openSymbolProviderDialog() {
         final SWTBotView viewBot = fBot.viewById(CallStackView.ID);
         viewBot.setFocus();
         viewBot.toolbarButton(CONFIGURE_SYMBOL_PROVIDERS).click();
-        fBot.waitUntil(Conditions.shellIsActive("Symbol mapping"));
+        return fBot.shell("Symbol mapping");
     }
 
     /**
@@ -417,20 +418,12 @@ public class CallStackViewTest {
 
         String absoluteFile = FileLocator.toFileURL(mapUrl).getFile();
         TmfFileDialogFactory.setOverrideFiles(absoluteFile);
-        viewBot.toolbarButton("Configure how the addresses are mapped to function names").click();
-        String shellTitle = "Symbol mapping";
-        fBot.waitUntil(Conditions.shellIsActive(shellTitle));
-        SWTBot shellBot = fBot.shell(shellTitle).bot();
-        SWTBotShell activeShell = shellBot.activeShell();
+
+        SWTBotShell shell = openSymbolProviderDialog();
+        SWTBot shellBot = shell.bot();
         shellBot.button("Add...").click();
         shellBot.button("OK").click();
-        shellBot.waitUntil(Conditions.shellCloses(activeShell));
-        /*
-         * FIXME: Seek to time needed to update the call stack entry names.
-         * Remove when applying symbol configuration correctly updates entries.
-         */
-        goToTime(TIMESTAMPS[0]);
-        WaitUtils.waitForJobs();
+        shellBot.waitUntil(Conditions.shellCloses(shell));
         SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(viewBot.bot());
         SWTBotTimeGraphEntry[] threads = timeGraph.getEntry(TRACE, PROCESS).getEntries();
         assertEquals(1, threads.length);

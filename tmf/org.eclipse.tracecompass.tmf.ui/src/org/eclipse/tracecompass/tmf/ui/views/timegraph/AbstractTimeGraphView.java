@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2017 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2017 Ericsson, École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -101,6 +101,7 @@ import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
 import org.eclipse.tracecompass.tmf.core.signal.TmfMarkerEventSourceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -117,6 +118,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.TmfUiRefreshHandler;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfAllowMultiple;
+import org.eclipse.tracecompass.tmf.ui.views.ITmfPinnable;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphBookmarkListener;
@@ -162,7 +164,7 @@ import com.google.common.collect.Iterables;
  *
  * This view contains a time graph viewer.
  */
-public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeAligned, ITmfAllowMultiple, IResourceChangeListener {
+public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeAligned, ITmfAllowMultiple, ITmfPinnable, IResourceChangeListener {
 
     private static final String DIRTY_UNDERFLOW_ERROR = "Dirty underflow error"; //$NON-NLS-1$
 
@@ -318,6 +320,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     /** The marker set menu */
     private MenuManager fMarkerSetMenu;
+
+    /** The original view title */
+    private String fOriginalTabLabel;
 
     // ------------------------------------------------------------------------
     // Classes
@@ -1126,6 +1131,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         createContextMenu();
         fPartListener = new TimeGraphPartListener();
         getSite().getPage().addPartListener(fPartListener);
+
+        fOriginalTabLabel = getPartName();
     }
 
     /**
@@ -1271,7 +1278,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             fEditorFile = null;
             setStartTime(SWT.DEFAULT);
             setEndTime(SWT.DEFAULT);
-            refresh();
+            if (isPinned()) {
+                setPinned(false);
+            } else {
+                refresh();
+            }
         }
     }
 
@@ -1298,16 +1309,21 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     @TmfSignalHandler
     public void selectionRangeUpdated(final TmfSelectionRangeUpdatedSignal signal) {
-        if (signal.getSource() == this || fTrace == null) {
+        final ITmfTrace trace = fTrace;
+        if (signal.getSource() == this || trace == null) {
             return;
         }
-        final long beginTime = signal.getBeginTime().toNanos();
-        final long endTime = signal.getEndTime().toNanos();
+        TmfTraceContext ctx = TmfTraceManager.getInstance().getTraceContext(trace);
+        long beginTime = ctx.getSelectionRange().getStartTime().toNanos();
+        long endTime = ctx.getSelectionRange().getEndTime().toNanos();
 
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
                 if (fTimeGraphViewer.getControl().isDisposed()) {
+                    return;
+                }
+                if (beginTime == fTimeGraphViewer.getSelectionBegin() && endTime == fTimeGraphViewer.getSelectionEnd()) {
                     return;
                 }
                 if (beginTime == endTime) {
@@ -1332,15 +1348,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         if (signal.getSource() == this || fTrace == null) {
             return;
         }
-        if (signal.getCurrentRange().getIntersection(fTrace.getTimeRange()) == null) {
-            return;
-        }
-        final long startTime = signal.getCurrentRange().getStartTime().toNanos();
-        final long endTime = signal.getCurrentRange().getEndTime().toNanos();
+        TmfTraceContext ctx = TmfTraceManager.getInstance().getTraceContext(checkNotNull(fTrace));
+        final long startTime = ctx.getWindowRange().getStartTime().toNanos();
+        final long endTime = ctx.getWindowRange().getEndTime().toNanos();
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
                 if (fTimeGraphViewer.getControl().isDisposed()) {
+                    return;
+                }
+                if (startTime == fTimeGraphViewer.getTime0() && endTime == fTimeGraphViewer.getTime1()) {
                     return;
                 }
                 fTimeGraphViewer.setStartFinishTime(startTime, endTime);
@@ -1709,8 +1726,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                             long endTime = fTrace == null ? SWT.DEFAULT : ctx.getWindowRange().getEndTime().toNanos();
                             startTime = (fStartTime == Long.MAX_VALUE ? SWT.DEFAULT : Math.max(startTime, fStartTime));
                             endTime = (fEndTime == Long.MIN_VALUE ? SWT.DEFAULT : Math.min(endTime, fEndTime));
-                            fTimeGraphViewer.setSelectionRange(selectionBeginTime, selectionEndTime, false);
-                            fTimeGraphViewer.setStartFinishTime(startTime, endTime);
+                            if (!isPinned()) {
+                                fTimeGraphViewer.setSelectionRange(selectionBeginTime, selectionEndTime, false);
+                                fTimeGraphViewer.setStartFinishTime(startTime, endTime);
+                            }
 
                             if (inputChanged && selectionBeginTime != SWT.DEFAULT) {
                                 synchingToTime(selectionBeginTime);
@@ -1985,6 +2004,40 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     public void performAlign(int offset, int width) {
         if (fTimeGraphViewer != null) {
             fTimeGraphViewer.performAlign(offset, width);
+        }
+    }
+
+    @Override
+    public synchronized void setPinned(boolean pinned) {
+        if (pinned) {
+            ITmfTrace trace = getTrace();
+            if (trace == null) {
+                if (fPinAction != null) {
+                    fPinAction.setChecked(false);
+                }
+                return;
+            }
+            /* Ignore relevant inbound signals */
+            TmfSignalManager.addIgnoredInboundSignal(this, TmfTraceOpenedSignal.class);
+            TmfSignalManager.addIgnoredInboundSignal(this, TmfTraceSelectedSignal.class);
+
+            setPartName(String.format("%s <%s>", fOriginalTabLabel, trace.getName())); //$NON-NLS-1$
+        } else {
+            /* Handle relevant inbound signals */
+            TmfSignalManager.removeIgnoredInboundSignal(this, TmfTraceOpenedSignal.class);
+            TmfSignalManager.removeIgnoredInboundSignal(this, TmfTraceSelectedSignal.class);
+
+            setPartName(fOriginalTabLabel);
+
+            ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
+            if (trace != null && !trace.equals(fTrace)) {
+                loadTrace(trace);
+            } else {
+                refresh();
+            }
+        }
+        if (fPinAction != null) {
+            fPinAction.setChecked(pinned);
         }
     }
 

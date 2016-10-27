@@ -76,7 +76,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
 import org.eclipse.tracecompass.tmf.ui.symbols.SymbolProviderConfigDialog;
-import org.eclipse.tracecompass.tmf.ui.views.ITmfPinnable;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphContentProvider;
@@ -99,7 +98,7 @@ import com.google.common.collect.Multimap;
  *
  * @author Patrick Tasse
  */
-public class CallStackView extends AbstractTimeGraphView implements ITmfPinnable {
+public class CallStackView extends AbstractTimeGraphView {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -167,13 +166,6 @@ public class CallStackView extends AbstractTimeGraphView implements ITmfPinnable
 
     // The action to import a binary file mapping */
     private Action fConfigureSymbolsAction;
-
-    // The saved time sync. signal used when switching off the pinning of a view
-    private TmfSelectionRangeUpdatedSignal fSavedTimeSyncSignal;
-
-    // The saved window range signal used when switching off the pinning of
-    // a view
-    private TmfWindowRangeUpdatedSignal fSavedRangeSyncSignal;
 
     // When set to true, syncToTime() will select the first call stack entry
     // whose current state start time exactly matches the sync time.
@@ -444,32 +436,8 @@ public class CallStackView extends AbstractTimeGraphView implements ITmfPinnable
     @Override
     @TmfSignalHandler
     public void selectionRangeUpdated(final TmfSelectionRangeUpdatedSignal signal) {
-
-        fSavedTimeSyncSignal = isPinned() ? new TmfSelectionRangeUpdatedSignal(signal.getSource(), signal.getBeginTime(), signal.getEndTime()) : null;
-
-        if (signal.getSource() == this || getTrace() == null || isPinned()) {
-            return;
-        }
-        final long beginTime = signal.getBeginTime().toNanos();
-        final long endTime = signal.getEndTime().toNanos();
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                if (getTimeGraphViewer().getControl().isDisposed()) {
-                    return;
-                }
-                if (beginTime == endTime) {
-                    getTimeGraphViewer().setSelectedTime(beginTime, true);
-                } else {
-                    getTimeGraphViewer().setSelectionRange(beginTime, endTime, true);
-                }
-                fSyncSelection = true;
-                synchingToTime(beginTime);
-                fSyncSelection = false;
-                startZoomThread(getTimeGraphViewer().getTime0(), getTimeGraphViewer().getTime1());
-            }
-        });
-
+        fSyncSelection = true;
+        super.selectionRangeUpdated(signal);
     }
 
     /**
@@ -478,13 +446,7 @@ public class CallStackView extends AbstractTimeGraphView implements ITmfPinnable
     @Override
     @TmfSignalHandler
     public void windowRangeUpdated(final TmfWindowRangeUpdatedSignal signal) {
-
-        if (isPinned()) {
-            fSavedRangeSyncSignal = new TmfWindowRangeUpdatedSignal(signal.getSource(), signal.getCurrentRange());
-            fSavedTimeSyncSignal = null;
-        }
-
-        if ((signal.getSource() == this) || isPinned()) {
+        if (signal.getSource() == this) {
             return;
         }
         super.windowRangeUpdated(signal);
@@ -831,9 +793,6 @@ public class CallStackView extends AbstractTimeGraphView implements ITmfPinnable
     protected void synchingToTime(final long time) {
         List<TimeGraphEntry> traceEntries = getEntryList(getTrace());
         Map<ITmfStateSystem, List<ITmfStateInterval>> fullStateMap = new HashMap<>();
-        if (traceEntries == null) {
-            return;
-        }
         Consumer<TimeGraphEntry> consumer = new Consumer<TimeGraphEntry>() {
             @Override
             public void accept(TimeGraphEntry entry) {
@@ -886,7 +845,10 @@ public class CallStackView extends AbstractTimeGraphView implements ITmfPinnable
                 return fullState;
             }
         };
-        traceEntries.forEach(consumer);
+        if (traceEntries != null) {
+            traceEntries.forEach(consumer);
+        }
+        fSyncSelection = false;
         if (Display.getCurrent() != null) {
             getTimeGraphViewer().refresh();
         }
@@ -926,21 +888,6 @@ public class CallStackView extends AbstractTimeGraphView implements ITmfPinnable
         fNextItemAction = getTimeGraphViewer().getNextItemAction();
         fNextItemAction.setText(Messages.TmfTimeGraphViewer_NextItemActionNameText);
         fNextItemAction.setToolTipText(Messages.TmfTimeGraphViewer_NextItemActionToolTipText);
-    }
-
-    @Override
-    public void setPinned(boolean pinned) {
-        if (!pinned) {
-            if (fSavedRangeSyncSignal != null) {
-                windowRangeUpdated(fSavedRangeSyncSignal);
-                fSavedRangeSyncSignal = null;
-            }
-
-            if (fSavedTimeSyncSignal != null) {
-                selectionRangeUpdated(fSavedTimeSyncSignal);
-                fSavedTimeSyncSignal = null;
-            }
-        }
     }
 
     /**
@@ -1235,7 +1182,7 @@ public class CallStackView extends AbstractTimeGraphView implements ITmfPinnable
                 SymbolProviderConfigDialog dialog = new SymbolProviderConfigDialog(getSite().getShell(), getProviderPages());
                 if (dialog.open() == IDialogConstants.OK_ID) {
                     getPresentationProvider().resetFunctionNames();
-                    refresh();
+                    synchingToTime(getTimeGraphViewer().getSelectionBegin());
                 }
             }
         };

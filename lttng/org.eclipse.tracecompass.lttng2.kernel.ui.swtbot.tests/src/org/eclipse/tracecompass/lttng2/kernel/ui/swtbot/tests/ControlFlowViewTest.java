@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2017 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -107,7 +107,8 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
                 "Add Bookmark...", "Previous Marker", "Next Marker", SEPARATOR,
                 "Select Previous Process", "Select Next Process", "Zoom In", "Zoom Out", SEPARATOR,
                 "Hide Arrows", "Follow CPU Backward", "Follow CPU Forward",
-                "Go to previous event of the selected thread", "Go to next event of the selected thread");
+                "Go to previous event of the selected thread", "Go to next event of the selected thread", SEPARATOR,
+                "Pin View");
     }
 
     /**
