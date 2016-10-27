@@ -33,6 +33,7 @@ import org.eclipse.swtbot.swt.finder.waits.WaitForObjectCondition;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRootMenu;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 
 /**
@@ -45,16 +46,19 @@ public class SWTBotTimeGraphEntry extends AbstractSWTBotControl<TimeGraphControl
     /**
      * Constructor
      *
-     * @param w the widget
-     * @param entry the time graph entry
+     * @param w
+     *            the widget
+     * @param entry
+     *            the time graph entry
      *
-     * @throws WidgetNotFoundException if the widget is <code>null</code> or widget has been disposed.
+     * @throws WidgetNotFoundException
+     *             if the widget is <code>null</code> or widget has been
+     *             disposed.
      */
     public SWTBotTimeGraphEntry(TimeGraphControl w, ITimeGraphEntry entry) throws WidgetNotFoundException {
         super(w);
         fEntry = entry;
     }
-
 
     @Override
     protected SWTBotRootMenu contextMenu(final Control control) throws WidgetNotFoundException {
@@ -99,6 +103,47 @@ public class SWTBotTimeGraphEntry extends AbstractSWTBotControl<TimeGraphControl
                 }
                 return entries.toArray(new SWTBotTimeGraphEntry[0]);
             }
+        });
+    }
+
+    /**
+     * Click on the entry at a timestamp
+     *
+     * @param time
+     *            the timestamp to click at.
+     */
+    public void click(long time) {
+        final Point p = getPointForTime(time);
+        if (p == null) {
+            return;
+        }
+        clickXY(p.x, p.y);
+    }
+
+    /**
+     * Double-click on the entry at a timestamp
+     *
+     * @param time
+     *            the timestamp to double-click at.
+     */
+    public void doubleClick(long time) {
+        final Point p = getPointForTime(time);
+        if (p == null) {
+            return;
+        }
+        doubleClickXY(p.x, p.y);
+    }
+
+    private Point getPointForTime(long time) {
+        return UIThreadRunnable.syncExec((Result<Point>) () -> {
+            ITimeDataProvider timeDataProvider = widget.getTimeDataProvider();
+            if (timeDataProvider.getTime0() > time || timeDataProvider.getTime1() < time) {
+                return null;
+            }
+            int x = widget.getXForTime(time);
+            Rectangle bounds = widget.getItemBounds(fEntry);
+            int y = bounds.y + bounds.height / 2;
+            return new Point(x, y);
         });
     }
 

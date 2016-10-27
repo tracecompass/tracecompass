@@ -139,7 +139,7 @@ public class FlameGraphView extends TmfView {
                             FlamegraphEvent event = (FlamegraphEvent) object;
                             long startTime = event.getTime();
                             long endTime = startTime + event.getDuration();
-                            getTimeGraphViewer().setStartFinishTime(startTime, endTime);
+                            getTimeGraphViewer().setStartFinishTimeNotify(startTime, endTime);
                             break;
                         }
                     }

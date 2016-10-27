@@ -34,6 +34,10 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.tracecompass.analysis.timing.core.tests.flamegraph.AggregationTreeTest;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph.FlameGraphPresentationProvider;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph.FlameGraphView;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphViewer;
@@ -45,6 +49,7 @@ import org.eclipse.ui.IViewPart;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
@@ -126,8 +131,7 @@ public class FlameGraphTest extends AggregationTreeTest {
                 .filter(i -> (i instanceof TimeEvent)).filter(j -> !(j instanceof NullTimeEvent))
                 .findFirst();
         assertTrue(actualEventOpt.isPresent());
-        ITimeEvent actualEvent = actualEventOpt.get();
-        return actualEvent;
+        return actualEventOpt.get();
     }
 
     @Override
@@ -217,6 +221,29 @@ public class FlameGraphTest extends AggregationTreeTest {
         tooltip = new FlameGraphPresentationProvider().getEventHoverToolTipInfo(actualEvent, 5);
         assertTrue(tooltip.toString().contains("duration=80 ns"));
         assertTrue(tooltip.toString().contains("duration=40 ns"));
+    }
+
+    /**
+     * Try to zoom by doubleclicking an event
+     *
+     * @throws InterruptedException
+     *             on interruption
+     */
+    @Test
+    public void tryMouseDoubleclickZoom() throws InterruptedException {
+        super.treeTest();
+        loadFlameGraph();
+
+        SWTBotTimeGraph sbtg = new SWTBotTimeGraph(fView.bot());
+        // Test the number of timegraph entries in the graph
+        SWTBotTimeGraphEntry sbtge = sbtg.getEntry("Thread");
+        assertEquals(3, sbtge.getEntries().length);
+        SWTBotTimeGraphEntry actualEntry = sbtge.getEntry("1");
+
+        actualEntry.doubleClick(40);
+        fFg.waitForUpdate();
+
+        assertEquals(new TmfTimeRange(TmfTimestamp.fromNanos(0), TmfTimestamp.fromNanos(80)), new TmfTimeRange(TmfTimestamp.fromNanos(fTimeGraphViewer.getTime0()), TmfTimestamp.fromNanos(fTimeGraphViewer.getTime1())));
     }
 
     /**
