@@ -466,6 +466,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         fStateProvider = provider;
         synchronized (fRequestSyncObj) {
             startRequest();
+            request = fRequest;
         }
 
         /*
@@ -479,18 +480,42 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
          * progress monitor displays that it is running).
          */
         try {
-            if (fRequest != null) {
-                fRequest.waitForCompletion();
+            if (request != null) {
+                request.waitForCompletion();
+                if (request.isFailed()) {
+                    Throwable failureCause = request.getFailureCause();
+                    if (failureCause != null) {
+                        fail(failureCause);
+                    } else {
+                        fail(new RuntimeException("Event request failed without a cause")); //$NON-NLS-1$
+                    }
+                }
             }
         } catch (InterruptedException e) {
-             e.printStackTrace();
+             fail(e);
         }
     }
 
-    private class StateSystemEventRequest extends TmfEventRequest {
+    /**
+     * A request to build a state system from a state provider
+     *
+     * @since 2.3
+     */
+    @VisibleForTesting
+    protected class StateSystemEventRequest extends TmfEventRequest {
         private final ITmfStateProvider sci;
         private final ITmfTrace trace;
 
+        /**
+         * Constructor
+         *
+         * @param sp
+         *            The state provider used to build the state system
+         * @param timeRange
+         *            The requested time range for the request
+         * @param index
+         *            The event number at which to start the request
+         */
         public StateSystemEventRequest(ITmfStateProvider sp, TmfTimeRange timeRange, int index) {
             super(ITmfEvent.class,
                     timeRange,
@@ -599,9 +624,26 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         if (stateProvider == null || timeRange == null) {
             return;
         }
-        ITmfEventRequest request = new StateSystemEventRequest(stateProvider, timeRange, fNbRead);
+        ITmfEventRequest request = createEventRequest(stateProvider, timeRange, fNbRead);
         stateProvider.getTrace().sendRequest(request);
         fRequest = request;
+    }
+
+    /**
+     * Create a new event request
+     *
+     * @param stateProvider
+     *            The state provider used to build the state system
+     * @param timeRange
+     *            The requested time range for the request
+     * @param nbRead
+     *            The event number at which to start the request
+     * @return A new event request
+     * @since 2.3
+     */
+    @VisibleForTesting
+    protected ITmfEventRequest createEventRequest(ITmfStateProvider stateProvider, TmfTimeRange timeRange, int nbRead) {
+        return new StateSystemEventRequest(stateProvider, timeRange, nbRead);
     }
 
     private static boolean isCompleteTrace(ITmfTrace trace) {

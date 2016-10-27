@@ -74,6 +74,8 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
 
     private boolean fAnalysisCancelled = false;
 
+    private @Nullable Throwable fFailureCause = null;
+
     @Override
     public boolean isAutomatic() {
         return fAutomatic;
@@ -278,6 +280,14 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
         }
     }
 
+    /**
+     * @since 2.3
+     */
+    @Override
+    public final void fail(Throwable cause) {
+        fFailureCause = cause;
+    }
+
     @Override
     public void dispose() {
         super.dispose();
@@ -425,7 +435,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
         } catch (InterruptedException e) {
             Activator.logError("Error while waiting for module completion", e); //$NON-NLS-1$
         }
-        return !fAnalysisCancelled;
+        return (!fAnalysisCancelled && fFailureCause == null);
     }
 
     @Override
@@ -440,7 +450,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
         } catch (InterruptedException e) {
             Activator.logError("Error while waiting for module completion", e); //$NON-NLS-1$
         }
-        return !fAnalysisCancelled;
+        return (!fAnalysisCancelled && fFailureCause == null);
     }
 
     /**

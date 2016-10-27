@@ -245,6 +245,16 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      */
     void cancel();
 
+    /**
+     * Makes the analysis fail with a cause
+     *
+     * @param cause The cause of the failure
+     * @since 2.3
+     */
+    default void fail(@NonNull Throwable cause) {
+        // Do nothing by default.
+    }
+
     // -----------------------------------------------------
     // Utilities
     // -----------------------------------------------------

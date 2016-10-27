@@ -306,4 +306,31 @@ public class StateSystemAnalysisModuleTest {
             module2.dispose();
         }
     }
+
+    /**
+     * Test that an analysis whose event request throws an exception is failed
+     * correctly
+     *
+     * @throws TmfAnalysisException
+     *             Propagates exceptions
+     */
+    @Test
+    public void testRequestFailure() throws TmfAnalysisException {
+        TestStateSystemModule module = new TestStateSystemModule();
+        module.setRequestAction(e -> {
+            throw new IllegalArgumentException("This exception is desired and part of the test");
+        });
+        try {
+            ITmfTrace trace = fTrace;
+            assertNotNull(trace);
+            module.setTrace(trace);
+
+            // Execute the module that should throw the exception
+            module.schedule();
+            assertFalse(module.waitForCompletion());
+
+        } finally {
+            module.dispose();
+        }
+    }
 }
