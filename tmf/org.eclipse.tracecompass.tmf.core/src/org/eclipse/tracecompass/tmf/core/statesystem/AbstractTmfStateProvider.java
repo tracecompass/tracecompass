@@ -126,8 +126,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
     public void processEvent(ITmfEvent event) {
         /* Make sure the target state system has been assigned */
         if (!fStateSystemAssigned) {
-            Activator.logError("Cannot process event without a target state system"); //$NON-NLS-1$
-            return;
+            throw new IllegalStateException("Cannot process event without a target state system. ID: " + getClass().getSimpleName()); //$NON-NLS-1$
         }
 
         /* Insert the event we're received into the events queue */
