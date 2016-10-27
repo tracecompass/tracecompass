@@ -63,8 +63,9 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.core;x-friends:="org.eclip
  org.eclipse.tracecompass.tmf.core.trace.text,
  org.eclipse.tracecompass.tmf.core.uml2sd,
  org.eclipse.tracecompass.tmf.core.util
-Import-Package: com.google.common.base,
+Import-Package: com.google.common.annotations,
+ com.google.common.base,
  com.google.common.cache,
  com.google.common.collect,
- com.google.common.hash;version="15.0.0",
+ com.google.common.hash,
  org.apache.commons.io

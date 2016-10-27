@@ -47,6 +47,8 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Abstract analysis module to generate a state system. It is a base class that
  * can be used as a shortcut by analysis who just need to build a single state
@@ -189,7 +191,14 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     // TmfAbstractAnalysisModule
     // ------------------------------------------------------------------------
 
-    private @Nullable File getSsFile() {
+    /**
+     * Get the file where to save the results of the analysis
+     *
+     * @return The file to save the results in
+     * @since 2.2
+     */
+    @VisibleForTesting
+    protected @Nullable File getSsFile() {
         ITmfTrace trace = getTrace();
         if (trace == null) {
             return null;

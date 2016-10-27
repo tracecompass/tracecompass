@@ -14,6 +14,8 @@ package org.eclipse.tracecompass.tmf.tests.stubs.analysis;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.io.File;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
@@ -29,6 +31,24 @@ public class TestStateSystemModule extends TmfStateSystemAnalysisModule {
 
     private @Nullable TestStateSystemProvider fProvider = null;
     private boolean fThrottleEvents = false;
+    private final boolean fOnDisk;
+
+    /**
+     * Constructor
+     */
+    public TestStateSystemModule() {
+        this(false);
+    }
+
+    /**
+     * Constructor specifying the backend type
+     *
+     * @param onDisk <code>true</code> if the state system should be built on disk
+     */
+    public TestStateSystemModule(boolean onDisk) {
+        super();
+        fOnDisk = onDisk;
+    }
 
     @Override
     protected ITmfStateProvider createStateProvider() {
@@ -42,7 +62,7 @@ public class TestStateSystemModule extends TmfStateSystemAnalysisModule {
 
     @Override
     protected StateSystemBackendType getBackendType() {
-        return StateSystemBackendType.INMEM;
+        return fOnDisk ? StateSystemBackendType.FULL : StateSystemBackendType.INMEM;
     }
 
     /**
@@ -76,6 +96,11 @@ public class TestStateSystemModule extends TmfStateSystemAnalysisModule {
         if (provider != null) {
             provider.signalNextEvent();
         }
+    }
+
+    @Override
+    public @Nullable File getSsFile() {
+        return super.getSsFile();
     }
 
 }

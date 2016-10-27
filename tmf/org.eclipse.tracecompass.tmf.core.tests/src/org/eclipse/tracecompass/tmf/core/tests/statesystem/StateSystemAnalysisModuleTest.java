@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -23,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.statesystem.Messages;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -272,5 +274,35 @@ public class StateSystemAnalysisModuleTest {
         assertTrue(module.isQueryable(5));
         assertTrue(module.isQueryable(7));
         assertTrue(module.isQueryable(10));
+    }
+
+    /**
+     * Test that an analysis with full backend is re-read correctly
+     * @throws TmfAnalysisException Propagates exceptions
+     */
+    @Test
+    public void testReReadFullAnalysis() throws TmfAnalysisException {
+        TestStateSystemModule module = new TestStateSystemModule(true);
+        TestStateSystemModule module2 = new TestStateSystemModule(true);
+        try {
+            ITmfTrace trace = fTrace;
+            assertNotNull(trace);
+            module.setTrace(trace);
+            module2.setTrace(trace);
+
+            // Execute the first module
+            module.schedule();
+            assertTrue(module.waitForCompletion());
+
+            // Execute the second module, it should read the state system file
+            File ssFile = module2.getSsFile();
+            assertNotNull(ssFile);
+            assertTrue(ssFile.exists());
+            module2.schedule();
+            assertTrue(module2.waitForCompletion());
+        } finally {
+            module.dispose();
+            module2.dispose();
+        }
     }
 }
