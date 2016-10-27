@@ -14,110 +14,66 @@ package org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests.latency;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.eclipse.swtbot.swt.finder.results.BoolResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
-import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
+import org.eclipse.tracecompass.analysis.timing.ui.swtbot.tests.table.SegmentTableTest;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableView;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.SystemCall;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyView;
-import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
+import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.WorkbenchException;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests of the latency table
+ * SystemCall Latency Table Test. This adds specific tests for the system call
+ * name for the TSV export and adds a column test.
  *
  * @author Matthew Khouzam
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
-public class SystemCallLatencyTableAnalysisTest {
+public class SystemCallLatencyTableAnalysisTest extends SegmentTableTest {
 
     private static final String TRACE_TYPE = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
     private static final String PROJECT_NAME = "test";
-    private static final String VIEW_ID = SystemCallLatencyView.ID;
-    private static final String TRACING_PERSPECTIVE_ID = "org.eclipse.linuxtools.tmf.ui.perspective";
+    static final String VIEW_ID = SystemCallLatencyView.ID;
+    private static final SystemCallLatencyAnalysis fSystemCallLatencyAnalysis = new SystemCallLatencyAnalysis();
 
-    /** The Log4j logger instance. */
-    private static final Logger fLogger = Logger.getRootLogger();
-    private SystemCallLatencyView fLatencyView;
-    private AbstractSegmentStoreTableViewer fTable;
+    @Override
+    protected ISegmentStoreProvider getSegStoreProvider() {
+        return fSystemCallLatencyAnalysis;
+    }
 
     /**
      * Things to setup
      */
     @BeforeClass
     public static void beforeClass() {
-
-        SWTBotUtils.initialize();
-        Thread.currentThread().setName("SWTBotTest");
-        /* set up for swtbot */
-        SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
-        SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
-        fLogger.removeAllAppenders();
-        fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        final List<SWTBotView> openViews = bot.views();
-        for (SWTBotView view : openViews) {
-            if (view.getTitle().equals("Welcome")) {
-                view.close();
-                bot.waitUntil(ConditionHelpers.ViewIsClosed(view));
-            }
-        }
-        /* Switch perspectives */
-        switchTracingPerspective();
-        /* Finish waiting for eclipse to load */
-        WaitUtils.waitForJobs();
-
+        SegmentTableTest.beforeClass();
     }
 
-    /**
-     * Opens a latency table
-     */
-    @Before
-    public void createTable() {
+    @Override
+    protected AbstractSegmentStoreTableView openTable() {
         /*
          * Open latency view
          */
@@ -135,261 +91,35 @@ public class SystemCallLatencyTableAnalysisTest {
         if (!(viewPart instanceof SystemCallLatencyView)) {
             fail("Could not instanciate view");
         }
-        fLatencyView = (SystemCallLatencyView) viewPart;
-        fTable = fLatencyView.getSegmentStoreViewer();
-        assertNotNull(fTable);
+        return (SystemCallLatencyView) viewPart;
     }
 
-    /**
-     * Closes the view
-     */
-    @After
-    public void closeTable() {
-        final SWTWorkbenchBot swtWorkbenchBot = new SWTWorkbenchBot();
-        SWTBotView viewBot = swtWorkbenchBot.viewById(VIEW_ID);
-        viewBot.close();
+    @Override
+    protected @NonNull ISegment createSegment(long start, long end) {
+        // Notice the string is interned, that saves a lot of ram.
+        return new SystemCall(new SystemCall.InitialInfo(start, start % 3 == 0 ? "rightpad" : "leftpad"), end);
     }
 
-    private static void switchTracingPerspective() {
-        final Exception retE[] = new Exception[1];
-        if (!UIThreadRunnable.syncExec(new BoolResult() {
-            @Override
-            public Boolean run() {
-                try {
-                    PlatformUI.getWorkbench().showPerspective(TRACING_PERSPECTIVE_ID,
-                            PlatformUI.getWorkbench().getActiveWorkbenchWindow());
-                } catch (WorkbenchException e) {
-                    retE[0] = e;
-                    return false;
-                }
-                return true;
-            }
-        })) {
-            fail(retE[0].getMessage());
-        }
-
-    }
-
-    /**
-     * Test incrementing
-     */
     @Test
+    @Override
     public void climbTest() {
-        List<@NonNull BasicSegment> fixture = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            fixture.add(new BasicSegment(i, 2 * i));
-        }
-
-        assertNotNull(fTable);
-        fTable.updateModel(fixture);
-        SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
-        SWTBot bot = new SWTBot();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
+        super.climbTest();
+        SWTWorkbenchBot bot = new SWTWorkbenchBot();
+        SWTBotTable tableBot = new SWTBotTable(getTable().getTableViewer().getTable());
+        tableBot.header("System Call").click();
+        // this is an assert in the sense that it will timeout if it is not true
+        // FIXME: The first one should be leftpad, but because of preceding
+        // sorts, it first sort descending in this case
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "rightpad", 0, 3));
+        tableBot.header("System Call").click();
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "leftpad", 0, 3));
+        // Test that duration still works after having tested System Call
         tableBot.header("Duration").click();
         bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
         bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "99", 0, 2));
-    }
-
-    /**
-     * Test decrementing
-     */
-    @Test
-    public void decrementingTest() {
-        List<@NonNull BasicSegment> fixture = new ArrayList<>();
-        for (int i = 100; i >= 0; i--) {
-            fixture.add(new BasicSegment(i, 2 * i));
-        }
-        assertNotNull(fTable);
-        fTable.updateModel(fixture);
-        SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
-        SWTBot bot = new SWTBot();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "100", 0, 2));
-        tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
-        tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "100", 0, 2));
-    }
-
-    /**
-     * Test small table
-     */
-    @Test
-    public void smallTest() {
-        List<@NonNull BasicSegment> fixture = new ArrayList<>();
-        for (int i = 1; i >= 0; i--) {
-            fixture.add(new BasicSegment(i, 2 * i));
-        }
-        assertNotNull(fTable);
-        fTable.updateModel(fixture);
-        SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
-        SWTBot bot = new SWTBot();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1", 0, 2));
-        tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
-        tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1", 0, 2));
-    }
-
-    /**
-     * Test large
-     */
-    @Test
-    public void largeTest() {
-        final int size = 1000000;
-        BasicSegment[] fixture = new BasicSegment[size];
-        for (int i = 0; i < size; i++) {
-            fixture[i] = (new BasicSegment(i, 2 * i));
-        }
-        assertNotNull(fTable);
-        fTable.updateModel(fixture);
-        SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
-        SWTBot bot = new SWTBot();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
-        tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
-        tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "999,999", 0, 2));
-    }
-
-    /**
-     * Test noise
-     */
-    @Test
-    public void noiseTest() {
-        Random rnd = new Random();
-        rnd.setSeed(1234);
-        final int size = 1000000;
-        BasicSegment[] fixture = new BasicSegment[size];
-        for (int i = 0; i < size; i++) {
-            int start = Math.abs(rnd.nextInt(100000000));
-            int end = start + Math.abs(rnd.nextInt(1000000));
-            fixture[i] = (new BasicSegment(start, end));
-        }
-        assertNotNull(fTable);
-        fTable.updateModel(fixture);
-        SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
-        SWTBot bot = new SWTBot();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "894,633", 0, 2));
-        tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
-        tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "999,999", 0, 2));
-    }
-
-    /**
-     * Test gaussian noise
-     */
-    @Test
-    public void gaussianNoiseTest() {
-        Random rnd = new Random();
-        rnd.setSeed(1234);
-        List<@NonNull BasicSegment> fixture = new ArrayList<>();
-        for (int i = 1; i <= 1000000; i++) {
-            int start = Math.abs(rnd.nextInt(100000000));
-            final int delta = Math.abs(rnd.nextInt(1000));
-            int end = start + delta * delta;
-            fixture.add(new BasicSegment(start, end));
-        }
-        assertNotNull(fTable);
-        fTable.updateModel(fixture);
-        SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
-        SWTBot bot = new SWTBot();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "400,689", 0, 2));
-        tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
-        tableBot.header("Duration").click();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "998,001", 0, 2));
-    }
-
-    /**
-     * Test creating a tsv
-     *
-     * @throws NoSuchMethodException
-     *             Error creating the tsv
-     * @throws IOException
-     *             no such file or the file is locked.
-     */
-    @Ignore
-    @Test
-    public void testWriteToTsv() throws NoSuchMethodException, IOException {
-
-        List<@NonNull BasicSegment> fixture = new ArrayList<>();
-        for (int i = 1; i <= 20; i++) {
-            int start = i;
-            final int delta = i;
-            int end = start + delta * delta;
-            fixture.add(new BasicSegment(start, end));
-        }
-        assertNotNull(fTable);
-        fTable.updateModel(fixture);
-        SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
-        SWTBot bot = new SWTBot();
-        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1", 0, 2));
-        SWTWorkbenchBot swtWorkbenchBot = new SWTWorkbenchBot();
-        SWTBotView viewBot = swtWorkbenchBot.viewById(VIEW_ID);
-        List<String> actionResult = Arrays.asList(testToTsv(viewBot));
-        String absolutePath = TmfTraceManager.getTemporaryDirPath() + File.separator + "syscallLatencyTest.testWriteToTsv.tsv";
-        TmfFileDialogFactory.setOverrideFiles(absolutePath);
-        SWTBotMenu menuBot = viewBot.viewMenu().menu("Export to TSV");
-        try {
-            assertTrue(menuBot.isEnabled());
-            assertTrue(menuBot.isVisible());
-            menuBot.click();
-
-            try (BufferedReader br = new BufferedReader(new FileReader(absolutePath))) {
-                List<String> lines = br.lines().collect(Collectors.toList());
-                assertEquals("Both reads", actionResult, lines);
-            }
-        } finally {
-            new File(absolutePath).delete();
-        }
-
-    }
-
-    private String[] testToTsv(SWTBotView view) throws NoSuchMethodException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        assertNotNull(os);
-        Class<@NonNull AbstractSegmentStoreTableView> clazz = AbstractSegmentStoreTableView.class;
-        Method method = clazz.getDeclaredMethod("exportToTsv", java.io.OutputStream.class);
-        method.setAccessible(true);
-        final Exception[] except = new Exception[1];
-        UIThreadRunnable.syncExec(() -> {
-            try {
-                method.invoke(fLatencyView, os);
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                except[0] = e;
-            }
-        });
-        assertNull(except[0]);
-        @SuppressWarnings("null")
-        String[] lines = String.valueOf(os).split(System.getProperty("line.separator"));
-        assertNotNull(lines);
-        assertEquals("number of lines", 21, lines.length);
-        assertEquals("header", "Start Time\tEnd Time\tDuration", lines[0]);
-        // not a straight up string compare due to time zones. Kathmandu and
-        // Eucla have 15 minute time zones.
-        assertTrue("line 1", lines[1].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s001\\t\\d\\d:\\d\\d:00.000 000 002\\t1"));
-        assertTrue("line 2", lines[2].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s002\\t\\d\\d:\\d\\d:00.000 000 006\\t4"));
-        assertTrue("line 3", lines[3].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s003\\t\\d\\d:\\d\\d:00.000 000 012\\t9"));
-        assertTrue("line 4", lines[4].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s004\\t\\d\\d:\\d\\d:00.000 000 020\\t16"));
-        assertTrue("line 5", lines[5].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s005\\t\\d\\d:\\d\\d:00.000 000 030\\t25"));
-        assertTrue("line 6", lines[6].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s006\\t\\d\\d:\\d\\d:00.000 000 042\\t36"));
-        assertTrue("line 7", lines[7].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s007\\t\\d\\d:\\d\\d:00.000 000 056\\t49"));
-        assertTrue("line 8", lines[8].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s008\\t\\d\\d:\\d\\d:00.000 000 072\\t64"));
-        assertTrue("line 9", lines[9].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s009\\t\\d\\d:\\d\\d:00.000 000 090\\t81"));
-        assertTrue("line 10", lines[10].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s010\\t\\d\\d:\\d\\d:00.000 000 110\\t100"));
-        assertTrue("line 11", lines[11].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s011\\t\\d\\d:\\d\\d:00.000 000 132\\t121"));
-        assertTrue("line 12", lines[12].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s012\\t\\d\\d:\\d\\d:00.000 000 156\\t144"));
-        assertTrue("line 13", lines[13].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s013\\t\\d\\d:\\d\\d:00.000 000 182\\t169"));
-        assertTrue("line 14", lines[14].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s014\\t\\d\\d:\\d\\d:00.000 000 210\\t196"));
-        assertTrue("line 15", lines[15].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s015\\t\\d\\d:\\d\\d:00.000 000 240\\t225"));
-        assertTrue("line 16", lines[16].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s016\\t\\d\\d:\\d\\d:00.000 000 272\\t256"));
-        assertTrue("line 17", lines[17].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s017\\t\\d\\d:\\d\\d:00.000 000 306\\t289"));
-        assertTrue("line 18", lines[18].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s018\\t\\d\\d:\\d\\d:00.000 000 342\\t324"));
-        assertTrue("line 19", lines[19].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s019\\t\\d\\d:\\d\\d:00.000 000 380\\t361"));
-        assertTrue("line 20", lines[20].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s020\\t\\d\\d:\\d\\d:00.000 000 420\\t400"));
-        return lines;
+        tableBot.header("Start Time").click();
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "99", 0, 2));
     }
 
     /**
@@ -412,9 +142,13 @@ public class SystemCallLatencyTableAnalysisTest {
         SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotUtils.openTrace(PROJECT_NAME, tracePath, TRACE_TYPE);
         WaitUtils.waitForJobs();
-        createTable();
+        AbstractSegmentStoreTableView tableView = openTable();
+        setTableView(tableView);
+        AbstractSegmentStoreTableViewer table = tableView.getSegmentStoreViewer();
+        assertNotNull(table);
+        setTable(table);
         WaitUtils.waitForJobs();
-        SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
+        SWTBotTable tableBot = new SWTBotTable(table.getTableViewer().getTable());
         bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "24,100", 0, 2));
         tableBot.header("Duration").click();
         bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1,000", 0, 2));
@@ -422,5 +156,34 @@ public class SystemCallLatencyTableAnalysisTest {
         bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "5,904,091,700", 0, 2));
         bot.closeAllEditors();
         SWTBotUtils.deleteProject(PROJECT_NAME, bot);
+    }
+
+    @Override
+    protected void testTsv(String[] lines) {
+        assertNotNull(lines);
+        assertEquals("number of lines", 21, lines.length);
+        assertEquals("header", "Start Time\tEnd Time\tDuration\tSystem Call", lines[0]);
+        // not a straight up string compare due to time zones. Kathmandu and
+        // Eucla have 15 minute time zones.
+        assertTrue("line 1 : " + lines[1], lines[1].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s001\\t\\d\\d:\\d\\d:00.000 000 002\\t1\\tleftpad"));
+        assertTrue("line 2 : " + lines[2], lines[2].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s002\\t\\d\\d:\\d\\d:00.000 000 006\\t4\\tleftpad"));
+        assertTrue("line 3 : " + lines[3], lines[3].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s003\\t\\d\\d:\\d\\d:00.000 000 012\\t9\\trightpad"));
+        assertTrue("line 4 : " + lines[4], lines[4].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s004\\t\\d\\d:\\d\\d:00.000 000 020\\t16\\tleftpad"));
+        assertTrue("line 5 : " + lines[5], lines[5].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s005\\t\\d\\d:\\d\\d:00.000 000 030\\t25\\tleftpad"));
+        assertTrue("line 6 : " + lines[6], lines[6].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s006\\t\\d\\d:\\d\\d:00.000 000 042\\t36\\trightpad"));
+        assertTrue("line 7 : " + lines[7], lines[7].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s007\\t\\d\\d:\\d\\d:00.000 000 056\\t49\\tleftpad"));
+        assertTrue("line 8 : " + lines[8], lines[8].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s008\\t\\d\\d:\\d\\d:00.000 000 072\\t64\\tleftpad"));
+        assertTrue("line 9 : " + lines[9], lines[9].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s009\\t\\d\\d:\\d\\d:00.000 000 090\\t81\\trightpad"));
+        assertTrue("line 10 : " + lines[10], lines[10].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s010\\t\\d\\d:\\d\\d:00.000 000 110\\t100\\tleftpad"));
+        assertTrue("line 11 : " + lines[11], lines[11].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s011\\t\\d\\d:\\d\\d:00.000 000 132\\t121\\tleftpad"));
+        assertTrue("line 12 : " + lines[12], lines[12].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s012\\t\\d\\d:\\d\\d:00.000 000 156\\t144\\trightpad"));
+        assertTrue("line 13 : " + lines[13], lines[13].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s013\\t\\d\\d:\\d\\d:00.000 000 182\\t169\\tleftpad"));
+        assertTrue("line 14 : " + lines[14], lines[14].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s014\\t\\d\\d:\\d\\d:00.000 000 210\\t196\\tleftpad"));
+        assertTrue("line 15 : " + lines[15], lines[15].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s015\\t\\d\\d:\\d\\d:00.000 000 240\\t225\\trightpad"));
+        assertTrue("line 16 : " + lines[16], lines[16].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s016\\t\\d\\d:\\d\\d:00.000 000 272\\t256\\tleftpad"));
+        assertTrue("line 17 : " + lines[17], lines[17].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s017\\t\\d\\d:\\d\\d:00.000 000 306\\t289\\tleftpad"));
+        assertTrue("line 18 : " + lines[18], lines[18].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s018\\t\\d\\d:\\d\\d:00.000 000 342\\t324\\trightpad"));
+        assertTrue("line 19 : " + lines[19], lines[19].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s019\\t\\d\\d:\\d\\d:00.000 000 380\\t361\\tleftpad"));
+        assertTrue("line 20 : " + lines[20], lines[20].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s020\\t\\d\\d:\\d\\d:00.000 000 420\\t400\\tleftpad"));
     }
 }

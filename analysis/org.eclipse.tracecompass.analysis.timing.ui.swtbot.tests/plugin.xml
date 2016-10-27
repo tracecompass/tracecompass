@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="org.eclipse.tracecompass.analysis.timing.ui.swtbot.tests.table.SegmentTableTest$TestSegmentStoreTableView"
+            id="org.eclipse.tracecompass.analysis.timing.ui.swtbot.tests.table.TestSegmentStoreTableView"
+            name="Table"
+            restorable="true">
+      </view>
+   </extension>
+
+</plugin>

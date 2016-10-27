@@ -30,6 +30,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
@@ -53,6 +54,8 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.table.TmfSimpleTableViewer;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Displays the segment store provider data in a column table
@@ -153,6 +156,32 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+
+    /**
+     * Sets the segment provider, use only in test, only run in display thread
+     *
+     * @param segmentProvider
+     *            the segment provider
+     * @since 1.2
+     */
+    @VisibleForTesting
+    public void setSegmentProvider(ISegmentStoreProvider segmentProvider) {
+        fSegmentProvider = segmentProvider;
+        // Sort order of the content provider is by start time by default
+        getTableViewer().setContentProvider(new SegmentStoreContentProvider());
+
+        Table table = getTableViewer().getTable();
+        table.setRedraw(false);
+        while (table.getColumnCount() > 0) {
+            table.getColumn(0).dispose();
+        }
+        createColumns();
+        createProviderColumns();
+        getTableViewer().getTable().addSelectionListener(new TableSelectionListener());
+        addPackListener();
+        fListener = new SegmentStoreProviderProgressListener();
+        table.setRedraw(true);
+    }
 
     /**
      * Create default columns for start time, end time and duration
