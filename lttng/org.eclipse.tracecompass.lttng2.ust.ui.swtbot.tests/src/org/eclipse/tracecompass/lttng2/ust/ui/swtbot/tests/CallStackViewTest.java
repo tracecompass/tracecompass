@@ -12,11 +12,13 @@
 
 package org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -303,16 +305,15 @@ public class CallStackViewTest {
     /**
      * Test check callstack at a time with function map
      *
-     * @throws URISyntaxException
-     *             Malformed url
      * @throws IOException
      *             Missing file
      */
     @Test
-    public void testGoToTimeAndCheckStackWithNames() throws URISyntaxException, IOException {
+    public void testGoToTimeAndCheckStackWithNames() throws IOException {
         goToTime(TIMESTAMPS[0]);
         final SWTBotView viewBot = fBot.viewById(CallStackView.ID);
         viewBot.setFocus();
+        SWTBotTree tree = viewBot.bot().tree();
         Object mapObj = CtfTmfTestTraceUtils.class.getResource("cyg-profile-mapping.txt");
         assertTrue(mapObj instanceof URL);
         URL mapUrl = (URL) mapObj;
@@ -328,10 +329,11 @@ public class CallStackViewTest {
         shellBot.button("Browse...", 1).click();
         shellBot.button("OK").click();
         shellBot.waitUntil(Conditions.shellCloses(activeShell));
-
-        SWTBotTree tree = viewBot.bot().tree();
+        // FIXME: remove when updates are propagated
+        goToTime(TIMESTAMPS[0]);
         WaitUtils.waitForJobs();
         List<String> names = new ArrayList<>();
+
         for (SWTBotTreeItem swtBotTreeItem : tree.getAllItems()) {
             for (SWTBotTreeItem items : swtBotTreeItem.getItems()) {
                 for (SWTBotTreeItem item : items.getItems()) {
@@ -339,7 +341,9 @@ public class CallStackViewTest {
                 }
             }
         }
-        assertEquals(names, ImmutableList.of("glxgears-16073"));
+        List<String> functions = getVisibleStackFrames(viewBot);
+        assertEquals(ImmutableList.of("glxgears-16073"), names);
+        assertEquals(ImmutableList.of("main", "event_loop", "handle_event", "", ""), functions);
     }
 
     /**
