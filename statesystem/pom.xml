@@ -25,6 +25,8 @@
   <name>Trace Compass State System Parent</name>
 
   <modules>
+    <module>org.eclipse.tracecompass.datastore.core</module>
+    <!-- <module>org.eclipse.tracecompass.datastore.core.tests</module> -->
     <module>org.eclipse.tracecompass.segmentstore.core</module>
     <module>org.eclipse.tracecompass.segmentstore.core.tests</module>
     <module>org.eclipse.tracecompass.statesystem.core</module>
