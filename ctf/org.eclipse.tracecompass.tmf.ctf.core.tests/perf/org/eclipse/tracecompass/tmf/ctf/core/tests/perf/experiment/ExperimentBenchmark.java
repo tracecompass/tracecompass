@@ -120,7 +120,6 @@ public class ExperimentBenchmark {
             for (int i = 0; i < traces.length; i++) {
                 traces[i] = new CtfTmfTrace();
             }
-            fExperiment = new TmfExperimentStub("MegaExperiment", traces, BLOCK_SIZE);
             int j = 0;
             for (int i = 0; i < (traces.length) && (j < traces.length); i++) {
                 String absolutePath = traceFiles[j].getAbsolutePath();
@@ -131,6 +130,7 @@ public class ExperimentBenchmark {
                 }
                 j++;
             }
+            fExperiment = new TmfExperimentStub("MegaExperiment", traces, BLOCK_SIZE);
             if (traces[traces.length - 1].getPath() == null) {
                 throw new TmfTraceException("Insufficient valid traces in directory");
             }
