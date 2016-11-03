@@ -1408,6 +1408,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
         return Math.abs(x - nameWidth) < SNAP_WIDTH;
     }
 
+    boolean isOverTimeSpace(int x, int y) {
+        Point size = getSize();
+        return x >= fTimeProvider.getNameSpace() && x < size.x && y >= 0 && y < size.y;
+    }
     /**
      * Gets the {@link ITimeGraphEntry} at the given location.
      *
@@ -3351,8 +3355,13 @@ public class TimeGraphControl extends TimeGraphBaseControl
         if (null == fTimeProvider) {
             return;
         }
+        /*
+         * This flag indicates if menu was prevented from being shown below and
+         * therefore must be made visible on callback from mouseUp().
+         */
+        boolean pendingEventCallback = fPendingMenuDetectEvent != null;
         Point p = toControl(e.x, e.y);
-        if (e.detail == SWT.MENU_MOUSE) {
+        if (e.detail == SWT.MENU_MOUSE && isOverTimeSpace(p.x, p.y)) {
             if (fPendingMenuDetectEvent == null) {
                 /* Feature in Linux. The MenuDetectEvent is received before mouseDown.
                  * Store the event and trigger it later just before handling mouseUp.
@@ -3360,25 +3369,35 @@ public class TimeGraphControl extends TimeGraphBaseControl
                  */
                 fPendingMenuDetectEvent = e;
                 /*
-                 *  Prevent the platform to show the menu when returning. The
-                 *  menu will be shown (see below) when this method is called
-                 *  again during mouseup().
+                 * Prevent the platform to show the menu when returning. The
+                 * menu will be shown (see below) when this method is called
+                 * again during mouseUp().
                  */
                 e.doit = false;
                 return;
             }
             fPendingMenuDetectEvent = null;
-            if ((p.x >= fTimeProvider.getNameSpace()) && (fDragState != DRAG_ZOOM || !isInDragZoomMargin())) {
+            if (fDragState != DRAG_ZOOM || !isInDragZoomMargin()) {
+                /*
+                 * Don't show the menu on mouseUp() if a drag zoom is in
+                 * progress with a drag range outside of the drag zoom margin,
+                 * or if any other drag operation, or none, is in progress.
+                 */
+                e.doit = false;
                 return;
             }
         } else {
             if (fDragState != DRAG_NONE) {
+                /*
+                 * Don't show the menu on keyboard menu or mouse menu outside of
+                 * the time space if any drag operation is in progress.
+                 */
+                e.doit = false;
                 return;
             }
         }
         int idx = getItemIndexAtY(p.y);
         if (idx >= 0 && idx < fItemData.fExpandedItems.length) {
-            e.doit = true;
             Item item = fItemData.fExpandedItems[idx];
             ITimeGraphEntry entry = item.fEntry;
 
@@ -3387,7 +3406,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             e.data = entry;
             fireMenuEventOnTimeGraphEntry(e);
             Menu menu = getMenu();
-            if (e.doit && (menu != null)) {
+            if (pendingEventCallback && e.doit && (menu != null)) {
                 menu.setVisible(true);
             }
 
@@ -3399,7 +3418,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                     e.data = event;
                     fireMenuEventOnTimeEvent(e);
                     menu = getMenu();
-                    if (e.doit && (menu != null)) {
+                    if (pendingEventCallback && e.doit && (menu != null)) {
                         menu.setVisible(true);
                     }
                 }
