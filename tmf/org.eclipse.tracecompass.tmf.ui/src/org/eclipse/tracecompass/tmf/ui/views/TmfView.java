@@ -141,7 +141,14 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
             fControlListener = new ControlAdapter() {
                 @Override
                 public void controlResized(ControlEvent e) {
-                    TIME_ALIGNMENT_SYNCHRONIZER.handleViewResized(TmfView.this);
+                    /*
+                     * When switching perspective, the view can be resized just
+                     * before it is made visible. Queue the time alignment to
+                     * ensure it occurs when the parent composite is visible.
+                     */
+                    e.display.asyncExec(() -> {
+                        TIME_ALIGNMENT_SYNCHRONIZER.handleViewResized(TmfView.this);
+                    });
                 }
             };
             parent.addControlListener(fControlListener);
