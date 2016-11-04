@@ -109,13 +109,9 @@ public class ManageXMLAnalysisDialog extends Dialog {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (fAnalysesList.getSelectionCount() == 0) {
-                    fDeleteButton.setEnabled(false);
-                    fExportButton.setEnabled(false);
-                    fEditButton.setEnabled(false);
+                    setButtonsEnabled(false);
                 } else {
-                    fDeleteButton.setEnabled(true);
-                    fExportButton.setEnabled(true);
-                    fEditButton.setEnabled(true);
+                    setButtonsEnabled(true);
                     handleSelection(fAnalysesList.getSelection());
                 }
             }
@@ -198,6 +194,12 @@ public class ManageXMLAnalysisDialog extends Dialog {
         return composite;
     }
 
+    private void setButtonsEnabled(boolean enable) {
+        fDeleteButton.setEnabled(enable);
+        fExportButton.setEnabled(enable);
+        fEditButton.setEnabled(enable);
+    }
+
     private void handleSelection(String[] selection) {
         Map<String, File> files = XmlUtils.listFiles();
         File file = files.get(createXmlFileString(selection[0]));
@@ -260,8 +262,7 @@ public class ManageXMLAnalysisDialog extends Dialog {
             IPath path = new Path(file);
             fAnalysesList.add(path.removeFileExtension().toString());
         }
-        fDeleteButton.setEnabled(false);
-        fExportButton.setEnabled(false);
+        setButtonsEnabled(false);
     }
 
     private void importAnalysis() {
