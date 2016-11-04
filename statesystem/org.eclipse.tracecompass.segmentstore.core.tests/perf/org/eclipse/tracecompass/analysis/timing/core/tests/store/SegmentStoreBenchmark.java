@@ -9,15 +9,13 @@
 
 package org.eclipse.tracecompass.analysis.timing.core.tests.store;
 
-import static org.junit.Assert.assertNotNull;
-
-import java.text.DecimalFormat;
-import java.text.Format;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.test.performance.Performance;
+import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.ArrayListStore;
 import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.LazyArrayListStore;
 import org.eclipse.tracecompass.internal.segmentstore.core.treemap.TreeMapStore;
@@ -36,7 +34,7 @@ import org.junit.runners.Parameterized.Parameters;
  * Segmentstore benchmarks, tests the performance for loads and reads.
  *
  * NOTE : Do not add this to isTracecompassFastYet, it is not information that
- * is interesting for users, it is for developpers.
+ * is interesting for users, it is for developers.
  *
  * @category benchmark
  *
@@ -47,9 +45,12 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class SegmentStoreBenchmark {
 
+    private static final int DEFAULT_SAMPLE = 1000;
+    private static final int DEFAULT_LOOP_COUNT = 10;
+
     private final ISegmentStore<@NonNull ISegment> fSegStore;
     private final String fName;
-    private static final Format FORMAT = new DecimalFormat("###,###.##"); //$NON-NLS-1$
+    private final Performance fPerf;
 
     /**
      * @return The arrays of parameters
@@ -74,6 +75,7 @@ public class SegmentStoreBenchmark {
     public SegmentStoreBenchmark(String name, ISegmentStore<@NonNull ISegment> segStore) {
         fSegStore = segStore;
         fName = name;
+        fPerf = Performance.getDefault();
     }
 
     /**
@@ -89,47 +91,39 @@ public class SegmentStoreBenchmark {
      * Add elements in order
      */
     @Test
-    public void test1AddInOrder() {
+    public void test1Ordered() {
+        PerformanceMeter pMorderedInsertion = fPerf.createPerformanceMeter("Ordered Insertion: " + fName);
         int size = 1;
         int[] fuzz = { 0 };
-        run(size, fuzz, new Object() {
-        }.getClass().getEnclosingMethod().getName());
+        for (int i = 0; i < DEFAULT_LOOP_COUNT; i++) {
+            fSegStore.clear();
+
+            System.gc();
+            pMorderedInsertion.start();
+            populate(size, fuzz, fSegStore, 0, getSegmentStoreSize());
+            pMorderedInsertion.stop();
+        }
+        pMorderedInsertion.commit();
     }
 
     /**
      * Add elements almost in order, this represents a typical degenerate use
-     * case.
+     * case. Then run all the iteration queries on the segment store.
      */
     @Test
-    public void test2AddFuzzyOrder() {
-        int size = 1000;
-        int[] fuzz = new int[size];
-        Random rng = new Random(10);
-        for (int i = 0; i < size; i++) {
-            fuzz[i] = rng.nextInt(1000);
-        }
-        String name = new Object() {
-        }.getClass().getEnclosingMethod().getName();
-        assertNotNull(name);
-        run(size, fuzz, name);
+    public void test2FuzzyOrder() {
+        int[] fuzz = fuzzyArray(DEFAULT_SAMPLE);
+        fullTest(DEFAULT_SAMPLE, fuzz, "Fuzzy");
     }
 
     /**
-     * Add elements almost in order, this represents a typical degenerate use
-     * case, then iterate over the list.
+     * Test adding elements in a random order, this is an atypical degenerate
+     * use case. Then run all the iteration queries on the segment store.
      */
     @Test
-    public void test3AddFuzzyOrderThenIterate() {
-        int size = 1000;
-        int[] fuzz = new int[size];
-        Random rng = new Random(10);
-        for (int i = 0; i < size; i++) {
-            fuzz[i] = rng.nextInt(1000);
-        }
-        String name = new Object() {
-        }.getClass().getEnclosingMethod().getName();
-        assertNotNull(name);
-        runIterate(size, fuzz, name);
+    public void test3Random() {
+        int[] fuzz = randomArray(DEFAULT_SAMPLE);
+        fullTest(DEFAULT_SAMPLE, fuzz, "Random");
     }
 
     /**
@@ -137,53 +131,9 @@ public class SegmentStoreBenchmark {
      * case, and iterate while building then when done.
      */
     @Test
-    public void test4AddFuzzyOrderThenIterateThenAddThenIterate() {
-        int size = 1000;
-        int[] fuzz = new int[size];
-        Random rng = new Random(10);
-        for (int i = 0; i < size; i++) {
-            fuzz[i] = rng.nextInt(1000);
-        }
-        String name = new Object() {
-        }.getClass().getEnclosingMethod().getName();
-        assertNotNull(name);
-        runIterateAddIterate(size, fuzz, name);
-    }
-
-    /**
-     * Test adding elements in a random order, this is an atypical degenerate
-     * use case.
-     */
-    @Test
-    public void test5AddRandomOrder() {
-        int size = 1000;
-        int[] fuzz = new int[size];
-        Random rng = new Random(10);
-        for (int i = 0; i < size; i++) {
-            fuzz[i] = Math.abs(rng.nextInt());
-        }
-        String name = new Object() {
-        }.getClass().getEnclosingMethod().getName();
-        assertNotNull(name);
-        runIterate(size, fuzz, name);
-    }
-
-    /**
-     * Test adding elements in a random order then iterate over the list, this
-     * is an atypical degenerate use case.
-     */
-    @Test
-    public void test6AddRandomOrderThenIterate() {
-        int size = 1000;
-        int[] fuzz = new int[size];
-        Random rng = new Random(10);
-        for (int i = 0; i < size; i++) {
-            fuzz[i] = Math.abs(rng.nextInt());
-        }
-        String name = new Object() {
-        }.getClass().getEnclosingMethod().getName();
-        assertNotNull(name);
-        runIterate(size, fuzz, name);
+    public void test4FuzzyInsertIterTwice() {
+        int[] fuzz = fuzzyArray(DEFAULT_SAMPLE);
+        insertIterTwice(DEFAULT_SAMPLE, fuzz, "Fuzzy");
     }
 
     /**
@@ -191,135 +141,102 @@ public class SegmentStoreBenchmark {
      * add more then iterate again, this is an atypical degenerate use case.
      */
     @Test
-    public void test7AddRandomOrderThenIterateThenAddThenIterate() {
-        int size = 1000;
-        int[] fuzz = new int[size];
+    public void test5RandomInsertIterTwice() {
+        int[] fuzz = randomArray(DEFAULT_SAMPLE);
+        insertIterTwice(DEFAULT_SAMPLE, fuzz, "Random");
+    }
+
+    private static int[] randomArray(int size) {
+        int[] fuzz = new int[DEFAULT_SAMPLE];
         Random rng = new Random(10);
-        for (int i = 0; i < size; i++) {
-            fuzz[i] = rng.nextInt(1000);
+        for (int i = 0; i < DEFAULT_SAMPLE; i++) {
+            fuzz[i] = Math.abs(rng.nextInt());
         }
-        String name = new Object() {
-        }.getClass().getEnclosingMethod().getName();
-        assertNotNull(name);
-        runIterateAddIterate(size, fuzz, name);
+        return fuzz;
     }
 
-    /**
-     * Test adding elements in a random order then iterate over the list, this
-     * is an atypical degenerate use case.
-     */
-    @Test
-    public void test8AddFuzzyOrderThenIterateByStartTime() {
-        int size = 1000;
-        int[] fuzz = new int[size];
+    private static int[] fuzzyArray(int size) {
+        int[] fuzz = new int[DEFAULT_SAMPLE];
         Random rng = new Random(10);
-        for (int i = 0; i < size; i++) {
-            fuzz[i] = rng.nextInt(1000);
+        for (int i = 0; i < DEFAULT_SAMPLE; i++) {
+            fuzz[i] = rng.nextInt(DEFAULT_SAMPLE);
         }
-        String name = new Object() {
-        }.getClass().getEnclosingMethod().getName();
-        assertNotNull(name);
-        runIterateCompare(size, fuzz, name, SegmentComparators.INTERVAL_START_COMPARATOR);
+        return fuzz;
     }
 
-    /**
-     * Test adding elements in a random order then iterate over the list, this
-     * is an atypical degenerate use case.
-     */
-    @Test
-    public void test9AddFuzzyOrderThenIterateByEndTime() {
-        int size = 1000;
-        int[] fuzz = new int[size];
-        Random rng = new Random(10);
-        for (int i = 0; i < size; i++) {
-            fuzz[i] = rng.nextInt(1000);
+    private void fullTest(int size, int[] fuzz, String distributionName) {
+        PerformanceMeter pMinsertion = fPerf.createPerformanceMeter(distributionName + " Insertion: " + fName);
+        PerformanceMeter pMiterateStart = fPerf.createPerformanceMeter(distributionName + " Iterate sorted by start: " + fName);
+        PerformanceMeter pMiterateEnd = fPerf.createPerformanceMeter(distributionName + " Iterate sorted by end: " + fName);
+        PerformanceMeter pMiterateDuration = fPerf.createPerformanceMeter(distributionName + " Iterate sorted by length: " + fName);
+
+        for (int i = 0; i < DEFAULT_LOOP_COUNT; i++) {
+            fSegStore.clear();
+
+            System.gc();
+            pMinsertion.start();
+            populate(size, fuzz, fSegStore, 0, getSegmentStoreSize());
+            pMinsertion.stop();
+
+            System.gc();
+            pMiterateStart.start();
+            sortedIterate(fSegStore, SegmentComparators.INTERVAL_START_COMPARATOR);
+            pMiterateStart.stop();
+
+            System.gc();
+            pMiterateEnd.start();
+            sortedIterate(fSegStore, SegmentComparators.INTERVAL_END_COMPARATOR);
+            pMiterateEnd.stop();
+
+            System.gc();
+            pMiterateDuration.start();
+            sortedIterate(fSegStore, SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
+            pMiterateDuration.stop();
         }
-        String name = new Object() {
-        }.getClass().getEnclosingMethod().getName();
-        assertNotNull(name);
-        runIterateCompare(size, fuzz, name, SegmentComparators.INTERVAL_END_COMPARATOR);
+
+        pMinsertion.commit();
+        pMiterateStart.commit();
+        pMiterateEnd.commit();
+        pMiterateDuration.commit();
     }
 
-    /**
-     * Test adding elements in a random order then iterate over the list, this
-     * is an atypical degenerate use case.
-     */
-    @Test
-    public void testAAddFuzzyOrderThenIterateByDuration() {
-        int size = 1000;
-        int[] fuzz = new int[size];
-        Random rng = new Random(10);
-        for (int i = 0; i < size; i++) {
-            fuzz[i] = rng.nextInt(1000);
+    private void insertIterTwice(int size, int[] fuzz, String distributionName) {
+        PerformanceMeter pMinsertion1 = fPerf.createPerformanceMeter(distributionName + " First Insertion: " + fName);
+        PerformanceMeter pMiterate1 = fPerf.createPerformanceMeter(distributionName + " First Iteration: " + fName);
+        PerformanceMeter pMinsertion2 = fPerf.createPerformanceMeter(distributionName + " Second Insertion: " + fName);
+        PerformanceMeter pMiterate2 = fPerf.createPerformanceMeter(distributionName + " Second Iteration: " + fName);
+
+        for (int i = 0; i < DEFAULT_LOOP_COUNT; i++) {
+            fSegStore.clear();
+
+            System.gc();
+            pMinsertion1.start();
+            populate(size, fuzz, fSegStore, 0, getSegmentStoreSize() / 2);
+            pMinsertion1.stop();
+
+            System.gc();
+            pMiterate1.start();
+            iterate(fSegStore);
+            pMiterate1.stop();
+
+            System.gc();
+            pMinsertion2.start();
+            populate(size, fuzz, fSegStore, getSegmentStoreSize() / 2 + 1, getSegmentStoreSize());
+            pMinsertion2.stop();
+
+            System.gc();
+            pMiterate2.start();
+            iterate(fSegStore);
+            pMiterate2.stop();
         }
-        String name = new Object() {
-        }.getClass().getEnclosingMethod().getName();
-        assertNotNull(name);
-        runIterateCompare(size, fuzz, name, SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
+
+        pMinsertion1.commit();
+        pMiterate1.commit();
+        pMinsertion2.commit();
+        pMiterate2.commit();
     }
 
-    private void runIterateCompare(int size, int[] fuzz, String method, @NonNull Comparator<@NonNull ISegment> comparator) {
-        long start = System.nanoTime();
-        populate(size, fuzz, fSegStore);
-        long startTime = fuzz[0];
-        long endTime = fSegStore.size() - 1 + fuzz[fSegStore.size() % size];
-        iterateCompare(startTime, endTime, fSegStore, comparator);
-        long end = System.nanoTime();
-        long duration = end - start;
-        outputResults(duration, method);
-    }
-
-    private void run(int size, int[] fuzz, String method) {
-        long duration = populate(size, fuzz, fSegStore);
-        outputResults(duration, method);
-    }
-
-
-    private long populate(int size, int[] fuzz, ISegmentStore<@NonNull ISegment> store) {
-        store.clear();
-        long start = System.nanoTime();
-        populate(size, fuzz, store, getSegmentStoreSize());
-        long end = System.nanoTime();
-        return end - start;
-    }
-
-    private void runIterate(int size, int[] fuzz, String method) {
-        long duration = addAndIterate(size, fuzz, fSegStore);
-
-        outputResults(duration, method);
-    }
-
-    private long addAndIterate(int size, int[] fuzz, ISegmentStore<@NonNull ISegment> store) {
-        long start = System.nanoTime();
-        populate(size, fuzz, store);
-        iterate(store);
-        long end = System.nanoTime();
-        return end - start;
-    }
-
-    private void runIterateAddIterate(int size, int[] fuzz, String method) {
-        long duration = runIterateAddIterate(size, fuzz, fSegStore);
-        outputResults(duration, method);
-    }
-
-    private static long runIterateAddIterate(int size, int[] fuzz, ISegmentStore<@NonNull ISegment> store) {
-        store.clear();
-        long start = System.nanoTime();
-        for (int i = 0; i < 50000; i++) {
-            long startTime = i + fuzz[i % size];
-            store.add(new BasicSegment(startTime, startTime + 10));
-        }
-        iterate(store);
-        for (int i = 50000; i < 100000; i++) {
-            long startTime = i + fuzz[i % size];
-            store.add(new BasicSegment(startTime, startTime + 10));
-        }
-        iterate(store);
-        long end = System.nanoTime();
-        return end - start;
-    }
-
-    private static Object iterate(ISegmentStore<@NonNull ISegment> store) {
+    private static Object iterate(Iterable<@NonNull ISegment> store) {
         Object shutupCompilerWarnings = null;
         for (ISegment elem : store) {
             shutupCompilerWarnings = elem;
@@ -327,22 +244,15 @@ public class SegmentStoreBenchmark {
         return shutupCompilerWarnings;
     }
 
-    private static Object iterateCompare(long startTime, long endTime, ISegmentStore<@NonNull ISegment> store, @NonNull Comparator<@NonNull ISegment> comparator) {
-        Object shutupCompilerWarnings = null;
-        for (ISegment elem : store.getIntersectingElements(startTime, endTime, comparator)) {
-            shutupCompilerWarnings = elem;
-        }
-        return shutupCompilerWarnings;
+    private static void sortedIterate(ISegmentStore<@NonNull ISegment> store, @NonNull Comparator<@NonNull ISegment> order) {
+        Iterable<@NonNull ISegment> iterable = store.iterator(order);
+        iterate(iterable);
     }
 
-    private static void populate(int size, int[] fuzz, ISegmentStore<@NonNull ISegment> store, long count) {
-        for (int i = 0; i < count; i++) {
-            long start = (long) i + fuzz[i % size];
+    private static void populate(int size, int[] fuzz, ISegmentStore<@NonNull ISegment> store, long low, long high) {
+        for (long i = low; i < high; i++) {
+            long start = i + fuzz[(int) (i % size)];
             store.add(new BasicSegment(start, start + 10));
         }
-    }
-
-    private void outputResults(long duration, String method) {
-        System.out.println(fName + ": Time taken for test " + method + ": " + FORMAT.format(duration));
     }
 }
