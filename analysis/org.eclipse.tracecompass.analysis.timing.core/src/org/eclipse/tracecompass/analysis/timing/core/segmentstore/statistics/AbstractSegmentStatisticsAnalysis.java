@@ -8,7 +8,6 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,7 +34,7 @@ import com.google.common.collect.ImmutableList;
  */
 public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnalysisModule {
 
-    private @Nullable IAnalysisModule fSegmentStoreProviderModule;
+    private @Nullable ISegmentStoreProvider fSegmentStoreProviderModule;
 
     private @Nullable SegmentStoreStatistics fTotalStats;
 
@@ -46,8 +45,8 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
         ITmfTrace trace = getTrace();
         if (trace != null) {
             ISegmentStoreProvider provider = getSegmentProviderAnalysis(trace);
+            fSegmentStoreProviderModule = provider;
             if (provider instanceof IAnalysisModule) {
-                fSegmentStoreProviderModule = (IAnalysisModule) provider;
                 return ImmutableList.of((IAnalysisModule) provider);
             }
         }
@@ -59,12 +58,13 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
         if (monitor.isCanceled()) {
             return false;
         }
-        @Nullable SegmentStoreStatistics totalStats = getTotalStats(TmfTimeRange.ETERNITY.getStartTime().toNanos(), TmfTimeRange.ETERNITY.getEndTime().toNanos(), monitor);
+
+        SegmentStoreStatistics totalStats = getTotalStats(TmfTimeRange.ETERNITY.getStartTime().toNanos(), TmfTimeRange.ETERNITY.getEndTime().toNanos(), monitor);
         if (totalStats == null) {
             return false;
         }
 
-        @Nullable Map<@NonNull String, @NonNull SegmentStoreStatistics> perTypeStats = getPerTypeStats(TmfTimeRange.ETERNITY.getStartTime().toNanos(), TmfTimeRange.ETERNITY.getEndTime().toNanos(), monitor);
+        Map<@NonNull String, @NonNull SegmentStoreStatistics> perTypeStats = getPerTypeStats(TmfTimeRange.ETERNITY.getStartTime().toNanos(), TmfTimeRange.ETERNITY.getEndTime().toNanos(), monitor);
         if (perTypeStats == null) {
             return false;
         }
@@ -73,8 +73,8 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
         return true;
     }
 
-    private @Nullable SegmentStoreStatistics getTotalStats(long start, long end , IProgressMonitor monitor) {
-        Collection<@NonNull ISegment> store = getSegmentStore(start, end);
+    private @Nullable SegmentStoreStatistics getTotalStats(long start, long end, IProgressMonitor monitor) {
+        Iterable<@NonNull ISegment> store = getSegmentStore(start, end);
         if (store == null) {
             return null;
         }
@@ -101,7 +101,7 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
      * @since 1.2
      */
     public @Nullable SegmentStoreStatistics getTotalStatsForRange(long start, long end, IProgressMonitor monitor) {
-        @Nullable ITmfTrace trace = getTrace();
+        ITmfTrace trace = getTrace();
         if (trace != null && (start == TmfTimeRange.ETERNITY.getStartTime().toNanos() && end == TmfTimeRange.ETERNITY.getEndTime().toNanos())) {
             waitForCompletion();
             return getTotalStats();
@@ -109,8 +109,8 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
         return getTotalStats(start, end, monitor);
     }
 
-    private @Nullable Map<@NonNull String, @NonNull SegmentStoreStatistics> getPerTypeStats(long start, long end , IProgressMonitor monitor) {
-        Collection<@NonNull ISegment> store = getSegmentStore(start, end);
+    private @Nullable Map<@NonNull String, @NonNull SegmentStoreStatistics> getPerTypeStats(long start, long end, IProgressMonitor monitor) {
+        Iterable<@NonNull ISegment> store = getSegmentStore(start, end);
         if (monitor.isCanceled()) {
             return Collections.EMPTY_MAP;
         }
@@ -134,7 +134,7 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
      * @since 1.2
      */
     public @Nullable Map<@NonNull String, @NonNull SegmentStoreStatistics> getPerSegmentTypeStatsForRange(long start, long end, IProgressMonitor monitor) {
-        @Nullable ITmfTrace trace = getTrace();
+        ITmfTrace trace = getTrace();
         if (trace != null && (start == TmfTimeRange.ETERNITY.getStartTime().toNanos() && end == TmfTimeRange.ETERNITY.getEndTime().toNanos())) {
             waitForCompletion();
             return getPerSegmentTypeStats();
@@ -147,33 +147,34 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
      *
      * @return The segment store
      */
-    private @Nullable Collection<@NonNull ISegment> getSegmentStore(long start, long end) {
-        IAnalysisModule segmentStoreProviderModule = fSegmentStoreProviderModule;
-        if (!(segmentStoreProviderModule instanceof ISegmentStoreProvider)) {
+    private @Nullable Iterable<@NonNull ISegment> getSegmentStore(long start, long end) {
+        ISegmentStoreProvider segmentStoreProviderModule = fSegmentStoreProviderModule;
+        if (segmentStoreProviderModule == null) {
             return null;
         }
-        segmentStoreProviderModule.waitForCompletion();
+        if (segmentStoreProviderModule instanceof IAnalysisModule) {
+            ((IAnalysisModule) segmentStoreProviderModule).waitForCompletion();
+        }
 
-        @Nullable ISegmentStore<@NonNull ISegment> segmentStore = ((ISegmentStoreProvider) segmentStoreProviderModule).getSegmentStore();
-        return segmentStore != null ?
-                    start != TmfTimeRange.ETERNITY.getStartTime().toNanos() || end != TmfTimeRange.ETERNITY.getEndTime().toNanos() ? (Collection<@NonNull ISegment>) segmentStore.getIntersectingElements(start, end) : segmentStore
-                    : Collections.EMPTY_LIST;
+        ISegmentStore<@NonNull ISegment> segmentStore = segmentStoreProviderModule.getSegmentStore();
+        return segmentStore != null ? start != TmfTimeRange.ETERNITY.getStartTime().toNanos() || end != TmfTimeRange.ETERNITY.getEndTime().toNanos() ? (Iterable<@NonNull ISegment>) segmentStore.getIntersectingElements(start, end) : segmentStore
+                : Collections.EMPTY_LIST;
     }
 
-    private static @Nullable SegmentStoreStatistics calculateTotalManual(Collection<@NonNull ISegment> segments, IProgressMonitor monitor) {
+    private static @Nullable SegmentStoreStatistics calculateTotalManual(Iterable<@NonNull ISegment> segments, IProgressMonitor monitor) {
         SegmentStoreStatistics total = new SegmentStoreStatistics();
         Iterator<@NonNull ISegment> iter = segments.iterator();
         while (iter.hasNext()) {
             if (monitor.isCanceled()) {
                 return null;
             }
-            @NonNull ISegment segment = iter.next();
+            ISegment segment = iter.next();
             total.update(segment);
         }
         return total;
     }
 
-    private Map<@NonNull String, @NonNull SegmentStoreStatistics> calculateTotalPerType(Collection<ISegment> segments, IProgressMonitor monitor) {
+    private Map<@NonNull String, @NonNull SegmentStoreStatistics> calculateTotalPerType(Iterable<ISegment> segments, IProgressMonitor monitor) {
         Map<String, SegmentStoreStatistics> perSegmentTypeStats = new HashMap<>();
 
         Iterator<ISegment> iter = segments.iterator();
