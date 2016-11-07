@@ -309,6 +309,15 @@ public final class ConditionHelpers {
                 }
                 return false;
             }
+
+            @Override
+            public String getFailureMessage() {
+                String cell = table.cell(row, column);
+                if (cell == null) {
+                    return NLS.bind("Cell absent, expected: {0}", content);
+                }
+                return NLS.bind("Cell content: {0} expected: {1}", cell, content);
+            }
         };
     }
 
