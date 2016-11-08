@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.common.core.tests.collect;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.util.Collection;
@@ -66,6 +67,60 @@ public class BufferedBlockingQueueTest {
     @Before
     public void init() {
         charQueue = new BufferedBlockingQueue<>(15, 15);
+    }
+
+    /**
+     * Test with chunkSize = 1 and buffer queueSize = 1
+     */
+    public void testValidConstructor1() {
+        assertNotNull(new BufferedBlockingQueue<>(1, 1));
+    }
+
+    /**
+     * Test with chunkSize = 0 and buffer queueSize = 0
+     * <p>
+     * Should fail with an {@link IllegalArgumentException}
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidConstructor1() {
+        assertNotNull(new BufferedBlockingQueue<>(0, 0));
+    }
+
+    /**
+     * Test with chunkSize = 0 and buffer queueSize = 1
+     * <p>
+     * Should fail with an {@link IllegalArgumentException}
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidConstructor2() {
+        assertNotNull(new BufferedBlockingQueue<>(1, 0));
+    }
+
+    /**
+     * Test with chunkSize = 1 and buffer queueSize = 0
+     */
+    public void testInvalidConstructor3() {
+        assertNotNull(new BufferedBlockingQueue<>(0, 1));
+    }
+
+    /**
+     * Test with chunkSize = 1 and buffer queueSize =-1
+     * <p>
+     * Should fail with an {@link IllegalArgumentException}
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidConstructor4() {
+        assertNotNull(new BufferedBlockingQueue<>(-1, 1));
+    }
+
+    /**
+     * Test with chunkSize = -1 and buffer queueSize = 1
+     * <p>
+     * Should fail with an {@link IllegalArgumentException}
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidConstructor5() {
+        assertNotNull(new BufferedBlockingQueue<>(1, -1));
     }
 
     /**

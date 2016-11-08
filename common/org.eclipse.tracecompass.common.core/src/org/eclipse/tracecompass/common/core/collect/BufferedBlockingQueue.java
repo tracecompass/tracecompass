@@ -73,11 +73,19 @@ public class BufferedBlockingQueue<T> implements Iterable<T> {
      *
      * @param queueSize
      *            The size of the actual blocking queue. This is the number of
-     *            *chunks* that will go in the queue.
+     *            additional *chunks* that will go in the queue. The value must
+     *            be larger or equal to 0.
      * @param chunkSize
-     *            The size of an individual chunk.
+     *            The size of an individual chunk. The value must be larger than
+     *            0.
      */
     public BufferedBlockingQueue(int queueSize, int chunkSize) {
+        if (queueSize < 0) {
+            throw new IllegalArgumentException("queueSize must be >= 0"); //$NON-NLS-1$
+        }
+        if (chunkSize <= 0) {
+            throw new IllegalArgumentException("chunkSize must be > 0"); //$NON-NLS-1$
+        }
         /* Add one to the queue size for the output buffer */
         fInnerQueue = new LinkedBlockingDeque<>(queueSize + 1);
         fChunkSize = chunkSize;
