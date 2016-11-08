@@ -408,7 +408,7 @@ public class BufferedBlockingQueueTest {
          * Convert the test's testBuffer into an array of String, one for each
          * character.
          */
-        List<String> strings = Chars.asList(testString.toCharArray()).stream()
+        List<@NonNull String> strings = Chars.asList(testString.toCharArray()).stream()
             .map(Object::toString)
             .collect(Collectors.toList());
 
@@ -444,7 +444,7 @@ public class BufferedBlockingQueueTest {
      * @return The consumed elements, as seen by each consumer thread.
      */
     private static <T> Iterable<Iterable<T>> runConcurrencyTest(final BufferedBlockingQueue<@NonNull T> queue,
-            final List<T> testBuffer,
+            final List<@NonNull T> testBuffer,
             final @NonNull T poisonPill,
             int nbProducerThreads,
             int nbConsumerThreads,
@@ -455,10 +455,6 @@ public class BufferedBlockingQueueTest {
             public void run() {
                 for (int i = 0; i < testBuffer.size(); i++) {
                     T elem = testBuffer.get(i);
-                    if (elem == null) {
-                        // TODO replace with List<@NonNull T> once we can
-                        throw new IllegalArgumentException();
-                    }
                     queue.put(elem);
                 }
                 queue.put(poisonPill);
