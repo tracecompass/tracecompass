@@ -2193,13 +2193,17 @@ The Control Flow View '''toolbar''', located at the top right of the view, has s
 | [[Image:images/shift_r_edit.gif]]
 | Go to next event of the selected thread
 | Move to the closest following event belonging to the selected thread. This action looks through all trace events, unlike the ''Select Next State Change'' action which only stops at state changes.
+|-
+| [[Image:images/unpinned_view.gif]]<br>[[Image:images/pin_view.gif]]
+| Pin/Unpin View
+| Pin or unpin the view. A pinned view is frozen with the trace selected at the time of pinning. When the unpin button is clicked the view synchronizes back to the active trace. The button's drop down menu can be used to quickly pin the view to any of the opened traces.
 |}
 
 View Menu
 
 {|
 | New Control Flow view
-| Spawn a new control flow view.
+| Spawn a new Control Flow view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
 |-
 | Align Views
 | Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
@@ -2326,13 +2330,17 @@ The Resources View '''toolbar''', located at the top right of the view, has shor
 | [[Image:images/zoomout_nav.gif]]
 | Zoom Out
 | Zooms out on the selection by 50%.
+|-
+| [[Image:images/unpinned_view.gif]]<br>[[Image:images/pin_view.gif]]
+| Pin/Unpin View
+| Pin or unpin the view. A pinned view is frozen with the trace selected at the time of pinning. When the unpin button is clicked the view synchronizes back to the active trace. The button's drop down menu can be used to quickly pin the view to any of the opened traces.
 |}
 
 View Menu
 
 {|
 | New Resources view
-| Spawn a new resources view.
+| Spawn a new Resources view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
 |-
 | Align Views
 | Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.

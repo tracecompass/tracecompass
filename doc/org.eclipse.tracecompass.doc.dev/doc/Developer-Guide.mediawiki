@@ -341,6 +341,7 @@ This tutorial will cover concepts like:
 * Signal handling (@TmfSignalHandler)
 * Data requests (TmfEventRequest)
 * SWTChart integration
+* Use of the pin feature
 
 '''Note''': Trace Compass 0.1.0 provides base implementations for generating SWTChart viewers and views. For more details please refer to chapter [[#TMF Built-in Views and Viewers]].
 
@@ -674,6 +675,26 @@ The view is now ready but we need a proper trace to test it. For this example, a
 [[Image:images/SampleView.png]]<br>
 
 In summary, we have implemented a simple TMF view using the SWTChart library. We made use of signals and requests to populate the view at the appropriate time and we formated the time stamps nicely. We also made sure that the time stamp format is updated when the preferences change.
+
+==== Pin feature ====
+
+The pin feature allows pinning a view to a specific trace. A pinned view will not synchronize on active trace changes. How the view implements the pinning and unpinning is up to the view itself.
+
+Sub-classes of TmfView may optionally support the pin feature by implementing the ITmfPinnable interface. The view then provides a pin button in its toolbar.<br>
+[[Image:images/TmfViewPinAction.png]]<br>
+
+It is the view's responsibility to take the proper actions when the view is pinned.
+
+<pre>
+    @Override
+    public synchronized void setPinned(ITmfTrace trace) {
+        if (trace != null) {
+           /* pinned code */
+        } else {
+           /* unpinned code */
+        }
+    }
+</pre>
 
 == TMF Built-in Views and Viewers ==
 
