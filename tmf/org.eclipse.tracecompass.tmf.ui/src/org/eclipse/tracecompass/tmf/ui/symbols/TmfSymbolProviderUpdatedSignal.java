@@ -15,6 +15,8 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
  * Symbol provider is updated. It will be fired when the symbol provider loads a
  * new mapping. This should be listened to by all views and viewers that need to
  * display items using the symbol map.
+ * <p>
+ * FIXME: move to core when possible
  *
  * @author Matthew Khouzam
  * @since 2.2
