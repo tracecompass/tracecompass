@@ -43,6 +43,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.hamcrest.Matcher;
 import org.junit.Test;
@@ -100,6 +101,17 @@ public class ImportAndReadKernelSmokeTest extends KernelTestBase {
         HistogramView hv = (HistogramView) vp;
         final TmfSelectionRangeUpdatedSignal signal = new TmfSelectionRangeUpdatedSignal(hv, fDesired1.getTimestamp());
         final TmfSelectionRangeUpdatedSignal signal2 = new TmfSelectionRangeUpdatedSignal(hv, fDesired2.getTimestamp());
+        hvBot.close();
+        hv = (HistogramView) UIThreadRunnable.syncExec(() -> {
+            try {
+                return (PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(HistogramView.ID));
+            } catch (PartInitException e) {
+                // Do nothing, returning null fails
+            }
+            return null;
+        });
+        assertNotNull(hv);
+        hvBot = (new SWTWorkbenchBot()).viewById(HistogramView.ID);
         hv.updateTimeRange(100000);
         WaitUtils.waitForJobs();
         hv.selectionRangeUpdated(signal);
