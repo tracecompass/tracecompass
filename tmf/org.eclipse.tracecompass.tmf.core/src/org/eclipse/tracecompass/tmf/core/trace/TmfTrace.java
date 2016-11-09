@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2009, 2017 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -21,10 +21,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
@@ -88,7 +90,7 @@ import com.google.common.collect.ImmutableList;
  * @see ITmfTraceIndexer
  * @see ITmfEventParser
  */
-public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, ITmfEventParser, ITmfTraceCompleteness {
+public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, ITmfEventParser, ITmfTraceCompleteness, IAdaptable {
 
     // ------------------------------------------------------------------------
     // Class attributes
@@ -727,6 +729,25 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     @Override
     public @NonNull ITmfTimestamp createTimestamp(long ts) {
         return TmfTimestamp.fromNanos(getTimestampTransform().transform(ts));
+    }
+
+    // ------------------------------------------------------------------------
+    // IAdaptable
+    // ------------------------------------------------------------------------
+
+    //TODO: Move to ITmfTrace as default method when Bug 507246 is fixed
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getAdapter(Class<T> adapter) {
+        List<T> adapters = TmfTraceAdapterManager.getAdapters(this, adapter);
+        if (!adapters.isEmpty()) {
+            return adapters.get(0);
+        }
+        if (adapter.isInstance(this)) {
+            return (T) this;
+        }
+        return null;
     }
 
     // ------------------------------------------------------------------------
