@@ -173,7 +173,7 @@ public class ShowFilterDialogAction extends Action {
         ArrayList<ITimeGraphEntry> items = new ArrayList<>();
         for (ITimeGraphEntry entry : inputs) {
             items.add(entry);
-            if (entry.hasChildren()) {
+            if (entry != null && entry.hasChildren()) {
                 items.addAll(listAllInputs(entry.getChildren()));
             }
         }
