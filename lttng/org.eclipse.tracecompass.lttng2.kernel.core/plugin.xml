@@ -39,4 +39,10 @@
          </tracetype>
       </module>
    </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.analysis.xml.core.files">
+      <xmlfile
+            file="analysis.xml/org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.xml.futex/futex_analysis_lttng.xml">
+      </xmlfile>
+   </extension>
 </plugin>

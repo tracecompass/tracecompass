@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ***************************************************************************
+ * Copyright (c) 2016 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Jean-Christian Kouame - Initial API and implementation
+ *************************************************************************** -->
+
+<!-- OP Flags for the futex. Source : futex.h  - http://lxr.free-electrons.com/source/include/uapi/linux/futex.h#L24
+FUTEX_WAIT              0
+FUTEX_WAKE              1
+FUTEX_FD                2
+FUTEX_REQUEUE           3
+FUTEX_CMP_REQUEUE       4
+FUTEX_WAKE_OP           5
+FUTEX_LOCK_PI           6
+FUTEX_UNLOCK_PI         7
+FUTEX_TRYLOCK_PI        8
+FUTEX_WAIT_BITSET       9
+FUTEX_WAKE_BITSET       10
+FUTEX_WAIT_REQUEUE_PI   11
+FUTEX_CMP_REQUEUE_PI    12
+FUTEX_PRIVATE_FLAG      128
+FUTEX_CLOCK_REALTIME    256
+FUTEX_CMD_MASK          ~(FUTEX_PRIVATE_FLAG | FUTEX_CLOCK_REALTIME)
+FUTEX_WAIT_PRIVATE      (FUTEX_WAIT | FUTEX_PRIVATE_FLAG)				128
+FUTEX_WAKE_PRIVATE      (FUTEX_WAKE | FUTEX_PRIVATE_FLAG)				129
+FUTEX_REQUEUE_PRIVATE   (FUTEX_REQUEUE | FUTEX_PRIVATE_FLAG)
+FUTEX_CMP_REQUEUE_PRIVATE (FUTEX_CMP_REQUEUE | FUTEX_PRIVATE_FLAG)
+FUTEX_WAKE_OP_PRIVATE   (FUTEX_WAKE_OP | FUTEX_PRIVATE_FLAG)				133
+FUTEX_LOCK_PI_PRIVATE   (FUTEX_LOCK_PI | FUTEX_PRIVATE_FLAG)				134
+FUTEX_UNLOCK_PI_PRIVATE (FUTEX_UNLOCK_PI | FUTEX_PRIVATE_FLAG)				135
+FUTEX_TRYLOCK_PI_PRIVATE (FUTEX_TRYLOCK_PI | FUTEX_PRIVATE_FLAG)			136
+FUTEX_WAIT_BITSET_PRIVATE       (FUTEX_WAIT_BITSET | FUTEX_PRIVATE_FLAG)		137
+FUTEX_WAKE_BITSET_PRIVATE       (FUTEX_WAKE_BITSET | FUTEX_PRIVATE_FLAG)		138
+FUTEX_WAIT_REQUEUE_PI_PRIVATE   (FUTEX_WAIT_REQUEUE_PI | \ FUTEX_PRIVATE_FLAG)
+FUTEX_CMP_REQUEUE_PI_PRIVATE    (FUTEX_CMP_REQUEUE_PI | \ FUTEX_PRIVATE_FLAG)
+
+	      private	realtime
+WAKE		129		257
+WAKE_BITSET	138		266
+UNLOCK_PI	135		263
+WAKE_OP		133		261
+
+WAIT		128		256
+WAIT_BITSET	137		265
+LOCK_PI		134		262
+TRYLOCK_PI	136		264
+ -->
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+
+<!-- Timegraph view for uaddr x TID-->
+<timeGraphView id="lttng2.kernel.core.futex.uaddrvswaiter">
+	<head>
+		<analysis id="lttng.analysis.futex"/>
+		<label value="uaddr vs waiter" />
+	</head>
+	<definedValue name="WAIT" value="1" color="#646464" />
+
+	<entry path="lock/*">
+		<display type="self"/>
+		<entry path="*">
+			<display type="self"/>
+		</entry>
+    </entry>
+</timeGraphView>
+
+<!--Timegraph view that show the scenario execution state in time  -->
+<timeGraphView id="lttng2.kernel.core.futex.scenarios">
+	<head>
+		<analysis id="lttng.analysis.futex" />
+		<label value="scenario" />
+	</head>
+<!--  FFA040 -->
+	<definedValue name="PENDING" value="0" color="#CCCCCC"/>
+	<definedValue name="IN_PROGRESS" value="1" color="#00CCFF"/>
+	<definedValue name="MATCHED" value="2" color="#118811"/>
+	<definedValue name="ABANDONED" value="3" color="#EE0000"/>
+
+	<!-- Scenario view -->
+	<entry path="scenarios/*">
+		<display type="self" />
+		<name type="self" />
+		<entry path="*">
+			<display type="constant" value="status" />
+			<name type="self" />
+		</entry>
+	</entry>
+</timeGraphView>
+
+<pattern version="0" id="lttng.analysis.futex">
+	<head>
+		<traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
+		<label value="XML Futex Contention Analysis" />
+	</head>
+
+	<location id="CurrentCPU">
+		<stateAttribute type="constant" value="CPUs" />
+		<stateAttribute type="eventField" value="cpu" />
+	</location>
+	<location id="CurrentThread">
+		<stateAttribute type="location" value="CurrentCPU" />
+		<stateAttribute type="constant" value="Current_thread" />
+	</location>
+	<location id="CurrentThreadName">
+		<stateAttribute type="location" value="CurrentCPU" />
+		<stateAttribute type="constant" value="Current_thread_name" />
+	</location>
+	<mappingGroup id="lock/unlock">
+		<entry>
+			<stateValue type="long" value="128" />
+			<stateValue type="string" value="WAIT" />
+		</entry>
+		<entry>
+			<stateValue type="long" value="137" />
+			<stateValue type="string" value="WAIT_BITSET" />
+		</entry>
+		<entry>
+			<stateValue type="long" value="134" />
+			<stateValue type="string" value="LOCK_PI" />
+		</entry>
+		<entry>
+			<stateValue type="long" value="136" />
+			<stateValue type="string" value="TRYLOCK_PI" />
+		</entry>
+		<entry>
+			<stateValue type="long" value="129" />
+			<stateValue type="string" value="WAKE" />
+		</entry>
+		<entry>
+			<stateValue type="long" value="138" />
+			<stateValue type="string" value="WAKE_BITSET" />
+		</entry>
+		<entry>
+			<stateValue type="long" value="135" />
+			<stateValue type="string" value="UNLOCK_PI" />
+		</entry>
+		<entry>
+			<stateValue type="long" value="133" />
+			<stateValue type="string" value="WAKE_OP" />
+		</entry>
+	</mappingGroup>
+	<patternHandler>
+		<test id="futex_condition">
+			<if>
+				<condition>
+					<stateValue type="string" stack="peek" >
+						<stateAttribute type="constant" value="stack" />
+						<stateAttribute type="query" >
+							<stateAttribute type="location" value="CurrentThread" />
+						</stateAttribute>
+					</stateValue>
+					<stateValue type="string" value="sys_futex" />
+				</condition>
+			</if>
+		</test>
+		<test id="unlock_op">
+			<if>
+				<or>
+					<condition>
+						<field name="op" />
+						<stateValue type="long" value="129" />
+					</condition>
+					<condition>
+						<field name="op" />
+						<stateValue type="long" value="138" />
+					</condition>
+					<condition>
+						<field name="op" />
+						<stateValue type="long" value="135" />
+					</condition>
+					<condition>
+						<field name="op" />
+						<stateValue type="long" value="133" />
+					</condition>
+				</or>
+			</if>
+		</test>
+		<test id="lock_op">
+			<if>
+				<or>
+					<condition>
+						<field name="op" />
+						<stateValue type="long" value="128" />
+					</condition>
+					<condition>
+						<field name="op" />
+						<stateValue type="long" value="137" />
+					</condition>
+					<condition>
+						<field name="op" />
+						<stateValue type="long" value="134" />
+					</condition>
+					<condition>
+						<field name="op" />
+						<stateValue type="long" value="136" />
+					</condition>
+				</or>
+			</if>
+		</test>
+		<test id="tid_condition">
+			<if>
+				<condition>
+					<stateValue type="query">
+						<stateAttribute type="constant" value="#CurrentScenario" />
+						<stateAttribute type="constant" value="thread" />
+					</stateValue>
+					<stateValue type="query" >
+						<stateAttribute type="location" value="CurrentThread" />
+					</stateValue>
+				</condition>
+			</if>
+		</test>
+		<test id="isTidValid">
+			<if>
+				<not>
+					<condition>
+						<stateAttribute type="location" value="CurrentThread" />
+						<stateValue type="null"/>
+					</condition>
+				</not>
+			</if>
+		</test>
+<!-- 		FUTEX FSM ACTIONS -->
+		<action id="set_operation">
+			<stateChange>
+				<stateAttribute type="constant" value="#CurrentScenario" />
+				<stateAttribute type="constant" value="op" />
+				<stateValue type="eventField" value="op" />
+			</stateChange>
+		</action>
+		<action id="waiter_in">
+			<stateChange>
+				<stateAttribute type="constant" value="lock" />
+				<stateAttribute type="query">
+					<stateAttribute type="constant" value="#CurrentScenario" />
+					<stateAttribute type="constant" value="uaddr" />
+				</stateAttribute>
+				<stateAttribute type="query">
+					<stateAttribute type="constant" value="#CurrentScenario" />
+					<stateAttribute type="constant" value="thread" />
+				</stateAttribute>
+				<stateValue type="int" value="1"/>
+			</stateChange>
+		</action>
+		<action id="waiter_out">
+			<stateChange>
+				<stateAttribute type="constant" value="lock" />
+				<stateAttribute type="query">
+					<stateAttribute type="constant" value="#CurrentScenario" />
+					<stateAttribute type="constant" value="uaddr" />
+				</stateAttribute>
+				<stateAttribute type="query">
+					<stateAttribute type="constant" value="#CurrentScenario" />
+					<stateAttribute type="constant" value="thread" />
+				</stateAttribute>
+				<stateValue type="null" />
+			</stateChange>
+		</action>
+		<action id="create_futex_segment" >
+			<segment>
+				<segType>
+					<segName>
+						<stateValue type="query" mappingGroup="lock/unlock">
+							<stateAttribute type="constant" value="#CurrentScenario" />
+							<stateAttribute type="constant" value="op" />
+						</stateValue>
+					</segName>
+				</segType>
+				<segContent>
+					<segField name="uaddr" type="string">
+					    <stateValue type="query">
+						<stateAttribute type="constant" value="#CurrentScenario" />
+						<stateAttribute type="constant" value="uaddr" />
+					    </stateValue>
+					</segField>
+					<segField name="name" type="string">
+						<stateValue type="query">
+							<stateAttribute type="constant" value="#CurrentScenario" />
+							<stateAttribute type="constant" value="thread_name" />
+						</stateValue>
+					</segField>
+					<segField name="thread" type="string">
+						<stateValue type="query">
+							<stateAttribute type="constant" value="#CurrentScenario" />
+							<stateAttribute type="constant" value="thread" />
+						</stateValue>
+					</segField>
+				</segContent>
+			</segment>
+		</action>
+		<action id="saveContext">
+			<stateChange>
+				<stateAttribute type="constant" value="#CurrentScenario" />
+				<stateAttribute type="constant" value="cpu" />
+				<stateValue type="eventField" value="cpu"/>
+			</stateChange>
+			<stateChange>
+				<stateAttribute type="constant" value="#CurrentScenario" />
+				<stateAttribute type="constant" value="uaddr" />
+				<stateValue type="eventField" value="uaddr"/>
+			</stateChange>
+			<stateChange>
+				<stateAttribute type="constant" value="#CurrentScenario" />
+				<stateAttribute type="constant" value="thread" />
+				<stateValue type="query">
+					<stateAttribute type="location" value="CurrentThread" />
+				</stateValue>
+			</stateChange>
+			<stateChange>
+				<stateAttribute type="constant" value="#CurrentScenario" />
+				<stateAttribute type="constant" value="thread_name" />
+				<stateValue type="query">
+					<stateAttribute type="location" value="CurrentThreadName" />
+				</stateValue>
+			</stateChange>
+		</action>
+<!-- 		SYSCALL FSM ACTIONS -->
+		<action id="push_syscall" >
+			<stateChange>
+				<stateAttribute type="constant" value="stack" />
+				<stateAttribute type="query" >
+					<stateAttribute type="location" value="CurrentCPU" />
+					<stateAttribute type="constant" value="Current_thread" />
+				</stateAttribute>
+				<stateValue stack="push" type="eventName"/>
+			</stateChange>
+		</action>
+		<action id="pop_syscall" >
+			<stateChange>
+				<stateAttribute type="constant" value="stack" />
+				<stateAttribute type="query" >
+					<stateAttribute type="location" value="CurrentCPU" />
+					<stateAttribute type="constant" value="Current_thread" />
+				</stateAttribute>
+				<stateValue stack="pop" type="string" />
+			</stateChange>
+		</action>
+		<fsm id="futex_lock_2_4">
+			<precondition event="exit_syscall" cond="isTidValid" />
+			<initialState>
+				<transition event="sys_futex" cond="isTidValid:lock_op" target="syscall_entry_x" action="saveContext:set_operation:waiter_in"/>
+			</initialState>
+			<state id="syscall_entry_x" >
+				<transition event="exit_syscall" cond="futex_condition:tid_condition" target="syscall_exit_x" action="waiter_out:create_futex_segment"/>
+			</state>
+			<final id="syscall_exit_x"/>
+		</fsm>
+		<fsm id="futex_unlock_2_4">
+			<precondition event="exit_syscall" cond="isTidValid" />
+			<initialState>
+				<transition event="sys_futex" cond="isTidValid:unlock_op" target="syscall_entry_x" action="saveContext:set_operation"/>
+			</initialState>
+			<state id="syscall_entry_x" >
+				<transition event="exit_syscall" cond="futex_condition:tid_condition" target="syscall_exit_x" action="create_futex_segment"/>
+			</state>
+			<final id="syscall_exit_x"/>
+		</fsm>
+		<fsm id="stack" multiple="false">
+			<precondition event="sys_*" />
+			<precondition event="exit_syscall" />
+			<precondition cond="isTidValid" />
+			<state id="foo">
+				<transition event="sys_*" target="foo" action="push_syscall"/>
+				<transition event="exit_syscall" target="foo" action="pop_syscall"/>
+			</state>
+		</fsm>
+		<fsm id="futex_lock_2_7">
+			<precondition event="syscall_exit_futex" cond="isTidValid" />
+			<initialState>
+				<transition event="syscall_entry_futex" cond="isTidValid:lock_op" target="syscall_entry_x" action="saveContext:set_operation:waiter_in"/>
+			</initialState>
+			<state id="syscall_entry_x" >
+				<transition event="syscall_exit_futex" cond="tid_condition" target="syscall_exit_x" action="waiter_out:create_futex_segment"/>
+			</state>
+			<final id="syscall_exit_x"/>
+		</fsm>
+		<fsm id="futex_unlock_2_7">
+			<precondition event="syscall_exit_futex" cond="isTidValid" />
+			<initialState>
+				<transition event="syscall_entry_futex" cond="isTidValid:unlock_op" target="syscall_entry_x" action="saveContext:set_operation"/>
+			</initialState>
+			<state id="syscall_entry_x" >
+				<transition event="syscall_exit_futex" cond="tid_condition" target="syscall_exit_x" action="create_futex_segment"/>
+			</state>
+			<final id="syscall_exit_x"/>
+		</fsm>
+<!-- 		SCHED_SWITCH 		-->
+		<action id="update_current_thread">
+			<stateChange>
+				<stateAttribute type="location" value="CurrentThread" />
+				<stateValue type="eventField" value="next_tid" />
+			</stateChange>
+		</action>
+		<action id="update_current_thread_name">
+			<stateChange>
+				<stateAttribute type="location" value="CurrentThreadName" />
+				<stateValue type="eventField" value="next_comm" />
+			</stateChange>
+		</action>
+		<fsm id="sched_switch" multiple="false">
+			<precondition event="sched_switch"/>
+			<state id="sched_switch">
+				<transition target="sched_switch" action="update_current_thread:update_current_thread_name" />
+			</state>
+		</fsm>
+	</patternHandler>
+</pattern>
+</tmfxml>
