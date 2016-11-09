@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -23,8 +23,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.tracecompass.internal.tmf.core.markers.IMarkerConstants;
@@ -36,6 +38,7 @@ import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker.SplitMarker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker.WeightedMarker;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ui.markers.IMarkerReferenceProvider;
 import org.eclipse.tracecompass.tmf.ui.markers.PeriodicMarkerEventSource;
 import org.eclipse.tracecompass.tmf.ui.markers.PeriodicMarkerEventSource.Reference;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
@@ -58,6 +61,7 @@ public class ConfigurableMarkerEventSource implements IMarkerEventSource {
 
     private List<IConfigurableMarkerEventSource> fMarkerEventSources;
     private Map<Marker, RGBA> fColors = new HashMap<>();
+    private final ITmfTrace fTrace;
 
     /**
      * Constructor
@@ -67,6 +71,7 @@ public class ConfigurableMarkerEventSource implements IMarkerEventSource {
      */
     public ConfigurableMarkerEventSource(ITmfTrace trace) {
         fMarkerEventSources = new ArrayList<>();
+        fTrace = trace;
     }
 
     /**
@@ -87,11 +92,22 @@ public class ConfigurableMarkerEventSource implements IMarkerEventSource {
     private void configure(Marker marker) {
         if (marker instanceof PeriodicMarker) {
             PeriodicMarker periodicMarker = (PeriodicMarker) marker;
+            String referenceId = periodicMarker.getReferenceId();
+            Reference baseReference = null;
+            if (fTrace instanceof IAdaptable && !referenceId.isEmpty()) {
+                @Nullable IMarkerReferenceProvider adapter = ((IAdaptable) fTrace).getAdapter(IMarkerReferenceProvider.class);
+                if (adapter != null) {
+                    baseReference = adapter.getReference(referenceId);
+                }
+            }
+            if (baseReference == null) {
+                baseReference = Reference.ZERO;
+            }
             long rollover = periodicMarker.getRange().hasUpperBound() ? (periodicMarker.getRange().upperEndpoint() - periodicMarker.getRange().lowerEndpoint() + 1) : 0;
             RGBA evenColor = getColor(periodicMarker);
             RGBA oddColor = getOddColor(evenColor);
             double period = convertToNanos(periodicMarker.getPeriod(), periodicMarker.getUnit());
-            Reference reference = new Reference(Math.round(convertToNanos(periodicMarker.getOffset(), periodicMarker.getUnit())), 0);
+            Reference reference = new Reference(baseReference.getTime() + Math.round(convertToNanos(periodicMarker.getOffset(), periodicMarker.getUnit())), baseReference.getIndex());
             ConfigurablePeriodicMarkerEventSource markerEventSource = new ConfigurablePeriodicMarkerEventSource(marker, checkNotNull(periodicMarker.getName()), reference, period, rollover, evenColor, oddColor, false, periodicMarker.getRange().lowerEndpoint(), checkNotNull(periodicMarker.getLabel()), periodicMarker.getIndexRange());
             fMarkerEventSources.add(markerEventSource);
         }

@@ -50,6 +50,7 @@ public class Marker {
 
         private final String fLabel;
         private final String fId;
+        private final String fReferenceId;
         private final double fPeriod;
         private final String fUnit;
         private final Range<Long> fRange;
@@ -65,6 +66,8 @@ public class Marker {
          *            the label
          * @param id
          *            the id
+         * @param referenceId
+         *            the reference id
          * @param color
          *            the color
          * @param period
@@ -78,10 +81,11 @@ public class Marker {
          * @param indexRange
          *            the index range
          */
-        public PeriodicMarker(String name, String label, String id, String color, double period, String unit, Range<Long> range, long offset, RangeSet<Long> indexRange) {
+        public PeriodicMarker(String name, String label, String id, String referenceId, String color, double period, String unit, Range<Long> range, long offset, RangeSet<Long> indexRange) {
             super(name, color);
             fLabel = label;
             fId = id;
+            fReferenceId = referenceId;
             fPeriod = period;
             fUnit = unit;
             fRange = range;
@@ -101,6 +105,13 @@ public class Marker {
          */
         public String getId() {
             return fId;
+        }
+
+        /**
+         * @return the reference id
+         */
+        public String getReferenceId() {
+            return fReferenceId;
         }
 
         /**

@@ -38,6 +38,8 @@ public interface IMarkerConstants {
     String LABEL = "label"; //$NON-NLS-1$
     /** ID attribute */
     String ID = "id"; //$NON-NLS-1$
+    /** Reference ID attribute */
+    String REFERENCE_ID = "referenceid"; //$NON-NLS-1$
     /** Color attribute */
     String COLOR = "color"; //$NON-NLS-1$
     /** Period attribute */

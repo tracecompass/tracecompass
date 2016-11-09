@@ -165,13 +165,14 @@ public class MarkerConfigXmlParser {
             String name = markerElem.getAttribute(IMarkerConstants.NAME);
             String label = parseLabel(markerElem.getAttribute(IMarkerConstants.LABEL));
             String id = markerElem.getAttribute(IMarkerConstants.ID);
+            String referenceId = markerElem.getAttribute(IMarkerConstants.REFERENCE_ID);
             String color = markerElem.getAttribute(IMarkerConstants.COLOR);
             double period = parsePeriod(markerElem.getAttribute(IMarkerConstants.PERIOD));
             String unit = parseUnit(markerElem.getAttribute(IMarkerConstants.UNIT));
             Range<Long> range = parseRange(markerElem.getAttribute(IMarkerConstants.RANGE));
             long offset = parseOffset(markerElem.getAttribute(IMarkerConstants.OFFSET));
             RangeSet<Long> indexRange = parseRangeSet(markerElem.getAttribute(IMarkerConstants.INDEX));
-            PeriodicMarker marker = new PeriodicMarker(name, label, id, color, period, unit, range, offset, indexRange);
+            PeriodicMarker marker = new PeriodicMarker(name, label, id, referenceId, color, period, unit, range, offset, indexRange);
             parseSubMarkers(markerElem, marker);
             markers.add(marker);
         }

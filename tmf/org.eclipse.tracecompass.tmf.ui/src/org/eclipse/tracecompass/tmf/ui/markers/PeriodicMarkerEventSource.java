@@ -74,6 +74,26 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
             this.index = index;
         }
 
+        /**
+         * Gets the reference marker time.
+         *
+         * @return the reference marker time
+         * @since 2.3
+         */
+        public long getTime() {
+            return time;
+        }
+
+        /**
+         * Gets the reference marker index.
+         *
+         * @return the reference marker index
+         * @since 2.3
+         */
+        public long getIndex() {
+            return index;
+        }
+
         @Override
         public String toString() {
             return String.format("[%d, %d]", time, index); //$NON-NLS-1$
