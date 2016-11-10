@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2014 Intel Corporation, Ericsson
+ * Copyright (c) 2007, 2016 Intel Corporation, Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -555,6 +556,11 @@ public class Utils {
         // append the ms, us and ns as specified in the resolution
         str.append(formatNs(delta, resolution));
         str.append("s"); //$NON-NLS-1$
+        if (seconds == 0) {
+            str.append(" ("); //$NON-NLS-1$
+            str.append(new DecimalUnitFormat(1.0 / SEC_IN_NS).format(delta));
+            str.append("s)"); //$NON-NLS-1$
+        }
         return str.toString();
     }
 
