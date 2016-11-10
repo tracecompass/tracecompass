@@ -676,9 +676,9 @@ public class CTFTrace implements IDefinitionScope {
     }
 
     /**
-     * gets the time offset of a clock with respect to UTC in nanoseconds
+     * Gets the clock offset with respect to POSIX.1 Epoch in cycles
      *
-     * @return the time offset of a clock with respect to UTC in nanoseconds
+     * @return the clock offset with respect to POSIX.1 Epoch in cycles
      */
     public final long getOffset() {
         if (getClock() == null) {
@@ -688,9 +688,9 @@ public class CTFTrace implements IDefinitionScope {
     }
 
     /**
-     * gets the time offset of a clock with respect to UTC in nanoseconds
+     * Gets the time scale in nanoseconds/cycle
      *
-     * @return the time offset of a clock with respect to UTC in nanoseconds
+     * @return the time scale in nanoseconds/cycle
      */
     private double getTimeScale() {
         if (getClock() == null) {
@@ -742,9 +742,9 @@ public class CTFTrace implements IDefinitionScope {
     }
 
     /**
-     * the inverse clock for returning to a scale.
+     * Gets the inverse time scale in cycles/nanosecond
      *
-     * @return 1.0 / scale
+     * @return the inverse time scale in cycles/nanosecond
      */
     private double getInverseTimeScale() {
         if (getClock() == null) {
@@ -754,9 +754,11 @@ public class CTFTrace implements IDefinitionScope {
     }
 
     /**
+     * Gets the clock cycles count for a specified time
+     *
      * @param cycles
-     *            clock cycles since boot
-     * @return time in nanoseconds UTC offset
+     *            clock cycles relative to clock offset
+     * @return time in nanoseconds relative to POSIX.1 Epoch
      */
     public long timestampCyclesToNanos(long cycles) {
         long retVal = cycles + getOffset();
@@ -771,9 +773,11 @@ public class CTFTrace implements IDefinitionScope {
     }
 
     /**
+     * Gets the time for a specified clock cycle count
+     *
      * @param nanos
-     *            time in nanoseconds UTC offset
-     * @return clock cycles since boot.
+     *            time in nanoseconds relative to POSIX.1 Epoch
+     * @return clock cycles relative to clock offset
      */
     public long timestampNanoToCycles(long nanos) {
         long retVal;
