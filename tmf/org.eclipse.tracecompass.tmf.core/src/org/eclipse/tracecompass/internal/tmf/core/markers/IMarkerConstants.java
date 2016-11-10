@@ -61,4 +61,6 @@ public interface IMarkerConstants {
     String US = "us"; //$NON-NLS-1$
     /** Nanoseconds unit */
     String NS = "ns"; //$NON-NLS-1$
+    /** Cycles unit */
+    String CYCLES = "cycles"; //$NON-NLS-1$
 }

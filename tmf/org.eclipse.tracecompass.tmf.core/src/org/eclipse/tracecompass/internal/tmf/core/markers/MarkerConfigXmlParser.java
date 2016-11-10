@@ -251,7 +251,7 @@ public class MarkerConfigXmlParser {
     }
 
     private static String parseUnit(String unitAttr) {
-        if (Arrays.asList(IMarkerConstants.MS, IMarkerConstants.US, IMarkerConstants.NS).contains(unitAttr)) {
+        if (Arrays.asList(IMarkerConstants.MS, IMarkerConstants.US, IMarkerConstants.NS, IMarkerConstants.CYCLES).contains(unitAttr)) {
             return unitAttr;
         }
         throw new IllegalArgumentException("Unsupported unit: " + unitAttr); //$NON-NLS-1$

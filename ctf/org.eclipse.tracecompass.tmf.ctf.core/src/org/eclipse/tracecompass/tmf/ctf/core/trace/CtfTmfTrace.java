@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2017 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -48,12 +48,13 @@ import org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator.CtfIterator
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
-import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.trace.ICyclesConverter;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceKnownSize;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
@@ -86,7 +87,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class CtfTmfTrace extends TmfTrace
         implements ITmfPropertiesProvider, ITmfPersistentlyIndexable,
-        ITmfTraceWithPreDefinedEvents, ITmfTraceKnownSize {
+        ITmfTraceWithPreDefinedEvents, ITmfTraceKnownSize, ICyclesConverter {
 
     // -------------------------------------------
     // Constants
@@ -487,9 +488,9 @@ public class CtfTmfTrace extends TmfTrace
     // -------------------------------------------
 
     /**
-     * gets the clock offset
+     * Gets the clock offset with respect to POSIX.1 Epoch in cycles
      *
-     * @return the clock offset in ns
+     * @return the clock offset with respect to POSIX.1 Epoch in cycles
      */
     public long getOffset() {
         if (fTrace != null) {
@@ -503,8 +504,8 @@ public class CtfTmfTrace extends TmfTrace
      * for this trace.
      *
      * @param cycles
-     *            The timestamp in cycles
-     * @return The timestamp in nanoseconds
+     *            The timestamp in cycles, relative to the clock offset
+     * @return The timestamp in nanoseconds, relative to POSIX.1 Epoch
      */
     public long timestampCyclesToNanos(long cycles) {
         return fTrace.timestampCyclesToNanos(cycles);
@@ -515,8 +516,8 @@ public class CtfTmfTrace extends TmfTrace
      * for this trace.
      *
      * @param nanos
-     *            The timestamp in nanoseconds
-     * @return The timestamp in cycles
+     *            The timestamp in nanoseconds, relative to POSIX.1 Epoch
+     * @return The timestamp in cycles, relative to the clock offset
      */
     public long timestampNanoToCycles(long nanos) {
         return fTrace.timestampNanoToCycles(nanos);
@@ -739,5 +740,17 @@ public class CtfTmfTrace extends TmfTrace
     @Override
     public int progress() {
         return (int) (getNbEvents() / REDUCTION_FACTOR);
+    }
+
+    @Override
+    public long cyclesToNanos(long cycles) {
+        // CTFTrace adds the clock offset in cycles to the input
+        return fTrace.timestampCyclesToNanos(cycles - fTrace.getOffset());
+    }
+
+    @Override
+    public long nanosToCycles(long nanos) {
+        // CTFTrace subtracts the clock offset in cycles from the output
+        return fTrace.timestampNanoToCycles(nanos) + fTrace.getOffset();
     }
 }

@@ -37,6 +37,7 @@ import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker.SplitMarker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker.WeightedMarker;
+import org.eclipse.tracecompass.tmf.core.trace.ICyclesConverter;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.markers.IMarkerReferenceProvider;
 import org.eclipse.tracecompass.tmf.ui.markers.PeriodicMarkerEventSource;
@@ -113,13 +114,19 @@ public class ConfigurableMarkerEventSource implements IMarkerEventSource {
         }
     }
 
-    private static double convertToNanos(double number, String unit) {
+    private double convertToNanos(double number, String unit) {
         if (unit.equalsIgnoreCase(IMarkerConstants.MS)) {
             return number * NANO_PER_MILLI;
         } else if (unit.equalsIgnoreCase(IMarkerConstants.US)) {
             return number * NANO_PER_MICRO;
         } else if (unit.equalsIgnoreCase(IMarkerConstants.NS)) {
             return number;
+        } else if (unit.equalsIgnoreCase(IMarkerConstants.CYCLES) &&
+                fTrace instanceof IAdaptable) {
+            ICyclesConverter adapter = ((IAdaptable) fTrace).getAdapter(ICyclesConverter.class);
+            if (adapter != null) {
+                return adapter.cyclesToNanos((long) number);
+            }
         }
         return number;
     }
