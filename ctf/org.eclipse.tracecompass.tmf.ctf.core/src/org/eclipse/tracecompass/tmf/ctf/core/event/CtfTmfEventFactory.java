@@ -143,7 +143,7 @@ public class CtfTmfEventFactory {
         long nbLostEvents = ((IntegerDefinition) nbLostEventsDef).getValue();
         long duration = ((IntegerDefinition) durationDef).getValue();
         ITmfTimestamp timestampEnd = trace.createTimestamp(
-                trace.timestampCyclesToNanos(ts) + duration);
+                trace.timestampCyclesToNanos(ts) + trace.timestampCyclesToNanos(duration - trace.getOffset()));
 
         CtfTmfLostEvent lostEvent = new CtfTmfLostEvent(trace,
                 ITmfContext.UNKNOWN_RANK,
