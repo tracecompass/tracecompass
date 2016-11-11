@@ -33,6 +33,10 @@ import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCanvas;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.tracecompass.ctf.core.tests.shared.LttngTraceGenerator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources.ResourcesView;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -56,6 +60,14 @@ import org.junit.Test;
  * @author Patrick Tasse
  */
 public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
+    private static final String CHECK_SELECTED = "Check selected";
+
+    private static final String CHECK_ALL = "Check all";
+    private static final String CHECK_SUBTREE = "Check subtree";
+    private static final String UNCHECK_SELECTED = "Uncheck selected";
+    private static final String UNCHECK_ALL = "Uncheck all";
+    private static final String UNCHECK_SUBTREE = "Uncheck subtree";
+
 
     private static final String NEXT_MARKER = "Next Marker";
     private static final String PREVIOUS_MARKER = "Previous Marker";
@@ -105,7 +117,7 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         return Arrays.asList("Align Views", "Show View Filters", "Show Legend", SEPARATOR,
                 "Reset the Time Scale to Default", "Select Previous State Change", "Select Next State Change", SEPARATOR,
                 "Add Bookmark...", "Previous Marker", "Next Marker", SEPARATOR,
-                "Select Previous Resource", "Select Next Resource", "Zoom In", "Zoom Out" );
+                "Select Previous Resource", "Select Next Resource", "Zoom In", "Zoom Out");
     }
 
     /**
@@ -391,6 +403,67 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         /* show Lost Events markers */
         viewBot.viewMenu(LOST_EVENTS).click();
         assertEquals(size1, getSize(markerAxis));
+    }
+
+    /**
+     * Test the filter
+     */
+    @Test
+    public void testFilter() {
+        /* change window range to 1 ms */
+        TmfTimeRange range = new TmfTimeRange(START_TIME, START_TIME.normalize(1000000L, ITmfTimestamp.NANOSECOND_SCALE));
+        TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, range));
+        timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME), START_TIME);
+        SWTBotToolbarButton filterButton = getViewBot().toolbarButton("Show View Filters");
+        filterButton.click();
+        fBot.waitUntil(org.eclipse.swtbot.swt.finder.waits.Conditions.shellIsActive("Filter"));
+        SWTBot bot = fBot.activeShell().bot();
+        SWTBotTree treeBot = bot.tree();
+        TreeCheckedCounter treeCheckCounter = new TreeCheckedCounter(treeBot);
+        // get how many items there are
+        Integer checked = UIThreadRunnable.syncExec(treeCheckCounter);
+        assertEquals("default", 26, checked.intValue());
+        // test "uncheck all button"
+        bot.button(UNCHECK_ALL).click();
+        checked = UIThreadRunnable.syncExec(treeCheckCounter);
+        assertEquals(0, checked.intValue());
+        // test check all
+        bot.button(CHECK_ALL).click();
+        checked = UIThreadRunnable.syncExec(treeCheckCounter);
+        assertEquals(CHECK_ALL, 26, checked.intValue());
+        // test uncheck inactive
+        treeBot.getTreeItem(LttngTraceGenerator.getName()).select("CPU 1");
+        bot.button(UNCHECK_ALL).click();
+        bot.button(CHECK_SELECTED).click();
+        checked = UIThreadRunnable.syncExec(treeCheckCounter);
+        assertEquals(CHECK_SELECTED, 2, checked.intValue());
+        // test check subtree
+        bot.button(UNCHECK_ALL).click();
+        bot.button(CHECK_SUBTREE).click();
+        checked = UIThreadRunnable.syncExec(treeCheckCounter);
+        assertEquals(CHECK_SUBTREE, 2, checked.intValue());
+        // test uncheck selected
+        bot.button(CHECK_ALL).click();
+        bot.button(UNCHECK_SELECTED).click();
+        checked = UIThreadRunnable.syncExec(treeCheckCounter);
+        assertEquals(UNCHECK_SELECTED, 25, checked.intValue());
+        // test uncheck subtree
+        bot.button(CHECK_ALL).click();
+        bot.button(UNCHECK_SUBTREE).click();
+        checked = UIThreadRunnable.syncExec(treeCheckCounter);
+        assertEquals(UNCHECK_SELECTED, 25, checked.intValue());
+        // test filter
+        bot.button(UNCHECK_ALL).click();
+        checked = UIThreadRunnable.syncExec(treeCheckCounter);
+        assertEquals(0, checked.intValue());
+        bot.text().setText("CPU 2");
+        SWTBotTreeItem treeItem = treeBot.getTreeItem(LttngTraceGenerator.getName());
+        treeItem.rowCount();
+        fBot.waitUntil(ConditionHelpers.treeItemCount(treeItem, 25));
+        bot.button(CHECK_ALL).click();
+        checked = UIThreadRunnable.syncExec(treeCheckCounter);
+        assertEquals("Filtered", 26, checked.intValue());
+        bot.button("OK").click();
     }
 
     private void timeGraphIsReadyCondition(@NonNull TmfTimeRange selectionRange, @NonNull ITmfTimestamp visibleTime) {
