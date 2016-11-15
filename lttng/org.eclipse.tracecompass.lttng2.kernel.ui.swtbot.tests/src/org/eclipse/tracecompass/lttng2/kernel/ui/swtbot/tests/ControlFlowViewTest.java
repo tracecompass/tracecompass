@@ -96,7 +96,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
 
     @Override
     protected List<String> getLegendValues() {
-        return Arrays.asList("UNKNOWN", "WAIT_UNKNOWN", "WAIT_BLOCKED", "WAIT_FOR_CPU", "USERMODE", "SYSCALL", "INTERRUPTED");
+        return Arrays.asList("Unknown", "Usermode", "System call", "Interrupt", "Wait blocked", "Wait for CPU", "Wait");
     }
 
     @Override
@@ -107,7 +107,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
                 "Add Bookmark...", "Previous Marker", "Next Marker", SEPARATOR,
                 "Select Previous Process", "Select Next Process", "Zoom In", "Zoom Out", SEPARATOR,
                 "Hide Arrows", "Follow CPU Backward", "Follow CPU Forward",
-                "Go to previous event of the selected thread", "Go to next event of the selected thread" );
+                "Go to previous event of the selected thread", "Go to next event of the selected thread");
     }
 
     /**
@@ -252,7 +252,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
 
         SWTBotView viewBot = getViewBot();
-        SWTBotToolbarButton filterButton = viewBot .toolbarButton("Show View Filters");
+        SWTBotToolbarButton filterButton = viewBot.toolbarButton("Show View Filters");
         filterButton.click();
         fBot.waitUntil(org.eclipse.swtbot.swt.finder.waits.Conditions.shellIsActive("Filter"));
         SWTBot bot = fBot.activeShell().bot();
@@ -425,7 +425,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
     }
 
     private void timeGraphIsReadyCondition(@NonNull TmfTimeRange selectionRange) {
-        IWorkbenchPart part = getViewBot() .getViewReference().getPart(false);
+        IWorkbenchPart part = getViewBot().getViewReference().getPart(false);
         fBot.waitUntil(ConditionHelpers.timeGraphIsReadyCondition((AbstractTimeGraphView) part, selectionRange, selectionRange.getEndTime()));
     }
 }

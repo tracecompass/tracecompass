@@ -20,7 +20,6 @@ import java.util.Map;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
@@ -29,6 +28,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
+import org.eclipse.tracecompass.internal.analysis.os.linux.ui.registry.LinuxStyle;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources.ResourcesEntry.Type;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -50,6 +50,9 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 /**
  * Presentation provider for the Resource view, based on the generic TMF
  * presentation provider.
@@ -63,21 +66,24 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
     private Color fColorGray;
     private Integer fAverageCharWidth;
 
-    private enum State {
-        IDLE             (new RGB(200, 200, 200)),
-        USERMODE         (new RGB(  0, 200,   0)),
-        SYSCALL          (new RGB(  0,   0, 200)),
-        IRQ              (new RGB(200,   0, 100)),
-        SOFT_IRQ         (new RGB(200, 150, 100)),
-        IRQ_ACTIVE       (new RGB(200,   0, 100)),
-        SOFT_IRQ_RAISED  (new RGB(200, 200,   0)),
-        SOFT_IRQ_ACTIVE  (new RGB(200, 150, 100));
+    private static final Map<Integer, StateItem> STATE_MAP;
 
-        public final RGB rgb;
+    private static final List<StateItem> STATE_LIST;
 
-        private State(RGB rgb) {
-            this.rgb = rgb;
-        }
+    private static StateItem createState(LinuxStyle style) {
+        return new StateItem(style.getColor().rgb, style.getLabel());
+    }
+
+    static {
+        ImmutableMap.Builder<Integer, StateItem> builder = new ImmutableMap.Builder<>();
+        builder.put(StateValues.CPU_STATUS_IDLE, createState(LinuxStyle.IDLE));
+        builder.put(StateValues.CPU_STATUS_RUN_USERMODE, createState(LinuxStyle.USERMODE));
+        builder.put(StateValues.CPU_STATUS_RUN_SYSCALL, createState(LinuxStyle.SYSCALL));
+        builder.put(StateValues.CPU_STATUS_IRQ, createState(LinuxStyle.INTERRUPTED));
+        builder.put(StateValues.CPU_STATUS_SOFTIRQ, createState(LinuxStyle.SOFT_IRQ));
+        builder.put(StateValues.CPU_STATUS_SOFT_IRQ_RAISED, createState(LinuxStyle.SOFT_IRQ_RAISED));
+        STATE_MAP = builder.build();
+        STATE_LIST = ImmutableList.copyOf(STATE_MAP.values());
     }
 
     /**
@@ -87,36 +93,20 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
         super();
     }
 
-    private static State[] getStateValues() {
-        return State.values();
-    }
-
-    private static State getEventState(TimeEvent event) {
+    private static StateItem getEventState(TimeEvent event) {
         if (event.hasValue()) {
             ResourcesEntry entry = (ResourcesEntry) event.getEntry();
             int value = event.getValue();
 
             if (entry.getType() == Type.CPU) {
-                if (value == StateValues.CPU_STATUS_IDLE) {
-                    return State.IDLE;
-                } else if (value == StateValues.CPU_STATUS_RUN_USERMODE) {
-                    return State.USERMODE;
-                } else if (value == StateValues.CPU_STATUS_RUN_SYSCALL) {
-                    return State.SYSCALL;
-                } else if (value == StateValues.CPU_STATUS_IRQ) {
-                    return State.IRQ;
-                } else if (value == StateValues.CPU_STATUS_SOFTIRQ) {
-                    return State.SOFT_IRQ;
-                } else if (value == StateValues.CPU_STATUS_SOFT_IRQ_RAISED) {
-                    return State.SOFT_IRQ_RAISED;
-                }
+                return STATE_MAP.getOrDefault(value, STATE_MAP.get(StateValues.PROCESS_STATUS_UNKNOWN));
             } else if (entry.getType() == Type.IRQ) {
-                return State.IRQ_ACTIVE;
+                return STATE_MAP.get(StateValues.CPU_STATUS_IRQ);
             } else if (entry.getType() == Type.SOFT_IRQ) {
                 if (value == StateValues.CPU_STATUS_SOFT_IRQ_RAISED) {
-                    return State.SOFT_IRQ_RAISED;
+                    return STATE_MAP.get(StateValues.CPU_STATUS_SOFT_IRQ_RAISED);
                 }
-                return State.SOFT_IRQ_ACTIVE;
+                return STATE_MAP.get(StateValues.CPU_STATUS_SOFTIRQ);
             }
         }
         return null;
@@ -124,9 +114,9 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
     @Override
     public int getStateTableIndex(ITimeEvent event) {
-        State state = getEventState((TimeEvent) event);
+        StateItem state = getEventState((TimeEvent) event);
         if (state != null) {
-            return state.ordinal();
+            return STATE_LIST.indexOf(state);
         }
         if (event instanceof NullTimeEvent) {
             return INVISIBLE;
@@ -136,20 +126,14 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
     @Override
     public StateItem[] getStateTable() {
-        State[] states = getStateValues();
-        StateItem[] stateTable = new StateItem[states.length];
-        for (int i = 0; i < stateTable.length; i++) {
-            State state = states[i];
-            stateTable[i] = new StateItem(state.rgb, state.toString());
-        }
-        return stateTable;
+        return STATE_LIST.toArray(new StateItem[STATE_LIST.size()]);
     }
 
     @Override
     public String getEventName(ITimeEvent event) {
-        State state = getEventState((TimeEvent) event);
+        StateItem state = getEventState((TimeEvent) event);
         if (state != null) {
-            return state.toString();
+            return state.getStateString();
         }
         if (event instanceof NullTimeEvent) {
             return null;
@@ -174,7 +158,8 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 // Check for IRQ or Soft_IRQ type
                 if (entry.getType().equals(Type.IRQ) || entry.getType().equals(Type.SOFT_IRQ)) {
 
-                    // Get CPU of IRQ or SoftIRQ and provide it for the tooltip display
+                    // Get CPU of IRQ or SoftIRQ and provide it for the tooltip
+                    // display
                     int cpu = tcEvent.getValue();
                     if (cpu >= 0) {
                         retMap.put(Messages.ResourcesView_attributeCpuName, String.valueOf(cpu));
@@ -207,7 +192,8 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                             /* Ignored */
                         }
                     } else if (status == StateValues.CPU_STATUS_SOFTIRQ) {
-                        // In SOFT_IRQ state get the SOFT_IRQ that caused the interruption
+                        // In SOFT_IRQ state get the SOFT_IRQ that caused the
+                        // interruption
                         int cpu = entry.getId();
 
                         try {
@@ -335,8 +321,9 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                             } else if (status == StateValues.CPU_STATUS_RUN_SYSCALL) {
                                 attribute = Attributes.SYSTEM_CALL;
                                 /*
-                                 * Remove the "sys_" or "syscall_entry_" or similar from what we
-                                 * draw in the rectangle. This depends on the trace's event layout.
+                                 * Remove the "sys_" or "syscall_entry_" or
+                                 * similar from what we draw in the rectangle.
+                                 * This depends on the trace's event layout.
                                  */
                                 ITmfTrace trace = entry.getTrace();
                                 if (trace instanceof IKernelTrace) {

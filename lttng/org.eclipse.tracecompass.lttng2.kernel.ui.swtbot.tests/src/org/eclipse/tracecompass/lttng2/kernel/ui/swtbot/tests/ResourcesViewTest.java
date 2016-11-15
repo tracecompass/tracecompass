@@ -103,7 +103,7 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
 
     @Override
     protected List<String> getLegendValues() {
-        return Arrays.asList("IDLE", "USERMODE", "SYSCALL", "IRQ", "SOFT_IRQ", "IRQ_ACTIVE", "SOFT_IRQ_RAISED", "SOFT_IRQ_ACTIVE");
+        return Arrays.asList("Idle", "Usermode", "System call", "Interrupt", "Soft Irq", "Soft Irq raised");
     }
 
     @Override

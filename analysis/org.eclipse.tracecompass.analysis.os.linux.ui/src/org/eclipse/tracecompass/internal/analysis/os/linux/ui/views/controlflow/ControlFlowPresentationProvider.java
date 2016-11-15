@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
@@ -28,6 +27,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
+import org.eclipse.tracecompass.internal.analysis.os.linux.ui.registry.LinuxStyle;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -44,26 +44,32 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 /**
  * Presentation provider for the control flow view
  */
 public class ControlFlowPresentationProvider extends TimeGraphPresentationProvider {
 
-    private enum State {
-        UNKNOWN        (new RGB(100, 100, 100)),
-        WAIT_UNKNOWN   (new RGB(200, 200, 200)),
-        WAIT_BLOCKED   (new RGB(200, 200, 0)),
-        WAIT_FOR_CPU   (new RGB(200, 100, 0)),
-        USERMODE       (new RGB(0,   200, 0)),
-        SYSCALL        (new RGB(0,     0, 200)),
-        INTERRUPTED    (new RGB(200,   0, 100));
+    private static final Map<Integer, StateItem> STATE_MAP;
+    private static final List<StateItem> STATE_LIST;
 
-        public final RGB rgb;
+    private static StateItem createState(LinuxStyle style) {
+        return new StateItem(style.getColor().rgb, style.getLabel());
+    }
 
-        private State(RGB rgb) {
-            this.rgb = rgb;
-        }
-
+    static {
+        ImmutableMap.Builder<Integer, StateItem> builder = new ImmutableMap.Builder<>();
+        builder.put(StateValues.PROCESS_STATUS_UNKNOWN, createState(LinuxStyle.UNKNOWN));
+        builder.put(StateValues.PROCESS_STATUS_RUN_USERMODE, createState(LinuxStyle.USERMODE));
+        builder.put(StateValues.PROCESS_STATUS_RUN_SYSCALL, createState(LinuxStyle.SYSCALL));
+        builder.put(StateValues.PROCESS_STATUS_INTERRUPTED, createState(LinuxStyle.INTERRUPTED));
+        builder.put(StateValues.PROCESS_STATUS_WAIT_BLOCKED, createState(LinuxStyle.WAIT_BLOCKED));
+        builder.put(StateValues.PROCESS_STATUS_WAIT_FOR_CPU, createState(LinuxStyle.WAIT_FOR_CPU));
+        builder.put(StateValues.PROCESS_STATUS_WAIT_UNKNOWN, createState(LinuxStyle.WAIT_UNKNOWN));
+        STATE_MAP = builder.build();
+        STATE_LIST = ImmutableList.copyOf(STATE_MAP.values());
     }
 
     /**
@@ -79,26 +85,16 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         super(Messages.ControlFlowView_stateTypeName);
     }
 
-    private static State[] getStateValues() {
-        return State.values();
-    }
-
     @Override
     public StateItem[] getStateTable() {
-        State[] states = getStateValues();
-        StateItem[] stateTable = new StateItem[states.length];
-        for (int i = 0; i < stateTable.length; i++) {
-            State state = states[i];
-            stateTable[i] = new StateItem(state.rgb, state.toString());
-        }
-        return stateTable;
+        return STATE_LIST.toArray(new StateItem[STATE_LIST.size()]);
     }
 
     @Override
     public int getStateTableIndex(ITimeEvent event) {
         if (event instanceof TimeEvent && ((TimeEvent) event).hasValue()) {
             int status = ((TimeEvent) event).getValue();
-            return getMatchingState(status).ordinal();
+            return STATE_LIST.indexOf(getMatchingState(status));
         }
         if (event instanceof NullTimeEvent) {
             return INVISIBLE;
@@ -111,29 +107,14 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         if (event instanceof TimeEvent) {
             TimeEvent ev = (TimeEvent) event;
             if (ev.hasValue()) {
-                return getMatchingState(ev.getValue()).toString();
+                return getMatchingState(ev.getValue()).getStateString();
             }
         }
         return Messages.ControlFlowView_multipleStates;
     }
 
-    private static State getMatchingState(int status) {
-        switch (status) {
-        case StateValues.PROCESS_STATUS_WAIT_UNKNOWN:
-            return State.WAIT_UNKNOWN;
-        case StateValues.PROCESS_STATUS_WAIT_BLOCKED:
-            return State.WAIT_BLOCKED;
-        case StateValues.PROCESS_STATUS_WAIT_FOR_CPU:
-            return State.WAIT_FOR_CPU;
-        case StateValues.PROCESS_STATUS_RUN_USERMODE:
-            return State.USERMODE;
-        case StateValues.PROCESS_STATUS_RUN_SYSCALL:
-            return State.SYSCALL;
-        case StateValues.PROCESS_STATUS_INTERRUPTED:
-            return State.INTERRUPTED;
-        default:
-            return State.UNKNOWN;
-        }
+    private static StateItem getMatchingState(int status) {
+        return STATE_MAP.getOrDefault(status, STATE_MAP.get(StateValues.PROCESS_STATUS_WAIT_UNKNOWN));
     }
 
     @Override
@@ -228,7 +209,8 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
 
                 /*
                  * Remove the "sys_" or "syscall_entry_" or similar from what we
-                 * draw in the rectangle. This depends on the trace's event layout.
+                 * draw in the rectangle. This depends on the trace's event
+                 * layout.
                  */
                 int beginIndex = 0;
                 ITmfTrace trace = entry.getTrace();
