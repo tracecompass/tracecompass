@@ -12,13 +12,17 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 
 /**
  * Interface for the time graph widget provider
@@ -27,11 +31,13 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
  */
 public interface ITimeGraphPresentationProvider {
 
-    /** State table index for an invisible event
+    /**
+     * State table index for an invisible event
      */
     final int INVISIBLE = -1;
 
-    /** State table index for a transparent event (only borders drawn)
+    /**
+     * State table index for a transparent event (only borders drawn)
      */
     final int TRANSPARENT = -2;
 
@@ -42,15 +48,15 @@ public interface ITimeGraphPresentationProvider {
      */
     String getStateTypeName();
 
-   /**
-    * Returns the name of state type depending on the given entry.
-    * Note that this overwrites the name which is return by getStateTypeName().
-    *
-    * @param entry
-    *           the entry
-    * @return the name of state type depending on the given entry or null.
-    */
-   String getStateTypeName(ITimeGraphEntry entry);
+    /**
+     * Returns the name of state type depending on the given entry. Note that
+     * this overwrites the name which is return by getStateTypeName().
+     *
+     * @param entry
+     *            the entry
+     * @return the name of state type depending on the given entry or null.
+     */
+    String getStateTypeName(ITimeGraphEntry entry);
 
     /**
      * Returns table of states with state name to state color relationship.
@@ -63,12 +69,13 @@ public interface ITimeGraphPresentationProvider {
 
     /**
      * Returns the index in the state table corresponding to this time event.
-     * The index should correspond to a state in the state table,
-     * otherwise the color SWT.COLOR_BLACK will be used.
-     * If the index returned is TRANSPARENT, only the event borders will be drawn.
-     * If the index returned is INVISIBLE or another negative, the event will not be drawn.
+     * The index should correspond to a state in the state table, otherwise the
+     * color SWT.COLOR_BLACK will be used. If the index returned is TRANSPARENT,
+     * only the event borders will be drawn. If the index returned is INVISIBLE
+     * or another negative, the event will not be drawn.
      *
-     * @param event the time event
+     * @param event
+     *            the time event
      * @return the corresponding state table index
      *
      * @see #getStateTable
@@ -112,9 +119,11 @@ public interface ITimeGraphPresentationProvider {
     void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc);
 
     /**
-     * Returns the height of this item. This value is ignored if the time graph has a fixed item height.
+     * Returns the height of this item. This value is ignored if the time graph
+     * has a fixed item height.
      *
-     * @param entry the entry
+     * @param entry
+     *            the entry
      * @return the item height
      *
      * @see TimeGraphViewer#setItemHeight
@@ -124,7 +133,8 @@ public interface ITimeGraphPresentationProvider {
     /**
      * Provides the image icon for a given entry.
      *
-     * @param entry the entry
+     * @param entry
+     *            the entry
      * @return the image icon
      */
     Image getItemImage(ITimeGraphEntry entry);
@@ -139,31 +149,72 @@ public interface ITimeGraphPresentationProvider {
     String getEventName(ITimeEvent event);
 
     /**
-     * Returns a map of name and value providing additional information
-     * to display in the tool tip for this event.
+     * Returns a map of name and value providing additional information to
+     * display in the tool tip for this event.
      *
-     * @param event the time event
+     * @param event
+     *            the time event
      * @return a map of tool tip information
      */
     Map<String, String> getEventHoverToolTipInfo(ITimeEvent event);
 
     /**
-     * Returns a map of name and value providing additional information
-     * to display in the tool tip for this event.
+     * Returns a map of name and value providing additional information to
+     * display in the tool tip for this event.
      *
-     * @param event the time event
-     * @param hoverTime the time corresponding to the mouse hover position
+     * @param event
+     *            the time event
+     * @param hoverTime
+     *            the time corresponding to the mouse hover position
      * @return a map of tool tip information
      */
     Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime);
 
     /**
-     * Check whether time and duration should be displayed in tooltip (after items from
-     * {@link #getEventHoverToolTipInfo(ITimeEvent)}).
+     * Check whether time and duration should be displayed in tooltip (after
+     * items from {@link #getEventHoverToolTipInfo(ITimeEvent)}).
      *
-     * @return <code>true</code> if times and duration should be displayed on tooltip, <code>false</code> otherwise.
+     * @return <code>true</code> if times and duration should be displayed on
+     *         tooltip, <code>false</code> otherwise.
      */
     public boolean displayTimesInTooltip();
 
+    /**
+     * Get the style map of a given ITimeEvent
+     *
+     * @param event
+     *            the time event
+     * @return the style map, as detailed in {@link ITimeEventStyleStrings}
+     * @since 2.4
+     */
+    default Map<String, Object> getEventStyle(ITimeEvent event) {
+        StateItem stateItem = null;
+        if (event instanceof TimeEvent) {
+            int index = getStateTableIndex(event);
+            StateItem[] stateTable = getStateTable();
+            if (index >= 0 && index < stateTable.length) {
+                stateItem = stateTable[index];
+            }
+        }
+        Map<String, Object> styleMap = new HashMap<>();
+        if (stateItem != null) {
+            styleMap.putAll(stateItem.getStyleMap());
+        }
+        styleMap.putAll(getSpecificEventStyle(event));
+        return styleMap;
+    }
+
+    /**
+     * Get the specific style map for a given event.
+     *
+     * @param event
+     *            the time event
+     * @return a style map containing the elements as detailed in
+     *         {@link ITimeEventStyleStrings} to override
+     * @since 2.4
+     */
+    default Map<String, Object> getSpecificEventStyle(ITimeEvent event) {
+        return Collections.emptyMap();
+    }
 
 }

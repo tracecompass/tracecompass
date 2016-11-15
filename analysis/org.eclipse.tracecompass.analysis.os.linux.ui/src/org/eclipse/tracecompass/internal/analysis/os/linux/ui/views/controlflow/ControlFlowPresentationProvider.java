@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
@@ -40,6 +41,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
@@ -54,13 +56,24 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
 
     private static final Map<Integer, StateItem> STATE_MAP;
     private static final List<StateItem> STATE_LIST;
+    private static final StateItem[] STATE_TABLE;
 
     private static StateItem createState(LinuxStyle style) {
-        return new StateItem(style.getColor().rgb, style.getLabel());
+        int rgbInt = (int) style.toMap().getOrDefault(ITimeEventStyleStrings.fillColor(), 0);
+        RGB color = new RGB(rgbInt >> 24 & 0xff, rgbInt >> 16 & 0xff, rgbInt >> 8 & 0xff);
+        return new StateItem(color, style.getLabel()) {
+            @Override
+            public Map<String, Object> getStyleMap() {
+                return style.toMap();
+            }
+        };
     }
 
     static {
         ImmutableMap.Builder<Integer, StateItem> builder = new ImmutableMap.Builder<>();
+        /*
+         * ADD STATE MAPPING HERE
+         */
         builder.put(StateValues.PROCESS_STATUS_UNKNOWN, createState(LinuxStyle.UNKNOWN));
         builder.put(StateValues.PROCESS_STATUS_RUN_USERMODE, createState(LinuxStyle.USERMODE));
         builder.put(StateValues.PROCESS_STATUS_RUN_SYSCALL, createState(LinuxStyle.SYSCALL));
@@ -68,8 +81,12 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         builder.put(StateValues.PROCESS_STATUS_WAIT_BLOCKED, createState(LinuxStyle.WAIT_BLOCKED));
         builder.put(StateValues.PROCESS_STATUS_WAIT_FOR_CPU, createState(LinuxStyle.WAIT_FOR_CPU));
         builder.put(StateValues.PROCESS_STATUS_WAIT_UNKNOWN, createState(LinuxStyle.WAIT_UNKNOWN));
+        /*
+         * DO NOT MODIFY AFTER
+         */
         STATE_MAP = builder.build();
         STATE_LIST = ImmutableList.copyOf(STATE_MAP.values());
+        STATE_TABLE = STATE_LIST.toArray(new StateItem[STATE_LIST.size()]);
     }
 
     /**
@@ -87,7 +104,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
 
     @Override
     public StateItem[] getStateTable() {
-        return STATE_LIST.toArray(new StateItem[STATE_LIST.size()]);
+        return STATE_TABLE;
     }
 
     @Override
