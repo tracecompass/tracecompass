@@ -229,7 +229,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
      * @param entry
      *            The entry to add
      */
-    public void addChild(XmlEntry entry) {
+    public void addChild(@NonNull XmlEntry entry) {
         int index;
         for (index = 0; index < getChildren().size(); index++) {
             XmlEntry other = (XmlEntry) getChildren().get(index);
@@ -242,7 +242,6 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
             }
         }
 
-        entry.setParent(this);
         addChild(index, entry);
     }
 
