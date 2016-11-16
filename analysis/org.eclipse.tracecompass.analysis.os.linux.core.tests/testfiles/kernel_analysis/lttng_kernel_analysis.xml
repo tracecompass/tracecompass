@@ -56,7 +56,7 @@
 <field name="prev_comm" value="proc3" type="string" />
 <field name="prev_tid" value="30" type="long" />
 <field name="prev_prio" value="20" type="long" />
-<field name="prev_state" value="0" type="long" />
+<field name="prev_state" value="1" type="long" />
 <field name="next_comm" value="proc11" type="string" />
 <field name="next_tid" value="11" type="long" />
 <field name="next_prio" value="20" type="long" />
@@ -84,7 +84,7 @@
 <field name="prev_comm" value="proc11" type="string" />
 <field name="prev_tid" value="10" type="long" />
 <field name="prev_prio" value="20" type="long" />
-<field name="prev_state" value="0" type="long" />
+<field name="prev_state" value="1" type="long" />
 <field name="next_comm" value="proc20" type="string" />
 <field name="next_tid" value="20" type="long" />
 <field name="next_prio" value="20" type="long" />
@@ -103,7 +103,7 @@
 <field name="prev_comm" value="proc20" type="string" />
 <field name="prev_tid" value="20" type="long" />
 <field name="prev_prio" value="20" type="long" />
-<field name="prev_state" value="0" type="long" />
+<field name="prev_state" value="1" type="long" />
 <field name="next_comm" value="proc21" type="string" />
 <field name="next_tid" value="21" type="long" />
 <field name="next_prio" value="20" type="long" />
@@ -113,7 +113,7 @@
 <field name="prev_comm" value="lttng-sessiond" type="string" />
 <field name="prev_tid" value="100" type="long" />
 <field name="prev_prio" value="20" type="long" />
-<field name="prev_state" value="0" type="long" />
+<field name="prev_state" value="1" type="long" />
 <field name="next_comm" value="proc11" type="string" />
 <field name="next_tid" value="11" type="long" />
 <field name="next_prio" value="20" type="long" />
@@ -133,7 +133,7 @@
 <field name="prev_comm" value="proc30" type="string" />
 <field name="prev_tid" value="30" type="long" />
 <field name="prev_prio" value="20" type="long" />
-<field name="prev_state" value="0" type="long" />
+<field name="prev_state" value="1" type="long" />
 <field name="next_comm" value="proc21" type="string" />
 <field name="next_tid" value="21" type="long" />
 <field name="next_prio" value="20" type="long" />
@@ -143,7 +143,7 @@
 <field name="prev_comm" value="proc21" type="string" />
 <field name="prev_tid" value="21" type="long" />
 <field name="prev_prio" value="20" type="long" />
-<field name="prev_state" value="0" type="long" />
+<field name="prev_state" value="1" type="long" />
 <field name="next_comm" value="proc20" type="string" />
 <field name="next_tid" value="20" type="long" />
 <field name="next_prio" value="20" type="long" />

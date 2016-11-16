@@ -18,11 +18,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.common.core.StreamUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
@@ -33,6 +37,8 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Information provider utility class that retrieves thread-related information
@@ -79,6 +85,155 @@ public final class KernelThreadInformationProvider {
     }
 
     /**
+     * The the threads that have been scheduled on the given CPU(s), for the
+     * given time range. Threads with TID 0 (swapper threads) will never be
+     * included.
+     *
+     * @param module
+     *            The kernel analysis module to query
+     * @param cpus
+     *            The list of cpus
+     * @param rangeStart
+     *            The start of the time range
+     * @param rangeEnd
+     *            The end of the time range
+     * @return A set of all the thread IDs that are run on said CPUs on the time
+     *         range. Empty set if there is no thread on the CPUs in this time
+     *         range. Null if the information is not available.
+     * @since 2.4
+     */
+    public static @Nullable Set<Integer> getThreadsOfCpus(KernelAnalysisModule module, Collection<Long> cpus, long rangeStart, long rangeEnd) {
+        ITmfStateSystem ss = module.getStateSystem();
+        if (ss == null) {
+            return null;
+        }
+
+        Set<Long> uniqueCpus = (cpus instanceof Set ? (Set<Long>) cpus : ImmutableSet.copyOf(cpus));
+
+        int threadsQuark = ss.optQuarkAbsolute(Attributes.THREADS);
+        if (threadsQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+            return null;
+        }
+
+        List<Integer> threadQuarks = ss.getSubAttributes(threadsQuark, false);
+        return threadQuarks.stream()
+                /*
+                 * Keep only the quarks of threads that are on at least one of the
+                 * wanted CPUs' run queue.
+                 */
+                .filter(threadQuark -> {
+                    int threadCurrentCpuQuark = ss.optQuarkRelative(threadQuark, Attributes.CURRENT_CPU_RQ);
+                    if (threadCurrentCpuQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+                        return false;
+                    }
+
+                    /* Check if the thread was seen on any of the requested CPUs. */
+                    QuarkIterator it = new QuarkIterator(ss, threadCurrentCpuQuark, rangeStart, rangeEnd);
+                    return StreamUtils.getStream(it)
+                            .map(ITmfStateInterval::getStateValue)
+                            .filter(value -> !value.isNull())
+                            .map(value -> Long.valueOf(value.unboxLong()))
+                            .anyMatch(uniqueCpus::contains);
+                })
+
+                /* Convert the thread quarks to their corresponding TIDs */
+                .map(ss::getAttributeName)
+                /* Ignore swapper threads */
+                .filter(attribName -> !attribName.startsWith(Attributes.THREAD_0_PREFIX))
+                .map(Integer::valueOf)
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Predicate indicating if a thread state value is considered active or not.
+     */
+    private static final Predicate<ITmfStateValue> IS_STATE_VALUE_ACTIVE = stateValue -> {
+        return !(stateValue.isNull() ||
+                stateValue.equals(ProcessStatus.UNKNOWN.getStateValue()) ||
+                stateValue.equals(ProcessStatus.WAIT_BLOCKED.getStateValue()) ||
+                stateValue.equals(ProcessStatus.WAIT_UNKNOWN.getStateValue()));
+    };
+
+    /**
+     * Return all the threads that are considered active in the given time
+     * range. Threads with TID 0 (swapper threads) will never be included.
+     *
+     * @param module
+     *            The kernel analysis module to query
+     * @param rangeStart
+     *            The start of the time range
+     * @param rangeEnd
+     *            The end of the time range
+     * @return A set of all the thread IDs that are considered active in the
+     *         time range. Empty set if there are none. Null if the information
+     *         is not available.
+     * @since 2.4
+     */
+    public static @Nullable Set<Integer> getActiveThreadsForRange(KernelAnalysisModule module, long rangeStart, long rangeEnd) {
+        ITmfStateSystem ss = module.getStateSystem();
+        if (ss == null) {
+            return null;
+        }
+
+        List<ITmfStateInterval> fullQueryAtStart;
+        int threadsQuark;
+        try {
+            fullQueryAtStart = ss.queryFullState(rangeStart);
+            threadsQuark = ss.getQuarkAbsolute(Attributes.THREADS);
+        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
+            return null;
+        }
+
+
+        List<Integer> threadQuarks = ss.getSubAttributes(threadsQuark, false);
+        return threadQuarks.stream()
+                /*
+                 * Keep only the quarks of threads that are considered active at
+                 * some point in the time range.
+                 */
+                .filter(threadQuark -> {
+                    /*
+                     * If the thread was active at range start, we can already
+                     * consider it active.
+                     */
+                    ITmfStateInterval intervalAtStart = fullQueryAtStart.get(threadQuark);
+                    if (IS_STATE_VALUE_ACTIVE.test(intervalAtStart.getStateValue())) {
+                        return true;
+                    }
+
+                    /*
+                     * If it was inactive, and it remains in the exact same
+                     * state for the whole time range, we can conclude it is
+                     * inactive for the whole range.
+                     *
+                     * Note this will not catch cases where the threads goes
+                     * from one inactive state to another, this will be found
+                     * with the range query below.
+                     */
+                    if (intervalAtStart.getEndTime() >= rangeEnd) {
+                        return false;
+                    }
+
+                    QuarkIterator it = new QuarkIterator(ss, threadQuark, rangeStart, rangeEnd);
+                    while (it.hasNext()) {
+                        ITmfStateInterval interval = it.next();
+                        if (IS_STATE_VALUE_ACTIVE.test(interval.getStateValue())) {
+                            return true;
+                        }
+                    }
+                    /* We haven't found an active state value in the whole range. */
+                    return false;
+                })
+
+                /* Convert the thread quarks to their corresponding TIDs */
+                .map(ss::getAttributeName)
+                /* Ignore swapper threads */
+                .filter(attribName -> !attribName.startsWith(Attributes.THREAD_0_PREFIX))
+                .map(Integer::parseInt)
+                .collect(Collectors.toSet());
+    }
+
+    /**
      * Get the TIDs of the threads from an analysis
      *
      * @param module
@@ -88,7 +243,7 @@ public final class KernelThreadInformationProvider {
     public static Collection<Integer> getThreadIds(KernelAnalysisModule module) {
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
         int threadQuark;
         try {
@@ -100,8 +255,9 @@ public final class KernelThreadInformationProvider {
             }
             return tids;
         } catch (AttributeNotFoundException e) {
+            // Do Nothing
         }
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     /**
@@ -216,7 +372,7 @@ public final class KernelThreadInformationProvider {
     public static List<ITmfStateInterval> getStatusIntervalsForThread(KernelAnalysisModule module, Integer threadId, long start, long end, long resolution, IProgressMonitor monitor) {
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         try {
@@ -224,8 +380,9 @@ public final class KernelThreadInformationProvider {
             List<ITmfStateInterval> statusIntervals = StateSystemUtils.queryHistoryRange(ss, threadQuark, Math.max(start, ss.getStartTime()), Math.min(end - 1, ss.getCurrentEndTime()), resolution, monitor);
             return statusIntervals;
         } catch (AttributeNotFoundException | StateSystemDisposedException | TimeRangeException e) {
+            // Do Nothing
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     /**
