@@ -1606,6 +1606,21 @@ public class TimeGraphControl extends TimeGraphBaseControl
         return fItemData.fExpandedItems[index].fEntry;
     }
 
+    /**
+     * Get the bounds of the specified entry
+     *
+     * @param entry the time graph entry
+     * @return the bounds of the entry, or null if the entry is not visible
+     * @since 2.2
+     */
+    public Rectangle getItemBounds(ITimeGraphEntry entry) {
+        int idx = fItemData.findItemIndex(entry);
+        if (idx >= 0) {
+            return getItemRect(getBounds(), idx);
+        }
+        return null;
+    }
+
     Rectangle getNameRect(Rectangle bounds, int idx, int nameWidth) {
         Rectangle rect = getItemRect(bounds, idx);
         rect.width = nameWidth;

@@ -23,7 +23,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
@@ -48,6 +47,8 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackView;
@@ -68,6 +69,9 @@ public class CallStackViewTest {
     private static final String UST_ID = "org.eclipse.linuxtools.lttng2.ust.tracetype";
 
     private static final String PROJECT_NAME = "TestForCallstack";
+    private static final String TRACE = "glxgears-cyg-profile";
+    private static final String PROCESS = "UNKNOWN";
+    private static final @NonNull String THREAD = "glxgears-16073";
 
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
@@ -94,17 +98,17 @@ public class CallStackViewTest {
      * Stack frames of consecutive events in the trace
      */
     private static final String[] STACK_FRAMES[] = new String[][] {
-            { "0x40472b", "0x4045c8", "0x404412", "", "" },
-            { "0x40472b", "0x4045c8", "0x404412", "0x40392b", "" },
-            { "0x40472b", "0x4045c8", "0x404412", "", "" },
-            { "0x40472b", "0x4045c8", "", "", "" },
-            { "0x40472b", "0x4045c8", "0x404412", "", "" },
-            { "0x40472b", "0x4045c8", "0x404412", "0x40392b", "" },
-            { "0x40472b", "0x4045c8", "0x404412", "", "" },
-            { "0x40472b", "0x4045c8", "", "", "" },
-            { "0x40472b", "0x4045c8", "0x404412", "", "" },
-            { "0x40472b", "0x4045c8", "0x404412", "0x40392b", "" },
-            { "0x40472b", "0x4045c8", "0x404412", "", "" },
+            { "0x40472b", "0x4045c8", "0x404412" },
+            { "0x40472b", "0x4045c8", "0x404412", "0x40392b" },
+            { "0x40472b", "0x4045c8", "0x404412" },
+            { "0x40472b", "0x4045c8" },
+            { "0x40472b", "0x4045c8", "0x404412" },
+            { "0x40472b", "0x4045c8", "0x404412", "0x40392b" },
+            { "0x40472b", "0x4045c8", "0x404412" },
+            { "0x40472b", "0x4045c8" },
+            { "0x40472b", "0x4045c8", "0x404412" },
+            { "0x40472b", "0x4045c8", "0x404412", "0x40392b" },
+            { "0x40472b", "0x4045c8", "0x404412" },
     };
 
     /** Tooltips of the toolbar buttons */
@@ -163,6 +167,7 @@ public class CallStackViewTest {
         SWTBotUtils.closeView("welcome", fBot);
 
         SWTBotUtils.switchToTracingPerspective();
+        SWTBotUtils.closeView("Statistics", fBot);
         /* finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
     }
@@ -196,19 +201,9 @@ public class CallStackViewTest {
      */
     @Test
     public void testOpenCallstack() {
-        String node = "glxgears-cyg-profile";
-        String processName = "UNKNOWN";
-        String childName = "glxgears-16073";
-        List<String> expected = ImmutableList.of("0x40472b", "", "", "", "");
-
         SWTBotView viewBot = fBot.viewById(CallStackView.ID);
         viewBot.setFocus();
-        final SWTBotView viewBot1 = viewBot;
-        SWTBotTree tree = viewBot1.bot().tree();
-        SWTBotTreeItem treeItem = tree.getTreeItem(node).getNode(processName);
-        assertEquals(childName, treeItem.getNodes().get(0));
-        List<String> names = treeItem.getNode(childName).getNodes();
-        assertEquals(expected, names);
+        assertEquals(Arrays.asList("0x40472b"), getVisibleStackFrames(viewBot));
     }
 
     /**
@@ -284,15 +279,14 @@ public class CallStackViewTest {
 
     private static List<String> getVisibleStackFrames(final SWTBotView viewBot) {
         SWTBotTree tree = viewBot.bot().tree();
-        return Arrays.stream(tree.getAllItems())
-                // Process entries
-                .flatMap(item -> Arrays.stream(item.getItems()))
-                // Thread entries
-                .flatMap(item -> Arrays.stream(item.getItems()))
-                // Callstack entries
-                .flatMap(item -> Arrays.stream(item.getItems()))
-                .map(item -> item.cell(0))
-                .collect(Collectors.toList());
+        List<String> stackFrames = new ArrayList<>();
+        for (SWTBotTreeItem treeItem : tree.expandNode(TRACE, PROCESS, THREAD).getItems()) {
+            String name = treeItem.cell(0);
+            if (!name.isEmpty()) {
+                stackFrames.add(name);
+            }
+        }
+        return stackFrames;
     }
 
     private static void goToTime(long timestamp) {
@@ -313,7 +307,6 @@ public class CallStackViewTest {
         goToTime(TIMESTAMPS[0]);
         final SWTBotView viewBot = fBot.viewById(CallStackView.ID);
         viewBot.setFocus();
-        SWTBotTree tree = viewBot.bot().tree();
         Object mapObj = CtfTmfTestTraceUtils.class.getResource("cyg-profile-mapping.txt");
         assertTrue(mapObj instanceof URL);
         URL mapUrl = (URL) mapObj;
@@ -329,21 +322,17 @@ public class CallStackViewTest {
         shellBot.button("Browse...", 1).click();
         shellBot.button("OK").click();
         shellBot.waitUntil(Conditions.shellCloses(activeShell));
-        // FIXME: remove when updates are propagated
+        /*
+         * FIXME: Seek to time needed to update the call stack entry names.
+         * Remove when applying symbol configuration correctly updates entries.
+         */
         goToTime(TIMESTAMPS[0]);
         WaitUtils.waitForJobs();
-        List<String> names = new ArrayList<>();
-
-        for (SWTBotTreeItem swtBotTreeItem : tree.getAllItems()) {
-            for (SWTBotTreeItem items : swtBotTreeItem.getItems()) {
-                for (SWTBotTreeItem item : items.getItems()) {
-                    names.add(item.cell(0));
-                }
-            }
-        }
-        List<String> functions = getVisibleStackFrames(viewBot);
-        assertEquals(ImmutableList.of("glxgears-16073"), names);
-        assertEquals(ImmutableList.of("main", "event_loop", "handle_event", "", ""), functions);
+        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(viewBot.bot());
+        SWTBotTimeGraphEntry[] threads = timeGraph.getEntry(TRACE, PROCESS).getEntries();
+        assertEquals(1, threads.length);
+        assertEquals(THREAD, threads[0].getText());
+        assertEquals(Arrays.asList("main", "event_loop", "handle_event"), getVisibleStackFrames(viewBot));
     }
 
     /**

@@ -20,7 +20,6 @@ import java.nio.file.Paths;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -29,6 +28,8 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -77,6 +78,7 @@ public class CriticalPathTest extends KernelTestBase {
     public void testFull() {
         SWTBotTree treeCfv = fViewBotCfv.bot().tree();
         SWTBotTree treeCp = fViewBotCp.bot().tree();
+        SWTBotTimeGraph timeGraphCp = new SWTBotTimeGraph(fViewBotCp.bot());
         assertNotNull(treeCfv.widget);
         assertNotNull(treeCp.widget);
         SWTBotTreeItem[] allItems = treeCp.getAllItems();
@@ -86,19 +88,11 @@ public class CriticalPathTest extends KernelTestBase {
 
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         assertNotNull(trace);
-        SWTBotTreeItem item = treeCfv.getTreeItem(trace.getName());
-        assertNotNull(item);
-        item = item.getNode("systemd");
-        assertNotNull(item);
-        item = item.getNode("we");
-        assertNotNull(item);
-        item = item.getNode(PROCESS);
-        assertNotNull(item);
-        final SWTBotTreeItem treeItem = item;
-        UIThreadRunnable.syncExec(() -> treeCfv.widget.setTopItem(treeItem.widget));
-        item.click();
+        SWTBotTreeItem entry = treeCfv.expandNode(trace.getName(), "systemd", "we", PROCESS);
+        assertNotNull(entry);
+        entry.select();
 
-        SWTBotMenu menu = item.contextMenu("Follow " + PROCESS + "/" + TID);
+        SWTBotMenu menu = entry.contextMenu("Follow " + PROCESS + "/" + TID);
         assertEquals("Follow " + PROCESS + "/" + TID, menu.getText());
         menu.click();
         fBot.waitUntil(new DefaultCondition() {
@@ -107,8 +101,8 @@ public class CriticalPathTest extends KernelTestBase {
 
             @Override
             public boolean test() throws Exception {
-                SWTBotTreeItem[] items = treeCp.getAllItems();
-                return EXPECTED_TREE_TEXT.equals(items[0].getNode(0).getText());
+                SWTBotTimeGraphEntry[] entries = timeGraphCp.getEntries();
+                return EXPECTED_TREE_TEXT.equals(entries[0].getEntries()[0].getText());
             }
 
             @Override

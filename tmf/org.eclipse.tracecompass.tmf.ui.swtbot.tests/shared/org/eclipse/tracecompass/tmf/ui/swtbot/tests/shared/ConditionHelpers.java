@@ -471,6 +471,39 @@ public final class ConditionHelpers {
         };
     }
 
+    /**
+     * Condition to check if the selection contains the specified text at the
+     * specified column. The text is checked in any item of the tree selection.
+     *
+     * @param tree
+     *            the SWTBot tree
+     * @param column
+     *            the column index
+     * @param text
+     *            the expected text
+     * @return ICondition for verification
+     */
+    public static ICondition timeGraphSelectionContains(final SWTBotTimeGraph timeGraph, final int column, final String text) {
+        return new SWTBotTestCondition() {
+            @Override
+            public boolean test() throws Exception {
+                TableCollection selection = timeGraph.selection();
+                for (int row = 0; row < selection.rowCount(); row++) {
+                    if (selection.get(row, column).equals(text)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return NLS.bind("Time graph selection [0,{0}]: {1} expected: {2}",
+                        new Object[] { column, timeGraph.selection().get(0, column), text});
+            }
+        };
+    }
+
     private static class EventsTableSelectionCondition extends DefaultCondition {
         private long fSelectionTime;
         private SWTWorkbenchBot fBot;

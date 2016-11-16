@@ -27,8 +27,6 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
 import org.eclipse.swtbot.swt.finder.keyboard.KeyboardFactory;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
-import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
-import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -41,9 +39,9 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.ui.IWorkbenchPart;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,7 +68,6 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
     private static final String FOLLOW_CPU_FORWARD = "Follow CPU Forward";
     private static final String SELECT_PREVIOUS_STATE_CHANGE = "Select Previous State Change";
     private static final String SELECT_NEXT_STATE_CHANGE = "Select Next State Change";
-    private static final String SELECT_NEXT_PROCESS = "Select Next Process";
     private static final Keyboard KEYBOARD = KeyboardFactory.getSWTKeyboard();
     private static final @NonNull ITmfTimestamp START_TIME = TmfTimestamp.fromNanos(1368000272650993664L);
     private static final @NonNull ITmfTimestamp TID1_TIME1 = TmfTimestamp.fromNanos(1368000272651208412L);
@@ -153,18 +150,13 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, START_TIME));
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
 
-        /* select first item */
-        SWTBotUtils.pressShortcutGoToTreeTop(KEYBOARD);
-        fViewBot.toolbarButton(SELECT_NEXT_PROCESS).click();
-
         /* set focus on time graph */
-        final TimeGraphControl timegraph = fViewBot.bot().widget(WidgetOfType.widgetOfType(TimeGraphControl.class));
-        UIThreadRunnable.syncExec(new VoidResult() {
-            @Override
-            public void run() {
-                timegraph.setFocus();
-            }
-        });
+        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(fViewBot.bot());
+        timeGraph.setFocus();
+
+        /* select first item */
+        KEYBOARD.pressShortcut(Keystrokes.HOME);
+        KEYBOARD.pressShortcut(Keystrokes.DOWN);
 
         /* click "Select Next State Change" 3 times */
         selectNext.run();
@@ -311,10 +303,10 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
         assertEquals("Filtered", 26, checked.intValue());
         bot.button("OK").click();
-        treeBot = fViewBot.bot().tree();
-        treeItem = treeBot.getTreeItem(LttngTraceGenerator.getName());
-        for (int i = 0; i < 25; i++) {
-            assertEquals("Filtered Control flow view", "Half-life 3", treeItem.cell(i, 0));
+        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(fViewBot.bot());
+        SWTBotTimeGraphEntry traceEntry = timeGraph.getEntry(LttngTraceGenerator.getName());
+        for (SWTBotTimeGraphEntry entry : traceEntry.getEntries()) {
+            assertEquals("Filtered Control flow view", "Half-life 3", entry.getText());
         }
     }
 
@@ -330,21 +322,17 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
 
         /* set selection to trace start time */
         TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, START_TIME));
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(START_TIME, START_TIME)));
+        timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
 
-        /* select first item */
         final SWTBotTree tree = fViewBot.bot().tree();
-        SWTBotUtils.pressShortcutGoToTreeTop(KEYBOARD);
-        fViewBot.toolbarButton(SELECT_NEXT_PROCESS).click();
 
         /* set focus on time graph */
-        final TimeGraphControl timegraph = fViewBot.bot().widget(WidgetOfType.widgetOfType(TimeGraphControl.class));
-        UIThreadRunnable.syncExec(new VoidResult() {
-            @Override
-            public void run() {
-                timegraph.setFocus();
-            }
-        });
+        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(fViewBot.bot());
+        timeGraph.setFocus();
+
+        /* select first item */
+        KEYBOARD.pressShortcut(Keystrokes.HOME);
+        KEYBOARD.pressShortcut(Keystrokes.DOWN);
 
         /* click "Follow CPU Forward" 3 times */
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
