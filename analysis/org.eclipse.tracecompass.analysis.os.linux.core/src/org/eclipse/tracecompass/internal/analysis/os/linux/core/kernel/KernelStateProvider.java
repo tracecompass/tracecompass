@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.ProcessExitHandler;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.ProcessForkHandler;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.ProcessFreeHandler;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.SchedMigrateTaskHandler;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.SchedSwitchHandler;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.SchedWakeupHandler;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.SoftIrqEntryHandler;
@@ -67,6 +68,7 @@ import com.google.common.collect.ImmutableMap;
  * |  |  |- EXEC_NAME
  * |  |  |- PRIO
  * |  |  |- SYSTEM_CALL
+ * |  |  |- CURRENT_CPU_RQ
  * </pre>
  *
  * @author Alexandre Montplaisir
@@ -81,7 +83,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
      * Version number of this state provider. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
-    private static final int VERSION = 24;
+    private static final int VERSION = 25;
 
     // ------------------------------------------------------------------------
     // Fields
@@ -133,6 +135,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
         builder.put(layout.eventSchedProcessExit(), new ProcessExitHandler(layout));
         builder.put(layout.eventSchedProcessFree(), new ProcessFreeHandler(layout));
         builder.put(layout.eventSchedProcessWaking(), new SchedWakeupHandler(layout));
+        builder.put(layout.eventSchedMigrateTask(), new SchedMigrateTaskHandler(layout));
 
         for (String s : layout.getIPIIrqVectorsEntries()) {
             builder.put(s, new IPIEntryHandler(layout));

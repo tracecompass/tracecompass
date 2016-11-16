@@ -43,9 +43,11 @@ public class SchedWakeupHandler extends KernelEventHandler {
         Integer cpu = KernelEventHandlerUtils.getCpu(event);
         final int tid = ((Long) event.getContent().getField(getLayout().fieldTid()).getValue()).intValue();
         final int prio = ((Long) event.getContent().getField(getLayout().fieldPrio()).getValue()).intValue();
+        Long targetCpu = event.getContent().getFieldValue(Long.class, getLayout().fieldTargetCpu());
 
         String threadAttributeName = Attributes.buildThreadAttributeName(tid, cpu);
-        if (threadAttributeName == null) {
+
+        if (cpu == null || targetCpu == null || threadAttributeName == null) {
             return;
         }
 
@@ -64,11 +66,16 @@ public class SchedWakeupHandler extends KernelEventHandler {
             ss.modifyAttribute(timestamp, value, threadNode);
         }
 
+        /* Set the thread's target run queue */
+        int quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.CURRENT_CPU_RQ);
+        value = TmfStateValue.newValueInt(targetCpu.intValue());
+        ss.modifyAttribute(timestamp, value, quark);
+
         /*
          * When a user changes a threads prio (e.g. with pthread_setschedparam),
          * it shows in ftrace with a sched_wakeup.
          */
-        int quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.PRIO);
+        quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.PRIO);
         value = TmfStateValue.newValueInt(prio);
         ss.modifyAttribute(timestamp, value, quark);
     }

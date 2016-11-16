@@ -36,6 +36,7 @@ public interface Attributes {
     String IRQS = "IRQs";
 
     /* Sub-attributes of the Thread nodes */
+    String CURRENT_CPU_RQ = "Current_cpu_rq";
     String PPID = "PPID";
     String EXEC_NAME = "Exec_name";
 

@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers
 import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -75,6 +76,17 @@ public class ProcessForkHandler extends KernelEventHandler {
         /* Set the new process' status */
         value = ProcessStatus.WAIT_CPU.getStateValue();
         ss.modifyAttribute(timestamp, value, childTidNode);
+
+        /*
+         * Set the process's run queue to be the same as the parent's, if
+         * available.
+         */
+        quark = ss.optQuarkRelative(parentTidNode, Attributes.CURRENT_CPU_RQ);
+        if (quark != ITmfStateSystem.INVALID_ATTRIBUTE) {
+            value = ss.queryOngoingState(quark);
+            quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.CURRENT_CPU_RQ);
+            ss.modifyAttribute(timestamp, value, quark);
+        }
 
         /* Set the process' syscall name, to be the same as the parent's */
         quark = ss.getQuarkRelativeAndAdd(parentTidNode, Attributes.SYSTEM_CALL);

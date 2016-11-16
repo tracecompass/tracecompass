@@ -232,6 +232,17 @@ public interface IKernelAnalysisEventLayout {
     }
 
     /**
+     * Migration event, moving a non-running thread from one CPU's run queue to
+     * another.
+     *
+     * @return The event name
+     * @since 2.4
+     */
+    default String eventSchedMigrateTask() {
+        return "sched_migrate_task"; //$NON-NLS-1$
+    }
+
+    /**
      * Starting the high resolution timer
      * <p>
      * In Linux, High resolution timers are used in the following:
@@ -609,6 +620,28 @@ public interface IKernelAnalysisEventLayout {
      */
     default String fieldSyscallRet() {
         return "ret"; //$NON-NLS-1$
+    }
+
+    /**
+     * Field indicating the upcoming CPU of sched_wakeup and sched_waking
+     * events.
+     *
+     * @return The field name
+     * @since 2.4
+     */
+    default String fieldTargetCpu() {
+        return "target_cpu"; //$NON-NLS-1$
+    }
+
+    /**
+     * Field of scheduler migration events, indicating the destination CPU of a
+     * thread being migrated.
+     *
+     * @return The field name
+     * @since 2.4
+     */
+    default String fieldDestCpu() {
+        return "dest_cpu"; //$NON-NLS-1$
     }
 
     // ------------------------------------------------------------------------
