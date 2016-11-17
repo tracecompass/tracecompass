@@ -33,7 +33,9 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
@@ -482,22 +484,20 @@ public final class SWTBotUtils {
      *            delay and wait for jobs
      */
     public static void openTrace(final String projectName, final String tracePath, final String traceType, boolean delay) {
-        final Exception exception[] = new Exception[1];
-        exception[0] = null;
-        UIThreadRunnable.syncExec(new VoidResult() {
+        IStatus status = UIThreadRunnable.syncExec(new Result<IStatus>() {
             @Override
-            public void run() {
+            public IStatus run() {
                 try {
                     IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
                     TmfTraceFolder destinationFolder = TmfProjectRegistry.getProject(project, true).getTracesFolder();
-                    TmfOpenTraceHelper.openTraceFromPath(destinationFolder, tracePath, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), traceType);
+                    return TmfOpenTraceHelper.openTraceFromPath(destinationFolder, tracePath, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), traceType);
                 } catch (CoreException e) {
-                    exception[0] = e;
+                    return new Status(IStatus.ERROR, "", e.getMessage(), e);
                 }
             }
         });
-        if (exception[0] != null) {
-            fail(exception[0].getMessage());
+        if (!status.isOK()) {
+            fail(status.getMessage());
         }
 
         if (delay) {
