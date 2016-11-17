@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.test.internal.performance.PerformanceTestPlugin;
 import org.eclipse.test.internal.performance.data.Dim;
@@ -403,8 +404,8 @@ public class PerfResultsToJSon {
         overviewMetadata.put(FILE_LABEL, OVERVIEW_CHART_FILE_NAME + numOverviewChart);
         overviewMetadata.put(OS_LABEL, os);
         overviewMetadata.put(JVM_LABEL, jvm);
-        overviewMetadata.put(DIMENSION_LABEL, "");
-        overviewMetadata.put(UNIT_LABEL, "");
+        overviewMetadata.put(DIMENSION_LABEL, StringUtils.EMPTY);
+        overviewMetadata.put(UNIT_LABEL, StringUtils.EMPTY);
 
         return overviewMetadata;
     }

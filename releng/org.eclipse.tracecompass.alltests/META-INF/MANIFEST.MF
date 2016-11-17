@@ -46,6 +46,7 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
 Export-Package: org.eclipse.tracecompass.alltests;x-internal:=true,
  org.eclipse.tracecompass.alltests.perf;x-internal:=true,
  org.eclipse.tracecompass.alltests.swtbot;x-internal:=true
-Import-Package: org.apache.derby.jdbc,
+Import-Package: org.apache.commons.lang,
+ org.apache.derby.jdbc,
  org.json
 Bundle-Activator: org.eclipse.tracecompass.alltests.Activator
