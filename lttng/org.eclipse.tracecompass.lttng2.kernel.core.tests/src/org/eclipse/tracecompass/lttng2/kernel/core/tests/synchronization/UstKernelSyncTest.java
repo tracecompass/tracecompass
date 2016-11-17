@@ -135,7 +135,9 @@ public class UstKernelSyncTest {
         ustEvent = (CtfTmfEvent) TmfTraceUtils.getNextEventMatching(experiment, rank, eventFinder, null);
         assertNotNull(ustEvent);
 
+        /* Make sure the correct event was retrieved */
         assertEquals(ustTrace, ustEvent.getTrace());
+        assertEquals(1450193715128075054L, ustEvent.getTimestamp().toNanos());
 
         Integer tidFromKernel = KernelThreadInformationProvider.getThreadOnCpu(module,
                 ustEvent.getCPU(), ustEvent.getTimestamp().toNanos());
