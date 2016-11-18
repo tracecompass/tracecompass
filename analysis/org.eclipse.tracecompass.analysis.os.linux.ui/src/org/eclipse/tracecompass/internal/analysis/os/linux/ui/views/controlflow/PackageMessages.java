@@ -29,6 +29,10 @@ public class PackageMessages extends NLS {
     public static String ControlFlowView_PreviousEventActionTooltip;
     public static String ControlFlowView_PreviousEventJobName;
 
+    public static String ControlFlowView_DynamicFiltersActiveThreadToggleLabel;
+    public static String ControlFlowView_DynamicFiltersActiveThreadToggleToolTip;
+    public static String ControlFlowView_DynamicFiltersConfigureLabel;
+    public static String ControlFlowView_DynamicFiltersMenuLabel;
 
     static {
         NLS.initializeMessages(BUNDLE_NAME, PackageMessages.class);

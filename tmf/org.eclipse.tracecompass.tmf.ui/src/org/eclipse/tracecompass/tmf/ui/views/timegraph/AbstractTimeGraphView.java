@@ -567,7 +567,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     }
                     fTimeGraphViewer.setMarkerCategories(getMarkerCategories());
                     fTimeGraphViewer.setMarkers(markers);
-                    redraw();
+                    refresh();
                 });
             }
         }
@@ -1666,6 +1666,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             markerEventSources = Collections.emptyList();
         }
         return markerEventSources;
+    }
+
+    /**
+     * Gets the trace to viewer filters map.
+     *
+     * @return The trace to viewer filters map
+     * @since 3.3
+     */
+    protected @NonNull Map<ITmfTrace, ViewerFilter[]> getFiltersMap() {
+        return checkNotNull(fFiltersMap);
     }
 
     /**

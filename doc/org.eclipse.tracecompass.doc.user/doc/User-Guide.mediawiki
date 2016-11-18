@@ -2162,6 +2162,36 @@ The tooltip indicates:
 * the pointed state date and start/stop times
 * the pointed state duration (seconds)
 
+==== Dynamics Filters ====
+
+Dynamic filters are filters that are processed and applied each time the control flow view visible time range changes.
+
+The dynamics filters can be rapidly toggled in their view sub menu.
+
+[[Image:images/DynamicFilters/DynamicFiltersToggle.png]]
+
+
+The dynamics filters  can be fine tuned in the configuration dialog.
+
+[[Image:images/DynamicFilters/DynamicFiltersConfigure.png]]
+
+Note: Dynamic filters can induce performance degradation.
+
+===== Show Active Threads Only =====
+
+The Show Active Threads Only filter allow a user to increase the signal to noise ratio by filtering out all <u>inactive</u> threads.
+
+A thread is considered inactive when it is in the following state:
+
+* non-existing
+* unknown
+* wait and blocked
+* wait and unknown
+
+A user can fine tune this filter by providing ranges of CPUs allowing the filter to only show active thread running on the specified CPUs.
+
+[[Image:images/DynamicFilters/DynamicFilter_ShowActiveThreadsConfigure.png]]
+
 === Toolbar ===
 
 <!-- Keep in sync with ref:resource-view-toolbar -->
@@ -2267,6 +2297,10 @@ View Menu
 |-
 | Thread Presentation
 | Select the threads layout. Two layouts are available. '''Flat''' layout lists the threads in a flat list per trace. '''Hierarchical''' layout shows the threads in a parent-child tree per trace.
+|-
+|
+| Dynamic Filters
+| Select and configure the Dynamic Filters to be applied.
 |}
 
 === Marker Axis ===

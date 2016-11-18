@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -26,6 +27,11 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
 import org.eclipse.swtbot.swt.finder.keyboard.KeyboardFactory;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -55,6 +61,20 @@ import org.junit.runner.RunWith;
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
+
+    private static final String DIALOG_OK = "OK";
+    private static final String DIALOG_CANCEL = "Cancel";
+
+    private static final String THREAD_PRESENTATION_HIERARCHICAL = "Hierarchical";
+    private static final String THREAD_PRESENTATION_FLAT = "Flat";
+
+    private static final String DYNAMIC_FILTER_ACTIVE_THREADS_ONLY_TOGGLE = "Active Threads only";
+    private static final String DYNAMIC_FILTER_ON_CPU_FIELD_MESSAGE = "e.g. 0-3,5,7-8";
+    private static final String DYNAMIC_FILTERS_ALL_ACTIVE_RADIO = "All Active Threads";
+    private static final String DYNAMIC_FILTERS_ON_CPU_RADIO = "Active Threads on CPUs:";
+    private static final String DYNAMIC_FILTERS_SHOW_ACTIVE_THREADS_ONLY_CHECKBOX = "Show Active Threads Only";
+    private static final String DYNAMIC_FILTERS_SHELL_TEXT = "Dynamic Filters Configuration";
+    private static final String DYNAMIC_FILTER_CONFIGURE_LABEL = "Configure...";
 
     private static final String CHECK_SELECTED = "Check selected";
     private static final String CHECK_ALL = "Check all";
@@ -309,12 +329,182 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         bot.button(CHECK_ALL).click();
         checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
         assertEquals("Filtered", 26, checked);
-        bot.button("OK").click();
+        bot.button(DIALOG_OK).click();
         SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(getViewBot().bot());
         SWTBotTimeGraphEntry traceEntry = timeGraph.getEntry(LttngTraceGenerator.getName());
         for (SWTBotTimeGraphEntry entry : traceEntry.getEntries()) {
             assertEquals("Filtered Control flow view", "Half-life 3", entry.getText());
         }
+    }
+
+    /**
+     * Test dynamic filters dialog
+     */
+    @Test
+    public void testDynamicFiltersDialog() {
+
+        String valid_cpu_ranges = "0,1,2-100";
+        String invalid_cpu_ranges = "-1,1";
+
+        /* Change window range to 10 ms */
+        TmfTimeRange range = new TmfTimeRange(START_TIME, START_TIME.normalize(10000000L, ITmfTimestamp.NANOSECOND_SCALE));
+        TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, range));
+        TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, range.getStartTime(), range.getEndTime()));
+        timeGraphIsReadyCondition(range);
+
+        getViewBot().viewMenu(DYNAMIC_FILTER_CONFIGURE_LABEL).click();
+        fBot.waitUntil(Conditions.shellIsActive(DYNAMIC_FILTERS_SHELL_TEXT));
+        SWTBotShell shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT);
+        shell.activate();
+
+        /* Make sure nothing is checked and radio buttons are disabled */
+        SWTBotCheckBox activeThreadsCheckbox = shell.bot().checkBox(DYNAMIC_FILTERS_SHOW_ACTIVE_THREADS_ONLY_CHECKBOX);
+        SWTBotRadio onCpuRadio = shell.bot().radio(DYNAMIC_FILTERS_ON_CPU_RADIO);
+        SWTBotRadio allActiveRadio = shell.bot().radio(DYNAMIC_FILTERS_ALL_ACTIVE_RADIO);
+        SWTBotText onCpuField = shell.bot().textWithMessage(DYNAMIC_FILTER_ON_CPU_FIELD_MESSAGE);
+
+        assertFalse(activeThreadsCheckbox.isChecked());
+        assertFalse(onCpuRadio.isEnabled());
+        assertFalse(allActiveRadio.isEnabled());
+        assertFalse(onCpuField.isEnabled());
+
+        /*
+         * Test Active Filter buttons toggle
+         */
+        activeThreadsCheckbox.click();
+
+        /* All objects should be enabled except for the CPU ranges field */
+        assertTrue(activeThreadsCheckbox.isChecked());
+        assertTrue(allActiveRadio.isEnabled());
+        assertTrue(onCpuRadio.isEnabled());
+        assertFalse(onCpuField.isEnabled());
+
+        /*
+         * The All Active Threads option should be the default for a new filter
+         */
+        assertTrue(allActiveRadio.isSelected());
+
+        /*
+         * Select All Threads on CPUs option
+         */
+        onCpuRadio.click();
+
+        /* All objects should be enabled */
+        assertTrue(activeThreadsCheckbox.isChecked());
+        assertTrue(allActiveRadio.isEnabled());
+        assertTrue(onCpuRadio.isEnabled());
+        assertTrue(onCpuField.isEnabled());
+
+        assertFalse(allActiveRadio.isSelected());
+        assertTrue(onCpuRadio.isSelected());
+
+        /*
+         * Select All Active Threads then Active Threads on CPUs to validate
+         * toggle of options
+         */
+        allActiveRadio.click();
+
+        /* All objects should be enabled except for the CPU ranges field */
+        assertTrue(activeThreadsCheckbox.isChecked());
+        assertTrue(allActiveRadio.isEnabled());
+        assertTrue(onCpuRadio.isEnabled());
+        assertFalse(onCpuField.isEnabled());
+
+        assertTrue(allActiveRadio.isSelected());
+        assertFalse(onCpuRadio.isSelected());
+
+        /* Select Active Threads on CPUs */
+        onCpuRadio.click();
+
+        /* All objects should be enabled */
+        assertTrue(activeThreadsCheckbox.isChecked());
+        assertTrue(allActiveRadio.isEnabled());
+        assertTrue(onCpuRadio.isEnabled());
+        assertTrue(onCpuField.isEnabled());
+
+        assertFalse(allActiveRadio.isSelected());
+        assertTrue(onCpuRadio.isSelected());
+
+        /* Put an invalid value in the CPU ranges field */
+        onCpuField.setText(invalid_cpu_ranges);
+
+        /* Make sure the OK button is not enabled when in an invalid state */
+        assertFalse(shell.bot().button(DIALOG_OK).isEnabled());
+
+        /* Put a valid value in the CPU ranges field */
+        onCpuField.setText(valid_cpu_ranges);
+
+        /* Make sure the OK button is enabled when in a valid state */
+        assertTrue(shell.bot().button(DIALOG_OK).isEnabled());
+
+        shell.bot().button(DIALOG_OK).click();
+        timeGraphIsReadyCondition(range);
+
+        /* Make sure that the quick Active Thread Filter toggle is checked */
+        assertTrue(getViewBot().viewMenu(DYNAMIC_FILTER_ACTIVE_THREADS_ONLY_TOGGLE).isChecked());
+
+        /* Make sure that the Flat presentation is checked */
+        assertTrue(getViewBot().viewMenu(THREAD_PRESENTATION_FLAT).isChecked());
+        assertFalse(getViewBot().viewMenu(THREAD_PRESENTATION_HIERARCHICAL).isChecked());
+
+        /* Reopen the dialog */
+        getViewBot().viewMenu(DYNAMIC_FILTER_CONFIGURE_LABEL).click();
+        fBot.waitUntil(Conditions.shellIsActive(DYNAMIC_FILTERS_SHELL_TEXT));
+        shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT);
+        shell.activate();
+
+        /* Make sure nothing is checked and radio buttons are disabled */
+        activeThreadsCheckbox = shell.bot().checkBox(DYNAMIC_FILTERS_SHOW_ACTIVE_THREADS_ONLY_CHECKBOX);
+        onCpuRadio = shell.bot().radio(DYNAMIC_FILTERS_ON_CPU_RADIO);
+        allActiveRadio = shell.bot().radio(DYNAMIC_FILTERS_ALL_ACTIVE_RADIO);
+        onCpuField = shell.bot().textWithMessage(DYNAMIC_FILTER_ON_CPU_FIELD_MESSAGE);
+
+        /* Make sure the previous settings are set correctly */
+        assertTrue(activeThreadsCheckbox.isChecked());
+        assertTrue(allActiveRadio.isEnabled());
+        assertTrue(onCpuRadio.isEnabled());
+        assertTrue(onCpuField.isEnabled());
+        assertFalse(allActiveRadio.isSelected());
+        assertTrue(onCpuRadio.isSelected());
+        assertTrue(onCpuField.isEnabled());
+        assertEquals("CPU ranges not equal", onCpuField.getText(), valid_cpu_ranges);
+
+        /*
+         * Change to All Active Threads option click OK then reopen. The
+         * previous CPU range should still be there.
+         */
+
+        allActiveRadio.click();
+        /* Make sure that the ranges are still visible but disabled */
+        assertFalse(onCpuField.isEnabled());
+        assertEquals("Cpu ranges not equal", onCpuField.getText(), valid_cpu_ranges);
+
+        /* Close the dialog */
+        shell.bot().button(DIALOG_OK).click();
+        timeGraphIsReadyCondition(range);
+
+        /* Open the dialog */
+        getViewBot().viewMenu(DYNAMIC_FILTER_CONFIGURE_LABEL).click();
+        fBot.waitUntil(Conditions.shellIsActive(DYNAMIC_FILTERS_SHELL_TEXT));
+        shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT);
+        shell.activate();
+
+        activeThreadsCheckbox = shell.bot().checkBox(DYNAMIC_FILTERS_SHOW_ACTIVE_THREADS_ONLY_CHECKBOX);
+        onCpuRadio = shell.bot().radio(DYNAMIC_FILTERS_ON_CPU_RADIO);
+        allActiveRadio = shell.bot().radio(DYNAMIC_FILTERS_ALL_ACTIVE_RADIO);
+        onCpuField = shell.bot().textWithMessage(DYNAMIC_FILTER_ON_CPU_FIELD_MESSAGE);
+
+        /* Range field should have a value in it */
+        assertTrue(activeThreadsCheckbox.isChecked());
+        assertTrue(allActiveRadio.isEnabled());
+        assertTrue(onCpuRadio.isEnabled());
+        assertFalse(onCpuField.isEnabled());
+        assertTrue(allActiveRadio.isSelected());
+        assertFalse(onCpuRadio.isSelected());
+        assertFalse(onCpuField.isEnabled());
+        assertEquals("CPU ranges not equal", onCpuField.getText(), valid_cpu_ranges);
+
+        shell.bot().button(DIALOG_CANCEL).click();
     }
 
     /**
