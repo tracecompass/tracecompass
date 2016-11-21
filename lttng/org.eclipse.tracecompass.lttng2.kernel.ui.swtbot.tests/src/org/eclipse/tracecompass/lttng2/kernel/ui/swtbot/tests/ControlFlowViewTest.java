@@ -82,11 +82,9 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
     private static final @NonNull ITmfTimestamp TID2_TIME4 = TmfTimestamp.fromNanos(1368000272652496900L);
     private static final @NonNull ITmfTimestamp TID5_TIME1 = TmfTimestamp.fromNanos(1368000272652496900L);
 
-    private SWTBotView fViewBot;
-
     @Override
     protected SWTBotView getViewBot() {
-        return fViewBot;
+        return fBot.viewByTitle("Control Flow");
     }
 
     @Override
@@ -112,9 +110,9 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
     @Before
     public void before() {
         super.before();
-        fViewBot = fBot.viewByTitle("Control Flow");
-        fViewBot.show();
-        fViewBot.setFocus();
+        SWTBotView viewBot = getViewBot();
+        viewBot.show();
+        viewBot.setFocus();
     }
 
     /**
@@ -134,10 +132,11 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
      */
     @Test
     public void testToolBarSelectNextPreviousStateChange() {
-        testNextPreviousEvent(() -> fViewBot.toolbarButton(SELECT_NEXT_STATE_CHANGE).click(),
-                () -> fViewBot.toolbarButton(SELECT_NEXT_STATE_CHANGE).click(SWT.SHIFT),
-                () -> fViewBot.toolbarButton(SELECT_PREVIOUS_STATE_CHANGE).click(),
-                () -> fViewBot.toolbarButton(SELECT_PREVIOUS_STATE_CHANGE).click(SWT.SHIFT));
+        SWTBotView viewBot = getViewBot();
+        testNextPreviousEvent(() -> viewBot.toolbarButton(SELECT_NEXT_STATE_CHANGE).click(),
+                () -> viewBot.toolbarButton(SELECT_NEXT_STATE_CHANGE).click(SWT.SHIFT),
+                () -> viewBot.toolbarButton(SELECT_PREVIOUS_STATE_CHANGE).click(),
+                () -> viewBot.toolbarButton(SELECT_PREVIOUS_STATE_CHANGE).click(SWT.SHIFT));
     }
 
     private void testNextPreviousEvent(Runnable selectNext, Runnable shiftSelectNext, Runnable selectPrevious, Runnable shiftSelectPrevious) {
@@ -151,7 +150,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
 
         /* set focus on time graph */
-        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(fViewBot.bot());
+        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(getViewBot().bot());
         timeGraph.setFocus();
 
         /* select first item */
@@ -245,7 +244,8 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, range));
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
 
-        SWTBotToolbarButton filterButton = fViewBot.toolbarButton("Show View Filters");
+        SWTBotView viewBot = getViewBot();
+        SWTBotToolbarButton filterButton = viewBot .toolbarButton("Show View Filters");
         filterButton.click();
         fBot.waitUntil(org.eclipse.swtbot.swt.finder.waits.Conditions.shellIsActive("Filter"));
         SWTBot bot = fBot.activeShell().bot();
@@ -303,7 +303,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         checked = UIThreadRunnable.syncExec(treeCheckCounter);
         assertEquals("Filtered", 26, checked.intValue());
         bot.button("OK").click();
-        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(fViewBot.bot());
+        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(getViewBot().bot());
         SWTBotTimeGraphEntry traceEntry = timeGraph.getEntry(LttngTraceGenerator.getName());
         for (SWTBotTimeGraphEntry entry : traceEntry.getEntries()) {
             assertEquals("Filtered Control flow view", "Half-life 3", entry.getText());
@@ -324,10 +324,11 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, START_TIME));
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
 
-        final SWTBotTree tree = fViewBot.bot().tree();
+        SWTBotView viewBot = getViewBot();
+        final SWTBotTree tree = viewBot.bot().tree();
 
         /* set focus on time graph */
-        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(fViewBot.bot());
+        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(viewBot.bot());
         timeGraph.setFocus();
 
         /* select first item */
@@ -336,90 +337,90 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
 
         /* click "Follow CPU Forward" 3 times */
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
+        viewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
         timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME1, TID1_TIME1));
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
+        viewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME1, TID2_TIME1));
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
+        viewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME2));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME2, TID2_TIME2)));
         fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "2"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID2_TIME2));
 
         /* shift-click "Follow CPU Forward" 3 times */
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        viewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME3));
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        viewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME4));
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        viewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME4));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME2, TID5_TIME1)));
         fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "5"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID5_TIME1));
 
         /* shift-click "Follow CPU Backward" 4 times */
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        viewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME4));
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        viewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME3));
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        viewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME2));
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        viewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME1));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME2, TID2_TIME1)));
         fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "2"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID2_TIME1));
 
         /* click "Follow CPU Forward" 2 times */
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
+        viewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME2));
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
+        viewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME3));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME3, TID2_TIME3)));
         fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "2"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID2_TIME3));
 
         /* shift-click "Follow CPU Backward" 3 times */
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        viewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME2));
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        viewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME1));
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        viewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID1_TIME1));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME3, TID1_TIME1)));
         fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "1"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME1));
 
         /* shift-click "Follow CPU Forward" 4 times */
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        viewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME1));
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        viewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME2));
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        viewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME3));
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        viewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME4));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME3, TID2_TIME4)));
         fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "2"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID2_TIME4));
 
         /* click "Follow CPU Backward" 5 times */
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
+        viewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME3));
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
+        viewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME2));
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
+        viewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
         timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME1, TID2_TIME1));
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
+        viewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
         timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME1, TID1_TIME1));
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
+        viewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(START_TIME, START_TIME)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(START_TIME));
     }
 
     private void timeGraphIsReadyCondition(@NonNull TmfTimeRange selectionRange) {
-        IWorkbenchPart part = fViewBot.getViewReference().getPart(false);
+        IWorkbenchPart part = getViewBot() .getViewReference().getPart(false);
         fBot.waitUntil(ConditionHelpers.timeGraphIsReadyCondition((AbstractTimeGraphView) part, selectionRange, selectionRange.getEndTime()));
     }
 }
