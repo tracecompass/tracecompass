@@ -41,6 +41,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphMarkerAxis;
@@ -91,6 +92,12 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
     @Override
     protected List<String> getLegendValues() {
         return Arrays.asList("IDLE", "USERMODE", "SYSCALL", "IRQ", "SOFT_IRQ", "IRQ_ACTIVE", "SOFT_IRQ_RAISED", "SOFT_IRQ_ACTIVE");
+    }
+
+    @Override
+    protected SWTBotView openView() {
+        SWTBotUtils.openView(ResourcesView.ID);
+        return getViewBot();
     }
 
     @Override

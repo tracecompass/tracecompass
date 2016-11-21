@@ -14,12 +14,19 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
 import org.junit.Test;
 
 /**
@@ -58,6 +65,13 @@ public abstract class KernelTimeGraphViewTestBase extends KernelTestBase {
     protected abstract List<String> getLegendValues();
 
     /**
+     * Opens the view
+     *
+     * @return the view bot
+     */
+    protected abstract SWTBotView openView();
+
+    /**
      * Test toolbar button order and that all buttons are enabled and visible
      */
     @Test
@@ -89,6 +103,34 @@ public abstract class KernelTimeGraphViewTestBase extends KernelTestBase {
             assertEquals(labelValues.get(i - 1), label.getText());
         }
         bot.button("OK").click();
+    }
+
+    /**
+     * Test that re-opening a view repoopulates it properly.
+     */
+    @Test
+    public void testOpenCloseOpen() {
+        SWTBotView viewBot = openView();
+        SWTBotTimeGraph tgBot = new SWTBotTimeGraph(viewBot.bot());
+        Map<String, List<String>> before = getItemNames(tgBot);
+        viewBot.close();
+        viewBot = openView();
+        tgBot = new SWTBotTimeGraph(viewBot.bot());
+        Map<String, List<String>> after = getItemNames(tgBot);
+        assertEquals(before, after);
+    }
+
+    private @NonNull static Map<String, List<String>> getItemNames(SWTBotTimeGraph tgBot) {
+        Map<String, List<String>> returnStructure = new HashMap<>();
+        for (SWTBotTimeGraphEntry element : tgBot.getEntries()) {
+            returnStructure.put(element.getText(),
+                    Arrays.stream(
+                        element.getEntries())
+                        .map(tgEntry -> tgEntry.getText())
+                        .collect(Collectors.toList())
+                    );
+        }
+        return returnStructure;
     }
 
 }
