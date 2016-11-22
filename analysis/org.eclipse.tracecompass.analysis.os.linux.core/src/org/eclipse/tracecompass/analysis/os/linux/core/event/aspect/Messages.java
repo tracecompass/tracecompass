@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.core.event.aspect;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 
@@ -44,7 +45,7 @@ public class Messages extends NLS {
      */
     static String getMessage(@Nullable String msg) {
         if (msg == null) {
-            return ""; //$NON-NLS-1$
+            return StringUtils.EMPTY;
         }
         return msg;
     }
