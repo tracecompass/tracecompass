@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -461,7 +462,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
         @Override
         public String getColumnText(@Nullable Object element, int columnIndex) {
             if (element == null) {
-                return ""; //$NON-NLS-1$
+                return StringUtils.EMPTY;
             }
             CriticalPathEntry entry = (CriticalPathEntry) element;
             if (columnIndex == 0) {
@@ -475,7 +476,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
                 String value = String.format("%.2f", percent * 100); //$NON-NLS-1$
                 return NonNullUtils.nullToEmptyString(value);
             }
-            return ""; //$NON-NLS-1$
+            return StringUtils.EMPTY;
         }
 
     }
