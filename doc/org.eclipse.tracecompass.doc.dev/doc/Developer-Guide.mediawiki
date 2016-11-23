@@ -4630,3 +4630,25 @@ JUL logging will produce trace data and unless one wants to visually parse a tra
 Third party plugins provide a custom trace parser and LTTng trace type for JUL statements that use the following format
 
     [EventName:MayContainSemiColon] paramName1=paramValue1, paramName2=paramValue2
+
+=== Logging to populate Callstacks and Callgraph analyses ===
+
+In order to log data in a way that the call stack analysis has enough information to display, use the TraceCompassLogUtils#ScopeLog. It is an auto-closable logger that will log a try-with-resources block of code.
+
+        try (TraceCompassLogUtils.ScopeLog linksLogger = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.CONFIG, "Perform Query")) { //$NON-NLS-1$
+           // Do something
+           new Object();
+       }
+
+The resulting trace will have the following fields
+
+       INFO: {"ts":12345,"ph":"B",tid:1,"name:Perform Query"}
+       INFO: {"ts":"12366,"ph":"E","tid":1}
+
+=== Logging to track Object life cycles ===
+
+In order to log data so that a lifecycle of a given object can be followed, use TraceCompassLogUtils#traceObjectCreation and TraceCompassLogUtils#traceObjectCreation. The objects life cycles will be tracked and displayed.
+
+=== Logging to track Asynchronous operations ===
+
+In order to log data so that a lifecycle of a given object can be followed, use TraceCompassLogUtils#traceObjectCreation and TraceCompassLogUtils#traceAsyncStart/Nested/End. These create nestable sequences to follow. 

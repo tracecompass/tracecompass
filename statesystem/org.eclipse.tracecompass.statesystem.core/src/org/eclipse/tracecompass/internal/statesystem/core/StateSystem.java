@@ -23,11 +23,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -61,7 +64,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
     private static final String PARENT = ".."; //$NON-NLS-1$
     private static final String WILDCARD = "*"; //$NON-NLS-1$
 
-    private static final Logger LOGGER = TraceCompassLog.getLogger(StateSystem.class);
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(StateSystem.class);
 
     /* References to the inner structures */
     private final AttributeTree attributeTree;
@@ -331,7 +334,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
         if (remainder.isEmpty()) {
             if (element.equals(WILDCARD)) {
                 builder.addAll(getSubAttributes(quark, false));
-            } else if (element.equals(PARENT)){
+            } else if (element.equals(PARENT)) {
                 builder.add(getParentAttributeQuark(quark));
             } else {
                 int subQuark = optQuarkRelative(quark, element);
@@ -441,7 +444,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
 
         if (stackDepth <= 0) {
             /* This on the other hand should not happen... */
-            throw new StateValueTypeException(getSSID() + " Quark:" + attributeQuark + ", Stack depth:" + stackDepth);  //$NON-NLS-1$//$NON-NLS-2$
+            throw new StateValueTypeException(getSSID() + " Quark:" + attributeQuark + ", Stack depth:" + stackDepth); //$NON-NLS-1$//$NON-NLS-2$
         }
 
         /* The attribute should already exist at this point */
@@ -539,37 +542,42 @@ public class StateSystem implements ITmfStateSystemBuilder {
             throw new StateSystemDisposedException();
         }
 
-        LOGGER.info(() -> "[StateSystem:FullQueryStart] ssid=" + this.getSSID() + ", ts=" + t);  //$NON-NLS-1$//$NON-NLS-2$
+        try (ScopeLog log = new ScopeLog(LOGGER, Level.FINER, "StateSystem:FullQuery", //$NON-NLS-1$
+                "ssid", getSSID(), "ts", t);) { //$NON-NLS-1$ //$NON-NLS-2$
 
-        final int nbAttr = getNbAttributes();
-        List<@Nullable ITmfStateInterval> stateInfo = new ArrayList<>(nbAttr);
+            final int nbAttr = getNbAttributes();
+            List<@Nullable ITmfStateInterval> stateInfo = new ArrayList<>(nbAttr);
 
-        /* Bring the size of the array to the current number of attributes */
-        for (int i = 0; i < nbAttr; i++) {
-            stateInfo.add(null);
-        }
-
-        /*
-         * If we are currently building the history, also query the "ongoing"
-         * states for stuff that might not yet be written to the history.
-         */
-        if (transState.isActive()) {
-            transState.doQuery(stateInfo, t);
-        }
-
-        /* Query the storage backend */
-        backend.doQuery(stateInfo, t);
-
-        /*
-         * We should have previously inserted an interval for every attribute.
-         */
-        for (ITmfStateInterval interval : stateInfo) {
-            if (interval == null) {
-                throw new IllegalStateException("Incoherent interval storage"); //$NON-NLS-1$
+            /*
+             * Bring the size of the array to the current number of attributes
+             */
+            for (int i = 0; i < nbAttr; i++) {
+                stateInfo.add(null);
             }
+
+            /*
+             * If we are currently building the history, also query the
+             * "ongoing" states for stuff that might not yet be written to the
+             * history.
+             */
+            if (transState.isActive()) {
+                transState.doQuery(stateInfo, t);
+            }
+
+            /* Query the storage backend */
+            backend.doQuery(stateInfo, t);
+
+            /*
+             * We should have previously inserted an interval for every
+             * attribute.
+             */
+            for (ITmfStateInterval interval : stateInfo) {
+                if (interval == null) {
+                    throw new IllegalStateException("Incoherent interval storage"); //$NON-NLS-1$
+                }
+            }
+            return stateInfo;
         }
-        LOGGER.info(() -> "[StateSystem:FullQueryEnd]");  //$NON-NLS-1$
-        return stateInfo;
     }
 
     @Override
@@ -578,27 +586,28 @@ public class StateSystem implements ITmfStateSystemBuilder {
         if (isDisposed) {
             throw new StateSystemDisposedException();
         }
+        try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "StateSystem:SingleQuery", //$NON-NLS-1$
+                "ssid" , this.getSSID(), //$NON-NLS-1$
+                "ts", t, //$NON-NLS-1$
+                "attribute" ,attributeQuark)) { //$NON-NLS-1$
+            ITmfStateInterval ret = transState.getIntervalAt(t, attributeQuark);
+            if (ret == null) {
+                /*
+                 * The transient state did not have the information, let's look
+                 * into the backend next.
+                 */
+                ret = backend.doSingularQuery(t, attributeQuark);
+            }
 
-        LOGGER.info(() -> "[StateSystem:SingleQueryStart] ssid=" + this.getSSID() + ", ts=" + t + ", attribute=" + attributeQuark);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-
-        ITmfStateInterval ret = transState.getIntervalAt(t, attributeQuark);
-        if (ret == null) {
-            /*
-             * The transient state did not have the information, let's look into
-             * the backend next.
-             */
-            ret = backend.doSingularQuery(t, attributeQuark);
+            if (ret == null) {
+                /*
+                 * If we did our job correctly, there should be intervals for
+                 * every possible attribute, over all the valid time range.
+                 */
+                throw new IllegalStateException("Incoherent interval storage"); //$NON-NLS-1$
+            }
+            return ret;
         }
-
-        if (ret == null) {
-            /*
-             * If we did our job correctly, there should be intervals for every
-             * possible attribute, over all the valid time range.
-             */
-            throw new IllegalStateException("Incoherent interval storage"); //$NON-NLS-1$
-        }
-        LOGGER.info(() -> "[StateSystem:SingleQueryEnd]");  //$NON-NLS-1$
-        return ret;
     }
 
     @Override

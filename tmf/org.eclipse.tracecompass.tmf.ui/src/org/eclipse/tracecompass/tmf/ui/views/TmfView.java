@@ -14,6 +14,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.views;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.events.ControlAdapter;
@@ -216,11 +217,11 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
      * @return This view's view ID
      * @since 2.2
      */
-    protected String getViewId() {
+    protected @NonNull String getViewId() {
         IViewSite viewSite = getViewSite();
         String secondaryId = viewSite.getSecondaryId();
         if (secondaryId == null) {
-            return viewSite.getId();
+            return String.valueOf(viewSite.getId());
         }
         return viewSite.getId() + ':' + secondaryId;
     }

@@ -19,12 +19,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -64,7 +66,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     /** The trace to state system multi map */
     private final Multimap<ITmfTrace, ITmfStateSystem> fTraceSSMap = HashMultimap.create();
 
-    private static final Logger LOGGER = TraceCompassLog.getLogger(AbstractStateSystemTimeGraphView.class);
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(AbstractStateSystemTimeGraphView.class);
 
     // ------------------------------------------------------------------------
     // Classes
@@ -149,19 +151,21 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             queryFullStates(ss, start, end, resolution, monitor, new IQueryHandler() {
                 @Override
                 public void handle(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) {
-                    LOGGER.config(() -> "[TimeGraphView:ZoomThreadGettingStates]"); //$NON-NLS-1$
-                    if (!fullRange) {
-                        for (TimeGraphEntry entry : entryList) {
-                            zoom(checkNotNull(entry), ss, fullStates, prevFullState, monitor);
+                    try (TraceCompassLogUtils.ScopeLog scope = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.CONFIG, "ZoomThread:GettingStates");) { //$NON-NLS-1$
+                        if (!fullRange) {
+                            for (TimeGraphEntry entry : entryList) {
+                                zoom(checkNotNull(entry), ss, fullStates, prevFullState, monitor);
+                            }
                         }
                     }
                     /* Refresh the arrows when zooming */
-                    LOGGER.config(() -> "[TimeGraphView:ZoomThreadGettingLinks]"); //$NON-NLS-1$
-                    links.addAll(getLinkList(ss, fullStates, prevFullState, monitor));
+                    try (TraceCompassLogUtils.ScopeLog linksLogger = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.CONFIG, "ZoomThread:GettingLinks")) { //$NON-NLS-1$
+                        links.addAll(getLinkList(ss, fullStates, prevFullState, monitor));
+                    }
                     /* Refresh the view-specific markers when zooming */
-                    LOGGER.config(() -> "[TimeGraphView:ZoomThreadGettingMarkers]"); //$NON-NLS-1$
-                    markers.addAll(getViewMarkerList(ss, fullStates, prevFullState, monitor));
-                    LOGGER.config(() -> "[TimeGraphView:ZoomThreadDone]"); //$NON-NLS-1$
+                    try (TraceCompassLogUtils.ScopeLog linksLogger = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.CONFIG, "ZoomThread:GettingMarkers")) { //$NON-NLS-1$
+                        markers.addAll(getViewMarkerList(ss, fullStates, prevFullState, monitor));
+                    }
                 }
             });
             refresh();
@@ -419,8 +423,8 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     /**
-     * Gets the list of markers for a given list of full
-     * states. The default implementation returns an empty list.
+     * Gets the list of markers for a given list of full states. The default
+     * implementation returns an empty list.
      *
      * @param ss
      *            The state system
@@ -439,7 +443,8 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     /**
-     * @deprecated The subclass should call {@link #getEntryList(ITmfStateSystem)} instead.
+     * @deprecated The subclass should call
+     *             {@link #getEntryList(ITmfStateSystem)} instead.
      */
     @Deprecated
     @Override
@@ -448,7 +453,9 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     /**
-     * @deprecated The subclass should call {@link #addToEntryList(ITmfTrace, ITmfStateSystem, List)} instead.
+     * @deprecated The subclass should call
+     *             {@link #addToEntryList(ITmfTrace, ITmfStateSystem, List)}
+     *             instead.
      */
     @Deprecated
     @Override
@@ -457,7 +464,9 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     /**
-     * @deprecated The subclass should call {@link #putEntryList(ITmfTrace, ITmfStateSystem, List)} instead.
+     * @deprecated The subclass should call
+     *             {@link #putEntryList(ITmfTrace, ITmfStateSystem, List)}
+     *             instead.
      */
     @Deprecated
     @Override
@@ -466,7 +475,9 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     /**
-     * @deprecated The subclass should call {@link #removeFromEntryList(ITmfTrace, ITmfStateSystem, List)} instead.
+     * @deprecated The subclass should call
+     *             {@link #removeFromEntryList(ITmfTrace, ITmfStateSystem, List)}
+     *             instead.
      */
     @Deprecated
     @Override
@@ -475,7 +486,9 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     /**
-     * @deprecated The subclass should implement {@link #getEventList(TimeGraphEntry, ITmfStateSystem, List, List, IProgressMonitor)} instead.
+     * @deprecated The subclass should implement
+     *             {@link #getEventList(TimeGraphEntry, ITmfStateSystem, List, List, IProgressMonitor)}
+     *             instead.
      */
     @Deprecated
     @Override
@@ -484,7 +497,9 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     /**
-     * @deprecated The subclass should implement {@link #getLinkList(ITmfStateSystem, List, List, IProgressMonitor)} instead.
+     * @deprecated The subclass should implement
+     *             {@link #getLinkList(ITmfStateSystem, List, List, IProgressMonitor)}
+     *             instead.
      */
     @Deprecated
     @Override
@@ -493,7 +508,9 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     /**
-     * @deprecated The subclass should implement {@link #getViewMarkerList(ITmfStateSystem, List, List, IProgressMonitor)} instead.
+     * @deprecated The subclass should implement
+     *             {@link #getViewMarkerList(ITmfStateSystem, List, List, IProgressMonitor)}
+     *             instead.
      */
     @Deprecated
     @Override

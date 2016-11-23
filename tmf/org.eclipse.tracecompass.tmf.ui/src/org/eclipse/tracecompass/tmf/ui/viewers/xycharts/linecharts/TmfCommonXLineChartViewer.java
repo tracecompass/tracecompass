@@ -16,16 +16,19 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
@@ -56,7 +59,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     /* The desired number of points per pixel */
     private static final double RESOLUTION = 1.0;
-    private static final Logger LOGGER = TraceCompassLog.getLogger(TmfCommonXLineChartViewer.class);
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(TmfCommonXLineChartViewer.class);
     private static final String LOG_STRING_WITH_PARAM = "[TmfCommonXLineChart:%s] viewerId=%s, %s"; //$NON-NLS-1$
     private static final String LOG_STRING = "[TmfCommonXLineChart:%s] viewerId=%s"; //$NON-NLS-1$
 
@@ -143,26 +146,26 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
             // Don't use TmfUiRefreshHandler (bug 467751)
             @Override
             public void run() {
-                LOGGER.info(() -> getLogMessage("InitializeThreadStart", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
-                initializeDataSource();
-                if (!getSwtChart().isDisposed()) {
-                    getDisplay().asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!getSwtChart().isDisposed()) {
-                                /* Delete the old series */
-                                try {
-                                    clearContent();
-                                    createSeries();
-                                } finally {
-                                    /* View is cleared, decrement fDirty */
-                                    fDirty.decrementAndGet();
+                try (TraceCompassLogUtils.ScopeLog tracer = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.INFO, "InitializeThread")) { //$NON-NLS-1$
+                    initializeDataSource();
+                    if (!getSwtChart().isDisposed()) {
+                        getDisplay().asyncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (!getSwtChart().isDisposed()) {
+                                    /* Delete the old series */
+                                    try {
+                                        clearContent();
+                                        createSeries();
+                                    } finally {
+                                        /* View is cleared, decrement fDirty */
+                                        fDirty.decrementAndGet();
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
-                LOGGER.info(() -> getLogMessage("InitializeThreadEnd", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
             }
         };
         thread.start();
@@ -189,18 +192,18 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
         @Override
         public void run() {
-            LOGGER.info(() -> getLogMessage("UpdateThreadStart", "numRequests=" + fNumRequests + ", tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            try {
-                updateData(getWindowStartTime(), getWindowEndTime(), fNumRequests, fMonitor);
-            } finally {
-                /*
-                 * fDirty should have been incremented before creating the
-                 * thread, so we decrement it once it is finished
-                 */
-                fDirty.decrementAndGet();
+            try (TraceCompassLogUtils.ScopeLog scope = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.INFO, "TmfCommonXLineChart:UpdateThread", "numRequests=" , fNumRequests)) { //$NON-NLS-1$ //$NON-NLS-2$
+                try {
+                    updateData(getWindowStartTime(), getWindowEndTime(), fNumRequests, fMonitor);
+                } finally {
+                    /*
+                     * fDirty should have been incremented before creating the
+                     * thread, so we decrement it once it is finished
+                     */
+                    fDirty.decrementAndGet();
+                }
+                updateThreadFinished(this);
             }
-            updateThreadFinished(this);
-            LOGGER.info(() -> getLogMessage("UpdateThreadEnd", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         public void cancel() {
@@ -391,8 +394,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
             @Override
             public void run() {
-                try {
-                    LOGGER.info(() -> getLogMessage("UpdateDisplayStart", null)); //$NON-NLS-1$
+                try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.INFO, "UpdateDisplay")) { //$NON-NLS-1$
                     if (!getSwtChart().isDisposed()) {
                         double[] xValues = fXValues;
                         double maxy = DEFAULT_MAXY;
@@ -429,7 +431,8 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                         getSwtChart().redraw();
 
                         if (isSendTimeAlignSignals()) {
-                            // The width of the chart might have changed and its
+                            // The width of the chart might have changed and
+                            // its
                             // time axis might be misaligned with the other
                             // views
                             Point viewPos = TmfCommonXLineChartViewer.this.getParent().getParent().toDisplay(0, 0);
@@ -439,7 +442,6 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                             TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(TmfCommonXLineChartViewer.this, timeAlignmentInfo, true));
                         }
                     }
-                    LOGGER.info(() -> getLogMessage("UpdateDisplayEnd", null)); //$NON-NLS-1$
                 } finally {
                     /* Content has been updated, decrement dirtiness */
                     fDirty.decrementAndGet();

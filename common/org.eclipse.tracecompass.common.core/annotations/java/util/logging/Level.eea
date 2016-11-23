@@ -1,0 +1,28 @@
+class java/util/logging/Level
+ALL
+ Ljava/util/logging/Level;
+ L1java/util/logging/Level;
+CONFIG
+ Ljava/util/logging/Level;
+ L1java/util/logging/Level;
+FINE
+ Ljava/util/logging/Level;
+ L1java/util/logging/Level;
+FINER
+ Ljava/util/logging/Level;
+ L1java/util/logging/Level;
+FINEST
+ Ljava/util/logging/Level;
+ L1java/util/logging/Level;
+INFO
+ Ljava/util/logging/Level;
+ L1java/util/logging/Level;
+OFF
+ Ljava/util/logging/Level;
+ L1java/util/logging/Level;
+SEVERE
+ Ljava/util/logging/Level;
+ L1java/util/logging/Level;
+WARNING
+ Ljava/util/logging/Level;
+ L1java/util/logging/Level;

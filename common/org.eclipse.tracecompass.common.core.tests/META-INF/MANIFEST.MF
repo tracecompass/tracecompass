@@ -15,6 +15,7 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
 Export-Package: org.eclipse.tracecompass.common.core.tests;x-friends:="org.eclipse.tracecompass.alltests",
  org.eclipse.tracecompass.common.core.tests.collect;x-internal:=true,
  org.eclipse.tracecompass.common.core.tests.format;x-internal:=true,
+ org.eclipse.tracecompass.common.core.tests.log;x-internal:=true,
  org.eclipse.tracecompass.common.core.tests.math;x-internal:=true
 Import-Package: com.google.common.base,
  com.google.common.collect,
