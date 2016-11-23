@@ -110,7 +110,7 @@ public final class NonNullUtils {
         if (stream == null) {
             throw new NullPointerException();
         }
-        return checkNotNull(stream.map(t -> checkNotNull(t)));
+        return checkNotNull(stream.<@NonNull T> map(t -> checkNotNull(t)));
     }
 
     /**
