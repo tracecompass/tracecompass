@@ -475,8 +475,8 @@ public final class ConditionHelpers {
      * Condition to check if the selection contains the specified text at the
      * specified column. The text is checked in any item of the tree selection.
      *
-     * @param tree
-     *            the SWTBot tree
+     * @param timeGraph
+     *            the {@link SWTBotTimeGraph}
      * @param column
      *            the column index
      * @param text
