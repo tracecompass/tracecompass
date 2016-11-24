@@ -9,8 +9,11 @@
 
 package org.eclipse.tracecompass.analysis.timing.core.tests.store;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Random;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -98,7 +101,6 @@ public class SegmentStoreBenchmark {
         for (int i = 0; i < DEFAULT_LOOP_COUNT; i++) {
             fSegStore.clear();
 
-            System.gc();
             pMorderedInsertion.start();
             populate(size, fuzz, fSegStore, 0, getSegmentStoreSize());
             pMorderedInsertion.stop();
@@ -173,25 +175,24 @@ public class SegmentStoreBenchmark {
         for (int i = 0; i < DEFAULT_LOOP_COUNT; i++) {
             fSegStore.clear();
 
-            System.gc();
             pMinsertion.start();
             populate(size, fuzz, fSegStore, 0, getSegmentStoreSize());
             pMinsertion.stop();
 
-            System.gc();
             pMiterateStart.start();
-            sortedIterate(fSegStore, SegmentComparators.INTERVAL_START_COMPARATOR);
+            int count = sortedIterate(fSegStore, SegmentComparators.INTERVAL_START_COMPARATOR);
             pMiterateStart.stop();
+            assertEquals(fSegStore.size(), count);
 
-            System.gc();
             pMiterateEnd.start();
-            sortedIterate(fSegStore, SegmentComparators.INTERVAL_END_COMPARATOR);
+            count = sortedIterate(fSegStore, SegmentComparators.INTERVAL_END_COMPARATOR);
             pMiterateEnd.stop();
+            assertEquals(fSegStore.size(), count);
 
-            System.gc();
             pMiterateDuration.start();
-            sortedIterate(fSegStore, SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
+            count = sortedIterate(fSegStore, SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
             pMiterateDuration.stop();
+            assertEquals(fSegStore.size(), count);
         }
 
         pMinsertion.commit();
@@ -209,25 +210,23 @@ public class SegmentStoreBenchmark {
         for (int i = 0; i < DEFAULT_LOOP_COUNT; i++) {
             fSegStore.clear();
 
-            System.gc();
             pMinsertion1.start();
             populate(size, fuzz, fSegStore, 0, getSegmentStoreSize() / 2);
             pMinsertion1.stop();
 
-            System.gc();
             pMiterate1.start();
-            iterate(fSegStore);
+            int count = iterate(fSegStore);
             pMiterate1.stop();
+            assertEquals(fSegStore.size(), count);
 
-            System.gc();
             pMinsertion2.start();
             populate(size, fuzz, fSegStore, getSegmentStoreSize() / 2 + 1, getSegmentStoreSize());
             pMinsertion2.stop();
 
-            System.gc();
             pMiterate2.start();
-            iterate(fSegStore);
+            count = iterate(fSegStore);
             pMiterate2.stop();
+            assertEquals(fSegStore.size(), count);
         }
 
         pMinsertion1.commit();
@@ -236,17 +235,19 @@ public class SegmentStoreBenchmark {
         pMiterate2.commit();
     }
 
-    private static Object iterate(Iterable<@NonNull ISegment> store) {
-        Object shutupCompilerWarnings = null;
-        for (ISegment elem : store) {
-            shutupCompilerWarnings = elem;
+    private static int iterate(Iterable<@NonNull ISegment> store) {
+        int count = 0;
+        Iterator<@NonNull ISegment> iterator = store.iterator();
+        while (iterator.hasNext()) {
+            count++;
+            iterator.next();
         }
-        return shutupCompilerWarnings;
+        return count;
     }
 
-    private static void sortedIterate(ISegmentStore<@NonNull ISegment> store, @NonNull Comparator<@NonNull ISegment> order) {
+    private static int sortedIterate(ISegmentStore<@NonNull ISegment> store, @NonNull Comparator<@NonNull ISegment> order) {
         Iterable<@NonNull ISegment> iterable = store.iterator(order);
-        iterate(iterable);
+        return iterate(iterable);
     }
 
     private static void populate(int size, int[] fuzz, ISegmentStore<@NonNull ISegment> store, long low, long high) {
