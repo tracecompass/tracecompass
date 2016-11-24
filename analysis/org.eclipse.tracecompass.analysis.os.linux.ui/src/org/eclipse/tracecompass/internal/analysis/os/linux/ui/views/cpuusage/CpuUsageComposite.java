@@ -17,6 +17,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,9 +34,6 @@ import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModu
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -291,42 +289,24 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
             return tid;
         }
 
-        try {
-            int cpusNode = kernelSs.getQuarkAbsolute(Attributes.THREADS);
+        /* Retrieve the quark for process tid's execName */
+        int execNameQuark = kernelSs.optQuarkAbsolute(Attributes.THREADS, tid, Attributes.EXEC_NAME);
+        if (execNameQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+            /*
+             * No information on this thread (yet?), skip it for now
+             */
+            return tid;
+        }
 
-            /* Get the quarks for each cpu */
-            List<Integer> cpuNodes = kernelSs.getSubAttributes(cpusNode, false);
-
-            for (Integer tidQuark : cpuNodes) {
-                if (kernelSs.getAttributeName(tidQuark).equals(tid)) {
-                    int execNameQuark;
-                    List<ITmfStateInterval> execNameIntervals;
-                    try {
-                        execNameQuark = kernelSs.getQuarkRelative(tidQuark, Attributes.EXEC_NAME);
-                        execNameIntervals = StateSystemUtils.queryHistoryRange(kernelSs, execNameQuark, getStartTime(), getEndTime());
-                    } catch (TimeRangeException | AttributeNotFoundException e) {
-                        /*
-                         * No information on this thread (yet?), skip it for now
-                         */
-                        continue;
-                    } catch (StateSystemDisposedException e) {
-                        /* State system is closing down, no point continuing */
-                        break;
-                    }
-
-                    for (ITmfStateInterval execNameInterval : execNameIntervals) {
-                        if (!execNameInterval.getStateValue().isNull() &&
-                                execNameInterval.getStateValue().getType() == ITmfStateValue.Type.STRING) {
-                            execName = execNameInterval.getStateValue().unboxStr();
-                            fProcessNameMap.put(tid, execName);
-                            return execName;
-                        }
-                    }
-                }
+        /* Find a name in this attribute's intervals */
+        Iterator<ITmfStateInterval> iterator = new StateSystemUtils.QuarkIterator(kernelSs, execNameQuark, getStartTime());
+        while (iterator.hasNext()) {
+            ITmfStateInterval execNameInterval = iterator.next();
+            if (execNameInterval.getStateValue().getType() == ITmfStateValue.Type.STRING) {
+                execName = execNameInterval.getStateValue().unboxStr();
+                fProcessNameMap.put(tid, execName);
+                return execName;
             }
-
-        } catch (AttributeNotFoundException e) {
-            /* can't find the process name, just return the tid instead */
         }
         return tid;
     }
