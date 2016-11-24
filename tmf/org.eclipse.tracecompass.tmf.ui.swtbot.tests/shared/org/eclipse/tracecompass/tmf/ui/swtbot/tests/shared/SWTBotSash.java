@@ -79,7 +79,7 @@ public class SWTBotSash extends AbstractSWTBotControl<Sash> {
         return syncExec(new Result<Event>() {
             @Override
             public Event run() {
-                boolean vertical = (widget.getStyle() | SWT.VERTICAL) != 0;
+                boolean vertical = (widget.getStyle() & SWT.VERTICAL) != 0;
                 Point size = widget.getSize();
                 Event event = createSelectionEvent(stateMask);
                 event.x = vertical ? x : 0;
