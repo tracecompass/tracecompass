@@ -64,7 +64,7 @@ public final class TraceCompassLog {
      * @return The logger
      */
     public static Logger getLogger(Class<?> clazz) {
-        return Logger.getLogger(clazz.getName());
+        return getLogger(clazz.getName());
     }
 
 }
