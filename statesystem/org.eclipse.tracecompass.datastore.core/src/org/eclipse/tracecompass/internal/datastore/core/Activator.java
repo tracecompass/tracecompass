@@ -13,11 +13,13 @@ import org.eclipse.tracecompass.common.core.TraceCompassActivator;
 
 /**
  * The activator class controls the plug-in life cycle
+ *
+ * @author Geneviève Bastien
  */
 public class Activator extends TraceCompassActivator {
 
     /** The plug-in ID */
-    public static final String PLUGIN_ID = "org.eclipse.tracecompass.backends.core"; //$NON-NLS-1$
+    public static final String PLUGIN_ID = "org.eclipse.tracecompass.datastore.core"; //$NON-NLS-1$
 
     /**
      * The constructor
