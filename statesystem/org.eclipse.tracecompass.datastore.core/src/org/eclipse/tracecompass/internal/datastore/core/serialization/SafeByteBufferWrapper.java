@@ -7,12 +7,12 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.statesystem.core.statevalue;
+package org.eclipse.tracecompass.internal.datastore.core.serialization;
 
 import java.nio.ByteBuffer;
 
-import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue.ISafeByteBufferReader;
-import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue.ISafeByteBufferWriter;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferReader;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferWriter;
 
 /**
  * This class is a wrapper around a ByteBuffer. The size to read/write to the
@@ -28,7 +28,6 @@ import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue
  * seeks.
  *
  * @author Geneviève Bastien
- * @since 2.0
  */
 public class SafeByteBufferWrapper implements ISafeByteBufferReader, ISafeByteBufferWriter {
 

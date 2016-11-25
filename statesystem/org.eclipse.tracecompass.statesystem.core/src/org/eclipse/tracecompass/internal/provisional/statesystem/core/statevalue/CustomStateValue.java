@@ -12,6 +12,8 @@ package org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalu
 import java.nio.BufferOverflowException;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferReader;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferWriter;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 

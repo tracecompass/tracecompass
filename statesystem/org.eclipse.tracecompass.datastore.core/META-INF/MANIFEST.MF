@@ -10,4 +10,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.common.core
-Export-Package: org.eclipse.tracecompass.internal.datastore.core;x-internal:=true
+Export-Package: org.eclipse.tracecompass.internal.datastore.core;x-internal:=true,
+ org.eclipse.tracecompass.internal.datastore.core.serialization;x-internal:=true,
+ org.eclipse.tracecompass.internal.provisional.datastore.core.serialization;x-friends:="org.eclipse.tracecompass.statesystem.core,org.eclipse.tracecompass.statesystem.core.tests"

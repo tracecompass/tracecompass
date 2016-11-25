@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue;
+package org.eclipse.tracecompass.internal.provisional.datastore.core.serialization;
 
 /**
  * Interface for a safe ByteBuffer for reading purposes. This interface allows
@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalu
  * implementations must make sure that only the allowed data can be read.
  *
  * @author Geneviève Bastien
+ * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface ISafeByteBufferReader {
 

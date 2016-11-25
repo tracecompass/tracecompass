@@ -7,18 +7,18 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.statesystem.core.tests.statevalue;
+package org.eclipse.tracecompass.internal.datastore.core.serialization;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
-import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue.ISafeByteBufferReader;
-import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue.ISafeByteBufferWriter;
-import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue.SafeByteBufferFactory;
-import org.eclipse.tracecompass.internal.statesystem.core.statevalue.SafeByteBufferWrapper;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferReader;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferWriter;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.SafeByteBufferFactory;
 import org.junit.Test;
 
 /**
@@ -306,6 +306,52 @@ public class SafeByteBufferWrapperTest {
         ISafeByteBufferReader reader = SafeByteBufferFactory.wrapReader(fMainBuffer, bufferSize);
         assertEquals(valString, reader.getString());
         assertEquals(valLong, reader.getLong());
+    }
+
+    /**
+     * Test writing in buffers with different endianness
+     */
+    @Test
+    public void testEndianness() {
+        long valLong = 54262542352L;
+        int valInt = 2048;
+        int bufferSize = Integer.BYTES + Long.BYTES;
+
+        // Change the order of the buffer
+        ByteOrder order = fMainBuffer.order();
+        ByteOrder newOrder = (order == ByteOrder.BIG_ENDIAN ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+        fMainBuffer.order(newOrder);
+
+        ByteBuffer otherBuffer = ByteBuffer.allocate(fMainBuffer.capacity());
+        otherBuffer.order(newOrder);
+
+        // Wrap one of the buffer in a safe buffer
+        ISafeByteBufferWriter buffer = SafeByteBufferFactory.wrapWriter(fMainBuffer, bufferSize);
+
+        // Write the same data in both buffer and make sure they are equal
+        buffer.putLong(valLong);
+        otherBuffer.putLong(valLong);
+        buffer.putInt(valInt);
+        otherBuffer.putInt(valInt);
+
+        fMainBuffer.flip();
+        otherBuffer.flip();
+
+        byte[] expected = new byte[bufferSize];
+        byte[] actual = new byte[bufferSize];
+
+        fMainBuffer.get(actual, 0, bufferSize);
+        otherBuffer.get(expected, 0, bufferSize);
+
+        assertArrayEquals(expected, actual);
+
+        fMainBuffer.flip();
+        otherBuffer.flip();
+
+        // Read the safe byte buffer and make sure the results are the same
+        ISafeByteBufferReader reader = SafeByteBufferFactory.wrapReader(fMainBuffer, bufferSize);
+        assertEquals(otherBuffer.getLong(), reader.getLong());
+        assertEquals(otherBuffer.getInt(), reader.getInt());
     }
 
 }

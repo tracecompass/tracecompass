@@ -21,10 +21,10 @@ import java.nio.charset.Charset;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferReader;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferWriter;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.SafeByteBufferFactory;
 import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue.CustomStateValue;
-import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue.ISafeByteBufferReader;
-import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue.ISafeByteBufferWriter;
-import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue.SafeByteBufferFactory;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;

@@ -7,11 +7,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue;
+package org.eclipse.tracecompass.internal.provisional.datastore.core.serialization;
 
 import java.nio.ByteBuffer;
 
-import org.eclipse.tracecompass.internal.statesystem.core.statevalue.SafeByteBufferWrapper;
+import org.eclipse.tracecompass.internal.datastore.core.serialization.SafeByteBufferWrapper;
 
 /**
  * Class that creates instances of safe byte buffers wrappers from a part of a
@@ -40,6 +40,7 @@ public final class SafeByteBufferFactory {
         // Slice the main buffer, so that position 0 is the current position
         // set it as read-only also
         ByteBuffer readOnlyBuffer = buffer.slice().asReadOnlyBuffer();
+        readOnlyBuffer.order(buffer.order());
         // Set its limit to the request limit
         readOnlyBuffer.limit(size);
         // Operations on fBuffer will not affect the main buffer's position, so
@@ -62,6 +63,7 @@ public final class SafeByteBufferFactory {
         int pos = buffer.position();
         // Slice the main buffer, so that position 0 is the current position
         ByteBuffer readWriteBuffer = buffer.slice();
+        readWriteBuffer.order(buffer.order());
         // Set its limit to the request limit
         readWriteBuffer.limit(size);
         // Operations on fBuffer will not affect the main buffer's position, so
