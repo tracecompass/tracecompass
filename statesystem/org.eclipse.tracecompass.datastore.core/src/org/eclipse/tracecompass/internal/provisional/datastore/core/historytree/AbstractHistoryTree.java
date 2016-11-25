@@ -18,6 +18,7 @@ import java.nio.ByteOrder;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -362,7 +363,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
      * @return The immutable latest branch
      */
     @VisibleForTesting
-    protected List<N> getLatestBranch() {
+    List<N> getLatestBranch() {
         return ImmutableList.copyOf(fLatestBranch);
     }
 
@@ -421,7 +422,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
      *             closed
      */
     @VisibleForTesting
-    protected @NonNull N getNode(int seqNum) throws ClosedChannelException {
+    @NonNull N getNode(int seqNum) throws ClosedChannelException {
         // First, check in the latest branch if the node is there
         for (N node : fLatestBranch) {
             if (node.getSequenceNumber() == seqNum) {
@@ -437,7 +438,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
      * @return The TreeIO
      */
     @VisibleForTesting
-    protected HtIo<E, N> getTreeIO() {
+    HtIo<E, N> getTreeIO() {
         return fTreeIO;
     }
 
@@ -903,4 +904,73 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
                 + fLatestBranch.get(fLatestBranch.size() - 1).getSequenceNumber();
     }
 
+
+    // ------------------------------------------------------------------------
+    // Test-specific methods
+    // ------------------------------------------------------------------------
+
+    /**
+     * Get the current depth of the tree.
+     *
+     * @return The current depth
+     */
+    @VisibleForTesting
+    protected int getDepth() {
+        return getLatestBranch().size();
+    }
+
+    /**
+     * Get the leaf (bottom-most) node of the latest branch.
+     *
+     * @return The latest leaf
+     */
+    @VisibleForTesting
+    protected N getLatestLeaf() {
+        List<N> latestBranch = getLatestBranch();
+        return latestBranch.get(latestBranch.size() - 1);
+    }
+
+    /**
+     * Verify a node's specific information about a child.
+     *
+     * @param parent
+     *            The parent node
+     * @param index
+     *            The index of the child in the parent's extra data
+     * @param child
+     *            The child node to verify
+     * @return False if a problem was found, true otherwise
+     */
+    @VisibleForTesting
+    protected boolean verifyChildrenSpecific(N parent,
+            int index,
+            N child) {
+        // Nothing to do for the default implementation
+        return true;
+    }
+
+    /**
+     * This method should verify in the whole time range of the parent node that
+     * the child node appears or not as a next children for a given timestamp.
+     *
+     * @param parent
+     *            The parent node
+     * @param child
+     *            The child node
+     * @return False if a problem was found, true otherwise
+     */
+    @VisibleForTesting
+    protected boolean verifyIntersectingChildren(N parent, N child) {
+        int childSequence = child.getSequenceNumber();
+        boolean shouldBeInCollection;
+        Collection<Integer> nextChildren;
+        for (long t = parent.getNodeStart(); t < parent.getNodeEnd(); t++) {
+            shouldBeInCollection = true;
+            nextChildren = parent.selectNextChildren(RangeCondition.singleton(t));
+            if (shouldBeInCollection != nextChildren.contains(childSequence)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

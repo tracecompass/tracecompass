@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.internal.provisional.datastore.core.historytree;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
@@ -64,7 +65,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
      * </pre>
      */
     @VisibleForTesting
-    protected static final int COMMON_HEADER_SIZE = Byte.BYTES
+    public static final int COMMON_HEADER_SIZE = Byte.BYTES
             + 2 * Long.BYTES
             + 3 * Integer.BYTES
             + Byte.BYTES;
@@ -337,6 +338,28 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
             }
 
             return childList;
+        }
+
+        @Override
+        public int hashCode() {
+            /*
+             * Do not consider "fNode", since the node's equals/hashCode already
+             * consider us.
+             */
+            return Objects.hash(fNbChildren, fChildren);
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (obj.getClass() != getClass()) {
+                return false;
+            }
+            CoreNodeData other = (CoreNodeData) obj;
+            return (fNbChildren == other.fNbChildren
+                    && Arrays.equals(fChildren, other.fChildren));
         }
 
     }
@@ -918,7 +941,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(fBlockSize, fMaxChildren, fNodeStart, fNodeEnd, fSequenceNumber, fParentSequenceNumber);
+        return Objects.hash(fBlockSize, fMaxChildren, fNodeStart, fNodeEnd, fSequenceNumber, fParentSequenceNumber, fExtraData);
     }
 
     @Override
@@ -935,7 +958,22 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
                 fNodeStart == other.fNodeStart &&
                 fNodeEnd == other.fNodeEnd &&
                 fSequenceNumber == other.fSequenceNumber &&
-                fParentSequenceNumber == other.fParentSequenceNumber);
+                fParentSequenceNumber == other.fParentSequenceNumber &&
+                Objects.equals(fExtraData, other.fExtraData));
     }
 
+    // -----------------------------------------
+    // Test-specific methods
+    // -----------------------------------------
+
+    /**
+     * Print all current intervals into the given writer.
+     *
+     * @param writer
+     *            The writer to write to
+     */
+    @VisibleForTesting
+    public void debugPrintIntervals(PrintStream writer) {
+        getIntervals().forEach(writer::println);
+    }
 }
