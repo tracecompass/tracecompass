@@ -375,7 +375,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
      *            The depth at which to get the node
      * @return The node at depth
      */
-    protected final N getLatestNode(int depth) {
+    protected N getLatestNode(int depth) {
         if (depth > fLatestBranch.size()) {
             throw new IndexOutOfBoundsException("Trying to get latest node too deep"); //$NON-NLS-1$
         }
@@ -634,6 +634,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
      */
     protected final void tryInsertAtNode(E interval, int depth) {
         N targetNode = getLatestBranch().get(depth);
+        informInsertingAtDepth(depth);
 
         /* Verify if there is enough room in this node to store this interval */
         if (interval.getSizeOnDisk() > targetNode.getNodeFreeSpace()) {
@@ -660,6 +661,22 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
         targetNode.add(interval);
 
         updateEndTime(interval);
+    }
+
+    /**
+     * Informs the tree that the insertion is requested at a given depth. When
+     * this is called, the element is not yet inserted, but the last call to
+     * this for an element will represent the depth at which is was really
+     * inserted. By default, this method does nothing and should not be
+     * necessary for concrete implementations, but it can be used by unit tests
+     * to check to position of insertion of elements.
+     *
+     * @param depth
+     *            The depth at which the last insertion was done
+     */
+    @VisibleForTesting
+    protected void informInsertingAtDepth(int depth) {
+
     }
 
     /**

@@ -21,6 +21,7 @@ import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HistoryTreeStub;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.IHTNode.NodeType;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.classic.ClassicHistoryTreeStub;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.overlapping.OverlappingHistoryTreeStub;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTIntervalReader;
 import org.junit.Test;
@@ -59,8 +60,14 @@ public class HTCoreNodeTest<E extends IHTInterval, N extends HTNode<E>> extends 
                         HTNode.COMMON_HEADER_SIZE + Integer.BYTES + Integer.BYTES * NB_CHILDREN + Long.BYTES * NB_CHILDREN,
                         ClassicHistoryTreeStub.CLASSIC_NODE_FACTORY,
                         HtTestUtils.READ_FACTORY,
-                        HTNodeTest.BASE_OBJ_FACTORY },
-
+                        HTNodeTest.BASE_OBJ_FACTORY
+                },
+                { "Overlapping core node",
+                        HTNode.COMMON_HEADER_SIZE + Integer.BYTES + Integer.BYTES * NB_CHILDREN + 2 * Long.BYTES * NB_CHILDREN,
+                        OverlappingHistoryTreeStub.OVERLAPPING_NODE_FACTORY,
+                        HtTestUtils.READ_FACTORY,
+                        HTNodeTest.BASE_OBJ_FACTORY
+                },
         });
     }
 

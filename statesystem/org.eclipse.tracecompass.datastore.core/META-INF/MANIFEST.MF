@@ -18,6 +18,7 @@ Export-Package: org.eclipse.tracecompass.internal.datastore.core;x-internal:=tru
  org.eclipse.tracecompass.internal.provisional.datastore.core.exceptions,
  org.eclipse.tracecompass.internal.provisional.datastore.core.historytree;x-internal:=true,
  org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.classic;x-internal:=true,
+ org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.overlapping;x-internal:=true,
  org.eclipse.tracecompass.internal.provisional.datastore.core.interval;x-internal:=true,
  org.eclipse.tracecompass.internal.provisional.datastore.core.serialization;x-friends:="org.eclipse.tracecompass.statesystem.core,org.eclipse.tracecompass.statesystem.core.tests"
 Import-Package: com.google.common.annotations,
