@@ -35,6 +35,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
@@ -137,30 +138,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         if (ssq == null) {
             return retMap;
         }
-        int tid = entry.getThreadId();
 
-        try {
-            // Find every CPU first, then get the current thread
-            int cpusQuark = ssq.getQuarkAbsolute(Attributes.CPUS);
-            List<Integer> cpuQuarks = ssq.getSubAttributes(cpusQuark, false);
-            for (Integer cpuQuark : cpuQuarks) {
-                int currentThreadQuark = ssq.getQuarkRelative(cpuQuark, Attributes.CURRENT_THREAD);
-                ITmfStateInterval interval = ssq.querySingleState(event.getTime(), currentThreadQuark);
-                if (!interval.getStateValue().isNull()) {
-                    ITmfStateValue state = interval.getStateValue();
-                    int currentThreadId = state.unboxInt();
-                    if (tid == currentThreadId) {
-                        retMap.put(Messages.ControlFlowView_attributeCpuName, ssq.getAttributeName(cpuQuark));
-                        break;
-                    }
-                }
-            }
-
-        } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException e) {
-            Activator.getDefault().logError("Error in ControlFlowPresentationProvider", e); //$NON-NLS-1$
-        } catch (StateSystemDisposedException e) {
-            /* Ignored */
-        }
         int status = ((TimeEvent) event).getValue();
         if (status == ProcessStatus.RUN_SYTEMCALL.getStateValue().unboxInt()) {
             int syscallQuark = ssq.optQuarkRelative(entry.getThreadQuark(), Attributes.SYSTEM_CALL);
@@ -183,6 +161,41 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
 
         return retMap;
     }
+
+    @Override
+    public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime) {
+        Map<String, String> retMap = super.getEventHoverToolTipInfo(event, hoverTime);
+        if (retMap == null) {
+            retMap = new LinkedHashMap<>();
+        }
+
+        if (!(event instanceof TimeEvent) || !((TimeEvent) event).hasValue() ||
+                !(event.getEntry() instanceof ControlFlowEntry)) {
+            return retMap;
+        }
+
+        ControlFlowEntry entry = (ControlFlowEntry) event.getEntry();
+        ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(entry.getTrace(), KernelAnalysisModule.ID);
+        if (ssq == null) {
+            return retMap;
+        }
+
+        try {
+            int currentCpuRqQuark = ssq.getQuarkRelative(entry.getThreadQuark(), Attributes.CURRENT_CPU_RQ);
+            ITmfStateInterval interval = ssq.querySingleState(hoverTime, currentCpuRqQuark);
+            ITmfStateValue value = interval.getStateValue();
+            if (value.getType() == Type.INTEGER) {
+                retMap.put(Messages.ControlFlowView_attributeCpuName, String.valueOf(value.unboxInt()));
+            }
+        } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException e) {
+            Activator.getDefault().logError("Error in ControlFlowPresentationProvider", e); //$NON-NLS-1$
+        } catch (StateSystemDisposedException e) {
+            /* Ignored */
+        }
+
+        return retMap;
+    }
+
 
     @Override
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
