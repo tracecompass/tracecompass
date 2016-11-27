@@ -135,7 +135,11 @@ public final class TmfTraceType {
      * @param categoryId
      *            The category ID
      * @return the category name or empty string if not found
+     * @deprecated Use {@link Platform#getExtensionRegistry()} and various
+     *             public constants in {@link TmfTraceType} if achieving this is
+     *             needed.
      */
+    @Deprecated
     public static String getCategoryName(String categoryId) {
         IConfigurationElement[] elements = Platform.getExtensionRegistry()
                 .getConfigurationElementsFor(TMF_TRACE_TYPE_ID);
@@ -152,7 +156,11 @@ public final class TmfTraceType {
      * for the trace type extension that apply to traces and not experiments.
      *
      * @return an array of trace type configuration elements
+     * @deprecated Use {@link Platform#getExtensionRegistry()} and various
+     *             public constants in {@link TmfTraceType} if achieving this is
+     *             needed.
      */
+    @Deprecated
     public static IConfigurationElement[] getTypeElements() {
         IConfigurationElement[] elements = Platform.getExtensionRegistry()
                 .getConfigurationElementsFor(TMF_TRACE_TYPE_ID);
@@ -169,7 +177,10 @@ public final class TmfTraceType {
      * Get an iterable view of the existing trace type IDs.
      *
      * @return The currently registered trace type IDs
+     * @deprecated Use a combination of {@link #getTraceTypeHelpers()} and
+     *             {@link TraceTypeHelper#getTraceTypeId()} instead.
      */
+    @Deprecated
     public static Iterable<String> getTraceTypeIDs() {
         return TRACE_TYPES.keySet();
     }
@@ -230,7 +241,11 @@ public final class TmfTraceType {
      * Gets all the custom trace types
      *
      * @return the list of custom trace types
+     * @deprecated Use {@link CustomTxtTraceDefinition#loadAll()} and
+     *             {@link CustomXmlTraceDefinition#loadAll()} if achieving this
+     *             is needed.
      */
+    @Deprecated
     public static List<String> getCustomTraceTypes() {
 
         List<String> traceTypes = new ArrayList<>();
@@ -413,7 +428,11 @@ public final class TmfTraceType {
      * Returns the list of trace categories
      *
      * @return the list of trace categories
+     * @deprecated Use {@link #getTraceTypeHelpers()} and
+     *             {@link TraceTypeHelper#getCategoryName()} to retrieve all
+     *             category names.
      */
+    @Deprecated
     public static List<String> getTraceCategories() {
         List<String> categoryNames = new ArrayList<>();
         for (TraceTypeHelper helper : TRACE_TYPES.values()) {
@@ -432,7 +451,11 @@ public final class TmfTraceType {
      * @param categoryName
      *            the categoryName to lookup
      * @return a list of trace type helper classes {@link TraceTypeHelper}
+     * @deprecated Use {@link #getTraceTypeHelpers()} and
+     *             {@link TraceTypeHelper#getCategoryName()} to retrieve all
+     *             category names.
      */
+    @Deprecated
     public static List<TraceTypeHelper> getTraceTypes(String categoryName) {
         List<TraceTypeHelper> traceNames = new ArrayList<>();
         for (TraceTypeHelper traceTypeHelper : TRACE_TYPES.values()) {
@@ -454,7 +477,11 @@ public final class TmfTraceType {
      * @param fileName
      *            the file name (and path)
      * @return true if the trace is of a valid type
+     * @deprecated Use TmfTraceType.getTraceTypeHelpers and
+     *             {@link TraceTypeHelper#validate(String)} or
+     *             {@link TraceTypeHelper#validateWithConfidence(String)}
      */
+    @Deprecated
     public static boolean validate(String traceTypeName, String fileName) {
         if (traceTypeName != null && !traceTypeName.isEmpty()) {
             final TraceTypeHelper traceTypeHelper = TRACE_TYPES.get(traceTypeName);
@@ -471,7 +498,11 @@ public final class TmfTraceType {
      * @param traceToValidate
      *            the trace category (canonical name)
      * @return true if the trace is of a valid type
+     * @deprecated Use TmfTraceType.getTraceTypeHelpers and
+     *             {@link TraceTypeHelper#validate(String)} or
+     *             {@link TraceTypeHelper#validateWithConfidence(String)}
      */
+    @Deprecated
     public static boolean validate(TraceValidationHelper traceToValidate) {
         return validate(traceToValidate.getTraceType(), traceToValidate.getTraceToScan());
     }

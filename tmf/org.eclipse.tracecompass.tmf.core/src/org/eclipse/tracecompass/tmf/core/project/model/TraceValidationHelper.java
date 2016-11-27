@@ -18,7 +18,11 @@ import java.util.Objects;
  * Trace import helper class
  *
  * @author Matthew Khouzam
+ * @deprecated Use TmfTraceType.getTraceTypeHelpers and
+ *             {@link TraceTypeHelper#validate(String)} or
+ *             {@link TraceTypeHelper#validateWithConfidence(String)}
  */
+@Deprecated
 public class TraceValidationHelper implements Comparable<TraceValidationHelper> {
 
     private final String fTraceToScan;
