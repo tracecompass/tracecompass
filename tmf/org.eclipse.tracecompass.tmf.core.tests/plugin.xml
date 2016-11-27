@@ -152,5 +152,19 @@
             id="org.eclipse.tracecompass.tmf.core.tests.analysis1">
       </analysis>
    </extension>
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.custom.trace">
+      <customTrace
+            file="testfiles/txt/testTxtExtensionDefinition.xml"
+            traceContentType="text">
+      </customTrace>
+   </extension>
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.custom.trace">
+      <customTrace
+            file="testfiles/xml/testXmlExtensionDefinition.xml"
+            traceContentType="xml">
+      </customTrace>
+   </extension>
 
 </plugin>

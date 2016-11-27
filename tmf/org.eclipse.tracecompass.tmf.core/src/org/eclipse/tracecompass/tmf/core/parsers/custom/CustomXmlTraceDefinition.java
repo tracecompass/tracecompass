@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -119,6 +120,12 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
     private static final String ACTION_ATTRIBUTE = Messages.CustomXmlTraceDefinition_action;
     private static final String FORMAT_ATTRIBUTE = Messages.CustomXmlTraceDefinition_format;
     private static final String OUTPUT_COLUMN_ELEMENT = Messages.CustomXmlTraceDefinition_outputColumn;
+
+    /**
+     * This is the value that the extension sets for traceContentType to be able
+     * to load an XML parser
+     **/
+    private static final String TRACE_CONTENT_TYPE_ATTRIBUTE_VALUE = "xml"; //$NON-NLS-1$
 
     /** Top-level input element */
     public CustomXmlInputElement rootInputElement;
@@ -333,6 +340,12 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         defs.addAll(Arrays.asList(loadAll(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME)));
         if (includeDefaults) {
             defs.addAll(Arrays.asList(loadAll(CUSTOM_XML_TRACE_DEFINITIONS_DEFAULT_PATH_NAME)));
+
+            // Also load definitions contributed by extensions
+            Collection<String> paths = getExtensionDefinitionsPaths(TRACE_CONTENT_TYPE_ATTRIBUTE_VALUE);
+            for (String customTraceDefinitionPath : paths) {
+                defs.addAll(Arrays.asList(loadAll(customTraceDefinitionPath)));
+            }
         }
         return defs.toArray(new CustomXmlTraceDefinition[0]);
     }

@@ -15,14 +15,24 @@ package org.eclipse.tracecompass.tmf.core.parsers.custom;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.osgi.framework.Bundle;
 import org.w3c.dom.Element;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
@@ -143,6 +153,11 @@ public abstract class CustomTraceDefinition {
      * @deprecated Use {@link Tag#OTHER} instead. */
     @Deprecated
     public static final String TAG_OTHER = Messages.CustomTraceDefinition_otherTag;
+
+    private static final String TMF_CUSTOM_TRACE_BUILTIN_EXTENSION_ID = "org.eclipse.tracecompass.tmf.core.custom.trace"; //$NON-NLS-1$
+    private static final String ATTRIBUTE_NAME_FILE = "file"; //$NON-NLS-1$
+    private static final String ATTRIBUTE_NAME_TRACE_CONTENT_TYPE = "traceContentType"; //$NON-NLS-1$
+    private static final String ELEMENT_NAME_CUSTOM_TRACE = "customTrace"; //$NON-NLS-1$
 
     /** Category of this trace definition */
     public String categoryName;
@@ -308,5 +323,53 @@ public abstract class CustomTraceDefinition {
             name = checkNotNull(tag.toString());
         }
         return new SimpleEntry<>(tag, name);
+    }
+
+    /**
+     * Get all the custom trace definition paths contributed by extensions, for
+     * a given content type (XML or Text).
+     *
+     * @param traceContentTypeToLoad
+     *            XML or Text (extension attribute value)
+     * @return the paths
+     *
+     * Note: This method is package-visible by design.
+     */
+    static final Collection<String> getExtensionDefinitionsPaths(String traceContentTypeToLoad) {
+        List<String> extensionDefinitionsPaths = new ArrayList<>();
+        IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(TMF_CUSTOM_TRACE_BUILTIN_EXTENSION_ID);
+        for (IConfigurationElement element : elements) {
+            if (!element.getName().equals(ELEMENT_NAME_CUSTOM_TRACE)) {
+                continue;
+            }
+
+            final String traceContentType = element.getAttribute(ATTRIBUTE_NAME_TRACE_CONTENT_TYPE);
+            if (!traceContentType.equals(traceContentTypeToLoad)) {
+                continue;
+            }
+
+            final String filename = element.getAttribute(ATTRIBUTE_NAME_FILE);
+            final String name = element.getContributor().getName();
+            SafeRunner.run(new ISafeRunnable() {
+                @Override
+                public void run() throws IOException {
+                    if (name != null) {
+                        Bundle bundle = Platform.getBundle(name);
+                        if (bundle != null) {
+                            URL xmlUrl = bundle.getResource(filename);
+                            URL locatedURL = FileLocator.toFileURL(xmlUrl);
+                            extensionDefinitionsPaths.add(locatedURL.getPath());
+                        }
+                    }
+                }
+
+                @Override
+                public void handleException(Throwable exception) {
+                    // Handled sufficiently in SafeRunner
+                }
+            });
+
+        }
+        return extensionDefinitionsPaths;
     }
 }

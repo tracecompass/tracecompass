@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<CustomTxtTraceDefinitionList>
+<Definition name="testtxtextension">
+<TimeStampOutputFormat>Tn</TimeStampOutputFormat>
+<InputLine>
+<Cardinality max="2147483647" min="0"/>
+<RegEx>(\S+) (foo-event)</RegEx>
+<InputData action="0" format="dd/MM/yyyy HH:mm:ss:SSS" name="Timestamp" tag="TIMESTAMP"/>
+<InputData action="0" format="" name="Message" tag="MESSAGE"/>
+<InputLine>
+<Cardinality max="2147483647" min="0"/>
+<RegEx>(.*\S)</RegEx>
+<InputData action="2" tag="MESSAGE"/>
+</InputLine>
+</InputLine>
+<OutputColumn name="Timestamp" tag="TIMESTAMP"/>
+<OutputColumn name="Message" tag="MESSAGE"/>
+</Definition>
+</CustomTxtTraceDefinitionList>
