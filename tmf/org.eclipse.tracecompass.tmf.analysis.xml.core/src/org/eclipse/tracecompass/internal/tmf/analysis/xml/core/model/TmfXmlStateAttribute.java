@@ -12,13 +12,13 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
+
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
-import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
@@ -31,6 +31,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.w3c.dom.Element;
@@ -223,6 +224,8 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                 if (name == null) {
                     throw new IllegalStateException("Invalid attribute name"); //$NON-NLS-1$
                 }
+
+                Object fieldValue = null;
                 /* First, look for a field with the given name */
                 ITmfEventField field = event.getContent().getField(name);
                 /* Field not found, see if it is a special case field */
@@ -234,10 +237,18 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                         if (cpu != null) {
                             return getQuarkRelativeAndAdd(startQuark, cpu.toString());
                         }
+                        return IXmlStateSystemContainer.ERROR_QUARK;
                     }
-                    return IXmlStateSystemContainer.ERROR_QUARK;
+                    /* Search between the trace event aspects */
+                    for (ITmfEventAspect<?> aspect : event.getTrace().getEventAspects()) {
+                        if (aspect.getName().equals(fName)) {
+                            fieldValue = aspect.resolve(event);
+                            break;
+                        }
+                    }
+                } else {
+                    fieldValue = field.getValue();
                 }
-                Object fieldValue = field.getValue();
 
                 if (fieldValue instanceof String) {
                     String fieldString = (String) fieldValue;
@@ -249,6 +260,7 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                     Integer fieldInterger = (Integer) fieldValue;
                     quark = getQuarkRelativeAndAdd(startQuark, fieldInterger.toString());
                 }
+
                 return quark;
             }
             case QUERY: {

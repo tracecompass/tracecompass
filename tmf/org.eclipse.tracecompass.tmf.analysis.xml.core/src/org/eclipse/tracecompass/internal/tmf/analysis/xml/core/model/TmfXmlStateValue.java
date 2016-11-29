@@ -30,6 +30,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.w3c.dom.Element;
@@ -297,9 +298,10 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
 
         final ITmfEventField field = event.getContent().getField(fieldName);
 
+        Object fieldValue = null;
+
         /* If the field does not exist, see if it's a special case */
         if (field == null) {
-
             if (fieldName.equalsIgnoreCase(TmfXmlStrings.CPU)) {
                 /* A "CPU" field will return the CPU aspect if available */
                 Integer cpu = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
@@ -313,10 +315,19 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
                  */
                 return TmfStateValue.newValueLong(event.getTimestamp().getValue());
             }
-            return value;
+            // This will allow to use any column as input
+            for (ITmfEventAspect<?> aspect : event.getTrace().getEventAspects()) {
+                if (aspect.getName().equals(fieldName)) {
+                    fieldValue = aspect.resolve(event);
+                    break;
+                }
+            }
+            if (fieldValue == null) {
+                return value;
+            }
+        } else {
+            fieldValue = field.getValue();
         }
-
-        Object fieldValue = field.getValue();
 
         /*
          * Try to find the right type. The type can be forced by
