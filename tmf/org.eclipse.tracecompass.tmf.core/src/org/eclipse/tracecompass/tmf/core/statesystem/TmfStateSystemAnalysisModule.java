@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -26,6 +28,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
 import org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial.PartialHistoryBackend;
 import org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial.PartialStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -62,6 +66,8 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisModule
         implements ITmfAnalysisModuleWithStateSystems {
+
+    private static final Logger LOGGER = TraceCompassLog.getLogger(TmfStateSystemAnalysisModule.class);
 
     private static final String EXTENSION = ".ht"; //$NON-NLS-1$
 
@@ -218,14 +224,16 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     }
 
     @Override
-    protected boolean executeAnalysis(@Nullable final  IProgressMonitor monitor) {
+    protected boolean executeAnalysis(@Nullable final IProgressMonitor monitor) {
         IProgressMonitor mon = (monitor == null ? new NullProgressMonitor() : monitor);
         final ITmfStateProvider provider = createStateProvider();
 
         String id = getId();
 
-        /* FIXME: State systems should make use of the monitor, to be cancelled */
-        try {
+        /*
+         * FIXME: State systems should make use of the monitor, to be cancelled
+         */
+        try (ScopeLog log = new ScopeLog(LOGGER, Level.FINE, "StateSystemAnalysis:executing", "id", id)) { //$NON-NLS-1$ //$NON-NLS-2$
             /* Get the state system according to backend */
             StateSystemBackendType backend = getBackendType();
 
