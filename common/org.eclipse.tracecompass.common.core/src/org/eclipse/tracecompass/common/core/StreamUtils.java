@@ -11,6 +11,9 @@ package org.eclipse.tracecompass.common.core;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -34,6 +37,23 @@ public final class StreamUtils {
      */
     public static <T> Stream<T> getStream(Iterable<T> iterable) {
         return StreamSupport.stream(iterable.spliterator(), false);
+    }
+
+    /**
+     * Get a {@link Stream} from a generic {@link Iterator}.
+     *
+     * Depending on the type of terminal operation used on the stream, the
+     * iterator may or may not have some elements remaining. Be wary if you
+     * re-use the same iterator afterwards.
+     *
+     * @param iterator
+     *            The iterator to wrap
+     * @return A stream containing the iterator's elements
+     * @since 2.2
+     */
+    public static <T> Stream<T> getStream(Iterator<T> iterator) {
+        Spliterator<T> spliterator = Spliterators.spliteratorUnknownSize(iterator, 0);
+        return StreamSupport.stream(spliterator, false);
     }
 
     /**
