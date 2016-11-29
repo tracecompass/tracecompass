@@ -23,7 +23,14 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.tracecompass.internal.tmf.core.component.TmfEventThread;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
@@ -41,6 +48,9 @@ import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
  * @version 1.1
  */
 public class TmfRequestExecutor implements Executor {
+
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(TmfRequestExecutor.class);
+    private static final @NonNull String LOG_CATEGORY = "RequestExecutor"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Constants
@@ -77,7 +87,8 @@ public class TmfRequestExecutor implements Executor {
      * Default constructor
      */
     public TmfRequestExecutor() {
-        // We know the canonical name is not null because we use ExecutorService only
+        // We know the canonical name is not null because we use ExecutorService
+        // only
         String canonicalName = checkNotNull(fExecutor.getClass().getCanonicalName());
         fExecutorName = canonicalName.substring(canonicalName.lastIndexOf('.') + 1);
         if (TmfCoreTracer.isComponentTraced()) {
@@ -125,33 +136,35 @@ public class TmfRequestExecutor implements Executor {
 
         // We are expecting MyEventThread:s
         if (!(command instanceof TmfEventThread)) {
-            // TODO: Log an error
+            TraceCompassLogUtils.traceInstant(LOGGER, Level.WARNING, "RequestExecutor:NotATmfEventThread", "cmd", command.toString()); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
 
-        // Wrap the thread in a MyThread
-        TmfEventThread thread = (TmfEventThread) command;
-        TmfEventThread wrapper = new TmfEventThread(thread) {
-            @Override
-            public void run() {
-                try {
-                    command.run();
-                } finally {
-                    scheduleNext();
+        try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "RequestExecutor:CreatingThread").setCategory(LOG_CATEGORY).build()) { //$NON-NLS-1$
+            // Wrap the thread in a MyThread
+            TmfEventThread thread = (TmfEventThread) command;
+            TmfEventThread wrapper = new TmfEventThread(thread) {
+                @Override
+                public void run() {
+                    try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "RequestExecutor:RunningRequest", "thread", thread.getThread(), "execution type", thread.getExecType()).setParentScope(scope).build()) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        thread.run();
+                    } finally {
+                        scheduleNext();
+                    }
                 }
-            }
-        };
+            };
 
-        // Add the thread to the appropriate queue
-        ExecutionType priority = thread.getExecType();
+            // Add the thread to the appropriate queue
+            ExecutionType priority = thread.getExecType();
 
-        if (priority == ExecutionType.FOREGROUND) {
-            if (!fForegroundTasks.offer(wrapper)) {
-                wrapper.cancel();
-            }
-        } else {
-            if (!fBackgroundTasks.offer(wrapper)) {
-                wrapper.cancel();
+            if (priority == ExecutionType.FOREGROUND) {
+                if (!fForegroundTasks.offer(wrapper)) {
+                    wrapper.cancel();
+                }
+            } else {
+                if (!fBackgroundTasks.offer(wrapper)) {
+                    wrapper.cancel();
+                }
             }
         }
     }
@@ -303,9 +316,8 @@ public class TmfRequestExecutor implements Executor {
     // ------------------------------------------------------------------------
 
     @Override
-    @SuppressWarnings("nls")
     public String toString() {
-        return "[TmfRequestExecutor(" + fExecutorName + ")]";
+        return "[TmfRequestExecutor(" + fExecutorName + ")]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
 }
