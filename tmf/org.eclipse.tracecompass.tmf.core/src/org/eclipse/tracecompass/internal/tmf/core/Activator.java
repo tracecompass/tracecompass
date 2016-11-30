@@ -91,6 +91,8 @@ public class Activator extends Plugin {
     @Override
     public void stop(BundleContext context) throws Exception {
         TmfCoreTracer.stop();
+        TmfTraceManager.getInstance().dispose();
+        TmfAnalysisManager.dispose();
         TmfSignalManager.dispose();
         setDefault(null);
         super.stop(context);

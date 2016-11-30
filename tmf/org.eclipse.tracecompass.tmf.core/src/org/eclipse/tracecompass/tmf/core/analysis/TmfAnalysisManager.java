@@ -55,6 +55,16 @@ public class TmfAnalysisManager {
     }
 
     /**
+     * Disposes the analysis manager
+     *
+     * @since 2.2
+     */
+    public static void dispose() {
+        TmfAnalysisParameterProviders.dispose();
+        fParamProviderInstances.values().forEach(provider -> provider.dispose());
+    }
+
+    /**
      * Registers a new source of modules
      *
      * @param source

@@ -99,10 +99,12 @@ public class TmfAnalysisModuleOutputs {
                 if (childCe.getName().equals(ANALYSIS_ID_ELEM)) {
                     listener = new TmfNewAnalysisOutputListener(output, childCe.getAttribute(ID_ATTR), null);
                 } else if (childCe.getName().equals(MODULE_CLASS_ELEM)) {
-                    listener = new TmfNewAnalysisOutputListener(output, null, childCe.createExecutableExtension(CLASS_ATTR).getClass().asSubclass(IAnalysisModule.class));
+                    String contributorName = childCe.getContributor().getName();
+                    Class<?> moduleClass = Platform.getBundle(contributorName).loadClass(childCe.getAttribute(CLASS_ATTR));
+                    listener = new TmfNewAnalysisOutputListener(output, null, moduleClass.asSubclass(IAnalysisModule.class));
                 }
             }
-        } catch (InvalidRegistryObjectException | CoreException e) {
+        } catch (InvalidRegistryObjectException | CoreException | ClassNotFoundException e) {
             Activator.logError("Error creating module output listener", e); //$NON-NLS-1$
         }
         return listener;

@@ -41,6 +41,12 @@ public class CriticalPathParameterProvider extends TmfAbstractAnalysisParamProvi
     }
 
     @Override
+    public void dispose() {
+        super.dispose();
+        TmfSignalManager.deregister(this);
+    }
+
+    @Override
     public String getName() {
         return NAME;
     }

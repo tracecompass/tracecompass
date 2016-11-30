@@ -21,11 +21,13 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.internal.tmf.ui.markers.LostEventsMarkerEventSourceFactory;
+import org.eclipse.tracecompass.internal.tmf.ui.views.TmfAlignmentSynchronizer;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceAdapterManager;
 import org.eclipse.tracecompass.tmf.ui.TmfUiRefreshHandler;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventAdapterFactory;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -105,6 +107,8 @@ public class Activator extends AbstractUIPlugin {
     public void stop(BundleContext context) throws Exception {
         TmfUiTracer.stop();
         TmfUiRefreshHandler.getInstance().dispose();
+        TmfAlignmentSynchronizer.getInstance().dispose();
+        TmfProjectRegistry.dispose();
         plugin = null;
 
         Platform.getAdapterManager().unregisterAdapters(fTmfEventAdapterFactory);

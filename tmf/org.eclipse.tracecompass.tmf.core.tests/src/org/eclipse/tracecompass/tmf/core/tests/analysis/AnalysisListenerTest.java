@@ -44,6 +44,8 @@ public class AnalysisListenerTest {
          * by 1
          */
         assertEquals(countBefore + 1, NewModuleListenerStub.getModuleCount());
+
+        module.dispose();
     }
 
 }

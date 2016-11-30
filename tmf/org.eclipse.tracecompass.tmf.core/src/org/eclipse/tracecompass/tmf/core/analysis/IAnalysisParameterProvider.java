@@ -64,4 +64,13 @@ public interface IAnalysisParameterProvider {
      */
     void registerModule(IAnalysisModule module);
 
+
+    /**
+     * Dispose of the parameter provider
+     *
+     * @since 2.2
+     */
+    default void dispose() {
+        /* override to perform any necessary cleanup */
+    }
 }

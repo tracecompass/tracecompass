@@ -19,7 +19,6 @@ import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -32,7 +31,7 @@ import org.junit.Test;
  */
 public class SyscallStatsAnalysisTest {
 
-    private TmfTrace fTestTrace;
+    private ITmfTrace fTestTrace;
     private SystemCallLatencyStatisticsAnalysisModule fSyscallStatsModule;
 
     /**
@@ -40,9 +39,10 @@ public class SyscallStatsAnalysisTest {
      */
     @Before
     public void setupAnalysis() {
-        ITmfTrace trace = KernelCtfTraceStub.getTrace(CtfTestTrace.ARM_64_BIT_HEADER);
+        KernelCtfTraceStub trace = KernelCtfTraceStub.getTrace(CtfTestTrace.ARM_64_BIT_HEADER);
+        fTestTrace = trace;
         /* Make sure the Kernel analysis has run */
-        ((TmfTrace) trace).traceOpened(new TmfTraceOpenedSignal(this, trace, null));
+        trace.traceOpened(new TmfTraceOpenedSignal(this, trace, null));
         IAnalysisModule module = null;
         for (IAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, SystemCallLatencyAnalysis.class)) {
             module = mod;
@@ -65,7 +65,7 @@ public class SyscallStatsAnalysisTest {
      */
     @After
     public void cleanup() {
-        final TmfTrace testTrace = fTestTrace;
+        final ITmfTrace testTrace = fTestTrace;
         if (testTrace != null) {
             testTrace.dispose();
         }

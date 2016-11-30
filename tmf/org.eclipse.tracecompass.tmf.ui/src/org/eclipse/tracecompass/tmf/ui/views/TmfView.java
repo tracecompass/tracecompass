@@ -41,11 +41,11 @@ import org.eclipse.ui.part.ViewPart;
  */
 public abstract class TmfView extends ViewPart implements ITmfComponent {
 
+    private static final TmfAlignmentSynchronizer TIME_ALIGNMENT_SYNCHRONIZER = TmfAlignmentSynchronizer.getInstance();
     private final String fName;
     /** This allows us to keep track of the view sizes */
     private Composite fParentComposite;
     private ControlAdapter fControlListener;
-    private static final TmfAlignmentSynchronizer TIME_ALIGNMENT_SYNCHRONIZER = new TmfAlignmentSynchronizer();
 
     /**
      * Action class for pinning of TmfView.

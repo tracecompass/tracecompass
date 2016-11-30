@@ -58,6 +58,15 @@ public final class TmfAnalysisParameterProviders {
     }
 
     /**
+     * Disposes the analysis parameter providers
+     *
+     * @since 2.2
+     */
+    public static void dispose() {
+        fParamProviderInstances.values().forEach(provider -> provider.dispose());
+    }
+
+    /**
      * Return the analysis parameter providers advertised in the extension
      * point, and associated with an analysis ID.
      *
@@ -85,13 +94,11 @@ public final class TmfAnalysisParameterProviders {
                     }
                     if (analysisId.equals(id)) {
                         IAnalysisParameterProvider provider = fParamProviderInstances.get(className);
-                        if (provider != null) {
-                            providers.add(provider);
-                        } else {
+                        if (provider == null) {
                             provider = checkNotNull((IAnalysisParameterProvider) ce.createExecutableExtension(CLASS_ATTR));
                             fParamProviderInstances.put(className, provider);
-                            providers.add(provider);
                         }
+                        providers.add(provider);
                     }
                 } catch (InvalidRegistryObjectException | CoreException e) {
                     Activator.logError("Error creating module parameter provider", e); //$NON-NLS-1$

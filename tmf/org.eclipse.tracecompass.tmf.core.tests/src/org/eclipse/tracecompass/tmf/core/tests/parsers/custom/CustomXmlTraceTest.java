@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,6 +16,7 @@ import java.io.File;
 
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
+import org.junit.After;
 import org.junit.Before;
 
 /**
@@ -40,7 +41,7 @@ public abstract class CustomXmlTraceTest {
 
 
     /**
-     * set up directories
+     * set up definition
      */
     @Before
     public void init() {
@@ -48,6 +49,15 @@ public abstract class CustomXmlTraceTest {
         t = new CustomXmlTrace(cxtd);
     }
 
+    /**
+     * clean up
+     */
+    @After
+    public void cleanup() {
+        if (t != null) {
+            t.dispose();
+        }
+    }
 
     /**
      * @return the trace

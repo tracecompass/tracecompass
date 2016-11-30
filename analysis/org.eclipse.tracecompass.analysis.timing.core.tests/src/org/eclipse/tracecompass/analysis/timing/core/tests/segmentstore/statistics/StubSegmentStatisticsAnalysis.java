@@ -72,7 +72,7 @@ class StubSegmentStatisticsAnalysis extends AbstractSegmentStatisticsAnalysis {
 
     private final List<@NonNull ISegment> fPreFixture;
     private final ISegmentStore<@NonNull ISegment> fFixture = SegmentStoreFactory.createSegmentStore();
-    private StubProvider fSegmentStoreProvider;
+    private @NonNull StubProvider fSegmentStoreProvider;
 
     public StubSegmentStatisticsAnalysis() {
         ImmutableList.Builder<@NonNull ISegment> builder = new Builder<>();
@@ -83,6 +83,12 @@ class StubSegmentStatisticsAnalysis extends AbstractSegmentStatisticsAnalysis {
         fPreFixture = builder.build();
         fFixture.addAll(fPreFixture);
         fSegmentStoreProvider = new StubProvider(fFixture);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        fSegmentStoreProvider.dispose();
     }
 
     @Override

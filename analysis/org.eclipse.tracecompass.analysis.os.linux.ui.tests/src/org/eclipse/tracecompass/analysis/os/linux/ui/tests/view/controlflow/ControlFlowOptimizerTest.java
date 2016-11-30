@@ -30,6 +30,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
+import org.junit.AfterClass;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
@@ -59,6 +60,14 @@ public class ControlFlowOptimizerTest {
      */
     protected Function<Collection<ILinkEvent>, Map<Integer, Long>> getOptimizationMethod() {
         return new NaiveOptimizationAlgorithm();
+    }
+
+    /**
+     * Clean up
+     */
+    @AfterClass
+    public static void afterClass() {
+        TRACE.dispose();
     }
 
     /**

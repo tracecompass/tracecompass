@@ -65,6 +65,12 @@ class TmfMipmapStateProviderStub extends AbstractTmfMipmapStateProvider {
     }
 
     @Override
+    public void dispose() {
+        super.dispose();
+        getTrace().dispose();
+    }
+
+    @Override
     protected void eventHandle(ITmfEvent ev) {
         ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
         final long ts = ev.getTimestamp().toNanos();

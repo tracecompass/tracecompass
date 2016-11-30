@@ -16,14 +16,15 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisEventRequirement;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement.PriorityLevel;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisEventRequirement;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
+import org.junit.After;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableSet;
@@ -84,6 +85,14 @@ public class AnalysisEventRequirementTest {
     }
 
     private final @NonNull TmfTrace fTrace = new TraceWithEvents();
+
+    /**
+     * Clean up
+     */
+    @After
+    public void cleanup() {
+        fTrace.dispose();
+    }
 
     /**
      * Test with optional requirements
@@ -177,6 +186,7 @@ public class AnalysisEventRequirementTest {
         req = new TmfAnalysisEventRequirement(ImmutableSet.of(EVENT1, EVENT2), PriorityLevel.OPTIONAL);
         assertTrue(req.test(traceNoEvents));
 
+        traceNoEvents.dispose();
     }
 
 }

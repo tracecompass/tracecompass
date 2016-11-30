@@ -167,7 +167,9 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
     public Iterable<TmfAbstractAnalysisRequirement> getAnalysisRequirements() {
         IAnalysisModule module = createModule();
         if (module != null) {
-            return module.getAnalysisRequirements();
+            Iterable<@NonNull TmfAbstractAnalysisRequirement> requirements = module.getAnalysisRequirements();
+            module.dispose();
+            return requirements;
         }
         return Collections.EMPTY_SET;
 

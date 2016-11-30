@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -49,6 +49,10 @@ public class TmfAlignmentSynchronizer {
 
     private static final long THROTTLE_DELAY = 500;
     private static final int NEAR_THRESHOLD = 10;
+
+    /** Singleton instance */
+    private static TmfAlignmentSynchronizer fInstance = null;
+
     private final Timer fTimer;
     private final List<AlignmentOperation> fPendingOperations = Collections.synchronizedList(new ArrayList<AlignmentOperation>());
 
@@ -57,7 +61,7 @@ public class TmfAlignmentSynchronizer {
     /**
      * Constructor
      */
-    public TmfAlignmentSynchronizer() {
+    private TmfAlignmentSynchronizer() {
         TmfSignalManager.register(this);
         fTimer = new Timer();
         createPreferenceListener();
@@ -67,6 +71,27 @@ public class TmfAlignmentSynchronizer {
                 /* Do nothing */
             }
         };
+    }
+
+    /**
+     * Get the alignment synchronizer's instance
+     *
+     * @return The singleton instance
+     */
+    public static synchronized TmfAlignmentSynchronizer getInstance() {
+        if (fInstance == null) {
+            fInstance = new TmfAlignmentSynchronizer();
+        }
+        return fInstance;
+    }
+
+    /**
+     * Disposes the alignment synchronizer
+     */
+    public void dispose() {
+        TmfSignalManager.deregister(this);
+        fTimer.cancel();
+        fCurrentTask.cancel();
     }
 
     private IPreferenceChangeListener createPreferenceListener() {

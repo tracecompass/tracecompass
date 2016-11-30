@@ -106,6 +106,17 @@ public final class TmfTraceManager {
         return mgr;
     }
 
+    /**
+     * Disposes the trace manager
+     *
+     * @since 2.2
+     */
+    public void dispose() {
+        TmfSignalManager.deregister(this);
+        fTraces.clear();
+        fCurrentTrace = null;
+    }
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------

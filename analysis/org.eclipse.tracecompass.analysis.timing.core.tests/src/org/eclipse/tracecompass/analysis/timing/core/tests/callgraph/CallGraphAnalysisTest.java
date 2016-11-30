@@ -132,6 +132,7 @@ public class CallGraphAnalysisTest {
         assertEquals("Depth:First parent", 0, f1.getDepth());
         assertEquals("Depth:Second parent", 1, f2.getDepth());
         assertEquals("Depth:Last child", 2, f3.getDepth());
+        cga.dispose();
     }
 
     /**
@@ -193,6 +194,7 @@ public class CallGraphAnalysisTest {
         assertEquals("Function's self time", 10, f1.getSelfTime());
         assertEquals("Compare the function's self time and total time", f1.getLength(), f1.getSelfTime());
         assertEquals("Function's depth", 0, f1.getDepth());
+        cga.dispose();
     }
 
     /**
@@ -247,7 +249,7 @@ public class CallGraphAnalysisTest {
 
         assertEquals("Test of parenthood", NonNullUtils.checkNotNull(firstChild.getParent()).getSymbol(), threads.get(0).getSymbol());
         assertEquals("Test of parenthood", NonNullUtils.checkNotNull(secondChild.getParent()).getSymbol(), threads.get(1).getSymbol());
-
+        cga.dispose();
     }
 
     /**
@@ -287,6 +289,7 @@ public class CallGraphAnalysisTest {
         for (int i = 1; i < LARGE_AMOUNT_OF_SEGMENTS; i++) {
             assertEquals("Test parenthood", ((ICalledFunction) segments[i - 1]).getSymbol(), NonNullUtils.checkNotNull(((ICalledFunction) segments[i]).getParent()).getSymbol());
         }
+        cga.dispose();
     }
 
     /**
@@ -302,6 +305,7 @@ public class CallGraphAnalysisTest {
         assertNotNull(segmentStore);
         Object[] segments = segmentStore.toArray();
         assertEquals("Number of root functions", 0, segments.length);
+        cga.dispose();
     }
 
     /**
@@ -394,6 +398,6 @@ public class CallGraphAnalysisTest {
 
         // Test if the first child and the third one have the same address
         assertEquals("Test the address of two functions", firstChild.getSymbol(), thirdChild.getSymbol());
-
+        cga.dispose();
     }
 }

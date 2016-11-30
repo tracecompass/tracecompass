@@ -69,6 +69,8 @@ public class XmlStubTraceTest {
         for (File f : validFiles) {
             assertTrue(trace.validate(null, f.getAbsolutePath()).isOK());
         }
+
+        trace.dispose();
     }
 
     /**
@@ -90,6 +92,8 @@ public class XmlStubTraceTest {
             fail(e.getMessage());
         }
         assertEquals(4, req.getCount());
+
+        trace.dispose();
     }
 
     /**
@@ -134,6 +138,9 @@ public class XmlStubTraceTest {
         assertNotNull(event);
         assertEquals("Cpu aspect of event 4", 1, cpuAspect.resolve(event));
         assertEquals("Test aspect of event 4", "def", testAspect.resolve(event));
+
+        ctx.dispose();
+        trace.dispose();
     }
 
     private static IStatus testEvent(ITmfEvent event) {

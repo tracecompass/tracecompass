@@ -66,6 +66,8 @@ public abstract class XmlModuleTestBase {
         assertEquals(getAnalysisId(), fModule.getId());
 
         assertEquals(getAnalysisName(), fModule.getName());
+
+        fModule.dispose();
     }
 
     private void createModule(@NonNull Element element) {
@@ -171,6 +173,7 @@ public abstract class XmlModuleTestBase {
         } finally {
             trace.dispose();
         }
-
+        fModule.dispose();
+        CtfTmfTestTraceUtils.dispose(getTrace());
     }
 }

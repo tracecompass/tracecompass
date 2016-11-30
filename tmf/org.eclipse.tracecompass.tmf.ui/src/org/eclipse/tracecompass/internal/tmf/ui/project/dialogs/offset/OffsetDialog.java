@@ -252,7 +252,7 @@ public class OffsetDialog extends Dialog {
         composite.addDisposeListener(new DisposeListener() {
             @Override
             public void widgetDisposed(DisposeEvent e) {
-                TmfSignalManager.deregister(this);
+                TmfSignalManager.deregister(OffsetDialog.this);
             }
         });
         return area;

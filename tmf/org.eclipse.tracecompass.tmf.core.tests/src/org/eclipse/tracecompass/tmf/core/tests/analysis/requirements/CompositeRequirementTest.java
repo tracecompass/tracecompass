@@ -18,14 +18,14 @@ import java.util.Collections;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement.PriorityLevel;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfCompositeAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableSet;
-
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfCompositeAnalysisRequirement;
 
 /**
  * Test the {@link TmfCompositeAnalysisRequirement} class
@@ -70,6 +70,16 @@ public class CompositeRequirementTest {
     @Before
     public void setupTrace() {
         fTrace = new TmfTraceStub();
+    }
+
+    /**
+     * Clean up
+     */
+    @After
+    public void cleanup() {
+        if (fTrace != null) {
+            fTrace.dispose();
+        }
     }
 
     /**

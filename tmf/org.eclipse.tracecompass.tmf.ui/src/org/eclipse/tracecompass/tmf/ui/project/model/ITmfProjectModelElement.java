@@ -112,4 +112,14 @@ public interface ITmfProjectModelElement {
     default boolean hasChildren() {
         return !getChildren().isEmpty();
     }
+
+    /**
+     * Recursively dispose of the element and its children.
+     *
+     * @since 2.2
+     */
+    default void dispose() {
+        getChildren().forEach(element -> element.dispose());
+        /* override to perform any necessary cleanup */
+    }
 }

@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.ITimeGraphEntryComparator;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -41,7 +42,7 @@ public class ControlFlowEntryComparatorTest {
 
     private static final @NonNull CtfTestTrace TEST_TRACE1 = CtfTestTrace.SYNC_DEST;
     private static final @NonNull CtfTestTrace TEST_TRACE2 = CtfTestTrace.SYNC_SRC;
-    private static final @NonNull CtfTestTrace TEST_TRACE3 = CtfTestTrace.DEBUG_INFO;
+    private static final @NonNull CtfTestTrace TEST_TRACE3 = CtfTestTrace.DEBUG_INFO4;
 
     private static ITmfTrace TRACE1;
     private static ITmfTrace TRACE2;
@@ -74,6 +75,16 @@ public class ControlFlowEntryComparatorTest {
         TRACE1 = CtfTmfTestTraceUtils.getTrace(TEST_TRACE1);
         TRACE2 = CtfTmfTestTraceUtils.getTrace(TEST_TRACE2);
         TRACE3 = CtfTmfTestTraceUtils.getTrace(TEST_TRACE3);
+    }
+
+    /**
+     * Clean up
+     */
+    @AfterClass
+    public static void afterClass() {
+        TRACE1.dispose();
+        TRACE2.dispose();
+        TRACE3.dispose();
     }
 
     /**

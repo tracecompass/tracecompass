@@ -176,6 +176,7 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
 
     @Override
     public void dispose() {
+        super.dispose();
         if (fChartViewer != null) {
             fChartViewer.dispose();
         }

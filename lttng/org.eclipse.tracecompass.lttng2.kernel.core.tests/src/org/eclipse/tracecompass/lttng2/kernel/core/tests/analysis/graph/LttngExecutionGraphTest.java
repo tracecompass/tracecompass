@@ -36,7 +36,6 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.junit.Test;
 
@@ -57,7 +56,7 @@ public class LttngExecutionGraphTest {
      * @return The trace with its graph module executed
      */
     public ITmfTrace setUpTrace(String traceFile) {
-        ITmfTrace trace = new TmfXmlKernelTraceStub();
+        TmfXmlKernelTraceStub trace = new TmfXmlKernelTraceStub();
         IPath filePath = Activator.getAbsoluteFilePath(traceFile);
         IStatus status = trace.validate(null, filePath.toOSString());
         if (!status.isOK()) {
@@ -68,7 +67,7 @@ public class LttngExecutionGraphTest {
         } catch (TmfTraceException e) {
             fail(e.getMessage());
         }
-        ((TmfTrace) trace).traceOpened(new TmfTraceOpenedSignal(this, trace, null));
+        trace.traceOpened(new TmfTraceOpenedSignal(this, trace, null));
         IAnalysisModule module = null;
         for (IAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, TmfGraphBuilderModule.class)) {
             module = mod;
@@ -200,5 +199,6 @@ public class LttngExecutionGraphTest {
                 break;
             }
         }
+        trace.dispose();
     }
 }

@@ -101,8 +101,14 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
     }
 
     // ------------------------------------------------------------------------
-    // TmfProjectModelElement
+    // ITmfProjectModelElement
     // ------------------------------------------------------------------------
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        TmfSignalManager.deregister(this);
+    }
 
     /**
      * @since 2.0

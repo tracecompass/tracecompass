@@ -226,6 +226,7 @@ public class TmfTraceTest {
             fail("TmfTrace.initialize() - no exception thrown");
         } catch (TmfTraceException e) {
             // Success
+            trace.dispose();
         } catch (Exception e) {
             fail("TmfTrace.initialize() - wrong exception thrown");
         }

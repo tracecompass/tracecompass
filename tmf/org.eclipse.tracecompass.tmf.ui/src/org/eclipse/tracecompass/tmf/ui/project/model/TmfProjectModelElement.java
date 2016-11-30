@@ -218,12 +218,15 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
 
     /**
      * Remove an element from the current child elements.
+     * <p>
+     * Disposes the removed element. It should no longer be used.
      *
      * @param child
      *            The child to remove
      */
     protected void removeChild(ITmfProjectModelElement child) {
         fChildren.remove(child);
+        child.dispose();
     }
 
     /**

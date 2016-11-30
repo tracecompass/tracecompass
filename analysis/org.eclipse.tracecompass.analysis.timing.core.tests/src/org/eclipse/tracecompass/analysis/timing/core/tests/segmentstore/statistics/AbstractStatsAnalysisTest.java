@@ -22,6 +22,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub;
 import org.junit.Test;
 
@@ -44,6 +45,7 @@ public class AbstractStatsAnalysisTest {
     public void testExecuteNoTrace() throws TmfAnalysisException {
         StubSegmentStatisticsAnalysis fixture = new StubSegmentStatisticsAnalysis();
         assertFalse(fixture.executeAnalysis(new NullProgressMonitor()));
+        fixture.dispose();
     }
 
     /**
@@ -55,8 +57,11 @@ public class AbstractStatsAnalysisTest {
     @Test
     public void testExecuteNoDepend() throws TmfAnalysisException {
         StubSegmentStatisticsAnalysis fixture = new StubSegmentStatisticsAnalysis();
-        fixture.setTrace(new TmfXmlTraceStub());
+        TmfXmlTraceStub trace = new TmfXmlTraceStub();
+        fixture.setTrace(trace);
         assertFalse(fixture.executeAnalysis(new NullProgressMonitor()));
+        trace.dispose();
+        fixture.dispose();
     }
 
     /**
@@ -72,6 +77,8 @@ public class AbstractStatsAnalysisTest {
         fixture.setTrace(trace);
         fixture.getDependentAnalyses();
         assertTrue(fixture.executeAnalysis(new NullProgressMonitor()));
+        trace.dispose();
+        fixture.dispose();
     }
 
     /**
@@ -83,11 +90,14 @@ public class AbstractStatsAnalysisTest {
      */
     @Test
     public void testTotalStats() throws TmfAnalysisException {
-        StubSegmentStatisticsAnalysis fixture = getValidSegmentStats();
+        TmfXmlTraceStub trace = new TmfXmlTraceStub();
+        StubSegmentStatisticsAnalysis fixture = getValidSegmentStats(trace);
         SegmentStoreStatistics totalStats = fixture.getTotalStats();
         assertNotNull(totalStats);
         // no need to test the content much as it is tested in the other test.
         assertEquals(StubSegmentStatisticsAnalysis.SIZE, totalStats.getNbSegments());
+        trace.dispose();
+        fixture.dispose();
     }
 
     /**
@@ -99,7 +109,8 @@ public class AbstractStatsAnalysisTest {
      */
     @Test
     public void testPerTypeStats() throws TmfAnalysisException {
-        StubSegmentStatisticsAnalysis fixture = getValidSegmentStats();
+        TmfXmlTraceStub trace = new TmfXmlTraceStub();
+        StubSegmentStatisticsAnalysis fixture = getValidSegmentStats(trace);
         Map<@NonNull String, @NonNull SegmentStoreStatistics> perTypeStats = fixture.getPerSegmentTypeStats();
         assertNotNull(perTypeStats);
         // no need to test the content much as it is tested in the other test.
@@ -109,6 +120,8 @@ public class AbstractStatsAnalysisTest {
         assertNotNull(segmentStoreStatistics);
         // starts with 0  so size + 1
         assertEquals(StubSegmentStatisticsAnalysis.SIZE / 2 + 1, segmentStoreStatistics.getNbSegments());
+        trace.dispose();
+        fixture.dispose();
     }
 
     /**
@@ -120,7 +133,8 @@ public class AbstractStatsAnalysisTest {
      */
     @Test
     public void testPartialStats() throws TmfAnalysisException {
-        StubSegmentStatisticsAnalysis fixture = getValidSegmentStats();
+        TmfXmlTraceStub trace = new TmfXmlTraceStub();
+        StubSegmentStatisticsAnalysis fixture = getValidSegmentStats(trace);
         SegmentStoreStatistics totalStats = fixture.getTotalStatsForRange(100, 1100, new NullProgressMonitor());
         assertNotNull(totalStats);
         // no need to test the content much as it is tested in the other test.
@@ -128,6 +142,8 @@ public class AbstractStatsAnalysisTest {
         // 1051 = 1001 where start is between start and end + 50 overlapping
         // start
         assertEquals(1051, totalStats.getNbSegments());
+        trace.dispose();
+        fixture.dispose();
     }
 
     /**
@@ -139,7 +155,8 @@ public class AbstractStatsAnalysisTest {
      */
     @Test
     public void testPartialPerTypeStats() throws TmfAnalysisException {
-        StubSegmentStatisticsAnalysis fixture = getValidSegmentStats();
+        TmfXmlTraceStub trace = new TmfXmlTraceStub();
+        StubSegmentStatisticsAnalysis fixture = getValidSegmentStats(trace);
         Map<@NonNull String, @NonNull SegmentStoreStatistics> perTypeStats = fixture.getPerSegmentTypeStatsForRange(100, 1100, new NullProgressMonitor());
         assertNotNull(perTypeStats);
         // no need to test the content much as it is tested in the other test.
@@ -149,6 +166,8 @@ public class AbstractStatsAnalysisTest {
         assertNotNull(segmentStoreStatistics);
         // 526 = 1051/2+1 = see explanation of 1051 in #testPartialStats
         assertEquals(526, segmentStoreStatistics.getNbSegments());
+        trace.dispose();
+        fixture.dispose();
     }
 
     /**
@@ -159,16 +178,18 @@ public class AbstractStatsAnalysisTest {
      */
     @Test
     public void testPartialPerTypeStatsCancel() throws TmfAnalysisException {
-        StubSegmentStatisticsAnalysis fixture = getValidSegmentStats();
+        TmfXmlTraceStub trace = new TmfXmlTraceStub();
+        StubSegmentStatisticsAnalysis fixture = getValidSegmentStats(trace);
         NullProgressMonitor monitor = new NullProgressMonitor();
         monitor.setCanceled(true);
         Map<@NonNull String, @NonNull SegmentStoreStatistics> perTypeStats = fixture.getPerSegmentTypeStatsForRange(100, 1100, monitor);
         assertEquals(Collections.emptyMap(), perTypeStats);
+        trace.dispose();
+        fixture.dispose();
     }
 
-    private static StubSegmentStatisticsAnalysis getValidSegmentStats() throws TmfAnalysisException {
+    private static StubSegmentStatisticsAnalysis getValidSegmentStats(@NonNull ITmfTrace trace) throws TmfAnalysisException {
         StubSegmentStatisticsAnalysis fixture = new StubSegmentStatisticsAnalysis();
-        TmfXmlTraceStub trace = new TmfXmlTraceStub();
         fixture.setTrace(trace);
         fixture.getDependentAnalyses();
         fixture.executeAnalysis(new NullProgressMonitor());

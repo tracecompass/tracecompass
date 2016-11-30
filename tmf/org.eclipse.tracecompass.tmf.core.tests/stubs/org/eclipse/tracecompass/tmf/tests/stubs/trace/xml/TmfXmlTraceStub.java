@@ -129,6 +129,7 @@ public class TmfXmlTraceStub extends TmfTrace {
         try {
             trace.initTrace(null, absolutePath.toOSString(), TmfEvent.class);
         } catch (TmfTraceException e) {
+            trace.dispose();
             fail(e.getMessage());
         }
         return trace;
@@ -139,7 +140,7 @@ public class TmfXmlTraceStub extends TmfTrace {
      * definition.
      */
     public TmfXmlTraceStub() {
-
+        boolean nonNullTraceIsNonNull = false;
         /* Load custom XML definition */
         try (InputStream in = TmfXmlTraceStub.class.getResourceAsStream(DEVELOPMENT_TRACE_PARSER_PATH);) {
             CustomXmlTraceDefinition[] definitions = CustomXmlTraceDefinition.loadAll(in);
@@ -154,9 +155,14 @@ public class TmfXmlTraceStub extends TmfTrace {
                     return new TmfCheckpointIndexer(this, interval);
                 }
             };
+            TmfSignalManager.deregister(fTrace);
+            nonNullTraceIsNonNull = true;
             /* The second definition parses 'event' trace events */
             fDefinition = checkNotNull(definitions[1]);
         } catch (IOException e) {
+            if (nonNullTraceIsNonNull) {
+                fTrace.dispose();
+            }
             throw new IllegalStateException("Cannot open the trace parser for development traces"); //$NON-NLS-1$
         }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2011, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -47,15 +47,23 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 public class TmfProjectRegistry implements IResourceChangeListener {
 
     // Create the singleton instance
-    static {
-        new TmfProjectRegistry();
-    }
+    private static final TmfProjectRegistry INSTANCE = new TmfProjectRegistry();
 
     // The map of project resource to project model elements
     private static Map<IProject, TmfProjectElement> registry = new HashMap<>();
 
     private TmfProjectRegistry() {
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
+    }
+
+    /**
+     * Disposes the project registry
+     *
+     * @since 2.2
+     */
+    public static void dispose() {
+        ResourcesPlugin.getWorkspace().removeResourceChangeListener(INSTANCE);
+        registry.values().forEach(projectElement -> projectElement.dispose());
     }
 
     /**
@@ -188,7 +196,10 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                             TmfProjectElement projectElement = getProject(project, true);
                             projectElement.refresh();
                         } else if (delta.getKind() == IResourceDelta.REMOVED) {
-                            registry.remove(project);
+                            TmfProjectElement projectElement = registry.remove(project);
+                            if (projectElement != null) {
+                                projectElement.dispose();
+                            }
                         }
                     } catch (CoreException e) {
                         Activator.getDefault().logError("Error handling resource change event for " + project.getName(), e); //$NON-NLS-1$

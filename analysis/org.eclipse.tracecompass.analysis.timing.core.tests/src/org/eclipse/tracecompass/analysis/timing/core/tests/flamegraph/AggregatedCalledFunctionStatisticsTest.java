@@ -150,6 +150,7 @@ public class AggregatedCalledFunctionStatisticsTest {
         assertEquals("Test second function's average self time", 30, functionStatistics2.getAverageSelfTime(), ERROR);
         assertEquals("Test second function's standard deviation", Double.NaN, functionStatistics2.getStdDev(), ERROR);
         assertEquals("Test second function's self time standard deviation", Double.NaN, functionStatistics2.getStdDevSelfTime(), ERROR);
+        cga.dispose();
     }
 
     /**
@@ -248,7 +249,7 @@ public class AggregatedCalledFunctionStatisticsTest {
         assertEquals("Test second leaf's average self time", 20, leafStatistics2.getAverageSelfTime(), ERROR);
         assertEquals("Test second leaf's standard deviation", Double.NaN, leafStatistics2.getStdDev(), ERROR);
         assertEquals("Test second leaf's self time standard deviation", Double.NaN, leafStatistics2.getStdDevSelfTime(), ERROR);
-
+        cga.dispose();
     }
 
     /**
@@ -330,6 +331,7 @@ public class AggregatedCalledFunctionStatisticsTest {
         assertEquals("Test third function's average self time", 10, functionStatistics3.getAverageSelfTime(), ERROR);
         assertEquals("Test third function's standard deviation", Double.NaN, functionStatistics3.getStdDev(), ERROR);
         assertEquals("Test third function's self time standard deviation", Double.NaN, functionStatistics3.getStdDevSelfTime(), ERROR);
+        cga.dispose();
     }
 
     /**
@@ -470,6 +472,7 @@ public class AggregatedCalledFunctionStatisticsTest {
         assertEquals("Test fourth function's average duration", 15, fourthFunctionStatistics4.getAverageSelfTime(), ERROR);
         assertEquals("Test fourth function's standard deviation", Double.NaN, fourthFunctionStatistics4.getStdDev(), ERROR);
         assertEquals("Test fourth function's self time deviation", Double.NaN, fourthFunctionStatistics4.getStdDevSelfTime(), ERROR);
+        cga.dispose();
     }
 
 }

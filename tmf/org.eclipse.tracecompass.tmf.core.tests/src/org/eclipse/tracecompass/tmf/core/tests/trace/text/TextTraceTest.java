@@ -130,6 +130,8 @@ public class TextTraceTest {
 
         ITmfTimestamp initRange = TmfTimestamp.fromSeconds(60);
         assertEquals("getInitialRangeOffset", initRange, trace.getInitialRangeOffset());
+
+        trace.dispose();
     }
 
     @Test
@@ -154,6 +156,8 @@ public class TextTraceTest {
         String invalidTrace = fTestFile.getParentFile().getAbsolutePath();
         status = trace.validate(null, invalidTrace);
         assertFalse(status.isOK());
+
+        trace.dispose();
     }
 
     @Test
@@ -167,6 +171,7 @@ public class TextTraceTest {
         assertEquals("getPath",      fTestFile.toURI().getPath(), trace.getPath());
         assertEquals("getName",      NAME, trace.getName());
         assertEquals("getCacheSize", 100, trace.getCacheSize());
+        trace.dispose();
     }
 
     // ------------------------------------------------------------------------

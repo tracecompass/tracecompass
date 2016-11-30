@@ -89,6 +89,15 @@ public abstract class XmlProviderTestBase {
     }
 
     /**
+     * Clean up
+     */
+    @After
+    public void cleanup() {
+        fModule.dispose();
+        CtfTmfTestTraceUtils.dispose(getTrace());
+    }
+
+    /**
      * The node name of the analysis in the file
      *
      * @return The name

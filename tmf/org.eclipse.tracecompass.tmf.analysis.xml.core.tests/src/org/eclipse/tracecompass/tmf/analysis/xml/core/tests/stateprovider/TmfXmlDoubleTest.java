@@ -61,5 +61,7 @@ public class TmfXmlDoubleTest {
         assertEquals(2.71828, val.get(0).getStateValue().unboxDouble(), Double.MIN_VALUE);
         val = ss.queryFullState(6);
         assertEquals(1.41421, val.get(0).getStateValue().unboxDouble(), Double.MIN_VALUE);
+        trace.dispose();
+        module.dispose();
     }
 }

@@ -40,6 +40,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.event.TmfSyncEventStub;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -68,6 +69,19 @@ public class SyncTest {
         traces.add(t1);
         traces.add(t2);
         fTraces = traces;
+    }
+
+    /**
+     * Clean up
+     */
+    @After
+    public void cleanup() {
+        if (t1 != null) {
+            t1.dispose();
+        }
+        if (t2 != null) {
+            t2.dispose();
+        }
     }
 
     /**

@@ -141,6 +141,7 @@ public final class LttngRelaydConnectionManager {
      * Dispose of all the manager's resources (i.e. its connections).
      */
     public void dispose() {
+        TmfSignalManager.deregister(fConnectionManager);
         for (LttngRelaydConsumer consumer : fConnections.values()) {
             consumer.dispose();
         }

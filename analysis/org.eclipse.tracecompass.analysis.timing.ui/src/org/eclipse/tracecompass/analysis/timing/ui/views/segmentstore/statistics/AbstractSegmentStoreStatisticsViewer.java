@@ -35,6 +35,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
@@ -99,7 +100,13 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
             }
         });
         Menu tablePopup = fTablePopupMenuManager.createContextMenu(getTreeViewer().getTree());
-        getTreeViewer().getTree().setMenu(tablePopup);
+        Tree tree = getTreeViewer().getTree();
+        tree.setMenu(tablePopup);
+        tree.addDisposeListener(e -> {
+            if (fModule != null) {
+                fModule.dispose();
+            }
+        });
     }
 
     /** Provides label for the Segment Store tree viewer cells */
@@ -301,6 +308,9 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
             try {
                 module.setTrace(trace);
                 module.schedule();
+                if (fModule != null) {
+                    fModule.dispose();
+                }
                 fModule = module;
             } catch (TmfAnalysisException e) {
                 Activator.getDefault().logError("Error initializing statistics analysis module", e); //$NON-NLS-1$

@@ -41,7 +41,7 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
-import org.junit.BeforeClass;
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -67,11 +67,11 @@ public class SystemCallLatencyTableAnalysisTest extends SegmentTableTest {
     }
 
     /**
-     * Things to setup
+     * Clean up
      */
-    @BeforeClass
-    public static void beforeClass() {
-        SegmentTableTest.beforeClass();
+    @AfterClass
+    public static void afterClass() {
+        fSystemCallLatencyAnalysis.dispose();
     }
 
     @Override

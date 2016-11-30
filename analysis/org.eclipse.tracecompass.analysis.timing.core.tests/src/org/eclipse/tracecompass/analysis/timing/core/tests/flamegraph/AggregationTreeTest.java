@@ -121,6 +121,7 @@ public class AggregationTreeTest {
         List<ThreadNode> threads = cga.getThreadNodes();
         assertNotNull(threads);
         assertEquals("Number of threads found", 0, threads.size());
+        cga.dispose();
     }
 
     /**
@@ -192,6 +193,7 @@ public class AggregationTreeTest {
         assertEquals("Test first function's nombre of calls", 1, firstFunction.getNbCalls());
         assertEquals("Test second function's nombre of calls", 1, secondFunction.getNbCalls());
         assertEquals("Test third function's nombre of calls", 1, thirdFunction.getNbCalls());
+        cga.dispose();
     }
 
     /**
@@ -267,6 +269,7 @@ public class AggregationTreeTest {
         assertEquals("Test first function's number of calls", 1, firstFunction.getNbCalls());
         assertEquals("Test second function's number of calls", 2, secondFunction.getNbCalls());
         assertEquals("Test third function's number of calls", 1, thirdFunction.getNbCalls());
+        cga.dispose();
     }
 
     /**
@@ -356,6 +359,7 @@ public class AggregationTreeTest {
         assertEquals("Test second function's number of calls", 2, secondFunction.getNbCalls());
         assertEquals("Test first leaf's number of calls", 1, leaf1.getNbCalls());
         assertEquals("Test second leaf's number of calls", 1, leaf2.getNbCalls());
+        cga.dispose();
     }
 
     /**
@@ -477,6 +481,7 @@ public class AggregationTreeTest {
         assertEquals("Test first child's number of calls", 2, function2.getNbCalls());
         assertEquals("Test second child's number of calls", 1, function3.getNbCalls());
         assertEquals("Test leaf's number of calls", 2, function4.getNbCalls());
+        cga.dispose();
     }
 
     /**
@@ -519,6 +524,7 @@ public class AggregationTreeTest {
             assertEquals("Test parenthood", NonNullUtils.checkNotNull(child.getParent()).getSymbol(), NonNullUtils.checkNotNull(parent.getSymbol()));
             parent = child;
         }
+        cga.dispose();
     }
 
     /**
@@ -593,7 +599,7 @@ public class AggregationTreeTest {
         assertEquals("Test first function's number of calls", 2, firstFunction.getNbCalls());
         assertEquals("Test second function's number of calls", 1, function2.getNbCalls());
         assertEquals("Test third function's number of calls", 1, function3.getNbCalls());
-
+        cga.dispose();
     }
 
     /**
@@ -677,7 +683,7 @@ public class AggregationTreeTest {
         assertEquals("Test first function's number of calls", 1, secondFunction.getNbCalls());
         assertEquals("Test third function's number of calls", 1, function3.getNbCalls());
         assertEquals("Test third function's number of calls", 1, function4.getNbCalls());
-
+        cga.dispose();
     }
 
     /**

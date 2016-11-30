@@ -86,6 +86,7 @@ public class OpenTraceStressTest {
         SWTBotUtils.createProject(TRACE_PROJECT_NAME);
 
         File fTestFile = new File(CtfTmfTestTraceUtils.getTrace(CTF_TRACE).getPath());
+        CtfTmfTestTraceUtils.dispose(CTF_TRACE);
 
         String path = fTestFile.getAbsolutePath();
 

@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.analysis.graph.core.tests.Activator;
 import org.eclipse.tracecompass.analysis.graph.core.tests.stubs.TestGraphWorker;
 import org.eclipse.tracecompass.analysis.graph.core.tests.stubs.module.GraphBuilderModuleStub;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub;
@@ -50,9 +49,8 @@ public class TmfGraphBuilderModuleTest {
      *
      * @return
      */
-    private TmfGraphBuilderModule getModule() {
-        ITmfTrace trace = TmfXmlTraceStub.setupTrace(Activator.getAbsoluteFilePath(STUB_TRACE_FILE));
-        ((TmfTrace) trace).traceOpened(new TmfTraceOpenedSignal(this, trace, null));
+    private TmfGraphBuilderModule getModule(TmfTrace trace) {
+        trace.traceOpened(new TmfTraceOpenedSignal(this, trace, null));
         GraphBuilderModuleStub module = null;
         for (GraphBuilderModuleStub mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, GraphBuilderModuleStub.class)) {
             module = mod;
@@ -67,8 +65,9 @@ public class TmfGraphBuilderModuleTest {
      */
     @Test
     public void testBuildGraph() {
+        TmfXmlTraceStub trace = TmfXmlTraceStub.setupTrace(Activator.getAbsoluteFilePath(STUB_TRACE_FILE));
 
-        TmfGraphBuilderModule module = getModule();
+        TmfGraphBuilderModule module = getModule(trace);
         module.schedule();
         module.waitForCompletion();
 
@@ -115,6 +114,7 @@ public class TmfGraphBuilderModuleTest {
             assertEquals(hasEdges2[i][3], v.getEdge(EdgeDirection.OUTGOING_VERTICAL_EDGE) != null);
         }
 
+        trace.dispose();
     }
 
 }
