@@ -47,6 +47,7 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.L
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.format.LamiDecimalUnitFormat;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.format.LamiTimeStampFormat;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.signals.LamiSelectionUpdateSignal;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportViewTabPage;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.ui.ISharedImages;
@@ -165,8 +166,8 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
         refreshDisplayLabels();
     };
 
-    private final LamiResultTable fResultTable;
     private final LamiChartModel fChartModel;
+    private final LamiReportViewTabPage fPage;
 
     private final Chart fChart;
 
@@ -188,17 +189,16 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
      *
      * @param parent
      *            The parent composite to draw in.
-     * @param resultTable
-     *            The result table containing the data from which to build the
-     *            chart
+     * @param page
+     *            The {@link LamiReportViewTabPage} parent page
      * @param chartModel
      *            The information about the chart to build
      */
-    public LamiXYChartViewer(Composite parent, LamiResultTable resultTable, LamiChartModel chartModel) {
+    public LamiXYChartViewer(Composite parent, LamiReportViewTabPage page, LamiChartModel chartModel) {
         super(parent);
 
         fParent = parent;
-        fResultTable = resultTable;
+        fPage = page;
         fChartModel = chartModel;
         fSelection = new HashSet<>();
 
@@ -209,7 +209,7 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
         fChart.addListener(SWT.Resize, fResizeListener);
 
         /* Set Chart title */
-        fChartTitle = fResultTable.getTableClass().getTableTitle();
+        fChartTitle = fPage.getResultTable().getTableClass().getTableTitle();
 
         /* Set X axis title */
         if (fChartModel.getXSeriesColumns().size() == 1) {
@@ -536,7 +536,16 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
      * @return The chart result table.
      */
     protected LamiResultTable getResultTable() {
-        return fResultTable;
+        return fPage.getResultTable();
+    }
+
+    /**
+     * Get the chart {@code LamiReportViewTabPage} parent.
+     *
+     * @return The {@code LamiReportViewTabPage} parent.
+     */
+    protected LamiReportViewTabPage getPage() {
+        return fPage;
     }
 
     /**
@@ -752,7 +761,7 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
      */
     @TmfSignalHandler
     public void updateSelection(LamiSelectionUpdateSignal signal) {
-        if (getResultTable().hashCode() != signal.getSignalHash() || equals(signal.getSource())) {
+        if (getPage() != signal.getSignalKey() || equals(signal.getSource())) {
             /* The signal is not for us */
             return;
         }
