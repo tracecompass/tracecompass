@@ -35,6 +35,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
  * Provide utility methods for the state system
  *
  * @author Geneviève Bastien
+ * @author Loïc Prieur-Drevon
  */
 @NonNullByDefault
 public final class StateSystemUtils {
@@ -282,71 +283,114 @@ public final class StateSystemUtils {
     }
 
     /**
-     * Iterator over the intervals of a given attribute. Not thread-safe.
+     * Iterator class to allow 2-way iteration over intervals of a given
+     * attribute. Not thread-safe!
      *
-     * @param ss
-     *            The state system on which to query intervals
-     *
-     * @param quark
-     *            The key to the attribute to iterate over
-     * @param start
-     *            The begin of the range of intervals to iterate over, if start
-     *            is before the state system's start time, the iteration will
-     *            begin at the state system's start time.
-     * @param end
-     *            The end of the range of intervals to iterate over, it can be
-     *            greater than the current state system's end time, iteration
-     *            will end at the smallest of the two.
-     * @return an Iterator over the intervals of a given attribute, with
-     *         intervals ordered
-     * @throws TimeRangeException
-     *             If end < start.
      * @since 2.1
      */
-    public static Iterator<ITmfStateInterval> getIteratorOverQuark(ITmfStateSystem ss, int quark, long start, long end) {
-        if (end < start) {
-            throw new TimeRangeException("iterateOverQuark: end < start !"); //$NON-NLS-1$
+    public static class QuarkIterator implements Iterator<ITmfStateInterval> {
+
+        private final ITmfStateSystem fSS;
+        private final int fQuark;
+        private final long fInitialTime;
+
+        private @Nullable ITmfStateInterval fCurrent;
+
+        /**
+         * Constructor
+         *
+         * @param ss
+         *            The state system on which to query intervals
+         * @param quark
+         *            The key to the attribute to iterate over
+         * @param initialTime
+         *            The timestamp that the first returned interval will
+         *            intersect. This timestamp can be smaller than the
+         *            StateSystem's start time, in which case, iteration will
+         *            start at the StateSystem's start, on bigger than the
+         *            StateSystem's current end time, in which case iteration
+         *            will start at the StateSystem's current end time.
+         * @throws TimeRangeException
+         *             If end < start.
+         * @since 2.1
+         */
+        public QuarkIterator(ITmfStateSystem ss, int quark, long initialTime) {
+            fSS = ss;
+            fQuark = quark;
+            fInitialTime = initialTime;
         }
 
-        return new Iterator<ITmfStateInterval>() {
-            private @Nullable ITmfStateInterval fCurrent;
+        private long getNextQueryTime() {
+            if (fCurrent != null) {
+                return (fCurrent.getEndTime() + 1);
+            }
+            /* Iteration has not started yet */
+            return Long.max(fInitialTime, fSS.getStartTime());
+        }
 
-            private long getNextQueryTime() {
-                if (fCurrent != null) {
-                    return fCurrent.getEndTime() + 1;
+        private long getPreviousQueryTime() {
+            if (fCurrent != null) {
+                return fCurrent.getStartTime() - 1;
+            }
+            /* Iteration has not started yet */
+            return Long.min(fInitialTime, fSS.getCurrentEndTime());
+        }
+
+        @Override
+        public boolean hasNext() {
+            /*
+             * Ensure that the next query time falls within state system and
+             * query time range. By definition getNextQueryTime() is larger than
+             * the state system's start time.
+             */
+            return (getNextQueryTime() <= fSS.getCurrentEndTime());
+        }
+
+        @Override
+        public ITmfStateInterval next() {
+            if (hasNext()) {
+                try {
+                    fCurrent = fSS.querySingleState(getNextQueryTime(), fQuark);
+                    return fCurrent;
+                } catch (StateSystemDisposedException e) {
+                    /* GOTO throw NoSuchElementException. */
                 }
-                /* Iteration has not started yet */
-                return Long.max(start, ss.getStartTime());
             }
+            throw new NoSuchElementException();
+        }
 
-            @Override
-            public boolean hasNext() {
-                /*
-                 * Compute the query's real end time here, to update it if the
-                 * iterator is used during state system build
-                 */
-                long realEnd = Long.min(end, ss.getCurrentEndTime());
+        /**
+         * Returns true if the iteration has more previous elements. (In other
+         * words, returns true if previous() would return an element rather than
+         * throwing an exception.)
+         *
+         * @return true if the iteration has more previous elements
+         */
+        public boolean hasPrevious() {
+            /*
+             * Ensure that the next query time falls within state system and
+             * query time range. By definition getPreviousQueryTime() is smaller
+             * than the state system's end time.
+             */
+            return (getPreviousQueryTime() >= fSS.getStartTime());
+        }
 
-                /*
-                 * Ensure that the next query time falls within state system and
-                 * query time range. By definition getNextQueryTime() is larger
-                 * than the state system's start time.
-                 */
-                return getNextQueryTime() <= realEnd;
-            }
-
-            @Override
-            public ITmfStateInterval next() {
-                if (hasNext()) {
-                    try {
-                        return fCurrent = ss.querySingleState(getNextQueryTime(), quark);
-                    } catch (StateSystemDisposedException e) {
-                        /* GOTO throw NoSuchElementException. */
-                    }
+        /**
+         * Returns the previous element in the iteration.
+         *
+         * @return the previous element in the iteration
+         */
+        public ITmfStateInterval previous() {
+            if (hasPrevious()) {
+                try {
+                    fCurrent = fSS.querySingleState(getPreviousQueryTime(), fQuark);
+                    return fCurrent;
+                } catch (StateSystemDisposedException e) {
+                    /* GOTO throw NoSuchElementException. */
                 }
-                throw new NoSuchElementException();
             }
-        };
+            throw new NoSuchElementException();
+        }
     }
 
 }

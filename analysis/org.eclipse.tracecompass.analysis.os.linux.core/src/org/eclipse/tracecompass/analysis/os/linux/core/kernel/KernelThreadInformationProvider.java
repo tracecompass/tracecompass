@@ -24,6 +24,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
+import org.eclipse.tracecompass.statesystem.core.StateSystemUtils.QuarkIterator;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -148,21 +149,16 @@ public final class KernelThreadInformationProvider {
         if (ss == null) {
             return null;
         }
-        Integer execNameNode;
-        try {
-            execNameNode = ss.getQuarkAbsolute(Attributes.THREADS, threadId.toString(), Attributes.EXEC_NAME);
-            List<ITmfStateInterval> execNameIntervals = StateSystemUtils.queryHistoryRange(ss, execNameNode, ss.getStartTime(), ss.getCurrentEndTime());
-
-            ITmfStateValue execNameValue;
-            String execName = null;
-            for (ITmfStateInterval interval : execNameIntervals) {
-                execNameValue = interval.getStateValue();
-                if (execNameValue.getType().equals(Type.STRING)) {
-                    execName = execNameValue.unboxStr();
-                }
+        int execNameNode = ss.optQuarkAbsolute(Attributes.THREADS, threadId.toString(), Attributes.EXEC_NAME);
+        if (execNameNode == ITmfStateSystem.INVALID_ATTRIBUTE) {
+            return null;
+        }
+        QuarkIterator reversedIterator = new QuarkIterator(ss, execNameNode, ss.getCurrentEndTime());
+        while (reversedIterator.hasPrevious()) {
+            ITmfStateValue nameInterval = reversedIterator.previous().getStateValue();
+            if (nameInterval.getType() == Type.STRING) {
+                return nameInterval.unboxStr();
             }
-            return execName;
-        } catch (AttributeNotFoundException | StateSystemDisposedException | TimeRangeException e) {
         }
         return null;
     }
