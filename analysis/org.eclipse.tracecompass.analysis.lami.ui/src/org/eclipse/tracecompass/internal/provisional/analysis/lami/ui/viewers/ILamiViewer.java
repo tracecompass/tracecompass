@@ -13,7 +13,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiResultTable;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportViewTabPage;
 
 /**
  * Common interface for all Lami viewers.
@@ -32,13 +32,13 @@ public interface ILamiViewer {
      *
      * @param parent
      *            The parent composite
-     * @param resultTable
-     *            The result table to display
+     * @param page
+     *            The {@link LamiReportViewTabPage} parent page
      * @return The new viewer
      */
-    static ILamiViewer createLamiTable(Composite parent, LamiResultTable resultTable) {
+    static ILamiViewer createLamiTable(Composite parent, LamiReportViewTabPage page) {
         TableViewer tableViewer = new TableViewer(parent, SWT.FULL_SELECTION | SWT.MULTI | SWT.VIRTUAL);
-        return new LamiTableViewer(tableViewer, resultTable);
+        return new LamiTableViewer(tableViewer, page);
     }
 
     /**
@@ -47,18 +47,18 @@ public interface ILamiViewer {
      *
      * @param parent
      *            The parent composite
-     * @param resultTable
-     *            The result table to use as a data source
+     * @param page
+     *            The {@link LamiReportViewTabPage} parent page
      * @param chartModel
      *            The information about the chart to display
      * @return The new viewer
      */
-    static ILamiViewer createLamiChart(Composite parent, LamiResultTable resultTable, LamiChartModel chartModel) {
+    static ILamiViewer createLamiChart(Composite parent, LamiReportViewTabPage page, LamiChartModel chartModel) {
         switch (chartModel.getChartType()) {
         case BAR_CHART:
-            return new LamiBarChartViewer(parent, resultTable, chartModel);
+            return new LamiBarChartViewer(parent, page, chartModel);
         case XY_SCATTER:
-            return new LamiScatterViewer(parent, resultTable, chartModel);
+            return new LamiScatterViewer(parent, page, chartModel);
         case PIE_CHART:
         default:
             throw new UnsupportedOperationException("Unsupported chart type: " + chartModel.toString()); //$NON-NLS-1$

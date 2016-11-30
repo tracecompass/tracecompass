@@ -15,7 +15,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.analysis.lami.ui.Activator;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiResultTable;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.viewers.ILamiViewer;
 
 /**
@@ -37,16 +36,16 @@ public final class LamiViewerControl {
      *
      * @param parent
      *            The parent composite
-     * @param table
-     *            The results table populating the table viewer
+     * @param page
+     *            The {@link LamiReportViewTabPage} page parent
      */
-    public LamiViewerControl(Composite parent, LamiResultTable table) {
+    public LamiViewerControl(Composite parent, LamiReportViewTabPage page) {
         fToggleAction = new Action() {
             @Override
             public void run() {
                 ILamiViewer viewer = fViewer;
                 if (viewer == null) {
-                    fViewer = ILamiViewer.createLamiTable(parent, table);
+                    fViewer = ILamiViewer.createLamiTable(parent, page);
                 } else {
                     viewer.dispose();
                     fViewer = null;
@@ -64,18 +63,18 @@ public final class LamiViewerControl {
      *
      * @param parent
      *            The parent composite
-     * @param table
-     *            The table containing the source data
+     * @param page
+     *            The {@link LamiReportViewTabPage} parent page
      * @param graphModel
      *            The graph model
      */
-    public LamiViewerControl(Composite parent, LamiResultTable table, LamiChartModel graphModel) {
+    public LamiViewerControl(Composite parent, LamiReportViewTabPage page, LamiChartModel graphModel) {
         fToggleAction = new Action() {
             @Override
             public void run() {
                 ILamiViewer viewer = fViewer;
                 if (viewer == null) {
-                    fViewer = ILamiViewer.createLamiChart(parent, table, graphModel);
+                    fViewer = ILamiViewer.createLamiChart(parent, page, graphModel);
                 } else {
                     viewer.dispose();
                     fViewer = null;

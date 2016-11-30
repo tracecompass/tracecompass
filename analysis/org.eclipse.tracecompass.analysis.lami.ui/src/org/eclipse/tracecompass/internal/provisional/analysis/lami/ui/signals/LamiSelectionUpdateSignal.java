@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.signals;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportViewTabPage;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
 
 /**
@@ -22,12 +23,13 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
 public class LamiSelectionUpdateSignal extends TmfSignal {
 
     private final Set<Integer> fEntryIndexes;
-    /*
-     * TODO: replace this with an object to equals. A signalHash can only
-     * guaranty that objects are different, not that they are the same. Using
-     * this is looking for trouble.
+
+    /**
+     * Use the {@link LamiReportViewTabPage LamiReportViewTabPage} object as the
+     * unique key for LAMI internal signaling. The {@link LamiReportViewTabPage}
+     * object is also the synchronization point for LAMI internal signaling.
      */
-    private final int fSignalHash;
+    private final LamiReportViewTabPage fSignalKey;
 
     /**
      * Constructor for a new signal.
@@ -36,13 +38,14 @@ public class LamiSelectionUpdateSignal extends TmfSignal {
      *            The object sending this signal
      * @param entryIndexList
      *            The list of selected indices
-     * @param signalHash
-     *            The hash for exclusivity signaling
+     * @param signalKey
+     *            The {@link LamiReportViewTabPage LamiReportViewTabPage} acting
+     *            as a key for the signal.
      */
-    public LamiSelectionUpdateSignal(Object source, Set<Integer> entryIndexList, int signalHash) {
+    public LamiSelectionUpdateSignal(Object source, Set<Integer> entryIndexList, LamiReportViewTabPage signalKey) {
         super(source);
         fEntryIndexes = new HashSet<>(entryIndexList);
-        fSignalHash = signalHash;
+        fSignalKey = signalKey;
     }
 
 
@@ -63,12 +66,12 @@ public class LamiSelectionUpdateSignal extends TmfSignal {
 
 
     /**
-     * Getter for the exclusivity hash
+     * Getter for the exclusivity key
      *
      * @return
-     *          The exclusivity hash
+     *          The exclusivity key
      */
-    public int getSignalHash() {
-        return fSignalHash;
+    public LamiReportViewTabPage getSignalKey() {
+        return fSignalKey;
     }
 }

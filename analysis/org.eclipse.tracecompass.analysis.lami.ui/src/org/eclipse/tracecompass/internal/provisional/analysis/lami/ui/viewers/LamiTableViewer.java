@@ -9,8 +9,6 @@
 
 package org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.viewers;
 
-
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import java.util.HashSet;
@@ -28,10 +26,10 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiTableEntryAspect;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiResultTable;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiTableEntry;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.signals.LamiSelectionUpdateSignal;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportView;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportViewTabPage;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.table.TmfSimpleTableViewer;
@@ -47,7 +45,7 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final LamiResultTable fResultTable;
+    private final LamiReportViewTabPage fPage;
     private Set<Integer> fSelections;
 
     // ------------------------------------------------------------------------
@@ -89,13 +87,13 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
 
             Set<Integer> selectionIndexes = new HashSet<>();
             for (Object selectedEntry : selections.toArray() ) {
-                selectionIndexes.add(fResultTable.getEntries().indexOf(selectedEntry));
+                selectionIndexes.add(fPage.getResultTable().getEntries().indexOf(selectedEntry));
             }
 
             fSelections = selectionIndexes;
 
             /* Signal all Lami viewers & views of the selection */
-            LamiSelectionUpdateSignal signal = new LamiSelectionUpdateSignal(LamiTableViewer.this, selectionIndexes, checkNotNull(fResultTable).hashCode());
+            LamiSelectionUpdateSignal signal = new LamiSelectionUpdateSignal(LamiTableViewer.this, selectionIndexes, fPage);
             TmfSignalManager.dispatchSignal(signal);
         }
     }
@@ -109,17 +107,17 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
      *
      * @param tableViewer
      *            Table viewer of the view
-     * @param resultTable
-     *            Data table populating this viewer
+     * @param page
+     *            The {@link LamiReportViewTabPage} parent page
      */
-    public LamiTableViewer(TableViewer tableViewer, LamiResultTable resultTable) {
+    public LamiTableViewer(TableViewer tableViewer, LamiReportViewTabPage page) {
         super(tableViewer);
         /*
          * The table viewer should always be the first element in the control.
          */
         tableViewer.getTable().moveAbove(null);
 
-        fResultTable = resultTable;
+        fPage = page;
         fSelections = new HashSet<>();
 
         /* Default sort order of the content provider is by its first column */
@@ -135,7 +133,7 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
     // ------------------------------------------------------------------------
 
     private void createColumns() {
-        final List<LamiTableEntryAspect> aspects = fResultTable.getTableClass().getAspects();
+        final List<LamiTableEntryAspect> aspects = fPage.getResultTable().getTableClass().getAspects();
 
         Display.getDefault().asyncExec(new Runnable() {
             @Override
@@ -165,14 +163,14 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
             tableViewer.setSelection(StructuredSelection.EMPTY);
 
             /* Fill the table data */
-            tableViewer.setInput(fResultTable.getEntries());
+            tableViewer.setInput(fPage.getResultTable().getEntries());
             LamiTableContentProvider latencyContentProvider = (LamiTableContentProvider) getTableViewer().getContentProvider();
             tableViewer.setItemCount(latencyContentProvider.getNbEntries());
 
             /* Set the column's alignment and pack them */
             TableColumn[] cols = tableViewer.getTable().getColumns();
             for (int i = 0; i < cols.length; i++) {
-                LamiTableEntryAspect colAspect = fResultTable.getTableClass().getAspects().get(i);
+                LamiTableEntryAspect colAspect = fPage.getResultTable().getTableClass().getAspects().get(i);
                 int alignment = (colAspect.isContinuous() ? SWT.RIGHT : SWT.LEFT);
                 cols[i].setAlignment(alignment);
 
@@ -186,7 +184,11 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
              * we have no guarantee of time of execution of the fill data.
              */
             if (!fSelections.isEmpty()) {
-                int[] selectionsIndexes = fSelections.stream().map(index -> fResultTable.getEntries().get(index)).mapToInt(entry -> ((LamiTableContentProvider) getTableViewer().getContentProvider()).getIndexOf(entry)).toArray();
+                int[] selectionsIndexes = fSelections.stream()
+                        .map(index -> fPage.getResultTable().getEntries().get(index))
+                        .mapToInt(entry -> ((LamiTableContentProvider) getTableViewer().getContentProvider()).getIndexOf(entry))
+                        .toArray();
+
                 Display.getDefault().asyncExec(() -> {
                     getTableViewer().getTable().setSelection(selectionsIndexes);
                     getTableViewer().getTable().redraw();
@@ -214,7 +216,7 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
     @TmfSignalHandler
     public void updateSelection(LamiSelectionUpdateSignal signal) {
 
-        if (fResultTable.hashCode() != signal.getSignalHash() || equals(signal.getSource())) {
+        if (fPage != signal.getSignalKey() || equals(signal.getSource())) {
             /* The signal is not for us */
             return;
          }
@@ -224,7 +226,7 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
         Set<Integer> selections = signal.getEntryIndex();
 
         int[] selectionsIndexes = selections.stream()
-                .map(index -> fResultTable.getEntries().get(index))
+                .map(index -> fPage.getResultTable().getEntries().get(index))
                 .mapToInt(entry -> latencyContentProvider.getIndexOf(entry))
                 .toArray();
 

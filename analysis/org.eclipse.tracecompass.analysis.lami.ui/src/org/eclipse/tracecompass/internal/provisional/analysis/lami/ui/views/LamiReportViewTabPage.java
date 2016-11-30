@@ -91,14 +91,14 @@ public final class LamiReportViewTabPage extends TmfComponent {
         fControl = parent;
 
         /* Prepare the table viewer, which is always present */
-        LamiViewerControl tableViewerControl = new LamiViewerControl(fControl, fResultTable);
+        LamiViewerControl tableViewerControl = new LamiViewerControl(fControl, this);
         fTableViewerControl = tableViewerControl;
 
         /* Automatically open the table viewer initially */
         tableViewerControl.getToggleAction().run();
 
         /* Simulate a new external signal to the default viewer */
-        LamiSelectionUpdateSignal signal = new LamiSelectionUpdateSignal(LamiReportViewTabPage.this, fSelectionIndexes, checkNotNull(fResultTable).hashCode());
+        LamiSelectionUpdateSignal signal = new LamiSelectionUpdateSignal(LamiReportViewTabPage.this, fSelectionIndexes, this);
         TmfSignalManager.dispatchSignal(signal);
 
         fControl.addDisposeListener(e -> {
@@ -312,13 +312,13 @@ public final class LamiReportViewTabPage extends TmfComponent {
                 isXLogScale,
                 isYLogScale);
 
-        LamiViewerControl viewerControl = new LamiViewerControl(fControl, fResultTable, model);
+        LamiViewerControl viewerControl = new LamiViewerControl(fControl, this, model);
         fCustomGraphViewerControls.add(viewerControl);
         viewerControl.getToggleAction().run();
 
         /* Signal the current selection to the newly created graph */
         LamiSelectionUpdateSignal signal = new LamiSelectionUpdateSignal(LamiReportViewTabPage.this,
-                fSelectionIndexes, checkNotNull(fResultTable).hashCode());
+                fSelectionIndexes, this);
         TmfSignalManager.dispatchSignal(signal);
     }
 
@@ -338,12 +338,12 @@ public final class LamiReportViewTabPage extends TmfComponent {
         LamiResultTable table = fResultTable;
         Object source = signal.getSource();
 
-        if (table.hashCode() != signal.getSignalHash() ||
-                source == this ||
-                /*
-                 * Don't forward signals from other tab pages, especially those
-                 * from other views.
-                 */
+        /*
+         * Don't forward signals from other tab pages, especially those
+         * from other views/tab page.
+         */
+        if (this != signal.getSignalKey() ||
+                this == source ||
                 source instanceof LamiReportViewTabPage) {
             /* The signal is not for us */
             return;
@@ -405,7 +405,7 @@ public final class LamiReportViewTabPage extends TmfComponent {
         Set<Integer> selections = getIndexOfEntriesIntersectingTimerange(table, range);
 
         /* Update all LamiViewer */
-        LamiSelectionUpdateSignal signal1 = new LamiSelectionUpdateSignal(LamiReportViewTabPage.this, selections, table.hashCode());
+        LamiSelectionUpdateSignal signal1 = new LamiSelectionUpdateSignal(LamiReportViewTabPage.this, selections, this);
         TmfSignalManager.dispatchSignal(signal1);
     }
 

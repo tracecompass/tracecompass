@@ -38,9 +38,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiTableEntryAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel.ChartType;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiResultTable;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiTableEntry;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.signals.LamiSelectionUpdateSignal;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportViewTabPage;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.swtchart.IAxis;
 import org.swtchart.IAxisTick;
@@ -93,14 +93,13 @@ public class LamiBarChartViewer extends LamiXYChartViewer {
      *
      * @param parent
      *            The parent composite to draw in.
-     * @param resultTable
-     *            The result table containing the data from which to build the
-     *            chart
+     * @param page
+     *            The {@link LamiReportViewTabPage} parent page
      * @param chartModel
      *            The information about the chart to build
      */
-    public LamiBarChartViewer(Composite parent, LamiResultTable resultTable, LamiChartModel chartModel) {
-        super(parent, resultTable, chartModel);
+    public LamiBarChartViewer(Composite parent, LamiReportViewTabPage page, LamiChartModel chartModel) {
+        super(parent, page, chartModel);
 
         List<LamiTableEntryAspect> xAxisAspects = getXAxisAspects();
         List<LamiTableEntryAspect> yAxisAspects = getYAxisAspects();
@@ -340,7 +339,7 @@ public class LamiBarChartViewer extends LamiXYChartViewer {
             setSelection(selections);
             /* Signal all Lami viewers & views of the selection */
             LamiSelectionUpdateSignal signal = new LamiSelectionUpdateSignal(this,
-                    selections, getResultTable().hashCode());
+                    selections, getPage());
             TmfSignalManager.dispatchSignal(signal);
             redraw();
         }
