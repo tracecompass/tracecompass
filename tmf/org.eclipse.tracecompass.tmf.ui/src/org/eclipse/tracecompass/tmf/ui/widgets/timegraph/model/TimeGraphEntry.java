@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -265,13 +266,9 @@ public class TimeGraphEntry implements ITimeGraphEntry {
         if (fComparator == null) {
             addChild(fChildren.size(), child);
         } else {
-            int i;
-            for (i = 0; i < fChildren.size(); i++) {
-                ITimeGraphEntry entry = fChildren.get(i);
-                if (fComparator.compare(child, entry) < 0) {
-                    break;
-                }
-            }
+            int i = Collections.binarySearch(fChildren, child, fComparator);
+            /* Deal with negative insertion points from binarySearch */
+            i = i >= 0 ? i : -i - 1;
             addChild(i, child);
         }
     }
