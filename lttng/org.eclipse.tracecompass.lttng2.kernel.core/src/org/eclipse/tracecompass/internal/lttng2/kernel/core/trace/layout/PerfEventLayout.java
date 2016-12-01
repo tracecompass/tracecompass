@@ -143,6 +143,11 @@ public final class PerfEventLayout implements IKernelAnalysisEventLayout {
     }
 
     @Override
+    public String eventSchedProcessWaking() {
+        return "sched:sched_waking"; //$NON-NLS-1$
+    }
+
+    @Override
     public String eventHRTimerStart() {
         return "timer:hrtimer_start";  //$NON-NLS-1$
     }

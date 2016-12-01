@@ -221,6 +221,17 @@ public interface IKernelAnalysisEventLayout {
     String eventSchedProcessWakeupNew();
 
     /**
+     * Event called when waking a task; this event is guaranteed to be called
+     * from the waking context.
+     *
+     * @return The name of the event
+     * @since 2.1
+     */
+    default String eventSchedProcessWaking() {
+        return "sched_waking"; //$NON-NLS-1$
+    }
+
+    /**
      * Starting the high resolution timer
      * <p>
      * In Linux, High resolution timers are used in the following:

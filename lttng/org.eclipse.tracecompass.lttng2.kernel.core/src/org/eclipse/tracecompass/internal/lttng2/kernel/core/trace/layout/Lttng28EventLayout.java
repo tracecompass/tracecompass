@@ -33,13 +33,7 @@ public class Lttng28EventLayout extends Lttng27EventLayout {
     // New definitions in LTTng 2.8
     // ------------------------------------------------------------------------
 
-    /**
-     * Event called when waking a task; this event is guaranteed to be called
-     * from the waking context.
-     *
-     * @return The name of the event
-     * @since 2.0
-     */
+    @Override
     public String eventSchedProcessWaking() {
         return "sched_waking"; //$NON-NLS-1$
     }

@@ -414,12 +414,7 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout {
         return NOW;
     }
 
-    /**
-     * Event indicating the source of the wakeup signal.
-     *
-     * @return The name of the event
-     * @since 2.0
-     */
+    @Override
     public String eventSchedProcessWaking() {
         return SCHED_WAKING;
     }

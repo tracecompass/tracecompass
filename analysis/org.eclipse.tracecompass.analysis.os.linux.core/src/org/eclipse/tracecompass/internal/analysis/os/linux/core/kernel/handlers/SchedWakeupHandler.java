@@ -22,7 +22,11 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
- * Wakeup handler
+ * Waking/wakeup handler.
+ *
+ * "sched_waking" and "sched_wakeup" tracepoints contain the same fields, and
+ * apply the same state transitions in our model, so they can both use this
+ * handler.
  */
 public class SchedWakeupHandler extends KernelEventHandler {
 

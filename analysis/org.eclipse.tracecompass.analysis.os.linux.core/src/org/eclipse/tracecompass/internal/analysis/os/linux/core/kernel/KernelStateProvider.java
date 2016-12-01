@@ -79,7 +79,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
      * Version number of this state provider. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
-    private static final int VERSION = 21;
+    private static final int VERSION = 22;
 
     // ------------------------------------------------------------------------
     // Fields
@@ -130,10 +130,12 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
         builder.put(layout.eventSchedProcessFork(), new ProcessForkHandler(layout));
         builder.put(layout.eventSchedProcessExit(), new ProcessExitHandler(layout));
         builder.put(layout.eventSchedProcessFree(), new ProcessFreeHandler(layout));
-        for( String s : layout.getIPIIrqVectorsEntries()) {
+        builder.put(layout.eventSchedProcessWaking(), new SchedWakeupHandler(layout));
+
+        for (String s : layout.getIPIIrqVectorsEntries()) {
             builder.put(s, new IPIEntryHandler(layout));
         }
-        for( String s : layout.getIPIIrqVectorsExits()) {
+        for (String s : layout.getIPIIrqVectorsExits()) {
             builder.put(s, new IPIExitHandler(layout));
         }
 
