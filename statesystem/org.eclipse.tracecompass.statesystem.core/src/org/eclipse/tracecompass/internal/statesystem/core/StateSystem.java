@@ -57,6 +57,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class StateSystem implements ITmfStateSystemBuilder {
 
+    private static final int MAX_STACK_DEPTH = 100000;
     private static final String PARENT = ".."; //$NON-NLS-1$
     private static final String WILDCARD = "*"; //$NON-NLS-1$
 
@@ -340,9 +341,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
             }
         } else {
             if (element.equals(WILDCARD)) {
-                for (@NonNull Integer subquark : getSubAttributes(quark, false)) {
-                    getQuarks(builder, subquark, remainder);
-                }
+                getSubAttributes(quark, false).forEach(subquark -> getQuarks(builder, subquark, remainder));
             } else if (element.equals(PARENT)){
                 getQuarks(builder, getParentAttributeQuark(quark), remainder);
             } else {
@@ -399,7 +398,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
             throw new StateValueTypeException(getSSID() + " Quark:" + attributeQuark + ", Type:" + previousSV.getType() + ", Expected:" + Type.INTEGER); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
 
-        if (stackDepth >= 100000) {
+        if (stackDepth >= MAX_STACK_DEPTH) {
             /*
              * Limit stackDepth to 100000, to avoid having Attribute Trees grow
              * out of control due to buggy insertions
