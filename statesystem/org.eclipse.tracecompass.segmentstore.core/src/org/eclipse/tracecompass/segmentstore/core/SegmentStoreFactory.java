@@ -12,13 +12,18 @@
 
 package org.eclipse.tracecompass.segmentstore.core;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTIntervalReader;
+import org.eclipse.tracecompass.internal.provisional.segmentstore.core.ISegment2;
 import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.ArrayListStore;
 import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.LazyArrayListStore;
+import org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree.HistoryTreeSegmentStore;
 import org.eclipse.tracecompass.internal.segmentstore.core.treemap.TreeMapStore;
 
 /**
@@ -111,6 +116,23 @@ public final class SegmentStoreFactory<E> {
         }
         // default option is the fastest
         return new LazyArrayListStore<>(array);
+    }
+
+    /**
+     * SegmentStore factory method that creates a segment store on disk
+     *
+     * @param segmentFile
+     *            The file where to store the segments
+     * @param segmentReader
+     *            The factory to read the segments from a safe byte buffer
+     *
+     * @return an {@link ISegmentStore}
+     * @throws IOException
+     *             Exceptions when creating the segment store
+     * @since 1.2
+     */
+    public static <E extends ISegment2> ISegmentStore<E> createOnDiskSegmentStore(Path segmentFile, IHTIntervalReader<E> segmentReader) throws IOException {
+        return new HistoryTreeSegmentStore<>(segmentFile, segmentReader);
     }
 
     private static Set<@NonNull SegmentStoreType> getListOfFlags(SegmentStoreType... segmentTypes) {

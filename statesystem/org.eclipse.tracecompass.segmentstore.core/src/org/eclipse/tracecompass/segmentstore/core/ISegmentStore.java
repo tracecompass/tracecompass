@@ -51,7 +51,7 @@ public interface ISegmentStore<E extends ISegment> extends Collection<E> {
      * @since 1.1
      */
     default Iterable<E> iterator(Comparator<ISegment> order){
-        return getIntersectingElements(Long.MIN_VALUE, Long.MAX_VALUE, order);
+        return getIntersectingElements(0, Long.MAX_VALUE, order);
     }
 
     /**
