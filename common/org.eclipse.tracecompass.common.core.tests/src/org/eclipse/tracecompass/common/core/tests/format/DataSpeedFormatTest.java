@@ -27,13 +27,15 @@ public class DataSpeedFormatTest extends DataSizeFormatTest {
     /**
      * Constructor
      *
-     * @param value
-     *            The numeric value to format
-     * @param expected
-     *            The expected formatted result
+     * @param numValue
+     *            The numeric value
+     * @param stringValue
+     *            The string value
+     * @param parseValue
+     *            The parse value of the string value
      */
-    public DataSpeedFormatTest(@NonNull Number value, @NonNull String expected) {
-        super(value, expected + PER_SECOND);
+    public DataSpeedFormatTest(@NonNull Number numValue, @NonNull String stringValue, @NonNull Number parseValue) {
+        super(numValue, stringValue + PER_SECOND, parseValue);
     }
 
     @Override

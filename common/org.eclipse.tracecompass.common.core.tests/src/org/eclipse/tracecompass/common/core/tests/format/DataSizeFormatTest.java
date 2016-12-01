@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.common.core.tests.format;
 import static org.junit.Assert.assertEquals;
 
 import java.text.Format;
+import java.text.ParseException;
 import java.util.Arrays;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -32,19 +33,23 @@ public class DataSizeFormatTest {
     private static final @NonNull Format FORMAT = DataSizeWithUnitFormat.getInstance();
 
     private final @NonNull Number fNumValue;
-    private final @NonNull String fExpected;
+    private final @NonNull String fStringValue;
+    private final @NonNull Number fParseValue;
 
     /**
      * Constructor
      *
-     * @param value
-     *            The numeric value to format
-     * @param expected
-     *            The expected formatted result
+     * @param numValue
+     *            The numeric value
+     * @param stringValue
+     *            The string value
+     * @param parseValue
+     *            The parse value of the string value
      */
-    public DataSizeFormatTest(@NonNull Number value, @NonNull String expected) {
-        fNumValue = value;
-        fExpected = expected;
+    public DataSizeFormatTest(@NonNull Number numValue, @NonNull String stringValue, @NonNull Number parseValue) {
+        fNumValue = numValue;
+        fStringValue = stringValue;
+        fParseValue = parseValue;
     }
 
     /**
@@ -53,25 +58,25 @@ public class DataSizeFormatTest {
     @Parameters(name = "{index}: {0}")
     public static Iterable<Object[]> getParameters() {
         return Arrays.asList(new Object[][] {
-                { 0, "0" },
-                { 3, "3 B" },
-                { 975, "975 B" },
-                { 1024, "1 KB" },
-                { 1024 * 1024, "1 MB" },
-                { 1024 * 1024 * 1024, "1 GB" },
-                { 1024L * 1024L * 1024L * 1024L, "1 TB" },
-                { 4096, "4 KB" },
-                { -4096, "-4 KB" },
-                { 4096L, "4 KB" },
-                { 4096.0, "4 KB" },
-                { 12345678, "11.774 MB" },
-                { Integer.MAX_VALUE, "2 GB" },
-                { Integer.MIN_VALUE, "-2 GB" },
-                { Long.MAX_VALUE, "8388608 TB" },
-                { 98765432.123456, "94.19 MB" },
-                { -98765432.123456, "-94.19 MB" },
-                { 555555555555L, "517.401 GB" },
-                { 555555555555555L, "505.275 TB" }
+                { 0, "0", 0L },
+                { 3, "3 B", 3L },
+                { 975, "975 B", 975L },
+                { 1024, "1 KB", 1024L },
+                { 1024 * 1024, "1 MB", 1024 * 1024L },
+                { 1024 * 1024 * 1024, "1 GB", 1024 * 1024 * 1024L },
+                { 1024L * 1024L * 1024L * 1024L, "1 TB", 1024 * 1024 * 1024 * 1024L },
+                { 4096, "4 KB", 4096L },
+                { -4096, "-4 KB", -4096L },
+                { 4096L, "4 KB", 4096L },
+                { 4096.0, "4 KB", 4096L },
+                { 12345678, "11.774 MB", 12345933.824 },
+                { Integer.MAX_VALUE, "2 GB", 2147483648L },
+                { Integer.MIN_VALUE, "-2 GB", -2147483648L },
+                { Long.MAX_VALUE, "8388608 TB", 9.223372036854775808E18 },
+                { 98765432.123456, "94.19 MB", 98765373.44 },
+                { -98765432.123456, "-94.19 MB", -98765373.44 },
+                { 555555555555L, "517.401 GB", 555555093479.424 },
+                { 555555555555555L, "505.275 TB", 555555737724518.4 }
         });
     }
 
@@ -89,6 +94,17 @@ public class DataSizeFormatTest {
      */
     @Test
     public void testFormat() {
-        assertEquals("format value", fExpected, getFormatter().format(fNumValue));
+        assertEquals("format value", fStringValue, getFormatter().format(fNumValue));
+    }
+
+    /**
+     * Test the {@link Format#parseObject(String)} method
+     *
+     * @throws ParseException
+     *             if the string cannot be parsed
+     */
+    @Test
+    public void testParseObject() throws ParseException {
+        assertEquals("parseObject value", fParseValue, getFormatter().parseObject(fStringValue));
     }
 }
