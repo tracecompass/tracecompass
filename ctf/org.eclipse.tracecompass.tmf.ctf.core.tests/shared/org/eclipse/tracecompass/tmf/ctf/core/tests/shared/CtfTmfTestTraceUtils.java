@@ -29,11 +29,14 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  * @author Alexandre Montplaisir
  */
 @NonNullByDefault
-public final class CtfTmfTestTraceUtils {
+public class CtfTmfTestTraceUtils {
 
     private static final Map<CtfTestTrace, CtfTmfTrace> CTF_TMF_TRACES = new HashMap<>();
 
-    private CtfTmfTestTraceUtils() {}
+    /**
+     * Constructor
+     */
+    protected CtfTmfTestTraceUtils() {}
 
     /**
      * Return a CtfTmfTraceStub object of this test trace. It will be already
@@ -47,6 +50,25 @@ public final class CtfTmfTestTraceUtils {
      * @return A CtfTmfTrace reference to this trace
      */
     public static synchronized CtfTmfTrace getTrace(CtfTestTrace ctfTrace) {
+        return new CtfTmfTestTraceUtils().internalGetTrace(ctfTrace, CTF_TMF_TRACES, new CtfTmfTraceStub());
+    }
+
+    /**
+     * Return a CtfTmfTraceStub object of this test trace. It will be already
+     * initTrace()'ed.
+     *
+     * After being used by unit tests, traces should be properly disposed by
+     * calling the {@link #dispose(CtfTestTrace)} method.
+     *
+     * @param ctfTrace
+     *            The test trace to initialize
+     * @param map
+     *            the trace map
+     * @param trace
+     *            the trace stub instance
+     * @return A CtfTmfTrace reference to this trace
+     */
+    protected synchronized CtfTmfTrace internalGetTrace(CtfTestTrace ctfTrace, Map<CtfTestTrace, CtfTmfTrace> map, CtfTmfTrace trace) {
         String tracePath;
         try {
             tracePath = FileLocator.toFileURL(ctfTrace.getTraceURL()).getPath();
@@ -54,15 +76,14 @@ public final class CtfTmfTestTraceUtils {
             throw new IllegalStateException();
         }
 
-        dispose(ctfTrace);
-        CtfTmfTrace trace = new CtfTmfTraceStub();
+        internalDispose(ctfTrace, map);
         try {
             trace.initTrace(null, tracePath, CtfTmfEvent.class);
         } catch (TmfTraceException e) {
             /* Should not happen if tracesExist() passed */
             throw new RuntimeException(e);
         }
-        CTF_TMF_TRACES.put(ctfTrace, trace);
+        map.put(ctfTrace, trace);
         return trace;
     }
 
@@ -73,7 +94,19 @@ public final class CtfTmfTestTraceUtils {
      *            Trace to dispose
      */
     public static synchronized void dispose(CtfTestTrace ctfTrace) {
-        CtfTmfTrace trace = CTF_TMF_TRACES.remove(ctfTrace);
+        new CtfTmfTestTraceUtils().internalDispose(ctfTrace, CTF_TMF_TRACES);
+    }
+
+    /**
+     * Dispose of the trace
+     *
+     * @param ctfTrace
+     *            Trace to dispose
+     * @param map
+     *            the trace map
+     */
+    protected synchronized void internalDispose(CtfTestTrace ctfTrace, Map<CtfTestTrace, CtfTmfTrace> map) {
+        CtfTmfTrace trace = map.remove(ctfTrace);
         if (trace != null) {
             trace.dispose();
         }

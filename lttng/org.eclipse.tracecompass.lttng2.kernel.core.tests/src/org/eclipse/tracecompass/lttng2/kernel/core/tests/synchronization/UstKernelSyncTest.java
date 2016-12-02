@@ -11,7 +11,6 @@ package org.eclipse.tracecompass.lttng2.kernel.core.tests.synchronization;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -20,10 +19,9 @@ import java.util.function.Predicate;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelThreadInformationProvider;
-import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
+import org.eclipse.tracecompass.lttng2.lttng.kernel.core.tests.shared.LttngKernelTestTraceUtils;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
@@ -57,7 +55,6 @@ public class UstKernelSyncTest {
     private static final @NonNull CtfTestTrace UST_TRACE = CtfTestTrace.CONTEXT_SWITCHES_UST;
 
     private TmfExperiment fExperiment;
-    private ITmfTrace fKernelTrace;
     private ITmfTrace fUstTrace;
     private KernelAnalysisModule fKernelModule;
 
@@ -67,19 +64,7 @@ public class UstKernelSyncTest {
     @Before
     public void setup() {
         ITmfTrace ustTrace = CtfTmfTestTraceUtils.getTrace(UST_TRACE);
-
-        /*
-         * We need to initialize the kernel trace to the "LttngKernelTrace"
-         * type ourselves, so the kernel analysis can run on it.
-         */
-        String kernelTracePath = CtfTmfTestTraceUtils.getTrace(KERNEL_TRACE).getPath();
-        ITmfTrace kernelTrace = new LttngKernelTrace();
-
-        try {
-            kernelTrace.initTrace(null, kernelTracePath, CtfTmfEvent.class);
-        } catch (TmfTraceException e) {
-            fail(e.getMessage());
-        }
+        ITmfTrace kernelTrace = LttngKernelTestTraceUtils.getTrace(KERNEL_TRACE);
 
         TmfExperiment experiment = new TmfExperiment(CtfTmfEvent.class,
                 "test-exp",
@@ -88,10 +73,6 @@ public class UstKernelSyncTest {
                 null);
 
         /* Simulate experiment being opened */
-        // We have to "open" the sub-traces too, or their analyses are
-        // never initialized. Is that on purpose?
-        TmfSignalManager.dispatchSignal(new TmfTraceOpenedSignal(this, ustTrace, null));
-        TmfSignalManager.dispatchSignal(new TmfTraceOpenedSignal(this, kernelTrace, null));
         TmfSignalManager.dispatchSignal(new TmfTraceOpenedSignal(this, experiment, null));
         TmfSignalManager.dispatchSignal(new TmfTraceSelectedSignal(this, experiment));
 
@@ -101,7 +82,6 @@ public class UstKernelSyncTest {
         module.waitForCompletion();
 
         fExperiment = experiment;
-        fKernelTrace = kernelTrace;
         fUstTrace = ustTrace;
         fKernelModule = module;
     }
@@ -114,12 +94,8 @@ public class UstKernelSyncTest {
         if (fExperiment != null) {
             fExperiment.dispose();
         }
-        if (fKernelTrace != null) {
-            fKernelTrace.dispose();
-        }
-
-        CtfTmfTestTraceUtils.dispose(KERNEL_TRACE);
         CtfTmfTestTraceUtils.dispose(UST_TRACE);
+        LttngKernelTestTraceUtils.dispose(KERNEL_TRACE);
     }
 
     /**

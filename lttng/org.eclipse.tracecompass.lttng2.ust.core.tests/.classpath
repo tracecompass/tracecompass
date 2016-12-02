@@ -11,5 +11,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="shared"/>
+	<classpathentry kind="src" path="stubs"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
