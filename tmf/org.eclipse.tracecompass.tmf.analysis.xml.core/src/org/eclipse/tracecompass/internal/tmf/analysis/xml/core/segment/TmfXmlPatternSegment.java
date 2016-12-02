@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.segmentstore.core.IContentSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.segment.interfaces.INamedSegment;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -29,7 +30,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
  *
  * @author Jean-Christian Kouame
  */
-public class TmfXmlPatternSegment implements INamedSegment {
+public class TmfXmlPatternSegment implements INamedSegment, IContentSegment {
 
     /**
      * The serial version UID
@@ -45,8 +46,8 @@ public class TmfXmlPatternSegment implements INamedSegment {
     private final int fScale;
     private final long fStart;
     private final long fEnd;
-    private final String fSegmentName;
-    private transient Map<@NonNull String, @NonNull ITmfStateValue> fContent;
+    private final @NonNull String fSegmentName;
+    private transient @NonNull Map<@NonNull String, @NonNull ITmfStateValue> fContent;
 
     /**
      * Constructs an XML pattern segment
@@ -66,7 +67,7 @@ public class TmfXmlPatternSegment implements INamedSegment {
         fStart = start;
         fEnd = end;
         fScale = scale;
-        fSegmentName = segmentName;
+        fSegmentName = String.valueOf(segmentName);
         fContent = Collections.unmodifiableMap(fields);
     }
 
@@ -90,8 +91,10 @@ public class TmfXmlPatternSegment implements INamedSegment {
 
     /**
      * Get the content of the pattern segment
+     *
      * @return The content
      */
+    @Override
     public Map<@NonNull String, @NonNull ITmfStateValue> getContent() {
         return fContent;
     }
@@ -103,6 +106,7 @@ public class TmfXmlPatternSegment implements INamedSegment {
 
     /**
      * Get the timestamp scale of the pattern segment
+     *
      * @return The timestamp scale
      */
     public int getScale() {
@@ -112,6 +116,10 @@ public class TmfXmlPatternSegment implements INamedSegment {
     @Override
     public int compareTo(@NonNull ISegment o) {
         int ret = INamedSegment.super.compareTo(o);
+        if (ret != 0) {
+            return ret;
+        }
+        ret = IContentSegment.super.compareTo(o);
         if (ret != 0) {
             return ret;
         }
