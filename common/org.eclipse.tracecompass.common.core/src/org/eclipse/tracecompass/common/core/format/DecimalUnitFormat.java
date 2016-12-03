@@ -142,7 +142,7 @@ public class DecimalUnitFormat extends Format {
     }
 
     /**
-     * @since 2.1
+     * @since 2.2
      */
     @Override
     public Number parseObject(String source, ParsePosition pos) {
