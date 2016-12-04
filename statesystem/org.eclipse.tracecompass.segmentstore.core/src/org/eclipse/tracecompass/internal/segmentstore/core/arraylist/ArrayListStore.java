@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -222,9 +221,37 @@ public class ArrayListStore<@NonNull E extends ISegment> implements ISegmentStor
     public Iterable<E> getIntersectingElements(long start, long end) {
         fLock.readLock().lock();
         try {
-            int index = Collections.binarySearch(fStore, new BasicSegment(end, Long.MAX_VALUE));
-            index = (index >= 0) ? index : -index - 1;
-            return fStore.subList(0, index).stream().filter(element -> !(start > element.getEnd() || end < element.getStart())).collect(Collectors.toList());
+            /*
+             * Compute the index of the last Segment we will find in here,
+             * correct the negative insertion point and add 1 for array size.
+             */
+            int arraySize = Collections.binarySearch(fStore, new BasicSegment(end, Long.MAX_VALUE));
+            arraySize = (arraySize >= 0) ? arraySize + 1 : -arraySize;
+            /*
+             * Create the ArrayList as late as possible, with size = (first
+             * intersecting segment index) - (last intersecting segment index).
+             */
+            ArrayList<E> iterable = null;
+            for (E seg : fStore) {
+                if (seg.getStart() <= end && seg.getEnd() >= start) {
+                    if (iterable == null) {
+                        iterable = new ArrayList<>(arraySize);
+                    }
+                    iterable.add(seg);
+                } else if (seg.getStart() > end) {
+                    /*
+                     * Since segments are sorted by start times, there is no
+                     * point in searching segments that start too late.
+                     */
+                    break;
+                }
+                arraySize--;
+            }
+            if (iterable != null) {
+                iterable.trimToSize();
+                return iterable;
+            }
+            return Collections.EMPTY_LIST;
         } finally {
             fLock.readLock().unlock();
         }

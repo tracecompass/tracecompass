@@ -18,7 +18,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -66,6 +65,8 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
     private @Nullable transient Iterable<E> fLastSnapshot = null;
 
     private volatile boolean fDirty = false;
+    private volatile long fStart = Long.MAX_VALUE;
+    private volatile long fEnd = Long.MIN_VALUE;
 
     /**
      * Constructor
@@ -87,6 +88,8 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
                 E element = (E) array[i];
                 setDirtyIfNeeded(element);
                 fStore.add(element);
+                fStart = Math.min(fStart, element.getStart());
+                fEnd = Math.max(fEnd, element.getEnd());
             }
         }
         if (fDirty) {
@@ -140,6 +143,8 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
             setDirtyIfNeeded(val);
             fStore.add(val);
             fLastSnapshot = null;
+            fStart = Math.min(fStart, val.getStart());
+            fEnd = Math.max(fEnd, val.getEnd());
             return true;
         } finally {
             fLock.unlock();
@@ -255,9 +260,45 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
             sortStore();
         }
         try {
-            int index = Collections.binarySearch(fStore, new BasicSegment(end, Long.MAX_VALUE));
-            index = (index >= 0) ? index : -index - 1;
-            return fStore.subList(0, index).stream().filter(element -> !(start > element.getEnd() || end < element.getStart())).collect(Collectors.toList());
+            if (start <= fStart && end >= fEnd) {
+                Iterable<E> lastSnapshot = fLastSnapshot;
+                if (lastSnapshot == null) {
+                    lastSnapshot = ImmutableList.copyOf(fStore);
+                    fLastSnapshot = lastSnapshot;
+                }
+                return checkNotNull(lastSnapshot);
+            }
+            /*
+             * Compute the index of the last Segment we will find in here,
+             * correct the negative insertion point and add 1 for array size.
+             */
+            int arraySize = Collections.binarySearch(fStore, new BasicSegment(end, Long.MAX_VALUE));
+            arraySize = (arraySize >= 0) ? arraySize + 1 : -arraySize;
+            /*
+             * Create the ArrayList as late as possible, with size = (first
+             * intersecting segment index) - (last intersecting segment index).
+             */
+            ArrayList<E> iterable = null;
+            for (E seg : fStore) {
+                if (seg.getStart() <= end && seg.getEnd() >= start) {
+                    if (iterable == null) {
+                        iterable = new ArrayList<>(arraySize);
+                    }
+                    iterable.add(seg);
+                } else if (seg.getStart() > end) {
+                    /*
+                     * Since segments are sorted by start times, there is no
+                     * point in searching segments that start too late.
+                     */
+                    break;
+                }
+                arraySize--;
+            }
+            if (iterable != null) {
+                iterable.trimToSize();
+                return iterable;
+            }
+            return Collections.EMPTY_LIST;
         } finally {
             fLock.unlock();
         }

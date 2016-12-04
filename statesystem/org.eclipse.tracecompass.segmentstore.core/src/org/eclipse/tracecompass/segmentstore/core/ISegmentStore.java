@@ -12,13 +12,10 @@
 
 package org.eclipse.tracecompass.segmentstore.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
-
-import org.eclipse.jdt.annotation.NonNull;
 
 import com.google.common.collect.Lists;
 
@@ -115,15 +112,20 @@ public interface ISegmentStore<E extends ISegment> extends Collection<E> {
      * @return The intervals that cross this position
      * @since 1.1
      */
-    default Iterable<E> getIntersectingElements(long start, long end, Comparator<ISegment> order){
-        List<E> list = Lists.newArrayList(getIntersectingElements(start, end));
-        return new Iterable<@NonNull E>() {
-            @Override
-            public Iterator<@NonNull E> iterator() {
-                Collections.sort(list, order);
-                return list.iterator();
-            }
-        };
+    default Iterable<E> getIntersectingElements(long start, long end, Comparator<ISegment> order) {
+        Iterable<E> ret = getIntersectingElements(start, end);
+        List<E> list;
+        if (ret instanceof ArrayList<?>) {
+            /*
+             * No point in copying the intersecting elements into a new
+             * ArrayList if they are already in a new ArrayList.
+             */
+            list = (List<E>) ret;
+        } else {
+            list = Lists.newArrayList(ret);
+        }
+        list.sort(order);
+        return list;
     }
 
     /**

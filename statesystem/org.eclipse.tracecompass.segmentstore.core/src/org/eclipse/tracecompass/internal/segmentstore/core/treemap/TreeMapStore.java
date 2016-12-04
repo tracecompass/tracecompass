@@ -14,26 +14,27 @@ package org.eclipse.tracecompass.internal.segmentstore.core.treemap;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
-import java.util.TreeMap;
+import java.util.List;
+import java.util.NavigableSet;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Function;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
-import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
 
 /**
- * Implementation of a {@link ISegmentStore} using in-memory {@link TreeMap}'s.
+ * Implementation of a {@link ISegmentStore} using an in-memory {@link TreeMultimap}s.
  * This relatively simple implementation holds everything in memory, and as such
  * cannot contain too much data.
  *
@@ -42,7 +43,7 @@ import com.google.common.collect.TreeMultimap;
  * secondary comparator will be the end time. If even those are equal, it will
  * defer to the segments' natural ordering ({@link ISegment#compareTo}).
  *
- * The store's tree maps will not accept duplicate key-value pairs, which means
+ * The store's tree map will not accept duplicate key-value pairs, which means
  * that if you want several segments with the same start and end times, make
  * sure their compareTo() differentiates them.
  *
@@ -58,9 +59,10 @@ public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<
     private final ReadWriteLock fLock = new ReentrantReadWriteLock(false);
 
     private final TreeMultimap<Long, E> fStartTimesIndex;
-    private final TreeMultimap<Long, E> fEndTimesIndex;
 
-    private volatile long fSize;
+    private volatile int fSize;
+    private volatile long fStart = Long.MAX_VALUE;
+    private volatile long fEnd = Long.MIN_VALUE;
 
     private @Nullable transient Iterable<E> fLastSnapshot = null;
 
@@ -76,17 +78,9 @@ public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<
          * The secondary "value" comparator will check the end times first, and
          * in the event of a tie, defer to the ISegment's Comparable
          * implementation, a.k.a. its natural ordering.
-         *
-         * The same is done for the end times index, but swapping the first two
-         * comparators instead.
          */
-        fStartTimesIndex = TreeMultimap.create(
-                SegmentComparators.LONG_COMPARATOR,
-                Ordering.from(SegmentComparators.INTERVAL_END_COMPARATOR).compound(Ordering.natural()));
-
-        fEndTimesIndex = TreeMultimap.create(
-                SegmentComparators.LONG_COMPARATOR,
-                Ordering.from(SegmentComparators.INTERVAL_START_COMPARATOR).compound(Ordering.natural()));
+        fStartTimesIndex = TreeMultimap.create(Comparator.<Long>naturalOrder(),
+                Comparator.comparingLong(E::getEnd).thenComparing(Function.identity()));
 
         fSize = 0;
     }
@@ -118,13 +112,14 @@ public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<
 
         fLock.writeLock().lock();
         try {
-            if (fStartTimesIndex.put(Long.valueOf(val.getStart()), val)) {
-                fEndTimesIndex.put(Long.valueOf(val.getEnd()), val);
+            boolean put = fStartTimesIndex.put(val.getStart(), val);
+            if (put) {
                 fSize++;
+                fStart = Math.min(fStart, val.getStart());
+                fEnd = Math.max(fEnd, val.getEnd());
                 fLastSnapshot = null;
-                return true;
             }
-            return false;
+            return put;
         } finally {
             fLock.writeLock().unlock();
         }
@@ -132,7 +127,7 @@ public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<
 
     @Override
     public int size() {
-        return Long.valueOf(fSize).intValue();
+        return fSize;
     }
 
     @Override
@@ -142,9 +137,14 @@ public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<
 
     @Override
     public boolean contains(@Nullable Object o) {
+        if (o == null || !(o instanceof ISegment)) {
+            return false;
+        }
         fLock.readLock().lock();
         try {
-            return fStartTimesIndex.containsValue(o);
+            /* Narrow down the search */
+            ISegment seg = (ISegment) o;
+            return fStartTimesIndex.get(seg.getStart()).contains(o);
         } finally {
             fLock.readLock().unlock();
         }
@@ -190,7 +190,7 @@ public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<
         try {
             boolean changed = false;
             for (E elem : c) {
-                if (this.add(elem)) {
+                if (add(elem)) {
                     changed = true;
                 }
             }
@@ -205,7 +205,8 @@ public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<
         fLock.writeLock().lock();
         try {
             fSize = 0;
-            fEndTimesIndex.clear();
+            fStart = Long.MAX_VALUE;
+            fEnd = Long.MIN_VALUE;
             fStartTimesIndex.clear();
         } finally {
             fLock.writeLock().unlock();
@@ -220,9 +221,29 @@ public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<
     public Iterable<E> getIntersectingElements(long start, long end) {
         fLock.readLock().lock();
         try {
-            Iterable<E> matchStarts = Iterables.concat(fStartTimesIndex.asMap().headMap(end, true).values());
-            Iterable<E> matchEnds = Iterables.concat(fEndTimesIndex.asMap().tailMap(start, true).values());
-            return checkNotNull(Sets.intersection(Sets.newHashSet(matchStarts), Sets.newHashSet(matchEnds)));
+            if (start <= fStart && end >= fEnd) {
+                if (fLastSnapshot == null) {
+                    fLastSnapshot = ImmutableList.copyOf(fStartTimesIndex.values());
+                }
+                return checkNotNull(fLastSnapshot);
+            }
+            List<E> iterable = new ArrayList<>();
+            /**
+             * fromElement is used to search the navigable sets of the
+             * TreeMultiMap for Segments that end after start query time.
+             */
+            E fromElement = (E) new BasicSegment(Long.MIN_VALUE, start);
+            /* Get the sets of segments for startTimes <= end */
+            for (Collection<E> col : fStartTimesIndex.asMap().headMap(end, true).values()) {
+                /*
+                 * The collections of segments are NavigableSets for
+                 * TreeMultimap, add elements from the tailSet: which will have
+                 * endTimes >= start.
+                 */
+                NavigableSet<E> nav = (NavigableSet<E>) col;
+                iterable.addAll(nav.tailSet(fromElement, true));
+            }
+            return iterable;
         } finally {
             fLock.readLock().unlock();
         }
@@ -230,13 +251,6 @@ public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<
 
     @Override
     public void dispose() {
-        fLock.writeLock().lock();
-        try {
-            fStartTimesIndex.clear();
-            fEndTimesIndex.clear();
-            fSize = 0;
-        } finally {
-            fLock.writeLock().unlock();
-        }
+        clear();
     }
 }
