@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -34,6 +36,9 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
@@ -57,6 +62,8 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 public abstract class TmfAbstractAnalysisModule extends TmfComponent
         implements IAnalysisModule, ITmfPropertiesProvider {
 
+    private static final Logger LOGGER = TraceCompassLog.getLogger(TmfAbstractAnalysisModule.class);
+    private static final String LOG_CATEGORY = "AbstractAnalysisModule"; //$NON-NLS-1$
     private @Nullable String fId;
     private boolean fAutomatic = false, fStarted = false;
     private volatile @Nullable ITmfTrace fTrace;
@@ -328,89 +335,98 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
     }
 
     private void execute(final ITmfTrace trace) {
-        /*
-         * TODO: The analysis in a job should be done at the analysis manager
-         * level instead of depending on this abstract class implementation,
-         * otherwise another analysis implementation may block the main thread
-         */
+        try (FlowScopeLog analysisLog = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TmfAbstractAnalysis:scheduling", "id", getId(), "name", getName()).setCategory(LOG_CATEGORY).build()) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            /*
+             * TODO: The analysis in a job should be done at the analysis
+             * manager level instead of depending on this abstract class
+             * implementation, otherwise another analysis implementation may
+             * block the main thread
+             */
 
-        /* Do not execute if analysis has already run */
-        if (fFinishedLatch.getCount() == 0) {
-            TmfCoreTracer.traceAnalysis(getId(), getTrace(), "already executed"); //$NON-NLS-1$
-            return;
-        }
-
-        /* Do not execute if analysis already running */
-        synchronized (syncObj) {
-            if (fStarted) {
-                TmfCoreTracer.traceAnalysis(getId(), getTrace(), "already started, not starting again"); //$NON-NLS-1$
+            /* Do not execute if analysis has already run */
+            if (fFinishedLatch.getCount() == 0) {
+                TmfCoreTracer.traceAnalysis(getId(), getTrace(), "already executed"); //$NON-NLS-1$
                 return;
             }
-            fStarted = true;
-        }
 
-        /* Execute dependent analyses before creating the job for this one */
-        final Iterable<IAnalysisModule> dependentAnalyses = getDependentAnalyses();
-        int depLevel = 0;
-        for (IAnalysisModule module : dependentAnalyses) {
-            module.schedule();
-            // Add the dependency level of the analysis + 1 to make sure that if
-            // an analysis already depends on another, it is taken into account
-            depLevel += module.getDependencyLevel() + 1;
-        }
-        fDependencyLevel = depLevel;
-
-        /*
-         * Actual analysis will be run on a separate thread
-         */
-        String jobName = checkNotNull(NLS.bind(Messages.TmfAbstractAnalysisModule_RunningAnalysis, getName()));
-        fJob = new Job(jobName) {
-            @Override
-            protected @Nullable IStatus run(final @Nullable IProgressMonitor monitor) {
-                IProgressMonitor mon = monitor;
-                if (mon == null) {
-                    mon = new NullProgressMonitor();
+            /* Do not execute if analysis already running */
+            synchronized (syncObj) {
+                if (fStarted) {
+                    TmfCoreTracer.traceAnalysis(getId(), getTrace(), "already started, not starting again"); //$NON-NLS-1$
+                    return;
                 }
-                try {
-                    mon.beginTask("", IProgressMonitor.UNKNOWN); //$NON-NLS-1$
-                    broadcast(new TmfStartAnalysisSignal(TmfAbstractAnalysisModule.this, TmfAbstractAnalysisModule.this));
-                    TmfCoreTracer.traceAnalysis(TmfAbstractAnalysisModule.this.getId(), TmfAbstractAnalysisModule.this.getTrace(), "started"); //$NON-NLS-1$
-                    fAnalysisCancelled = !executeAnalysis(mon);
-                    for (IAnalysisModule module : dependentAnalyses) {
-                        module.waitForCompletion(mon);
-                    }
-                    TmfCoreTracer.traceAnalysis(TmfAbstractAnalysisModule.this.getId(), TmfAbstractAnalysisModule.this.getTrace(), "finished"); //$NON-NLS-1$
-                } catch (TmfAnalysisException e) {
-                    Activator.logError("Error executing analysis with trace " + trace.getName(), e); //$NON-NLS-1$
-                } catch (Exception e) {
-                    Activator.logError("Unexpected error executing analysis with trace " + trace.getName(), e); //$NON-NLS-1$
-                    fail(e);
-                    // Reset analysis so that it can be executed again.
-                    resetAnalysis();
-                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.OK, "Exception executing analysis", e); //$NON-NLS-1$
-                } finally {
-                    synchronized (syncObj) {
-                        mon.done();
-                        setAnalysisCompleted();
-                    }
-                    TmfTraceManager.refreshSupplementaryFiles(trace);
-                }
-                if (!fAnalysisCancelled) {
-                    return Status.OK_STATUS;
-                }
-                // Reset analysis so that it can be executed again.
-                resetAnalysis();
-                return Status.CANCEL_STATUS;
+                fStarted = true;
             }
 
-            @Override
-            protected void canceling() {
-                TmfCoreTracer.traceAnalysis(getId(), getTrace(), "job cancelled"); //$NON-NLS-1$
-                TmfAbstractAnalysisModule.this.canceling();
+            /*
+             * Execute dependent analyses before creating the job for this one
+             */
+            final Iterable<IAnalysisModule> dependentAnalyses = getDependentAnalyses();
+            int depLevel = 0;
+            for (IAnalysisModule module : dependentAnalyses) {
+                module.schedule();
+                // Add the dependency level of the analysis + 1 to make sure
+                // that if
+                // an analysis already depends on another, it is taken into
+                // account
+                depLevel += module.getDependencyLevel() + 1;
             }
+            fDependencyLevel = depLevel;
 
-        };
-        fJob.schedule();
+            /*
+             * Actual analysis will be run on a separate thread
+             */
+            String jobName = checkNotNull(NLS.bind(Messages.TmfAbstractAnalysisModule_RunningAnalysis, getName()));
+            fJob = new Job(jobName) {
+                @Override
+                protected @Nullable IStatus run(final @Nullable IProgressMonitor monitor) {
+                    try (FlowScopeLog jobLog = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TmfAbstractAnalysis:executing").setParentScope(analysisLog).build()) { //$NON-NLS-1$
+                        IProgressMonitor mon = monitor;
+                        if (mon == null) {
+                            mon = new NullProgressMonitor();
+                        }
+                        try {
+                            mon.beginTask("", IProgressMonitor.UNKNOWN); //$NON-NLS-1$
+                            broadcast(new TmfStartAnalysisSignal(TmfAbstractAnalysisModule.this, TmfAbstractAnalysisModule.this));
+                            TmfCoreTracer.traceAnalysis(TmfAbstractAnalysisModule.this.getId(), TmfAbstractAnalysisModule.this.getTrace(), "started"); //$NON-NLS-1$
+                            fAnalysisCancelled = !executeAnalysis(mon);
+                            for (IAnalysisModule module : dependentAnalyses) {
+                                module.waitForCompletion(mon);
+                            }
+                            TmfCoreTracer.traceAnalysis(TmfAbstractAnalysisModule.this.getId(), TmfAbstractAnalysisModule.this.getTrace(), "finished"); //$NON-NLS-1$
+                        } catch (TmfAnalysisException e) {
+                            Activator.logError("Error executing analysis with trace " + trace.getName(), e); //$NON-NLS-1$
+                        } catch (Exception e) {
+                            Activator.logError("Unexpected error executing analysis with trace " + trace.getName(), e); //$NON-NLS-1$
+                            fail(e);
+                            // Reset analysis so that it can be executed again.
+                            resetAnalysis();
+                            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.OK, "Exception executing analysis", e); //$NON-NLS-1$
+                        } finally {
+                            synchronized (syncObj) {
+                                mon.done();
+                                setAnalysisCompleted();
+                            }
+                            TmfTraceManager.refreshSupplementaryFiles(trace);
+                        }
+                        if (!fAnalysisCancelled) {
+                            return Status.OK_STATUS;
+                        }
+                        // Reset analysis so that it can be executed again.
+                        resetAnalysis();
+                        return Status.CANCEL_STATUS;
+                    }
+                }
+
+                @Override
+                protected void canceling() {
+                    TmfCoreTracer.traceAnalysis(getId(), getTrace(), "job cancelled"); //$NON-NLS-1$
+                    TmfAbstractAnalysisModule.this.canceling();
+                }
+
+            };
+            fJob.schedule();
+        }
     }
 
     @Override
