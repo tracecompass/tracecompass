@@ -344,6 +344,10 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
      */
     protected void queryFullStates(ITmfStateSystem ss, long start, long end, long resolution,
             @NonNull IProgressMonitor monitor, @NonNull IQueryHandler handler) {
+        if (end < start) {
+            /* We have an empty trace, the state system will be empty: nothing to do here. */
+            return;
+        }
         List<List<ITmfStateInterval>> fullStates = new ArrayList<>();
         List<ITmfStateInterval> prevFullState = null;
         try {
