@@ -13,12 +13,17 @@
 
 package org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.Messages;
 import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
@@ -56,6 +61,8 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
  * @author Francois Chouinard
  */
 public class TmfCheckpointIndexer implements ITmfTraceIndexer {
+
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(TmfCheckpointIndexer.class);
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -379,6 +386,7 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
                     setName(Messages.TmfCheckpointIndexer_Indexing + ' ' + fTrace.getName() + " (" + String.format("%,d", nbEvents) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     // setName doesn't refresh the UI, setTaskName does
                     long rate = (nbEvents - prevNbEvents) * 4;
+                    TraceCompassLogUtils.traceCounter(LOGGER, Level.FINE, fTrace.getName(), "indexed", nbEvents - prevNbEvents); //$NON-NLS-1$
                     subMonitor.setTaskName(String.format("%,d", rate) + " " + Messages.TmfCheckpointIndexer_EventsPerSecond); //$NON-NLS-1$ //$NON-NLS-2$
                 } catch (final InterruptedException e) {
                     return Status.OK_STATUS;
