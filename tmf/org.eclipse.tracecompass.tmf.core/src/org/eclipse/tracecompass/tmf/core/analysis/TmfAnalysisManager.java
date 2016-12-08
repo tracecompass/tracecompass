@@ -57,7 +57,7 @@ public class TmfAnalysisManager {
     /**
      * Disposes the analysis manager
      *
-     * @since 2.2
+     * @since 2.3
      */
     public static void dispose() {
         TmfAnalysisParameterProviders.dispose();

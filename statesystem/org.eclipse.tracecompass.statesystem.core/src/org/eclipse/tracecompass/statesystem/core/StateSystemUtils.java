@@ -286,7 +286,7 @@ public final class StateSystemUtils {
      * Iterator class to allow 2-way iteration over intervals of a given
      * attribute. Not thread-safe!
      *
-     * @since 2.1
+     * @since 2.2
      */
     public static class QuarkIterator implements Iterator<ITmfStateInterval> {
 

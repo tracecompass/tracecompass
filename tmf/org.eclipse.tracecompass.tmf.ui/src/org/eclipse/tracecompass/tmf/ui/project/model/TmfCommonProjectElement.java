@@ -104,6 +104,9 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
     // ITmfProjectModelElement
     // ------------------------------------------------------------------------
 
+    /**
+     * @since 2.3
+     */
     @Override
     public void dispose() {
         super.dispose();

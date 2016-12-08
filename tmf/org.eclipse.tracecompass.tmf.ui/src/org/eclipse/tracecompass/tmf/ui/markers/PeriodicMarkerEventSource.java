@@ -67,7 +67,7 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
          *            the reference marker time in time units
          * @param index
          *            the reference marker index
-         * @since 2.2
+         * @since 2.3
          */
         public Reference(long time, long index) {
             this.time = time;

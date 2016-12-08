@@ -59,7 +59,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
     /**
      * Disposes the project registry
      *
-     * @since 2.2
+     * @since 2.3
      */
     public static void dispose() {
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(INSTANCE);

@@ -1611,7 +1611,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *
      * @param entry the time graph entry
      * @return the bounds of the entry, or null if the entry is not visible
-     * @since 2.2
+     * @since 2.3
      */
     public Rectangle getItemBounds(ITimeGraphEntry entry) {
         int idx = fItemData.findItemIndex(entry);

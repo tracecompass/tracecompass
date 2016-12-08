@@ -68,7 +68,7 @@ public interface IAnalysisParameterProvider {
     /**
      * Dispose of the parameter provider
      *
-     * @since 2.2
+     * @since 2.3
      */
     default void dispose() {
         /* override to perform any necessary cleanup */

@@ -195,7 +195,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      * Get the file where to save the results of the analysis
      *
      * @return The file to save the results in
-     * @since 2.2
+     * @since 2.3
      */
     @VisibleForTesting
     protected @Nullable File getSsFile() {

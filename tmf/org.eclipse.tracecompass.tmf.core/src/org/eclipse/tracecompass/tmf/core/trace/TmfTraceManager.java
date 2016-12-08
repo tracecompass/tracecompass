@@ -109,7 +109,7 @@ public final class TmfTraceManager {
     /**
      * Disposes the trace manager
      *
-     * @since 2.2
+     * @since 2.3
      */
     public void dispose() {
         TmfSignalManager.deregister(this);

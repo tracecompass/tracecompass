@@ -225,7 +225,7 @@ public interface IKernelAnalysisEventLayout {
      * from the waking context.
      *
      * @return The name of the event
-     * @since 2.1
+     * @since 2.2
      */
     default String eventSchedProcessWaking() {
         return "sched_waking"; //$NON-NLS-1$
