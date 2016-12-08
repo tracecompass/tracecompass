@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.tracecompass.btf"
       label="%featureName"
-      version="2.2.0.qualifier"
+      version="2.3.0.qualifier"
       provider-name="%featureProvider"
       license-feature="org.eclipse.license"
       license-feature-version="0.0.0">
