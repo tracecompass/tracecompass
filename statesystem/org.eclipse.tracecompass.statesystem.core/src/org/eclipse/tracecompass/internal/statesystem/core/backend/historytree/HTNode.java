@@ -21,6 +21,7 @@ import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -134,6 +135,12 @@ public abstract class HTNode {
 
     /* Lock used to protect the accesses to intervals, nodeEnd and such */
     private final ReentrantReadWriteLock fRwl = new ReentrantReadWriteLock(false);
+
+    /** Order of intervals in a HTNode: sorted by end times, then by start times. */
+    private static final Comparator<ITmfStateInterval> NODE_ORDER = Comparator
+            .comparingLong(ITmfStateInterval::getEndTime)
+            .thenComparingLong(ITmfStateInterval::getStartTime)
+            .thenComparingInt(ITmfStateInterval::getAttribute);
 
     /**
      * Constructor
@@ -375,9 +382,14 @@ public abstract class HTNode {
             assert (newInterval.getSizeOnDisk() <= getNodeFreeSpace());
 
             /* Find the insert position to keep the list sorted */
-            int index = fIntervals.size();
-            while (index > 0 && newInterval.compareTo(fIntervals.get(index - 1)) < 0) {
-                index--;
+            int index = 0;
+            if (!fIntervals.isEmpty()) {
+                index = Collections.binarySearch(fIntervals, newInterval, NODE_ORDER);
+                /*
+                 * Interval should not already be in the node, binarySearch will
+                 * return (-insertionPoint - 1).
+                 */
+                index = -index - 1;
             }
 
             fIntervals.add(index, newInterval);
@@ -480,8 +492,7 @@ public abstract class HTNode {
             for (int i = getStartIndexFor(t); i < fIntervals.size(); i++) {
                 HTInterval curInterval = fIntervals.get(i);
                 if (curInterval.getAttribute() == key
-                        && curInterval.getStartTime() <= t
-                        && curInterval.getEndTime() >= t) {
+                        && curInterval.getStartTime() <= t) {
                     return curInterval;
                 }
             }
@@ -500,36 +511,18 @@ public abstract class HTNode {
         if (fIntervals.isEmpty()) {
             return 0;
         }
+
         /*
-         * Since the intervals are sorted by end time, we can skip all the ones
-         * at the beginning whose end times are smaller than 't'. Java does
-         * provides a .binarySearch method, but its API is quite weird...
+         * Since the intervals are sorted by end time then by start time, we can
+         * skip all the ones at the beginning whose end times are smaller than
+         * 't'. We search for a dummy interval from [Long.MIN_VALUE, t], which
+         * will return the first interval that ends with a time >= t.
          */
-        HTInterval dummy = new HTInterval(0, t, 0, TmfStateValue.nullValue());
-        int index = Collections.binarySearch(fIntervals, dummy);
+        HTInterval dummy = new HTInterval(Long.MIN_VALUE, t, 0, TmfStateValue.nullValue());
+        int index = Collections.binarySearch(fIntervals, dummy, NODE_ORDER);
 
-        if (index < 0) {
-            /*
-             * .binarySearch returns a negative number if the exact value was
-             * not found. Here we just want to know where to start searching, we
-             * don't care if the value is exact or not.
-             */
-            index = -index - 1;
-
-        } else {
-            /*
-             * Another API quirkiness, the returned index is the one of the *last*
-             * element of a series of equal endtimes, which happens sometimes. We
-             * want the *first* element of such a series, to read through them
-             * again.
-             */
-            while (index > 0
-                    && fIntervals.get(index - 1).compareTo(fIntervals.get(index)) == 0) {
-                index--;
-            }
-        }
-
-        return index;
+        /* Handle negative binarySearch return */
+        return (index >= 0 ? index : -index - 1);
     }
 
     /**

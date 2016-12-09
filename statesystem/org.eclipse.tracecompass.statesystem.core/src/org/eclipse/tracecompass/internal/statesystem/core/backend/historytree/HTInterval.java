@@ -36,7 +36,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
  *
  * @author Alexandre Montplaisir
  */
-public final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
+public final class HTInterval implements ITmfStateInterval {
 
     private static final Charset CHARSET = Charset.forName("UTF-8"); //$NON-NLS-1$
 
@@ -341,21 +341,6 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
      */
     public int getSizeOnDisk() {
         return fSizeOnDisk;
-    }
-
-    /**
-     * Compare the END TIMES of different intervals. This is used to sort the
-     * intervals when we close down a node.
-     */
-    @Override
-    public int compareTo(HTInterval other) {
-        if (this.end < other.end) {
-            return -1;
-        } else if (this.end > other.end) {
-            return 1;
-        } else {
-            return 0;
-        }
     }
 
     @Override
