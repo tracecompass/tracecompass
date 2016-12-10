@@ -549,4 +549,18 @@ public class LoggerTest {
         assertEquals("FINER: {\"ts\":0,\"ph\":\"C\",\"tid\":1,\"name\":\"counter\",\"args\":{\"cats\":0}}", fLog.getMessages().get(2));
     }
 
+    /**
+     * Test Marker
+     */
+    @Test
+    public void testMarker() {
+        Logger logger = fLogger;
+        assertNotNull(logger);
+        TraceCompassLogUtils.traceMarker(logger, Level.CONFIG, "instant", 0);
+        TraceCompassLogUtils.traceMarker(logger, Level.CONFIG, "colored", 15, "color", 0xaabccdd);
+        fStreamHandler.flush();
+        assertEquals("CONFIG: {\"ts\":0,\"ph\":\"R\",\"tid\":1,\"name\":\"instant\",\"dur\":0}", fLog.getMessages().get(0));
+        assertEquals("CONFIG: {\"ts\":0,\"ph\":\"R\",\"tid\":1,\"name\":\"colored\",\"dur\":15,\"args\":{\"color\":179031261}}", fLog.getMessages().get(1));
+    }
+
 }

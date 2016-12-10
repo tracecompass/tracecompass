@@ -712,6 +712,37 @@ public final class TraceCompassLogUtils {
         });
     }
 
+    /**
+     * The Marker events are events with a duration that define a region of
+     * interest. These regions can be displayed in views as Markers or other
+     * indicators.
+     *
+     * @param logger
+     *            The Logger
+     * @param level
+     *            The {@link Level} of this event.
+     * @param name
+     *            The name of the marker message message
+     * @param duration
+     *            How long the marker should last
+     * @param args
+     *            The counters to log in the format : "title", value, note
+     *            "color" and an rbga will be used
+     */
+    public static void traceMarker(Logger logger, Level level, @Nullable String name, long duration, Object... args) {
+        long time = System.nanoTime();
+        long threadId = Thread.currentThread().getId();
+        logger.log(level, () -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append('{');
+            appendCommon(sb, 'R', time, threadId);
+            appendName(sb, name);
+            sb.append(',');
+            writeObject(sb, "dur", duration); //$NON-NLS-1$
+            return appendArgs(sb, args).append('}').toString();
+        });
+    }
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
