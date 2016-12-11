@@ -26,7 +26,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTInterval;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferReader;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferWriter;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.SafeByteBufferFactory;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.StateSystemInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,14 +41,14 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 /**
- * Test the reading/writing logic in {@link HTInterval}, particularly regarding
+ * Test the reading/writing logic in {@link StateSystemInterval}, particularly regarding
  * the string length limitations.
  *
  * @author Alexandre Montplaisir
  */
 @RunWith(Parameterized.class)
 @NonNullByDefault({})
-public class HTIntervalStringReadWriteTest {
+public class SSIntervalStringReadWriteTest {
 
     private static final Charset CHARSET = Charset.forName("UTF-8");
 
@@ -100,7 +103,7 @@ public class HTIntervalStringReadWriteTest {
      *            The length (in bytes) of the UTF-8-encoded form of the
      *            character being used.
      */
-    public HTIntervalStringReadWriteTest(Integer nbChars, Integer charLength) {
+    public SSIntervalStringReadWriteTest(Integer nbChars, Integer charLength) {
         fNbChars = nbChars.intValue();
         fCharLength = charLength.intValue();
         switch (charLength) {
@@ -136,17 +139,17 @@ public class HTIntervalStringReadWriteTest {
         if (fNbChars * fCharLength > Short.MAX_VALUE) {
             /* For sizes that are known to be too long, expect an exception */
             try {
-                new HTInterval(0, 10, 1, value);
+                new StateSystemInterval(0, 10, 1, value);
             } catch (IllegalArgumentException e) {
                 return;
             }
             fail();
         }
-        HTInterval interval = new HTInterval(0, 10, 1, value);
+        StateSystemInterval interval = new StateSystemInterval(0, 10, 1, value);
         writeAndReadInterval(interval);
     }
 
-    private static void writeAndReadInterval(HTInterval interval) throws IOException {
+    private static void writeAndReadInterval(StateSystemInterval interval) throws IOException {
         int sizeOnDisk = interval.getSizeOnDisk();
 
         /* Write the interval to a file */
@@ -158,14 +161,16 @@ public class HTIntervalStringReadWriteTest {
             bb.order(ByteOrder.LITTLE_ENDIAN);
             bb.clear();
 
-            interval.writeInterval(bb);
+            ISafeByteBufferWriter sbbw = SafeByteBufferFactory.wrapWriter(bb, sizeOnDisk);
+            interval.writeSegment(sbbw);
+
             bb.flip();
             int written = fc.write(bb);
             assertEquals(sizeOnDisk, written);
         }
 
         /* Read the interval from the file */
-        HTInterval readInterval;
+        StateSystemInterval readInterval;
         try (FileInputStream fis = new FileInputStream(tempFile);
                 FileChannel fc = fis.getChannel();) {
 
@@ -176,7 +181,9 @@ public class HTIntervalStringReadWriteTest {
             int read = fc.read(bb);
             assertEquals(sizeOnDisk, read);
             bb.flip();
-            readInterval = HTInterval.readFrom(bb);
+
+            ISafeByteBufferReader sbbr = SafeByteBufferFactory.wrapReader(bb, sizeOnDisk);
+            readInterval = StateSystemInterval.DESERIALISER.readInterval(sbbr);
         }
 
         assertEquals(interval, readInterval);

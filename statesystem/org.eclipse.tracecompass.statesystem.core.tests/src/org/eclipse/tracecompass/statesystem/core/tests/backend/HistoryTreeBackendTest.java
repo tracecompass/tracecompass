@@ -20,9 +20,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.tracecompass.internal.provisional.datastore.core.exceptions.RangeException;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HistoryTreeBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.junit.After;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -114,5 +116,14 @@ public class HistoryTreeBackendTest extends StateHistoryBackendTestBase {
         HistoryTreeBackend reOpenedBackend = new HistoryTreeBackend(SSID, historyTreeFile, PROVIDER_VERSION);
         fBackendMap.put(reOpenedBackend, historyTreeFile);
         return reOpenedBackend;
+    }
+
+    /**
+     * This backend throws a different exception.
+     */
+    @Override
+    @Test(expected = RangeException.class)
+    public void testIntervalBeforeStart() {
+        super.testIntervalBeforeStart();
     }
 }

@@ -18,15 +18,13 @@ package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.channels.ClosedChannelException;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
-import org.eclipse.tracecompass.internal.statesystem.core.Activator;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.RangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.IHistoryTree;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -35,6 +33,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Iterables;
 
 /**
  * History Tree backend for storing a state history. This is the basic version
@@ -51,7 +50,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     /**
      * The history tree that sits underneath.
      */
-    private final @NonNull IHistoryTree fSht;
+    private final @NonNull IHistoryTree<@NonNull StateSystemInterval> fSht;
 
     /** Indicates if the history tree construction is done */
     private volatile boolean fFinishedBuilding = false;
@@ -99,15 +98,18 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      *             Thrown if we can't create the file for some reason
      */
     public HistoryTreeBackend(@NonNull String ssid,
-            File newStateFile,
+            @NonNull File newStateFile,
             int providerVersion,
             long startTime,
             int blockSize,
             int maxChildren) throws IOException {
+
         fSsid = ssid;
-        final HTConfig conf = new HTConfig(newStateFile, blockSize, maxChildren,
-                providerVersion, startTime);
-        fSht = initializeSHT(conf);
+        fSht = initializeSHT(newStateFile,
+                blockSize,
+                maxChildren,
+                providerVersion,
+                startTime);
     }
 
     /**
@@ -130,7 +132,8 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      *             Thrown if we can't create the file for some reason
      * @since 1.0
      */
-    public HistoryTreeBackend(@NonNull String ssid, File newStateFile, int providerVersion, long startTime)
+    public HistoryTreeBackend(@NonNull String ssid, @NonNull File newStateFile,
+            int providerVersion, long startTime)
             throws IOException {
         this(ssid, newStateFile, providerVersion, startTime, 64 * 1024, 50);
     }
@@ -157,18 +160,40 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     }
 
     /**
-     * New-tree initializer for the History Tree wrapped by this backend. Can be
-     * overriden to use different implementations.
+     * Instantiate the new history tree to be used.
      *
-     * @param conf
-     *            The HTConfig configuration object
+     * @param stateHistoryFile
+     *            The name of the history file
+     * @param blockSize
+     *            The size of each "block" on disk in bytes. One node will
+     *            always fit in one block. It should be at least 4096.
+     * @param maxChildren
+     *            The maximum number of children allowed per core (non-leaf)
+     *            node.
+     * @param providerVersion
+     *            The version of the state provider. If a file already exists,
+     *            and their versions match, the history file will not be rebuilt
+     *            uselessly.
+     * @param treeStart
+     *            The start time of the history
      * @return The new history tree
      * @throws IOException
-     *             If there was a problem during creation
+     *             If an error happens trying to open/write to the file
+     *             specified in the config
      */
     @VisibleForTesting
-    protected @NonNull IHistoryTree initializeSHT(@NonNull HTConfig conf) throws IOException {
-        return HistoryTreeFactory.createHistoryTree(conf);
+    protected @NonNull IHistoryTree<@NonNull StateSystemInterval> initializeSHT(
+            @NonNull File stateHistoryFile,
+            int blockSize,
+            int maxChildren,
+            int providerVersion,
+            long treeStart) throws IOException {
+
+        return HistoryTreeFactory.createHistoryTree(stateHistoryFile,
+                blockSize,
+                maxChildren,
+                providerVersion,
+                treeStart);
     }
 
     /**
@@ -184,7 +209,8 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      *             If there was a problem during creation
      */
     @VisibleForTesting
-    protected @NonNull IHistoryTree initializeSHT(@NonNull File existingStateFile, int providerVersion) throws IOException {
+    protected @NonNull IHistoryTree<@NonNull StateSystemInterval>initializeSHT(
+            @NonNull File existingStateFile, int providerVersion) throws IOException {
         return HistoryTreeFactory.createFromFile(existingStateFile.toPath(), providerVersion);
     }
 
@@ -197,7 +223,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      *
      * @return The history tree
      */
-    protected final @NonNull IHistoryTree getSHT() {
+    protected final @NonNull IHistoryTree<@NonNull StateSystemInterval> getSHT() {
         return fSht;
     }
 
@@ -219,11 +245,11 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     @Override
     public void insertPastState(long stateStartTime, long stateEndTime,
             int quark, ITmfStateValue value) throws TimeRangeException {
-        HTInterval interval = new HTInterval(stateStartTime, stateEndTime,
+        StateSystemInterval interval = new StateSystemInterval(stateStartTime, stateEndTime,
                 quark, (TmfStateValue) value);
 
         /* Start insertions at the "latest leaf" */
-        getSHT().insertInterval(interval);
+        getSHT().insert(interval);
     }
 
     @Override
@@ -272,41 +298,24 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
             throws TimeRangeException, StateSystemDisposedException {
         checkValidTime(t);
 
-        /* Queue is a stack of nodes containing nodes intersecting t */
-        Deque<Integer> queue = new LinkedList<>();
+        RangeCondition<@NonNull Long> rc = RangeCondition.singleton(t);
 
-        /* We start by reading the information in the root node */
-        queue.add(getSHT().getRootNode().getSequenceNumber());
-
-        /* Then we follow the down in the relevant children */
-        try {
-            while (!queue.isEmpty()) {
-                int sequenceNumber = queue.pop();
-                HTNode currentNode = getSHT().readNode(sequenceNumber);
-                if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
-                    /* Here we add the relevant children nodes for BFS */
-                    queue.addAll(((ParentNode) currentNode).selectNextChildren(t));
-                }
-                currentNode.writeInfoFromNode(stateInfo, t);
-            }
-        } catch (ClosedChannelException e) {
-            throw new StateSystemDisposedException(e);
-        }
-
-        /*
-         * The stateInfo should now be filled with everything needed, we pass
-         * the control back to the State System.
-         */
+        Iterable<StateSystemInterval> intervals = getSHT().getMatchingIntervals(rc, e -> true);
+        Iterables.filter(intervals, e -> e.getAttribute() < stateInfo.size())
+                .forEach(e -> stateInfo.set(e.getAttribute(), e));
     }
 
     @Override
     public ITmfStateInterval doSingularQuery(long t, int attributeQuark)
             throws TimeRangeException, StateSystemDisposedException {
-        try {
-            return getRelevantInterval(t, attributeQuark);
-        } catch (ClosedChannelException e) {
-            throw new StateSystemDisposedException(e);
-        }
+            checkValidTime(t);
+
+            RangeCondition<@NonNull Long> rc = RangeCondition.singleton(t);
+
+            Iterable<StateSystemInterval> intervals = getSHT()
+                    .getMatchingIntervals(rc, e -> e.getAttribute() == attributeQuark);
+
+            return Iterables.getFirst(intervals, null);
     }
 
     private void checkValidTime(long t) {
@@ -316,29 +325,6 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
             throw new TimeRangeException(String.format("%s Time:%d, Start:%d, End:%d", //$NON-NLS-1$
                     fSsid, t, startTime, endTime));
         }
-    }
-
-    /**
-     * Inner method to find the interval in the tree containing the requested
-     * key/timestamp pair, wherever in which node it is.
-     */
-    private HTInterval getRelevantInterval(long t, int key)
-            throws TimeRangeException, ClosedChannelException {
-        checkValidTime(t);
-
-        Deque<Integer> queue = new LinkedList<>();
-        queue.add(getSHT().getRootNode().getSequenceNumber());
-        HTInterval interval = null;
-        while (interval == null && !queue.isEmpty()) {
-            int sequenceNumber = queue.pop();
-            HTNode currentNode = getSHT().readNode(sequenceNumber);
-            if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
-                /* Here we add the relevant children nodes for BFS */
-                queue.addAll(((ParentNode) currentNode).selectNextChildren(t));
-            }
-            interval = currentNode.getRelevantInterval(key, t);
-        }
-        return interval;
     }
 
     /**
@@ -356,25 +342,28 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      * @return Average node usage %
      */
     public int getAverageNodeUsage() {
-        HTNode node;
-        long total = 0;
-        long ret;
+        return 0;
+        // TODO Reimplement, elsewhere?
 
-        try {
-            for (int seq = 0; seq < getSHT().getNodeCount(); seq++) {
-                node = getSHT().readNode(seq);
-                total += node.getNodeUsagePercent();
-            }
-        } catch (ClosedChannelException e) {
-            Activator.getDefault().logError(e.getMessage(), e);
-        }
-
-        ret = total / getSHT().getNodeCount();
-        /* The return value should be a percentage */
-        if (ret < 0 || ret > 100) {
-            throw new IllegalStateException("Average node usage is not a percentage: " + ret); //$NON-NLS-1$
-        }
-        return (int) ret;
+//        HTNode node;
+//        long total = 0;
+//        long ret;
+//
+//        try {
+//            for (int seq = 0; seq < getSHT().getNodeCount(); seq++) {
+//                node = getSHT().readNode(seq);
+//                total += node.getNodeUsagePercent();
+//            }
+//        } catch (ClosedChannelException e) {
+//            Activator.getDefault().logError(e.getMessage(), e);
+//        }
+//
+//        ret = total / getSHT().getNodeCount();
+//        /* The return value should be a percentage */
+//        if (ret < 0 || ret > 100) {
+//            throw new IllegalStateException("Average node usage is not a percentage: " + ret); //$NON-NLS-1$
+//        }
+//        return (int) ret;
     }
 
 }

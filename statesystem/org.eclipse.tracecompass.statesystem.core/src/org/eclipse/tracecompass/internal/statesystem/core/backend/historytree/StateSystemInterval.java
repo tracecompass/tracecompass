@@ -15,15 +15,15 @@
 
 package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.nio.charset.Charset;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferReader;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.HTInterval;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferWriter;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.SafeByteBufferFactory;
 import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue.CustomStateValue;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -36,7 +36,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
  *
  * @author Alexandre Montplaisir
  */
-public final class HTInterval implements ITmfStateInterval {
+public final class StateSystemInterval extends HTInterval implements ITmfStateInterval {
 
     private static final Charset CHARSET = Charset.forName("UTF-8"); //$NON-NLS-1$
 
@@ -50,10 +50,8 @@ public final class HTInterval implements ITmfStateInterval {
     private static final byte TYPE_DOUBLE = 3;
     private static final byte TYPE_CUSTOM = 20;
 
-    private final long start;
-    private final long end;
-    private final int attribute;
-    private final @NonNull TmfStateValue sv;
+    private final int fAttribute;
+    private final @NonNull TmfStateValue fSv;
 
     /** Number of bytes used by this interval when it is written to disk */
     private final int fSizeOnDisk;
@@ -73,17 +71,13 @@ public final class HTInterval implements ITmfStateInterval {
      * @throws TimeRangeException
      *             If the start time or end time are invalid
      */
-    public HTInterval(long intervalStart, long intervalEnd, int attribute,
+    public StateSystemInterval(long intervalStart, long intervalEnd, int attribute,
             @NonNull TmfStateValue value) throws TimeRangeException {
-        if (intervalStart > intervalEnd) {
-            throw new TimeRangeException("Start:" + intervalStart + ", End:" + intervalEnd); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+        super(intervalStart, intervalEnd);
 
-        this.start = intervalStart;
-        this.end = intervalEnd;
-        this.attribute = attribute;
-        this.sv = value;
-        this.fSizeOnDisk = computeSizeOnDisk(sv);
+        fAttribute = attribute;
+        fSv = value;
+        fSizeOnDisk = computeSizeOnDisk(fSv);
     }
 
     /**
@@ -131,49 +125,11 @@ public final class HTInterval implements ITmfStateInterval {
     }
 
     /**
-     * "Faster" constructor for inner use only. When we build an interval when
-     * reading it from disk (with {@link #readFrom}), we already know the size
-     * of the strings entry, so there is no need to call
-     * {@link #computeStringsEntrySize()} and do an extra copy.
+     * Reader object for this interval type.
      */
-    private HTInterval(long intervalStart, long intervalEnd, int attribute,
-            @NonNull TmfStateValue value, int size) throws TimeRangeException {
-        if (intervalStart > intervalEnd) {
-            throw new TimeRangeException("Start:" + intervalStart + ", End:" + intervalEnd); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-
-        this.start = intervalStart;
-        this.end = intervalEnd;
-        this.attribute = attribute;
-        this.sv = value;
-        this.fSizeOnDisk = size;
-    }
-
-    /**
-     * Reader factory method. Builds the interval using an already-allocated
-     * ByteBuffer, which normally comes from a NIO FileChannel.
-     *
-     * The interval is just a start, end, attribute and value, this is the
-     * layout of the HTInterval on disk
-     * <ul>
-     * <li>start (8 bytes)</li>
-     * <li>end (8 bytes)</li>
-     * <li>attribute (4 bytes)</li>
-     * <li>sv type (1 byte)</li>
-     * <li>sv ( 0 bytes for null, 4 for int , 8 for long and double, and the
-     * length of the string +2 for strings (it's variable))</li>
-     * </ul>
-     *
-     * @param buffer
-     *            The ByteBuffer from which to read the information
-     * @return The interval object
-     * @throws IOException
-     *             If there was an error reading from the buffer
-     */
-    public static final HTInterval readFrom(ByteBuffer buffer) throws IOException {
+    public static final @NonNull IHTIntervalReader<@NonNull StateSystemInterval> DESERIALISER = buffer -> {
         TmfStateValue value;
 
-        int posStart = buffer.position();
         /* Read the Data Section entry */
         long intervalStart = buffer.getLong();
         long intervalEnd = buffer.getLong();
@@ -202,7 +158,7 @@ public final class HTInterval implements ITmfStateInterval {
             /* Confirm the 0'ed byte at the end */
             byte res = buffer.get();
             if (res != 0) {
-                throw new IOException(errMsg);
+                throw new RuntimeException(errMsg);
             }
             break;
         }
@@ -218,59 +174,43 @@ public final class HTInterval implements ITmfStateInterval {
             break;
 
         case TYPE_CUSTOM: {
-            short valueSize = buffer.getShort();
-            ISafeByteBufferReader safeBuffer = SafeByteBufferFactory.wrapReader(buffer, valueSize);
-            value = CustomStateValue.readSerializedValue(safeBuffer);
+            buffer.getShort();
+            // short valueSize = buffer.getShort();
+            // ISafeByteBufferReader safeBuffer =
+            // SafeByteBufferFactory.wrapReader(buffer, valueSize);
+            value = CustomStateValue.readSerializedValue(buffer);
             break;
         }
         default:
             /* Unknown data, better to not make anything up... */
-            throw new IOException(errMsg);
+            throw new RuntimeException(errMsg);
         }
 
         try {
-            return new HTInterval(intervalStart, intervalEnd, attribute, value, buffer.position() - posStart);
+            return new StateSystemInterval(intervalStart, intervalEnd, attribute, value);
         } catch (TimeRangeException e) {
-            throw new IOException(errMsg);
+            throw new RuntimeException(errMsg);
         }
-    }
+    };
 
-    /**
-     * Antagonist of the previous constructor, write the Data entry
-     * corresponding to this interval in a ByteBuffer (mapped to a block in the
-     * history-file, hopefully)
-     *
-     * The interval is just a start, end, attribute and value, this is the
-     * layout of the HTInterval on disk
-     * <ul>
-     * <li>start (8 bytes)</li>
-     * <li>end (8 bytes)</li>
-     * <li>attribute (4 bytes)</li>
-     * <li>sv type (1 byte)</li>
-     * <li>sv ( 0 bytes for null, 4 for int , 8 for long and double, and the
-     * length of the string +2 for strings (it's variable))</li>
-     * </ul>
-     *
-     * @param buffer
-     *            The already-allocated ByteBuffer corresponding to a SHT Node
-     */
-    public void writeInterval(ByteBuffer buffer) {
-        final byte byteFromType = getByteFromType(sv.getType());
+    @Override
+    public void writeSegment(ISafeByteBufferWriter buffer) {
+        final byte byteFromType = getByteFromType(fSv.getType());
 
-        buffer.putLong(start);
-        buffer.putLong(end);
-        buffer.putInt(attribute);
+        buffer.putLong(getStart());
+        buffer.putLong(getEnd());
+        buffer.putInt(fAttribute);
         buffer.put(byteFromType);
 
         switch (byteFromType) {
         case TYPE_NULL:
             break;
         case TYPE_INTEGER:
-            buffer.putInt(sv.unboxInt());
+            buffer.putInt(fSv.unboxInt());
             break;
 
         case TYPE_STRING: {
-            String string = sv.unboxStr();
+            String string = fSv.unboxStr();
             byte[] strArray = string.getBytes(CHARSET);
 
             /*
@@ -284,18 +224,19 @@ public final class HTInterval implements ITmfStateInterval {
         }
 
         case TYPE_LONG:
-            buffer.putLong(sv.unboxLong());
+            buffer.putLong(fSv.unboxLong());
             break;
 
         case TYPE_DOUBLE:
-            buffer.putDouble(sv.unboxDouble());
+            buffer.putDouble(fSv.unboxDouble());
             break;
 
         case TYPE_CUSTOM: {
-            int size = ((CustomStateValue) sv).getSerializedSize();
+            int size = ((CustomStateValue) fSv).getSerializedSize();
             buffer.putShort((short) size);
-            ISafeByteBufferWriter safeBuffer = SafeByteBufferFactory.wrapWriter(buffer, size);
-            ((CustomStateValue) sv).serialize(safeBuffer);
+            // TODO: We send the full safe buffer to the custom value, its size
+            // should set to the necessary size only
+            ((CustomStateValue) fSv).serialize(buffer);
             break;
         }
 
@@ -304,66 +245,56 @@ public final class HTInterval implements ITmfStateInterval {
         }
     }
 
+    // FIXME Remove these two duplicate methods
+
     @Override
     public long getStartTime() {
-        return start;
+        return getStart();
     }
 
     @Override
     public long getEndTime() {
-        return end;
+        return getEnd();
     }
 
     @Override
     public int getAttribute() {
-        return attribute;
+        return fAttribute;
     }
 
     @Override
     public ITmfStateValue getStateValue() {
-        return sv;
+        return fSv;
     }
 
     @Override
     public boolean intersects(long timestamp) {
-        if (start <= timestamp) {
-            if (end >= timestamp) {
-                return true;
-            }
-        }
-        return false;
+        /*
+         * Need to explicitly re-define due to conflicting methods in
+         * super-interfaces.
+         */
+        return super.intersects(timestamp);
     }
 
-    /**
-     * Total serialized size of this interval
-     *
-     * @return The interval size
-     */
+    @Override
     public int getSizeOnDisk() {
         return fSizeOnDisk;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        HTInterval other = (HTInterval) obj;
-        return (start == other.start &&
-                end == other.end &&
-                attribute == other.attribute &&
-                sv.equals(other.sv));
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), fAttribute, fSv);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(start, end, attribute, sv);
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+
+        StateSystemInterval other = (StateSystemInterval) checkNotNull(obj);
+        return (fAttribute == other.fAttribute
+                && fSv.equals(other.fSv));
     }
 
     @Override
@@ -371,16 +302,16 @@ public final class HTInterval implements ITmfStateInterval {
         /* Only for debug, should not be externalized */
         StringBuilder sb = new StringBuilder();
         sb.append('[');
-        sb.append(start);
+        sb.append(getStart());
         sb.append(", "); //$NON-NLS-1$
-        sb.append(end);
+        sb.append(getEnd());
         sb.append(']');
 
         sb.append(", attribute = "); //$NON-NLS-1$
-        sb.append(attribute);
+        sb.append(fAttribute);
 
         sb.append(", value = "); //$NON-NLS-1$
-        sb.append(sv.toString());
+        sb.append(fSv.toString());
 
         return sb.toString();
     }

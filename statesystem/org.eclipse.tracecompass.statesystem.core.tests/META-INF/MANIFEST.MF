@@ -20,7 +20,6 @@ Export-Package: org.eclipse.tracecompass.statesystem.core.tests,
  org.eclipse.tracecompass.statesystem.core.tests.perf.historytree,
  org.eclipse.tracecompass.statesystem.core.tests.shared.utils,
  org.eclipse.tracecompass.statesystem.core.tests.statevalue,
- org.eclipse.tracecompass.statesystem.core.tests.stubs.backend,
  org.eclipse.tracecompass.statesystem.core.tests.stubs.statevalues
 Import-Package: com.google.common.base,
  com.google.common.collect,
