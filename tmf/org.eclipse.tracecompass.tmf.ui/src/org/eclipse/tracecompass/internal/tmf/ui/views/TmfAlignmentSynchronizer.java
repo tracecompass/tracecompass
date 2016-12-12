@@ -90,8 +90,10 @@ public class TmfAlignmentSynchronizer {
      */
     public void dispose() {
         TmfSignalManager.deregister(this);
-        fTimer.cancel();
-        fCurrentTask.cancel();
+        synchronized (fPendingOperations) {
+            fTimer.cancel();
+            fCurrentTask.cancel();
+        }
     }
 
     private IPreferenceChangeListener createPreferenceListener() {

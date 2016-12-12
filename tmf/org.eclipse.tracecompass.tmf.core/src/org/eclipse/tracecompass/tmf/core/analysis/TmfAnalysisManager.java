@@ -61,7 +61,9 @@ public class TmfAnalysisManager {
      */
     public static void dispose() {
         TmfAnalysisParameterProviders.dispose();
-        fParamProviderInstances.values().forEach(provider -> provider.dispose());
+        synchronized (fParameterProviders) {
+            fParamProviderInstances.values().forEach(provider -> provider.dispose());
+        }
     }
 
     /**

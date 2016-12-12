@@ -174,7 +174,7 @@ public class TmfSignalManager {
     /**
      * Disposes the signal manager
      */
-    public static void dispose() {
+    public static synchronized void dispose() {
         for (Entry<Object, Throwable> entry : fContexts.entrySet()) {
             System.err.println(getWarningMessage(entry.getKey()));
             StackTraceElement[] stackTrace = entry.getValue().getStackTrace();

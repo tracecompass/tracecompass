@@ -111,7 +111,7 @@ public final class TmfTraceManager {
      *
      * @since 2.3
      */
-    public void dispose() {
+    public synchronized void dispose() {
         TmfSignalManager.deregister(this);
         fTraces.clear();
         fCurrentTrace = null;
