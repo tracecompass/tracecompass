@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.timing.core.tests.store;
+package org.eclipse.tracecompass.segmentstore.core.tests.perf;
 
 import java.io.IOException;
 import java.nio.file.Files;
