@@ -84,9 +84,9 @@
   <setupTask
       xsi:type="pde:APIBaselineTask"
       name="Trace Compass"
-      version="1.1.0"
+      version="2.2.0"
       location="${workspace.location/../api.baseline}"
-      remoteURI="http://download.eclipse.org/tracecompass/releases/1.1.0/repository/tracecompass-1.1.0.zip"/>
+      remoteURI="http://download.eclipse.org/tracecompass/neon/milestones/ur2-rc4/tracecompass-2.2.0.zip"/>
   <stream name="master">
     <setupTask
         xsi:type="git:GitCloneTask"
