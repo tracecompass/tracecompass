@@ -533,7 +533,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
     //--------------------------------------------------------------------------
 
     @Override
-    public synchronized List<ITmfStateInterval> queryFullState(long t)
+    public List<ITmfStateInterval> queryFullState(long t)
             throws TimeRangeException, StateSystemDisposedException {
         if (isDisposed) {
             throw new StateSystemDisposedException();
