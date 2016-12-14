@@ -39,7 +39,7 @@ import org.eclipse.ui.IActionBars;
 public class TmfStateSystemExplorer extends TmfView {
 
     /** The Environment View's ID */
-    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.ssview"; //$NON-NLS-1$
+    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.ssvisualizer"; //$NON-NLS-1$
 
     private static final Image FILTER_IMAGE =
             Activator.getDefault().getImageFromPath( File.separator + "icons" +  File.separator + "elcl16" +  File.separator + "filter_items.gif"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

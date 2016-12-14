@@ -16,4 +16,13 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/eclipse/tracecompass/tmf/ui/views/statesystem/TmfStateSystemExplorer.java" type="org.eclipse.tracecompass.tmf.ui.views.statesystem.TmfStateSystemExplorer">
+        <filter id="388194388">
+            <message_arguments>
+                <message_argument value="org.eclipse.tracecompass.tmf.ui.views.statesystem.TmfStateSystemExplorer"/>
+                <message_argument value="ID"/>
+                <message_argument value="org.eclipse.linuxtools.tmf.ui.views.ssview"/>
+            </message_arguments>
+        </filter>
+    </resource>
 </component>
