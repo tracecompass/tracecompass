@@ -5,10 +5,6 @@ Bundle-Vendor: %Bundle-Vendor
 Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.datastore.core.tests;singleton:=true
-Bundle-Activator: org.eclipse.tracecompass.datastore.core.tests.BackendTestPlugin
-Bundle-ActivationPolicy: lazy
+Fragment-Host: org.eclipse.tracecompass.datastore.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.junit;bundle-version="4.0.0",
- org.eclipse.core.runtime,
- org.eclipse.core.resources
-Export-Package: org.eclipse.tracecompass.datastore.core.tests
+Require-Bundle: org.junit;bundle-version="4.0.0"
