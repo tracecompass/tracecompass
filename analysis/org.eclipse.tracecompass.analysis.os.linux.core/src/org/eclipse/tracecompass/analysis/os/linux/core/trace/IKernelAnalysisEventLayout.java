@@ -769,6 +769,27 @@ public interface IKernelAnalysisEventLayout {
         return "vector"; //$NON-NLS-1$
     }
 
+
+    /**
+     * Get the name of the 'order' field from memory page allocation events.
+     *
+     * The 'order' of a page allocation is it's logarithm to the base 2, and the
+     * size of the allocation is 2^order, an integral power-of-2 number of
+     * pages. 'Order' ranges from from 0 to MAX_ORDER-1.
+     *
+     * The smallest - and most frequent - page allocation is 2^0 or 1 page. The
+     * maximum allocation possible is 2^(MAX_ORDER-1) pages. MAX_ORDER is
+     * assigned a default value of 11 - resulting in a maximum allocation of
+     * 2^10 or 1024 pages. However it may be redefined at kernel configuration
+     * time with the option CONFIG_FORCE_MAX_ZONEORDER.
+     *
+     * @return the name of the order field
+     * @since 2.2
+     */
+    default @Nullable String fieldOrder() {
+        return null;
+    }
+
     // ------------------------------------------------------------------------
     // Network events and fields
     // ------------------------------------------------------------------------

@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout;
 
 import java.util.Collection;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 
@@ -26,7 +27,8 @@ import com.google.common.collect.ImmutableList;
  */
 public final class PerfEventLayout implements IKernelAnalysisEventLayout {
 
-    private PerfEventLayout() {}
+    private PerfEventLayout() {
+    }
 
     private static final PerfEventLayout INSTANCE = new PerfEventLayout();
 
@@ -78,8 +80,7 @@ public final class PerfEventLayout implements IKernelAnalysisEventLayout {
         return "sched:sched_pi_setprio"; //$NON-NLS-1$
     }
 
-    private static final Collection<String> WAKEUP_EVENTS =
-            ImmutableList.of("sched:sched_wakeup", "sched:sched_wakeup_new"); //$NON-NLS-1$ //$NON-NLS-2$
+    private static final Collection<String> WAKEUP_EVENTS = ImmutableList.of("sched:sched_wakeup", "sched:sched_wakeup_new"); //$NON-NLS-1$ //$NON-NLS-2$
 
     @Override
     public Collection<String> eventsSchedWakeup() {
@@ -139,7 +140,7 @@ public final class PerfEventLayout implements IKernelAnalysisEventLayout {
 
     @Override
     public String eventSchedProcessWakeupNew() {
-        return "sched:process_wakeup_new";  //$NON-NLS-1$
+        return "sched:process_wakeup_new"; //$NON-NLS-1$
     }
 
     @Override
@@ -149,7 +150,7 @@ public final class PerfEventLayout implements IKernelAnalysisEventLayout {
 
     @Override
     public String eventHRTimerStart() {
-        return "timer:hrtimer_start";  //$NON-NLS-1$
+        return "timer:hrtimer_start"; //$NON-NLS-1$
     }
 
     @Override
@@ -299,6 +300,11 @@ public final class PerfEventLayout implements IKernelAnalysisEventLayout {
     @Override
     public String fieldHRtimerNow() {
         return "now"; //$NON-NLS-1$
+    }
+
+    @Override
+    public @NonNull String fieldOrder() {
+        return "order"; //$NON-NLS-1$
     }
 
     // ------------------------------------------------------------------------

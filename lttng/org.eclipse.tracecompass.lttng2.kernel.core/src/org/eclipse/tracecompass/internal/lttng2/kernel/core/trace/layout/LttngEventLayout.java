@@ -105,6 +105,7 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     private static final String NR_SECTOR="nr_sector";
     private static final String RQ_SECTOR= "rq_sector";
     private static final String NEXTRQ_SECTOR= "nextrq_sector";
+    private static final String ORDER = "order";
 
     /* Network events and field names */
     private static final Collection<String> EVENTS_NETWORK_SEND = Collections.singleton("net_dev_queue");
@@ -508,6 +509,11 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     @Override
     public String @NonNull [] fieldPathTcpFlags() {
         return TCP_FLAGS_FIELD;
+    }
+
+    @Override
+    public @NonNull String fieldOrder() {
+        return ORDER;
     }
 
     // ------------------------------------------------------------------------
