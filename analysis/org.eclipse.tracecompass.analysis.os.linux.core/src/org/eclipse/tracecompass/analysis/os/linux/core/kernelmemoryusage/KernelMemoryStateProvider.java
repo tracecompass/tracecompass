@@ -49,9 +49,11 @@ public class KernelMemoryStateProvider extends AbstractTmfStateProvider {
     public static final String OTHER_TID = "other"; //$NON-NLS-1$
 
     /* Version of this state provider */
-    private static final int VERSION = 1;
+    private static final int VERSION = 2;
 
     private static final int PAGE_SIZE = 4096;
+
+    private static final long MAX_ORDER = 62; // Larger than that would overflow
 
     private IKernelAnalysisEventLayout fLayout;
 
@@ -92,8 +94,19 @@ public class KernelMemoryStateProvider extends AbstractTmfStateProvider {
         }
 
         try {
+            String fieldOrder = fLayout.fieldOrder();
+            if (fieldOrder != null) {
+                Long value = event.getContent().getFieldValue(Long.class, fieldOrder);
+                if (value != null) {
+                    if (value > MAX_ORDER || value < 0) {
+                        Activator.getDefault().logWarning("Order of alloc is outside of acceptable range : " + value); //$NON-NLS-1$
+                        return;
+                    }
+                    inc <<= value;
+                }
+            }
             ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
-            long ts = event.getTimestamp().getValue();
+            long ts = event.getTimestamp().toNanos();
 
             Integer tidField = KernelTidAspect.INSTANCE.resolve(event);
             String tid;
@@ -121,7 +134,7 @@ public class KernelMemoryStateProvider extends AbstractTmfStateProvider {
                 ss.modifyAttribute(ts, TmfStateValue.newValueLong(currentMemoryValue), lowestMemoryQuark);
             }
         } catch (AttributeNotFoundException e) {
-            Activator.getDefault().logError(e.getMessage(), e);
+            Activator.getDefault().logError(String.valueOf(e.getMessage()), e);
         }
     }
 

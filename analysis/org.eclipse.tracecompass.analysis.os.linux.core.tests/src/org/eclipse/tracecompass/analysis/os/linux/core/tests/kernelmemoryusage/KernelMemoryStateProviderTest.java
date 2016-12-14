@@ -124,7 +124,7 @@ public class KernelMemoryStateProviderTest {
         threadEvent.put(1L, PAGE_SIZE); // kmem_mm_page_alloc at timestamp = 1
         threadEvent.put(2L, -PAGE_SIZE); // kmem_mm_page_free at timestamp = 2
         threadEvent.put(3L, -PAGE_SIZE); // kmem_mm_page_free at timestamp = 3
-        threadEvent.put(17L, PAGE_SIZE); // kmem_mm_page_alloc at timestamp = 17
+        threadEvent.put(17L, PAGE_SIZE << 2); // kmem_mm_page_alloc at timestamp = 17
         threadEvent.put(22L, -PAGE_SIZE); // kmem_mm_page_free at timestamp = 22
         threadEvent.put(28L, -PAGE_SIZE); // kmem_mm_page_free at timestamp = 28
         threadEvent.put(29L, PAGE_SIZE); // kmem_mm_page_alloc at timestamp = 29

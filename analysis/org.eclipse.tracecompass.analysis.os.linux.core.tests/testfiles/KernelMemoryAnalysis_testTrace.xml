@@ -8,33 +8,41 @@
 <event timestamp="1" name="kmem_mm_page_alloc">
 <field name="cpu" value="0" type="int" />
 <field name="tid" value="proc1" type="string" />
+<field name="order" value="0" type="long" />
 </event>
 <event timestamp="2" name="kmem_mm_page_free">
 <field name="cpu" value="1" type="int" />
 <field name="tid" value="proc2" type="string" />
+<field name="order" value="0" type="long" />
 </event>
 <event timestamp="3" name="kmem_mm_page_free">
 <field name="cpu" value="1" type="int" />
 <field name="tid" value="proc1" type="string" />
+<field name="order" value="0" type="long" />
 </event>
 <event timestamp="17" name="kmem_mm_page_alloc">
 <field name="cpu" value="0" type="int" />
 <field name="tid" value="proc3" type="string" />
+<field name="order" value="2" type="long" />
 </event>
 <event timestamp="22" name="kmem_mm_page_free">
 <field name="cpu" value="1" type="int" />
 <field name="tid" value="proc4" type="string" />
+<field name="order" value="0" type="long" />
 </event>
 <event timestamp="28" name="kmem_mm_page_free">
 <field name="cpu" value="1" type="int" />
 <field name="tid" value="proc2" type="string" />
+<field name="order" value="0" type="long" />
 </event>
 <event timestamp="29" name="kmem_mm_page_alloc">
 <field name="cpu" value="0" type="int" />
 <field name="tid" value="proc4" type="string" />
+<field name="order" value="0" type="long" />
 </event>
 <event timestamp="30" name="kmem_mm_page_alloc">
 <field name="cpu" value="0" type="int" />
 <field name="tid" value="proc3" type="string" />
+<field name="order" value="0" type="long" />
 </event>
 </trace>
