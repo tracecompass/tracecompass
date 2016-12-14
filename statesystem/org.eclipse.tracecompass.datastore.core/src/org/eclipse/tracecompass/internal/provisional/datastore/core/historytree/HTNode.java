@@ -153,6 +153,15 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
         }
 
         /**
+         * Return this core data's full node. To be used by subclasses.
+         *
+         * @return The node
+         */
+        protected HTNode<?> getNode() {
+            return fNode;
+        }
+
+        /**
          * Read the specific header for this extra node data
          *
          * @param buffer

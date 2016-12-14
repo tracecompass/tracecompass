@@ -24,6 +24,7 @@ import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HistoryTreeStub;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.IHTNode;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.IHTNode.NodeType;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.classic.ClassicHistoryTreeStub;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.HTInterval;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTIntervalReader;
@@ -87,6 +88,11 @@ public class HTNodeTest<E extends IHTInterval, N extends HTNode<E>> {
                         HistoryTreeStub.NODE_FACTORY,
                         HtTestUtils.READ_FACTORY, BASE_OBJ_FACTORY
                 },
+                { "Classic leaf node",
+                        HTNode.COMMON_HEADER_SIZE,
+                        ClassicHistoryTreeStub.CLASSIC_NODE_FACTORY,
+                        HtTestUtils.READ_FACTORY,
+                        BASE_OBJ_FACTORY },
         });
     }
 

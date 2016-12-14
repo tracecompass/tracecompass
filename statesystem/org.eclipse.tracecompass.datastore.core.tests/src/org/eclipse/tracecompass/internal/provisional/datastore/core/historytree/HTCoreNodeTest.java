@@ -20,6 +20,7 @@ import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTNode;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HistoryTreeStub;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.IHTNode.NodeType;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.classic.ClassicHistoryTreeStub;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTIntervalReader;
 import org.junit.Test;
@@ -54,6 +55,12 @@ public class HTCoreNodeTest<E extends IHTInterval, N extends HTNode<E>> extends 
                         HtTestUtils.READ_FACTORY,
                         HTNodeTest.BASE_OBJ_FACTORY
                 },
+                { "Classic core node",
+                        HTNode.COMMON_HEADER_SIZE + Integer.BYTES + Integer.BYTES * NB_CHILDREN + Long.BYTES * NB_CHILDREN,
+                        ClassicHistoryTreeStub.CLASSIC_NODE_FACTORY,
+                        HtTestUtils.READ_FACTORY,
+                        HTNodeTest.BASE_OBJ_FACTORY },
+
         });
     }
 
@@ -73,8 +80,12 @@ public class HTCoreNodeTest<E extends IHTInterval, N extends HTNode<E>> extends 
      * @throws IOException
      *             Any exception occurring with the file
      */
-    public HTCoreNodeTest(String name, int headerSize, IHTNodeFactory<E, N> factory,
-            IHTIntervalReader<E> readFactory, ObjectFactory<E> objFactory) throws IOException {
+    public HTCoreNodeTest(String name,
+            int headerSize,
+            IHTNodeFactory<E, N> factory,
+            IHTIntervalReader<E> readFactory,
+            ObjectFactory<E> objFactory) throws IOException {
+
         super(name, headerSize, NodeType.CORE, factory, readFactory, objFactory);
     }
 
