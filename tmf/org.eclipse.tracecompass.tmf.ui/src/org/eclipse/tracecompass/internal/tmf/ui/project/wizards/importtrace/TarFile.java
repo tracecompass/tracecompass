@@ -63,7 +63,7 @@ public class TarFile {
         entryEnumerationStream = new TarArchiveInputStream(fInputStream);
         try {
             curEntry = (TarArchiveEntry) entryEnumerationStream.getNextEntry();
-            if (!curEntry.isCheckSumOK()) {
+            if (curEntry == null || !curEntry.isCheckSumOK()) {
                 throw new IOException("Error detected parsing initial entry header"); //$NON-NLS-1$
             }
         } catch (IOException e) {
