@@ -26,6 +26,8 @@ import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Memory usage view
  *
@@ -97,5 +99,12 @@ public class KernelMemoryUsageView extends TmfChartView {
             }
         });
         return fTreeViewer;
+    }
+
+    @VisibleForTesting
+    @Override
+    public TmfXYChartViewer getChartViewer() {
+        // change visibility
+        return super.getChartViewer();
     }
 }
