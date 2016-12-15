@@ -104,12 +104,13 @@ public class ArchiveUtil {
         }
 
         // FIXME: Work around Bug 463633. Remove this block once we move to Eclipse 4.5.
-        if (new File(fileName).length() < 512) {
+        File tarCandidate = new File(fileName);
+        if (tarCandidate.length() < 512) {
             return null;
         }
 
         try {
-            return new TarFile(fileName);
+            return new TarFile(tarCandidate);
         } catch (IOException e) {
             // ignore
         }
