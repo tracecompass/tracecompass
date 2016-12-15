@@ -22,13 +22,12 @@ import java.util.List;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
+import org.eclipse.tracecompass.lttng2.lttng.kernel.core.tests.shared.LttngKernelTestTraceUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestHelper;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.After;
@@ -51,16 +50,7 @@ public class LttngKernelAnalysisTest {
     @Before
     public void setUp() {
         fKernelAnalysisModule = new KernelAnalysisModule();
-        // Rework the utils to allow creating a sub-type directly.
-        String path = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.KERNEL).getPath();
-
-        fTrace = new LttngKernelTrace();
-        try {
-            fTrace.initTrace(null, path, CtfTmfEvent.class);
-        } catch (TmfTraceException e) {
-            /* Should not happen if tracesExist() passed */
-            throw new RuntimeException(e);
-        }
+        fTrace = LttngKernelTestTraceUtils.getTrace(CtfTestTrace.KERNEL);
     }
 
     /**
@@ -68,7 +58,7 @@ public class LttngKernelAnalysisTest {
      */
     @After
     public void tearDown() {
-        fTrace.dispose();
+        LttngKernelTestTraceUtils.dispose(CtfTestTrace.KERNEL);
         fKernelAnalysisModule.dispose();
         fTrace = null;
         fKernelAnalysisModule = null;
@@ -116,7 +106,7 @@ public class LttngKernelAnalysisTest {
          * in the kernel analysis so it will return true.
          */
         assertTrue(fKernelAnalysisModule.canExecute(trace));
-        trace.dispose();
+        CtfTmfTestTraceUtils.dispose(CtfTestTrace.CYG_PROFILE);
     }
 
 }

@@ -82,8 +82,7 @@ public class ExperimentSyncTest {
         assertEquals(syncAlgo.getTimestampTransform(trace1.getHostId()), trace1.getTimestampTransform());
         assertEquals(syncAlgo.getTimestampTransform(trace2.getHostId()), trace2.getTimestampTransform());
 
-        trace1.dispose();
-        trace2.dispose();
+        experiment.dispose();
     }
 
     /**
@@ -113,8 +112,6 @@ public class ExperimentSyncTest {
         assertEquals("TmfTimestampTransformLinearFast [ slope = 0.9999996313017589597204633828681240, offset = 498490309972.0038068817738527724192 ]", tt2.toString());
         assertEquals("TmfTimestampTransformLinearFast [ slope = 1.000000119014882262265342419815932, offset = -166652893534.6189900382736187431134 ]", tt3.toString());
 
-        trace1.dispose();
-        trace2.dispose();
-        trace3.dispose();
+        experiment.dispose();
     }
 }

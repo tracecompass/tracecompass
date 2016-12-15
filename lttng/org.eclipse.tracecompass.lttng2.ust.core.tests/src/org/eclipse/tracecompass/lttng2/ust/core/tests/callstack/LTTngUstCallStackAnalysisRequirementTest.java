@@ -19,6 +19,7 @@ import org.eclipse.tracecompass.internal.lttng2.ust.core.callstack.LttngUstCallS
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventType;
+import org.junit.AfterClass;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableSet;
@@ -107,6 +108,16 @@ public class LTTngUstCallStackAnalysisRequirementTest {
             return fIsValid;
         }
 
+    }
+
+    /**
+     * Clean up
+     */
+    @AfterClass
+    public static void cleanup() {
+        for (TestData testData: TestData.values()) {
+            testData.getTrace().dispose();
+        }
     }
 
     /**

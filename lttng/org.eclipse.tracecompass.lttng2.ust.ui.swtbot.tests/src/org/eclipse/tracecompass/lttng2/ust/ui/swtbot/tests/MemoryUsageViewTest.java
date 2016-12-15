@@ -87,6 +87,7 @@ public class MemoryUsageViewTest {
         assertNotNull(treeItem);
         final CtfTestTrace cygProfile = CtfTestTrace.MEMORY_ANALYSIS;
         final File file = new File(CtfTmfTestTraceUtils.getTrace(cygProfile).getPath());
+        CtfTmfTestTraceUtils.dispose(cygProfile);
         SWTBotUtils.openTrace(PROJECT_NAME, file.getAbsolutePath(), UST_ID);
         SWTBotUtils.openView(MemoryUsageView.ID);
         WaitUtils.waitForJobs();

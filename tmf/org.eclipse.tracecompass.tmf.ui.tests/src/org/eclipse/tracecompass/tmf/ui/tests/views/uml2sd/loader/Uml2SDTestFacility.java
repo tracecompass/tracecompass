@@ -148,6 +148,9 @@ public class Uml2SDTestFacility {
             delay(200);
             fIsInitialized = false;
         }
+        if (fTrace != null) {
+            fTrace.dispose();
+        }
     }
 
     /**
@@ -333,12 +336,11 @@ public class Uml2SDTestFacility {
      * @param wait true to wait for indexing to finish else false
      */
     public void selectExperiment(final boolean wait) {
-        fParser = new TmfUml2SDTestTrace();
-        fTrace = setupTrace(fParser);
-        fParser.setTrace(fTrace);
+        TmfUml2SDTestTrace parser = new TmfUml2SDTestTrace();
+        ITmfTrace trace = setupTrace(parser);
+        parser.setTrace(trace);
 
-        final ITmfTrace traces[] = new ITmfTrace[1];
-        traces[0] = fTrace;
+        final ITmfTrace traces[] = new ITmfTrace[] { trace };
         fExperiment = new TmfExperiment(ITmfEvent.class, "TestExperiment",
                 traces, TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, null) {
             @Override
@@ -346,8 +348,8 @@ public class Uml2SDTestFacility {
                 return new TmfCheckpointIndexer(this, interval);
             }
         };
-        fTrace.broadcast(new TmfTraceOpenedSignal(this, fExperiment, null));
-        fTrace.broadcast(new TmfTraceSelectedSignal(this, fExperiment));
+        trace.broadcast(new TmfTraceOpenedSignal(this, fExperiment, null));
+        trace.broadcast(new TmfTraceSelectedSignal(this, fExperiment));
         if (wait) {
             while (fExperiment.getNbEvents() == 0) {
                 delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
@@ -361,12 +363,11 @@ public class Uml2SDTestFacility {
      * Disposes the experiment.
      */
     public void disposeExperiment() {
-        ITmfTrace trace = fTrace;
         TmfExperiment experiment = fExperiment;
-        if (trace == null || experiment == null) {
+        if (experiment == null) {
             throw new IllegalStateException();
         }
-        trace.broadcast(new TmfTraceClosedSignal(this, experiment));
+        experiment.broadcast(new TmfTraceClosedSignal(this, experiment));
         experiment.dispose();
         delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
     }

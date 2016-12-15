@@ -87,6 +87,7 @@ public class TraceAndExperimentTypeTest {
         TmfExperiment experiment = experimentElement.instantiateTrace();
         assertNotNull(experiment);
         assertEquals(TmfTraceType.DEFAULT_EXPERIMENT_TYPE, experimentElement.getTraceType());
+        experiment.dispose();
     }
 
     /**

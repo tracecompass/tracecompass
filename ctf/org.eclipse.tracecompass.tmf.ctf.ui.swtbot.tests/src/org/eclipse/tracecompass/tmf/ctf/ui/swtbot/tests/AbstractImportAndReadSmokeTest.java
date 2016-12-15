@@ -74,7 +74,7 @@ public abstract class AbstractImportAndReadSmokeTest {
     /** Trace type name for generic CTF traces */
     protected static final String TRACE_TYPE_NAME = "Generic CTF Trace";
     /** A Generic CTF Trace */
-    protected static final @NonNull CtfTestTrace fTrace = CtfTestTrace.SYNC_DEST;
+    protected static final @NonNull CtfTmfTrace fTrace = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.SYNC_DEST);
     /** SWT BOT workbench reference */
     protected static SWTWorkbenchBot fBot;
     /** Wizard to use */
@@ -106,6 +106,7 @@ public abstract class AbstractImportAndReadSmokeTest {
      */
     @AfterClass
     public static void terminate() {
+        CtfTmfTestTraceUtils.dispose(CtfTestTrace.SYNC_DEST);
         fLogger.removeAllAppenders();
     }
 
@@ -280,9 +281,8 @@ public abstract class AbstractImportAndReadSmokeTest {
      * @return the event at given rank
      */
     protected CtfTmfEvent getEvent(int rank) {
-        CtfTmfTrace trace = CtfTmfTestTraceUtils.getTrace(fTrace);
-        ITmfContext ctx = trace.seekEvent(rank);
-        CtfTmfEvent ret = trace.getNext(ctx);
+        ITmfContext ctx = fTrace.seekEvent(rank);
+        CtfTmfEvent ret = fTrace.getNext(ctx);
         ctx.dispose();
         return ret;
     }

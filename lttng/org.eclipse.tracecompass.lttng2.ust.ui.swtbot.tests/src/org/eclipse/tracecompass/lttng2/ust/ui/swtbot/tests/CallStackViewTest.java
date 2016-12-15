@@ -182,6 +182,7 @@ public class CallStackViewTest {
         assertNotNull(treeItem);
         final CtfTestTrace cygProfile = CtfTestTrace.CYG_PROFILE;
         final File file = new File(CtfTmfTestTraceUtils.getTrace(cygProfile).getPath());
+        CtfTmfTestTraceUtils.dispose(cygProfile);
         SWTBotUtils.openTrace(PROJECT_NAME, file.getAbsolutePath(), UST_ID);
         SWTBotUtils.openView(CallStackView.ID);
         WaitUtils.waitForJobs();
