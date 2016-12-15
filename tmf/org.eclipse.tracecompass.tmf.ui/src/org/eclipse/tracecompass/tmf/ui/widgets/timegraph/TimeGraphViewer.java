@@ -885,10 +885,6 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
         fMarkerAxisCtrl.redraw();
-        /* force update the controls to keep them aligned */
-        fTimeScaleCtrl.update();
-        fMarkerAxisCtrl.update();
-        fTimeGraphCtrl.update();
     }
 
     @Override
@@ -971,10 +967,6 @@ public class TimeGraphViewer implements ITimeDataProvider, IMarkerAxisListener, 
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
         fMarkerAxisCtrl.redraw();
-        /* force update the controls to keep them aligned */
-        fTimeScaleCtrl.update();
-        fMarkerAxisCtrl.update();
-        fTimeGraphCtrl.update();
     }
 
     @Override
