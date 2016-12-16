@@ -53,7 +53,9 @@ public enum TmfXmlTestFiles {
     /** A valid pattern file to test the initialState element */
     INITIAL_STATE_ELEMENT_TEST_FILE_1("test_xml_files/test_valid/test_initialState_element1.xml"),
     /** A valid pattern file to test the initialState element */
-    INITIAL_STATE_ELEMENT_TEST_FILE_2("test_xml_files/test_valid/test_initialState_element2.xml");
+    INITIAL_STATE_ELEMENT_TEST_FILE_2("test_xml_files/test_valid/test_initialState_element2.xml"),
+    /** A valid xml timegraph view */
+    VALID_TIMEGRAPH_VIEW_ELEMENT_FILE("test_xml_files/test_valid/test_valid_xml_timegraphView.xml");
 
     private final String fPath;
 

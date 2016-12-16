@@ -27,7 +27,7 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.analysis.xml.ui;x-friends:
  org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module;x-friends:="org.eclipse.tracecompass.tmf.analysis.xml.ui.tests",
  org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency;x-friends:="org.eclipse.tracecompass.tmf.analysis.xml.ui.swtbot.tests",
- org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.timegraph;x-internal:=true,
+ org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.timegraph;x-friends:="org.eclipse.tracecompass.tmf.analysis.xml.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.xychart;x-internal:=true
 Import-Package: com.google.common.collect,
  org.eclipse.ui.views.properties
