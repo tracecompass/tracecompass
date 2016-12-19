@@ -2394,6 +2394,22 @@ A time aligned XY chart of the read and write speed for the different disks on t
 
 The '''System Call Latency Analysis''' measures the system call latency between system call entry and exit per type of system call. The durations are visualized using the '''Latency''' views. For more information about the '''Latency''' views see chapter [[#Latency_Analyses | Latency Analyses]].
 
+== Futex Contention Latency Analysis ==
+
+The '''Futex Contention Latency Analysis''' measures the futexes contention latency between futex entry and exit event for a thread. The durations are visualized using the '''Latency''' views. For more information about the '''Latency''' views see chapter [[#Latency_Analyses | Latency Analyses]].
+
+The following views are also available for the Futex Contention Latency Analysis:
+
+=== Uaddr vs Waiter ===
+A timegraph view of the waiters by futex uaddr. This view is useful to see which threads are waiting on a specific futex and understand blocked threads.
+
+[[Image:images/futex/uaddrVsWaiter.png| uaddr vs waiter example]]
+
+=== Scenarios ===
+A timegraph view of the futex wait/lock and wake/unlock scenarios (from futex entry to futex exit). This view is useful to suss up the general level of contention in a given trace. It highlights futex lifespans.
+
+[[Image:images/futex/scenario.png| scenario example]]
+
 == LTTng Kernel Events Editor ==
 
 The LTTng Kernel Events editor '''is''' the plain TMF [[#Events_Editor | Events Editor]], except that it provides its own specialized viewer to replace the standard one. In short, it has exactly the same behaviour but the layout is slightly different:

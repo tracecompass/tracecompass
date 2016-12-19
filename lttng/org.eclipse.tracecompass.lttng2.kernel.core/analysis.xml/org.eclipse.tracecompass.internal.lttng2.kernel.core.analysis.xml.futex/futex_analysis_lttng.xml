@@ -59,7 +59,7 @@ TRYLOCK_PI	136		264
 <timeGraphView id="lttng2.kernel.core.futex.uaddrvswaiter">
 	<head>
 		<analysis id="lttng.analysis.futex"/>
-		<label value="uaddr vs waiter" />
+		<label value="Uaddr vs Waiter" />
 	</head>
 	<definedValue name="WAIT" value="1" color="#646464" />
 
@@ -75,7 +75,7 @@ TRYLOCK_PI	136		264
 <timeGraphView id="lttng2.kernel.core.futex.scenarios">
 	<head>
 		<analysis id="lttng.analysis.futex" />
-		<label value="scenario" />
+		<label value="Scenarios" />
 	</head>
 <!--  FFA040 -->
 	<definedValue name="PENDING" value="0" color="#CCCCCC"/>
