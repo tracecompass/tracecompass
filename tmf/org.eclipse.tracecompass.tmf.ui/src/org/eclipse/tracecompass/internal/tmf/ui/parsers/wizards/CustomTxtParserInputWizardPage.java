@@ -279,7 +279,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 InputLine inputLine = new InputLine(Cardinality.ZERO_OR_MORE, "", null); //$NON-NLS-1$
-                if (((List<?>) treeViewer.getInput()).size() == 0) {
+                if (((List<?>) treeViewer.getInput()).isEmpty()) {
                     definition.inputs.add(inputLine);
                 } else if (treeViewer.getSelection().isEmpty()) {
                     return;
@@ -306,7 +306,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 InputLine inputLine = new InputLine(Cardinality.ZERO_OR_MORE, "", null); //$NON-NLS-1$
-                if (((List<?>) treeViewer.getInput()).size() == 0) {
+                if (((List<?>) treeViewer.getInput()).isEmpty()) {
                     definition.inputs.add(inputLine);
                 } else if (treeViewer.getSelection().isEmpty()) {
                     return;
@@ -497,7 +497,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         @Override
         public boolean hasChildren(Object element) {
             InputLine inputLine = (InputLine) element;
-            return (inputLine.childrenInputs != null && inputLine.childrenInputs.size() > 0);
+            return (inputLine.childrenInputs != null && !inputLine.childrenInputs.isEmpty());
         }
 
         @Override
@@ -569,7 +569,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             timestampOutputFormatText.setText(""); //$NON-NLS-1$
         }
         treeViewer.setInput(def.inputs);
-        if (def.inputs.size() > 0) {
+        if (!def.inputs.isEmpty()) {
             InputLine inputLine = def.inputs.get(0);
             treeViewer.setSelection(new StructuredSelection(inputLine));
         }
@@ -733,7 +733,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                         }
                         HashMap<InputLine, Integer> countMap = new HashMap<>();
                         InputLine currentInput = null;
-                        if (rootInputLine.childrenInputs != null && rootInputLine.childrenInputs.size() > 0) {
+                        if (rootInputLine.childrenInputs != null && !rootInputLine.childrenInputs.isEmpty()) {
                             currentInput = rootInputLine.childrenInputs.get(0);
                             countMap.put(currentInput, 0);
                         }
@@ -757,7 +757,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                             } else {
                                 if (checkNotNull(countMap.get(currentInput)) >= currentInput.getMinCount()) {
                                     List<InputLine> nextInputs = currentInput.getNextInputs(countMap);
-                                    if (nextInputs.size() == 0 || nextInputs.get(nextInputs.size() - 1).getMinCount() == 0) {
+                                    if (nextInputs.isEmpty() || nextInputs.get(nextInputs.size() - 1).getMinCount() == 0) {
                                         for (InputLine input : definition.inputs) {
                                             try {
                                                 matcher = input.getPattern().matcher(log);
@@ -792,12 +792,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                                                     iter.remove();
                                                 }
                                             }
-                                            if (currentInput.childrenInputs != null && currentInput.childrenInputs.size() > 0) {
+                                            if (currentInput.childrenInputs != null && !currentInput.childrenInputs.isEmpty()) {
                                                 currentInput = currentInput.childrenInputs.get(0);
                                                 countMap.put(currentInput, 0);
                                             } else {
                                                 if (checkNotNull(countMap.get(currentInput)) >= currentInput.getMaxCount()) {
-                                                    if (currentInput.getNextInputs(countMap).size() > 0) {
+                                                    if (!currentInput.getNextInputs(countMap).isEmpty()) {
                                                         currentInput = currentInput.getNextInputs(countMap).get(0);
                                                         if (countMap.get(currentInput) == null) {
                                                             countMap.put(currentInput, 0);
@@ -830,12 +830,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                                                 COLOR_BLACK, COLOR_LIGHT_YELLOW, SWT.ITALIC));
                                         updatePreviewLine(currentInput, matcher, data, rawPos, rootLineMatches);
                                         countMap.put(currentInput, checkNotNull(countMap.get(currentInput)) + 1);
-                                        if (currentInput.childrenInputs != null && currentInput.childrenInputs.size() > 0) {
+                                        if (currentInput.childrenInputs != null && !currentInput.childrenInputs.isEmpty()) {
                                             currentInput = currentInput.childrenInputs.get(0);
                                             countMap.put(currentInput, 0);
                                         } else {
                                             if (checkNotNull(countMap.get(currentInput)) >= currentInput.getMaxCount()) {
-                                                if (currentInput.getNextInputs(countMap).size() > 0) {
+                                                if (!currentInput.getNextInputs(countMap).isEmpty()) {
                                                     currentInput = currentInput.getNextInputs(countMap).get(0);
                                                     if (countMap.get(currentInput) == null) {
                                                         countMap.put(currentInput, 0);
