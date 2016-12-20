@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.lttng2.ust.core.callstack;
 
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -121,8 +122,7 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
             return false;
         }
         ITmfEventField content = ((CtfTmfEvent) event).getContent();
-        if (content.getField(fLayout.contextVtid()) == null ||
-                content.getField(fLayout.contextProcname()) == null) {
+        if (content.getField(fLayout.contextVtid()) == null) {
             return false;
         }
         return true;
@@ -178,8 +178,9 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
     public @Nullable String getThreadName(ITmfEvent event) {
         /* We checked earlier that the "procname" context is present */
         ITmfEventField content = event.getContent();
-        String procName = (String) content.getField(fLayout.contextProcname()).getValue();
+        ITmfEventField field = content.getField(fLayout.contextProcname());
+        String procName = field == null ? StringUtils.EMPTY : (String.valueOf(field.getValue()) + '-');
         long vtid = getThreadId(event);
-        return (procName + '-' + Long.toString(vtid));
+        return (procName + Long.toString(vtid));
     }
 }

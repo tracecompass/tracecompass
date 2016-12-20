@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.internal.lttng2.ust.core.callstack;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -44,9 +45,7 @@ public class LttngUstCallStackAnalysisRequirement extends TmfCompositeAnalysisRe
     }
 
     private static Collection<TmfAbstractAnalysisRequirement> getSubRequirements(ILttngUstEventLayout layout) {
-        Set<@NonNull String> requiredEventsFields = ImmutableSet.of(
-                layout.contextProcname(),
-                layout.contextVtid());
+        Set<@NonNull String> requiredEventsFields = Collections.singleton(layout.contextVtid());
 
         // Requirement for the cyg_profile events
         TmfAnalysisEventFieldRequirement entryReq = new TmfAnalysisEventFieldRequirement(

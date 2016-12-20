@@ -28,4 +28,5 @@ Import-Package: com.google.common.annotations;version="15.0.0",
  com.google.common.base,
  com.google.common.cache,
  com.google.common.collect,
- com.google.common.io
+ com.google.common.io,
+ org.apache.commons.lang3;version="3.1.0"
