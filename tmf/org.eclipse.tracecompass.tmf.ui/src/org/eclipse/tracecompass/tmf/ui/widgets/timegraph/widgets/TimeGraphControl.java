@@ -1725,7 +1725,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Get the bounds of the specified entry
+     * Get the bounds of the specified entry relative to its parent time graph.
      *
      * @param entry the time graph entry
      * @return the bounds of the entry, or null if the entry is not visible
@@ -1734,7 +1734,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     public Rectangle getItemBounds(ITimeGraphEntry entry) {
         int idx = fItemData.findItemIndex(entry);
         if (idx >= 0) {
-            return getItemRect(getBounds(), idx);
+            return getItemRect(getClientArea(), idx);
         }
         return null;
     }

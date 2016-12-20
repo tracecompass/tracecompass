@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -64,15 +65,17 @@ public class SWTBotTimeGraphEntry extends AbstractSWTBotControl<TimeGraphControl
                 if (bounds == null) {
                     return;
                 }
+                Point location = widget.toDisplay(bounds.x, bounds.y);
                 final Event event = new Event();
                 event.time = (int) System.currentTimeMillis();
                 event.display = control.getDisplay();
                 event.widget = control;
-                event.x = bounds.x + widget.getTimeDataProvider().getNameSpace() / 2;
-                event.y = bounds.y + bounds.height / 2;
+                event.x = location.x + widget.getTimeDataProvider().getNameSpace() / 2;
+                event.y = location.y + bounds.height / 2;
                 control.notifyListeners(SWT.MenuDetect, event);
             }
         });
+        select();
 
         WaitForObjectCondition<Menu> waitForMenu = Conditions.waitForPopupMenu(control);
         new SWTBot().waitUntilWidgetAppears(waitForMenu);
@@ -157,7 +160,8 @@ public class SWTBotTimeGraphEntry extends AbstractSWTBotControl<TimeGraphControl
             @Override
             public void run() {
                 widget.setFocus();
-                widget.selectItem(fEntry, true);
+                widget.selectItem(fEntry, false);
+                widget.fireSelectionChanged();
             }
         });
         return this;
