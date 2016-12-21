@@ -511,8 +511,10 @@ public final class TmfTraceManager {
     /**
      * Signal handler for the selection range signal.
      *
-     * The current time of *all* traces whose range contains the requested new
-     * selection time range will be updated.
+     * If the active trace is null, the time selection of *all* traces whose
+     * range contains the requested new selection time range will be updated. If
+     * there is an active trace, the signal trace and time-synchronized traces
+     * will be updated, but not other instances of the signal trace.
      *
      * @param signal
      *            The incoming signal
@@ -522,9 +524,14 @@ public final class TmfTraceManager {
     public synchronized void selectionRangeUpdated(final TmfSelectionRangeUpdatedSignal signal) {
         final ITmfTimestamp beginTs = signal.getBeginTime();
         final ITmfTimestamp endTs = signal.getEndTime();
+        final ITmfTrace activeTrace = fCurrentTrace;
+        final IResource activeResource = activeTrace == null ? null : activeTrace.getResource();
 
         for (ITmfTrace trace : fTraces.keySet()) {
-            if (beginTs.intersects(getValidTimeRange(trace)) || endTs.intersects(getValidTimeRange(trace))) {
+            /* other instance of the same trace should never synchronize */
+            final boolean sameTrace = trace.getResource() == null ? false : trace.getResource().equals(activeResource);
+            if ((beginTs.intersects(getValidTimeRange(trace)) || endTs.intersects(getValidTimeRange(trace)))
+                    && ((activeTrace == null) || trace.equals(activeTrace) || (!sameTrace && getTraceContext(trace).isSynchronized()))) {
                 updateTraceContext(trace, builder ->
                         builder.setSelection(new TmfTimeRange(beginTs, endTs)));
             }
@@ -534,8 +541,10 @@ public final class TmfTraceManager {
     /**
      * Signal handler for the window range signal.
      *
-     * The current window time range of *all* valid traces will be updated to
-     * the new requested times.
+     * If the active trace is null, the window range of *all* valid traces will
+     * be updated to the new window range. If there is an active trace, the
+     * active trace and time-synchronized traces will be updated, but not other
+     * instances of the active trace.
      *
      * @param signal
      *            The incoming signal
@@ -543,10 +552,19 @@ public final class TmfTraceManager {
      */
     @TmfSignalHandler
     public synchronized void windowRangeUpdated(final TmfWindowRangeUpdatedSignal signal) {
-        for (ITmfTrace trace : fTraces.keySet()) {
+        final ITmfTrace activeTrace = fCurrentTrace;
+        final IResource activeResource = activeTrace == null ? null : activeTrace.getResource();
+        for (Map.Entry<ITmfTrace, TmfTraceContext> entry : fTraces.entrySet()) {
+            ITmfTrace trace = checkNotNull(entry.getKey());
+            TmfTraceContext ctx = checkNotNull(entry.getValue());
+            /* other instance of the same trace should never synchronize */
+            final boolean sameTrace = trace.getResource() == null ? false : trace.getResource().equals(activeResource);
+            if ((activeTrace != null) && !trace.equals(activeTrace) && (sameTrace || !ctx.isSynchronized())) {
+                continue;
+            }
             final TmfTimeRange validTr = getValidTimeRange(trace);
             if (validTr == null) {
-                return;
+                continue;
             }
 
             /* Determine the new time range */

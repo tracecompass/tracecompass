@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,6 +13,7 @@
 
 package org.eclipse.tracecompass.tmf.ctf.core.tests.temp.tracemanager;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -599,6 +600,8 @@ public class TmfTraceManagerTest {
     public void testTwoTracesTimeRangeInBoth() {
         openTrace(trace1);
         openTrace(trace2);
+        /* Enable time synchronization for trace2 */
+        TmfTraceManager.getInstance().updateTraceContext(checkNotNull(trace2), builder -> builder.setSynchronized(true));
         selectTrace(trace1);
         TmfTimeRange range = new TmfTimeRange(
                 TmfTimestamp.fromNanos(t1end - ONE_SECOND),
