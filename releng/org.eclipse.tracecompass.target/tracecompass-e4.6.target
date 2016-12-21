@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="tracecompass-e4.6" sequenceNumber="24">
+<?pde version="3.8"?><target name="tracecompass-e4.6" sequenceNumber="25">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.cdt.gnu.dsf.feature.group" version="0.0.0"/>
-<repository location="http://download.eclipse.org/tools/cdt/releases/9.1/r"/>
+<repository location="http://download.eclipse.org/tools/cdt/builds/neon/milestones/ur2-rc4/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.mylyn.wikitext_feature.feature.group" version="0.0.0"/>
@@ -11,7 +11,7 @@
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.linuxtools.dataviewers.feature.feature.group" version="0.0.0"/>
-<repository location="http://download.eclipse.org/linuxtools/update-5.1.0"/>
+<repository location="http://download.eclipse.org/linuxtools/update-neon-2-rc4a"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.swtbot.eclipse.feature.group" version="0.0.0"/>
@@ -24,10 +24,14 @@
 <unit id="org.eclipse.remote.ui" version="0.0.0"/>
 <unit id="org.eclipse.remote.jsch.core" version="0.0.0"/>
 <unit id="org.eclipse.remote.jsch.ui" version="0.0.0"/>
-<repository location="http://download.eclipse.org/tools/ptp/builds/remote/neon/milestones/UR1-RC3"/>
+<repository location="http://download.eclipse.org/tools/ptp/builds/remote/neon/milestones/UR2-RC4"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-<repository location="http://download.eclipse.org/tools/cdt/launchbar/neon.1"/>
+<unit id="org.eclipse.tm.terminal.control" version="0.0.0"/>
+<repository location="http://download.eclipse.org/tm/terminal/updates/4.2milestones/20161128"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
+<repository location="http://download.eclipse.org/tools/cdt/launchbar/neon.2"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.antlr.runtime" version="3.2.0.v201101311130"/>
@@ -36,6 +40,7 @@
 <unit id="org.apache.commons.io" version="0.0.0"/>
 <unit id="org.swtchart" version="0.7.0.v201201201914"/>
 <unit id="com.google.guava" version="15.0.0.v201403281430"/>
+<unit id="com.google.guava" version="0.0.0"/>
 <unit id="org.json" version="0.0.0"/>
 <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20160520211859/repository/"/>
 </location>
@@ -56,7 +61,7 @@
 <unit id="org.eclipse.jdt.annotation" version="0.0.0"/>
 <unit id="org.eclipse.ui.trace" version="0.0.0"/>
 <unit id="org.eclipse.ui.views.log" version="0.0.0"/>
-<repository location="http://download.eclipse.org/eclipse/updates/4.6/"/>
+<repository location="http://download.eclipse.org/eclipse/updates/4.6/R-4.6.2-201611241400/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf" version="1.6.0"/>
