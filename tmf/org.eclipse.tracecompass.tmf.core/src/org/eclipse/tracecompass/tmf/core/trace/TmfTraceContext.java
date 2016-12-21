@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -48,7 +48,7 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
     private final TmfTimeRange fWindowRange;
     private final @Nullable IFile fEditorFile;
     private final @Nullable ITmfFilter fFilter;
-    private final Map<@NonNull String, @NonNull Object> fData = new HashMap<>();
+    private final Map<@NonNull String, @NonNull Object> fData;
 
     /**
      * Build a new trace context.
@@ -68,7 +68,22 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
         fWindowRange = windowRange;
         fEditorFile = editorFile;
         fFilter = filter;
-        fData.clear();
+        fData = new HashMap<>();
+    }
+
+    /**
+     * Constructs a new trace context with data taken from a builder.
+     *
+     * @param builder
+     *            the builder
+     * @since 2.3
+     */
+    public TmfTraceContext(Builder builder) {
+        fSelection = builder.selection;
+        fWindowRange = builder.windowRange;
+        fEditorFile = builder.editorFile;
+        fFilter = builder.filter;
+        fData = new HashMap<>(builder.data);
     }
 
     /**
@@ -151,6 +166,89 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
      */
     public synchronized Map<String, Object> getData() {
         return ImmutableMap.copyOf(fData);
+    }
+
+    /**
+     * Returns a new builder that is initialized with the data from this trace
+     * context.
+     *
+     * @return the builder
+     * @since 2.3
+     */
+    public Builder builder() {
+        return new Builder(this);
+    }
+
+    /**
+     * A builder for creating trace context instances.
+     *
+     * @since 2.3
+     */
+    public class Builder {
+        private TmfTimeRange selection;
+        private TmfTimeRange windowRange;
+        private @Nullable IFile editorFile;
+        private @Nullable ITmfFilter filter;
+        private Map<String, Object> data;
+
+        /**
+         * Constructor
+         *
+         * @param ctx
+         *            the trace context used to initialize the builder
+         */
+        public Builder(TmfTraceContext ctx) {
+            this.selection = ctx.fSelection;
+            this.windowRange = ctx.fWindowRange;
+            this.editorFile = ctx.fEditorFile;
+            this.filter = ctx.fFilter;
+            this.data = new HashMap<>(ctx.fData);
+        }
+
+        /**
+         * Build the trace context.
+         *
+         * @return a trace context
+         */
+        public TmfTraceContext build() {
+            return new TmfTraceContext(this);
+        }
+
+        /**
+         * Sets the selected time range.
+         *
+         * @param selection
+         *            the selected time range
+         * @return this {@code Builder} object
+         */
+        public Builder setSelection(TmfTimeRange selection) {
+            this.selection = selection;
+            return this;
+        }
+
+        /**
+         * Sets the window range.
+         *
+         * @param windowRange
+         *            the window range
+         * @return this {@code Builder} object
+         */
+        public Builder setWindowRange(TmfTimeRange windowRange) {
+            this.windowRange = windowRange;
+            return this;
+        }
+
+        /**
+         * Sets the current filter.
+         *
+         * @param filter
+         *            the current filter
+         * @return this {@code Builder} object
+         */
+        public Builder setFilter(@Nullable ITmfFilter filter) {
+            this.filter = filter;
+            return this;
+        }
     }
 
     @Override

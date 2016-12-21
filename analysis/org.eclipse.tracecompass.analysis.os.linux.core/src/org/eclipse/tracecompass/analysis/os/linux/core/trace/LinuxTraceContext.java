@@ -59,6 +59,20 @@ public class LinuxTraceContext extends TmfTraceContext {
         fTrace = trace;
     }
 
+    /**
+     * Constructs a new trace context with data taken from a builder.
+     *
+     * @param builder
+     *            the builder
+     * @since 2.2
+     */
+    public LinuxTraceContext(LinuxBuilder builder) {
+        super(builder);
+        fCpu = builder.cpu;
+        fTid = builder.tid;
+        fTrace = builder.trace;
+    }
+
     @Override
     public void receive(@NonNull TmfTraceModelSignal signal) {
         if (signal.getHostId().equals(fTrace.getHostId())) {
@@ -88,4 +102,42 @@ public class LinuxTraceContext extends TmfTraceContext {
         return fTid;
     }
 
+    @Override
+    public @NonNull Builder builder() {
+        return new LinuxBuilder(this);
+    }
+
+    /**
+     * A builder for creating trace context instances.
+     *
+     * @since 2.2
+     */
+    public class LinuxBuilder extends Builder {
+        private int cpu;
+        private int tid;
+        private ITmfTrace trace;
+
+        /**
+         * Constructor
+         *
+         * @param ctx
+         *            the trace context used to initialize the builder
+         */
+        public LinuxBuilder(LinuxTraceContext ctx) {
+            super(ctx);
+            this.cpu = ctx.fCpu;
+            this.tid = ctx.fTid;
+            this.trace = ctx.fTrace;
+        }
+
+        /**
+         * Build the trace context.
+         *
+         * @return a trace context
+         */
+        @Override
+        public TmfTraceContext build() {
+            return new LinuxTraceContext(this);
+        }
+    }
 }

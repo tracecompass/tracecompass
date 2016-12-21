@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -368,17 +368,15 @@ public final class TmfTraceManager {
      */
     @TmfSignalHandler
     public synchronized void filterApplied(TmfEventFilterAppliedSignal signal) {
-        final ITmfTrace newTrace = signal.getTrace();
-        TmfTraceContext context = fTraces.get(newTrace);
+        final ITmfTrace trace = signal.getTrace();
+        TmfTraceContext context = fTraces.get(trace);
         if (context == null) {
             throw new RuntimeException();
         }
-        final TmfTraceContext newContext = newTrace.createTraceContext(context.getSelectionRange(),
-                context.getWindowRange(),
-                context.getEditorFile(),
-                signal.getEventFilter());
-        newContext.setData(context.getData());
-        fTraces.put(newTrace, newContext);
+        final TmfTraceContext newContext = context.builder()
+                .setFilter(signal.getEventFilter())
+                .build();
+        fTraces.put(trace, newContext);
     }
 
     /**
@@ -424,11 +422,9 @@ public final class TmfTraceManager {
                  * else the same as the previous trace context.
                  */
                 TmfTimeRange newSelectionRange = new TmfTimeRange(beginTs, endTs);
-                TmfTraceContext newCtx = trace.createTraceContext(newSelectionRange,
-                        prevCtx.getWindowRange(),
-                        prevCtx.getEditorFile(),
-                        prevCtx.getFilter());
-                newCtx.setData(prevCtx.getData());
+                TmfTraceContext newCtx = prevCtx.builder()
+                        .setSelection(newSelectionRange)
+                        .build();
                 entry.setValue(newCtx);
             }
         }
@@ -460,9 +456,9 @@ public final class TmfTraceManager {
             TmfTimeRange newWindowTr = (targetTr == null ? prevCtx.getWindowRange() : targetTr);
 
             /* Keep the values from the old context, except for the window range */
-            TmfTraceContext newCtx = trace.createTraceContext(prevCtx.getSelectionRange(),
-                    newWindowTr, prevCtx.getEditorFile(), prevCtx.getFilter());
-            newCtx.setData(prevCtx.getData());
+            TmfTraceContext newCtx = prevCtx.builder()
+                    .setWindowRange(newWindowTr)
+                    .build();
             entry.setValue(newCtx);
         }
     }
