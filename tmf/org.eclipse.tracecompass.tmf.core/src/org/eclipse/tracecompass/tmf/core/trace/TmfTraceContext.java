@@ -130,7 +130,11 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
      * @param value
      *            The value of the data
      * @since 2.1
+     * @deprecated Use
+     *             {@link TmfTraceManager#updateTraceContext(ITmfTrace, java.util.function.UnaryOperator)}
+     *             and apply {@link Builder#setData(String, Object)} instead.
      */
+    @Deprecated
     public synchronized void setData(String key, Object value) {
         fData.put(key, value);
     }
@@ -141,7 +145,11 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
      * @param data
      *            The map of data to copy
      * @since 2.1
+     * @deprecated Use
+     *             {@link TmfTraceManager#updateTraceContext(ITmfTrace, java.util.function.UnaryOperator)}
+     *             and apply {@link Builder#setData(Map)} instead.
      */
+    @Deprecated
     public synchronized void setData(Map<String, Object> data) {
         fData.putAll(data);
     }
@@ -247,6 +255,32 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
          */
         public Builder setFilter(@Nullable ITmfFilter filter) {
             this.filter = filter;
+            return this;
+        }
+
+        /**
+         * Sets a data mapping.
+         *
+         * @param key
+         *            The key of the data
+         * @param value
+         *            The value of the data
+         * @return this {@code Builder} object
+         */
+        public Builder setData(String key, Object value) {
+            this.data.put(key, value);
+            return this;
+        }
+
+        /**
+         * Sets data mappings.
+         *
+         * @param data
+         *            The map of data
+         * @return this {@code Builder} object
+         */
+        public Builder setData(Map<String, Object> data) {
+            this.data.putAll(data);
             return this;
         }
     }

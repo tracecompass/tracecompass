@@ -19,6 +19,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceModelSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 
 /**
  * A Linux trace context is a context that stores OS related actions as well as
@@ -35,8 +36,8 @@ public class LinuxTraceContext extends TmfTraceContext {
     /** An invalid thread id */
     public static final int INVALID_THREAD_ID = -1;
 
-    private int fCpu = INVALID_CPU;
-    private int fTid = INVALID_THREAD_ID;
+    private final int fCpu;
+    private final int fTid;
     private final ITmfTrace fTrace;
 
     /**
@@ -56,6 +57,8 @@ public class LinuxTraceContext extends TmfTraceContext {
      */
     public LinuxTraceContext(TmfTimeRange selection, TmfTimeRange windowRange, @Nullable IFile editorFile, @Nullable ITmfFilter filter, ITmfTrace trace) {
         super(selection, windowRange, editorFile, filter);
+        fCpu = INVALID_CPU;
+        fTid = INVALID_THREAD_ID;
         fTrace = trace;
     }
 
@@ -76,11 +79,16 @@ public class LinuxTraceContext extends TmfTraceContext {
     @Override
     public void receive(@NonNull TmfTraceModelSignal signal) {
         if (signal.getHostId().equals(fTrace.getHostId())) {
-            if (signal instanceof TmfThreadSelectedSignal) {
-                fTid = ((TmfThreadSelectedSignal) signal).getThreadId();
-            } else if (signal instanceof TmfCpuSelectedSignal) {
-                fCpu = ((TmfCpuSelectedSignal) signal).getCore();
-            }
+            TmfTraceManager.getInstance().updateTraceContext(fTrace, builder -> {
+                if (builder instanceof LinuxBuilder) {
+                    if (signal instanceof TmfThreadSelectedSignal) {
+                        ((LinuxBuilder) builder).setTid(((TmfThreadSelectedSignal) signal).getThreadId());
+                    } else if (signal instanceof TmfCpuSelectedSignal) {
+                        ((LinuxBuilder) builder).setCpu(((TmfCpuSelectedSignal) signal).getCore());
+                    }
+                }
+                return builder;
+            });
         }
     }
 
@@ -138,6 +146,30 @@ public class LinuxTraceContext extends TmfTraceContext {
         @Override
         public TmfTraceContext build() {
             return new LinuxTraceContext(this);
+        }
+
+        /**
+         * Sets the current CPU.
+         *
+         * @param cpu
+         *            the current CPU
+         * @return this {@code Builder} object
+         */
+        public Builder setCpu(int cpu) {
+            this.cpu = cpu;
+            return this;
+        }
+
+        /**
+         * Sets the current TID.
+         *
+         * @param tid
+         *            the current TID
+         * @return this {@code Builder} object
+         */
+        public Builder setTid(int tid) {
+            this.tid = tid;
+            return this;
         }
     }
 }

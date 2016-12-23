@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2016 École Polytechnique de Montréal
+ * Copyright (c) 2016, 2017 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -69,8 +69,12 @@ public class KernelMemoryUsageView extends TmfChartView {
                     KernelMemoryUsageEntry entry = (KernelMemoryUsageEntry) structSelection;
                     fTreeViewerReference.setSelectedThread(entry.getTid());
                     ((KernelMemoryUsageViewer) getChartViewer()).setSelectedThread(entry.getTid());
-                    TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
-                    ctx.setData(KERNEL_MEMORY, checkNotNull(entry.getTid()));
+                    ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
+                    if (trace == null) {
+                        return;
+                    }
+                    TmfTraceManager.getInstance().updateTraceContext(trace,
+                            builder -> builder.setData(KERNEL_MEMORY, checkNotNull(entry.getTid())));
                 }
             }
         }

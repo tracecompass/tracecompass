@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2016 Ericsson
+ * Copyright (c) 2013, 2017 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -26,6 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IFile;
@@ -183,6 +184,23 @@ public final class TmfTraceManager {
         return curCtx;
     }
 
+    /**
+     * Get the {@link TmfTraceContext} of the given trace.
+     *
+     * @param trace
+     *            The trace or experiment.
+     * @return The trace's context.
+     * @since 2.3
+     */
+    public synchronized TmfTraceContext getTraceContext(ITmfTrace trace) {
+        TmfTraceContext curCtx = fTraces.get(trace);
+        if (curCtx == null) {
+            /* The trace is not opened. */
+            return TmfTraceContext.NULL_CONTEXT;
+        }
+        return curCtx;
+    }
+
     // ------------------------------------------------------------------------
     // Public utility methods
     // ------------------------------------------------------------------------
@@ -303,6 +321,22 @@ public final class TmfTraceManager {
         refreshSupplementaryFiles(trace);
     }
 
+    /**
+     * Update the trace context of a given trace.
+     *
+     * @param trace
+     *            The trace
+     * @param updater
+     *            the function to apply to the trace context's builder
+     * @since 2.3
+     */
+    public synchronized void updateTraceContext(ITmfTrace trace, UnaryOperator<TmfTraceContext.Builder> updater) {
+        TmfTraceContext ctx = getTraceContext(trace);
+        if (!ctx.equals(TmfTraceContext.NULL_CONTEXT)) {
+            fTraces.put(trace, checkNotNull(updater.apply(ctx.builder())).build());
+        }
+    }
+
     // ------------------------------------------------------------------------
     // Signal handlers
     // ------------------------------------------------------------------------
@@ -368,15 +402,12 @@ public final class TmfTraceManager {
      */
     @TmfSignalHandler
     public synchronized void filterApplied(TmfEventFilterAppliedSignal signal) {
-        final ITmfTrace trace = signal.getTrace();
-        TmfTraceContext context = fTraces.get(trace);
-        if (context == null) {
-            throw new RuntimeException();
+        ITmfTrace trace = signal.getTrace();
+        if (trace == null) {
+            return;
         }
-        final TmfTraceContext newContext = context.builder()
-                .setFilter(signal.getEventFilter())
-                .build();
-        fTraces.put(trace, newContext);
+        updateTraceContext(trace, builder ->
+                builder.setFilter(signal.getEventFilter()));
     }
 
     /**
@@ -412,20 +443,10 @@ public final class TmfTraceManager {
         final ITmfTimestamp beginTs = signal.getBeginTime();
         final ITmfTimestamp endTs = signal.getEndTime();
 
-        for (Map.Entry<ITmfTrace, TmfTraceContext> entry : fTraces.entrySet()) {
-            final ITmfTrace trace = entry.getKey();
+        for (ITmfTrace trace : fTraces.keySet()) {
             if (beginTs.intersects(getValidTimeRange(trace)) || endTs.intersects(getValidTimeRange(trace))) {
-                TmfTraceContext prevCtx = checkNotNull(entry.getValue());
-
-                /*
-                 * We want to update the selection range, but keep everything
-                 * else the same as the previous trace context.
-                 */
-                TmfTimeRange newSelectionRange = new TmfTimeRange(beginTs, endTs);
-                TmfTraceContext newCtx = prevCtx.builder()
-                        .setSelection(newSelectionRange)
-                        .build();
-                entry.setValue(newCtx);
+                updateTraceContext(trace, builder ->
+                        builder.setSelection(new TmfTimeRange(beginTs, endTs)));
             }
         }
     }
@@ -442,10 +463,7 @@ public final class TmfTraceManager {
      */
     @TmfSignalHandler
     public synchronized void windowRangeUpdated(final TmfWindowRangeUpdatedSignal signal) {
-        for (Map.Entry<ITmfTrace, TmfTraceContext> entry : fTraces.entrySet()) {
-            final ITmfTrace trace = entry.getKey();
-            final TmfTraceContext prevCtx = checkNotNull(entry.getValue());
-
+        for (ITmfTrace trace : fTraces.keySet()) {
             final TmfTimeRange validTr = getValidTimeRange(trace);
             if (validTr == null) {
                 return;
@@ -453,13 +471,10 @@ public final class TmfTraceManager {
 
             /* Determine the new time range */
             TmfTimeRange targetTr = signal.getCurrentRange().getIntersection(validTr);
-            TmfTimeRange newWindowTr = (targetTr == null ? prevCtx.getWindowRange() : targetTr);
-
-            /* Keep the values from the old context, except for the window range */
-            TmfTraceContext newCtx = prevCtx.builder()
-                    .setWindowRange(newWindowTr)
-                    .build();
-            entry.setValue(newCtx);
+            if (targetTr != null) {
+                updateTraceContext(trace, builder ->
+                        builder.setWindowRange(targetTr));
+            }
         }
     }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2017 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -436,8 +436,12 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
     @TmfSignalHandler
     public void listenToCpu(TmfCpuSelectedSignal signal) {
         int data = signal.getCore() >= 0 ? signal.getCore() : -1;
-        TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
-        ctx.setData(RESOURCES_FOLLOW_CPU, data);
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            return;
+        }
+        TmfTraceManager.getInstance().updateTraceContext(trace,
+                builder -> builder.setData(RESOURCES_FOLLOW_CPU, data));
     }
 
 }

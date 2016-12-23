@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2016 École Polytechnique de Montréal and others
+ * Copyright (c) 2014, 2017 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,8 +11,6 @@
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.cpuusage;
-
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -133,9 +131,13 @@ public class CpuUsageView extends TmfChartView {
     /**
      * Save a data in the data map of {@link TmfTraceContext}
      */
-    private static void saveData(@NonNull String key, Object data) {
-        TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
-        ctx.setData(key, checkNotNull(data));
+    private static void saveData(@NonNull String key, @NonNull Object data) {
+        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
+        if (trace == null) {
+            return;
+        }
+        TmfTraceManager.getInstance().updateTraceContext(trace,
+                builder -> builder.setData(key, data));
     }
 
     private static Object getData(@NonNull String key) {
