@@ -67,6 +67,7 @@ public class Messages extends NLS {
     public static String TmfEventsTable_ShowRawActionText;
     public static String TmfEventsTable_ShowTableActionText;
     public static String TmfEventsTable_SourceColumnHeader;
+    public static String TmfEventsTable_SynchronizeActionText;
     public static String TmfEventsTable_TimestampColumnHeader;
     public static String TmfEventsTable_TypeColumnHeader;
 

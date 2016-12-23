@@ -1308,6 +1308,14 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             }
         };
 
+        final IAction synchronizeAction = new Action(Messages.TmfEventsTable_SynchronizeActionText, IAction.AS_CHECK_BOX) {
+            @Override
+            public void run() {
+                TmfTraceManager.getInstance().updateTraceContext(NonNullUtils.checkNotNull(fTrace),
+                        builder -> builder.setSynchronized(isChecked()));
+            }
+        };
+
         class ToggleBookmarkAction extends Action {
             Long fRank;
 
@@ -1447,6 +1455,14 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     }
                     fTablePopupMenuManager.add(subMenu);
                 }
+                fTablePopupMenuManager.add(new Separator());
+
+                ITmfTrace trace = fTrace;
+                if (trace != null) {
+                    synchronizeAction.setChecked(TmfTraceManager.getInstance().getTraceContext(trace).isSynchronized());
+                    fTablePopupMenuManager.add(synchronizeAction);
+                }
+
                 appendToTablePopupMenu(fTablePopupMenuManager, item);
             }
         });
