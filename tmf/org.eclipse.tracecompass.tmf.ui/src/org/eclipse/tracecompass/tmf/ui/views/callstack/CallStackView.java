@@ -385,7 +385,7 @@ public class CallStackView extends AbstractTimeGraphView {
                         long entryTime = entry.getFunctionEntryTime();
                         long exitTime = entry.getFunctionExitTime();
                         TmfTimeRange range = new TmfTimeRange(TmfTimestamp.fromNanos(entryTime), TmfTimestamp.fromNanos(exitTime));
-                        broadcast(new TmfWindowRangeUpdatedSignal(CallStackView.this, range));
+                        broadcast(new TmfWindowRangeUpdatedSignal(CallStackView.this, range, getTrace()));
                         getTimeGraphViewer().setStartFinishTime(entryTime, exitTime);
                         startZoomThread(entryTime, exitTime);
                     }
@@ -405,7 +405,7 @@ public class CallStackView extends AbstractTimeGraphView {
                             long startTime = event.getTime();
                             long endTime = startTime + event.getDuration();
                             TmfTimeRange range = new TmfTimeRange(TmfTimestamp.fromNanos(startTime), TmfTimestamp.fromNanos(endTime));
-                            broadcast(new TmfWindowRangeUpdatedSignal(CallStackView.this, range));
+                            broadcast(new TmfWindowRangeUpdatedSignal(CallStackView.this, range, getTrace()));
                             getTimeGraphViewer().setStartFinishTime(startTime, endTime);
                             startZoomThread(startTime, endTime);
                             break;

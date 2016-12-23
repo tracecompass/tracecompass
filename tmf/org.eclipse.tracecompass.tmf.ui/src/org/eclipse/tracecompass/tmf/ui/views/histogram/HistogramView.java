@@ -541,7 +541,7 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
         updateDisplayedSelectionTime(beginTime, endTime);
         ITmfTimestamp beginTs = TmfTimestamp.fromNanos(beginTime);
         ITmfTimestamp endTs = TmfTimestamp.fromNanos(endTime);
-        TmfSelectionRangeUpdatedSignal signal = new TmfSelectionRangeUpdatedSignal(this, beginTs, endTs);
+        TmfSelectionRangeUpdatedSignal signal = new TmfSelectionRangeUpdatedSignal(this, beginTs, endTs, fTrace);
         fTimeSyncThrottle.queue(signal);
     }
 
@@ -585,7 +585,7 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
             updateDisplayedTimeRange(startTime, endTime);
 
             // Send the FW signal
-            TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, timeRange);
+            TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, timeRange, fTrace);
             fTimeRangeSyncThrottle.queue(signal);
         }
     }

@@ -218,7 +218,7 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
             final ITmfTimestamp startTimestamp = TmfTimestamp.fromNanos(getSelectionBeginTime());
             final ITmfTimestamp endTimestamp = TmfTimestamp.fromNanos(getSelectionEndTime());
 
-            TmfSelectionRangeUpdatedSignal signal = new TmfSelectionRangeUpdatedSignal(this, startTimestamp, endTimestamp);
+            TmfSelectionRangeUpdatedSignal signal = new TmfSelectionRangeUpdatedSignal(this, startTimestamp, endTimestamp, getTrace());
             broadcast(signal);
         }
     }
@@ -234,7 +234,7 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
                 TmfTimestamp.fromNanos(getWindowEndTime()));
 
         // Send the signal
-        TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, timeRange);
+        TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, timeRange, fTrace);
         fTimeRangeSyncThrottle.queue(signal);
     }
 

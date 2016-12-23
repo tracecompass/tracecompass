@@ -114,7 +114,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
             ISegment selectedSegment = ((ISegment) NonNullUtils.checkNotNull(e).item.getData());
             ITmfTimestamp start = TmfTimestamp.fromNanos(selectedSegment.getStart());
             ITmfTimestamp end = TmfTimestamp.fromNanos(selectedSegment.getEnd());
-            TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreTableViewer.this, start, end));
+            TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreTableViewer.this, start, end, fTrace));
         }
     }
 
@@ -127,6 +127,11 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
      * provider progress listener
      */
     private final @Nullable SegmentStoreProviderProgressListener fListener;
+
+    /**
+     * The selected trace
+     */
+    private @Nullable ITmfTrace fTrace;
 
     /**
      * Flag to create columns once
@@ -327,14 +332,14 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
             IAction gotoStartTime = new Action(Messages.SegmentStoreTableViewer_goToStartEvent) {
                 @Override
                 public void run() {
-                    broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreTableViewer.this, TmfTimestamp.fromNanos(segment.getStart())));
+                    broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreTableViewer.this, TmfTimestamp.fromNanos(segment.getStart()), TmfTimestamp.fromNanos(segment.getStart()), fTrace));
                 }
             };
 
             IAction gotoEndTime = new Action(Messages.SegmentStoreTableViewer_goToEndEvent) {
                 @Override
                 public void run() {
-                    broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreTableViewer.this, TmfTimestamp.fromNanos(segment.getEnd())));
+                    broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreTableViewer.this, TmfTimestamp.fromNanos(segment.getEnd()), TmfTimestamp.fromNanos(segment.getEnd()), fTrace));
                 }
             };
 
@@ -370,6 +375,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
         ITmfTrace trace = signal.getTrace();
+        fTrace = trace;
         if (trace != null) {
             setData(getSegmentStoreProvider(trace));
         }
@@ -385,6 +391,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
         ITmfTrace trace = signal.getTrace();
+        fTrace = trace;
         if (trace != null) {
             setData(getSegmentStoreProvider(trace));
         }
@@ -413,6 +420,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
                     provider.removeListener(listener);
                 }
             }
+            fTrace = null;
         }
     }
 

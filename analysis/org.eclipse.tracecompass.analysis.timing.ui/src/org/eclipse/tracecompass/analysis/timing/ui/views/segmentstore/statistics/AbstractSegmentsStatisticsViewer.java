@@ -336,7 +336,7 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
                     ISegment minObject = segment.getEntry().getMinObject();
                     long start = minObject == null ? 0 : minObject.getStart();
                     long end = minObject == null ? 0 : minObject.getEnd();
-                    broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentsStatisticsViewer.this, TmfTimestamp.fromNanos(start), TmfTimestamp.fromNanos(end)));
+                    broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentsStatisticsViewer.this, TmfTimestamp.fromNanos(start), TmfTimestamp.fromNanos(end), getTrace()));
                     updateContent(start, end, true);
                 }
             };
@@ -347,7 +347,7 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
                     ISegment maxObject = segment.getEntry().getMaxObject();
                     long start = maxObject == null ? 0 : maxObject.getStart();
                     long end = maxObject == null ? 0 : maxObject.getEnd();
-                    broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentsStatisticsViewer.this, TmfTimestamp.fromNanos(start), TmfTimestamp.fromNanos(end)));
+                    broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentsStatisticsViewer.this, TmfTimestamp.fromNanos(start), TmfTimestamp.fromNanos(end), getTrace()));
                     updateContent(start, end, true);
                 }
             };

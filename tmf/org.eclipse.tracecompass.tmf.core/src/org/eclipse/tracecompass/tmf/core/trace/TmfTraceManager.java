@@ -511,10 +511,10 @@ public final class TmfTraceManager {
     /**
      * Signal handler for the selection range signal.
      *
-     * If the active trace is null, the time selection of *all* traces whose
+     * If the signal trace is null, the time selection of *all* traces whose
      * range contains the requested new selection time range will be updated. If
-     * there is an active trace, the signal trace and time-synchronized traces
-     * will be updated, but not other instances of the signal trace.
+     * the signal contains a trace, the signal trace and time-synchronized
+     * traces will be updated, but not other instances of the signal trace.
      *
      * @param signal
      *            The incoming signal
@@ -524,14 +524,14 @@ public final class TmfTraceManager {
     public synchronized void selectionRangeUpdated(final TmfSelectionRangeUpdatedSignal signal) {
         final ITmfTimestamp beginTs = signal.getBeginTime();
         final ITmfTimestamp endTs = signal.getEndTime();
-        final ITmfTrace activeTrace = fCurrentTrace;
-        final IResource activeResource = activeTrace == null ? null : activeTrace.getResource();
+        final ITmfTrace signalTrace = signal.getTrace();
+        final IResource signalResource = signalTrace == null ? null : signalTrace.getResource();
 
         for (ITmfTrace trace : fTraces.keySet()) {
             /* other instance of the same trace should never synchronize */
-            final boolean sameTrace = trace.getResource() == null ? false : trace.getResource().equals(activeResource);
+            final boolean sameTrace = trace.getResource() == null ? false : trace.getResource().equals(signalResource);
             if ((beginTs.intersects(getValidTimeRange(trace)) || endTs.intersects(getValidTimeRange(trace)))
-                    && ((activeTrace == null) || trace.equals(activeTrace) || (!sameTrace && getTraceContext(trace).isSynchronized()))) {
+                    && ((signalTrace == null) || trace.equals(signalTrace) || (!sameTrace && getTraceContext(trace).isSynchronized()))) {
                 updateTraceContext(trace, builder ->
                         builder.setSelection(new TmfTimeRange(beginTs, endTs)));
             }
@@ -541,10 +541,10 @@ public final class TmfTraceManager {
     /**
      * Signal handler for the window range signal.
      *
-     * If the active trace is null, the window range of *all* valid traces will
-     * be updated to the new window range. If there is an active trace, the
-     * active trace and time-synchronized traces will be updated, but not other
-     * instances of the active trace.
+     * If the signal trace is null, the window range of *all* valid traces will
+     * be updated to the new window range. If the signal contains a trace, the
+     * signal trace and time-synchronized traces will be updated, but not other
+     * instances of the signal trace.
      *
      * @param signal
      *            The incoming signal
@@ -552,14 +552,14 @@ public final class TmfTraceManager {
      */
     @TmfSignalHandler
     public synchronized void windowRangeUpdated(final TmfWindowRangeUpdatedSignal signal) {
-        final ITmfTrace activeTrace = fCurrentTrace;
-        final IResource activeResource = activeTrace == null ? null : activeTrace.getResource();
+        final ITmfTrace signalTrace = signal.getTrace();
+        final IResource signalResource = signalTrace == null ? null : signalTrace.getResource();
         for (Map.Entry<ITmfTrace, TmfTraceContext> entry : fTraces.entrySet()) {
             ITmfTrace trace = checkNotNull(entry.getKey());
             TmfTraceContext ctx = checkNotNull(entry.getValue());
             /* other instance of the same trace should never synchronize */
-            final boolean sameTrace = trace.getResource() == null ? false : trace.getResource().equals(activeResource);
-            if ((activeTrace != null) && !trace.equals(activeTrace) && (sameTrace || !ctx.isSynchronized())) {
+            final boolean sameTrace = trace.getResource() == null ? false : trace.getResource().equals(signalResource);
+            if ((signalTrace != null) && !trace.equals(signalTrace) && (sameTrace || !ctx.isSynchronized())) {
                 continue;
             }
             final TmfTimeRange validTr = getValidTimeRange(trace);

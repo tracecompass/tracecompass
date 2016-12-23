@@ -371,7 +371,7 @@ public class FlameGraphView extends TmfView {
                             if (maxSeg == null) {
                                 return;
                             }
-                            TmfSelectionRangeUpdatedSignal sig = new TmfSelectionRangeUpdatedSignal(this, TmfTimestamp.fromNanos(maxSeg.getStart()), TmfTimestamp.fromNanos(maxSeg.getEnd()));
+                            TmfSelectionRangeUpdatedSignal sig = new TmfSelectionRangeUpdatedSignal(this, TmfTimestamp.fromNanos(maxSeg.getStart()), TmfTimestamp.fromNanos(maxSeg.getEnd()), fTrace);
                             broadcast(sig);
                         }
                     });
@@ -383,7 +383,7 @@ public class FlameGraphView extends TmfView {
                             if (minSeg == null) {
                                 return;
                             }
-                            TmfSelectionRangeUpdatedSignal sig = new TmfSelectionRangeUpdatedSignal(this, TmfTimestamp.fromNanos(minSeg.getStart()), TmfTimestamp.fromNanos(minSeg.getEnd()));
+                            TmfSelectionRangeUpdatedSignal sig = new TmfSelectionRangeUpdatedSignal(this, TmfTimestamp.fromNanos(minSeg.getStart()), TmfTimestamp.fromNanos(minSeg.getEnd()), fTrace);
                             broadcast(sig);
                         }
                     });

@@ -159,6 +159,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
@@ -301,7 +302,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     }
                     ITmfTimestamp selectedBeginTimestamp = fSelectedBeginTimestamp;
                     if (selectedBeginTimestamp != null) {
-                        broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, selectedBeginTimestamp, ts));
+                        broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, selectedBeginTimestamp, ts, fTrace));
                         if (fTable.getSelectionIndices().length == 2) {
                             updateStatusLine(ts.getDelta(selectedBeginTimestamp));
                         }
@@ -372,7 +373,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 TableItem item = fTable.getSelection()[0];
                 final TmfTimestamp ts = (TmfTimestamp) item.getData(Key.TIMESTAMP);
                 if (ts != null) {
-                    broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, ts));
+                    broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, ts, ts, fTrace));
                 }
                 if (item.getData() instanceof ITmfEvent) {
                     broadcast(new TmfEventSelectedSignal(TmfEventsTable.this, (ITmfEvent) item.getData()));
@@ -2519,7 +2520,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     fSelectedBeginRank = fSelectedRank;
                     fRawViewer.selectAndReveal(fSelectedRank);
                     if (foundTimestamp != null) {
-                        broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, foundTimestamp));
+                        broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, foundTimestamp, foundTimestamp, fTrace));
                     }
                     fireSelectionChanged(new SelectionChangedEvent(TmfEventsTable.this, getSelection()));
                     synchronized (fSearchSyncObj) {
@@ -3233,9 +3234,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             updateStatusLine(null);
             if (tsBegin != null) {
                 if (tsEnd != null) {
-                    broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, tsBegin, tsEnd));
+                    broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, tsBegin, tsEnd, fTrace));
                 } else {
-                    broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, tsBegin));
+                    broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, tsBegin, tsBegin, fTrace));
                 }
             }
         }
@@ -3300,7 +3301,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      */
     @TmfSignalHandler
     public void selectionRangeUpdated(final TmfSelectionRangeUpdatedSignal signal) {
-        if ((signal.getSource() != this) && (fTrace != null) && (!fTable.isDisposed())) {
+        ITmfTrace trace = fTrace;
+        if ((signal.getSource() != this) && (trace != null) && (!fTable.isDisposed())) {
 
             Job timeSelectJob;
             synchronized (fTimeSelectMutexRule) {
@@ -3309,12 +3311,13 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     timeSelectJob.cancel();
                 }
 
+                TmfTraceContext ctx = TmfTraceManager.getInstance().getTraceContext(trace);
+                ITmfTimestamp ts = ctx.getSelectionRange().getStartTime();
+                ITmfTimestamp tf = ctx.getSelectionRange().getEndTime();
                 /*
                  * Run in separate thread to not block UI thread for too long.
                  */
                 timeSelectJob = new Job("Events table selection job") { //$NON-NLS-1$
-                    ITmfTimestamp ts = signal.getBeginTime();
-                    ITmfTimestamp tf = signal.getEndTime();
 
                     @Override
                     protected IStatus run(IProgressMonitor monitor) {
@@ -3432,6 +3435,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             public void run() {
                                 // Return if table is disposed
                                 if (fTable.isDisposed()) {
+                                    return;
+                                }
+                                if (fSelectedBeginRank == rankBegin && fSelectedRank == rankEnd) {
                                     return;
                                 }
 

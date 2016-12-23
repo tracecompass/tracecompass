@@ -599,7 +599,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                 if (startTime == null) {
                     startTime = TmfTimestamp.BIG_BANG;
                 }
-                broadcast(new TmfSelectionRangeUpdatedSignal(this, startTime));
+                broadcast(new TmfSelectionRangeUpdatedSignal(this, startTime, startTime, fTrace));
             }
         }
     }
@@ -1118,7 +1118,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
         if (notifyAll) {
             TmfTimeRange timeRange = getSignalTimeRange(window.getStartTime());
-            broadcast(new TmfWindowRangeUpdatedSignal(this, timeRange));
+            broadcast(new TmfWindowRangeUpdatedSignal(this, timeRange, fTrace));
         }
     }
 

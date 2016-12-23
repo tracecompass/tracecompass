@@ -348,7 +348,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
                             TmfTraceUtils.getNextEventMatching(cfEntry.getTrace(), rank, predicate, monitor) :
                             TmfTraceUtils.getPreviousEventMatching(cfEntry.getTrace(), rank, predicate, monitor));
                     if (event != null) {
-                        TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, event.getTimestamp()));
+                        TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, event.getTimestamp(), event.getTimestamp(), getTrace()));
                     }
                     return Status.OK_STATUS;
 

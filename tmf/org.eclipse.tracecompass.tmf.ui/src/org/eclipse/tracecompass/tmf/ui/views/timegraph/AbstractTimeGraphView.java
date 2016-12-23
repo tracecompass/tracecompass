@@ -1015,7 +1015,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 final long startTime = event.getStartTime();
                 final long endTime = event.getEndTime();
                 TmfTimeRange range = new TmfTimeRange(TmfTimestamp.fromNanos(startTime), TmfTimestamp.fromNanos(endTime));
-                broadcast(new TmfWindowRangeUpdatedSignal(AbstractTimeGraphView.this, range));
+                broadcast(new TmfWindowRangeUpdatedSignal(AbstractTimeGraphView.this, range, fTrace));
                 startZoomThread(startTime, endTime);
             }
         });
@@ -1025,7 +1025,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             public void timeSelected(TimeGraphTimeEvent event) {
                 ITmfTimestamp startTime = TmfTimestamp.fromNanos(event.getBeginTime());
                 ITmfTimestamp endTime = TmfTimestamp.fromNanos(event.getEndTime());
-                broadcast(new TmfSelectionRangeUpdatedSignal(AbstractTimeGraphView.this, startTime, endTime));
+                broadcast(new TmfSelectionRangeUpdatedSignal(AbstractTimeGraphView.this, startTime, endTime, fTrace));
             }
         });
 
