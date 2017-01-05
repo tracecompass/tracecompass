@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.descriptor.IDataChartDescriptor;
@@ -65,7 +66,7 @@ public class ChartData {
      *
      * @return The list of series
      */
-    public List<ChartSeries> getChartSeries() {
+    public Collection<ChartSeries> getChartSeries() {
         return fSeries;
     }
 
