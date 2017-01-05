@@ -75,4 +75,9 @@ public class DataChartNumericalDescriptor<T, R extends Number> implements IDataC
         return null;
     }
 
+    @Override
+    public String toString() {
+        return "Numerical Descriptor: " + getName(); //$NON-NLS-1$
+    }
+
 }

@@ -64,4 +64,9 @@ public class DataChartStringDescriptor<T> implements IDataChartDescriptor<T, Str
         return fName;
     }
 
+    @Override
+    public String toString() {
+        return "String Descriptor: " + getName(); //$NON-NLS-1$
+    }
+
 }
