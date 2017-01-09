@@ -584,9 +584,11 @@ public class CallStackView extends AbstractTimeGraphView {
             }
 
             try {
-                List<ITmfStateInterval> endStates = ss.queryFullState(ss.getCurrentEndTime());
-
+                /*
+                 * Get quarks first to make sure they are in the full query result.
+                 */
                 List<Integer> processQuarks = ss.getQuarks(module.getProcessesPattern());
+                List<ITmfStateInterval> endStates = ss.queryFullState(end);
                 for (int processQuark : processQuarks) {
 
                     /*
@@ -635,6 +637,10 @@ public class CallStackView extends AbstractTimeGraphView {
                         int callStackQuark = ss.getQuarkRelative(threadQuark, callStackPath);
                         String threadName = ss.getAttributeName(threadQuark);
                         long threadEnd = end + 1;
+                        if (callStackQuark >= endStates.size()) {
+                            /* attribute created after previous full query */
+                            endStates = ss.queryFullState(end);
+                        }
                         ITmfStateInterval endInterval = endStates.get(callStackQuark);
                         if (endInterval.getStateValue().isNull() && endInterval.getStartTime() != ss.getStartTime()) {
                             threadEnd = endInterval.getStartTime();
@@ -646,10 +652,15 @@ public class CallStackView extends AbstractTimeGraphView {
                         if (threadQuark != processQuark) {
                             ThreadEntry threadEntry = threadEntryMap.get(threadQuark);
                             if (threadEntry == null) {
-                                if (startStates == null) {
+                                if (startStates == null || callStackQuark >= startStates.size()) {
+                                    /* attribute created after previous full query */
                                     startStates = ss.queryFullState(ss.getStartTime());
                                 }
                                 long threadId = -1;
+                                if (threadQuark >= endStates.size()) {
+                                    /* attribute created after previous full query */
+                                    endStates = ss.queryFullState(end);
+                                }
                                 ITmfStateValue threadStateValue = endStates.get(threadQuark).getStateValue();
                                 if (threadStateValue.getType() == Type.LONG || threadStateValue.getType() == Type.INTEGER) {
                                     threadId = threadStateValue.unboxLong();
