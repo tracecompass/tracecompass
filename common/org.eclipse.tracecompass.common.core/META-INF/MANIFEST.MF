@@ -17,4 +17,5 @@ Export-Package: org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.common.core.math,
  org.eclipse.tracecompass.common.core.process,
  org.eclipse.tracecompass.internal.common.core;x-internal:=true
-Import-Package: com.google.common.collect
+Import-Package: com.google.common.base,
+ com.google.common.collect

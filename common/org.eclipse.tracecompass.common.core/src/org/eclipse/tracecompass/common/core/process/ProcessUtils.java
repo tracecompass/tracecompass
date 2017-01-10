@@ -26,6 +26,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.common.core.Activator;
 
+import com.google.common.base.Charsets;
+
 /**
  * Common utility methods for launching external processes and retrieving their
  * output.
@@ -34,6 +36,8 @@ import org.eclipse.tracecompass.internal.common.core.Activator;
  * @since 2.2
  */
 public final class ProcessUtils {
+
+    private static final int PROGRESS_DURATION = 1000;
 
     private ProcessUtils() {}
 
@@ -51,7 +55,7 @@ public final class ProcessUtils {
             builder.redirectErrorStream(true);
 
             Process p = builder.start();
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream(), Charsets.UTF_8));) {
                 List<String> output = new LinkedList<>();
 
                 /*
@@ -78,7 +82,7 @@ public final class ProcessUtils {
      * {@link #getOutputFromCommandCancellable}.
      */
     @FunctionalInterface
-    public static interface OutputReaderFunction {
+    public interface OutputReaderFunction {
 
         /**
          * Handle the output of the process. This can include reporting progress
@@ -132,7 +136,7 @@ public final class ProcessUtils {
         Thread cancellerThread = null;
 
         try {
-            monitor.beginTask(mainTaskName, 1000);
+            monitor.beginTask(mainTaskName, PROGRESS_DURATION);
 
             ProcessBuilder builder = new ProcessBuilder(command);
             builder.redirectErrorStream(false);
@@ -143,7 +147,7 @@ public final class ProcessUtils {
             cancellerThread = new Thread(cancellerRunnable);
             cancellerThread.start();
 
-            try (BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(p.getInputStream()));) {
+            try (BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(p.getInputStream(), Charsets.UTF_8));) {
 
                 List<String> lines = readerFunction.readOutput(stdoutReader, monitor);
 
@@ -170,8 +174,8 @@ public final class ProcessUtils {
                     }
                     if (stderrOutput.isEmpty()) {
                         /*
-                         * At least say "no output", so an error message actually
-                         * shows up.
+                         * At least say "no output", so an error message
+                         * actually shows up.
                          */
                         status.add(new Status(IStatus.ERROR, Activator.instance().getPluginId(), Messages.ProcessUtils_ErrorNoOutput));
                     }
@@ -193,6 +197,9 @@ public final class ProcessUtils {
                 try {
                     cancellerThread.join();
                 } catch (InterruptedException e) {
+                    /*
+                     * If it is interrupted, process is terminated.
+                     */
                 }
             }
 
@@ -206,6 +213,7 @@ public final class ProcessUtils {
      */
     private static class CancellableRunnable implements Runnable {
 
+        private static final int SLEEP_DURATION = 500;
         private final Process fProcess;
         private final IProgressMonitor fMonitor;
 
@@ -224,13 +232,16 @@ public final class ProcessUtils {
         public void run() {
             try {
                 while (!fIsFinished) {
-                    Thread.sleep(500);
+                    Thread.sleep(SLEEP_DURATION);
                     if (fMonitor.isCanceled()) {
                         fProcess.destroy();
                         return;
                     }
                 }
             } catch (InterruptedException e) {
+                /*
+                 * If it is interrupted, process is terminated.
+                 */
             }
         }
 
