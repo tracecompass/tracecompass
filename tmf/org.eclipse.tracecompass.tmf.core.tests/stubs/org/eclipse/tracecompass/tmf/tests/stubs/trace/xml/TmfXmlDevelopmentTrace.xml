@@ -23,7 +23,7 @@
 <OutputColumn name="type"/>
 </Definition>
 <Definition name="events">
-<TimeStampOutputFormat>T</TimeStampOutputFormat>
+<TimeStampOutputFormat>Tn</TimeStampOutputFormat>
 <InputElement name="trace">
 <InputElement logentry="true" name="event">
 <InputData action="0" format="" name="Ignore"/>
@@ -31,7 +31,7 @@
 <InputData action="0" format="" name="Message"/>
 </Attribute>
 <Attribute name="timestamp">
-<InputData action="0" format="T" name="Time Stamp"/>
+<InputData action="0" format="Tn" name="Time Stamp"/>
 </Attribute>
 <InputElement name="field">
 <InputData action="0" format="" name="Ignore"/>

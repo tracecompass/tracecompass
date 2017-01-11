@@ -166,7 +166,7 @@ public class TestTraceOffsetting {
         editor = fBot.editorByTitle(fLocation.getName());
         eventsTableBot = editor.bot().table();
         timestamp = eventsTableBot.cell(1, 1);
-        assertEquals("19:00:00.000 000 099", timestamp);
+        assertEquals("19:01:39.000 000 000", timestamp);
         SWTBotUtils.deleteProject(PROJET_NAME, fBot);
     }
 

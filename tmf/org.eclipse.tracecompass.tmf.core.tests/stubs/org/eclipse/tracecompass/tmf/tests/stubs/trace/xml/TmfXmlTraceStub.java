@@ -61,7 +61,6 @@ import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
@@ -103,8 +102,6 @@ public class TmfXmlTraceStub extends TmfTrace {
     private static final String TYPE_INTEGER = "int"; //$NON-NLS-1$
     private static final String TYPE_LONG = "long"; //$NON-NLS-1$
     private static final String ASPECT_CPU = "cpu";
-
-    private static final Long SECONDS_TO_NS = 1000000000L;
 
     private final CustomXmlTraceDefinition fDefinition;
     private CustomXmlTrace fTrace;
@@ -354,8 +351,7 @@ public class TmfXmlTraceStub extends TmfTrace {
          * original is in second and we need to convert it. We should do that at
          * the source when it is supported
          */
-        ITmfTimestamp timestamp = TmfTimestamp.fromNanos(event.getTimestamp().getValue() / SECONDS_TO_NS);
-        TmfEvent newEvent = new TmfEvent(this, ITmfContext.UNKNOWN_RANK, timestamp, eventType, eventFields);
+        TmfEvent newEvent = new TmfEvent(this, ITmfContext.UNKNOWN_RANK, event.getTimestamp(), eventType, eventFields);
         updateAttributes(savedContext, event);
         return newEvent;
     }
