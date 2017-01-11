@@ -25,6 +25,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub;
+import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStubNs;
 import org.junit.Test;
 
 /**
@@ -65,7 +66,7 @@ public class TmfGraphBuilderModuleTest {
      */
     @Test
     public void testBuildGraph() {
-        TmfXmlTraceStub trace = TmfXmlTraceStub.setupTrace(Activator.getAbsoluteFilePath(STUB_TRACE_FILE));
+        TmfXmlTraceStub trace = TmfXmlTraceStubNs.setupTrace(Activator.getAbsoluteFilePath(STUB_TRACE_FILE));
 
         TmfGraphBuilderModule module = getModule(trace);
         module.schedule();

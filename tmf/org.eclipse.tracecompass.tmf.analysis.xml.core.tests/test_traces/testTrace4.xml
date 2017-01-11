@@ -10,20 +10,20 @@
 	* Geneviève Bastien - Initial API and implementation
 *************************************************************************** -->
 <trace>
-<event timestamp="1" name="entry" source="0">
+<event timestamp="1" name="entry">
 <field name="cpu" type="int" value="0" />
 <field name="op" type="string" value="op1" />
 </event>
-<event timestamp="3" name="exit" source="0">
+<event timestamp="3" name="exit">
 <field name="cpu" type="int" value="0" />
 <field name="curState" type="string" value="GOOD" />
 <field name="op" type="string" value="op1" />
 </event>
-<event timestamp="5" name="entry" source="0">
+<event timestamp="5" name="entry">
 <field name="cpu" type="int" value="0" />
 <field name="op" type="string" value="op1" />
 </event>
-<event timestamp="7" name="exit" source="0">
+<event timestamp="7" name="exit">
 <field name="cpu" type="int" value="0" />
 <field name="curState" type="string" value="BAD" />
 <field name="op" type="string" value="op1" />

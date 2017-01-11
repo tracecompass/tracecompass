@@ -8,15 +8,15 @@
 *************************************************************************** -->
 <trace>
 <event timestamp="1" name="x">
-<field name="testField" type="double" value="3.141592" />
+<field name="testField" type="string" value="3.141592" />
 </event>
 <event timestamp="3" name="x">
-<field name="testField" type="double" value="2.71828" />
+<field name="testField" type="string" value="2.71828" />
 </event>
 <event timestamp="5" name="x">
-<field name="testField" type="double" value="1.41421" />
+<field name="testField" type="string" value="1.41421" />
 </event>
 <event timestamp="7" name="x">
-<field name="testField" type="double" value="2.68545" />
+<field name="testField" type="string" value="2.68545" />
 </event>
 </trace>

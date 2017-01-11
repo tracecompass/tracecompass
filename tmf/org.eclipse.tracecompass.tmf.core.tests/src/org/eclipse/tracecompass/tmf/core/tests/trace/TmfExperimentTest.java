@@ -60,7 +60,7 @@ import org.eclipse.tracecompass.tmf.core.trace.location.TmfLongLocation;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestExperimentAnalysis;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfExperimentStub;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
-import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub;
+import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStubNs;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -1006,7 +1006,7 @@ public class TmfExperimentTest {
         assertTrue("isCancelled", request.isCancelled());
     }
 
-    private static abstract class TestTrace extends TmfXmlTraceStub implements ITmfPropertiesProvider {
+    private static abstract class TestTrace extends TmfXmlTraceStubNs implements ITmfPropertiesProvider {
 
     }
 
@@ -1099,7 +1099,7 @@ public class TmfExperimentTest {
         };
         t2.setTimestampTransform(tt2);
 
-        ITmfTrace t3 = new TmfXmlTraceStub() {
+        ITmfTrace t3 = new TmfXmlTraceStubNs() {
             @Override
             public @NonNull String getHostId() {
                 return hostId2;

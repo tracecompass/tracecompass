@@ -450,7 +450,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         SWTBotImportWizardUtils.selectImportFromArchive(fBot, absolutePath.toOSString());
         String subFolderName = IS_WIN32 ? "folder_colon" : "folder:colon";
         selectFolder(ARCHIVE_ROOT_ELEMENT_NAME, subFolderName);
-        SWTBotImportWizardUtils.setOptions(fBot, 0, "Test trace : XML Trace Stub");
+        SWTBotImportWizardUtils.setOptions(fBot, 0, "Test trace : XML Trace Stub (ns)");
         importFinish();
 
         TmfProjectElement tmfProject = TmfProjectRegistry.getProject(getProjectResource(), true);

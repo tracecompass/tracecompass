@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.jdt.annotation.NonNull;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -68,21 +69,21 @@ public class Activator extends Plugin {
      *            The path relative to this plugin
      * @return The absolute path corresponding to this relative path
      */
-    public static IPath getAbsolutePath(Path relativePath) {
+    public static @NonNull IPath getAbsolutePath(Path relativePath) {
         Activator plugin2 = getDefault();
         if (plugin2 == null) {
             /*
              * Shouldn't happen but at least throw something to get the test to
              * fail early
              */
-            return null;
+            throw new IllegalStateException();
         }
         URL location = FileLocator.find(plugin2.getBundle(), relativePath, null);
         try {
             IPath path = new Path(FileLocator.toFileURL(location).getPath());
             return path;
         } catch (IOException e) {
-            return null;
+            throw new IllegalStateException(e);
         }
     }
 

@@ -46,6 +46,7 @@
 					<xs:enumeration value="int"/>
 					<xs:enumeration value="long"/>
 					<xs:enumeration value="string"/>
+					<xs:enumeration value="double"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>

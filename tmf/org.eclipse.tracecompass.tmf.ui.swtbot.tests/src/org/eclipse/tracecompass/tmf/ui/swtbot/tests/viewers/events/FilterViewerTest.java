@@ -59,7 +59,7 @@ public class FilterViewerTest {
     private static final String COMPARE = "COMPARE";
     private static final String CONTAINS = "CONTAINS";
     private static final String XMLSTUB_ID = "org.eclipse.linuxtools.tmf.core.tests.xmlstub";
-    private static final String TRACETYPE = "Test trace : XML Trace Stub";
+    private static final String TRACETYPE = "Test trace : XML Trace Stub (ns)";
     private static final String AND = "AND";
     private static final String WITH_TRACETYPE = "WITH TRACETYPE " + TRACETYPE;
     private static final String FILTER_TEST = "FILTER ";

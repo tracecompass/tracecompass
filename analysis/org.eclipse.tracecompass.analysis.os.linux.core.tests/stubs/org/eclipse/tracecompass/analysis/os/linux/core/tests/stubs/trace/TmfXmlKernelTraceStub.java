@@ -15,7 +15,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelTidAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
-import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub;
+import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStubNs;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableSet;
  *
  * @author Geneviève Bastien
  */
-public class TmfXmlKernelTraceStub extends TmfXmlTraceStub implements IKernelTrace {
+public class TmfXmlKernelTraceStub extends TmfXmlTraceStubNs implements IKernelTrace {
 
     private @Nullable IKernelAnalysisEventLayout fLayout;
 

@@ -43,10 +43,9 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.Activator;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
-import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub;
+import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStubNs;
 import org.junit.After;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -225,12 +224,7 @@ public class XmlUtilsTest {
      */
     public static @NonNull ITmfTrace initializeTrace(String traceFile) {
         /* Initialize the trace */
-        TmfXmlTraceStub trace = new TmfXmlTraceStub();
-        try {
-            trace.initTrace(null, Activator.getAbsolutePath(new Path(traceFile)).toOSString(), TmfEvent.class);
-        } catch (TmfTraceException e1) {
-            fail(e1.getMessage());
-        }
+        TmfXmlTraceStub trace = TmfXmlTraceStubNs.setupTrace(Activator.getAbsolutePath(new Path(traceFile)));
         return trace;
     }
 

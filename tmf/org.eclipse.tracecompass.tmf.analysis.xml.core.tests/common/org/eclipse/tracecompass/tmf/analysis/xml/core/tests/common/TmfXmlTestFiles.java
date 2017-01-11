@@ -69,11 +69,7 @@ public enum TmfXmlTestFiles {
      * @return The absolute path of this test file
      */
     public IPath getPath() {
-        IPath absPath = Activator.getAbsolutePath(new Path(fPath));
-        if (absPath == null) {
-            fail("Cannot find file path for '" + fPath + "'");
-        }
-        return absPath;
+        return Activator.getAbsolutePath(new Path(fPath));
     }
 
     /**

@@ -14,7 +14,6 @@
 package org.eclipse.tracecompass.tmf.tests.stubs.trace.xml;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +33,6 @@ import javax.xml.validation.Validator;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.DefaultLocation;
@@ -87,9 +85,8 @@ import com.google.common.collect.Iterables;
  *
  * @author Geneviève Bastien
  */
-public class TmfXmlTraceStub extends TmfTrace {
+public abstract class TmfXmlTraceStub extends TmfTrace {
 
-    private static final String DEVELOPMENT_TRACE_PARSER_PATH = "TmfXmlDevelopmentTrace.xml"; //$NON-NLS-1$
     private static final String DEVELOPMENT_TRACE_XSD = "TmfXmlDevelopmentTrace.xsd"; //$NON-NLS-1$
     private static final String EMPTY = ""; //$NON-NLS-1$
 
@@ -111,35 +108,13 @@ public class TmfXmlTraceStub extends TmfTrace {
     private final Collection<IAnalysisModule> fAdditionalModules = new HashSet<>();
 
     /**
-     * Validate and initialize a {@link TmfXmlTraceStub} object
-     *
-     * @param absolutePath
-     *            The absolute file path of the trace file
-     * @return The trace
-     */
-    public static TmfXmlTraceStub setupTrace(IPath absolutePath) {
-        TmfXmlTraceStub trace = new TmfXmlTraceStub();
-        IStatus status = trace.validate(null, absolutePath.toOSString());
-        if (!status.isOK()) {
-            fail(status.getException().getMessage());
-        }
-        try {
-            trace.initTrace(null, absolutePath.toOSString(), TmfEvent.class);
-        } catch (TmfTraceException e) {
-            trace.dispose();
-            fail(e.getMessage());
-        }
-        return trace;
-    }
-
-    /**
      * Constructor. Constructs the custom XML trace with the appropriate
      * definition.
      */
     public TmfXmlTraceStub() {
         boolean nonNullTraceIsNonNull = false;
         /* Load custom XML definition */
-        try (InputStream in = TmfXmlTraceStub.class.getResourceAsStream(DEVELOPMENT_TRACE_PARSER_PATH);) {
+        try (InputStream in = TmfXmlTraceStub.class.getResourceAsStream(getParserFileName());) {
             CustomXmlTraceDefinition[] definitions = CustomXmlTraceDefinition.loadAll(in);
             if (definitions.length < 2) {
                 throw new IllegalStateException("The custom trace definition does not exist"); //$NON-NLS-1$
@@ -164,6 +139,14 @@ public class TmfXmlTraceStub extends TmfTrace {
         }
 
     }
+
+    /**
+     * Get the name of the file that contains the XML parser for this trace
+     * stub. The file should be located in this class's package.
+     *
+     * @return The name of the file
+     */
+    protected abstract String getParserFileName();
 
     @Override
     @NonNullByDefault({DefaultLocation.TYPE_ARGUMENT})

@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestStateSystemModule;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestStateSystemProvider;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub;
+import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStubNs;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -64,7 +65,7 @@ public class StateSystemAnalysisModuleTest {
      */
     @Before
     public void setupTraces() {
-        TmfXmlTraceStub trace = TmfXmlTraceStub.setupTrace(TmfCoreTestPlugin.getAbsoluteFilePath(XML_TRACE));
+        TmfXmlTraceStub trace = TmfXmlTraceStubNs.setupTrace(TmfCoreTestPlugin.getAbsoluteFilePath(XML_TRACE));
         trace.traceOpened(new TmfTraceOpenedSignal(this, trace, null));
         fTrace = trace;
 

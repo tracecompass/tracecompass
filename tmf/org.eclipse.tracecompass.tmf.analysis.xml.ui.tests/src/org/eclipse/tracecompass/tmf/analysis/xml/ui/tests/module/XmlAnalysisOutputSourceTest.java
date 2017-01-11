@@ -20,7 +20,7 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisOutput;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
-import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub;
+import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStubNs;
 import org.junit.Test;
 
 /**
@@ -40,7 +40,7 @@ public class XmlAnalysisOutputSourceTest {
     @Test
     public void testBuiltinOutput() {
 
-        TmfTrace trace = new TmfXmlTraceStub();
+        TmfTrace trace = new TmfXmlTraceStubNs();
         try {
             trace.traceOpened(new TmfTraceOpenedSignal(this, trace, null));
 

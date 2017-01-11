@@ -31,11 +31,11 @@ import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub;
+import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStubNs;
 import org.junit.Test;
 
 /**
- * Test suite for the {@link TmfXmlTraceStub} class
+ * Test suite for the {@link TmfXmlTraceStubNs} class
  *
  * @author Geneviève Bastien
  */
@@ -52,12 +52,12 @@ public class XmlStubTraceTest {
 
     /**
      * Test the
-     * {@link TmfXmlTraceStub#validate(org.eclipse.core.resources.IProject, String)}
+     * {@link TmfXmlTraceStubNs#validate(org.eclipse.core.resources.IProject, String)}
      * method
      */
     @Test
     public void testValidate() {
-        TmfXmlTraceStub trace = new TmfXmlTraceStub();
+        TmfXmlTraceStubNs trace = new TmfXmlTraceStubNs();
         File[] invalidFiles = TmfCoreTestPlugin.getAbsoluteFilePath(INVALID_PATH).toFile().listFiles();
         assertTrue(invalidFiles.length > 0);
         for (File f : invalidFiles) {
@@ -79,7 +79,7 @@ public class XmlStubTraceTest {
      */
     @Test
     public void testDevelopmentTrace() {
-        TmfXmlTraceStub trace = TmfXmlTraceStub.setupTrace(TmfCoreTestPlugin.getAbsoluteFilePath(VALID_FILE));
+        TmfXmlTraceStubNs trace = TmfXmlTraceStubNs.setupTrace(TmfCoreTestPlugin.getAbsoluteFilePath(VALID_FILE));
 
         CustomEventRequest req = new CustomEventRequest(trace);
         trace.sendRequest(req);
@@ -101,7 +101,7 @@ public class XmlStubTraceTest {
      */
     @Test
     public void testAspects() {
-        TmfXmlTraceStub trace = TmfXmlTraceStub.setupTrace(TmfCoreTestPlugin.getAbsoluteFilePath(VALID_FILE));
+        TmfXmlTraceStubNs trace = TmfXmlTraceStubNs.setupTrace(TmfCoreTestPlugin.getAbsoluteFilePath(VALID_FILE));
 
         ITmfEventAspect<?> cpuAspect = null;
         ITmfEventAspect<?> testAspect = null;

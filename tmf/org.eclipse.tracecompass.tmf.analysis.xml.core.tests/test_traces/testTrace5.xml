@@ -7,16 +7,16 @@
 * http://www.eclipse.org/legal/epl-v10.html
 *************************************************************************** -->
 <trace>
-<event timestamp="1" name="entry" source="0">
+<event timestamp="1" name="entry">
 <field name="cpu" type="int" value="0" />
 </event>
-<event timestamp="3" name="entry" source="0">
+<event timestamp="3" name="entry">
 <field name="cpu" type="int" value="0" />
 </event>
-<event timestamp="5" name="entry" source="0">
+<event timestamp="5" name="entry">
 <field name="cpu" type="int" value="0" />
 </event>
-<event timestamp="7" name="exit" source="0">
+<event timestamp="7" name="exit">
 <field name="cpu" type="int" value="0" />
 </event>
 </trace>
