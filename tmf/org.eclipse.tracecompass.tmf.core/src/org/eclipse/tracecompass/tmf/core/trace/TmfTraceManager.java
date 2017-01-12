@@ -29,6 +29,7 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -38,6 +39,7 @@ import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventFilterAppliedSignal;
@@ -52,8 +54,10 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Multiset;
 
 /**
  * Central trace manager for TMF. It tracks the currently opened traces and
@@ -75,6 +79,9 @@ public final class TmfTraceManager {
 
     private final Map<ITmfTrace, TmfTraceContext> fTraces;
 
+    /** Count of trace instances by resource, used to track instance number */
+    private final Multiset<IResource> fInstanceCounts;
+
     /** The currently-selected trace. Should always be part of the trace map */
     private @Nullable ITmfTrace fCurrentTrace = null;
 
@@ -86,6 +93,8 @@ public final class TmfTraceManager {
 
     private TmfTraceManager() {
         fTraces = new LinkedHashMap<>();
+        fInstanceCounts = checkNotNull(HashMultiset.create());
+
         TmfSignalManager.registerVIP(this);
     }
 
@@ -114,6 +123,7 @@ public final class TmfTraceManager {
     public synchronized void dispose() {
         TmfSignalManager.deregister(this);
         fTraces.clear();
+        fInstanceCounts.clear();
         fCurrentTrace = null;
     }
 
@@ -214,6 +224,31 @@ public final class TmfTraceManager {
             return TmfTraceContext.NULL_CONTEXT;
         }
         return curCtx;
+    }
+
+    /**
+     * Gets a unique name that differentiates multiple opened instances of the
+     * same trace. The first instance has the trace name, subsequent instances
+     * have a sequential suffix appended to the trace name. Closing all trace
+     * instances resets the sequence.
+     *
+     * @param trace
+     *            The trace or experiment
+     *
+     * @return The trace unique name
+     * @since 3.2
+     */
+    public synchronized String getTraceUniqueName(@Nullable ITmfTrace trace) {
+        if (trace == null) {
+            return StringUtils.EMPTY;
+        }
+        TmfTraceContext ctx = getTraceContext(trace);
+        int instanceNumber = ctx.getInstanceNumber();
+        String name = NonNullUtils.nullToEmptyString(trace.getName());
+        if (instanceNumber <= 1) {
+            return name;
+        }
+        return name + " | " + instanceNumber; //$NON-NLS-1$
     }
 
     // ------------------------------------------------------------------------
@@ -393,6 +428,12 @@ public final class TmfTraceManager {
 
         fTraces.put(trace, startCtx);
 
+        IResource resource = trace.getResource();
+        if (resource != null) {
+            fInstanceCounts.add(resource);
+            updateTraceContext(trace, builder -> builder.setInstanceNumber(fInstanceCounts.count(resource)));
+        }
+
         /* We also want to set the newly-opened trace as the active trace */
         fCurrentTrace = trace;
     }
@@ -450,6 +491,14 @@ public final class TmfTraceManager {
     @TmfSignalHandler
     public synchronized void traceClosed(final TmfTraceClosedSignal signal) {
         fTraces.remove(signal.getTrace());
+
+        IResource resource = signal.getTrace().getResource();
+        if (resource != null && !fTraces.keySet().stream()
+                .anyMatch(trace -> resource.equals(trace.getResource()))) {
+            /* Reset the instance count only when no other instance remains */
+            fInstanceCounts.setCount(resource, 0);
+        }
+
         if (fTraces.size() == 0) {
             fCurrentTrace = null;
             /*

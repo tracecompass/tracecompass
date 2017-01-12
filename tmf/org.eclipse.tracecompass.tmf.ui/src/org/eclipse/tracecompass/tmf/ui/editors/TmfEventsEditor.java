@@ -53,6 +53,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import org.eclipse.tracecompass.tmf.ui.project.model.Messages;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
@@ -259,7 +260,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
 
     private void createAndInitializeTable() {
         if (fTrace != null) {
-            setPartName(fTrace.getName());
             fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());
             fEventsTable.registerContextMenus(getSite());
             fEventsTable.addSelectionChangedListener(this);
@@ -276,6 +276,9 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             if (fTraceSelected) {
                 broadcast(new TmfTraceSelectedSignal(this, fTrace));
             }
+
+            /* update part name only after trace manager notified */
+            setPartName(TmfTraceManager.getInstance().getTraceUniqueName(fTrace));
 
             /* go to marker after trace opened */
             if (fPendingGotoMarker != null) {

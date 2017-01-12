@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2016 Ericsson
+ * Copyright (c) 2013, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -46,6 +46,7 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
 
     private final TmfTimeRange fSelection;
     private final TmfTimeRange fWindowRange;
+    private final int fInstanceNumber;
     private final @Nullable IFile fEditorFile;
     private final @Nullable ITmfFilter fFilter;
     private final Map<@NonNull String, @NonNull Object> fData;
@@ -66,6 +67,7 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
             @Nullable IFile editorFile, @Nullable ITmfFilter filter) {
         fSelection = selection;
         fWindowRange = windowRange;
+        fInstanceNumber = 1;
         fEditorFile = editorFile;
         fFilter = filter;
         fData = new HashMap<>();
@@ -81,6 +83,7 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
     public TmfTraceContext(Builder builder) {
         fSelection = builder.selection;
         fWindowRange = builder.windowRange;
+        fInstanceNumber = builder.instanceNumber;
         fEditorFile = builder.editorFile;
         fFilter = builder.filter;
         fData = new HashMap<>(builder.data);
@@ -102,6 +105,16 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
      */
     public TmfTimeRange getWindowRange() {
         return fWindowRange;
+    }
+
+    /**
+     * Return the instance number of this trace.
+     *
+     * @return The instance number
+     * @since 3.2
+     */
+    public int getInstanceNumber() {
+        return fInstanceNumber;
     }
 
     /**
@@ -163,6 +176,7 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
     public static class Builder {
         private TmfTimeRange selection;
         private TmfTimeRange windowRange;
+        private int instanceNumber;
         private @Nullable IFile editorFile;
         private @Nullable ITmfFilter filter;
         private Map<String, Object> data;
@@ -176,6 +190,7 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
         public Builder(TmfTraceContext ctx) {
             this.selection = ctx.fSelection;
             this.windowRange = ctx.fWindowRange;
+            this.instanceNumber = ctx.fInstanceNumber;
             this.editorFile = ctx.fEditorFile;
             this.filter = ctx.fFilter;
             this.data = new HashMap<>(ctx.fData);
@@ -211,6 +226,19 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
          */
         public Builder setWindowRange(TmfTimeRange windowRange) {
             this.windowRange = windowRange;
+            return this;
+        }
+
+        /**
+         * Sets the instance number of this trace.
+         *
+         * @param instanceNumber
+         *            the instance number
+         * @return this {@code Builder} object
+         */
+        /* Package visibility only so that users can't change it */
+        Builder setInstanceNumber(int instanceNumber) {
+            this.instanceNumber = instanceNumber;
             return this;
         }
 

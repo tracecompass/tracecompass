@@ -2021,7 +2021,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             TmfSignalManager.addIgnoredInboundSignal(this, TmfTraceOpenedSignal.class);
             TmfSignalManager.addIgnoredInboundSignal(this, TmfTraceSelectedSignal.class);
 
-            setPartName(String.format("%s <%s>", fOriginalTabLabel, trace.getName())); //$NON-NLS-1$
+            setPartName(String.format("%s <%s>", fOriginalTabLabel, TmfTraceManager.getInstance().getTraceUniqueName(trace))); //$NON-NLS-1$
         } else {
             /* Handle relevant inbound signals */
             TmfSignalManager.removeIgnoredInboundSignal(this, TmfTraceOpenedSignal.class);
