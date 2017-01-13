@@ -2330,9 +2330,11 @@ public class TimeGraphControl extends TimeGraphBaseControl
                     // draw icon
                     int imgHeight = img.getImageData().height;
                     int imgWidth = img.getImageData().width;
+                    int dstHeight = Math.min(bounds.height, imgHeight);
+                    int dstWidth = dstHeight * imgWidth / imgHeight;
                     int x = width;
-                    int y = bounds.y + (bounds.height - imgHeight) / 2;
-                    gc.drawImage(img, x, y);
+                    int y = bounds.y + (bounds.height - dstHeight) / 2;
+                    gc.drawImage(img, 0, 0, imgWidth, imgHeight, x, y, dstWidth, dstHeight);
                     width += imgWidth + MARGIN;
                 }
             } else {
