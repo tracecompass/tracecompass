@@ -518,18 +518,12 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     public void mouseDown(MouseEvent e) {
         getParent().setFocus();
         if (fDragState == NO_BUTTON && null != fTimeProvider) {
-            int x = e.x - fTimeProvider.getNameSpace();
-            if (LEFT_BUTTON == e.button && x > 0) {
+            if (LEFT_BUTTON == e.button && e.x > 0) {
                 setCapture(true);
                 fDragState = LEFT_BUTTON;
             }
-            if (x < 0) {
-                x = 0;
-            } else if (x > getSize().x - fTimeProvider.getNameSpace()) {
-                x = getSize().x - fTimeProvider.getNameSpace();
-            }
-            fDragX = x;
-            fDragX0 = x;
+            fDragX = e.x;
+            fDragX0 = e.x;
             fTime0bak = fTimeProvider.getTime0();
             fTime1bak = fTimeProvider.getTime1();
         }
@@ -553,12 +547,9 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         if (fDragX0 < 0 || fDragState == NO_BUTTON || fTimeProvider == null) {
             return;
         }
-        Point size = getSize();
-        int leftSpace = fTimeProvider.getNameSpace();
-        int x = e.x - leftSpace;
         if (LEFT_BUTTON == fDragState) {
-            if (x > 0 && size.x > leftSpace && fDragX != x) {
-                fDragX = x;
+            if (e.x > 0 && fDragX != e.x) {
+                fDragX = e.x;
                 if (fTimeProvider.getTime0() == fTimeProvider.getTime1()) {
                     return;
                 }
