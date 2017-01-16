@@ -131,8 +131,8 @@ public class CpuUsageView extends TmfChartView {
     /**
      * Save a data in the data map of {@link TmfTraceContext}
      */
-    private static void saveData(@NonNull String key, @NonNull Object data) {
-        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
+    private void saveData(@NonNull String key, @NonNull Object data) {
+        ITmfTrace trace = getViewerTrace();
         if (trace == null) {
             return;
         }
@@ -140,9 +140,18 @@ public class CpuUsageView extends TmfChartView {
                 builder -> builder.setData(key, data));
     }
 
-    private static Object getData(@NonNull String key) {
-        TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+    private Object getData(@NonNull String key) {
+        ITmfTrace trace = getViewerTrace();
+        if (trace == null) {
+            return null;
+        }
+        TmfTraceContext ctx = TmfTraceManager.getInstance().getTraceContext(trace);
         return ctx.getData(key);
+    }
+
+    private ITmfTrace getViewerTrace() {
+        CpuUsageComposite treeViewer = fTreeViewer;
+        return (treeViewer != null) ? treeViewer.getTrace() : null;
     }
 
     @Override

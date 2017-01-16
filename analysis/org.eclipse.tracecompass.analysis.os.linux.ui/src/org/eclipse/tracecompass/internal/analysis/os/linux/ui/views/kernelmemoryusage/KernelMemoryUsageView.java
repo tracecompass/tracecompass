@@ -8,8 +8,6 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.kernelmemoryusage;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -62,19 +60,28 @@ public class KernelMemoryUsageView extends TmfChartView {
     private final class SelectionChangeListener implements ISelectionChangedListener {
         @Override
         public void selectionChanged(SelectionChangedEvent event) {
+            KernelMemoryUsageTreeViewer treeViewer = fTreeViewerReference;
+            KernelMemoryUsageViewer chartViewer = (KernelMemoryUsageViewer) getChartViewer();
+            if (treeViewer == null || chartViewer == null) {
+                return;
+            }
+            ITmfTrace trace = treeViewer.getTrace();
+            if (trace == null) {
+                return;
+            }
             ISelection selection = event.getSelection();
             if (selection instanceof IStructuredSelection) {
                 Object structSelection = ((IStructuredSelection) selection).getFirstElement();
                 if (structSelection instanceof KernelMemoryUsageEntry) {
                     KernelMemoryUsageEntry entry = (KernelMemoryUsageEntry) structSelection;
-                    fTreeViewerReference.setSelectedThread(entry.getTid());
-                    ((KernelMemoryUsageViewer) getChartViewer()).setSelectedThread(entry.getTid());
-                    ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
-                    if (trace == null) {
+                    String tid = entry.getTid();
+                    if (tid == null) {
                         return;
                     }
+                    treeViewer.setSelectedThread(tid);
+                    chartViewer.setSelectedThread(tid);
                     TmfTraceManager.getInstance().updateTraceContext(trace,
-                            builder -> builder.setData(KERNEL_MEMORY, checkNotNull(entry.getTid())));
+                            builder -> builder.setData(KERNEL_MEMORY, tid));
                 }
             }
         }
