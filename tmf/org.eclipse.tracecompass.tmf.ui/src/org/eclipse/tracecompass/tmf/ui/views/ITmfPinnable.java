@@ -9,6 +9,9 @@
 
 package org.eclipse.tracecompass.tmf.ui.views;
 
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+
 /**
  * An interface that adds the pin feature to a view.
  *
@@ -19,8 +22,8 @@ public interface ITmfPinnable {
     /**
      * Set the pin state.
      *
-     * @param pinned
-     *            The pin state to take action on
+     * @param trace
+     *            The trace that the view should be pinned to, or null to unpin
      */
-    void setPinned(boolean pinned);
+    void setPinned(@Nullable ITmfTrace trace);
 }

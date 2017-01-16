@@ -45,6 +45,7 @@ public interface ITmfImageConstants {
     String IMG_UI_NEXT_ITEM = IMG_UI_NEXT_PAGE;
     String IMG_UI_PREV_ITEM = IMG_UI_PREV_PAGE;
     String IMG_UI_PIN_VIEW = ICONS_PATH + "elcl16/pin_view.gif";
+    String IMG_UI_UNPINNED_VIEW = ICONS_PATH + "elcl16/unpinned_view.gif";
     String IMG_UI_HIDE_ARROWS = ICONS_PATH + "elcl16/hide_arrows.gif";
     String IMG_UI_FOLLOW_ARROW_FORWARD = ICONS_PATH + "elcl16/follow_arrow_fwd.gif";
     String IMG_UI_FOLLOW_ARROW_BACKWARD = ICONS_PATH + "elcl16/follow_arrow_bwd.gif";

@@ -1279,7 +1279,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             setStartTime(SWT.DEFAULT);
             setEndTime(SWT.DEFAULT);
             if (isPinned()) {
-                setPinned(false);
+                setPinned(null);
             } else {
                 refresh();
             }
@@ -1719,17 +1719,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                             long endBound = (fEndTime == Long.MIN_VALUE ? SWT.DEFAULT : fEndTime);
                             fTimeGraphViewer.setTimeBounds(startBound, endBound);
 
-                            TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
-                            long selectionBeginTime = fTrace == null ? SWT.DEFAULT : ctx.getSelectionRange().getStartTime().toNanos();
-                            long selectionEndTime = fTrace == null ? SWT.DEFAULT : ctx.getSelectionRange().getEndTime().toNanos();
-                            long startTime = fTrace == null ? SWT.DEFAULT : ctx.getWindowRange().getStartTime().toNanos();
-                            long endTime = fTrace == null ? SWT.DEFAULT : ctx.getWindowRange().getEndTime().toNanos();
+                            ITmfTrace trace = fTrace;
+                            TmfTraceContext ctx = (trace == null) ? null : TmfTraceManager.getInstance().getTraceContext(trace);
+                            long selectionBeginTime = ctx == null ? SWT.DEFAULT : ctx.getSelectionRange().getStartTime().toNanos();
+                            long selectionEndTime = ctx == null ? SWT.DEFAULT : ctx.getSelectionRange().getEndTime().toNanos();
+                            long startTime = ctx == null ? SWT.DEFAULT : ctx.getWindowRange().getStartTime().toNanos();
+                            long endTime = ctx == null ? SWT.DEFAULT : ctx.getWindowRange().getEndTime().toNanos();
                             startTime = (fStartTime == Long.MAX_VALUE ? SWT.DEFAULT : Math.max(startTime, fStartTime));
                             endTime = (fEndTime == Long.MIN_VALUE ? SWT.DEFAULT : Math.min(endTime, fEndTime));
-                            if (!isPinned()) {
-                                fTimeGraphViewer.setSelectionRange(selectionBeginTime, selectionEndTime, false);
-                                fTimeGraphViewer.setStartFinishTime(startTime, endTime);
-                            }
+                            fTimeGraphViewer.setSelectionRange(selectionBeginTime, selectionEndTime, false);
+                            fTimeGraphViewer.setStartFinishTime(startTime, endTime);
 
                             if (inputChanged && selectionBeginTime != SWT.DEFAULT) {
                                 synchingToTime(selectionBeginTime);
@@ -2008,20 +2007,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     @Override
-    public synchronized void setPinned(boolean pinned) {
-        if (pinned) {
-            ITmfTrace trace = getTrace();
-            if (trace == null) {
-                if (fPinAction != null) {
-                    fPinAction.setChecked(false);
-                }
-                return;
-            }
+    public synchronized void setPinned(ITmfTrace trace) {
+        if (trace != null) {
             /* Ignore relevant inbound signals */
             TmfSignalManager.addIgnoredInboundSignal(this, TmfTraceOpenedSignal.class);
             TmfSignalManager.addIgnoredInboundSignal(this, TmfTraceSelectedSignal.class);
 
             setPartName(String.format("%s <%s>", fOriginalTabLabel, TmfTraceManager.getInstance().getTraceUniqueName(trace))); //$NON-NLS-1$
+            if (!trace.equals(fTrace)) {
+                loadTrace(trace);
+            }
         } else {
             /* Handle relevant inbound signals */
             TmfSignalManager.removeIgnoredInboundSignal(this, TmfTraceOpenedSignal.class);
@@ -2029,15 +2024,15 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
             setPartName(fOriginalTabLabel);
 
-            ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
-            if (trace != null && !trace.equals(fTrace)) {
-                loadTrace(trace);
+            ITmfTrace activeTrace = TmfTraceManager.getInstance().getActiveTrace();
+            if (activeTrace != null && !activeTrace.equals(fTrace)) {
+                loadTrace(activeTrace);
             } else {
                 refresh();
             }
         }
         if (fPinAction != null) {
-            fPinAction.setChecked(pinned);
+            fPinAction.setPinnedTrace(trace);
         }
     }
 

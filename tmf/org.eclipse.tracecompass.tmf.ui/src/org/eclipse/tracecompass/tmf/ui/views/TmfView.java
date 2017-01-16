@@ -19,8 +19,6 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -29,6 +27,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.views.TmfAlignmentSynchronizer;
 import org.eclipse.tracecompass.tmf.core.component.ITmfComponent;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewSite;
@@ -130,41 +129,24 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
      * @return if the view is pinned
      */
     public boolean isPinned() {
-        return ((fPinAction != null) && (fPinAction.isChecked()));
+        return ((fPinAction != null) && (fPinAction.isPinned()));
     }
 
     /**
      * Method adds a pin action to the TmfView. For example, this action can be
      * used to ignore time synchronization signals from other TmfViews. <br>
      *
-     * Uses {@link ITmfPinnable#setPinned(boolean)} to propagate the state of the
-     * action button.
+     * Uses {@link ITmfPinnable#setPinned(ITmfTrace)} to propagate the state of
+     * the action button.
      */
     protected void contributePinActionToToolBar() {
-        if (fPinAction == null) {
-            fPinAction = new PinTmfViewAction();
+        if (fPinAction == null && this instanceof ITmfPinnable) {
+            fPinAction = new PinTmfViewAction((ITmfPinnable) this);
 
             IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
             toolBarManager.add(new Separator(IWorkbenchActionConstants.PIN_GROUP));
             toolBarManager.add(fPinAction);
         }
-
-        fPinAction.addPropertyChangeListener(new IPropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent event) {
-                if (IAction.CHECKED.equals(event.getProperty())) {
-                    /* Take action on the pin state */
-                    Object value = event.getNewValue();
-                    if (!(value instanceof Boolean)) {
-                        throw new IllegalStateException();
-                    }
-                    if (TmfView.this instanceof ITmfPinnable) {
-                        ITmfPinnable view = (ITmfPinnable) TmfView.this;
-                        view.setPinned((Boolean) value);
-                    }
-                }
-            }
-        });
     }
 
     @Override
