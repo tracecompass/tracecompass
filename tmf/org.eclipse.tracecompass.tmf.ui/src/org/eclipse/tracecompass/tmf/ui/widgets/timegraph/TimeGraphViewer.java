@@ -17,6 +17,7 @@
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -933,7 +934,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
         int width = fTimeAlignedComposite.getSize().x;
         if (width == 0) {
             /* the weigths will be applied when the control is resized */
-            fWeights = weights;
+            fWeights = Arrays.copyOf(weights, weights.length);
             return;
         }
         setNameSpace(width * weights[0] / (weights[0] + weights[1]));

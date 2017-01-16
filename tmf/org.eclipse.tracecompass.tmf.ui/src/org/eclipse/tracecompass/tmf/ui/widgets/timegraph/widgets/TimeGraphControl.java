@@ -134,7 +134,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private static final int SNAP_WIDTH = 3;
     private static final int ARROW_HOVER_MAX_DIST = 5;
 
-    private static double ARROW_RATIO = Math.sqrt(3) / 2; // base to height ratio
+    private static final double ARROW_RATIO = Math.sqrt(3) / 2; // base to height ratio
 
     private static final int NO_STATUS = -1;
     private static final int STATUS_WITHOUT_CURSOR_TIME = -2;

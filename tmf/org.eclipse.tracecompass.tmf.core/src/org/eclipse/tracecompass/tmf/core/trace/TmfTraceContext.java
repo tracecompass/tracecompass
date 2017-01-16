@@ -192,7 +192,7 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
      *
      * @since 2.3
      */
-    public class Builder {
+    public static class Builder {
         private TmfTimeRange selection;
         private TmfTimeRange windowRange;
         private @Nullable IFile editorFile;

@@ -120,7 +120,7 @@ public class LinuxTraceContext extends TmfTraceContext {
      *
      * @since 2.2
      */
-    public class LinuxBuilder extends Builder {
+    public static class LinuxBuilder extends Builder {
         private int cpu;
         private int tid;
         private ITmfTrace trace;
