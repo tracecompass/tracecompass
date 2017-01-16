@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
 
 /**
  * Implementation of model element representing the unique "Traces" folder in
@@ -26,8 +27,17 @@ public class TmfTracesFolder extends TmfTraceFolder {
 
     /**
      * The name of the traces folder
+     *
+     * @deprecated use {@link TmfProjectElement#getTracesFolder()} and
+     *             (@link TmfTracesFolder#getName()} for the visible name.
+     *             use {@link TmfProjectElement#getTracesFolder()},
+     *             (@link TmfTracesFolder#getResource()} and
+     *             {@link IResource#getName()} for the resource name.
      */
+    @Deprecated
     public static final String TRACES_FOLDER_NAME = "Traces"; //$NON-NLS-1$
+
+    static final String TRACES_RESOURCE_NAME = "Traces"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Constructor

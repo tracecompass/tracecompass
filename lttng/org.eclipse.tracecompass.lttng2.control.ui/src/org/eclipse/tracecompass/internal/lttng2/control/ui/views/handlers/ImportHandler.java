@@ -71,7 +71,6 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceTypeUIUtils;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -264,49 +263,49 @@ public class ImportHandler extends BaseControlViewHandler {
     }
 
 
-    private static void initializeTraceResource(final LttngRelaydConnectionInfo connectionInfo, final String tracePath, final IProject project) throws CoreException, TmfTraceImportException {
-        IFolder folder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
-        IFolder traceFolder = folder.getFolder(connectionInfo.getSessionName());
-        Path location = new Path(tracePath);
-        IStatus result = ResourcesPlugin.getWorkspace().validateLinkLocation(folder, location);
-        if (result.isOK()) {
-            traceFolder.createLink(location, IResource.REPLACE, new NullProgressMonitor());
-        } else {
-            throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, result.getMessage()));
-        }
+   private static void initializeTraceResource(final LttngRelaydConnectionInfo connectionInfo, final String tracePath, final IProject project) throws CoreException, TmfTraceImportException {
+       final TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
+       final TmfTraceFolder tracesFolder = projectElement.getTracesFolder();
+       if (tracesFolder != null) {
+           IFolder folder = tracesFolder.getResource();
+           IFolder traceFolder = folder.getFolder(connectionInfo.getSessionName());
+           Path location = new Path(tracePath);
+           IStatus result = ResourcesPlugin.getWorkspace().validateLinkLocation(folder, location);
+           if (result.isOK()) {
+               traceFolder.createLink(location, IResource.REPLACE, new NullProgressMonitor());
+           } else {
+               throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, result.getMessage()));
+           }
 
-        TraceTypeHelper selectedTraceType = TmfTraceTypeUIUtils.selectTraceType(location.toOSString(), null, null);
-        // No trace type was determined.
-        TmfTraceTypeUIUtils.setTraceType(traceFolder, selectedTraceType);
+           TraceTypeHelper selectedTraceType = TmfTraceTypeUIUtils.selectTraceType(location.toOSString(), null, null);
+           // No trace type was determined.
+           TmfTraceTypeUIUtils.setTraceType(traceFolder, selectedTraceType);
 
-        final TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
-        TmfTraceElement found = null;
-        final TmfTraceFolder tracesFolder = projectElement.getTracesFolder();
-        if (tracesFolder != null) {
-            final List<TmfTraceElement> traces = tracesFolder.getTraces();
-            for (TmfTraceElement candidate : traces) {
-                if (candidate.getName().equals(connectionInfo.getSessionName())) {
-                    found = candidate;
-                }
-            }
-        }
+           TmfTraceElement found = null;
+           final List<TmfTraceElement> traces = tracesFolder.getTraces();
+           for (TmfTraceElement candidate : traces) {
+               if (candidate.getName().equals(connectionInfo.getSessionName())) {
+                   found = candidate;
+               }
+           }
 
-        if (found == null) {
-            throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_LiveTraceElementError));
-        }
+           if (found == null) {
+               throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_LiveTraceElementError));
+           }
 
-        // Properties used to be able to reopen a trace in live mode
-        traceFolder.setPersistentProperty(CtfConstants.LIVE_HOST, connectionInfo.getHost());
-        traceFolder.setPersistentProperty(CtfConstants.LIVE_PORT, Integer.toString(connectionInfo.getPort()));
-        traceFolder.setPersistentProperty(CtfConstants.LIVE_SESSION_NAME, connectionInfo.getSessionName());
+           // Properties used to be able to reopen a trace in live mode
+           traceFolder.setPersistentProperty(CtfConstants.LIVE_HOST, connectionInfo.getHost());
+           traceFolder.setPersistentProperty(CtfConstants.LIVE_PORT, Integer.toString(connectionInfo.getPort()));
+           traceFolder.setPersistentProperty(CtfConstants.LIVE_SESSION_NAME, connectionInfo.getSessionName());
 
-        final TmfTraceElement finalTrace = found;
-        Display.getDefault().syncExec(new Runnable() {
+           final TmfTraceElement finalTrace = found;
+           Display.getDefault().syncExec(new Runnable() {
 
-            @Override
-            public void run() {
-                TmfOpenTraceHelper.openTraceFromElement(finalTrace);
-            }
-        });
-    }
+               @Override
+               public void run() {
+                   TmfOpenTraceHelper.openTraceFromElement(finalTrace);
+               }
+           });
+       }
+   }
 }

@@ -65,7 +65,6 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.wizards.SWTBotImportWizardUtils;
@@ -738,12 +737,14 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
 
         assertEquals((optionFlags & ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE) != 0, traceResource.isLinked());
 
+        String tracesFolderName = tracesFolder.getResource().getName();
+
         // i.e. /Tracing/Traces
-        IPath expectedPath = Path.ROOT.append(new Path(TRACE_PROJECT_NAME)).append(TmfTracesFolder.TRACES_FOLDER_NAME).append(expectedElementPath);
+        IPath expectedPath = Path.ROOT.append(new Path(TRACE_PROJECT_NAME)).append(tracesFolderName).append(expectedElementPath);
         assertEquals(expectedPath, traceResource.getFullPath());
 
         if (expectedElementPathRenamed != null) {
-            IPath expectedPathRenamed = Path.ROOT.append(new Path(TRACE_PROJECT_NAME)).append(TmfTracesFolder.TRACES_FOLDER_NAME).append(expectedElementPathRenamed);
+            IPath expectedPathRenamed = Path.ROOT.append(new Path(TRACE_PROJECT_NAME)).append(tracesFolderName).append(expectedElementPathRenamed);
             IResource traceResourceRenamed = traces.get(1).getResource();
             assertEquals(expectedPathRenamed, traceResourceRenamed.getFullPath());
         }

@@ -12,8 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.tests.actions;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.net.URI;
 import java.text.ParseException;
@@ -45,7 +45,6 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.ProjectModelTestData;
 import org.eclipse.ui.PlatformUI;
 import org.junit.After;
@@ -80,7 +79,10 @@ public class SelectTracesOperationTest {
         IProject project = TmfProjectRegistry.createProject("Experiment Select Trace Test Project", null, null);
         fProjectElement = TmfProjectRegistry.getProject(project, true);
 
-        IFolder traceFolder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
+        TmfTraceFolder tmfTracesFolder = fProjectElement.getTracesFolder();
+        assertNotNull(tmfTracesFolder);
+
+        IFolder traceFolder = tmfTracesFolder.getResource();
 
         List<IPath> tracePaths = new ArrayList<>();
         tracePaths.add(new Path(TmfTestTrace.SYSLOG_1.getFullPath()));
@@ -95,8 +97,6 @@ public class SelectTracesOperationTest {
             traceResource.setPersistentProperty(TmfCommonConstants.TRACETYPE, "org.eclipse.linuxtools.tmf.tests.stubs.trace.text.testsyslog");
         }
 
-        TmfTraceFolder tmfTracesFolder = fProjectElement.getTracesFolder();
-        assertNotNull(tmfTracesFolder);
         for (TmfTraceElement trace : tmfTracesFolder.getTraces()) {
             trace.refreshTraceType();
         }

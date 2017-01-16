@@ -89,7 +89,6 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.ui.dialogs.FileSystemElement;
 import org.eclipse.ui.dialogs.WizardResourceImportPage;
 import org.eclipse.ui.ide.dialogs.IElementFilter;
@@ -255,7 +254,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 if (project.hasNature(TmfProjectNature.ID)) {
                     TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
                     fTraceFolderElement = projectElement.getTracesFolder();
-                    traceFolder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
+                    traceFolder = fTraceFolderElement.getResource();
                 }
             } catch (CoreException e) {
             }
@@ -268,7 +267,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     TmfCommonConstants.DEFAULT_TRACE_PROJECT_NAME, null, new NullProgressMonitor());
             TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
             fTraceFolderElement = projectElement.getTracesFolder();
-            traceFolder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
+            traceFolder = fTraceFolderElement.getResource();
         }
 
         // Set the target trace folder

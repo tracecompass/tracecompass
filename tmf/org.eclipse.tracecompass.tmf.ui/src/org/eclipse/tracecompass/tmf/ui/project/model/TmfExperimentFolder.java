@@ -46,8 +46,16 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
 
     /**
      * The name of the experiment folder.
+     * @deprecated use {@link TmfProjectElement#getExperimentsFolder()} and
+     *             (@link getExperimentsFolder#getName()} for the visible name.
+     *             Use {@link TmfProjectElement#getExperimentsFolder()},
+     *             (@link TmfExperimentFolder#getResource()} and
+     *             {@link IResource#getName()} for the resource name.
      */
+    @Deprecated
     public static final String EXPER_FOLDER_NAME = "Experiments"; //$NON-NLS-1$
+
+    static final String EXPER_RESOURCE_NAME = "Experiments"; //$NON-NLS-1$
 
     // Property View stuff
     private static final String INFO_CATEGORY = "Info"; //$NON-NLS-1$

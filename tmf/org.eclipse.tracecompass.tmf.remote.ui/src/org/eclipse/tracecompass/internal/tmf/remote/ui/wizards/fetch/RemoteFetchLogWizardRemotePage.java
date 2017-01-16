@@ -73,7 +73,6 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
@@ -605,7 +604,15 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
             }
 
             IProject project = fProjects.get(fProjectIndex);
-            IFolder traceFolder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
+            TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
+            TmfTraceFolder tracesFolderElement = projectElement.getTracesFolder();
+
+            if (tracesFolderElement == null) {
+                handleError(RemoteMessages.RemoteFetchLogWizardRemotePage_InvalidTracingProject, null);
+                return false;
+            }
+
+            IFolder traceFolder = tracesFolderElement.getResource();
 
             if (!traceFolder.exists()) {
                 handleError(RemoteMessages.RemoteFetchLogWizardRemotePage_InvalidTracingProject, null);
@@ -614,7 +621,6 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
 
             try {
                 if (project.hasNature(TmfProjectNature.ID)) {
-                    TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
                     fTmfTraceFolder = projectElement.getTracesFolder();
                     fExperimentFolderElement = projectElement.getExperimentsFolder();
                 }

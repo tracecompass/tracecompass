@@ -105,7 +105,6 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers.ProjectElementHasChild;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitTimeoutException;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
@@ -573,7 +572,7 @@ public final class SWTBotUtils {
         final SWTBotTreeItem treeItem = tree.getTreeItem(projectName);
         treeItem.expand();
 
-        SWTBotTreeItem tracesNode = getTraceProjectItem(projectExplorerBot, treeItem, TmfTracesFolder.TRACES_FOLDER_NAME);
+        SWTBotTreeItem tracesNode = getTraceProjectItem(projectExplorerBot, treeItem, "Traces");
         tracesNode.expand();
 
         SWTBotTreeItem currentItem = tracesNode;
@@ -639,7 +638,7 @@ public final class SWTBotUtils {
     public static SWTBotTreeItem selectTracesFolder(SWTWorkbenchBot bot, String projectName) {
         SWTBotTreeItem projectTreeItem = selectProject(bot, projectName);
         projectTreeItem.select();
-        SWTBotTreeItem tracesFolderItem = getTraceProjectItem(bot, projectTreeItem, TmfTracesFolder.TRACES_FOLDER_NAME);
+        SWTBotTreeItem tracesFolderItem = getTraceProjectItem(bot, projectTreeItem, "Traces");
         tracesFolderItem.select();
         return tracesFolderItem;
     }

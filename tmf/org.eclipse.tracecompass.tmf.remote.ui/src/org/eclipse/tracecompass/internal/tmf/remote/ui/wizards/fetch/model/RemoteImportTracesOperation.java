@@ -66,7 +66,6 @@ import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceTypeUIUtils;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
 
@@ -149,7 +148,7 @@ public class RemoteImportTracesOperation extends TmfWorkspaceModifyOperation {
 
         IFolder destinationFolder = fDestination.getResource();
         if (!destinationFolder.exists()) {
-            throw new ExecutionException(RemoteMessages.RemoteImportTracesOperation_ImportDialogInvalidTracingProject + " (" + TmfTracesFolder.TRACES_FOLDER_NAME + ")"); //$NON-NLS-1$//$NON-NLS-2$
+            throw new ExecutionException(RemoteMessages.RemoteImportTracesOperation_ImportDialogInvalidTracingProject + " (" + destinationFolder + ")"); //$NON-NLS-1$//$NON-NLS-2$
         }
 
         SubMonitor subMonitor = SubMonitor.convert(monitor, fTraceElements.length * 4);

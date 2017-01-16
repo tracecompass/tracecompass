@@ -118,14 +118,14 @@ public class TmfProjectElement extends TmfProjectModelElement {
 
         // Add the model folder if the corresponding resource exists and is not
         // accounted for
-        IFolder folder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
+        IFolder folder = project.getFolder(TmfTracesFolder.TRACES_RESOURCE_NAME);
         if (folder != null && folder.exists()) {
             String name = folder.getName();
             ITmfProjectModelElement element = childrenMap.get(name);
             if (element instanceof TmfTracesFolder) {
                 childrenMap.remove(name);
             } else {
-                element = new TmfTracesFolder(TmfTracesFolder.TRACES_FOLDER_NAME, folder, this);
+                element = new TmfTracesFolder(TmfTracesFolder.TRACES_RESOURCE_NAME, folder, this);
                 addChild(element);
             }
             ((TmfTracesFolder) element).refreshChildren();
@@ -133,14 +133,14 @@ public class TmfProjectElement extends TmfProjectModelElement {
 
         // Add the model folder if the corresponding resource exists and is not
         // accounted for
-        folder = project.getFolder(TmfExperimentFolder.EXPER_FOLDER_NAME);
+        folder = project.getFolder(TmfExperimentFolder.EXPER_RESOURCE_NAME);
         if (folder != null && folder.exists()) {
             String name = folder.getName();
             ITmfProjectModelElement element = childrenMap.get(name);
             if (element instanceof TmfExperimentFolder) {
                 childrenMap.remove(name);
             } else {
-                element = new TmfExperimentFolder(TmfExperimentFolder.EXPER_FOLDER_NAME, folder, this);
+                element = new TmfExperimentFolder(TmfExperimentFolder.EXPER_RESOURCE_NAME, folder, this);
                 addChild(element);
             }
             ((TmfExperimentFolder) element).refreshChildren();

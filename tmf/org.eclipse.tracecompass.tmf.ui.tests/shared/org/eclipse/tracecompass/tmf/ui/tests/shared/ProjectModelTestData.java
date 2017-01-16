@@ -36,7 +36,6 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
@@ -62,25 +61,23 @@ public class ProjectModelTestData {
     public static TmfProjectElement getFilledProject() throws CoreException {
 
         IProject project = TmfProjectRegistry.createProject(PROJECT_NAME, null, null);
-        IFolder traceFolder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
-
-        /* Create a trace, if it exist, it will be replaced */
-        final IPath pathString = new Path(testTrace.getFullPath());
-        IResource linkedTrace = TmfImportHelper.createLink(traceFolder, pathString, pathString.lastSegment());
-        if (!(linkedTrace != null && linkedTrace.exists())) {
-            return null;
-        }
-        linkedTrace.setPersistentProperty(TmfCommonConstants.TRACETYPE,
-                "org.eclipse.linuxtools.tmf.core.tests.tracetype");
-
         final TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
-        TmfTraceFolder tracesFolder = projectElement.getTracesFolder(); {
-            if (tracesFolder != null) {
-                TmfTraceElement traceElement = tracesFolder.getTraces().get(0);
-                traceElement.refreshTraceType();
-            }
-        }
+        TmfTraceFolder tracesFolder = projectElement.getTracesFolder();
+        if (tracesFolder != null) {
+            IFolder traceFolder = tracesFolder.getResource();
 
+            /* Create a trace, if it exist, it will be replaced */
+            final IPath pathString = new Path(testTrace.getFullPath());
+            IResource linkedTrace = TmfImportHelper.createLink(traceFolder, pathString, pathString.lastSegment());
+            if (!(linkedTrace != null && linkedTrace.exists())) {
+                return null;
+            }
+            linkedTrace.setPersistentProperty(TmfCommonConstants.TRACETYPE,
+                    "org.eclipse.linuxtools.tmf.core.tests.tracetype");
+
+            TmfTraceElement traceElement = tracesFolder.getTraces().get(0);
+            traceElement.refreshTraceType();
+        }
         projectElement.refresh();
 
         return projectElement;

@@ -147,12 +147,12 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                 description.setNatureIds(new String[] { TmfProjectNature.ID });
                 project.setDescription(description, null);
 
-                IFolder folder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
+                IFolder folder = project.getFolder(TmfTracesFolder.TRACES_RESOURCE_NAME);
                 if (!folder.exists()) {
                     folder.create(true, true, null);
                 }
 
-                folder = project.getFolder(TmfExperimentFolder.EXPER_FOLDER_NAME);
+                folder = project.getFolder(TmfExperimentFolder.EXPER_RESOURCE_NAME);
                 if (!folder.exists()) {
                     folder.create(true, true, null);
                 }
