@@ -1094,6 +1094,31 @@
                style="push">
          </command>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.projectConfigure">
+         <command
+               commandId="org.eclipse.tracecompass.tmf.ui.command.convert_project"
+               label="%command.convert"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <and>
+                        <instanceof
+                           value="org.eclipse.core.resources.IProject">
+                        </instanceof>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -1263,6 +1288,12 @@
             description="%command.clear_offset.description"
             id="org.eclipse.linuxtools.tmf.ui.command.clear_offset"
             name="%command.clear_offset">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
+            description="%command.convert.description"
+            id="org.eclipse.tracecompass.tmf.ui.command.convert_project"
+            name="%command.convert">
       </command>
    </extension>
    <extension
@@ -1756,6 +1787,10 @@
                </not>
             </and>
          </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.ConvertToTracingProjectHandler"
+            commandId="org.eclipse.tracecompass.tmf.ui.command.convert_project">
       </handler>
    </extension>
    <extension point="org.eclipse.ui.bindings">
