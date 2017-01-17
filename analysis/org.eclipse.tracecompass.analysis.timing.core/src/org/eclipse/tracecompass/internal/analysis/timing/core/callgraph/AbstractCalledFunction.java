@@ -138,7 +138,7 @@ abstract class AbstractCalledFunction implements ICalledFunction {
 
     @Override
     public String toString() {
-        return '[' + String.valueOf(fStart) + ", " + String.valueOf(fEnd) + ']'; //$NON-NLS-1$
+        return '[' + String.valueOf(fStart) + ", " + String.valueOf(fEnd) + ']' + " Duration: " + getLength() + ", Self Time: " + fSelfTime; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     @Override

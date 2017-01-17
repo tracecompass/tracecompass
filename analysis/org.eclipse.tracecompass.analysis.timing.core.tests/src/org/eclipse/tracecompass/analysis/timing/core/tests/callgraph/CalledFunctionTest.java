@@ -337,8 +337,8 @@ public class CalledFunctionTest {
      */
     @Test
     public void testToString() {
-        assertEquals("[10, 1010]", fFixture.toString());
-        assertEquals("[400, 500]", f42Fixture.toString());
-        assertEquals("[20, 50]", fHiFixture.toString());
+        assertEquals("[10, 1010] Duration: 1000, Self Time: 870", fFixture.toString());
+        assertEquals("[400, 500] Duration: 100, Self Time: 100", f42Fixture.toString());
+        assertEquals("[20, 50] Duration: 30, Self Time: 30", fHiFixture.toString());
     }
 }

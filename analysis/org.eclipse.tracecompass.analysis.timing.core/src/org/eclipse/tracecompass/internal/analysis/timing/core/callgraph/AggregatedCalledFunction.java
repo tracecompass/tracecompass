@@ -264,4 +264,9 @@ public class AggregatedCalledFunction {
     public AggregatedCalledFunctionStatistics getFunctionStatistics() {
         return fStatistics;
     }
+
+    @Override
+    public String toString() {
+        return "Aggregate Function: " + getSymbol() + ", Duration: " + getDuration() + ", Self Time: " + fSelfTime + " on " + getNbCalls() + " calls"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+    }
 }
