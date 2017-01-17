@@ -9,7 +9,8 @@
 ###############################################################################
 
 # A script that checks every plugin for modifications since last release
-# and prompt to bump the micro version if necessary.
+# and prompt to bump the micro version if necessary. Major and minor
+# version changes are handled by the API tooling already.
 #
 # Usage  ./check_plugins_changes.sh [ignoredCommit1,ignoredCommit2,...]
 #

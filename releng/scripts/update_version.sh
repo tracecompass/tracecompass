@@ -7,6 +7,23 @@
 # http://www.eclipse.org/legal/epl-v10.html
 ###############################################################################
 
+# Updates the version numbers of the project
+#
+# Which versions are updated? At the time of writing, plug-ins with
+# code are updated when the API changes (API additions or breakage)
+# by using the API tooling inside Eclipse. So this script does not
+# deal with those.
+# Things that follow the project version number (subject to change):
+# - Features
+# - Documentation plugins
+# - Product related stuff (about text, branding plugins, etc)
+# - Parent pom version
+
+# Usage  ./update_version.sh oldversion newversion
+# For example ./update_version.sh 2.1.0 2.2.0
+#
+# Note that can also make the version go backwards if needed.
+
 oldVersion=$1
 newVersion=$2
 
