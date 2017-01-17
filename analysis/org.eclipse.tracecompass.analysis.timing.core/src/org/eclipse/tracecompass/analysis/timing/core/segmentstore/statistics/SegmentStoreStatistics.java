@@ -20,7 +20,9 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
  * Class to calculate simple segment store statistics (min, max, average)
  *
  * @author Bernd Hufmann
+ * @deprecated Use {@link IStatistics} instead
  */
+@Deprecated
 public class SegmentStoreStatistics {
 
     private static final ISegment MIN_SEGMENT = new BasicSegment(0, Long.MAX_VALUE);
