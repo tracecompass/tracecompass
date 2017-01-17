@@ -31,13 +31,13 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCanvas;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
-import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
+import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
+import org.eclipse.tracecompass.analysis.timing.core.statistics.Statistics;
 import org.eclipse.tracecompass.analysis.timing.core.tests.flamegraph.AggregationTreeTest;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityViewer;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.ISegmentStoreDensityViewerDataListener;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.CallGraphDensityView;
-import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
@@ -163,9 +163,9 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
         loadData();
         assertEquals(3, fTableBot.rowCount());
         ISeries series = getSeries();
-        SegmentStoreStatistics sss = getDescriptiveStatistics(series);
+        IStatistics<@NonNull Long> sss = getDescriptiveStatistics(series);
         assertEquals(3.0, sss.getTotal(), 0.0);
-        assertEquals(0.02, sss.getAverage(), 0.02); // low mean
+        assertEquals(0.02, sss.getMean(), 0.02); // low mean
     }
 
     @Override
@@ -174,9 +174,9 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
         loadData();
         assertEquals(5, fTableBot.rowCount());
         ISeries series = getSeries();
-        SegmentStoreStatistics sss = getDescriptiveStatistics(series);
+        IStatistics<@NonNull Long> sss = getDescriptiveStatistics(series);
         assertEquals(5.0, sss.getTotal(), 0.0);
-        assertEquals(0.02, sss.getAverage(), 0.03); // low mean
+        assertEquals(0.02, sss.getMean(), 0.03); // low mean
     }
 
     @Override
@@ -185,9 +185,9 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
         loadData();
         assertEquals(4, fTableBot.rowCount());
         ISeries series = getSeries();
-        SegmentStoreStatistics sss = getDescriptiveStatistics(series);
+        IStatistics<@NonNull Long> sss = getDescriptiveStatistics(series);
         assertEquals(4.0, sss.getTotal(), 0.0);
-        assertEquals(0.02, sss.getAverage(), 0.02); // low mean
+        assertEquals(0.02, sss.getMean(), 0.02); // low mean
     }
 
     @Override
@@ -198,9 +198,9 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
         ISeries series = getSeries();
         double[] ySeries = series.getYSeries();
         assertNotNull(ySeries);
-        SegmentStoreStatistics sss = getDescriptiveStatistics(series);
+        IStatistics<@NonNull Long> sss = getDescriptiveStatistics(series);
         assertEquals(8.0, sss.getTotal(), 0.0);
-        assertEquals(0.06, sss.getAverage(), 0.02); // average mean
+        assertEquals(0.06, sss.getMean(), 0.02); // average mean
     }
 
     @Override
@@ -211,9 +211,9 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
         ISeries series = getSeries();
         double[] ySeries = series.getYSeries();
         assertNotNull(ySeries);
-        SegmentStoreStatistics sss = getDescriptiveStatistics(series);
+        IStatistics<@NonNull Long> sss = getDescriptiveStatistics(series);
         assertEquals(4.0, sss.getTotal(), 0.0);
-        assertEquals(0.02, sss.getAverage(), 0.02); // low mean
+        assertEquals(0.02, sss.getMean(), 0.02); // low mean
     }
 
     @Override
@@ -224,9 +224,9 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
         ISeries series = getSeries();
         double[] ySeries = series.getYSeries();
         assertNotNull(ySeries);
-        SegmentStoreStatistics sss = getDescriptiveStatistics(series);
+        IStatistics<@NonNull Long> sss = getDescriptiveStatistics(series);
         assertEquals(4.0, sss.getTotal(), 0.0);
-        assertEquals(0.02, sss.getAverage(), 0.02); // low mean
+        assertEquals(0.02, sss.getMean(), 0.02); // low mean
     }
 
     @Override
@@ -237,9 +237,9 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
         ISeries series = getSeries();
         double[] ySeries = series.getYSeries();
         assertNotNull(ySeries);
-        SegmentStoreStatistics sss = getDescriptiveStatistics(series);
+        IStatistics<@NonNull Long> sss = getDescriptiveStatistics(series);
         assertEquals(1000.0, sss.getTotal(), 0.0);
-        assertEquals(8, sss.getAverage(), 1); // high mean
+        assertEquals(8, sss.getMean(), 1); // high mean
     }
 
     private ISeries getSeries() {
@@ -274,14 +274,14 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
 
     }
 
-    private static SegmentStoreStatistics getDescriptiveStatistics(ISeries series) {
+    private static IStatistics<@NonNull Long> getDescriptiveStatistics(ISeries series) {
         double[] ySeries = series.getYSeries();
         assertNotNull(ySeries);
-        SegmentStoreStatistics sss = new SegmentStoreStatistics();
+        IStatistics<@NonNull Long> stats = new Statistics<>();
         for (double item : ySeries) {
-            sss.update(new BasicSegment(0, (long) (item - 1.0)));
+            stats.update((long) (item - 1.0));
         }
-        return sss;
+        return stats;
     }
 
 }
