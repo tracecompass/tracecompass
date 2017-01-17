@@ -117,39 +117,39 @@ public class AggregatedCalledFunctionStatisticsTest {
         // Test the main statistics
         @NonNull
         AggregatedCalledFunctionStatistics mainStatistics1 = firstFunction.getFunctionStatistics();
-        assertEquals("Test main's maximum duration", 100, mainStatistics1.getMax());
-        assertEquals("Test main's minimum duration", 100, mainStatistics1.getMin());
-        assertEquals("Test main's maximum self time", 20, mainStatistics1.getMaxSelfTime());
-        assertEquals("Test main's minimum self time", 20, mainStatistics1.getMinSelfTime());
-        assertEquals("Test main's number of calls", 1, mainStatistics1.getNbSegments());
-        assertEquals("Test main's average duration", 100, mainStatistics1.getAverage(), ERROR);
-        assertEquals("Test main's standard deviation", 20, mainStatistics1.getAverageSelfTime(), ERROR);
-        assertEquals("Test main's standard deviation", Double.NaN, mainStatistics1.getStdDev(), ERROR);
-        assertEquals("Test main's standard deviation", Double.NaN, mainStatistics1.getStdDevSelfTime(), ERROR);
+        assertEquals("Test main's maximum duration", 100, mainStatistics1.getDurationStatistics().getMax());
+        assertEquals("Test main's minimum duration", 100, mainStatistics1.getDurationStatistics().getMin());
+        assertEquals("Test main's maximum self time", 20, mainStatistics1.getSelfTimeStatistics().getMax());
+        assertEquals("Test main's minimum self time", 20, mainStatistics1.getSelfTimeStatistics().getMin());
+        assertEquals("Test main's number of calls", 1, mainStatistics1.getDurationStatistics().getNbElements());
+        assertEquals("Test main's average duration", 100, mainStatistics1.getDurationStatistics().getMean(), ERROR);
+        assertEquals("Test main's standard deviation", 20, mainStatistics1.getSelfTimeStatistics().getMean(), ERROR);
+        assertEquals("Test main's standard deviation", Double.NaN, mainStatistics1.getDurationStatistics().getStdDev(), ERROR);
+        assertEquals("Test main's standard deviation", Double.NaN, mainStatistics1.getSelfTimeStatistics().getStdDev(), ERROR);
         // Test the first function statistics
         @NonNull
         AggregatedCalledFunctionStatistics functionStatistics1 = SecondFunction.getFunctionStatistics();
-        assertEquals("Test first function's maximum duration", 50, functionStatistics1.getMax());
-        assertEquals("Test first function's minimum duration", 30, functionStatistics1.getMin());
-        assertEquals("Test first function's maximum self time", 30, functionStatistics1.getMaxSelfTime());
-        assertEquals("Test first function's mininmum self time", 20, functionStatistics1.getMinSelfTime());
-        assertEquals("Test first function's number of calls", 2, functionStatistics1.getNbSegments());
-        assertEquals("Test first function's average duration", 40, functionStatistics1.getAverage(), ERROR);
-        assertEquals("Test first function's average self time", 25, functionStatistics1.getAverageSelfTime(), ERROR);
-        assertEquals("Test first function's standard deviation", Double.NaN, functionStatistics1.getStdDev(), ERROR);
-        assertEquals("Test first function's self time standard deviation", Double.NaN, functionStatistics1.getStdDevSelfTime(), ERROR);
+        assertEquals("Test first function's maximum duration", 50, functionStatistics1.getDurationStatistics().getMax());
+        assertEquals("Test first function's minimum duration", 30, functionStatistics1.getDurationStatistics().getMin());
+        assertEquals("Test first function's maximum self time", 30, functionStatistics1.getSelfTimeStatistics().getMax());
+        assertEquals("Test first function's mininmum self time", 20, functionStatistics1.getSelfTimeStatistics().getMin());
+        assertEquals("Test first function's number of calls", 2, functionStatistics1.getDurationStatistics().getNbElements());
+        assertEquals("Test first function's average duration", 40, functionStatistics1.getDurationStatistics().getMean(), ERROR);
+        assertEquals("Test first function's average self time", 25, functionStatistics1.getSelfTimeStatistics().getMean(), ERROR);
+        assertEquals("Test first function's standard deviation", Double.NaN, functionStatistics1.getDurationStatistics().getStdDev(), ERROR);
+        assertEquals("Test first function's self time standard deviation", Double.NaN, functionStatistics1.getSelfTimeStatistics().getStdDev(), ERROR);
         // Test the third function statistics
         @NonNull
         AggregatedCalledFunctionStatistics functionStatistics2 = ThirdFunction.getFunctionStatistics();
-        assertEquals("Test second function's maximum duration", 30, functionStatistics2.getMax());
-        assertEquals("Test second function's minimum duration", 30, functionStatistics2.getMin());
-        assertEquals("Test second function's maximum self time", 30, functionStatistics2.getMaxSelfTime());
-        assertEquals("Test second function's minimum self time", 30, functionStatistics2.getMinSelfTime());
-        assertEquals("Test second function's number of calls", 1, functionStatistics2.getNbSegments());
-        assertEquals("Test second function's average duration", 30, functionStatistics2.getAverage(), ERROR);
-        assertEquals("Test second function's average self time", 30, functionStatistics2.getAverageSelfTime(), ERROR);
-        assertEquals("Test second function's standard deviation", Double.NaN, functionStatistics2.getStdDev(), ERROR);
-        assertEquals("Test second function's self time standard deviation", Double.NaN, functionStatistics2.getStdDevSelfTime(), ERROR);
+        assertEquals("Test second function's maximum duration", 30, functionStatistics2.getDurationStatistics().getMax());
+        assertEquals("Test second function's minimum duration", 30, functionStatistics2.getDurationStatistics().getMin());
+        assertEquals("Test second function's maximum self time", 30, functionStatistics2.getSelfTimeStatistics().getMax());
+        assertEquals("Test second function's minimum self time", 30, functionStatistics2.getSelfTimeStatistics().getMin());
+        assertEquals("Test second function's number of calls", 1, functionStatistics2.getDurationStatistics().getNbElements());
+        assertEquals("Test second function's average duration", 30, functionStatistics2.getDurationStatistics().getMean(), ERROR);
+        assertEquals("Test second function's average self time", 30, functionStatistics2.getSelfTimeStatistics().getMean(), ERROR);
+        assertEquals("Test second function's standard deviation", Double.NaN, functionStatistics2.getDurationStatistics().getStdDev(), ERROR);
+        assertEquals("Test second function's self time standard deviation", Double.NaN, functionStatistics2.getSelfTimeStatistics().getStdDev(), ERROR);
         cga.dispose();
     }
 
@@ -204,51 +204,51 @@ public class AggregatedCalledFunctionStatisticsTest {
         // Test the first function statistics
         @NonNull
         AggregatedCalledFunctionStatistics functionStatistics1 = firstFunction.getFunctionStatistics();
-        assertEquals("Test first function's maximum duration", 100, functionStatistics1.getMax());
-        assertEquals("Test first function's minimum duration", 100, functionStatistics1.getMin());
-        assertEquals("Test first function's maximum self time", 20, functionStatistics1.getMaxSelfTime());
-        assertEquals("Test first function's minimum self time", 20, functionStatistics1.getMinSelfTime());
-        assertEquals("Test first function's number of segments", 1, functionStatistics1.getNbSegments());
-        assertEquals("Test first function's average duration", 100, functionStatistics1.getAverage(), ERROR);
-        assertEquals("Test first function's average self time", 20, functionStatistics1.getAverageSelfTime(), ERROR);
-        assertEquals("Test first function's standard deviation", Double.NaN, functionStatistics1.getStdDev(), ERROR);
-        assertEquals("Test first function's standard deviation", Double.NaN, functionStatistics1.getStdDevSelfTime(), ERROR);
+        assertEquals("Test first function's maximum duration", 100, functionStatistics1.getDurationStatistics().getMax());
+        assertEquals("Test first function's minimum duration", 100, functionStatistics1.getDurationStatistics().getMin());
+        assertEquals("Test first function's maximum self time", 20, functionStatistics1.getSelfTimeStatistics().getMax());
+        assertEquals("Test first function's minimum self time", 20, functionStatistics1.getSelfTimeStatistics().getMin());
+        assertEquals("Test first function's number of segments", 1, functionStatistics1.getDurationStatistics().getNbElements());
+        assertEquals("Test first function's average duration", 100, functionStatistics1.getDurationStatistics().getMean(), ERROR);
+        assertEquals("Test first function's average self time", 20, functionStatistics1.getSelfTimeStatistics().getMean(), ERROR);
+        assertEquals("Test first function's standard deviation", Double.NaN, functionStatistics1.getDurationStatistics().getStdDev(), ERROR);
+        assertEquals("Test first function's standard deviation", Double.NaN, functionStatistics1.getSelfTimeStatistics().getStdDev(), ERROR);
         // Test the first function statistics
         @NonNull
         AggregatedCalledFunctionStatistics functionStatistics2 = secondFunction.getFunctionStatistics();
-        assertEquals("Test second function's maximum duration", 50, functionStatistics2.getMax());
-        assertEquals("Test second function's minimum duration", 30, functionStatistics2.getMin());
-        assertEquals("Test second function's maximum self time", 20, functionStatistics2.getMaxSelfTime());
-        assertEquals("Test second function's minimum self time", 10, functionStatistics2.getMinSelfTime());
-        assertEquals("Test second function's number of calls", 2, functionStatistics2.getNbSegments());
-        assertEquals("Test second function's average duration", 40, functionStatistics2.getAverage(), ERROR);
-        assertEquals("Test second function's average self time", 15, functionStatistics2.getAverageSelfTime(), ERROR);
-        assertEquals("Test second function's standard deviation", Double.NaN, functionStatistics2.getStdDev(), ERROR);
-        assertEquals("Test second function's standard deviation", Double.NaN, functionStatistics2.getStdDevSelfTime(), ERROR);
+        assertEquals("Test second function's maximum duration", 50, functionStatistics2.getDurationStatistics().getMax());
+        assertEquals("Test second function's minimum duration", 30, functionStatistics2.getDurationStatistics().getMin());
+        assertEquals("Test second function's maximum self time", 20, functionStatistics2.getSelfTimeStatistics().getMax());
+        assertEquals("Test second function's minimum self time", 10, functionStatistics2.getSelfTimeStatistics().getMin());
+        assertEquals("Test second function's number of calls", 2, functionStatistics2.getDurationStatistics().getNbElements());
+        assertEquals("Test second function's average duration", 40, functionStatistics2.getDurationStatistics().getMean(), ERROR);
+        assertEquals("Test second function's average self time", 15, functionStatistics2.getSelfTimeStatistics().getMean(), ERROR);
+        assertEquals("Test second function's standard deviation", Double.NaN, functionStatistics2.getDurationStatistics().getStdDev(), ERROR);
+        assertEquals("Test second function's standard deviation", Double.NaN, functionStatistics2.getSelfTimeStatistics().getStdDev(), ERROR);
         // Test the first leaf statistics
         @NonNull
         AggregatedCalledFunctionStatistics leafStatistics1 = leaf1.getFunctionStatistics();
-        assertEquals("Test first leaf's maximum duration", 30, leafStatistics1.getMax());
-        assertEquals("Test first leaf's minimum duration", 30, leafStatistics1.getMin());
-        assertEquals("Test first leaf's maximum self time", 30, leafStatistics1.getMaxSelfTime());
-        assertEquals("Test first leaf's minimum self time", 30, leafStatistics1.getMinSelfTime());
-        assertEquals("Test first leaf's number of calls", 1, leafStatistics1.getNbSegments());
-        assertEquals("Test first leaf's minimum duration", 30, leafStatistics1.getAverage(), ERROR);
-        assertEquals("Test first leaf's average self time", 30, leafStatistics1.getAverageSelfTime(), ERROR);
-        assertEquals("Test first leaf's standard deviation", Double.NaN, leafStatistics1.getStdDev(), ERROR);
-        assertEquals("Test first leaf's self time standard deviation", Double.NaN, leafStatistics1.getStdDevSelfTime(), ERROR);
+        assertEquals("Test first leaf's maximum duration", 30, leafStatistics1.getDurationStatistics().getMax());
+        assertEquals("Test first leaf's minimum duration", 30, leafStatistics1.getDurationStatistics().getMin());
+        assertEquals("Test first leaf's maximum self time", 30, leafStatistics1.getSelfTimeStatistics().getMax());
+        assertEquals("Test first leaf's minimum self time", 30, leafStatistics1.getSelfTimeStatistics().getMin());
+        assertEquals("Test first leaf's number of calls", 1, leafStatistics1.getDurationStatistics().getNbElements());
+        assertEquals("Test first leaf's minimum duration", 30, leafStatistics1.getDurationStatistics().getMean(), ERROR);
+        assertEquals("Test first leaf's average self time", 30, leafStatistics1.getSelfTimeStatistics().getMean(), ERROR);
+        assertEquals("Test first leaf's standard deviation", Double.NaN, leafStatistics1.getDurationStatistics().getStdDev(), ERROR);
+        assertEquals("Test first leaf's self time standard deviation", Double.NaN, leafStatistics1.getSelfTimeStatistics().getStdDev(), ERROR);
         // Test the second leaf statistics
         @NonNull
         AggregatedCalledFunctionStatistics leafStatistics2 = leaf2.getFunctionStatistics();
-        assertEquals("Test second leaf's maximum duration", 20, leafStatistics2.getMax());
-        assertEquals("Test second leaf's minimum duration", 20, leafStatistics2.getMin());
-        assertEquals("Test second leaf's maximum self time", 20, leafStatistics2.getMaxSelfTime());
-        assertEquals("Test second leaf's minimum self time", 20, leafStatistics2.getMinSelfTime());
-        assertEquals("Test second leaf's number of calls", 1, leafStatistics2.getNbSegments());
-        assertEquals("Test second leaf's average duration", 20, leafStatistics2.getAverage(), ERROR);
-        assertEquals("Test second leaf's average self time", 20, leafStatistics2.getAverageSelfTime(), ERROR);
-        assertEquals("Test second leaf's standard deviation", Double.NaN, leafStatistics2.getStdDev(), ERROR);
-        assertEquals("Test second leaf's self time standard deviation", Double.NaN, leafStatistics2.getStdDevSelfTime(), ERROR);
+        assertEquals("Test second leaf's maximum duration", 20, leafStatistics2.getDurationStatistics().getMax());
+        assertEquals("Test second leaf's minimum duration", 20, leafStatistics2.getDurationStatistics().getMin());
+        assertEquals("Test second leaf's maximum self time", 20, leafStatistics2.getSelfTimeStatistics().getMax());
+        assertEquals("Test second leaf's minimum self time", 20, leafStatistics2.getSelfTimeStatistics().getMin());
+        assertEquals("Test second leaf's number of calls", 1, leafStatistics2.getDurationStatistics().getNbElements());
+        assertEquals("Test second leaf's average duration", 20, leafStatistics2.getDurationStatistics().getMean(), ERROR);
+        assertEquals("Test second leaf's average self time", 20, leafStatistics2.getSelfTimeStatistics().getMean(), ERROR);
+        assertEquals("Test second leaf's standard deviation", Double.NaN, leafStatistics2.getDurationStatistics().getStdDev(), ERROR);
+        assertEquals("Test second leaf's self time standard deviation", Double.NaN, leafStatistics2.getSelfTimeStatistics().getStdDev(), ERROR);
         cga.dispose();
     }
 
@@ -298,39 +298,39 @@ public class AggregatedCalledFunctionStatisticsTest {
         // Test the first function statistics
         @NonNull
         AggregatedCalledFunctionStatistics functionStatistics1 = firstFunction.getFunctionStatistics();
-        assertEquals("Test first function's maximum duration", 50, functionStatistics1.getMax());
-        assertEquals("Test first function's minimum duration", 20, functionStatistics1.getMin());
-        assertEquals("Test first function's maximum self time", 40, functionStatistics1.getMaxSelfTime());
-        assertEquals("Test first function's minimum self time", 10, functionStatistics1.getMinSelfTime());
-        assertEquals("Test first function's number of segments", 2, functionStatistics1.getNbSegments());
-        assertEquals("Test first function's average duration", 35, functionStatistics1.getAverage(), ERROR);
-        assertEquals("Test first function's average self time", 25, functionStatistics1.getAverageSelfTime(), ERROR);
-        assertEquals("Test first function's standard deviation", Double.NaN, functionStatistics1.getStdDev(), ERROR);
-        assertEquals("Test first function's self time standard deviation", Double.NaN, functionStatistics1.getStdDevSelfTime(), ERROR);
+        assertEquals("Test first function's maximum duration", 50, functionStatistics1.getDurationStatistics().getMax());
+        assertEquals("Test first function's minimum duration", 20, functionStatistics1.getDurationStatistics().getMin());
+        assertEquals("Test first function's maximum self time", 40, functionStatistics1.getSelfTimeStatistics().getMax());
+        assertEquals("Test first function's minimum self time", 10, functionStatistics1.getSelfTimeStatistics().getMin());
+        assertEquals("Test first function's number of segments", 2, functionStatistics1.getDurationStatistics().getNbElements());
+        assertEquals("Test first function's average duration", 35, functionStatistics1.getDurationStatistics().getMean(), ERROR);
+        assertEquals("Test first function's average self time", 25, functionStatistics1.getSelfTimeStatistics().getMean(), ERROR);
+        assertEquals("Test first function's standard deviation", Double.NaN, functionStatistics1.getDurationStatistics().getStdDev(), ERROR);
+        assertEquals("Test first function's self time standard deviation", Double.NaN, functionStatistics1.getSelfTimeStatistics().getStdDev(), ERROR);
         // Test the second function statistics
         @NonNull
         AggregatedCalledFunctionStatistics functionStatistics2 = function2.getFunctionStatistics();
-        assertEquals("Test second function's maximum duration", 10, functionStatistics2.getMax());
-        assertEquals("Test second function's minimum duration", 10, functionStatistics2.getMin());
-        assertEquals("Test second function's maximum self time", 10, functionStatistics2.getMaxSelfTime());
-        assertEquals("Test second function's minimum self time", 10, functionStatistics2.getMinSelfTime());
-        assertEquals("Test second function's number of calls", 1, functionStatistics2.getNbSegments());
-        assertEquals("Test second function's average duration", 10, functionStatistics2.getAverage(), ERROR);
-        assertEquals("Test second function's average self time", 10, functionStatistics2.getAverageSelfTime(), ERROR);
-        assertEquals("Test second function's standard deviation", Double.NaN, functionStatistics2.getStdDev(), ERROR);
-        assertEquals("Test second function's self time standard deviation", Double.NaN, functionStatistics2.getStdDevSelfTime(), ERROR);
+        assertEquals("Test second function's maximum duration", 10, functionStatistics2.getDurationStatistics().getMax());
+        assertEquals("Test second function's minimum duration", 10, functionStatistics2.getDurationStatistics().getMin());
+        assertEquals("Test second function's maximum self time", 10, functionStatistics2.getSelfTimeStatistics().getMax());
+        assertEquals("Test second function's minimum self time", 10, functionStatistics2.getSelfTimeStatistics().getMin());
+        assertEquals("Test second function's number of calls", 1, functionStatistics2.getDurationStatistics().getNbElements());
+        assertEquals("Test second function's average duration", 10, functionStatistics2.getDurationStatistics().getMean(), ERROR);
+        assertEquals("Test second function's average self time", 10, functionStatistics2.getSelfTimeStatistics().getMean(), ERROR);
+        assertEquals("Test second function's standard deviation", Double.NaN, functionStatistics2.getDurationStatistics().getStdDev(), ERROR);
+        assertEquals("Test second function's self time standard deviation", Double.NaN, functionStatistics2.getSelfTimeStatistics().getStdDev(), ERROR);
         // Test the third function statistics
         @NonNull
         AggregatedCalledFunctionStatistics functionStatistics3 = function3.getFunctionStatistics();
-        assertEquals("Test third function's maximum duration", 10, functionStatistics3.getMax());
-        assertEquals("Test third function's minimum duration", 10, functionStatistics3.getMin());
-        assertEquals("Test third function's maximum selftime", 10, functionStatistics3.getMaxSelfTime());
-        assertEquals("Test third function's minimum self time", 10, functionStatistics3.getMinSelfTime());
-        assertEquals("Test third function's number of calls", 1, functionStatistics3.getNbSegments());
-        assertEquals("Test third function's average duration", 10, functionStatistics3.getAverage(), ERROR);
-        assertEquals("Test third function's average self time", 10, functionStatistics3.getAverageSelfTime(), ERROR);
-        assertEquals("Test third function's standard deviation", Double.NaN, functionStatistics3.getStdDev(), ERROR);
-        assertEquals("Test third function's self time standard deviation", Double.NaN, functionStatistics3.getStdDevSelfTime(), ERROR);
+        assertEquals("Test third function's maximum duration", 10, functionStatistics3.getDurationStatistics().getMax());
+        assertEquals("Test third function's minimum duration", 10, functionStatistics3.getDurationStatistics().getMin());
+        assertEquals("Test third function's maximum selftime", 10, functionStatistics3.getSelfTimeStatistics().getMax());
+        assertEquals("Test third function's minimum self time", 10, functionStatistics3.getSelfTimeStatistics().getMin());
+        assertEquals("Test third function's number of calls", 1, functionStatistics3.getDurationStatistics().getNbElements());
+        assertEquals("Test third function's average duration", 10, functionStatistics3.getDurationStatistics().getMean(), ERROR);
+        assertEquals("Test third function's average self time", 10, functionStatistics3.getSelfTimeStatistics().getMean(), ERROR);
+        assertEquals("Test third function's standard deviation", Double.NaN, functionStatistics3.getDurationStatistics().getStdDev(), ERROR);
+        assertEquals("Test third function's self time standard deviation", Double.NaN, functionStatistics3.getSelfTimeStatistics().getStdDev(), ERROR);
         cga.dispose();
     }
 
@@ -419,59 +419,59 @@ public class AggregatedCalledFunctionStatisticsTest {
         AggregatedCalledFunction function4 = (AggregatedCalledFunction) firstChildCallee[0];
         // Test the main function statistics
         AggregatedCalledFunctionStatistics mainStatistics1 = main.getFunctionStatistics();
-        assertEquals("Test main's maximum duration", 150, mainStatistics1.getMax());
-        assertEquals("Test main's minimum duration", 150, mainStatistics1.getMin());
-        assertEquals("Test main's maximum self time", 40, mainStatistics1.getMaxSelfTime());
-        assertEquals("Test main's minimum self time", 40, mainStatistics1.getMinSelfTime());
-        assertEquals("Test main's number of calls", 1, mainStatistics1.getNbSegments());
-        assertEquals("Test main's average duration", 150, mainStatistics1.getAverage(), ERROR);
-        assertEquals("Test main's average self time", 40, mainStatistics1.getAverageSelfTime(), ERROR);
-        assertEquals("Test main's standard deviation", Double.NaN, mainStatistics1.getStdDev(), ERROR);
-        assertEquals("Test main's self time standard deviation", Double.NaN, mainStatistics1.getStdDevSelfTime(), ERROR);
+        assertEquals("Test main's maximum duration", 150, mainStatistics1.getDurationStatistics().getMax());
+        assertEquals("Test main's minimum duration", 150, mainStatistics1.getDurationStatistics().getMin());
+        assertEquals("Test main's maximum self time", 40, mainStatistics1.getSelfTimeStatistics().getMax());
+        assertEquals("Test main's minimum self time", 40, mainStatistics1.getSelfTimeStatistics().getMin());
+        assertEquals("Test main's number of calls", 1, mainStatistics1.getDurationStatistics().getNbElements());
+        assertEquals("Test main's average duration", 150, mainStatistics1.getDurationStatistics().getMean(), ERROR);
+        assertEquals("Test main's average self time", 40, mainStatistics1.getSelfTimeStatistics().getMean(), ERROR);
+        assertEquals("Test main's standard deviation", Double.NaN, mainStatistics1.getDurationStatistics().getStdDev(), ERROR);
+        assertEquals("Test main's self time standard deviation", Double.NaN, mainStatistics1.getSelfTimeStatistics().getStdDev(), ERROR);
         // Test the first function statistics
         AggregatedCalledFunctionStatistics firstFunctionStatistics = function1.getFunctionStatistics();
-        assertEquals("Test first function's maximum duration", 50, firstFunctionStatistics.getMax());
-        assertEquals("Test first function's minimum duration", 20, firstFunctionStatistics.getMin());
-        assertEquals("Test first function's maximum self time", 30, firstFunctionStatistics.getMaxSelfTime());
-        assertEquals("Test first function's minimum self time", 10, firstFunctionStatistics.getMinSelfTime());
-        assertEquals("Test first function's number of segments", 3, firstFunctionStatistics.getNbSegments());
-        assertEquals("Test first function's average duration", 36.666666667, firstFunctionStatistics.getAverage(), ERROR);
-        assertEquals("Test first function's average self time", 20, firstFunctionStatistics.getAverageSelfTime(), ERROR);
-        assertEquals("Test first function's standard deviation", 15.275252316, firstFunctionStatistics.getStdDev(), ERROR);
-        assertEquals("Test first function's self time standard deviation", 10, firstFunctionStatistics.getStdDevSelfTime(), ERROR);
+        assertEquals("Test first function's maximum duration", 50, firstFunctionStatistics.getDurationStatistics().getMax());
+        assertEquals("Test first function's minimum duration", 20, firstFunctionStatistics.getDurationStatistics().getMin());
+        assertEquals("Test first function's maximum self time", 30, firstFunctionStatistics.getSelfTimeStatistics().getMax());
+        assertEquals("Test first function's minimum self time", 10, firstFunctionStatistics.getSelfTimeStatistics().getMin());
+        assertEquals("Test first function's number of segments", 3, firstFunctionStatistics.getDurationStatistics().getNbElements());
+        assertEquals("Test first function's average duration", 36.666666667, firstFunctionStatistics.getDurationStatistics().getMean(), ERROR);
+        assertEquals("Test first function's average self time", 20, firstFunctionStatistics.getSelfTimeStatistics().getMean(), ERROR);
+        assertEquals("Test first function's standard deviation", 15.275252316, firstFunctionStatistics.getDurationStatistics().getStdDev(), ERROR);
+        assertEquals("Test first function's self time standard deviation", 10, firstFunctionStatistics.getSelfTimeStatistics().getStdDev(), ERROR);
         // Test the second function statistics
         AggregatedCalledFunctionStatistics secondFunctionStatistics2 = function2.getFunctionStatistics();
-        assertEquals("Test second function's maximum duration", 30, secondFunctionStatistics2.getMax());
-        assertEquals("Test second function's minimum duration", 10, secondFunctionStatistics2.getMin());
-        assertEquals("Test second function's maximum self time", 10, secondFunctionStatistics2.getMaxSelfTime());
-        assertEquals("Test second function's minimum self time", 0, secondFunctionStatistics2.getMinSelfTime());
-        assertEquals("Test second function's number of segments", 2, secondFunctionStatistics2.getNbSegments());
-        assertEquals("Test second function's average duration", 20, secondFunctionStatistics2.getAverage(), ERROR);
-        assertEquals("Test second function's average self time", 5, secondFunctionStatistics2.getAverageSelfTime(), ERROR);
-        assertEquals("Test second function's standard deviation", Double.NaN, secondFunctionStatistics2.getStdDev(), ERROR);
-        assertEquals("Test second function's self time standard deviation", Double.NaN, secondFunctionStatistics2.getStdDevSelfTime(), ERROR);
+        assertEquals("Test second function's maximum duration", 30, secondFunctionStatistics2.getDurationStatistics().getMax());
+        assertEquals("Test second function's minimum duration", 10, secondFunctionStatistics2.getDurationStatistics().getMin());
+        assertEquals("Test second function's maximum self time", 10, secondFunctionStatistics2.getSelfTimeStatistics().getMax());
+        assertEquals("Test second function's minimum self time", 0, secondFunctionStatistics2.getSelfTimeStatistics().getMin());
+        assertEquals("Test second function's number of segments", 2, secondFunctionStatistics2.getDurationStatistics().getNbElements());
+        assertEquals("Test second function's average duration", 20, secondFunctionStatistics2.getDurationStatistics().getMean(), ERROR);
+        assertEquals("Test second function's average self time", 5, secondFunctionStatistics2.getSelfTimeStatistics().getMean(), ERROR);
+        assertEquals("Test second function's standard deviation", Double.NaN, secondFunctionStatistics2.getDurationStatistics().getStdDev(), ERROR);
+        assertEquals("Test second function's self time standard deviation", Double.NaN, secondFunctionStatistics2.getSelfTimeStatistics().getStdDev(), ERROR);
         // Test the third function statistics
         AggregatedCalledFunctionStatistics thirdFunctionStatistics3 = function3.getFunctionStatistics();
-        assertEquals("Test third function's maximum duration", 10, thirdFunctionStatistics3.getMax());
-        assertEquals("Test third function's minimum duration", 10, thirdFunctionStatistics3.getMin());
-        assertEquals("Test third function's maximum self time", 10, thirdFunctionStatistics3.getMaxSelfTime());
-        assertEquals("Test third function's minimum self time", 10, thirdFunctionStatistics3.getMinSelfTime());
-        assertEquals("Test third function's number of segments", 1, thirdFunctionStatistics3.getNbSegments());
-        assertEquals("Test third function's average duration", 10, thirdFunctionStatistics3.getAverage(), ERROR);
-        assertEquals("Test third function's average self time", 10, thirdFunctionStatistics3.getAverageSelfTime(), ERROR);
-        assertEquals("Test third function's self time deviation", Double.NaN, thirdFunctionStatistics3.getStdDev(), ERROR);
-        assertEquals("Test third function's self time standard deviation", Double.NaN, thirdFunctionStatistics3.getStdDev(), ERROR);
+        assertEquals("Test third function's maximum duration", 10, thirdFunctionStatistics3.getDurationStatistics().getMax());
+        assertEquals("Test third function's minimum duration", 10, thirdFunctionStatistics3.getDurationStatistics().getMin());
+        assertEquals("Test third function's maximum self time", 10, thirdFunctionStatistics3.getSelfTimeStatistics().getMax());
+        assertEquals("Test third function's minimum self time", 10, thirdFunctionStatistics3.getSelfTimeStatistics().getMin());
+        assertEquals("Test third function's number of segments", 1, thirdFunctionStatistics3.getDurationStatistics().getNbElements());
+        assertEquals("Test third function's average duration", 10, thirdFunctionStatistics3.getDurationStatistics().getMean(), ERROR);
+        assertEquals("Test third function's average self time", 10, thirdFunctionStatistics3.getSelfTimeStatistics().getMean(), ERROR);
+        assertEquals("Test third function's self time deviation", Double.NaN, thirdFunctionStatistics3.getDurationStatistics().getStdDev(), ERROR);
+        assertEquals("Test third function's self time standard deviation", Double.NaN, thirdFunctionStatistics3.getSelfTimeStatistics().getStdDev(), ERROR);
         // Test the fourth function statistics
         AggregatedCalledFunctionStatistics fourthFunctionStatistics4 = function4.getFunctionStatistics();
-        assertEquals("Test fourth function's maximum duration", 20, fourthFunctionStatistics4.getMax());
-        assertEquals("Test fourth function's minimum duration", 10, fourthFunctionStatistics4.getMin());
-        assertEquals("Test fourth function's maximum self time", 20, fourthFunctionStatistics4.getMaxSelfTime());
-        assertEquals("Test fourth function's maximum self time", 10, fourthFunctionStatistics4.getMinSelfTime());
-        assertEquals("Test fourth function's number of segments", 2, fourthFunctionStatistics4.getNbSegments());
-        assertEquals("Test fourth function's average duration", 15, fourthFunctionStatistics4.getAverage(), ERROR);
-        assertEquals("Test fourth function's average duration", 15, fourthFunctionStatistics4.getAverageSelfTime(), ERROR);
-        assertEquals("Test fourth function's standard deviation", Double.NaN, fourthFunctionStatistics4.getStdDev(), ERROR);
-        assertEquals("Test fourth function's self time deviation", Double.NaN, fourthFunctionStatistics4.getStdDevSelfTime(), ERROR);
+        assertEquals("Test fourth function's maximum duration", 20, fourthFunctionStatistics4.getDurationStatistics().getMax());
+        assertEquals("Test fourth function's minimum duration", 10, fourthFunctionStatistics4.getDurationStatistics().getMin());
+        assertEquals("Test fourth function's maximum self time", 20, fourthFunctionStatistics4.getSelfTimeStatistics().getMax());
+        assertEquals("Test fourth function's maximum self time", 10, fourthFunctionStatistics4.getSelfTimeStatistics().getMin());
+        assertEquals("Test fourth function's number of segments", 2, fourthFunctionStatistics4.getDurationStatistics().getNbElements());
+        assertEquals("Test fourth function's average duration", 15, fourthFunctionStatistics4.getDurationStatistics().getMean(), ERROR);
+        assertEquals("Test fourth function's average duration", 15, fourthFunctionStatistics4.getSelfTimeStatistics().getMean(), ERROR);
+        assertEquals("Test fourth function's standard deviation", Double.NaN, fourthFunctionStatistics4.getDurationStatistics().getStdDev(), ERROR);
+        assertEquals("Test fourth function's self time deviation", Double.NaN, fourthFunctionStatistics4.getSelfTimeStatistics().getStdDev(), ERROR);
         cga.dispose();
     }
 

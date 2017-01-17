@@ -317,7 +317,10 @@ public class FlameGraphView extends TmfView {
                     menuManager.add(new Action(Messages.FlameGraphView_GotoMaxDuration) {
                         @Override
                         public void run() {
-                            ISegment maxSeg = flamegraphEvent.getStatistics().getMaxSegment();
+                            ISegment maxSeg = flamegraphEvent.getStatistics().getDurationStatistics().getMaxObject();
+                            if (maxSeg == null) {
+                                return;
+                            }
                             TmfSelectionRangeUpdatedSignal sig = new TmfSelectionRangeUpdatedSignal(this, TmfTimestamp.fromNanos(maxSeg.getStart()), TmfTimestamp.fromNanos(maxSeg.getEnd()));
                             broadcast(sig);
                         }
@@ -326,7 +329,10 @@ public class FlameGraphView extends TmfView {
                     menuManager.add(new Action(Messages.FlameGraphView_GotoMinDuration) {
                         @Override
                         public void run() {
-                            ISegment minSeg = flamegraphEvent.getStatistics().getMinSegment();
+                            ISegment minSeg = flamegraphEvent.getStatistics().getDurationStatistics().getMinObject();
+                            if (minSeg == null) {
+                                return;
+                            }
                             TmfSelectionRangeUpdatedSignal sig = new TmfSelectionRangeUpdatedSignal(this, TmfTimestamp.fromNanos(minSeg.getStart()), TmfTimestamp.fromNanos(minSeg.getEnd()));
                             broadcast(sig);
                         }

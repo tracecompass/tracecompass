@@ -18,6 +18,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.AggregatedCalledFunctionStatistics;
+import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.ICalledFunction;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
@@ -90,19 +91,19 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
     public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime) {
         AggregatedCalledFunctionStatistics statistics = ((FlamegraphEvent) event).getStatistics();
         ImmutableMap.Builder<String, String> builder = new ImmutableMap.Builder<>();
-        builder.put(Messages.FlameGraph_NbCalls, NumberFormat.getIntegerInstance().format(statistics.getNbSegments())); // $NON-NLS-1$
+        builder.put(Messages.FlameGraph_NbCalls, NumberFormat.getIntegerInstance().format(statistics.getDurationStatistics().getNbElements())); // $NON-NLS-1$
         builder.put(String.valueOf(Messages.FlameGraph_Durations), ""); //$NON-NLS-1$
         builder.put("\t" + Messages.FlameGraph_Duration, FORMATTER.format(event.getDuration())); //$NON-NLS-1$
-        builder.put("\t" + Messages.FlameGraph_AverageDuration, FORMATTER.format(statistics.getAverage())); // $NON-NLS-1$ //$NON-NLS-1$
-        builder.put("\t" + Messages.FlameGraph_MaxDuration, FORMATTER.format((statistics.getMax()))); // $NON-NLS-1$ //$NON-NLS-1$
-        builder.put("\t" + Messages.FlameGraph_MinDuration, FORMATTER.format(statistics.getMin())); // $NON-NLS-1$ //$NON-NLS-1$
-        builder.put("\t" + Messages.FlameGraph_Deviation, FORMATTER.format(statistics.getStdDev())); //$NON-NLS-1$
+        builder.put("\t" + Messages.FlameGraph_AverageDuration, FORMATTER.format(statistics.getDurationStatistics().getMean())); // $NON-NLS-1$ //$NON-NLS-1$
+        builder.put("\t" + Messages.FlameGraph_MaxDuration, FORMATTER.format((statistics.getDurationStatistics().getMax()))); // $NON-NLS-1$ //$NON-NLS-1$
+        builder.put("\t" + Messages.FlameGraph_MinDuration, FORMATTER.format(statistics.getDurationStatistics().getMin())); // $NON-NLS-1$ //$NON-NLS-1$
+        builder.put("\t" + Messages.FlameGraph_Deviation, FORMATTER.format(statistics.getDurationStatistics().getStdDev())); //$NON-NLS-1$
         builder.put(Messages.FlameGraph_SelfTimes, ""); //$NON-NLS-1$
         builder.put("\t" + Messages.FlameGraph_SelfTime, FORMATTER.format(((FlamegraphEvent) event).getSelfTime())); //$NON-NLS-1$
-        builder.put("\t" + Messages.FlameGraph_AverageSelfTime, FORMATTER.format(statistics.getAverageSelfTime())); // $NON-NLS-1$ //$NON-NLS-1$
-        builder.put("\t" + Messages.FlameGraph_MaxSelfTime, FORMATTER.format(statistics.getMaxSelfTime())); // $NON-NLS-1$ //$NON-NLS-1$
-        builder.put("\t" + Messages.FlameGraph_MinSelfTime, FORMATTER.format(statistics.getMinSelfTime())); // $NON-NLS-1$ //$NON-NLS-1$
-        builder.put("\t" + Messages.FlameGraph_SelfTimeDeviation, FORMATTER.format(statistics.getStdDevSelfTime())); //$NON-NLS-1$
+        builder.put("\t" + Messages.FlameGraph_AverageSelfTime, FORMATTER.format(statistics.getSelfTimeStatistics().getMean())); // $NON-NLS-1$ //$NON-NLS-1$
+        builder.put("\t" + Messages.FlameGraph_MaxSelfTime, FORMATTER.format(statistics.getSelfTimeStatistics().getMax())); // $NON-NLS-1$ //$NON-NLS-1$
+        builder.put("\t" + Messages.FlameGraph_MinSelfTime, FORMATTER.format(statistics.getSelfTimeStatistics().getMin())); // $NON-NLS-1$ //$NON-NLS-1$
+        builder.put("\t" + Messages.FlameGraph_SelfTimeDeviation, FORMATTER.format(statistics.getSelfTimeStatistics().getStdDev())); //$NON-NLS-1$
         return builder.build();
 
     }
@@ -135,7 +136,11 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
                 return "0x" + Long.toHexString(longAddress); //$NON-NLS-1$
             }
             // take time of max segment for time a query the symbol name
-            long time = event.getStatistics().getMaxSegment().getStart();
+            ICalledFunction maxObject = event.getStatistics().getDurationStatistics().getMaxObject();
+            if (maxObject == null) {
+                return "0x" + Long.toHexString(longAddress); //$NON-NLS-1$
+            }
+            long time = maxObject.getStart();
             int pid = event.getProcessId();
             if (pid > 0) {
                 String text = symbolProvider.getSymbolText(pid, time, longAddress);

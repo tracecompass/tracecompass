@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2017 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,57 +9,44 @@
 
 package org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;
 
-import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
-import org.eclipse.tracecompass.segmentstore.core.ISegment;
+import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
+import org.eclipse.tracecompass.analysis.timing.core.statistics.Statistics;
 
 /**
  * Class to calculate statistics for an aggregated function.
  *
  * @author Sonia Farrah
+ * @author Geneviève Bastien
  */
-public class AggregatedCalledFunctionStatistics extends SegmentStoreStatistics {
+public class AggregatedCalledFunctionStatistics {
 
-    /**
-     * The maximum self time
-     */
-    private long fMaxSelfTime;
-    /**
-     * The minimum duration
-     */
-    private long fMinSelfTime;
-    /**
-     * The average self time
-     */
-    private double fSelfTimeAverage;
-    /**
-     * The variance of the self time
-     */
-    private double fVariance;
-    /**
-     * The segment with the longest duration
-     */
-    private ISegment fMaxSegment;
-    /**
-     * The segment with the shortest duration
-     */
-    private ISegment fMinSegment;
+    // Duration statistics will be kept for all calls of the method, so we make
+    // them on the called function themselves
+    private final IStatistics<ICalledFunction> fDurations;
+    // Self time statistics are on aggregated called function because self times
+    // are known only at the end, once the aggregation is over
+    private final IStatistics<ICalledFunction> fSelfTimes;
 
     /**
      * Constructor
-     *
-     * @param duration
-     *            The function's duration
-     * @param selfTime
-     *            The function's self time
      */
-    public AggregatedCalledFunctionStatistics(ISegment duration, ISegment selfTime) {
-        fMaxSelfTime = selfTime.getLength();
-        fMinSelfTime = selfTime.getLength();
-        fSelfTimeAverage = selfTime.getLength();
-        fVariance = 0.0;
-        fMinSegment = duration;
-        fMaxSegment = duration;
-        update(duration);
+    public AggregatedCalledFunctionStatistics() {
+        fDurations = new Statistics<>(f -> f.getLength());
+        fSelfTimes = new Statistics<>(f -> f.getSelfTime());
+    }
+
+    /**
+     * Update the durations and self time statistics for a function. This
+     * function should be called only once all the children of the function have
+     * been assigned and the self time will not change anymore, otherwise, the
+     * results will not be accurate for self times.
+     *
+     * @param function
+     *            The function to add statistics for
+     */
+    public void update(ICalledFunction function) {
+        fDurations.update(function);
+        fSelfTimes.update(function);
     }
 
     /**
@@ -68,80 +55,33 @@ public class AggregatedCalledFunctionStatistics extends SegmentStoreStatistics {
      *
      * @param statisticsNode
      *            The statistics node to be merged
-     * @param duration
-     *            The function to be merged duration
-     * @param selfTime
-     *            The function to be merged self time
      */
-    public void update(SegmentStoreStatistics statisticsNode, long duration, long selfTime) {
-        merge(statisticsNode);
-        if (fMaxSelfTime < selfTime) {
-            fMaxSelfTime = selfTime;
-        }
-        if (fMinSelfTime > selfTime) {
-            fMinSelfTime = selfTime;
-        }
-        double delta = selfTime - fSelfTimeAverage;
-        fSelfTimeAverage += delta / getNbSegments();
-        fVariance += delta * (selfTime - fSelfTimeAverage);
+    public void merge(AggregatedCalledFunctionStatistics statisticsNode) {
+        fDurations.merge(statisticsNode.fDurations);
+        fSelfTimes.merge(statisticsNode.fSelfTimes);
     }
 
     /**
-     * Get the maximum self time
+     * Get the statistics for the duration of the called functions
      *
-     * @return The maximum self time
+     * @return The durations statistics
      */
-    public long getMaxSelfTime() {
-        return fMaxSelfTime;
+    public IStatistics<ICalledFunction> getDurationStatistics() {
+        return fDurations;
     }
 
     /**
-     * Get the minimum self time
+     * Get the statistics for the self times of the called functions
      *
-     * @return The minimum self time
+     * @return The self time statistics
      */
-    public long getMinSelfTime() {
-        return fMinSelfTime;
-    }
-
-    /**
-     * Get the average self time
-     *
-     * @return The average self time
-     */
-    public double getAverageSelfTime() {
-        return fSelfTimeAverage;
-    }
-
-    /**
-     * Get the standard deviation of the self time
-     *
-     * @return The standard deviation of the self time
-     */
-    public double getStdDevSelfTime() {
-        long nbSegments = getNbSegments();
-        return nbSegments > 2 ? Math.sqrt(fVariance / (nbSegments - 1)) : Double.NaN;
-    }
-
-    /**
-     * Initialize the maximum and minimum self time
-     *
-     * @param selfTime
-     *            Self time
-     */
-    public void initializeMaxMinSelfTime(long selfTime) {
-        fMaxSelfTime = selfTime;
-        fMinSelfTime = selfTime;
-        fSelfTimeAverage = selfTime;
+    public IStatistics<ICalledFunction> getSelfTimeStatistics() {
+        return fSelfTimes;
     }
 
     @Override
-    public ISegment getMaxSegment() {
-        return fMaxSegment;
+    public String toString() {
+        return "Aggregated function statistics: Durations: " + fDurations + ", Self times " + fSelfTimes; //$NON-NLS-1$//$NON-NLS-2$
     }
 
-    @Override
-    public ISegment getMinSegment() {
-        return fMinSegment;
-    }
 }

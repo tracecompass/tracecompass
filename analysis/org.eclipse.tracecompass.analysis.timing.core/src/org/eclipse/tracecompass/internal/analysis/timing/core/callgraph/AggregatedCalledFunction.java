@@ -64,7 +64,7 @@ public class AggregatedCalledFunction {
         fProcessId = calledFunction.getProcessId();
         fMaxDepth = parent.getMaxDepth();
         fParent = parent;
-        fStatistics = new AggregatedCalledFunctionStatistics(calledFunction, calledFunction);
+        fStatistics = new AggregatedCalledFunctionStatistics();
     }
 
     /**
@@ -83,7 +83,7 @@ public class AggregatedCalledFunction {
         fProcessId = calledFunction.getProcessId();
         fMaxDepth = maxDepth;
         fParent = null;
-        fStatistics = new AggregatedCalledFunctionStatistics(calledFunction, calledFunction);
+        fStatistics = new AggregatedCalledFunctionStatistics();
     }
 
     /**
@@ -119,18 +119,21 @@ public class AggregatedCalledFunction {
      * it'll combine their callees.
      *
      * @param child
-     *            The callees of a function
+     *            The callee to add to this function
+     * @param aggregatedChild
+     *            The aggregated data of the callee
      */
-    public synchronized void addChild(AggregatedCalledFunction child) {
-        AggregatedCalledFunction node = fChildren.get(child.getSymbol());
+    public synchronized void addChild(AbstractCalledFunction child, AggregatedCalledFunction aggregatedChild) {
+        // Update the child's statistics with itself
+        fSelfTime -= aggregatedChild.getDuration();
+        aggregatedChild.getFunctionStatistics().update(child);
+        AggregatedCalledFunction node = fChildren.get(aggregatedChild.getSymbol());
         if (node == null) {
-            fChildren.put(child.getSymbol(), child);
+            fChildren.put(aggregatedChild.getSymbol(), aggregatedChild);
         } else {
-            merge(node, child);
+            merge(node, aggregatedChild);
             fChildren.replace(node.getSymbol(), node);
         }
-        fSelfTime -= child.fDuration;
-        fStatistics.initializeMaxMinSelfTime(fSelfTime);
     }
 
     /**
@@ -179,7 +182,7 @@ public class AggregatedCalledFunction {
         long sourceSelfTime = source.getSelfTime();
         destination.addToDuration(sourceDuration);
         destination.addToSelfTime(sourceSelfTime);
-        destination.getFunctionStatistics().update(source.getFunctionStatistics(), sourceDuration, sourceSelfTime);
+        destination.getFunctionStatistics().merge(source.getFunctionStatistics());
         // merge the children callees.
         mergeChildren(destination, source);
     }
@@ -217,7 +220,7 @@ public class AggregatedCalledFunction {
      * @return The number of calls of a function
      */
     public long getNbCalls() {
-        return fStatistics.getNbSegments();
+        return fStatistics.getDurationStatistics().getNbElements();
     }
 
     /**

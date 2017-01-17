@@ -251,13 +251,13 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
                     long intervalStart = interval.getStartTime();
                     long intervalEnd = interval.getEndTime();
                     // Create the segment for the first call event.
-                    AbstractCalledFunction segment = CalledFunctionFactory.create(intervalStart, intervalEnd + 1, depth, stateValue, processId, null);
-                    fRootFunctions.add(segment);
-                    AggregatedCalledFunction firstNode = new AggregatedCalledFunction(segment, fCurrentQuarks.size());
-                    if (!findChildren(segment, depth, stateSystem, fCurrentQuarks.size() + fCurrentQuarks.get(depth), firstNode, processId, monitor)) {
+                    AbstractCalledFunction rootFunction = CalledFunctionFactory.create(intervalStart, intervalEnd + 1, depth, stateValue, processId, null);
+                    fRootFunctions.add(rootFunction);
+                    AggregatedCalledFunction firstNode = new AggregatedCalledFunction(rootFunction, fCurrentQuarks.size());
+                    if (!findChildren(rootFunction, depth, stateSystem, fCurrentQuarks.size() + fCurrentQuarks.get(depth), firstNode, processId, monitor)) {
                         return false;
                     }
-                    init.addChild(firstNode);
+                    init.addChild(rootFunction, firstNode);
                 }
 
                 curTime = interval.getEndTime() + 1;
@@ -317,12 +317,13 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
                 if (intervalStart < node.getStart() || intervalEnd > limit) {
                     return true;
                 }
-                AbstractCalledFunction segment = CalledFunctionFactory.create(intervalStart, intervalEnd + 1, node.getDepth() + 1, stateValue, processId, node);
-                AggregatedCalledFunction childNode = new AggregatedCalledFunction(segment, aggregatedCalledFunction);
+                AbstractCalledFunction function = CalledFunctionFactory.create(intervalStart, intervalEnd + 1, node.getDepth() + 1, stateValue, processId, node);
+                AggregatedCalledFunction childNode = new AggregatedCalledFunction(function, aggregatedCalledFunction);
                 // Search for the children with the next quark.
-                findChildren(segment, depth + 1, ss, maxQuark, childNode, processId, monitor);
-                aggregatedCalledFunction.addChild(childNode);
-                node.addChild(segment);
+                findChildren(function, depth + 1, ss, maxQuark, childNode, processId, monitor);
+                node.addChild(function);
+                aggregatedCalledFunction.addChild(function, childNode);
+
             }
             curTime = interval.getEndTime() + 1;
         }
