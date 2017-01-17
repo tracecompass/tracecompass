@@ -16,7 +16,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentStoreStatisticsViewer;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentsStatisticsViewer;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.statistics.SystemCallLatencyStatisticsAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 
@@ -26,7 +26,7 @@ import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
  * @author Bernd Hufmann
  *
  */
-public class SystemCallLatencyStatisticsViewer extends AbstractSegmentStoreStatisticsViewer {
+public class SystemCallLatencyStatisticsViewer extends AbstractSegmentsStatisticsViewer {
 
     private static final String SYSCALL_LEVEL = checkNotNull(Messages.LatencyStatistics_SyscallLevelName);
 

@@ -1,13 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016 Ericsson
+ * Copyright (c) 2015, 2017 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
 package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics;
 
@@ -26,6 +23,7 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.ExportToTsvAction;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -35,15 +33,15 @@ import com.google.common.base.Joiner;
  * Abstract view to to be extended to display segment store statistics.
  *
  * @author Bernd Hufmann
- * @deprecated use {@link AbstractSegmentsStatisticsView} instead
+ * @author Geneviève Bastien
+ * @since 1.3
  */
-@Deprecated
-public abstract class AbstractSegmentStoreStatisticsView extends TmfView {
+public abstract class AbstractSegmentsStatisticsView extends TmfView {
 
     private final Action fExportAction = new ExportToTsvAction() {
         @Override
         protected void exportToTsv(@Nullable OutputStream stream) {
-            AbstractSegmentStoreStatisticsView.this.exportToTsv(stream);
+            AbstractSegmentsStatisticsView.this.exportToTsv(stream);
         }
 
         @Override
@@ -53,19 +51,19 @@ public abstract class AbstractSegmentStoreStatisticsView extends TmfView {
 
     };
 
-    private @Nullable AbstractSegmentStoreStatisticsViewer fStatsViewer = null;
+    private @Nullable AbstractTmfTreeViewer fStatsViewer = null;
 
     /**
      * Constructor
      */
-    public AbstractSegmentStoreStatisticsView() {
+    public AbstractSegmentsStatisticsView() {
         super("StatisticsView"); //$NON-NLS-1$
     }
 
     @Override
     public void createPartControl(@Nullable Composite parent) {
         super.createPartControl(parent);
-        AbstractSegmentStoreStatisticsViewer statsViewer = createSegmentStoreStatisticsViewer(NonNullUtils.checkNotNull(parent));
+        AbstractTmfTreeViewer statsViewer = createSegmentStoreStatisticsViewer(NonNullUtils.checkNotNull(parent));
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         if (trace != null) {
             statsViewer.loadTrace(trace);
@@ -76,7 +74,7 @@ public abstract class AbstractSegmentStoreStatisticsView extends TmfView {
 
     @Override
     public void setFocus() {
-        AbstractSegmentStoreStatisticsViewer statsViewer = fStatsViewer;
+        AbstractTmfTreeViewer statsViewer = fStatsViewer;
         if (statsViewer != null) {
             statsViewer.getControl().setFocus();
         }
@@ -85,7 +83,7 @@ public abstract class AbstractSegmentStoreStatisticsView extends TmfView {
     @Override
     public void dispose() {
         super.dispose();
-        AbstractSegmentStoreStatisticsViewer statsViewer = fStatsViewer;
+        AbstractTmfTreeViewer statsViewer = fStatsViewer;
         if (statsViewer != null) {
             statsViewer.dispose();
         }
@@ -98,7 +96,7 @@ public abstract class AbstractSegmentStoreStatisticsView extends TmfView {
      *            the parent composite to create the viewer in.
      * @return the latency statistics viewer implementation
      */
-    protected abstract AbstractSegmentStoreStatisticsViewer createSegmentStoreStatisticsViewer(Composite parent);
+    protected abstract AbstractTmfTreeViewer createSegmentStoreStatisticsViewer(Composite parent);
 
     /**
      * Export a given items's TSV
@@ -110,7 +108,7 @@ public abstract class AbstractSegmentStoreStatisticsView extends TmfView {
     @VisibleForTesting
     protected void exportToTsv(@Nullable OutputStream stream) {
         try (PrintWriter pw = new PrintWriter(stream)) {
-            AbstractSegmentStoreStatisticsViewer statsViewer = fStatsViewer;
+            AbstractTmfTreeViewer statsViewer = fStatsViewer;
             if (statsViewer == null) {
                 return;
             }

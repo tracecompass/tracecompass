@@ -12,9 +12,11 @@ package org.eclipse.tracecompass.analysis.os.linux.core.tests.latency;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.statistics.SystemCallLatencyStatisticsAnalysisModule;
+import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -79,9 +81,9 @@ public class SyscallStatsAnalysisTest {
     public void testSmallTraceSequential() {
         final SystemCallLatencyStatisticsAnalysisModule syscallStatsModule = fSyscallStatsModule;
         assertNotNull(syscallStatsModule);
-        SegmentStoreStatistics totalStats = syscallStatsModule.getTotalStats();
+        IStatistics<@NonNull ISegment> totalStats = syscallStatsModule.getStatsTotal();
         assertNotNull(totalStats);
-        assertEquals(1801, totalStats.getNbSegments());
+        assertEquals(1801, totalStats.getNbElements());
         assertEquals(5904091700L, totalStats.getMax());
     }
 }

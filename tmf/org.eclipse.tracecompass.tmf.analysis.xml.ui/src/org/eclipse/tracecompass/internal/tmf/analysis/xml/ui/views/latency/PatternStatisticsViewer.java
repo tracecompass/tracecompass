@@ -11,7 +11,7 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentStoreStatisticsViewer;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentsStatisticsViewer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternLatencyStatisticsAnalysis;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 
@@ -20,7 +20,7 @@ import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
  *
  * @author Jean-Christian Kouame
  */
-public class PatternStatisticsViewer extends AbstractSegmentStoreStatisticsViewer {
+public class PatternStatisticsViewer extends AbstractSegmentsStatisticsViewer {
 
     private String fAnalysisId;
 

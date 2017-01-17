@@ -12,17 +12,17 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentStoreStatisticsView;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentStoreStatisticsViewer;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentsStatisticsView;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlLatencyViewInfo;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
 
 /**
  * The statistic view for pattern latency analysis
  *
  * @author Jean-Christian Kouame
  */
-public class PatternStatisticsView extends AbstractSegmentStoreStatisticsView {
+public class PatternStatisticsView extends AbstractSegmentsStatisticsView {
 
     private PatternStatisticsViewer fViewer;
     /** The view's ID */
@@ -56,7 +56,7 @@ public class PatternStatisticsView extends AbstractSegmentStoreStatisticsView {
     }
 
     @Override
-    protected @NonNull AbstractSegmentStoreStatisticsViewer createSegmentStoreStatisticsViewer(@NonNull Composite parent) {
+    protected @NonNull AbstractTmfTreeViewer createSegmentStoreStatisticsViewer(@NonNull Composite parent) {
         PatternStatisticsViewer viewer = new PatternStatisticsViewer(parent);
         fViewer = viewer;
         loadStatisticView();

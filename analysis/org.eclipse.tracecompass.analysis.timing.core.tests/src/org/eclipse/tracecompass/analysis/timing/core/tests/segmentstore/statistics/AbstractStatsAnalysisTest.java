@@ -20,7 +20,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
-import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
+import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
+import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub;
@@ -93,10 +94,10 @@ public class AbstractStatsAnalysisTest {
     public void testTotalStats() throws TmfAnalysisException {
         TmfXmlTraceStub trace = new TmfXmlTraceStubNs();
         StubSegmentStatisticsAnalysis fixture = getValidSegmentStats(trace);
-        SegmentStoreStatistics totalStats = fixture.getTotalStats();
+        IStatistics<@NonNull ISegment> totalStats = fixture.getStatsTotal();
         assertNotNull(totalStats);
         // no need to test the content much as it is tested in the other test.
-        assertEquals(StubSegmentStatisticsAnalysis.SIZE, totalStats.getNbSegments());
+        assertEquals(StubSegmentStatisticsAnalysis.SIZE, totalStats.getNbElements());
         trace.dispose();
         fixture.dispose();
     }
@@ -112,15 +113,15 @@ public class AbstractStatsAnalysisTest {
     public void testPerTypeStats() throws TmfAnalysisException {
         TmfXmlTraceStub trace = new TmfXmlTraceStubNs();
         StubSegmentStatisticsAnalysis fixture = getValidSegmentStats(trace);
-        Map<@NonNull String, @NonNull SegmentStoreStatistics> perTypeStats = fixture.getPerSegmentTypeStats();
+        Map<@NonNull String, IStatistics<@NonNull ISegment>> perTypeStats = fixture.getStatsPerType();
         assertNotNull(perTypeStats);
         // no need to test the content much as it is tested in the other test.
         assertEquals(2, perTypeStats.size());
         assertEquals(ImmutableSet.<String> of("odd", "even"), perTypeStats.keySet());
-        SegmentStoreStatistics segmentStoreStatistics = perTypeStats.get("even");
+        IStatistics<@NonNull ISegment> segmentStoreStatistics = perTypeStats.get("even");
         assertNotNull(segmentStoreStatistics);
         // starts with 0  so size + 1
-        assertEquals(StubSegmentStatisticsAnalysis.SIZE / 2 + 1, segmentStoreStatistics.getNbSegments());
+        assertEquals(StubSegmentStatisticsAnalysis.SIZE / 2 + 1, segmentStoreStatistics.getNbElements());
         trace.dispose();
         fixture.dispose();
     }
@@ -136,13 +137,13 @@ public class AbstractStatsAnalysisTest {
     public void testPartialStats() throws TmfAnalysisException {
         TmfXmlTraceStub trace = new TmfXmlTraceStubNs();
         StubSegmentStatisticsAnalysis fixture = getValidSegmentStats(trace);
-        SegmentStoreStatistics totalStats = fixture.getTotalStatsForRange(100, 1100, new NullProgressMonitor());
+        IStatistics<@NonNull ISegment> totalStats = fixture.getStatsForRange(100, 1100, new NullProgressMonitor());
         assertNotNull(totalStats);
         // no need to test the content much as it is tested in the other test.
 
         // 1051 = 1001 where start is between start and end + 50 overlapping
         // start
-        assertEquals(1051, totalStats.getNbSegments());
+        assertEquals(1051, totalStats.getNbElements());
         trace.dispose();
         fixture.dispose();
     }
@@ -158,15 +159,15 @@ public class AbstractStatsAnalysisTest {
     public void testPartialPerTypeStats() throws TmfAnalysisException {
         TmfXmlTraceStub trace = new TmfXmlTraceStubNs();
         StubSegmentStatisticsAnalysis fixture = getValidSegmentStats(trace);
-        Map<@NonNull String, @NonNull SegmentStoreStatistics> perTypeStats = fixture.getPerSegmentTypeStatsForRange(100, 1100, new NullProgressMonitor());
+        Map<@NonNull String, IStatistics<@NonNull ISegment>> perTypeStats = fixture.getStatsPerTypeForRange(100, 1100, new NullProgressMonitor());
         assertNotNull(perTypeStats);
         // no need to test the content much as it is tested in the other test.
         assertEquals(2, perTypeStats.size());
         assertEquals(ImmutableSet.<String> of("odd", "even"), perTypeStats.keySet());
-        SegmentStoreStatistics segmentStoreStatistics = perTypeStats.get("even");
+        IStatistics<@NonNull ISegment> segmentStoreStatistics = perTypeStats.get("even");
         assertNotNull(segmentStoreStatistics);
         // 526 = 1051/2+1 = see explanation of 1051 in #testPartialStats
-        assertEquals(526, segmentStoreStatistics.getNbSegments());
+        assertEquals(526, segmentStoreStatistics.getNbElements());
         trace.dispose();
         fixture.dispose();
     }
@@ -183,7 +184,7 @@ public class AbstractStatsAnalysisTest {
         StubSegmentStatisticsAnalysis fixture = getValidSegmentStats(trace);
         NullProgressMonitor monitor = new NullProgressMonitor();
         monitor.setCanceled(true);
-        Map<@NonNull String, @NonNull SegmentStoreStatistics> perTypeStats = fixture.getPerSegmentTypeStatsForRange(100, 1100, monitor);
+        Map<@NonNull String, IStatistics<@NonNull ISegment>> perTypeStats = fixture.getStatsPerTypeForRange(100, 1100, monitor);
         assertEquals(Collections.emptyMap(), perTypeStats);
         trace.dispose();
         fixture.dispose();

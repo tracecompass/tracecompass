@@ -12,8 +12,8 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentStoreStatisticsView;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentStoreStatisticsViewer;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentsStatisticsView;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
 
 /**
  * View to display latency statistics.
@@ -21,13 +21,13 @@ import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics
  * @author Bernd Hufmann
  *
  */
-public class SystemCallLatencyStatisticsView extends AbstractSegmentStoreStatisticsView {
+public class SystemCallLatencyStatisticsView extends AbstractSegmentsStatisticsView {
 
     /** The view ID*/
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.ui.views.latency.statsview"; //$NON-NLS-1$
 
     @Override
-    protected AbstractSegmentStoreStatisticsViewer createSegmentStoreStatisticsViewer(Composite parent) {
+    protected AbstractTmfTreeViewer createSegmentStoreStatisticsViewer(Composite parent) {
         return new SystemCallLatencyStatisticsViewer(parent);
     }
 

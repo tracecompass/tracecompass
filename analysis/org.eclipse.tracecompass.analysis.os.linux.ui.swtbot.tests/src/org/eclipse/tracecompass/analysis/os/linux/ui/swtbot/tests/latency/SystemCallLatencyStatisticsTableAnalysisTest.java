@@ -39,7 +39,7 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentStoreStatisticsView;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentsStatisticsView;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics.SystemCallLatencyStatisticsView;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
@@ -213,7 +213,7 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
         assertNotNull(os);
         IViewPart viewPart = view.getReference().getView(true);
         assertTrue(viewPart instanceof SystemCallLatencyStatisticsView);
-        Class<@NonNull AbstractSegmentStoreStatisticsView> clazz = AbstractSegmentStoreStatisticsView.class;
+        Class<@NonNull AbstractSegmentsStatisticsView> clazz = AbstractSegmentsStatisticsView.class;
         Method method = clazz.getDeclaredMethod("exportToTsv", java.io.OutputStream.class);
         method.setAccessible(true);
         final Exception[] except = new Exception[1];

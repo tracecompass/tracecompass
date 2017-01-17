@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics;
 
+import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
+import org.eclipse.tracecompass.analysis.timing.core.statistics.Statistics;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 
@@ -20,35 +22,37 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
  * @author Bernd Hufmann
  */
 public class SegmentStoreStatistics {
-    private ISegment fMin;
-    private ISegment fMax;
-    private long fNbSegments;
-    private double fAverage;
-    /**
-     * reminder, this is the variance * nb elem, as per the online algorithm
-     */
-    private double fVariance;
-    private double fTotal;
+
+    private static final ISegment MIN_SEGMENT = new BasicSegment(0, Long.MAX_VALUE);
+    private static final ISegment MAX_SEGMENT = new BasicSegment(Long.MIN_VALUE, 0);
+
+    private final IStatistics<ISegment> fStatistics;
 
     /**
      * Constructor
      */
     public SegmentStoreStatistics() {
-        fMin = new BasicSegment(0, Long.MAX_VALUE);
-        fMax = new BasicSegment(Long.MIN_VALUE, 0);
-        fNbSegments = 0;
-        fAverage = 0.0;
-        fVariance = 0.0;
-        fTotal = 0.0;
+        fStatistics = new Statistics<>(s -> s.getLength());
+    }
+
+    /**
+     * Constructor
+     *
+     * @param stats The statistics object
+     * @since 1.3
+     */
+    public SegmentStoreStatistics(IStatistics<ISegment> stats) {
+        fStatistics = stats;
     }
 
     /**
      * Get minimum value
      *
      * @return minimum value
+     * @since 1.2
      */
     public long getMin() {
-        return fMin.getLength();
+        return fStatistics.getMin();
     }
 
     /**
@@ -57,7 +61,7 @@ public class SegmentStoreStatistics {
      * @return maximum value
      */
     public long getMax() {
-        return fMax.getLength();
+        return fStatistics.getMax();
     }
 
     /**
@@ -66,7 +70,8 @@ public class SegmentStoreStatistics {
      * @return segment with minimum length
      */
     public ISegment getMinSegment() {
-        return fMin;
+        ISegment minObject = fStatistics.getMinObject();
+        return minObject == null ? MIN_SEGMENT : minObject;
     }
 
     /**
@@ -75,7 +80,8 @@ public class SegmentStoreStatistics {
      * @return segment with maximum length
      */
     public ISegment getMaxSegment() {
-        return fMax;
+        ISegment maxObject = fStatistics.getMaxObject();
+        return maxObject == null ? MAX_SEGMENT : maxObject;
     }
 
     /**
@@ -84,7 +90,7 @@ public class SegmentStoreStatistics {
      * @return number of segments analyzed
      */
     public long getNbSegments() {
-        return fNbSegments;
+        return fStatistics.getNbElements();
     }
 
     /**
@@ -93,7 +99,7 @@ public class SegmentStoreStatistics {
      * @return arithmetic average
      */
     public double getAverage() {
-        return fAverage;
+        return fStatistics.getMean();
     }
 
     /**
@@ -106,7 +112,7 @@ public class SegmentStoreStatistics {
      *         there are less than 3 elements
      */
     public double getStdDev() {
-        return fNbSegments > 2 ? Math.sqrt(fVariance / (fNbSegments - 1)) : Double.NaN;
+        return fStatistics.getStdDev();
     }
 
     /**
@@ -116,7 +122,7 @@ public class SegmentStoreStatistics {
      * @since 1.1
      */
     public double getTotal() {
-        return fTotal;
+        return fStatistics.getTotal();
     }
 
     /**
@@ -128,23 +134,7 @@ public class SegmentStoreStatistics {
      *            the segment used for the update
      */
     public void update(ISegment segment) {
-        long value = segment.getLength();
-        /*
-         * Min and max are trivial, as well as number of segments
-         */
-        long min = fMin.getLength();
-        long max = fMax.getLength();
-        fMin = min <= value ? fMin : segment;
-        fMax = max >= value ? fMax : segment;
-
-        fNbSegments++;
-        /*
-         * The running mean is not trivial, see proof in javadoc.
-         */
-        double delta = value - fAverage;
-        fAverage += delta / fNbSegments;
-        fVariance += delta * (value - fAverage);
-        fTotal += value;
+        fStatistics.update(segment);
     }
 
     /**
@@ -157,70 +147,11 @@ public class SegmentStoreStatistics {
      * @since 1.2
      */
     public void merge(SegmentStoreStatistics other) {
-        if (other.fNbSegments == 0) {
-            return;
-        } else if (fNbSegments == 0) {
-            copy(other);
-        } else if (other.fNbSegments == 1) {
-            update(other.fMax);
-        } else if (fNbSegments == 1) {
-            SegmentStoreStatistics copyOther = new SegmentStoreStatistics();
-            copyOther.copy(other);
-            copyOther.update(fMax);
-            copy(copyOther);
-        } else {
-            internalMerge(other);
-        }
+        fStatistics.merge(other.getStatObject());
     }
 
-    private void internalMerge(SegmentStoreStatistics other) {
-        /*
-         * Min and max are trivial, as well as number of segments
-         */
-        long min = fMin.getLength();
-        long max = fMax.getLength();
-        fMin = min <= other.getMin() ? fMin : other.getMinSegment();
-        fMax = max >= other.getMax() ? fMax : other.getMaxSegment();
-
-        long oldNbSeg = fNbSegments;
-        double oldAverage = fAverage;
-        long otherSegments = other.getNbSegments();
-        double otherAverage = other.getAverage();
-        fNbSegments += otherSegments;
-        fTotal += other.getTotal();
-
-        /*
-         * Average is a weighted average
-         */
-        fAverage = ((oldNbSeg * oldAverage) + (otherAverage * otherSegments)) / fNbSegments;
-
-        /*
-         * This one is a bit tricky.
-         *
-         * The variance is the sum of the deltas from a mean squared.
-         *
-         * So if we add the old mean squared back to to variance and remove the
-         * new mean, the standard deviation can be easily calculated.
-         */
-        double avg1Sq = oldAverage * oldAverage;
-        double avg2sq = otherAverage * otherAverage;
-        double avgtSq = fAverage * fAverage;
-        /*
-         * This is a tricky part, bear in mind that the set is not continuous but discrete,
-         * Therefore, we have for n elements, n-1 intervals between them.
-         * Ergo, n-1 intervals are used for divisions and multiplications.
-         */
-        double variance1 = fVariance / (oldNbSeg - 1);
-        double variance2 = other.fVariance / (otherSegments - 1);
-        fVariance = ((variance1 + avg1Sq - avgtSq) * (oldNbSeg - 1) + (variance2 + avg2sq - avgtSq) * (otherSegments - 1));
+    private IStatistics<ISegment> getStatObject() {
+        return fStatistics;
     }
 
-    private void copy(SegmentStoreStatistics copyOther) {
-        fAverage = copyOther.fAverage;
-        fMax = copyOther.fMax;
-        fMin = copyOther.fMin;
-        fNbSegments = copyOther.fNbSegments;
-        fTotal = copyOther.fTotal;
-        fVariance = copyOther.fVariance;
-    }
 }
