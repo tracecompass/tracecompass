@@ -53,6 +53,9 @@ public class TmfEditorLinkHelper implements ILinkHelper {
                 }
 
                 final TmfProjectElement project = TmfProjectRegistry.getProject(file.getProject(), true);
+                if (project == null) {
+                    return StructuredSelection.EMPTY;
+                }
                 TmfTraceFolder tracesFolder = project.getTracesFolder();
 
                 // Check for experiments, traces which are folders or traces which are files

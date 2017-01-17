@@ -252,9 +252,12 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             IProject project = (IProject) element;
             try {
                 if (project.hasNature(TmfProjectNature.ID)) {
+                    TmfProjectRegistry.addTracingNature(project, new NullProgressMonitor());
                     TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
                     fTraceFolderElement = projectElement.getTracesFolder();
-                    traceFolder = fTraceFolderElement.getResource();
+                    if (fTraceFolderElement != null) {
+                        traceFolder = fTraceFolderElement.getResource();
+                    }
                 }
             } catch (CoreException e) {
             }

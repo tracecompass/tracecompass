@@ -186,13 +186,14 @@ public class SelectTraceTypeHandler extends AbstractHandler {
 
         IResource resource = element.getResource();
         TmfTraceTypeUIUtils.setTraceType(resource, traceTypeHelper);
-
+        element.refreshViewer();
         TmfExperimentFolder experimentFolder = element.getProject().getExperimentsFolder();
         if (experimentFolder != null) {
             for (final TmfExperimentElement experiment : experimentFolder.getExperiments()) {
                 for (final TmfTraceElement child : experiment.getTraces()) {
                     if (child.getName().equals(element.getName())) {
                         TmfTraceTypeUIUtils.setTraceType(child.getResource(), traceTypeHelper);
+                        child.refreshViewer();
                         break;
                     }
                 }

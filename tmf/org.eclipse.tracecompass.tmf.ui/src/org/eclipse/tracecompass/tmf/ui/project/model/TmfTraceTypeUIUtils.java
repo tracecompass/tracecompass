@@ -201,6 +201,9 @@ public final class TmfTraceTypeUIUtils {
         resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceTypeId);
 
         TmfProjectElement tmfProject = TmfProjectRegistry.getProject(resource.getProject(), true);
+        if (tmfProject == null) {
+            return Status.CANCEL_STATUS;
+        }
         TmfTraceFolder tracesFolder = tmfProject.getTracesFolder();
         TmfExperimentFolder experimentsFolder = tmfProject.getExperimentsFolder();
         if (tracesFolder != null) {

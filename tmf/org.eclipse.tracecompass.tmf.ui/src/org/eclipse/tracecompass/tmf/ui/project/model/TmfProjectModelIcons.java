@@ -45,6 +45,7 @@ final class TmfProjectModelIcons {
     public static final @NonNull Image BUILT_IN_ONDEMAND_ICON;
     public static final @NonNull Image USER_DEFINED_ONDEMAND_ICON;
     public static final @NonNull Image REPORTS_ICON;
+    public static final @NonNull Image TRACECOMPASS_ICON;
 
     public static final WorkbenchLabelProvider WORKSPACE_LABEL_PROVIDER = new WorkbenchLabelProvider();
 
@@ -58,6 +59,7 @@ final class TmfProjectModelIcons {
     private static final String REPORTS_ICON_FILE = "icons/obj16/arraypartition_obj.gif"; //$NON-NLS-1$
     private static final String DEFAULT_REPORT_ICON_FILE = "icons/etool16/copy_edit.gif"; //$NON-NLS-1$
     private static final String VIEWS_ICON_FILE = "icons/obj16/analysisprovider_obj.gif"; //$NON-NLS-1$
+    private static final String TRACECOMPASS_ICON_FILE = "icons/obj16/tc_icon.png"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Initialization
@@ -79,9 +81,13 @@ final class TmfProjectModelIcons {
         DEFAULT_VIEW_ICON = checkNotNull(loadIcon(bundle, VIEW_ICON_FILE));
         DEFAULT_REPORT_ICON = checkNotNull(loadIcon(bundle, DEFAULT_REPORT_ICON_FILE));
         VIEWS_ICON = checkNotNull(loadIcon(bundle, VIEWS_ICON_FILE));
+        TRACECOMPASS_ICON = checkNotNull(loadIcon(bundle, TRACECOMPASS_ICON_FILE));
     }
 
     public static @Nullable Image loadIcon(Bundle bundle, String url) {
+        if (bundle == null) {
+            return null;
+        }
         Activator plugin = Activator.getDefault();
         String key = bundle.getSymbolicName() + "/" + url; //$NON-NLS-1$
         Image icon = plugin.getImageRegistry().get(key);

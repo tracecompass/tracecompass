@@ -149,6 +149,9 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                 } else if (ITmfEventsEditorConstants.TRACE_INPUT_TYPE_CONSTANTS.contains(traceTypeId)) {
                     // Special case: trace bookmark resource
                     final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject(), true);
+                    if (project == null) {
+                        throw new PartInitException(Messages.TmfOpenTraceHelper_NoTraceType);
+                    }
                     final TmfTraceFolder tracesFolder = project.getTracesFolder();
                     if (tracesFolder != null) {
                         for (final TmfTraceElement traceElement : tracesFolder.getTraces()) {

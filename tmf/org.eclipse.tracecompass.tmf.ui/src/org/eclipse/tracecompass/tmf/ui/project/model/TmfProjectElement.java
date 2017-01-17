@@ -16,10 +16,14 @@ package org.eclipse.tracecompass.tmf.ui.project.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 
 /**
  * The implementation of TMF project model element.
@@ -30,11 +34,20 @@ import org.eclipse.swt.graphics.Image;
 public class TmfProjectElement extends TmfProjectModelElement {
 
     // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    static final String TRACECOMPASS_PROJECT_FILE = ".tracecompass"; //$NON-NLS-1$
+    private static final String DEFAULT_LABEL_NAME = "Trace Compass"; //$NON-NLS-1$
+
+    // ------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
     @Nullable private TmfTraceFolder fTraceFolder = null;
     @Nullable private TmfExperimentFolder fExperimentFolder = null;
+    @Nullable private IFolder fSupplFolder = null;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -99,6 +112,15 @@ public class TmfProjectElement extends TmfProjectModelElement {
         return fExperimentFolder;
     }
 
+    /**
+     * @return returns the supplementary folder
+     *
+     * @since 3.2
+     */
+    public IFolder getSupplementaryFolder() {
+        return fSupplFolder;
+    }
+
     // ------------------------------------------------------------------------
     // TmfProjectModelElement
     // ------------------------------------------------------------------------
@@ -116,9 +138,11 @@ public class TmfProjectElement extends TmfProjectModelElement {
             childrenMap.put(element.getResource().getName(), element);
         }
 
+        TmfProjectConfig config = getFolderStructure(project);
+
         // Add the model folder if the corresponding resource exists and is not
         // accounted for
-        IFolder folder = project.getFolder(TmfTracesFolder.TRACES_RESOURCE_NAME);
+        IFolder folder = config.getTracesFolder();
         if (folder != null && folder.exists()) {
             String name = folder.getName();
             ITmfProjectModelElement element = childrenMap.get(name);
@@ -133,7 +157,7 @@ public class TmfProjectElement extends TmfProjectModelElement {
 
         // Add the model folder if the corresponding resource exists and is not
         // accounted for
-        folder = project.getFolder(TmfExperimentFolder.EXPER_RESOURCE_NAME);
+        folder = config.getExperimentsFolder();
         if (folder != null && folder.exists()) {
             String name = folder.getName();
             ITmfProjectModelElement element = childrenMap.get(name);
@@ -145,6 +169,8 @@ public class TmfProjectElement extends TmfProjectModelElement {
             }
             ((TmfExperimentFolder) element).refreshChildren();
         }
+
+        fSupplFolder = config.getSupplementaryFolder();
 
         // Cleanup dangling children from the model
         for (ITmfProjectModelElement danglingChild : childrenMap.values()) {
@@ -162,6 +188,58 @@ public class TmfProjectElement extends TmfProjectModelElement {
      */
     @Override
     public Image getIcon() {
-        return null;
+        return TmfProjectModelIcons.TRACECOMPASS_ICON;
+    }
+
+    @Override
+    public String getLabelText() {
+        return DEFAULT_LABEL_NAME;
+    }
+
+    static void createFolderStructure(IContainer parent) throws CoreException {
+        IFolder folder = parent.getFolder(new Path(TmfTracesFolder.TRACES_RESOURCE_NAME));
+        createFolder(folder);
+
+        folder = parent.getFolder(new Path(TmfExperimentFolder.EXPER_RESOURCE_NAME));
+        createFolder(folder);
+
+        // create folder for supplementary tracing files
+        folder = parent.getFolder(new Path(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER_NAME));
+        createFolder(folder);
+    }
+
+    static IFolder createFolderStructure(IProject project, IProject shadowProject) throws CoreException {
+        if (shadowProject != null) {
+            createFolderStructure(shadowProject);
+        }
+        IFolder parentFolder = project.getFolder(TRACECOMPASS_PROJECT_FILE);
+        createFolder(parentFolder);
+        return parentFolder;
+    }
+
+    static TmfProjectConfig getFolderStructure(IProject project) {
+        TmfProjectConfig.Builder builder = new TmfProjectConfig.Builder();
+
+        IFolder folder = project.getFolder(new Path(TmfTracesFolder.TRACES_RESOURCE_NAME));
+        builder.setTracesFolder(folder);
+
+        folder = project.getFolder(new Path(TmfExperimentFolder.EXPER_RESOURCE_NAME));
+        builder.setExperimentsFolder(folder);
+
+        // create folder for supplementary tracing files
+        folder = project.getFolder(new Path(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER_NAME));
+        builder.setSupplementaryFolder(folder);
+        return builder.build();
+    }
+
+    private static void createFolder(IFolder folder) throws CoreException {
+        if (!folder.exists()) {
+            folder.create(true, true, null);
+        }
+    }
+
+    static boolean showProjectRoot(IProject project) {
+        IFolder traceCompassFile = project.getFolder(TRACECOMPASS_PROJECT_FILE);
+        return traceCompassFile != null && traceCompassFile.exists();
     }
 }

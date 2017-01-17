@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 
@@ -37,6 +38,8 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
@@ -44,7 +47,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfUIPreferences;
-import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
+import org.eclipse.tracecompass.internal.tmf.ui.project.model.TmfProjectModelHelper;
 import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -97,11 +100,19 @@ public class TmfProjectRegistry implements IResourceChangeListener {
 
     /**
      * Get the project model element for a project resource
-     * @param project the project resource
+     * @param aProject the project resource
      * @param force a flag controlling whether a new project should be created if it doesn't exist
      * @return the project model element
      */
-    public static synchronized TmfProjectElement getProject(IProject project, boolean force) {
+    public static synchronized TmfProjectElement getProject(IProject aProject, boolean force) {
+        IProject project = aProject;
+        if (TmfProjectElement.showProjectRoot(project)) {
+            IWorkspace workspace = ResourcesPlugin.getWorkspace();
+            IProject shadowProject = workspace.getRoot().getProject(TmfProjectModelHelper.getShadowProjectName(project.getName()));
+            if (shadowProject.exists()) {
+                project = shadowProject;
+            }
+        }
         TmfProjectElement element = registry.get(project);
         if (element == null && force) {
             element = new TmfProjectElement(project.getName(), project, null);
@@ -147,31 +158,91 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                 description.setNatureIds(new String[] { TmfProjectNature.ID });
                 project.setDescription(description, null);
 
-                IFolder folder = project.getFolder(TmfTracesFolder.TRACES_RESOURCE_NAME);
-                if (!folder.exists()) {
-                    folder.create(true, true, null);
-                }
-
-                folder = project.getFolder(TmfExperimentFolder.EXPER_RESOURCE_NAME);
-                if (!folder.exists()) {
-                    folder.create(true, true, null);
-                }
-
-                // create folder for supplementary tracing files
-                folder = project.getFolder(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER_NAME);
-
-                if (!folder.exists()) {
-                    folder.create(true, true, null);
-                }
+                TmfProjectElement.createFolderStructure(project);
             }
         };
         try {
-            PlatformUI.getWorkbench().getProgressService().run(false, false, action);
+            action.run(monitor);
         } catch (InvocationTargetException e) {
             Activator.getDefault().logError("Error creating TMF project " + project.getName(), e); //$NON-NLS-1$
         } catch (InterruptedException e) {
         }
         return project;
+    }
+
+    /**
+     * Add a the tracing nature to the given project resource
+     *
+     * @param project
+     *            the project resource
+     * @param monitor
+     *          - A progress monitor
+     * @since 3.2
+     */
+    public static void addTracingNature(IProject project, IProgressMonitor monitor) {
+        WorkspaceModifyOperation action = new WorkspaceModifyOperation() {
+            @Override
+            protected void execute(IProgressMonitor progressMonitor) throws CoreException, InvocationTargetException, InterruptedException {
+                if (!project.isOpen()) {
+                    project.open(progressMonitor);
+                }
+
+                IProjectDescription description = project.getDescription();
+                boolean hasNature = description.hasNature(TmfProjectNature.ID);
+                String[] natures = description.getNatureIds();
+                IWorkspace workspace = ResourcesPlugin.getWorkspace();
+                if (workspace == null) {
+                    return;
+                }
+
+                if (!hasNature && natures.length > 0) {
+                    // Only add nature if project doesn't have the tracing nature
+                    String[] newNatures = new String[natures.length + 1];
+                    System.arraycopy(natures, 0, newNatures, 0, natures.length);
+
+                    // add the tracing nature ID
+                    newNatures[natures.length] = TmfProjectNature.ID;
+
+                    // validate the natures
+                    IStatus status = workspace.validateNatureSet(newNatures);
+
+                    // only apply new nature, if the status is ok
+                    if (status.isOK()) {
+                        description.setNatureIds(newNatures);
+                        project.setDescription(description, null);
+                    } else {
+                        Activator.getDefault().getLog().log(status);
+                    }
+                }
+
+                // Create shadow project
+                description = project.getDescription();
+                hasNature = description.hasNature(TmfProjectNature.ID);
+                natures = description.getNatureIds();
+                if (hasNature && natures.length > 1) {
+                    String shadowProjectName = TmfProjectModelHelper.getShadowProjectName(project.getName());
+                    IProject shadowProject = workspace.getRoot().getProject(shadowProjectName);
+                    if (!shadowProject.exists()) {
+                        // Get or create shadow project
+                        IFolder shadowProjectFolder = TmfProjectElement.createFolderStructure(project, null);
+                        shadowProject = createProject(shadowProjectName, shadowProjectFolder.getLocationURI(), progressMonitor);
+                        shadowProjectFolder.refreshLocal(IResource.DEPTH_INFINITE, progressMonitor);
+                    }
+
+                    if (!shadowProject.isOpen()) {
+                        shadowProject.open(progressMonitor);
+                    }
+                    // Create project directory in shadow project
+                    TmfProjectElement.createFolderStructure(project, shadowProject);
+                }
+            }
+        };
+        try {
+            action.run(monitor);
+        } catch (InvocationTargetException e) {
+            Activator.getDefault().logError("Error adding tracing natue to project " + project.getName(), e); //$NON-NLS-1$
+        } catch (InterruptedException e) {
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -182,24 +253,49 @@ public class TmfProjectRegistry implements IResourceChangeListener {
     public void resourceChanged(IResourceChangeEvent event) {
         if (event.getType() == IResourceChangeEvent.PRE_DELETE || event.getType() == IResourceChangeEvent.PRE_CLOSE) {
             if (event.getResource() instanceof IProject) {
-                IProject project = (IProject) event.getResource();
+                IProject aProject = (IProject) event.getResource();
                 try {
-                    if (project.isAccessible() && project.hasNature(TmfProjectNature.ID)) {
-                        TmfProjectElement tmfProjectElement = registry.get(project);
-                        if (tmfProjectElement == null) {
-                            return;
+                    boolean isShadowProject = TmfProjectModelHelper.isShadowProject(Objects.requireNonNull(aProject));
+                    if (aProject.isAccessible() && aProject.hasNature(TmfProjectNature.ID)) {
+                        // A tracing project is being deleted.
+                        IProject project = aProject;
+                        if (!isShadowProject) {
+                            // If a shadow project exists, use the shadow project.
+                            IProject shadowProject = TmfProjectModelHelper.getShadowProject(project);
+                            if (shadowProject.exists()) {
+                                project = shadowProject;
+                            }
                         }
-                        TmfTraceFolder tracesFolder = tmfProjectElement.getTracesFolder();
-                        if (tracesFolder != null) {
-                            final List<TmfTraceElement> traces = tracesFolder.getTraces();
-                            if (!traces.isEmpty()) {
-                                // Close editors in UI Thread
-                                Display.getDefault().syncExec(() -> traces.forEach(TmfTraceElement::closeEditors));
+
+                        TmfProjectElement tmfProjectElement = registry.get(project);
+                        if (tmfProjectElement != null) {
+                            // Close all traces editors
+                            TmfTraceFolder tracesFolder = tmfProjectElement.getTracesFolder();
+                            if (tracesFolder != null) {
+                                final List<TmfTraceElement> traces = tracesFolder.getTraces();
+                                if (!traces.isEmpty()) {
+                                    // Close editors in UI Thread
+                                    Display.getDefault().syncExec(() -> traces.forEach(TmfTraceElement::closeEditors));
+                                }
+                            }
+                        }
+
+                        // If parent project was deleted and a shadow project exists,
+                        if (!isShadowProject) {
+                            final IProject shadowProject = TmfProjectModelHelper.getShadowProject(aProject);
+                            if (shadowProject.exists()) {
+                                Display.getDefault().asyncExec(() -> {
+                                    try {
+                                        shadowProject.delete(false, true, null);
+                                    } catch (CoreException e) {
+                                        Activator.getDefault().logError("Error remove shadow project when is parent project being deleted " + shadowProject.getName(), e); //$NON-NLS-1$
+                                    }
+                                });
                             }
                         }
                     }
                 } catch (CoreException e) {
-                    Activator.getDefault().logError("Error handling resource change event for " + project.getName(), e); //$NON-NLS-1$
+                    Activator.getDefault().logError("Error handling resource change event for " + aProject.getName(), e); //$NON-NLS-1$
                 }
             }
         } else if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
@@ -207,8 +303,16 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                 if (delta.getResource() instanceof IProject) {
                     IProject project = (IProject) delta.getResource();
                     try {
+
                         if (delta.getKind() == IResourceDelta.CHANGED &&
                                 project.isOpen() && project.hasNature(TmfProjectNature.ID)) {
+                            // If shadow project exists, handle resource change in the shadow project
+                            if (TmfProjectModelHelper.shadowProjectAccessible(project)) {
+                                handeParentProjectRefresh(project);
+                                return;
+                            }
+
+                            // Handle resource change in the relevant project
                             Set<IResource> resourcesToRefresh = new HashSet<>();
                             event.getDelta().accept(visited -> {
                                 if ((visited.getFlags() & IResourceDelta.CONTENT) != 0) {
@@ -245,6 +349,11 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                             for (TmfTraceElement trace : changedTraces) {
                                 handleTraceContentChanged(trace);
                             }
+                            // Refresh viewer for parent project
+                            IProject parentProject = TmfProjectModelHelper.getProjectFromShadowProject(project);
+                            if (parentProject != null) {
+                                new TmfProjectElement(parentProject.getName(), parentProject, null).refreshViewer();
+                            }
                             for (ITmfProjectModelElement element : elementsToRefresh) {
                                 element.refresh();
                             }
@@ -255,8 +364,15 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                             }
                         } else if (delta.getKind() == IResourceDelta.REMOVED) {
                             TmfProjectElement projectElement = registry.remove(project);
+
                             if (projectElement != null) {
                                 projectElement.dispose();
+                            }
+
+                            // Refresh viewer for parent project
+                            IProject parentProject = TmfProjectModelHelper.getProjectFromShadowProject(project);
+                            if (parentProject != null) {
+                                new TmfProjectElement(parentProject.getName(), parentProject, null).refreshViewer();
                             }
                         }
                     } catch (CoreException e) {
@@ -307,7 +423,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
      * @since 3.1
      */
     public static ITmfProjectModelElement findElement(IResource resource, boolean exact) {
-        if (resource == null) {
+        if ((resource == null) || (resource.getProject() == null)) {
             return null;
         }
         ITmfProjectModelElement element = getProject(resource.getProject());
@@ -393,6 +509,20 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                  */
                 promptQueue.remove();
                 prompting = promptQueue.peek();
+            }
+        });
+    }
+
+    private static void handeParentProjectRefresh(IProject project) {
+        Display.getDefault().asyncExec(() -> {
+            IWorkspace workspace = ResourcesPlugin.getWorkspace();
+            IProject shadowProject = workspace.getRoot().getProject(TmfProjectModelHelper.getShadowProjectName(project.getName()));
+            if (shadowProject.exists()) {
+                try {
+                    shadowProject.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+                } catch (CoreException e) {
+                    Activator.getDefault().logError("Error refeshing shadow project " + shadowProject.getName(), e); //$NON-NLS-1$
+                }
             }
         });
     }

@@ -26,6 +26,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.project.model.TmfProjectModelHelper;
 import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
 import org.eclipse.ui.PlatformUI;
 
@@ -82,7 +83,7 @@ public class TraceUtils {
         List<IProject> tmfProjects = new ArrayList<>();
         for (IProject project : projects) {
             try {
-                if (project.isAccessible() && project.getNature(TmfProjectNature.ID) != null) {
+                if (project.isAccessible() && project.getNature(TmfProjectNature.ID) != null && !TmfProjectModelHelper.isShadowProject(project)) {
                     tmfProjects.add(project);
                 }
             } catch (CoreException e) {

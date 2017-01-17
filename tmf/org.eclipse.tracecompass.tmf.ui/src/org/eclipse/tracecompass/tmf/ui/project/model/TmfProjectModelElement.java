@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -248,10 +247,8 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
      */
     public IFolder getTraceSupplementaryFolder(String supplFolderPath) {
         TmfProjectElement project = getProject();
-        IProject projectResource = project.getResource();
-        IFolder supplFolderParent = projectResource.getFolder(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER_NAME);
-        IFolder folder = supplFolderParent.getFolder(supplFolderPath);
-        return folder;
+        IFolder supplFolderParent = project.getSupplementaryFolder();
+        return supplFolderParent.getFolder(supplFolderPath);
     }
 
     /**

@@ -19,6 +19,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.tracecompass.internal.tmf.ui.project.model.TmfProjectModelHelper;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.navigator.ICommonContentExtensionSite;
 import org.eclipse.ui.navigator.IPipelinedTreeContentProvider;
@@ -49,8 +50,24 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
             return project.getParent();
         }
 
+        if (element instanceof TmfProjectElement) {
+            IProject p = TmfProjectModelHelper.getProjectFromShadowProject(((TmfProjectElement) element).getResource());
+            if ((p != null) && (p.isAccessible())) {
+                return p;
+            }
+            return ((TmfProjectElement) element).getResource();
+        }
+
         if (element instanceof TmfTracesFolder) {
             TmfTracesFolder folder = (TmfTracesFolder) element;
+
+            // Return TmfProjectElement if shadow project case
+            if (folder.getParent() instanceof TmfProjectElement) {
+                IProject p = TmfProjectModelHelper.getProjectFromShadowProject(((TmfProjectElement) folder.getParent()).getResource());
+                if ((p != null) && (p.isAccessible())) {
+                    return folder.getParent();
+                }
+            }
             // Return the corresponding IProject as parent because from CNF point of view the IProject is the parent.
             // The IProject is needed e.g. for link with Editor to work correctly.
             return folder.getParent().getResource();
@@ -58,6 +75,14 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
 
         if (element instanceof TmfExperimentFolder) {
             TmfExperimentFolder folder = (TmfExperimentFolder) element;
+
+            // Return TmfProjectElement if shadow project case
+            if (folder.getParent() instanceof TmfProjectElement) {
+                IProject p = TmfProjectModelHelper.getProjectFromShadowProject(((TmfProjectElement) folder.getParent()).getResource());
+                if ((p != null) && (p.isAccessible())) {
+                    return folder.getParent();
+                }
+            }
             // Return the corresponding IProject as parent because from CNF point of view the IProject is the parent.
             // The IProject is needed e.g. for link with Editor to work correctly.
             return folder.getParent().getResource();
@@ -113,7 +138,16 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
 
         // Tracing project level
         if (parentElement instanceof IProject) {
-            TmfProjectElement element = TmfProjectRegistry.getProject((IProject) parentElement, true);
+            IProject parentProject = (IProject) parentElement;
+            if (TmfProjectElement.showProjectRoot(parentProject)) {
+                if (TmfProjectModelHelper.shadowProjectAccessible(parentProject)) {
+                    TmfProjectElement[] elements = new TmfProjectElement[1];
+                    elements[0] = TmfProjectRegistry.getProject(parentProject, true);
+                    return elements;
+                }
+                return new Object[0];
+            }
+            TmfProjectElement element = TmfProjectRegistry.getProject(parentProject, true);
             return element.getChildren().toArray();
         }
 
