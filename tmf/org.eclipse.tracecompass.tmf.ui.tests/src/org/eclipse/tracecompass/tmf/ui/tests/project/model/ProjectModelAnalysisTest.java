@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfViewsElement;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.ProjectModelTestData;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitTimeoutException;
@@ -68,7 +69,9 @@ public class ProjectModelAnalysisTest {
 
     private TmfTraceElement getTraceElement() {
         TmfTraceElement trace = null;
-        for (ITmfProjectModelElement element : fixture.getTracesFolder().getChildren()) {
+        final TmfTraceFolder tracesFolder = fixture.getTracesFolder();
+        assertNotNull(tracesFolder);
+        for (ITmfProjectModelElement element : tracesFolder.getChildren()) {
             if (element instanceof TmfTraceElement) {
                 TmfTraceElement traceElement = (TmfTraceElement) element;
                 if (traceElement.getName().equals(ProjectModelTestData.getTraceName())) {

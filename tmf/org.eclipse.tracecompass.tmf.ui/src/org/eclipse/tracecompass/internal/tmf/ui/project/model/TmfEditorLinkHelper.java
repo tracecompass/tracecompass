@@ -18,9 +18,11 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -51,27 +53,36 @@ public class TmfEditorLinkHelper implements ILinkHelper {
                 }
 
                 final TmfProjectElement project = TmfProjectRegistry.getProject(file.getProject(), true);
+                TmfTraceFolder tracesFolder = project.getTracesFolder();
 
                 // Check for experiments, traces which are folders or traces which are files
                 if (ITmfEventsEditorConstants.EXPERIMENT_INPUT_TYPE_CONSTANTS.contains(traceTypeId)) {
+                    TmfExperimentFolder experimentFolder = project.getExperimentsFolder();
                     // Case 1: Experiment
-                    for (final TmfExperimentElement experimentElement : project.getExperimentsFolder().getExperiments()) {
-                        if (experimentElement.getResource().equals(file.getParent())) {
-                            return new StructuredSelection(experimentElement);
+                    if (experimentFolder != null) {
+                        for (final TmfExperimentElement experimentElement : experimentFolder.getExperiments()) {
+                            if (experimentElement.getResource().equals(file.getParent())) {
+                                return new StructuredSelection(experimentElement);
+                            }
                         }
                     }
                 } else if (ITmfEventsEditorConstants.TRACE_INPUT_TYPE_CONSTANTS.contains(traceTypeId)) {
                     // Case 2: Trace that is a folder
-                    for (final TmfTraceElement traceElement : project.getTracesFolder().getTraces()) {
-                        if (traceElement.getResource().equals(file.getParent())) {
-                            return new StructuredSelection(traceElement);
+
+                    if (tracesFolder != null) {
+                        for (final TmfTraceElement traceElement : tracesFolder.getTraces()) {
+                            if (traceElement.getResource().equals(file.getParent())) {
+                                return new StructuredSelection(traceElement);
+                            }
                         }
                     }
                 } else {
                     // Case 3: Trace that is a file
-                    for (final TmfTraceElement traceElement : project.getTracesFolder().getTraces()) {
-                        if (traceElement.getResource().equals(file)) {
-                            return new StructuredSelection(traceElement);
+                    if (tracesFolder != null) {
+                        for (final TmfTraceElement traceElement : tracesFolder.getTraces()) {
+                            if (traceElement.getResource().equals(file)) {
+                                return new StructuredSelection(traceElement);
+                            }
                         }
                     }
                 }

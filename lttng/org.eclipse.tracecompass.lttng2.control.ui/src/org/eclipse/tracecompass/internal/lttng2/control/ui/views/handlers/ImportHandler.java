@@ -280,12 +280,14 @@ public class ImportHandler extends BaseControlViewHandler {
         TmfTraceTypeUIUtils.setTraceType(traceFolder, selectedTraceType);
 
         final TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
-        final TmfTraceFolder tracesFolder = projectElement.getTracesFolder();
-        final List<TmfTraceElement> traces = tracesFolder.getTraces();
         TmfTraceElement found = null;
-        for (TmfTraceElement candidate : traces) {
-            if (candidate.getName().equals(connectionInfo.getSessionName())) {
-                found = candidate;
+        final TmfTraceFolder tracesFolder = projectElement.getTracesFolder();
+        if (tracesFolder != null) {
+            final List<TmfTraceElement> traces = tracesFolder.getTraces();
+            for (TmfTraceElement candidate : traces) {
+                if (candidate.getName().equals(connectionInfo.getSessionName())) {
+                    found = candidate;
+                }
             }
         }
 

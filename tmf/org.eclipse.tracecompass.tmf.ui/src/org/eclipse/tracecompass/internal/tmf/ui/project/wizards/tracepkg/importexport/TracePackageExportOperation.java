@@ -49,6 +49,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePa
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageTraceElement;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.internal.wizards.datatransfer.ArchiveFileExportOperation;
 import org.w3c.dom.Document;
@@ -214,7 +215,12 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
         Document doc = traceNode.getOwnerDocument();
         TmfTraceElement traceElement = ((TracePackageTraceElement) element.getParent()).getTraceElement();
         IResource resource = traceElement.getResource();
-        IPath traceFolderPath = traceElement.getProject().getTracesFolder().getPath();
+
+        final TmfTraceFolder tracesFolder = traceElement.getProject().getTracesFolder();
+        if (tracesFolder == null) {
+            return;
+        }
+        IPath traceFolderPath = tracesFolder.getPath();
 
         // project/Traces/A/B/Kernel -> A/B/Kernel
         IPath relativeToExportFolder = resource.getFullPath().makeRelativeTo(traceFolderPath);

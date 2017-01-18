@@ -23,6 +23,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.ProjectModelTestData;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitTimeoutException;
 import org.junit.After;
@@ -65,7 +66,10 @@ public class ProjectModelTraceTest {
     public void testOpenTrace() {
         assertNotNull(fixture);
 
-        final TmfTraceElement traceElement = fixture.getTracesFolder().getTraces().get(0);
+        final TmfTraceFolder tracesFolder = fixture.getTracesFolder();
+        assertNotNull(tracesFolder);
+
+        final TmfTraceElement traceElement = tracesFolder.getTraces().get(0);
 
         /*
          * Get the trace from the element, it is not opened yet, should be null

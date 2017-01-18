@@ -410,7 +410,11 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
                 ArchiveFile archiveFile = getSpecifiedArchiveFile();
                 existingTrace.refreshSupplementaryFolder();
                 // Project/Traces/A/B -> A/B
-                IPath traceFolderRelativePath = fTmfTraceFolder.getPath().makeRelativeTo(fTmfTraceFolder.getProject().getTracesFolder().getPath());
+                final TmfTraceFolder tracesFolder = fTmfTraceFolder.getProject().getTracesFolder();
+                if (tracesFolder == null) {
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation);
+                }
+                IPath traceFolderRelativePath = fTmfTraceFolder.getPath().makeRelativeTo(tracesFolder.getPath());
                 // Project/.tracing/A/B/
                 IFolder traceSupplementaryFolder = fTmfTraceFolder.getTraceSupplementaryFolder(traceFolderRelativePath.toString());
                 IPath destinationContainerPath = traceSupplementaryFolder.getFullPath();

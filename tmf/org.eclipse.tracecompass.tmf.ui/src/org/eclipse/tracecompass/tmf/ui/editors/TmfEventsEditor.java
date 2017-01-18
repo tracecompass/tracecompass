@@ -56,10 +56,12 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import org.eclipse.tracecompass.tmf.ui.project.model.Messages;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.ui.IEditorInput;
@@ -124,42 +126,52 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                 if (traceTypeId == null) {
                     throw new PartInitException(Messages.TmfOpenTraceHelper_NoTraceType);
                 }
+
                 if (ITmfEventsEditorConstants.EXPERIMENT_INPUT_TYPE_CONSTANTS.contains(traceTypeId)) {
                     // Special case: experiment bookmark resource
                     final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject(), true);
                     if (project == null) {
                         throw new PartInitException(Messages.TmfOpenTraceHelper_NoTraceType);
                     }
-                    for (final TmfExperimentElement experimentElement : project.getExperimentsFolder().getExperiments()) {
-                        if (experimentElement.getResource().equals(fFile.getParent())) {
-                            setPartName(experimentElement.getName());
-                            super.setSite(site);
-                            super.setInput(fileEditorInput);
-                            TmfOpenTraceHelper.reopenTraceFromElement(experimentElement, this);
-                            return;
+                    TmfExperimentFolder experimentFolder = project.getExperimentsFolder();
+                    if (experimentFolder != null) {
+                        for (final TmfExperimentElement experimentElement : experimentFolder.getExperiments()) {
+                            if (experimentElement.getResource().equals(fFile.getParent())) {
+                                setPartName(experimentElement.getName());
+                                super.setSite(site);
+                                super.setInput(fileEditorInput);
+                                TmfOpenTraceHelper.reopenTraceFromElement(experimentElement, this);
+                                return;
+                            }
                         }
                     }
                 } else if (ITmfEventsEditorConstants.TRACE_INPUT_TYPE_CONSTANTS.contains(traceTypeId)) {
                     // Special case: trace bookmark resource
                     final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject(), true);
-                    for (final TmfTraceElement traceElement : project.getTracesFolder().getTraces()) {
-                        if (traceElement.getResource().equals(fFile.getParent())) {
-                            setPartName(traceElement.getElementPath());
-                            super.setSite(site);
-                            super.setInput(fileEditorInput);
-                            TmfOpenTraceHelper.reopenTraceFromElement(traceElement, this);
-                            return;
+                    final TmfTraceFolder tracesFolder = project.getTracesFolder();
+                    if (tracesFolder != null) {
+                        for (final TmfTraceElement traceElement : tracesFolder.getTraces()) {
+                            if (traceElement.getResource().equals(fFile.getParent())) {
+                                setPartName(traceElement.getElementPath());
+                                super.setSite(site);
+                                super.setInput(fileEditorInput);
+                                TmfOpenTraceHelper.reopenTraceFromElement(traceElement, this);
+                                return;
+                            }
                         }
                     }
                 } else {
                     final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject(), true);
-                    for (final TmfTraceElement traceElement : project.getTracesFolder().getTraces()) {
-                        if (traceElement.getResource().equals(fFile)) {
-                            setPartName(traceElement.getElementPath());
-                            super.setSite(site);
-                            super.setInput(fileEditorInput);
-                            TmfOpenTraceHelper.reopenTraceFromElement(traceElement, this);
-                            return;
+                    final TmfTraceFolder tracesFolder = project.getTracesFolder();
+                    if (tracesFolder != null) {
+                        for (final TmfTraceElement traceElement : tracesFolder.getTraces()) {
+                            if (traceElement.getResource().equals(fFile)) {
+                                setPartName(traceElement.getElementPath());
+                                super.setSite(site);
+                                super.setInput(fileEditorInput);
+                                TmfOpenTraceHelper.reopenTraceFromElement(traceElement, this);
+                                return;
+                            }
                         }
                     }
                 }

@@ -83,6 +83,13 @@ public class RenameTraceHandler extends AbstractHandler {
 
         IFolder parentFolder = (IFolder) oldTrace.getParent().getResource();
         final TmfTraceFolder tracesFolder = oldTrace.getProject().getTracesFolder();
+        TmfExperimentFolder experimentFolder = oldTrace.getProject().getExperimentsFolder();
+
+        // Not a standard tracing project
+        if ((tracesFolder == null) || (experimentFolder == null)) {
+            return null;
+        }
+
         final IPath newPath = parentFolder.getFullPath().append(newName);
 
         WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
@@ -153,7 +160,6 @@ public class RenameTraceHandler extends AbstractHandler {
                     return;
                 }
 
-                TmfExperimentFolder experimentFolder = newTrace.getProject().getExperimentsFolder();
                 for (final TmfExperimentElement experiment : experimentFolder.getExperiments()) {
                     for (final TmfTraceElement expTrace : experiment.getTraces()) {
                         if (expTrace.getElementPath().equals(oldTrace.getElementPath())) {

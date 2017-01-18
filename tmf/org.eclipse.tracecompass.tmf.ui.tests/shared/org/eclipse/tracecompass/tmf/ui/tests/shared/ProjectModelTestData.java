@@ -31,9 +31,11 @@ import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfCommonProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
@@ -74,8 +76,12 @@ public class ProjectModelTestData {
                 "org.eclipse.linuxtools.tmf.core.tests.tracetype");
 
         final TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
-        TmfTraceElement traceElement = projectElement.getTracesFolder().getTraces().get(0);
-        traceElement.refreshTraceType();
+        TmfTraceFolder tracesFolder = projectElement.getTracesFolder(); {
+            if (tracesFolder != null) {
+                TmfTraceElement traceElement = tracesFolder.getTraces().get(0);
+                traceElement.refreshTraceType();
+            }
+        }
 
         projectElement.refresh();
 
@@ -92,26 +98,28 @@ public class ProjectModelTestData {
      * @return The newly created experiment
      */
     public static TmfExperimentElement addExperiment(TmfProjectElement projectElement, String experimentName) {
-        IFolder experimentFolder = projectElement.getExperimentsFolder().getResource();
-        final IFolder folder = experimentFolder.getFolder(experimentName);
+        TmfExperimentFolder experimentsFolder = projectElement.getExperimentsFolder();
+        if (experimentsFolder != null) {
+            IFolder experimentFolder = experimentsFolder.getResource();
+            final IFolder folder = experimentFolder.getFolder(experimentName);
 
-        WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
-            @Override
-            public void execute(IProgressMonitor monitor) throws CoreException {
-                monitor.beginTask("", 1000);
-                folder.create(false, true, monitor);
-                monitor.done();
+            WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
+                @Override
+                public void execute(IProgressMonitor monitor) throws CoreException {
+                    monitor.beginTask("", 1000);
+                    folder.create(false, true, monitor);
+                    monitor.done();
+                }
+            };
+            try {
+                PlatformUI.getWorkbench().getProgressService().busyCursorWhile(operation);
+            } catch (InterruptedException | InvocationTargetException | RuntimeException exception) {
+
             }
-        };
-        try {
-            PlatformUI.getWorkbench().getProgressService().busyCursorWhile(operation);
-        } catch (InterruptedException | InvocationTargetException | RuntimeException exception) {
-
-        }
-
-        for (ITmfProjectModelElement el : projectElement.getExperimentsFolder().getChildren()) {
-            if (el.getName().equals(experimentName) && (el instanceof TmfExperimentElement)) {
-                return (TmfExperimentElement) el;
+            for (ITmfProjectModelElement el : experimentsFolder.getChildren()) {
+                if (el.getName().equals(experimentName) && (el instanceof TmfExperimentElement)) {
+                    return (TmfExperimentElement) el;
+                }
             }
         }
         return null;
@@ -137,51 +145,57 @@ public class ProjectModelTestData {
      */
     public static void deleteProject(TmfProjectElement project) {
         /* Delete experiments */
-        ITmfProjectModelElement[] experiments = project.getExperimentsFolder().getChildren().toArray(new ITmfProjectModelElement[0]);
-        for (ITmfProjectModelElement element : experiments) {
-            if (element instanceof TmfExperimentElement) {
-                TmfExperimentElement experiment = (TmfExperimentElement) element;
-                IResource resource = experiment.getResource();
+        TmfExperimentFolder experimentsFolder = project.getExperimentsFolder();
+        if (experimentsFolder != null) {
+            ITmfProjectModelElement[] experiments = experimentsFolder.getChildren().toArray(new ITmfProjectModelElement[0]);
+            for (ITmfProjectModelElement element : experiments) {
+                if (element instanceof TmfExperimentElement) {
+                    TmfExperimentElement experiment = (TmfExperimentElement) element;
+                    IResource resource = experiment.getResource();
 
-                /* Close the experiment if open */
-                experiment.closeEditors();
+                    /* Close the experiment if open */
+                    experiment.closeEditors();
 
-                IPath path = resource.getLocation();
-                if (path != null) {
-                    /* Delete supplementary files */
-                    experiment.deleteSupplementaryFolder();
-                }
+                    IPath path = resource.getLocation();
+                    if (path != null) {
+                        /* Delete supplementary files */
+                        experiment.deleteSupplementaryFolder();
+                    }
 
-                /* Finally, delete the experiment */
-                try {
-                    resource.delete(true, null);
-                } catch (CoreException e) {
-                    Activator.getDefault().logError("Error deleting experiment element", e);
+                    /* Finally, delete the experiment */
+                    try {
+                        resource.delete(true, null);
+                    } catch (CoreException e) {
+                        Activator.getDefault().logError("Error deleting experiment element", e);
+                    }
                 }
             }
         }
 
         /* Delete traces */
-        ITmfProjectModelElement[] traces = project.getTracesFolder().getChildren().toArray(new ITmfProjectModelElement[0]);
-        for (ITmfProjectModelElement element : traces) {
-            if (element instanceof TmfTraceElement) {
-                TmfTraceElement trace = (TmfTraceElement) element;
-                IResource resource = trace.getResource();
+        TmfTraceFolder tracesFolder = project.getTracesFolder();
+        if (tracesFolder != null) {
+            ITmfProjectModelElement[] traces = tracesFolder.getChildren().toArray(new ITmfProjectModelElement[0]);
+            for (ITmfProjectModelElement element : traces) {
+                if (element instanceof TmfTraceElement) {
+                    TmfTraceElement trace = (TmfTraceElement) element;
+                    IResource resource = trace.getResource();
 
-                /* Close the trace if open */
-                trace.closeEditors();
+                    /* Close the trace if open */
+                    trace.closeEditors();
 
-                IPath path = resource.getLocation();
-                if (path != null) {
-                    /* Delete supplementary files */
-                    trace.deleteSupplementaryFolder();
-                }
+                    IPath path = resource.getLocation();
+                    if (path != null) {
+                        /* Delete supplementary files */
+                        trace.deleteSupplementaryFolder();
+                    }
 
-                /* Finally, delete the trace */
-                try {
-                    resource.delete(true, new NullProgressMonitor());
-                } catch (CoreException e) {
-                    Activator.getDefault().logError("Error deleting trace element", e);
+                    /* Finally, delete the trace */
+                    try {
+                        resource.delete(true, new NullProgressMonitor());
+                    } catch (CoreException e) {
+                        Activator.getDefault().logError("Error deleting trace element", e);
+                    }
                 }
             }
         }

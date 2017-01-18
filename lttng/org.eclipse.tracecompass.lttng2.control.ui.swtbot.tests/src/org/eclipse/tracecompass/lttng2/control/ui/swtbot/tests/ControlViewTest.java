@@ -639,6 +639,7 @@ public class ControlViewTest {
 
     private static void verifyExperimentFolder(boolean createExperiment, TmfProjectElement tmfProject, String experimentName) {
         TmfExperimentFolder expFolder = tmfProject.getExperimentsFolder();
+        assertNotNull(expFolder);
         if (createExperiment) {
             if (experimentName != null) {
                 TmfExperimentElement expElement = expFolder.getExperiment(experimentName);

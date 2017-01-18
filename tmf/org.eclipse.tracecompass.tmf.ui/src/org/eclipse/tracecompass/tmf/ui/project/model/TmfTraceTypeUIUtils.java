@@ -201,26 +201,36 @@ public final class TmfTraceTypeUIUtils {
         resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceTypeId);
 
         TmfProjectElement tmfProject = TmfProjectRegistry.getProject(resource.getProject(), true);
-        if (tmfProject.getTracesFolder().getPath().isPrefixOf(resource.getFullPath())) {
-            String elementPath = resource.getFullPath().makeRelativeTo(tmfProject.getTracesFolder().getPath()).toString();
-            refreshTraceElement(tmfProject.getTracesFolder().getTraces(), elementPath);
-        } else if (resource.getParent().equals(tmfProject.getExperimentsFolder().getResource())) {
-            /* The trace type to set is for an experiment */
-            for (TmfExperimentElement experimentElement : tmfProject.getExperimentsFolder().getExperiments()) {
-                if (resource.equals(experimentElement.getResource())) {
-                    experimentElement.refreshTraceType();
-                    break;
-                }
+        TmfTraceFolder tracesFolder = tmfProject.getTracesFolder();
+        TmfExperimentFolder experimentsFolder = tmfProject.getExperimentsFolder();
+        if (tracesFolder != null) {
+            if (tracesFolder.getPath().isPrefixOf(resource.getFullPath())) {
+                String elementPath = resource.getFullPath().makeRelativeTo(tracesFolder.getPath()).toString();
+                refreshTraceElement(tracesFolder.getTraces(), elementPath);
             }
-        } else {
-            for (TmfExperimentElement experimentElement : tmfProject.getExperimentsFolder().getExperiments()) {
-                if (experimentElement.getPath().isPrefixOf(resource.getFullPath())) {
-                    String elementPath = resource.getFullPath().makeRelativeTo(experimentElement.getPath()).toString();
-                    refreshTraceElement(experimentElement.getTraces(), elementPath);
-                    break;
+        }
+        if ((tracesFolder == null) || (experimentsFolder != null)) {
+            if (experimentsFolder != null) {
+                if (resource.getParent().equals(experimentsFolder.getResource())) {
+                    /* The trace type to set is for an experiment */
+                    for (TmfExperimentElement experimentElement : experimentsFolder.getExperiments()) {
+                        if (resource.equals(experimentElement.getResource())) {
+                            experimentElement.refreshTraceType();
+                            break;
+                        }
+                    }
+                } else {
+                    for (TmfExperimentElement experimentElement : experimentsFolder.getExperiments()) {
+                        if (experimentElement.getPath().isPrefixOf(resource.getFullPath())) {
+                            String elementPath = resource.getFullPath().makeRelativeTo(experimentElement.getPath()).toString();
+                            refreshTraceElement(experimentElement.getTraces(), elementPath);
+                            break;
+                        }
+                    }
                 }
             }
         }
+
         if (refresh) {
             tmfProject.refresh();
         }

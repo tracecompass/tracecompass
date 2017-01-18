@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.PlatformUI;
 
@@ -55,19 +56,22 @@ public class CustomParserUtils {
                 for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
                     if (project.hasNature(TmfProjectNature.ID)) {
                         TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
-                        for (final TmfTraceElement trace : projectElement.getTracesFolder().getTraces()) {
-                            if (monitor.isCanceled()) {
-                                throw new OperationCanceledException();
-                            }
-                            if (traceTypeId.equals(trace.getTraceType())) {
-                                Display.getDefault().syncExec(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        trace.closeEditors();
-                                    }
-                                });
-                                trace.deleteSupplementaryResources();
-                                trace.refreshSupplementaryFolder();
+                        final TmfTraceFolder tracesFolder = projectElement.getTracesFolder();
+                        if (tracesFolder != null) {
+                            for (final TmfTraceElement trace : tracesFolder.getTraces()) {
+                                if (monitor.isCanceled()) {
+                                    throw new OperationCanceledException();
+                                }
+                                if (traceTypeId.equals(trace.getTraceType())) {
+                                    Display.getDefault().syncExec(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            trace.closeEditors();
+                                        }
+                                    });
+                                    trace.deleteSupplementaryResources();
+                                    trace.refreshSupplementaryFolder();
+                                }
                             }
                         }
                     }

@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
@@ -81,6 +82,11 @@ public class RenameFolderHandler extends AbstractHandler {
         IContainer parentFolder = oldFolder.getResource().getParent();
         final TmfTraceFolder tracesFolder = oldFolder.getProject().getTracesFolder();
         final IPath newFolderPath = parentFolder.getFullPath().append(newName);
+        TmfExperimentFolder experimentFolder = oldFolder.getProject().getExperimentsFolder();
+        // Not a standard tracing project
+        if ((tracesFolder == null) || (experimentFolder == null)) {
+            return null;
+        }
 
         WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
             @Override
@@ -131,7 +137,7 @@ public class RenameFolderHandler extends AbstractHandler {
 
                 IPath oldFolderElementPath = oldFolder.getPath().makeRelativeTo(tracesFolder.getPath());
                 IPath newFolderElementPath = oldFolderElementPath.removeLastSegments(1).append(newName);
-                for (TmfExperimentElement experiment : oldFolder.getProject().getExperimentsFolder().getExperiments()) {
+                for (TmfExperimentElement experiment : experimentFolder.getExperiments()) {
                     for (TmfTraceElement oldTrace : experiment.getTraces()) {
                         if (oldTrace.getElementPath().startsWith(oldFolderElementPath.toString())) {
                             experiment.removeTrace(oldTrace);

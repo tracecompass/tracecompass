@@ -40,6 +40,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
@@ -411,7 +412,11 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
 
     @Override
     public IFile createBookmarksFile() throws CoreException {
-        return createBookmarksFile(getProject().getExperimentsFolder().getResource(), ITmfEventsEditorConstants.EXPERIMENT_EDITOR_INPUT_TYPE);
+        TmfExperimentFolder experimentFolder = getProject().getExperimentsFolder();
+        if (experimentFolder == null) {
+            throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TmfProject_ExperimentFolderNotExists));
+        }
+        return createBookmarksFile(experimentFolder.getResource(), ITmfEventsEditorConstants.EXPERIMENT_EDITOR_INPUT_TYPE);
     }
 
     @Override

@@ -128,12 +128,17 @@ public class ExportTracePackageSelectTraceWizardPage extends WizardPage {
                 TmfProjectElement project = TmfProjectRegistry.getProject(fSelectedProject, true);
 
                 TmfTraceFolder tracesFolder = project.getTracesFolder();
-                List<TmfTraceElement> traces = tracesFolder.getTraces();
-                TmfTraceElement[] array = traces.toArray(new TmfTraceElement[] {});
-                traceViewer.setInput(array);
-                traceViewer.refresh();
-                fTraceTable.select(0);
-                fTraceTable.notifyListeners(SWT.Selection, new Event());
+                TmfTraceElement[] array = new TmfTraceElement[0];
+                if (tracesFolder != null) {
+                    List<TmfTraceElement> traces = tracesFolder.getTraces();
+                    array = traces.toArray(new TmfTraceElement[] {});
+                    traceViewer.setInput(array);
+                    traceViewer.refresh();
+                }
+                if (array.length > 0) {
+                    fTraceTable.select(0);
+                    fTraceTable.notifyListeners(SWT.Selection, new Event());
+                }
                 getWizard().getContainer().updateButtons();
             }
         });

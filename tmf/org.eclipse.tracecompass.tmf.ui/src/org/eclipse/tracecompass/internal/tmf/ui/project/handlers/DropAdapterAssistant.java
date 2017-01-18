@@ -137,11 +137,14 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                     // If source resource is a trace, use the trace element
                     IResource sourceResource = (IResource) source;
                     TmfProjectElement projectElement = TmfProjectRegistry.getProject(sourceResource.getProject());
-                    if (projectElement != null && projectElement.getTracesFolder() != null) {
-                        for (TmfTraceElement trace : projectElement.getTracesFolder().getTraces()) {
-                            if (trace.getResource().equals(sourceResource)) {
-                                source = trace;
-                                break;
+                    if (projectElement != null) {
+                        TmfTraceFolder tracesFolder = projectElement.getTracesFolder();
+                        if (tracesFolder != null) {
+                            for (TmfTraceElement trace : tracesFolder.getTraces()) {
+                                if (trace.getResource().equals(sourceResource)) {
+                                    source = trace;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -227,7 +230,12 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
 
         IResource traceResource = sourceResource;
 
-        IPath tracesFolderPath = targetExperiment.getProject().getTracesFolder().getPath();
+        TmfTraceFolder tracesFolder = targetExperiment.getProject().getTracesFolder();
+        if (tracesFolder == null) {
+            return null;
+        }
+
+        IPath tracesFolderPath = tracesFolder.getPath();
         if (tracesFolderPath.isPrefixOf(sourceResource.getFullPath())) {
             String elementPath = sourceResource.getFullPath().makeRelativeTo(tracesFolderPath).toString();
             for (TmfTraceElement trace : targetExperiment.getTraces()) {
@@ -237,7 +245,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             }
         } else {
             String targetName = sourceResource.getName();
-            for (ITmfProjectModelElement element : targetExperiment.getProject().getTracesFolder().getChildren()) {
+            for (ITmfProjectModelElement element : tracesFolder.getChildren()) {
                 if (element.getName().equals(targetName)) {
                     targetName = promptRename(element);
                     if (targetName == null) {
@@ -248,17 +256,17 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             }
             try {
                 if (operation == DND.DROP_COPY && !sourceResource.isLinked()) {
-                    IPath destination = targetExperiment.getProject().getTracesFolder().getResource().getFullPath().addTrailingSeparator().append(targetName);
+                    IPath destination = tracesFolder.getResource().getFullPath().addTrailingSeparator().append(targetName);
                     sourceResource.copy(destination, false, null);
                     cleanupBookmarks(destination);
                 } else {
-                    createLink(targetExperiment.getProject().getTracesFolder().getResource(), sourceResource, targetName);
+                    createLink(tracesFolder.getResource(), sourceResource, targetName);
                 }
                 // use the copied resource for the experiment
                 if (sourceResource.getType() == IResource.FILE) {
-                    traceResource = targetExperiment.getProject().getTracesFolder().getResource().getFile(targetName);
+                    traceResource = tracesFolder.getResource().getFile(targetName);
                 } else if (sourceResource.getType() == IResource.FOLDER) {
-                    traceResource = targetExperiment.getProject().getTracesFolder().getResource().getFolder(targetName);
+                    traceResource = tracesFolder.getResource().getFolder(targetName);
                 }
                 String sourceLocation = sourceResource.getPersistentProperty(TmfCommonConstants.SOURCE_LOCATION);
                 if (sourceLocation == null) {
@@ -272,7 +280,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
         }
         if (traceResource != null && traceResource.exists()) {
             setTraceType(traceResource);
-            for (TmfTraceElement trace : targetExperiment.getProject().getTracesFolder().getTraces()) {
+            for (TmfTraceElement trace : tracesFolder.getTraces()) {
                 if (trace.getResource().equals(traceResource)) {
                     targetExperiment.addTrace(trace);
                     targetExperiment.closeEditors();
@@ -299,9 +307,10 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
 
         IResource sourceResource = sourceTrace.getResource();
         IResource targetResource = drop(sourceResource, traceFolder, operation);
+        TmfTraceFolder tracesFolder = traceFolder.getProject().getTracesFolder();
 
-        if (targetResource != null) {
-            String elementPath = targetResource.getFullPath().makeRelativeTo(traceFolder.getProject().getTracesFolder().getPath()).toString();
+        if ((targetResource != null) && (tracesFolder != null)) {
+            String elementPath = targetResource.getFullPath().makeRelativeTo(tracesFolder.getPath()).toString();
             IFolder destinationSupplementaryFolder = traceFolder.getTraceSupplementaryFolder(elementPath);
             sourceTrace.copySupplementaryFolder(destinationSupplementaryFolder);
             return true;
@@ -370,7 +379,12 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             TmfExperimentElement targetExperiment,
             int operation) {
 
-        IPath tracesFolderPath = targetExperiment.getProject().getTracesFolder().getResource().getLocation();
+        TmfTraceFolder tracesFolder = targetExperiment.getProject().getTracesFolder();
+        if (tracesFolder == null) {
+            return false;
+        }
+
+        IPath tracesFolderPath = tracesFolder.getResource().getLocation();
         IResource traceResource = null;
         if (tracesFolderPath.isPrefixOf(path)) {
             String elementPath = path.makeRelativeTo(tracesFolderPath).toString();
@@ -379,10 +393,10 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                     return false;
                 }
             }
-            traceResource = targetExperiment.getProject().getTracesFolder().getResource().findMember(elementPath);
+            traceResource = tracesFolder.getResource().findMember(elementPath);
         } else {
             String targetName = path.lastSegment();
-            for (ITmfProjectModelElement element : targetExperiment.getProject().getTracesFolder().getChildren()) {
+            for (ITmfProjectModelElement element : tracesFolder.getChildren()) {
                 if (element.getName().equals(targetName)) {
                     targetName = promptRename(element);
                     if (targetName == null) {
@@ -392,16 +406,16 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 }
             }
             if (operation == DND.DROP_COPY) {
-                importTrace(targetExperiment.getProject().getTracesFolder().getResource(), path, targetName);
+                importTrace(tracesFolder.getResource(), path, targetName);
             } else {
-                createLink(targetExperiment.getProject().getTracesFolder().getResource(), path, targetName);
+                createLink(tracesFolder.getResource(), path, targetName);
             }
             // use the copied resource for the experiment
             File file = new File(path.toString());
             if (file.exists() && file.isFile()) {
-                traceResource = targetExperiment.getProject().getTracesFolder().getResource().getFile(targetName);
+                traceResource = tracesFolder.getResource().getFile(targetName);
             } else if (file.exists() && file.isDirectory()) {
-                traceResource = targetExperiment.getProject().getTracesFolder().getResource().getFolder(targetName);
+                traceResource = tracesFolder.getResource().getFolder(targetName);
             }
         }
         if (traceResource != null && traceResource.exists()) {
@@ -412,7 +426,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 displayException(e);
             }
             setTraceType(traceResource);
-            for (TmfTraceElement trace : targetExperiment.getProject().getTracesFolder().getTraces()) {
+            for (TmfTraceElement trace : tracesFolder.getTraces()) {
                 if (trace.getResource().equals(traceResource)) {
                     targetExperiment.addTrace(trace);
                     targetExperiment.closeEditors();

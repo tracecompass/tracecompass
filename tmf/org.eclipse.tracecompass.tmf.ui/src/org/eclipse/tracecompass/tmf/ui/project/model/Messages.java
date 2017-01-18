@@ -139,7 +139,16 @@ public class Messages extends NLS {
     /** Trace not found */
     public static String TmfOpenTraceHelper_TraceNotFound;
 
-
+    /**
+     * Error when experiment folder doesn't exists
+     * @since 2.3
+     */
+    public static String TmfProject_ExperimentFolderNotExists;
+    /**
+     * Error when traces folder doesn't exists
+     * @since 2.3
+     */
+    public static String TmfProject_TracesFolderNotExists;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

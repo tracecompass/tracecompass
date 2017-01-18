@@ -46,9 +46,11 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfCommonProjectElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectModelElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPropertyListener;
@@ -221,8 +223,14 @@ public class ManageXMLAnalysisDialog extends Dialog {
             TmfProjectElement pElement = TmfProjectRegistry.getProject(project);
             if (pElement != null) {
                 java.util.List<TmfCommonProjectElement> tElements = new ArrayList<>();
-                tElements.addAll(pElement.getTracesFolder().getTraces());
-                tElements.addAll(pElement.getExperimentsFolder().getExperiments());
+                TmfTraceFolder tracesFolder = pElement.getTracesFolder();
+                if (tracesFolder != null) {
+                    tElements.addAll(tracesFolder.getTraces());
+                }
+                TmfExperimentFolder experimentsFolder = pElement.getExperimentsFolder();
+                if (experimentsFolder != null) {
+                    tElements.addAll(experimentsFolder.getExperiments());
+                }
                 for (TmfCommonProjectElement tElement : tElements) {
                     boolean closeEditor = false;
                     for (IResource resource : tElement.getSupplementaryResources()) {

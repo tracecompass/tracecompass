@@ -35,7 +35,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
@@ -371,7 +373,11 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     public IFile createBookmarksFile() throws CoreException {
         IFile file = getBookmarksFile();
         if (getResource() instanceof IFolder) {
-            return createBookmarksFile(getProject().getTracesFolder().getResource(), ITmfEventsEditorConstants.TRACE_EDITOR_INPUT_TYPE);
+            TmfTraceFolder tracesFolder = getProject().getTracesFolder();
+            if (tracesFolder == null) {
+                throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TmfProject_TracesFolderNotExists));
+            }
+            return createBookmarksFile(tracesFolder.getResource(), ITmfEventsEditorConstants.TRACE_EDITOR_INPUT_TYPE);
         }
         return file;
     }
@@ -409,9 +415,12 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         // If trace is under an experiment, return original trace from the
         // traces folder
         if (getParent() instanceof TmfExperimentElement) {
-            for (TmfTraceElement aTrace : getProject().getTracesFolder().getTraces()) {
-                if (aTrace.getElementPath().equals(getElementPath())) {
-                    return aTrace;
+            TmfTraceFolder tracesFolder = getProject().getTracesFolder();
+            if (tracesFolder != null) {
+                for (TmfTraceElement aTrace : tracesFolder.getTraces()) {
+                    if (aTrace.getElementPath().equals(getElementPath())) {
+                        return aTrace;
+                    }
                 }
             }
         }
@@ -664,11 +673,13 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         // Close experiments that contain the trace if open
         if (getParent() instanceof TmfTraceFolder) {
             TmfExperimentFolder experimentsFolder = getProject().getExperimentsFolder();
-            for (TmfExperimentElement experiment : experimentsFolder.getExperiments()) {
-                for (TmfTraceElement trace : experiment.getTraces()) {
-                    if (trace.getElementPath().equals(getElementPath())) {
-                        experiment.closeEditors();
-                        break;
+            if (experimentsFolder != null) {
+                for (TmfExperimentElement experiment : experimentsFolder.getExperiments()) {
+                    for (TmfTraceElement trace : experiment.getTraces()) {
+                        if (trace.getElementPath().equals(getElementPath())) {
+                            experiment.closeEditors();
+                            break;
+                        }
                     }
                 }
             }
@@ -704,18 +715,19 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
                 TmfExperimentFolder experimentFolder = getProject().getExperimentsFolder();
 
                 // Propagate the removal to traces
-                for (TmfExperimentElement experiment : experimentFolder.getExperiments()) {
-                    List<TmfTraceElement> toRemove = new LinkedList<>();
-                    for (TmfTraceElement trace : experiment.getTraces()) {
-                        if (trace.getElementPath().equals(getElementPath())) {
-                            toRemove.add(trace);
+                if (experimentFolder != null) {
+                    for (TmfExperimentElement experiment : experimentFolder.getExperiments()) {
+                        List<TmfTraceElement> toRemove = new LinkedList<>();
+                        for (TmfTraceElement trace : experiment.getTraces()) {
+                            if (trace.getElementPath().equals(getElementPath())) {
+                                toRemove.add(trace);
+                            }
+                        }
+                        for (TmfTraceElement child : toRemove) {
+                            experiment.removeTrace(child);
                         }
                     }
-                    for (TmfTraceElement child : toRemove) {
-                        experiment.removeTrace(child);
-                    }
                 }
-
                 // Delete supplementary files
                 deleteSupplementaryFolder();
 

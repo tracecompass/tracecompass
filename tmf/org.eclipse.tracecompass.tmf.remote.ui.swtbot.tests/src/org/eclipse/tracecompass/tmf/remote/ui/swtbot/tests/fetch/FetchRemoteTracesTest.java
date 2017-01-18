@@ -47,6 +47,7 @@ import org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests.TmfRemoteUISWTBotTest
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
@@ -131,7 +132,8 @@ public class FetchRemoteTracesTest {
 
         @Override
         public boolean test() throws Exception {
-            return fProject.getTracesFolder().getTraces().size() == fExpectedCount;
+            final TmfTraceFolder tracesFolder = fProject.getTracesFolder();
+            return ((tracesFolder != null) && (tracesFolder.getTraces().size() == fExpectedCount));
         }
 
         @Override
@@ -154,7 +156,9 @@ public class FetchRemoteTracesTest {
             public void run() {
                 final TmfProjectElement project = TmfProjectRegistry.getProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME), true);
                 fBot.waitUntil(new TraceCountCondition(project, 2));
-                List<TmfTraceElement> traces = project.getTracesFolder().getTraces();
+                final TmfTraceFolder tracesFolder = project.getTracesFolder();
+                assertNotNull(tracesFolder);
+                List<TmfTraceElement> traces = tracesFolder.getTraces();
                 assertEquals(2, traces.size());
                 testTrace(traces.get(0), CONNECTION_NODE_NAME + "/resources/generated/synthetic-trace", TRACE_TYPE_LTTNG);
                 testTrace(traces.get(1), CONNECTION_NODE_NAME + "/resources/syslog", TRACE_TYPE_SYSLOG);
@@ -184,7 +188,9 @@ public class FetchRemoteTracesTest {
             public void run() {
                 TmfProjectElement project = TmfProjectRegistry.getProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME), true);
                 fBot.waitUntil(new TraceCountCondition(project, 1));
-                List<TmfTraceElement> traces = project.getTracesFolder().getTraces();
+                final TmfTraceFolder tracesFolder = project.getTracesFolder();
+                assertNotNull(tracesFolder);
+                List<TmfTraceElement> traces = tracesFolder.getTraces();
                 assertEquals(1, traces.size());
                 testTrace(traces.get(0), CONNECTION_NODE_NAME + "/resources/syslog", TRACE_TYPE_SYSLOG);
             }
@@ -205,7 +211,9 @@ public class FetchRemoteTracesTest {
             @Override
             public void run() {
                 TmfProjectElement project = TmfProjectRegistry.getProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME), true);
-                List<TmfTraceElement> traces = project.getTracesFolder().getTraces();
+                final TmfTraceFolder tracesFolder = project.getTracesFolder();
+                assertNotNull(tracesFolder);
+                List<TmfTraceElement> traces = tracesFolder.getTraces();
                 assertEquals(0, traces.size());
             }
         });
@@ -235,7 +243,9 @@ public class FetchRemoteTracesTest {
             @Override
             public void run() {
                 TmfProjectElement project = TmfProjectRegistry.getProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME), true);
-                List<TmfTraceElement> traces = project.getTracesFolder().getTraces();
+                final TmfTraceFolder tracesFolder = project.getTracesFolder();
+                assertNotNull(tracesFolder);
+                List<TmfTraceElement> traces = tracesFolder.getTraces();
                 assertEquals(0, traces.size());
             }
         });

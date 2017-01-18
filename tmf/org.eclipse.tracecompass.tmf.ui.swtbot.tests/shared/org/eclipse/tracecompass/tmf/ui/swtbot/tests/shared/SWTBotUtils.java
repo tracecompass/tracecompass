@@ -646,6 +646,9 @@ public final class SWTBotUtils {
         IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
         TmfProjectElement tmfProject = TmfProjectRegistry.getProject(project, false);
         TmfTraceFolder tracesFolder = tmfProject.getTracesFolder();
+        if (tracesFolder == null) {
+            return;
+        }
         try {
             for (TmfTraceElement traceElement : tracesFolder.getTraces()) {
                 traceElement.delete(null);
@@ -714,6 +717,9 @@ public final class SWTBotUtils {
         IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
         TmfProjectElement tmfProject = TmfProjectRegistry.getProject(project, false);
         TmfExperimentFolder expFolder = tmfProject.getExperimentsFolder();
+        if (expFolder == null) {
+            return;
+        }
         expFolder.getExperiments().forEach(experiment -> {
             IResource resource = experiment.getResource();
             try {

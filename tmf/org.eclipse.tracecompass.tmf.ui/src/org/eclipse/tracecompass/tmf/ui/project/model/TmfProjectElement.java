@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -32,8 +33,8 @@ public class TmfProjectElement extends TmfProjectModelElement {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private TmfTraceFolder fTraceFolder = null;
-    private TmfExperimentFolder fExperimentFolder = null;
+    @Nullable private TmfTraceFolder fTraceFolder = null;
+    @Nullable private TmfExperimentFolder fExperimentFolder = null;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -85,6 +86,7 @@ public class TmfProjectElement extends TmfProjectModelElement {
      * Returns the containing trace folder element.
      * @return the TMF trace folder element.
      */
+    @Nullable
     public TmfTraceFolder getTracesFolder() {
         return fTraceFolder;
     }
@@ -93,7 +95,7 @@ public class TmfProjectElement extends TmfProjectModelElement {
      * Returns the containing experiment folder element.
      * @return the TMF experiment folder element.
      */
-    public TmfExperimentFolder getExperimentsFolder() {
+    @Nullable public TmfExperimentFolder getExperimentsFolder() {
         return fExperimentFolder;
     }
 

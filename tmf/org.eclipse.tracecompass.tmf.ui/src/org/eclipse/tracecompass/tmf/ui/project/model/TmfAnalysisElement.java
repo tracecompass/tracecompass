@@ -104,7 +104,11 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
         }
 
         /** Get base path for resource */
-        IPath path = getProject().getTracesFolder().getPath();
+        final TmfTraceFolder tracesFolder = getProject().getTracesFolder();
+        if (tracesFolder == null) {
+            return;
+        }
+        IPath path = tracesFolder.getPath();
         IResource resource = getResource();
         if (resource instanceof IFolder) {
             path = ((IFolder) resource).getFullPath();

@@ -169,17 +169,20 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                         if (tmfProjectElement == null) {
                             return;
                         }
-                        final List<TmfTraceElement> traces = tmfProjectElement.getTracesFolder().getTraces();
-                        if (!traces.isEmpty()) {
-                            // Close editors in UI Thread
-                            Display.getDefault().syncExec(new Runnable() {
-                                @Override
-                                public void run() {
-                                    for (TmfTraceElement traceElement : traces) {
-                                        traceElement.closeEditors();
+                        TmfTraceFolder tracesFolder = tmfProjectElement.getTracesFolder();
+                        if (tracesFolder != null) {
+                            final List<TmfTraceElement> traces = tracesFolder.getTraces();
+                            if (!traces.isEmpty()) {
+                                // Close editors in UI Thread
+                                Display.getDefault().syncExec(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        for (TmfTraceElement traceElement : traces) {
+                                            traceElement.closeEditors();
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            }
                         }
                     }
                 } catch (CoreException e) {
