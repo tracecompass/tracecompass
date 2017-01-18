@@ -18,9 +18,12 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.tracecompass.tmf.ui,
  org.eclipse.tracecompass.tmf.core.tests
 Export-Package: org.eclipse.tracecompass.tmf.ui.tests,
+ org.eclipse.tracecompass.tmf.ui.tests.actions,
+ org.eclipse.tracecompass.tmf.ui.tests.experiment.type,
  org.eclipse.tracecompass.tmf.ui.tests.histogram,
  org.eclipse.tracecompass.tmf.ui.tests.markers,
  org.eclipse.tracecompass.tmf.ui.tests.project.model,
+ org.eclipse.tracecompass.tmf.ui.tests.shared,
  org.eclipse.tracecompass.tmf.ui.tests.statistics,
  org.eclipse.tracecompass.tmf.ui.tests.stubs.analysis,
  org.eclipse.tracecompass.tmf.ui.tests.uml2sd.load,
@@ -28,10 +31,9 @@ Export-Package: org.eclipse.tracecompass.tmf.ui.tests,
  org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.dialogs,
  org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.load,
  org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.loader,
- org.eclipse.tracecompass.tmf.ui.tests.experiment.type,
+ org.eclipse.tracecompass.tmf.ui.tests.widgets.timegraph.model,
  org.eclipse.tracecompass.tmf.ui.widgets.timegraph.test.stub.adaption,
  org.eclipse.tracecompass.tmf.ui.widgets.timegraph.test.stub.model,
- org.eclipse.tracecompass.tmf.ui.widgets.timegraph.test.stub.views,
- org.eclipse.tracecompass.tmf.ui.tests.shared
+ org.eclipse.tracecompass.tmf.ui.widgets.timegraph.test.stub.views
 Bundle-Activator: org.eclipse.tracecompass.tmf.ui.tests.TmfUITestPlugin
 Import-Package: com.google.common.collect
