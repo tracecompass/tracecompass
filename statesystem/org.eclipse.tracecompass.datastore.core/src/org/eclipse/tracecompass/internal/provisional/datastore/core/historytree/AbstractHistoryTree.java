@@ -908,7 +908,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
 
                 if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
                     /* Here we add the relevant children nodes for BFS */
-                    queue.addAll(currentNode.selectNextChildren(nodeCondition));
+                    queue.addAll(currentNode.selectNextChildren(nodeCondition, currentNode.getCoreDataPredicate(extraPredicate)));
                 }
                 Collection<E> nodeIntervals = currentNode.getMatchingIntervals(nodeCondition, extraPredicate);
                 intervalsOfNodes.addAll(nodeIntervals);

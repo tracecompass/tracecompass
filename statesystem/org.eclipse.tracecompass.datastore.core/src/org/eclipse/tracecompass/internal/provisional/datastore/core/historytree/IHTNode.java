@@ -273,9 +273,11 @@ public interface IHTNode<E extends IHTInterval> {
      * node that intersect the given timestamp. Useful when navigating the tree.
      *
      * @param timeCondition
-     *            The time-based range condition to choose which child is the next one
+     *            The time-based range condition to choose which child is the
+     *            next one
      * @return Collection of sequence numbers of the child nodes that intersect
-     *         the time condition, non-null empty collection if this is a Leaf Node
+     *         the time condition, non-null empty collection if this is a Leaf
+     *         Node
      * @throws RangeException
      *             If t is out of the node's range
      */

@@ -58,7 +58,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
      * <pre>
      *  1 - byte (the type of node)
      * 16 - 2x long (start time, end time)
-     * 16 - 3x int (seq number, parent seq number, intervalcount)
+     * 12 - 3x int (seq number, parent seq number, intervalcount)
      *  1 - byte (done or not)
      * </pre>
      */
@@ -67,6 +67,8 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
             + 2 * Long.BYTES
             + 3 * Integer.BYTES
             + Byte.BYTES;
+
+    private static final Predicate<Integer> ALWAYS_TRUE = i -> true;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -309,11 +311,33 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
          *         intersect t, non-null empty collection if this is a Leaf Node
          */
         public final Collection<Integer> selectNextChildren(TimeRangeCondition timeCondition) {
+            return selectNextChildren(timeCondition, ALWAYS_TRUE);
+        }
+
+        /**
+         * Inner method to select the sequence numbers for the children of the
+         * current node that intersect the given timestamp. Useful for moving
+         * down the tree.
+         *
+         * @param timeCondition
+         *            The time-based RangeCondition to choose which children
+         *            match.
+         * @param extraPredicate
+         *            Extra check to decide whether this child should be
+         *            returned. This predicate receives the index of a child
+         *            node and can do extra verification from the child's header
+         *            data at this index.
+         * @return Collection of sequence numbers of the child nodes that
+         *         intersect t, non-null empty collection if this is a Leaf Node
+         */
+        public final Collection<Integer> selectNextChildren(TimeRangeCondition timeCondition, Predicate<Integer> extraPredicate) {
             fNode.takeReadLock();
             try {
                 List<Integer> list = new ArrayList<>();
                 for (int index : selectNextIndices(timeCondition)) {
-                    list.add(fChildren[index]);
+                    if (extraPredicate.test(index)) {
+                        list.add(fChildren[index]);
+                    }
                 }
                 return list;
             } finally {
@@ -799,6 +823,25 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
         return low; // key not found
     }
 
+    /**
+     * Transform a predicate on the intervals into a predicate to filter the
+     * children nodes from their index in the {@link HTNode.CoreNodeData}.
+     *
+     * Typically, implementations of the tree who saves more information than
+     * time in their CoreNodeData will have some Predicate classes for the
+     * intervals that can be transformed in Predicate to add an additional
+     * filter for the core node data.
+     *
+     * By default, this method should return <code>i -> true</code>.
+     *
+     * @param predicate
+     *            The predicate on the intervals of a node
+     * @return The predicate on the index in the core node data
+     */
+    public Predicate<Integer> getCoreDataPredicate(Predicate<E> predicate) {
+        return ALWAYS_TRUE;
+    }
+
     @Override
     public void closeThisNode(long endtime) {
         fRwl.writeLock().lock();
@@ -980,6 +1023,36 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
         CoreNodeData extraData = fExtraData;
         if (extraData != null) {
             return extraData.selectNextChildren(timeCondition);
+        }
+        return IHTNode.super.selectNextChildren(timeCondition);
+    }
+
+    /**
+     * Method to select the sequence numbers for the children of the current
+     * node that intersect the given time condition and verify a predicate.
+     * Useful when navigating the tree.
+     *
+     * This method is protected and not intended to be accessed from outside, as
+     * the predicate needs insight on the specific CoreNodeData class for this
+     * node type. Typically, this predicate will be generated from a
+     * tree-specific interval predicate, by the tree itself.
+     *
+     * @param timeCondition
+     *            The time-based RangeCondition to choose which children match.
+     * @param extraPredicate
+     *            Extra check to decide whether this child should be returned.
+     *            This predicate receives the index of a child node and can do
+     *            extra verification from the child's header data at this index.
+     * @return Collection of sequence numbers of the child nodes that intersect
+     *         t, non-null empty collection if this is a Leaf Node
+     * @throws RangeException
+     *             If t is out of the node's range
+     */
+    protected Collection<Integer> selectNextChildren(TimeRangeCondition timeCondition, Predicate<Integer> extraPredicate)
+            throws RangeException {
+        CoreNodeData extraData = fExtraData;
+        if (extraData != null) {
+            return extraData.selectNextChildren(timeCondition, extraPredicate);
         }
         return IHTNode.super.selectNextChildren(timeCondition);
     }
