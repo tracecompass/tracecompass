@@ -186,12 +186,6 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
             module.setId(analysisid);
             ssModule.setXmlFile(new Path(fSourceFile.getAbsolutePath()));
 
-            /*
-             * FIXME: There is no way to know if a module is automatic, so we
-             * default to true
-             */
-            ssModule.setAutomatic(true);
-
             break;
         case PATTERN:
             module = new XmlPatternAnalysis();
@@ -199,11 +193,6 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
             module.setId(analysisid);
             XmlPatternAnalysis paModule = (XmlPatternAnalysis) module;
             paModule.setXmlFile(new Path(fSourceFile.getAbsolutePath()));
-
-            /*
-             * FIXME: Maybe the pattern analysis should not be automatic.
-             */
-            paModule.setAutomatic(true);
 
             break;
         default:

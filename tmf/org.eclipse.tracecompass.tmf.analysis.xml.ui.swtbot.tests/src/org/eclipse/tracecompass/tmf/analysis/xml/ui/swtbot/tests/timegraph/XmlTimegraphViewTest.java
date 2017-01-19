@@ -101,6 +101,7 @@ public class XmlTimegraphViewTest {
         SWTBotTreeItem treeItem = SWTBotUtils.selectTracesFolder(fBot, PROJECT_NAME);
         treeItem = SWTBotUtils.getTreeItem(fBot, treeItem, TRACE_NAME, "Views", ANALYSIS_NAME, viewTitle);
         treeItem.doubleClick();
+        WaitUtils.waitForJobs();
     }
 
     /**
