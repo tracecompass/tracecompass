@@ -98,7 +98,7 @@ public class RangeConditionTest {
         assertEquals(min, cnd.min());
         assertEquals(max, cnd.max());
         for (Long i = min; i <= max; i++) {
-            assertTrue(cnd.contains(i));
+            assertTrue(cnd.test(i));
         }
 
         // Test with a step of 0, it should take 1 as a default value
@@ -108,7 +108,7 @@ public class RangeConditionTest {
         assertEquals(min, cnd.min());
         assertEquals(max, cnd.max());
         for (Long i = min; i <= max; i++) {
-            assertTrue(cnd.contains(i));
+            assertTrue(cnd.test(i));
         }
 
         // Test with a step of 2. Make sure that values have the right steps and
@@ -120,12 +120,12 @@ public class RangeConditionTest {
         assertEquals(max, cnd.max());
         for (Long i = min; i < max; i++) {
             if ((i - min) % step == 0) {
-                assertTrue(cnd.contains(i));
+                assertTrue(cnd.test(i));
             } else {
-                assertFalse(cnd.contains(i));
+                assertFalse(cnd.test(i));
             }
         }
-        assertTrue(cnd.contains(max));
+        assertTrue(cnd.test(max));
     }
 
     /**

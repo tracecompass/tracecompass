@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -33,7 +34,7 @@ import org.eclipse.tracecompass.internal.datastore.core.condition.DiscreteRangeC
  *            Long
  * @noimplement Accessor interface
  */
-public interface RangeCondition<@NonNull E extends Comparable<E>> {
+public interface RangeCondition<@NonNull E extends Comparable<E>> extends Predicate<E> {
 
     /**
      * Get the lower bound of this range
@@ -50,7 +51,7 @@ public interface RangeCondition<@NonNull E extends Comparable<E>> {
     @NonNull E max();
 
     /**
-     * Verify whether a value is within this specific range boundaries. If the
+     * Test whether a value is within this specific range boundaries. If the
      * range is continuous, it will return <code>true</code> if the value is
      * between the lower and upper bounds. If the range is discrete, it will
      * return <code>true</code> if the requested element is one of the elements
@@ -60,7 +61,8 @@ public interface RangeCondition<@NonNull E extends Comparable<E>> {
      *            value that we want to test
      * @return true if element is contained in this condition's set or range
      */
-    boolean contains(@NonNull E element);
+    @Override
+    boolean test(@NonNull E element);
 
     /**
      * Determine if the current range intersects a ranged bounded by the values

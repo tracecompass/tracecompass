@@ -56,7 +56,7 @@ public class DiscreteRangeCondition<E extends Comparable<E>> implements RangeCon
     }
 
     @Override
-    public boolean contains(E element) {
+    public boolean test(E element) {
         return fSet.contains(element);
     }
 

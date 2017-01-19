@@ -52,7 +52,7 @@ public class ContinuousRangeCondition<E extends Comparable<E>> implements RangeC
     }
 
     @Override
-    public boolean contains(E element) {
+    public boolean test(E element) {
         return fMin.compareTo(element) <= 0 && element.compareTo(fMax) <= 0;
     }
 
@@ -84,4 +84,5 @@ public class ContinuousRangeCondition<E extends Comparable<E>> implements RangeC
     public String toString() {
         return "Continuous condition: " + fMin.toString() + '-' + fMax.toString(); //$NON-NLS-1$
     }
+
 }

@@ -51,12 +51,12 @@ public class ContinuousRangeConditionTest {
      * Test that the right elements are contained in the condition.
      */
     @Test
-    public void testContains() {
-        assertFalse(CONDITION.contains(-5));
-        assertTrue(CONDITION.contains(LOW));
-        assertTrue(CONDITION.contains(5));
-        assertTrue(CONDITION.contains(HIGH));
-        assertFalse(CONDITION.contains(15));
+    public void testPredicate() {
+        assertFalse(CONDITION.test(-5));
+        assertTrue(CONDITION.test(LOW));
+        assertTrue(CONDITION.test(5));
+        assertTrue(CONDITION.test(HIGH));
+        assertFalse(CONDITION.test(15));
     }
 
     /**

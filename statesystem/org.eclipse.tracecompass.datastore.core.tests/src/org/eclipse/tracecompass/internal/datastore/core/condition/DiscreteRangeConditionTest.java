@@ -56,13 +56,13 @@ public class DiscreteRangeConditionTest {
      * Test that the right elements are contained in the condition.
      */
     @Test
-    public void testContains() {
-        assertFalse(CONDITION.contains(-5));
+    public void testPredicate() {
+        assertFalse(CONDITION.test(-5));
         for (Integer v : VALUES) {
-            assertTrue(CONDITION.contains(v));
-            assertFalse(CONDITION.contains(v + 1));
+            assertTrue(CONDITION.test(v));
+            assertFalse(CONDITION.test(v + 1));
         }
-        assertFalse(CONDITION.contains(15));
+        assertFalse(CONDITION.test(15));
     }
 
     /**
@@ -70,21 +70,21 @@ public class DiscreteRangeConditionTest {
      * affect the condition
      */
     @Test
-    public void testContainsAndAdd() {
+    public void testPredicateAndAdd() {
         List<Integer> values = new ArrayList<>();
         values.add(1);
         values.add(5);
         DiscreteRangeCondition<Integer> condition = new DiscreteRangeCondition<>(values);
-        assertFalse(condition.contains(-5));
+        assertFalse(condition.test(-5));
         for (Integer v : values) {
-            assertTrue(condition.contains(v));
-            assertFalse(condition.contains(v + 1));
+            assertTrue(condition.test(v));
+            assertFalse(condition.test(v + 1));
         }
-        assertFalse(condition.contains(15));
+        assertFalse(condition.test(15));
         // Add the values to the initial set and make sure it is not part of the
         // condition
         values.add(15);
-        assertFalse(condition.contains(15));
+        assertFalse(condition.test(15));
     }
 
     /**
