@@ -54,6 +54,7 @@ public class XmlPatternSegmentStoreModule extends AbstractSegmentStoreAnalysisMo
         fParent = parent;
     }
 
+    @Deprecated
     @Override
     protected Object @NonNull [] readObject(@NonNull ObjectInputStream ois) throws ClassNotFoundException, IOException {
         return checkNotNull((Object[]) ois.readObject());
@@ -84,7 +85,7 @@ public class XmlPatternSegmentStoreModule extends AbstractSegmentStoreAnalysisMo
     }
 
     @Override
-    protected @Nullable String getDataFileName() {
+    protected String getDataFileName() {
         return getId() + XmlPatternAnalysis.SEGMENT_STORE_EXTENSION;
     }
 

@@ -159,10 +159,16 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
         if (segmentStoreProviderModule instanceof IAnalysisModule) {
             ((IAnalysisModule) segmentStoreProviderModule).waitForCompletion();
         }
-
+        long t0 = start;
+        long t1 = end;
+        if (end < start) {
+            t0 = end;
+            t1 = start;
+        }
         ISegmentStore<@NonNull ISegment> segmentStore = segmentStoreProviderModule.getSegmentStore();
-        return segmentStore != null ? start != TmfTimeRange.ETERNITY.getStartTime().toNanos() || end != TmfTimeRange.ETERNITY.getEndTime().toNanos() ? (Iterable<@NonNull ISegment>) segmentStore.getIntersectingElements(start, end) : segmentStore
-                : Collections.EMPTY_LIST;
+        return segmentStore != null ? t0 != TmfTimeRange.ETERNITY.getStartTime().toNanos() || t1 != TmfTimeRange.ETERNITY.getEndTime().toNanos() ?
+                (Iterable<@NonNull ISegment>) segmentStore.getIntersectingElements(t0, t1) : segmentStore
+                : Collections.emptyList();
     }
 
     private static @Nullable IStatistics<ISegment> calculateTotalManual(Iterable<@NonNull ISegment> segments, IProgressMonitor monitor) {

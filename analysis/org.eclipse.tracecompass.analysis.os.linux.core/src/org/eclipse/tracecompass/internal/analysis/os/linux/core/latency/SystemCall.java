@@ -9,11 +9,10 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.latency;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
+import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWriter;
+import org.eclipse.tracecompass.datastore.core.serialization.SafeByteBufferFactory;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.segment.interfaces.INamedSegment;
 
@@ -26,6 +25,11 @@ import org.eclipse.tracecompass.segmentstore.core.segment.interfaces.INamedSegme
 public final class SystemCall implements INamedSegment {
 
     private static final long serialVersionUID = 1554494342105208730L;
+
+    /**
+     * The reader for this segment class
+     */
+    public static final IHTIntervalReader<ISegment> READER = buffer -> new SystemCall(buffer.getLong(), buffer.getLong(), buffer.getString());
 
     /**
      * The subset of information that is available from the syscall entry event.
@@ -49,9 +53,9 @@ public final class SystemCall implements INamedSegment {
         }
     }
 
-    private long fStartTime;
-    private long fEndTime;
-    private String fName;
+    private final long fStartTime;
+    private final long fEndTime;
+    private final String fName;
 
     /**
      * @param info
@@ -67,16 +71,10 @@ public final class SystemCall implements INamedSegment {
         fEndTime = endTime;
     }
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeLong(fStartTime);
-        out.writeLong(fEndTime);
-        out.writeUTF(fName);
-    }
-
-    private void readObject(ObjectInputStream in) throws IOException {
-        fStartTime = in.readLong();
-        fEndTime = in.readLong();
-        fName = in.readUTF().intern();
+    private SystemCall(long startTime, long endTime, String name) {
+        fStartTime = startTime;
+        fEndTime = endTime;
+        fName = name;
     }
 
     @Override
@@ -100,6 +98,18 @@ public final class SystemCall implements INamedSegment {
     }
 
     @Override
+    public int getSizeOnDisk() {
+        return 2 * Long.BYTES + SafeByteBufferFactory.getStringSizeInBuffer(fName);
+    }
+
+    @Override
+    public void writeSegment(@NonNull ISafeByteBufferWriter buffer) {
+        buffer.putLong(fStartTime);
+        buffer.putLong(fEndTime);
+        buffer.putString(fName);
+    }
+
+    @Override
     public int compareTo(@NonNull ISegment o) {
         int ret = INamedSegment.super.compareTo(o);
         if (ret != 0) {
@@ -115,4 +125,5 @@ public final class SystemCall implements INamedSegment {
                 "; Duration = " + getLength() + //$NON-NLS-1$
                 "; Name = " + getName(); //$NON-NLS-1$
     }
+
 }

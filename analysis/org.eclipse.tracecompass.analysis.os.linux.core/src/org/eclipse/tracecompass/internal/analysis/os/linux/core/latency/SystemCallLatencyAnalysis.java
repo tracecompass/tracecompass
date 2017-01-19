@@ -28,8 +28,10 @@ import org.eclipse.tracecompass.analysis.os.linux.core.tid.TidAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisEventBasedModule;
+import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
+import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory.SegmentStoreType;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
@@ -48,8 +50,6 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
      * The ID of this analysis
      */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.latency.syscall"; //$NON-NLS-1$
-
-    private static final String DATA_FILENAME = "latency-analysis.dat"; //$NON-NLS-1$
 
     private static final Collection<ISegmentAspect> BASE_ASPECTS =
             ImmutableList.of(SyscallNameAspect.INSTANCE);
@@ -78,15 +78,21 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
     }
 
     @Override
-    public @NonNull String getDataFileName() {
-        return DATA_FILENAME;
+    protected @NonNull SegmentStoreType getSegmentStoreType() {
+        return SegmentStoreType.OnDisk;
     }
 
     @Override
-    public AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> syscalls) {
+    protected  AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> syscalls) {
         return new SyscallLatencyAnalysisRequest(syscalls);
     }
 
+    @Override
+    protected @NonNull IHTIntervalReader<ISegment> getSegmentReader() {
+        return SystemCall.READER;
+    }
+
+    @Deprecated
     @Override
     protected Object[] readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
         return checkNotNull((Object[]) ois.readObject());
@@ -159,7 +165,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
                 }
 
                 long endTime = event.getTimestamp().toNanos();
-                ISegment syscall = new SystemCall(info, endTime);
+                SystemCall syscall = new SystemCall(info, endTime);
                 getSegmentStore().add(syscall);
             }
         }

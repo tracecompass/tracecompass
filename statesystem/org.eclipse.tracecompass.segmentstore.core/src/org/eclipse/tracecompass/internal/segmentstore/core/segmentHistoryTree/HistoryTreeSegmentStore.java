@@ -145,6 +145,15 @@ public class HistoryTreeSegmentStore<E extends ISegment> implements ISegmentStor
         fFinishedBuilding = true;
     }
 
+    @Override
+    public void close(boolean deleteFiles) {
+        if (deleteFiles) {
+            removeFiles();
+        } else {
+            finishedBuilding(getEndTime());
+        }
+    }
+
     /**
      * delete the SHT files from disk
      */

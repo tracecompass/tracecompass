@@ -12,21 +12,26 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
+import org.eclipse.tracecompass.internal.analysis.timing.core.Activator;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory;
+import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory.SegmentStoreType;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
@@ -44,6 +49,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
  */
 public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnalysisModule implements ISegmentStoreProvider {
 
+    private static final String EXTENSION = ".ss"; //$NON-NLS-1$
     private final ListenerList fListeners = new ListenerList(ListenerList.IDENTITY);
 
     private @Nullable ISegmentStore<ISegment> fSegmentStore;
@@ -81,10 +87,10 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
     /**
      * Returns the file name for storing segment store
      *
-     * @return segment store fine name, or null if you don't want a file
+     * @return segment store file name
      */
-    protected @Nullable String getDataFileName() {
-        return null;
+    protected String getDataFileName() {
+        return getId() + EXTENSION;
     }
 
     /**
@@ -97,7 +103,10 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
      *             - Class of a serialized object cannot be found.
      * @throws IOException
      *             - Any of the usual Input/Output related exceptions.
+     * @deprecated The segment store analysis modules are either on disk or all
+     *             in memory, no in between anymore
      */
+    @Deprecated
     protected abstract Object[] readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException;
 
     /**
@@ -119,6 +128,28 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
      */
     protected abstract boolean buildAnalysisSegments(ISegmentStore<ISegment> segmentStore, IProgressMonitor monitor) throws TmfAnalysisException;
 
+    /**
+     * Get the reader for the segments on disk. If the segment store is not on
+     * disk, this method can return null.
+     *
+     * @return The segment reader
+     * @since 3.0
+     */
+    protected IHTIntervalReader<ISegment> getSegmentReader() {
+        throw new UnsupportedOperationException("getSegmentReader: This method should be overriden in classes that saves the segment store on disk"); //$NON-NLS-1$
+    }
+
+    /**
+     * Get the type of segment store to build. By default it is
+     * {@link SegmentStoreType#Fast}
+     *
+     * @return The type of segment store to build
+     * @since 3.0
+     */
+    protected SegmentStoreType getSegmentStoreType() {
+        return SegmentStoreType.Fast;
+    }
+
     @Override
     public @Nullable ISegmentStore<ISegment> getSegmentStore() {
         return fSegmentStore;
@@ -135,60 +166,83 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
 
     @Override
     protected boolean executeAnalysis(IProgressMonitor monitor) throws TmfAnalysisException {
-        ITmfTrace trace = checkNotNull(getTrace());
-
-        final @Nullable String dataFileName = getDataFileName();
-        if (dataFileName != null) {
-            /* See if the data file already exists on disk */
-            String dir = TmfTraceManager.getSupplementaryFileDir(trace);
-            final Path file = Paths.get(dir, dataFileName);
-
-            if (Files.exists(file)) {
-                /* Attempt to read the existing file */
-                try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(file))) {
-                    Object[] segmentArray = readObject(ois);
-                    ISegmentStore<ISegment> store = SegmentStoreFactory.createSegmentStore(NonNullUtils.checkNotNullContents(segmentArray));
-                    fSegmentStore = store;
-                    sendUpdate(store);
-                    return true;
-                } catch (IOException | ClassNotFoundException | ClassCastException e) {
-                    /*
-                     * We did not manage to read the file successfully, we will
-                     * just fall-through to rebuild a new one.
-                     */
-                    try {
-                        Files.delete(file);
-                    } catch (IOException e1) {
-                    }
-                }
-            }
+        SegmentStoreType type = getSegmentStoreType();
+        ISegmentStore<ISegment> store = null;
+        switch (type) {
+        case Distinct:
+            // Fall-through
+        case Fast:
+            // Fall-through
+        case Stable:
+            store = buildInMemorySegmentStore(type, monitor);
+            break;
+        case OnDisk:
+            final @Nullable String dataFileName = getDataFileName();
+            store = buildOnDiskSegmentStore(dataFileName, monitor);
+            break;
+        default:
+            Activator.getInstance().logError("Unknown segment store type: " + type); //$NON-NLS-1$
+            break;
         }
 
-        ISegmentStore<ISegment> segmentStore = SegmentStoreFactory.createSegmentStore();
-        boolean completed = buildAnalysisSegments(segmentStore, monitor);
-        if (!completed) {
+        if (store == null) {
             return false;
         }
-        fSegmentStore = segmentStore;
 
-        if (dataFileName != null) {
-            String dir = TmfTraceManager.getSupplementaryFileDir(trace);
-            final Path file = Paths.get(dir, dataFileName);
+        fSegmentStore = store;
+        sendUpdate(store);
+        return true;
+    }
 
-            /* Serialize the collections to disk for future usage */
-            try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(file))) {
-                oos.writeObject(segmentStore.toArray());
-            } catch (IOException e) {
-                /*
-                 * Didn't work, oh well. We will just re-read the trace next
-                 * time
-                 */
+    private @Nullable ISegmentStore<@NonNull ISegment> buildOnDiskSegmentStore(@Nullable String dataFileName, IProgressMonitor monitor) throws TmfAnalysisException {
+        ITmfTrace trace = checkNotNull(getTrace());
+
+        String fileName = dataFileName;
+        if (fileName == null) {
+            fileName = getId() + ".ss"; //$NON-NLS-1$
+        }
+        /* See if the data file already exists on disk */
+        String dir = TmfTraceManager.getSupplementaryFileDir(trace);
+        final Path file = Paths.get(dir, fileName);
+
+        boolean built = false;
+        ISegmentStore<ISegment> segmentStore;
+        try {
+            // Compare the file creation time to determine if this analysis is
+            // built from scratch or not
+            FileTime origCreationTime = (Files.exists(file) ? NonNullUtils.checkNotNull(Files.readAttributes(file, BasicFileAttributes.class)).creationTime() : FileTime.fromMillis(0));
+            segmentStore = SegmentStoreFactory.createOnDiskSegmentStore(file, getSegmentReader());
+            FileTime creationTime = NonNullUtils.checkNotNull(Files.readAttributes(file, BasicFileAttributes.class)).creationTime();
+            built = origCreationTime.equals(creationTime);
+        } catch (IOException e) {
+            try {
+                Files.deleteIfExists(file);
+            } catch (IOException e1) {
+                // Ignore
             }
+            Activator.getInstance().logError("Error creating segment store", e); //$NON-NLS-1$
+            return null;
         }
 
-        sendUpdate(segmentStore);
+        if (built) {
+            return segmentStore;
+        }
+        boolean completed = buildAnalysisSegments(segmentStore, monitor);
+        if (!completed) {
+            return null;
+        }
 
-        return true;
+        return segmentStore;
+    }
+
+    private @Nullable ISegmentStore<@NonNull ISegment> buildInMemorySegmentStore(SegmentStoreType type, IProgressMonitor monitor) throws TmfAnalysisException {
+        ISegmentStore<ISegment> segmentStore = SegmentStoreFactory.createSegmentStore(type);
+        boolean completed = buildAnalysisSegments(segmentStore, monitor);
+        if (!completed) {
+            return null;
+        }
+
+        return segmentStore;
     }
 
     /**

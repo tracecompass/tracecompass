@@ -57,7 +57,17 @@ public final class SegmentStoreFactory<E> {
         /**
          * Segment Store should contain no duplicate segments
          */
-        Distinct
+        Distinct,
+        /**
+         * Segment store that doesn't have to reside entirely in memory, ideal
+         * for very large stores, the performance are not as high as the other
+         * segment stores. These kind of stores should be created using the
+         * {@link SegmentStoreFactory#createOnDiskSegmentStore(Path, IHTIntervalReader)}
+         * factory method
+         *
+         * @since 2.0
+         */
+        OnDisk
     }
 
     private SegmentStoreFactory() {
