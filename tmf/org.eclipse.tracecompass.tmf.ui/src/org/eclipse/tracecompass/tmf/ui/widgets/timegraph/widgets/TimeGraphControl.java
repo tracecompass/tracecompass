@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2016 Intel Corporation and others
+ * Copyright (c) 2007, 2017 Intel Corporation and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -164,6 +164,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private boolean fMouseOverSplitLine = false;
     private int fGlobalItemHeight = CUSTOM_ITEM_HEIGHT;
     private int fHeightAdjustment = 0;
+    private int fMaxItemHeight = 0;
     private Map<Integer, Font> fFonts = new HashMap<>();
     private boolean fBlendSubPixelEvents = false;
     private int fMinimumItemWidth = 0;
@@ -1243,6 +1244,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             fHeightAdjustment++;
         } else {
             fHeightAdjustment--;
+            fHeightAdjustment = Math.max(fHeightAdjustment, 1 - fMaxItemHeight);
         }
         fItemData.refreshData();
         redraw();
@@ -3371,6 +3373,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         public void refreshData() {
             ITimeGraphEntry selection = getSelectedTrace();
             Map<ITimeGraphEntry, Item> itemMap = new LinkedHashMap<>();
+            fMaxItemHeight = 0;
             for (int i = 0; i < fRootEntries.length; i++) {
                 ITimeGraphEntry entry = fRootEntries[i];
                 refreshData(itemMap, null, 0, entry);
@@ -3398,6 +3401,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             } else {
                 item.fItemHeight = fGlobalItemHeight;
             }
+            fMaxItemHeight = Math.max(fMaxItemHeight, item.fItemHeight);
             item.fItemHeight = Math.max(1, item.fItemHeight + fHeightAdjustment);
             itemMap.put(entry, item);
             if (entry.hasChildren()) {
