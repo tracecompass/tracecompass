@@ -138,6 +138,25 @@ can be defined. See the class
 ''org.eclipse.tracecompass.internal.gdbtrace.ui.views.events.GdbEventsTable''
 for an example implementation.
 
+=== Perspective ===
+
+The  '''perspective''' element of the '''org.eclipse.linuxtools.tmf.ui.tracetypeui'''
+extension point allows for configuring the default perspective associated with a
+trace type. If omitted, the current perspective will be used.
+
+To configure an associated perspective, first add the
+'''perspective''' element to the trace type in the extension definition.
+This can be done by selecting the trace type in the plug-in manifest editor.
+Then click the right mouse button and select '''New -> perspective''' in the
+context sensitive menu. Then select the newly added element and select the
+''id'' text field on the right side of the manifest editor. Enter the associated
+perspective id, which can be found in the '''org.eclipse.ui.perspectives'''
+extension that defines the perspective.
+
+By using this element, the workbench will switch to the associated perspective
+when a trace of this trace type is opened. This behavior can be controlled by a
+user dialog or preference.
+
 == Other Considerations ==
 
 Other views and components may provide additional features that are active only

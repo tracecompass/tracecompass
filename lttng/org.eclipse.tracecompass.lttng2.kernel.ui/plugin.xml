@@ -52,6 +52,9 @@
       <type
             icon="icons/obj16/garland16.png"
             tracetype="org.eclipse.linuxtools.lttng2.kernel.tracetype">
+         <perspective
+               id="org.eclipse.linuxtools.lttng2.kernel.ui.perspective">
+         </perspective>
       </type>
    </extension>
    <extension

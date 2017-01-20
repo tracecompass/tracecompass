@@ -58,6 +58,7 @@
          <sequence>
             <element ref="eventsTableType" minOccurs="0" maxOccurs="1"/>
             <element ref="defaultEditor" minOccurs="0" maxOccurs="1"/>
+            <element ref="perspective" minOccurs="0" maxOccurs="1"/>
          </sequence>
          <attribute name="tracetype" type="string" use="required">
             <annotation>
@@ -92,6 +93,7 @@
          <sequence>
             <element ref="eventsTableType" minOccurs="0" maxOccurs="1"/>
             <element ref="defaultEditor" minOccurs="0" maxOccurs="1"/>
+            <element ref="perspective" minOccurs="0" maxOccurs="1"/>
          </sequence>
          <attribute name="tracetype" type="string" use="required">
             <annotation>
@@ -157,6 +159,25 @@ If empty, the default events editor will be used.
       </complexType>
    </element>
 
+   <element name="perspective">
+      <annotation>
+         <documentation>
+            The associated perspective to use for this trace type.
+If omitted, the current perspective will be used.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="default" value="org.eclipse.linuxtools.tmf.ui.perspective">
+            <annotation>
+               <documentation>
+                  The associated perspective to use for this trace type.
+If empty, the current perspective will be used.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
    <annotation>
       <appinfo>
          <meta.section type="since"/>
@@ -213,7 +234,7 @@ If empty, the default events editor will be used.
          <meta.section type="copyright"/>
       </appinfo>
       <documentation>
-         Copyright (c) 2014 Ericsson
+         Copyright (c) 2014, 2017 Ericsson
 
 All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at &lt;a href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
       </documentation>

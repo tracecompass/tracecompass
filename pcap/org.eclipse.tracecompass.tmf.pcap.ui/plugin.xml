@@ -6,6 +6,9 @@
       <type
             icon="icons/pcap.png"
             tracetype="org.eclipse.linuxtools.tmf.pcap.core.pcaptrace">
+         <perspective
+               id="org.eclipse.linuxtools.tmf.pcap.ui.perspective.network">
+         </perspective>
       </type>
    </extension>
    <extension

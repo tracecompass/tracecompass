@@ -42,6 +42,7 @@ import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType.TraceElementType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsTable;
 import org.osgi.framework.Bundle;
 
@@ -72,6 +73,14 @@ public final class TmfTraceTypeUIUtils {
 
     /** Extension point element 'Event Table Columns' */
     public static final String EVENT_TABLE_COLUMNS = "eventTableColumns"; //$NON-NLS-1$
+
+    /** Extension point element 'perspective'
+     * @since 2.3*/
+    public static final String PERSPECTIVE_ELEM = "perspective"; //$NON-NLS-1$
+
+    /** Extension point attribute 'id'
+     * @since 2.3*/
+    public static final String ID_ATTR = "id"; //$NON-NLS-1$
 
     /** Extension point attribute 'tracetype' */
     public static final String TRACETYPE_ATTR = "tracetype"; //$NON-NLS-1$
@@ -292,7 +301,8 @@ public final class TmfTraceTypeUIUtils {
             return null;
         }
 
-        for (final IConfigurationElement ce : TmfTraceTypeUIUtils.getTypeUIElements(TraceElementType.TRACE)) {
+        TraceElementType elType = (trace instanceof TmfExperiment) ? TraceElementType.EXPERIMENT : TraceElementType.TRACE;
+        for (final IConfigurationElement ce : TmfTraceTypeUIUtils.getTypeUIElements(elType)) {
             if (ce.getAttribute(TmfTraceTypeUIUtils.TRACETYPE_ATTR).equals(traceType)) {
                 final IConfigurationElement[] eventsTableTypeCE = ce.getChildren(TmfTraceTypeUIUtils.EVENTS_TABLE_TYPE_ELEM);
 
@@ -315,6 +325,40 @@ public final class TmfTraceTypeUIUtils {
                         IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                     return null;
                 }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get the perspective id specified by the trace type's extension point, if
+     * there is one.
+     *
+     * @param trace
+     *            The trace for which we want the perspective id.
+     * @return The corresponding perspective id, or 'null' if this trace type
+     *         did not specify any.
+     * @since 2.3
+     */
+    public static @Nullable String getPerspectiveId(ITmfTrace trace) {
+        final String traceType = getTraceType(trace);
+        if (traceType == null) {
+            return null;
+        }
+
+        TraceElementType elType = (trace instanceof TmfExperiment) ? TraceElementType.EXPERIMENT : TraceElementType.TRACE;
+        for (final IConfigurationElement ce : TmfTraceTypeUIUtils.getTypeUIElements(elType)) {
+            if (ce.getAttribute(TRACETYPE_ATTR).equals(traceType)) {
+                final IConfigurationElement[] perspectiveCE = ce.getChildren(PERSPECTIVE_ELEM);
+
+                if (perspectiveCE.length != 1) {
+                    break;
+                }
+                final String perspectiveId = perspectiveCE[0].getAttribute(ID_ATTR);
+                if (!perspectiveId.isEmpty()) {
+                    return perspectiveId;
+                }
+                break;
             }
         }
         return null;
