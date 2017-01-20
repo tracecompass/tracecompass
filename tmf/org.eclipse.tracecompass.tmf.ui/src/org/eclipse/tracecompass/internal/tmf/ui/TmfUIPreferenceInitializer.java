@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.tmf.ui;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 
 /**
  * Initializes TMF UI preferences
@@ -25,5 +26,6 @@ public class TmfUIPreferenceInitializer extends AbstractPreferenceInitializer {
     public void initializeDefaultPreferences() {
         IEclipsePreferences defaultPreferences = DefaultScope.INSTANCE.getNode(Activator.PLUGIN_ID);
         defaultPreferences.putBoolean(ITmfUIPreferences.PREF_ALIGN_VIEWS, true);
+        defaultPreferences.put(ITmfUIPreferences.SWITCH_TO_PERSPECTIVE, MessageDialogWithToggle.PROMPT);
     }
 }

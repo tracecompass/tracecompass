@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -27,4 +27,9 @@ public interface ITmfUIPreferences {
      * Preference (not user visible) for saving the last location used when using "Open Trace"
      */
     String PREF_SAVED_OPEN_FILE_LOCATION = "PREF_LAST_OPEN_FILE_LOCATION"; //$NON-NLS-1$
+
+    /**
+     * Preference to switch to associated perspective when opening a trace
+     */
+    String SWITCH_TO_PERSPECTIVE = "SWITCH_TO_PERSPECTIVE"; //$NON-NLS-1$
 }

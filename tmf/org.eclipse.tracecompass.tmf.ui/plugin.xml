@@ -1820,6 +1820,12 @@
             id="org.eclipse.linuxtools.tmf.ui.preferences.timestamp.format"
             name="%preferences.page.timestamp.format">
       </page>
+      <page
+            category="org.eclipse.linuxtools.tmf.ui.TmfTracingPreferences"
+            class="org.eclipse.tracecompass.internal.tmf.ui.preferences.PerspectivesPreferencePage"
+            id="org.eclipse.tracecompass.tmf.ui.preferences.perspectives"
+            name="%preferences.page.perspectives">
+      </page>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.ui.uml2SDLoader">
@@ -1975,5 +1981,11 @@
             id="org.eclipse.tracecompass.tmf.ui.providerFactory1"
             priority="0">
       </providerFactory>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.tracecompass.internal.tmf.ui.TmfUIPreferenceInitializer">
+      </initializer>
    </extension>
 </plugin>

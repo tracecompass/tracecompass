@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 Ericsson
+ * Copyright (c) 2012, 2017 Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -345,6 +345,11 @@ public class Messages extends NLS {
     public static String ExportToTextJob_Export_to;
     public static String ExportToTextJob_Export_trace_to;
     public static String ExportToTextJob_Unable_to_export_trace;
+
+    public static String PerspectivesPreferencePage_SwitchToPerspectiveGroupText;
+    public static String PerspectivesPreferencePage_SwitchToPerspectiveAlways;
+    public static String PerspectivesPreferencePage_SwitchToPerspectiveNever;
+    public static String PerspectivesPreferencePage_SwitchToPerspectivePrompt;
 
     static {
         // initialize resource bundle
