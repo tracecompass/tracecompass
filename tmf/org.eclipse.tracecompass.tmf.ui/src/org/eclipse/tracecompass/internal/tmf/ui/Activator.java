@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2009, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -21,6 +21,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.internal.tmf.ui.markers.LostEventsMarkerEventSourceFactory;
+import org.eclipse.tracecompass.internal.tmf.ui.perspectives.TmfPerspectiveManager;
 import org.eclipse.tracecompass.internal.tmf.ui.views.TmfAlignmentSynchronizer;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -96,6 +97,7 @@ public class Activator extends AbstractUIPlugin {
         TmfUiTracer.init();
         TmfTraceElement.init();
         TmfExperimentElement.init();
+        TmfPerspectiveManager.init();
 
         fTmfEventAdapterFactory = new TmfEventAdapterFactory();
         Platform.getAdapterManager().registerAdapters(fTmfEventAdapterFactory, ITmfEvent.class);
@@ -109,6 +111,7 @@ public class Activator extends AbstractUIPlugin {
         TmfUiRefreshHandler.getInstance().dispose();
         TmfAlignmentSynchronizer.getInstance().dispose();
         TmfProjectRegistry.dispose();
+        TmfPerspectiveManager.dispose();
         plugin = null;
 
         Platform.getAdapterManager().unregisterAdapters(fTmfEventAdapterFactory);

@@ -41,6 +41,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.Point;
@@ -71,6 +73,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.ITmfUIPreferences;
 import org.eclipse.tracecompass.internal.tmf.ui.project.operations.NewExperimentOperation;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
@@ -387,6 +391,10 @@ public final class SWTBotUtils {
                 makeShellFullyVisible(shell);
             }
         });
+
+        /* Do not switch perspectives on trace open */
+        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+        store.setValue(ITmfUIPreferences.SWITCH_TO_PERSPECTIVE, MessageDialogWithToggle.NEVER);
     }
 
     private static void printEnvironment() {

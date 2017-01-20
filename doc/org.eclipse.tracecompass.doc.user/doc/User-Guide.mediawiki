@@ -144,7 +144,7 @@ If you do not have any traces, sample LTTng traces can be found here [http://ltt
 Here are the quick steps to verify that your installation is functional using a LTTng trace:
 
 * Start Eclipse
-* Open the LTTng perspective
+* Open the LTTng Kernel perspective
 * Create a Tracing project
 ** Right-click in the Project Explorer view and select New, Tracing Project
 ** Enter the name of your project (e.g. "MyLTTngProject")
@@ -460,6 +460,8 @@ After selecting the trace type, the trace icon will be updated with the correspo
 A trace or experiment can be opened by double-clicking the left mouse button on the trace or experiment in the '''Project Explorer''' view. Alternatively, select the trace or experiment in the in the '''Project Explorer''' view and click the right mouse button. Then select '''Open''' menu item of the context-sensitive menu. If there is no trace type set for a file resource then the file will be opened in the default editor associated with this file type.
 
 [[Image:images/OpenTraceAction.png]]
+
+If there is a default perspective associated with the opened trace or experiment and it is not the active perspective, the user will be prompted to switch to this perspective. The user can choose to remember this decision. The user preference can be later updated in the '''Perspectives''' preference page. Select '''Window > Preferences''' in the main menu, then select '''Tracing > Perspectives''' in the tree, and choose one of the options under '''Open the associated perspective when a trace is opened'''..
 
 When opening a trace or experiment, all currently opened views which are relevant for the corresponding trace type will be updated.
 

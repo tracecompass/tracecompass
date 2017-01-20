@@ -351,6 +351,11 @@ public class Messages extends NLS {
     public static String PerspectivesPreferencePage_SwitchToPerspectiveNever;
     public static String PerspectivesPreferencePage_SwitchToPerspectivePrompt;
 
+    public static String TmfPerspectiveManager_SwitchPerspectiveDialogMessage;
+    public static String TmfPerspectiveManager_SwitchPerspectiveDialogTitle;
+    public static String TmfPerspectiveManager_SwitchPerspectiveErrorMessage;
+    public static String TmfPerspectiveManager_SwitchPerspectiveErrorTitle;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
