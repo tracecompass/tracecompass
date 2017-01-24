@@ -13,7 +13,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.resolver.INumericalResolver;
 
 /**
- * Generic descriptor that describes a time range duration.
+ * Generic descriptor that describes a time range duration. Its default units
+ * are nanoseconds.
  *
  * @param <T>
  *            The type of the input it understands
@@ -43,7 +44,21 @@ public class DataChartDurationDescriptor<T, R extends Number> extends DataChartN
      *            The resolver used for mapping durations
      */
     public DataChartDurationDescriptor(String name, INumericalResolver<T, R> resolver) {
-        super(name, resolver);
+        super(name, resolver, UNIT);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param name
+     *            The name of the descriptor
+     * @param resolver
+     *            The resolver used for mapping numbers
+     * @param unit
+     *            The unit of this descriptor, eg. s, ms, ns
+     */
+    public DataChartDurationDescriptor(String name, INumericalResolver<T, R> resolver, @Nullable String unit) {
+        super(name, resolver, unit);
     }
 
     // ------------------------------------------------------------------------
@@ -53,11 +68,6 @@ public class DataChartDurationDescriptor<T, R extends Number> extends DataChartN
     @Override
     public void accept(IDescriptorVisitor visitor) {
         visitor.visit(this);
-    }
-
-    @Override
-    public @Nullable String getUnit() {
-        return UNIT;
     }
 
 }

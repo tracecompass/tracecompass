@@ -14,5 +14,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.tmf.chart.core
 Export-Package: org.eclipse.tracecompass.internal.tmf.chart.core.tests;x-internal:=true,
  org.eclipse.tracecompass.tmf.chart.core.tests.chart,
+ org.eclipse.tracecompass.tmf.chart.core.tests.consumer,
+ org.eclipse.tracecompass.tmf.chart.core.tests.descriptor,
  org.eclipse.tracecompass.tmf.chart.core.tests.resolver,
  org.eclipse.tracecompass.tmf.chart.core.tests.stubs

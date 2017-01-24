@@ -34,6 +34,8 @@ public class DataChartNumericalDescriptor<T, R extends Number> implements IDataC
     private final String fName;
     private final INumericalResolver<T, R> fResolver;
 
+    private final @Nullable String fUnit;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -47,8 +49,23 @@ public class DataChartNumericalDescriptor<T, R extends Number> implements IDataC
      *            The resolver used for mapping numbers
      */
     public DataChartNumericalDescriptor(String name, INumericalResolver<T, R> resolver) {
+        this(name, resolver, null);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param name
+     *            The name of the descriptor
+     * @param resolver
+     *            The resolver used for mapping numbers
+     * @param unit
+     *            The unit of this descriptor, eg. s, ms, ns
+     */
+    public DataChartNumericalDescriptor(String name, INumericalResolver<T, R> resolver, @Nullable String unit) {
         fName = name;
         fResolver = resolver;
+        fUnit = unit;
     }
 
     // ------------------------------------------------------------------------
@@ -72,7 +89,7 @@ public class DataChartNumericalDescriptor<T, R extends Number> implements IDataC
 
     @Override
     public @Nullable String getUnit() {
-        return null;
+        return fUnit;
     }
 
     @Override
