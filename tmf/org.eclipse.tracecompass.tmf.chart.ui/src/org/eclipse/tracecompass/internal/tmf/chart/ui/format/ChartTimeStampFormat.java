@@ -17,7 +17,7 @@ import java.text.Format;
 import java.text.ParsePosition;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRange;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRangeMap;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 
@@ -84,6 +84,15 @@ public class ChartTimeStampFormat extends Format {
         fRangeMap = map;
     }
 
+    /**
+     * Get the pattern string of the format.
+     *
+     * @return the pattern string.
+     */
+    public String getPattern() {
+        return NonNullUtils.checkNotNull(fFormat.toPattern());
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -101,14 +110,6 @@ public class ChartTimeStampFormat extends Format {
         if (rangeMap == null) {
             long time = ((Number) obj).longValue();
             return checkNotNull(toAppendTo.append(fFormat.format(time)));
-        }
-
-        ChartRange internalRange = rangeMap.getPlottedRange();
-        ChartRange externalRange = rangeMap.getInputDataRange();
-
-        /* If any range's delta is null, format with the external bounds */
-        if (internalRange.isDeltaNull() || externalRange.isDeltaNull()) {
-            return checkNotNull(toAppendTo.append(fFormat.format(externalRange.getMinimum().doubleValue())));
         }
 
         /* Find external value before formatting */

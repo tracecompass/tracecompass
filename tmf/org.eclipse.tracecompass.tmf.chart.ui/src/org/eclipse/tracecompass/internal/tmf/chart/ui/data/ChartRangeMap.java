@@ -187,4 +187,9 @@ public class ChartRangeMap {
         return checkNotNull(externalValue);
     }
 
+    @Override
+    public String toString() {
+        return "ChartRangeMap: Input Data -> " + fInputDataRange + ", Plotted -> " + fPlottedRange + "]";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+    }
+
 }

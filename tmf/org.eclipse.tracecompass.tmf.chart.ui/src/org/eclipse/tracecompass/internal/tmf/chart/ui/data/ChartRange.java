@@ -14,7 +14,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.math.BigDecimal;
 
 /**
- * BigDecimal based range representation
+ * BigDecimal based range representation. The chart range cannot be 0.
  *
  * @author Jonathan Rajotte-Julien
  */
@@ -50,9 +50,20 @@ public class ChartRange {
      *            The maximum value of the range
      */
     public ChartRange(BigDecimal minimum, BigDecimal maximum) {
-        fMinimum = minimum;
-        fMaximum = maximum;
-        fRange = checkNotNull(maximum.subtract(minimum));
+        BigDecimal subtract = maximum.subtract(minimum);
+        if (minimum.compareTo(maximum) > 0) {
+            throw new IllegalArgumentException("ChartRange: minimum should be lower than or equal to the maximum (min: " + minimum + ", max: " + maximum + ')'); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        if (BigDecimal.ZERO.equals(subtract)) {
+            // Minimum and maximum values are all the same, so add 1 to the minimum
+            fMinimum = minimum;
+            fMaximum = minimum.add(BigDecimal.ONE);
+            fRange = checkNotNull(BigDecimal.ONE);
+        } else {
+            fMinimum = minimum;
+            fMaximum = maximum;
+            fRange = checkNotNull(subtract);
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -87,41 +98,6 @@ public class ChartRange {
         return fRange;
     }
 
-    /**
-     * Method that checks if the delta is equal to zero.
-     *
-     * @return {@code true} if the delta is null, else {@code false}
-     */
-    public boolean isDeltaNull() {
-        return getDelta().compareTo(BigDecimal.ZERO) == 0;
-    }
-
-    // ------------------------------------------------------------------------
-    // Mutators
-    // ------------------------------------------------------------------------
-
-    /**
-     * Mutator that sets the minimum value of the range.
-     *
-     * @param minimum
-     *            The new minimum value
-     */
-    public void setMinimum(BigDecimal minimum) {
-        fMinimum = minimum;
-        fRange = checkNotNull(getMaximum().subtract(getMinimum()));
-    }
-
-    /**
-     * Mutator that sets the maximum value of the range.
-     *
-     * @param maximum
-     *            The new maximum value
-     */
-    public void setMaximum(BigDecimal maximum) {
-        fMaximum = maximum;
-        fRange = checkNotNull(getMaximum().subtract(getMinimum()));
-    }
-
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -133,9 +109,17 @@ public class ChartRange {
      * @return The current range map
      */
     public ChartRange clamp() {
-        fMinimum = fMinimum.min(BigDecimal.ZERO);
+        if (fMinimum.compareTo(BigDecimal.ZERO) > 0) {
+            fMinimum = checkNotNull(BigDecimal.ZERO);
+            fRange = fMaximum;
+        }
 
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "ChartRange: [" + fMinimum + ", " + fMaximum + "]"; //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
     }
 
 }

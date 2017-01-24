@@ -15,7 +15,6 @@ import java.text.FieldPosition;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
-import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRange;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRangeMap;
 
 /**
@@ -102,15 +101,6 @@ public class ChartDecimalUnitFormat extends DecimalUnitFormat {
         ChartRangeMap rangeMap = fRangeMap;
         if (rangeMap == null) {
             StringBuffer buffer = super.format(number, toAppendTo, pos);
-            return (buffer == null ? new StringBuffer() : buffer);
-        }
-
-        ChartRange internalRange = rangeMap.getPlottedRange();
-        ChartRange externalRange = rangeMap.getInputDataRange();
-
-        /* If any range's delta is null, format with the external bounds */
-        if (internalRange.isDeltaNull() || externalRange.isDeltaNull()) {
-            StringBuffer buffer = super.format(externalRange.getMinimum().doubleValue(), toAppendTo, pos);
             return (buffer == null ? new StringBuffer() : buffer);
         }
 
