@@ -70,14 +70,16 @@ public class NumericalConsumerTest {
         IDataChartDescriptor<StubObject, ?> descriptor = fProvider.getDataDescriptor(StubChartProvider.LONG_DESCRIPTOR);
         Predicate<@Nullable Number> predicate = d -> true;
         NumericalConsumer consumer = new NumericalConsumer(INumericalResolver.class.cast(descriptor.getResolver()), predicate);
-        StubObject obj = new StubObject("str", 1, 10L, 10.0);
 
+        StubObject obj = new StubObject("str", 1, 10L, 10.0);
         assertTrue(consumer.test(obj));
         consumer.accept(obj);
         assertEquals(Long.valueOf(10L), consumer.getData().get(0));
 
         obj = new StubObject("str", 1, null, 10.0);
         assertTrue(consumer.test(obj));
+        consumer.accept(obj);
+        assertEquals(Long.valueOf(0L), consumer.getData().get(1));
     }
 
 }

@@ -9,8 +9,6 @@
 
 package org.eclipse.tracecompass.internal.tmf.chart.core.consumer;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -87,7 +85,11 @@ public class NumericalConsumer implements IDataConsumer {
 
     @Override
     public void accept(Object obj) {
-        Number number = checkNotNull(fResolver.getMapper().apply(obj));
+        Number number = fResolver.getMapper().apply(obj);
+
+        if (number == null) {
+            number = fResolver.getZeroValue();
+        }
 
         /* Update the minimum value */
         if (fResolver.getComparator().compare(number, fMin) < 0) {
