@@ -45,7 +45,7 @@ public class ChartTimeStampFormat extends Format {
     // ------------------------------------------------------------------------
 
     private final TmfTimestampFormat fFormat;
-    private @Nullable ChartRangeMap fRangeMap;
+    private final @Nullable ChartRangeMap fRangeMap;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -72,20 +72,6 @@ public class ChartTimeStampFormat extends Format {
      */
     public ChartTimeStampFormat(String pattern, @Nullable ChartRangeMap map) {
         fFormat = new TmfTimestampFormat(pattern);
-        fRangeMap = map;
-    }
-
-    // ------------------------------------------------------------------------
-    // Mutators
-    // ------------------------------------------------------------------------
-
-    /**
-     * Mutators that sets the chart range map of this formatter.
-     *
-     * @param map
-     *            The new chart range map
-     */
-    public void setRangeMap(ChartRangeMap map) {
         fRangeMap = map;
     }
 

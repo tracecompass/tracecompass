@@ -47,7 +47,7 @@ public class ChartDecimalUnitFormat extends DecimalUnitFormat {
     // Members
     // ------------------------------------------------------------------------
 
-    private @Nullable ChartRangeMap fRangeMap;
+    private final @Nullable ChartRangeMap fRangeMap;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -74,20 +74,6 @@ public class ChartDecimalUnitFormat extends DecimalUnitFormat {
      */
     public ChartDecimalUnitFormat(double factor, @Nullable ChartRangeMap map) {
         super(factor);
-        fRangeMap = map;
-    }
-
-    // ------------------------------------------------------------------------
-    // Mutators
-    // ------------------------------------------------------------------------
-
-    /**
-     * Mutators that sets the chart range map of this formatter.
-     *
-     * @param map
-     *            The new chart range map
-     */
-    public void setRangeMap(ChartRangeMap map) {
         fRangeMap = map;
     }
 
