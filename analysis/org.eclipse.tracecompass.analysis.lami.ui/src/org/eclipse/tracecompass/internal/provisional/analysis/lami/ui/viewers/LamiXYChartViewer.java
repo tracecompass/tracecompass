@@ -115,34 +115,34 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
                 );
 
     /**
-     * Time stamp formatter for intervals in the days range.
+     * Time stamp formatter pattern for intervals in the days range.
      */
-    protected static final LamiTimeStampFormat DAYS_FORMATTER = new LamiTimeStampFormat("dd HH:mm"); //$NON-NLS-1$
+    protected static final String DAYS_FORMATTER_PATTERN = "dd HH:mm"; //$NON-NLS-1$
 
     /**
-     * Time stamp formatter for intervals in the hours range.
+     * Time stamp formatter pattern for intervals in the hours range.
      */
-    protected static final LamiTimeStampFormat HOURS_FORMATTER = new LamiTimeStampFormat("HH:mm"); //$NON-NLS-1$
+    protected static final String HOURS_FORMATTER_PATTERN = "HH:mm"; //$NON-NLS-1$
 
     /**
-     * Time stamp formatter for intervals in the minutes range.
+     * Time stamp formatter pattern for intervals in the minutes range.
      */
-    protected static final LamiTimeStampFormat MINUTES_FORMATTER = new LamiTimeStampFormat("mm:ss"); //$NON-NLS-1$
+    protected static final String MINUTES_FORMATTER_PATTERN = "mm:ss"; //$NON-NLS-1$
 
     /**
-     * Time stamp formatter for intervals in the seconds range.
+     * Time stamp formatter pattern for intervals in the seconds range.
      */
-    protected static final LamiTimeStampFormat SECONDS_FORMATTER = new LamiTimeStampFormat("ss"); //$NON-NLS-1$
+    protected static final String SECONDS_FORMATTER_PATTERN = "ss"; //$NON-NLS-1$
 
     /**
-     * Time stamp formatter for intervals in the milliseconds range.
+     * Time stamp formatter pattern for intervals in the milliseconds range.
      */
-    protected static final LamiTimeStampFormat MILLISECONDS_FORMATTER = new LamiTimeStampFormat("ss.SSS"); //$NON-NLS-1$
+    protected static final String MILLISECONDS_FORMATTER_PATTERN = "ss.SSS"; //$NON-NLS-1$
 
     /**
-     * Decimal formatter to display nanoseconds as seconds.
+     * Decimal formatter factor to display nanoseconds as seconds.
      */
-    protected static final DecimalUnitFormat NANO_TO_SECS_FORMATTER = new LamiDecimalUnitFormat(0.000000001);
+    protected static final double NANO_TO_SECS_FORMATTER_FACTOR = 0.000000001;
 
     /**
      * Default decimal formatter.
@@ -478,7 +478,7 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
      */
     protected static Format getContinuousAxisFormatter(List<LamiTableEntryAspect> axisAspects, List<LamiTableEntry> entries , @Nullable LamiGraphRange internalRange, @Nullable LamiGraphRange externalRange) {
 
-        Format formatter = DECIMAL_FORMATTER;
+        Format formatter = null;
 
         if (areAspectsTimeStamp(axisAspects)) {
             /* Set a TimeStamp formatter depending on the duration between the first and last value */
@@ -498,33 +498,25 @@ public abstract class LamiXYChartViewer extends TmfViewer implements ILamiViewer
 
             long duration = max.subtract(min).longValue();
             if (duration > TimeUnit.DAYS.toNanos(1)) {
-                formatter = DAYS_FORMATTER;
+                formatter = new LamiTimeStampFormat(DAYS_FORMATTER_PATTERN, internalRange, externalRange);
             } else if (duration > TimeUnit.HOURS.toNanos(1)) {
-                formatter = HOURS_FORMATTER;
+                formatter = new LamiTimeStampFormat(HOURS_FORMATTER_PATTERN, internalRange, externalRange);
             } else if (duration > TimeUnit.MINUTES.toNanos(1)) {
-                formatter = MINUTES_FORMATTER;
+                formatter = new LamiTimeStampFormat(MINUTES_FORMATTER_PATTERN, internalRange, externalRange);
             } else if (duration > TimeUnit.SECONDS.toNanos(15)) {
-                formatter = SECONDS_FORMATTER;
+                formatter = new LamiTimeStampFormat(SECONDS_FORMATTER_PATTERN, internalRange, externalRange);
             } else {
-                formatter = MILLISECONDS_FORMATTER;
+                formatter = new LamiTimeStampFormat(MILLISECONDS_FORMATTER_PATTERN, internalRange, externalRange);
             }
-            ((LamiTimeStampFormat) formatter).setInternalRange(internalRange);
-            ((LamiTimeStampFormat) formatter).setExternalRange(externalRange);
-
         } else if (areAspectsTimeDuration(axisAspects)) {
             /* Set the time duration formatter. */
-            formatter = NANO_TO_SECS_FORMATTER;
-            ((LamiDecimalUnitFormat) formatter).setInternalRange(internalRange);
-            ((LamiDecimalUnitFormat) formatter).setExternalRange(externalRange);
-
+            formatter = new LamiDecimalUnitFormat(NANO_TO_SECS_FORMATTER_FACTOR, internalRange, externalRange);
         } else {
             /*
              * For other numeric aspects, use the default lami decimal unit
              * formatter.
              */
-            formatter = DECIMAL_FORMATTER;
-            ((LamiDecimalUnitFormat) formatter).setInternalRange(internalRange);
-            ((LamiDecimalUnitFormat) formatter).setExternalRange(externalRange);
+            formatter = new LamiDecimalUnitFormat(internalRange, externalRange);
         }
 
         return formatter;

@@ -31,43 +31,12 @@ public class LamiTimeStampFormat extends Format {
 
     private final TmfTimestampFormat fFormat;
 
-    private @Nullable LamiGraphRange fInternalRange = null;
-    private @Nullable LamiGraphRange fExternalRange = null;
+    private final @Nullable LamiGraphRange fInternalRange;
+    private final @Nullable LamiGraphRange fExternalRange;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
-
-    /**
-     * The default constructor
-     */
-    public LamiTimeStampFormat() {
-        fFormat = checkNotNull(TmfTimestampFormat.getDefaulTimeFormat());
-    }
-
-    /**
-     * The base constructor
-     *
-     * @param internalRange
-     *            The internal range used for graph representation
-     * @param externalRange
-     *            The external (real value) range shown to the user
-     */
-    public LamiTimeStampFormat(LamiGraphRange internalRange, LamiGraphRange externalRange) {
-        fFormat = checkNotNull(TmfTimestampFormat.getDefaulTimeFormat());
-        fInternalRange = internalRange;
-        fExternalRange = externalRange;
-    }
-
-    /**
-     * The normal constructor
-     *
-     * @param pattern
-     *            The format pattern
-     */
-    public LamiTimeStampFormat(String pattern) {
-        fFormat = new TmfTimestampFormat(pattern);
-    }
 
     /**
      * The normal constructor
@@ -79,7 +48,7 @@ public class LamiTimeStampFormat extends Format {
      * @param externalRange
      *            The external (real value) range shown to the user
      */
-    public LamiTimeStampFormat(String pattern, LamiGraphRange internalRange, LamiGraphRange externalRange) {
+    public LamiTimeStampFormat(String pattern, @Nullable LamiGraphRange internalRange, @Nullable LamiGraphRange externalRange) {
         fFormat = new TmfTimestampFormat(pattern);
         fInternalRange = internalRange;
         fExternalRange = externalRange;
@@ -97,28 +66,11 @@ public class LamiTimeStampFormat extends Format {
     }
 
     /**
-     * @param internalRange
-     *            The internal range definition to be used by the formatter
-     */
-    public void setInternalRange(@Nullable LamiGraphRange internalRange) {
-        fInternalRange = internalRange;
-    }
-
-    /**
      * @return the external range definition
      */
     public @Nullable LamiGraphRange getExternalRange() {
         return fExternalRange;
     }
-
-    /**
-     * @param externalRange
-     *            The external range definition to be used by the formatter
-     */
-    public void setExternalRange(@Nullable LamiGraphRange externalRange) {
-        fExternalRange = externalRange;
-    }
-
 
     @Override
     public StringBuffer format(@Nullable Object obj, @Nullable StringBuffer toAppendTo, @Nullable FieldPosition pos) {

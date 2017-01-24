@@ -34,14 +34,16 @@ public class LamiDecimalUnitFormat extends DecimalUnitFormat {
 
     private static final long serialVersionUID = 977671266270661188L;
 
-    private @Nullable LamiGraphRange fInternalRange = null;
-    private @Nullable LamiGraphRange fExternalRange = null;
+    private final @Nullable LamiGraphRange fInternalRange;
+    private final @Nullable LamiGraphRange fExternalRange;
 
     /**
      * Default constructor
      */
     public LamiDecimalUnitFormat() {
         super();
+        fInternalRange = null;
+        fExternalRange = null;
     }
 
     /**
@@ -53,20 +55,10 @@ public class LamiDecimalUnitFormat extends DecimalUnitFormat {
      * @param externalRange
      *            The external (real value) range shown to the user
      */
-    public LamiDecimalUnitFormat(LamiGraphRange internalRange, LamiGraphRange externalRange) {
+    public LamiDecimalUnitFormat(@Nullable LamiGraphRange internalRange, @Nullable LamiGraphRange externalRange) {
         super();
         fInternalRange = internalRange;
         fExternalRange = externalRange;
-    }
-
-    /**
-     * Constructor with multiplication factor.
-     *
-     * @param factor
-     *            Multiplication factor to apply to the value
-     */
-    public LamiDecimalUnitFormat(double factor) {
-        super(factor);
     }
 
     /**
@@ -80,7 +72,7 @@ public class LamiDecimalUnitFormat extends DecimalUnitFormat {
      * @param externalRange
      *            The external (real value) range shown to the user
      */
-    public LamiDecimalUnitFormat(double factor, LamiGraphRange internalRange, LamiGraphRange externalRange) {
+    public LamiDecimalUnitFormat(double factor, @Nullable LamiGraphRange internalRange, @Nullable LamiGraphRange externalRange) {
         super(factor);
         fInternalRange = internalRange;
         fExternalRange = externalRange;
@@ -94,26 +86,10 @@ public class LamiDecimalUnitFormat extends DecimalUnitFormat {
     }
 
     /**
-     * @param internalRange
-     *            The internal range definition to be used by the formatter
-     */
-    public void setInternalRange(@Nullable LamiGraphRange internalRange) {
-        fInternalRange = internalRange;
-    }
-
-    /**
      * @return the external range definition
      */
     public @Nullable LamiGraphRange getExternalRange() {
         return fExternalRange;
-    }
-
-    /**
-     * @param externalRange
-     *            The external range definition to be used by the formatter
-     */
-    public void setExternalRange(@Nullable LamiGraphRange externalRange) {
-        fExternalRange = externalRange;
     }
 
     @Override
