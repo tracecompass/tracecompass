@@ -142,4 +142,10 @@ public abstract class LamiTableEntryAspect {
         boolean numerical = (this.isContinuous() == aspect.isContinuous());
         return (timestamp && numerical);
     }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + ':' + ' ' + getName();
+    }
+
 }
