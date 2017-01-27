@@ -109,7 +109,7 @@ public class LamiScatterViewer extends LamiXYChartViewer {
             xAxisAspects.add(singleXAspect);
         }
 
-        BiMap<@Nullable String, Integer> xMap = checkNotNull(HashBiMap.create());
+        BiMap<@Nullable String, Integer> xMap = HashBiMap.create();
         boolean xIsLog = graphModel.xAxisIsLog();
 
         boolean areXAspectsContinuous = areAspectsContinuous(xAxisAspects);
@@ -146,7 +146,7 @@ public class LamiScatterViewer extends LamiXYChartViewer {
          * Create Y series
          */
         List<LamiTableEntryAspect> yAxisAspects = getYAxisAspects();
-        BiMap<@Nullable String, Integer> yMap = checkNotNull(HashBiMap.create());
+        BiMap<@Nullable String, Integer> yMap = HashBiMap.create();
         boolean yIsLog = graphModel.yAxisIsLog();
 
         boolean areYAspectsContinuous = areAspectsContinuous(yAxisAspects);
