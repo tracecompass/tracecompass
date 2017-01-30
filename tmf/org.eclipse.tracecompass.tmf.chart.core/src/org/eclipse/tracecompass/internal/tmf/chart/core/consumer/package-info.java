@@ -8,4 +8,4 @@
  *******************************************************************************/
 
 @org.eclipse.jdt.annotation.NonNullByDefault
-package org.eclipse.tracecompass.internal.tmf.chart.ui.consumer;
+package org.eclipse.tracecompass.internal.tmf.chart.core.consumer;

@@ -12,8 +12,9 @@ package org.eclipse.tracecompass.internal.tmf.chart.ui.aggregator;
 import java.math.BigDecimal;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.chart.ui.consumer.IDataConsumer;
-import org.eclipse.tracecompass.internal.tmf.chart.ui.consumer.NumericalConsumer;
+import org.eclipse.tracecompass.internal.tmf.chart.core.aggregator.IConsumerAggregator;
+import org.eclipse.tracecompass.internal.tmf.chart.core.consumer.IDataConsumer;
+import org.eclipse.tracecompass.internal.tmf.chart.core.consumer.NumericalConsumer;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRange;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRangeMap;
 

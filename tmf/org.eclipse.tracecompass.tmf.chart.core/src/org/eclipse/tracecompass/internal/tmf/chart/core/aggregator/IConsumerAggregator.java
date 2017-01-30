@@ -7,13 +7,13 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.tmf.chart.ui.aggregator;
+package org.eclipse.tracecompass.internal.tmf.chart.core.aggregator;
 
 import java.util.function.Consumer;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.chart.ui.consumer.IDataConsumer;
-import org.eclipse.tracecompass.internal.tmf.chart.ui.consumer.NumericalConsumer;
+import org.eclipse.tracecompass.internal.tmf.chart.core.consumer.IDataConsumer;
+import org.eclipse.tracecompass.internal.tmf.chart.core.consumer.NumericalConsumer;
 
 /**
  * This interface is used for performing operations on multiple
@@ -21,9 +21,6 @@ import org.eclipse.tracecompass.internal.tmf.chart.ui.consumer.NumericalConsumer
  * of multiple {@link NumericalConsumer}. Normally, it should process the data
  * consumers only when they are done processing individual object from the
  * stream of data.
- *
- * FIXME: Find a better name. It consumes consumer, but it kind of seems
- * confusing calling it IConsumerConsumer.
  *
  * @author Gabriel-Andrew Pollo-Guilbert
  */

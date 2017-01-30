@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.tmf.chart.ui.consumer;
+package org.eclipse.tracecompass.internal.tmf.chart.core.consumer;
 
 import java.util.function.Consumer;
 
