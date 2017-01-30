@@ -23,9 +23,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.SchemaFactory;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -58,6 +60,12 @@ public class MarkerConfigXmlParser {
     public static final IPath MARKER_CONFIG_PATH = Activator.getDefault().getStateLocation().addTrailingSeparator().append("markers.xml"); //$NON-NLS-1$
     /** Marker configuration file */
     private static final File MARKER_CONFIG_FILE = MARKER_CONFIG_PATH.toFile();
+    /** Marker configuration schema URL */
+    private static final URL MARKER_CONFIG_SCHEMA_URL = MarkerConfigXmlParser.class.getResource("/schema/markers.xsd"); //$NON-NLS-1$
+    /** Marker configuration schema path */
+    private static final IPath MARKER_CONFIG_SCHEMA_PATH = Activator.getDefault().getStateLocation().addTrailingSeparator().append("markers.xsd"); //$NON-NLS-1$
+    /** Marker configuration schema file */
+    private static final File MARKER_CONFIG_SCHEMA_FILE = MARKER_CONFIG_SCHEMA_PATH.toFile();
     /** Default marker label */
     private static final String DEFAULT_LABEL = "%d"; //$NON-NLS-1$
 
@@ -87,6 +95,14 @@ public class MarkerConfigXmlParser {
                 Activator.logError("Error copying " + DEFAULT_MARKER_CONFIG_URL + " to " + MARKER_CONFIG_FILE.getAbsolutePath(), e); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
+        if (!MARKER_CONFIG_SCHEMA_FILE.exists()) {
+            try {
+                File schemaFile = new File(FileLocator.toFileURL(MARKER_CONFIG_SCHEMA_URL).toURI());
+                Files.copy(schemaFile.toPath(), MARKER_CONFIG_SCHEMA_FILE.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (URISyntaxException | IOException e) {
+                Activator.logError("Error copying " + MARKER_CONFIG_SCHEMA_URL + " to " + MARKER_CONFIG_SCHEMA_FILE.getAbsolutePath(), e); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+        }
     }
 
     /**
@@ -102,6 +118,9 @@ public class MarkerConfigXmlParser {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setValidating(false);
+            dbf.setNamespaceAware(true);
+            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            dbf.setSchema(schemaFactory.newSchema(MARKER_CONFIG_SCHEMA_URL));
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following catches xml parsing exceptions

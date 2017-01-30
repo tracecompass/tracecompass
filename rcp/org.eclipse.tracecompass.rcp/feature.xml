@@ -28,6 +28,7 @@
       <import feature="org.eclipse.tracecompass.tmf" version="0.0.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.platform" version="0.0.0" match="greaterOrEqual"/>
    </requires>
+
    <plugin
          id="javax.xml"
          download-size="0"
@@ -289,6 +290,20 @@
 
    <plugin
          id="org.apache.commons.lang3"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.wst.xsd.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.xsd"
          download-size="0"
          install-size="0"
          version="0.0.0"

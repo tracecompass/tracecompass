@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ***************************************************************************
+ * Copyright (c) 2017 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Patrick Tasse - Initial API and implementation
+ ***************************************************************************
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+<xs:element name="marker-sets" type="marker-sets_type">
+</xs:element>
+
+<xs:complexType name="marker-sets_type">
+	<xs:sequence>
+		<xs:element name="marker-set" type="marker-set_type" minOccurs="0" maxOccurs="unbounded"/>
+	</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="marker-set_type">
+	<xs:sequence>
+		<xs:element name="marker" type="marker_type" minOccurs="0" maxOccurs="unbounded"/>
+	</xs:sequence>
+	<xs:attribute name="name" type="xs:string" use="required"/>
+	<xs:attribute name="id" type="xs:string" use="required"/>
+</xs:complexType>
+
+<xs:complexType name="marker_type">
+	<xs:sequence>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="submarker" type="submarker_type"/>
+			<xs:element name="segments" type="segments_type"/>
+		</xs:choice>
+	</xs:sequence>
+	<xs:attribute name="name" type="xs:string" use="required"/>
+	<xs:attribute name="label" type="xs:string" use="optional"/>
+	<xs:attribute name="id" type="xs:string" use="optional"/>
+	<xs:attribute name="referenceid" type="xs:string" use="optional"/>
+	<xs:attribute name="color" type="xs:string" use="required"/>
+	<xs:attribute name="period" type="period_type" use="required"/>
+	<xs:attribute name="unit" type="unit_type" use="required"/>
+	<xs:attribute name="range" type="range_type" use="optional"/>
+	<xs:attribute name="offset" type="xs:integer" use="optional"/>
+	<xs:attribute name="index" type="index_type" use="optional"/>
+</xs:complexType>
+
+<xs:complexType name="submarker_type">
+	<xs:sequence>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="submarker" type="submarker_type"/>
+			<xs:element name="segments" type="segments_type"/>
+		</xs:choice>
+	</xs:sequence>
+	<xs:attribute name="name" type="xs:string" use="required"/>
+	<xs:attribute name="label" type="xs:string" use="optional"/>
+	<xs:attribute name="id" type="xs:string" use="optional"/>
+	<xs:attribute name="color" type="xs:string" use="optional"/>
+	<xs:attribute name="range" type="range_type" use="required"/>
+	<xs:attribute name="index" type="index_type" use="optional"/>
+</xs:complexType>
+
+<xs:complexType name="segments_type">
+	<xs:sequence>
+		<xs:element name="segment" type="segment_type" minOccurs="1" maxOccurs="unbounded"/>
+		<xs:sequence>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="submarker" type="submarker_type"/>
+				<xs:element name="segments" type="segments_type"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:sequence>
+	<xs:attribute name="name" type="xs:string" use="required"/>
+</xs:complexType>
+
+<xs:complexType name="segment_type">
+	<xs:sequence>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="submarker" type="submarker_type"/>
+			<xs:element name="segments" type="segments_type"/>
+		</xs:choice>
+	</xs:sequence>
+	<xs:attribute name="label" type="xs:string" use="optional"/>
+	<xs:attribute name="id" type="xs:string" use="optional"/>
+	<xs:attribute name="color" type="xs:string" use="optional"/>
+	<xs:attribute name="length" type="length_type" use="required"/>
+</xs:complexType>
+
+<xs:simpleType name="period_type">
+	<xs:restriction base="xs:double">
+		<xs:minExclusive value="0"/>
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="unit_type">
+	<xs:restriction base="xs:string">
+		<xs:enumeration value="ms"/>
+		<xs:enumeration value="us"/>
+		<xs:enumeration value="ns"/>
+		<xs:enumeration value="cycles"/>
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="length_type">
+	<xs:restriction base="xs:integer">
+		<xs:minExclusive value="0"/>
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="range_type">
+	<xs:restriction base="xs:string">
+		<xs:pattern value="[0-9]*\.\.[0-9]*|[0-9]*"/>
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="index_type">
+	<xs:restriction base="xs:string">
+		<xs:pattern value="([0-9]*\.\.[0-9]*|[0-9]*)(,([0-9]*\.\.[0-9]*|[0-9]*))*"/>
+	</xs:restriction>
+</xs:simpleType>
+
+</xs:schema>

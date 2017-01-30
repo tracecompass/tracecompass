@@ -26,7 +26,9 @@ Require-Bundle: org.eclipse.core.expressions,
  org.eclipse.linuxtools.dataviewers.piechart,
  org.eclipse.tracecompass.segmentstore.core,
  org.apache.commons.compress,
- org.apache.commons.lang3
+ org.apache.commons.lang3,
+ org.eclipse.wst.xml.ui,
+ org.eclipse.wst.xsd.core
 Export-Package: org.eclipse.tracecompass.internal.tmf.ui;x-friends:="org.eclipse.tracecompass.tmf.ui.tests,org.eclipse.tracecompass.tmf.ctf.ui.tests",
  org.eclipse.tracecompass.internal.tmf.ui.commands;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.dialogs;x-internal:=true,
