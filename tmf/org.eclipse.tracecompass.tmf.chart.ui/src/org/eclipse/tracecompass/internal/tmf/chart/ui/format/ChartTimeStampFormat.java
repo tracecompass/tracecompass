@@ -23,6 +23,12 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 /**
  * Formatter for timestamps.
  *
+ * TODO: See if this formatter is specific to the swtchart charts that are
+ * implemented in this plugin or if they can be re-used in another other
+ * charting scheme. We'll probably know when we actually have another
+ * implementation. If swtchart specific, the name of the class and package
+ * should make it clear.
+ *
  * @author Michael Jeanson
  * @author Gabriel-Andrew Pollo-Guilbert
  */

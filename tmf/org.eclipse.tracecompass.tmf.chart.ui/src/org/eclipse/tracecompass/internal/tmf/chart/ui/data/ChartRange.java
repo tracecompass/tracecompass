@@ -16,6 +16,12 @@ import java.math.BigDecimal;
 /**
  * BigDecimal based range representation. The chart range cannot be 0.
  *
+ * TODO: See if this chart range is specific to the swtchart charts that are
+ * implemented in this plugin or if they can be re-used in another other
+ * charting scheme. We'll probably know when we actually have another
+ * implementation. If swtchart specific, the name of the class and package
+ * should make it clear.
+ *
  * @author Jonathan Rajotte-Julien
  */
 public class ChartRange {
@@ -55,7 +61,10 @@ public class ChartRange {
             throw new IllegalArgumentException("ChartRange: minimum should be lower than or equal to the maximum (min: " + minimum + ", max: " + maximum + ')'); //$NON-NLS-1$ //$NON-NLS-2$
         }
         if (BigDecimal.ZERO.equals(subtract)) {
-            // Minimum and maximum values are all the same, so add 1 to the minimum
+            /*
+             * Minimum and maximum values are all the same, so add 1 to the
+             * minimum
+             */
             fMinimum = minimum;
             fMaximum = minimum.add(BigDecimal.ONE);
             fRange = checkNotNull(BigDecimal.ONE);

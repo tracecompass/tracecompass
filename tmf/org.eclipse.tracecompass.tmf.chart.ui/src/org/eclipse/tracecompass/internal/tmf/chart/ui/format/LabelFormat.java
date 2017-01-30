@@ -20,6 +20,12 @@ import com.google.common.collect.BiMap;
 /**
  * Format label based on a given Map<String, Integer>.
  *
+ * TODO: See if this formatter is specific to the swtchart charts that are
+ * implemented in this plugin or if they can be re-used in another other
+ * charting scheme. We'll probably know when we actually have another
+ * implementation. If swtchart specific, the name of the class and package
+ * should make it clear.
+ *
  * @author Jonathan Rajotte-Julien
  * @author Gabriel-Andrew Pollo-Guilbert
  */
