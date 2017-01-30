@@ -22,6 +22,8 @@
 #             </artifact>
 
 import sys, re
+if len(sys.argv) < 4:
+    sys.exit('Usage: python update_root_pom_versions.py [file] [old version] [new version]')
 fileContent = open(sys.argv[1]).read()
 fileContent = re.sub("(<artifactId>org.eclipse.tracecompass.*</artifactId>\n\s+)<version>" + sys.argv[2] + "-SNAPSHOT</version>", "\g<1><version>" + sys.argv[3] + "-SNAPSHOT</version>", fileContent)
 # Also the target platform version being used

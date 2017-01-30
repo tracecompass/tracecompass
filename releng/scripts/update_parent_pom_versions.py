@@ -18,6 +18,8 @@
 #   </parent>
 
 import sys, re
+if len(sys.argv) < 4:
+    sys.exit('Usage: python update_parent_pom_versions.py [file] [old version] [new version]')
 fileContent = open(sys.argv[1]).read()
 fileContent = re.sub("<version>" + sys.argv[2] + "-SNAPSHOT</version>(\n\s+</parent>)", "<version>" + sys.argv[3] + "-SNAPSHOT</version>\g<1>", fileContent)
 open(sys.argv[1], "w").write(fileContent)
