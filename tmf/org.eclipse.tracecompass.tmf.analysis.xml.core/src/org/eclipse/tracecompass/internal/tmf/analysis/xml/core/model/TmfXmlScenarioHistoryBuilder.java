@@ -71,11 +71,11 @@ public class TmfXmlScenarioHistoryBuilder {
     /**
      * Cache the available status in a map
      */
-    protected static final BiMap<ScenarioStatusType, ITmfStateValue> STATUS_MAP = NonNullUtils.checkNotNull(ImmutableBiMap.of(
+    protected static final BiMap<ScenarioStatusType, ITmfStateValue> STATUS_MAP = ImmutableBiMap.of(
             ScenarioStatusType.PENDING, TmfStateValue.newValueInt(0),
             ScenarioStatusType.IN_PROGRESS, TmfStateValue.newValueInt(1),
             ScenarioStatusType.MATCHED, TmfStateValue.newValueInt(2),
-            ScenarioStatusType.ABANDONED, TmfStateValue.newValueInt(3)));
+            ScenarioStatusType.ABANDONED, TmfStateValue.newValueInt(3));
 
     /**
      * Get the scenario matched process start time
