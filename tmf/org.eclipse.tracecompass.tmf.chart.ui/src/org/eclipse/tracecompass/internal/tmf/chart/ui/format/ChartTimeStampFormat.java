@@ -17,7 +17,6 @@ import java.text.Format;
 import java.text.ParsePosition;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRangeMap;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 
@@ -90,7 +89,7 @@ public class ChartTimeStampFormat extends Format {
      * @return the pattern string.
      */
     public String getPattern() {
-        return NonNullUtils.checkNotNull(fFormat.toPattern());
+        return fFormat.toPattern();
     }
 
     // ------------------------------------------------------------------------

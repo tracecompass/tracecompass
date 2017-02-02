@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 
 /**
@@ -79,7 +80,7 @@ public final class TmfTimePreferences {
      *
      * @return the timestamp pattern
      */
-    public static String getTimePattern() {
+    public static @NonNull String getTimePattern() {
         return computeTimePattern(getPreferenceMap(false));
     }
 
@@ -88,7 +89,7 @@ public final class TmfTimePreferences {
      *
      * @return the interval pattern
      */
-    public static String getIntervalPattern() {
+    public static @NonNull String getIntervalPattern() {
         return computeIntervalPattern(getPreferenceMap(false));
     }
 
@@ -154,7 +155,7 @@ public final class TmfTimePreferences {
     // Operations
     // ------------------------------------------------------------------------
 
-    private static String computeIntervalPattern(Map<String, String> prefsMap) {
+    private static @NonNull String computeIntervalPattern(Map<String, String> prefsMap) {
         String ssecFmt = computeSubSecFormat(prefsMap);
         return ITmfTimePreferencesConstants.TIME_ELAPSED_FMT + "." + ssecFmt; //$NON-NLS-1$
     }
@@ -176,7 +177,7 @@ public final class TmfTimePreferences {
      * @param prefsMap the preferences to apply when computing the time pattern
      * @return the time pattern resulting in applying the preferences
      */
-    public static String computeTimePattern(Map<String, String> prefsMap) {
+    public static @NonNull String computeTimePattern(Map<String, String> prefsMap) {
         String dateTimeFormat = prefsMap.get(ITmfTimePreferencesConstants.DATIME);
         if (dateTimeFormat == null) {
             dateTimeFormat = ITmfTimePreferencesConstants.DEFAULT_TIME_PATTERN;

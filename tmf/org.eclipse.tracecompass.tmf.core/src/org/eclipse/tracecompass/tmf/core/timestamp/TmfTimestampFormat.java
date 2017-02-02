@@ -26,6 +26,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
  * A formatting and parsing facility that can handle timestamps that span the
  * epoch with a precision down to the nanosecond. It can be understood as an
@@ -222,7 +224,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     private static TmfTimestampFormat fDefaultIntervalFormat = null;
 
     // The timestamp pattern
-    private String fPattern;
+    private @NonNull String fPattern;
 
     // The index of the decimal separator in the pattern
     private int fPatternDecimalSeparatorIndex;
@@ -302,8 +304,9 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      *
      * @param pattern the format pattern
      */
-    public TmfTimestampFormat(String pattern) {
+    public TmfTimestampFormat(@NonNull String pattern) {
         fLocale = Locale.getDefault();
+        fPattern = pattern;
         applyPattern(pattern);
     }
 
@@ -313,9 +316,10 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      * @param pattern the format pattern
      * @param timeZone the time zone
      */
-    public TmfTimestampFormat(String pattern, TimeZone timeZone) {
+    public TmfTimestampFormat(@NonNull String pattern, TimeZone timeZone) {
         fLocale = Locale.getDefault();
         setTimeZone(timeZone);
+        fPattern = pattern;
         applyPattern(pattern);
     }
 
@@ -326,11 +330,12 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      * @param timeZone the time zone
      * @param locale the locale
      */
-    public TmfTimestampFormat(String pattern, TimeZone timeZone, Locale locale) {
+    public TmfTimestampFormat(@NonNull String pattern, TimeZone timeZone, Locale locale) {
         super("", locale); //$NON-NLS-1$
         fLocale = locale;
         setTimeZone(timeZone);
         setCalendar(Calendar.getInstance(timeZone, locale));
+        fPattern = pattern;
         applyPattern(pattern);
     }
 
@@ -383,6 +388,9 @@ public class TmfTimestampFormat extends SimpleDateFormat {
 
     @Override
     public void applyPattern(String pattern) {
+        if (pattern == null) {
+            throw new NullPointerException("TmfTimestampFormat: pattern should not be null"); //$NON-NLS-1$
+        }
         fPattern = pattern;
         fPatternDecimalSeparatorIndex = indexOfPatternDecimalSeparator(pattern);
         fDateTimePattern = unquotePattern(pattern.substring(0, fPatternDecimalSeparatorIndex));
@@ -401,7 +409,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     }
 
     @Override
-    public String toPattern() {
+    public @NonNull String toPattern() {
         return fPattern;
     }
 
