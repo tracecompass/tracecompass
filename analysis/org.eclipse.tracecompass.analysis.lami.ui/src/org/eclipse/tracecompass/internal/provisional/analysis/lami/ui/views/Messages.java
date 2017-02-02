@@ -30,26 +30,7 @@ public class Messages extends NLS {
     public static String LamiReportView_ToggleAction_ButtonTooltip;
 
     public static String LamiReportView_NewCustomChart;
-    public static String LamiReportView_NewCustomBarChart;
-    public static String LamiReportView_NewCustomScatterChart;
     public static String LamiReportView_ClearAllCustomViews;
-    public static String LamiReportView_LogScale;
-    public static String LamiReportView_SelectColumnForX;
-    public static String LamiReportView_SelectColumnsForCategories;
-    public static String LamiReportView_SelectColumnsForSeries;
-    public static String LamiReportView_Custom;
-
-    public static String LamiSeriesDialog_creation;
-    public static String LamiSeriesDialog_add;
-    public static String LamiSeriesDialog_chart_options;
-    public static String LamiSeriesDialog_delete;
-    public static String LamiSeriesDialog_selectionRestrictionWarning;
-    public static String LamiSeriesDialog_serie_creator;
-    public static String LamiSeriesDialog_series;
-    public static String LamiSeriesDialog_x_axis;
-    public static String LamiSeriesDialog_x_values;
-    public static String LamiSeriesDialog_y_axis;
-    public static String LamiSeriesDialog_y_values;
 
     static {
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

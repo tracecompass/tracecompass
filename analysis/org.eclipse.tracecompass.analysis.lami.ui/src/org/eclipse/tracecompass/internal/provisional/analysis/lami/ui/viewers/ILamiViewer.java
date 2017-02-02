@@ -12,7 +12,6 @@ package org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.viewers;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportViewTabPage;
 
 /**
@@ -41,27 +40,4 @@ public interface ILamiViewer {
         return new LamiTableViewer(tableViewer, page);
     }
 
-    /**
-     * Factory method to create a new chart viewer. The chart type is specified
-     * by the 'chartModel' parameter.
-     *
-     * @param parent
-     *            The parent composite
-     * @param page
-     *            The {@link LamiReportViewTabPage} parent page
-     * @param chartModel
-     *            The information about the chart to display
-     * @return The new viewer
-     */
-    static ILamiViewer createLamiChart(Composite parent, LamiReportViewTabPage page, LamiChartModel chartModel) {
-        switch (chartModel.getChartType()) {
-        case BAR_CHART:
-            return new LamiBarChartViewer(parent, page, chartModel);
-        case XY_SCATTER:
-            return new LamiScatterViewer(parent, page, chartModel);
-        case PIE_CHART:
-        default:
-            throw new UnsupportedOperationException("Unsupported chart type: " + chartModel.toString()); //$NON-NLS-1$
-        }
-    }
 }

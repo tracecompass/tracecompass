@@ -14,8 +14,12 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.analysis.lami.ui.Activator;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.viewers.ILamiViewer;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.viewers.LamiTableViewer;
+import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartData;
+import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartType;
+import org.eclipse.tracecompass.internal.provisional.tmf.chart.ui.chart.IChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 
 /**
  * Control for Lami viewers.
@@ -29,7 +33,7 @@ public final class LamiViewerControl {
 
     private final Action fToggleAction;
 
-    private @Nullable ILamiViewer fViewer;
+    private @Nullable TmfViewer fViewer;
 
     /**
      * Build a new control for a Lami table viewer.
@@ -43,9 +47,9 @@ public final class LamiViewerControl {
         fToggleAction = new Action() {
             @Override
             public void run() {
-                ILamiViewer viewer = fViewer;
+                TmfViewer viewer = fViewer;
                 if (viewer == null) {
-                    fViewer = ILamiViewer.createLamiTable(parent, page);
+                    fViewer = LamiTableViewer.createLamiTable(parent, page);
                 } else {
                     viewer.dispose();
                     fViewer = null;
@@ -63,18 +67,18 @@ public final class LamiViewerControl {
      *
      * @param parent
      *            The parent composite
-     * @param page
+     * @param data
      *            The {@link LamiReportViewTabPage} parent page
-     * @param graphModel
+     * @param model
      *            The graph model
      */
-    public LamiViewerControl(Composite parent, LamiReportViewTabPage page, LamiChartModel graphModel) {
+    public LamiViewerControl(Composite parent, ChartData data, ChartModel model) {
         fToggleAction = new Action() {
             @Override
             public void run() {
-                ILamiViewer viewer = fViewer;
+                TmfViewer viewer = fViewer;
                 if (viewer == null) {
-                    fViewer = ILamiViewer.createLamiChart(parent, page, graphModel);
+                    fViewer = (TmfViewer) IChartViewer.createChart(parent, data, model);
                 } else {
                     viewer.dispose();
                     fViewer = null;
@@ -82,9 +86,9 @@ public final class LamiViewerControl {
                 parent.layout();
             }
         };
-        fToggleAction.setText(Messages.LamiReportView_ToggleAction_ButtonNamePrefix + ' ' + graphModel.getName());
+        fToggleAction.setText(Messages.LamiReportView_ToggleAction_ButtonNamePrefix + ' ' + model.getTitle());
         fToggleAction.setToolTipText(Messages.LamiReportView_ToggleAction_ButtonTooltip);
-        fToggleAction.setImageDescriptor(getIconForGraphType(graphModel.getChartType()));
+        fToggleAction.setImageDescriptor(getIconForGraphType(model.getChartType()));
     }
 
     /**
@@ -93,7 +97,7 @@ public final class LamiViewerControl {
      *
      * @return The viewer
      */
-    public @Nullable ILamiViewer getViewer() {
+    public @Nullable TmfViewer getViewer() {
         return fViewer;
     }
 
@@ -115,12 +119,12 @@ public final class LamiViewerControl {
         }
     }
 
-    private static @Nullable ImageDescriptor getIconForGraphType(LamiChartModel.LamiChartType graphType) {
-        switch (graphType) {
+    private static @Nullable ImageDescriptor getIconForGraphType(ChartType chartType) {
+        switch (chartType) {
         case BAR_CHART:
             return Activator.getDefault().getImageDescripterFromPath("icons/histogram.gif"); //$NON-NLS-1$
         case PIE_CHART:
-        case XY_SCATTER:
+        case SCATTER_CHART:
         default:
             // FIXME Use other icons
             return Activator.getDefault().getImageDescripterFromPath("icons/histogram.gif"); //$NON-NLS-1$

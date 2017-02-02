@@ -24,11 +24,11 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiTableEntryAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiTableEntry;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.signals.LamiSelectionUpdateSignal;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportView;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportViewTabPage;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.signal.ChartSelectionUpdateSignal;
@@ -49,7 +49,6 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
     // ------------------------------------------------------------------------
 
     private final LamiReportViewTabPage fPage;
-    private Set<Integer> fSelections;
     private Set<Object> fSelection;
 
     // ------------------------------------------------------------------------
@@ -87,18 +86,6 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
         public void widgetSelected(@Nullable SelectionEvent event) {
             IStructuredSelection selections = getTableViewer().getStructuredSelection();
 
-            // Lami selections
-            Set<Integer> selectionIndexes = new HashSet<>();
-            for (Object selectedEntry : selections.toArray() ) {
-                selectionIndexes.add(fPage.getResultTable().getEntries().indexOf(selectedEntry));
-            }
-
-            fSelections = selectionIndexes;
-
-            /* Signal all Lami viewers & views of the selection */
-            LamiSelectionUpdateSignal signal = new LamiSelectionUpdateSignal(LamiTableViewer.this, selectionIndexes, fPage);
-            TmfSignalManager.dispatchSignal(signal);
-
             /* Find all selected entries */
             Set<Object> selectionSet = new HashSet<>();
             for (Object selectedEntry : selections.toArray()) {
@@ -132,7 +119,6 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
         tableViewer.getTable().moveAbove(null);
 
         fPage = page;
-        fSelections = new HashSet<>();
         fSelection = new HashSet<>();
 
         /* Default sort order of the content provider is by its first column */
@@ -141,6 +127,20 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
 
         createColumns();
         fillData();
+    }
+
+    /**
+     * Factory method to create a new Table viewer.
+     *
+     * @param parent
+     *            The parent composite
+     * @param page
+     *            The {@link LamiReportViewTabPage} parent page
+     * @return The new viewer
+     */
+    public static LamiTableViewer createLamiTable(Composite parent, LamiReportViewTabPage page) {
+        TableViewer tableViewer = new TableViewer(parent, SWT.FULL_SELECTION | SWT.MULTI | SWT.VIRTUAL);
+        return new LamiTableViewer(tableViewer, page);
     }
 
     // ------------------------------------------------------------------------
@@ -198,17 +198,6 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
              * asynchronous task we cannot use the normal signal handler since
              * we have no guarantee of time of execution of the fill data.
              */
-            if (!fSelections.isEmpty()) {
-                int[] selectionsIndexes = fSelections.stream()
-                        .map(index -> fPage.getResultTable().getEntries().get(index))
-                        .mapToInt(entry -> ((LamiTableContentProvider) getTableViewer().getContentProvider()).getIndexOf(entry))
-                        .toArray();
-
-                Display.getDefault().asyncExec(() -> {
-                    getTableViewer().getTable().setSelection(selectionsIndexes);
-                    getTableViewer().getTable().redraw();
-                });
-            }
             if (!fSelection.isEmpty()) {
                 LamiTableContentProvider provider = (LamiTableContentProvider) getTableViewer().getContentProvider();
 
@@ -240,37 +229,6 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
     // ------------------------------------------------------------------------
     // Signals
     // ------------------------------------------------------------------------
-
-    /**
-     * The signal handler for selection update.
-     *
-     * @param signal
-     *          The selection update signal
-     */
-    @TmfSignalHandler
-    public void updateSelection(LamiSelectionUpdateSignal signal) {
-
-        if (fPage != signal.getSignalKey() || equals(signal.getSource())) {
-            /* The signal is not for us */
-            return;
-         }
-        /* Fetch the position of the selected entry in the actual table since it could be sorted by another column */
-        LamiTableContentProvider latencyContentProvider = (LamiTableContentProvider) getTableViewer().getContentProvider();
-
-        Set<Integer> selections = signal.getEntryIndex();
-
-        int[] selectionsIndexes = selections.stream()
-                .map(index -> fPage.getResultTable().getEntries().get(index))
-                .mapToInt(entry -> latencyContentProvider.getIndexOf(entry))
-                .toArray();
-
-        fSelections = new HashSet<>(selections);
-
-        Display.getDefault().asyncExec(() -> {
-            getTableViewer().getTable().setSelection(selectionsIndexes);
-            getTableViewer().getTable().redraw();
-        });
-    }
 
     /**
      * The signal handler for selection update.

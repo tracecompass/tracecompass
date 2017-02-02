@@ -27,7 +27,6 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.analysis.lami.ui.Activator;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiAnalysisReport;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiChartModel.LamiChartType;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiResultTable;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 
@@ -65,24 +64,6 @@ public final class LamiReportView extends TmfView {
                 return;
             }
             page.toggleTableViewer();
-        }
-    }
-
-    private class NewChartAction extends Action {
-
-        private final LamiChartType fChartType;
-
-        public NewChartAction(LamiChartType chartType) {
-            fChartType = chartType;
-        }
-
-        @Override
-        public void run() {
-            LamiReportViewTabPage page = getCurrentSelectedPage();
-            if (page == null) {
-                return;
-            }
-            page.createNewCustomChart(fChartType);
         }
     }
 
@@ -148,11 +129,6 @@ public final class LamiReportView extends TmfView {
         toolbarMgr.add(toggleTableAction);
 
         IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-        IAction newBarChartAction = new NewChartAction(LamiChartType.BAR_CHART);
-        IAction newXYScatterAction = new NewChartAction(LamiChartType.XY_SCATTER);
-
-        newBarChartAction.setText(Messages.LamiReportView_NewCustomBarChart);
-        newXYScatterAction.setText(Messages.LamiReportView_NewCustomScatterChart);
 
         IAction newChartAction = new NewCustomChartAction();
         newChartAction.setText(Messages.LamiReportView_NewCustomChart);
@@ -170,8 +146,6 @@ public final class LamiReportView extends TmfView {
         };
         clearCustomViewsAction.setText(Messages.LamiReportView_ClearAllCustomViews);
 
-        menuMgr.add(newBarChartAction);
-        menuMgr.add(newXYScatterAction);
         menuMgr.add(newChartAction);
         menuMgr.add(new Separator());
         menuMgr.add(clearCustomViewsAction);
