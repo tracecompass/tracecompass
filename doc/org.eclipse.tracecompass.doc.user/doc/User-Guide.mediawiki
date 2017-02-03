@@ -1145,6 +1145,110 @@ Various options are available in the ''' Options ''' group :
 
 The ''' Direction ''' group allows to select the search direction : ''' Forward ''' or ''' Backward '''.
 
+== Configurable Marker Sets ==
+
+Time graph views can allow the user to display periodic markers over time graphs by selecting a marker set. The marker sets are user-configurable by editing the ''markers.xml'' file.
+
+From the view menu, select '''Marker Set''' &gt; '''Edit...'''.  The ''markers.xml'' file will be opened in an editor. After editing the file, save the modifications, and then select '''Marker Set''' &gt; ''marker set name'' to activate the marker set. Select '''Marker set''' &gt; '''None''' to deactivate the marker set.
+
+=== Marker Set Configuration XML Format ===
+
+The format of the ''markers.xml'' file is defined as follows:
+
+ <marker-sets> (marker-set*)
+   <market-set> (marker*)
+     <marker> ((submarker | segments))*
+       <submarker> ((submarker | segments))*
+       </submarker>
+       <segments> (segment+, ((submarker | segments))*)
+         <segment/> ((submarker | segments))*
+       </segments>
+     </marker>
+   </marker-set>
+ </marker-sets>
+
+The ''<marker>'' element defines a fixed-period marker at the root of the marker set. Optionally, a ''<marker>'' can have child ''<submarker>'' elements, which split each marker into a number of equal sub-markers, and/or child ''<segments>'' elements, which split each marker into segments of defined weights defined by the list of child ''<segment>'' elements. Each of these elements can recursively have their own ''<submarker>'' and ''<segments>'' child elements.
+
+The element attributes are defined as follows:
+
+ <marker-set name="name" id="id">
+;name (required)
+:The name of the marker set.
+;id (required)
+:The unique id of the marker set.
+
+ <marker name="name" label="label" id="id" referenceid="referenceid" color="color" period="period" unit="unit" range="range" offset="offset" index="index">
+;name (required)
+:The category name for this marker.
+;label (optional)
+:The Java String format for this marker, where the first and only argument is the marker index. When omitted, the default value is "%d".
+;id (optional)
+:The unique id of this marker.
+;referenceid (optional)
+:The reference id that can be used by a trace to provide a marker reference by adapting the IMarkerReferenceProvider interface. When omitted, the marker reference is time zero.
+;color (required)
+:An RGB value in format #rrggbb.
+;period (required)
+:The marker period in units, as a decimal number.
+;unit (required)
+:One of ms, us, ns or cycles. If cycles is used, the trace should adapt the ICyclesConverter interface.
+;range (optional)
+:The marker index range, in format min..max where min and max are optional. If max is not present, the index does not wrap. If omitted, the default range of 0.. is used.
+;offset (optional)
+:The offset in units, relative to the marker reference. If omitted, the offset is zero.
+;index (optional)
+:The set of valid index ranges, as a comma-separated list of (index|min..max). Index values not in this range set will not generate any markers or child markers. If omitted, are index values are valid.
+
+ <submarker name="name" label="label" id="id" color="color" range="range" index="index">
+;name (required)
+:The category name for this sub-marker.
+;label (optional)
+:The Java String format for this marker, where the first and only argument is the marker index. When omitted, the default value is "%d".
+;id (optional)
+:The unique id of this sub-marker.
+;color (optional)
+:An RGB value in format #rrggbb. If omitted, the parent marker's color will be used.
+;range (required)
+:The marker index range, in format min..max. The range determines the number of equal sub-markers in which the parent marker will be split.
+;index (optional)
+:The set of valid index ranges, as a comma-separated list of (index|min..max). Index values not in this range set will not generate any markers or child markers. If omitted, are index values are valid.
+
+ <segments name="name">
+;name (required)
+:The category name for the segments.
+
+ <segment label="label" id="id" color="color" length="length">
+;label (optional)
+:The Java String format for this marker, where the first and only argument is the marker index. When omitted, the default value is "%d". The segment elements index is sequential, starting at zero for the first segment.
+;id (optional)
+:The unique id of this segment.
+;color (optional)
+:An RGB value in format #rrggbb. If omitted, the segment will not generate any markers or child markers.
+;length (required)
+:The length of this segment, as an integer number relative to the total of all segments' lengths. The length determines the fraction of the parent marker to be used for this segment.
+
+An example marker set configuration can be found below:
+
+<pre>
+<?xml version="1.0" encoding="UTF-8"?>
+<marker-sets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="markers.xsd">
+	<marker-set name="Example" id="example.id">
+		<marker name="Frame" color="#ff0000" period="10" unit="ms" range="0..4095">
+			<submarker name="Subframe" color="#00ff00" label="#%d Normal" range="0..9" index="0,2..9">
+				<submarker name="Slot" color="#008800" range="0..1"/>
+			</submarker>
+			<submarker name="Subframe" color="#ff8800" label="#%d Special" range="0..9" index="1">
+				<segments name="Slot">
+					<segment label="A" color="#884400" length="1"/>
+					<segment label="B" color="#884400" length="3"/>
+					<segment label="C" color="#884400" length="2"/>
+				</segments>
+			</submarker>
+		</marker>
+	</marker-set>
+</marker-sets>
+</pre>
+
 = LTTng Tracer Control =
 
 The LTTng Tracer Control in Eclipse for the LTTng Tracer toolchain version v2.0 (or later) is done using SSH and requires an SSH server to be running on the remote host. For the SSH connection the SSH implementation of Remote Services is used. The functions to control the LTTng tracer (e.g. start and stop), either locally or remotely, are available from a dedicated Control View.
@@ -2066,6 +2170,10 @@ View Menu
 | A marker highlights a time interval. A marker can be used for instance to indicate a time range where lost events occurred or to bookmark an interesting interval for future reference. Selecting a category name will toggle the visibility of markers of that category.
 |-
 |
+| Marker Set
+| The user can select from one of the configured market sets, or choose '''None''' to use no marker set. The setting applies to all views that support marker sets. The marker set configuration can be edited by selecting the '''Edit...''' menu item (see [[#Marker Set Configuration XML Format]]). After saving the changes in the opened editor, the marker set should then be re-selected to update the view.
+|-
+|
 | Thread Presentation
 | Select the threads layout. Two layouts are available. '''Flat''' layout lists the threads in a flat list per trace. '''Hierarchical''' layout shows the threads in a parent-child tree per trace.
 |}
@@ -2194,6 +2302,9 @@ View Menu
 |
 | Show Markers
 | A marker highlights a time interval. A marker can be used for instance to indicate a time range where lost events occurred or to bookmark an interesting interval for future reference. Selecting a category name will toggle the visibility of markers of that category.
+
+| Marker Set
+| The user can select from one of the configured market sets, or choose '''None''' to use no marker set. The setting applies to all views that support marker sets. The marker set configuration can be edited by selecting the '''Edit...''' menu item (see [[#Marker Set Configuration XML Format]]). After saving the changes in the opened editor, the marker set should then be re-selected to update the view.
 |}
 
 === Marker Axis ===
