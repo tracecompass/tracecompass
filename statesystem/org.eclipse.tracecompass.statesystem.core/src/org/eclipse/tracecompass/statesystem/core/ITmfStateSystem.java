@@ -97,6 +97,9 @@ public interface ITmfStateSystem {
      * This can be useful, for example, for a component doing queries
      * periodically to the system while it is being built.
      *
+     * Specifying a timeout of 0 (or less) will return immediately with whether
+     * the state system is finished building or not.
+     *
      * @param timeout
      *            Timeout value in milliseconds
      * @return True if the return was due to the construction finishing, false
