@@ -20,6 +20,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.statesystem.core.AttributeTree;
 import org.eclipse.tracecompass.internal.statesystem.core.StateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -64,8 +65,11 @@ public class PartialStateSystem extends StateSystem {
      * @param ss
      *            The real state system
      */
-    public void assignUpstream(StateSystem ss) {
-        realStateSystem = ss;
+    public void assignUpstream(ITmfStateSystemBuilder ss) {
+        if (!(ss instanceof StateSystem)) {
+            throw new IllegalArgumentException("Partial state system's upstream state system should be of class StateSystem. This one is " + ss.getClass()); //$NON-NLS-1$
+        }
+        realStateSystem = (StateSystem) ss;
         ssAssignedLatch.countDown();
     }
 

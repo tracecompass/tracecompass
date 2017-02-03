@@ -396,9 +396,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         IStateHistoryBackend partialBackend = new PartialHistoryBackend(id + ".partial", partialProvider, pss, realBackend, granularity); //$NON-NLS-1$
 
         /* 4 */
-        @SuppressWarnings("restriction")
-        org.eclipse.tracecompass.internal.statesystem.core.StateSystem realSS =
-        (org.eclipse.tracecompass.internal.statesystem.core.StateSystem) StateSystemFactory.newStateSystem(partialBackend);
+        ITmfStateSystemBuilder realSS = StateSystemFactory.newStateSystem(partialBackend);
 
         /* 5 */
         pss.assignUpstream(realSS);
