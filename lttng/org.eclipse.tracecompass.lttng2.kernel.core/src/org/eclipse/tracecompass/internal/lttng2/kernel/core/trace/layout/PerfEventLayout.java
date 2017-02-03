@@ -47,12 +47,12 @@ public final class PerfEventLayout implements IKernelAnalysisEventLayout {
 
     @Override
     public String eventIrqHandlerEntry() {
-        return "irq:irq_handler_exit"; //$NON-NLS-1$
+        return "irq:irq_handler_entry"; //$NON-NLS-1$
     }
 
     @Override
     public String eventIrqHandlerExit() {
-        return "irq:irq_handler_entry"; //$NON-NLS-1$
+        return "irq:irq_handler_exit"; //$NON-NLS-1$
     }
 
     @Override
