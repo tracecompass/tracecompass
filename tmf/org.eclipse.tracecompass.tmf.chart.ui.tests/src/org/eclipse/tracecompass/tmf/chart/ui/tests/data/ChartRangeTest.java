@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNotNull;
 import java.math.BigDecimal;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRange;
 import org.junit.Test;
 
@@ -26,9 +25,9 @@ import org.junit.Test;
  */
 public class ChartRangeTest {
 
-    private static final @NonNull BigDecimal ZERO = NonNullUtils.checkNotNull(BigDecimal.ZERO);
-    private static final @NonNull BigDecimal ONE = NonNullUtils.checkNotNull(BigDecimal.ONE);
-    private static final @NonNull BigDecimal TEN = NonNullUtils.checkNotNull(BigDecimal.TEN);
+    private static final @NonNull BigDecimal ZERO = BigDecimal.ZERO;
+    private static final @NonNull BigDecimal ONE = BigDecimal.ONE;
+    private static final @NonNull BigDecimal TEN = BigDecimal.TEN;
 
     /**
      * Test the default constructor

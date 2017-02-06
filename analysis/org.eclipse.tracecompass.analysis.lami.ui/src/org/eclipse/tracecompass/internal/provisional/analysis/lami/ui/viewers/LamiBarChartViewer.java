@@ -84,7 +84,7 @@ public class LamiBarChartViewer extends LamiXYChartViewer {
     private final Map<ISeries, List<Mapping>> fIndexPerSeriesMapping;
     private final Map<LamiTableEntry, Mapping> fEntryToCategoriesMap;
 
-    private LamiGraphRange fYInternalRange = new LamiGraphRange(checkNotNull(BigDecimal.ZERO), checkNotNull(BigDecimal.ONE));
+    private LamiGraphRange fYInternalRange = new LamiGraphRange(BigDecimal.ZERO, BigDecimal.ONE);
     private LamiGraphRange fYExternalRange;
 
 

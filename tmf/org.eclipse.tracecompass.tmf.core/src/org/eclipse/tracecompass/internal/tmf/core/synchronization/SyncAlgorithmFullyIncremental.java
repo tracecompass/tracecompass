@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.synchronization.graph.SyncSpanningTree;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -220,7 +221,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
          * Slopes and ordinate at origin of respectively fLmin, fLmax and the
          * bisector
          */
-        private BigDecimal fAlphamin, fBetamax, fAlphamax, fBetamin, fAlpha, fBeta;
+        private @NonNull BigDecimal fAlphamin, fBetamax, fAlphamax, fBetamin, fAlpha, fBeta;
         private int fNbMatches, fNbAccurateMatches;
         private SyncQuality fQuality;
 
@@ -587,7 +588,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
         /*
          * Gets the alpha (slope) between two points
          */
-        public BigDecimal getAlpha(SyncPoint p1) {
+        public @NonNull BigDecimal getAlpha(SyncPoint p1) {
             if (p1 == null) {
                 return BigDecimal.ONE;
             }
@@ -602,7 +603,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
         /*
          * Get the beta value (when x = 0) of the line given alpha
          */
-        public BigDecimal getBeta(BigDecimal alpha) {
+        public @NonNull BigDecimal getBeta(BigDecimal alpha) {
             return BigDecimal.valueOf(y.getValue()).subtract(alpha.multiply(BigDecimal.valueOf(x.getValue()), fMc));
         }
 

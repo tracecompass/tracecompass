@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.tmf.core.synchronization;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
@@ -38,8 +39,8 @@ public class TmfTimestampTransformLinear implements ITmfTimestampTransformInvert
     /**
      * Respectively the slope and offset and this linear equation.
      */
-    private final BigDecimal fAlpha;
-    private final BigDecimal fBeta;
+    private final @NonNull BigDecimal fAlpha;
+    private final @NonNull BigDecimal fBeta;
 
     private static final MathContext fMc = MathContext.DECIMAL128;
 

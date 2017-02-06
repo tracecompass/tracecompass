@@ -18,6 +18,7 @@ import java.io.ObjectInputStream;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -68,8 +69,8 @@ public class TmfTimestampTransformLinearFast implements ITmfTimestampTransformIn
     private static final HashFunction HASHER = Hashing.goodFastHash(32);
     private static final MathContext MC = MathContext.DECIMAL128;
 
-    private final BigDecimal fAlpha;
-    private final BigDecimal fBeta;
+    private final @NonNull BigDecimal fAlpha;
+    private final @NonNull BigDecimal fBeta;
     private final long fAlphaLong;
     private final long fDeltaMax;
     private final int fDeltaBits;
@@ -108,7 +109,7 @@ public class TmfTimestampTransformLinearFast implements ITmfTimestampTransformIn
      * @param beta
      *            The initial offset of the linear transform
      */
-    public TmfTimestampTransformLinearFast(final BigDecimal alpha, final BigDecimal beta) {
+    public TmfTimestampTransformLinearFast(final @NonNull BigDecimal alpha, final @NonNull BigDecimal beta) {
         /*
          * Validate the slope range:
          *

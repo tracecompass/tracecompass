@@ -42,8 +42,8 @@ public class ChartRange {
      * Constructor.
      */
     public ChartRange() {
-        fMinimum = checkNotNull(BigDecimal.ZERO);
-        fMaximum = checkNotNull(BigDecimal.ONE);
+        fMinimum = BigDecimal.ZERO;
+        fMaximum = BigDecimal.ONE;
         fRange = checkNotNull(getMaximum().subtract(getMinimum()));
     }
 
@@ -67,7 +67,7 @@ public class ChartRange {
              */
             fMinimum = minimum;
             fMaximum = minimum.add(BigDecimal.ONE);
-            fRange = checkNotNull(BigDecimal.ONE);
+            fRange = BigDecimal.ONE;
         } else {
             fMinimum = minimum;
             fMaximum = maximum;
@@ -119,7 +119,7 @@ public class ChartRange {
      */
     public ChartRange clamp() {
         if (fMinimum.compareTo(BigDecimal.ZERO) > 0) {
-            fMinimum = checkNotNull(BigDecimal.ZERO);
+            fMinimum = BigDecimal.ZERO;
             fRange = fMaximum;
         }
 

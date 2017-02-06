@@ -72,8 +72,8 @@ public class LamiScatterViewer extends LamiXYChartViewer {
     private final Map<ISeries, List<Integer>> fIndexMapping;
 
     /* Use a scale from 0 to 1 internally for both axes */
-    private LamiGraphRange fXInternalRange = new LamiGraphRange(checkNotNull(BigDecimal.ZERO), checkNotNull(BigDecimal.ONE));
-    private LamiGraphRange fYInternalRange = new LamiGraphRange(checkNotNull(BigDecimal.ZERO), checkNotNull(BigDecimal.ONE));
+    private LamiGraphRange fXInternalRange = new LamiGraphRange(BigDecimal.ZERO, BigDecimal.ONE);
+    private LamiGraphRange fYInternalRange = new LamiGraphRange(BigDecimal.ZERO, BigDecimal.ONE);
 
     private @Nullable LamiGraphRange fXExternalRange = null;
     private @Nullable LamiGraphRange fYExternalRange = null;
