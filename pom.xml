@@ -43,8 +43,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <testArgLine></testArgLine>
 
-    <tycho-version>0.26.0</tycho-version>
-    <tycho-extras-version>0.26.0</tycho-extras-version>
+    <tycho-version>1.0.0</tycho-version>
+    <tycho-extras-version>1.0.0</tycho-extras-version>
     <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/tracecompass/org.eclipse.tracecompass.git</tycho.scmUrl>
     <cbi-plugins.version>1.1.3</cbi-plugins.version>
     <target-platform>tracecompass-e4.6</target-platform>
@@ -464,7 +464,6 @@
             <source>1.8</source>
             <target>1.8</target>
             <encoding>UTF-8</encoding>
-            <useProjectSettings>true</useProjectSettings>
             <compilerArguments>
               <annotationpath>common/org.eclipse.tracecompass.common.core/annotations</annotationpath>
             </compilerArguments>
