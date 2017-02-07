@@ -80,9 +80,7 @@ public class XmlStateProvider extends AbstractTmfStateProvider implements IXmlSt
         fFilePath = file;
         Element doc = XmlUtils.getElementInFile(fFilePath.makeAbsolute().toOSString(), TmfXmlStrings.STATE_PROVIDER, fStateId);
         if (doc == null) {
-            fLocations = new HashSet<>();
-            fMappingGroups = new HashMap<>();
-            return;
+            throw new IllegalArgumentException("XmlStateProvider: Cannot find state provider element in file " + file); //$NON-NLS-1$
         }
 
         ITmfXmlModelFactory modelFactory = TmfXmlReadWriteModelFactory.getInstance();

@@ -11,10 +11,16 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stateprovider;
 
+import static org.junit.Assert.assertNotNull;
+
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateProvider;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
+import org.junit.Test;
 
 /**
  * Test suite for the xml state providers
@@ -25,6 +31,14 @@ import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFil
  * @author Geneviève Bastien
  */
 public class StateProviderTest extends XmlProviderTestBase {
+
+    /**
+     * Test an invalid instantiation
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidInput() {
+        assertNotNull(new XmlStateProvider(CtfTmfTestTraceUtils.getTrace(getTrace()), "Bla", Path.fromOSString("")));
+    }
 
     @Override
     protected @NonNull String getAnalysisNodeName() {

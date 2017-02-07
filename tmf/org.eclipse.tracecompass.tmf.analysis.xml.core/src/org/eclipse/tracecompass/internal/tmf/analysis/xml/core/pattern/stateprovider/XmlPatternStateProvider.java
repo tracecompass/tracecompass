@@ -18,10 +18,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlMapEntry;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlMapEntry;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternEventHandler;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioHistoryBuilder;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readwrite.TmfXmlReadWriteModelFactory;
@@ -58,7 +57,7 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
     /** Map for stored values */
     private final @NonNull Map<@NonNull String, @NonNull String> fStoredFields = new HashMap<>();
 
-    private TmfXmlPatternEventHandler fHandler;
+    private final TmfXmlPatternEventHandler fHandler;
 
     private final ISegmentListener fListener;
 
@@ -84,10 +83,7 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
         final String pathString = fFilePath.makeAbsolute().toOSString();
         Element doc = XmlUtils.getElementInFile(pathString, TmfXmlStrings.PATTERN, fStateId);
         if (doc == null) {
-            fLocations = new HashSet<>();
-            fMappingGroups = new HashMap<>();
-            Activator.logError("Failed to find a pattern in " + pathString); //$NON-NLS-1$
-            return;
+            throw new IllegalArgumentException("XmlPatternStateProvider: Cannot find pattern element in file " + pathString); //$NON-NLS-1$
         }
 
         /* parser for defined Fields */
