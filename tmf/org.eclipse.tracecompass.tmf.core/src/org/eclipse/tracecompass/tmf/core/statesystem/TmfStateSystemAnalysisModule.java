@@ -174,6 +174,15 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         return fInitializationSucceeded;
     }
 
+    @Override
+    protected void onFail() {
+        super.onFail();
+        // Make sure any analysis waiting for initialization can continue
+        if (fInitialized.getCount() > 0) {
+            analysisReady(false);
+        }
+    }
+
     /**
      * @since 2.0
      */

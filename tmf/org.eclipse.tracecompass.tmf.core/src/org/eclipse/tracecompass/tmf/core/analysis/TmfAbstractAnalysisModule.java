@@ -286,6 +286,19 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
     @Override
     public final void fail(Throwable cause) {
         fFailureCause = cause;
+        onFail();
+    }
+
+    /**
+     * Method executed when the analysis has failed, so that analysis can
+     * rectify their state. For instance, if the analysis had not been
+     * initialized when the exception occurred, this method could mark the
+     * initialization as failed.
+     *
+     * @since 2.3
+     */
+    protected void onFail() {
+        // Do nothing by default
     }
 
     @Override

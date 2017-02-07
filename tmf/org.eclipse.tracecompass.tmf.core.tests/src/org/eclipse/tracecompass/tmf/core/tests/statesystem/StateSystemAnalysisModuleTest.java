@@ -22,7 +22,9 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -303,7 +305,9 @@ public class StateSystemAnalysisModuleTest {
 
     /**
      * Test that an analysis with full backend is re-read correctly
-     * @throws TmfAnalysisException Propagates exceptions
+     *
+     * @throws TmfAnalysisException
+     *             Propagates exceptions
      */
     @Test
     public void testReReadFullAnalysis() throws TmfAnalysisException {
@@ -418,6 +422,36 @@ public class StateSystemAnalysisModuleTest {
         try {
             module.setTrace(trace);
             module.schedule();
+            assertFalse(module.waitForCompletion());
+        } finally {
+            module.dispose();
+        }
+    }
+
+    /**
+     * Test a module that causes an exception before the module is initialized
+     *
+     * @throws TmfAnalysisException
+     *             An exception when setting the trace
+     */
+    @Test
+    public void testFailBeforeInitialization() throws TmfAnalysisException {
+        ITmfTrace trace = fTrace;
+        assertNotNull(trace);
+
+        /* This module will throw an exception before it is initialized */
+        TmfStateSystemAnalysisModule module = new TestStateSystemModule() {
+
+            @Override
+            protected boolean executeAnalysis(@Nullable IProgressMonitor monitor) {
+                throw new IllegalStateException("This exception happens before initialization");
+            }
+
+        };
+        try {
+            module.setTrace(trace);
+            module.schedule();
+            assertFalse(module.waitForInitialization());
             assertFalse(module.waitForCompletion());
         } finally {
             module.dispose();
