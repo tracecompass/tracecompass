@@ -19,7 +19,6 @@
 <event timestamp="7" name="block_bio_frontmerge">
 <field name="cpu" value="0" type="int" />
 <field name="dev" value="8388624" type="long" />
-<field name="rq_sector" value="444" type="long" />
 <field name="sector" value="436" type="long" />
 <field name="nr_sector" value="8" type="long" />
 <field name="rwbs" value="33" type="long" />
