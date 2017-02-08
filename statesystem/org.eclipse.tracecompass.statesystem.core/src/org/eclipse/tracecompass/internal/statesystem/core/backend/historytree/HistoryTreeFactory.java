@@ -9,7 +9,6 @@
 
 package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -19,8 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.IHistoryTree;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.classic.ClassicHistoryTree;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.classic.HistoryTreeClassic;
 
 /**
  * Class that contains factory methods to build different types of history trees
@@ -34,40 +32,18 @@ public final class HistoryTreeFactory {
     }
 
     /**
-     * Create a new History Tree from scratch, specifying all configuration
-     * parameters.
+     * Create a new State History from scratch, using a {@link HTConfig} object
+     * for configuration.
      *
-     * @param stateHistoryFile
-     *            The name of the history file
-     * @param blockSize
-     *            The size of each "block" on disk in bytes. One node will
-     *            always fit in one block. It should be at least 4096.
-     * @param maxChildren
-     *            The maximum number of children allowed per core (non-leaf)
-     *            node.
-     * @param providerVersion
-     *            The version of the state provider. If a file already exists,
-     *            and their versions match, the history file will not be rebuilt
-     *            uselessly.
-     * @param treeStart
-     *            The start time of the history
-     * @return The new history tree
+     * @param conf
+     *            The config to use for this History Tree.
+     * @return the new state history tree
      * @throws IOException
      *             If an error happens trying to open/write to the file
      *             specified in the config
      */
-    public static IHistoryTree<StateSystemInterval> createHistoryTree(File stateHistoryFile,
-            int blockSize,
-            int maxChildren,
-            int providerVersion,
-            long treeStart) throws IOException {
-
-        return new ClassicHistoryTree<>(stateHistoryFile,
-                blockSize,
-                maxChildren,
-                providerVersion,
-                treeStart,
-                StateSystemInterval.DESERIALISER);
+    public static IHistoryTree createHistoryTree(HTConfig conf) throws IOException {
+        return new HistoryTreeClassic(conf);
     }
 
     /**
@@ -82,8 +58,7 @@ public final class HistoryTreeFactory {
      * @throws IOException
      *             If an error happens reading the file
      */
-    public static IHistoryTree<StateSystemInterval> createFromFile(
-            Path existingStateFile, int expectedProviderVersion) throws IOException {
+    public static IHistoryTree createFromFile(Path existingStateFile, int expectedProviderVersion) throws IOException {
         /*
          * Check the file exists and has a positive length. These verifications
          * will also be done in the HT's constructor.
@@ -109,9 +84,8 @@ public final class HistoryTreeFactory {
          */
         int magicNumber = buffer.getInt();
         switch (magicNumber) {
-        case ClassicHistoryTree.HISTORY_FILE_MAGIC_NUMBER:
-            return new ClassicHistoryTree<>(existingStateFile.toFile(),
-                    expectedProviderVersion, StateSystemInterval.DESERIALISER);
+        case HistoryTreeClassic.HISTORY_FILE_MAGIC_NUMBER:
+            return new HistoryTreeClassic(existingStateFile.toFile(), expectedProviderVersion);
         default:
             throw new IOException("Not a known history tree file"); //$NON-NLS-1$
         }

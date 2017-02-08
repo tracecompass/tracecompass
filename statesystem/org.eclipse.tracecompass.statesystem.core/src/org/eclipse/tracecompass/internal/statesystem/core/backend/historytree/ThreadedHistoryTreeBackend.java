@@ -37,7 +37,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
         implements Runnable {
 
     private static final int CHUNK_SIZE = 127;
-    private final @NonNull BufferedBlockingQueue<StateSystemInterval> intervalQueue;
+    private final @NonNull BufferedBlockingQueue<HTInterval> intervalQueue;
     private final @NonNull Thread shtThread;
     /**
      * The backend tracks its end time separately from the tree, to take into
@@ -73,7 +73,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
      *             If there was a problem opening the history file for writing
      */
     public ThreadedHistoryTreeBackend(@NonNull String ssid,
-            @NonNull File newStateFile,
+            File newStateFile,
             int providerVersion,
             long startTime,
             int queueSize,
@@ -110,7 +110,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
      *             If there was a problem opening the history file for writing
      */
     public ThreadedHistoryTreeBackend(@NonNull String ssid,
-            @NonNull File newStateFile,
+            File newStateFile,
             int providerVersion,
             long startTime,
             int queueSize)
@@ -139,7 +139,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
          * underneath, we'll put them in the Queue. They will then be taken and
          * processed by the other thread executing the run() method.
          */
-        StateSystemInterval interval = new StateSystemInterval(stateStartTime, stateEndTime,
+        HTInterval interval = new HTInterval(stateStartTime, stateEndTime,
                 quark, (TmfStateValue) value);
         intervalQueue.put(interval);
         fEndTime = Math.max(fEndTime, stateEndTime);
@@ -186,7 +186,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
          * closeTree()
          */
         try {
-            StateSystemInterval pill = new StateSystemInterval(-1, endTime, -1, TmfStateValue.nullValue());
+            HTInterval pill = new HTInterval(-1, endTime, -1, TmfStateValue.nullValue());
             intervalQueue.put(pill);
             intervalQueue.flushInputBuffer();
             shtThread.join();
@@ -200,10 +200,10 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
     @Override
     public void run() {
         try {
-            StateSystemInterval currentInterval = intervalQueue.blockingPeek();
+            HTInterval currentInterval = intervalQueue.blockingPeek();
             while (currentInterval.getStartTime() != -1) {
                 /* Send the interval to the History Tree */
-                getSHT().insert(currentInterval);
+                getSHT().insertInterval(currentInterval);
                 /* Actually remove the interval from the queue */
                 // FIXME Replace with remove() once it is implemented.
                 intervalQueue.take();
