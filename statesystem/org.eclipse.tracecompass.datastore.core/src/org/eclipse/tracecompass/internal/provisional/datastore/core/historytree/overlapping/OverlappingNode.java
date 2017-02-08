@@ -15,6 +15,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -23,7 +24,6 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.RangeCondition;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.exceptions.RangeException;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTNode;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.IHTNode;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
@@ -184,9 +184,9 @@ public class OverlappingNode<E extends IHTInterval> extends HTNode<E> {
         protected Collection<Integer> selectNextIndices(RangeCondition<Long> rc) {
             OverlappingNode<?> node = getNode();
 
-            if (rc.min() < node.getNodeStart()
-                    || (node.isOnDisk() && rc.max() > node.getNodeEnd())) {
-                throw new RangeException("Requesting children outside the node's range: " + rc.toString()); //$NON-NLS-1$
+            if (rc.max() < node.getNodeStart()
+                    || (node.isOnDisk() && rc.min() > node.getNodeEnd())) {
+                return Collections.emptySet();
             }
 
             node.takeReadLock();
