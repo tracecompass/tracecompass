@@ -47,7 +47,7 @@ time, the review process for this code is the same as consensus.
 
 
     analysis/graph          | Geneviève + Matthew
-    analysis/lami           | Alexandre + Matthew
+    analysis/lami           | *Open*
     analysis/os.linux       | Matthew + Geneviève (core) + Patrick (ui)
     analysis/timing         | Matthew + Bernd
     btf                     | Bernd + Matthew
@@ -56,12 +56,12 @@ time, the review process for this code is the same as consensus.
     doc                     | *follows the runtime code*
     gdbtrace                | Patrick + Marc-André
     lttng.control           | Bernd + Marc-André
-    lttng.kernel            | Alexandre + Geneviève
+    lttng.kernel            | *Open*
     lttng.kernel.{vm+graph} | *same os.linux, should move there eventually*
-    lttng.ust               | Alexandre + Marc-André
+    lttng.ust               | *Open*
     pcap                    | Marc-Andre + Matthew
     rcp                     | Bernd + Marc-André
-    releng                  | Marc-André + Bernd + Alexandre
+    releng                  | Marc-André + Bernd
     ss.segmentstore         | Jean-Christian + Geneviève
     ss.statesystem          | Alexandre + Geneviève
     tmf.xml                 | Geneviève + Jean-Christian
