@@ -36,6 +36,7 @@
             </goals>
             <configuration>
               <excludes>
+                <plugin id="javax.xml"/>
                 <plugin id="org.apache.commons.compress"/>
                 <plugin id="org.apache.commons.lang3"/>
                 <plugin id="org.apache.xerces"/>
