@@ -90,13 +90,16 @@ public class FlameGraphView extends TmfView {
     private ITmfTrace fTrace;
 
     private final @NonNull MenuManager fEventMenuManager = new MenuManager();
-    private Action fSortByNameAction;
-    private Action fSortByIdAction;
     /**
      * A plain old semaphore is used since different threads will be competing
      * for the same resource.
      */
+
     private final Semaphore fLock = new Semaphore(1);
+
+    private Action fSortByNameAction;
+    private Action fSortByIdAction;
+    private Job fJob;
 
     /**
      * Constructor
@@ -191,6 +194,10 @@ public class FlameGraphView extends TmfView {
          *
          * 4- on a clean execution
          */
+        Job job = fJob;
+        if (job != null) {
+            job.cancel();
+        }
         try {
             fLock.acquire();
         } catch (InterruptedException e) {
@@ -204,24 +211,28 @@ public class FlameGraphView extends TmfView {
         }
         fTimeGraphViewer.setInput(callGraphAnalysis.getSegmentStore());
         callGraphAnalysis.schedule();
-        Job j = new Job(Messages.CallGraphAnalysis_Execution) {
+        job = new Job(Messages.CallGraphAnalysis_Execution) {
 
             @Override
             protected IStatus run(IProgressMonitor monitor) {
-                if (monitor.isCanceled()) {
+                try {
+                    if (monitor.isCanceled()) {
+                        return Status.CANCEL_STATUS;
+                    }
+                    callGraphAnalysis.waitForCompletion(monitor);
+                    Display.getDefault().asyncExec(() -> {
+                        fTimeGraphViewer.setInput(callGraphAnalysis.getThreadNodes());
+                        fTimeGraphViewer.resetStartFinishTime();
+                    });
+                    return Status.OK_STATUS;
+                } finally {
+                    fJob = null;
                     fLock.release();
-                    return Status.CANCEL_STATUS;
                 }
-                callGraphAnalysis.waitForCompletion(monitor);
-                Display.getDefault().asyncExec(() -> {
-                    fTimeGraphViewer.setInput(callGraphAnalysis.getThreadNodes());
-                    fTimeGraphViewer.resetStartFinishTime();
-                    fLock.release();
-                });
-                return Status.OK_STATUS;
             }
         };
-        j.schedule();
+        fJob = job;
+        job.schedule();
     }
 
     /**
