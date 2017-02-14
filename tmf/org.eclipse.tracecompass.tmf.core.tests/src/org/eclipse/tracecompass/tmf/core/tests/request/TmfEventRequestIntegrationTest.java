@@ -9,8 +9,10 @@
 
 package org.eclipse.tracecompass.tmf.core.tests.request;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,17 +23,22 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.core.component.TmfProviderManager;
 import org.eclipse.tracecompass.internal.tmf.core.request.TmfCoalescedEventRequest;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.request.TmfEventRequestStub;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -46,7 +53,7 @@ public class TmfEventRequestIntegrationTest {
 
     /**
      * The test should timeout after a few seconds, that would mean a deadlock
-     * may have hapened
+     * may have happened
      */
      @Rule
      public TestRule globalTimeout = new Timeout(120, TimeUnit.SECONDS);
@@ -54,23 +61,35 @@ public class TmfEventRequestIntegrationTest {
     private static final TmfTestTrace TEST_TRACE = TmfTestTrace.A_TEST_10K;
 
     // Initialize the test trace
-    private TmfTraceStub fTrace = null;
+    private static TmfTraceStub fTrace = null;
 
-    private synchronized TmfTraceStub setupTrace(String path) {
-        if (fTrace == null) {
-            try {
-                URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
-                File test = new File(FileLocator.toFileURL(location).toURI());
-                fTrace = new TmfTraceStub(test.getPath(), 500, false, null);
-            } catch (TmfTraceException e) {
-                e.printStackTrace();
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    /**
+     * Test class setup
+     */
+    @BeforeClass
+    public static void setUp() {
+        try {
+            final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TEST_TRACE.getFullPath()), null);
+            final File test = new File(FileLocator.toFileURL(location).toURI());
+            fTrace = new TmfTraceStub(test.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
+            TmfSignalManager.deregister(fTrace);
+            fTrace.indexTrace(true);
+        } catch (final TmfTraceException | URISyntaxException | IOException e) {
+            e.printStackTrace();
+            fail("Error setting up test trace");
         }
-        return fTrace;
+    }
+
+    /**
+     * Test class clean-up
+     */
+    @AfterClass
+    public static void tearDown() {
+        if (fTrace != null) {
+            fTrace.dispose();
+            fTrace = null;
+            assertEquals(0, TmfProviderManager.getProviders(ITmfEvent.class).length);
+        }
     }
 
     /**
@@ -81,7 +100,7 @@ public class TmfEventRequestIntegrationTest {
      */
     @Test
     public void testSingleRequestException() throws InterruptedException {
-        TmfTrace trace = setupTrace(TEST_TRACE.getFullPath());
+        TmfTrace trace = fTrace;
 
         TmfEventRequest requestFail = new TmfEventRequestStub(ITmfEvent.class, TmfTimeRange.ETERNITY, 2, 0, ExecutionType.BACKGROUND, 0) {
 
@@ -107,7 +126,7 @@ public class TmfEventRequestIntegrationTest {
      */
     @Test
     public void testRequestException() throws InterruptedException {
-        TmfTrace trace = setupTrace(TEST_TRACE.getFullPath());
+        TmfTrace trace = fTrace;
 
         TmfCoalescedEventRequest allRequests = new TmfCoalescedEventRequest(ITmfEvent.class, TmfTimeRange.ETERNITY, 2, 0, ExecutionType.BACKGROUND, 0);
         TmfEventRequest requestOk = new TmfEventRequestStub(ITmfEvent.class, TmfTimeRange.ETERNITY, 2, 0, ExecutionType.BACKGROUND, 0);
