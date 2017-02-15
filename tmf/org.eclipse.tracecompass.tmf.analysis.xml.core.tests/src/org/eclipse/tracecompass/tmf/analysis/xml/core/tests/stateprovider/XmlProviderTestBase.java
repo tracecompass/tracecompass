@@ -52,7 +52,7 @@ public abstract class XmlProviderTestBase {
     @Before
     public void setupTest() {
         /* Initialize the trace */
-        ITmfTrace trace = CtfTmfTestTraceUtils.getTrace(getTrace());
+        ITmfTrace trace = CtfTmfTestTraceUtils.getTrace(getTestTrace());
         fTrace = trace;
 
         /* Initialize the state provider module */
@@ -94,7 +94,7 @@ public abstract class XmlProviderTestBase {
     @After
     public void cleanup() {
         fModule.dispose();
-        CtfTmfTestTraceUtils.dispose(getTrace());
+        CtfTmfTestTraceUtils.dispose(getTestTrace());
     }
 
     /**
@@ -116,7 +116,16 @@ public abstract class XmlProviderTestBase {
      *
      * @return The trace
      */
-    protected abstract @NonNull CtfTestTrace getTrace();
+    protected abstract @NonNull CtfTestTrace getTestTrace();
+
+    /**
+     * Get the trace to use for the tests
+     *
+     * @return The instance of the the test trace
+     */
+    protected ITmfTrace getTrace() {
+        return fTrace;
+    }
 
     /**
      * Cleanup after the test
