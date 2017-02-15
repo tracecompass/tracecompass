@@ -27,6 +27,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Predicate;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.datastore.core.historytree.HtIo;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.RangeCondition;
@@ -906,6 +907,36 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
         } catch (ClosedChannelException e) {
         }
         return Iterables.concat(intervalsOfNodes);
+    }
+
+    @Override
+    public @Nullable E getMatchingInterval(RangeCondition<Long> timeCondition,
+            Predicate<E> extraPredicate) {
+
+        /* Queue a stack of nodes containing nodes intersecting t */
+        Deque<Integer> queue = new LinkedList<>();
+        /* We start by reading the information in the root node */
+        queue.add(getRootNode().getSequenceNumber());
+
+        /* Then we follow the down in the relevant children until we find the interval */
+        try {
+            while (!queue.isEmpty()) {
+                int sequenceNumber = queue.pop();
+                HTNode<E> currentNode = readNode(sequenceNumber);
+
+                @Nullable E interval = currentNode.getMatchingInterval(timeCondition, extraPredicate);
+                if (interval != null) {
+                    return interval;
+                }
+
+                if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
+                    /* Here we add the relevant children nodes for BFS */
+                    queue.addAll(currentNode.selectNextChildren(timeCondition));
+                }
+            }
+        } catch (ClosedChannelException e) {
+        }
+        return null;
     }
 
     @Override

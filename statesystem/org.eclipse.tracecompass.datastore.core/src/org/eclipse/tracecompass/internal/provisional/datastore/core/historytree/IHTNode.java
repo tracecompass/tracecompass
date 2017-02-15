@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Predicate;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.RangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.exceptions.RangeException;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
@@ -166,6 +167,20 @@ public interface IHTNode<E extends IHTInterval> {
      * @return Iterable of the elements in this node matching the condtions
      */
     Iterable<E> getMatchingIntervals(RangeCondition<Long> timeCondition,
+            Predicate<E> extraPredicate);
+
+    /**
+     * Retrieve an interval inside this node that matches the given conditions.
+     *
+     * @param timeCondition
+     *            The time-based RangeCondition
+     * @param extraPredicate
+     *            Extra predicate to run on the elements. Only intervals also
+     *            matching this predicate will be returned.
+     * @return An interval matching the conditions or <code>null</code> if no
+     *         interval was found
+     */
+    @Nullable E getMatchingInterval(RangeCondition<Long> timeCondition,
             Predicate<E> extraPredicate);
 
     /**

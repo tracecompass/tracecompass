@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.util.function.Predicate;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.RangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.exceptions.RangeException;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
@@ -148,6 +149,24 @@ public interface IHistoryTree<E extends IHTInterval> {
      * @return An Iterable of the matching elements
      */
     Iterable<E> getMatchingIntervals(RangeCondition<Long> timeCondition,
+            Predicate<E> extraPredicate);
+
+    /**
+     * Query the tree to retrieve an interval matching the given conditions.
+     *
+     * @param timeCondition
+     *            Time-based RangeCondition, can represent a single timestamp, a
+     *            series of punctual timestamps, or a time range.
+     * @param extraPredicate
+     *            Extra check to run on the elements to determine if they should
+     *            be returned or not. This will be checked at the node level, so
+     *            if it's known in advance it might be advantageous to pass it
+     *            here rather than checking it yourself on the returned
+     *            Iterable.
+     * @return An interval matching the given conditions, or <code>null</code>
+     *         if no interval was found.
+     */
+    @Nullable E getMatchingInterval(RangeCondition<Long> timeCondition,
             Predicate<E> extraPredicate);
 
     // ------------------------------------------------------------------------

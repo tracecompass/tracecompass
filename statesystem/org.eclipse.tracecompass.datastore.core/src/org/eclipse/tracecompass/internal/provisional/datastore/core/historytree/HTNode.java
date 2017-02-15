@@ -37,7 +37,6 @@ import org.eclipse.tracecompass.internal.provisional.datastore.core.serializatio
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 
 /**
  * The base class for all the types of nodes that go in the History Tree.
@@ -579,6 +578,9 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
      * Sub-classes may override this to change or specify the interval
      * comparator.
      *
+     * NOTE: sub-classes who override this may also need to override the
+     * {@link #getStartIndexFor(RangeCondition, Predicate)}.
+     *
      * @return The way intervals are to be sorted in this node
      */
     protected Comparator<E> getIntervalComparator() {
@@ -681,30 +683,112 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
     public Iterable<E> getMatchingIntervals(RangeCondition<Long> timeCondition,
             Predicate<E> extraPredicate) {
 
-        // TODO Use getIntervalComparator() to restrict the dataset further
         // TODO Benchmark using/returning streams instead of iterables
 
         if (isOnDisk()) {
-            @NonNull Iterable<E> ret = fIntervals;
-            ret = Iterables.filter(ret, interval -> timeCondition.intersects(interval.getStart(), interval.getEnd()));
-            ret = Iterables.filter(ret, interval -> extraPredicate.test(interval));
-            return ret;
+            return doGetMatchingIntervals(timeCondition, extraPredicate);
         }
 
         takeReadLock();
         try {
-        return fIntervals.stream()
-                .filter(interval -> timeCondition.intersects(interval.getStart(), interval.getEnd()))
-                .filter(extraPredicate)
-                    /*
-                     * Because this class works with read locks, we can't
-                     * return a lazy stream unfortunately. Room for improvement?
-                     */
-                .collect(Collectors.toList());
+            return doGetMatchingIntervals(timeCondition, extraPredicate);
 
         } finally {
             releaseReadLock();
         }
+    }
+
+    @Override
+    public @Nullable E getMatchingInterval(RangeCondition<Long> timeCondition, Predicate<E> extraPredicate) {
+        if (isOnDisk()) {
+            return doGetMatchingInterval(timeCondition, extraPredicate);
+        }
+
+        takeReadLock();
+        try {
+            return doGetMatchingInterval(timeCondition, extraPredicate);
+
+        } finally {
+            releaseReadLock();
+        }
+    }
+
+    private Iterable<E> doGetMatchingIntervals(RangeCondition<Long> timeCondition,
+            Predicate<E> extraPredicate) {
+        List<E> list = new ArrayList<>();
+        for (int i = getStartIndexFor(timeCondition, extraPredicate); i < fIntervals.size(); i++) {
+            E curInterval = fIntervals.get(i);
+            if (timeCondition.intersects(curInterval.getStart(), curInterval.getEnd()) &&
+                    extraPredicate.test(curInterval)) {
+                list.add(curInterval);
+            }
+        }
+        return list;
+    }
+
+    private @Nullable E doGetMatchingInterval(RangeCondition<Long> timeCondition,
+            Predicate<E> extraPredicate) {
+        for (int i = getStartIndexFor(timeCondition, extraPredicate); i < fIntervals.size(); i++) {
+            E curInterval = fIntervals.get(i);
+            if (timeCondition.intersects(curInterval.getStart(), curInterval.getEnd()) &&
+                    extraPredicate.test(curInterval)) {
+                return curInterval;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get the start index. It will skip all the intervals that end before the
+     * beginning of the time range.
+     *
+     * NOTE: This method goes with the comparator. If a tree overrides the
+     * default comparator (that sorts first by end time), then it will need to
+     * override this method. Here, the binary search is re-implemented because
+     * the interval type is generic but a tree for a concrete type could use a
+     * binary search instead.
+     *
+     * @param timeCondition
+     *            The time-based RangeCondition
+     * @param extraPredicate
+     *            Extra predicate to run on the elements.
+     * @return The index of the first interval greater than or equal to the
+     *         conditions in parameter
+     */
+    protected int getStartIndexFor(RangeCondition<Long> timeCondition, Predicate<E> extraPredicate) {
+        if (fIntervals.isEmpty()) {
+            return 0;
+        }
+        /*
+         * Implement our own binary search since the intervals are generic, we
+         * cannot make a dummy interval and find its position
+         */
+        int low = 0;
+        int high = fIntervals.size() - 1;
+        long target = timeCondition.min();
+
+        while (low <= high) {
+            // Divide the sum by 2
+            int mid = (low + high) >>> 1;
+            E midVal = fIntervals.get(mid);
+            long end = midVal.getEnd();
+
+            if (end < target) {
+                low = mid + 1;
+            } else if (end > target) {
+                high = mid - 1;
+            } else {
+                // key found, rewind to see where it starts
+                while (end == target && mid > 0) {
+                    mid = mid - 1;
+                    midVal = fIntervals.get(mid);
+                    end = midVal.getEnd();
+                }
+                // if end == target, then mid is 0
+                return (end == target ? mid : mid + 1); // key found
+            }
+        }
+        return low; // key not found
     }
 
     @Override
@@ -985,4 +1069,5 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
     public void debugPrintIntervals(PrintStream writer) {
         getIntervals().forEach(writer::println);
     }
+
 }
