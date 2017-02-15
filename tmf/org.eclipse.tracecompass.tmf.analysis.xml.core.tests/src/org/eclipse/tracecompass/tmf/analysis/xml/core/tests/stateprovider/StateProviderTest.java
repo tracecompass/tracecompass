@@ -19,7 +19,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.Tmf
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateProvider;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.junit.Test;
 
 /**
@@ -37,7 +37,9 @@ public class StateProviderTest extends XmlProviderTestBase {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidInput() {
-        assertNotNull(new XmlStateProvider(CtfTmfTestTraceUtils.getTrace(getTrace()), "Bla", Path.fromOSString("")));
+        ITmfTrace trace = getTrace();
+        assertNotNull(trace);
+        assertNotNull(new XmlStateProvider(trace, "Bla", Path.fromOSString("")));
     }
 
     @Override
@@ -51,7 +53,7 @@ public class StateProviderTest extends XmlProviderTestBase {
     }
 
     @Override
-    protected @NonNull CtfTestTrace getTrace() {
+    protected @NonNull CtfTestTrace getTestTrace() {
         return CtfTestTrace.KERNEL;
     }
 

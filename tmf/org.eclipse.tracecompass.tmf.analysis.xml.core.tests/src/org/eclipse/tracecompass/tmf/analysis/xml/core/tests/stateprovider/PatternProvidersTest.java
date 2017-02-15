@@ -22,7 +22,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.junit.Test;
 
 /**
@@ -38,11 +38,13 @@ public class PatternProvidersTest extends XmlProviderTestBase {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidInput() {
-        assertNotNull(new XmlPatternStateProvider(CtfTmfTestTraceUtils.getTrace(getTrace()), "Bla", Path.fromOSString(""), (@NonNull ISegment segment) -> { }));
+        ITmfTrace trace = getTrace();
+        assertNotNull(trace);
+        assertNotNull(new XmlPatternStateProvider(trace, "Bla", Path.fromOSString(""), (@NonNull ISegment segment) -> { }));
     }
 
     @Override
-    protected CtfTestTrace getTrace() {
+    protected CtfTestTrace getTestTrace() {
         return CtfTestTrace.ARM_64_BIT_HEADER;
     }
 
