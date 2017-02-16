@@ -471,7 +471,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
         ISafeByteBufferReader readBuffer = SafeByteBufferFactory.wrapReader(buffer, res - buffer.position());
         for (int i = 0; i < intervalCount; i++) {
             E interval = objectReader.readInterval(readBuffer);
-            newNode.add(interval);
+            newNode.addNoCheck(interval);
         }
 
         /* Assign the node's other information we have read previously */
@@ -677,6 +677,14 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
         } finally {
             fRwl.writeLock().unlock();
         }
+    }
+
+    /**
+     * Directly add the interval to the node, without check. This method is
+     * package private because only the read method should make use of it.
+     */
+    void addNoCheck(E newInterval) {
+        fIntervals.add(newInterval);
     }
 
     @Override
