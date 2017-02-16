@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,25 +15,18 @@ package org.eclipse.tracecompass.tmf.core.tests.synchronization;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
-import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
@@ -91,10 +84,8 @@ public class TimeOffsetTest {
         }
     }
 
-    private ITmfTrace createAndIndexTrace() throws URISyntaxException, IOException, TmfTraceException {
-        final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TEST_TRACE.getFullPath()), null);
-        File testfile = new File(FileLocator.toFileURL(location).toURI());
-        TmfTraceStub trace = new TmfTraceStub(fResource, testfile.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
+    private ITmfTrace createAndIndexTrace() throws TmfTraceException {
+        TmfTraceStub trace = new TmfTraceStub(fResource, TEST_TRACE.getFullPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
         trace.indexTrace(true);
         return trace;
     }
@@ -104,7 +95,7 @@ public class TimeOffsetTest {
     // ------------------------------------------------------------------------
 
     @Test
-    public void testNoOffset() throws URISyntaxException, IOException, TmfTraceException {
+    public void testNoOffset() throws TmfTraceException {
         ITmfTrace trace = createAndIndexTrace();
         final TmfContext context = (TmfContext) trace.seekEvent(0);
 
@@ -117,7 +108,7 @@ public class TimeOffsetTest {
     }
 
     @Test
-    public void testPositiveOffset() throws URISyntaxException, IOException, TmfTraceException {
+    public void testPositiveOffset() throws TmfTraceException {
         ITmfTimestampTransform tt = TimestampTransformFactory.createWithOffset(ONE_MS);
         TimestampTransformFactory.setTimestampTransform(fResource, tt);
 
@@ -133,7 +124,7 @@ public class TimeOffsetTest {
     }
 
     @Test
-    public void testNegativeOffset() throws URISyntaxException, IOException, TmfTraceException {
+    public void testNegativeOffset() throws TmfTraceException {
         ITmfTimestampTransform tt = TimestampTransformFactory.createWithOffset(-ONE_MS);
         TimestampTransformFactory.setTimestampTransform(fResource, tt);
 
@@ -149,7 +140,7 @@ public class TimeOffsetTest {
     }
 
     @Test
-    public void testClearOffset() throws URISyntaxException, IOException, TmfTraceException {
+    public void testClearOffset() throws TmfTraceException {
         ITmfTimestampTransform tt = TimestampTransformFactory.createWithOffset(ONE_MS);
         TimestampTransformFactory.setTimestampTransform(fResource, tt);
         TimestampTransformFactory.setTimestampTransform(fResource, null);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2009, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -21,15 +21,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Map;
 import java.util.Vector;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.component.TmfProviderManager;
 import org.eclipse.tracecompass.internal.tmf.core.synchronization.SyncAlgorithmFullyIncremental;
@@ -46,7 +40,6 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationAlgorithm;
 import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
-import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.tests.analysis.AnalysisManagerTest;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -96,15 +89,9 @@ public class TmfExperimentTest {
         if (fTestTraces == null) {
             fTestTraces = new ITmfTrace[1];
             try {
-                final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
-                final File test = new File(FileLocator.toFileURL(location).toURI());
-                final TmfTraceStub trace = new TmfTraceStub(test.getPath(), 0, true, null);
+                final TmfTraceStub trace = new TmfTraceStub(path, 0, true, null);
                 fTestTraces[0] = trace;
             } catch (final TmfTraceException e) {
-                e.printStackTrace();
-            } catch (final URISyntaxException e) {
-                e.printStackTrace();
-            } catch (final IOException e) {
                 e.printStackTrace();
             }
         }

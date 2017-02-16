@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2009, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -21,21 +21,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Vector;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentContext;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
-import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -88,22 +81,14 @@ public class TmfMultiTraceExperimentTest {
         try {
             ITmfTrace[] traces = new ITmfTrace[2];
 
-            URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TmfTestTrace.O_TEST_10K.getFullPath()), null);
-            File test = new File(FileLocator.toFileURL(location).toURI());
-            final TmfTraceStub trace1 = new TmfTraceStub(test.getPath(), 0, true, null);
+            final TmfTraceStub trace1 = new TmfTraceStub(TmfTestTrace.O_TEST_10K.getFullPath(), 0, true, null);
             traces[0] = trace1;
 
-            location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TmfTestTrace.E_TEST_10K.getFullPath()), null);
-            test = new File(FileLocator.toFileURL(location).toURI());
-            final TmfTraceStub trace2 = new TmfTraceStub(test.getPath(), 0, true, null);
+            final TmfTraceStub trace2 = new TmfTraceStub(TmfTestTrace.E_TEST_10K.getFullPath(), 0, true, null);
             traces[1] = trace2;
 
             return traces;
         } catch (final TmfTraceException e) {
-            e.printStackTrace();
-        } catch (final URISyntaxException e) {
-            e.printStackTrace();
-        } catch (final IOException e) {
             e.printStackTrace();
         }
         return new ITmfTrace[0];

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Ericsson
+ * Copyright (c) 2009, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -21,16 +21,11 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceUpdatedSignal;
-import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -216,17 +211,11 @@ public abstract class AbstractIndexTest {
      * @param path
      *            the path
      * @return the created trace
-     * @throws URISyntaxException
-     *             when error occurs
-     * @throws IOException
-     *             when error occurs
      * @throws TmfTraceException
      *             when error occurs
      */
-    protected TestTrace createTrace(final String path) throws URISyntaxException, IOException, TmfTraceException {
-        final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
-        final File test = new File(FileLocator.toFileURL(location).toURI());
-        TestTrace trace = new TestTrace(test.toURI().getPath(), BLOCK_SIZE);
+    protected TestTrace createTrace(final String path) throws TmfTraceException {
+        TestTrace trace = new TestTrace(path, BLOCK_SIZE);
         trace.indexTrace(true);
         return trace;
     }
@@ -236,10 +225,6 @@ public abstract class AbstractIndexTest {
             try {
                 fTrace = createTrace(path);
             } catch (final TmfTraceException e) {
-                fail(e.getMessage());
-            } catch (final URISyntaxException e) {
-                fail(e.getMessage());
-            } catch (final IOException e) {
                 fail(e.getMessage());
             }
         }

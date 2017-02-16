@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 École Polytechnique de Montréal
+ * Copyright (c) 2013, 2017 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -45,7 +45,7 @@ public enum TmfTestTrace {
     R_TEST_10K("R-Test-10K");
 
     private final @NonNull String fPath;
-    private final String fDirectory = "../../tmf/org.eclipse.tracecompass.tmf.core.tests/testfiles";
+    private final String fDirectory = "testfiles";
     private ITmfTrace fTrace = null;
 
     private TmfTestTrace(@NonNull String file) {
@@ -67,7 +67,12 @@ public enum TmfTestTrace {
      * @return The full path of the trace
      */
     public String getFullPath() {
-        return fDirectory + File.separator + fPath;
+        URL resource = TmfCoreTestPlugin.getDefault().getBundle().getResource(fDirectory + File.separator + fPath);
+        try {
+            return FileLocator.toFileURL(resource).toURI().getPath();
+        } catch (URISyntaxException | IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**
@@ -84,13 +89,11 @@ public enum TmfTestTrace {
         if (fTrace != null) {
             fTrace.dispose();
         }
-        final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(fDirectory + File.separator + fPath), null);
         try {
-            File test = new File(FileLocator.toFileURL(location).toURI());
-            ITmfTrace trace = new TmfTraceStub(test.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
+            ITmfTrace trace = new TmfTraceStub(getFullPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
             fTrace = trace;
             return trace;
-        } catch (URISyntaxException | IOException | TmfTraceException  e) {
+        } catch (TmfTraceException e) {
             throw new IllegalStateException(e);
         }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -17,16 +17,8 @@ package org.eclipse.tracecompass.tmf.core.tests.trace.indexer.checkpoint;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -88,19 +80,11 @@ public class TmfExperimentCheckpointIndexTest {
 
         fTestTraces = new ITmfTrace[2];
         try {
-            URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TEST_TRACE1.getFullPath()), null);
-            File test = new File(FileLocator.toFileURL(location).toURI());
-            final TmfTraceStub trace1 = new TmfTraceStub(test.getPath(), 0, true, null);
+            final TmfTraceStub trace1 = new TmfTraceStub(TEST_TRACE1.getFullPath(), 0, true, null);
             fTestTraces[0] = trace1;
-            location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TEST_TRACE2.getFullPath()), null);
-            test = new File(FileLocator.toFileURL(location).toURI());
-            final TmfTraceStub trace2 = new TmfTraceStub(test.getPath(), 0, true, null);
+            final TmfTraceStub trace2 = new TmfTraceStub(TEST_TRACE2.getFullPath(), 0, true, null);
             fTestTraces[1] = trace2;
         } catch (final TmfTraceException e) {
-            e.printStackTrace();
-        } catch (final URISyntaxException e) {
-            e.printStackTrace();
-        } catch (final IOException e) {
             e.printStackTrace();
         }
     }
@@ -142,19 +126,11 @@ public class TmfExperimentCheckpointIndexTest {
     public void testGrowingIndex() {
         ITmfTrace[] testTraces = new TmfTraceStub[2];
         try {
-            URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TEST_TRACE1.getFullPath()), null);
-            File test = new File(FileLocator.toFileURL(location).toURI());
-            final TmfTraceStub trace1 = new TmfTraceStub(test.getPath(), 0, false, null);
+            final TmfTraceStub trace1 = new TmfTraceStub(TEST_TRACE1.getFullPath(), 0, false, null);
             testTraces[0] = trace1;
-            location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TEST_TRACE2.getFullPath()), null);
-            test = new File(FileLocator.toFileURL(location).toURI());
-            final TmfTraceStub trace2 = new TmfTraceStub(test.getPath(), 0, false, null);
+            final TmfTraceStub trace2 = new TmfTraceStub(TEST_TRACE2.getFullPath(), 0, false, null);
             testTraces[1] = trace2;
         } catch (final TmfTraceException e) {
-            e.printStackTrace();
-        } catch (final URISyntaxException e) {
-            e.printStackTrace();
-        } catch (final IOException e) {
             e.printStackTrace();
         }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 École Polytechnique de Montréal
+ * Copyright (c) 2013, 2017 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -65,9 +65,7 @@ public class ProjectModelTestData {
         IFolder traceFolder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
 
         /* Create a trace, if it exist, it will be replaced */
-        File file = new File(testTrace.getFullPath());
-        String path = file.getAbsolutePath();
-        final IPath pathString = Path.fromOSString(path);
+        final IPath pathString = new Path(testTrace.getFullPath());
         IResource linkedTrace = TmfImportHelper.createLink(traceFolder, pathString, pathString.lastSegment());
         if (!(linkedTrace != null && linkedTrace.exists())) {
             return null;

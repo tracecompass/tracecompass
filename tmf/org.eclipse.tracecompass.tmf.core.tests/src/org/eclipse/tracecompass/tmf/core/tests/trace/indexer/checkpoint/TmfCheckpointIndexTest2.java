@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson
+ * Copyright (c) 2012, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,14 +19,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.tests.trace.indexer.checkpoint.AbstractIndexTest.ITestIndexer;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -135,15 +130,9 @@ public class TmfCheckpointIndexTest2 {
     private synchronized void setupTrace(final String path) {
         if (fTrace == null) {
             try {
-                final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(path), null);
-                final File test = new File(FileLocator.toFileURL(location).toURI());
-                fTrace = new TestTrace(test.toURI().getPath(), BLOCK_SIZE);
+                fTrace = new TestTrace(path, BLOCK_SIZE);
                 fTrace.indexTrace(true);
             } catch (final TmfTraceException e) {
-                e.printStackTrace();
-            } catch (final URISyntaxException e) {
-                e.printStackTrace();
-            } catch (final IOException e) {
                 e.printStackTrace();
             }
         }
