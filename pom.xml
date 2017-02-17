@@ -175,7 +175,7 @@
           <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.7.8</version>
+            <version>0.7.9</version>
             <executions>
               <execution>
                 <id>pre-test</id>
@@ -611,7 +611,7 @@
         <plugin>
           <groupId>org.jboss.tools.tycho-plugins</groupId>
           <artifactId>repository-utils</artifactId>
-          <version>0.26.0</version>
+          <version>0.26.1</version>
         </plugin>
 
         <plugin>
