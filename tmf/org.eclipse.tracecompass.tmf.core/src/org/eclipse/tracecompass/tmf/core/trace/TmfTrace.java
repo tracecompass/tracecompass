@@ -340,12 +340,11 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
         }
 
         /* Clean up the analysis modules */
-        synchronized (fAnalysisModules) {
-            for (IAnalysisModule module : fAnalysisModules.values()) {
-                module.dispose();
-            }
-            fAnalysisModules.clear();
+        Iterable<IAnalysisModule> analysisModules = getAnalysisModules();
+        for (IAnalysisModule module : analysisModules) {
+            module.dispose();
         }
+        fAnalysisModules.clear();
 
         super.dispose();
     }
