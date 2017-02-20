@@ -71,7 +71,7 @@ public class CopyToClipboardTest {
     private static final String TRACE_PATH = "testfiles/" + TRACE_NAME;
     private static final String TRACE_TYPE = "org.eclipse.linuxtools.tmf.tests.stubs.trace.text.testsyslog";
     private static final String COPY_TO_CLIPBOARD = "Copy to Clipboard";
-    private static final int TIMEOUT = 2000; /* 20 second timeout */
+    private static final int TIMEOUT = 20000; /* 20 second timeout */
 
     private static File fTestFile = null;
 

@@ -100,7 +100,7 @@ public class ExportToTsvTest {
     private static final String TRACE_PATH = "testfiles/" + TRACE_NAME;
     private static final String TRACE_TYPE = "org.eclipse.linuxtools.tmf.tests.stubs.trace.text.testsyslog";
     private static final String EXPORT_TO_TSV = "Export To Text...";
-    private static final int TIMEOUT = 2000; /* 20 second timeout */
+    private static final int TIMEOUT = 20000; /* 20 second timeout */
 
     private @Nullable static File fTestFile = null;
 
