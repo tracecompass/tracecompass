@@ -15,6 +15,7 @@ import java.io.OutputStream;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
@@ -56,7 +57,7 @@ public abstract class ExportToTsvAction extends Action {
         if (shell == null) {
             return;
         }
-        FileDialog fd = TmfFileDialogFactory.create(shell);
+        FileDialog fd = TmfFileDialogFactory.create(shell, SWT.SAVE);
         fd.setFilterExtensions(getExtension());
         String fileName = fd.open();
         if (fileName == null) {
