@@ -112,7 +112,11 @@ public final class TmfFileDialogFactory {
             fOverridePaths = null;
             return createNewFileDialog(parent, style, Arrays.asList(overridePath));
         }
-        return new FileDialog(parent, style);
+        FileDialog fileDialog = new FileDialog(parent, style);
+        if ((style & SWT.SAVE) != 0) {
+            fileDialog.setOverwrite(true);
+        }
+        return fileDialog;
     }
 
     /**
