@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.RangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.exceptions.RangeException;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.AbstractHistoryTree.IHTNodeFactory;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
@@ -309,7 +309,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
          * @return Collection of sequence numbers of the child nodes that
          *         intersect t, non-null empty collection if this is a Leaf Node
          */
-        public final Collection<Integer> selectNextChildren(RangeCondition<Long> timeCondition) {
+        public final Collection<Integer> selectNextChildren(TimeRangeCondition timeCondition) {
             fNode.takeReadLock();
             try {
                 return selectNextIndices(timeCondition).stream()
@@ -338,7 +338,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
          * @return Collection of the indices of the child nodes that intersect
          *         the time condition
          */
-        protected Collection<Integer> selectNextIndices(RangeCondition<Long> timeCondition) {
+        protected Collection<Integer> selectNextIndices(TimeRangeCondition timeCondition) {
             /* By default, all children are returned */
             List<Integer> childList = new ArrayList<>();
             for (int i = 0; i < fNbChildren; i++) {
@@ -579,7 +579,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
      * comparator.
      *
      * NOTE: sub-classes who override this may also need to override the
-     * {@link #getStartIndexFor(RangeCondition, Predicate)}.
+     * {@link #getStartIndexFor(TimeRangeCondition, Predicate)}.
      *
      * @return The way intervals are to be sorted in this node
      */
@@ -680,7 +680,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
     }
 
     @Override
-    public Iterable<E> getMatchingIntervals(RangeCondition<Long> timeCondition,
+    public Iterable<E> getMatchingIntervals(TimeRangeCondition timeCondition,
             Predicate<E> extraPredicate) {
 
         // TODO Benchmark using/returning streams instead of iterables
@@ -699,7 +699,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
     }
 
     @Override
-    public @Nullable E getMatchingInterval(RangeCondition<Long> timeCondition, Predicate<E> extraPredicate) {
+    public @Nullable E getMatchingInterval(TimeRangeCondition timeCondition, Predicate<E> extraPredicate) {
         if (isOnDisk()) {
             return doGetMatchingInterval(timeCondition, extraPredicate);
         }
@@ -713,7 +713,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
         }
     }
 
-    private Iterable<E> doGetMatchingIntervals(RangeCondition<Long> timeCondition,
+    private Iterable<E> doGetMatchingIntervals(TimeRangeCondition timeCondition,
             Predicate<E> extraPredicate) {
         List<E> list = new ArrayList<>();
         for (int i = getStartIndexFor(timeCondition, extraPredicate); i < fIntervals.size(); i++) {
@@ -726,7 +726,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
         return list;
     }
 
-    private @Nullable E doGetMatchingInterval(RangeCondition<Long> timeCondition,
+    private @Nullable E doGetMatchingInterval(TimeRangeCondition timeCondition,
             Predicate<E> extraPredicate) {
         for (int i = getStartIndexFor(timeCondition, extraPredicate); i < fIntervals.size(); i++) {
             E curInterval = fIntervals.get(i);
@@ -755,7 +755,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
      * @return The index of the first interval greater than or equal to the
      *         conditions in parameter
      */
-    protected int getStartIndexFor(RangeCondition<Long> timeCondition, Predicate<E> extraPredicate) {
+    protected int getStartIndexFor(TimeRangeCondition timeCondition, Predicate<E> extraPredicate) {
         if (fIntervals.isEmpty()) {
             return 0;
         }
@@ -967,7 +967,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
     }
 
     @Override
-    public Collection<Integer> selectNextChildren(RangeCondition<Long> timeCondition)
+    public Collection<Integer> selectNextChildren(TimeRangeCondition timeCondition)
             throws RangeException {
         CoreNodeData extraData = fExtraData;
         if (extraData != null) {

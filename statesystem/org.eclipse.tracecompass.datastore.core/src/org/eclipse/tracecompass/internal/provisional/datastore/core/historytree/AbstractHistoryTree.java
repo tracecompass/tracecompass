@@ -30,7 +30,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.datastore.core.historytree.HtIo;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.RangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.exceptions.RangeException;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.IHTNode.NodeType;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
@@ -873,7 +873,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
     }
 
     @Override
-    public Iterable<E> getMatchingIntervals(RangeCondition<Long> timeCondition,
+    public Iterable<E> getMatchingIntervals(TimeRangeCondition timeCondition,
             Predicate<E> extraPredicate) {
 
         // TODO Change this to evaluate the nodes lazily
@@ -890,7 +890,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
             while (!queue.isEmpty()) {
                 int sequenceNumber = queue.pop();
                 HTNode<E> currentNode = readNode(sequenceNumber);
-                RangeCondition<Long> nodeCondition = timeCondition.subCondition(
+                TimeRangeCondition nodeCondition = timeCondition.subCondition(
                         currentNode.getNodeStart(), currentNode.getNodeEnd());
 
                 if (nodeCondition == null) {
@@ -910,7 +910,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
     }
 
     @Override
-    public @Nullable E getMatchingInterval(RangeCondition<Long> timeCondition,
+    public @Nullable E getMatchingInterval(TimeRangeCondition timeCondition,
             Predicate<E> extraPredicate) {
 
         /* Queue a stack of nodes containing nodes intersecting t */
@@ -1014,7 +1014,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
         Collection<Integer> nextChildren;
         for (long t = parent.getNodeStart(); t < parent.getNodeEnd(); t++) {
             shouldBeInCollection = true;
-            nextChildren = parent.selectNextChildren(RangeCondition.singleton(t));
+            nextChildren = parent.selectNextChildren(TimeRangeCondition.singleton(t));
             if (shouldBeInCollection != nextChildren.contains(childSequence)) {
                 return false;
             }

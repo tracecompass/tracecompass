@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.function.Predicate;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.RangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.exceptions.RangeException;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
 
@@ -166,7 +166,7 @@ public interface IHTNode<E extends IHTInterval> {
      *            matching this predicate will be returned.
      * @return Iterable of the elements in this node matching the condtions
      */
-    Iterable<E> getMatchingIntervals(RangeCondition<Long> timeCondition,
+    Iterable<E> getMatchingIntervals(TimeRangeCondition timeCondition,
             Predicate<E> extraPredicate);
 
     /**
@@ -180,7 +180,7 @@ public interface IHTNode<E extends IHTInterval> {
      * @return An interval matching the conditions or <code>null</code> if no
      *         interval was found
      */
-    @Nullable E getMatchingInterval(RangeCondition<Long> timeCondition,
+    @Nullable E getMatchingInterval(TimeRangeCondition timeCondition,
             Predicate<E> extraPredicate);
 
     /**
@@ -279,7 +279,7 @@ public interface IHTNode<E extends IHTInterval> {
      * @throws RangeException
      *             If t is out of the node's range
      */
-    default Collection<Integer> selectNextChildren(RangeCondition<Long> timeCondition) {
+    default Collection<Integer> selectNextChildren(TimeRangeCondition timeCondition) {
         return Collections.emptyList();
     }
 

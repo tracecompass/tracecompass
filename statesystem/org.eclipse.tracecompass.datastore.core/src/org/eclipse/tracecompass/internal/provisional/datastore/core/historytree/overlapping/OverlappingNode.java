@@ -23,7 +23,7 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.RangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTNode;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.IHTNode;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
@@ -181,7 +181,7 @@ public class OverlappingNode<E extends IHTInterval> extends HTNode<E> {
         }
 
         @Override
-        protected Collection<Integer> selectNextIndices(RangeCondition<Long> rc) {
+        protected Collection<Integer> selectNextIndices(TimeRangeCondition rc) {
             OverlappingNode<?> node = getNode();
 
             if (rc.max() < node.getNodeStart()

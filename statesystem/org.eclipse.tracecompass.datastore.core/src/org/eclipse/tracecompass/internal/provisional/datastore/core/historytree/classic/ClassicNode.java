@@ -21,7 +21,7 @@ import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.RangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.exceptions.RangeException;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTNode;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.IHTNode;
@@ -127,7 +127,7 @@ public class ClassicNode<E extends IHTInterval> extends HTNode<E> {
         }
 
         @Override
-        protected Collection<Integer> selectNextIndices(RangeCondition<Long> rc) {
+        protected Collection<Integer> selectNextIndices(TimeRangeCondition rc) {
             ClassicNode<?> node = getNode();
 
             if (rc.min() < node.getNodeStart()

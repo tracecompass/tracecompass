@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.RangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.AbstractHistoryTree;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTIntervalReader;
@@ -139,7 +139,7 @@ public class ClassicHistoryTree<E extends IHTInterval>
     protected boolean verifyIntersectingChildren(ClassicNode<E> parent, ClassicNode<E> child) {
         int childSequence = child.getSequenceNumber();
         for (long t = parent.getNodeStart(); t < parent.getNodeEnd(); t++) {
-            RangeCondition<Long> timeCondition = RangeCondition.singleton(t);
+            TimeRangeCondition timeCondition = TimeRangeCondition.singleton(t);
             boolean shouldBeInCollection = timeCondition.intersects(child.getNodeStart(), child.getNodeEnd());
             Collection<Integer> nextChildren = parent.selectNextChildren(timeCondition);
             /* There should be only one intersecting child */

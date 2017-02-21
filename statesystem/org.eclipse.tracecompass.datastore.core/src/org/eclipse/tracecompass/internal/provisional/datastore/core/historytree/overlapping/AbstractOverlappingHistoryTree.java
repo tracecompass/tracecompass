@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.RangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.AbstractHistoryTree;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTIntervalReader;
@@ -146,7 +146,7 @@ public abstract class AbstractOverlappingHistoryTree<E extends IHTInterval, N ex
         boolean shouldBeInCollection;
         Collection<Integer> nextChildren;
         for (long t = parent.getNodeStart(); t < parent.getNodeEnd(); t++) {
-            RangeCondition<Long> timeCondition = RangeCondition.singleton(t);
+            TimeRangeCondition timeCondition = TimeRangeCondition.singleton(t);
             shouldBeInCollection = (timeCondition.intersects(child.getNodeStart(), child.getNodeEnd()));
             nextChildren = parent.selectNextChildren(timeCondition);
             if (shouldBeInCollection != nextChildren.contains(childSequence)) {

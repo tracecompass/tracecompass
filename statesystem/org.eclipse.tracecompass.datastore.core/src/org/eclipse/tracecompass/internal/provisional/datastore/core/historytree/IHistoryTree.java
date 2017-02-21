@@ -16,7 +16,7 @@ import java.nio.channels.ClosedChannelException;
 import java.util.function.Predicate;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.RangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.exceptions.RangeException;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
 
@@ -148,7 +148,7 @@ public interface IHistoryTree<E extends IHTInterval> {
      *            Iterable.
      * @return An Iterable of the matching elements
      */
-    Iterable<E> getMatchingIntervals(RangeCondition<Long> timeCondition,
+    Iterable<E> getMatchingIntervals(TimeRangeCondition timeCondition,
             Predicate<E> extraPredicate);
 
     /**
@@ -166,7 +166,7 @@ public interface IHistoryTree<E extends IHTInterval> {
      * @return An interval matching the given conditions, or <code>null</code>
      *         if no interval was found.
      */
-    @Nullable E getMatchingInterval(RangeCondition<Long> timeCondition,
+    @Nullable E getMatchingInterval(TimeRangeCondition timeCondition,
             Predicate<E> extraPredicate);
 
     // ------------------------------------------------------------------------
