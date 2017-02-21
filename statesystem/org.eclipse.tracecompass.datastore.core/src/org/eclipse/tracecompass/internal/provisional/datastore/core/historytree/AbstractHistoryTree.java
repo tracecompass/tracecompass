@@ -118,6 +118,8 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
     /* Lock used to protect the accesses to the HT_IO object */
     private final ReentrantReadWriteLock fRwl = new ReentrantReadWriteLock(false);
 
+    private transient @Nullable List<N> fLatestBranchSnapshot = null;
+
     /**
      * Create a new State History from scratch, specifying all configuration
      * parameters.
@@ -364,8 +366,15 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
      * @return The immutable latest branch
      */
     @VisibleForTesting
-    List<N> getLatestBranch() {
-        return ImmutableList.copyOf(fLatestBranch);
+    final List<N> getLatestBranch() {
+        List<N> latestBranchSnapshot = fLatestBranchSnapshot;
+        if (latestBranchSnapshot == null) {
+            synchronized (fLatestBranch) {
+                latestBranchSnapshot = ImmutableList.copyOf(fLatestBranch);
+                fLatestBranchSnapshot = latestBranchSnapshot;
+            }
+        }
+        return latestBranchSnapshot;
     }
 
     /**
@@ -634,7 +643,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
      *            insertion
      */
     protected final void tryInsertAtNode(E interval, int depth) {
-        N targetNode = getLatestBranch().get(depth);
+        N targetNode = fLatestBranch.get(depth);
         informInsertingAtDepth(depth);
 
         /* Verify if there is enough room in this node to store this interval */
@@ -710,6 +719,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
     private final void addSiblingNode(int depth, long newNodeStartTime) {
         synchronized (fLatestBranch) {
             final long splitTime = fTreeEnd;
+            fLatestBranchSnapshot = null;
 
             if (depth >= fLatestBranch.size()) {
                 /*
