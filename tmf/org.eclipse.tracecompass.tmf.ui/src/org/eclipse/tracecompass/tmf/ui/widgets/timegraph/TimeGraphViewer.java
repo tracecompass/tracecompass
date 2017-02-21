@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2016 Intel Corporation, Ericsson, others
+ * Copyright (c) 2007, 2017 Intel Corporation, Ericsson, others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -509,7 +509,9 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
         fTimeAlignedComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         fTree = new Tree(fTimeAlignedComposite, SWT.NO_SCROLL);
-        fTree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
+        gd.widthHint = fNameWidth;
+        fTree.setLayoutData(gd);
         fTree.setHeaderVisible(true);
         // add a default column
         TreeColumn column = new TreeColumn(fTree, SWT.LEFT);
@@ -672,7 +674,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
         });
 
         Composite filler = new Composite(fDataViewer, SWT.NONE);
-        GridData gd = new GridData(SWT.DEFAULT, SWT.DEFAULT, false, false);
+        gd = new GridData(SWT.DEFAULT, SWT.DEFAULT, false, false);
         gd.heightHint = fHorizontalScrollBar.getSize().y;
         filler.setLayoutData(gd);
         filler.setLayout(new FillLayout());
@@ -754,6 +756,8 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
         if (fNameWidth < fMinNameWidth) {
             fNameWidth = fMinNameWidth;
         }
+        GridData gd = (GridData) fTree.getLayoutData();
+        gd.widthHint = fNameWidth;
         if (fTree.getColumnCount() == 1) {
             fTree.getColumn(0).setWidth(fNameWidth);
         }
