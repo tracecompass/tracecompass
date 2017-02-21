@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 EfficiOS Inc., Alexandre Montplaisir
+ * Copyright (c) 2016, 2017 EfficiOS Inc., Alexandre Montplaisir
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -85,7 +85,7 @@ public class TmfTraceManagerUtilityTest {
              * supplementary files already.
              */
             assertFalse(isDirectoryEmpty(suppFilesPath));
-
+            trace.dispose();
             TmfTraceManager.deleteSupplementaryFiles(trace);
             assertTrue(isDirectoryEmpty(suppFilesPath));
 
