@@ -18,6 +18,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -67,7 +68,7 @@ public enum TmfTestTrace {
      * @return The full path of the trace
      */
     public String getFullPath() {
-        URL resource = TmfCoreTestPlugin.getDefault().getBundle().getResource(fDirectory + File.separator + fPath);
+        URL resource = TmfCoreTestPlugin.getDefault().getBundle().getResource(fDirectory + IPath.SEPARATOR + fPath);
         try {
             return FileLocator.toFileURL(resource).toURI().getPath();
         } catch (URISyntaxException | IOException e) {
