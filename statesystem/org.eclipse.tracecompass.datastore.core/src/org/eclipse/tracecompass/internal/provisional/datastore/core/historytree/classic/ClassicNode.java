@@ -142,6 +142,7 @@ public class ClassicNode<E extends IHTInterval> extends HTNode<E> {
                     return Collections.EMPTY_LIST;
                 }
 
+                long end = rc.max();
                 List<Integer> matchingChildren = new LinkedList<>();
                 /* Check all children except the last one */
                 for (int i = 0; i < nbChildren - 1; i++) {
@@ -151,6 +152,9 @@ public class ClassicNode<E extends IHTInterval> extends HTNode<E> {
 
                     if (rc.intersects(childStart, childEnd)) {
                         matchingChildren.add(i);
+                    }
+                    if (end <= childEnd) {
+                        return matchingChildren;
                     }
                 }
 
