@@ -28,6 +28,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.tracecompass.analysis.timing.core.tests.flamegraph.AggregationTreeTest;
@@ -44,12 +45,14 @@ import org.eclipse.ui.IViewPart;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
 
 /**
  * Unit tests for the flame graph view
  *
  * @author Matthew Khouzam
  */
+@RunWith(SWTBotJunit4ClassRunner.class)
 public class FlameGraphTest extends AggregationTreeTest {
 
     private static final String FLAMEGRAPH_ID = FlameGraphView.ID;
