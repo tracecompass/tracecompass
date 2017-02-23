@@ -38,7 +38,6 @@ import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHT
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 
 /**
  * Base class for history trees that encapsulates the logic to read from/write
@@ -888,7 +887,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
 
         // TODO Change this to evaluate the nodes lazily
 
-        List<Iterable<E>> intervalsOfNodes = new LinkedList<>();
+        List<E> intervalsOfNodes = new ArrayList<>();
 
         /* Queue is a stack of nodes containing nodes intersecting t */
         Deque<Integer> queue = new LinkedList<>();
@@ -911,12 +910,12 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
                     /* Here we add the relevant children nodes for BFS */
                     queue.addAll(currentNode.selectNextChildren(nodeCondition));
                 }
-                Iterable<E> nodeIntervals = currentNode.getMatchingIntervals(nodeCondition, extraPredicate);
-                intervalsOfNodes.add(nodeIntervals);
+                Collection<E> nodeIntervals = currentNode.getMatchingIntervals(nodeCondition, extraPredicate);
+                intervalsOfNodes.addAll(nodeIntervals);
             }
         } catch (ClosedChannelException e) {
         }
-        return Iterables.concat(intervalsOfNodes);
+        return intervalsOfNodes;
     }
 
     @Override

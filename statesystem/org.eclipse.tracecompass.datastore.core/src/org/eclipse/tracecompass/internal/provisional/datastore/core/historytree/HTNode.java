@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -312,9 +311,11 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
         public final Collection<Integer> selectNextChildren(TimeRangeCondition timeCondition) {
             fNode.takeReadLock();
             try {
-                return selectNextIndices(timeCondition).stream()
-                        .map(i -> fChildren[i])
-                        .collect(Collectors.toList());
+                List<Integer> list = new ArrayList<>();
+                for (int index : selectNextIndices(timeCondition)) {
+                    list.add(fChildren[index]);
+                }
+                return list;
             } finally {
                 fNode.releaseReadLock();
             }
@@ -688,11 +689,10 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
     }
 
     @Override
-    public Iterable<E> getMatchingIntervals(TimeRangeCondition timeCondition,
+    public Collection<E> getMatchingIntervals(TimeRangeCondition timeCondition,
             Predicate<E> extraPredicate) {
 
         // TODO Benchmark using/returning streams instead of iterables
-
         if (isOnDisk()) {
             return doGetMatchingIntervals(timeCondition, extraPredicate);
         }
@@ -721,7 +721,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
         }
     }
 
-    private Iterable<E> doGetMatchingIntervals(TimeRangeCondition timeCondition,
+    private Collection<E> doGetMatchingIntervals(TimeRangeCondition timeCondition,
             Predicate<E> extraPredicate) {
         List<E> list = new ArrayList<>();
         for (int i = getStartIndexFor(timeCondition, extraPredicate); i < fIntervals.size(); i++) {
