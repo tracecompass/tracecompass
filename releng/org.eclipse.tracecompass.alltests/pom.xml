@@ -50,6 +50,9 @@
          putting -DcustomTestSuite=<name> on the command line. -->
     <profile>
       <id>run-custom-test-suite</id>
+      <properties>
+        <tracecompass.extra.args></tracecompass.extra.args>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -62,7 +65,7 @@
               </includes>
               <useUIHarness>true</useUIHarness>
               <useUIThread>false</useUIThread>
-              <argLine>${tycho.testArgLine} ${base.ui.test.vmargs}</argLine>
+              <argLine>${tycho.testArgLine} ${base.ui.test.vmargs} ${tracecompass.extra.args}</argLine>
               <product>org.eclipse.platform.ide</product>
               <environmentVariables>
                 <SWT_GTK3>${SWT_GTK3}</SWT_GTK3>
