@@ -1989,6 +1989,10 @@ The Control Flow View '''toolbar''', located at the top right of the view, has s
 | Show Legend
 | Displays the states legend.
 |-
+| [[Image:images/Optimization.png]]
+| Optimize
+| "Optimize" the row order of the control flow view. This groups the threads by minimizing the distance in the graph of transitions by CPU for a given time range. The scheduler will often keep tightly coupled threads on the same CPU to preserve data locality. An interesting side effect of this is that threads communicating together in that time range will be moved closer together when pressing the button. The button moves the rows only when pressed. When the time range is moved, the optimization action can be re-applied.
+|-
 | [[Image:images/home_nav.gif]]
 | Reset the Time Scale to Default
 | Resets the zoom window to the full range.
