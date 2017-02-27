@@ -1978,4 +1978,13 @@
             class="org.eclipse.tracecompass.internal.tmf.ui.TmfUIPreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.linuxtools.tmf.ui.TmfTracingPreferences"
+            class="org.eclipse.tracecompass.tmf.ui.tracetype.preferences.TraceTypePreferencePage"
+            id="org.eclipse.tracecompass.tmf.ui.traceTypes"
+            name="%preferences.page.trace.types">
+      </page>
+   </extension>
 </plugin>

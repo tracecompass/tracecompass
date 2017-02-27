@@ -30,7 +30,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
-import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.ui.IWorkbenchPage;
@@ -122,31 +121,33 @@ public class SelectElementTypeContributionItem extends CompoundContributionItem 
         List<IContributionItem> list = new LinkedList<>();
 
         Map<String, MenuManager> categoriesMap = new HashMap<>();
-        for (TraceTypeHelper traceTypeHelper : TmfTraceType.getTraceTypeHelpers()) {
-            if (forExperiments != traceTypeHelper.isExperimentType()) {
-                continue;
-            }
-
-            String categoryName = traceTypeHelper.getCategoryName().replaceAll("&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
-            MenuManager subMenu = null;
-            if (!categoryName.isEmpty()) {
-                subMenu = categoriesMap.get(categoryName);
-                if (subMenu == null) {
-                    subMenu = new MenuManager(categoryName);
-                    categoriesMap.put(categoryName, subMenu);
-                    list.add(subMenu);
-                }
-            }
+        TmfTraceType.getTraceTypeHelpers().forEach(traceTypeHelper -> {
 
             String traceTypeId = traceTypeHelper.getTraceTypeId();
-            String label = traceTypeHelper.getName().replaceAll("&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
             boolean selected = selectedTraceTypes.contains(traceTypeId);
-            if (selected && subMenu != null) {
-                subMenu.setImageDescriptor(SELECTED_ICON);
-            }
+            if (traceTypeHelper.isEnabled() || selected) {
 
-            addContributionItem(list, traceTypeId, label, selected, subMenu);
-        }
+                if (forExperiments == traceTypeHelper.isExperimentType()) {
+                    String categoryName = traceTypeHelper.getCategoryName().replaceAll("&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
+                    MenuManager subMenu = null;
+                    if (!categoryName.isEmpty()) {
+                        subMenu = categoriesMap.get(categoryName);
+                        if (subMenu == null) {
+                            subMenu = new MenuManager(categoryName);
+                            categoriesMap.put(categoryName, subMenu);
+                            list.add(subMenu);
+                        }
+                    }
+
+                    String label = traceTypeHelper.getName().replaceAll("&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
+                    if (selected && subMenu != null) {
+                        subMenu.setImageDescriptor(SELECTED_ICON);
+                    }
+
+                    addContributionItem(list, traceTypeId, label, selected, subMenu);
+                }
+            }
+        });
 
         Collections.sort(list, ITEM_COMPARATOR);
         return list.toArray(new IContributionItem[list.size()]);

@@ -98,11 +98,12 @@ public final class TmfTraceType {
     // configuration element
     private static final Map<String, IConfigurationElement> TRACE_TYPE_ATTRIBUTES = new HashMap<>();
     private static final Map<String, IConfigurationElement> TRACE_CATEGORIES = new HashMap<>();
-    private static final Map<String, TraceTypeHelper> TRACE_TYPES = new LinkedHashMap<>();
+    private static final Map<String, @NonNull TraceTypeHelper> TRACE_TYPES = new LinkedHashMap<>();
 
     static {
         populateCategoriesAndTraceTypes();
         populateCustomTraceTypes();
+        enableTraceTypes();
     }
 
     /**
@@ -190,7 +191,7 @@ public final class TmfTraceType {
      *
      * @return The currently registered trace type helpers
      */
-    public static Iterable<TraceTypeHelper> getTraceTypeHelpers() {
+    public static Iterable<@NonNull TraceTypeHelper> getTraceTypeHelpers() {
         return TRACE_TYPES.values();
     }
 
@@ -221,8 +222,8 @@ public final class TmfTraceType {
         // Generate the list of Category:TraceType to populate the ComboBox
         List<String> traceTypes = new ArrayList<>();
 
-        for (TraceTypeHelper tt : TRACE_TYPES.values()) {
-            if (!tt.isExperimentType()) {
+        for (TraceTypeHelper tt : getTraceTypeHelpers()) {
+            if (tt.isEnabled() && !tt.isExperimentType()) {
                 traceTypes.add(tt.getLabel());
             }
         }
@@ -359,6 +360,15 @@ public final class TmfTraceType {
      */
     public static TraceTypeHelper getTraceType(String id) {
         return TRACE_TYPES.get(id);
+    }
+
+    private static void enableTraceTypes() {
+        List<String> preferences = TraceTypePreferences.getPreferenceValue();
+        TRACE_TYPES.values().forEach(helper -> {
+            if (!helper.isExperimentType()) {
+                helper.setEnabled(!preferences.contains(helper.getTraceTypeId()));
+            }
+        });
     }
 
     private static void populateCategoriesAndTraceTypes() {
@@ -556,8 +566,8 @@ public final class TmfTraceType {
     /**
      * @param traceType
      *            the trace type
-     * @return <code>true</code> it is a directory trace type else else
-     *         <code>false</code>
+     * @return <code>true</code> if it is a directory trace type,
+     *         <code>false</code> otherwise
      */
     public static boolean isDirectoryTraceType(String traceType) {
         if (traceType != null) {
@@ -645,7 +655,7 @@ public final class TmfTraceType {
         TreeSet<Pair<Integer, TraceTypeHelper>> validCandidates = new TreeSet<>(comparator);
         final Iterable<TraceTypeHelper> traceTypeHelpers = TmfTraceType.getTraceTypeHelpers();
         for (TraceTypeHelper traceTypeHelper : traceTypeHelpers) {
-            if (traceTypeHelper.isExperimentType()) {
+            if (!traceTypeHelper.isEnabled() || traceTypeHelper.isExperimentType()) {
                 continue;
             }
             int confidence = traceTypeHelper.validateWithConfidence(path);

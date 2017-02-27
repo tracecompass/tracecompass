@@ -33,11 +33,11 @@ public class TraceTypeHelper {
 
     private final String fName;
     private final String fCategoryName;
-    private final String fTraceTypeId;
+    private final @NonNull String fTraceTypeId;
     private final TraceElementType fElementType;
-    @NonNull
-    private final ITmfTrace fTrace;
+    private final @NonNull ITmfTrace fTrace;
     private final boolean fIsDirectory;
+    private boolean fEnable;
 
     /**
      * Constructor for a trace type helper. It is a link between a trace type
@@ -64,6 +64,7 @@ public class TraceTypeHelper {
         fTrace = trace;
         fIsDirectory = isDir;
         fElementType = elementType;
+        fEnable = true;
     }
 
     /**
@@ -101,7 +102,7 @@ public class TraceTypeHelper {
      *
      * @return the trace type id
      */
-    public String getTraceTypeId() {
+    public @NonNull String getTraceTypeId() {
         return fTraceTypeId;
     }
 
@@ -169,6 +170,27 @@ public class TraceTypeHelper {
         return fIsDirectory;
     }
 
+    /**
+     * Test whether the trace helper is enabled based on the trace type
+     * preferences or not
+     *
+     * @return True if the trace helper is enabled, false otherwise
+     * @since 2.3
+     */
+    public boolean isEnabled() {
+        return fEnable;
+    }
+
+    /**
+     * Enable/disable the trace type helper
+     *
+     * @param enable
+     *            the new enable state
+     * @since 2.3
+     */
+    public void setEnabled(boolean enable) {
+        fEnable = enable;
+    }
 
     @Override
     public String toString() {

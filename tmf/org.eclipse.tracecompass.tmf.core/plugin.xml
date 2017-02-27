@@ -11,6 +11,9 @@
       <initializer
             class="org.eclipse.tracecompass.internal.tmf.core.TmfCorePreferenceInitializer">
       </initializer>
+      <initializer
+            class="org.eclipse.tracecompass.internal.tmf.core.project.model.TraceTypePreferenceInitializer">
+      </initializer>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">

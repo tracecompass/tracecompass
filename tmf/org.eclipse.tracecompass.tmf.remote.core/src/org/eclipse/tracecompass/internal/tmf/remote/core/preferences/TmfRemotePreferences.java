@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.tracecompass.internal.tmf.remote.core.Activator;
 
 /**
- * Singleton class to access the remote control preferences of Trace Compasss.
+ * Singleton class to access the remote control preferences of Trace Compass.
  *
  * @author Bernd Hufmann
  */
