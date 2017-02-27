@@ -73,6 +73,7 @@
 <target name="downloadTraceFiles">
   <echo message="Attempting to download test traces"/>
   <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="synctraces.tar.gz" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/synctraces.tar.gz" />
+  <get ignoreerrors="true" maxtime="120" skipexisting="true" dest="os-events.tar.gz" src="http://archive.eclipse.org/tracecompass/test-traces/os-events.tar.gz" />
 </target>
 
 <target name="pullTestSuite" if="testSuiteExists">
@@ -100,6 +101,8 @@
     </antcall>
     <gunzip src="synctraces.tar.gz" />
     <untar src="synctraces.tar" dest="." />
+    <gunzip src="os-events.tar.gz" />
+    <untar src="os-events.tar" dest="." />
 
     <echo message="Traces extracted successfully"/>
 </target>
