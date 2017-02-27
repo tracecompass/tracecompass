@@ -20,6 +20,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRangeMap;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Formatter for timestamps.
  *
@@ -82,6 +84,16 @@ public class ChartTimeStampFormat extends Format {
      */
     public String getPattern() {
         return fFormat.toPattern();
+    }
+
+    /**
+     * Get the range map for this formatter
+     *
+     * @return The range map
+     */
+    @VisibleForTesting
+    public @Nullable ChartRangeMap getRangeMap() {
+        return fRangeMap;
     }
 
     // ------------------------------------------------------------------------

@@ -60,6 +60,7 @@
         <module>org.eclipse.tracecompass.tmf.ui.swtbot.tests</module>
         <module>org.eclipse.tracecompass.tmf.analysis.xml.ui.swtbot.tests</module>
         <module>org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests</module>
+        <module>org.eclipse.tracecompass.tmf.chart.ui.swtbot.tests</module>
       </modules>
     </profile>
   </profiles>

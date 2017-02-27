@@ -11,7 +11,13 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.tmf.core
-Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart;x-friends:="org.eclipse.tracecompass.tmf.chart.ui,org.eclipse.tracecompass.tmf.chart.core.tests,org.eclipse.tracecompass.analysis.lami.ui",
+Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart;
+  x-friends:="org.eclipse.tracecompass.tmf.chart.ui,
+   org.eclipse.tracecompass.tmf.chart.core.tests,
+   org.eclipse.tracecompass.analysis.lami.ui,
+   org.eclipse.tracecompass.analysis.lami.core,
+   org.eclipse.tracecompass.analysis.lami.ui.swtbot.tests,
+   org.eclipse.tracecompass.tmf.chart.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.provisional.tmf.chart.core.descriptor;
   x-friends:="org.eclipse.tracecompass.tmf.chart.ui,
    org.eclipse.tracecompass.tmf.chart.core.tests,

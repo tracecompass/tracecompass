@@ -17,6 +17,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRangeMap;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Decimal formatter for graph
  *
@@ -75,6 +77,16 @@ public class ChartDecimalUnitFormat extends DecimalUnitFormat {
     public ChartDecimalUnitFormat(double factor, @Nullable ChartRangeMap map) {
         super(factor);
         fRangeMap = map;
+    }
+
+    /**
+     * Get the range map for this formatter
+     *
+     * @return The range map
+     */
+    @VisibleForTesting
+    public @Nullable ChartRangeMap getRangeMap() {
+        return fRangeMap;
     }
 
     // ------------------------------------------------------------------------

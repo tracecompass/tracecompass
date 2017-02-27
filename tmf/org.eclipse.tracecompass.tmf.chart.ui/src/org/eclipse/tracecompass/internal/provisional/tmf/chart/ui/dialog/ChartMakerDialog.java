@@ -590,7 +590,8 @@ public class ChartMakerDialog extends Dialog {
     private class TypeLabelProvider extends ColumnLabelProvider {
         @Override
         public @Nullable String getText(@Nullable Object element) {
-            return null;
+            IChartTypeDefinition type = checkNotNull((IChartTypeDefinition) element);
+            return type.getType().name();
         }
 
         @Override
