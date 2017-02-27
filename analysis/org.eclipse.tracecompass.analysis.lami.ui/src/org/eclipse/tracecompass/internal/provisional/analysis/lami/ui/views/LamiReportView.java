@@ -168,7 +168,7 @@ public final class LamiReportView extends TmfView {
         }
     }
 
-    private @Nullable LamiReportViewTabPage getCurrentSelectedPage() {
+    @Nullable LamiReportViewTabPage getCurrentSelectedPage() {
         CTabFolder tf = fTabFolder;
         if (tf == null) {
             return null;
