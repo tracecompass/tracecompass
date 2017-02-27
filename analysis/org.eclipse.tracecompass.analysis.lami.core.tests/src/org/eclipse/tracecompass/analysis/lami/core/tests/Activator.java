@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.analysis.lami.core.tests;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.TraceCompassActivator;
 
 /**
@@ -16,7 +17,7 @@ import org.eclipse.tracecompass.common.core.TraceCompassActivator;
  */
 public class Activator extends TraceCompassActivator {
 
-    private static final String PLUGIN_ID = "org.eclipse.tracecompass.analysis.lami.core.tests"; //$NON-NLS-1$
+    private static final @NonNull String PLUGIN_ID = "org.eclipse.tracecompass.analysis.lami.core.tests"; //$NON-NLS-1$
 
     /**
      * Return the singleton instance of this activator.

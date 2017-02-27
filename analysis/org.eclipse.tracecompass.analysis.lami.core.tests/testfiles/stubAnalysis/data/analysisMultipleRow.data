@@ -1,0 +1,6511 @@
+{
+  "results": [
+    {
+      "time-range": {
+        "begin": 1444764658020966700,
+        "class": "time-range",
+        "end": 1444764658045521000
+      },
+      "class": "log",
+      "data": [
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658020971800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658020981500
+          },
+          {
+            "class": "duration",
+            "value": 9672
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658021070300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658021075200
+          },
+          {
+            "class": "duration",
+            "value": 4717
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658021370600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658021382400
+          },
+          {
+            "class": "duration",
+            "value": 11807
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 21948,
+            "pid": 21948,
+            "class": "process",
+            "name": "kworker/u8:1"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658021366000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658021386200
+          },
+          {
+            "class": "duration",
+            "value": 20064
+          },
+          20,
+          {
+            "id": 0,
+            "class": "cpu"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658021415400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658021426400
+          },
+          {
+            "class": "duration",
+            "value": 11052
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 24225,
+            "pid": 24225,
+            "class": "process",
+            "name": "compiz"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658021954800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658021963500
+          },
+          {
+            "class": "duration",
+            "value": 8694
+          },
+          20,
+          {
+            "id": 2,
+            "class": "cpu"
+          },
+          {
+            "tid": 7,
+            "pid": 7,
+            "class": "process",
+            "name": "rcu_sched"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658021967600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658021972200
+          },
+          {
+            "class": "duration",
+            "value": 4531
+          },
+          20,
+          {
+            "id": 0,
+            "class": "cpu"
+          },
+          {
+            "tid": 9,
+            "pid": 9,
+            "class": "process",
+            "name": "rcuos/1"
+          },
+          {
+            "tid": 7,
+            "pid": 7,
+            "class": "process",
+            "name": "rcu_sched"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658021966600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658021972500
+          },
+          {
+            "class": "duration",
+            "value": 5872
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 10,
+            "pid": 10,
+            "class": "process",
+            "name": "rcuos/2"
+          },
+          {
+            "tid": 7,
+            "pid": 7,
+            "class": "process",
+            "name": "rcu_sched"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658021994800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658022002400
+          },
+          {
+            "class": "duration",
+            "value": 7633
+          },
+          20,
+          {
+            "id": 2,
+            "class": "cpu"
+          },
+          {
+            "tid": 7,
+            "pid": 7,
+            "class": "process",
+            "name": "rcu_sched"
+          },
+          {
+            "tid": 10,
+            "pid": 10,
+            "class": "process",
+            "name": "rcuos/2"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658022350800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658022354700
+          },
+          {
+            "class": "duration",
+            "value": 3857
+          },
+          20,
+          {
+            "id": 0,
+            "class": "cpu"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          },
+          {
+            "tid": 24225,
+            "pid": 24225,
+            "class": "process",
+            "name": "compiz"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658022439400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658022459400
+          },
+          {
+            "class": "duration",
+            "value": 19733
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 24225,
+            "pid": 24225,
+            "class": "process",
+            "name": "compiz"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658022885600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658022894600
+          },
+          {
+            "class": "duration",
+            "value": 8742
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658022964200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658022967800
+          },
+          {
+            "class": "duration",
+            "value": 3518
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023072000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023077000
+          },
+          {
+            "class": "duration",
+            "value": 5121
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023081500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023086000
+          },
+          {
+            "class": "duration",
+            "value": 4424
+          },
+          20,
+          {
+            "id": 0,
+            "class": "cpu"
+          },
+          {
+            "tid": 9,
+            "pid": 9,
+            "class": "process",
+            "name": "rcuos/1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023084800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023089000
+          },
+          {
+            "class": "duration",
+            "value": 4127
+          },
+          20,
+          {
+            "id": 0,
+            "class": "cpu"
+          },
+          {
+            "tid": 22603,
+            "pid": 22603,
+            "class": "process",
+            "name": "kworker/0:2"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023086800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023090000
+          },
+          {
+            "class": "duration",
+            "value": 3080
+          },
+          20,
+          {
+            "id": 2,
+            "class": "cpu"
+          },
+          {
+            "tid": 21684,
+            "pid": 21684,
+            "class": "process",
+            "name": "kworker/2:2"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023089000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023099400
+          },
+          {
+            "class": "duration",
+            "value": 10643
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023102500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023104000
+          },
+          {
+            "class": "duration",
+            "value": 1714
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          {
+            "tid": 22603,
+            "pid": 22603,
+            "class": "process",
+            "name": "kworker/0:2"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023144200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023147300
+          },
+          {
+            "class": "duration",
+            "value": 3052
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023240000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023243300
+          },
+          {
+            "class": "duration",
+            "value": 3251
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023283500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023286500
+          },
+          {
+            "class": "duration",
+            "value": 3173
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023384300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023388000
+          },
+          {
+            "class": "duration",
+            "value": 3472
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023476200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023479000
+          },
+          {
+            "class": "duration",
+            "value": 2804
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023575800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023579400
+          },
+          {
+            "class": "duration",
+            "value": 3491
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023619600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023622700
+          },
+          {
+            "class": "duration",
+            "value": 3013
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023679500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023682800
+          },
+          {
+            "class": "duration",
+            "value": 3378
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023721000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023723800
+          },
+          {
+            "class": "duration",
+            "value": 2931
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023779300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023782700
+          },
+          {
+            "class": "duration",
+            "value": 3407
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023821600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023824100
+          },
+          {
+            "class": "duration",
+            "value": 2701
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023881000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023884300
+          },
+          {
+            "class": "duration",
+            "value": 3221
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023923500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023926300
+          },
+          {
+            "class": "duration",
+            "value": 2675
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658023968800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658023971800
+          },
+          {
+            "class": "duration",
+            "value": 3163
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024011300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024014300
+          },
+          {
+            "class": "duration",
+            "value": 2933
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024062000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024070400
+          },
+          {
+            "class": "duration",
+            "value": 8664
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024100600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024103200
+          },
+          {
+            "class": "duration",
+            "value": 2635
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024156700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024159200
+          },
+          {
+            "class": "duration",
+            "value": 2515
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024195600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024198100
+          },
+          {
+            "class": "duration",
+            "value": 2622
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024242700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024245200
+          },
+          {
+            "class": "duration",
+            "value": 2492
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024284000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024286700
+          },
+          {
+            "class": "duration",
+            "value": 2644
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024328700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024331300
+          },
+          {
+            "class": "duration",
+            "value": 2539
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024366800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024369400
+          },
+          {
+            "class": "duration",
+            "value": 2682
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024411000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024413400
+          },
+          {
+            "class": "duration",
+            "value": 2529
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024448800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024451300
+          },
+          {
+            "class": "duration",
+            "value": 2637
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024491800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024494300
+          },
+          {
+            "class": "duration",
+            "value": 2555
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024530200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024533000
+          },
+          {
+            "class": "duration",
+            "value": 2738
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024574500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024577300
+          },
+          {
+            "class": "duration",
+            "value": 2632
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024619000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024621800
+          },
+          {
+            "class": "duration",
+            "value": 2866
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024665000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024668000
+          },
+          {
+            "class": "duration",
+            "value": 2619
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024704300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024707300
+          },
+          {
+            "class": "duration",
+            "value": 2967
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024749600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024752000
+          },
+          {
+            "class": "duration",
+            "value": 2567
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024787700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024790500
+          },
+          {
+            "class": "duration",
+            "value": 2649
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024852500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024855000
+          },
+          {
+            "class": "duration",
+            "value": 2525
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024891100
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024893700
+          },
+          {
+            "class": "duration",
+            "value": 2750
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024942000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024944600
+          },
+          {
+            "class": "duration",
+            "value": 2532
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658024981200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658024983800
+          },
+          {
+            "class": "duration",
+            "value": 2613
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025026000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025028600
+          },
+          {
+            "class": "duration",
+            "value": 2507
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025064000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025066500
+          },
+          {
+            "class": "duration",
+            "value": 2595
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025108000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025110500
+          },
+          {
+            "class": "duration",
+            "value": 2697
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025145900
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025148400
+          },
+          {
+            "class": "duration",
+            "value": 2595
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025190400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025192700
+          },
+          {
+            "class": "duration",
+            "value": 2430
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025228500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025231000
+          },
+          {
+            "class": "duration",
+            "value": 2603
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025273600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025276200
+          },
+          {
+            "class": "duration",
+            "value": 2482
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025312800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025315300
+          },
+          {
+            "class": "duration",
+            "value": 2618
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025356000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025358600
+          },
+          {
+            "class": "duration",
+            "value": 2574
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025400000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025402600
+          },
+          {
+            "class": "duration",
+            "value": 2636
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025445400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025448200
+          },
+          {
+            "class": "duration",
+            "value": 2842
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025483300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025486000
+          },
+          {
+            "class": "duration",
+            "value": 2603
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025528300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025530600
+          },
+          {
+            "class": "duration",
+            "value": 2510
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025566700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025569300
+          },
+          {
+            "class": "duration",
+            "value": 2641
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025616400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025625000
+          },
+          {
+            "class": "duration",
+            "value": 8701
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025738800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025748000
+          },
+          {
+            "class": "duration",
+            "value": 9081
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025801000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025803500
+          },
+          {
+            "class": "duration",
+            "value": 2551
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025841400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025844200
+          },
+          {
+            "class": "duration",
+            "value": 2635
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025886200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025888300
+          },
+          {
+            "class": "duration",
+            "value": 1959
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025923800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025927200
+          },
+          {
+            "class": "duration",
+            "value": 3390
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025955300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025958400
+          },
+          {
+            "class": "duration",
+            "value": 3267
+          },
+          20,
+          {
+            "id": 2,
+            "class": "cpu"
+          },
+          {
+            "tid": 7,
+            "pid": 7,
+            "class": "process",
+            "name": "rcu_sched"
+          },
+          {
+            "tid": 8961,
+            "pid": 8854,
+            "class": "process",
+            "name": "lttng-sessiond"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025969200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025972000
+          },
+          {
+            "class": "duration",
+            "value": 2862
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658025961000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658025976800
+          },
+          {
+            "class": "duration",
+            "value": 16066
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 10,
+            "pid": 10,
+            "class": "process",
+            "name": "rcuos/2"
+          },
+          {
+            "tid": 7,
+            "pid": 7,
+            "class": "process",
+            "name": "rcu_sched"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026014000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026017000
+          },
+          {
+            "class": "duration",
+            "value": 2936
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026059000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026061600
+          },
+          {
+            "class": "duration",
+            "value": 2632
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026099700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026102500
+          },
+          {
+            "class": "duration",
+            "value": 2706
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026149400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026158000
+          },
+          {
+            "class": "duration",
+            "value": 8686
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026188000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026190800
+          },
+          {
+            "class": "duration",
+            "value": 2691
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026251000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026253600
+          },
+          {
+            "class": "duration",
+            "value": 2517
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026291200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026293800
+          },
+          {
+            "class": "duration",
+            "value": 2643
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026335200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026337800
+          },
+          {
+            "class": "duration",
+            "value": 2566
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026373600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026376200
+          },
+          {
+            "class": "duration",
+            "value": 2632
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026417400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026420000
+          },
+          {
+            "class": "duration",
+            "value": 2541
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026455600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026458000
+          },
+          {
+            "class": "duration",
+            "value": 2626
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026499000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026501600
+          },
+          {
+            "class": "duration",
+            "value": 2539
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026538000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026540500
+          },
+          {
+            "class": "duration",
+            "value": 2675
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026581500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026583800
+          },
+          {
+            "class": "duration",
+            "value": 2540
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026620000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026622500
+          },
+          {
+            "class": "duration",
+            "value": 2634
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026663400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026666000
+          },
+          {
+            "class": "duration",
+            "value": 2509
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026701000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026703600
+          },
+          {
+            "class": "duration",
+            "value": 2650
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026746000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026748400
+          },
+          {
+            "class": "duration",
+            "value": 2476
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026783700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026786300
+          },
+          {
+            "class": "duration",
+            "value": 2663
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026827500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026830000
+          },
+          {
+            "class": "duration",
+            "value": 2503
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026865700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026868500
+          },
+          {
+            "class": "duration",
+            "value": 2656
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026910200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026912800
+          },
+          {
+            "class": "duration",
+            "value": 2507
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026948600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026951400
+          },
+          {
+            "class": "duration",
+            "value": 2672
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658026992600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658026995200
+          },
+          {
+            "class": "duration",
+            "value": 2462
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027030300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027033000
+          },
+          {
+            "class": "duration",
+            "value": 2650
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027074800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027077000
+          },
+          {
+            "class": "duration",
+            "value": 2515
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027112400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027115300
+          },
+          {
+            "class": "duration",
+            "value": 2606
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027155700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027158000
+          },
+          {
+            "class": "duration",
+            "value": 2512
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027193300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027196200
+          },
+          {
+            "class": "duration",
+            "value": 2756
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027238000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027240200
+          },
+          {
+            "class": "duration",
+            "value": 2508
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027275500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027278000
+          },
+          {
+            "class": "duration",
+            "value": 2692
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027320000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027322600
+          },
+          {
+            "class": "duration",
+            "value": 2538
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027357700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027360500
+          },
+          {
+            "class": "duration",
+            "value": 2656
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027402000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027404500
+          },
+          {
+            "class": "duration",
+            "value": 2535
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027440000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027442700
+          },
+          {
+            "class": "duration",
+            "value": 2674
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027485000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027487500
+          },
+          {
+            "class": "duration",
+            "value": 2549
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027523000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027525600
+          },
+          {
+            "class": "duration",
+            "value": 2637
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027567600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027570200
+          },
+          {
+            "class": "duration",
+            "value": 2496
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027600100
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027604200
+          },
+          {
+            "class": "duration",
+            "value": 4134
+          },
+          20,
+          {
+            "id": 0,
+            "class": "cpu"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027639300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027642000
+          },
+          {
+            "class": "duration",
+            "value": 2983
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027695400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027698000
+          },
+          {
+            "class": "duration",
+            "value": 2538
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027734300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027737000
+          },
+          {
+            "class": "duration",
+            "value": 2709
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027712500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027743700
+          },
+          {
+            "class": "duration",
+            "value": 31276
+          },
+          20,
+          {
+            "id": 0,
+            "class": "cpu"
+          },
+          {
+            "tid": 24419,
+            "pid": 24419,
+            "class": "process",
+            "name": "gnome-terminal"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027785700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027794700
+          },
+          {
+            "class": "duration",
+            "value": 8924
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027824400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027827000
+          },
+          {
+            "class": "duration",
+            "value": 2657
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027881700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027884300
+          },
+          {
+            "class": "duration",
+            "value": 2619
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027920000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027921700
+          },
+          {
+            "class": "duration",
+            "value": 1852
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 22592,
+            "pid": 22592,
+            "class": "process",
+            "name": "kworker/1:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027954400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027958500
+          },
+          {
+            "class": "duration",
+            "value": 4168
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          },
+          {
+            "tid": 24419,
+            "pid": 24419,
+            "class": "process",
+            "name": "gnome-terminal"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027969500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658027976700
+          },
+          {
+            "class": "duration",
+            "value": 7247
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658027983600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028039400
+          },
+          {
+            "class": "duration",
+            "value": 55831
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 11,
+            "pid": 11,
+            "class": "process",
+            "name": "rcuos/3"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028030000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028041500
+          },
+          {
+            "class": "duration",
+            "value": 11587
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028088600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028093200
+          },
+          {
+            "class": "duration",
+            "value": 4539
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028133600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028136400
+          },
+          {
+            "class": "duration",
+            "value": 2633
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028177200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028181500
+          },
+          {
+            "class": "duration",
+            "value": 4350
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028216300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028219000
+          },
+          {
+            "class": "duration",
+            "value": 2593
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028260400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028264700
+          },
+          {
+            "class": "duration",
+            "value": 4127
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028299300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028301800
+          },
+          {
+            "class": "duration",
+            "value": 2598
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028343300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028347400
+          },
+          {
+            "class": "duration",
+            "value": 4118
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028381700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028384300
+          },
+          {
+            "class": "duration",
+            "value": 2551
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028425000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028429000
+          },
+          {
+            "class": "duration",
+            "value": 4260
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028463600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028466400
+          },
+          {
+            "class": "duration",
+            "value": 2601
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028508200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028512300
+          },
+          {
+            "class": "duration",
+            "value": 4147
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028546600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028549000
+          },
+          {
+            "class": "duration",
+            "value": 2552
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028591400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028595500
+          },
+          {
+            "class": "duration",
+            "value": 4085
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028630800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028633300
+          },
+          {
+            "class": "duration",
+            "value": 2585
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028674300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028678700
+          },
+          {
+            "class": "duration",
+            "value": 4168
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028713000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028715500
+          },
+          {
+            "class": "duration",
+            "value": 2552
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028755700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028760000
+          },
+          {
+            "class": "duration",
+            "value": 4207
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028794600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028797200
+          },
+          {
+            "class": "duration",
+            "value": 2587
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028838400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028842500
+          },
+          {
+            "class": "duration",
+            "value": 4146
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028879400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028882200
+          },
+          {
+            "class": "duration",
+            "value": 2772
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028928800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028939500
+          },
+          {
+            "class": "duration",
+            "value": 10575
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658028967700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658028970500
+          },
+          {
+            "class": "duration",
+            "value": 2600
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029022700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029027000
+          },
+          {
+            "class": "duration",
+            "value": 4169
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029061000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029064000
+          },
+          {
+            "class": "duration",
+            "value": 2629
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029113900
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029118000
+          },
+          {
+            "class": "duration",
+            "value": 4134
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029155800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029158400
+          },
+          {
+            "class": "duration",
+            "value": 2559
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029199000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029203200
+          },
+          {
+            "class": "duration",
+            "value": 4127
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029238500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029241000
+          },
+          {
+            "class": "duration",
+            "value": 2596
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029282000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029286100
+          },
+          {
+            "class": "duration",
+            "value": 4118
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029321200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029323800
+          },
+          {
+            "class": "duration",
+            "value": 2567
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029364200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029368300
+          },
+          {
+            "class": "duration",
+            "value": 4220
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029402400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029405000
+          },
+          {
+            "class": "duration",
+            "value": 2577
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029445600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029449700
+          },
+          {
+            "class": "duration",
+            "value": 4128
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029483800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029486300
+          },
+          {
+            "class": "duration",
+            "value": 2545
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029528000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029532200
+          },
+          {
+            "class": "duration",
+            "value": 4097
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029566000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029568500
+          },
+          {
+            "class": "duration",
+            "value": 2539
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029609200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029613300
+          },
+          {
+            "class": "duration",
+            "value": 4109
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029648000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029650400
+          },
+          {
+            "class": "duration",
+            "value": 2602
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029689900
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029694000
+          },
+          {
+            "class": "duration",
+            "value": 4093
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029729300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029731800
+          },
+          {
+            "class": "duration",
+            "value": 2536
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029772800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029777200
+          },
+          {
+            "class": "duration",
+            "value": 4253
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029811200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029814000
+          },
+          {
+            "class": "duration",
+            "value": 2623
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029853700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029858000
+          },
+          {
+            "class": "duration",
+            "value": 4150
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029893600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029896200
+          },
+          {
+            "class": "duration",
+            "value": 2574
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029936000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029940200
+          },
+          {
+            "class": "duration",
+            "value": 4116
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658029961500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658029988000
+          },
+          {
+            "class": "duration",
+            "value": 26581
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030047000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030051300
+          },
+          {
+            "class": "duration",
+            "value": 4392
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030086100
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030088700
+          },
+          {
+            "class": "duration",
+            "value": 2632
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030132000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030136000
+          },
+          {
+            "class": "duration",
+            "value": 4188
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030170000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030172700
+          },
+          {
+            "class": "duration",
+            "value": 2603
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030213600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030217700
+          },
+          {
+            "class": "duration",
+            "value": 4145
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030251500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030254000
+          },
+          {
+            "class": "duration",
+            "value": 2589
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030295300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030299600
+          },
+          {
+            "class": "duration",
+            "value": 4116
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030333400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030336000
+          },
+          {
+            "class": "duration",
+            "value": 2582
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030377000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030381000
+          },
+          {
+            "class": "duration",
+            "value": 4140
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030416000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030418400
+          },
+          {
+            "class": "duration",
+            "value": 2694
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030474500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030478300
+          },
+          {
+            "class": "duration",
+            "value": 4053
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030512000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030514700
+          },
+          {
+            "class": "duration",
+            "value": 2567
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030555400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030559500
+          },
+          {
+            "class": "duration",
+            "value": 4181
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030594000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030596600
+          },
+          {
+            "class": "duration",
+            "value": 2546
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030637300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030641400
+          },
+          {
+            "class": "duration",
+            "value": 4089
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030675500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030677800
+          },
+          {
+            "class": "duration",
+            "value": 2557
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030719000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030723000
+          },
+          {
+            "class": "duration",
+            "value": 4127
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030756600
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030759200
+          },
+          {
+            "class": "duration",
+            "value": 2540
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030800400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030804500
+          },
+          {
+            "class": "duration",
+            "value": 4126
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030839300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030841900
+          },
+          {
+            "class": "duration",
+            "value": 2544
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030881300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030885400
+          },
+          {
+            "class": "duration",
+            "value": 4112
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030918700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030921200
+          },
+          {
+            "class": "duration",
+            "value": 2620
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030961700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658030966000
+          },
+          {
+            "class": "duration",
+            "value": 4312
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658030999300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658031002000
+          },
+          {
+            "class": "duration",
+            "value": 2621
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658031043000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658031047200
+          },
+          {
+            "class": "duration",
+            "value": 4111
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658031081500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658031084000
+          },
+          {
+            "class": "duration",
+            "value": 2536
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658031124500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658031128600
+          },
+          {
+            "class": "duration",
+            "value": 4038
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658031163100
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658031166000
+          },
+          {
+            "class": "duration",
+            "value": 2686
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658031207200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658031211300
+          },
+          {
+            "class": "duration",
+            "value": 4126
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658031246000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658031248600
+          },
+          {
+            "class": "duration",
+            "value": 2561
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658031289000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658031293200
+          },
+          {
+            "class": "duration",
+            "value": 4089
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658031327700
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658031330300
+          },
+          {
+            "class": "duration",
+            "value": 2547
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658031370000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658031374000
+          },
+          {
+            "class": "duration",
+            "value": 4070
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658031409200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658031411700
+          },
+          {
+            "class": "duration",
+            "value": 2571
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658031453200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658031457000
+          },
+          {
+            "class": "duration",
+            "value": 4076
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658031491000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658031493600
+          },
+          {
+            "class": "duration",
+            "value": 2591
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 22567,
+            "pid": 22567,
+            "class": "process",
+            "name": "kworker/3:1"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658031533800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658031538000
+          },
+          {
+            "class": "duration",
+            "value": 4093
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 8998,
+            "pid": 8993,
+            "class": "process",
+            "name": "lttng-consumerd"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658035589400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658035607600
+          },
+          {
+            "class": "duration",
+            "value": 18219
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658035668500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658035672600
+          },
+          {
+            "class": "duration",
+            "value": 4072
+          },
+          20,
+          {
+            "id": 0,
+            "class": "cpu"
+          },
+          {
+            "tid": 24419,
+            "pid": 24419,
+            "class": "process",
+            "name": "gnome-terminal"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658035819500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658035821000
+          },
+          {
+            "class": "duration",
+            "value": 1640
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          },
+          {
+            "tid": 24419,
+            "pid": 24419,
+            "class": "process",
+            "name": "gnome-terminal"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658038023400
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658038030800
+          },
+          {
+            "class": "duration",
+            "value": 7614
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 21948,
+            "pid": 21948,
+            "class": "process",
+            "name": "kworker/u8:1"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658038019800
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658038034000
+          },
+          {
+            "class": "duration",
+            "value": 14058
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658042593000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658042596000
+          },
+          {
+            "class": "duration",
+            "value": 3036
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 21948,
+            "pid": 21948,
+            "class": "process",
+            "name": "kworker/u8:1"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658042590500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658042603800
+          },
+          {
+            "class": "duration",
+            "value": 13487
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658042627000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658042630700
+          },
+          {
+            "class": "duration",
+            "value": 3504
+          },
+          20,
+          {
+            "id": 3,
+            "class": "cpu"
+          },
+          {
+            "tid": 24225,
+            "pid": 24225,
+            "class": "process",
+            "name": "compiz"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658042878500
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658042883000
+          },
+          {
+            "class": "duration",
+            "value": 4449
+          },
+          20,
+          {
+            "id": 0,
+            "class": "cpu"
+          },
+          {
+            "tid": 24419,
+            "pid": 24419,
+            "class": "process",
+            "name": "gnome-terminal"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658043585300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658043603700
+          },
+          {
+            "class": "duration",
+            "value": 18430
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          },
+          null
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658043639000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658043642000
+          },
+          {
+            "class": "duration",
+            "value": 3234
+          },
+          20,
+          {
+            "id": 0,
+            "class": "cpu"
+          },
+          {
+            "tid": 24419,
+            "pid": 24419,
+            "class": "process",
+            "name": "gnome-terminal"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658043712300
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658043717400
+          },
+          {
+            "class": "duration",
+            "value": 4910
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          },
+          {
+            "tid": 24419,
+            "pid": 24419,
+            "class": "process",
+            "name": "gnome-terminal"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658043732200
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658043736000
+          },
+          {
+            "class": "duration",
+            "value": 3943
+          },
+          20,
+          {
+            "id": 0,
+            "class": "cpu"
+          },
+          {
+            "tid": 24419,
+            "pid": 24419,
+            "class": "process",
+            "name": "gnome-terminal"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          }
+        ],
+        [
+          {
+            "class": "timestamp",
+            "value": 1444764658044788000
+          },
+          {
+            "class": "timestamp",
+            "value": 1444764658044790300
+          },
+          {
+            "class": "duration",
+            "value": 2230
+          },
+          20,
+          {
+            "id": 1,
+            "class": "cpu"
+          },
+          {
+            "tid": 23649,
+            "pid": 23649,
+            "class": "process",
+            "name": "Xorg"
+          },
+          null
+        ]
+      ]
+    }
+  ]
+}

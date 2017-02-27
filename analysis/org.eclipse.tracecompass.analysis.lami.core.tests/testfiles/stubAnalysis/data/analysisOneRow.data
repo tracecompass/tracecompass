@@ -1,0 +1,40 @@
+{
+    "results": [
+        {
+            "class": "log",
+            "data": [
+                [
+                    {
+                        "class": "timestamp",
+                        "value": 9000000000000000100
+                    },
+                    {
+                        "class": "timestamp",
+                        "value": 9000000000000000102
+                    },
+                    {
+                        "class": "duration",
+                        "value": 0
+                    },
+                    null,
+                    {
+                        "class": "cpu",
+                        "id": 0
+                    },
+                    {
+                        "class": "process",
+                        "name": "swapper/5",
+                        "pid": 0,
+                        "tid": 0
+                    },
+                    null
+                ]
+            ],
+            "time-range": {
+                "begin": 9000000000000000000,
+                "class": "time-range",
+                "end": 9000000000000000300
+            }
+        }
+    ]
+}

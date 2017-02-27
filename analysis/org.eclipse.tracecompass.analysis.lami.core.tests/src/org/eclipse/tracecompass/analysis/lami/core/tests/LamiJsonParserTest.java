@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.tracecompass.analysis.lami.core.tests.shared.analysis.LamiAnalysisStub;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiTableEntryAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiResultTable;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiTableClass;
@@ -82,9 +83,11 @@ public class LamiJsonParserTest {
      */
     @Test
     public void testMetadata() {
-        LamiAnalysisStub analysis = new LamiAnalysisStub("test-metadata.json", "test-results.json");
+        LamiAnalysisStub analysis = new LamiAnalysisStub("Stub analysis", "test-metadata.json", "test-results.json");
 
-        assertTrue(analysis.canExecute(fTrace));
+        LamiTmfTraceStub trace = fTrace;
+        assertNotNull(trace);
+        assertTrue(analysis.canExecute(trace));
         assertEquals("LAMI test", analysis.getAnalysisTitle());
 
         Map<String, LamiTableClass> tableModels = analysis.getTableClasses();
@@ -129,9 +132,11 @@ public class LamiJsonParserTest {
      */
     @Test
     public void testResults() throws CoreException {
-        LamiAnalysisStub analysis = new LamiAnalysisStub("test-metadata.json", "test-results.json");
+        LamiAnalysisStub analysis = new LamiAnalysisStub("Stub analysis", "test-metadata.json", "test-results.json");
 
-        List<LamiResultTable> resultTables = analysis.execute(fTrace, null, "", new NullProgressMonitor());
+        LamiTmfTraceStub trace = fTrace;
+        assertNotNull(trace);
+        List<LamiResultTable> resultTables = analysis.execute(trace, null, "", new NullProgressMonitor());
 
         assertFalse(resultTables.isEmpty());
         assertEquals(4, resultTables.size());
@@ -214,9 +219,11 @@ public class LamiJsonParserTest {
      */
     @Test (expected = CoreException.class)
     public void testResultsError() throws CoreException {
-        LamiAnalysisStub analysis = new LamiAnalysisStub("test-metadata.json", "test-error.json");
+        LamiTmfTraceStub trace = fTrace;
+        assertNotNull(trace);
+        LamiAnalysisStub analysis = new LamiAnalysisStub("Stub analysis", "test-metadata.json", "test-error.json");
 
-        analysis.execute(fTrace, null, "", new NullProgressMonitor());
+        analysis.execute(trace, null, "", new NullProgressMonitor());
     }
 
     /**
@@ -224,14 +231,16 @@ public class LamiJsonParserTest {
      */
     @Test
     public void testBaseCommand() {
-        LamiAnalysisStub analysis = new LamiAnalysisStub("test-metadata.json", "test-error.json");
+        LamiTmfTraceStub trace = fTrace;
+        assertNotNull(trace);
+        LamiAnalysisStub analysis = new LamiAnalysisStub("Stub analysis", "test-metadata.json", "test-error.json");
 
         ITmfTimestamp begin = TmfTimestamp.fromNanos(98233);
         ITmfTimestamp end = TmfTimestamp.fromNanos(1293828);
 
         TmfTimeRange timerange = new TmfTimeRange(begin, end);
 
-        assertEquals("StubExecutable " + '\"' + TRACEPATH + '\"', analysis.getFullCommandAsString(fTrace, null));
-        assertEquals("StubExecutable --begin 98233 --end 1293828 " + '\"' + TRACEPATH + '\"', analysis.getFullCommandAsString(fTrace, timerange));
+        assertEquals("StubExecutable " + '\"' + TRACEPATH + '\"', analysis.getFullCommandAsString(trace, null));
+        assertEquals("StubExecutable --begin 98233 --end 1293828 " + '\"' + TRACEPATH + '\"', analysis.getFullCommandAsString(trace, timerange));
     }
 }
