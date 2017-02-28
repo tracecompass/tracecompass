@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ***************************************************************************
+* Copyright (c) 2017 École Polytechnique de Montréal
+*
+* All rights reserved. This program and the accompanying materials are
+* made available under the terms of the Eclipse Public License v1.0 which
+* accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*************************************************************************** -->
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+
+	<my name="extended element 1">
+		<mySubElement>Test</mySubElement>
+		<mySubElement>Test2</mySubElement>
+	</my>
+
+	<xyView id="kernel.kvm.exit.xychart">
+		<head>
+			<analysis id="kernel.kvm.exit.sp" />
+			<label value="Exit reasons" />
+		</head>
+
+		<entry path="Reasons/*" displayType="delta">
+			<display type="self" />
+		</entry>
+	</xyView>
+
+	<abc name="extended element abc">
+		<mySubElement>Test</mySubElement>
+		<mySubElement>Test2</mySubElement>
+	</abc>
+
+	<stateProvider id="kernel.kvm.exit.sp" version="1">
+		<head>
+			<traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
+			<label value="KVM exit reasons" />
+		</head>
+
+		<!-- case 1 : exit_syscall : Fields: int64 ret -->
+		<eventHandler eventName="kvm_exit">
+			<stateChange>
+				<stateAttribute type="constant" value="Reasons" />
+				<stateAttribute type="eventField" value="exit_reason" />
+				<stateValue type="int" value="1" increment="true" />
+			</stateChange>
+		</eventHandler>
+	</stateProvider>
+
+</tmfxml>

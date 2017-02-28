@@ -36,6 +36,8 @@ public class Messages extends NLS {
     public static String XmlUtils_XmlValidateError;
     /** XML validation error */
     public static String XmlUtils_XmlValidationError;
+    /** XSD validation error */
+    public static String XmlUtils_XsdValidationError;
 
     static {
         // initialize resource bundle

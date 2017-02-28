@@ -32,8 +32,17 @@
 				<xs:element maxOccurs="unbounded" minOccurs="0" name="pattern" type="pattern" >
 					<xs:annotation>
 						<xs:documentation>Define a new pattern analysis</xs:documentation></xs:annotation></xs:element>
+				<xs:element ref="extra" maxOccurs="unbounded" minOccurs="0" >
+					<xs:annotation>
+						<xs:documentation>A placeholder for additional functionalities</xs:documentation></xs:annotation></xs:element>
 			</xs:choice>
 		</xs:complexType>
 	</xs:element>
+
+	<xs:element name="extra" type="extraType" abstract="true"/>
+
+	<xs:complexType name="extraType" abstract="true" >
+		<xs:sequence/>
+	</xs:complexType>
 
 </xs:schema>

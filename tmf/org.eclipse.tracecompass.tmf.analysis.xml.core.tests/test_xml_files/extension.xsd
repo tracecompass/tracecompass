@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- ***************************************************************************
+ * Copyright (c) 2017 École Polytechnique de Montréal and others
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *************************************************************************** -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	attributeFormDefault="unqualified" elementFormDefault="qualified">
+
+	<xs:element name="my" substitutionGroup="extra" type="myType"/>
+	<xs:element name="abc" substitutionGroup="extra" type="myType"/>
+
+	<xs:complexType name="myType">
+		<xs:complexContent>
+			<xs:extension base="extraType">
+				<xs:annotation>
+					<xs:documentation>Example type to extend the XML with new functionalities</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element maxOccurs="unbounded" minOccurs="0" name="mySubElement" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>A sub-element to this new type</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="name" type="xs:string" use="optional">
+					<xs:annotation>
+						<xs:documentation>An extra attribute</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+</xs:schema>

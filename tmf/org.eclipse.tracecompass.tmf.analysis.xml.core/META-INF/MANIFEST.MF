@@ -25,4 +25,5 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.analysis.xml.core;x-friend
  org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider;x-friends:="org.eclipse.tracecompass.tmf.analysis.xml.ui,org.eclipse.tracecompass.tmf.analysis.xml.core.tests",
  org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment;x-friends:="org.eclipse.tracecompass.tmf.analysis.xml.core.tests",
  org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider;x-friends:="org.eclipse.tracecompass.tmf.analysis.xml.core.tests,org.eclipse.tracecompass.tmf.analysis.xml.ui"
-Import-Package: com.google.common.collect
+Import-Package: com.google.common.collect,
+ org.apache.commons.io

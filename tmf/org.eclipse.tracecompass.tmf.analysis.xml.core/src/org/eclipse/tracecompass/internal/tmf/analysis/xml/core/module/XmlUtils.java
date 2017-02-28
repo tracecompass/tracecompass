@@ -36,6 +36,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.io.FilenameUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
@@ -48,6 +49,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.osgi.framework.Bundle;
@@ -76,6 +78,11 @@ public class XmlUtils {
     private static final String TMF_XML_BUILTIN_ID = "org.eclipse.linuxtools.tmf.analysis.xml.core.files"; //$NON-NLS-1$
     private static final String XML_FILE_ELEMENT = "xmlfile"; //$NON-NLS-1$
     private static final String XML_FILE_ATTRIB = "file"; //$NON-NLS-1$
+
+    /** Extension point ID and attributes for extra XSD files */
+    private static final String TMF_XSD_ID = "org.eclipse.tracecompass.tmf.analysis.xml.core.xsd"; //$NON-NLS-1$
+    private static final String XSD_FILE_ELEMENT = "xsdfile"; //$NON-NLS-1$
+    private static final String XSD_FILE_ATTRIB = "file"; //$NON-NLS-1$
 
     /**
      * Extension for XML files
@@ -115,11 +122,41 @@ public class XmlUtils {
      */
     public static IStatus xmlValidate(File xmlFile) {
         URL url = XmlUtils.class.getResource(XSD);
+        List<@NonNull URL> xsdFiles = getExtraXsdFiles();
+        Validator validator = null;
+        Schema schema = null;
+
+        Source[] sources = new Source[xsdFiles.size() + 1];
+        sources[0] = new StreamSource(url.toExternalForm());
+        for (int i = 0; i < xsdFiles.size(); i++) {
+            sources[i + 1] = new StreamSource(xsdFiles.get(i).toExternalForm());
+        }
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+        try {
+            /*
+             * Even though the XSDs do not define a namespace, there is one
+             * default namespace of null and to allow multiple XSDs to be parsed
+             * together, we must allow namespace growth
+             */
+            schemaFactory.setFeature("http://apache.org/xml/features/namespace-growth", true); //$NON-NLS-1$
+            schema = schemaFactory.newSchema(sources);
+        } catch (SAXException e) {
+            // There was an error setting up the schema, log the error
+            String error = NLS.bind(Messages.XmlUtils_XsdValidationError, e.getLocalizedMessage());
+            Activator.logError(error);
+            try {
+                // and fallback to the builtin schema only
+                schema = schemaFactory.newSchema(url);
+            } catch (SAXException e1) {
+                error = NLS.bind(Messages.XmlUtils_XsdValidationError, e1.getLocalizedMessage());
+                Activator.logError(error);
+                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, error, e1);
+            }
+        }
+        validator = schema.newValidator();
         Source xmlSource = new StreamSource(xmlFile);
         try {
-            Schema schema = schemaFactory.newSchema(url);
-            Validator validator = schema.newValidator();
             validator.validate(xmlSource);
         } catch (SAXParseException e) {
             String error = NLS.bind(Messages.XmlUtils_XmlParseError, e.getLineNumber(), e.getLocalizedMessage());
@@ -182,17 +219,35 @@ public class XmlUtils {
     }
 
     /**
-     * List all files advertised through the builtin extension point. It returns a map where the key is the file name.
+     * List all files advertised through the builtin extension point. It returns
+     * a map where the key is the file name.
      *
      * @return A map with all the XMl analysis builtin files
      */
     public static synchronized @NonNull Map<String, IPath> listBuiltinFiles() {
-        /* Get the XML files advertised through the extension point */
-        IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(TMF_XML_BUILTIN_ID);
+        List<URL> urls = getUrlsFromConfiguration(TMF_XML_BUILTIN_ID, XML_FILE_ELEMENT, XML_FILE_ATTRIB);
+
         Map<String, IPath> map = new HashMap<>();
+        urls.forEach(url -> map.put(FilenameUtils.getName(url.getPath()), new Path(url.getPath())));
+        return map;
+    }
+
+    /**
+     * List all the additional files advertised through the XSD extension point
+     *
+     * @return A map with all the XMl analysis builtin files
+     */
+    private static synchronized @NonNull List<@NonNull URL> getExtraXsdFiles() {
+        return getUrlsFromConfiguration(TMF_XSD_ID, XSD_FILE_ELEMENT, XSD_FILE_ATTRIB);
+    }
+
+    private static synchronized @NonNull List<@NonNull URL> getUrlsFromConfiguration(String extensionName, String elementName, String attribName) {
+        /* Get the XSD files advertised through the extension point */
+        IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(extensionName);
+        List<@NonNull URL> list = new ArrayList<>();
         for (IConfigurationElement element : elements) {
-            if (element.getName().equals(XML_FILE_ELEMENT)) {
-                final String filename = element.getAttribute(XML_FILE_ATTRIB);
+            if (element.getName().equals(elementName)) {
+                final String filename = element.getAttribute(attribName);
                 final String name = element.getContributor().getName();
                 // Run this in a safe runner in case there is an exception
                 // (IOException, FileNotFoundException, NPE, etc).
@@ -210,7 +265,7 @@ public class XmlUtils {
                                     throw new FileNotFoundException(filename);
                                 }
                                 URL locatedURL = FileLocator.toFileURL(xmlUrl);
-                                map.put(filename, new Path(locatedURL.getPath()));
+                                list.add(NonNullUtils.checkNotNull(locatedURL));
                             }
                         }
                     }
@@ -222,7 +277,7 @@ public class XmlUtils {
                 });
             }
         }
-        return map;
+        return list;
     }
 
     /**
