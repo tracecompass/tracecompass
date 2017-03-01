@@ -22,9 +22,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.TmfAnalysisModuleHelperXml.XmlAnalysisModuleType;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.ITmfXmlSchemaParser;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfAnalysisModuleHelperXml;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfAnalysisModuleHelperXml.XmlAnalysisModuleType;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleSource;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
@@ -73,7 +76,7 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
         return modules;
     }
 
-    private static void processFile(File xmlFile) {
+    private static void processFile(@NonNull File xmlFile) {
         if (!XmlUtils.xmlValidate(xmlFile).isOK()) {
             return;
         }
@@ -98,6 +101,11 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
                 IAnalysisModuleHelper helper = new TmfAnalysisModuleHelperXml(xmlFile, node, XmlAnalysisModuleType.PATTERN);
                 fModules.add(helper);
             }
+
+            Iterable<ITmfXmlSchemaParser> extraSchemaParsers = XmlUtils.getExtraSchemaParsers();
+            for (ITmfXmlSchemaParser parser : extraSchemaParsers) {
+                fModules.addAll(parser.getModuleHelpers(xmlFile, doc));
+            }
         } catch (ParserConfigurationException | SAXException | IOException e) {
             Activator.logError("Error opening XML file", e); //$NON-NLS-1$
         }
@@ -106,7 +114,7 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
     private static void populateBuiltinModules() {
         Map<String, IPath> files = XmlUtils.listBuiltinFiles();
         for (IPath xmlPath : files.values()) {
-            processFile(xmlPath.toFile());
+            processFile(NonNullUtils.checkNotNull(xmlPath.toFile()));
         }
     }
 
@@ -137,7 +145,7 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
                 }
             }
         }
-        Map<String, File> files = XmlUtils.listFiles();
+        Map<String, @NonNull File> files = XmlUtils.listFiles();
         for (File xmlFile : files.values()) {
             processFile(xmlFile);
         }

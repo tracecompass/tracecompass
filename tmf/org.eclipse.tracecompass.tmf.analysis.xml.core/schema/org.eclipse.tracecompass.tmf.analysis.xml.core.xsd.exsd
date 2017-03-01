@@ -19,6 +19,7 @@
       <complexType>
          <sequence>
             <element ref="xsdfile" minOccurs="1" maxOccurs="unbounded"/>
+            <element ref="schemaParser" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -56,6 +57,21 @@
                </documentation>
                <appinfo>
                   <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="schemaParser">
+      <complexType>
+         <attribute name="class" type="string">
+            <annotation>
+               <documentation>
+                  The class that contains the extra schema parsing information.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.ITmfXmlSchemaParser"/>
                </appinfo>
             </annotation>
          </attribute>

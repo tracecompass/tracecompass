@@ -10,7 +10,7 @@
 <tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
 
-	<my name="extended element 1">
+	<my id="extended.my" name="extended element 1">
 		<mySubElement>Test</mySubElement>
 		<mySubElement>Test2</mySubElement>
 	</my>
@@ -26,7 +26,7 @@
 		</entry>
 	</xyView>
 
-	<abc name="extended element abc">
+	<abc id="extended.abc" name="extended element abc">
 		<mySubElement>Test</mySubElement>
 		<mySubElement>Test2</mySubElement>
 	</abc>

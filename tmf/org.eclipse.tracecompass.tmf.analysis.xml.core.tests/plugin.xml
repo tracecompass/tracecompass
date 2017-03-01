@@ -12,6 +12,9 @@
       <xsdfile
             file="test_xml_files/extension.xsd">
       </xsdfile>
+      <schemaParser
+            class="org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stubs.XmlSchemaParserStub">
+      </schemaParser>
    </extension>
 
 </plugin>

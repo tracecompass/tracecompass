@@ -20,12 +20,21 @@
 					<xs:documentation>Example type to extend the XML with new functionalities</xs:documentation>
 				</xs:annotation>
 				<xs:sequence>
+				    <xs:element maxOccurs="1" minOccurs="0" name="head" type="headPattern" >
+						<xs:annotation>
+							<xs:documentation>Provides meta-information on this pattern provider, like labels and applicable trace types.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
 					<xs:element maxOccurs="unbounded" minOccurs="0" name="mySubElement" type="xs:string">
 						<xs:annotation>
 							<xs:documentation>A sub-element to this new type</xs:documentation>
 						</xs:annotation>
 					</xs:element>
 				</xs:sequence>
+				<xs:attribute name="id" type="xs:string" use="required" >
+					<xs:annotation>
+						<xs:documentation>The unique ID of this analysis. It will be used to identify the analysis that will be built from this element.</xs:documentation></xs:annotation>
+					</xs:attribute>
 				<xs:attribute name="name" type="xs:string" use="optional">
 					<xs:annotation>
 						<xs:documentation>An extra attribute</xs:documentation>

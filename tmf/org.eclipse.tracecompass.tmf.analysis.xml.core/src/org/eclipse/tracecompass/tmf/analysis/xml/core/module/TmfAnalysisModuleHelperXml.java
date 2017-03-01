@@ -7,17 +7,21 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module;
+package org.eclipse.tracecompass.tmf.analysis.xml.core.module;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.Messages;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
@@ -37,7 +41,7 @@ import org.w3c.dom.Element;
  * Analysis module helpers for modules provided by XML files
  *
  * @author Geneviève Bastien
- * @since 2.0
+ * @since 2.2
  */
 public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPropertiesProvider {
 
@@ -52,10 +56,12 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
 
         /**
          * Analysis will be of type XmlPatternAnalysisModule
-         *
-         * @since 2.0
          */
-        PATTERN
+        PATTERN,
+        /**
+         * Analysis is of type other.
+         */
+        OTHER
     }
 
     private final File fSourceFile;
@@ -110,9 +116,6 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
         return false;
     }
 
-    /**
-     * @since 1.0
-     */
     @Override
     public boolean appliesToExperiment() {
         return false;
@@ -175,7 +178,7 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
     }
 
     @Override
-    public IAnalysisModule newModule(ITmfTrace trace) throws TmfAnalysisException {
+    public final @Nullable IAnalysisModule newModule(ITmfTrace trace) throws TmfAnalysisException {
         String analysisid = getId();
         IAnalysisModule module = null;
         switch (fType) {
@@ -194,6 +197,10 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
             paModule.setXmlFile(fSourceFile.toPath());
 
             break;
+        case OTHER:
+            String name = getName();
+            module = createOtherModule(analysisid, name);
+            break;
         default:
             break;
 
@@ -202,13 +209,60 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
             if (module.setTrace(trace)) {
                 TmfAnalysisManager.analysisModuleCreated(module);
             } else {
-                /* The analysis does not apply to the trace, dispose of the module */
+                /*
+                 * The analysis does not apply to the trace, dispose of the
+                 * module
+                 */
                 module.dispose();
                 module = null;
             }
         }
 
         return module;
+    }
+
+    /**
+     * Create an analysis module from a type not provided by the main XML code.
+     * Typically a plugin that provides new schema information through the xsd
+     * extension point will also provide a schema parser. The schema parser may
+     * create a module helper for a module of type OTHER that will override this
+     * method.
+     *
+     * The returned module should have its name and id initialized and any other
+     * specific information. Values for analysisid and name are provided in
+     * parameter using the pattern of mandatory ID attribute in the main element
+     * and an optional {@link TmfXmlStrings#HEAD} element in the sequence. But
+     * the analysis is free to override those. The trace will be set later.
+     *
+     * @param analysisid
+     *            The analysis ID, as found in the ID attribute of the analysis
+     *            element
+     * @param name
+     *            The name of the analysis as obtained from calling the
+     *            {@link #getName()} method.
+     *
+     * @return The newly created module
+     */
+    protected IAnalysisModule createOtherModule(@NonNull String analysisid, @NonNull String name) {
+        throw new UnsupportedOperationException("Other modules should be implemented by their own helper classes"); //$NON-NLS-1$
+    }
+
+    /**
+     * Get the source file where this XML element was found
+     *
+     * @return The source file
+     */
+    protected Path getSourceFile() {
+        return fSourceFile.toPath();
+    }
+
+    /**
+     * Get the source element for this module
+     *
+     * @return The source element for this module
+     */
+    protected Element getSourceElement() {
+        return fSourceElement;
     }
 
     // ------------------------------------------------------------------------

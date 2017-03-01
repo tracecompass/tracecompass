@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +38,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.apache.commons.io.FilenameUtils;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
@@ -52,6 +54,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.ITmfXmlSchemaParser;
 import org.osgi.framework.Bundle;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -83,6 +86,8 @@ public class XmlUtils {
     private static final String TMF_XSD_ID = "org.eclipse.tracecompass.tmf.analysis.xml.core.xsd"; //$NON-NLS-1$
     private static final String XSD_FILE_ELEMENT = "xsdfile"; //$NON-NLS-1$
     private static final String XSD_FILE_ATTRIB = "file"; //$NON-NLS-1$
+    private static final String XSD_SCHEMA_PARSER_ELEMENT = "schemaParser"; //$NON-NLS-1$
+    private static final String XSD_PARSER_CLASS_ATTRIB = "class"; //$NON-NLS-1$
 
     /**
      * Extension for XML files
@@ -197,11 +202,11 @@ public class XmlUtils {
      *
      * @return A map with all the XML analysis files
      */
-    public static synchronized @NonNull Map<String, File> listFiles() {
+    public static synchronized @NonNull Map<@NonNull String, @NonNull File> listFiles() {
         IPath pathToFiles = XmlUtils.getXmlFilesPath();
         File folder = pathToFiles.toFile();
 
-        Map<String, File> fileMap = new HashMap<>();
+        Map<@NonNull String, @NonNull File> fileMap = new HashMap<>();
         if ((folder.isDirectory() && folder.exists())) {
             File[] listOfFiles = folder.listFiles();
             if (listOfFiles != null) {
@@ -275,6 +280,28 @@ public class XmlUtils {
                         // Handled sufficiently in SafeRunner
                     }
                 });
+            }
+        }
+        return list;
+    }
+
+    /**
+     * List all the additional files advertised through the XSD extension point
+     *
+     * @return A map with all the XMl analysis builtin files
+     */
+    public static synchronized @NonNull Collection<ITmfXmlSchemaParser> getExtraSchemaParsers() {
+        /* Get the XSD files advertised through the extension point */
+        IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(TMF_XSD_ID);
+        List<org.eclipse.tracecompass.tmf.analysis.xml.core.module.ITmfXmlSchemaParser> list = new ArrayList<>();
+        for (IConfigurationElement element : elements) {
+            if (element.getName().equals(XSD_SCHEMA_PARSER_ELEMENT)) {
+                try {
+                    ITmfXmlSchemaParser parser = NonNullUtils.checkNotNull((ITmfXmlSchemaParser) element.createExecutableExtension(XSD_PARSER_CLASS_ATTRIB));
+                    list.add(parser);
+                } catch (CoreException e) {
+                    Activator.logError("Error getting analysis modules from configuration files", e); //$NON-NLS-1$
+                }
             }
         }
         return list;
