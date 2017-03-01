@@ -278,4 +278,25 @@ public class TextTraceTest {
         assertEquals("event", null, event);
         context.dispose();
     }
+
+    /**
+     * Run readingBounds for trace: testfiles/syslog
+     */
+    @Test
+    public void testBounds(){
+        testReadingBounds("Jan 1 01:01:01" , "Jan 1 06:06:06");
+    }
+
+    /**
+     * Test that the methods for reading the trace without indexing it return
+     * the right values.
+     */
+    private static void testReadingBounds(String expectedStart, String expectedEnd) {
+        ITmfTimestamp start = fTrace.readStart();
+        assertNotNull("Failed to read Syslog trace start", start);
+        assertEquals("readStart", expectedStart, start.toString());
+        ITmfTimestamp end = fTrace.readEnd();
+        assertNotNull("Failed to read Syslog trace end", end);
+        assertEquals("readEnd", expectedEnd, end.toString());
+    }
 }

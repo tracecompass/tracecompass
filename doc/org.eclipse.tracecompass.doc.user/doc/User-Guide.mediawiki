@@ -563,6 +563,18 @@ A new dialog box will open with a list of supplementary files, grouped under the
 
 [[Image:images/DeleteSupplementaryFilesDialog.png]]
 
+=== Displaying the trace's time range ===
+
+The trace's time range can be displayed alongside the trace's name. The time is displayed in the Time Format from Tracing preferences.
+
+To enable this feature, head to '''Preferences > Tracing''' and check the box '''Show trace time range in Project Explorer'''.
+
+[[Image:images/ProjectExplorerDisplayRangePreferences.png]]
+
+If a trace is empty or its type unknown, nothing will be shown. It the range has not been fully read from the trace or the supplementary files, '''[...]''' will be shown. If the trace is being read and only its start time '''start''' is known, '''[start - ...]''' will be shown. Finally, when the end time '''end''' is also known, '''[start - end]''' will be shown.
+
+[[Image:images/ProjectExplorerDisplayRange.png]]
+
 === Link with Editor ===
 
 The tracing projects support the feature '''Link With Editor''' of the Project Explorer view. With this feature it is now possible to<br/>

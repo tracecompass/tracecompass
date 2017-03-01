@@ -32,4 +32,9 @@ public interface ITmfUIPreferences {
      * Preference to switch to associated perspective when opening a trace
      */
     String SWITCH_TO_PERSPECTIVE = "SWITCH_TO_PERSPECTIVE"; //$NON-NLS-1$
+
+    /**
+     * Preference to display a trace's time range in the project explorer
+     */
+    String TRACE_DISPLAY_RANGE_PROJECTEXPLORER = "EXPLORER_TIMERANGE"; //$NON-NLS-1$
 }

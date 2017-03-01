@@ -494,10 +494,15 @@ public class Utils {
         // format time from nanoseconds to calendar time HH:MM:SS
         String stime = TIME_FORMAT.format(new Date(time / MILLISEC_IN_NS));
         str.append(stime);
-        str.append('.');
-        // append the Milliseconds, MicroSeconds and NanoSeconds as specified in
-        // the Resolution
-        str.append(formatNs(time, res));
+        String ns = formatNs(time, res);
+        if (!ns.isEmpty()) {
+            str.append('.');
+            /*
+             * append the Milliseconds, MicroSeconds and NanoSeconds as
+             * specified in the Resolution
+             */
+            str.append(ns);
+        }
         return str.toString();
     }
 

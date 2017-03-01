@@ -57,6 +57,12 @@ public class Messages extends NLS {
     /** Experiment text */
     public static String TmfExperimentElement_TypeName;
 
+    /**
+     * Name for the job that updates a trace's time range in the Project Explorer.
+     * @since 2.3
+     */
+    public static String TmfNavigatorLabelProvider_UpdateBoundsJobName;
+
     /** The category of the resource properties */
     public static String TmfTraceElement_ResourceProperties;
 

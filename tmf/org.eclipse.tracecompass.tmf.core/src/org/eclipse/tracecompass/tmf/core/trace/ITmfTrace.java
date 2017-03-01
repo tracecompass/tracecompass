@@ -447,4 +447,34 @@ public interface ITmfTrace extends ITmfEventProvider {
     default @NonNull TmfTraceContext createTraceContext(@NonNull TmfTimeRange selection, @NonNull TmfTimeRange windowRange, @Nullable IFile editorFile, @Nullable ITmfFilter filter) {
         return new TmfTraceContext(selection, windowRange, editorFile, filter);
     }
+
+    /**
+     * Read the start time of the trace quickly, without requiring it to be
+     * indexed.
+     *
+     * @return the trace's start time. Null if the trace is empty or failed.
+     * @since 2.3
+     */
+    default ITmfTimestamp readStart() {
+        ITmfContext context = seekEvent(0L);
+        ITmfEvent event = getNext(context);
+        context.dispose();
+        return (event != null) ? event.getTimestamp() : null;
+    }
+
+    /**
+     * Read the end time of the trace quickly, without requiring it to be
+     * indexed.
+     *
+     * @return the trace's end time. Null if the trace is empty or failed.
+     * @since 2.3
+     */
+    default ITmfTimestamp readEnd() {
+        /*
+         * Subclasses should override this method when a faster implementation
+         * is possible.
+         */
+        indexTrace(true);
+        return (getNbEvents() != 0) ? getEndTime() : null;
+    }
 }

@@ -810,4 +810,26 @@ public class CtfTmfTrace extends TmfTrace
         // CTFTrace subtracts the clock offset in cycles from the output
         return fTrace.timestampNanoToCycles(nanos) + fTrace.getOffset();
     }
+
+    /**
+     * @since 2.2
+     */
+    @Override
+    public ITmfTimestamp readStart() {
+        return getStartTime();
+    }
+
+    /**
+     * @since 2.2
+     */
+    @Override
+    public ITmfTimestamp readEnd()  {
+        try (CTFTraceReader reader = new CTFTraceReader(fTrace);) {
+            reader.goToLastEvent();
+            long end = reader.getEndTime();
+            return TmfTimestamp.fromNanos(end);
+        } catch (CTFException e) {
+            return null;
+        }
+    }
 }

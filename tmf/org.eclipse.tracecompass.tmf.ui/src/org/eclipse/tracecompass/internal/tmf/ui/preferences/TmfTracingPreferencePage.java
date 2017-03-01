@@ -11,10 +11,16 @@
  ******************************************************************************/
 package org.eclipse.tracecompass.internal.tmf.ui.preferences;
 
-import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.ITmfUIPreferences;
+import org.eclipse.tracecompass.internal.tmf.ui.Messages;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -24,11 +30,13 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  * @version 1.0
  * @author Bernd Hufmann
  */
-public class TmfTracingPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+public class TmfTracingPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+
+    BooleanFieldEditor fExplorerRange;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -38,15 +46,38 @@ public class TmfTracingPreferencePage extends PreferencePage implements IWorkben
     // Operations
     // ------------------------------------------------------------------------
 
-    @Override
-    protected Control createContents(Composite parent) {
-        Composite composite = new Composite(parent, SWT.NONE);
-        // No content yet!
-        return composite;
+    /**
+     * Preferences
+     */
+    public TmfTracingPreferencePage() {
+        super(FieldEditorPreferencePage.GRID);
+
+        // Set the preference store for the preference page.
+        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+        setPreferenceStore(store);
     }
 
     @Override
     public void init(IWorkbench workbench) {
         // Nothing to do yet!
+    }
+
+    @Override
+    protected void createFieldEditors() {
+        fExplorerRange = new BooleanFieldEditor(ITmfUIPreferences.TRACE_DISPLAY_RANGE_PROJECTEXPLORER,
+                Messages.TmfTracingPreferencePage_TraceRangeInProjectExplorer, getFieldEditorParent());
+        addField(fExplorerRange);
+    }
+
+    @Override
+    public boolean performOk() {
+        boolean performOK = super.performOk();
+        for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+            TmfProjectElement projectElement = TmfProjectRegistry.getProject(project);
+            if (projectElement != null) {
+                projectElement.refresh();
+            }
+        }
+        return performOK;
     }
 }

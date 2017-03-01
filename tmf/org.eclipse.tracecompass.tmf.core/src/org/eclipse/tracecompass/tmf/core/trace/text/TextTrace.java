@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
@@ -431,5 +432,39 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
             }
         }
         super.traceRangeUpdated(signal);
+    }
+
+    /**
+     * @since 2.3
+     */
+    @Override
+    public synchronized ITmfTimestamp readEnd() {
+        try {
+            Long pos = fFile.length() - 1;
+            /* Outer loop to find the first line of a matcher group. */
+            while (pos > 0) {
+                /* Inner loop to find line beginning */
+                while (pos > 0) {
+                    fFile.seek(pos - 1);
+                    if (fFile.read() == '\n') {
+                        break;
+                    }
+                    pos--;
+                }
+                ITmfLocation location = new TmfLongLocation(pos);
+                ITmfContext context = seekEvent(location);
+                ITmfEvent event = getNext(context);
+                context.dispose();
+                if (event != null) {
+                    return event.getTimestamp();
+                }
+                pos--;
+            }
+        } catch (IOException e) {
+            return null;
+        }
+
+        /* Empty trace */
+        return null;
     }
 }

@@ -356,6 +356,8 @@ public class Messages extends NLS {
     public static String TmfPerspectiveManager_SwitchPerspectiveErrorMessage;
     public static String TmfPerspectiveManager_SwitchPerspectiveErrorTitle;
 
+    public static String TmfTracingPreferencePage_TraceRangeInProjectExplorer;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

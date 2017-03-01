@@ -43,6 +43,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
@@ -57,6 +58,7 @@ import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -199,6 +201,8 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     // ------------------------------------------------------------------------
 
     private FileInfo fFileInfo;
+    private ITmfTimestamp fStartTime = null;
+    private ITmfTimestamp fEndTime = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -739,6 +743,71 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
 
         // Finally, delete the trace
         getResource().delete(true, progressMonitor);
+    }
+
+    /**
+     * Update the trace's start time
+     *
+     * @param startTime
+     *            updated start time for this trace
+     * @since 2.3
+     */
+    public void setStartTime(ITmfTimestamp startTime) {
+        fStartTime = startTime;
+    }
+
+    /**
+     * Getter for the trace start time
+     *
+     * @return the start time from the trace if available, or from self when
+     *         read in advance from supplementary files or from fast trace read.
+     *         Return null if completely unknown.
+     * @since 2.3
+     */
+    public ITmfTimestamp getStartTime() {
+        ITmfTrace trace = getTrace();
+        if (trace != null) {
+            setStartTime(trace.getStartTime());
+        }
+        return fStartTime;
+    }
+
+    /**
+     * Update the trace's end time
+     *
+     * @param end
+     *            updated end time for this trace
+     * @since 2.3
+     */
+    public void setEndTime(@NonNull ITmfTimestamp end) {
+        if (fEndTime == null || end.compareTo(fEndTime) > 0) {
+            fEndTime = end;
+        }
+    }
+
+    /**
+     * Getter for the trace end time
+     *
+     * @return the end time from the trace if available, or from self when read
+     *         in advance from supplementary files or from fast trace read.
+     *         Return null if completely unknown.
+     * @since 2.3
+     */
+    public ITmfTimestamp getEndTime() {
+        ITmfTrace trace = getTrace();
+        if (trace != null) {
+            setEndTime(trace.getEndTime());
+        }
+        return fEndTime;
+    }
+
+    @Override
+    public void deleteSupplementaryResources(IResource[] resources) {
+        /* Invalidate the cached trace bounds */
+        fStartTime = null;
+        fEndTime = null;
+
+        super.deleteSupplementaryResources(resources);
     }
 
 }

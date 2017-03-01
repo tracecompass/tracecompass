@@ -344,8 +344,8 @@ public final class ConditionHelpers {
         public ProjectElementHasChild(final SWTBotTreeItem parentItem, final String name) {
             fParentItem = parentItem;
             fName = name;
-            /* Project element labels may have count suffix */
-            fRegex = Pattern.quote(name) + "(\\s\\[(\\d)+\\])?";
+            /* Project element labels may have count suffix or time range */
+            fRegex = Pattern.quote(name) + "(\\s\\[(.*)+?\\])?";
         }
 
         @Override
