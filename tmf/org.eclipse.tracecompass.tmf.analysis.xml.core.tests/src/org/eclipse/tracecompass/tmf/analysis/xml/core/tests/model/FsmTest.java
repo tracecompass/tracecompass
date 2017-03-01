@@ -13,7 +13,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternSegmentBuilder;
@@ -55,7 +54,7 @@ public class FsmTest {
 
     private static XmlPatternAnalysis createModule(@NonNull Element element, TmfXmlTestFiles file) {
         XmlPatternAnalysis module = new XmlPatternAnalysis();
-        module.setXmlFile(new Path(file.getFile().getAbsolutePath()));
+        module.setXmlFile(file.getFile().toPath());
         module.setName(XmlModuleTestBase.getName(element));
         return module;
     }

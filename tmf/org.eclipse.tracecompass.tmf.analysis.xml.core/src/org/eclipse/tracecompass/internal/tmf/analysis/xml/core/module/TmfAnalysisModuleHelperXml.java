@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
@@ -184,7 +183,7 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
             module = new XmlStateSystemModule();
             XmlStateSystemModule ssModule = (XmlStateSystemModule) module;
             module.setId(analysisid);
-            ssModule.setXmlFile(new Path(fSourceFile.getAbsolutePath()));
+            ssModule.setXmlFile(fSourceFile.toPath());
 
             break;
         case PATTERN:
@@ -192,7 +191,7 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
             module.setName(getName());
             module.setId(analysisid);
             XmlPatternAnalysis paModule = (XmlPatternAnalysis) module;
-            paModule.setXmlFile(new Path(fSourceFile.getAbsolutePath()));
+            paModule.setXmlFile(fSourceFile.toPath());
 
             break;
         default:

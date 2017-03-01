@@ -10,7 +10,8 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.statepro
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
-import org.eclipse.core.runtime.IPath;
+import java.nio.file.Path;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
@@ -25,7 +26,7 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModul
  */
 public class XmlPatternStateSystemModule extends TmfStateSystemAnalysisModule {
 
-    private @Nullable IPath fXmlFile;
+    private @Nullable Path fXmlFile;
     private final ISegmentListener fListener;
 
     /**
@@ -51,7 +52,7 @@ public class XmlPatternStateSystemModule extends TmfStateSystemAnalysisModule {
      * @param file
      *            The full path to the XML file
      */
-    public void setXmlFile(IPath file) {
+    public void setXmlFile(Path file) {
         fXmlFile = file;
     }
 

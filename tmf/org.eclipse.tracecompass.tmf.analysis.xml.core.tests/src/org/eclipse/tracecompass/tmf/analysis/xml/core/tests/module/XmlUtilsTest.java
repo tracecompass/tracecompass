@@ -251,7 +251,7 @@ public class XmlUtilsTest {
         assertNotNull(moduleId);
         module.setId(moduleId);
 
-        module.setXmlFile(xmlAnalysisFile.getPath());
+        module.setXmlFile(xmlAnalysisFile.getFile().toPath());
 
         return module;
     }
@@ -279,7 +279,7 @@ public class XmlUtilsTest {
         assertNotNull(moduleId);
         analysis.setId(moduleId);
 
-        analysis.setXmlFile(xmlAnalysisFile.getPath());
+        analysis.setXmlFile(xmlAnalysisFile.getFile().toPath());
 
         return analysis;
     }

@@ -8,13 +8,13 @@
  ******************************************************************************/
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
@@ -42,7 +42,7 @@ import org.w3c.dom.NodeList;
  */
 public class XmlPatternStateProvider extends AbstractTmfStateProvider implements IXmlStateSystemContainer {
 
-    private final IPath fFilePath;
+    private final Path fFilePath;
 
     private final @NonNull String fStateId;
 
@@ -74,13 +74,13 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
      * @param listener
      *            Listener for segment creation
      */
-    public XmlPatternStateProvider(@NonNull ITmfTrace trace, @NonNull String stateid, @Nullable IPath file, ISegmentListener listener) {
+    public XmlPatternStateProvider(@NonNull ITmfTrace trace, @NonNull String stateid, @Nullable Path file, ISegmentListener listener) {
         super(trace, stateid);
         fStateId = stateid;
         fFilePath = file;
         fListener = listener;
         fHistoryBuilder = new TmfXmlScenarioHistoryBuilder();
-        final String pathString = fFilePath.makeAbsolute().toOSString();
+        final String pathString = fFilePath.toAbsolutePath().toString();
         Element doc = XmlUtils.getElementInFile(pathString, TmfXmlStrings.PATTERN, fStateId);
         if (doc == null) {
             throw new IllegalArgumentException("XmlPatternStateProvider: Cannot find pattern element in file " + pathString); //$NON-NLS-1$

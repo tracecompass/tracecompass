@@ -13,7 +13,8 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stateprovider;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.eclipse.core.runtime.Path;
+import java.nio.file.Paths;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateProvider;
@@ -39,7 +40,7 @@ public class StateProviderTest extends XmlProviderTestBase {
     public void testInvalidInput() {
         ITmfTrace trace = getTrace();
         assertNotNull(trace);
-        assertNotNull(new XmlStateProvider(trace, "Bla", Path.fromOSString("")));
+        assertNotNull(new XmlStateProvider(trace, "Bla", Paths.get("")));
     }
 
     @Override

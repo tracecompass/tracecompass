@@ -12,8 +12,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.nio.file.Paths;
+
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
@@ -40,7 +41,7 @@ public class PatternProvidersTest extends XmlProviderTestBase {
     public void testInvalidInput() {
         ITmfTrace trace = getTrace();
         assertNotNull(trace);
-        assertNotNull(new XmlPatternStateProvider(trace, "Bla", Path.fromOSString(""), (@NonNull ISegment segment) -> { }));
+        assertNotNull(new XmlPatternStateProvider(trace, "Bla", Paths.get(""), (@NonNull ISegment segment) -> { }));
     }
 
     @Override

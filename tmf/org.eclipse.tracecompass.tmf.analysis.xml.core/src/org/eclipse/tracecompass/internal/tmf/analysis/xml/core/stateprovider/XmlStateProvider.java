@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
@@ -45,7 +45,7 @@ import org.w3c.dom.NodeList;
  */
 public class XmlStateProvider extends AbstractTmfStateProvider implements IXmlStateSystemContainer {
 
-    private final IPath fFilePath;
+    private final Path fFilePath;
     private final @NonNull String fStateId;
 
     /** List of all Event Handlers */
@@ -74,11 +74,11 @@ public class XmlStateProvider extends AbstractTmfStateProvider implements IXmlSt
      * @param file
      *            Path to the XML file containing the state provider definition
      */
-    public XmlStateProvider(@NonNull ITmfTrace trace, @NonNull String stateid, IPath file) {
+    public XmlStateProvider(@NonNull ITmfTrace trace, @NonNull String stateid, Path file) {
         super(trace, stateid);
         fStateId = stateid;
         fFilePath = file;
-        Element doc = XmlUtils.getElementInFile(fFilePath.makeAbsolute().toOSString(), TmfXmlStrings.STATE_PROVIDER, fStateId);
+        Element doc = XmlUtils.getElementInFile(file.toAbsolutePath().toString(), TmfXmlStrings.STATE_PROVIDER, fStateId);
         if (doc == null) {
             throw new IllegalArgumentException("XmlStateProvider: Cannot find state provider element in file " + file); //$NON-NLS-1$
         }
@@ -155,7 +155,7 @@ public class XmlStateProvider extends AbstractTmfStateProvider implements IXmlSt
 
     @Override
     public int getVersion() {
-        Element ssNode = XmlUtils.getElementInFile(fFilePath.makeAbsolute().toOSString(), TmfXmlStrings.STATE_PROVIDER, fStateId);
+        Element ssNode = XmlUtils.getElementInFile(fFilePath.toAbsolutePath().toString(), TmfXmlStrings.STATE_PROVIDER, fStateId);
         if (ssNode != null) {
             return Integer.parseInt(ssNode.getAttribute(TmfXmlStrings.VERSION));
         }

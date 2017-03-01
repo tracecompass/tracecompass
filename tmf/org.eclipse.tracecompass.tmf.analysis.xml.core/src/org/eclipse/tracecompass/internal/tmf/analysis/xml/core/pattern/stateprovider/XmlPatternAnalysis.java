@@ -11,12 +11,12 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.statepro
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
@@ -199,7 +199,7 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
      * @param file
      *            The full path to the XML file
      */
-    public void setXmlFile(IPath file) {
+    public void setXmlFile(Path file) {
         fStateSystemModule.setXmlFile(file);
     }
 

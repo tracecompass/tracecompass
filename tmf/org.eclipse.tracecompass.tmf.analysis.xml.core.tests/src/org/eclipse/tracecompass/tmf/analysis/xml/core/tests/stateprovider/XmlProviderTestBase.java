@@ -16,7 +16,6 @@ import static org.junit.Assert.fail;
 import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
@@ -66,11 +65,11 @@ public abstract class XmlProviderTestBase {
         switch (getAnalysisNodeName()) {
         case TmfXmlStrings.PATTERN:
             fModule = new XmlPatternAnalysis();
-            ((XmlPatternAnalysis) fModule).setXmlFile(new Path(getXmlFile().getFile().getAbsolutePath()));
+            ((XmlPatternAnalysis) fModule).setXmlFile(getXmlFile().getFile().toPath());
             break;
         case TmfXmlStrings.STATE_PROVIDER:
             fModule = new XmlStateSystemModule();
-            ((XmlStateSystemModule) fModule).setXmlFile(new Path(getXmlFile().getFile().getAbsolutePath()));
+            ((XmlStateSystemModule) fModule).setXmlFile(getXmlFile().getFile().toPath());
             break;
 
         default:
