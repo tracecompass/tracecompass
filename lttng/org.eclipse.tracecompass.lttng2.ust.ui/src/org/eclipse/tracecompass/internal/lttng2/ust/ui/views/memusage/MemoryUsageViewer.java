@@ -22,6 +22,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryStrings;
 import org.eclipse.tracecompass.internal.lttng2.ust.ui.Activator;
@@ -132,7 +133,12 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
                     }
 
                     if (oldSeriesName != null && !oldSeriesName.equals(seriesName)) {
-                        deleteSeries(oldSeriesName);
+                        Display display = Display.getDefault();
+                        if (!display.isDisposed()) {
+                            display.syncExec(() -> {
+                                deleteSeries(oldSeriesName);
+                            });
+                        }
                     }
                     fSeriesName.put(quark, seriesName);
                 }
