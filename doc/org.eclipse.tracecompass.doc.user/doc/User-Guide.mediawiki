@@ -3523,7 +3523,7 @@ Here is the full XML for the time graph view:
 </tmfxml>
 </pre>
 
-The following screenshot shows the result of the preceding example on a test trace. The trace used, as well as the XML file are available [http://secretaire.dorsal.polymtl.ca/~gbastien/Xml4Traces/XML_documentation_example.tar.gz here].
+The following screenshot shows the result of the preceding example on a test trace. The trace used, as well as the XML file are available [https://secretaire.dorsal.polymtl.ca/~gbastien/Xml4Traces/XML_documentation_example.tar.gz here].
 
 [[Image:images/Xml_analysis_screenshot.png| XML analysis with view]]
 
