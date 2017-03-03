@@ -57,11 +57,11 @@ import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartM
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartSeries;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartType;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.descriptor.IDataChartDescriptor;
-import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.model.IDataChartProvider;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.dialog.Messages;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.type.BarChartTypeDefinition;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.type.IChartTypeDefinition;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.type.ScatterChartTypeDefinition;
+import org.eclipse.tracecompass.tmf.chart.core.model.IDataChartProvider;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 

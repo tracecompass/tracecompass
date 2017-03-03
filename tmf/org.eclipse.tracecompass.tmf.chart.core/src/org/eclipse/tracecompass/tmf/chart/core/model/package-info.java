@@ -8,4 +8,4 @@
  *******************************************************************************/
 
 @org.eclipse.jdt.annotation.NonNullByDefault
-package org.eclipse.tracecompass.internal.provisional.tmf.chart.core.model;
+package org.eclipse.tracecompass.tmf.chart.core.model;

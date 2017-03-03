@@ -11,7 +11,7 @@ package org.eclipse.tracecompass.internal.provisional.tmf.chart.core.signal;
 
 import java.util.Set;
 
-import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.model.IDataChartProvider;
+import org.eclipse.tracecompass.tmf.chart.core.model.IDataChartProvider;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
 
 import com.google.common.collect.ImmutableSet;

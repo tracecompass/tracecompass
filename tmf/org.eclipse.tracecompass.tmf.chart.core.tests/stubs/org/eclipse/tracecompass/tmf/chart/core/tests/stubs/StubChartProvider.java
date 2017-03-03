@@ -22,11 +22,11 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.descriptor.DataChartNumericalDescriptor;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.descriptor.DataChartStringDescriptor;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.descriptor.IDataChartDescriptor;
-import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.model.IDataChartProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.resolver.AbstractDoubleResolver;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.resolver.AbstractLongResolver;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.resolver.INumericalResolver;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.resolver.IStringResolver;
+import org.eclipse.tracecompass.tmf.chart.core.model.IDataChartProvider;
 
 /**
  * A chart provider that will return a few long values

@@ -25,10 +25,10 @@ import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.descriptor.D
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.descriptor.DataChartStringDescriptor;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.descriptor.DataChartTimestampDescriptor;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.descriptor.IDataChartDescriptor;
-import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.model.IDataChartProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.resolver.AbstractDoubleResolver;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.resolver.AbstractLongResolver;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.resolver.IStringResolver;
+import org.eclipse.tracecompass.tmf.chart.core.model.IDataChartProvider;
 
 import com.google.common.collect.ImmutableList;
 

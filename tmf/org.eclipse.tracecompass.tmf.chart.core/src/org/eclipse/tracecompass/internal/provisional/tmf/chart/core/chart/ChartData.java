@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.descriptor.IDataChartDescriptor;
-import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.model.IDataChartProvider;
+import org.eclipse.tracecompass.tmf.chart.core.model.IDataChartProvider;
 
 import com.google.common.collect.ImmutableList;
 

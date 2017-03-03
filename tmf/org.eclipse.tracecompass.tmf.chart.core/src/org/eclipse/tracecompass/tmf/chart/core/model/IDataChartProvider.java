@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.provisional.tmf.chart.core.model;
+package org.eclipse.tracecompass.tmf.chart.core.model;
 
 import java.util.Collection;
 import java.util.stream.Stream;
