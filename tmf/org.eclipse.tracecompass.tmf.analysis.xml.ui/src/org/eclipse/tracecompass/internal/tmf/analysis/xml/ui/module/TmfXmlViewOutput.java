@@ -15,7 +15,6 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource.ViewType;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
@@ -93,7 +92,7 @@ public class TmfXmlViewOutput extends TmfAnalysisViewOutput {
             if ((viewId == null) || (filePath == null)) {
                 return;
             }
-            Element viewElement = XmlUtils.getElementInFile(filePath, fViewType.getXmlElem(), viewId);
+            Element viewElement = TmfXmlUtils.getElementInFile(filePath, fViewType.getXmlElem(), viewId);
             if (viewElement == null) {
                 return;
             }

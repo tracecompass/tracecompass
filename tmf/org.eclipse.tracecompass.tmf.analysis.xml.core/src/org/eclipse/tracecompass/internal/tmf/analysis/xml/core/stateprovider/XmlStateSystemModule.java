@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
@@ -53,7 +52,7 @@ public class XmlStateSystemModule extends TmfStateSystemAnalysisModule {
         if (xmlFile == null) {
             return id;
         }
-        Element doc = XmlUtils.getElementInFile(xmlFile.toAbsolutePath().toString(), TmfXmlStrings.STATE_PROVIDER, id);
+        Element doc = TmfXmlUtils.getElementInFile(xmlFile.toAbsolutePath().toString(), TmfXmlStrings.STATE_PROVIDER, id);
         /* Label may be available in XML header */
         List<Element> head = TmfXmlUtils.getChildElements(doc, TmfXmlStrings.HEAD);
         String name = null;

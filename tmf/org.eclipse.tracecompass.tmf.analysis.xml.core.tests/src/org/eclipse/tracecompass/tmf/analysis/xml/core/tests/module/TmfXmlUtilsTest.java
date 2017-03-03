@@ -10,13 +10,14 @@
 package org.eclipse.tracecompass.tmf.analysis.xml.core.tests.module;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
@@ -31,6 +32,18 @@ import org.w3c.dom.Element;
 public class TmfXmlUtilsTest {
 
     private static final @NonNull String ANALYSIS_ID = "kernel.linux.sp";
+
+    /**
+     * Test the {@link TmfXmlUtils#getElementInFile(String, String, String)} method
+     */
+    @Test
+    public void testGetElementInFile() {
+        File testXmlFile = TmfXmlTestFiles.VALID_FILE.getFile();
+        assertNotNull("XML test file does not exist", testXmlFile);
+        assertTrue("XML test file does not exist", testXmlFile.exists());
+        Element analysis = TmfXmlUtils.getElementInFile(testXmlFile.getAbsolutePath(), TmfXmlStrings.STATE_PROVIDER, ANALYSIS_ID);
+        assertNotNull(analysis);
+    }
 
     /**
      * Test the {@link TmfXmlUtils#getChildElements(Element, String)} method
@@ -49,7 +62,7 @@ public class TmfXmlUtilsTest {
             return;
         }
 
-        Element analysis = XmlUtils.getElementInFile(testXmlFile.getAbsolutePath(), TmfXmlStrings.STATE_PROVIDER, ANALYSIS_ID);
+        Element analysis = TmfXmlUtils.getElementInFile(testXmlFile.getAbsolutePath(), TmfXmlStrings.STATE_PROVIDER, ANALYSIS_ID);
 
         List<Element> values = TmfXmlUtils.getChildElements(analysis, TmfXmlStrings.LOCATION);
         assertEquals(5, values.size());

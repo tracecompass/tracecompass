@@ -20,7 +20,6 @@ import java.util.concurrent.CountDownLatch;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
@@ -127,7 +126,7 @@ public class XmlViewInfo extends AbstractXmlViewInfo {
         if (id == null) {
             return null;
         }
-        Element viewElement = XmlUtils.getElementInFile(fFilePath, xmlTag, id);
+        Element viewElement = TmfXmlUtils.getElementInFile(fFilePath, xmlTag, id);
         return viewElement;
     }
 

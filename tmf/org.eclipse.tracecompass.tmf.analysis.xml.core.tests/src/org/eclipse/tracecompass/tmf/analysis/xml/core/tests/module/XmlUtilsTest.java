@@ -41,6 +41,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.Activator;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -165,20 +166,6 @@ public class XmlUtilsTest {
         assertTrue(destFile.exists());
     }
 
-    private static final @NonNull String ANALYSIS_ID = "kernel.linux.sp";
-
-    /**
-     * Test the {@link XmlUtils#getElementInFile(String, String, String)} method
-     */
-    @Test
-    public void testGetElementInFile() {
-        File testXmlFile = TmfXmlTestFiles.VALID_FILE.getFile();
-        assertNotNull("XML test file does not exist", testXmlFile);
-        assertTrue("XML test file does not exist", testXmlFile.exists());
-        Element analysis = XmlUtils.getElementInFile(testXmlFile.getAbsolutePath(), TmfXmlStrings.STATE_PROVIDER, ANALYSIS_ID);
-        assertNotNull(analysis);
-    }
-
     /**
      * Test the {@link XmlUtils#getChildElements(Element)} method
      */
@@ -197,7 +184,7 @@ public class XmlUtilsTest {
             return;
         }
 
-        Element analysis = XmlUtils.getElementInFile(testXmlFile.getAbsolutePath(), TmfXmlStrings.STATE_PROVIDER, analysisId);
+        Element analysis = TmfXmlUtils.getElementInFile(testXmlFile.getAbsolutePath(), TmfXmlStrings.STATE_PROVIDER, analysisId);
 
         List<Element> childElements = XmlUtils.getChildElements(analysis);
         assertEquals(5, childElements.size());

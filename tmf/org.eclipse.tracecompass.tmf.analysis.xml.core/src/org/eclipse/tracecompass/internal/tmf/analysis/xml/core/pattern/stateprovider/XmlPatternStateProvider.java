@@ -25,9 +25,9 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatte
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioHistoryBuilder;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readwrite.TmfXmlReadWriteModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
@@ -81,7 +81,7 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
         fListener = listener;
         fHistoryBuilder = new TmfXmlScenarioHistoryBuilder();
         final String pathString = fFilePath.toAbsolutePath().toString();
-        Element doc = XmlUtils.getElementInFile(pathString, TmfXmlStrings.PATTERN, fStateId);
+        Element doc = TmfXmlUtils.getElementInFile(pathString, TmfXmlStrings.PATTERN, fStateId);
         if (doc == null) {
             throw new IllegalArgumentException("XmlPatternStateProvider: Cannot find pattern element in file " + pathString); //$NON-NLS-1$
         }

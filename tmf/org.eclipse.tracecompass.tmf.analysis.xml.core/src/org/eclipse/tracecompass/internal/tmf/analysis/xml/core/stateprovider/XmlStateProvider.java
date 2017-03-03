@@ -29,7 +29,6 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocat
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlMapEntry;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readwrite.TmfXmlReadWriteModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
@@ -80,7 +79,7 @@ public class XmlStateProvider extends AbstractTmfStateProvider implements IXmlSt
         super(trace, stateid);
         fStateId = stateid;
         fFilePath = file;
-        Element doc = XmlUtils.getElementInFile(file.toAbsolutePath().toString(), TmfXmlStrings.STATE_PROVIDER, fStateId);
+        Element doc = TmfXmlUtils.getElementInFile(file.toAbsolutePath().toString(), TmfXmlStrings.STATE_PROVIDER, fStateId);
         if (doc == null) {
             throw new IllegalArgumentException("XmlStateProvider: Cannot find state provider element in file " + file); //$NON-NLS-1$
         }
@@ -157,7 +156,7 @@ public class XmlStateProvider extends AbstractTmfStateProvider implements IXmlSt
 
     @Override
     public int getVersion() {
-        Element ssNode = XmlUtils.getElementInFile(fFilePath.toAbsolutePath().toString(), TmfXmlStrings.STATE_PROVIDER, fStateId);
+        Element ssNode = TmfXmlUtils.getElementInFile(fFilePath.toAbsolutePath().toString(), TmfXmlStrings.STATE_PROVIDER, fStateId);
         if (ssNode != null) {
             return Integer.parseInt(ssNode.getAttribute(TmfXmlStrings.VERSION));
         }

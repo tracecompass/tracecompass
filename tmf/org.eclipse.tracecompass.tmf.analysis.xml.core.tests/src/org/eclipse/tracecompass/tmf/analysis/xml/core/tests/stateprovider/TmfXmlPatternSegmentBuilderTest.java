@@ -22,6 +22,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readwrite.T
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.module.XmlUtilsTest;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stubs.PatternSegmentFactoryStub;
@@ -82,7 +83,7 @@ public class TmfXmlPatternSegmentBuilderTest {
      */
     @Test
     public void testBuilder() {
-        Element doc = XmlUtils.getElementInFile(fTestXmlFile.getPath(), TmfXmlStrings.PATTERN, ANALYSIS_ID);
+        Element doc = TmfXmlUtils.getElementInFile(fTestXmlFile.getPath(), TmfXmlStrings.PATTERN, ANALYSIS_ID);
         NodeList patternSegments = doc.getElementsByTagName(TmfXmlStrings.SEGMENT);
         assertEquals("Number of pattern segments", 2, patternSegments.getLength());
 
