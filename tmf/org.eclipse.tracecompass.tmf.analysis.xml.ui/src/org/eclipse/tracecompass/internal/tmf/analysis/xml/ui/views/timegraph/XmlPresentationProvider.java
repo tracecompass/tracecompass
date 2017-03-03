@@ -24,10 +24,10 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.timegraph.XmlEntry.EntryDisplayType;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -134,7 +134,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
     public synchronized void loadNewStates(@NonNull Element viewElement) {
         stateValues.clear();
         stateIndex.clear();
-        List<Element> states = XmlUtils.getChildElements(viewElement, TmfXmlStrings.DEFINED_VALUE);
+        List<Element> states = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.DEFINED_VALUE);
 
         for (Element state : states) {
             int value = Integer.parseInt(state.getAttribute(TmfXmlStrings.VALUE));

@@ -21,8 +21,9 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -138,13 +139,13 @@ public class XmlViewInfo extends AbstractXmlViewInfo {
      * @return The view title
      */
     public @Nullable String getViewTitle(Element viewElement) {
-        List<Element> heads = XmlUtils.getChildElements(viewElement, TmfXmlStrings.HEAD);
+        List<Element> heads = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.HEAD);
 
         String title = null;
         if (!heads.isEmpty()) {
             Element head = heads.get(0);
             /* Set the title of this view from the label in the header */
-            List<Element> labels = XmlUtils.getChildElements(head, TmfXmlStrings.LABEL);
+            List<Element> labels = TmfXmlUtils.getChildElements(head, TmfXmlStrings.LABEL);
             for (Element label : labels) {
                 if (!label.getAttribute(TmfXmlStrings.VALUE).isEmpty()) {
                     title = label.getAttribute(TmfXmlStrings.VALUE);
@@ -164,14 +165,14 @@ public class XmlViewInfo extends AbstractXmlViewInfo {
      * @return The list of all analysis IDs this view is for
      */
     public Set<String> getViewAnalysisIds(Element viewElement) {
-        List<Element> heads = XmlUtils.getChildElements(viewElement, TmfXmlStrings.HEAD);
+        List<Element> heads = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.HEAD);
 
         Set<String> analysisIds = new HashSet<>();
         if (!heads.isEmpty()) {
             Element head = heads.get(0);
 
             /* Get the application analysis from the view's XML header */
-            List<Element> applicableAnalysis = XmlUtils.getChildElements(head, TmfXmlStrings.ANALYSIS);
+            List<Element> applicableAnalysis = TmfXmlUtils.getChildElements(head, TmfXmlStrings.ANALYSIS);
             for (Element oneAnalysis : applicableAnalysis) {
                 analysisIds.add(oneAnalysis.getAttribute(TmfXmlStrings.ID));
             }

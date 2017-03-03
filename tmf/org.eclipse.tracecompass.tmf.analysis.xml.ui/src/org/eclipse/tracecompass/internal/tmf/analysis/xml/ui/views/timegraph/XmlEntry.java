@@ -24,11 +24,11 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStat
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readonly.TmfXmlReadOnlyModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
@@ -101,7 +101,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
         fElement = entryElement;
 
         /* Get the parent if specified */
-        List<Element> elements = XmlUtils.getChildElements(fElement, TmfXmlUiStrings.PARENT_ELEMENT);
+        List<Element> elements = TmfXmlUtils.getChildElements(fElement, TmfXmlUiStrings.PARENT_ELEMENT);
         if (elements.size() > 0) {
             fParentId = getFirstValue(elements.get(0));
         } else {
@@ -109,7 +109,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
         }
 
         /* Get the name of this entry */
-        elements = XmlUtils.getChildElements(fElement, TmfXmlUiStrings.NAME_ELEMENT);
+        elements = TmfXmlUtils.getChildElements(fElement, TmfXmlUiStrings.NAME_ELEMENT);
         if (elements.size() > 0) {
             String nameFromSs = getFirstValue(elements.get(0));
             if (!nameFromSs.isEmpty()) {
@@ -118,7 +118,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
         }
 
         /* Get the id of this entry */
-        elements = XmlUtils.getChildElements(fElement, TmfXmlUiStrings.ID_ELEMENT);
+        elements = TmfXmlUtils.getChildElements(fElement, TmfXmlUiStrings.ID_ELEMENT);
         if (elements.size() > 0) {
             fId = getFirstValue(elements.get(0));
         } else {

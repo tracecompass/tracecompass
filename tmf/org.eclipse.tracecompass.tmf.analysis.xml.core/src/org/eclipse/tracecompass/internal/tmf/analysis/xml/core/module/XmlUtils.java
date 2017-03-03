@@ -53,8 +53,9 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.ITmfXmlSchemaParser;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.osgi.framework.Bundle;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -126,7 +127,7 @@ public class XmlUtils {
      * @return True if the XML validates
      */
     public static IStatus xmlValidate(File xmlFile) {
-        URL url = XmlUtils.class.getResource(XSD);
+        URL url = TmfXmlUtils.class.getResource(XSD);
         List<@NonNull URL> xsdFiles = getExtraXsdFiles();
         Validator validator = null;
         Schema schema = null;
@@ -435,30 +436,6 @@ public class XmlUtils {
         for (int index = 0; index < childNodes.getLength(); index++) {
             if (childNodes.item(index).getNodeType() == Node.ELEMENT_NODE) {
                 childElements.add((Element) childNodes.item(index));
-            }
-        }
-        return childElements;
-    }
-
-    /**
-     * Get the XML children element of an XML element, but only those of a
-     * certain type
-     *
-     * @param parent
-     *            The parent element to get the children from
-     * @param elementTag
-     *            The tag of the elements to return
-     * @return The list of children {@link Element} of the parent
-     */
-    public static List<@NonNull Element> getChildElements(Element parent, String elementTag) {
-        /* get the state providers and find the corresponding one */
-        NodeList nodes = parent.getElementsByTagName(elementTag);
-        List<@NonNull Element> childElements = new ArrayList<>();
-
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Element node = (Element) nodes.item(i);
-            if (node.getParentNode().equals(parent)) {
-                childElements.add(node);
             }
         }
         return childElements;

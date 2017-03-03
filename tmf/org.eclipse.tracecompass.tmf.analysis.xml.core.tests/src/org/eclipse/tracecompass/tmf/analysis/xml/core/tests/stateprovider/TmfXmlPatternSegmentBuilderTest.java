@@ -21,7 +21,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatte
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readwrite.TmfXmlReadWriteModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.module.XmlUtilsTest;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stubs.PatternSegmentFactoryStub;

@@ -33,7 +33,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
@@ -41,6 +40,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundExc
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.Activator;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -180,12 +180,12 @@ public class XmlUtilsTest {
     }
 
     /**
-     * Test the {@link XmlUtils#getChildElements(Element)} and
-     * {@link XmlUtils#getChildElements(Element, String)} methods
+     * Test the {@link XmlUtils#getChildElements(Element)} method
      */
     @Test
     public void testGetChildElements() {
-        File testXmlFile = TmfXmlTestFiles.VALID_FILE.getFile();
+        String analysisId = "test.xml.conditions";
+        File testXmlFile = TmfXmlTestFiles.CONDITION_FILE.getFile();
         if ((testXmlFile == null) || !testXmlFile.exists()) {
             fail("XML test file does not exist");
         }
@@ -197,22 +197,17 @@ public class XmlUtilsTest {
             return;
         }
 
-        Element analysis = XmlUtils.getElementInFile(testXmlFile.getAbsolutePath(), TmfXmlStrings.STATE_PROVIDER, ANALYSIS_ID);
+        Element analysis = XmlUtils.getElementInFile(testXmlFile.getAbsolutePath(), TmfXmlStrings.STATE_PROVIDER, analysisId);
 
-        List<Element> values = XmlUtils.getChildElements(analysis, TmfXmlStrings.LOCATION);
-        assertEquals(5, values.size());
+        List<Element> childElements = XmlUtils.getChildElements(analysis);
+        assertEquals(5, childElements.size());
 
-        Element aLocation = values.get(0);
-        List<Element> attributes = XmlUtils.getChildElements(aLocation, TmfXmlStrings.STATE_ATTRIBUTE);
-        assertEquals(2, attributes.size());
-
-        values = XmlUtils.getChildElements(analysis, TmfXmlStrings.HEAD);
-        assertEquals(1, values.size());
-
-        Element head = values.get(0);
-        values = XmlUtils.getChildElements(head);
-        assertEquals(2, values.size());
-
+        // Make sure all elements are event handlers and have 1 child each
+        for (Element element : childElements) {
+            assertEquals(TmfXmlStrings.EVENT_HANDLER, element.getNodeName());
+            List<Element> children = XmlUtils.getChildElements(element);
+            assertEquals(1, children.size());
+        }
     }
 
     /**

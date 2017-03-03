@@ -17,11 +17,11 @@ import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
@@ -130,9 +130,9 @@ public abstract class XmlModuleTestBase {
      */
     public static @NonNull String getName(Element element) {
         String name = null;
-        List<Element> head = XmlUtils.getChildElements(element, TmfXmlStrings.HEAD);
+        List<Element> head = TmfXmlUtils.getChildElements(element, TmfXmlStrings.HEAD);
         if (head.size() == 1) {
-            List<Element> labels = XmlUtils.getChildElements(head.get(0), TmfXmlStrings.LABEL);
+            List<Element> labels = TmfXmlUtils.getChildElements(head.get(0), TmfXmlStrings.LABEL);
             if (!labels.isEmpty()) {
                 name = labels.get(0).getAttribute(TmfXmlStrings.VALUE);
             }

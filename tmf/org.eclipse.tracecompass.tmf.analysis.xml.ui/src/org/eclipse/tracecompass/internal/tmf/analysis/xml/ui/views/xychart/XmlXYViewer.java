@@ -31,8 +31,6 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStat
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readonly.TmfXmlReadOnlyModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
@@ -41,6 +39,8 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -382,7 +382,7 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
          * Initialize state attributes. There should be only one entry element
          * for XY charts.
          */
-        List<Element> entries = XmlUtils.getChildElements(viewElement, TmfXmlUiStrings.ENTRY_ELEMENT);
+        List<Element> entries = TmfXmlUtils.getChildElements(viewElement, TmfXmlUiStrings.ENTRY_ELEMENT);
         Element entryElement = entries.get(0);
         String path = entryElement.getAttribute(TmfXmlUiStrings.PATH);
         if (path.isEmpty()) {
@@ -392,7 +392,7 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
         fEntry = entry;
 
         /* Get the display element to use */
-        List<@NonNull Element> displayElements = XmlUtils.getChildElements(entryElement, TmfXmlUiStrings.DISPLAY_ELEMENT);
+        List<@NonNull Element> displayElements = TmfXmlUtils.getChildElements(entryElement, TmfXmlUiStrings.DISPLAY_ELEMENT);
         if (displayElements.isEmpty()) {
             Activator.logWarning(String.format("XML view: entry for %s should have a display element", path)); //$NON-NLS-1$
             return;
@@ -401,7 +401,7 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
         fDisplay = fFactory.createStateAttribute(displayElement, entry);
 
         /* Get the series name element to use */
-        List<Element> seriesNameElements = XmlUtils.getChildElements(entryElement, TmfXmlUiStrings.NAME_ELEMENT);
+        List<Element> seriesNameElements = TmfXmlUtils.getChildElements(entryElement, TmfXmlUiStrings.NAME_ELEMENT);
         if (!seriesNameElements.isEmpty()) {
             Element seriesNameElement = seriesNameElements.get(0);
             fSeriesName = fFactory.createStateAttribute(seriesNameElement, entry);

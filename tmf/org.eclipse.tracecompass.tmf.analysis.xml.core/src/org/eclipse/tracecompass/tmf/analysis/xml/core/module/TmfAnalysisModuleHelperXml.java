@@ -21,9 +21,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.Messages;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
@@ -97,9 +95,9 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
     public String getName() {
         String name = null;
         /* Label may be available in XML header */
-        List<Element> head = XmlUtils.getChildElements(fSourceElement, TmfXmlStrings.HEAD);
+        List<Element> head = TmfXmlUtils.getChildElements(fSourceElement, TmfXmlStrings.HEAD);
         if (head.size() == 1) {
-            List<Element> labels = XmlUtils.getChildElements(head.get(0), TmfXmlStrings.LABEL);
+            List<Element> labels = TmfXmlUtils.getChildElements(head.get(0), TmfXmlStrings.LABEL);
             if (!labels.isEmpty()) {
                 name = labels.get(0).getAttribute(TmfXmlStrings.VALUE);
             }
@@ -144,14 +142,14 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
     @Override
     public boolean appliesToTraceType(Class<? extends ITmfTrace> traceClass) {
         /* Trace types may be available in XML header */
-        List<Element> head = XmlUtils.getChildElements(fSourceElement, TmfXmlStrings.HEAD);
+        List<Element> head = TmfXmlUtils.getChildElements(fSourceElement, TmfXmlStrings.HEAD);
         if (head.size() != 1) {
             return true;
         }
         /*
          * TODO: Test with custom trace types
          */
-        List<Element> elements = XmlUtils.getChildElements(head.get(0), TmfXmlStrings.TRACETYPE);
+        List<Element> elements = TmfXmlUtils.getChildElements(head.get(0), TmfXmlStrings.TRACETYPE);
         if (elements.isEmpty()) {
             return true;
         }

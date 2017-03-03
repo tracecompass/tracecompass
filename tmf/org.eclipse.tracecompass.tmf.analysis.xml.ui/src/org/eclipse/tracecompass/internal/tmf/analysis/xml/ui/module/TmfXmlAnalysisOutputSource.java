@@ -23,7 +23,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternDensityView;
@@ -32,6 +31,8 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.Patte
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternStatisticsView;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.timegraph.XmlTimeGraphView;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.xychart.XmlXYView;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisOutput;
 import org.eclipse.tracecompass.tmf.core.analysis.ITmfNewAnalysisModuleListener;
@@ -166,12 +167,12 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
                             Element node = (Element) ssViewNodes.item(i);
 
                             /* Check if analysis is the right one */
-                            List<Element> headNodes = XmlUtils.getChildElements(node, TmfXmlStrings.HEAD);
+                            List<Element> headNodes = TmfXmlUtils.getChildElements(node, TmfXmlStrings.HEAD);
                             if (headNodes.size() != 1) {
                                 continue;
                             }
 
-                            List<Element> analysisNodes = XmlUtils.getChildElements(headNodes.get(0), TmfXmlStrings.ANALYSIS);
+                            List<Element> analysisNodes = TmfXmlUtils.getChildElements(headNodes.get(0), TmfXmlStrings.ANALYSIS);
                             for (Element analysis : analysisNodes) {
                                 String analysisId = analysis.getAttribute(TmfXmlStrings.ID);
                                 if (analysisId.equals(module.getId())) {

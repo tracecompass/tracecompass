@@ -38,8 +38,6 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlMode
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readonly.TmfXmlReadOnlyModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
@@ -52,6 +50,8 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -261,7 +261,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
 
         Set<String> analysisIds = fViewInfo.getViewAnalysisIds(viewElement);
 
-        List<Element> entries = XmlUtils.getChildElements(viewElement, TmfXmlUiStrings.ENTRY_ELEMENT);
+        List<Element> entries = TmfXmlUtils.getChildElements(viewElement, TmfXmlUiStrings.ENTRY_ELEMENT);
         Set<XmlEntry> entryList = new TreeSet<>(getEntryComparator());
         if (monitor.isCanceled()) {
             return;
@@ -335,8 +335,8 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
          * otherwise issue a warning
          */
 
-        List<Element> displayElements = XmlUtils.getChildElements(entryElement, TmfXmlUiStrings.DISPLAY_ELEMENT);
-        List<Element> entryElements = XmlUtils.getChildElements(entryElement, TmfXmlUiStrings.ENTRY_ELEMENT);
+        List<Element> displayElements = TmfXmlUtils.getChildElements(entryElement, TmfXmlUiStrings.DISPLAY_ELEMENT);
+        List<Element> entryElements = TmfXmlUtils.getChildElements(entryElement, TmfXmlUiStrings.ENTRY_ELEMENT);
 
         if (displayElements.isEmpty() && entryElements.isEmpty()) {
             Activator.logWarning(String.format("XML view: entry for %s should have either a display element or entry elements", path)); //$NON-NLS-1$

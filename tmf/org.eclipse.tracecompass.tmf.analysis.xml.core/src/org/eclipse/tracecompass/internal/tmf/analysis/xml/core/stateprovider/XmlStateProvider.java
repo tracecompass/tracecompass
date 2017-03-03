@@ -31,6 +31,8 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readwrite.T
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -92,7 +94,7 @@ public class XmlStateProvider extends AbstractTmfStateProvider implements IXmlSt
         }
 
         /* parser for the locations */
-        List<Element> childElements = XmlUtils.getChildElements(doc, TmfXmlStrings.LOCATION);
+        List<Element> childElements = TmfXmlUtils.getChildElements(doc, TmfXmlStrings.LOCATION);
         Set<@NonNull TmfXmlLocation> locations = new HashSet<>();
         for (Element element : childElements) {
             if (element == null) {
@@ -129,7 +131,7 @@ public class XmlStateProvider extends AbstractTmfStateProvider implements IXmlSt
         fMappingGroups = Collections.unmodifiableMap(mapGroups);
 
         /* parser for the event handlers */
-        childElements = XmlUtils.getChildElements(doc, TmfXmlStrings.EVENT_HANDLER);
+        childElements = TmfXmlUtils.getChildElements(doc, TmfXmlStrings.EVENT_HANDLER);
         for (Element element : childElements) {
             if (element == null) {
                 continue;

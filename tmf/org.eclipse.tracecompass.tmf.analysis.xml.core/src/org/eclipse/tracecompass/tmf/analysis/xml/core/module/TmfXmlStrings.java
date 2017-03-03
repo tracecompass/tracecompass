@@ -10,7 +10,7 @@
  *   Florian Wininger - Initial implementation
  ******************************************************************************/
 
-package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider;
+package org.eclipse.tracecompass.tmf.analysis.xml.core.module;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
@@ -19,6 +19,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  *
  * @author Florian Wininger
  * @noimplement This interface only contains static defines
+ * @since 2.2
  */
 @SuppressWarnings({ "javadoc", "nls" })
 @NonNullByDefault

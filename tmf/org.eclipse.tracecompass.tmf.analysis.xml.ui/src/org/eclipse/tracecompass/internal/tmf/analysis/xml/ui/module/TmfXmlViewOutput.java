@@ -16,9 +16,10 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource.ViewType;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
@@ -96,12 +97,12 @@ public class TmfXmlViewOutput extends TmfAnalysisViewOutput {
             if (viewElement == null) {
                 return;
             }
-            List<Element> heads = XmlUtils.getChildElements(viewElement, TmfXmlStrings.HEAD);
+            List<Element> heads = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.HEAD);
             if (heads.size() != 1) {
                 return;
             }
             Element headElement = heads.get(0);
-            List<Element> label = XmlUtils.getChildElements(headElement, TmfXmlStrings.LABEL);
+            List<Element> label = TmfXmlUtils.getChildElements(headElement, TmfXmlStrings.LABEL);
             if (label.isEmpty()) {
                 return;
             }
