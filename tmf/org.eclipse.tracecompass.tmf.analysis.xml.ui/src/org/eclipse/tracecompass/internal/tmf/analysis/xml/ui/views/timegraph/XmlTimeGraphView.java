@@ -402,7 +402,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         }
 
         long entryStart = ss.getStartTime();
-        long entryEnd = ss.getCurrentEndTime();
+        long entryEnd = ss.getCurrentEndTime() + 1;
 
         try {
 
@@ -419,7 +419,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             entryStart = oneInterval.getStartTime();
 
             /* The entry end is the last non-null interval */
-            oneInterval = ss.querySingleState(entryEnd, displayQuark);
+            oneInterval = ss.querySingleState(entryEnd - 1, displayQuark);
             while (oneInterval.getStateValue().isNull()) {
                 long ts = oneInterval.getStartTime() - 1;
                 if (ts < ss.getStartTime()) {
@@ -427,7 +427,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
                 }
                 oneInterval = ss.querySingleState(ts, displayQuark);
             }
-            entryEnd = oneInterval.getEndTime();
+            entryEnd = oneInterval.getEndTime() + 1;
 
         } catch (StateSystemDisposedException e) {
         }
