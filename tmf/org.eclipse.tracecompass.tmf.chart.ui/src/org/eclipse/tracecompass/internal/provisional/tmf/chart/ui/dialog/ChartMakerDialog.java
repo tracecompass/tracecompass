@@ -353,7 +353,7 @@ public class ChartMakerDialog extends Dialog {
         fSelectionXTable.getTable().setParent(creatorXComposite);
         fSelectionXTable.setContentProvider(ArrayContentProvider.getInstance());
         fSelectionXTable.setInput(fDataProvider.getDataDescriptors());
-        fSelectionXTable.setFilters(new CreatorXFilter());
+        fSelectionXTable.setFilters(new ViewerFilter[] { new CreatorXFilter() });
         fSelectionXTable.addSelectionChangedListener(new CreatorXSelectedEvent());
 
         /* Y axis table */
@@ -371,7 +371,7 @@ public class ChartMakerDialog extends Dialog {
         fSelectionYTable.getTable().setParent(creatorYComposite);
         fSelectionYTable.setContentProvider(ArrayContentProvider.getInstance());
         fSelectionYTable.setInput(fDataProvider.getDataDescriptors());
-        fSelectionYTable.setFilters(new CreatorYFilter());
+        fSelectionYTable.setFilters(new ViewerFilter[] { new CreatorYFilter() });
         fSelectionYTable.addCheckStateListener(new CreatorYSelectedEvent());
 
         /* Selected series warning */
