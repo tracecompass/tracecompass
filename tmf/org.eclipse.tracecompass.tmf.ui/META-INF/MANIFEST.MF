@@ -68,6 +68,7 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.ui;x-friends:="org.eclipse
  org.eclipse.tracecompass.tmf.ui,
  org.eclipse.tracecompass.tmf.ui.actions,
  org.eclipse.tracecompass.tmf.ui.analysis,
+ org.eclipse.tracecompass.tmf.ui.colors,
  org.eclipse.tracecompass.tmf.ui.dialog,
  org.eclipse.tracecompass.tmf.ui.editors,
  org.eclipse.tracecompass.tmf.ui.markers,
