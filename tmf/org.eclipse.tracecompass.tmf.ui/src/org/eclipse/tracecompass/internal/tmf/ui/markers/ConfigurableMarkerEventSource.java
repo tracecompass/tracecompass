@@ -39,6 +39,7 @@ import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker.SplitMarker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker.WeightedMarker;
 import org.eclipse.tracecompass.tmf.core.trace.ICyclesConverter;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ui.colors.X11Color;
 import org.eclipse.tracecompass.tmf.ui.markers.IMarkerReferenceProvider;
 import org.eclipse.tracecompass.tmf.ui.markers.PeriodicMarkerEventSource;
 import org.eclipse.tracecompass.tmf.ui.markers.PeriodicMarkerEventSource.Reference;
@@ -151,7 +152,10 @@ public class ConfigurableMarkerEventSource implements IMarkerEventSource {
                     Integer.valueOf(color.substring(3, 5), 16),
                     Integer.valueOf(color.substring(5, 7), 16));
         } else {
-            rgb = new RGB(0, 0, 0);
+            rgb = X11Color.toRGB(color);
+            if (rgb == null) {
+                rgb = new RGB(0, 0, 0);
+            }
         }
         return new RGBA(rgb.red, rgb.green, rgb.blue, ALPHA);
     }

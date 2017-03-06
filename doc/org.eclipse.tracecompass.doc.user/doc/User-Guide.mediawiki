@@ -1187,7 +1187,7 @@ The element attributes are defined as follows:
 ;referenceid (optional)
 :The reference id that can be used by a trace to provide a marker reference by adapting the IMarkerReferenceProvider interface. When omitted, the marker reference is time zero.
 ;color (required)
-:An RGB value in format #rrggbb.
+:An RGB value in format #rrggbb, or an X11 color name.
 ;period (required)
 :The marker period in units, as a decimal number.
 ;unit (required)
@@ -1207,7 +1207,7 @@ The element attributes are defined as follows:
 ;id (optional)
 :The unique id of this sub-marker.
 ;color (optional)
-:An RGB value in format #rrggbb. If omitted, the parent marker's color will be used.
+:An RGB value in format #rrggbb, or an X11 color name. If omitted, the parent marker's color will be used.
 ;range (required)
 :The marker index range, in format min..max. The range determines the number of equal sub-markers in which the parent marker will be split.
 ;index (optional)
@@ -1223,7 +1223,7 @@ The element attributes are defined as follows:
 ;id (optional)
 :The unique id of this segment.
 ;color (optional)
-:An RGB value in format #rrggbb. If omitted, the segment will not generate any markers or child markers.
+:An RGB value in format #rrggbb, or an X11 color name. If omitted, the segment will not generate any markers or child markers.
 ;length (required)
 :The length of this segment, as an integer number relative to the total of all segments' lengths. The length determines the fraction of the parent marker to be used for this segment.
 

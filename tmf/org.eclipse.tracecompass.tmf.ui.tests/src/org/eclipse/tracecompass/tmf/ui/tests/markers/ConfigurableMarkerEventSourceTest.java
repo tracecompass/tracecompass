@@ -90,9 +90,14 @@ public class ConfigurableMarkerEventSourceTest {
         }
     }
 
+    private static final int ALPHA = 10;
     private static final String COLOR_STR = "#010101";
-    private static final RGBA COLOR = new RGBA(1, 1, 1, 10);
+    private static final RGBA COLOR = new RGBA(1, 1, 1, ALPHA);
     private static final RGBA ODD_COLOR = new RGBA(1, 1, 1, 0);
+    private static final String RED_STR = "red";
+    private static final RGBA RED = new RGBA(255, 0, 0, ALPHA);
+    private static final String INVALID_STR = "invalid";
+    private static final RGBA DEFAULT = new RGBA(0, 0, 0, ALPHA);
 
     private static ITmfTrace fTrace;
     private static AbstractTmfTraceAdapterFactory fFactory;
@@ -216,11 +221,11 @@ public class ConfigurableMarkerEventSourceTest {
          */
         WeightedMarker markerE = new WeightedMarker("E");
         markerD.addSubMarker(markerE);
-        MarkerSegment segmentE1 = new MarkerSegment("E1 %d", "e1", COLOR_STR, 2);
+        MarkerSegment segmentE1 = new MarkerSegment("E1 %d", "e1", RED_STR, 2);
         markerE.addSegment(segmentE1);
         MarkerSegment segmentE2 = new MarkerSegment("E2 %d", "e2", "", 1);
         markerE.addSegment(segmentE2);
-        MarkerSegment segmentE3 = new MarkerSegment("E3 %d", "e3", COLOR_STR, 3);
+        MarkerSegment segmentE3 = new MarkerSegment("E3 %d", "e3", INVALID_STR, 3);
         markerE.addSegment(segmentE3);
         source.configure(set);
         assertEquals(Arrays.asList("A", "B", "C", "D", "E"), source.getMarkerCategories());
@@ -230,9 +235,9 @@ public class ConfigurableMarkerEventSourceTest {
         for (long t = 0L; t < 2000L; t += 40L) {
             int index = (int) (t / 40L) % 50;
             if (index == 30L || index == 31L || index == 40L) {
-                validateMarker(markerList.get(i++), t, 13L, "E", String.format("E1 %d", 0), COLOR);
+                validateMarker(markerList.get(i++), t, 13L, "E", String.format("E1 %d", 0), RED);
                 // segment 2 does not have visible marker due to empty color name
-                validateMarker(markerList.get(i++), t + 20L, 20L, "E", String.format("E3 %d", 2), COLOR);
+                validateMarker(markerList.get(i++), t + 20L, 20L, "E", String.format("E3 %d", 2), DEFAULT);
             }
         }
     }
