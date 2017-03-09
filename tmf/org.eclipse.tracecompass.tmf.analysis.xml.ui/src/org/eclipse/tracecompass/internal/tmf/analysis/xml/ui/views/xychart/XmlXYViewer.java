@@ -217,11 +217,6 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
 
     @Override
     protected void updateData(long start, long end, int nb, @Nullable IProgressMonitor monitor) {
-
-        if (!fViewInfo.waitForInitialization()) {
-            return;
-        }
-
         ITmfXmlStateAttribute display = fDisplay;
         ITmfXmlStateAttribute seriesNameAttrib = fSeriesName;
         XmlXYEntry entry = fEntry;

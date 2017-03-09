@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2016 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2017 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -34,7 +34,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readonly.TmfXmlReadOnlyModelFactory;
@@ -136,8 +135,12 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
 
     @Override
     public void createPartControl(Composite parent) {
+        String name = getViewSite().getSecondaryId();
+        if (name != null) {
+            /* must initialize view info before calling super */
+            fViewInfo.setName(name);
+        }
         super.createPartControl(parent);
-        fViewInfo.setName(NonNullUtils.checkNotNull(getViewSite().getSecondaryId()));
     }
 
     private void loadNewXmlView() {
@@ -230,10 +233,6 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
 
     @Override
     protected void buildEntryList(ITmfTrace trace, ITmfTrace parentTrace, IProgressMonitor monitor) {
-
-        if (!fViewInfo.waitForInitialization()) {
-            return;
-        }
         /*
          * Get the view element from the XML file. If the element can't be
          * found, return.
