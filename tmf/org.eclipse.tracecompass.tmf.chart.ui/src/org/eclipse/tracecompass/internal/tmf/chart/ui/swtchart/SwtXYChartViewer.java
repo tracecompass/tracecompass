@@ -295,6 +295,7 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
 
         /* Refresh the titles to fit the current chart size */
         refreshDisplayTitles();
+        refreshDisplayLabels();
     }
 
     /**
