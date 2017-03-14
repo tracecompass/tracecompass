@@ -1171,6 +1171,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
         long center = time0 + Math.round(((double) (xPos - nameSpace) / timeSpace * interval));
         long newTime0 = center - Math.round((double) newInterval * (center - time0) / interval);
+        /* snap to bounds if zooming out of range */
+        newTime0 = Math.max(fTimeProvider.getMinTime(), Math.min(newTime0, fTimeProvider.getMaxTime() - newInterval));
         long newTime1 = newTime0 + newInterval;
         fTimeProvider.setStartFinishTimeNotify(newTime0, newTime1);
     }
@@ -1187,18 +1189,11 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
         ITimeDataProvider provider = fTimeProvider;
         long selTime = (provider.getSelectionEnd() + provider.getSelectionBegin()) / 2;
-        if (selTime <= prevTime0 || selTime >= prevTime1) {
+        if (selTime < prevTime0 || selTime > prevTime1) {
             selTime = (prevTime0 + prevTime1) / 2;
         }
         long time0 = selTime - (long) ((selTime - prevTime0) / ZOOM_FACTOR);
         long time1 = selTime + (long) ((prevTime1 - selTime) / ZOOM_FACTOR);
-
-        long inaccuracy = (fTimeProvider.getMaxTime() - fTimeProvider.getMinTime()) - (time1 - time0);
-
-        if (inaccuracy > 0 && inaccuracy < 100) {
-            fTimeProvider.setStartFinishTimeNotify(fTimeProvider.getMinTime(), fTimeProvider.getMaxTime());
-            return;
-        }
 
         long min = fTimeProvider.getMinTimeInterval();
         if ((time1 - time0) < min) {
@@ -1217,17 +1212,21 @@ public class TimeGraphControl extends TimeGraphBaseControl
         long prevTime1 = fTimeProvider.getTime1();
         ITimeDataProvider provider = fTimeProvider;
         long selTime = (provider.getSelectionEnd() + provider.getSelectionBegin()) / 2;
-        if (selTime <= prevTime0 || selTime >= prevTime1) {
+        if (selTime < prevTime0 || selTime > prevTime1) {
             selTime = (prevTime0 + prevTime1) / 2;
         }
-        long time0 = (long) (selTime - (selTime - prevTime0) * ZOOM_FACTOR);
-        long time1 = (long) (selTime + (prevTime1 - selTime) * ZOOM_FACTOR);
-
-        long inaccuracy = (fTimeProvider.getMaxTime() - fTimeProvider.getMinTime()) - (time1 - time0);
-        if (inaccuracy > 0 && inaccuracy < 100) {
-            fTimeProvider.setStartFinishTimeNotify(fTimeProvider.getMinTime(), fTimeProvider.getMaxTime());
-            return;
+        long newInterval;
+        long time0;
+        if (prevTime1 - prevTime0 <= 1) {
+            newInterval = 2;
+            time0 = selTime - 1;
+        } else {
+            newInterval = (long) Math.ceil((prevTime1 - prevTime0) * ZOOM_FACTOR);
+            time0 = selTime - (long) Math.ceil((selTime - prevTime0) * ZOOM_FACTOR);
         }
+        /* snap to bounds if zooming out of range */
+        time0 = Math.max(fTimeProvider.getMinTime(), Math.min(time0, fTimeProvider.getMaxTime() - newInterval));
+        long time1 = time0 + newInterval;
 
         fTimeProvider.setStartFinishTimeNotify(time0, time1);
     }
