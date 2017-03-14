@@ -21,6 +21,7 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.chart.core.cha
  org.eclipse.tracecompass.internal.provisional.tmf.chart.core.descriptor;
   x-friends:="org.eclipse.tracecompass.tmf.chart.ui,
    org.eclipse.tracecompass.tmf.chart.core.tests,
+   org.eclipse.tracecompass.tmf.chart.ui.swtbot.tests,
    org.eclipse.tracecompass.analysis.lami.core,
    org.eclipse.tracecompass.analysis.lami.ui",
  org.eclipse.tracecompass.internal.provisional.tmf.chart.core.resolver;x-friends:="org.eclipse.tracecompass.tmf.chart.ui,org.eclipse.tracecompass.tmf.chart.core.tests,org.eclipse.tracecompass.analysis.lami.core",

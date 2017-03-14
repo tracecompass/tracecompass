@@ -47,6 +47,24 @@ import org.swtchart.ISeriesSet;
 public final class SWTBotCustomChartUtils {
 
     /**
+     * The index in the dialog for the table to select the chart type
+     */
+    public static final int CHART_TYPE_TABLE_INDEX = 0;
+    /**
+     * The index in the dialog for the table containing the selected series
+     */
+    public static final int SERIES_SELECTION_TABLE_INDEX = 1;
+    /**
+     * The index in the dialog for the table with the choices for the X axis
+     */
+    public static final int X_SERIES_TABLE_INDEX = 2;
+    /**
+     * The index in the dialog for the table with the choices for the X axis
+     */
+    public static final int Y_SERIES_TABLE_INDEX = 3;
+
+
+    /**
      * An enum for the chart axis
      */
     public enum AxisType {
@@ -95,7 +113,7 @@ public final class SWTBotCustomChartUtils {
             throw new IllegalStateException("Unsupported chart type: " + chartType.name());
         }
         // The chart selection table is the first
-        SWTBotTable table = bot.table(0);
+        SWTBotTable table = bot.table(CHART_TYPE_TABLE_INDEX);
         // Click on the row corresponding to the chart type
         table.click(index, 0);
     }
@@ -119,10 +137,10 @@ public final class SWTBotCustomChartUtils {
     public static void addSeries(SWTWorkbenchBot bot, String xSerie, Set<String> ySeries) {
         ensureDialogFocus(bot);
         // The X and Y tables are the 3rd and 4th respectively
-        SWTBotTable xTable = bot.table(2);
+        SWTBotTable xTable = bot.table(X_SERIES_TABLE_INDEX);
         xTable.getTableItem(xSerie).click();
 
-        SWTBotTable yTable = bot.table(3);
+        SWTBotTable yTable = bot.table(Y_SERIES_TABLE_INDEX);
         ySeries.stream().forEach(s -> yTable.getTableItem(s).check());
 
         bot.buttonInGroup("Series Creator", 0).click();
