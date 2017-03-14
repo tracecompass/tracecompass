@@ -392,6 +392,10 @@ public class LttngTraceGenerator {
 
                 @Override
                 public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    // If a file failed to delete, it's more useful to throw this instead
+                    if (exc != null) {
+                        throw exc;
+                    }
                     Files.delete(dir);
                     return FileVisitResult.CONTINUE;
                 }

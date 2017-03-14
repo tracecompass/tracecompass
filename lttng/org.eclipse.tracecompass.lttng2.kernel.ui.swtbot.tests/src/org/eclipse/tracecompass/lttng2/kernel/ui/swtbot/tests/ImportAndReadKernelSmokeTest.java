@@ -110,7 +110,7 @@ public class ImportAndReadKernelSmokeTest extends KernelTestBase {
             testHV(getViewPart("Histogram"));
             testCFV((ControlFlowView) getViewPart("Control Flow"));
             testRV((ResourcesView) getViewPart("Resources"));
-            testStateSystemExplorer();
+            testStateSystemExplorer(trace.getPath());
         } finally {
             trace.dispose();
         }
@@ -189,7 +189,7 @@ public class ImportAndReadKernelSmokeTest extends KernelTestBase {
         return vps[0];
     }
 
-    private void testStateSystemExplorer() {
+    private static void testStateSystemExplorer(String tracePath) {
         // Set up
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
         // Open the view
@@ -210,7 +210,7 @@ public class ImportAndReadKernelSmokeTest extends KernelTestBase {
         bot.closeAllEditors();
         bot.waitUntil(treeHasRows(sseBot.bot().tree(), 0));
         // re-open the trace
-        before();
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, tracePath, KERNEL_TRACE_TYPE);
         secondOpen = getSSNames(sseBot);
         assertEquals("Test reopen trace", actual, secondOpen);
         sseBot.close();
