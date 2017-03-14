@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.tmf.chart.core,
  org.eclipse.tracecompass.tmf.core,
  org.eclipse.tracecompass.tmf.ui
-Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.chart.ui.chart;x-friends:="org.eclipse.tracecompass.analysis.lami.ui",
+Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.chart.ui.chart;x-friends:="org.eclipse.tracecompass.analysis.lami.ui,org.eclipse.tracecompass.tmf.chart.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.provisional.tmf.chart.ui.dialog;x-friends:="org.eclipse.tracecompass.analysis.lami.ui,org.eclipse.tracecompass.tmf.chart.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.tmf.chart.ui;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.chart.ui.aggregator;x-internal:=true,
