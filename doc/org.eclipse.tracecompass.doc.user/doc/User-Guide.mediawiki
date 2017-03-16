@@ -234,7 +234,7 @@ To open a trace, right-click on a target trace folder and select '''Open Trace..
 
 A new dialog will show for selecting a trace to open. Select a trace file and then click on '''OK'''. Note that for traces that are directories (such as Common Trace Format (CTF) traces) any file in the trace directory can be selected to open the trace. Now, the trace viewer will attempt to detect the trace types of the selected trace. The auto detection algorithm will validate the trace against all known trace types. If multiple trace types are valid, a trace type is chosen based on a confidence criteria. The validation process and the computation of the confidence level are trace type specific. After successful validation the trace will be linked into the selected target trace folder and then opened with the detected trace type.
 
-Note that a trace type is an extension point of the '''Tracing and Monitoring Framework (TMF)'''. Depending on the which features are loaded, the list of available trace types can vary.
+Depending of the trace types enabled in the [[#Trace_Types_Preference_Page | Trace Types preference page]], the list of available trace types can vary.
 
 ==== Importing ====
 
@@ -246,7 +246,7 @@ At this point, the '''Import Trace Wizard''' will show for selecting traces to i
 
 Traces can also be imported directly from an archive file such as a zip or a tar file by selecting the '''Select archive file''' option then by clicking '''Browse'''. Then select the traces to import in the list of files and folders as usual.
 
-Optionally, select the '''Trace Type''' from the drop-down menu. If '''Trace Type''' is set to '''<Automatic Detection>''', the wizard will attempt to detect the trace types of the selected files. The automatic detection algorithm validates a trace against all known trace types. If multiple trace types are valid, a trace type is chosen based on a confidence criteria. The validation process and the computation of the confidence level are trace type specific. Optionally, '''Import unrecognized traces''' can be selected to import trace files that could not be automatically detected by '''<Automatic Detection>'''.
+Optionally, select the '''Trace Type''' from the drop-down menu. If '''Trace Type''' is set to '''<Automatic Detection>''', the wizard will attempt to detect the trace types of the selected files. The automatic detection algorithm validates a trace against all the trace types enabled in the [[#Trace_Types_Preference_Page | Trace Types preference page]]. If multiple trace types are valid, a trace type is chosen based on a confidence criteria. The validation process and the computation of the confidence level are trace type specific. Optionally, '''Import unrecognized traces''' can be selected to import trace files that could not be automatically detected by '''<Automatic Detection>'''.
 
 Select or deselect the checkboxes for '''Overwrite existing trace without warning''', '''Create links in workspace''' and '''Preserve folder structure'''. When all options are configured, click on '''Finish'''.
 
@@ -266,7 +266,7 @@ If one selects '''Rename All''', '''Overwrite All''' or '''Skip All''' the choic
 
 Upon successful importing, the traces will be stored in the target trace folder. If a trace type was associated to a trace, then the corresponding icon will be displayed. If no trace type is detected the default editor icon associated with this file type will be displayed. Linked traces will have a little arrow as decorator on the right bottom corner.
 
-Note that trace type is an extension point of the '''Tracing and Monitoring Framework (TMF)'''. Depending on the which features are loaded, the list of trace types can vary.
+Depending of the trace types enabled in the [[#Trace_Types_Preference_Page | Trace Types preference page]], the list of available trace types can vary.
 
 Alternatively, one can open the '''Import...''' menu from the '''File''' main menu, then select '''Tracing''' > '''Trace Import''' and click on '''Next >'''.
 
@@ -454,6 +454,21 @@ If no trace type was selected a trace type has to be associated to a trace befor
 After selecting the trace type, the trace icon will be updated with the corresponding trace type icon.
 
 [[Image:images/ExplorerWithAssociatedTraceType.png]]
+
+The user can edit the [[#Trace_Types_Preference_Page | Trace Types preference page]] to choose which trace types will be available under the '''Select Trace Type...''' menu.
+
+=== Trace Types Preference Page ===
+The '''Trace Types''' preference page lists all the available trace types and allows the user to enable/disable the trace types.
+
+Trace type is an extension point of the '''Tracing and Monitoring Framework (TMF)'''. Depending on which features are loaded and which custom parsers have been created, the list of trace types can vary.
+
+The user needs to press the '''Apply''' button or '''OK'''' to save the changes.
+
+Only the enabled trace types will be used for trace importing, auto-detection, as well as shown under the [[#Selecting_a_Trace_Type | Select Trace Type...]] menu.
+
+To access the '''Trace Types''' preference page, select the '''Window''' menu. Then Select '''Preferences''' and search for '''Trace Type''' under '''Tracing''' group. The example below shows the '''Trace Types''' preference page.
+
+[[Image:images/TraceTypePreferencePage.png]]
 
 === Opening a Trace or Experiment ===
 
