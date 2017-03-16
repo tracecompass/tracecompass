@@ -23,7 +23,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
-import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
@@ -169,9 +168,8 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
         SWTBotTree treeBot = bot.tree();
         bot.button(UNCHECK_ALL).click();
 
-        TreeCheckedCounter treeCheckCounter = new TreeCheckedCounter(treeBot);
-        Integer checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals("default", 0, checked.intValue());
+        int checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
+        assertEquals("default", 0, checked);
 
         // select root nodes and their children
         checkFilterTreeItems(bot, treeBot, SYSTEMD_PROCESS_NAME);
@@ -185,8 +183,7 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
         SWTBotTreeItem item = SWTBotUtils.getTreeItem(bot, treeBot, TRACE_NAME, process);
         item.select();
         bot.button(CHECK_SUBTREE).click();
-        TreeCheckedCounter treeCheckCounter = new TreeCheckedCounter(treeBot);
-        UIThreadRunnable.syncExec(treeCheckCounter);
+        SWTBotUtils.getTreeCheckedItemCount(treeBot);
     }
 
     private static void testProcessSorting(final SWTBotTree tree, final SWTBotTimeGraph timeGraph) {

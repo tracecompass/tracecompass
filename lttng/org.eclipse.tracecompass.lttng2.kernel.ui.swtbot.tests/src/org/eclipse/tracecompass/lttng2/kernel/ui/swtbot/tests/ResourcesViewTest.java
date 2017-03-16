@@ -419,50 +419,49 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         fBot.waitUntil(org.eclipse.swtbot.swt.finder.waits.Conditions.shellIsActive("Filter"));
         SWTBot bot = fBot.activeShell().bot();
         SWTBotTree treeBot = bot.tree();
-        TreeCheckedCounter treeCheckCounter = new TreeCheckedCounter(treeBot);
         // get how many items there are
-        Integer checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals("default", 26, checked.intValue());
+        int checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
+        assertEquals("default", 26, checked);
         // test "uncheck all button"
         bot.button(UNCHECK_ALL).click();
-        checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(0, checked.intValue());
+        checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
+        assertEquals(0, checked);
         // test check all
         bot.button(CHECK_ALL).click();
-        checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(CHECK_ALL, 26, checked.intValue());
+        checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
+        assertEquals(CHECK_ALL, 26, checked);
         // test uncheck inactive
         treeBot.getTreeItem(LttngTraceGenerator.getName()).select("CPU 1");
         bot.button(UNCHECK_ALL).click();
         bot.button(CHECK_SELECTED).click();
-        checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(CHECK_SELECTED, 2, checked.intValue());
+        checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
+        assertEquals(CHECK_SELECTED, 2, checked);
         // test check subtree
         bot.button(UNCHECK_ALL).click();
         bot.button(CHECK_SUBTREE).click();
-        checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(CHECK_SUBTREE, 2, checked.intValue());
+        checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
+        assertEquals(CHECK_SUBTREE, 2, checked);
         // test uncheck selected
         bot.button(CHECK_ALL).click();
         bot.button(UNCHECK_SELECTED).click();
-        checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(UNCHECK_SELECTED, 25, checked.intValue());
+        checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
+        assertEquals(UNCHECK_SELECTED, 25, checked);
         // test uncheck subtree
         bot.button(CHECK_ALL).click();
         bot.button(UNCHECK_SUBTREE).click();
-        checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(UNCHECK_SELECTED, 25, checked.intValue());
+        checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
+        assertEquals(UNCHECK_SELECTED, 25, checked);
         // test filter
         bot.button(UNCHECK_ALL).click();
-        checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals(0, checked.intValue());
+        checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
+        assertEquals(0, checked);
         bot.text().setText("CPU 2");
         SWTBotTreeItem treeItem = treeBot.getTreeItem(LttngTraceGenerator.getName());
         treeItem.rowCount();
         fBot.waitUntil(ConditionHelpers.treeItemCount(treeItem, 25));
         bot.button(CHECK_ALL).click();
-        checked = UIThreadRunnable.syncExec(treeCheckCounter);
-        assertEquals("Filtered", 26, checked.intValue());
+        checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
+        assertEquals("Filtered", 26, checked);
         bot.button("OK").click();
     }
 

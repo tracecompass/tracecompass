@@ -17,12 +17,9 @@ package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.tracecompass.ctf.core.tests.shared.LttngTraceGenerator;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
@@ -100,36 +97,5 @@ public abstract class KernelTestBase {
     public void after() {
         fBot.closeAllEditors();
         SWTBotUtils.closeSecondaryShells(fBot);
-    }
-
-    /**
-     * Class to check number of checked items
-     */
-    static final class TreeCheckedCounter implements Result<Integer> {
-        private final SWTBotTree fTreeBot;
-
-        TreeCheckedCounter(SWTBotTree treeBot) {
-            fTreeBot = treeBot;
-        }
-
-        @Override
-        public Integer run() {
-            int checked = 0;
-            for (TreeItem item : fTreeBot.widget.getItems()) {
-                checked += getChecked(item);
-            }
-            return checked;
-        }
-
-        private int getChecked(TreeItem item) {
-            int total = 0;
-            if (item.getChecked()) {
-                total++;
-            }
-            for (TreeItem child : item.getItems()) {
-                total += getChecked(child);
-            }
-            return total;
-        }
     }
 }

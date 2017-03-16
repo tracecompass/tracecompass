@@ -39,5 +39,6 @@ Export-Package: org.eclipse.tracecompass.tmf.ui.swtbot.tests.parsers.custom;x-in
  org.eclipse.tracecompass.tmf.ui.swtbot.tests.perf.views,
  org.eclipse.tracecompass.tmf.ui.swtbot.tests.perspectives;x-internal:=true,
  org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared,
+ org.eclipse.tracecompass.tmf.ui.swtbot.tests.tracetype.preferences,
  org.eclipse.tracecompass.tmf.ui.swtbot.tests.viewers.events;x-internal:=true,
  org.eclipse.tracecompass.tmf.ui.swtbot.tests.wizards;x-internal:=true

@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
@@ -59,6 +60,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
+import org.eclipse.swtbot.swt.finder.results.IntResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.utils.MessageFormat;
@@ -1036,5 +1038,37 @@ public final class SWTBotUtils {
         } catch (ExecutionException | NotDefinedException | NotEnabledException | NotHandledException e) {
             fail(e.getMessage());
         }
+    }
+
+    /**
+     * Get the number of checked items of a tree
+     *
+     * @param tree
+     *            The tree bot
+     * @return The number of checked items
+     */
+    public static int getTreeCheckedItemCount(SWTBotTree tree) {
+        return UIThreadRunnable.syncExec(new IntResult() {
+
+            @Override
+            public Integer run() {
+                int checked = 0;
+                for (TreeItem item : tree.widget.getItems()) {
+                    checked += getChecked(item);
+                }
+                return checked;
+            }
+
+            private int getChecked(TreeItem item) {
+                int total = 0;
+                if (item.getChecked()) {
+                    total++;
+                }
+                for (TreeItem child : item.getItems()) {
+                    total += getChecked(child);
+                }
+                return total;
+            }
+        });
     }
 }
