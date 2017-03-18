@@ -469,7 +469,7 @@ public class CtfTmfTrace extends TmfTrace
      * @param eventName
      *            The event name to look for
      * @return The best callsite candidate
-     * @since 2.1
+     * @since 2.2
      */
     public @Nullable CtfTmfCallsite getCallsite(String eventName) {
         Optional<@NonNull CTFCallsite> callsite = StreamSupport.stream(fTrace.getStreams().spliterator(), false)
@@ -492,7 +492,7 @@ public class CtfTmfTrace extends TmfTrace
      * @param ip
      *            The instruction pointer
      * @return The closest matching callsite
-     * @since 2.1
+     * @since 2.2
      */
     public @Nullable CtfTmfCallsite getCallsite(String eventName, long ip) {
         Optional<@NonNull CTFCallsite> callsite = StreamSupport.stream(fTrace.getStreams().spliterator(), false)
@@ -793,12 +793,18 @@ public class CtfTmfTrace extends TmfTrace
         return (int) (getNbEvents() / REDUCTION_FACTOR);
     }
 
+    /**
+     * @since 2.2
+     */
     @Override
     public long cyclesToNanos(long cycles) {
         // CTFTrace adds the clock offset in cycles to the input
         return fTrace.timestampCyclesToNanos(cycles - fTrace.getOffset());
     }
 
+    /**
+     * @since 2.2
+     */
     @Override
     public long nanosToCycles(long nanos) {
         // CTFTrace subtracts the clock offset in cycles from the output
