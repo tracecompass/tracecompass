@@ -73,6 +73,15 @@ public class CtfTmfEventTest {
     }
 
     /**
+     * Test the timestamps
+     */
+    @Test
+    public void testTimestamp() {
+        assertEquals("Offsetted scaled timestamp", 1332170682440137077L, fixture.getTimestamp().toNanos());
+        assertEquals("Raw timestamp", 4277198423090L, fixture.getUnscaledTime());
+    }
+
+    /**
      * Run the CTFEvent(EventDefinition,StreamInputReader) constructor test.
      */
     @Test
@@ -198,8 +207,8 @@ public class CtfTmfEventTest {
     }
 
     /**
-     * Test the {@link CtfTmfEventFactory#getNullEvent} method, and
-     * the nullEvent's values.
+     * Test the {@link CtfTmfEventFactory#getNullEvent} method, and the
+     * nullEvent's values.
      */
     @Test
     public void testNullEvent() {

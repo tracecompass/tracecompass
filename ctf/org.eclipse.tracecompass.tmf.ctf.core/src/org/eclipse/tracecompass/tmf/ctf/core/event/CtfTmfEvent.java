@@ -242,6 +242,17 @@ public class CtfTmfEvent extends TmfEvent
         return stream.getId();
     }
 
+    /**
+     * Get the event unscaled time. This is often the number of cycles run. In
+     * some cases it is the same as the actual timestamp.
+     *
+     * @return the event unscaled time in long format.
+     * @since 2.2
+     */
+    public long getUnscaledTime() {
+        return fEvent.getTimestamp();
+    }
+
     // ------------------------------------------------------------------------
     // TmfEvent
     // ------------------------------------------------------------------------
@@ -345,7 +356,7 @@ public class CtfTmfEvent extends TmfEvent
      * Get the call site for this event.
      *
      * @return the call site information, or null if there is none
-     * @since 2.1
+     * @since 2.2
      */
     @Override
     public @Nullable ITmfCallsite getCallsite() {
