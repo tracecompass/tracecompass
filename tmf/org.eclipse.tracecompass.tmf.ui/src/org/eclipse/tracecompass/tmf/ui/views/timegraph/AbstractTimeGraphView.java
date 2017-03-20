@@ -87,7 +87,6 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerConfigXmlParser;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
-import org.eclipse.tracecompass.internal.tmf.ui.markers.ConfigurableMarkerEventSource;
 import org.eclipse.tracecompass.internal.tmf.ui.markers.MarkerUtils;
 import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
 import org.eclipse.tracecompass.tmf.core.signal.TmfMarkerEventSourceUpdatedSignal;
@@ -1707,15 +1706,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         @Override
         public void runWithEvent(Event event) {
-            MarkerUtils.setDefaultMarkerSetId(fMarkerSet == null ? null : fMarkerSet.getId());
-            for (ITmfTrace trace : TmfTraceManager.getInstance().getOpenedTraces()) {
-                for (IMarkerEventSource source : TmfTraceAdapterManager.getAdapters(trace, IMarkerEventSource.class)) {
-                    if (source instanceof ConfigurableMarkerEventSource) {
-                        ((ConfigurableMarkerEventSource) source).configure(fMarkerSet);
-                    }
-                }
+            if (isChecked()) {
+                MarkerUtils.setDefaultMarkerSet(fMarkerSet);
+                broadcast(new TmfMarkerEventSourceUpdatedSignal(AbstractTimeGraphView.this));
             }
-            broadcast(new TmfMarkerEventSourceUpdatedSignal(AbstractTimeGraphView.this));
         }
     }
 
@@ -1734,13 +1728,14 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         fMarkerSetMenu.addMenuListener(new IMenuListener() {
             @Override
             public void menuAboutToShow(IMenuManager mgr) {
-                Action action = new MarkerSetAction(null);
-                String defaultMarkerSetId = MarkerUtils.getDefaultMarkerSetId();
-                action.setChecked(defaultMarkerSetId == null || defaultMarkerSetId.isEmpty());
-                mgr.add(action);
+                Action noneAction = new MarkerSetAction(null);
+                MarkerSet defaultMarkerSet = MarkerUtils.getDefaultMarkerSet();
+                String defaultMarkerSetId = (defaultMarkerSet == null) ? null : defaultMarkerSet.getId();
+                noneAction.setChecked(defaultMarkerSetId == null);
+                mgr.add(noneAction);
                 List<MarkerSet> markerSets = MarkerConfigXmlParser.getMarkerSets();
                 for (MarkerSet markerSet : markerSets) {
-                    action = new MarkerSetAction(markerSet);
+                    Action action = new MarkerSetAction(markerSet);
                     action.setChecked(markerSet.getId().equals(defaultMarkerSetId));
                     mgr.add(action);
                 }

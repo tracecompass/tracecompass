@@ -37,6 +37,10 @@ import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker.SplitMarker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker.WeightedMarker;
+import org.eclipse.tracecompass.tmf.core.signal.TmfMarkerEventSourceUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.core.trace.AbstractTmfTraceAdapterFactory.IDisposableAdapter;
 import org.eclipse.tracecompass.tmf.core.trace.ICyclesConverter;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.colors.X11Color;
@@ -53,7 +57,7 @@ import com.google.common.collect.RangeSet;
 /**
  * Configurable marker event source.
  */
-public class ConfigurableMarkerEventSource implements IMarkerEventSource {
+public class ConfigurableMarkerEventSource implements IMarkerEventSource, IDisposableAdapter {
 
     private static final long NANO_PER_MILLI = 1000000L;
     private static final long NANO_PER_MICRO = 1000L;
@@ -74,6 +78,12 @@ public class ConfigurableMarkerEventSource implements IMarkerEventSource {
     public ConfigurableMarkerEventSource(ITmfTrace trace) {
         fMarkerEventSources = new ArrayList<>();
         fTrace = trace;
+        TmfSignalManager.register(this);
+    }
+
+    @Override
+    public void dispose() {
+        TmfSignalManager.deregister(this);
     }
 
     /**
@@ -317,5 +327,16 @@ public class ConfigurableMarkerEventSource implements IMarkerEventSource {
         public List<SubMarker> getSubMarkers() {
             return fMarker.getSubMarkers();
         }
+    }
+
+    /**
+     * A marker event source has been updated
+     *
+     * @param signal
+     *            the signal
+     */
+    @TmfSignalHandler
+    public void markerEventSourceUpdated(final TmfMarkerEventSourceUpdatedSignal signal) {
+        configure(MarkerUtils.getDefaultMarkerSet());
     }
 }

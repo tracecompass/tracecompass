@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.internal.tmf.ui.markers;
 
-import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerConfigXmlParser;
-import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.tmf.core.trace.AbstractTmfTraceAdapterFactory;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEventSource;
@@ -27,7 +25,7 @@ public class ConfigurableMarkerEventSourceFactory extends AbstractTmfTraceAdapte
     protected <T> T getTraceAdapter(ITmfTrace trace, Class<T> adapterType) {
         if (IMarkerEventSource.class.equals(adapterType)) {
             ConfigurableMarkerEventSource adapter = new ConfigurableMarkerEventSource(trace);
-            configure(adapter);
+            adapter.configure(MarkerUtils.getDefaultMarkerSet());
             return adapterType.cast(adapter);
         }
         return null;
@@ -38,14 +36,5 @@ public class ConfigurableMarkerEventSourceFactory extends AbstractTmfTraceAdapte
         return new Class[] {
                 IMarkerEventSource.class
         };
-    }
-
-    private static void configure(ConfigurableMarkerEventSource source) {
-        String defaultMarkerSetId = MarkerUtils.getDefaultMarkerSetId();
-        for (MarkerSet markerSet : MarkerConfigXmlParser.getMarkerSets()) {
-            if (markerSet.getId().equals(defaultMarkerSetId)) {
-                source.configure(markerSet);
-            }
-        }
     }
 }
