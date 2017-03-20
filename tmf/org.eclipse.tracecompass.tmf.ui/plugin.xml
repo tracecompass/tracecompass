@@ -1092,18 +1092,8 @@
             id="org.eclipse.linuxtools.tmf.ui.command.select_trace_type"
             name="%command.select_trace_type">
          <commandParameter
-               id="org.eclipse.linuxtools.tmf.ui.commandparameter.select_trace_type.bundle"
-               name="%command.select_trace_type.bundle"
-               optional="false">
-         </commandParameter>
-         <commandParameter
                id="org.eclipse.linuxtools.tmf.ui.commandparameter.select_trace_type.type"
                name="%command.select_trace_type.type"
-               optional="false">
-         </commandParameter>
-         <commandParameter
-               id="org.eclipse.linuxtools.tmf.ui.commandparameter.select_trace_type.icon"
-               name="%command.select_trace_type.icon"
                optional="false">
          </commandParameter>
       </command>
