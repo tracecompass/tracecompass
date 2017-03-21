@@ -51,6 +51,7 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
@@ -455,7 +456,12 @@ public class TmfOpenTraceHelper {
                     @Override
                     public void run() {
                         final IWorkbench wb = PlatformUI.getWorkbench();
-                        final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+                        IWorkbenchWindow activeWorkbenchWindow = wb.getActiveWorkbenchWindow();
+                        if (activeWorkbenchWindow == null) {
+                            return;
+                        }
+
+                        final IWorkbenchPage activePage = activeWorkbenchWindow.getActivePage();
                         activePage.reuseEditor(editor, editorInput);
                         activePage.activate(editor);
                     }

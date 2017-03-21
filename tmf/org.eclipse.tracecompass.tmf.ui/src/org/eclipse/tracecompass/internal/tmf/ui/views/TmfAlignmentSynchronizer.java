@@ -151,6 +151,10 @@ public class TmfAlignmentSynchronizer {
      *            the view that was resized
      */
     public void handleViewResized(TmfView view) {
+        if (view.getParentComposite().isDisposed()) {
+            return;
+        }
+
         TmfTimeViewAlignmentInfo alignmentInfo = new TmfTimeViewAlignmentInfo(view.getParentComposite().getShell(), getViewLocation(view), 0);
 
         // Don't use a view that was just resized as a reference view.
@@ -528,7 +532,7 @@ public class TmfAlignmentSynchronizer {
 
     private static IWorkbenchWindow getWorkbenchWindow(Shell shell) {
         for (IWorkbenchWindow window : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-            if (window.getShell().equals(shell)) {
+            if (window.getShell() != null && window.getShell().equals(shell)) {
                 return window;
             }
         }
