@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.internal.tmf.core.analysis;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -18,6 +19,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
@@ -78,7 +80,11 @@ public final class TmfAnalysisParameterProviders {
     public static Set<IAnalysisParameterProvider> getParameterProvidersFor(String analysisId) {
         Set<IAnalysisParameterProvider> providers = new HashSet<>();
         // Get the parameter provider elements from the extension point
-        IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(TMF_ANALYSIS_TYPE_ID);
+        IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
+        if (extensionRegistry == null) {
+            return Collections.emptySet();
+        }
+        IConfigurationElement[] config = extensionRegistry.getConfigurationElementsFor(TMF_ANALYSIS_TYPE_ID);
         for (IConfigurationElement ce : config) {
             String elementName = ce.getName();
             if (elementName.equals(PARAMETER_PROVIDER_ELEM)) {
