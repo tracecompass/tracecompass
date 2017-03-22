@@ -9,12 +9,15 @@
 
 package org.eclipse.tracecompass.tmf.core.tests.parsers.custom;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -156,6 +159,26 @@ public abstract class AbstractCustomTraceDataTest {
             event = trace.getNext(ctx);
         }
         fTestData.validateEventCount(eventCount);
+    }
+
+    /**
+     * Test that the fast bound reading method returns the correct time stamps.
+     */
+    @Test
+    public void testReadingBounds() {
+        /* First, read the bounds without indexing. */
+        ITmfTimestamp start = fTrace.readStart();
+        ITmfTimestamp end = fTrace.readEnd();
+
+        /*
+         * Index the trace so that getStartTime and getEndTime return the
+         * correct time stamps.
+         */
+        fTrace.indexTrace(true);
+
+        /* Compare the TmfTrace bounds to the fast read bounds. */
+        assertEquals(fTrace.getStartTime(), start);
+        assertEquals(fTrace.getEndTime(), end);
     }
 
 }

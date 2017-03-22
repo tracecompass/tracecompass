@@ -40,6 +40,7 @@ import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition.InputLine;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
@@ -582,5 +583,41 @@ public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexabl
             }
         }
         super.traceRangeUpdated(signal);
+    }
+
+    /**
+     * @since 2.3
+     */
+    @Override
+    public synchronized ITmfTimestamp readEnd() {
+        try {
+            Long pos = fFile.length() - 1;
+            /* Outer loop to find the first line of a matcher group. */
+            while (pos > 0) {
+                /* Inner loop to find line beginning */
+                while (pos > 0) {
+                    fFile.seek(pos - 1);
+                    if (fFile.read() == '\n') {
+                        break;
+                    }
+                    pos--;
+                }
+                ITmfLocation location = new TmfLongLocation(pos);
+                ITmfContext context = seekEvent(location);
+                ITmfEvent event = parseEvent(context);
+                context.dispose();
+                if (event != null) {
+                    /* The last event in the trace was successfully parsed. */
+                    return event.getTimestamp();
+                }
+                /* pos was after the beginning of the lines of the last event. */
+                pos--;
+            }
+        } catch (IOException e) {
+            Activator.logError("Error seeking last event. File: " + getPath(), e); //$NON-NLS-1$
+        }
+
+        /* Empty trace */
+        return null;
     }
 }
