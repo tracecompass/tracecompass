@@ -187,7 +187,7 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
                 continue;
             }
             long endTime = end + 1;
-            setEndTime(Math.max(getEndTime(), endTime));
+            setEndTime(Math.max(getEndTime(), end));
 
             if (traceEntry == null) {
                 traceEntry = new ResourcesEntry(trace, trace.getName(), startTime, endTime, 0);

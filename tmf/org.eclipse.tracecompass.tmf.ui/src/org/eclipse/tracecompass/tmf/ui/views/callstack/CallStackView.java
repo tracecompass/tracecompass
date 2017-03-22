@@ -702,7 +702,7 @@ public class CallStackView extends AbstractTimeGraphView {
             if (parentTrace == getTrace()) {
                 synchronized (this) {
                     setStartTime(getStartTime() == SWT.DEFAULT ? start : Math.min(getStartTime(), start));
-                    setEndTime(getEndTime() == SWT.DEFAULT ? end + 1 : Math.max(getEndTime(), end + 1));
+                    setEndTime(getEndTime() == SWT.DEFAULT ? end : Math.max(getEndTime(), end));
                 }
                 synchingToTime(getTimeGraphViewer().getSelectionBegin());
                 refresh();

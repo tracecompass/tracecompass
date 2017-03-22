@@ -636,7 +636,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
             final TraceEntry traceEntry = aTraceEntry;
 
             final long resolution = Math.max(1, (end - ssq.getStartTime()) / getDisplayWidth());
-            setEndTime(Math.max(getEndTime(), end + 1));
+            setEndTime(Math.max(getEndTime(), end));
             final List<Integer> threadQuarks = ssq.getQuarks(Attributes.THREADS, "*"); //$NON-NLS-1$
             queryFullStates(ssq, start, end, resolution, monitor, new IQueryHandler() {
                 @Override

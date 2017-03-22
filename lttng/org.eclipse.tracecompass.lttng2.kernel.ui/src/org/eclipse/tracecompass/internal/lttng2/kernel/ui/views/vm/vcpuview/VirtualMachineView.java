@@ -162,11 +162,12 @@ public class VirtualMachineView extends AbstractTimeGraphView {
                 return;
             }
 
-            long endTime = ssq.getCurrentEndTime() + 1;
+            long currentEndTime = ssq.getCurrentEndTime();
+            long endTime = currentEndTime + 1;
             groupEntry.updateEndTime(endTime);
 
             setStartTime(Math.min(getStartTime(), startTime));
-            setEndTime(Math.max(getEndTime(), endTime));
+            setEndTime(Math.max(getEndTime(), currentEndTime));
 
             /*
              * Create the entries for the VMs in this experiment and their
