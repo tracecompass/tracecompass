@@ -125,7 +125,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                     getTimeGraphViewer().setMarkers(markers);
                 });
             } else {
-                LOGGER.info(() -> "[TimeGraphView:ZoomThreadCanceled]"); //$NON-NLS-1$
+                TraceCompassLogUtils.traceInstant(LOGGER, Level.FINE, "TimeGraphView:ZoomThreadCanceled"); //$NON-NLS-1$
             }
         }
 
@@ -151,7 +151,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             queryFullStates(ss, start, end, resolution, monitor, new IQueryHandler() {
                 @Override
                 public void handle(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) {
-                    try (TraceCompassLogUtils.ScopeLog scope = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.CONFIG, "ZoomThread:GettingStates");) { //$NON-NLS-1$
+                    try (TraceCompassLogUtils.ScopeLog scope = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStates");) { //$NON-NLS-1$
                         if (!fullRange) {
                             for (TimeGraphEntry entry : entryList) {
                                 zoom(checkNotNull(entry), ss, fullStates, prevFullState, monitor);
@@ -159,11 +159,11 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                         }
                     }
                     /* Refresh the arrows when zooming */
-                    try (TraceCompassLogUtils.ScopeLog linksLogger = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.CONFIG, "ZoomThread:GettingLinks")) { //$NON-NLS-1$
+                    try (TraceCompassLogUtils.ScopeLog linksLogger = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingLinks")) { //$NON-NLS-1$
                         links.addAll(getLinkList(ss, fullStates, prevFullState, monitor));
                     }
                     /* Refresh the view-specific markers when zooming */
-                    try (TraceCompassLogUtils.ScopeLog linksLogger = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.CONFIG, "ZoomThread:GettingMarkers")) { //$NON-NLS-1$
+                    try (TraceCompassLogUtils.ScopeLog linksLogger = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingMarkers")) { //$NON-NLS-1$
                         markers.addAll(getViewMarkerList(ss, fullStates, prevFullState, monitor));
                     }
                 }
@@ -185,7 +185,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             }
             for (TimeGraphEntry child : entry.getChildren()) {
                 if (monitor.isCanceled()) {
-                    LOGGER.info(() -> "[TimeGraphView:ZoomThreadCanceled]"); //$NON-NLS-1$
+                    TraceCompassLogUtils.traceInstant(LOGGER, Level.FINE, "TimeGraphView:ZoomThreadCanceled"); //$NON-NLS-1$
                     return;
                 }
                 zoom(child, ss, fullStates, prevFullState, monitor);

@@ -85,11 +85,11 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
-import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerConfigXmlParser;
-import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
+import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerConfigXmlParser;
+import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.markers.MarkerUtils;
 import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
@@ -160,8 +160,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private static final Pattern RGBA_PATTERN = Pattern.compile("RGBA \\{(\\d+), (\\d+), (\\d+), (\\d+)\\}"); //$NON-NLS-1$
 
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(AbstractTimeGraphView.class);
-    private static final String LOG_STRING_WITH_PARAM = "[TimeGraphView:%s] viewId=%s, %s"; //$NON-NLS-1$
-    private static final String LOG_STRING = "[TimeGraphView:%s] viewId=%s"; //$NON-NLS-1$
 
     /**
      * Redraw state enum
@@ -360,14 +358,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private class BuildRunnable {
         private final @NonNull ITmfTrace fBuildTrace;
         private final @NonNull ITmfTrace fParentTrace;
+        private final @NonNull FlowScopeLog fScope;
 
-        public BuildRunnable(final @NonNull ITmfTrace trace, final @NonNull ITmfTrace parentTrace) {
+        public BuildRunnable(final @NonNull ITmfTrace trace, final @NonNull ITmfTrace parentTrace, final @NonNull FlowScopeLog log) {
             fBuildTrace = trace;
             fParentTrace = parentTrace;
+            fScope = log;
         }
 
         public void run(IProgressMonitor monitor) {
-            try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.INFO, "TimeGraphView:BuildThread", "trace", fBuildTrace.getName())) { //$NON-NLS-1$ //$NON-NLS-2$
+            try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TimeGraphView:BuildThread", "trace", fBuildTrace.getName()).setParentScope(fScope).build()) { //$NON-NLS-1$ //$NON-NLS-2$
                 buildEntryList(fBuildTrace, fParentTrace, NonNullUtils.checkNotNull(monitor));
                 synchronized (fBuildJobMap) {
                     fBuildJobMap.remove(fBuildTrace);
@@ -385,6 +385,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         private final long fZoomStartTime;
         private final long fZoomEndTime;
         private final long fResolution;
+        private int fScopeId = -1;
         private final @NonNull IProgressMonitor fMonitor;
 
         /**
@@ -442,7 +443,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         @Override
         public final void run() {
-            try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.INFO, "TimeGraphView:ZoomThread", "start", fZoomStartTime, "end", fZoomEndTime)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TimeGraphView:ZoomThread", "start", fZoomStartTime, "end", fZoomEndTime).setCategoryAndId(getViewId(), fScopeId).build()) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 doRun();
                 fDirty.decrementAndGet();
             }
@@ -472,6 +473,19 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
          * @since 2.0
          */
         public abstract void doRun();
+
+        /**
+         * Set the ID of the calling flow scope. This data will allow to
+         * determine the causality between the zoom thread and its caller if
+         * tracing is enabled.
+         *
+         * @param scopeId
+         *            The ID of the calling flow scope
+         * @since 2.4
+         */
+        public void setScopeId(int scopeId) {
+            fScopeId = scopeId;
+        }
     }
 
     private class ZoomThreadByEntry extends ZoomThread {
@@ -484,7 +498,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         @Override
         public void doRun() {
-            try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.CONFIG, "ZoomThread:GettingStates")) { //$NON-NLS-1$
+            try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStates")) { //$NON-NLS-1$
                 for (TimeGraphEntry entry : fZoomEntryList) {
                     if (getMonitor().isCanceled()) {
                         log.addData("canceled", true); //$NON-NLS-1$
@@ -497,12 +511,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 }
             }
             List<ILinkEvent> events;
-            try (TraceCompassLogUtils.ScopeLog linkLog = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.CONFIG, "ZoomThread:GettingLinks")) { //$NON-NLS-1$
+            try (TraceCompassLogUtils.ScopeLog linkLog = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingLinks")) { //$NON-NLS-1$
                 /* Refresh the arrows when zooming */
                 events = getLinkList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
             }
             /* Refresh the view-specific markers when zooming */
-            try (TraceCompassLogUtils.ScopeLog markerLoglog = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.CONFIG, "ZoomThread:GettingMarkers")) { //$NON-NLS-1$
+            try (TraceCompassLogUtils.ScopeLog markerLoglog = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingMarkers")) { //$NON-NLS-1$
                 List<IMarkerEvent> markers = new ArrayList<>(getViewMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
                 /* Refresh the trace-specific markers when zooming */
                 markers.addAll(getTraceMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
@@ -923,25 +937,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         return fFindTarget;
     }
 
-    /**
-     * Formats a log message for this class
-     *
-     * @param event
-     *            The event to log, that will be appended to the class name to
-     *            make the full event name
-     * @param parameters
-     *            The string of extra parameters to add to the log message, in
-     *            the format name=value[, name=value]*, or <code>null</code> for
-     *            no params
-     * @return The complete log message for this class
-     */
-    private String getLogMessage(String event, @Nullable String parameters) {
-        if (parameters == null) {
-            return String.format(LOG_STRING, event, getViewId());
-        }
-        return String.format(LOG_STRING_WITH_PARAM, event, getViewId(), parameters);
-    }
-
     // ------------------------------------------------------------------------
     // ViewPart
     // ------------------------------------------------------------------------
@@ -1277,7 +1272,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
         fTrace = trace;
 
-        LOGGER.info(() -> getLogMessage("LoadingTrace", "trace=" + trace.getName())); //$NON-NLS-1$ //$NON-NLS-2$
+        TraceCompassLogUtils.traceInstant(LOGGER, Level.FINE, "TimeGraphView:LoadingTrace", "trace", trace.getName(), "viewId", getViewId());  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
 
         restoreViewContext();
         fEditorFile = TmfTraceManager.getInstance().getTraceEditorFile(trace);
@@ -1298,37 +1293,39 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * this trace
      */
     protected void rebuild() {
-        setStartTime(Long.MAX_VALUE);
-        setEndTime(Long.MIN_VALUE);
-        refresh();
-        ITmfTrace viewTrace = fTrace;
-        if (viewTrace == null) {
-            return;
-        }
-        resetView(viewTrace);
-
-        List<IMarkerEventSource> markerEventSources = new ArrayList<>();
-        synchronized (fBuildJobMap) {
-            for (ITmfTrace trace : getTracesToBuild(viewTrace)) {
-                if (trace == null) {
-                    break;
-                }
-                List<@NonNull IMarkerEventSource> adapters = TmfTraceAdapterManager.getAdapters(trace, IMarkerEventSource.class);
-                markerEventSources.addAll(adapters);
-
-                Job buildJob = new Job(getTitle() + Messages.AbstractTimeGraphView_BuildJob) {
-                    @Override
-                    protected IStatus run(IProgressMonitor monitor) {
-                        new BuildRunnable(trace, viewTrace).run(monitor);
-                        monitor.done();
-                        return Status.OK_STATUS;
-                    }
-                };
-                fBuildJobMap.put(trace, buildJob);
-                buildJob.schedule();
+        try (FlowScopeLog parentLogger = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TimeGraphView:Rebuilding").setCategory(getViewId()).build()) { //$NON-NLS-1$
+            setStartTime(Long.MAX_VALUE);
+            setEndTime(Long.MIN_VALUE);
+            refresh();
+            ITmfTrace viewTrace = fTrace;
+            if (viewTrace == null) {
+                return;
             }
+            resetView(viewTrace);
+
+            List<IMarkerEventSource> markerEventSources = new ArrayList<>();
+            synchronized (fBuildJobMap) {
+                for (ITmfTrace trace : getTracesToBuild(viewTrace)) {
+                    if (trace == null) {
+                        break;
+                    }
+                    List<@NonNull IMarkerEventSource> adapters = TmfTraceAdapterManager.getAdapters(trace, IMarkerEventSource.class);
+                    markerEventSources.addAll(adapters);
+
+                    Job buildJob = new Job(getTitle() + Messages.AbstractTimeGraphView_BuildJob) {
+                        @Override
+                        protected IStatus run(IProgressMonitor monitor) {
+                            new BuildRunnable(trace, viewTrace, parentLogger).run(monitor);
+                            monitor.done();
+                            return Status.OK_STATUS;
+                        }
+                    };
+                    fBuildJobMap.put(trace, buildJob);
+                    buildJob.schedule();
+                }
+            }
+            fMarkerEventSourcesMap.put(viewTrace, markerEventSources);
         }
-        fMarkerEventSourcesMap.put(viewTrace, markerEventSources);
     }
 
     /**
@@ -1527,12 +1524,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * Refresh the display
      */
     protected void refresh() {
-        try (FlowScopeLog parentLogger = new FlowScopeLogBuilder(LOGGER, Level.INFO, "RefreshRequested").setCategory(getViewId()).build()) { //$NON-NLS-1$
+        try (FlowScopeLog parentLogger = new FlowScopeLogBuilder(LOGGER, Level.FINE, "RefreshRequested").setCategory(getViewId()).build()) { //$NON-NLS-1$
             final boolean zoomThread = Thread.currentThread() instanceof ZoomThread;
             TmfUiRefreshHandler.getInstance().queueUpdate(this, new Runnable() {
                 @Override
                 public void run() {
-                    try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.INFO, "TimeGraphView:Refresh").setParentScope(parentLogger).build()) { //$NON-NLS-1$
+                    try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TimeGraphView:Refresh").setParentScope(parentLogger).build()) { //$NON-NLS-1$
                         if (fTimeGraphViewer.getControl().isDisposed()) {
                             return;
                         }
@@ -1610,11 +1607,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 return;
             }
         }
-        try (FlowScopeLog flowParent = new FlowScopeLogBuilder(LOGGER, Level.INFO, "RedrawRequested").setCategory(getViewId()).build()) { //$NON-NLS-1$
+        try (FlowScopeLog flowParent = new FlowScopeLogBuilder(LOGGER, Level.FINE, "RedrawRequested").setCategory(getViewId()).build()) { //$NON-NLS-1$
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.INFO, "TimeGraphView:Redraw").setParentScope(flowParent).build()) { //$NON-NLS-1$
+                    try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TimeGraphView:Redraw").setParentScope(flowParent).build()) { //$NON-NLS-1$
                         if (fTimeGraphViewer.getControl().isDisposed()) {
                             return;
                         }
@@ -1653,27 +1650,33 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @since 2.0
      */
     protected final void startZoomThread(long startTime, long endTime) {
-        long clampedStartTime = (fStartTime == Long.MAX_VALUE ? startTime : Math.min(Math.max(startTime, fStartTime), fEndTime));
-        long clampedEndTime = (fEndTime == Long.MIN_VALUE ? endTime : Math.max(Math.min(endTime, fEndTime), fStartTime));
-        fDirty.incrementAndGet();
-        boolean restart = false;
-        if (fZoomThread != null) {
-            fZoomThread.cancel();
-            if (fZoomThread.fZoomStartTime == clampedStartTime && fZoomThread.fZoomEndTime == clampedEndTime) {
-                restart = true;
+        try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TimeGraphView:ZoomThreadCreated").setCategory(getViewId()).build()) { //$NON-NLS-1$
+            long clampedStartTime = (fStartTime == Long.MAX_VALUE ? startTime : Math.min(Math.max(startTime, fStartTime), fEndTime));
+            long clampedEndTime = (fEndTime == Long.MIN_VALUE ? endTime : Math.max(Math.min(endTime, fEndTime), fStartTime));
+            fDirty.incrementAndGet();
+            boolean restart = false;
+            ZoomThread zoomThread = fZoomThread;
+            if (zoomThread != null) {
+                zoomThread.cancel();
+                if (zoomThread.fZoomStartTime == clampedStartTime && zoomThread.fZoomEndTime == clampedEndTime) {
+                    restart = true;
+                }
             }
-        }
-        long resolution = Math.max(1, (clampedEndTime - clampedStartTime) / fDisplayWidth);
-        fZoomThread = createZoomThread(clampedStartTime, clampedEndTime, resolution, restart);
-        if (fZoomThread != null) {
-            // Don't start a new thread right away if results are being applied
-            // from an old ZoomThread. Otherwise, the old results might
-            // overwrite the new results if it finishes after.
-            synchronized (fZoomThreadResultLock) {
-                fZoomThread.start();
+            long resolution = Math.max(1, (clampedEndTime - clampedStartTime) / fDisplayWidth);
+            zoomThread = createZoomThread(clampedStartTime, clampedEndTime, resolution, restart);
+            fZoomThread = zoomThread;
+            if (zoomThread != null) {
+                zoomThread.setScopeId(log.getId());
+                // Don't start a new thread right away if results are being
+                // applied
+                // from an old ZoomThread. Otherwise, the old results might
+                // overwrite the new results if it finishes after.
+                synchronized (fZoomThreadResultLock) {
+                    zoomThread.start();
+                }
+            } else {
+                fDirty.decrementAndGet();
             }
-        } else {
-            fDirty.decrementAndGet();
         }
     }
 

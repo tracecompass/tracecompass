@@ -225,6 +225,7 @@ public final class TraceCompassLogUtils {
         private final Level fLevel;
         private final String fLabel;
         private final Object[] fArgs;
+        private int fId = Integer.MIN_VALUE;
         private @Nullable String fCategory = null;
         private @Nullable FlowScopeLog fParent = null;
 
@@ -269,11 +270,34 @@ public final class TraceCompassLogUtils {
         }
 
         /**
+         * Set a category and ID for the flow scope. When building the scope
+         *
+         * This method is mutually exclusive with
+         * {@link #setParentScope(FlowScopeLog)}. Calling both will throw an
+         * exception.
+         *
+         * @param category
+         *            The category of this flow
+         * @param id
+         *            The ID of this flow
+         * @return This builder
+         */
+        public FlowScopeLogBuilder setCategoryAndId(String category, int id) {
+            if (fParent != null) {
+                throw new IllegalStateException("FlowScopeLogBuilder: Cannot set a category if a parent has already been set"); //$NON-NLS-1$
+            }
+            fCategory = category;
+            fId = id;
+            return this;
+        }
+
+        /**
          * Set a parent scope for the flow scope to build. The scope will have
          * the same category and ID as the parent scope.
          *
-         * This method is mutually exclusive with {@link #setCategory(String)}.
-         * Calling both will throw an exception.
+         * This method is mutually exclusive with {@link #setCategory(String)}
+         * and {@link #setCategoryAndId(String, int)}. Calling both will throw
+         * an exception.
          *
          * @param parent
          *            The parent scope
@@ -297,7 +321,7 @@ public final class TraceCompassLogUtils {
             if (parent != null) {
                 return new FlowScopeLog(fLogger, fLevel, fLabel, parent.fCategory, parent.fId, fArgs);
             }
-            return new FlowScopeLog(fLogger, fLevel, fLabel, String.valueOf(fCategory), ID_GENERATOR.incrementAndGet(), fArgs);
+            return new FlowScopeLog(fLogger, fLevel, fLabel, String.valueOf(fCategory), (fId == Integer.MIN_VALUE ? ID_GENERATOR.incrementAndGet() : fId), fArgs);
         }
 
     }
@@ -422,6 +446,16 @@ public final class TraceCompassLogUtils {
          */
         public void addData(String name, Object value) {
             fData.put(name, value);
+        }
+
+        /**
+         * Get the ID for this scope. The ID can be injected to other components
+         * that can use it for the scope loggers
+         *
+         * @return The ID of this scope
+         */
+        public int getId() {
+            return fId;
         }
 
         @Override
