@@ -24,6 +24,7 @@ import java.util.logging.StreamHandler;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -206,13 +207,13 @@ public class LoggerTest {
     public void testFlowFiltered() {
         Logger logger = fLogger;
         assertNotNull(logger);
-        try (FlowScopeLog log = new FlowScopeLog(logger, Level.FINE, "foo", "mycat")) {
+        try (FlowScopeLog log = new FlowScopeLogBuilder(logger, Level.FINE, "foo").setCategory("mycat").build()) {
             // do something
             new Object();
-            try (FlowScopeLog log1 = new FlowScopeLog(logger, Level.FINER, "bar", log)) {
+            try (FlowScopeLog log1 = new FlowScopeLogBuilder(logger, Level.FINER, "bar", "big", "ben").setParentScope(log).build()) {
                 // do something
                 new Object();
-                try (FlowScopeLog log2 = new FlowScopeLog(logger, Level.FINEST, "baz", log1)) {
+                try (FlowScopeLog log2 = new FlowScopeLogBuilder(logger, Level.FINEST, "baz").setParentScope(log1).build()) {
                     // do something
                     new Object();
                 }
@@ -220,7 +221,7 @@ public class LoggerTest {
         }
         fStreamHandler.flush();
         assertEquals("FINE: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"name\":\"foo\",\"cat\":\"mycat\",\"id\":\"0x1234\"}", fLog.getMessages().get(0));
-        assertEquals("FINER: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"name\":\"bar\",\"cat\":\"mycat\",\"id\":\"0x1234\"}", fLog.getMessages().get(1));
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"name\":\"bar\",\"cat\":\"mycat\",\"id\":\"0x1234\",\"args\":{\"big\":\"ben\"}}", fLog.getMessages().get(1));
         assertEquals("FINER: {\"ts\":0,\"ph\":\"f\",\"tid\":1,\"cat\":\"mycat\",\"id\":\"0x1234\"}", fLog.getMessages().get(2));
         assertEquals("FINE: {\"ts\":0,\"ph\":\"f\",\"tid\":1,\"cat\":\"mycat\",\"id\":\"0x1234\"}", fLog.getMessages().get(3));
     }
@@ -232,8 +233,8 @@ public class LoggerTest {
     public void testFlowLogLevels() {
         Logger logger = fLogger;
         assertNotNull(logger);
-        try (FlowScopeLog log = new FlowScopeLog(logger, Level.WARNING, "foo", "mydog")) {
-            try (FlowScopeLog log1 = new FlowScopeLog(logger, Level.FINE, "bar", log)) {
+        try (FlowScopeLog log = new FlowScopeLogBuilder(logger, Level.WARNING, "foo").setCategory("mydog").build()) {
+            try (FlowScopeLog log1 = new FlowScopeLogBuilder(logger, Level.FINE, "bar").setParentScope(log).build()) {
                 log1.step("barked");
                 new Object();
             }
@@ -254,8 +255,8 @@ public class LoggerTest {
     public void testFlowWithData() {
         Logger logger = fLogger;
         assertNotNull(logger);
-        try (FlowScopeLog log = new FlowScopeLog(logger, Level.WARNING, "foo", "myspider")) {
-            try (FlowScopeLog log1 = new FlowScopeLog(logger, Level.FINE, "bar", log)) {
+        try (FlowScopeLog log = new FlowScopeLogBuilder(logger, Level.WARNING, "foo").setCategory("myspider").build()) {
+            try (FlowScopeLog log1 = new FlowScopeLogBuilder(logger, Level.FINE, "bar").setParentScope(log).build()) {
                 // do something
                 log1.addData("return", false);
             }
@@ -266,6 +267,58 @@ public class LoggerTest {
         assertEquals("FINE: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"name\":\"bar\",\"cat\":\"myspider\",\"id\":\"0x1234\"}", fLog.getMessages().get(1));
         assertEquals("FINE: {\"ts\":0,\"ph\":\"f\",\"tid\":1,\"cat\":\"myspider\",\"id\":\"0x1234\",\"args\":{\"return\":\"false\"}}", fLog.getMessages().get(2));
         assertEquals("WARNING: {\"ts\":0,\"ph\":\"f\",\"tid\":1,\"cat\":\"myspider\",\"id\":\"0x1234\"}", fLog.getMessages().get(3));
+    }
+
+    /**
+     * Test the flow scope builder without calling any other method than the
+     * constructor
+     */
+    @Test
+    public void testFlowBuilderNoExtra() {
+        Logger logger = fLogger;
+        assertNotNull(logger);
+        try (FlowScopeLog log = new FlowScopeLogBuilder(logger, Level.WARNING, "foo").build()) {
+            // do something
+            new Object();
+        }
+        fStreamHandler.flush();
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"name\":\"foo\",\"cat\":\"null\",\"id\":\"0x1234\"}",
+                fLog.getMessages().get(0));
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"f\",\"tid\":1,\"cat\":\"null\",\"id\":\"0x1234\"}", fLog.getMessages().get(1));
+    }
+
+    /**
+     * Test the flow scope builder calling
+     * {@link FlowScopeLogBuilder#setParentScope(FlowScopeLog)}, then
+     * {@link FlowScopeLogBuilder#setCategory(String)}.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void testFlowBuilderCatThenParent() {
+        Logger logger = fLogger;
+        assertNotNull(logger);
+        try (FlowScopeLog log = new FlowScopeLogBuilder(logger, Level.WARNING, "foo").setCategory("myspider").build()) {
+            try (FlowScopeLog log1 = new FlowScopeLogBuilder(logger, Level.FINE, "bar").setParentScope(log).setCategory("myspider").build()) {
+                // do something
+                new Object();
+            }
+        }
+    }
+
+    /**
+     * Test the flow scope builder calling
+     * {@link FlowScopeLogBuilder#setParentScope(FlowScopeLog)}, then
+     * {@link FlowScopeLogBuilder#setCategory(String)}.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void testFlowBuilderParentThenCat() {
+        Logger logger = fLogger;
+        assertNotNull(logger);
+        try (FlowScopeLog log = new FlowScopeLogBuilder(logger, Level.WARNING, "foo").setCategory("myspider").build()) {
+            try (FlowScopeLog log1 = new FlowScopeLogBuilder(logger, Level.FINE, "bar").setCategory("myspider").setParentScope(log).build()) {
+                // do something
+                new Object();
+            }
+        }
     }
 
     /**

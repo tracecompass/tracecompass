@@ -89,6 +89,7 @@ import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerConfigXmlParser;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.markers.MarkerUtils;
 import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
@@ -1526,12 +1527,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * Refresh the display
      */
     protected void refresh() {
-        try (FlowScopeLog parentLogger = new FlowScopeLog(LOGGER, Level.INFO, "RefreshRequested", getViewId())) { //$NON-NLS-1$
+        try (FlowScopeLog parentLogger = new FlowScopeLogBuilder(LOGGER, Level.INFO, "RefreshRequested").setCategory(getViewId()).build()) { //$NON-NLS-1$
             final boolean zoomThread = Thread.currentThread() instanceof ZoomThread;
             TmfUiRefreshHandler.getInstance().queueUpdate(this, new Runnable() {
                 @Override
                 public void run() {
-                    try (FlowScopeLog log = new FlowScopeLog(LOGGER, Level.INFO, "TimeGraphView:Refresh", parentLogger)) { //$NON-NLS-1$
+                    try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.INFO, "TimeGraphView:Refresh").setParentScope(parentLogger).build()) { //$NON-NLS-1$
                         if (fTimeGraphViewer.getControl().isDisposed()) {
                             return;
                         }
@@ -1609,11 +1610,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 return;
             }
         }
-        try (FlowScopeLog flowParent = new FlowScopeLog(LOGGER, Level.INFO, "RedrawRequested", getViewId())) { //$NON-NLS-1$
+        try (FlowScopeLog flowParent = new FlowScopeLogBuilder(LOGGER, Level.INFO, "RedrawRequested").setCategory(getViewId()).build()) { //$NON-NLS-1$
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    try (FlowScopeLog log = new FlowScopeLog(LOGGER, Level.INFO, "TimeGraphView:Redraw", flowParent)) { //$NON-NLS-1$
+                    try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.INFO, "TimeGraphView:Redraw").setParentScope(flowParent).build()) { //$NON-NLS-1$
                         if (fTimeGraphViewer.getControl().isDisposed()) {
                             return;
                         }

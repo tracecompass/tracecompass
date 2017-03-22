@@ -208,6 +208,96 @@ public final class TraceCompassLogUtils {
     }
 
     /**
+     * Builder class for the {@link FlowScopeLog}. One can either set a category
+     * or a parent scope before building the flow scope log. If none is set, a
+     * default category called "null" will be used.
+     *
+     * @author Geneviève Bastien
+     */
+    public static class FlowScopeLogBuilder {
+
+        private final Logger fLogger;
+        private final Level fLevel;
+        private final String fLabel;
+        private final Object[] fArgs;
+        private @Nullable String fCategory = null;
+        private @Nullable FlowScopeLog fParent = null;
+
+        /**
+         * Flow scope log builder constructor
+         *
+         * @param logger
+         *            the JUL logger
+         * @param level
+         *            the log level see {@link Level}
+         * @param label
+         *            The label of the event pair
+         * @param args
+         *            the messages to pass, should be in pairs key, value, key2,
+         *            value2.... typically arguments
+         */
+        public FlowScopeLogBuilder(Logger logger, Level level, String label, Object... args) {
+            fLogger = logger;
+            fLevel = level;
+            fLabel = label;
+            fArgs = args;
+        }
+
+        /**
+         * Set a category for the flow scope. When building the scope, an ID
+         * will be automatically generated.
+         *
+         * This method is mutually exclusive with
+         * {@link #setParentScope(FlowScopeLog)}. Calling both will throw an
+         * exception.
+         *
+         * @param category
+         *            The category of this flow
+         * @return This builder
+         */
+        public FlowScopeLogBuilder setCategory(String category) {
+            if (fParent != null) {
+                throw new IllegalStateException("FlowScopeLogBuilder: Cannot set a category if a parent has already been set"); //$NON-NLS-1$
+            }
+            fCategory = category;
+            return this;
+        }
+
+        /**
+         * Set a parent scope for the flow scope to build. The scope will have
+         * the same category and ID as the parent scope.
+         *
+         * This method is mutually exclusive with {@link #setCategory(String)}.
+         * Calling both will throw an exception.
+         *
+         * @param parent
+         *            The parent scope
+         * @return This builder
+         */
+        public FlowScopeLogBuilder setParentScope(FlowScopeLog parent) {
+            if (fCategory != null) {
+                throw new IllegalStateException("FlowScopeLogBuilder: Cannot set a parent scope if a category has already been set"); //$NON-NLS-1$
+            }
+            fParent = parent;
+            return this;
+        }
+
+        /**
+         * Build the flow scope log
+         *
+         * @return The flow scope log
+         */
+        public FlowScopeLog build() {
+            FlowScopeLog parent = fParent;
+            if (parent != null) {
+                return new FlowScopeLog(fLogger, fLevel, fLabel, parent.fCategory, parent.fId, fArgs);
+            }
+            return new FlowScopeLog(fLogger, fLevel, fLabel, String.valueOf(fCategory), ID_GENERATOR.incrementAndGet(), fArgs);
+        }
+
+    }
+
+    /**
      * Flow Scope Logger helper. It will automatically log entry and exit of the
      * scope. It can be used with other flow scopes to follow the program flow
      * across threads. To do so, these scopes save more data, so take more disk
@@ -240,9 +330,6 @@ public final class TraceCompassLogUtils {
      *  INFO: {"ts":12416","ph":"t",tid:0,"name":"updating ui", "cat":"category", "id":256}
      *  INFO: {"ts":"12420,"ph":"f","tid":0,"cat":"category", "id":256}
      * </pre>
-     *
-     * TODO The 2 public constructors with the extra arguments are easy to
-     * misuse. Use a builder to really differentiate the 2.
      */
     public static class FlowScopeLog implements AutoCloseable {
 
@@ -288,48 +375,6 @@ public final class TraceCompassLogUtils {
                 sb.append('}');
                 return sb.toString();
             }));
-        }
-
-        /**
-         * Flow scope logger constructor. This will auto-generate an ID for this
-         * scope. This ID will be used in enclosed flow by passing this flow to
-         * the constructor.
-         *
-         * @param log
-         *            the JUL logger
-         * @param level
-         *            the log level see {@link Level}
-         * @param label
-         *            The label of the event pair
-         * @param category
-         *            the category of the flow events
-         * @param args
-         *            Additional messages to pass for this scope, should be in
-         *            pairs key, value, key2, value2.... typically arguments.
-         *            Note that these arguments will be logged only at the
-         *            beginning of the scope
-         */
-        public FlowScopeLog(Logger log, Level level, String label, String category, Object... args) {
-            this(log, level, label, category, ID_GENERATOR.incrementAndGet(), args);
-        }
-
-        /**
-         * Flow scope logger constructor, with a parent scope.
-         *
-         * @param log
-         *            the JUL logger
-         * @param level
-         *            the log level see {@link Level}
-         * @param label
-         *            The label of the event pair
-         * @param parent
-         *            The parent Flow Scope that will be used to retrieve the ID
-         * @param args
-         *            the messages to pass, should be in pairs key, value, key2,
-         *            value2.... typically arguments
-         */
-        public FlowScopeLog(Logger log, Level level, String label, FlowScopeLog parent, Object... args) {
-            this(log, level, label, parent.fCategory, parent.fId, args);
         }
 
         /**
