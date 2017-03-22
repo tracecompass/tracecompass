@@ -119,9 +119,8 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     private int fDragX = 0;
     private long fTime0bak;
     private long fTime1bak;
-    private boolean fIsInUpdate;
     private int fHeight;
-    private List<Integer> fTickList = new ArrayList<>();
+    private int fDigitWidth;
 
     /**
      * Standard constructor
@@ -140,6 +139,9 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         addDisposeListener((e) -> {
             TmfSignalManager.deregister(TimeGraphScale.this);
         });
+        GC gc = new GC(parent.getDisplay());
+        fDigitWidth = gc.getCharWidth('0');
+        gc.dispose();
     }
 
     /**
@@ -201,13 +203,94 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     }
 
     /**
+     * Get the list of visible tick times of the time axis.
+     *
+     * @return the list of visible tick times
+     */
+    private List<Long> getTickTimeList() {
+        List<Long> tickTimeList = new ArrayList<>();
+        if (fTimeProvider == null) {
+            return tickTimeList;
+        }
+        long time0 = fTimeProvider.getTime0();
+        long time1 = fTimeProvider.getTime1();
+        int timeSpace = fTimeProvider.getTimeSpace();
+        if (time1 <= time0 || timeSpace < 2) {
+            return tickTimeList;
+        }
+        int numDigits = calculateDigits(time0, time1);
+
+        int labelWidth = fDigitWidth * numDigits;
+        double pixelsPerNanoSec = (timeSpace <= RIGHT_MARGIN) ? 0 :
+                (double) (timeSpace - RIGHT_MARGIN) / (time1 - time0);
+        long timeDelta = calcTimeDelta(labelWidth, pixelsPerNanoSec);
+        long time;
+        if (fTimeProvider != null && fTimeProvider.getTimeFormat() == TimeFormat.CALENDAR) {
+            time = floorToCalendar(time0, timeDelta);
+        } else {
+            time = (time0 / timeDelta) * timeDelta;
+        }
+        while (time <= time1) {
+            if (time >= time0) {
+                tickTimeList.add(time);
+            }
+            if (pixelsPerNanoSec == 0 || time > Long.MAX_VALUE - timeDelta || timeDelta == 0) {
+                break;
+            }
+            if (fTimeProvider != null && fTimeProvider.getTimeFormat() == TimeFormat.CALENDAR) {
+                if (timeDelta >= YEAR_IN_NS) {
+                    long millis = time / MILLISEC_IN_NS;
+                    GREGORIAN_CALENDAR.setTime(new Date(millis));
+                    GREGORIAN_CALENDAR.add(Calendar.YEAR, (int) (timeDelta / YEAR_IN_NS));
+                    millis = GREGORIAN_CALENDAR.getTimeInMillis();
+                    time = millis * MILLISEC_IN_NS;
+                } else if (timeDelta >= MONTH_IN_NS) {
+                    long millis = time / MILLISEC_IN_NS;
+                    GREGORIAN_CALENDAR.setTime(new Date(millis));
+                    GREGORIAN_CALENDAR.add(Calendar.MONTH, (int) (timeDelta / MONTH_IN_NS));
+                    millis = GREGORIAN_CALENDAR.getTimeInMillis();
+                    time = millis * MILLISEC_IN_NS;
+                } else if (timeDelta >= DAY_IN_NS) {
+                    long millis = time / MILLISEC_IN_NS;
+                    GREGORIAN_CALENDAR.setTime(new Date(millis));
+                    GREGORIAN_CALENDAR.add(Calendar.DAY_OF_MONTH, (int) (timeDelta / DAY_IN_NS));
+                    millis = GREGORIAN_CALENDAR.getTimeInMillis();
+                    time = millis * MILLISEC_IN_NS;
+                } else {
+                    time += timeDelta;
+                }
+            } else {
+                time += timeDelta;
+            }
+        }
+        return tickTimeList;
+    }
+
+    /**
      * Get the list of visible ticks of the time axis.
      *
      * @return the list of visible tick x-coordinates
      * @since 2.0
      */
     public List<Integer> getTickList() {
-        return fTickList;
+        double pixelsPerNanoSec = calcPixelsPerNanoSec();
+        long time0 = fTimeProvider.getTime0();
+        int namespace = fTimeProvider.getNameSpace();
+        List<Long> tickTimeList = getTickTimeList();
+        List<Integer> tickList = new ArrayList<>(tickTimeList.size());
+        for (long time : tickTimeList) {
+            int x = (int) (Math.floor((time - time0) * pixelsPerNanoSec));
+            tickList.add(namespace + x);
+        }
+        return tickList;
+    }
+
+    private double calcPixelsPerNanoSec() {
+        long time0 = fTimeProvider.getTime0();
+        long time1 = fTimeProvider.getTime1();
+        int timeSpace = fTimeProvider.getTimeSpace();
+        return (timeSpace <= RIGHT_MARGIN) ? 0 :
+            (double) (timeSpace - RIGHT_MARGIN) / (time1 - time0);
     }
 
     private long calcTimeDelta(int width, double pixelsPerNanoSec) {
@@ -307,7 +390,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     @Override
     void paint(Rectangle rect, PaintEvent e) {
 
-        if (fIsInUpdate || null == fTimeProvider) {
+        if (fTimeProvider == null) {
             return;
         }
 
@@ -316,7 +399,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
 
         long time0 = fTimeProvider.getTime0();
         long time1 = fTimeProvider.getTime1();
-        int timeSpace = fTimeProvider.getTimeSpace();
 
         gc.setBackground(getColorScheme().getColor(TimeGraphColorScheme.TOOL_BACKGROUND));
         gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
@@ -329,16 +411,14 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         rect0.height--;
         gc.fillRectangle(rect0);
 
-        if (time1 <= time0 || timeSpace < 2) {
-            fTickList.clear();
+        if (time1 <= time0) {
             return;
         }
 
         int numDigits = calculateDigits(time0, time1);
 
-        int labelWidth = gc.getCharWidth('0') * numDigits;
-        double pixelsPerNanoSec = (timeSpace <= RIGHT_MARGIN) ? 0 :
-                (double) (timeSpace - RIGHT_MARGIN) / (time1 - time0);
+        int labelWidth = fDigitWidth * numDigits;
+        double pixelsPerNanoSec = calcPixelsPerNanoSec();
         long timeDelta = calcTimeDelta(labelWidth, pixelsPerNanoSec);
 
         TimeDraw timeDraw = getTimeDraw(timeDelta);
@@ -361,62 +441,16 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         rect0.height = rect.height - Y_OFFSET;
         rect0.width = labelWidth;
 
-        long time;
-        if (fTimeProvider != null && fTimeProvider.getTimeFormat() == TimeFormat.CALENDAR) {
-            time = floorToCalendar(time0, timeDelta);
-        } else {
-            time = (time0 / timeDelta) * timeDelta;
-            if (time != time0) {
-                time += timeDelta;
-            }
-        }
-
         int y = rect0.y + rect0.height;
 
-        List<Integer> tickList = new ArrayList<>();
-        while (true) {
+        for (final long time : getTickTimeList()) {
             int x = SaturatedArithmetic.add(rect.x, (int) (Math.floor((time - time0) * pixelsPerNanoSec)));
-            if (x >= rect.x + rect.width - rect0.width) {
-                break;
-            }
-            if (x >= rect.x) {
-                gc.drawLine(x, y, x, y + Y_OFFSET);
-                rect0.x = x;
-                if (x + rect0.width <= rect.x + rect.width) {
-                    timeDraw.draw(gc, time, rect0);
-                }
-                tickList.add(x + fTimeProvider.getNameSpace());
-            }
-            if (pixelsPerNanoSec == 0 || time > Long.MAX_VALUE - timeDelta || timeDelta == 0) {
-                break;
-            }
-            if (fTimeProvider != null && fTimeProvider.getTimeFormat() == TimeFormat.CALENDAR) {
-                if (timeDelta >= YEAR_IN_NS) {
-                    long millis = time / MILLISEC_IN_NS;
-                    GREGORIAN_CALENDAR.setTime(new Date(millis));
-                    GREGORIAN_CALENDAR.add(Calendar.YEAR, (int) (timeDelta / YEAR_IN_NS));
-                    millis = GREGORIAN_CALENDAR.getTimeInMillis();
-                    time = millis * MILLISEC_IN_NS;
-                } else if (timeDelta >= MONTH_IN_NS) {
-                    long millis = time / MILLISEC_IN_NS;
-                    GREGORIAN_CALENDAR.setTime(new Date(millis));
-                    GREGORIAN_CALENDAR.add(Calendar.MONTH, (int) (timeDelta / MONTH_IN_NS));
-                    millis = GREGORIAN_CALENDAR.getTimeInMillis();
-                    time = millis * MILLISEC_IN_NS;
-                } else if (timeDelta >= DAY_IN_NS) {
-                    long millis = time / MILLISEC_IN_NS;
-                    GREGORIAN_CALENDAR.setTime(new Date(millis));
-                    GREGORIAN_CALENDAR.add(Calendar.DAY_OF_MONTH, (int) (timeDelta / DAY_IN_NS));
-                    millis = GREGORIAN_CALENDAR.getTimeInMillis();
-                    time = millis * MILLISEC_IN_NS;
-                } else {
-                    time += timeDelta;
-                }
-            } else {
-                time += timeDelta;
+            gc.drawLine(x, y, x, y + Y_OFFSET);
+            rect0.x = x;
+            if (x + rect0.width <= rect.x + rect.width) {
+                timeDraw.draw(gc, time, rect0);
             }
         }
-        fTickList = tickList;
     }
 
     private static void drawRangeDecorators(Rectangle rect, GC gc, int x1, int x2) {
@@ -482,21 +516,24 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     }
 
     private int calculateDigits(long time0, long time1) {
-        int numDigits = 5;
+        int numDigits;
         long timeRange = time1 - time0;
         TimeFormat timeFormat = fTimeProvider.getTimeFormat();
 
         if (timeFormat == TimeFormat.CALENDAR) {
-            // Calculate the number of digits to represent the minutes provided
-            // 11:222
-            // HH:mm:ss
-            numDigits += 8;
-            if (timeRange < 10000) {
-                // HH:11:222:333:444__
-                numDigits += 10;
-            } else if (timeRange < 10000000) {
-                // HH:11:222:333__
-                numDigits += 6;
+            // Calculate the number of digits to represent the time provided
+            if (timeRange < 10000L) {
+                // HH:mm:ss.SSSSSSSSS
+                numDigits = 18;
+            } else if (timeRange < 10000000L) {
+                // HH:mm:ss.SSSSSS
+                numDigits = 15;
+            } else if (timeRange < 10000000000L) {
+                // HH:mm:ss.SSS
+                numDigits = 12;
+            } else {
+                // HH:mm:ss
+                numDigits = 8;
             }
         } else {
             long sec = time1 / SEC_IN_NS;
