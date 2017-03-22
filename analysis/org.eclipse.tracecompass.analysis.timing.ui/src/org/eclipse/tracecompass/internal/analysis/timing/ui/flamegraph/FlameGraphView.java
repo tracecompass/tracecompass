@@ -76,10 +76,35 @@ public class FlameGraphView extends TmfView {
     public static final String ID = FlameGraphView.class.getPackage().getName() + ".flamegraphView"; //$NON-NLS-1$
 
     private static final String SORT_OPTION_KEY = "sort.option"; //$NON-NLS-1$
+    private static final String CONTENT_PRESENTATION_OPTION_KEY = "presentation.option"; //$NON-NLS-1$
     private static final ImageDescriptor SORT_BY_NAME_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_alpha.gif"); //$NON-NLS-1$
     private static final ImageDescriptor SORT_BY_NAME_REV_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_alpha_rev.gif"); //$NON-NLS-1$
     private static final ImageDescriptor SORT_BY_ID_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_num.gif"); //$NON-NLS-1$
     private static final ImageDescriptor SORT_BY_ID_REV_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_num_rev.gif"); //$NON-NLS-1$
+
+    private final Action VIEW_BY_THREAD = new Action(Messages.FlameGraph_ShowPerThreads, IAction.AS_RADIO_BUTTON) {
+        @Override
+        public void run() {
+            if (fContentPresentation != ContentPresentation.BY_THREAD) {
+                buildFlameGraph(fFlamegraphModule);
+                fContentPresentation = ContentPresentation.BY_THREAD;
+                saveContentPresentationOption(fContentPresentation);
+            }
+        }
+    };
+
+    private final Action VIEW_AGGREGATE = new Action(Messages.FlameGraph_AggregateByThread, IAction.AS_RADIO_BUTTON) {
+        @Override
+        public void run() {
+            if (fContentPresentation != ContentPresentation.AGGREGATE_THREADS) {
+                buildFlameGraph(fFlamegraphModule);
+                fContentPresentation = ContentPresentation.AGGREGATE_THREADS;
+                saveContentPresentationOption(fContentPresentation);
+            }
+        }
+    };
+
+    private volatile ContentPresentation fContentPresentation = ContentPresentation.AGGREGATE_THREADS;
 
     private TimeGraphViewer fTimeGraphViewer;
 
@@ -100,6 +125,8 @@ public class FlameGraphView extends TmfView {
     private Action fSortByNameAction;
     private Action fSortByIdAction;
     private Job fJob;
+
+    private CallGraphAnalysis fFlamegraphModule = null;
 
     /**
      * Constructor
@@ -125,8 +152,21 @@ public class FlameGraphView extends TmfView {
         }
         contributeToActionBars();
         loadSortOption();
+        loadContentPresentationOption();
         TmfSignalManager.register(this);
         getSite().setSelectionProvider(fTimeGraphViewer.getSelectionProvider());
+        IMenuManager menuManager = getViewSite().getActionBars().getMenuManager();
+        MenuManager item = new MenuManager(Messages.FlameGraphView_ContentPresentation);
+        item.setRemoveAllWhenShown(true);
+        item.addMenuListener(new IMenuListener() {
+
+            @Override
+            public void menuAboutToShow(IMenuManager manager) {
+                item.add(VIEW_BY_THREAD);
+                item.add(VIEW_AGGREGATE);
+            }
+        });
+        menuManager.add(item);
         createTimeEventContextMenu();
         fTimeGraphViewer.getTimeGraphControl().addMouseListener(new MouseAdapter() {
             @Override
@@ -168,8 +208,8 @@ public class FlameGraphView extends TmfView {
     public void traceSelected(final TmfTraceSelectedSignal signal) {
         fTrace = signal.getTrace();
         if (fTrace != null) {
-            CallGraphAnalysis flamegraphModule = TmfTraceUtils.getAnalysisModuleOfClass(fTrace, CallGraphAnalysis.class, CallGraphAnalysisUI.ID);
-            buildFlameGraph(flamegraphModule);
+            fFlamegraphModule = TmfTraceUtils.getAnalysisModuleOfClass(fTrace, CallGraphAnalysis.class, CallGraphAnalysisUI.ID);
+            buildFlameGraph(fFlamegraphModule);
         }
     }
 
@@ -209,7 +249,7 @@ public class FlameGraphView extends TmfView {
             fLock.release();
             return;
         }
-        fTimeGraphViewer.setInput(callGraphAnalysis.getSegmentStore());
+        fTimeGraphViewer.setInput(fContentPresentation == ContentPresentation.BY_THREAD ? callGraphAnalysis.getThreadNodes() : callGraphAnalysis.getFlameGraph());
         callGraphAnalysis.schedule();
         job = new Job(Messages.CallGraphAnalysis_Execution) {
 
@@ -221,7 +261,7 @@ public class FlameGraphView extends TmfView {
                     }
                     callGraphAnalysis.waitForCompletion(monitor);
                     Display.getDefault().asyncExec(() -> {
-                        fTimeGraphViewer.setInput(callGraphAnalysis.getThreadNodes());
+                        fTimeGraphViewer.setInput(fContentPresentation == ContentPresentation.BY_THREAD ? callGraphAnalysis.getThreadNodes() : callGraphAnalysis.getFlameGraph());
                         fTimeGraphViewer.resetStartFinishTime();
                     });
                     return Status.OK_STATUS;
@@ -449,6 +489,30 @@ public class FlameGraphView extends TmfView {
             return;
         }
         setSortOption(SortOption.fromName(sortOption));
+    }
+
+    private void saveContentPresentationOption(ContentPresentation contentPresentation) {
+        IDialogSettings settings = Activator.getDefault().getDialogSettings();
+        IDialogSettings section = settings.getSection(getClass().getName());
+        if (section == null) {
+            section = settings.addNewSection(getClass().getName());
+        }
+        section.put(CONTENT_PRESENTATION_OPTION_KEY, contentPresentation.name());
+    }
+
+    private void loadContentPresentationOption() {
+        IDialogSettings settings = Activator.getDefault().getDialogSettings();
+        IDialogSettings section = settings.getSection(getClass().getName());
+        ContentPresentation contentPresentation = fContentPresentation;
+        if (section != null) {
+            String contentPresentationOption = section.get(CONTENT_PRESENTATION_OPTION_KEY);
+            if (contentPresentationOption != null) {
+                contentPresentation = ContentPresentation.fromName(contentPresentationOption);
+            }
+        }
+        VIEW_BY_THREAD.setChecked(contentPresentation == ContentPresentation.BY_THREAD);
+        VIEW_AGGREGATE.setChecked(contentPresentation == ContentPresentation.AGGREGATE_THREADS);
+        fContentPresentation = contentPresentation;
     }
 
     /**

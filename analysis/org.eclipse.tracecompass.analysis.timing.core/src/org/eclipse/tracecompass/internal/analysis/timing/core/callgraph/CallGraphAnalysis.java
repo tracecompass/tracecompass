@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -379,6 +380,21 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
      */
     public List<ICalledFunction> getRootFunctions() {
         return ImmutableList.copyOf(fRootFunctions);
+    }
+
+    /**
+     * Merged threadnodes
+     *
+     * @return the merged threadnodes
+     */
+    public Collection<ThreadNode> getFlameGraph() {
+        AbstractCalledFunction initSegment = CalledFunctionFactory.create(0, 0, 0, "", 0, null); //$NON-NLS-1$
+        ThreadNode init = new ThreadNode(initSegment, 0, 0);
+        fThreadNodes.forEach(
+                tn -> tn.getChildren().forEach(
+                        child -> init.addChild(initSegment, child)));
+        return Collections.singleton(init);
+
     }
 
     /**

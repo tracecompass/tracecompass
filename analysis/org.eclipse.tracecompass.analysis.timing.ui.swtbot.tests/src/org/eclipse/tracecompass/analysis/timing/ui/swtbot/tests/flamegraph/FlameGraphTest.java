@@ -236,7 +236,7 @@ public class FlameGraphTest extends AggregationTreeTest {
 
         SWTBotTimeGraph sbtg = new SWTBotTimeGraph(fView.bot());
         // Test the number of timegraph entries in the graph
-        SWTBotTimeGraphEntry sbtge = sbtg.getEntry("Thread");
+        SWTBotTimeGraphEntry sbtge = sbtg.getEntry("");
         assertEquals(3, sbtge.getEntries().length);
         SWTBotTimeGraphEntry actualEntry = sbtge.getEntry("1");
 

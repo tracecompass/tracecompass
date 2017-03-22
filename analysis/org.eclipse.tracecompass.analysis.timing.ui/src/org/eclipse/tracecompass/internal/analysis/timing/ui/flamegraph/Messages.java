@@ -78,6 +78,10 @@ public class Messages extends NLS {
      */
     public static String FlameGraph_SelfTimes;
     /**
+     * Content presentation - by thread or total
+     */
+    public static String FlameGraphView_ContentPresentation;
+    /**
      * Go to maximum duration
      */
     public static String FlameGraphView_GotoMaxDuration;
@@ -93,6 +97,14 @@ public class Messages extends NLS {
      * The action name for sorting by thread name
      */
     public static String FlameGraph_SortByThreadId;
+    /**
+     * The action name for showing flame graph per thread
+     */
+    public static String FlameGraph_ShowPerThreads;
+    /**
+     * The action name for aggregating flame graph per thread
+     */
+    public static String FlameGraph_AggregateByThread;
     /**
      * Execution of the callGraph Analysis
      */

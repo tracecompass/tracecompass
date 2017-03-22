@@ -2690,6 +2690,10 @@ recorded times in the trace. This is interesting to compare and contrast the two
 Hovering over a function will show a tooltip with the statistics on a per-function basis. One can see the total and self times
 (''worst-case'', ''best-case'', ''average'', ''total time'', ''standard deviation'', ''number of calls'') for that function.
 
+If one wishes to explore at a medium detail level between the "classic" flame graph view and the call stack view, a per-thread flame
+graph view is available by selection the coarser menu and clicking on '''Content Presentation''' then '''Per-thread'''. To return to
+the default mode, return to that menu and click on '''Aggregate Threads'''.
+
 === How to use a Flame Graph ===
 
 Observing the time spent in each function can show where most of the time is spent and where one could optimize.
