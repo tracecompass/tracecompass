@@ -134,9 +134,20 @@ public class CTFStreamInputPacketIndexTest {
     @Test
     public void testStreamInputPacketIndexInvalidAppend() {
         fFixture = new StreamInputPacketIndex();
-        assertTrue(fFixture.append(new PacketStub(0, 0, -1)));
-        assertFalse(fFixture.append(new PacketStub(0, 0, 0)));
-        assertFalse(fFixture.append(new PacketStub(0, -1, 0)));
+        assertTrue(fFixture.append(new PacketStub(0, 0, 1)));
+        assertFalse("Same offset", fFixture.append(new PacketStub(0, 1, 2)));
+        assertFalse("Before", fFixture.append(new PacketStub(1, -1, 0)));
+        assertFalse("Empty", fFixture.append(new PacketStub(2, 3, 4) {
+            @Override
+            public long getContentSizeBits() {
+                return 0;
+            }
+
+            @Override
+            public long getPayloadStartBits() {
+                return 0;
+            }
+        }));
     }
 
 }

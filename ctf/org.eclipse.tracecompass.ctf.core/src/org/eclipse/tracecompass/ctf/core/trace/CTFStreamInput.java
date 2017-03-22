@@ -228,8 +228,7 @@ public class CTFStreamInput implements IDefinitionScope {
             currentPosBits = pos.getOffsetBits() + pos.getPacketSizeBits();
         }
         if (currentPosBits < getStreamSizeBits()) {
-            fIndex.append(createPacketIndexEntry(currentPosBits));
-            return true;
+            return fIndex.append(createPacketIndexEntry(currentPosBits));
         }
         return false;
     }

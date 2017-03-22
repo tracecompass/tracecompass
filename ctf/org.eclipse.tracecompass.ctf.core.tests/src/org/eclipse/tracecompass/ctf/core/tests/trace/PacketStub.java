@@ -25,8 +25,8 @@ class PacketStub implements ICTFPacketDescriptor {
     private final long fTsStart;
     private final long fTsEnd;
 
-    public PacketStub(long offset, long start, long end) {
-        fOffsetBytes = offset;
+    public PacketStub(long packetNumber, long start, long end) {
+        fOffsetBytes = packetNumber * getPacketSizeBits();
         fTsStart = start;
         fTsEnd = end;
     }
@@ -43,12 +43,12 @@ class PacketStub implements ICTFPacketDescriptor {
 
     @Override
     public long getPacketSizeBits() {
-        return 0;
+        return 3;
     }
 
     @Override
     public long getContentSizeBits() {
-        return 0;
+        return 2;
     }
 
     @Override
@@ -88,7 +88,7 @@ class PacketStub implements ICTFPacketDescriptor {
 
     @Override
     public long getPayloadStartBits() {
-        return 0;
+        return 1;
     }
 
     @Override

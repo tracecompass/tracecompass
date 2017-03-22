@@ -299,12 +299,15 @@ public class CTFStreamInputReader implements AutoCloseable {
         /*
          * Change packet if needed
          */
-        if (!fPacketReader.hasMoreEvents()) {
+        while (!fPacketReader.hasMoreEvents()) {
             final ICTFPacketDescriptor prevPacket = fPacketReader.getCurrentPacket();
-            if (prevPacket != null || fLive) {
-                goToNextPacket();
+            if (prevPacket == null) {
+                if (fLive) {
+                    goToNextPacket();
+                }
+                break;
             }
-
+            goToNextPacket();
         }
 
         /*
@@ -496,10 +499,11 @@ public class CTFStreamInputReader implements AutoCloseable {
     }
 
     private @Nullable ICTFPacketDescriptor getPacket() {
-        if (getPacketIndex() >= fStreamInput.getIndex().size()) {
+        int packetIndex = getPacketIndex();
+        if (packetIndex >= fStreamInput.getIndex().size()) {
             return null;
         }
-        return fStreamInput.getIndex().getElement(getPacketIndex());
+        return fStreamInput.getIndex().getElement(packetIndex);
     }
 
     /**

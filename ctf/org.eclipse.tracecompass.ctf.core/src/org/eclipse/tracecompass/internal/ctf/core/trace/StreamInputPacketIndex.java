@@ -102,9 +102,9 @@ public class StreamInputPacketIndex {
          * Validate entries are inserted in monotonic increasing timestamp
          * order.
          */
-        if (!fEntries.isEmpty() &&
+        if (!fEntries.isEmpty() && ((entryToAdd.getContentSizeBits() <= entryToAdd.getPayloadStartBits()) ||
                 (entryToAdd.getTimestampBegin() < lastElement().getTimestampBegin() ||
-                        entryToAdd.getOffsetBytes() <= lastElement().getOffsetBytes())) {
+                        entryToAdd.getOffsetBytes() <= lastElement().getOffsetBytes()))) {
             return false;
         }
 
