@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -40,6 +41,7 @@ import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.Tag;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
@@ -709,5 +711,47 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
             }
         }
         super.traceRangeUpdated(signal);
+    }
+
+    /**
+     * @since 2.3
+     */
+    @Override
+    public synchronized ITmfTimestamp readEnd() {
+        byte[] inputNameBytes = ("<" + fRecordInputElement.getElementName()).getBytes(); //$NON-NLS-1$
+        byte[] testBytes = new byte[inputNameBytes.length];
+        try {
+            Long pos = fFile.length() - inputNameBytes.length;
+            /* Outer loop to find the position of a matcher group. */
+            while (pos >= 0) {
+                /* Inner loop to find matching tag */
+                while (pos >= 0) {
+                    fFile.seek(pos);
+                    /* Make sure we have the right tag. */
+                    fFile.read(testBytes, 0, testBytes.length);
+                    if (Arrays.equals(inputNameBytes, testBytes)) {
+                        break;
+                    }
+                    pos--;
+                }
+                ITmfLocation location = new TmfLongLocation(pos);
+                ITmfContext context = seekEvent(location);
+                ITmfEvent event = parseEvent(context);
+                context.dispose();
+                if (event != null) {
+                    /* The last event in the trace was successfully parsed. */
+                    return event.getTimestamp();
+                }
+                /*
+                 * pos was after the beginning of the tag of the last event.
+                 */
+                pos -= inputNameBytes.length;
+            }
+        } catch (IOException e) {
+            Activator.logError("Error seeking last event. File: " + getPath(), e); //$NON-NLS-1$
+        }
+
+        /* Empty trace */
+        return null;
     }
 }
