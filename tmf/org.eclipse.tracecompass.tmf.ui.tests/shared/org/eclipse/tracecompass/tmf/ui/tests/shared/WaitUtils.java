@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.tests.shared;
 
+import java.util.function.Predicate;
+
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
 
@@ -88,6 +90,32 @@ public final class WaitUtils {
      */
     public static void waitUntil(IWaitCondition condition) {
         waitUntil(condition, DEFAULT_MAX_WAIT_TIME_MS);
+    }
+
+    /**
+     * Wait for a predicate to succeed
+     *
+     * @param predicate
+     *            The predicate
+     * @param argument
+     *            The argument used by the predicate for match
+     * @param failureMessage
+     *            The failure message
+     */
+    public static <E> void waitUntil(final Predicate<E> predicate, final E argument, final String failureMessage) {
+        IWaitCondition condition = new IWaitCondition() {
+
+            @Override
+            public boolean test() throws Exception {
+                return predicate.test(argument);
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return failureMessage;
+            }
+        };
+        waitUntil(condition);
     }
 
     /**
