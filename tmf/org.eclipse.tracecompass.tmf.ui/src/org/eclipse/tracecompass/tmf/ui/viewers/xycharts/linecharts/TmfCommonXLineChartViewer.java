@@ -22,13 +22,14 @@ import java.util.logging.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
@@ -60,8 +61,6 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     /* The desired number of points per pixel */
     private static final double RESOLUTION = 1.0;
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(TmfCommonXLineChartViewer.class);
-    private static final String LOG_STRING_WITH_PARAM = "[TmfCommonXLineChart:%s] viewerId=%s, %s"; //$NON-NLS-1$
-    private static final String LOG_STRING = "[TmfCommonXLineChart:%s] viewerId=%s"; //$NON-NLS-1$
 
     private static final int[] LINE_COLORS = { SWT.COLOR_BLUE, SWT.COLOR_RED, SWT.COLOR_GREEN,
             SWT.COLOR_MAGENTA, SWT.COLOR_CYAN,
@@ -115,23 +114,38 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
         reinitialize();
     }
 
-    /**
-     * Formats a log message for this class
-     *
-     * @param event
-     *            The event to log, that will be appended to the class name to
-     *            make the full event name
-     * @param parameters
-     *            The string of extra parameters to add to the log message, in
-     *            the format name=value[, name=value]*, or <code>null</code> for
-     *            no params
-     * @return The complete log message for this class
-     */
-    private String getLogMessage(String event, @Nullable String parameters) {
-        if (parameters == null) {
-            return String.format(LOG_STRING, event, getClass().getName());
-        }
-        return String.format(LOG_STRING_WITH_PARAM, event, getClass().getName(), parameters);
+    private @NonNull String getViewerId() {
+        return getClass().getName();
+    }
+
+    private Runnable newUiInitializeRunnable(@NonNull FlowScopeLog enclosingScope) {
+        return () -> {
+            try (FlowScopeLog uiScope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:UiInitialization").setParentScope(enclosingScope).build()) { //$NON-NLS-1$
+                if (!getSwtChart().isDisposed()) {
+                    /* Delete the old series */
+                    try {
+                        clearContent();
+                        createSeries();
+                    } finally {
+                        /*
+                         * View is cleared, decrement fDirty
+                         */
+                        fDirty.decrementAndGet();
+                    }
+                }
+            }
+        };
+    }
+
+    private Runnable newIntializeRunnable(@NonNull FlowScopeLog scope) {
+        return () -> {
+            try (FlowScopeLog tracer = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:InitializeThread").setParentScope(scope).build()) { //$NON-NLS-1$
+                initializeDataSource();
+                if (!getSwtChart().isDisposed()) {
+                    getDisplay().asyncExec(newUiInitializeRunnable(tracer));
+                }
+            }
+        };
     }
 
     /**
@@ -139,36 +153,14 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      * been initialized for this trace before
      */
     protected void reinitialize() {
-        fSeriesValues.clear();
-        /* Initializing data: the content is not current */
-        fDirty.incrementAndGet();
-        Thread thread = new Thread() {
+        try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:ReinitializeRequested").setCategory(getViewerId()).build()) { //$NON-NLS-1$
+            fSeriesValues.clear();
+            /* Initializing data: the content is not current */
+            fDirty.incrementAndGet();
             // Don't use TmfUiRefreshHandler (bug 467751)
-            @Override
-            public void run() {
-                try (TraceCompassLogUtils.ScopeLog tracer = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.INFO, "InitializeThread")) { //$NON-NLS-1$
-                    initializeDataSource();
-                    if (!getSwtChart().isDisposed()) {
-                        getDisplay().asyncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (!getSwtChart().isDisposed()) {
-                                    /* Delete the old series */
-                                    try {
-                                        clearContent();
-                                        createSeries();
-                                    } finally {
-                                        /* View is cleared, decrement fDirty */
-                                        fDirty.decrementAndGet();
-                                    }
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-        };
-        thread.start();
+            Thread thread = new Thread(newIntializeRunnable(scope));
+            thread.start();
+        }
     }
 
     /**
@@ -183,16 +175,18 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     private class UpdateThread extends Thread {
         private final IProgressMonitor fMonitor;
         private final int fNumRequests;
+        private final @NonNull FlowScopeLog fScope;
 
-        public UpdateThread(int numRequests) {
+        public UpdateThread(int numRequests, @NonNull FlowScopeLog log) {
             super("Line chart update"); //$NON-NLS-1$
             fNumRequests = numRequests;
             fMonitor = new NullProgressMonitor();
+            fScope = log;
         }
 
         @Override
         public void run() {
-            try (TraceCompassLogUtils.ScopeLog scope = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.INFO, "TmfCommonXLineChart:UpdateThread", "numRequests=" , fNumRequests)) { //$NON-NLS-1$ //$NON-NLS-2$
+            try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:UpdateThread", "numRequests=" , fNumRequests).setParentScope(fScope).build()) { //$NON-NLS-1$ //$NON-NLS-2$
                 try {
                     updateData(getWindowStartTime(), getWindowEndTime(), fNumRequests, fMonitor);
                 } finally {
@@ -207,16 +201,16 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
         }
 
         public void cancel() {
-            LOGGER.info(() -> getLogMessage("UpdateThreadCanceled", "tid=" + getId())); //$NON-NLS-1$ //$NON-NLS-2$
+            TraceCompassLogUtils.traceInstant(LOGGER, Level.FINE, "CommonXLineChart:UpdateThreadCanceled"); //$NON-NLS-1$
             fMonitor.setCanceled(true);
         }
     }
 
-    private synchronized void newUpdateThread() {
+    private synchronized void newUpdateThread(@NonNull FlowScopeLog fScope) {
         cancelUpdate();
         if (!getSwtChart().isDisposed()) {
             final int numRequests = (int) (getSwtChart().getPlotArea().getBounds().width * fResolution);
-            fUpdateThread = new UpdateThread(numRequests);
+            fUpdateThread = new UpdateThread(numRequests, fScope);
             fUpdateThread.start();
         }
     }
@@ -241,17 +235,21 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     @Override
     protected void updateContent() {
-        /*
-         * Content is not up to date, so we increment fDirty. It will be
-         * decremented at the end of the update thread
-         */
-        fDirty.incrementAndGet();
-        getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                newUpdateThread();
-            }
-        });
+        try (FlowScopeLog parentScope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:ContentUpdateRequested").setCategory(getViewerId()).build()) { //$NON-NLS-1$
+            /*
+             * Content is not up to date, so we increment fDirty. It will be
+             * decremented at the end of the update thread
+             */
+            fDirty.incrementAndGet();
+            getDisplay().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:CreatingUpdateThread").setParentScope(parentScope).build()) { //$NON-NLS-1$
+                        newUpdateThread(scope);
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -387,68 +385,70 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      * Update the chart's values before refreshing the viewer
      */
     protected void updateDisplay() {
-        /* Content is not up to date, increment dirtiness */
-        fDirty.incrementAndGet();
-        Display.getDefault().asyncExec(new Runnable() {
-            final TmfChartTimeStampFormat tmfChartTimeStampFormat = new TmfChartTimeStampFormat(getTimeOffset());
+        try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:UpdateDisplayRequested").setCategory(getViewerId()).build()) { //$NON-NLS-1$
+            /* Content is not up to date, increment dirtiness */
+            fDirty.incrementAndGet();
+            Display.getDefault().asyncExec(new Runnable() {
+                final TmfChartTimeStampFormat tmfChartTimeStampFormat = new TmfChartTimeStampFormat(getTimeOffset());
 
-            @Override
-            public void run() {
-                try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.INFO, "UpdateDisplay")) { //$NON-NLS-1$
-                    if (!getSwtChart().isDisposed()) {
-                        double[] xValues = fXValues;
-                        double maxy = DEFAULT_MAXY;
-                        double miny = DEFAULT_MINY;
-                        for (Entry<String, double[]> entry : fSeriesValues.entrySet()) {
-                            ILineSeries series = (ILineSeries) getSwtChart().getSeriesSet().getSeries(entry.getKey());
-                            if (series == null) {
-                                series = addSeries(entry.getKey());
+                @Override
+                public void run() {
+                    try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:UpdateDisplay").setParentScope(scope).build()) { //$NON-NLS-1$
+                        if (!getSwtChart().isDisposed()) {
+                            double[] xValues = fXValues;
+                            double maxy = DEFAULT_MAXY;
+                            double miny = DEFAULT_MINY;
+                            for (Entry<String, double[]> entry : fSeriesValues.entrySet()) {
+                                ILineSeries series = (ILineSeries) getSwtChart().getSeriesSet().getSeries(entry.getKey());
+                                if (series == null) {
+                                    series = addSeries(entry.getKey());
+                                }
+                                series.setXSeries(xValues);
+                                /*
+                                 * Find the minimal and maximum values in this
+                                 * series
+                                 */
+                                for (double value : entry.getValue()) {
+                                    maxy = Math.max(maxy, value);
+                                    miny = Math.min(miny, value);
+                                }
+                                series.setYSeries(entry.getValue());
                             }
-                            series.setXSeries(xValues);
-                            /*
-                             * Find the minimal and maximum values in this
-                             * series
-                             */
-                            for (double value : entry.getValue()) {
-                                maxy = Math.max(maxy, value);
-                                miny = Math.min(miny, value);
+                            if (maxy == DEFAULT_MAXY) {
+                                maxy = 1.0;
                             }
-                            series.setYSeries(entry.getValue());
-                        }
-                        if (maxy == DEFAULT_MAXY) {
-                            maxy = 1.0;
-                        }
 
-                        IAxisTick xTick = getSwtChart().getAxisSet().getXAxis(0).getTick();
-                        xTick.setFormat(tmfChartTimeStampFormat);
+                            IAxisTick xTick = getSwtChart().getAxisSet().getXAxis(0).getTick();
+                            xTick.setFormat(tmfChartTimeStampFormat);
 
-                        final double start = 0.0;
-                        double end = getWindowEndTime() - getWindowStartTime();
-                        getSwtChart().getAxisSet().getXAxis(0).setRange(new Range(start, end));
-                        if (maxy > miny) {
-                            getSwtChart().getAxisSet().getYAxis(0).setRange(new Range(miny, maxy));
-                        }
-                        getSwtChart().redraw();
+                            final double start = 0.0;
+                            double end = getWindowEndTime() - getWindowStartTime();
+                            getSwtChart().getAxisSet().getXAxis(0).setRange(new Range(start, end));
+                            if (maxy > miny) {
+                                getSwtChart().getAxisSet().getYAxis(0).setRange(new Range(miny, maxy));
+                            }
+                            getSwtChart().redraw();
 
-                        if (isSendTimeAlignSignals()) {
-                            // The width of the chart might have changed and
-                            // its
-                            // time axis might be misaligned with the other
-                            // views
-                            Point viewPos = TmfCommonXLineChartViewer.this.getParent().getParent().toDisplay(0, 0);
-                            int axisPos = getSwtChart().toDisplay(0, 0).x + getPointAreaOffset();
-                            int timeAxisOffset = axisPos - viewPos.x;
-                            TmfTimeViewAlignmentInfo timeAlignmentInfo = new TmfTimeViewAlignmentInfo(getControl().getShell(), viewPos, timeAxisOffset);
-                            TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(TmfCommonXLineChartViewer.this, timeAlignmentInfo, true));
+                            if (isSendTimeAlignSignals()) {
+                                // The width of the chart might have changed and
+                                // its
+                                // time axis might be misaligned with the other
+                                // views
+                                Point viewPos = TmfCommonXLineChartViewer.this.getParent().getParent().toDisplay(0, 0);
+                                int axisPos = getSwtChart().toDisplay(0, 0).x + getPointAreaOffset();
+                                int timeAxisOffset = axisPos - viewPos.x;
+                                TmfTimeViewAlignmentInfo timeAlignmentInfo = new TmfTimeViewAlignmentInfo(getControl().getShell(), viewPos, timeAxisOffset);
+                                TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(TmfCommonXLineChartViewer.this, timeAlignmentInfo, true));
+                            }
                         }
+                    } finally {
+                        /* Content has been updated, decrement dirtiness */
+                        fDirty.decrementAndGet();
                     }
-                } finally {
-                    /* Content has been updated, decrement dirtiness */
-                    fDirty.decrementAndGet();
-                }
 
-            }
-        });
+                }
+            });
+        }
     }
 
     /**
