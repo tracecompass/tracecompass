@@ -531,4 +531,22 @@ public class LoggerTest {
         assertEquals("INFO: {\"ts\":0,\"ph\":\"i\",\"tid\":1,\"name\":\"test null key\",\"args\":{\"null\":\"value\"}}", fLog.getMessages().get(1));
     }
 
+    /**
+     * Test counters
+     */
+    @Test
+    public void testCounter() {
+        Logger logger = fLogger;
+        assertNotNull(logger);
+
+        TraceCompassLogUtils.traceCounter(logger, Level.FINER, "counter", "cats", 0);
+        TraceCompassLogUtils.traceCounter(logger, Level.FINER, "counter", "cats", 10);
+        TraceCompassLogUtils.traceCounter(logger, Level.FINER, "counter", "cats", 0);
+
+        fStreamHandler.flush();
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"C\",\"tid\":1,\"name\":\"counter\",\"args\":{\"cats\":0}}", fLog.getMessages().get(0));
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"C\",\"tid\":1,\"name\":\"counter\",\"args\":{\"cats\":10}}", fLog.getMessages().get(1));
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"C\",\"tid\":1,\"name\":\"counter\",\"args\":{\"cats\":0}}", fLog.getMessages().get(2));
+    }
+
 }

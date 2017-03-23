@@ -63,6 +63,12 @@ import org.eclipse.jdt.annotation.Nullable;
  * <ul>
  * <li><strong>R</strong>, Marker event</li>
  * </ul>
+ * </li>
+ * <li>CounterEvents - events that count items
+ * <ul>
+ * <li><strong>C</strong>, Counter event</li>
+ * </ul>
+ * </li>
  * </ul>
  * <p>
  * To use <strong>durations</strong> and/or <strong>flows</strong>, see
@@ -441,8 +447,8 @@ public final class TraceCompassLogUtils {
      * then the object can be re-used, however, the resulting analyses may yield
      * erroneous data if precautions are not taken.
      *
-     * For mutable objects, save the return value of the call. This will be passed
-     * to the destruction of the object and then it can be matched.
+     * For mutable objects, save the return value of the call. This will be
+     * passed to the destruction of the object and then it can be matched.
      *
      * @param logger
      *            The JUL logger
@@ -642,6 +648,31 @@ public final class TraceCompassLogUtils {
             StringBuilder sb = new StringBuilder();
             sb.append('{');
             appendCommon(sb, 'i', time, threadId);
+            appendName(sb, name);
+            return appendArgs(sb, args).append('}').toString();
+        });
+    }
+
+    /**
+     * The counter events can track a value or multiple values as they change
+     * over time.
+     *
+     * @param logger
+     *            The Logger
+     * @param level
+     *            The {@link Level} of this event.
+     * @param name
+     *            The name of the asynchronous message
+     * @param args
+     *            The counters to log in the format : "title", value
+     */
+    public static void traceCounter(Logger logger, Level level, @Nullable String name, Object... args) {
+        long time = System.nanoTime();
+        long threadId = Thread.currentThread().getId();
+        logger.log(level, () -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append('{');
+            appendCommon(sb, 'C', time, threadId);
             appendName(sb, name);
             return appendArgs(sb, args).append('}').toString();
         });
