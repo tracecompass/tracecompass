@@ -56,6 +56,12 @@ public class LoggerTest {
 
         @Override
         public void write(int b) throws IOException {
+            // We don't care about carriage return (Windows). We only need to
+            // rely on \n to detect the next line
+            if (b == '\r') {
+                return;
+            }
+
             if (b != '\n') {
                 if (secondLine) {
                     if (start) {
