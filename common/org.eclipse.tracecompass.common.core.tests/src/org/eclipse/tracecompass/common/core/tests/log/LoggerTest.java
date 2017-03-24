@@ -516,4 +516,19 @@ public class LoggerTest {
         assertEquals("FINE: {\"ts\":0,\"ph\":\"e\",\"tid\":1,\"name\":\"network connect\",\"cat\":\"net\",\"id\":\"0x1234\",\"args\":{\"msg\":\"OK\"}}", fLog.getMessages().get(6));
     }
 
+    /**
+     * Test that null values in arguments are properly handled
+     */
+    @Test
+    public void testNullArguments() {
+        Logger logger = fLogger;
+        assertNotNull(logger);
+        TraceCompassLogUtils.traceInstant(logger, Level.INFO, "test null value", "nullvalue", null);
+        TraceCompassLogUtils.traceInstant(logger, Level.INFO, "test null key", null, "value");
+
+        fStreamHandler.flush();
+        assertEquals("INFO: {\"ts\":0,\"ph\":\"i\",\"tid\":1,\"name\":\"test null value\",\"args\":{\"nullvalue\":\"null\"}}", fLog.getMessages().get(0));
+        assertEquals("INFO: {\"ts\":0,\"ph\":\"i\",\"tid\":1,\"name\":\"test null key\",\"args\":{\"null\":\"value\"}}", fLog.getMessages().get(1));
+    }
+
 }

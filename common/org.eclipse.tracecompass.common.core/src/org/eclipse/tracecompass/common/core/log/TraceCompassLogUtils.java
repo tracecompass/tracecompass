@@ -21,7 +21,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 
 /**
  * Logger helper
@@ -742,19 +741,19 @@ public final class TraceCompassLogUtils {
                 if (i > 0) {
                     appendTo.append(',');
                 }
-                writeObject(appendTo, keyVal, NonNullUtils.checkNotNull(value));
+                writeObject(appendTo, keyVal, value);
             }
         }
 
         return appendTo.append('}');
     }
 
-    private static StringBuilder writeObject(StringBuilder appendTo, Object key, Object value) {
+    private static StringBuilder writeObject(StringBuilder appendTo, Object key, @Nullable Object value) {
         appendTo.append('"').append(key).append('"').append(':');
         if (value instanceof Number) {
             appendTo.append(value);
         } else {
-            appendTo.append('"').append(value).append('"');
+            appendTo.append('"').append(String.valueOf(value)).append('"');
         }
         return appendTo;
     }
