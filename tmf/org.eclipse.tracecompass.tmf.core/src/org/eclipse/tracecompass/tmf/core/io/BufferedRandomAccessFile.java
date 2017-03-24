@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,7 +19,9 @@ import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 
 /**
- * A class to mitigate the Java I/O inefficiency of RandomAccessFile.
+ * A class to mitigate the Java I/O inefficiency of RandomAccessFile. A memory
+ * buffer is used for read operations. Write operations are not be buffered and
+ * invalidate the read buffer.
  *
  * @version 1.0
  * @author Patrick Tasse
@@ -128,6 +130,11 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
     }
 
     @Override
+    public int read(byte[] b) throws IOException {
+        return read(b, 0, b.length);
+    }
+
+    @Override
     public int read(byte b[], int off, int len) throws IOException {
         int leftover = buf_end - buf_pos;
         if (len <= leftover) {
@@ -150,6 +157,30 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
     }
 
     @Override
+    public void write(int b) throws IOException {
+        super.seek(getFilePointer());
+        super.write(b);
+        seek(super.getFilePointer());
+        invalidate();
+    }
+
+    @Override
+    public void write(byte[] b) throws IOException {
+        super.seek(getFilePointer());
+        super.write(b);
+        seek(super.getFilePointer());
+        invalidate();
+    }
+
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+        super.seek(getFilePointer());
+        super.write(b, off, len);
+        seek(super.getFilePointer());
+        invalidate();
+    }
+
+    @Override
     public long getFilePointer() throws IOException {
         long l = real_pos;
         return (l - buf_end + buf_pos);
@@ -160,6 +191,12 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
         int n = (int) (real_pos - pos);
         if (n >= 0 && n <= buf_end) {
             buf_pos = buf_end - n;
+        } else if (n >= 0) {
+            /* seek backward, seek further to read ahead half of buffer size */
+            long newpos = Math.max(0, pos - BUF_SIZE / 2);
+            super.seek(newpos);
+            invalidate();
+            buf_pos = (int) (pos - newpos);
         } else {
             super.seek(pos);
             invalidate();
@@ -212,11 +249,12 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
     }
 
     private int fillBuffer() throws IOException {
+        int read_ahead = (int) (getFilePointer() - super.getFilePointer());
         int n = super.read(buffer, 0, BUF_SIZE);
         if (n >= 0) {
             real_pos += n;
             buf_end = n;
-            buf_pos = 0;
+            buf_pos = read_ahead;
         }
         return n;
     }
