@@ -120,5 +120,4 @@ Import-Package: com.google.common.annotations,
  com.google.common.cache,
  com.google.common.collect,
  org.eclipse.emf.common.util,
- org.eclipse.emf.ecore,
- org.eclipse.tracecompass.tmf.ctf.core.trace
+ org.eclipse.emf.ecore
