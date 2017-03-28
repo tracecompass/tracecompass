@@ -153,9 +153,11 @@ public final class TraceCompassLogUtils {
      */
     public static class ScopeLog implements AutoCloseable {
 
+        private final long fTime;
         private final long fThreadId;
         private final Logger fLogger;
         private final Level fLevel;
+        private final String fLabel;
         private final Map<String, Object> fData = new HashMap<>();
 
         /**
@@ -174,15 +176,16 @@ public final class TraceCompassLogUtils {
          *            beginning of the scope
          */
         public ScopeLog(Logger log, Level level, String label, Object... args) {
-            long time = System.nanoTime();
+            fTime = System.nanoTime();
             fLogger = log;
             fLevel = level;
             fThreadId = Thread.currentThread().getId();
+            fLabel = label;
             fLogger.log(fLevel, (() -> {
                 StringBuilder sb = new StringBuilder();
                 sb.append('{');
-                appendCommon(sb, 'B', time, fThreadId);
-                appendName(sb, label);
+                appendCommon(sb, 'B', fTime, fThreadId);
+                appendName(sb, fLabel);
                 appendArgs(sb, args);
                 sb.append('}');
                 return sb.toString();
@@ -216,6 +219,7 @@ public final class TraceCompassLogUtils {
                 appendCommon(sb, 'E', time, fThreadId);
                 return appendArgs(sb, fData).append('}').toString();
             }));
+            TraceCompassMonitorManager.getInstance().update(fLabel, time - fTime);
         }
     }
 
@@ -380,6 +384,8 @@ public final class TraceCompassLogUtils {
         private final int fId;
         private final String fCategory;
         private final Map<String, Object> fData = new HashMap<>();
+        private final String fLabel;
+        private final long fTime;
 
         /**
          * Flow scope logger constructor
@@ -402,16 +408,17 @@ public final class TraceCompassLogUtils {
          *            value2.... typically arguments
          */
         private FlowScopeLog(Logger log, Level level, String label, String category, int id, boolean startFlow, Object... args) {
-            long time = System.nanoTime();
+            fTime = System.nanoTime();
             fId = id;
             fLogger = log;
             fLevel = level;
             fCategory = category;
+            fLabel = label;
             fThreadId = Thread.currentThread().getId();
             fLogger.log(fLevel, (() -> {
                 StringBuilder sb = new StringBuilder();
                 sb.append('{');
-                appendCommon(sb, 'B', time, fThreadId);
+                appendCommon(sb, 'B', fTime, fThreadId);
                 appendName(sb, label);
                 appendArgs(sb, args);
                 sb.append('}');
@@ -421,7 +428,7 @@ public final class TraceCompassLogUtils {
             fLogger.log(fLevel, (() -> {
                 StringBuilder sb = new StringBuilder();
                 sb.append('{');
-                appendCommon(sb, startFlow ? 's' : 't', time, fThreadId);
+                appendCommon(sb, startFlow ? 's' : 't', fTime, fThreadId);
                 appendName(sb, label);
                 appendCategory(sb, category);
                 appendId(sb, fId);
@@ -493,6 +500,7 @@ public final class TraceCompassLogUtils {
                 sb.append('}');
                 return sb.toString();
             }));
+            TraceCompassMonitorManager.getInstance().update(fLabel, time - fTime);
         }
     }
 
@@ -876,5 +884,4 @@ public final class TraceCompassLogUtils {
         }
         return appendTo;
     }
-
 }

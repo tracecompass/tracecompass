@@ -18,7 +18,8 @@ Export-Package: org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.common.core.math,
  org.eclipse.tracecompass.common.core.process,
  org.eclipse.tracecompass.common.core.xml,
- org.eclipse.tracecompass.internal.common.core;x-internal:=true
+ org.eclipse.tracecompass.internal.common.core;x-internal:=true,
+ org.eclipse.tracecompass.internal.common.core.log;x-friends:="org.eclipse.tracecompass.common.core.tests"
 Import-Package: com.google.common.base,
  com.google.common.collect
 Automatic-Module-Name: org.eclipse.tracecompass.common.core
