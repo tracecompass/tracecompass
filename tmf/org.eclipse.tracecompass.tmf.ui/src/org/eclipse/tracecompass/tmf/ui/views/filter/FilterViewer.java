@@ -61,8 +61,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
-import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
@@ -423,10 +423,10 @@ class FilterViewer extends Composite {
             setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
         }
 
-        protected Map<String, TraceTypeHelper> getTraceTypeMap() {
+        protected Map<String, TraceTypeHelper> getTraceTypeMap(String selected) {
             Map<String, TraceTypeHelper> traceTypeMap = new TreeMap<>();
             for (TraceTypeHelper helper : TmfTraceType.getTraceTypeHelpers()) {
-                if (!helper.isExperimentType()) {
+                if (!helper.isExperimentType() && (helper.isEnabled() || (helper.getTraceTypeId().equals(selected)))) {
                     traceTypeMap.put(helper.getLabel(), helper);
                 }
             }
@@ -452,7 +452,7 @@ class FilterViewer extends Composite {
             label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             label.setText(Messages.FilterViewer_TypeLabel);
 
-            final List<TraceTypeItem> traceTypeList = getTraceTypeList(fAspectNode);
+            final List<TraceTypeItem> traceTypeList = getTraceTypeList(fAspectNode, fAspectNode.getTraceTypeId());
 
             fTraceTypeCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
             fTraceTypeCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
@@ -600,7 +600,7 @@ class FilterViewer extends Composite {
             });
         }
 
-        private List<TraceTypeItem> getTraceTypeList(ITmfFilterTreeNode node) {
+        private List<TraceTypeItem> getTraceTypeList(ITmfFilterTreeNode node, String selected) {
             ArrayList<TraceTypeItem> traceTypeList = new ArrayList<>();
             traceTypeList.add(new TraceTypeItem(Messages.FilterViewer_CommonCategory, TmfFilterAspectNode.BASE_ASPECT_ID));
 
@@ -617,7 +617,7 @@ class FilterViewer extends Composite {
                 curNode = curNode.getParent();
             }
 
-            for (TraceTypeHelper helper : getTraceTypeMap().values()) {
+            for (TraceTypeHelper helper : getTraceTypeMap(selected).values()) {
                 traceTypeList.add(new TraceTypeItem(helper.getLabel(), helper.getTraceTypeId()));
             }
             return traceTypeList;
@@ -706,7 +706,7 @@ class FilterViewer extends Composite {
         FilterTraceTypeNodeComposite(Composite parent, TmfFilterTraceTypeNode node) {
             super(parent);
             fNode = node;
-            fTraceTypeMap = getTraceTypeMap();
+            fTraceTypeMap = getTraceTypeMap(fNode.getTraceTypeId());
 
             Label label = new Label(this, SWT.NONE);
             label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));

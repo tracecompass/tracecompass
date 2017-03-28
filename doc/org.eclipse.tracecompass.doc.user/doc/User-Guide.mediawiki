@@ -832,7 +832,7 @@ The Filters view allows the user to define preset filters that can be applied to
 
 The filters can be more complex than what can be achieved with the filter header row in the events table. The filter is defined in a tree node structure, where the node types can be any of '''TRACETYPE''', '''AND''', '''OR''', '''CONTAINS''', '''EQUALS''', '''MATCHES''' or '''COMPARE'''. Some nodes types have restrictions on their possible children in the tree.
 
-The '''TRACETYPE''' node filters against the trace type of the trace as defined in a plug-in extension or in a custom parser. When used, any child node will have its ''type'' combo box fixed and its ''aspect'' combo box restricted to the possible aspects of that trace type.
+The '''TRACETYPE''' node filters against the trace type of the trace as defined in a plug-in extension or in a custom parser. When used, any child node will have its ''type'' combo box fixed and its ''aspect'' combo box restricted to the possible aspects of that trace type. Depending of the Trace Types enabled in the [[#Trace_Types_Preference_Page | Trace Types preference page]], the list of available trace types for the filtering can vary.
 
 The '''AND''' node applies the logical ''and'' condition on all of its children. All children conditions must be true for the filter to match. A ''not'' operator can be applied to invert the condition.
 

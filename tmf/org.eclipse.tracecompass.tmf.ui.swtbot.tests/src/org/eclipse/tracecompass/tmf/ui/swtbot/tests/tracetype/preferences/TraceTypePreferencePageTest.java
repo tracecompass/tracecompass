@@ -14,7 +14,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,6 +30,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
@@ -39,9 +42,11 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
+import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
+import org.eclipse.tracecompass.tmf.ui.views.filter.FilterView;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -56,6 +61,15 @@ import org.junit.runner.RunWith;
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class TraceTypePreferencePageTest {
+
+    private static final @NonNull String FILTER =
+            "<ROOT>"
+                + "<FILTER name=\"test\">"
+                    + "<TRACETYPE name=\"Custom XML : testxmlextension\" type=\"custom.xml.trace:Custom XML:testxmlextension\">"
+                        + "<MATCHES eventaspect=\"Message\" not=\"false\" regex=\"msg\" tracetypeid=\"custom.xml.trace:Custom XML:testxmlextension\"/>"
+                    + "</TRACETYPE>"
+                + "</FILTER>"
+            + "</ROOT>";
 
     private static final @NonNull String CHECK_SELECTED = "Check selected";
     private static final @NonNull String CHECK_ALL = "Check all";
@@ -127,6 +141,7 @@ public class TraceTypePreferencePageTest {
      */
     @AfterClass
     public static void afterClass() {
+        setTraceTypePreferences(CHECK_ALL);
         SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
         fBot.closeAllEditors();
         fLogger.removeAllAppenders();
@@ -228,6 +243,63 @@ public class TraceTypePreferencePageTest {
         setTraceTypePreferences(CHECK_ALL);
         traceTypeComboItems = getTraceTypeComboItems();
         assertEquals("Test all trace type enabled", defaultCount + 1, traceTypeComboItems.length);
+    }
+
+    /**
+     * Test enabled/disabled trace types behavior in the filters view
+     */
+    @Test
+    public void testFiltersView() {
+        int defaultCount = TmfTraceType.getAvailableTraceTypes().length;
+        SWTBotUtils.openView(FilterView.ID);
+        SWTBotView viewBot = fBot.viewById(FilterView.ID);
+        importFilter(viewBot);
+        SWTBot bot = viewBot.bot();
+
+        SWTBotTree tree = bot.tree(0);
+        SWTBotTreeItem item = tree.expandNode("FILTER test", "WITH TRACETYPE Custom XML : testxmlextension");
+        item.select();
+
+        SWTBotCombo comboBox = bot.comboBox(0);
+        assertEquals("Combo: number of trace types", defaultCount, comboBox.itemCount());
+
+        // Change the preference value for testxmlextension
+        setTraceTypePreferences(UNCHECK_ALL, "Custom XML", "testxmlextension");
+
+        // Change node to refresh the tree
+        item = tree.expandNode("FILTER test");
+        item.select();
+        item = tree.expandNode("FILTER test", "WITH TRACETYPE Custom XML : testxmlextension");
+        item.select();
+
+        comboBox = bot.comboBox(0);
+        assertEquals("Combo: number of trace types", 1, comboBox.itemCount());
+
+        setTraceTypePreferences(UNCHECK_ALL, "Custom Text", "testtxtextension");
+
+        // Change node to refresh the tree
+        item = tree.expandNode("FILTER test");
+        item.select();
+        item = tree.expandNode("FILTER test", "WITH TRACETYPE Custom XML : testxmlextension");
+        item.select();
+
+        comboBox = bot.comboBox(0);
+        assertEquals("Combo: number of trace types", 2, comboBox.itemCount());
+    }
+
+    private static void importFilter(SWTBotView viewBot) {
+        try {
+            File tempFile = File.createTempFile("test", ".xml");
+            FileWriter fw = new FileWriter(tempFile);
+            try (BufferedWriter bw = new BufferedWriter(fw)) {
+                bw.write(FILTER);
+            }
+            TmfFileDialogFactory.setOverrideFiles(tempFile.getAbsolutePath());
+        } catch (IOException e) {
+            fail("Failed to add a filter");
+        }
+        viewBot.toolbarButton("Import filters").click();
+        WaitUtils.waitUntil(tree -> tree.rowCount() > 0, viewBot.bot().tree(0), "Failed to import test filter");
     }
 
     private static void setTraceTypePreferences(@NonNull String button, @NonNull String... pathToCheck) {
