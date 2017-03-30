@@ -59,7 +59,7 @@ public class Messages extends NLS {
 
     /**
      * Name for the job that updates a trace's time range in the Project Explorer.
-     * @since 2.3
+     * @since 2.4
      */
     public static String TmfNavigatorLabelProvider_UpdateBoundsJobName;
 

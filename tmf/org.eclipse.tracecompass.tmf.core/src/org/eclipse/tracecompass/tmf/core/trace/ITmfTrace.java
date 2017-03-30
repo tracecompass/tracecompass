@@ -453,7 +453,7 @@ public interface ITmfTrace extends ITmfEventProvider {
      * indexed.
      *
      * @return the trace's start time. Null if the trace is empty or failed.
-     * @since 2.3
+     * @since 2.4
      */
     default ITmfTimestamp readStart() {
         ITmfContext context = seekEvent(0L);
@@ -467,7 +467,7 @@ public interface ITmfTrace extends ITmfEventProvider {
      * indexed.
      *
      * @return the trace's end time. Null if the trace is empty or failed.
-     * @since 2.3
+     * @since 2.4
      */
     default ITmfTimestamp readEnd() {
         /*

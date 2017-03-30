@@ -123,7 +123,7 @@ public interface ITmfStateProvider {
      * Makes the state provider fail with a cause
      *
      * @param cause The cause of the failure
-     * @since 2.3
+     * @since 2.4
      */
     default void fail(Throwable cause) {
         // Do nothing by default.
@@ -133,7 +133,7 @@ public interface ITmfStateProvider {
      * Get the cause of failure, or <code>null</code> if there is no failure.
      *
      * @return The failure cause
-     * @since 2.3
+     * @since 2.4
      */
     default @Nullable Throwable getFailureCause() {
         return null;

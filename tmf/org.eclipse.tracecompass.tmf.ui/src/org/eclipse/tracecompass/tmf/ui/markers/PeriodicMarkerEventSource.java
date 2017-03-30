@@ -78,7 +78,7 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
          * Gets the reference marker time.
          *
          * @return the reference marker time
-         * @since 2.3
+         * @since 2.4
          */
         public long getTime() {
             return time;
@@ -88,7 +88,7 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
          * Gets the reference marker index.
          *
          * @return the reference marker index
-         * @since 2.3
+         * @since 2.4
          */
         public long getIndex() {
             return index;
@@ -286,7 +286,7 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
      * @param index
      *            the marker index
      * @return true if the marker is applicable
-     * @since 2.3
+     * @since 2.4
      */
     public boolean isApplicable(long index) {
         return true;

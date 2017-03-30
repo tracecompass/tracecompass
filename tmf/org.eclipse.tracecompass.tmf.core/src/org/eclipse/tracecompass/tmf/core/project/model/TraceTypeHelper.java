@@ -175,7 +175,7 @@ public class TraceTypeHelper {
      * preferences or not
      *
      * @return True if the trace helper is enabled, false otherwise
-     * @since 2.3
+     * @since 2.4
      */
     public boolean isEnabled() {
         return fEnable;
@@ -186,7 +186,7 @@ public class TraceTypeHelper {
      *
      * @param enable
      *            the new enable state
-     * @since 2.3
+     * @since 2.4
      */
     public void setEnabled(boolean enable) {
         fEnable = enable;

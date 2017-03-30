@@ -18,7 +18,7 @@ import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
  * Trace type element label provider
  *
  * @author Jean-Christian Kouame
- * @since 2.3
+ * @since 2.4
  *
  */
 public class TraceTypeLabelProvider implements ITableLabelProvider, ILabelProvider {

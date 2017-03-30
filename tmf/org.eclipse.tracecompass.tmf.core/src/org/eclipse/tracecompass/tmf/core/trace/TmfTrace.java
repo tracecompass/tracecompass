@@ -738,7 +738,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     //TODO: Move to ITmfTrace as default method when Bug 507246 is fixed
 
     /**
-     * @since 2.3
+     * @since 2.4
      */
     @SuppressWarnings("unchecked")
     @Override

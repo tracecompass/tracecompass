@@ -295,7 +295,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
      * initialized when the exception occurred, this method could mark the
      * initialization as failed.
      *
-     * @since 2.3
+     * @since 2.4
      */
     protected void onFail() {
         // Do nothing by default

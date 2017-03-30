@@ -27,7 +27,7 @@ import com.google.common.collect.Lists;
  * This class implements a preference page for the trace type
  *
  * @author Jean-Christian Kouame
- * @since 2.3
+ * @since 2.4
  *
  */
 public class TraceTypePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {

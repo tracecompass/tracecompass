@@ -1730,7 +1730,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * Get the marker set menu
      *
      * @return the menu manager object
-     * @since 2.3
+     * @since 2.4
      */
     protected MenuManager getMarkerSetMenu() {
         if (fMarkerSetMenu != null) {

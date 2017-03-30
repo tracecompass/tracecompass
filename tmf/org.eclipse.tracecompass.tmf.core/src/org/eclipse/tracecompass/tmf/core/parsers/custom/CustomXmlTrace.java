@@ -714,7 +714,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
     }
 
     /**
-     * @since 2.3
+     * @since 2.4
      */
     @Override
     public synchronized ITmfTimestamp readEnd() {

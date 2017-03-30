@@ -750,7 +750,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      *
      * @param startTime
      *            updated start time for this trace
-     * @since 2.3
+     * @since 2.4
      */
     public void setStartTime(ITmfTimestamp startTime) {
         fStartTime = startTime;
@@ -762,7 +762,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      * @return the start time from the trace if available, or from self when
      *         read in advance from supplementary files or from fast trace read.
      *         Return null if completely unknown.
-     * @since 2.3
+     * @since 2.4
      */
     public ITmfTimestamp getStartTime() {
         ITmfTrace trace = getTrace();
@@ -777,7 +777,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      *
      * @param end
      *            updated end time for this trace
-     * @since 2.3
+     * @since 2.4
      */
     public void setEndTime(@NonNull ITmfTimestamp end) {
         if (fEndTime == null || end.compareTo(fEndTime) > 0) {
@@ -791,7 +791,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      * @return the end time from the trace if available, or from self when read
      *         in advance from supplementary files or from fast trace read.
      *         Return null if completely unknown.
-     * @since 2.3
+     * @since 2.4
      */
     public ITmfTimestamp getEndTime() {
         ITmfTrace trace = getTrace();

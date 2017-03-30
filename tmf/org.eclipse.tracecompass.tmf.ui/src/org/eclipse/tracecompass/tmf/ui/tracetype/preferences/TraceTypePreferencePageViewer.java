@@ -45,7 +45,7 @@ import com.google.common.collect.Lists;
  * This class implements a preference page viewer for the trace type
  *
  * @author Jean-Christian Kouame
- * @since 2.3
+ * @since 2.4
  */
 public class TraceTypePreferencePageViewer {
 

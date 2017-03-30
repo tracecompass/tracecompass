@@ -18,7 +18,7 @@ import org.eclipse.tracecompass.tmf.ui.markers.PeriodicMarkerEventSource.Referen
  * An adapter interface for traces, which allows the trace to provide a
  * reference for periodic markers.
  *
- * @since 2.3
+ * @since 2.4
  */
 public interface IMarkerReferenceProvider {
 
