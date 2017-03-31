@@ -43,4 +43,15 @@ public class TmfAnalysisException extends Exception {
         super(message);
     }
 
+    /**
+     * Constructs a new exception with the specified cause.
+     *
+     * @param cause
+     *            The cause
+     * @since 2.4
+     */
+    public TmfAnalysisException(Throwable cause) {
+        super(cause);
+    }
+
 }
