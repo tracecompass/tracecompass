@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
 
+import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withMnemonic;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -992,7 +993,8 @@ public final class SWTBotUtils {
     }
 
     /**
-     * Open the preferences dialog and return the corresponding shell.
+     * Open the preferences dialog and return the corresponding shell. See also
+     * {@link #pressOKishButtonInPreferences(SWTBot)} to close the dialog.
      *
      * @param bot
      *            a given workbench bot
@@ -1014,6 +1016,27 @@ public final class SWTBotUtils {
 
         bot.waitUntil(Conditions.shellIsActive(PREFERENCES_MENU_ITEM));
         return bot.activeShell();
+    }
+
+    /**
+     * Click the OK or "Apply and Close" button the preferences dialog. The
+     * button label changed from OK to "Apply and Close" in Eclipse version
+     * 4.7-I20170329-2000.
+     *
+     * @param bot
+     *            a given workbench bot
+     */
+    public static void pressOKishButtonInPreferences(SWTBot bot) {
+        try {
+            String okIshLabel = "Apply and Close";
+            // We do it this more manual way in order to not have to timout and
+            // wait 30 secs when the button is not there
+            bot.waitUntil(Conditions.waitForWidget(withMnemonic(okIshLabel)), 100);
+            bot.button(okIshLabel).click();
+        } catch (TimeoutException e) {
+            // Doesn't exist pre-4.7-I20170329-2000, try old "OK" button
+            bot.button("OK").click();
+        }
     }
 
     /**

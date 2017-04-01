@@ -193,7 +193,7 @@ public class TraceTypePreferencePageTest {
         checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
         assertEquals("Filtered removed all check", defaultCount, checked);
         bot.button("Apply").click();
-        bot.button("OK").click();
+        SWTBotUtils.pressOKishButtonInPreferences(fBot);
     }
 
     /**
@@ -317,7 +317,7 @@ public class TraceTypePreferencePageTest {
             bot.button(CHECK_SELECTED).click();
         }
         bot.button("Apply").click();
-        bot.button("OK").click();
+        SWTBotUtils.pressOKishButtonInPreferences(fBot);
     }
 
     private static List<String> getSelectTraceTypeMenuItems() {

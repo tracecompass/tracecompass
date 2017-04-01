@@ -200,7 +200,7 @@ public class TmfPerspectiveManagerTest {
         SWTBot shellBot = fBot.shell("Preferences").bot();
         shellBot.tree().expandNode("Tracing", "Perspectives").select();
         shellBot.radioInGroup(value, "Open the associated perspective when a trace is opened").click();
-        shellBot.button("OK").click();
+        SWTBotUtils.pressOKishButtonInPreferences(fBot);
     }
 
     private static void assertSwitchToPerspectivePreference(String value) {

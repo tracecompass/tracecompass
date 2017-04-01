@@ -334,7 +334,7 @@ public class FetchRemoteTracesTest {
         traceNodes = traceGroupNode.getItems();
         assertEquals(1, traceNodes.length);
         assertEquals(LTTNG_TRACE_FILE_PATTERN, traceNodes[0].getText());
-        fBot.button("OK").click();
+        SWTBotUtils.pressOKishButtonInPreferences(fBot);
         deleteProfile();
     }
 
@@ -421,7 +421,7 @@ public class FetchRemoteTracesTest {
         SWTBotCombo combo = fBot.comboBoxWithLabel("Trace type:");
         combo.setSelection("Test trace : Test Syslog");
 
-        fBot.button("OK").click();
+        SWTBotUtils.pressOKishButtonInPreferences(fBot);
     }
 
     private static void testTrace(TmfTraceElement tmfTraceElement, String expectedTracePath, String traceType) {
@@ -440,7 +440,7 @@ public class FetchRemoteTracesTest {
         treeNode.select();
         fBot.button("Remove").click();
         assertEquals(0, tree.getAllItems().length);
-        fBot.button("OK").click();
+        SWTBotUtils.pressOKishButtonInPreferences(fBot);
     }
 
     private static SWTBotTreeItem getTreeItem(SWTWorkbenchBot bot, SWTBotTree tree, String... nodeNames) {
