@@ -365,7 +365,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
      * @return The immutable latest branch
      */
     @VisibleForTesting
-    final List<N> getLatestBranch() {
+    protected final List<N> getLatestBranch() {
         List<N> latestBranchSnapshot = fLatestBranchSnapshot;
         if (latestBranchSnapshot == null) {
             synchronized (fLatestBranch) {
@@ -431,7 +431,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
      *             closed
      */
     @VisibleForTesting
-    @NonNull N getNode(int seqNum) throws ClosedChannelException {
+    protected @NonNull N getNode(int seqNum) throws ClosedChannelException {
         // First, check in the latest branch if the node is there
         for (N node : fLatestBranch) {
             if (node.getSequenceNumber() == seqNum) {

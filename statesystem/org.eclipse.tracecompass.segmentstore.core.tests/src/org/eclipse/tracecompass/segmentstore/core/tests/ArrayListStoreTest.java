@@ -11,7 +11,6 @@ package org.eclipse.tracecompass.segmentstore.core.tests;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.ArrayListStore;
-import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 
 /**
@@ -23,12 +22,12 @@ import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 public class ArrayListStoreTest extends AbstractTestSegmentStore {
 
     @Override
-    protected ISegmentStore<@NonNull ISegment> getSegmentStore() {
+    protected ISegmentStore<@NonNull TestSegment> getSegmentStore() {
         return new ArrayListStore<>();
     }
 
     @Override
-    protected ISegmentStore<@NonNull ISegment> getSegmentStore(@NonNull ISegment @NonNull [] data) {
+    protected ISegmentStore<@NonNull TestSegment> getSegmentStore(@NonNull TestSegment @NonNull [] data) {
         return new ArrayListStore<>(data);
     }
 }

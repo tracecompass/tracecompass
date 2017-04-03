@@ -16,8 +16,6 @@ import java.util.Arrays;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.segmentstore.core.treemap.TreeMapStore;
-import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
-import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.junit.Test;
 
@@ -29,16 +27,13 @@ import org.junit.Test;
 public class TreeMapStoreTest extends AbstractTestSegmentStore {
 
     @Override
-    protected ISegmentStore<@NonNull ISegment> getSegmentStore() {
+    protected ISegmentStore<@NonNull TestSegment> getSegmentStore() {
         return new TreeMapStore<>();
     }
 
-    /**
-     * The TreeMapStore does not have a bulk loader, if it ever gets one, it should be tested here.
-     */
     @Override
-    protected ISegmentStore<@NonNull ISegment> getSegmentStore(@NonNull ISegment @NonNull [] data) {
-        TreeMapStore<@NonNull ISegment> treeMapStore = new TreeMapStore<>();
+    protected ISegmentStore<@NonNull TestSegment> getSegmentStore(@NonNull TestSegment @NonNull [] data) {
+        TreeMapStore<@NonNull TestSegment> treeMapStore = new TreeMapStore<>();
         treeMapStore.addAll(Arrays.asList(data));
         return treeMapStore;
     }
@@ -48,8 +43,8 @@ public class TreeMapStoreTest extends AbstractTestSegmentStore {
      */
     @Test
     public void testNoDuplicateElements() {
-        for (ISegment segment : SEGMENTS) {
-            boolean ret = fSegmentStore.add(new BasicSegment(segment.getStart(), segment.getEnd()));
+        for (TestSegment segment : SEGMENTS) {
+            boolean ret = fSegmentStore.add(new TestSegment(segment.getStart(), segment.getEnd(), segment.getPayload()));
             assertFalse(ret);
         }
         assertEquals(SEGMENTS.size(), fSegmentStore.size());

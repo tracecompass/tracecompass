@@ -25,6 +25,10 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTIntervalReader;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferWriter;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.SafeByteBufferFactory;
+import org.eclipse.tracecompass.internal.provisional.segmentstore.core.ISegment2;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -50,14 +54,14 @@ public abstract class AbstractTestSegmentStore {
     /**
      * The segment store
      */
-    protected ISegmentStore<@NonNull ISegment> fSegmentStore;
+    protected final ISegmentStore<@NonNull TestSegment> fSegmentStore;
 
     /**
      * Get the segment store to test
      *
      * @return the segment store
      */
-    protected abstract ISegmentStore<@NonNull ISegment> getSegmentStore();
+    protected abstract ISegmentStore<@NonNull TestSegment> getSegmentStore();
 
     /**
      * Get the segment store to test with initial data
@@ -67,24 +71,110 @@ public abstract class AbstractTestSegmentStore {
      *
      * @return the segment store
      */
-    protected abstract ISegmentStore<@NonNull ISegment> getSegmentStore(@NonNull ISegment @NonNull [] data);
+    protected abstract ISegmentStore<@NonNull TestSegment> getSegmentStore(@NonNull TestSegment @NonNull [] data);
 
-    private static final @NonNull ISegment SEGMENT_2_6 = new BasicSegment(2, 6);
-    private static final @NonNull ISegment SEGMENT_4_6 = new BasicSegment(4, 6);
-    private static final @NonNull ISegment SEGMENT_4_8 = new BasicSegment(4, 8);
-    private static final @NonNull ISegment SEGMENT_6_8 = new BasicSegment(6, 8);
-    private static final @NonNull ISegment SEGMENT_10_14 = new BasicSegment(10, 14);
+    private static final @NonNull TestSegment SEGMENT_2_6 = new TestSegment(2, 6, "test");
+    private static final @NonNull TestSegment SEGMENT_4_6 = new TestSegment(4, 6, "test2");
+    private static final @NonNull TestSegment SEGMENT_4_8 = new TestSegment(4, 8, "test3");
+    private static final @NonNull TestSegment SEGMENT_6_8 = new TestSegment(6, 8, "test");
+    private static final @NonNull TestSegment SEGMENT_10_14 = new TestSegment(10, 14, "test");
     /**
      * A sample segment list
      */
-    protected static final List<@NonNull ISegment> SEGMENTS = ImmutableList.of(SEGMENT_2_6, SEGMENT_4_6, SEGMENT_4_8, SEGMENT_6_8, SEGMENT_10_14);
-    private static final List<@NonNull ISegment> REVERSE_SEGMENTS = Lists.reverse(SEGMENTS);
+    protected static final List<@NonNull TestSegment> SEGMENTS = ImmutableList.of(SEGMENT_2_6, SEGMENT_4_6, SEGMENT_4_8, SEGMENT_6_8, SEGMENT_10_14);
+    private static final List<@NonNull TestSegment> REVERSE_SEGMENTS = Lists.reverse(SEGMENTS);
+
+    /**
+     * A test type of segment that can be serialized with the safe buffers. It
+     * has an extra payload
+     *
+     * @author Geneviève Bastien
+     */
+    protected static final class TestSegment implements ISegment2 {
+
+        /**
+         * The reader for this class
+         */
+        public static final @NonNull IHTIntervalReader<@NonNull TestSegment> DESERIALISER = buffer -> new TestSegment(buffer.getLong(), buffer.getLong(), buffer.getString());
+
+        /**
+        *
+        */
+        private static final long serialVersionUID = -2242452053089575887L;
+
+        private final long fStart;
+        private final long fEnd;
+        private final @NonNull String fPayload;
+
+        /**
+         * Constructor
+         *
+         * @param start
+         *            Start of this segment
+         * @param end
+         *            End of this segment
+         * @param payload
+         *            Payload
+         */
+        public TestSegment(long start, long end, @NonNull String payload) {
+            fStart = start;
+            fEnd = end;
+            fPayload = payload;
+        }
+
+        @Override
+        public long getStart() {
+            return fStart;
+        }
+
+        @Override
+        public long getEnd() {
+            return fEnd;
+        }
+
+        /**
+         * Get the payload of this segment
+         *
+         * @return The payload
+         */
+        public String getPayload() {
+            return fPayload;
+        }
+
+        @Override
+        public int getSizeOnDisk() {
+            return 2 * Long.BYTES + SafeByteBufferFactory.getStringSizeInBuffer(fPayload);
+        }
+
+        @Override
+        public void writeSegment(@NonNull ISafeByteBufferWriter buffer) {
+            buffer.putLong(fStart);
+            buffer.putLong(fEnd);
+            buffer.putString(fPayload);
+        }
+
+    }
 
     /**
      * Constructor
      */
     public AbstractTestSegmentStore() {
         super();
+        fSegmentStore = getSegmentStore();
+    }
+
+    /**
+     * Asserts that 2 segments are equal. Some backend may not return exactly
+     * the same type of segment so the main assert will be false, but the
+     * segments are in fact identical
+     *
+     * @param expected
+     *            The expected segment
+     * @param actual
+     *            The actual segment
+     */
+    protected void assertSegmentsEqual(ISegment expected, ISegment actual) {
+        assertEquals(expected, actual);
     }
 
     /**
@@ -92,8 +182,7 @@ public abstract class AbstractTestSegmentStore {
      */
     @Before
     public void setup() {
-        fSegmentStore = getSegmentStore();
-        for (ISegment segment : SEGMENTS) {
+        for (TestSegment segment : SEGMENTS) {
             fSegmentStore.add(segment);
         }
     }
@@ -141,8 +230,7 @@ public abstract class AbstractTestSegmentStore {
      */
     @Test
     public void testAddAllConstructor() {
-        @SuppressWarnings("null")
-        ISegmentStore<@NonNull ISegment> other = getSegmentStore(fSegmentStore.toArray(new ISegment[fSegmentStore.size()]));
+        ISegmentStore<@NonNull TestSegment> other = getSegmentStore(fSegmentStore.toArray(new TestSegment[fSegmentStore.size()]));
         assertTrue(fSegmentStore.containsAll(other));
         assertTrue(other.containsAll(fSegmentStore));
     }
@@ -152,8 +240,7 @@ public abstract class AbstractTestSegmentStore {
      */
     @Test
     public void testAddAllConstructorOutOfOrder() {
-        @SuppressWarnings("null")
-        ISegmentStore<@NonNull ISegment> other = getSegmentStore(REVERSE_SEGMENTS.toArray(new ISegment[fSegmentStore.size()]));
+        ISegmentStore<@NonNull TestSegment> other = getSegmentStore(REVERSE_SEGMENTS.toArray(new TestSegment[fSegmentStore.size()]));
         assertTrue(fSegmentStore.containsAll(other));
         assertTrue(other.containsAll(fSegmentStore));
     }
@@ -186,7 +273,7 @@ public abstract class AbstractTestSegmentStore {
      * Test containsAll() method
      */
     public void testContainsAll() {
-        ISegmentStore<@NonNull ISegment> store = getSegmentStore();
+        ISegmentStore<@NonNull TestSegment> store = getSegmentStore();
 
         store.add(SEGMENT_2_6);
         assertTrue(store.containsAll(Collections.emptyList()));
@@ -221,10 +308,10 @@ public abstract class AbstractTestSegmentStore {
      */
     @Test
     public void testToSpecifyArraySubtype() {
-        ISegmentStore<@NonNull ISegment> tms2 = getSegmentStore();
-        BasicSegment otherSegment = new BasicSegment(2, 6);
+        ISegmentStore<@NonNull TestSegment> tms2 = getSegmentStore();
+        TestSegment otherSegment = new TestSegment(2, 6, "test");
         tms2.add(otherSegment);
-        BasicSegment[] array = tms2.toArray(new BasicSegment[0]);
+        TestSegment[] array = tms2.toArray(new TestSegment[0]);
 
         assertEquals(1, array.length);
         assertTrue(Arrays.asList(array).contains(otherSegment));
@@ -239,7 +326,7 @@ public abstract class AbstractTestSegmentStore {
     public void testIterationOrder() {
         int i = 0;
         for (ISegment segment : fSegmentStore) {
-            assertEquals(SEGMENTS.get(i++), segment);
+            assertSegmentsEqual(SEGMENTS.get(i++), segment);
         }
     }
 
@@ -250,8 +337,8 @@ public abstract class AbstractTestSegmentStore {
     @Test
     public void testIterationOrderNonSortedInsertion() {
         /* Prepare the segment store, we don't use the 'fixture' in this test */
-        ISegmentStore<@NonNull ISegment> store = getSegmentStore();
-        for (ISegment segment : REVERSE_SEGMENTS) {
+        ISegmentStore<@NonNull TestSegment> store = getSegmentStore();
+        for (TestSegment segment : REVERSE_SEGMENTS) {
             store.add(checkNotNull(segment));
         }
 
@@ -260,8 +347,8 @@ public abstract class AbstractTestSegmentStore {
          * start times, not the insertion order.
          */
         int i = 0;
-        for (ISegment segment : store) {
-            assertEquals(SEGMENTS.get(i++), segment);
+        for (TestSegment segment : store) {
+            assertSegmentsEqual(SEGMENTS.get(i++), segment);
         }
 
         /* Manually dispose our own store */
@@ -275,7 +362,7 @@ public abstract class AbstractTestSegmentStore {
     @Test
     public void testGetIntersectingElementsRange() {
 
-        Iterable<ISegment> intersectingElements;
+        Iterable<TestSegment> intersectingElements;
 
         /*
          * Range that does not include any segment
@@ -303,7 +390,7 @@ public abstract class AbstractTestSegmentStore {
          */
         intersectingElements = fSegmentStore.getIntersectingElements(11, 13);
         assertEquals(1, Iterables.size(intersectingElements));
-        assertEquals(SEGMENT_10_14, Iterables.getOnlyElement(intersectingElements));
+        assertSegmentsEqual(SEGMENT_10_14, Iterables.getOnlyElement(intersectingElements));
 
         /*
          * Range start time : On one segment start time Range end time : On one
@@ -311,7 +398,7 @@ public abstract class AbstractTestSegmentStore {
          */
         intersectingElements = fSegmentStore.getIntersectingElements(10, 14);
         assertEquals(1, Iterables.size(intersectingElements));
-        assertEquals(SEGMENT_10_14, Iterables.getOnlyElement(intersectingElements));
+        assertSegmentsEqual(SEGMENT_10_14, Iterables.getOnlyElement(intersectingElements));
 
         /*
          * Range start time : On last segment end time Range end time : After
@@ -319,7 +406,7 @@ public abstract class AbstractTestSegmentStore {
          */
         intersectingElements = fSegmentStore.getIntersectingElements(14, 18);
         assertEquals(1, Iterables.size(intersectingElements));
-        assertEquals(SEGMENT_10_14, Iterables.getOnlyElement(intersectingElements));
+        assertSegmentsEqual(SEGMENT_10_14, Iterables.getOnlyElement(intersectingElements));
 
         /*
          * Range start time : Before first segment start time Range end time :
@@ -327,7 +414,7 @@ public abstract class AbstractTestSegmentStore {
          */
         intersectingElements = fSegmentStore.getIntersectingElements(1, 2);
         assertEquals(1, Iterables.size(intersectingElements));
-        assertEquals(SEGMENT_2_6, Iterables.getOnlyElement(intersectingElements));
+        assertSegmentsEqual(SEGMENT_2_6, Iterables.getOnlyElement(intersectingElements));
     }
 
     /**
@@ -336,28 +423,28 @@ public abstract class AbstractTestSegmentStore {
     @Test
     public void testGetIntersectingElementsTime() {
 
-        Iterable<ISegment> intersectingElements;
+        Iterable<TestSegment> intersectingElements;
 
         /*
          * Time between segment start time and end time
          */
         intersectingElements = fSegmentStore.getIntersectingElements(3);
         assertEquals(1, Iterables.size(intersectingElements));
-        assertEquals(SEGMENT_2_6, Iterables.getOnlyElement(intersectingElements));
+        assertSegmentsEqual(SEGMENT_2_6, Iterables.getOnlyElement(intersectingElements));
 
         /*
          * Time on segment start time
          */
         intersectingElements = fSegmentStore.getIntersectingElements(2);
         assertEquals(1, Iterables.size(intersectingElements));
-        assertEquals(SEGMENT_2_6, Iterables.getOnlyElement(intersectingElements));
+        assertSegmentsEqual(SEGMENT_2_6, Iterables.getOnlyElement(intersectingElements));
 
         /*
          * Time on segment end time
          */
         intersectingElements = fSegmentStore.getIntersectingElements(14);
         assertEquals(1, Iterables.size(intersectingElements));
-        assertEquals(SEGMENT_10_14, Iterables.getOnlyElement(intersectingElements));
+        assertSegmentsEqual(SEGMENT_10_14, Iterables.getOnlyElement(intersectingElements));
 
         /*
          * Time overlapping many segments
@@ -389,7 +476,7 @@ public abstract class AbstractTestSegmentStore {
      */
     @Test
     public void testDispose() {
-        ISegmentStore<@NonNull ISegment> store = getSegmentStore();
+        ISegmentStore<@NonNull TestSegment> store = getSegmentStore();
         store.add(SEGMENT_2_6);
         store.dispose();
         assertEquals(0, store.size());
@@ -402,15 +489,15 @@ public abstract class AbstractTestSegmentStore {
      */
     @Test
     public void testIterator() {
-        Collection<@NonNull ISegment> beforeExpected = ImmutableList.of(SEGMENT_2_6);
-        Collection<@NonNull ISegment> afterExpected = ImmutableList.of(SEGMENT_2_6, SEGMENT_4_8);
-        Collection<@NonNull ISegment> lastExpected = ImmutableList.of(SEGMENT_2_6, SEGMENT_4_8, SEGMENT_6_8);
-        Collection<@NonNull ISegment> fixture = new ArrayList<>();
-        ISegmentStore<@NonNull ISegment> store = getSegmentStore();
+        Collection<@NonNull TestSegment> beforeExpected = ImmutableList.of(SEGMENT_2_6);
+        Collection<@NonNull TestSegment> afterExpected = ImmutableList.of(SEGMENT_2_6, SEGMENT_4_8);
+        Collection<@NonNull TestSegment> lastExpected = ImmutableList.of(SEGMENT_2_6, SEGMENT_4_8, SEGMENT_6_8);
+        Collection<@NonNull TestSegment> fixture = new ArrayList<>();
+        ISegmentStore<@NonNull TestSegment> store = getSegmentStore();
 
         // Add one segment to the segment store and iterate
         store.add(SEGMENT_2_6);
-        for (ISegment item : store) {
+        for (TestSegment item : store) {
             fixture.add(item);
         }
         assertEquals(beforeExpected, fixture);
@@ -418,26 +505,26 @@ public abstract class AbstractTestSegmentStore {
         // Add a second segment to the store and iterate
         fixture.clear();
         store.add(SEGMENT_4_8);
-        for (ISegment item : store) {
+        for (TestSegment item : store) {
             fixture.add(item);
         }
         assertEquals(afterExpected, fixture);
 
         fixture.clear();
         // Take an iterator
-        Iterator<@NonNull ISegment> iter = store.iterator();
+        Iterator<@NonNull TestSegment> iter = store.iterator();
 
         // Add a third segment to the store and iterate
         store.add(SEGMENT_6_8);
-        Iterator<@NonNull ISegment> iter2 = store.iterator();
+        Iterator<@NonNull TestSegment> iter2 = store.iterator();
         fixture.clear();
 
-        // Make sure the first iterator take has only 2 elements and the second
-        // has 3 elements
+        // Make sure the first iterator take has at least 2 elements (depends on
+        // implementation) and the second has 3 elements
         while (iter.hasNext()) {
             fixture.add(iter.next());
         }
-        assertEquals(afterExpected, fixture);
+        assertTrue(fixture.size() >= 2);
         fixture.clear();
         while (iter2.hasNext()) {
             fixture.add(iter2.next());
@@ -446,7 +533,7 @@ public abstract class AbstractTestSegmentStore {
     }
 
     /**
-     *  Test to check ordered iterators
+     * Test to check ordered iterators
      */
     @Test
     public void testSortedIterator() {
@@ -458,7 +545,7 @@ public abstract class AbstractTestSegmentStore {
         comparators.add(SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
         comparators.add(NonNullUtils.checkNotNull(SegmentComparators.INTERVAL_LENGTH_COMPARATOR.reversed()));
 
-        Iterable<ISegment> iterable;
+        Iterable<TestSegment> iterable;
         for (Comparator<ISegment> comparator : comparators) {
             iterable = fSegmentStore.iterator(comparator);
             verifySortedIterable(iterable, 5, comparator);
@@ -469,10 +556,10 @@ public abstract class AbstractTestSegmentStore {
         }
     }
 
-    private static void verifySortedIterable(Iterable<ISegment> iterable, int expectedSize, Comparator<ISegment> comparator) {
+    private static void verifySortedIterable(Iterable<TestSegment> iterable, int expectedSize, Comparator<ISegment> comparator) {
         // check its size
         assertEquals(expectedSize, Iterables.size(iterable));
-        Iterator<ISegment> iterator = iterable.iterator();
+        Iterator<TestSegment> iterator = iterable.iterator();
         // check the order
         ISegment prev, current = iterator.next();
         while (iterator.hasNext()) {
@@ -487,7 +574,7 @@ public abstract class AbstractTestSegmentStore {
      */
     @Test(expected = UnsupportedOperationException.class)
     public void testRetainAll() {
-        ISegmentStore<@NonNull ISegment> store = getSegmentStore();
+        ISegmentStore<@NonNull TestSegment> store = getSegmentStore();
 
         store.add(SEGMENT_2_6);
         store.retainAll(Collections.emptyList());
@@ -498,7 +585,7 @@ public abstract class AbstractTestSegmentStore {
      */
     @Test(expected = UnsupportedOperationException.class)
     public void testRemove() {
-        ISegmentStore<@NonNull ISegment> store = getSegmentStore();
+        ISegmentStore<@NonNull TestSegment> store = getSegmentStore();
 
         store.add(SEGMENT_2_6);
         store.remove(SEGMENT_2_6);
@@ -509,7 +596,7 @@ public abstract class AbstractTestSegmentStore {
      */
     @Test(expected = UnsupportedOperationException.class)
     public void testRemoveAll() {
-        ISegmentStore<@NonNull ISegment> store = getSegmentStore();
+        ISegmentStore<@NonNull TestSegment> store = getSegmentStore();
 
         store.add(SEGMENT_2_6);
         store.removeAll(Collections.emptyList());
