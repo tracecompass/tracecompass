@@ -16,30 +16,4 @@
             </message_arguments>
         </filter>
     </resource>
-    <resource path="src/org/eclipse/tracecompass/tmf/ui/views/statesystem/TmfStateSystemExplorer.java" type="org.eclipse.tracecompass.tmf.ui.views.statesystem.TmfStateSystemExplorer">
-        <filter id="388194388">
-            <message_arguments>
-                <message_argument value="org.eclipse.tracecompass.tmf.ui.views.statesystem.TmfStateSystemExplorer"/>
-                <message_argument value="ID"/>
-                <message_argument value="org.eclipse.linuxtools.tmf.ui.views.ssview"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="src/org/eclipse/tracecompass/tmf/ui/widgets/timegraph/model/ITimeGraphEntry.java" type="org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry">
-        <filter comment="API preference INTERFACE_ELEMENT_TYPE_ADDED_DEFAULT_METHOD=Ignore is not properly supported (Bug 507246)" id="403984517">
-            <message_arguments>
-                <message_argument value="org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry"/>
-                <message_argument value="org.eclipse.jface.viewers.ISelection"/>
-                <message_argument value="isEmpty()"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="src/org/eclipse/tracecompass/tmf/ui/widgets/timegraph/model/IMarkerEventSource.java" type="org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEventSource">
-        <filter comment="API preference INTERFACE_ELEMENT_TYPE_ADDED_DEFAULT_METHOD=Ignore is not properly supported (Bug 507246)" id="404000815">
-            <message_arguments>
-                <message_argument value="org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEventSource"/>
-                <message_argument value="getMarkerList(long, long, long, IProgressMonitor)"/>
-            </message_arguments>
-        </filter>
-    </resource>
 </component>
