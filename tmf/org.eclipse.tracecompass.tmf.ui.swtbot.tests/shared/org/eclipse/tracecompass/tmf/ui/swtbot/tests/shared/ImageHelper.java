@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016 Ericsson
+ * Copyright (c) 2015, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -86,6 +86,58 @@ public final class ImageHelper {
                 return new ImageHelper(new int[0], new Rectangle(0, 0, 0, 0));
             }
         });
+    }
+
+    /**
+     * Wait for the image at the specified bounds to change from the current
+     * image. The method returns when the new image is stable.
+     *
+     * @param bounds
+     *            the bounds in display coordinates
+     * @param currentImage
+     *            the current image, or null
+     * @return the new image
+     */
+    public static ImageHelper waitForNewImage(Rectangle bounds, ImageHelper currentImage) {
+        SWTBot bot = new SWTBot();
+        ImageHelper[] newImage = new ImageHelper[1];
+        bot.waitUntil(new DefaultCondition() {
+            @Override
+            public boolean test() throws Exception {
+                return UIThreadRunnable.syncExec(new Result<Boolean> () {
+                    @Override
+                    public Boolean run() {
+                        newImage[0] = ImageHelper.grabImage(bounds);
+                        return !newImage[0].equals(currentImage);
+                    }
+                });
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return "Image at bounds " + bounds + " did not change";
+            }
+        });
+        bot.waitUntil(new DefaultCondition() {
+            @Override
+            public boolean test() throws Exception {
+                return UIThreadRunnable.syncExec(new Result<Boolean> () {
+                    @Override
+                    public Boolean run() {
+                        ImageHelper image = ImageHelper.grabImage(bounds);
+                        boolean sameImage = image.equals(newImage[0]);
+                        newImage[0] = image;
+                        return sameImage;
+                    }
+                });
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return "Image at bounds " + bounds + " is not stable";
+            }
+        });
+        return newImage[0];
     }
 
     /**

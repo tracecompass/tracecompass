@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
 
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withMnemonic;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -21,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.commands.ExecutionException;
@@ -46,8 +48,11 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -68,11 +73,14 @@ import org.eclipse.swtbot.swt.finder.utils.MessageFormat;
 import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
+import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
@@ -860,6 +868,28 @@ public final class SWTBotUtils {
     }
 
     /**
+     * Get the bounds of a widget in display coordinates
+     *
+     * @param bot
+     *            the widget bot
+     * @return the widget bounds, in display coordinates
+     */
+    public static Rectangle getBoundsToDisplay(AbstractSWTBot<?> bot) {
+        if (bot.widget instanceof Control) {
+            final Control control = checkNotNull((Control) bot.widget);
+            return UIThreadRunnable.syncExec(new Result<Rectangle>() {
+                @Override
+                public Rectangle run() {
+                    Point location = control.toDisplay(0, 0);
+                    Point size = control.getSize();
+                    return new Rectangle(location.x, location.y, size.x, size.y);
+                }
+            });
+        }
+        throw new IllegalArgumentException(bot +" is not a Control widget");
+    }
+
+    /**
      * Get the bounds of a cell (SWT.Rectangle) for the specified row and column
      * index in a table
      *
@@ -947,6 +977,66 @@ public final class SWTBotUtils {
     }
 
     /**
+     * Press the shortcut specified by the given keys. The method returns when
+     * the key events have been received by the focus control.
+     *
+     * @param keyboard
+     *            the keyboard
+     * @param keys
+     *            the keys to press
+     */
+    public static void pressShortcut(Keyboard keyboard, KeyStroke... keys) {
+        Control focusControl = UIThreadRunnable.syncExec(new Result<Control>() {
+            @Override
+            public Control run() {
+                return Display.getCurrent().getFocusControl();
+            }
+        });
+        pressShortcut(focusControl, () -> keyboard.pressShortcut(keys), keys);
+    }
+
+    /**
+     * Press the shortcut specified by the given keys. The method returns when
+     * the key events have been received by the given control.
+     *
+     * @param bot
+     *            the control bot
+     * @param keys
+     *            the keys to press
+     */
+    public static void pressShortcut(AbstractSWTBotControl<?> bot, KeyStroke... keys) {
+        pressShortcut(bot.widget, () -> bot.pressShortcut(keys), keys);
+    }
+
+    private static void pressShortcut(Control control, Runnable pressShortcut, KeyStroke... keys) {
+        AtomicInteger keysPressed = new AtomicInteger();
+        AtomicInteger keysReleased = new AtomicInteger();
+        KeyListener keyListener = new KeyListener() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                keysPressed.incrementAndGet();
+            }
+            @Override
+            public void keyReleased(KeyEvent e) {
+                keysReleased.incrementAndGet();
+            }
+        };
+        UIThreadRunnable.syncExec(() -> control.addKeyListener(keyListener));
+        pressShortcut.run();
+        new SWTBot().waitUntil(new DefaultCondition() {
+            @Override
+            public boolean test() throws Exception {
+                return keysPressed.get() > 0 && keysPressed.get() == keysReleased.get();
+            }
+            @Override
+            public String getFailureMessage() {
+                return "key press " + Arrays.toString(keys) + " not detected";
+            }
+        });
+        UIThreadRunnable.syncExec(() -> control.removeKeyListener(keyListener));
+    }
+
+    /**
      * Press the keyboard shortcut that goes to the top of a tree widget. The
      * key combination can differ on different platforms.
      *
@@ -955,9 +1045,9 @@ public final class SWTBotUtils {
      */
     public static void pressShortcutGoToTreeTop(Keyboard keyboard) {
         if (SWTUtils.isMac()) {
-            keyboard.pressShortcut(Keystrokes.ALT, Keystrokes.UP);
+            pressShortcut(keyboard, Keystrokes.ALT, Keystrokes.UP);
         } else {
-            keyboard.pressShortcut(Keystrokes.HOME);
+            pressShortcut(keyboard, Keystrokes.HOME);
         }
     }
 
@@ -1093,5 +1183,44 @@ public final class SWTBotUtils {
                 return total;
             }
         });
+    }
+
+    /**
+     * Filter the specified list of items in a time graph view.
+     *
+     * @param viewBot
+     *            the view
+     * @param filterItems
+     *            the list of filter dialog item tree paths
+     * @param checkSubTree
+     *            true if the filter items sub-trees should be checked, or false
+     *            to only check the filter items
+     */
+    public static void applyTimeGraphFilter(SWTBotView viewBot, List<String[]> filterItems, boolean checkSubTree) {
+        final String FILTER_ACTION = "Show View Filters";
+        final String FILTER_DIALOG_TITLE = "Filter";
+        final String UNCHECK_ALL = "Uncheck all";
+        final String CHECK_SUBTREE = "Check subtree";
+        final String OK_BUTTON = "OK";
+
+        SWTBotToolbarButton filterButton = viewBot.toolbarButton(FILTER_ACTION);
+        filterButton.click();
+        SWTBotShell shell = viewBot.bot().shell(FILTER_DIALOG_TITLE).activate();
+
+        SWTBot bot = shell.bot();
+        SWTBotTree treeBot = bot.tree();
+        bot.button(UNCHECK_ALL).click();
+
+        for (String[] filterItem : filterItems) {
+            SWTBotTreeItem item = SWTBotUtils.getTreeItem(bot, treeBot, filterItem);
+            if (checkSubTree) {
+                item.select();
+                bot.button(CHECK_SUBTREE).click();
+            } else {
+                item.check();
+            }
+        }
+
+        bot.button(OK_BUTTON).click();
     }
 }

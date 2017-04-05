@@ -38,10 +38,8 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
-import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
-import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCLabel;
@@ -182,7 +180,7 @@ public class FilterColorEditorTest {
         fBot.text().typeText("HostF\n", 100);
         // make sure selected row is not matching row
         fTableBot.select(ROW - 1);
-        Multiset<RGB> colorAfter = waitForNewImage(cellBounds, before).getHistogram();
+        Multiset<RGB> colorAfter = ImageHelper.waitForNewImage(cellBounds, before).getHistogram();
 
         assertTrue(colorBefore.contains(fBackground));
         assertTrue(colorBefore.contains(fForeground));
@@ -212,7 +210,7 @@ public class FilterColorEditorTest {
         fBot.text().typeText("e\n", 100);
         // make sure matching item is not selected
         fTableBot.select(ROW - 1);
-        ImageHelper after = waitForNewImage(cellBounds, before);
+        ImageHelper after = ImageHelper.waitForNewImage(cellBounds, before);
 
         Multiset<RGB> colorBefore = before.getHistogram();
         Multiset<RGB> colorAfter = after.getHistogram();
@@ -259,7 +257,7 @@ public class FilterColorEditorTest {
         fBot.text().typeText("00\n", 100);
         // make sure matching column is not selected
         fTableBot.select(ROW - 1);
-        ImageHelper afterSearch = waitForNewImage(cellBounds, before);
+        ImageHelper afterSearch = ImageHelper.waitForNewImage(cellBounds, before);
 
         // click Add as Filter
         fTableBot.click(0, 0);
@@ -271,7 +269,7 @@ public class FilterColorEditorTest {
 
         // press DEL to clear highlighting
         fTableBot.pressShortcut(Keystrokes.DELETE);
-        ImageHelper afterClear = waitForNewImage(cellBounds, afterFilter);
+        ImageHelper afterClear = ImageHelper.waitForNewImage(cellBounds, afterFilter);
 
         List<RGB> beforeLine = before.getPixelRow(2);
         List<RGB> afterSearchLine = afterSearch.getPixelRow(2);
@@ -319,7 +317,7 @@ public class FilterColorEditorTest {
         fBot.text().typeText("HostF\n", 100);
         // make sure selected row is not matching row
         fTableBot.select(ROW - 1);
-        Multiset<RGB> colorAfter = waitForNewImage(cellBounds, before).getHistogram();
+        Multiset<RGB> colorAfter = ImageHelper.waitForNewImage(cellBounds, before).getHistogram();
 
         assertTrue(colorBefore.contains(fBackground));
         assertTrue(colorBefore.contains(fForeground));
@@ -390,27 +388,5 @@ public class FilterColorEditorTest {
                 return String.format("Cell (%d, %d) did not have highlight state: %s", row, column, Boolean.toString(highlight));
             }
         });
-    }
-
-    private static ImageHelper waitForNewImage(Rectangle bounds, ImageHelper currentImage) {
-        ImageHelper[] newImage = new ImageHelper[1];
-        fBot.waitUntil(new DefaultCondition() {
-            @Override
-            public boolean test() throws Exception {
-                return UIThreadRunnable.syncExec(new Result<Boolean> () {
-                    @Override
-                    public Boolean run() {
-                        newImage[0] = ImageHelper.grabImage(bounds);
-                        return !newImage[0].equals(currentImage);
-                    }
-                });
-            }
-
-            @Override
-            public String getFailureMessage() {
-                return "Image at bounds " + bounds + " did not change";
-            }
-        });
-        return newImage[0];
     }
 }
