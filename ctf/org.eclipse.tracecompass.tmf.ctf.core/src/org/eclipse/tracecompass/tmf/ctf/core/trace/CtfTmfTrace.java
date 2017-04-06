@@ -26,9 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.StreamSupport;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -472,13 +470,13 @@ public class CtfTmfTrace extends TmfTrace
      * @since 2.2
      */
     public @Nullable CtfTmfCallsite getCallsite(String eventName) {
-        Optional<@NonNull CTFCallsite> callsite = StreamSupport.stream(fTrace.getStreams().spliterator(), false)
-                .<@NonNull IEventDeclaration> flatMap(s -> s.getEventDeclarations().stream())
-                .filter(event -> Objects.equals(event.getName(), eventName))
-                .flatMap(ev -> ev.getCallsites().stream())
-                .findFirst();
-        if (callsite.isPresent()) {
-            return new CtfTmfCallsite(callsite.get());
+        for (ICTFStream stream : fTrace.getStreams()) {
+            for (IEventDeclaration eventDeclaration : stream.getEventDeclarations()) {
+                if (eventDeclaration != null && Objects.equals(eventDeclaration.getName(), eventName) &&
+                        !eventDeclaration.getCallsites().isEmpty()) {
+                    return new CtfTmfCallsite(eventDeclaration.getCallsites().get(0));
+                }
+            }
         }
         return null;
     }
@@ -495,17 +493,19 @@ public class CtfTmfTrace extends TmfTrace
      * @since 2.2
      */
     public @Nullable CtfTmfCallsite getCallsite(String eventName, long ip) {
-        Optional<@NonNull CTFCallsite> callsite = StreamSupport.stream(fTrace.getStreams().spliterator(), false)
-                .<@NonNull IEventDeclaration> flatMap(s -> s.getEventDeclarations().stream())
-                .filter(event -> Objects.equals(event.getName(), eventName))
-                .flatMap(ev -> ev.getCallsites().stream())
-                .filter(cs -> cs.getIp() > ip)
-                .sorted((o1, o2) -> (Long.compareUnsigned(o1.getIp(), o2.getIp())))
-                .findFirst();
-        if (callsite.isPresent()) {
-            return new CtfTmfCallsite(callsite.get());
+        CtfTmfCallsite callsite = null;
+        for (ICTFStream stream : fTrace.getStreams()) {
+            for (IEventDeclaration eventDeclaration : stream.getEventDeclarations()) {
+                if (eventDeclaration != null && Objects.equals(eventDeclaration.getName(), eventName)) {
+                    for (CTFCallsite cs : eventDeclaration.getCallsites()) {
+                        if (cs.getIp() >= ip && (callsite == null || cs.getIp() < callsite.getIntructionPointer())) {
+                            callsite = new CtfTmfCallsite(cs);
+                        }
+                    }
+                }
+            }
         }
-        return null;
+        return callsite;
     }
 
     /**
