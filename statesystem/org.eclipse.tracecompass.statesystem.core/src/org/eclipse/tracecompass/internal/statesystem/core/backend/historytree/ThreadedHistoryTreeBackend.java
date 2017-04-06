@@ -20,12 +20,16 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.collect.BufferedBlockingQueue;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.IntegerRangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
+
+import com.google.common.collect.Iterables;
 
 /**
  * Variant of the HistoryTreeBackend which runs all the interval-insertion logic
@@ -288,4 +292,19 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
         return super.doSingularQuery(t, attributeQuark);
     }
 
+    @Override
+    public Iterable<@NonNull ITmfStateInterval> query2D(IntegerRangeCondition quarks, TimeRangeCondition times)
+            throws TimeRangeException {
+        /*
+         * There can still be intervals in the queue, search the
+         * HistoryTreeBackend, then the queue for the intervals we need.
+         * Iterables will lazily evaluate the BBQ only once the
+         * HistoryTreeBackend is consumed and if the construction still isn't
+         * done.
+         */
+        Iterable<@NonNull HTInterval> queuedIntervals = Iterables.filter(intervalQueue,
+                interval -> !isFinishedBuilding() && quarks.test(interval.getAttribute())
+                        && times.intersects(interval.getStartTime(), interval.getEndTime()));
+        return Iterables.concat(super.query2D(quarks, times), queuedIntervals);
+    }
 }

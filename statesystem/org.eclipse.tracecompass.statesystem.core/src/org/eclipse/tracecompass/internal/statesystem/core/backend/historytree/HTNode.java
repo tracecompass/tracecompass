@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.IntegerRangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
@@ -505,6 +507,31 @@ public abstract class HTNode {
         }
     }
 
+    /**
+     * 2D query method, returns an iterable over the intervals for the desired
+     * quarks and times.
+     *
+     * @param quarks
+     *            NumCondition on the quarks on which we want information
+     * @param times
+     *            NumCondition on the times on which we want information
+     * @return an Iterable over intervals that match conditions.
+     */
+    public Iterable<HTInterval> iterable2D(IntegerRangeCondition quarks, TimeRangeCondition times) {
+        fRwl.readLock().lock();
+        try {
+            if (getNodeStart() > getNodeEnd()) {
+                return Collections.emptyList();
+            }
+            long start = times.min();
+            return Iterables.filter(fIntervals.subList(getStartIndexFor(start), fIntervals.size()),
+                    interval -> quarks.test(interval.getAttribute())
+                            && times.intersects(interval.getStartTime(), interval.getEndTime()));
+        } finally {
+            fRwl.readLock().unlock();
+        }
+    }
+
     private int getStartIndexFor(long t) throws TimeRangeException {
         /* Should only be called by methods with the readLock taken */
 
@@ -671,4 +698,5 @@ public abstract class HTNode {
      * @return A string representing the node
      */
     protected abstract String toStringSpecific();
+
 }

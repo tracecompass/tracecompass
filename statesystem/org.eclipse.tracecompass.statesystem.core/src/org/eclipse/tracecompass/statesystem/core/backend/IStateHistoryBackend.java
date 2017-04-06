@@ -18,6 +18,8 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.IntegerRangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -181,4 +183,21 @@ public interface IStateHistoryBackend {
     ITmfStateInterval doSingularQuery(long t, int attributeQuark)
             throws TimeRangeException, StateSystemDisposedException;
 
+    /**
+     * Generalized 2D iterable query method. Iterates over intervals that match
+     * the conditions on quarks and times with no guaranteed order.
+     *
+     * @param quarkCondition
+     *            Condition on the quarks for returned intervals.
+     * @param timeCondition
+     *            Condition on the times for returned intervals
+     * @return An un-ordered iterable over the queried intervals
+     * @throws TimeRangeException
+     *             if the time bounds are outside the range of the HistoryTree
+     * @since 2.3
+     */
+    default Iterable<@NonNull ITmfStateInterval> query2D(IntegerRangeCondition quarkCondition, TimeRangeCondition timeCondition)
+            throws TimeRangeException {
+        throw new UnsupportedOperationException("This backend does not support 2D queries"); //$NON-NLS-1$
+    }
 }

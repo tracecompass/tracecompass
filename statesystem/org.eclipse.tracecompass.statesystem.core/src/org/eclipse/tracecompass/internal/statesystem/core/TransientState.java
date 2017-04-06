@@ -17,11 +17,14 @@ package org.eclipse.tracecompass.internal.statesystem.core;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -350,6 +353,37 @@ public class TransientState {
                     stateInfo.set(i, interval);
                 }
             }
+        } finally {
+            fRWLock.readLock().unlock();
+        }
+    }
+
+    /**
+     * Generalized 2D iterable query method. Iterates over intervals that match
+     * the conditions on quarks and times in the Transient State.
+     *
+     * @param quarks
+     *            Collection of quarks for returned intervals.
+     * @param timeCondition
+     *            Condition on the times for returned intervals
+     * @return An iterable over the queried intervals, ordered by quarks.
+     * @since 2.1
+     */
+    public Iterable<ITmfStateInterval> query2D(Collection<Integer> quarks, TimeRangeCondition timeCondition) {
+        fRWLock.readLock().lock();
+        try {
+            if (!fIsActive) {
+                return Collections.EMPTY_LIST;
+            }
+            long end = timeCondition.max();
+            Collection<ITmfStateInterval> iterable = new ArrayList<>();
+            for (Integer quark : quarks) {
+                ITmfStateInterval interval = getIntervalAt(end, quark);
+                if (interval != null) {
+                    iterable.add(interval);
+                }
+            }
+            return iterable;
         } finally {
             fRWLock.readLock().unlock();
         }

@@ -1,7 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 Ericsson
- * Copyright (c) 2010, 2011 École Polytechnique de Montréal
- * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
+ * Copyright (c) 2012, 2017 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -31,6 +30,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.IntegerRangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -44,6 +45,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 import com.google.common.collect.ImmutableCollection.Builder;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 /**
  * This is the core class of the Generic State System. It contains all the
@@ -55,7 +57,7 @@ import com.google.common.collect.ImmutableSet;
  * inserting intervals, or the storage backend will have no way of knowing it
  * can close and write itself to disk, and its thread will keep running.
  *
- * @author alexmont
+ * @author Alexandre Montplaisir
  *
  */
 public class StateSystem implements ITmfStateSystemBuilder {
@@ -608,6 +610,45 @@ public class StateSystem implements ITmfStateSystemBuilder {
             }
             return ret;
         }
+    }
+
+    @Override
+    public Iterable<@NonNull ITmfStateInterval> query2D(Collection<@NonNull Integer> quarks, Collection<@NonNull Long> times)
+            throws StateSystemDisposedException, TimeRangeException, IndexOutOfBoundsException {
+        if (isDisposed) {
+            throw new StateSystemDisposedException();
+        }
+
+        TimeRangeCondition timeCondition = TimeRangeCondition.forDiscreteRange(times);
+        return query2D(quarks, timeCondition);
+    }
+
+    @Override
+    public Iterable<@NonNull ITmfStateInterval> query2D(Collection<@NonNull Integer> quarks, long start, long end)
+            throws StateSystemDisposedException, TimeRangeException, IndexOutOfBoundsException {
+        if (isDisposed) {
+            throw new StateSystemDisposedException();
+        }
+
+        TimeRangeCondition timeCondition = TimeRangeCondition.forContinuousRange(start, end);
+        return query2D(quarks, timeCondition);
+    }
+
+    private Iterable<@NonNull ITmfStateInterval> query2D(@NonNull Collection<@NonNull Integer> quarks, TimeRangeCondition timeCondition)
+            throws TimeRangeException, IndexOutOfBoundsException {
+        if (timeCondition.min() < getStartTime()) {
+            throw new TimeRangeException();
+        }
+
+        IntegerRangeCondition quarkCondition = IntegerRangeCondition.forDiscreteRange(quarks);
+        if (quarkCondition.min() < 0 || quarkCondition.max() >= getNbAttributes()) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        Iterable<@NonNull ITmfStateInterval> transStateIterable = transState.query2D(quarks, timeCondition);
+        Iterable<@NonNull ITmfStateInterval> backendIterable = backend.query2D(quarkCondition, timeCondition);
+
+        return Iterables.concat(transStateIterable, backendIterable);
     }
 
     @Override

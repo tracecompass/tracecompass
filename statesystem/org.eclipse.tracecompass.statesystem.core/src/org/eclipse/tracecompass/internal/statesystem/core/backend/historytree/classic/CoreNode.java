@@ -14,11 +14,15 @@
 package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.classic;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.IntegerRangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTConfig;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTNode;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.ParentNode;
@@ -168,6 +172,36 @@ public final class CoreNode extends ParentNode {
     }
 
     /**
+     * Get the end time for this child, the last child's end time will be
+     * Long.MAX_VALUE if it isn't written to disk.
+     *
+     * @param index
+     *            child position in this Parent
+     * @return the next child's endTime
+     */
+    private long getChildEnd(int index) {
+        rwl.readLock().lock();
+        try {
+            /*
+             * If this is not the last child, we can deduce its end time from
+             * the following child.
+             */
+            if (index < nbChildren - 1) {
+                return childStart[index + 1] - 1;
+            }
+            /*
+             * If it is the last child, it will have the same end time as its
+             * parent. However that time is unknown if the node isn't written to
+             * disk yet, so we return MAX_VALUE instead to avoid the query
+             * missing something.
+             */
+            return isOnDisk() ? getNodeEnd() : Long.MAX_VALUE;
+        } finally {
+            rwl.readLock().unlock();
+        }
+    }
+
+    /**
      * Get the sequence number of the extension to this node (if there is one).
      *
      * @return The sequence number of the extended node. '-1' is returned if
@@ -219,6 +253,24 @@ public final class CoreNode extends ParentNode {
                 throw new IllegalStateException("No next child node found"); //$NON-NLS-1$
             }
             return Collections.singleton(potentialNextSeqNb);
+        } finally {
+            rwl.readLock().unlock();
+        }
+    }
+
+    @Override
+    public Collection<Integer> selectNextChildren2D(IntegerRangeCondition quarks, TimeRangeCondition times) {
+        rwl.readLock().lock();
+        try {
+            /* Selectively search children */
+            List<Integer> list = new ArrayList<>();
+            for (int child = 0; child < nbChildren; child++) {
+                if (times.intersects(getChildStart(child), getChildEnd(child))) {
+                    int potentialNextSeqNb = getChild(child);
+                    list.add(potentialNextSeqNb);
+                }
+            }
+            return list;
         } finally {
             rwl.readLock().unlock();
         }

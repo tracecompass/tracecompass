@@ -13,31 +13,29 @@ import java.util.Collection;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.datastore.core.condition.ContinuousTimeRangeCondition;
-import org.eclipse.tracecompass.internal.datastore.core.condition.SingletonTimeRangeCondition;
-import org.eclipse.tracecompass.internal.datastore.core.condition.ArrayTimeRangeCondition;
+import org.eclipse.tracecompass.internal.datastore.core.condition.ArrayIntegerRangeCondition;
 
 /**
- * A range condition specific for time ranges. It allows to work with long
+ * A range condition specific for integer ranges. It allows to work with int
  * primitive types, which provides much better performances
  *
- * @author Geneviève Bastien
+ * @author Loic Prieur-Drevon
  */
-public interface TimeRangeCondition {
+public interface IntegerRangeCondition {
 
     /**
      * Get the lower bound of this range
      *
      * @return the lowest acceptable value for this condition.
      */
-    long min();
+    int min();
 
     /**
      * Get the upper bound of this range
      *
      * @return the highest acceptable value for this condition.
      */
-    long max();
+    int max();
 
     /**
      * Test whether a value is within this specific range boundaries. If the
@@ -50,7 +48,7 @@ public interface TimeRangeCondition {
      *            value that we want to test
      * @return true if element is contained in this condition's set or range
      */
-    boolean test(long element);
+    boolean test(int element);
 
     /**
      * Determine if the current range intersects a ranged bounded by the values
@@ -63,7 +61,7 @@ public interface TimeRangeCondition {
      * @return true if this element intersects the range's condition or any of
      *         the set's elements
      */
-    boolean intersects(long low, long high);
+    boolean intersects(int low, int high);
 
     /**
      * Reduce the Condition to elements or the range within bounds from and to.
@@ -76,46 +74,18 @@ public interface TimeRangeCondition {
      * @return the reduced condition or <code>null</code> if the reduced
      *         condition does not contain any element
      */
-    @Nullable TimeRangeCondition subCondition(long from, long to);
+    @Nullable IntegerRangeCondition subCondition(int from, int to);
 
     /**
-     * Get a condition of a single element.
+     * Get a range condition representing a discrete quark range.
      *
-     * @param elem
-     *            The single element
-     * @return The corresponding range condition
-     */
-    static TimeRangeCondition singleton(long elem) {
-        return new SingletonTimeRangeCondition(elem);
-    }
-
-    /**
-     * Get a range condition representing a continuous time range.
-     *
-     * @param bound1
-     *            The first bound
-     * @param bound2
-     *            The second bound. It's fine for bound2 to be > or < than
-     *            bound1.
-     * @return The corresponding range condition
-     */
-    static TimeRangeCondition forContinuousRange(long bound1, long bound2) {
-        if (bound2 < bound1) {
-            throw new IllegalArgumentException("Continuous time range condition: lower bound (" + bound1 + ") should be <= upper bound (" + bound2 + ')'); //$NON-NLS-1$//$NON-NLS-2$
-        }
-        return new ContinuousTimeRangeCondition(bound1, bound2);
-    }
-
-    /**
-     * Get a range condition representing a discrete time range.
-     *
-     * @param times
-     *            Collection of distinct time sets, needs to be distinct, not
+     * @param values
+     *            Collection of distinct integers, needs to be distinct but not
      *            sorted.
      * @return The corresponding range condition
      */
-    static TimeRangeCondition forDiscreteRange(Collection<@NonNull Long> times) {
-        return new ArrayTimeRangeCondition(times);
+    static IntegerRangeCondition forDiscreteRange(Collection<@NonNull Integer> values) {
+        return new ArrayIntegerRangeCondition(values);
     }
 
 }

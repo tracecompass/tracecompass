@@ -10,7 +10,10 @@
 package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 
 import java.util.Collection;
+
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.IntegerRangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 
 /**
@@ -20,6 +23,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
  *
  * @author Alexandre Montplaisir
  * @author Florian Wininger
+ * @author Loïc Prieur-Drevon
  */
 public abstract class ParentNode extends HTNode {
 
@@ -92,5 +96,19 @@ public abstract class ParentNode extends HTNode {
      *             If t is out of the node's range
      */
     public abstract @NonNull Collection<@NonNull Integer> selectNextChildren(long t);
+
+    /**
+     * Get a collection of sequence numbers for the children nodes that contain
+     * intervals with quarks from quarks, and times intersecting times from
+     * times.
+     *
+     * @param quarks
+     *            NumCondition on the quarks we are interested in.
+     * @param subTimes
+     *            NumCondition on the time stamps we are interested in.
+     * @return a collection of the sequence numbers for the children that match
+     *         the conditions.
+     */
+    public abstract Collection<Integer> selectNextChildren2D(IntegerRangeCondition quarks, TimeRangeCondition subTimes);
 
 }

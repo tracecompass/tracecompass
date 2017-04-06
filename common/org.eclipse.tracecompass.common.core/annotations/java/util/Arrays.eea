@@ -2,6 +2,27 @@ class java/util/Arrays
 asList
  <T:Ljava/lang/Object;>([TT;)Ljava/util/List<TT;>;
  <T:Ljava/lang/Object;>([TT;)L1java/util/List<TT;>;
+copyOfRange
+ ([BII)[B
+ ([BII)[1B
+copyOfRange
+ ([CII)[C
+ ([CII)[1C
+copyOfRange
+ ([DII)[D
+ ([DII)[1D
+copyOfRange
+ ([FII)[F
+ ([FII)[1F
+copyOfRange
+ ([III)[I
+ ([III)[1I
+copyOfRange
+ ([JII)[J
+ ([JII)[1J
+copyOfRange
+ ([ZII)[Z
+ ([ZII)[1Z
 stream
  ([D)Ljava/util/stream/DoubleStream;
  ([D)L1java/util/stream/DoubleStream;

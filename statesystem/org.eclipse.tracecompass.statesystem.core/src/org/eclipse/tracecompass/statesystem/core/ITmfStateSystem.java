@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.statesystem.core;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -436,4 +437,52 @@ public interface ITmfStateSystem {
      */
     @NonNull ITmfStateInterval querySingleState(long t, int attributeQuark)
             throws StateSystemDisposedException;
+
+    /**
+     * Multiple attribute and multiple times iterable query. Iterates over
+     * intervals from attributes in the quarks collection that intersect
+     * timestamps from the times collection with no guaranteed order. There may
+     * be duplicates during State System construction.
+     *
+     * @param quarks
+     *            a collection of quarks for which we want information
+     * @param times
+     *            the timestamps at which we want the states
+     * @return a lazily evaluated un-ordered iterable over the queried intervals
+     * @throws StateSystemDisposedException
+     *             If the query is sent after the state system has been disposed
+     * @throws IndexOutOfBoundsException
+     *             If the smallest attribute is <0 or if the largest is >= to
+     *             the number of attributes.
+     * @throws TimeRangeException
+     *             If the smallest time is before the state system start time.
+     * @since 2.3
+     */
+    Iterable<@NonNull ITmfStateInterval> query2D(@NonNull Collection<Integer> quarks,
+            @NonNull Collection<Long> times) throws StateSystemDisposedException, IndexOutOfBoundsException, TimeRangeException;
+
+    /**
+     * Multiple attribute and time range iterable query, Iterates over intervals
+     * from attributes in the quarks collection that intersect the [start, end]
+     * timerange with no guaranteed order. There may be duplicates during State
+     * System construction.
+     *
+     * @param quarks
+     *            a collection of quarks for which we want information
+     * @param start
+     *            lower bound for the query
+     * @param end
+     *            upper bound for the query
+     * @return a lazily evaluated un-ordered iterable over the queried intervals
+     * @throws StateSystemDisposedException
+     *             If the query is sent after the state system has been disposed
+     * @throws IndexOutOfBoundsException
+     *             If the smallest attribute is <0 or if the largest is >= to
+     *             the number of attributes.
+     * @throws TimeRangeException
+     *             If the smallest time is before the state system start time.
+     * @since 2.3
+     */
+    Iterable<@NonNull ITmfStateInterval> query2D(@NonNull Collection<Integer> quarks,
+            long start, long end) throws StateSystemDisposedException, IndexOutOfBoundsException, TimeRangeException;
 }

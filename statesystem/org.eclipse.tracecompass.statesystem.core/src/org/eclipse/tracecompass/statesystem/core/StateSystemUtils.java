@@ -286,7 +286,7 @@ public final class StateSystemUtils {
      * Iterator class to allow 2-way iteration over intervals of a given
      * attribute. Not thread-safe!
      *
-     * @since 2.2
+     * @since 2.3
      */
     public static class QuarkIterator implements Iterator<ITmfStateInterval> {
 
@@ -391,6 +391,39 @@ public final class StateSystemUtils {
             }
             throw new NoSuchElementException();
         }
+    }
+
+    /**
+     * Build a sorted list of time stamps separated by resolution between
+     * bounds, including the upper bound.
+     *
+     * @param from
+     *            lower bound of the list of time stamps.
+     * @param to
+     *            upper bound of the list of time stamps.
+     * @param resolution
+     *            positive duration between two consecutive time stamps.
+     * @return a sorted list of time stamps from start to end separated by
+     *         resolution, or consecutive timestamps if resolution == 0.
+     * @throws IllegalArgumentException
+     *             if end < start or resolution < 0.
+     * @since 2.3
+     */
+    public static List<Long> getTimes(long from, long to, long resolution) {
+        if (to < from || resolution < 0) {
+            throw new IllegalArgumentException();
+        }
+        /*
+         * If resolution is 0, adjust increment to return consecutive
+         * timestamps.
+         */
+        long increment = Math.max(resolution, 1L);
+        List<Long> times = new ArrayList<>((int) ((to - from) / increment + 1));
+        for (long t = from; t < to; t += increment) {
+            times.add(t);
+        }
+        times.add(to);
+        return times;
     }
 
 }

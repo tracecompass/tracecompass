@@ -14,10 +14,14 @@ package org.eclipse.tracecompass.internal.statesystem.core.backend;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.IntegerRangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
+import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 
@@ -115,5 +119,11 @@ public class NullBackend implements IStateHistoryBackend {
     public ITmfStateInterval doSingularQuery(long t, int attributeQuark) {
         /* Cannot do past queries */
         return null;
+    }
+
+    @Override
+    public Iterable<@NonNull ITmfStateInterval> query2D(IntegerRangeCondition quarks,
+            TimeRangeCondition times) throws TimeRangeException {
+        return Collections.EMPTY_LIST;
     }
 }

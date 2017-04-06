@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +27,8 @@ import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.IntegerRangeCondition;
+import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -35,6 +38,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Iterables;
 
 /**
  * History Tree backend for storing a state history. This is the basic version
@@ -339,6 +343,46 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
             interval = currentNode.getRelevantInterval(key, t);
         }
         return interval;
+    }
+
+    @Override
+    public Iterable<@NonNull ITmfStateInterval> query2D(IntegerRangeCondition quarks, TimeRangeCondition times)
+            throws TimeRangeException {
+        /* Get a flattened Iterable of nodes that match the conditions */
+        Iterable<HTNode> nodes = flatten(getSHT().getRootNode(), quarks, times);
+        /*
+         * Transform them into the iterables over their intervals that match the
+         * conditions.
+         */
+        Iterable<Iterable<HTInterval>> iterables = Iterables.transform(nodes,
+                n -> n.iterable2D(quarks, times));
+        return Iterables.concat(iterables);
+    }
+
+    private Iterable<HTNode> flatten(HTNode node, IntegerRangeCondition quarks, TimeRangeCondition times) {
+        if (node.getNodeType() == HTNode.NodeType.LEAF) {
+            return Collections.singleton(node);
+        }
+        ParentNode parent = (ParentNode) node;
+        /* Reduce the condition to this node's bounds. */
+        if (node.getNodeStart() > node.getNodeEnd()) {
+            return Collections.emptyList();
+        }
+        TimeRangeCondition subTimes = times.subCondition(node.getNodeStart(), node.getNodeEnd());
+        /*
+         * Transform the children's sequence numbers into the children's
+         * flattened subtrees.
+         */
+        Iterable<Iterable<HTNode>> children = Iterables.transform(parent.selectNextChildren2D(quarks, subTimes), seqNum -> {
+            try {
+                /* Recursive call to flatten children */
+                return flatten(getSHT().readNode(seqNum), quarks, subTimes);
+            } catch (ClosedChannelException e) {
+                return null;
+            }
+        });
+        /* BFS */
+        return Iterables.concat(Collections.singleton(node), Iterables.concat(children));
     }
 
     /**
