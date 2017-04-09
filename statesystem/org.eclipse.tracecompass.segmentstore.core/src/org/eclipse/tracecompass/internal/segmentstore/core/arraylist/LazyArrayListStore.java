@@ -18,16 +18,15 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
-import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Ordering;
 
 /**
  * Implementation of an {@link ISegmentStore} using one in-memory
@@ -55,12 +54,18 @@ import com.google.common.collect.Ordering;
  */
 public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegmentStore<E> {
 
-    private final Comparator<E> COMPARATOR = Ordering.from(SegmentComparators.INTERVAL_START_COMPARATOR)
-            .compound(SegmentComparators.INTERVAL_END_COMPARATOR);
+    /**
+     * Order to sort the backing array.
+     */
+    protected final Comparator<E> COMPARATOR = Comparator.comparing(E::getStart)
+            .thenComparing(E::getEnd).thenComparing(Function.identity());
 
     private final ReentrantLock fLock = new ReentrantLock(false);
 
-    private final List<E> fStore = new ArrayList<>();
+    /**
+     * Backing {@link ArrayList}
+     */
+    protected final List<E> fStore;
 
     private @Nullable transient Iterable<E> fLastSnapshot = null;
 
@@ -72,7 +77,7 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
      * Constructor
      */
     public LazyArrayListStore() {
-        // do nothing
+        fStore = new ArrayList<>();
     }
 
     /**
@@ -80,12 +85,12 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
      *
      * @param array
      *            an array of elements to wrap in the segment store
-     *
      */
     public LazyArrayListStore(Object[] array) {
-        for (int i = 0; i < array.length; i++) {
-            if (array[i] instanceof ISegment) {
-                E element = (E) array[i];
+        fStore = new ArrayList<>(array.length);
+        for (Object object : array) {
+            if (object instanceof ISegment) {
+                E element = (E) object;
                 setDirtyIfNeeded(element);
                 fStore.add(element);
                 fStart = Math.min(fStart, element.getStart());
@@ -97,7 +102,14 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
         }
     }
 
-    private void setDirtyIfNeeded(@NonNull E value) {
+    /**
+     * Set the store as dirty after inserting a segment if it does not respect
+     * the order.
+     *
+     * @param value
+     *            newly inserted segment.
+     */
+    protected void setDirtyIfNeeded(@NonNull E value) {
         if (!fStore.isEmpty() && COMPARATOR.compare(fStore.get(size() - 1), value) > 0) {
             fDirty = true;
         }
@@ -125,9 +137,10 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
     }
 
     /**
-     * DO NOT CALL FROM OUTSIDE OF A LOCK!
+     * Sort the backing ArrayList using the order defined by the internal
+     * comparator. DO NOT CALL FROM OUTSIDE OF A LOCK!
      */
-    private void sortStore() {
+    protected void sortStore() {
         fStore.sort(COMPARATOR);
         fDirty = false;
     }
@@ -141,7 +154,7 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
         fLock.lock();
         try {
             setDirtyIfNeeded(val);
-            fStore.add(val);
+            fStore.add(getInsertionPoint(val), val);
             fLastSnapshot = null;
             fStart = Math.min(fStart, val.getStart());
             fEnd = Math.max(fEnd, val.getEnd());
@@ -149,6 +162,22 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
         } finally {
             fLock.unlock();
         }
+    }
+
+    /**
+     * Find at which position to insert the new element.
+     * DO NOT CALL FROM OUTSIDE OF A LOCK!
+     *
+     * @param value
+     *            new Segment
+     * @return insertion position in the backing array
+     */
+    protected int getInsertionPoint(E value) {
+        /*
+         * For the LazyArrayListStore, always insert at the end, the backing
+         * ArrayList will be sorted upon reading.
+         */
+        return fStore.size();
     }
 
     @Override
@@ -225,13 +254,8 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
 
         fLock.lock();
         try {
-            boolean changed = false;
-            for (E elem : c) {
-                if (add(elem)) {
-                    changed = true;
-                }
-            }
-            return changed;
+            c.forEach(this::add);
+            return true;
         } finally {
             fLock.unlock();
         }
@@ -306,12 +330,6 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
 
     @Override
     public void dispose() {
-        fLock.lock();
-        try {
-            fStore.clear();
-            fDirty = false;
-        } finally {
-            fLock.unlock();
-        }
+        clear();
     }
 }
