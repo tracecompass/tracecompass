@@ -15,8 +15,6 @@
 
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,6 +22,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -212,11 +211,15 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         }
 
         /* super.refreshChildren() above should have set this */
-        TmfViewsElement viewsElement = checkNotNull(getChildElementViews());
+        TmfViewsElement viewsElement = getChildElementViews();
+        if (viewsElement == null) {
+            return;
+        }
 
         Map<String, TmfAnalysisElement> analysisMap = new HashMap<>();
         for (TmfAnalysisElement analysis : getAvailableAnalysis()) {
             analysisMap.put(analysis.getAnalysisId(), analysis);
+            analysis.refreshChildren();
         }
         for (IAnalysisModuleHelper module : TmfAnalysisManager.getAnalysisModules().values()) {
             if (!analysisMap.containsKey(module.getId()) && module.appliesToExperiment() && (experiment.getAnalysisModule(module.getId()) != null)) {
@@ -227,6 +230,22 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
                 analysisMap.put(module.getId(), analysis);
             }
         }
+    }
+
+    @Override
+    public List<TmfAnalysisElement> getChildrenAvailableAnalysis() {
+        List<TmfTraceElement> traces = getChildren().stream()
+                        .filter(elem -> (elem instanceof TmfTraceElement))
+                        .map(elem -> ((TmfTraceElement) elem).getElementUnderTraceFolder())
+                        .collect(Collectors.toList());
+
+        List<TmfAnalysisElement> analyses = new ArrayList<>();
+        for (TmfTraceElement traceElem : traces) {
+            if (traceElem.getChildElementViews() != null) {
+                analyses.addAll(traceElem.getAvailableAnalysis());
+            }
+        }
+        return analyses;
     }
 
     private List<IResource> getTraceResources() {
@@ -394,6 +413,14 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
                 closeEditors();
             }
         });
+
+        /* Remove all trace analyses from experiment view */
+        List<TmfAnalysisElement> analysisElements = trace.getElementUnderTraceFolder().getAvailableAnalysis();
+        TmfViewsElement view = getChildElementViews();
+
+        if (view != null) {
+            view.removeChildrenAnalysis(analysisElements);
+        }
 
         /* Finally, remove the trace from experiment */
         removeChild(trace);

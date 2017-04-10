@@ -21,6 +21,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -121,6 +122,10 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
         /* Get the base path to put the resource to */
         IPath tracePath = getResource().getFullPath();
         IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+
+        if (this.getParent() instanceof TmfExperimentElement) {
+            return;
+        }
 
         if (fViewsElement == null) {
             /* Add the "Views" node */
@@ -281,8 +286,10 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      */
     public ITmfTrace getTrace() {
         for (ITmfTrace trace : TmfTraceManager.getInstance().getOpenedTraces()) {
-            if (trace.getResource().equals(getResource())) {
-                return trace;
+            for (ITmfTrace t : TmfTraceManager.getTraceSetWithExperiment(trace)) {
+                if (getResource().equals(t.getResource())) {
+                    return t;
+                }
             }
         }
         return null;
@@ -427,6 +434,14 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
         return getChildElementViews().getChildren().stream()
             .map(elem -> (TmfAnalysisElement) elem)
             .collect(Collectors.toList());
+    }
+
+    /**
+     * @since 3.0
+     * @return list of children analysis elements
+     */
+    public List<TmfAnalysisElement> getChildrenAvailableAnalysis() {
+        return Collections.EMPTY_LIST;
     }
 
     // ------------------------------------------------------------------------

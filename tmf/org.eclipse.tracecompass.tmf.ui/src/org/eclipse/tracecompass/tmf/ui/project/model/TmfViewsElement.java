@@ -10,7 +10,10 @@
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -28,8 +31,11 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * Project model element for the "Views" node.
  *
  * For now it contains the list of the standard analyses, with their outputs
- * (views) under each. The plan is to eventually only show the views under this
- * node, since the user cannot really interact with the analyses themselves.
+ * (views) under each. For experiments all analyses from children traces are
+ * aggregated and shown under the "Views" node.
+ *
+ * The plan is to eventually only show the views under this node, since the
+ * user cannot really interact with the analyses themselves.
  *
  * @author Alexandre Montplaisir
  * @since 2.0
@@ -91,27 +97,118 @@ public class TmfViewsElement extends TmfProjectModelElement {
 
         IPath nodePath = getResource().getFullPath();
 
-        /* Add all new analysis modules or refresh outputs of existing ones */
-        for (IAnalysisModuleHelper module : TmfAnalysisManager.getAnalysisModules(traceClass).values()) {
+        TmfCommonProjectElement parent = getParent();
 
-            /* If the analysis is not a child of the trace, create it */
-            TmfAnalysisElement analysis = childrenMap.remove(module.getId());
-            if (analysis == null) {
-                IFolder analysisRes = ResourcesPlugin.getWorkspace().getRoot().getFolder(nodePath.append(module.getId()));
-                analysis = new TmfAnalysisElement(module.getName(), analysisRes, this, module);
-                addChild(analysis);
+        if (parent instanceof TmfTraceElement) {
+            /* Add all new analysis modules or refresh outputs of existing ones */
+            for (IAnalysisModuleHelper module : TmfAnalysisManager.getAnalysisModules(traceClass).values()) {
+
+                /* If the analysis is not a child of the trace, create it */
+                TmfAnalysisElement analysis = childrenMap.remove(module.getId());
+                if (analysis == null) {
+                    IFolder analysisRes = ResourcesPlugin.getWorkspace().getRoot().getFolder(nodePath.append(module.getId()));
+                    analysis = new TmfAnalysisElement(module.getName(), analysisRes, this, module);
+                    addChild(analysis);
+                }
+                analysis.refreshChildren();
             }
-            analysis.refreshChildren();
-        }
 
-        /* Remove analysis that are not children of this trace anymore */
-        for (TmfAnalysisElement analysis : childrenMap.values()) {
-            removeChild(analysis);
+            /* Remove analysis that are not children of this trace anymore */
+            for (TmfAnalysisElement analysis : childrenMap.values()) {
+                removeChild(analysis);
+            }
+        } else if (parent != null) {
+            /* In experiment case collect trace analyses in the aggregate analyses element */
+            Map<String, TmfAggregateAnalysisElement> analysisMap = new LinkedHashMap<>();
+
+            /* Add all new analysis modules or refresh outputs of existing ones */
+            for (IAnalysisModuleHelper module : TmfAnalysisManager.getAnalysisModules(traceClass).values()) {
+
+                /* If the analysis is not a child of the trace, create it */
+                TmfAnalysisElement analysis = childrenMap.remove(module.getId());
+                TmfAggregateAnalysisElement aggregateAnalysisElement = null;
+                if (analysis == null) {
+                    IFolder analysisRes = ResourcesPlugin.getWorkspace().getRoot().getFolder(nodePath.append(module.getId()));
+                    analysis = new TmfAnalysisElement(module.getName(), analysisRes, this, module);
+                    aggregateAnalysisElement = new TmfAggregateAnalysisElement(parent, analysis);
+                    addChild(aggregateAnalysisElement);
+                } else {
+                    if (analysis instanceof TmfAggregateAnalysisElement) {
+                        aggregateAnalysisElement = (TmfAggregateAnalysisElement) analysis;
+                    } else {
+                        aggregateAnalysisElement = new TmfAggregateAnalysisElement(parent, analysis);
+                    }
+                    removeChild(analysis);
+                    addChild(aggregateAnalysisElement);
+                }
+                analysisMap.put(analysis.getAnalysisId(), aggregateAnalysisElement);
+            }
+
+            /* Now add available all trace analyses */
+            for (TmfAnalysisElement analysis : getParent().getChildrenAvailableAnalysis()) {
+                /* If the analysis is not a child of the trace, create it */
+                TmfAnalysisElement a = childrenMap.remove(analysis.getAnalysisId());
+
+                TmfAggregateAnalysisElement childAnalysis = null;
+
+                if (a instanceof TmfAggregateAnalysisElement) {
+                    childAnalysis = (TmfAggregateAnalysisElement) a;
+                } else {
+                    childAnalysis = analysisMap.get(analysis.getAnalysisId());
+                }
+
+                if (childAnalysis == null) {
+                    childAnalysis = new TmfAggregateAnalysisElement(parent, analysis);
+                    addChild(childAnalysis);
+                } else {
+                    childAnalysis.addAnalyses(analysis);
+                }
+                analysisMap.put(analysis.getAnalysisId(), childAnalysis);
+            }
+
+            /* Remove analysis that are not children of this trace anymore */
+            for (TmfAnalysisElement analysis : childrenMap.values()) {
+                removeChild(analysis);
+            }
         }
     }
 
     @Override
     public Image getIcon() {
         return TmfProjectModelIcons.VIEWS_ICON;
+    }
+
+    /**
+     * Remove children analysis from aggregated traces
+     *
+     * @param analysisElements
+     *              list of analysis elements to remove
+     *
+     * @since 3.0
+     */
+    public void removeChildrenAnalysis(List<TmfAnalysisElement> analysisElements) {
+        for (TmfAnalysisElement tmfAnalysisElement : analysisElements) {
+            if (tmfAnalysisElement != null) {
+                TmfAggregateAnalysisElement aggrElement = getAggregateAnalysisElement(tmfAnalysisElement);
+                if (aggrElement != null) {
+                    aggrElement.removeAnalyses(tmfAnalysisElement);
+                    if (aggrElement.isEmpty()) {
+                        removeChild(aggrElement);
+                    }
+                }
+            }
+        }
+    }
+
+    private TmfAggregateAnalysisElement getAggregateAnalysisElement(TmfAnalysisElement element) {
+        Optional<TmfAggregateAnalysisElement> aggrElem = getChildren().stream()
+                .filter(elem -> (elem instanceof TmfAggregateAnalysisElement))
+                .map(elem -> ((TmfAggregateAnalysisElement) elem))
+                .filter(elem -> elem.getAnalysisHelper().getId().equals(element.getAnalysisHelper().getId()))
+                .findFirst();
+        if (aggrElem.isPresent()) {
+            return aggrElem.get();
+        }
+        return null;
     }
 }

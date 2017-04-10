@@ -53,7 +53,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
     };
 
     private final @NonNull IAnalysisModuleHelper fAnalysisHelper;
-    private boolean fCanExecute = true;
+    private volatile boolean fCanExecute = true;
 
     private static final String ANALYSIS_PROPERTIES_CATEGORY = Messages.TmfAnalysisElement_AnalysisProperties;
     private static final String HELPER_PROPERTIES_CATEGORY = Messages.TmfAnalysisElement_HelperProperties;
@@ -177,7 +177,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
 
     @Override
     public Styler getStyler() {
-        if (!fCanExecute) {
+        if (!canExecute()) {
             return ANALYSIS_CANT_EXECUTE_STYLER;
         }
         return null;
@@ -276,6 +276,27 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
             TmfTraceElement traceElement = (TmfTraceElement) parentTrace;
             TmfOpenTraceHelper.openTraceFromElement(traceElement);
         }
+    }
+
+    /**
+     * Checks whether the analysis can be executed or not.
+     *
+     * @return <code>true</code> if analysis can be executed else
+     *         <code>false</code>
+     * @since 3.0
+     */
+    public boolean canExecute() {
+        return fCanExecute;
+    }
+
+    /**
+     * Gets the analysis helper for this analysis.
+     *
+     * @return the analysis module helper
+     * @since 3.0
+     */
+    @NonNull protected IAnalysisModuleHelper getAnalysisHelper() {
+        return fAnalysisHelper;
     }
 
     // ------------------------------------------------------------------------
