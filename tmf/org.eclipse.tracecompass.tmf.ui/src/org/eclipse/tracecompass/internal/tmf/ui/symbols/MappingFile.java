@@ -13,10 +13,12 @@
 
 package org.eclipse.tracecompass.internal.tmf.ui.symbols;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Objects;
+import java.util.TreeMap;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
@@ -27,9 +29,12 @@ import org.eclipse.jdt.annotation.Nullable;
  * @since 3.0
  */
 public final class MappingFile {
+
+    private final @NonNull String DEFAULT_END_SUFFIX = "END__"; //$NON-NLS-1$
+
     private final String fFullPath;
     private final boolean fIsBinaryFile;
-    private final Map<String, String> fSymbolMapping = new HashMap<>();
+    private final @NonNull NavigableMap<Long, String> fSymbolMapping;
 
     /**
      * Create a new {@link MappingFile}
@@ -38,13 +43,13 @@ public final class MappingFile {
      *            Path leading to the mapping file
      * @param isBinaryFile
      *            Type of the mapping file
-     * @param symbolMapping
+     * @param results
      *            Resolved symbols for the given mapping file
      */
-    public MappingFile(String path, boolean isBinaryFile, Map<String, String> symbolMapping) {
+    public MappingFile(String path, boolean isBinaryFile, Map<Long, String> results) {
         fFullPath = path;
         fIsBinaryFile = isBinaryFile;
-        fSymbolMapping.putAll(symbolMapping);
+        fSymbolMapping = new TreeMap<>(results);
     }
 
     /**
@@ -64,8 +69,18 @@ public final class MappingFile {
     /**
      * @return resolved symbols for the given mapping file
      */
-    public Map<String, String> getSymbolMapping() {
+    public NavigableMap<Long, String> getSymbolMapping() {
         return fSymbolMapping;
+    }
+
+    /**
+     * Get the suffix for symbols that mark the end of address blocks in the
+     * file
+     *
+     * @return The suffix for symbols that end blocks of mapping addresses
+     */
+    public String getEndSuffix() {
+        return DEFAULT_END_SUFFIX;
     }
 
     @Override

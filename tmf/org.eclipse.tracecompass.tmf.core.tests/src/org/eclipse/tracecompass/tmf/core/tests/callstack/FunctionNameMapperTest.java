@@ -40,39 +40,40 @@ public class FunctionNameMapperTest {
         Path nmOutput = Paths.get("..", "..", "tmf", "org.eclipse.tracecompass.tmf.core.tests",
                 "testfiles", "callstack" , "nm-output-example");
         assertTrue(Files.exists(nmOutput));
-        Map<String, String> results = FunctionNameMapper.mapFromNmTextFile(nmOutput.toFile());
+        Map<Long, String> results = FunctionNameMapper.mapFromNmTextFile(nmOutput.toFile());
 
         assertNotNull(results);
         assertEquals(28, results.size());
         assertNull(results.get(""));
 
-        assertEquals("completed.7259", results.get("601190"));
-        assertEquals("data_start", results.get("601048"));
-        assertEquals("deregister_tm_clones", results.get("400690"));
-        assertEquals("__do_global_dtors_aux", results.get("400710"));
-        assertEquals("__dso_handle", results.get("601050"));
-        assertEquals("_DYNAMIC", results.get("600e18"));
-        assertEquals("_end", results.get("601198"));
-        assertEquals("_fini", results.get("400874"));
-        assertEquals("frame_dummy", results.get("400730"));
-        assertEquals("__FRAME_END__", results.get("400a28"));
-        assertEquals("_GLOBAL_OFFSET_TABLE_", results.get("601000"));
-        assertEquals("_GLOBAL__sub_I_main", results.get("4007ad"));
-        assertEquals("_init", results.get("4005d0"));
-        assertEquals("__init_array_end", results.get("600e08"));
-        assertEquals("__init_array_start", results.get("600df8"));
-        assertEquals("_IO_stdin_used", results.get("400880"));
-        assertEquals("__JCR_LIST__", results.get("600e10"));
-        assertEquals("__libc_csu_fini", results.get("400870"));
-        assertEquals("__libc_csu_init", results.get("400800"));
-        assertEquals("main", results.get("400756"));
-        assertEquals("register_tm_clones", results.get("4006d0"));
-        assertEquals("_start", results.get("400660"));
-        assertEquals("__TMC_END__", results.get("601058"));
-        assertEquals("Bar<int, int>* foo<int, int>(int, int)", results.get("4007c2"));
-        assertEquals("__static_initialization_and_destruction_0(int, int)", results.get("400770"));
-        assertEquals("std::cout@@GLIBCXX_3.4", results.get("601080"));
-        assertEquals("std::piecewise_construct", results.get("400884"));
-        assertEquals("std::__ioinit", results.get("601191"));
+        assertEquals("completed.7259", results.get(Long.valueOf("601190", 16)));
+        assertEquals("data_start", results.get(Long.valueOf("601048", 16)));
+        assertEquals("deregister_tm_clones", results.get(Long.valueOf("400690", 16)));
+        assertEquals("__do_global_dtors_aux", results.get(Long.valueOf("400710", 16)));
+        assertEquals("__dso_handle", results.get(Long.valueOf("601050", 16)));
+        assertEquals("_DYNAMIC", results.get(Long.valueOf("600e18", 16)));
+        assertEquals("_end", results.get(Long.valueOf("601198", 16)));
+        assertEquals("_fini", results.get(Long.valueOf("400874", 16)));
+        assertEquals("frame_dummy", results.get(Long.valueOf("400730", 16)));
+        assertEquals("__FRAME_END__", results.get(Long.valueOf("400a28", 16)));
+        assertEquals("_GLOBAL_OFFSET_TABLE_", results.get(Long.valueOf("601000", 16)));
+        assertEquals("_GLOBAL__sub_I_main", results.get(Long.valueOf("4007ad", 16)));
+        assertEquals("_init", results.get(Long.valueOf("4005d0", 16)));
+        assertEquals("__init_array_end", results.get(Long.valueOf("600e08", 16)));
+        assertEquals("__init_array_start", results.get(Long.valueOf("600df8", 16)));
+        assertEquals("_IO_stdin_used", results.get(Long.valueOf("400880", 16)));
+        assertEquals("__JCR_LIST__", results.get(Long.valueOf("600e10", 16)));
+        assertEquals("__libc_csu_fini", results.get(Long.valueOf("400870", 16)));
+        assertEquals("__libc_csu_init", results.get(Long.valueOf("400800", 16)));
+        assertEquals("main", results.get(Long.valueOf("400756", 16)));
+        assertEquals("register_tm_clones", results.get(Long.valueOf("4006d0", 16)));
+        assertEquals("_start", results.get(Long.valueOf("400660", 16)));
+        assertEquals("__TMC_END__", results.get(Long.valueOf("601058", 16)));
+        assertEquals("Bar<int, int>* foo<int, int>(int, int)", results.get(Long.valueOf("4007c2", 16)));
+        assertEquals("__static_initialization_and_destruction_0(int, int)", results.get(Long.valueOf("400770", 16)));
+        assertEquals("std::cout@@GLIBCXX_3.4", results.get(Long.valueOf("601080", 16)));
+        assertEquals("std::piecewise_construct", results.get(Long.valueOf("400884", 16)));
+        assertEquals("std::__ioinit", results.get(Long.valueOf("601191", 16)));
+
     }
 }

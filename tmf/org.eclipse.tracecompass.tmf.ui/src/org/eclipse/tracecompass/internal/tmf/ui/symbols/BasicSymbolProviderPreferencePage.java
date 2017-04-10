@@ -264,7 +264,7 @@ public class BasicSymbolProviderPreferencePage extends AbstractSymbolProviderPre
             String fullPath = filterPath + File.separator + fileName;
             File file = new File(fullPath);
 
-            Map<String, String> results = null;
+            Map<Long, String> results = null;
             boolean isBinaryFile = isBinaryFile(fullPath);
             if (isBinaryFile) {
                 results = FunctionNameMapper.mapFromBinaryFile(file);

@@ -22,9 +22,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,8 +65,8 @@ public final class FunctionNameMapper {
      *            The file to import
      * @return A map&lt;address, function name&gt; of the results
      */
-    public static @Nullable Map<String, String> mapFromNmTextFile(File mappingFile) {
-        Map<String, String> map = new HashMap<>();
+    public static @Nullable Map<Long, String> mapFromNmTextFile(File mappingFile) {
+        Map<Long, String> map = new TreeMap<>();
 
         try (FileReader fr = new FileReader(mappingFile);
                 BufferedReader reader = new BufferedReader(fr);) {
@@ -74,7 +74,7 @@ public final class FunctionNameMapper {
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 Matcher matcher = pattern.matcher(line);
                 if (matcher.find()) {
-                    String address = stripLeadingZeros(matcher.group(1));
+                    long address = Long.parseLong(stripLeadingZeros(matcher.group(1)), 16);
                     String name = matcher.group(3);
                     map.put(address, name);
                 }
@@ -98,18 +98,14 @@ public final class FunctionNameMapper {
      *            The file to import
      * @return A map&lt;address, function name&gt; of the results
      */
-    public static @Nullable Map<String, String> mapFromBinaryFile(File file) {
-        Map<String, String> map = new HashMap<>();
+    public static @Nullable Map<Long, String> mapFromBinaryFile(File file) {
+        Map<Long, String> map = new TreeMap<>();
         IBinaryParser.IBinaryObject binaryObject = getBinaryObject(file);
         if (binaryObject != null) {
             ISymbol[] symbols = binaryObject.getSymbols();
             for (ISymbol symbol : symbols) {
                 String address = symbol.getAddress().toHexAddressString();
-                /* Remove "0x" */
-                address = address.substring(2);
-                /* Strip the leading zeroes from the address */
-                address = stripLeadingZeros(address);
-                map.put(address, symbol.getName());
+                map.put(Long.decode(address), symbol.getName());
             }
         }
 
