@@ -37,6 +37,7 @@ import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
+import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.component.TmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfLostEvent;
@@ -636,11 +637,14 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
         boolean signalIsForUs = false;
-        for (ITmfTrace trace : TmfTraceManager.getTraceSet(signal.getTrace())) {
-            if (trace == this) {
+
+        ITmfEventProvider provider = this;
+        while (provider != null) {
+            if (provider == signal.getTrace()) {
                 signalIsForUs = true;
                 break;
             }
+            provider = provider.getParent();
         }
 
         if (!signalIsForUs) {
@@ -648,8 +652,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
         }
 
         /*
-         * The signal is either for this trace, or for an experiment containing
-         * this trace.
+         * The signal is either for this trace, or for a parent of this trace.
          */
         IStatus status = executeAnalysis();
         if (!status.isOK()) {

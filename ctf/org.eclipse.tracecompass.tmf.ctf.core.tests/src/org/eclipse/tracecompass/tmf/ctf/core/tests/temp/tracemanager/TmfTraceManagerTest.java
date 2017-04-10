@@ -68,6 +68,8 @@ public class TmfTraceManagerTest {
     private static final long t2start = 1332170682440133097L;
     private static final long t2end = 1332170692664579801L;
 
+    private static ITmfTrace trace3;
+
     private static final long ONE_SECOND = 1000000000L;
 
     private TmfTraceManager tm;
@@ -79,14 +81,17 @@ public class TmfTraceManagerTest {
     public static void setUpClass() {
         trace1 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.TRACE2);
         trace2 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.KERNEL);
+        trace3 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.KERNEL_VM);
 
         trace1.indexTrace(true);
         trace2.indexTrace(true);
+        trace3.indexTrace(true);
 
         // Deregister traces from signal manager so that they don't
         // interfere with the TmfTraceManager tests
         TmfSignalManager.deregister(trace1);
         TmfSignalManager.deregister(trace2);
+        TmfSignalManager.deregister(trace3);
     }
 
     /**
@@ -114,6 +119,7 @@ public class TmfTraceManagerTest {
     public static void tearDownClass() {
         CtfTmfTestTraceUtils.dispose(CtfTestTrace.TRACE2);
         CtfTmfTestTraceUtils.dispose(CtfTestTrace.KERNEL);
+        CtfTmfTestTraceUtils.dispose(CtfTestTrace.KERNEL_VM);
     }
 
     // ------------------------------------------------------------------------
@@ -205,6 +211,26 @@ public class TmfTraceManagerTest {
     }
 
     /**
+     * Test the contents of a trace set with a nested experiment.
+     */
+    @Test
+    public void testTraceSetNestedExperiment() {
+        final ITmfTrace localTrace1 = trace1;
+        final ITmfTrace localTrace2 = trace2;
+        final ITmfTrace localTrace3 = trace3;
+        assertNotNull(localTrace1);
+        assertNotNull(localTrace2);
+        assertNotNull(localTrace3);
+        TmfExperiment nestedExp = createExperiment(localTrace2, localTrace3);
+        TmfExperiment exp = createExperiment(localTrace1, nestedExp);
+
+        Collection<ITmfTrace> expected = ImmutableSet.of(localTrace1, localTrace2, localTrace3);
+        Collection<ITmfTrace> actual = TmfTraceManager.getTraceSet(exp);
+
+        assertEquals(expected, actual);
+    }
+
+    /**
      * Test the contents of the complete trace set.
      */
     @Test
@@ -225,6 +251,26 @@ public class TmfTraceManagerTest {
         expected = ImmutableSet.of(localTrace1, localTrace2, exp);
         actual = TmfTraceManager.getTraceSetWithExperiment(exp);
         assertEquals(3, actual.size());
+        assertEquals(expected, actual);
+    }
+
+    /**
+     * Test the contents of the complete trace set with a nested experiment.
+     */
+    @Test
+    public void testTraceSetWithNestedExperiment() {
+        final ITmfTrace localTrace1 = trace1;
+        final ITmfTrace localTrace2 = trace2;
+        final ITmfTrace localTrace3 = trace3;
+        assertNotNull(localTrace1);
+        assertNotNull(localTrace2);
+        assertNotNull(localTrace3);
+        TmfExperiment nestedExp = createExperiment(localTrace2, localTrace3);
+        TmfExperiment exp = createExperiment(localTrace1, nestedExp);
+
+        Collection<ITmfTrace> expected = ImmutableSet.of(exp, localTrace1, nestedExp, localTrace2, localTrace3);
+        Collection<ITmfTrace> actual = TmfTraceManager.getTraceSetWithExperiment(exp);
+
         assertEquals(expected, actual);
     }
 
@@ -693,7 +739,7 @@ public class TmfTraceManagerTest {
     // Utility methods
     // ------------------------------------------------------------------------
 
-    private static TmfExperiment createExperiment(ITmfTrace t1, ITmfTrace t2) {
+    private static @NonNull TmfExperiment createExperiment(ITmfTrace t1, ITmfTrace t2) {
         ITmfTrace[] traces = new ITmfTrace[] { t1, t2 };
         TmfExperiment exp = new TmfExperiment(ITmfEvent.class, "test-exp", traces,
                 TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, null);

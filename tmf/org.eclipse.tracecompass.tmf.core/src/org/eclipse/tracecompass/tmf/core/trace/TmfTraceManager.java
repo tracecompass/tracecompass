@@ -22,7 +22,6 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,9 +51,9 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 /**
  * Central trace manager for TMF. It tracks the currently opened traces and
@@ -206,9 +205,10 @@ public final class TmfTraceManager {
     // ------------------------------------------------------------------------
 
     /**
-     * Get the trace set of a given trace. For a standard trace, this is simply
-     * an array with only that trace in it. For experiments, this is an array of
-     * all the traces contained in this experiment.
+     * Get the trace set of a given trace or experiment. For a standard trace,
+     * this is simply a collection containing only that trace. For experiments,
+     * this is a collection of all the leaf traces contained in this experiment,
+     * recursively.
      *
      * @param trace
      *            The trace or experiment. If it is null, an empty collection
@@ -220,33 +220,32 @@ public final class TmfTraceManager {
             return ImmutableSet.of();
         }
         List<@NonNull ITmfTrace> traces = trace.getChildren(ITmfTrace.class);
-        if (traces.size() > 0) {
-            return ImmutableSet.copyOf(traces);
+        if (!traces.isEmpty()) {
+            Iterable<ITmfTrace> iterable = checkNotNull(Iterables.concat(Iterables.transform(traces, t -> getTraceSet(t))));
+            return ImmutableSet.copyOf(iterable);
         }
         return ImmutableSet.of(trace);
     }
 
     /**
      * Get the trace set of a given trace or experiment, including the
-     * experiment. For a standard trace, this is simply a set containing only
-     * that trace. For experiments, it is the set of all the traces contained in
-     * this experiment, along with the experiment.
+     * experiments. For a standard trace, this is simply a collection containing
+     * only that trace. For experiments, this is a collection of all the
+     * experiments and leaf traces contained in the experiments, recursively.
      *
      * @param trace
      *            The trace or experiment. If it is null, an empty collection
      *            will be returned.
-     * @return The corresponding trace set, including the experiment.
+     * @return The corresponding trace set, including experiments.
      */
     public static Collection<ITmfTrace> getTraceSetWithExperiment(@Nullable ITmfTrace trace) {
         if (trace == null) {
             return ImmutableSet.of();
         }
-        if (trace instanceof TmfExperiment) {
-            TmfExperiment exp = (TmfExperiment) trace;
-            List<ITmfTrace> traces = exp.getTraces();
-            Set<ITmfTrace> alltraces = new LinkedHashSet<>(traces);
-            alltraces.add(exp);
-            return ImmutableSet.copyOf(alltraces);
+        List<@NonNull ITmfTrace> traces = trace.getChildren(ITmfTrace.class);
+        if (!traces.isEmpty()) {
+            Iterable<ITmfTrace> iterable = checkNotNull(Iterables.concat(Iterables.transform(traces, t -> getTraceSetWithExperiment(t))));
+            return ImmutableSet.<ITmfTrace>builder().add(trace).addAll(iterable).build();
         }
         return Collections.singleton(trace);
     }
