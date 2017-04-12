@@ -16,7 +16,8 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.tmf.core,
  org.eclipse.tracecompass.tmf.ui,
- org.eclipse.tracecompass.tmf.core.tests
+ org.eclipse.tracecompass.tmf.core.tests,
+ org.apache.commons.io
 Export-Package: org.eclipse.tracecompass.tmf.ui.tests,
  org.eclipse.tracecompass.tmf.ui.tests.actions,
  org.eclipse.tracecompass.tmf.ui.tests.experiment.type,
