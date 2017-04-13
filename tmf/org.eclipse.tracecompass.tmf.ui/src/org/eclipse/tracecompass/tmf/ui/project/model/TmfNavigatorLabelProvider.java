@@ -298,7 +298,9 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider, IStyledL
                     styledString = new StyledString(text, styler);
                 }
             }
-            styledString = new StyledString(text);
+            if (styledString == null) {
+                styledString = new StyledString(text);
+            }
             boolean displayTimeRange = Activator.getDefault().getPreferenceStore().getBoolean(ITmfUIPreferences.TRACE_DISPLAY_RANGE_PROJECTEXPLORER);
             if (displayTimeRange && element instanceof TmfTraceElement) {
                 styledString.append(formatTraceRange(((TmfTraceElement) element).getElementUnderTraceFolder()));
