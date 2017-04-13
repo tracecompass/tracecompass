@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo;
 
 import java.util.Objects;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
@@ -95,11 +96,11 @@ public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile
 
     @Override
     public String toString() {
-        return com.google.common.base.Objects.toStringHelper(this)
-            .add("path", fFilePath) //$NON-NLS-1$
-            .add("build_id", fBuildId) //$NON-NLS-1$
-            .add("debug_link", fDebugLink) //$NON-NLS-1$
-            .add("is_pic", fIsPic) //$NON-NLS-1$
+        return new ToStringBuilder(this)
+            .append("path", fFilePath) //$NON-NLS-1$
+            .append("build_id", fBuildId) //$NON-NLS-1$
+            .append("debug_link", fDebugLink) //$NON-NLS-1$
+            .append("is_pic", fIsPic) //$NON-NLS-1$
             .toString();
     }
 

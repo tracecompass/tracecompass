@@ -12,10 +12,9 @@
 
 package org.eclipse.tracecompass.statesystem.core.interval;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-
-import com.google.common.base.Objects;
 
 /**
  * The StateInterval represents the "state" a particular attribute was in, at a
@@ -84,11 +83,11 @@ public final class TmfStateInterval implements ITmfStateInterval {
     @Override
     public String toString() {
         /* Only used for debugging */
-        return Objects.toStringHelper(this)
-            .add("start", start) //$NON-NLS-1$
-            .add("end", end) //$NON-NLS-1$
-            .add("key", attribute) //$NON-NLS-1$
-            .add("value", sv.toString()) //$NON-NLS-1$
+        return new ToStringBuilder(this)
+            .append("start", start) //$NON-NLS-1$
+            .append("end", end) //$NON-NLS-1$
+            .append("key", attribute) //$NON-NLS-1$
+            .append("value", sv.toString()) //$NON-NLS-1$
             .toString();
     }
 

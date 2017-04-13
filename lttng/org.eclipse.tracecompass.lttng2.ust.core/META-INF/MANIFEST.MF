@@ -25,8 +25,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.lttng2.control.core,
  org.eclipse.tracecompass.ctf.core
 Import-Package: com.google.common.annotations;version="15.0.0",
- com.google.common.base,
  com.google.common.cache,
  com.google.common.collect,
  com.google.common.io,
- org.apache.commons.lang3;version="3.1.0"
+ org.apache.commons.lang3;version="3.1.0",
+ org.apache.commons.lang3.builder;version="3.1.0"

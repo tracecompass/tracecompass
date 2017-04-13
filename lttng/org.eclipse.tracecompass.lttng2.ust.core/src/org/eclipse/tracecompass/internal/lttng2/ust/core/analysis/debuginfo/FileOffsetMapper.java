@@ -17,15 +17,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.process.ProcessUtils;
 import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 
-import com.google.common.base.Objects;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -65,7 +66,7 @@ public final class FileOffsetMapper {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(fFilePath, fBuildId, fOffset);
+            return Objects.hash(fFilePath, fBuildId, fOffset);
         }
 
         @Override
@@ -80,17 +81,17 @@ public final class FileOffsetMapper {
                 return false;
             }
             FileOffset other = (FileOffset) obj;
-            return Objects.equal(fFilePath, other.fFilePath) &&
-                    Objects.equal(fBuildId, other.fBuildId) &&
-                    Objects.equal(fOffset, other.fOffset);
+            return Objects.equals(fFilePath, other.fFilePath) &&
+                    Objects.equals(fBuildId, other.fBuildId) &&
+                    Objects.equals(fOffset, other.fOffset);
         }
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(this)
-                    .add("fFilePath", fFilePath) //$NON-NLS-1$
-                    .add("fBuildId", fBuildId) //$NON-NLS-1$
-                    .add("fOffset", String.format("0x%h", fOffset)) //$NON-NLS-1$ //$NON-NLS-2$
+            return new ToStringBuilder(this)
+                    .append("fFilePath", fFilePath) //$NON-NLS-1$
+                    .append("fBuildId", fBuildId) //$NON-NLS-1$
+                    .append("fOffset", String.format("0x%h", fOffset)) //$NON-NLS-1$ //$NON-NLS-2$
                     .toString();
         }
     }
@@ -200,10 +201,10 @@ public final class FileOffsetMapper {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(this)
-                    .add("fSourceFileName", fSourceFileName) //$NON-NLS-1$
-                    .add("fSourceLineNumber", fSourceLineNumber) //$NON-NLS-1$
-                    .add("fFunctionName", fFunctionName) //$NON-NLS-1$
+            return new ToStringBuilder(this)
+                    .append("fSourceFileName", fSourceFileName) //$NON-NLS-1$
+                    .append("fSourceLineNumber", fSourceLineNumber) //$NON-NLS-1$
+                    .append("fFunctionName", fFunctionName) //$NON-NLS-1$
                     .toString();
         }
     }
