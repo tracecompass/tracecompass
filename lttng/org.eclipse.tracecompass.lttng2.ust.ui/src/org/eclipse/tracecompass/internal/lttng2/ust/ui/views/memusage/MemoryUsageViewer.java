@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,8 +100,9 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
             double[] xvalues = getXAxis(start, end, nb);
             setXAxis(xvalues);
 
+
             boolean complete = false;
-            long currentEnd = start;
+            long currentEnd = Math.max(ss.getStartTime(), start);
 
             while (!complete && currentEnd < end) {
                 if (monitor.isCanceled()) {
@@ -109,40 +111,48 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
                 complete = ss.waitUntilBuilt(BUILD_UPDATE_TIMEOUT);
                 currentEnd = ss.getCurrentEndTime();
                 List<Integer> tidQuarks = ss.getSubAttributes(-1, false);
-                long traceStart = getStartTime();
+                long traceStart = Math.max(getStartTime(), ss.getStartTime());
                 long traceEnd = getEndTime();
                 long offset = this.getTimeOffset();
 
                 /* Initialize quarks and series names */
-                List<ITmfStateInterval> fullState = ss.queryFullState(start);
-                for (int quark : tidQuarks) {
-                    fYValues.put(quark, new double[xvalues.length]);
-                    fMemoryQuarks.put(quark, ss.getQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_MEMORY_ATTRIBUTE));
-                    int procNameQuark = ss.getQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_PROCNAME_ATTRIBUTE);
-                    String oldSeriesName = fSeriesName.get(quark);
-                    String seriesName = null;
-                    try {
-                        ITmfStateValue procnameValue = fullState.get(procNameQuark).getStateValue();
-                        String procname = ""; //$NON-NLS-1$
-                        if (!procnameValue.isNull()) {
-                            procname = procnameValue.unboxStr();
+                long queryStart = Math.max(ss.getStartTime(), start);
+                List<ITmfStateInterval> fullState = Collections.emptyList();
+                if (queryStart <= currentEnd) {
+                    fullState = ss.queryFullState(queryStart);
+                    for (int quark : tidQuarks) {
+                        fYValues.put(quark, new double[xvalues.length]);
+                        fMemoryQuarks.put(quark, ss.getQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_MEMORY_ATTRIBUTE));
+                        int procNameQuark = ss.getQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_PROCNAME_ATTRIBUTE);
+                        String oldSeriesName = fSeriesName.get(quark);
+                        String seriesName = null;
+                        try {
+                            ITmfStateValue procnameValue = fullState.get(procNameQuark).getStateValue();
+                            String procname = ""; //$NON-NLS-1$
+                            if (!procnameValue.isNull()) {
+                                procname = procnameValue.unboxStr();
+                            }
+                            seriesName = (procname + ' ' + '(' + ss.getAttributeName(quark) + ')').trim();
+                        } catch (TimeRangeException e) {
+                            seriesName = '(' + ss.getAttributeName(quark) + ')';
                         }
-                        seriesName = (procname + ' ' + '(' + ss.getAttributeName(quark) + ')').trim();
-                    } catch (TimeRangeException e) {
-                        seriesName = '(' + ss.getAttributeName(quark) + ')';
-                    }
 
-                    if (oldSeriesName != null && !oldSeriesName.equals(seriesName)) {
-                        Display display = Display.getDefault();
-                        if (!display.isDisposed()) {
-                            display.syncExec(() -> {
-                                deleteSeries(oldSeriesName);
-                            });
+                        if (oldSeriesName != null && !oldSeriesName.equals(seriesName)) {
+                            Display display = Display.getDefault();
+                            if (!display.isDisposed()) {
+                                display.syncExec(() -> {
+                                    deleteSeries(oldSeriesName);
+                                });
+                            }
                         }
+                        fSeriesName.put(quark, seriesName);
                     }
-                    fSeriesName.put(quark, seriesName);
+                } else {
+                    Display.getDefault().asyncExec(() -> {
+                        clearContent();
+                    });
+                    continue;
                 }
-
                 /*
                  * TODO: It should only show active threads in the time range.
                  * If a tid does not have any memory value (only 1 interval in
