@@ -3,29 +3,18 @@
 <plugin>
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
-      <module
-            analysis_module="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.CallGraphAnalysisUI"
-            automatic="false"
-            icon="icons/elcl16/callgraph.png"
-            id="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.callgraphanalysis"
-            name="%callgraph.analysis">
-         <tracetype
-               applies="true"
-               class="org.eclipse.tracecompass.tmf.core.trace.TmfTrace">
-         </tracetype>
-      </module>
       <output
             class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.callgraphDensity">
          <analysisModuleClass
-               class="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.CallGraphAnalysisUI">
+               class="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphAnalysis">
          </analysisModuleClass>
       </output>
       <output
             class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph.flamegraphView">
          <analysisModuleClass
-               class="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.CallGraphAnalysisUI">
+               class="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphAnalysis">
          </analysisModuleClass>
       </output>
    </extension>

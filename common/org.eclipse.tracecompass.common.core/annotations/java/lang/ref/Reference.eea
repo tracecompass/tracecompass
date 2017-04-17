@@ -1,0 +1,4 @@
+class java/lang/ref/Reference
+get
+ ()TT;
+ ()T0T;

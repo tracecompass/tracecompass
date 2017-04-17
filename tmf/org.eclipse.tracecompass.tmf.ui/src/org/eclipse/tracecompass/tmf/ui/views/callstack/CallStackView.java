@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
@@ -63,6 +64,8 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
+import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -70,10 +73,8 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampDelta;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor;
-import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
 import org.eclipse.tracecompass.tmf.ui.symbols.SymbolProviderConfigDialog;
-import org.eclipse.tracecompass.tmf.ui.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphContentProvider;
@@ -243,8 +244,7 @@ public class CallStackView extends AbstractTimeGraphView {
 
         @Override
         public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
-            return reverse ? o2.getName().compareTo(o1.getName()) :
-                    o1.getName().compareTo(o2.getName());
+            return reverse ? o2.getName().compareTo(o1.getName()) : o1.getName().compareTo(o2.getName());
         }
     }
 
@@ -260,8 +260,7 @@ public class CallStackView extends AbstractTimeGraphView {
             if (o1 instanceof ThreadEntry && o2 instanceof ThreadEntry) {
                 ThreadEntry t1 = (ThreadEntry) o1;
                 ThreadEntry t2 = (ThreadEntry) o2;
-                return reverse ? Long.compare(t2.getThreadId(), t1.getThreadId()) :
-                    Long.compare(t1.getThreadId(), t2.getThreadId());
+                return reverse ? Long.compare(t2.getThreadId(), t1.getThreadId()) : Long.compare(t1.getThreadId(), t2.getThreadId());
             }
             return 0;
         }
@@ -276,8 +275,7 @@ public class CallStackView extends AbstractTimeGraphView {
 
         @Override
         public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
-            return reverse ? Long.compare(o2.getStartTime(), o1.getStartTime()) :
-                    Long.compare(o1.getStartTime(), o2.getStartTime());
+            return reverse ? Long.compare(o2.getStartTime(), o1.getStartTime()) : Long.compare(o1.getStartTime(), o2.getStartTime());
         }
     }
 
@@ -505,8 +503,8 @@ public class CallStackView extends AbstractTimeGraphView {
     @TmfSignalHandler
     public void traceClosed(TmfTraceClosedSignal signal) {
         super.traceClosed(signal);
-        synchronized(fSymbolProviders){
-            for(ITmfTrace trace : getTracesToBuild(signal.getTrace())){
+        synchronized (fSymbolProviders) {
+            for (ITmfTrace trace : getTracesToBuild(signal.getTrace())) {
                 fSymbolProviders.remove(trace);
             }
         }
@@ -535,7 +533,7 @@ public class CallStackView extends AbstractTimeGraphView {
         ISymbolProvider provider = fSymbolProviders.get(trace);
         if (provider == null) {
             provider = SymbolProviderManager.getInstance().getSymbolProvider(trace);
-            provider.loadConfiguration(null);
+            provider.loadConfiguration(new NullProgressMonitor());
             fSymbolProviders.put(trace, provider);
         }
 
@@ -567,7 +565,8 @@ public class CallStackView extends AbstractTimeGraphView {
                 return;
             }
             long end = ss.getCurrentEndTime();
-            if (start == end && !complete) { // when complete execute one last time regardless of end time
+            if (start == end && !complete) { // when complete execute one last
+                                             // time regardless of end time
                 continue;
             }
 
@@ -583,14 +582,16 @@ public class CallStackView extends AbstractTimeGraphView {
 
             try {
                 /*
-                 * Get quarks first to make sure they are in the full query result.
+                 * Get quarks first to make sure they are in the full query
+                 * result.
                  */
                 List<Integer> processQuarks = ss.getQuarks(module.getProcessesPattern());
                 List<ITmfStateInterval> endStates = ss.queryFullState(end);
                 for (int processQuark : processQuarks) {
 
                     /*
-                     * Default to trace entry, overwrite if a process entry exists.
+                     * Default to trace entry, overwrite if a process entry
+                     * exists.
                      */
                     TimeGraphEntry threadParent = traceEntry;
                     int processId = -1;
@@ -644,19 +645,26 @@ public class CallStackView extends AbstractTimeGraphView {
                             threadEnd = endInterval.getStartTime();
                         }
                         /*
-                         * Default to process/trace entry, overwrite if a thread entry exists.
+                         * Default to process/trace entry, overwrite if a thread
+                         * entry exists.
                          */
                         TimeGraphEntry callStackParent = threadParent;
                         if (threadQuark != processQuark) {
                             ThreadEntry threadEntry = threadEntryMap.get(threadQuark);
                             if (threadEntry == null) {
                                 if (startStates == null || callStackQuark >= startStates.size()) {
-                                    /* attribute created after previous full query */
+                                    /*
+                                     * attribute created after previous full
+                                     * query
+                                     */
                                     startStates = ss.queryFullState(ss.getStartTime());
                                 }
                                 long threadId = -1;
                                 if (threadQuark >= endStates.size()) {
-                                    /* attribute created after previous full query */
+                                    /*
+                                     * attribute created after previous full
+                                     * query
+                                     */
                                     endStates = ss.queryFullState(end);
                                 }
                                 ITmfStateValue threadStateValue = endStates.get(threadQuark).getStateValue();
@@ -680,7 +688,10 @@ public class CallStackView extends AbstractTimeGraphView {
                             } else {
                                 threadEntry.updateEndTime(threadEnd);
                             }
-                            /* The parent of the call stack entries will be a thread */
+                            /*
+                             * The parent of the call stack entries will be a
+                             * thread
+                             */
                             callStackParent = threadEntry;
                         }
                         int level = 1;
@@ -1072,8 +1083,7 @@ public class CallStackView extends AbstractTimeGraphView {
          * Since we cannot know the exact analysis ID (in separate plugins), we
          * will search using the analysis type.
          */
-        Iterable<CallStackAnalysis> modules =
-                TmfTraceUtils.getAnalysisModulesOfClass(trace, CallStackAnalysis.class);
+        Iterable<CallStackAnalysis> modules = TmfTraceUtils.getAnalysisModulesOfClass(trace, CallStackAnalysis.class);
         Iterator<CallStackAnalysis> it = modules.iterator();
         if (!it.hasNext()) {
             /* This trace does not provide a call-stack analysis */
@@ -1260,8 +1270,9 @@ public class CallStackView extends AbstractTimeGraphView {
         if (trace != null) {
             for (ITmfTrace subTrace : getTracesToBuild(trace)) {
                 ISymbolProvider provider = fSymbolProviders.get(subTrace);
-                if (provider != null) {
-                    ISymbolProviderPreferencePage page = provider.createPreferencePage();
+                if (provider instanceof org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider) {
+                    org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider provider2 = (org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider) provider;
+                    ISymbolProviderPreferencePage page = provider2.createPreferencePage();
                     if (page != null) {
                         pages.add(page);
                     }

@@ -1,14 +1,15 @@
 /*******************************************************************************
- * Copyright (c) 2016 Movidius Inc. and others
+ * Copyright (c) 2016-2017 Movidius Inc. and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.symbols;
+package org.eclipse.tracecompass.tmf.core.symbols;
+
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -20,31 +21,27 @@ import java.util.WeakHashMap;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * This class offer services around the
- * <code>org.eclipse.tracecompass.tmf.ui.symbolProvider</code> extension point.
+ * <code>org.eclipse.tracecompass.tmf.core.symbolProvider</code> extension
+ * point.
  *
  * @author Robert Kiss
- * @since 2.0
- * @deprecated use
- *             {@link org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager}
- *             instead
+ * @since 2.4
  */
-@Deprecated
 public final class SymbolProviderManager {
 
     /**
      * The singleton instance of this manager
      */
-    private static SymbolProviderManager INSTANCE;
+    private static @Nullable SymbolProviderManager INSTANCE;
 
-    private static final String EXTENSION_POINT_ID = "org.eclipse.tracecompass.tmf.ui.symbolProvider"; //$NON-NLS-1$
+    private static final String OLD_EXTENSION_POINT_ID = "org.eclipse.tracecompass.tmf.ui.symbolProvider"; //$NON-NLS-1$
+    private static final String EXTENSION_POINT_ID = "org.eclipse.tracecompass.tmf.core.symbolProvider"; //$NON-NLS-1$
     private static final String ELEM_NAME_PROVIDER = "providerFactory"; //$NON-NLS-1$
     private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
     private static final String ATTR_PRIORITY = "priority"; //$NON-NLS-1$
@@ -65,54 +62,51 @@ public final class SymbolProviderManager {
         private SymbolProviderFactoryWrapper(ISymbolProviderFactory factory, int priority) {
             this.factory = factory;
             this.priority = priority;
-
         }
-
     }
 
     /**
-     * Get the instance of the {@link SymbolProviderManager}
      *
      * @return the singleton instance of this class
      */
-    @SuppressWarnings("null")
-    public static synchronized @NonNull SymbolProviderManager getInstance() {
-        if (INSTANCE == null) {
-            List<@NonNull SymbolProviderFactoryWrapper> providers = new ArrayList<>();
-            IConfigurationElement[] configElements = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_POINT_ID);
-            for (IConfigurationElement element : configElements) {
-                if (ELEM_NAME_PROVIDER.equals(element.getName())) {
-                    try {
-                        Object extension = element.createExecutableExtension(ATTR_CLASS);
-                        int priority = 0;
-                        try {
-                            priority = Integer.parseInt(element.getAttribute(ATTR_PRIORITY));
-                        } catch (NumberFormatException e) {
-                            // safe to ignore
-                        }
-                        providers.add(new SymbolProviderFactoryWrapper((ISymbolProviderFactory) extension, priority));
-                    } catch (CoreException | ClassCastException e) {
-                        Activator.getDefault().logError("Exception while loading extensions", e); //$NON-NLS-1$
-                    }
-                }
-            }
-            /*
-             * Those with a higher priority need to be on top
-             *
-             * Note: we cannot simply sort by negative priority because
-             * (-Integer.MIN_VAL) == Integer.MIN_VAL
-             */
-            providers.sort(Comparator.<SymbolProviderFactoryWrapper> comparingInt(o -> o.priority).reversed());
-            INSTANCE = new SymbolProviderManager(providers);
+    public static synchronized SymbolProviderManager getInstance() {
+        SymbolProviderManager manager = INSTANCE;
+        if (manager == null) {
+            manager = new SymbolProviderManager();
+            INSTANCE = manager;
         }
-        return INSTANCE;
+        return manager;
     }
 
     /**
      * The private constructor of this manager
      */
-    private SymbolProviderManager(@NonNull List<@NonNull SymbolProviderFactoryWrapper> providers) {
-        fProviders = ImmutableList.copyOf(providers);
+    private SymbolProviderManager() {
+        fProviders = new ArrayList<>();
+        load(OLD_EXTENSION_POINT_ID);
+        load(EXTENSION_POINT_ID);
+        // Those with a higher priority need to be on top
+        fProviders.sort(Comparator.comparingLong(o -> -o.priority));
+    }
+
+    private void load(String configElemPath) {
+        IConfigurationElement[] configElements = Platform.getExtensionRegistry().getConfigurationElementsFor(configElemPath);
+        for (IConfigurationElement element : configElements) {
+            if (element != null && ELEM_NAME_PROVIDER.equals(element.getName())) {
+                try {
+                    Object extension = checkNotNull(element.createExecutableExtension(ATTR_CLASS));
+                    int priority = 0;
+                    try {
+                        priority = Integer.parseInt(element.getAttribute(ATTR_PRIORITY));
+                    } catch (NumberFormatException e) {
+                        // safe to ignore
+                    }
+                    fProviders.add(new SymbolProviderFactoryWrapper((ISymbolProviderFactory) extension, priority));
+                } catch (CoreException | ClassCastException e) {
+                    Activator.logError("Exception while loading extensions", e); //$NON-NLS-1$
+                }
+            }
+        }
     }
 
     /**
@@ -124,7 +118,7 @@ public final class SymbolProviderManager {
      *            The trace to create a provider for
      * @return a valid {@link ISymbolProvider}, never null
      */
-    public @NonNull ISymbolProvider getSymbolProvider(@NonNull ITmfTrace trace) {
+    public ISymbolProvider getSymbolProvider(ITmfTrace trace) {
         // Check to see if we already have a provider for this trace
         synchronized (fInstances) {
             WeakReference<ISymbolProvider> reference = fInstances.get(trace);

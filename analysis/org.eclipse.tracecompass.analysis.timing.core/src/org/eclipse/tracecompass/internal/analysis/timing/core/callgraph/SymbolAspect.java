@@ -7,21 +7,19 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph;
+package org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;
 
 import java.util.Comparator;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.ICalledFunction;
-import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.Messages;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
+import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
+import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
-import org.eclipse.tracecompass.tmf.ui.symbols.SymbolProviderManager;
 
 /**
  * An aspect used to get the function name of a call stack event or to compare
@@ -33,7 +31,7 @@ public final class SymbolAspect implements ISegmentAspect {
     /**
      * A symbol aspect
      */
-    public static final @NonNull ISegmentAspect SYMBOL_ASPECT = new SymbolAspect();
+    public static final ISegmentAspect SYMBOL_ASPECT = new SymbolAspect();
 
     /**
      * Constructor
@@ -68,6 +66,7 @@ public final class SymbolAspect implements ISegmentAspect {
     public @Nullable Object resolve(@NonNull ISegment segment) {
         if (segment instanceof ICalledFunction) {
             ICalledFunction calledFunction = (ICalledFunction) segment;
+            // FIXME work around this trace
             ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
             if (trace != null) {
                 String symbolText;

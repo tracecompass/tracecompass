@@ -12,10 +12,10 @@ package org.eclipse.tracecompass.internal.lttng2.ust.ui.analysis.debuginfo;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoAnalysisModule;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
+import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
+import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProviderFactory;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
-import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
-import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderFactory;
 
 /**
  * Factory to create {@link UstDebugInfoSymbolProvider}. Provided to TMF via

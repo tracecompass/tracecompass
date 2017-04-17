@@ -38,6 +38,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.callstack.CallStackAnalysis;
+import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -63,7 +64,12 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Sonia Farrah
  */
-public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISegmentStoreProvider {
+public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISegmentStoreProvider {
+
+    /**
+     * ID
+     */
+    public static final String ID = "org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.callgraphanalysis"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -120,6 +126,11 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
          * analysis dependencies work better
          */
         return true;
+    }
+
+    @Override
+    public @NonNull Iterable<@NonNull ISegmentAspect> getSegmentAspects() {
+        return Collections.singletonList(SymbolAspect.SYMBOL_ASPECT);
     }
 
     @Override
@@ -429,4 +440,5 @@ public abstract class CallGraphAnalysis extends TmfAbstractAnalysisModule implem
         }
         return processId;
     }
+
 }

@@ -37,6 +37,6 @@ public class CallGraphDensityViewer extends AbstractSegmentStoreDensityViewer {
 
     @Override
     protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(@NonNull ITmfTrace trace) {
-        return TmfTraceUtils.getAnalysisModuleOfClass(trace, CallGraphAnalysis.class, CallGraphAnalysisUI.ID);
+        return TmfTraceUtils.getAnalysisModuleOfClass(trace, CallGraphAnalysis.class, CallGraphAnalysis.ID);
     }
 }

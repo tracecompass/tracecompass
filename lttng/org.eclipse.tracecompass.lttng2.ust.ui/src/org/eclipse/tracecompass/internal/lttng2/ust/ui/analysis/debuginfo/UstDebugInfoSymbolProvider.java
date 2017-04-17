@@ -18,8 +18,10 @@ import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoB
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoFunctionAspect;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoSourceAspect;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
+import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
-import org.eclipse.tracecompass.tmf.ui.symbols.DefaultSymbolProvider;
+import org.eclipse.tracecompass.tmf.core.symbols.DefaultSymbolProvider;
+import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
 
 /**
@@ -28,7 +30,7 @@ import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
  * @author Alexandre Montplaisir
  * @see UstDebugInfoAnalysisModule
  */
-public class UstDebugInfoSymbolProvider extends DefaultSymbolProvider {
+public class UstDebugInfoSymbolProvider extends DefaultSymbolProvider implements ISymbolProvider{
 
     /**
      * Create a new {@link UstDebugInfoSymbolProvider} for the given trace
@@ -82,6 +84,12 @@ public class UstDebugInfoSymbolProvider extends DefaultSymbolProvider {
     @Override
     public @NonNull ISymbolProviderPreferencePage createPreferencePage() {
         return new UstDebugInfoSymbolProviderPreferencePage(this);
+    }
+
+    @Deprecated
+    @Override
+    public @Nullable ITmfCallsite getSymbolInfo(long address) {
+        return null;
     }
 
 }

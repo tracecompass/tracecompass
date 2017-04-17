@@ -19,10 +19,11 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.AggregatedCalledFunctionStatistics;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.ICalledFunction;
+import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.SymbolAspect;
+import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
+import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
-import org.eclipse.tracecompass.tmf.ui.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -130,23 +131,15 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
     private static String getFuntionSymbol(FlamegraphEvent event, ISymbolProvider symbolProvider) {
         String funcSymbol = ""; //$NON-NLS-1$
         if (event.getSymbol() instanceof Long || event.getSymbol() instanceof Integer) {
-            long longAddress = ((Long) event.getSymbol()).longValue();
-            funcSymbol = symbolProvider.getSymbolText(longAddress);
-            if (funcSymbol == null) {
+
+            ICalledFunction segment = event.getStatistics().getDurationStatistics().getMinObject();
+            if (segment == null) {
+                long longAddress = ((Long) event.getSymbol()).longValue();
                 return "0x" + Long.toHexString(longAddress); //$NON-NLS-1$
             }
-            // take time of max segment for time a query the symbol name
-            ICalledFunction maxObject = event.getStatistics().getDurationStatistics().getMaxObject();
-            if (maxObject == null) {
-                return "0x" + Long.toHexString(longAddress); //$NON-NLS-1$
-            }
-            long time = maxObject.getStart();
-            int pid = event.getProcessId();
-            if (pid > 0) {
-                String text = symbolProvider.getSymbolText(pid, time, longAddress);
-                if (text != null) {
-                    return text;
-                }
+            Object symbol = SymbolAspect.SYMBOL_ASPECT.resolve(segment);
+            if (symbol != null) {
+                return symbol.toString();
             }
         } else {
             return event.getSymbol().toString();

@@ -1,24 +1,24 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.tracecompass.tmf.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.eclipse.tracecompass.tmf.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.tracecompass.tmf.ui" id="symbolProvider" name="TMF Symbol provider extension"/>
+         <meta.schema plugin="org.eclipse.tracecompass.tmf.core" id="org.eclipse.tracecompass.tmf.core.symbolProvider" name="Core Symbol Provider"/>
       </appinfo>
       <documentation>
-         This extension point can be used to transform from symbol addresses that might be found inside a TmfTrace into human readable texts, for example function names.
+         Core symbol provider, provides a symbol factory for a given trace. This extension point can be used to transform from symbol addresses that might be found inside a TmfTrace into human readable texts, for example function names.
       </documentation>
    </annotation>
 
    <element name="extension">
       <annotation>
          <appinfo>
-            <meta.element deprecated="true" />
+            <meta.element />
          </appinfo>
       </annotation>
       <complexType>
-         <sequence>
-            <element ref="providerFactory" minOccurs="1" maxOccurs="unbounded"/>
+         <sequence minOccurs="1" maxOccurs="unbounded">
+            <element ref="providerFactory"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -48,29 +48,14 @@
    </element>
 
    <element name="providerFactory">
-      <annotation>
-         <appinfo>
-            <meta.element deprecated="true"/>
-         </appinfo>
-         <documentation>
-            A symbol provider factory can be used to translate symbol addresses that can be found inside traces into symbol names.
-         </documentation>
-      </annotation>
       <complexType>
-         <attribute name="id" type="string" use="required">
-            <annotation>
-               <documentation>
-                  The ID of the extension
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="class" type="string" use="required">
+         <attribute name="class" type="string">
             <annotation>
                <documentation>
                   The name of the class responsible to create an ISymbolProvider
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderFactory"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.tracecompass.tmf.core.symbols.ISymbolProviderFactory"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -78,6 +63,13 @@
             <annotation>
                <documentation>
                   Specify the priority of this factory relative to the other. It should be an integer number. If not defined or not a valid integer it will be assumed to be zero.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The ID of the extension
                </documentation>
             </annotation>
          </attribute>
@@ -89,7 +81,7 @@
          <meta.section type="since"/>
       </appinfo>
       <documentation>
-         2.0
+         3.0
       </documentation>
    </annotation>
 
@@ -98,7 +90,22 @@
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
-         [Enter extension point usage example here.]
+         &lt;p&gt;For example, a symbol provider can be initialized with a priority. It is specified in the extension point.
+&lt;/p&gt;
+
+&lt;p&gt;
+The following is an example of the extension point usage:
+&lt;pre&gt;
+  &lt;extension
+         point=&quot;org.eclipse.tracecompass.tmf.core.symbolProvider&quot;&gt;
+      &lt;providerFactory
+            class=&quot;org.myproject.mypackage.mySymbolProviderFactory&quot;
+            id=&quot;org.myproject.mypackage.mySymbolProviderFactory.id&quot;
+            priority=&quot;42&quot;&gt;
+      &lt;/providerFactory&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
       </documentation>
    </annotation>
 
@@ -107,28 +114,21 @@
          <meta.section type="apiinfo"/>
       </appinfo>
       <documentation>
-         Since 2.0
+         Since 3.0
+
+Symbol providers using this extension point have to specify the symbol provider factory. This class has to implement ISymbolProviderFactory.
       </documentation>
    </annotation>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="implementation"/>
-      </appinfo>
-      <documentation>
-         [Enter information about supplied implementation of this extension point.]
-      </documentation>
-   </annotation>
 
    <annotation>
       <appinfo>
          <meta.section type="copyright"/>
       </appinfo>
       <documentation>
-         Copyright (c) 2016 Movidius Inc and others
- 
-All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at &lt;a 
-href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+         Copyright (c) 2017 Ericsson and others
+
+All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at &lt;a href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
       </documentation>
    </annotation>
 

@@ -12,9 +12,9 @@ package org.eclipse.tracecompass.internal.tmf.ui.symbols;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
+import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProviderFactory;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
-import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderFactory;
 
 /**
  * Basic symbol provider factory that can handle any trace. It will create a

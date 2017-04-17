@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <module
+            analysis_module="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphAnalysis"
+            applies_experiment="true"
+            automatic="true"
+            icon="icons/callgraph.png"
+            id="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.callgraphanalysis"
+            name="%callgraph.analysis">
+         <tracetype
+               applies="true"
+               class="org.eclipse.tracecompass.tmf.core.trace.TmfTrace">
+         </tracetype>
+      </module>
+   </extension>
+
+</plugin>

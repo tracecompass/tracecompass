@@ -50,7 +50,7 @@ public class CallGraphTableViewer extends AbstractSegmentStoreTableViewer {
 
     @Override
     protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(@NonNull ITmfTrace trace) {
-        CallGraphAnalysis fModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, CallGraphAnalysis.class, CallGraphAnalysisUI.ID);
+        CallGraphAnalysis fModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, CallGraphAnalysis.class, CallGraphAnalysis.ID);
         if (fModule == null) {
             return null;
         }
