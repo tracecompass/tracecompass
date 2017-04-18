@@ -15,16 +15,18 @@ package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter;
 
 import java.text.Format;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -67,6 +69,8 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
 
     private final AtomicInteger fDirty = new AtomicInteger();
 
+    private static final int UNKNOWN_SIZE = -1;
+
     private final class CompactingSegmentStoreQuery extends Job {
         private static final long MAX_POINTS = 1000;
         private final long fStart;
@@ -90,21 +94,20 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
                 final long startTime = fStart;
                 final long endTime = fEnd;
                 if (segmentProvider == null) {
-                    redraw(statusMonitor, startTime, startTime, Collections.EMPTY_LIST);
+                    redraw(statusMonitor, startTime, startTime, Collections.emptyList());
                     return new Status(IStatus.WARNING, Activator.PLUGIN_ID, "segment provider not available"); //$NON-NLS-1$
                 }
 
                 final ISegmentStore<ISegment> segStore = segmentProvider.getSegmentStore();
                 if (segStore == null) {
-                    redraw(statusMonitor, startTime, startTime, Collections.EMPTY_LIST);
+                    redraw(statusMonitor, startTime, startTime, Collections.emptyList());
                     return new Status(IStatus.INFO, Activator.PLUGIN_ID, "Segment provider does not have segments"); //$NON-NLS-1$
                 }
 
                 fPixelStart = startTime;
                 fPixelSize = Math.max(1, (endTime - startTime) / MAX_POINTS);
-                final Iterable<ISegment> intersectingElements = segStore.getIntersectingElements(startTime, endTime);
-                final List<ISegment> list = convertIterableToList(intersectingElements, statusMonitor);
-                final List<ISegment> displayData = (!list.isEmpty()) ? compactList(startTime, list, statusMonitor) : list;
+                final Iterable<ISegment> intersectingElements = segStore.getIntersectingElements(startTime, endTime, SegmentComparators.INTERVAL_START_COMPARATOR);
+                final Iterable<ISegment> displayData = compactList(startTime, intersectingElements);
 
                 redraw(statusMonitor, startTime, endTime, displayData);
 
@@ -122,7 +125,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
 
         }
 
-        private void redraw(final IProgressMonitor statusMonitor, final long startTime, final long endTime, final List<ISegment> displayData) {
+        private void redraw(final IProgressMonitor statusMonitor, final long startTime, final long endTime, final Iterable<@NonNull ISegment> displayData) {
             fDisplayData = displayData;
             /*
              * Increment at every redraw, since the content of the view is not
@@ -134,7 +137,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
                 @Override
                 public void run() {
                     try {
-                        updateData(startTime, endTime, displayData.size(), statusMonitor);
+                        updateData(startTime, endTime, UNKNOWN_SIZE, statusMonitor);
                     } finally {
                         /* Decrement once the redraw is done */
                         fDirty.decrementAndGet();
@@ -143,37 +146,57 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             });
         }
 
-        private List<ISegment> compactList(final long startTime, final List<ISegment> listToCompact, final IProgressMonitor statusMonitor) {
-            List<ISegment> displayData = new ArrayList<>();
-            ISegment last = listToCompact.get(0);
-            if (last.getStart() >= startTime) {
-                displayData.add(last);
-            }
-            for (ISegment next : listToCompact) {
-                if (next.getStart() < startTime) {
-                    continue;
-                }
-                if (statusMonitor.isCanceled()) {
-                    return Collections.EMPTY_LIST;
-                }
-                if (!overlaps(last, next)) {
-                    displayData.add(next);
-                    last = next;
-                }
-            }
-            return displayData;
-        }
+        private Iterable<ISegment> compactList(final long startTime, final Iterable<@NonNull ISegment> iterableToCompact) {
 
-        private List<ISegment> convertIterableToList(final Iterable<ISegment> iterable, final IProgressMonitor statusMonitor) {
-            final List<ISegment> list = new ArrayList<>();
-            for (ISegment seg : iterable) {
-                if (statusMonitor.isCanceled()) {
-                    return Collections.EMPTY_LIST;
+            return new Iterable<@NonNull ISegment>() {
+
+                @Override
+                public Iterator<ISegment> iterator() {
+
+                    return new Iterator<@NonNull ISegment>() {
+
+                        private @Nullable ISegment fLast = null;
+                        private @Nullable ISegment fNext = null;
+                        private Iterator<@NonNull ISegment> fIterator = iterableToCompact.iterator();
+
+                        @Override
+                        public @NonNull ISegment next() {
+                            /* hasNext implies next != null */
+                            if (hasNext()) {
+                                fLast = fNext;
+                                fNext = null;
+                                return Objects.requireNonNull(fLast);
+                            }
+                            throw new NoSuchElementException();
+                        }
+
+                        @Override
+                        public boolean hasNext() {
+                            if (fLast == null) {
+                                // iteration hasn't started yet.
+                                if (fIterator.hasNext()) {
+                                    fLast = fIterator.next();
+                                    if (fLast.getStart() >= startTime) {
+                                        fNext = fLast;
+                                    }
+                                } else {
+                                    return false;
+                                }
+                            }
+
+                            // clear warning in calling overlaps below.
+                            ISegment prev = fLast;
+                            while (fNext == null && fIterator.hasNext()) {
+                                ISegment tmp = fIterator.next();
+                                if (tmp.getStart() >= startTime && !overlaps(prev, tmp)) {
+                                    fNext = tmp;
+                                }
+                            }
+                            return fNext != null;
+                        }
+                    };
                 }
-                list.add(seg);
-            }
-            Collections.sort(list, SegmentComparators.INTERVAL_START_COMPARATOR);
-            return list;
+            };
         }
 
         private boolean overlaps(ISegment last, ISegment next) {
@@ -220,7 +243,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
     /**
      * Data to display
      */
-    private Collection<ISegment> fDisplayData = Collections.EMPTY_LIST;
+    private Iterable<@NonNull ISegment> fDisplayData = Collections.emptyList();
 
     /**
      * Provider completion listener
@@ -294,14 +317,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
                     }
                 });
             }
-            fDisplayData = Collections.EMPTY_LIST;
-        } else {
-            Collection<ISegment> elements = (Collection<ISegment>) dataInput.getIntersectingElements(currentStart, currentEnd);
-            // getIntersectingElements can return an unsorted iterable, make
-            // sure our collection is sorted
-            ArrayList<ISegment> list = new ArrayList<>(elements);
-            Collections.sort(list, SegmentComparators.INTERVAL_START_COMPARATOR);
-            fDisplayData = list;
+            fDisplayData = Collections.emptyList();
         }
         setWindowRange(currentStart, currentEnd);
         updateContent();
@@ -318,22 +334,18 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
 
     @Override
     protected void updateData(final long start, final long end, int nb, @Nullable IProgressMonitor monitor) {
-        // Third parameter is not used by implementation
-        // Determine data that needs to be visible
-        Collection<ISegment> data = fDisplayData;
-
-        final int dataSize = (nb == 0) ? data.size() : nb;
         if (end == start) {
             return;
         }
-
-        List<Double> xSeries = new ArrayList<>(dataSize);
-        List<Double> ySeries = new ArrayList<>(dataSize);
+        // Determine data that needs to be visible
+        List<Double> xSeries = nb != UNKNOWN_SIZE ? new ArrayList<>(nb) : new ArrayList<>();
+        List<Double> ySeries = nb != UNKNOWN_SIZE ? new ArrayList<>(nb) : new ArrayList<>();
         // For each visible segments, add start time to x value and duration
         // for y value
-        Iterator<ISegment> modelIter = data.iterator();
-        while (modelIter.hasNext()) {
-            ISegment segment = modelIter.next();
+        for (ISegment segment : fDisplayData) {
+            if (monitor != null && monitor.isCanceled()) {
+                return;
+            }
             xSeries.add((double) (segment.getStart() - start));
             ySeries.add((double) segment.getLength());
         }
