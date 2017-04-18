@@ -295,8 +295,8 @@ public class SegmentTreeNode<E extends ISegment2> extends OverlappingNode<E> {
         }
 
         /**
-         * Get a segment from a comparator that correspond whose field wrt to
-         * the comparator is the smallest value of the child node.
+         * Get the segment for a child node with the least value for the field
+         * corresponding to the comparator's field.
          *
          * @param index
          *            The index of the child node
@@ -315,17 +315,9 @@ public class SegmentTreeNode<E extends ISegment2> extends OverlappingNode<E> {
             } else if (order.equals(SegmentComparators.INTERVAL_END_COMPARATOR.reversed())) {
                 return new BasicSegment2(getChildEnd(index), getChildEnd(index));
             } else if (order.equals(SegmentComparators.INTERVAL_LENGTH_COMPARATOR)) {
-                /*
-                 * Do a math.max to prevent overflow, especially in case of
-                 * empty nodes where min length can be Long.MAX_VALUE
-                 */
-                return new BasicSegment2(getChildStart(index), getChildStart(index) + fMinLength[index]);
+                return new BasicSegment2(0, fMinLength[index]);
             } else if (order.equals(SegmentComparators.INTERVAL_LENGTH_COMPARATOR.reversed())) {
-                /*
-                 * Do a math.max to prevent overflow, though it should not
-                 * happen in this case
-                 */
-                return new BasicSegment2(getChildStart(index), Math.max(getChildStart(index) + fMaxLength[index], getChildStart(index)));
+                return new BasicSegment2(0, fMaxLength[index]);
             }
             // TODO: Don't know what to do with other comparators yet
             return new BasicSegment2(getChild(index), getChild(index));
