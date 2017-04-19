@@ -98,7 +98,10 @@
 		</xs:sequence>
 		<xs:attribute name="path" type="xs:string" use="required" >
 			<xs:annotation>
-				<xs:documentation>The path of the entry in the state system. Wildcards '*' may be used. For example, to display entries from all CPUs, the path could be "CPUs/*" and one entry will be created for each sub-attribute of the "CPUs" attribute. Each entry will be used as the base for all child elements, unless specified otherwise.</xs:documentation></xs:annotation></xs:attribute>
+				<xs:documentation>The path of the entry in the state system. Wildcards '*' may be used. For example, to display entries from all CPUs, the path could be "CPUs/*" and one entry will be created for each sub-attribute of the "CPUs" attribute. Each entry will be used as the base for all child elements, unless specified otherwise. Child entries can use place holders for any previous wildcard, with '$1' being the first wildcard encountered.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="analysisId" type="xs:string" use="optional" >
+			<xs:annotation>
+				<xs:documentation>The ID of an analysis different from the one defined in the output and from which this entry will be taken. In this case, the corresponding path is always absolute and any entry underneath will refer to this analysis ID.</xs:documentation></xs:annotation></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="xyViewEntry">

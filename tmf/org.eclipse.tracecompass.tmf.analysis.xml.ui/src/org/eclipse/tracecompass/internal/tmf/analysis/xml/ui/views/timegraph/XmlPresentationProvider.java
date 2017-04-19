@@ -221,4 +221,17 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
         return new RGB(r, g, b);
     }
 
+    /**
+     * Return whether an integer value has a corresponding index in the
+     * available states
+     *
+     * @param status
+     *            The numerical status of the event
+     * @return <code>true</code> if the numerical value is an existing value in
+     *         the available states
+     */
+    public boolean hasIndex(int status) {
+        return stateIndex.containsKey(status);
+    }
+
 }

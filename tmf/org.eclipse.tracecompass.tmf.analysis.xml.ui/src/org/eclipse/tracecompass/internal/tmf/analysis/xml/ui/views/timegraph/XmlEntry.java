@@ -18,7 +18,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
@@ -39,7 +41,7 @@ import org.w3c.dom.Element;
  *
  * @author Florian Wininger
  */
-public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer {
+public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer, Comparable<XmlEntry> {
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
@@ -51,14 +53,14 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
         DISPLAY
     }
 
-    private final ITmfTrace fTrace;
+    private final @NonNull ITmfTrace fTrace;
     private final EntryDisplayType fType;
     private final int fBaseQuark;
     private final int fDisplayQuark;
     private final String fParentId;
     private final String fId;
     private final @NonNull ITmfStateSystem fSs;
-    private final Element fElement;
+    private final @Nullable Element fElement;
 
     /**
      * Constructor
@@ -91,7 +93,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
      *            used to determine, if available, the parent, ID, name and
      *            other display option of this entry
      */
-    public XmlEntry(int baseQuark, int displayQuark, ITmfTrace trace, String name, long startTime, long endTime, EntryDisplayType type, @NonNull ITmfStateSystem ss, Element entryElement) {
+    public XmlEntry(int baseQuark, int displayQuark, @NonNull ITmfTrace trace, String name, long startTime, long endTime, EntryDisplayType type, @NonNull ITmfStateSystem ss, Element entryElement) {
         super(name, startTime, endTime);
         fTrace = trace;
         fType = type;
@@ -139,7 +141,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
      * @param ss
      *            The state system this entry belongs to
      */
-    public XmlEntry(int baseQuark, ITmfTrace trace, String name, @NonNull ITmfStateSystem ss) {
+    public XmlEntry(int baseQuark, @NonNull ITmfTrace trace, String name, @NonNull ITmfStateSystem ss) {
         super(name, ss.getStartTime(), ss.getCurrentEndTime());
         fTrace = trace;
         fType = EntryDisplayType.NULL;
@@ -174,7 +176,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
      *
      * @return the entry's trace
      */
-    public ITmfTrace getTrace() {
+    public @NonNull ITmfTrace getTrace() {
         return fTrace;
     }
 
@@ -224,28 +226,6 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
     }
 
     /**
-     * Add a child to this entry of type XmlEntry
-     *
-     * @param entry
-     *            The entry to add
-     */
-    public void addChild(@NonNull XmlEntry entry) {
-        int index;
-        for (index = 0; index < getChildren().size(); index++) {
-            XmlEntry other = (XmlEntry) getChildren().get(index);
-            if (entry.getType().compareTo(other.getType()) < 0) {
-                break;
-            } else if (entry.getType().equals(other.getType())) {
-                if (entry.getName().compareTo(other.getName()) < 0) {
-                    break;
-                }
-            }
-        }
-
-        addChild(index, entry);
-    }
-
-    /**
      * Return the state system this entry is associated to
      *
      * @return The state system, or <code>null</code> if the state system can't
@@ -282,4 +262,26 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
         }
         return pattern.matcher(fParentId).find();
     }
+
+    @Override
+    public int compareTo(XmlEntry other) {
+        // First compare by type
+        int cmp = getType().compareTo(other.getType());
+        if (cmp != 0) {
+            return cmp;
+        }
+        // For equal type, then compare by element's attribute (to not mix
+        // different element's entries)
+        Element element = fElement;
+        String attrib = (element == null) ? StringUtils.EMPTY : element.getAttribute(TmfXmlUiStrings.PATH);
+        element = other.fElement;
+        String otherAttrib = (element == null) ? StringUtils.EMPTY : element.getAttribute(TmfXmlUiStrings.PATH);
+        cmp = attrib.compareTo(otherAttrib);
+        if (cmp != 0) {
+            return cmp;
+        }
+        // Then compare by name
+        return getName().compareTo(other.getName());
+    }
+
 }

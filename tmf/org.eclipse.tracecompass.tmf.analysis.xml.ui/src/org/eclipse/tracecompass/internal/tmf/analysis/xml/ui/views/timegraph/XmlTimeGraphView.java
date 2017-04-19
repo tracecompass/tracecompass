@@ -25,7 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
@@ -53,6 +56,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
+import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
@@ -178,6 +182,16 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
     }
 
     /**
+     * Getter for the presentation provider
+     *
+     * @return The time graph presentation provider
+     */
+    @Override
+    protected XmlPresentationProvider getPresentationProvider() {
+        return (XmlPresentationProvider) super.getPresentationProvider();
+    }
+
+    /**
      * Default label provider, it shows name, id and parent columns
      *
      * TODO: There should be a way to define columns in the XML
@@ -210,13 +224,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             if ((o1 instanceof XmlEntry) && (o2 instanceof XmlEntry)) {
                 XmlEntry entry1 = (XmlEntry) o1;
                 XmlEntry entry2 = (XmlEntry) o2;
-                result = entry1.getTrace().getStartTime().compareTo(entry2.getTrace().getStartTime());
-                if (result == 0) {
-                    result = entry1.getTrace().getName().compareTo(entry2.getTrace().getName());
-                }
-                if (result == 0) {
-                    result = entry1.getName().compareTo(entry2.getName());
-                }
+                result = entry1.compareTo(entry2);
             }
 
             if (result == 0) {
@@ -303,7 +311,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
 
                 /* Add children entry of this entry for each line */
                 for (Element entry : entries) {
-                    buildEntry(entry, groupEntry, -1);
+                    buildEntry(entry, groupEntry, -1, StringUtils.EMPTY);
                 }
             }
         }
@@ -323,7 +331,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         }
     }
 
-    private void buildEntry(Element entryElement, XmlEntry parentEntry, int baseQuark) {
+    private void buildEntry(Element entryElement, XmlEntry parentEntry, int prevBaseQuark, String prevRegex) {
         /* Get the attribute string to display */
         String path = entryElement.getAttribute(TmfXmlUiStrings.PATH);
         if (path.isEmpty()) {
@@ -343,17 +351,37 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             return;
         }
 
-        ITmfStateSystem ss = parentEntry.getStateSystem();
+        // Get the state system to use to populate those entries, by default, it is the same as the parent
+        String analysisId = entryElement.getAttribute(TmfXmlUiStrings.ANALYSIS_ID);
+        ITmfStateSystem parentSs = parentEntry.getStateSystem();
+        ITmfStateSystem ss = parentSs;
+        int baseQuark = prevBaseQuark;
+        if (!analysisId.isEmpty()) {
+            ss = TmfStateSystemAnalysisModule.getStateSystem(parentEntry.getTrace(), analysisId);
+            baseQuark = ITmfStateSystem.ROOT_ATTRIBUTE;
+            if (ss == null) {
+                return;
+            }
+        }
+
+        // Replace any place holders in the path
+        Pattern pattern = Pattern.compile(prevRegex);
+        String attributePath = prevBaseQuark > 0 ? parentSs.getFullAttributePath(prevBaseQuark) : StringUtils.EMPTY;
+        Matcher matcher = pattern.matcher(attributePath);
+        if (matcher.find()) {
+            path = matcher.replaceFirst(path);
+        }
+        String regexName = path.replaceAll("\\*", "(.*)");  //$NON-NLS-1$//$NON-NLS-2$
 
         /* Get the list of quarks to process with this path */
-        String[] paths = path.split(SPLIT_STRING);
+        String[] paths = regexName.split(SPLIT_STRING);
         int i = 0;
         List<Integer> quarks = Collections.singletonList(baseQuark);
 
         while (i < paths.length) {
             List<Integer> subQuarks = new LinkedList<>();
             /* Replace * by .* to have a regex string */
-            String name = paths[i].replaceAll("\\*", ".*"); //$NON-NLS-1$ //$NON-NLS-2$
+            String name = paths[i];
             for (int relativeQuark : quarks) {
                 for (int quark : ss.getSubAttributes(relativeQuark, false, name)) {
                     subQuarks.add(quark);
@@ -379,7 +407,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             }
             /* Process the children entry of this entry */
             for (Element subEntryEl : entryElements) {
-                buildEntry(subEntryEl, currentEntry, quark);
+                buildEntry(subEntryEl, currentEntry, quark, prevRegex.isEmpty() ? regexName : prevRegex + '/' + regexName);
             }
         }
         if (!entryMap.isEmpty()) {
@@ -528,8 +556,23 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         return eventList;
     }
 
+    private int getStringIndex(String stateStr) {
+        XmlPresentationProvider pres = getPresentationProvider();
+        Integer statusInt = fStringValueMap.get(stateStr);
+        if (statusInt != null) {
+            return statusInt;
+        }
+
+        // Add this new state to the presentation provider
+        int status = pres.addState(stateStr);
+        fStringValueMap.put(stateStr, status);
+        return status;
+
+    }
+
     private int getStatusFromInterval(ITmfStateInterval statusInterval) {
         ITmfStateValue stateValue = statusInterval.getStateValue();
+
         int status = -1;
         switch (stateValue.getType()) {
         case INTEGER:
@@ -538,20 +581,14 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             break;
         case LONG:
             status = (int) stateValue.unboxLong();
+            XmlPresentationProvider pres = this.getPresentationProvider();
+            if (!pres.hasIndex(status)) {
+                status = getStringIndex("0x" + Long.toHexString(stateValue.unboxLong())); //$NON-NLS-1$
+            }
             break;
         case STRING:
             String statusStr = stateValue.unboxStr();
-            Integer statusInt = fStringValueMap.get(statusStr);
-            if (statusInt != null) {
-                status = statusInt;
-                break;
-            }
-            ITimeGraphPresentationProvider2 pres = this.getPresentationProvider();
-            if (pres instanceof XmlPresentationProvider) {
-                // Add this new state to the presentation provider
-                status = ((XmlPresentationProvider) pres).addState(statusStr);
-                fStringValueMap.put(statusStr, status);
-            }
+            status = getStringIndex(statusStr);
             break;
         case DOUBLE:
             status = (int) stateValue.unboxDouble();

@@ -32,6 +32,7 @@ public interface TmfXmlUiStrings {
 
     /* Elements and attributes of view entries */
     static final String PATH = "path";
+    static final String ANALYSIS_ID = "analysisId";
     static final String DISPLAY_ELEMENT = "display";
     static final String PARENT_ELEMENT = "parent";
     static final String NAME_ELEMENT = "name";
