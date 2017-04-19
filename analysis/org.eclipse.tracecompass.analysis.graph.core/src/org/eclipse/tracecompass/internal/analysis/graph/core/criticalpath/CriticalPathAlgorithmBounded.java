@@ -250,8 +250,8 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
             TmfEdge incomingEdge = vertexFrom.getEdge(EdgeDirection.INCOMING_HORIZONTAL_EDGE);
             if (inVerticalEdge != null &&
                     (incomingEdge == null ||
-                            incomingEdge.getType() != TmfEdge.EdgeType.BLOCKED ||
-                            incomingEdge.getType() != TmfEdge.EdgeType.NETWORK)) {
+                            (incomingEdge.getType() != TmfEdge.EdgeType.BLOCKED &&
+                            incomingEdge.getType() != TmfEdge.EdgeType.NETWORK))) {
                 stack.push(vertexFrom);
             }
             if (incomingEdge != null) {
