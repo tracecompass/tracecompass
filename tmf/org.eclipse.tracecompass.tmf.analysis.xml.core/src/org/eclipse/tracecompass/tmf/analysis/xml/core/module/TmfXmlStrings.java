@@ -55,6 +55,10 @@ public interface TmfXmlStrings {
      */
     static final String ANALYSIS_ID = "analysisId";
     /**
+     * @since 2.4
+     */
+    static final String DISPLAY_TEXT = "displayText";
+    /**
      * @since 2.3
      */
     static final String DISPLAY_ELEMENT = "display";

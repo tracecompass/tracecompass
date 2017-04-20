@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -32,6 +33,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationPr
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.w3c.dom.Element;
 
 /**
@@ -52,6 +54,11 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
     private static final int COLOR_MASK = 0xffffff;
 
     private List<StateItem> stateValues = new ArrayList<>();
+    /**
+     * Average width of the characters used for state labels. Is computed in the
+     * first call to postDrawEvent(). Is null before that.
+     */
+    private Integer fAverageCharacterWidth = null;
     /*
      * Maps the value of an event with the corresponding index in the
      * stateValues list
@@ -114,10 +121,26 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
 
     @Override
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
-        /*
-         * TODO Add the XML elements to support texts in intervals and implement
-         * this
-         */
+        // Is there text to show
+        XmlEntry entry = (XmlEntry) event.getEntry();
+        if (!entry.showText()) {
+            return;
+        }
+        // See if the state is too short to show text
+        if (fAverageCharacterWidth == null) {
+            fAverageCharacterWidth = gc.getFontMetrics().getAverageCharWidth();
+        }
+        if (bounds.width <= fAverageCharacterWidth) {
+            return;
+        }
+        String eventName = getEventName(event);
+        if (eventName == null) {
+            return;
+        }
+
+        Color stateColor = gc.getBackground();
+        gc.setForeground(Utils.getDistinctColor(stateColor.getRGB()));
+        Utils.drawText(gc, eventName, bounds.x, bounds.y, bounds.width, bounds.height, true, true);
     }
 
     @Override

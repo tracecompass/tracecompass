@@ -21,7 +21,7 @@
 		<definedValue name="NONE" value="0" color="#EEEEEE" />
 		<definedValue name="VALID" value="1" color="#FF0000" />
 	
-		<entry path="checkpoint">
+		<entry path="checkpoint" displayText="true">
 			<display type="self"/>
 		</entry>
 	</timeGraphView>

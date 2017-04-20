@@ -102,6 +102,9 @@
 		<xs:attribute name="analysisId" type="xs:string" use="optional" >
 			<xs:annotation>
 				<xs:documentation>The ID of an analysis different from the one defined in the output and from which this entry will be taken. In this case, the corresponding path is always absolute and any entry underneath will refer to this analysis ID.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="displayText" type="xs:boolean" use="optional" default="false">
+			<xs:annotation>
+				<xs:documentation>Whether to display the value of the state in the event box. If set to true at the entry level, every state in the time graph view for those entries will have its name displayed in the rectangle.</xs:documentation></xs:annotation></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="xyViewEntry">

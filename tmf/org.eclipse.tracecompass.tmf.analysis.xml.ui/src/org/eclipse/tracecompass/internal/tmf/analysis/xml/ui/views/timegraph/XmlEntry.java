@@ -59,6 +59,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
     private final String fId;
     private final @NonNull ITmfStateSystem fSs;
     private final @Nullable Element fElement;
+    private final boolean fShowText;
 
     /**
      * Constructor
@@ -99,6 +100,9 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
         fDisplayQuark = displayQuark;
         fSs = ss;
         fElement = entryElement;
+
+        String displayText = entryElement.getAttribute(TmfXmlStrings.DISPLAY_TEXT);
+        fShowText = Boolean.valueOf(displayText);
 
         /* Get the parent if specified */
         List<Element> elements = TmfXmlUtils.getChildElements(fElement, TmfXmlStrings.PARENT_ELEMENT);
@@ -149,6 +153,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
         fElement = null;
         fParentId = EMPTY_STRING;
         fId = name;
+        fShowText = false;
     }
 
     /** Return the state value of the first interval with a non-null value */
@@ -218,6 +223,15 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
     @Override
     public boolean hasTimeEvents() {
         return fType != EntryDisplayType.NULL;
+    }
+
+    /**
+     * Return whether the texts for this entry's states should be displayed
+     *
+     * @return <code>true</code> to display the text in the view
+     */
+    public boolean showText() {
+        return fShowText;
     }
 
     /**
