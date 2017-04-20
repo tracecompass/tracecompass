@@ -82,6 +82,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
         PEEK,
         /** Take the value at the top of the stack */
         POP,
+        /** Pops all the values from the stack */
+        POP_ALL,
         /** Push the value on the stack */
         PUSH;
 
@@ -100,6 +102,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
                 return POP;
             case TmfXmlStrings.STACK_PEEK:
                 return PEEK;
+            case TmfXmlStrings.STACK_POPALL:
+                return POP_ALL;
             default:
                 return NULL;
             }

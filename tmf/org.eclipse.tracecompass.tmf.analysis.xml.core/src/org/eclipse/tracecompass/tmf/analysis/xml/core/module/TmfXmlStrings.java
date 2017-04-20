@@ -176,6 +176,7 @@ public interface TmfXmlStrings {
     String FORCED_TYPE = "forcedType";
     String ATTRIBUTE_STACK = "stack";
     String STACK_POP = "pop";
+    String STACK_POPALL = "popAll";
     String STACK_PUSH = "push";
     String STACK_PEEK = "peek";
     String CPU = "cpu";

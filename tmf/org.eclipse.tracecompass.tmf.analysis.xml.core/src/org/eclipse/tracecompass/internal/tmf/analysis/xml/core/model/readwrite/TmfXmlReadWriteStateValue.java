@@ -222,6 +222,17 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
             case PUSH:
                 ss.pushAttribute(timestamp, value, quark);
                 break;
+            case POP_ALL:
+                // The stack state will contain the number of elements on the
+                // stack
+                ITmfStateValue stackState = ss.queryOngoingState(quark);
+                if (stackState.getType() == ITmfStateValue.Type.INTEGER) {
+                    int nbElements = stackState.unboxInt();
+                    for (int i = 0; i < nbElements; i++) {
+                        ss.popAttribute(timestamp, quark);
+                    }
+                }
+                break;
             case NULL:
             case PEEK:
             default:
@@ -290,6 +301,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
                 case PUSH:
                 case NULL:
                 case POP:
+                case POP_ALL:
                 default:
                     return fValue;
                 }

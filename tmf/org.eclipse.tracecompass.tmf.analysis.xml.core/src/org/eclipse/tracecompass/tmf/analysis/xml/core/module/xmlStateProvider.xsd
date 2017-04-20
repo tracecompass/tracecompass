@@ -322,6 +322,9 @@
 					<xs:enumeration value="pop">
 						<xs:annotation>
 							<xs:documentation>The value will be popped from the stack</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="popAll">
+						<xs:annotation>
+							<xs:documentation>All the values will be popped from the stack and the stack will be empty after.</xs:documentation></xs:annotation></xs:enumeration>
 					<xs:enumeration value="push">
 						<xs:annotation>
 							<xs:documentation>The value will be pushed on a stack</xs:documentation></xs:annotation></xs:enumeration>
