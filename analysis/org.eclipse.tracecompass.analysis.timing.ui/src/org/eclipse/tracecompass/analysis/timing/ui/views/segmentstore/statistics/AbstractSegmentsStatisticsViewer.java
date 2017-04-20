@@ -11,7 +11,7 @@ package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistic
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.text.Format;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,6 +52,8 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * An abstract tree viewer implementation for displaying segment store
@@ -162,139 +164,37 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
         return fModule;
     }
 
+    private static TmfTreeColumnData createTmfTreeColumnData(@Nullable String name, Comparator<SegmentStoreStatisticsEntry> comparator){
+        TmfTreeColumnData column = new TmfTreeColumnData(name);
+        column.setAlignment(SWT.RIGHT);
+        column.setComparator(new ViewerComparator() {
+            @Override
+            public int compare(@Nullable Viewer viewer, @Nullable Object e1, @Nullable Object e2) {
+                if ((e1 == null) || (e2 == null)) {
+                    return 0;
+                }
+
+                SegmentStoreStatisticsEntry n1 = (SegmentStoreStatisticsEntry) e1;
+                SegmentStoreStatisticsEntry n2 = (SegmentStoreStatisticsEntry) e2;
+
+                return comparator.compare(n1, n2);
+
+            }
+        });
+        return column;
+    }
+
     @Override
     protected ITmfTreeColumnDataProvider getColumnDataProvider() {
-        return new ITmfTreeColumnDataProvider() {
-
-            @Override
-            public List<@Nullable TmfTreeColumnData> getColumnData() {
-                /* All columns are sortable */
-                List<@Nullable TmfTreeColumnData> columns = new ArrayList<>();
-                TmfTreeColumnData column = new TmfTreeColumnData(COLUMN_NAMES[0]);
-                column.setAlignment(SWT.RIGHT);
-                column.setComparator(new ViewerComparator() {
-                    @Override
-                    public int compare(@Nullable Viewer viewer, @Nullable Object e1, @Nullable Object e2) {
-                        if ((e1 == null) || (e2 == null)) {
-                            return 0;
-                        }
-
-                        SegmentStoreStatisticsEntry n1 = (SegmentStoreStatisticsEntry) e1;
-                        SegmentStoreStatisticsEntry n2 = (SegmentStoreStatisticsEntry) e2;
-
-                        return n1.getName().compareTo(n2.getName());
-
-                    }
-                });
-                columns.add(column);
-                column = new TmfTreeColumnData(COLUMN_NAMES[1]);
-                column.setAlignment(SWT.RIGHT);
-                column.setComparator(new ViewerComparator() {
-                    @Override
-                    public int compare(@Nullable Viewer viewer, @Nullable Object e1, @Nullable Object e2) {
-                        if ((e1 == null) || (e2 == null)) {
-                            return 0;
-                        }
-
-                        SegmentStoreStatisticsEntry n1 = (SegmentStoreStatisticsEntry) e1;
-                        SegmentStoreStatisticsEntry n2 = (SegmentStoreStatisticsEntry) e2;
-
-                        return Long.compare(n1.getEntry().getMin(), n2.getEntry().getMin());
-
-                    }
-                });
-                columns.add(column);
-                column = new TmfTreeColumnData(COLUMN_NAMES[2]);
-                column.setAlignment(SWT.RIGHT);
-                column.setComparator(new ViewerComparator() {
-                    @Override
-                    public int compare(@Nullable Viewer viewer, @Nullable Object e1, @Nullable Object e2) {
-                        if ((e1 == null) || (e2 == null)) {
-                            return 0;
-                        }
-
-                        SegmentStoreStatisticsEntry n1 = (SegmentStoreStatisticsEntry) e1;
-                        SegmentStoreStatisticsEntry n2 = (SegmentStoreStatisticsEntry) e2;
-
-                        return Long.compare(n1.getEntry().getMax(), n2.getEntry().getMax());
-
-                    }
-                });
-                columns.add(column);
-                column = new TmfTreeColumnData(COLUMN_NAMES[3]);
-                column.setAlignment(SWT.RIGHT);
-                column.setComparator(new ViewerComparator() {
-                    @Override
-                    public int compare(@Nullable Viewer viewer, @Nullable Object e1, @Nullable Object e2) {
-                        if ((e1 == null) || (e2 == null)) {
-                            return 0;
-                        }
-
-                        SegmentStoreStatisticsEntry n1 = (SegmentStoreStatisticsEntry) e1;
-                        SegmentStoreStatisticsEntry n2 = (SegmentStoreStatisticsEntry) e2;
-
-                        return Double.compare(n1.getEntry().getMean(), n2.getEntry().getMean());
-
-                    }
-                });
-                columns.add(column);
-                column = new TmfTreeColumnData(COLUMN_NAMES[4]);
-                column.setAlignment(SWT.RIGHT);
-                column.setComparator(new ViewerComparator() {
-                    @Override
-                    public int compare(@Nullable Viewer viewer, @Nullable Object e1, @Nullable Object e2) {
-                        if ((e1 == null) || (e2 == null)) {
-                            return 0;
-                        }
-
-                        SegmentStoreStatisticsEntry n1 = (SegmentStoreStatisticsEntry) e1;
-                        SegmentStoreStatisticsEntry n2 = (SegmentStoreStatisticsEntry) e2;
-
-                        return Double.compare(n1.getEntry().getStdDev(), n2.getEntry().getStdDev());
-
-                    }
-                });
-                columns.add(column);
-                column = new TmfTreeColumnData(COLUMN_NAMES[5]);
-                column.setAlignment(SWT.RIGHT);
-                column.setComparator(new ViewerComparator() {
-                    @Override
-                    public int compare(@Nullable Viewer viewer, @Nullable Object e1, @Nullable Object e2) {
-                        if ((e1 == null) || (e2 == null)) {
-                            return 0;
-                        }
-
-                        SegmentStoreStatisticsEntry n1 = (SegmentStoreStatisticsEntry) e1;
-                        SegmentStoreStatisticsEntry n2 = (SegmentStoreStatisticsEntry) e2;
-
-                        return Long.compare(n1.getEntry().getNbElements(), n2.getEntry().getNbElements());
-
-                    }
-                });
-                columns.add(column);
-                column = new TmfTreeColumnData(COLUMN_NAMES[6]);
-                column.setAlignment(SWT.RIGHT);
-                column.setComparator(new ViewerComparator() {
-                    @Override
-                    public int compare(@Nullable Viewer viewer, @Nullable Object e1, @Nullable Object e2) {
-                        if ((e1 == null) || (e2 == null)) {
-                            return 0;
-                        }
-
-                        SegmentStoreStatisticsEntry n1 = (SegmentStoreStatisticsEntry) e1;
-                        SegmentStoreStatisticsEntry n2 = (SegmentStoreStatisticsEntry) e2;
-
-                        return Double.compare(n1.getEntry().getTotal(), n2.getEntry().getTotal());
-
-                    }
-                });
-                columns.add(column);
-                column = new TmfTreeColumnData(""); //$NON-NLS-1$
-                columns.add(column);
-                return columns;
-            }
-
-        };
+        return () -> ImmutableList.of(
+                createTmfTreeColumnData(COLUMN_NAMES[0], Comparator.comparing(SegmentStoreStatisticsEntry::getName)),
+                createTmfTreeColumnData(COLUMN_NAMES[1], Comparator.comparingLong(s -> s.getEntry().getMin())),
+                createTmfTreeColumnData(COLUMN_NAMES[2], Comparator.comparingLong(s -> s.getEntry().getMax())),
+                createTmfTreeColumnData(COLUMN_NAMES[3], Comparator.comparingDouble(s -> s.getEntry().getMean())),
+                createTmfTreeColumnData(COLUMN_NAMES[4], Comparator.comparingDouble(s -> s.getEntry().getStdDev())),
+                createTmfTreeColumnData(COLUMN_NAMES[5], Comparator.comparingLong(s -> s.getEntry().getNbElements())),
+                createTmfTreeColumnData(COLUMN_NAMES[6], Comparator.comparingDouble(s -> s.getEntry().getTotal())),
+                new TmfTreeColumnData("")); //$NON-NLS-1$
     }
 
     @Override
