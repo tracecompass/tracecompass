@@ -126,7 +126,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     /**
      * provider progress listener
      */
-    private SegmentStoreProviderProgressListener fListener;
+    private final @Nullable SegmentStoreProviderProgressListener fListener;
 
     /**
      * Flag to create columns once
@@ -144,13 +144,29 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
      *            Table viewer of the view
      */
     public AbstractSegmentStoreTableViewer(TableViewer tableViewer) {
+        this(tableViewer, true);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param tableViewer
+     *            Table viewer of the view
+     * @param withListener
+     *            Whether to add a listener to this table viewer. For instance,
+     *            for table viewers who are part of another view who update the
+     *            table's data, this value can be <code>false</code> so only the
+     *            other listeners will update the data
+     * @since 1.4
+     */
+    public AbstractSegmentStoreTableViewer(TableViewer tableViewer, boolean withListener) {
         super(tableViewer);
         // Sort order of the content provider is by start time by default
         getTableViewer().setContentProvider(new SegmentStoreContentProvider());
         createColumns();
         getTableViewer().getTable().addSelectionListener(new TableSelectionListener());
         addPackListener();
-        fListener = new SegmentStoreProviderProgressListener();
+        fListener = withListener ? new SegmentStoreProviderProgressListener() : null;
     }
 
     // ------------------------------------------------------------------------
@@ -179,7 +195,6 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         createProviderColumns();
         getTableViewer().getTable().addSelectionListener(new TableSelectionListener());
         addPackListener();
-        fListener = new SegmentStoreProviderProgressListener();
         table.setRedraw(true);
     }
 
@@ -287,7 +302,10 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         // If results are null, then add completion listener and if the provider
         // is an analysis, run the analysis
         updateModel(null);
-        provider.addListener(fListener);
+        SegmentStoreProviderProgressListener listener = fListener;
+        if (listener != null) {
+            provider.addListener(listener);
+        }
         if (provider instanceof IAnalysisModule) {
             ((IAnalysisModule) provider).schedule();
         }
@@ -390,7 +408,10 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
 
             ISegmentStoreProvider provider = getSegmentProvider();
             if ((provider != null)) {
-                provider.removeListener(fListener);
+                SegmentStoreProviderProgressListener listener = fListener;
+                if (listener != null) {
+                    provider.removeListener(listener);
+                }
             }
         }
     }

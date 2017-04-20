@@ -39,7 +39,7 @@ public class SystemCallLatencyDensityView extends AbstractSegmentStoreDensityVie
 
     @Override
     protected AbstractSegmentStoreTableViewer createSegmentStoreTableViewer(Composite parent) {
-        return new SegmentStoreTableViewer(new TableViewer(parent, SWT.FULL_SELECTION | SWT.VIRTUAL), SystemCallLatencyAnalysis.ID) {
+        return new SegmentStoreTableViewer(new TableViewer(parent, SWT.FULL_SELECTION | SWT.VIRTUAL), SystemCallLatencyAnalysis.ID, false) {
             @Override
             protected void createProviderColumns() {
                 super.createProviderColumns();
