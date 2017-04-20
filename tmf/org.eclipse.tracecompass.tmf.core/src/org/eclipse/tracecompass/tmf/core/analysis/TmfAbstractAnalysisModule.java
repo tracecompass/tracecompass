@@ -592,7 +592,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
     }
 
     @Override
-    public Iterable<@NonNull TmfAbstractAnalysisRequirement> getAnalysisRequirements() {
+    public Iterable<TmfAbstractAnalysisRequirement> getAnalysisRequirements() {
         return Collections.EMPTY_SET;
     }
 

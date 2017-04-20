@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -252,7 +253,7 @@ public class HistoryTreeSegmentStore<E extends ISegment2> implements ISegmentSto
         while (iterator.hasNext() && unFound > 0) {
             E seg = iterator.next();
             for (Object o : c) {
-                if (o.equals(seg)) {
+                if (Objects.equals(o, seg)) {
                     unFound--;
                 }
             }
