@@ -37,11 +37,12 @@ import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Test reading a trace in raw and eventy modes.
+ * Test reading a trace in raw and event modes.
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class RawTextEditorTest {
@@ -100,6 +101,7 @@ public class RawTextEditorTest {
     /**
      * Test going to raw and back
      */
+    @Ignore
     @Test
     public void testRead() {
         ITmfTrace activeTrace = TmfTraceManager.getInstance().getActiveTrace();
