@@ -13,19 +13,20 @@
 package org.eclipse.tracecompass.ctf.core.event.types;
 
 import java.nio.ByteOrder;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * A CTF enum declaration.
@@ -66,15 +67,38 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
         public long getSecond() {
             return fSecond;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            Pair other = (Pair) obj;
+            return fFirst == other.fFirst && fSecond == other.fSecond;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(fFirst, fSecond);
+        }
     }
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final EnumTable fTable = new EnumTable();
+    /**
+     * fEnumTree's key is the Pair of low and high, value is the label.
+     */
+    private final TreeMap<Pair, String> fEnumTree = new TreeMap<>(Comparator.comparingLong(Pair::getFirst).thenComparingLong(Pair::getSecond));
     private final IntegerDeclaration fContainerType;
-    private final Set<String> fLabels = new HashSet<>();
+    private Pair fLastAdded = new Pair(-1, -1);
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -157,8 +181,27 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      * @return was the value be added? true == success
      */
     public boolean add(long low, long high, @Nullable String label) {
-        fLabels.add(label);
-        return fTable.add(low, high, label);
+        if (high < low) {
+            return false;
+        }
+        /**
+         * Iterate over a collection of Entries, such that: entry.low <=
+         * high, sorted by decreasing low.
+         */
+        Set<Entry<Pair, String>> descendingSet = fEnumTree.descendingMap().tailMap(new Pair(high, Long.MAX_VALUE), true).entrySet();
+        for (Entry<Pair, String> entry : descendingSet) {
+            if (entry.getKey().fSecond >= low) {
+                /* if an entry overlaps */
+                return false;
+            }
+            /*
+             * No more entries can overlap as sorted by decreasing low and high.
+             */
+            break;
+        }
+        fLastAdded = new Pair(low, high);
+        fEnumTree.put(fLastAdded, label);
+        return true;
     }
 
     /**
@@ -171,8 +214,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      * @since 2.0
      */
     public boolean add(@Nullable String label) {
-        fLabels.add(label);
-        return fTable.add(label);
+        return add(fLastAdded.fFirst + 1, fLastAdded.fSecond + 1, label);
     }
 
     /**
@@ -184,7 +226,15 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      * @return the label of that value, can be null
      */
     public @Nullable String query(long value) {
-        return fTable.query(value);
+        /*
+         * Find an entry with the highest fLow <= value, and check that it
+         * intersects value.
+         */
+        Entry<Pair, String> floorEntry = fEnumTree.floorEntry(new Pair(value, Long.MAX_VALUE));
+        if (floorEntry != null && floorEntry.getKey().fSecond >= value) {
+            return floorEntry.getValue();
+        }
+        return null;
     }
 
     /**
@@ -194,12 +244,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      * @since 1.1
      */
     public Map<String, Pair> getEnumTable() {
-        ImmutableMap.Builder<String, Pair> builder = new ImmutableMap.Builder<>();
-        for (LabelAndRange range : fTable.ranges) {
-            builder.put(range.getLabel(), new Pair(range.low, range.high));
-        }
-        return builder.build();
-
+        return ImmutableBiMap.copyOf(fEnumTree).inverse();
     }
 
     /**
@@ -208,158 +253,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      * @return A set of labels of the enum, can be empty but not null
      */
     public Set<String> getLabels() {
-        return Collections.unmodifiableSet(fLabels);
-    }
-
-    /*
-     * Maps integer range -> string. A simple list for now, but feel free to
-     * optimize it. Babeltrace suggests an interval tree.
-     */
-    private class EnumTable {
-
-        private final List<LabelAndRange> ranges = new LinkedList<>();
-
-        public EnumTable() {
-        }
-
-        public synchronized boolean add(@Nullable String label) {
-            LabelAndRange lastAdded = ranges.isEmpty() ? new LabelAndRange(-1, -1, "") : ranges.get(ranges.size() - 1); //$NON-NLS-1$
-            return add(lastAdded.low + 1, lastAdded.high + 1, label);
-        }
-
-        public synchronized boolean add(long low, long high, @Nullable String label) {
-            LabelAndRange newRange = new LabelAndRange(low, high, label);
-
-            for (LabelAndRange r : ranges) {
-                if (r.intersects(newRange)) {
-                    return false;
-                }
-            }
-
-            ranges.add(newRange);
-
-            return true;
-        }
-
-        /**
-         * Return the first label that matches a value
-         *
-         * @param value
-         *            the value to query
-         * @return the label corresponding to that value
-         */
-        public synchronized @Nullable String query(long value) {
-            for (LabelAndRange r : ranges) {
-                if (r.intersects(value)) {
-                    return r.getLabel();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        public synchronized int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            for (LabelAndRange range : ranges) {
-                result = prime * result + range.hashCode();
-            }
-            return result;
-        }
-
-        @Override
-        public synchronized boolean equals(@Nullable Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            EnumTable other = (EnumTable) obj;
-            if (ranges.size() != other.ranges.size()) {
-                return false;
-            }
-            for (int i = 0; i < ranges.size(); i++) {
-                if (!ranges.get(i).equals(other.ranges.get(i))) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-    }
-
-    private static class LabelAndRange {
-
-        private final long low, high;
-        private final @Nullable String fLabel;
-
-        /**
-         * Get the label
-         *
-         * @return the label
-         */
-        public @Nullable String getLabel() {
-            return fLabel;
-        }
-
-        public LabelAndRange(long low, long high, @Nullable String str) {
-            this.low = low;
-            this.high = high;
-            this.fLabel = str;
-        }
-
-        public boolean intersects(long i) {
-            return (i >= this.low) && (i <= this.high);
-        }
-
-        public boolean intersects(LabelAndRange other) {
-            return this.intersects(other.low)
-                    || this.intersects(other.high);
-        }
-
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            final String label = fLabel;
-            result = prime * result + ((label == null) ? 0 : label.hashCode());
-            result = prime * result + (int) (high ^ (high >>> 32));
-            result = prime * result + (int) (low ^ (low >>> 32));
-            return result;
-        }
-
-        @Override
-        public boolean equals(@Nullable Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            LabelAndRange other = (LabelAndRange) obj;
-            final String label = fLabel;
-            if (label == null) {
-                if (other.fLabel != null) {
-                    return false;
-                }
-            } else if (!label.equals(other.fLabel)) {
-                return false;
-            }
-            if (high != other.high) {
-                return false;
-            }
-            if (low != other.low) {
-                return false;
-            }
-            return true;
-        }
+        return ImmutableSet.copyOf(fEnumTree.values());
     }
 
     @Override
@@ -367,7 +261,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
         /* Only used for debugging */
         StringBuilder sb = new StringBuilder();
         sb.append("[declaration] enum["); //$NON-NLS-1$
-        for (String label : fLabels) {
+        for (String label : fEnumTree.values()) {
             sb.append("label:").append(label).append(' '); //$NON-NLS-1$
         }
         sb.append("type:").append(fContainerType.toString()); //$NON-NLS-1$
@@ -379,10 +273,10 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
     public int hashCode() {
         final int prime = 31;
         int result = prime + fContainerType.hashCode();
-        for (String label : fLabels) {
+        for (String label : fEnumTree.values()) {
             result = prime * result + label.hashCode();
         }
-        result = prime * result + fTable.hashCode();
+        result = prime * result + fEnumTree.hashCode();
         return result;
     }
 
@@ -401,13 +295,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
         if (!fContainerType.equals(other.fContainerType)) {
             return false;
         }
-        if (fLabels.size() != other.fLabels.size()) {
-            return false;
-        }
-        if (!fLabels.containsAll(other.fLabels)) {
-            return false;
-        }
-        if (!fTable.equals(other.fTable)) {
+        if (!fEnumTree.equals(other.fEnumTree)) {
             return false;
         }
         return true;
@@ -428,13 +316,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
         if (!fContainerType.isBinaryEquivalent(other.fContainerType)) {
             return false;
         }
-        if (fLabels.size() != other.fLabels.size()) {
-            return false;
-        }
-        if (!fLabels.containsAll(other.fLabels)) {
-            return false;
-        }
-        if (!fTable.equals(other.fTable)) {
+        if (!fEnumTree.equals(other.fEnumTree)) {
             return false;
         }
         return true;
