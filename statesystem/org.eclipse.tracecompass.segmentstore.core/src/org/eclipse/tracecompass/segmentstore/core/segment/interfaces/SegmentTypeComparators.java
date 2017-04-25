@@ -20,7 +20,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
  *
  * @author Geneviève Bastien
  * @noimplement This interface only contains static definitions.
- * @since 1.2
+ * @since 2.0
  */
 public interface SegmentTypeComparators {
 

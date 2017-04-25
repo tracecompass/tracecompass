@@ -17,7 +17,7 @@ import org.eclipse.jdt.annotation.NonNull;
  * A segment with fields
  *
  * @author Matthew Khouzam
- * @since 1.2
+ * @since 2.0
  */
 public interface IContentSegment extends ISegment {
 

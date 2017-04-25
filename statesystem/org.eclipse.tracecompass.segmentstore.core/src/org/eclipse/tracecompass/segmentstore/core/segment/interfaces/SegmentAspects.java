@@ -16,7 +16,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
  * Interface to return some fields of a segment depending on the interfaces it
  * implements
  *
- * @since 1.2
+ * @since 2.0
  */
 public final class SegmentAspects {
 

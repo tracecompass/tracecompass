@@ -18,7 +18,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
  * This interface is a qualifier interface for segments. A concrete segment type
  * can implement many such qualifier interfaces.
  *
- * @since 1.2
+ * @since 2.0
  */
 public interface INamedSegment extends ISegment {
 

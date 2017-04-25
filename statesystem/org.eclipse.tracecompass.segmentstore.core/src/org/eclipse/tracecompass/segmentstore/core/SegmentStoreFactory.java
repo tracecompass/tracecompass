@@ -129,7 +129,7 @@ public final class SegmentStoreFactory<E> {
      * @return an {@link ISegmentStore}
      * @throws IOException
      *             Exceptions when creating the segment store
-     * @since 1.2
+     * @since 2.0
      */
     public static <E extends ISegment2> ISegmentStore<E> createOnDiskSegmentStore(Path segmentFile, IHTIntervalReader<E> segmentReader) throws IOException {
         return new HistoryTreeSegmentStore<>(segmentFile, segmentReader);

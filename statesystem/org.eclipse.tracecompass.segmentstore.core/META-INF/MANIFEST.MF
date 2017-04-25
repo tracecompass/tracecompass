@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 1.2.0.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.segmentstore.core;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.internal.segmentstore.core.Activator
@@ -18,8 +18,7 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.segmentstore.core;
  org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree;x-friends:="org.eclipse.tracecompass.segmentstore.core.tests",
  org.eclipse.tracecompass.internal.segmentstore.core.treemap;x-friends:="org.eclipse.tracecompass.segmentstore.core.tests",
  org.eclipse.tracecompass.segmentstore.core,
- org.eclipse.tracecompass.segmentstore.core.segment.interfaces,
- org.eclipse.tracecompass.segmentstore.core.treemap
+ org.eclipse.tracecompass.segmentstore.core.segment.interfaces
 Import-Package: com.google.common.annotations,
  com.google.common.base,
  com.google.common.collect
