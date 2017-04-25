@@ -10,7 +10,6 @@ package org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.variant;
 
 import static org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.TsdlUtils.childTypeError;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -337,14 +336,31 @@ public final class VariantParser extends AbstractScopedCommonTreeParser {
                 throw new ParseException("Variant tag must be an enum: " + variantTag); //$NON-NLS-1$
             }
             EnumDeclaration tagDecl = (EnumDeclaration) decl;
-            Set<String> intersection = new HashSet<>(tagDecl.getLabels());
-            intersection.retainAll(variantDeclaration.getFields().keySet());
-            if (intersection.isEmpty()) {
+            if (!intersects(tagDecl.getLabels(), variantDeclaration.getFields().keySet())) {
                 throw new ParseException("Variant contains no values of the tag, impossible to use: " + variantName); //$NON-NLS-1$
             }
         }
 
         return variantDeclaration;
+    }
+
+    /**
+     * Method to compute if the two sets intersect. Faster than computing the
+     * intersection of a set as we break as soon as a common element is found.
+     *
+     * @param set
+     *            first set
+     * @param fasterSet
+     *            second set, with faster lookups
+     * @return true if a string is in both the set and the map's keySet
+     */
+    private static boolean intersects(Set<String> set, Set<String> fasterSet) {
+        for (String setString : set) {
+            if (fasterSet.contains(setString)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

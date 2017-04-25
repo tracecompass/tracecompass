@@ -14,7 +14,6 @@ import static org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.Tsd
 
 import java.nio.ByteOrder;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.antlr.runtime.tree.CommonTree;
@@ -22,7 +21,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.ctf.core.event.metadata.DeclarationScope;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDeclaration;
-import org.eclipse.tracecompass.ctf.core.event.types.EnumDeclaration.Pair;
 import org.eclipse.tracecompass.ctf.core.event.types.FloatDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDeclaration;
@@ -239,10 +237,8 @@ public final class TraceDeclarationParser extends AbstractScopedCommonTreeParser
             final IntegerDeclaration containerType = decl.getContainerType();
             EnumDeclaration newEnum = new EnumDeclaration(IntegerDeclaration.createDeclaration(containerType.getLength(), containerType.isSigned(),
                     containerType.getBase(), byteOrder, containerType.getEncoding(),
-                    containerType.getClock(), containerType.getAlignment()));
-            for (Entry<String, Pair> entry : decl.getEnumTable().entrySet()) {
-                newEnum.add(entry.getValue().getFirst(), entry.getValue().getSecond(), entry.getKey());
-            }
+                    containerType.getClock(), containerType.getAlignment()),
+                    decl.getLookupTable());
 
             parentScope.replaceType(name, newEnum);
         }

@@ -15,18 +15,20 @@ package org.eclipse.tracecompass.ctf.core.event.types;
 import java.nio.ByteOrder;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 
 import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 /**
  * A CTF enum declaration.
@@ -89,14 +91,31 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
         }
     }
 
+    /**
+     * Out of specification {@link Comparator} which returns 0 if the
+     * {@link Pair}s overlap even if they are not equal.
+     */
+    private static final Comparator<Pair> OVERLAP_COMPARATOR = (interval1, interval2) -> {
+        if (interval1.fSecond < interval2.fFirst) {
+            return -1;
+        }
+        if (interval1.fFirst > interval2.fSecond) {
+            return 1;
+        }
+        return 0;
+    };
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
     /**
-     * fEnumTree's key is the Pair of low and high, value is the label.
+     * fEnumTree's key is the Pair of low and high, value is the label. This tree
+     * uses an out of specification comparator to make its behavior mimic that of a
+     * non overlapping interval tree. The get method will return any value who's key
+     * overlaps the queried interval.
      */
-    private final TreeMap<Pair, String> fEnumTree = new TreeMap<>(Comparator.comparingLong(Pair::getFirst).thenComparingLong(Pair::getSecond));
+    private final @NonNull Map<Pair, String> fEnumTree = new TreeMap<>(OVERLAP_COMPARATOR);
     private final IntegerDeclaration fContainerType;
     private Pair fLastAdded = new Pair(-1, -1);
 
@@ -117,6 +136,23 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
         fContainerType = containerType;
     }
 
+    /**
+     * Constructor
+     *
+     * @param containerType
+     *            the enum is an int, this is the type that the data is
+     *            contained in. If you have 1000 possible values, you need at
+     *            least a 10 bit enum. If you store 2 values in a 128 bit int,
+     *            you are wasting space.
+     * @param enumTree
+     *            Existing enum declaration table
+     * @since 2.1
+     */
+    public EnumDeclaration(IntegerDeclaration containerType, Map<Pair, String> enumTree){
+        fContainerType = containerType;
+        fEnumTree.putAll(enumTree);
+    }
+
     // ------------------------------------------------------------------------
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
@@ -131,7 +167,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
 
     @Override
     public long getAlignment() {
-        return this.getContainerType().getAlignment();
+        return getContainerType().getAlignment();
     }
 
     @Override
@@ -184,24 +220,13 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
         if (high < low) {
             return false;
         }
-        /**
-         * Iterate over a collection of Entries, such that: entry.low <=
-         * high, sorted by decreasing low.
-         */
-        Set<Entry<Pair, String>> descendingSet = fEnumTree.descendingMap().tailMap(new Pair(high, Long.MAX_VALUE), true).entrySet();
-        for (Entry<Pair, String> entry : descendingSet) {
-            if (entry.getKey().fSecond >= low) {
-                /* if an entry overlaps */
-                return false;
-            }
-            /*
-             * No more entries can overlap as sorted by decreasing low and high.
-             */
-            break;
+        Pair key = new Pair(low, high);
+        if (!fEnumTree.containsKey(key)) {
+            fEnumTree.put(key, label);
+            fLastAdded = key;
+            return true;
         }
-        fLastAdded = new Pair(low, high);
-        fEnumTree.put(fLastAdded, label);
-        return true;
+        return false;
     }
 
     /**
@@ -226,15 +251,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      * @return the label of that value, can be null
      */
     public @Nullable String query(long value) {
-        /*
-         * Find an entry with the highest fLow <= value, and check that it
-         * intersects value.
-         */
-        Entry<Pair, String> floorEntry = fEnumTree.floorEntry(new Pair(value, Long.MAX_VALUE));
-        if (floorEntry != null && floorEntry.getKey().fSecond >= value) {
-            return floorEntry.getValue();
-        }
-        return null;
+        return fEnumTree.get(new Pair(value, value));
     }
 
     /**
@@ -242,9 +259,22 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      *
      * @return the lookup table
      * @since 1.1
+     * @deprecated use {@link #getLookupTable()} instead
      */
+    @Deprecated
     public Map<String, Pair> getEnumTable() {
         return ImmutableBiMap.copyOf(fEnumTree).inverse();
+    }
+
+    /**
+     * Get a copy of the lookup table.
+     *
+     * @return a copy of the Enum declaration entry map.
+     *
+     * @since 3.0
+     */
+    public Map<Pair, String> getLookupTable() {
+        return ImmutableMap.copyOf(fEnumTree);
     }
 
     /**
@@ -271,13 +301,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = prime + fContainerType.hashCode();
-        for (String label : fEnumTree.values()) {
-            result = prime * result + label.hashCode();
-        }
-        result = prime * result + fEnumTree.hashCode();
-        return result;
+        return Objects.hash(fContainerType, fEnumTree);
     }
 
     @Override
@@ -295,10 +319,11 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
         if (!fContainerType.equals(other.fContainerType)) {
             return false;
         }
-        if (!fEnumTree.equals(other.fEnumTree)) {
-            return false;
-        }
-        return true;
+        /*
+         * Must iterate through the entry sets as the comparator used in the enum tree
+         * does not respect the contract
+         */
+        return Iterables.elementsEqual(fEnumTree.entrySet(), other.fEnumTree.entrySet());
     }
 
     @Override
@@ -316,10 +341,11 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
         if (!fContainerType.isBinaryEquivalent(other.fContainerType)) {
             return false;
         }
-        if (!fEnumTree.equals(other.fEnumTree)) {
-            return false;
-        }
-        return true;
+        /*
+         * Must iterate through the entry sets as the comparator used in the enum tree
+         * does not respect the contract
+         */
+        return Iterables.elementsEqual(fEnumTree.entrySet(), other.fEnumTree.entrySet());
     }
 
 }
