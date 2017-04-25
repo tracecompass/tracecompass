@@ -841,7 +841,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *
      * @return the entry list map
      */
-    protected List<TimeGraphEntry> getEntryList(ITmfTrace trace) {
+    protected @Nullable List<TimeGraphEntry> getEntryList(ITmfTrace trace) {
         synchronized (fEntryListMap) {
             return fEntryListMap.get(trace);
         }
@@ -875,7 +875,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             if (entryList == null) {
                 fEntryListMap.put(trace, new CopyOnWriteArrayList<>(list));
             } else {
-                entryList.addAll(list);
+                for (TimeGraphEntry entry : list) {
+                    if (!entryList.contains(entry)) {
+                        entryList.add(entry);
+                    }
+                }
             }
         }
     }

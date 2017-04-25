@@ -361,12 +361,15 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                     fFlatTraces.remove(parentTrace);
                     for (ITmfTrace trace : TmfTraceManager.getTraceSet(parentTrace)) {
                         final ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
-                        for (TimeGraphEntry traceEntry : getEntryList(ss)) {
-                            List<ControlFlowEntry> currentRootList = traceEntry.getChildren().stream()
-                                    .filter(e -> e instanceof ControlFlowEntry)
-                                    .map(e -> (ControlFlowEntry) e)
-                                    .collect(Collectors.toList());
-                            addEntriesToHierarchicalTree(currentRootList, traceEntry);
+                        List<@NonNull TimeGraphEntry> entryList = getEntryList(ss);
+                        if (entryList != null) {
+                            for (TimeGraphEntry traceEntry : entryList) {
+                                List<ControlFlowEntry> currentRootList = traceEntry.getChildren().stream()
+                                        .filter(e -> e instanceof ControlFlowEntry)
+                                        .map(e -> (ControlFlowEntry) e)
+                                        .collect(Collectors.toList());
+                                addEntriesToHierarchicalTree(currentRootList, traceEntry);
+                            }
                         }
                     }
                 }
@@ -464,6 +467,9 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
             List<ILinkEvent> arrows = getTimeGraphViewer().getTimeGraphControl().getArrows();
             final ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
             List<TimeGraphEntry> currentList = getEntryList(ss);
+            if (currentList == null) {
+                return;
+            }
 
             Map<Integer, Long> orderedTidMap = getUpdatedSchedulingColumn().apply(arrows);
 

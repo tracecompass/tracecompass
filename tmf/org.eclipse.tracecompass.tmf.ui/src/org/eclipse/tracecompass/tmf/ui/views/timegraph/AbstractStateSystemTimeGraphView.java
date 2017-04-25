@@ -16,8 +16,10 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -241,31 +243,36 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     // ------------------------------------------------------------------------
 
     /**
-     * Gets the entry list for a state system
+     * Gets the entry list for a state system. These entries, and their
+     * recursive children, will have their event lists computed using the
+     * provided state system.
      *
      * @param ss
      *            the state system
      *
-     * @return the entry list map
+     * @return the entry list
      */
-    protected List<@NonNull TimeGraphEntry> getEntryList(ITmfStateSystem ss) {
+    protected @Nullable List<@NonNull TimeGraphEntry> getEntryList(ITmfStateSystem ss) {
         synchronized (fSSEntryListMap) {
             return fSSEntryListMap.get(ss);
         }
     }
 
     /**
-     * Adds a trace entry list to the entry list map
+     * Sets the entry list for a state system. These entries, and their
+     * recursive children, will have their event lists computed using the
+     * provided state system. The root of each entry (or the entry itself if it
+     * is a root) will be added to the parent trace's entry list.
      *
      * @param trace
-     *            the trace
+     *            the parent trace
      * @param ss
      *            the state system
      * @param list
      *            the list of time graph entries
      */
     protected void putEntryList(ITmfTrace trace, ITmfStateSystem ss, List<@NonNull TimeGraphEntry> list) {
-        super.putEntryList(trace, list);
+        super.addToEntryList(trace, getRootEntries(list));
         synchronized (fSSEntryListMap) {
             fSSEntryListMap.put(ss, new CopyOnWriteArrayList<>(list));
             fTraceSSMap.put(trace, ss);
@@ -273,17 +280,21 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     /**
-     * Adds a list of entries to a trace's entry list
+     * Adds a list of entries to the entry list for a state system. These
+     * entries, and their recursive children, will have their event lists
+     * computed using the provided state system. The root of each entry (or the
+     * entry itself if it is a root) will be added to the parent trace's entry
+     * list.
      *
      * @param trace
-     *            the trace
+     *            the parent trace
      * @param ss
      *            the state system
      * @param list
      *            the list of time graph entries to add
      */
     protected void addToEntryList(ITmfTrace trace, ITmfStateSystem ss, List<@NonNull TimeGraphEntry> list) {
-        super.addToEntryList(trace, list);
+        super.addToEntryList(trace, getRootEntries(list));
         synchronized (fSSEntryListMap) {
             List<@NonNull TimeGraphEntry> entryList = fSSEntryListMap.get(ss);
             if (entryList == null) {
@@ -296,10 +307,13 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     /**
-     * Removes a list of entries from a trace's entry list
+     * Removes a list of entries from the entry list for a state system. These
+     * entries, and their recursive children, will no longer have their event
+     * lists computed using the provided state system. Each entry that is itself
+     * a root will be removed from the parent trace's entry list.
      *
      * @param trace
-     *            the trace
+     *            the parent trace
      * @param ss
      *            the state system
      * @param list
@@ -316,6 +330,18 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                 }
             }
         }
+    }
+
+    private static List<@NonNull TimeGraphEntry> getRootEntries(List<@NonNull TimeGraphEntry> list) {
+        Set<@NonNull TimeGraphEntry> roots = new LinkedHashSet<>();
+        for (@NonNull TimeGraphEntry entry : list) {
+            TimeGraphEntry root = entry;
+            while (root.getParent() != null) {
+                root = root.getParent();
+            }
+            roots.add(root);
+        }
+        return new ArrayList<>(roots);
     }
 
     @Override
@@ -443,56 +469,13 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     /**
-     * @deprecated The subclass should call
-     *             {@link #getEntryList(ITmfStateSystem)} instead.
-     */
-    @Deprecated
-    @Override
-    protected final List<TimeGraphEntry> getEntryList(ITmfTrace trace) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * @deprecated The subclass should call
-     *             {@link #addToEntryList(ITmfTrace, ITmfStateSystem, List)}
-     *             instead.
-     */
-    @Deprecated
-    @Override
-    protected final void addToEntryList(ITmfTrace trace, List<TimeGraphEntry> list) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * @deprecated The subclass should call
-     *             {@link #putEntryList(ITmfTrace, ITmfStateSystem, List)}
-     *             instead.
-     */
-    @Deprecated
-    @Override
-    protected final void putEntryList(ITmfTrace trace, List<TimeGraphEntry> list) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * @deprecated The subclass should call
-     *             {@link #removeFromEntryList(ITmfTrace, ITmfStateSystem, List)}
-     *             instead.
-     */
-    @Deprecated
-    @Override
-    protected final void removeFromEntryList(ITmfTrace trace, List<TimeGraphEntry> list) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
      * @deprecated The subclass should implement
      *             {@link #getEventList(TimeGraphEntry, ITmfStateSystem, List, List, IProgressMonitor)}
      *             instead.
      */
     @Deprecated
     @Override
-    protected final List<ITimeEvent> getEventList(TimeGraphEntry entry, long startTime, long endTime, long resolution, IProgressMonitor monitor) {
+    protected final @Nullable List<@NonNull ITimeEvent> getEventList(TimeGraphEntry entry, long startTime, long endTime, long resolution, IProgressMonitor monitor) {
         throw new UnsupportedOperationException();
     }
 
@@ -503,7 +486,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
      */
     @Deprecated
     @Override
-    protected final List<ILinkEvent> getLinkList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
+    protected final @Nullable List<@NonNull ILinkEvent> getLinkList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
         throw new UnsupportedOperationException();
     }
 
@@ -514,7 +497,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
      */
     @Deprecated
     @Override
-    protected final List<IMarkerEvent> getViewMarkerList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
+    protected final @NonNull List<IMarkerEvent> getViewMarkerList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
         throw new UnsupportedOperationException();
     }
 
