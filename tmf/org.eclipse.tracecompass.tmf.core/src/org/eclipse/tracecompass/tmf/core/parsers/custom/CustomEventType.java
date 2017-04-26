@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.tmf.core.parsers.custom;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
@@ -28,19 +26,6 @@ public abstract class CustomEventType extends TmfEventType {
 
     private static final @NonNull String EMPTY = ""; //$NON-NLS-1$
     private @NonNull String fEventName;
-
-    /**
-     * Constructor
-     *
-     * @param definition
-     *            Trace definition
-     * @deprecated Use {@link #CustomEventType(String, ITmfEventField)} instead.
-     */
-    @Deprecated
-    public CustomEventType(CustomTraceDefinition definition) {
-        super(EMPTY, getRootField(definition));
-        fEventName = checkNotNull(definition.definitionName);
-    }
 
     /**
      * Constructor

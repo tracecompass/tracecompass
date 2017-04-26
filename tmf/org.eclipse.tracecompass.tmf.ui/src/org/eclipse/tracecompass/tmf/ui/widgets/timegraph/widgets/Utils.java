@@ -333,54 +333,6 @@ public class Utils {
      *            The y coordinate of the top left corner of the rectangular area where the text is to be drawn
      * @param width
      *            The width of the area to be drawn
-     * @param isCentered
-     *            If <code>true</code> the text will be centered in the available width if space permits
-     * @param isTransparent
-     *            If <code>true</code> the background will be transparent, otherwise it will be opaque
-     * @return The number of characters written
-     * @deprecated Use {@link #drawText(GC, String, int, int, int, int, boolean, boolean)} instead.
-     */
-    @Deprecated
-    public static int drawText(GC gc, String text, int x, int y, int width, boolean isCentered, boolean isTransparent) {
-        if (width < 1) {
-            return 0;
-        }
-
-        int len = text.length();
-        int textWidth = 0;
-        boolean isReallyCentered = isCentered;
-        int realX = x;
-
-        while (len > 0) {
-            textWidth = gc.stringExtent(text.substring(0, len)).x;
-            if (textWidth <= width) {
-                break;
-            }
-            isReallyCentered = false;
-            len--;
-        }
-        if (len > 0) {
-            if (isReallyCentered) {
-                realX += (width - textWidth) / 2;
-            }
-            gc.drawText(text.substring(0, len), realX, y, isTransparent);
-        }
-        return len;
-    }
-
-    /**
-     * Draw text in a rectangle, trimming the text to prevent exceeding the specified width.
-     *
-     * @param gc
-     *            The SWT GC object
-     * @param text
-     *            The string to be drawn
-     * @param x
-     *            The x coordinate of the top left corner of the rectangular area where the text is to be drawn
-     * @param y
-     *            The y coordinate of the top left corner of the rectangular area where the text is to be drawn
-     * @param width
-     *            The width of the area to be drawn
      * @param height
      *            The height of the area to be drawn
      * @param isCentered

@@ -25,19 +25,6 @@ public class CustomXmlEventType extends CustomEventType {
     /**
      * Constructor
      *
-     * @param definition
-     *            Trace definition
-     * @deprecated Use {@link #CustomXmlEventType(String, ITmfEventField)}
-     *             instead.
-     */
-    @Deprecated
-    public CustomXmlEventType(CustomXmlTraceDefinition definition) {
-        super(definition);
-    }
-
-    /**
-     * Constructor
-     *
      * @param eventName
      *            the event name
      * @param root

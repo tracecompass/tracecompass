@@ -39,31 +39,6 @@ public final class CustomXmlInputAttribute {
      *
      * @param attributeName
      *            Name of the XML attribute
-     * @param inputName
-     *            Input name
-     * @param inputAction
-     *            Input action
-     * @param inputFormat
-     *            Input format
-     * @deprecated Use
-     *             {@link #CustomXmlInputAttribute(String, Tag, String, int, String)}
-     *             instead.
-     */
-    @Deprecated
-    public CustomXmlInputAttribute(String attributeName, String inputName,
-            int inputAction, String inputFormat) {
-        fAttributeName = attributeName;
-        fInputTag = Tag.IGNORE;
-        fInputName = inputName;
-        fInputAction = inputAction;
-        fInputFormat = inputFormat;
-    }
-
-    /**
-     * Constructor
-     *
-     * @param attributeName
-     *            Name of the XML attribute
      * @param inputTag
      *            Input tag
      * @param inputName

@@ -31,7 +31,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * point.
  *
  * @author Robert Kiss
- * @since 2.4
+ * @since 3.0
  */
 public final class SymbolProviderManager {
 

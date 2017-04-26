@@ -25,19 +25,6 @@ public class CustomTxtEventType extends CustomEventType {
     /**
      * Constructor
      *
-     * @param definition
-     *            Custom text trace definition
-     * @deprecated Use {@link #CustomTxtEventType(String, ITmfEventField)}
-     *             instead.
-     */
-    @Deprecated
-    public CustomTxtEventType(CustomTxtTraceDefinition definition) {
-        super(definition);
-    }
-
-    /**
-     * Constructor
-     *
      * @param eventName
      *            the event name
      * @param root

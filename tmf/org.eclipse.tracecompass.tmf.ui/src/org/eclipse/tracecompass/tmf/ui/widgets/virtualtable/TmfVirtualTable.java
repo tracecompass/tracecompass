@@ -1010,17 +1010,6 @@ public class TmfVirtualTable extends Composite {
     }
 
     /**
-     * Method setColumnHeaders.
-     *
-     * @param columnData
-     *            ColumnData[] the columndata array.
-     */
-    @Deprecated
-    public void setColumnHeaders(ColumnData columnData[]) {
-        /* No-op */
-    }
-
-    /**
      * Method removeAll.
      * @return int 0 the number of elements in the table
      */

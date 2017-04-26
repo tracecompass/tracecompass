@@ -86,7 +86,7 @@ public final class TmfTraceUtils {
      *
      * @param aspect
      *            The event aspect to register
-     * @since 2.4
+     * @since 3.0
      */
     public static void registerEventAspect(ITmfEventAspect<?> aspect) {
         EXTRA_ASPECTS.add(aspect);
@@ -169,7 +169,7 @@ public final class TmfTraceUtils {
      * @return The first result of the
      *         {@link ITmfEventAspect#resolve(ITmfEvent)} that returns non null
      *         for the event or {@code null} otherwise
-     * @since 2.4
+     * @since 3.0
      */
     public static @Nullable Object resolveAspectOfNameForEvent(ITmfTrace trace, String aspectName, ITmfEvent event) {
         // First look in the trace aspects

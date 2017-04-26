@@ -20,7 +20,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
  *
  * @author Matthew Khouzam
  * @author Robert Kiss
- * @since 2.4
+ * @since 3.0
  */
 public interface ISymbolProvider {
 

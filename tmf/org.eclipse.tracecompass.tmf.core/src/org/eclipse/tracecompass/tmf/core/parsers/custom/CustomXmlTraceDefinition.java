@@ -61,11 +61,6 @@ import org.xml.sax.SAXParseException;
  */
 public class CustomXmlTraceDefinition extends CustomTraceDefinition {
 
-    /** Ignore tag
-     * @deprecated Use {@link org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.Tag#IGNORE} instead. */
-    @Deprecated
-    public static final String TAG_IGNORE = Messages.CustomXmlTraceDefinition_ignoreTag;
-
     /**
      * Custom XML label used internally and therefore should not be externalized
      */

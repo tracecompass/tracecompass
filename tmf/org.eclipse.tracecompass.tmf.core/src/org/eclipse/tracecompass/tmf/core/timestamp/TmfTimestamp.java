@@ -422,27 +422,6 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
         return ts.getValue() == nts.getValue() && ts.getScale() == nts.getScale();
     }
 
-    /**
-     * Saturated addition. It will not overflow but instead clamp the result to
-     * {@link Long#MAX_VALUE} and {@link Long#MIN_VALUE}.
-     *
-     * @param left
-     *            The left long to add
-     * @param right
-     *            The right long to add
-     * @return The saturated addition result. The mathematical, not Java version
-     *         of Min(Max(MIN_VALUE, left+right), MAX_VALUE).
-     * @see <a href="http://en.wikipedia.org/wiki/Saturation_arithmetic">
-     *      Saturation arithmetic</a>
-     * @since 2.0
-     * @deprecated use {@link SaturatedArithmetic#add(long, long)} instead
-     */
-    @Deprecated
-    protected static final long saturatedAdd(final long left, final long right) {
-        return SaturatedArithmetic.add(left, right);
-    }
-
-
     // ------------------------------------------------------------------------
     // Object
     // ------------------------------------------------------------------------

@@ -57,19 +57,6 @@ public class TmfEventMatches implements IMatchProcessingUnit {
         return fMatchCount;
     }
 
-    /**
-     * Returns the match at the specified index
-     *
-     * @param index
-     *            The index of the match to get
-     * @return The match at index or null or not present
-     * @deprecated Matches are not kept anymore, they use up memory for no real reason
-     */
-    @Deprecated
-    public TmfEventDependency getMatch(int index) {
-        return null;
-    }
-
     @Override
     public String toString() {
         return getClass().getSimpleName() + " [ Number of matches found: " + fMatchCount + " ]"; //$NON-NLS-1$ //$NON-NLS-2$

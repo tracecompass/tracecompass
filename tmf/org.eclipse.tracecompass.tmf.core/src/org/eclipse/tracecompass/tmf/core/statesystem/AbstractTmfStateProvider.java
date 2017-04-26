@@ -184,7 +184,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
     }
 
     /**
-     * @since 2.4
+     * @since 3.0
      */
     @Override
     public void fail(Throwable cause) {
@@ -192,7 +192,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
     }
 
     /**
-     * @since 2.4
+     * @since 3.0
      */
     @Override
     public @Nullable Throwable getFailureCause() {

@@ -42,7 +42,7 @@ public class SourceCallsite extends TmfCallsite {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(getFileName()).append(':');
-        builder.append(Long.toString(getLineNumber()));
+        builder.append(getLineNo());
         return builder.toString();
     }
 

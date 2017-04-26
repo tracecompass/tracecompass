@@ -41,7 +41,6 @@ import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.component.TmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfLostEvent;
-import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
@@ -567,18 +566,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
      * Update the trace attributes
      *
      * @param context the current trace context
-     * @param timestamp the corresponding timestamp
-     * @deprecated Use {@link #updateAttributes(ITmfContext, ITmfEvent)}
-     */
-    @Deprecated
-    protected synchronized void updateAttributes(final ITmfContext context, final @NonNull ITmfTimestamp timestamp) {
-        updateAttributes(context, new TmfEvent(this, context.getRank(), timestamp, null, null));
-    }
-
-    /**
-     * Update the trace attributes
-     *
-     * @param context the current trace context
      * @param event the corresponding event
      * @since 1.1
      */
@@ -741,7 +728,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     //TODO: Move to ITmfTrace as default method when Bug 507246 is fixed
 
     /**
-     * @since 2.4
+     * @since 3.0
      */
     @SuppressWarnings("unchecked")
     @Override

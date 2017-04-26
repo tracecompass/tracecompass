@@ -158,7 +158,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
      * Gets the trace
      *
      * @return The trace
-     * @since 2.4
+     * @since 3.0
      */
     @Nullable public ITmfTrace getTrace() {
         return fTrace;
@@ -303,7 +303,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
      * initialized when the exception occurred, this method could mark the
      * initialization as failed.
      *
-     * @since 2.4
+     * @since 3.0
      */
     protected void onFail() {
         // Do nothing by default

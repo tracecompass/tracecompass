@@ -12,11 +12,9 @@
 
 package org.eclipse.tracecompass.tmf.core.parsers.custom;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import java.text.ParseException;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,8 +35,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
-import com.google.common.collect.Iterables;
-
 /**
  * Base event for custom text parsers.
  *
@@ -52,11 +48,6 @@ public class CustomEvent extends TmfEvent {
         /** Timestamp input format */
         TIMESTAMP_INPUT_FORMAT
     }
-
-    /** Input format key
-     * @deprecated Use {@link Key#TIMESTAMP_INPUT_FORMAT} instead. */
-    @Deprecated
-    protected static final String TIMESTAMP_INPUT_FORMAT_KEY = "CE_TS_I_F"; //$NON-NLS-1$
 
     /** Empty message */
     protected static final String NO_MESSAGE = ""; //$NON-NLS-1$
@@ -223,25 +214,6 @@ public class CustomEvent extends TmfEvent {
     // ------------------------------------------------------------------------
     // Other operations
     // ------------------------------------------------------------------------
-
-    /**
-     * Get the contents of an event table cell for this event's row.
-     *
-     * @param index
-     *            The ID/index of the field to display. This corresponds to the
-     *            index in the event content.
-     * @return The String to display in the cell
-     * @deprecated Use {@link ITmfEventField#getField(String...)} instead.
-     */
-    @Deprecated
-    public String getEventString(int index) {
-        Collection<? extends ITmfEventField> fields = getContent().getFields();
-        if (index < 0 || index >= fields.size()) {
-            return ""; //$NON-NLS-1$
-        }
-
-        return nullToEmptyString(checkNotNull(Iterables.get(fields, index)).getValue());
-    }
 
     private void processData() {
         // Remove the values as they are processed, so we can process the extra values at the end

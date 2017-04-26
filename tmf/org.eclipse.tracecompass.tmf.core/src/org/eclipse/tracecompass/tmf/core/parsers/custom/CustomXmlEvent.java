@@ -77,19 +77,6 @@ public class CustomXmlEvent extends CustomEvent {
      * Parse an entry.
      *
      * @param value Value
-     * @param name Name
-     * @param inputAction Input action
-     * @param inputFormat Input format
-     * @deprecated Use {@link #parseInput(String, Tag, String, int, String)} instead.
-     */
-    @Deprecated
-    public void parseInput(String value, String name, int inputAction, String inputFormat) {
-    }
-
-    /**
-     * Parse an entry.
-     *
-     * @param value Value
      * @param inputTag Input tag
      * @param inputName Input name
      * @param inputAction Input action

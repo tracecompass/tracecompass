@@ -132,20 +132,6 @@ public final class SWTBotUtils {
     private static final String TRACING_PERSPECTIVE_ID = TracingPerspectiveFactory.ID;
 
     /**
-     * Waits for all Eclipse jobs to finish. Times out after
-     * WaitUtils#MAX_JOBS_WAIT_TIME by default.
-     *
-     * @throws RuntimeException
-     *             once the waiting time passes the default maximum value
-     *
-     * @deprecated Use {@link WaitUtils#waitForJobs()} instead
-     */
-    @Deprecated
-    public static void waitForJobs() {
-        WaitUtils.waitForJobs();
-    }
-
-    /**
      * Sleeps current thread for a given time.
      *
      * @param waitTimeMillis

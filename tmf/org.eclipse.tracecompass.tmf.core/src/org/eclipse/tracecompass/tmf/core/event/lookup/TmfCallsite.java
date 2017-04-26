@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.tmf.core.event.lookup;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -39,22 +37,6 @@ public class TmfCallsite implements ITmfCallsite {
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
-
-    /**
-     * Default constructor.
-     *
-     * @param fileName
-     *            - a file name
-     * @param functionName
-     *            - a function name
-     * @param lineNumber
-     *            - a line number
-     * @deprecated Use {@link #TmfCallsite(String, Long)} instead.
-     */
-    @Deprecated
-    public TmfCallsite(String fileName, String functionName, long lineNumber) {
-        this(checkNotNull(fileName), lineNumber);
-    }
 
     /**
      * Constructor
@@ -89,20 +71,6 @@ public class TmfCallsite implements ITmfCallsite {
     public @NonNull String getFileName() {
         return fFileName;
     }
-
-    @Deprecated
-    @Override
-    public String getFunctionName() {
-        return ""; //$NON-NLS-1$
-    }
-
-    @Deprecated
-    @Override
-    public long getLineNumber() {
-        Long lineNumber = fLineNumber;
-        return (lineNumber == null ? -1 : lineNumber.longValue());
-    }
-
 
     /**
      * @since 2.1

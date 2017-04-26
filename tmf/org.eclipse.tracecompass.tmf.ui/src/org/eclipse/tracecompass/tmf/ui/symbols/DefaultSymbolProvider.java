@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -64,19 +63,6 @@ public class DefaultSymbolProvider implements ISymbolProvider {
             return String.format("%08x", address); //$NON-NLS-1$
         }
         return String.format("%016x", address); //$NON-NLS-1$
-    }
-
-    /**
-     * The default symbol provider will return null for this method
-     *
-     * @param address
-     *            the symbol address
-     * @return always null
-     */
-    @Deprecated
-    @Override
-    public @Nullable ITmfCallsite getSymbolInfo(long address) {
-        return null;
     }
 
     /**

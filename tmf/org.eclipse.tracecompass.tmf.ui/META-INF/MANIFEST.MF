@@ -84,7 +84,6 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.ui;x-friends:="org.eclipse
  org.eclipse.tracecompass.tmf.ui.viewers,
  org.eclipse.tracecompass.tmf.ui.viewers.events,
  org.eclipse.tracecompass.tmf.ui.viewers.events.columns,
- org.eclipse.tracecompass.tmf.ui.viewers.events.text,
  org.eclipse.tracecompass.tmf.ui.viewers.table,
  org.eclipse.tracecompass.tmf.ui.viewers.tree,
  org.eclipse.tracecompass.tmf.ui.viewers.xycharts,

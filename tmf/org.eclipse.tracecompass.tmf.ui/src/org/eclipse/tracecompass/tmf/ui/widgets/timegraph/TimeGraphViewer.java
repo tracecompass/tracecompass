@@ -1527,18 +1527,6 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
         setSelectedTimeInt(time, true, true);
     }
 
-    /**
-     * Sets a new selection for this viewer and makes it visible.
-     *
-     * @param entry
-     *            The entry to select
-     * @deprecated Use {@link #setSelection(ISelection, boolean)} instead.
-     */
-    @Deprecated
-    public void setSelection(ITimeGraphEntry entry) {
-        setSelection(entry, true);
-    }
-
     @Override
     public void setSelection(ISelection selection, boolean reveal) {
         /* if there is a pending selection, ignore this one */

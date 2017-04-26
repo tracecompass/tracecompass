@@ -48,7 +48,7 @@ public class TmfAnalysisException extends Exception {
      *
      * @param cause
      *            The cause
-     * @since 2.4
+     * @since 3.0
      */
     public TmfAnalysisException(Throwable cause) {
         super(cause);

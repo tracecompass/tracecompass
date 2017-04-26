@@ -38,50 +38,6 @@ public class CallStackEntry extends TimeGraphEntry {
     /**
      * Standard constructor
      *
-     * @param quark
-     *            The call stack quark
-     * @param stackLevel
-     *            The stack level
-     * @param trace
-     *            The trace that this view is talking about
-     * @deprecated Use {@link #CallStackEntry(String, int, int, int, ITmfTrace, ITmfStateSystem)}
-     */
-    @Deprecated
-    public CallStackEntry(int quark, int stackLevel, ITmfTrace trace) {
-        super(null, 0, 0);
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Standard constructor
-     *
-     * @param name
-     *            The parent thread name
-     * @param quark
-     *            The call stack quark
-     * @param stackLevel
-     *            The stack level
-     * @param trace
-     *            The trace that this view is talking about
-     * @param ss
-     *            The call stack state system
-     * @deprecated Use
-     *             {@link #CallStackEntry(String, int, int, int, ITmfTrace, ITmfStateSystem)}
-     */
-    @Deprecated
-    public CallStackEntry(String name, int quark, int stackLevel, ITmfTrace trace, @NonNull ITmfStateSystem ss) {
-        super(name, 0, 0);
-        fQuark = quark;
-        fStackLevel = stackLevel;
-        fProcessId = -1;
-        fTrace = trace;
-        fFunctionName = ""; //$NON-NLS-1$
-        fSS = ss;
-    }
-
-    /**
-     * Standard constructor
-     *
      * @param name
      *            The parent thread name
      * @param quark
@@ -120,26 +76,6 @@ public class CallStackEntry extends TimeGraphEntry {
      */
     public void setFunctionName(String functionName) {
         fFunctionName = functionName;
-    }
-
-    /**
-     * Set the start time of the call stack entry
-     * @param startTime the start time
-     * @deprecated Use {@link #setFunctionEntryTime(long)}
-     */
-    @Deprecated
-    public void setStartTime(long startTime) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Set the end time of the call stack entry
-     * @param endTime the end time
-     * @deprecated Use {@link #setFunctionExitTime(long)}
-     */
-    @Deprecated
-    public void setEndTime(long endTime) {
-        throw new UnsupportedOperationException();
     }
 
     /**

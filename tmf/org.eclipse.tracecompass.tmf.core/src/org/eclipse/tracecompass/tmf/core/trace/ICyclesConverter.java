@@ -16,7 +16,7 @@ package org.eclipse.tracecompass.tmf.core.trace;
  * An adapter interface for traces, which allows the trace to provide conversion
  * functions between cycles and nanoseconds.
  *
- * @since 2.4
+ * @since 3.0
  */
 public interface ICyclesConverter {
 

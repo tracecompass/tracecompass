@@ -123,38 +123,6 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
     }
 
     /**
-     * Store a data for the trace
-     *
-     * @param key
-     *            The id of the data
-     * @param value
-     *            The value of the data
-     * @since 2.1
-     * @deprecated Use
-     *             {@link TmfTraceManager#updateTraceContext(ITmfTrace, java.util.function.UnaryOperator)}
-     *             and apply {@link Builder#setData(String, Object)} instead.
-     */
-    @Deprecated
-    public synchronized void setData(String key, Object value) {
-        fData.put(key, value);
-    }
-
-    /**
-     * Copy data into the data map
-     *
-     * @param data
-     *            The map of data to copy
-     * @since 2.1
-     * @deprecated Use
-     *             {@link TmfTraceManager#updateTraceContext(ITmfTrace, java.util.function.UnaryOperator)}
-     *             and apply {@link Builder#setData(Map)} instead.
-     */
-    @Deprecated
-    public synchronized void setData(Map<String, Object> data) {
-        fData.putAll(data);
-    }
-
-    /**
      * Get the data for the specific key
      *
      * @param key

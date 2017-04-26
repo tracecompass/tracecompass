@@ -139,21 +139,6 @@ public abstract class CustomTraceDefinition {
      */
     public static final @NonNull String SEPARATOR = " | ";  //$NON-NLS-1$
 
-    /** Timestamp tag
-     * @deprecated Use {@link Tag#TIMESTAMP} instead. */
-    @Deprecated
-    public static final String TAG_TIMESTAMP = Messages.CustomTraceDefinition_timestampTag;
-
-    /** Message tag
-     * @deprecated Use {@link Tag#MESSAGE} instead. */
-    @Deprecated
-    public static final String TAG_MESSAGE = Messages.CustomTraceDefinition_messageTag;
-
-    /** "Other" tag
-     * @deprecated Use {@link Tag#OTHER} instead. */
-    @Deprecated
-    public static final String TAG_OTHER = Messages.CustomTraceDefinition_otherTag;
-
     private static final String TMF_CUSTOM_TRACE_BUILTIN_EXTENSION_ID = "org.eclipse.tracecompass.tmf.core.custom.trace"; //$NON-NLS-1$
     private static final String ATTRIBUTE_NAME_FILE = "file"; //$NON-NLS-1$
     private static final String ATTRIBUTE_NAME_TRACE_CONTENT_TYPE = "traceContentType"; //$NON-NLS-1$
@@ -182,30 +167,6 @@ public abstract class CustomTraceDefinition {
 
         /** Name of this column */
         public @NonNull String name;
-
-        /**
-         * Default constructor (empty)
-         * @deprecated Use {@link OutputColumn#OutputColumn(Tag, String)}
-         *             instead.
-         */
-        @Deprecated
-        public OutputColumn() {
-            this(Tag.IGNORE, ""); //$NON-NLS-1$
-        }
-
-        /**
-         * Constructor
-         *
-         * @param name
-         *            Name of this output column
-         * @deprecated Use {@link OutputColumn#OutputColumn(Tag, String)}
-         *             instead.
-         */
-        @Deprecated
-        public OutputColumn(@NonNull String name) {
-            this.tag = Tag.OTHER;
-            this.name = name;
-        }
 
         /**
          * Constructor

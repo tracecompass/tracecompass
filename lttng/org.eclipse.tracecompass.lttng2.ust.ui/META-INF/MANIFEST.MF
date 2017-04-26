@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 2.1.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.lttng2.ust.ui;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.internal.lttng2.ust.ui.Activator
@@ -18,8 +18,7 @@ Require-Bundle: org.eclipse.core.resources,
  org.eclipse.tracecompass.tmf.ctf.core
 Export-Package: org.eclipse.tracecompass.internal.lttng2.ust.ui;x-friends:="org.eclipse.tracecompass.lttng2.ust.ui.tests",
  org.eclipse.tracecompass.internal.lttng2.ust.ui.analysis.debuginfo;x-internal:=true,
- org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage;x-friends:="org.eclipse.tracecompass.lttng2.ust.ui.tests,org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests",
- org.eclipse.tracecompass.lttng2.ust.ui.analysis.callstack
+ org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage;x-friends:="org.eclipse.tracecompass.lttng2.ust.ui.tests,org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests"
 Import-Package: com.google.common.base,
  com.google.common.collect,
  org.swtchart

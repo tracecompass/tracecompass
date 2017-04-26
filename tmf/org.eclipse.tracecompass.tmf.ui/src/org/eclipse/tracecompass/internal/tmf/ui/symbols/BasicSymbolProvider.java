@@ -18,8 +18,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.callstack.FunctionNameMapper;
-import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
-import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
@@ -136,17 +134,6 @@ public class BasicSymbolProvider implements ISymbolProvider {
     public @Nullable String getSymbolText(long address) {
         loadConfiguration(null);
         return fMapping.get(Long.toHexString(address));
-    }
-
-    @Deprecated
-    @Override
-    public @Nullable ITmfCallsite getSymbolInfo(long address) {
-        loadConfiguration(null);
-        String symbolText = getSymbolText(address);
-        if (symbolText != null) {
-            return new TmfCallsite(null, symbolText, -1);
-        }
-        return null;
     }
 
     @Override

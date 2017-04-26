@@ -189,25 +189,6 @@ public class TmfAnalysisManager {
      * @param trace
      *            The trace
      * @return The set of parameter providers that apply to a trace for this module
-     * @deprecated Use the
-     *             {@link #getParameterProvidersForModule(IAnalysisModule, ITmfTrace)}
-     *             method that returns a set instead.
-     */
-    @Deprecated
-    public static List<IAnalysisParameterProvider> getParameterProviders(IAnalysisModule module, ITmfTrace trace) {
-        /* Call the method that returns a set */
-        Set<IAnalysisParameterProvider> providerList = getParameterProvidersForModule(module, trace);
-        return new ArrayList<>(providerList);
-    }
-
-    /**
-     * Get the parameter providers that apply to the requested trace
-     *
-     * @param module
-     *            Analysis module
-     * @param trace
-     *            The trace
-     * @return The set of parameter providers that apply to a trace for this module
      * @since 2.0
      */
     public static Set<IAnalysisParameterProvider> getParameterProvidersForModule(IAnalysisModule module, ITmfTrace trace) {

@@ -69,37 +69,6 @@ public final class CustomXmlInputElement {
      *            Element name
      * @param logEntry
      *            If this element is a log entry
-     * @param inputName
-     *            Name of the input
-     * @param inputAction
-     *            Input action
-     * @param inputFormat
-     *            Input format
-     * @param attributes
-     *            XML attributes of this element
-     * @deprecated Use
-     *             {@link #CustomXmlInputElement(String, boolean, Tag, String, int, String, List)}
-     *             instead.
-     */
-    @Deprecated
-    public CustomXmlInputElement(String elementName, boolean logEntry,
-            String inputName, int inputAction, String inputFormat,
-            List<CustomXmlInputAttribute> attributes) {
-        fElementName = elementName;
-        fLogEntry = logEntry;
-        fInputName = inputName;
-        fInputAction = inputAction;
-        fInputFormat = inputFormat;
-        fAttributes = attributes;
-    }
-
-    /**
-     * Constructor
-     *
-     * @param elementName
-     *            Element name
-     * @param logEntry
-     *            If this element is a log entry
      * @param inputTag
      *            Tag of the input
      * @param inputName

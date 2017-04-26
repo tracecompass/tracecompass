@@ -16,10 +16,7 @@ import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.FunctionLocat
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoAnalysisModule;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoBinaryAspect;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoFunctionAspect;
-import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoSourceAspect;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
-import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
-import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 import org.eclipse.tracecompass.tmf.core.symbols.DefaultSymbolProvider;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
@@ -70,26 +67,9 @@ public class UstDebugInfoSymbolProvider extends DefaultSymbolProvider implements
         return (loc == null ? null : loc.getFunctionName());
     }
 
-    @Deprecated
-    @Override
-    public @Nullable TmfCallsite getSymbolInfo(int pid, long timestamp, long address) {
-        BinaryCallsite bc = UstDebugInfoBinaryAspect.getBinaryCallsite(getTrace(), pid, timestamp, address);
-        if (bc == null) {
-            return null;
-        }
-
-        return UstDebugInfoSourceAspect.getSourceCallsite(getTrace(), bc);
-    }
-
     @Override
     public @NonNull ISymbolProviderPreferencePage createPreferencePage() {
         return new UstDebugInfoSymbolProviderPreferencePage(this);
-    }
-
-    @Deprecated
-    @Override
-    public @Nullable ITmfCallsite getSymbolInfo(long address) {
-        return null;
     }
 
 }

@@ -134,7 +134,6 @@ import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
-import org.eclipse.tracecompass.tmf.core.event.aspect.TmfContentFieldAspect;
 import org.eclipse.tracecompass.tmf.core.event.collapse.ITmfCollapsibleEvent;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfModelLookup;
@@ -188,7 +187,6 @@ import org.eclipse.ui.themes.IThemeManager;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 
 /**
@@ -785,43 +783,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      */
     public TmfEventsTable(final Composite parent, final int cacheSize) {
         this(parent, cacheSize, TmfTrace.BASE_ASPECTS);
-    }
-
-    /**
-     * Legacy constructor, using ColumnData to define columns
-     *
-     * @param parent
-     *            The parent composite UI object
-     * @param cacheSize
-     *            The size of the event table cache
-     * @param columnData
-     *            The column data array
-     * @deprecated Deprecated constructor, use
-     *             {@link #TmfEventsTable(Composite, int, Collection)}
-     */
-    @Deprecated
-    public TmfEventsTable(final Composite parent, int cacheSize,
-            final org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.ColumnData[] columnData) {
-        /*
-         * We'll do a "best-effort" to keep trace types still using this API to
-         * keep working, by defining a TmfEventTableColumn for each ColumnData
-         * they passed.
-         */
-        this(parent, cacheSize, convertFromColumnData(columnData));
-    }
-
-    @Deprecated
-    private static @NonNull Iterable<ITmfEventAspect<?>> convertFromColumnData(
-            org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.ColumnData[] columnData) {
-
-        ImmutableList.Builder<ITmfEventAspect<?>> builder = new ImmutableList.Builder<>();
-        for (org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.ColumnData col : columnData) {
-            String fieldName = col.header;
-            if (fieldName != null) {
-                builder.add(new TmfContentFieldAspect(fieldName, fieldName));
-            }
-        }
-        return builder.build();
     }
 
     /**
@@ -1578,17 +1539,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      */
     public TmfVirtualTable getTable() {
         return fTable;
-    }
-
-    /**
-     * @param columnData
-     *            columnData
-     * @deprecated The column headers are now set at the constructor, this
-     *             shouldn't be called anymore.
-     */
-    @Deprecated
-    protected void setColumnHeaders(final org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.ColumnData[] columnData) {
-        /* No-op */
     }
 
     /**

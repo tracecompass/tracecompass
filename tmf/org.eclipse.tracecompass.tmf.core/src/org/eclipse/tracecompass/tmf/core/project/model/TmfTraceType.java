@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -130,63 +129,6 @@ public final class TmfTraceType {
     // ------------------------------------------------------------------
 
     /**
-     * Retrieves the category name from the platform extension registry based on
-     * the category ID
-     *
-     * @param categoryId
-     *            The category ID
-     * @return the category name or empty string if not found
-     * @deprecated Use {@link Platform#getExtensionRegistry()} and various
-     *             public constants in {@link TmfTraceType} if achieving this is
-     *             needed.
-     */
-    @Deprecated
-    public static String getCategoryName(String categoryId) {
-        IConfigurationElement[] elements = Platform.getExtensionRegistry()
-                .getConfigurationElementsFor(TMF_TRACE_TYPE_ID);
-        for (IConfigurationElement element : elements) {
-            if (element.getName().equals(CATEGORY_ELEM) && element.getAttribute(ID_ATTR).equals(categoryId)) {
-                return element.getAttribute(NAME_ATTR);
-            }
-        }
-        return ""; //$NON-NLS-1$
-    }
-
-    /**
-     * Retrieves all configuration elements from the platform extension registry
-     * for the trace type extension that apply to traces and not experiments.
-     *
-     * @return an array of trace type configuration elements
-     * @deprecated Use {@link Platform#getExtensionRegistry()} and various
-     *             public constants in {@link TmfTraceType} if achieving this is
-     *             needed.
-     */
-    @Deprecated
-    public static IConfigurationElement[] getTypeElements() {
-        IConfigurationElement[] elements = Platform.getExtensionRegistry()
-                .getConfigurationElementsFor(TMF_TRACE_TYPE_ID);
-        List<IConfigurationElement> typeElements = new LinkedList<>();
-        for (IConfigurationElement element : elements) {
-            if (element.getName().equals(TYPE_ELEM)) {
-                typeElements.add(element);
-            }
-        }
-        return typeElements.toArray(new IConfigurationElement[typeElements.size()]);
-    }
-
-    /**
-     * Get an iterable view of the existing trace type IDs.
-     *
-     * @return The currently registered trace type IDs
-     * @deprecated Use a combination of {@link #getTraceTypeHelpers()} and
-     *             {@link TraceTypeHelper#getTraceTypeId()} instead.
-     */
-    @Deprecated
-    public static Iterable<String> getTraceTypeIDs() {
-        return TRACE_TYPES.keySet();
-    }
-
-    /**
      * Get an iterable view of the existing trace type helpers.
      *
      * @return The currently registered trace type helpers
@@ -236,29 +178,6 @@ public final class TmfTraceType {
 
         // Format result
         return traceTypes.toArray(new String[traceTypes.size()]);
-    }
-
-    /**
-     * Gets all the custom trace types
-     *
-     * @return the list of custom trace types
-     * @deprecated Use {@link CustomTxtTraceDefinition#loadAll()} and
-     *             {@link CustomXmlTraceDefinition#loadAll()} if achieving this
-     *             is needed.
-     */
-    @Deprecated
-    public static List<String> getCustomTraceTypes() {
-
-        List<String> traceTypes = new ArrayList<>();
-        for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
-            String traceTypeName = def.definitionName;
-            traceTypes.add(traceTypeName);
-        }
-        for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
-            String traceTypeName = def.definitionName;
-            traceTypes.add(traceTypeName);
-        }
-        return traceTypes;
     }
 
     private static void populateCustomTraceTypes() {
@@ -432,89 +351,6 @@ public final class TmfTraceType {
             }
         }
         return ""; //$NON-NLS-1$
-    }
-
-    /**
-     * Returns the list of trace categories
-     *
-     * @return the list of trace categories
-     * @deprecated Use {@link #getTraceTypeHelpers()} and
-     *             {@link TraceTypeHelper#getCategoryName()} to retrieve all
-     *             category names.
-     */
-    @Deprecated
-    public static List<String> getTraceCategories() {
-        List<String> categoryNames = new ArrayList<>();
-        for (TraceTypeHelper helper : TRACE_TYPES.values()) {
-            final String categoryName = helper.getCategoryName();
-            if (!categoryNames.contains(categoryName)) {
-                categoryNames.add(categoryName);
-            }
-        }
-        return categoryNames;
-    }
-
-    /**
-     * Get the trace type helper classes from category name. Return only the
-     * trace types, not the experiment types
-     *
-     * @param categoryName
-     *            the categoryName to lookup
-     * @return a list of trace type helper classes {@link TraceTypeHelper}
-     * @deprecated Use {@link #getTraceTypeHelpers()} and
-     *             {@link TraceTypeHelper#getCategoryName()} to retrieve all
-     *             category names.
-     */
-    @Deprecated
-    public static List<TraceTypeHelper> getTraceTypes(String categoryName) {
-        List<TraceTypeHelper> traceNames = new ArrayList<>();
-        for (TraceTypeHelper traceTypeHelper : TRACE_TYPES.values()) {
-            if (!traceTypeHelper.isExperimentType()) {
-                final String storedCategoryName = traceTypeHelper.getCategoryName();
-                if (storedCategoryName.equals(categoryName)) {
-                    traceNames.add(traceTypeHelper);
-                }
-            }
-        }
-        return traceNames;
-    }
-
-    /**
-     * Validate a trace type
-     *
-     * @param traceTypeName
-     *            the trace category (canonical name)
-     * @param fileName
-     *            the file name (and path)
-     * @return true if the trace is of a valid type
-     * @deprecated Use TmfTraceType.getTraceTypeHelpers and
-     *             {@link TraceTypeHelper#validate(String)} or
-     *             {@link TraceTypeHelper#validateWithConfidence(String)}
-     */
-    @Deprecated
-    public static boolean validate(String traceTypeName, String fileName) {
-        if (traceTypeName != null && !traceTypeName.isEmpty()) {
-            final TraceTypeHelper traceTypeHelper = TRACE_TYPES.get(traceTypeName);
-            if (traceTypeHelper == null || !traceTypeHelper.validate(fileName).isOK()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Validate a trace
-     *
-     * @param traceToValidate
-     *            the trace category (canonical name)
-     * @return true if the trace is of a valid type
-     * @deprecated Use TmfTraceType.getTraceTypeHelpers and
-     *             {@link TraceTypeHelper#validate(String)} or
-     *             {@link TraceTypeHelper#validateWithConfidence(String)}
-     */
-    @Deprecated
-    public static boolean validate(TraceValidationHelper traceToValidate) {
-        return validate(traceToValidate.getTraceType(), traceToValidate.getTraceToScan());
     }
 
     /**

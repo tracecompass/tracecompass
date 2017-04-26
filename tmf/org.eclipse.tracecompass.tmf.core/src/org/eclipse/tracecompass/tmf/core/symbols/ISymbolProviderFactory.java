@@ -19,7 +19,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  *
  * @author Robert Kiss
  *
- * @since 2.4
+ * @since 3.0
  */
 public interface ISymbolProviderFactory {
 

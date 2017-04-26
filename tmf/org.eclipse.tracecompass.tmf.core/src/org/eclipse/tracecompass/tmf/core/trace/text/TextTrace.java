@@ -435,7 +435,7 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
     }
 
     /**
-     * @since 2.4
+     * @since 3.0
      */
     @Override
     public synchronized ITmfTimestamp readEnd() {

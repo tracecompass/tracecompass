@@ -25,8 +25,7 @@ import com.google.common.collect.Lists;
  * trace type preferences is a blacklist preference of disabled trace types.
  *
  * @author Jean-Christian Kouame
- * @since 2.4
- *
+ * @since 3.0
  */
 public final class TraceTypePreferences {
 
