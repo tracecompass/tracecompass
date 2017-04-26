@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisOutput;
@@ -43,13 +44,14 @@ import org.eclipse.ui.views.IViewDescriptor;
 public class TmfAnalysisViewOutput implements IAnalysisOutput, IExecutableExtension {
 
     private String fViewId;
+    private final @Nullable String fSecondaryId;
     private final Map<String, String> fProperties = new HashMap<>();
 
     /**
      * Default constructor
      */
     public TmfAnalysisViewOutput() {
-
+        fSecondaryId = null;
     }
 
     /**
@@ -60,6 +62,25 @@ public class TmfAnalysisViewOutput implements IAnalysisOutput, IExecutableExtens
      */
     public TmfAnalysisViewOutput(String viewid) {
         fViewId = viewid;
+        fSecondaryId = null;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param viewid
+     *            id of the view to display as output
+     * @param secondaryId
+     *            The secondary ID for this view, for example, an analysis ID
+     *            for views supporting multiple analyses. If not
+     *            <code>null</code>, the view will be opened with id
+     *            "viewid:secondaryId", so multiple instances of the same view
+     *            can be opened at the same time.
+     * @since 3.0
+     */
+    public TmfAnalysisViewOutput(String viewid, String secondaryId) {
+        fViewId = viewid;
+        fSecondaryId = secondaryId;
     }
 
     /**
@@ -91,7 +112,13 @@ public class TmfAnalysisViewOutput implements IAnalysisOutput, IExecutableExtens
         final IWorkbench wb = PlatformUI.getWorkbench();
         final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
 
-        return activePage.showView(fViewId);
+        String viewId = fViewId;
+        String secondaryId = fSecondaryId;
+        if (secondaryId != null) {
+            viewId += ':' + secondaryId;
+        }
+
+        return activePage.showView(viewId);
     }
 
     @Override
