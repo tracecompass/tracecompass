@@ -500,7 +500,7 @@ After creating an experiment, traces need to be added to the experiment. To sele
 
 [[Image:images/SelectTracesAction.png]]
 
-A new dialog box will open with a list of available traces. The filter text box can be used to quickly find traces. Use buttons '''Select All''' or '''Deselect All''' to select or deselect all traces. Select the traces to add from the list and then click on '''Finish'''.
+A new dialog box will open with a list of available traces. The filter text box can be used to quickly find traces. Use buttons '''Select All''' or '''Deselect All''' to select or deselect all traces. Select the traces to add from the list and then click on '''Finish''' or you can go a step further by activating the time range filtering option. Enter the time range using the following format: 'yyyy-MM-dd HH:mm:ss.SSS SSS SSS' and click on '''Finish'''. By using this option, only traces, among your selected trace, that are in or overlap the range will be added to the experiment.
 
 [[Image:images/SelectTracesDialog.png]]
 

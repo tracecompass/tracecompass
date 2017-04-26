@@ -97,7 +97,7 @@ public class TraceImportOperationTest {
     public void test() throws Exception {
         WorkspaceModifyOperation operation = new TraceImportOperation(fSourcePath, fDestFolder);
         PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
-        assertEquals(3, fDestFolder.getTraces().size());
+        assertEquals(9, fDestFolder.getTraces().size());
         validateImport(fSourcePath, fDestFolder, true);
     }
 
@@ -122,7 +122,7 @@ public class TraceImportOperationTest {
         assertTrue(destFolder.getChildren().get(0) instanceof TmfTraceFolder);
         destFolder = (TmfTraceFolder) destFolder.getChildren().get(0);
         assertEquals("testfiles.zip", destFolder.getName());
-        assertEquals(3, destFolder.getTraces().size());
+        assertEquals(9, destFolder.getTraces().size());
         validateImport(fSourcePath, destFolder, false);
 
         fTracesFolder.getResource().getFolder("skipTrue").create(false, true, null);

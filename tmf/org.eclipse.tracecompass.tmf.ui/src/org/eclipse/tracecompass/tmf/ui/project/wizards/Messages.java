@@ -64,6 +64,26 @@ public class Messages extends NLS {
      */
     public static String SelectTracesWizardPage_InternalErrorTitle;
     /**
+     * The Label of the field to enter start time.
+     * @since 3.0
+     */
+    public static String SelectTracesWizardPage_StartTime;
+    /**
+     * The Label of the field to enter end time.
+     * @since 3.0
+     */
+    public static String SelectTracesWizardPage_EndTime;
+    /**
+     * The name of the button to enable time range filtering.
+     * @since 3.0
+     */
+    public static String SelectTracesWizardPage_TimeRangeOptionButton;
+    /**
+     * The error message when the time range is not valid.
+     * @since 3.0
+     */
+    public static String SelectTracesWizardPage_TimeRangeErrorMessage;
+    /**
      * The error message when no name was entered in a dialog box (new trace or
      * experiment dialog)
      */

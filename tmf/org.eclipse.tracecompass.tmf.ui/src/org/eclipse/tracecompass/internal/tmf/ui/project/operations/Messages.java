@@ -33,6 +33,11 @@ public class Messages extends NLS {
      */
     public static String SelectTracesWizardPage_SelectionError;
 
+    /**
+     * The job name for updating the trace bounds.
+     */
+    public static String SelectTracesWizardPage_UpdateTraceBoundsJobName;
+
     /** The error message when an experiment could not be created */
     public static String NewExperimentOperation_CreationError;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2009, 2015, 2017 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,11 +11,13 @@
  *   Geneviève Bastien - Moved the add and remove code to the experiment class
  *   Patrick Tasse - Add support for folder elements
  *   Marc-Andre Laperle - Convert to tree structure and add select/deselect all
+ *   Simon Delisle - Add time range selection support
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.ui.project.wizards;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +33,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
@@ -41,6 +44,8 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -49,10 +54,15 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.operations.SelectTracesOperation;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfNavigatorContentProvider;
@@ -82,6 +92,13 @@ public class SelectTracesWizardPage extends WizardPage {
     private CheckboxTreeViewer fCheckboxTreeViewer;
     private TmfNavigatorContentProvider fContentProvider;
     private TmfNavigatorLabelProvider fLabelProvider;
+
+    private Button fTimeRangeSelectionButton;
+    private Text fStartTimeRange;
+    private Text fEndTimeRange;
+    private ITmfTimestamp fStartTimestamp;
+    private ITmfTimestamp fEndTimestamp;
+    private static final TmfTimestampFormat TIMESTAMP_FORMAT = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss.SSS SSS SSS"); //$NON-NLS-1$
 
     private static final int COLUMN_WIDTH = 200;
     private static final int BUTTON_SPACING = 4;
@@ -148,6 +165,60 @@ public class SelectTracesWizardPage extends WizardPage {
                 setAllChecked(false);
             }
         });
+
+        createTimeRangeSelection(container);
+    }
+
+    private void createTimeRangeSelection(Composite parent) {
+        Composite timeRangeSelectionComposite = new Composite(parent, SWT.NONE);
+        GridLayout compositeLayout = new GridLayout(2, false);
+        compositeLayout.marginWidth = 0;
+        timeRangeSelectionComposite.setLayout(compositeLayout);
+        timeRangeSelectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+        fTimeRangeSelectionButton = new Button(timeRangeSelectionComposite, SWT.CHECK);
+        fTimeRangeSelectionButton.setText(Messages.SelectTracesWizardPage_TimeRangeOptionButton + " (" + TIMESTAMP_FORMAT.toPattern() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+        fTimeRangeSelectionButton.setLayoutData(GridDataFactory.swtDefaults().span(2, 1).create());
+
+        Label startTimeLabel = new Label(timeRangeSelectionComposite, SWT.NONE);
+        startTimeLabel.setText(Messages.SelectTracesWizardPage_StartTime);
+        startTimeLabel.setEnabled(false);
+        fStartTimeRange = new Text(timeRangeSelectionComposite, SWT.BORDER);
+        fStartTimeRange.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+        fStartTimeRange.setEnabled(false);
+
+        Label endTimeLabel = new Label(timeRangeSelectionComposite, SWT.NONE);
+        endTimeLabel.setText(Messages.SelectTracesWizardPage_EndTime);
+        endTimeLabel.setEnabled(false);
+        fEndTimeRange = new Text(timeRangeSelectionComposite, SWT.BORDER);
+        fEndTimeRange.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+        fEndTimeRange.setEnabled(false);
+
+        fTimeRangeSelectionButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                startTimeLabel.setEnabled(fTimeRangeSelectionButton.getSelection());
+                fStartTimeRange.setEnabled(fTimeRangeSelectionButton.getSelection());
+                endTimeLabel.setEnabled(fTimeRangeSelectionButton.getSelection());
+                fEndTimeRange.setEnabled(fTimeRangeSelectionButton.getSelection());
+            }
+        });
+
+        FocusListener focusListener = new FocusListener() {
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                validateTimeRange();
+            }
+
+            @Override
+            public void focusGained(FocusEvent e) {
+                setErrorMessage(null);
+                setPageComplete(true);
+            }
+        };
+        fStartTimeRange.addFocusListener(focusListener);
+        fEndTimeRange.addFocusListener(focusListener);
     }
 
     private TreeViewer doCreateTreeViewer(Composite parent) {
@@ -323,8 +394,12 @@ public class SelectTracesWizardPage extends WizardPage {
      * @return <code>true</code> if successful else <code>false</code>
      */
     public boolean performFinish() {
-
-        final SelectTracesOperation operation = new SelectTracesOperation(fExperiment, getSelection(), fPreviousTraces);
+        SelectTracesOperation operation;
+        if (fTimeRangeSelectionButton.getSelection() && validateTimeRange()) {
+            operation = new SelectTracesOperation(fExperiment, getSelection(), fPreviousTraces, fStartTimestamp, fEndTimestamp);
+        } else {
+            operation = new SelectTracesOperation(fExperiment, getSelection(), fPreviousTraces);
+        }
 
         IStatus status = Status.OK_STATUS;
         try {
@@ -374,6 +449,41 @@ public class SelectTracesWizardPage extends WizardPage {
         setErrorMessage(null);
 
         return true;
+    }
+
+    /**
+     * Validate time range and set wizard completion accordingly
+     *
+     * @return True if the time range is valid
+     */
+    private boolean validateTimeRange() {
+        boolean validTimeRange = parseTimeRange() && fStartTimestamp.compareTo(fEndTimestamp) <= 0;
+
+        if (validTimeRange) {
+            setErrorMessage(null);
+        } else {
+            setErrorMessage(Messages.SelectTracesWizardPage_TimeRangeErrorMessage);
+        }
+
+        setPageComplete(validTimeRange);
+        return validTimeRange;
+    }
+
+    /**
+     * Parse the user inputs and create timestamps.
+     *
+     * @return True if we are able to parse the inputs, false otherwise
+     */
+    private boolean parseTimeRange() {
+        try {
+            long startTimeValue = TIMESTAMP_FORMAT.parseValue(fStartTimeRange.getText());
+            long endTimeValue = TIMESTAMP_FORMAT.parseValue(fEndTimeRange.getText());
+            fStartTimestamp = TmfTimestamp.fromNanos(startTimeValue);
+            fEndTimestamp = TmfTimestamp.fromNanos(endTimeValue);
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
     }
 
     /**

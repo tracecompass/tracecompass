@@ -43,7 +43,20 @@ public enum TmfTestTrace {
     /** A fourth trace */
     O_TEST_10K("O-Test-10K"),
     /** And oh! a fifth trace */
-    R_TEST_10K("R-Test-10K");
+    R_TEST_10K("R-Test-10K"),
+    /** Syslog trace */
+    SYSLOG_1("syslog1"),
+    /** Syslog trace */
+    SYSLOG_2("syslog2"),
+    /** Syslog trace */
+    SYSLOG_3("syslog3"),
+    /** Syslog trace */
+    SYSLOG_4("syslog4"),
+    /** Syslog trace */
+    SYSLOG_5("syslog5"),
+    /** Syslog trace */
+    SYSLOG_6("syslog6");
+
 
     private final @NonNull String fPath;
     private final String fDirectory = "testfiles";

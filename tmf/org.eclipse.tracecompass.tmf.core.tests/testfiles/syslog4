@@ -1,0 +1,4 @@
+Jan 1 01:01:01 HostA LoggerA: SourceFileA:4 Message A
+Jan 1 03:02:02 HostB LoggerB: SourceFileB:5 Message B
+Jan 1 05:03:03 HostC LoggerC: SourceFileC:6 Message C
+Jan 1 07:04:04 HostD LoggerD: SourceFileD:7 Message D
