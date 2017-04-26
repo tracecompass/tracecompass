@@ -38,18 +38,9 @@ public class SWTBotSash extends AbstractSWTBotControl<Sash> {
         super(w);
     }
 
-    /**
-     * Get the bounds of the sash
-     *
-     * @return the bounds relative to the parent
-     */
+    @Override
     public Rectangle getBounds() {
-        return syncExec(new Result<Rectangle>() {
-            @Override
-            public Rectangle run() {
-                return widget.getBounds();
-            }
-        });
+        return super.getBounds();
     }
 
     /**
