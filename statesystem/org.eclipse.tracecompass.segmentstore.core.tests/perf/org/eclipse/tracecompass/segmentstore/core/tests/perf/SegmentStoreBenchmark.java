@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.segmentstore.core.tests.perf;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -188,6 +189,17 @@ public class SegmentStoreBenchmark {
             populate(size, fuzz, fSegStore, 0, getSegmentStoreSize());
             pMinsertion.stop();
 
+            if (i == 0) {
+                /**
+                 * Assert that the segments are returned in the correct order,
+                 * the benchmark will be irrelevant if the contract is not
+                 * respected.
+                 */
+                assertOrder(fSegStore, SegmentComparators.INTERVAL_START_COMPARATOR);
+                assertOrder(fSegStore, SegmentComparators.INTERVAL_END_COMPARATOR);
+                assertOrder(fSegStore, SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
+            }
+
             pMiterateStart.start();
             int count = sortedIterate(fSegStore, SegmentComparators.INTERVAL_START_COMPARATOR);
             pMiterateStart.stop();
@@ -257,6 +269,19 @@ public class SegmentStoreBenchmark {
     private static int sortedIterate(ISegmentStore<@NonNull BasicSegment> store, Comparator<ISegment> order) {
         Iterable<@NonNull BasicSegment> iterable = store.iterator(order);
         return iterate(iterable);
+    }
+
+    private static void assertOrder(ISegmentStore<@NonNull BasicSegment> store, Comparator<@NonNull ISegment> order) {
+        Iterable<@NonNull BasicSegment> iterable = store.iterator(order);
+        BasicSegment prev = null;
+        long count = 0L;
+        for (BasicSegment segment : iterable) {
+            if (prev != null) {
+                assertTrue("Incorrect iteration order at: " + count + ", prev: " + prev + ", current: " + segment, order.compare(prev, segment) <= 0);
+            }
+            prev = segment;
+            count++;
+        }
     }
 
     private static void populate(int size, int[] fuzz, ISegmentStore<@NonNull BasicSegment> store, long low, long high) {

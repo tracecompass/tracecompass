@@ -363,7 +363,7 @@ public class SegmentTreeNode<E extends ISegment> extends OverlappingNode<E> {
      * @return the earliest end time of this node's intervals
      */
     public long getMinEnd() {
-        return fMinEnd;
+        return fMinEnd != Long.MAX_VALUE ? fMinEnd : getNodeStart();
     }
 
     /**
@@ -382,6 +382,29 @@ public class SegmentTreeNode<E extends ISegment> extends OverlappingNode<E> {
      */
     public long getLongest() {
         return fLongest;
+    }
+
+    @Override
+    protected void readSpecificHeader(@NonNull ByteBuffer buffer) {
+        super.readSpecificHeader(buffer);
+        fMaxStart = buffer.getLong();
+        fMinEnd = buffer.getLong();
+        fShortest = buffer.getLong();
+        fLongest = buffer.getLong();
+    }
+
+    @Override
+    protected void writeSpecificHeader(@NonNull ByteBuffer buffer) {
+        super.writeSpecificHeader(buffer);
+        buffer.putLong(fMaxStart);
+        buffer.putLong(fMinEnd);
+        buffer.putLong(fShortest);
+        buffer.putLong(fLongest);
+    }
+
+    @Override
+    protected int getSpecificHeaderSize() {
+        return super.getSpecificHeaderSize() + 4 * Long.BYTES;
     }
 
     /**

@@ -414,7 +414,7 @@ public class SegmentTableTest {
             fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
             tableBot.header("Duration").click();
             // FIXME: Should be 999,999, but sorting on disk does not work well yet
-            fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "818,799", 0, 2));
+            fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "818,399", 0, 2));
         } finally {
             Files.delete(segmentFile);
         }

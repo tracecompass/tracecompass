@@ -78,7 +78,7 @@ public class SegmentTreeCoreNodeTest extends HTCoreNodeTest<BasicSegment, Segmen
     public static Iterable<Object[]> getParameters() {
         return Arrays.asList(new Object[][] {
                 { "Segment tree core node",
-                    HTNode.COMMON_HEADER_SIZE + Integer.BYTES + Integer.BYTES * NB_CHILDREN + 6 * Long.BYTES * NB_CHILDREN,
+                    HTNode.COMMON_HEADER_SIZE + Integer.BYTES + Integer.BYTES * NB_CHILDREN + 6 * Long.BYTES * NB_CHILDREN + 4 * Long.BYTES,
                     SegmentTreeNodeStub.NODE_FACTORY,
                     BasicSegment.BASIC_SEGMENT_READ_FACTORY,
                     BASE_SEGMENT_FACTORY },
@@ -97,7 +97,7 @@ public class SegmentTreeCoreNodeTest extends HTCoreNodeTest<BasicSegment, Segmen
 
         // Verify the default values
         assertEquals(start, stub.getMaxStart());
-        assertEquals(Long.MAX_VALUE, stub.getMinEnd());
+        assertEquals(start, stub.getMinEnd());
         assertEquals(Long.MAX_VALUE, stub.getShortest());
         assertEquals(0, stub.getLongest());
 
@@ -137,7 +137,7 @@ public class SegmentTreeCoreNodeTest extends HTCoreNodeTest<BasicSegment, Segmen
 
         // Verify the default values
         assertEquals(start, parentStub.getMaxStart(0));
-        assertEquals(Long.MAX_VALUE, parentStub.getMinEnd(0));
+        assertEquals(start, parentStub.getMinEnd(0));
         assertEquals(Long.MAX_VALUE, parentStub.getShortest(0));
         assertEquals(0, parentStub.getLongest(0));
 
@@ -162,7 +162,7 @@ public class SegmentTreeCoreNodeTest extends HTCoreNodeTest<BasicSegment, Segmen
 
         // ... but not the parent's own data
         assertEquals(start, parentStub.getMaxStart());
-        assertEquals(Long.MAX_VALUE, parentStub.getMinEnd());
+        assertEquals(start, parentStub.getMinEnd());
         assertEquals(Long.MAX_VALUE, parentStub.getShortest());
         assertEquals(0, parentStub.getLongest());
     }

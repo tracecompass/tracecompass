@@ -69,7 +69,7 @@ public class SegmentTreeNodeTest extends HTNodeTest<BasicSegment, SegmentTreeNod
     public static Iterable<Object[]> getParameters() {
         return Arrays.asList(new Object[][] {
                 { "Segment tree node",
-                        HTNode.COMMON_HEADER_SIZE,
+                        HTNode.COMMON_HEADER_SIZE + 4 * Long.BYTES,
                         SegmentTreeNodeStub.NODE_FACTORY,
                         BasicSegment.BASIC_SEGMENT_READ_FACTORY,
                         BASE_SEGMENT_FACTORY
