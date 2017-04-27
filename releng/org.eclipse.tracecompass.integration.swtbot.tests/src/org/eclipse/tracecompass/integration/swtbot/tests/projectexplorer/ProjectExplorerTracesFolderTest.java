@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -1524,13 +1524,11 @@ public class ProjectExplorerTracesFolderTest {
     }
 
     private static void checkTraceType(SWTBotTreeItem traceItem, String traceType) {
-        //FIXME: getTraceProperty() sometimes fails in WaitUtils.waitForJobs due to TmfEventsCache Fetching Events job never completing
-        //assertEquals(traceType, getTraceProperty(traceItem, "type"));
+        assertEquals(traceType, getTraceProperty(traceItem, "type"));
     }
 
     private static void checkTraceLinked(SWTBotTreeItem traceItem, boolean linked) {
-        //FIXME: getTraceProperty() sometimes fails in WaitUtils.waitForJobs due to TmfEventsCache Fetching Events job never completing
-        //assertEquals(Boolean.toString(linked), getTraceProperty(traceItem, "linked"));
+        assertEquals(Boolean.toString(linked), getTraceProperty(traceItem, "linked"));
     }
 
     private static String getTraceProperty(SWTBotTreeItem traceItem, String property) {

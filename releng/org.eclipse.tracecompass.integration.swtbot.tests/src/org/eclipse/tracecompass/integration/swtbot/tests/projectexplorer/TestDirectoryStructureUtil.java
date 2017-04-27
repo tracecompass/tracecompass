@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -185,8 +185,8 @@ public class TestDirectoryStructureUtil {
         ustGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + "simple_server-thread1"));
         ustGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + "simple_server-thread2"));
 
-        kernelGenerator = new LttngTraceGenerator(1000, 1001, 1);
-        ustGenerator = new LttngTraceGenerator(1000, 1001, 1, false);
+        kernelGenerator = new LttngTraceGenerator(1001, 1001, 1);
+        ustGenerator = new LttngTraceGenerator(1001, 1001, 1, false);
         kernelGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + CLASHES_DIR_NAME + File.separator + "kernel-overlap-testing"));
         ustGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + CLASHES_DIR_NAME + File.separator + "ust-overlap-testing"));
         ustGenerator.writeTrace(new File(importDir.getAbsolutePath() + File.separator + CLASHES_DIR_NAME + File.separator + "simple_server-thread1"));
