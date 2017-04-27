@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ***************************************************************************
+ * Copyright (c) 2017 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Jean-Christian Kouame - Initial API and implementation
+ *************************************************************************** -->
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+
+    <!--Timegraph view that show the scenario execution state in time -->
+    <timeGraphView id="xml.scenarios">
+        <head>
+            <analysis id="lttng.analysis.irq" />
+            <label value="scenario" />
+        </head>
+        <!-- FFA040 -->
+        <definedValue name="PENDING" value="0" color="#CCCCCC" />
+        <definedValue name="IN_PROGRESS" value="1" color="#00CCFF" />
+        <definedValue name="MATCHED" value="2" color="#118811" />
+        <definedValue name="ABANDONED" value="3" color="#EE0000" />
+
+        <!-- Scenario view -->
+        <entry path="scenarios/*">
+            <display type="self" />
+            <name type="self" />
+            <entry path="*">
+                <display type="constant" value="state" />
+                <name type="self" />
+            </entry>
+        </entry>
+    </timeGraphView>
+
+    <pattern version="0" id="lttng.analysis.irq">
+        <head>
+            <traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
+            <label value="XML IRQ Analysis"/>
+        </head>
+
+        <storedField id="ret" alias="ret" />
+        <location id="CurrentCPU">
+            <stateAttribute type="constant" value="CPUs" />
+            <stateAttribute type="eventField" value="cpu" />
+        </location>
+        <patternHandler>
+            <!-- MATCHING INPUTS -->
+            <test id="test_cpu">
+                <if>
+                    <condition>
+                        <stateValue type="query">
+                            <stateAttribute type="constant" value="#CurrentScenario" />
+                            <stateAttribute type="constant" value="cpu" />
+                        </stateValue>
+                        <stateValue type="eventField" value="cpu" />
+                    </condition>
+                </if>
+            </test>
+
+            <!-- IRQ FSM ACTIONS -->
+            <action id="irq_handler_entry">
+                <stateChange>
+                    <stateAttribute type="constant" value="#CurrentScenario" />
+                    <stateAttribute type="constant" value="irq" />
+                    <stateValue type="eventField" value="irq" />
+                </stateChange>
+                <stateChange>
+                    <stateAttribute type="constant" value="#CurrentScenario" />
+                    <stateAttribute type="constant" value="name" />
+                    <stateValue type="eventField" value="name" />
+                </stateChange>
+                <stateChange>
+                    <stateAttribute type="constant" value="#CurrentScenario" />
+                    <stateAttribute type="constant" value="cpu" />
+                    <stateValue type="eventField" value="cpu" />
+                </stateChange>
+            </action>
+            <action id="irq_handler_exit">
+                <segment>
+                    <segType>
+                        <segName>
+                            <stateValue type="query">
+                                <stateAttribute type="constant" value="#CurrentScenario" />
+                                <stateAttribute type="constant" value="name" />
+                            </stateValue>
+                        </segName>
+                    </segType>
+                    <segContent>
+                        <segField name="ret" type="long">
+                            <stateValue type="eventField" value="ret" />
+                        </segField>
+                        <segField name="irq" type="long">
+                            <stateValue type="query">
+                                <stateAttribute type="constant" value="#CurrentScenario" />
+                                <stateAttribute type="constant" value="irq" />
+                            </stateValue>
+                        </segField>
+                        <segField name="cpu" type="long">
+                            <stateValue type="eventField" value="cpu" />
+                        </segField>
+                    </segContent>
+                </segment>
+            </action>
+
+            <!-- IRQ FSM -->
+            <fsm id="irq_handler" initial="wait_irq_entry">
+                <precondition event="irq_handler_*" />
+                <state id="wait_irq_entry">
+                    <transition event="irq_handler_entry" target="wait_irq_exit"
+                        action="irq_handler_entry" />
+                </state>
+                <state id="wait_irq_exit">
+                    <transition event="irq_handler_exit" cond="test_cpu"
+                        target="irq" action="irq_handler_exit" />
+                </state>
+                <final id="irq" />
+            </fsm>
+
+            <!-- SCHED_SWITCH -->
+            <action id="update_current_thread">
+                <stateChange>
+                    <stateAttribute type="location" value="CurrentCPU" />
+                    <stateAttribute type="constant" value="Current_thread" />
+                    <stateValue type="eventField" value="next_tid" />
+                </stateChange>
+            </action>
+            <fsm id="sched_switch" multiple="false">
+                <!-- if event.name != sched_switch, no processing will be done -->
+                <precondition event="sched_switch" />
+                <state id="sched_switch">
+                    <!-- The state will stay here forever and execute the action "update
+                        current thread" each time a sched_switch event will be meet -->
+                    <transition event="sched_switch" target="sched_switch"
+                        action="update_current_thread" />
+                </state>
+            </fsm>
+        </patternHandler>
+    </pattern>
+</tmfxml>

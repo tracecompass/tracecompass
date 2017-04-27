@@ -44,5 +44,8 @@
       <xmlfile
             file="analysis.xml/org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.xml.futex/futex_analysis_lttng.xml">
       </xmlfile>
+      <xmlfile
+            file="analysis.xml/org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.xml.irq/irq_analysis_lttng.xml">
+      </xmlfile>
    </extension>
 </plugin>
