@@ -37,7 +37,6 @@ import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -101,7 +100,6 @@ public class RawTextEditorTest {
     /**
      * Test going to raw and back
      */
-    @Ignore
     @Test
     public void testRead() {
         ITmfTrace activeTrace = TmfTraceManager.getInstance().getActiveTrace();
