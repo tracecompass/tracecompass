@@ -10,19 +10,25 @@
 package org.eclipse.tracecompass.analysis.timing.core.tests.callgraph;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.AggregatedCalledFunction;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphAnalysis;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.ICalledFunction;
+import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.ThreadNode;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -32,6 +38,7 @@ import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -398,6 +405,41 @@ public class CallGraphAnalysisTest {
 
         // Test if the first child and the third one have the same address
         assertEquals("Test the address of two functions", firstChild.getSymbol(), thirdChild.getSymbol());
+
+        // test Flamegraph
+        Collection<@NonNull ThreadNode> flameGraph = cga.getFlameGraph();
+        assertNotNull("Test Flamegraph", flameGraph);
+        assertFalse(flameGraph.isEmpty());
+        ThreadNode flamegraphRoot = flameGraph.iterator().next();
+        assertNotNull("Test Flamegraph root", flamegraphRoot);
+
+        Collection<@NonNull ThreadNode> threadGraph = cga.getThreadNodes();
+        assertNotNull("Test ThreadNodes", threadGraph);
+        assertFalse(threadGraph.isEmpty());
+        ThreadNode threadgraphRoot = threadGraph.iterator().next();
+        localAssertEquals("Test Flamegraph root", threadgraphRoot, flamegraphRoot);
+
         cga.dispose();
+    }
+
+    private void localAssertEquals(String message, AggregatedCalledFunction aggregatedCalledFunction, AggregatedCalledFunction actualElem) {
+        if (Objects.equals(aggregatedCalledFunction, actualElem)) {
+            return;
+        }
+        assertNotNull(message, aggregatedCalledFunction);
+        assertNotNull(message, actualElem);
+        Assert.assertEquals(message, aggregatedCalledFunction.getDepth(), actualElem.getDepth());
+        Assert.assertEquals(message, aggregatedCalledFunction.getDuration(), actualElem.getDuration());
+        Assert.assertEquals(message, aggregatedCalledFunction.getMaxDepth(), actualElem.getMaxDepth());
+        Assert.assertEquals(message, aggregatedCalledFunction.getMaxDepth(), actualElem.getMaxDepth());
+        Assert.assertEquals(message, aggregatedCalledFunction.getSelfTime(), actualElem.getSelfTime());
+        localAssertEquals(message, aggregatedCalledFunction.getChildren(), actualElem.getChildren());
+    }
+
+    private void localAssertEquals(String message, @NonNull Collection<@NonNull AggregatedCalledFunction> expected, @NonNull Collection<@NonNull AggregatedCalledFunction> actual) {
+        Iterator<@NonNull AggregatedCalledFunction> expectedIter = expected.iterator();
+        for (AggregatedCalledFunction actualElem : actual) {
+            localAssertEquals(message, expectedIter.next(), actualElem);
+        }
     }
 }

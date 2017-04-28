@@ -2719,6 +2719,16 @@ that seems to be taking too longThen, using the context menu '''Go to maximum'''
 to the maximum duration and see if the OS is, for example, preempting the function for too long,
 or if the issue is in the code being executed.
 
+== Function Duration Statistics ==
+
+This displays the descriptive statistics of the 'wall time' durations of given functions. It gives an
+overview of how often a function is called, how much total time it took, its mean duration as well as
+its maximum, minimum times and the standard deviation.
+
+If a time range is selected it will display the local statistics too.
+
+This analysis is available if the ''Flame Graph'' is available.
+
 === Using the mouse ===
 
 *'''Double-click on the duration ruler''' will zoom the graph to the selected duration range.
