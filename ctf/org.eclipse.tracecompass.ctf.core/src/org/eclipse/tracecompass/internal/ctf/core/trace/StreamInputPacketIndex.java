@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
@@ -95,7 +94,7 @@ public class StreamInputPacketIndex {
         /* Validate consistent entry. */
         if (entryToAdd.getTimestampBegin() > entryToAdd.getTimestampEnd()) {
             Activator.log(IStatus.WARNING, "Packet at offset " + entryToAdd.getOffsetBytes() + //$NON-NLS-1$
-                          " begin timestamp is after end timestamp"); //$NON-NLS-1$
+                    " begin timestamp is after end timestamp"); //$NON-NLS-1$
             entryToAdd = new StreamInputPacketIndexEntry(entryToAdd, Long.MAX_VALUE);
         }
 
@@ -103,7 +102,9 @@ public class StreamInputPacketIndex {
          * Validate entries are inserted in monotonic increasing timestamp
          * order.
          */
-        if (!fEntries.isEmpty() && (entryToAdd.getTimestampBegin() < lastElement().getTimestampBegin())) {
+        if (!fEntries.isEmpty() &&
+                (entryToAdd.getTimestampBegin() < lastElement().getTimestampBegin() ||
+                        entryToAdd.getOffsetBytes() <= lastElement().getOffsetBytes())) {
             return false;
         }
 
@@ -113,7 +114,8 @@ public class StreamInputPacketIndex {
 
     /**
      * Returns the first packet that could include the timestamp, that is the
-     * last packet with a begin timestamp smaller than the given timestamp.
+     * first packet that includes the given timestamp, or if none exist, first
+     * packet that begins before the given timestamp
      *
      * @param timestamp
      *            The timestamp to look for.
@@ -131,7 +133,21 @@ public class StreamInputPacketIndex {
         if (index < 0) {
             index = -index - 1;
         }
-        return index;
+        if (index >= fEntries.size()) {
+            return fEntries.size() - 1;
+        }
+        for (int i = index; i > 0; i--) {
+            ICTFPacketDescriptor entry = fEntries.get(i);
+            ICTFPacketDescriptor nextEntry = fEntries.get(i - 1);
+            if (entry.getTimestampEnd() >= timestamp && nextEntry.getTimestampEnd() < timestamp) {
+                if (entry.getTimestampBegin() <= timestamp) {
+                    return i;
+                }
+                return i - 1;
+            }
+        }
+        return 0;
+
     }
 
     /**
@@ -162,9 +178,12 @@ public class StreamInputPacketIndex {
      * this data structure, or -1 if this data structure does not contain the
      * element. More formally, returns the lowest index {@code i} such that, for
      * an entry {@code o}, {@code (o==null ? get(i)==null : o.equals(get(i)))},
-     * or {@code -1} if there is no such index. This will work in log(n) time
-     * since the data structure contains elements in a non-repeating increasing
-     * manner.
+     * or {@code -1} if there is no such index. This will typically work in
+     * log(n) time since the data structure contains elements in a non-repeating
+     * increasing manner.
+     *
+     * Only the offset is checked in this case as there cannot be more than one
+     * packet with a given offset.
      *
      * @param element
      *            element to search for
@@ -183,38 +202,9 @@ public class StreamInputPacketIndex {
     public int indexOf(ICTFPacketDescriptor element) {
         int indexOf = -1;
         if (element != null) {
-            indexOf = Collections.binarySearch(fEntries, element, new MonotonicComparator());
+            indexOf = Collections.binarySearch(fEntries, element, Comparator.comparingLong(ICTFPacketDescriptor::getOffsetBytes));
         }
         return (indexOf < 0) ? -1 : indexOf;
-    }
-
-    /**
-     * Ordering comparator for entering entries into a data structure sorted by
-     * timestamp.
-     */
-    private static class MonotonicComparator implements Comparator<ICTFPacketDescriptor>, Serializable {
-        /**
-         * For {@link Serializable}, that way if we migrate to a {@link TreeSet}
-         * the comparator is serializable too.
-         */
-        private static final long serialVersionUID = -5693064068367242076L;
-
-        @Override
-        public int compare(ICTFPacketDescriptor left, ICTFPacketDescriptor right) {
-            if (left.getTimestampBegin() > right.getTimestampBegin()) {
-                return 1;
-            }
-            if (left.getTimestampBegin() < right.getTimestampBegin()) {
-                return -1;
-            }
-            if (left.getTimestampEnd() > right.getTimestampEnd()) {
-                return 1;
-            }
-            if (left.getTimestampEnd() < right.getTimestampEnd()) {
-                return -1;
-            }
-            return 0;
-        }
     }
 
     /**
