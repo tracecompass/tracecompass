@@ -90,7 +90,7 @@ abstract class AbstractCalledFunction implements ICalledFunction {
 
     @Override
     public String getName() {
-        return NonNullUtils.nullToEmptyString(getSymbol().toString());
+        return NonNullUtils.nullToEmptyString(SymbolAspect.SYMBOL_ASPECT.resolve(this));
     }
 
     /**
