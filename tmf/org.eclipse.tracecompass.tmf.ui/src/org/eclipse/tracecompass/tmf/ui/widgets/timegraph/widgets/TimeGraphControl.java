@@ -2465,7 +2465,11 @@ public class TimeGraphControl extends TimeGraphBaseControl
         // fill all rect area
         gc.setBackground(stateColor);
         if (visible) {
+            int prevAlpha = gc.getAlpha();
+            int alpha = ((int) styleMap.getOrDefault(ITimeEventStyleStrings.fillColor(), 0xff)) & 0xff;
+            gc.setAlpha(alpha);
             gc.fillRectangle(drawRect);
+            gc.setAlpha(prevAlpha);
         } else if (fBlendSubPixelEvents) {
             gc.setAlpha(128);
             gc.fillRectangle(drawRect);
