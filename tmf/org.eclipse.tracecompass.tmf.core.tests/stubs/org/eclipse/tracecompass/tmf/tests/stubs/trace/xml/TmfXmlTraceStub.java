@@ -68,6 +68,7 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 /**
@@ -411,16 +412,17 @@ public abstract class TmfXmlTraceStub extends TmfTrace {
     /**
      * Adds a new event aspect to this type of trace. Since this trace type is
      * used to build custom traces that mimic the behavior of real traces, the
-     * required aspects may be missing and this method allows to add them. This
-     * method should be called before calling
-     * {@link #initTrace(IResource, String, Class)} otherwise the additional
-     * aspects will not be picked up when generating the aspects.
+     * required aspects may be missing and this method allows to add them.
      *
      * @param aspect
      *            The aspect to have
      */
     public void addEventAspect(ITmfEventAspect<?> aspect) {
         fAdditionalAspects.add(aspect);
+        ImmutableSet.Builder<ITmfEventAspect<?>> builder = new ImmutableSet.Builder<>();
+        builder.addAll(fAspects);
+        builder.add(aspect);
+        fAspects = builder.build();
     }
 
     /**
