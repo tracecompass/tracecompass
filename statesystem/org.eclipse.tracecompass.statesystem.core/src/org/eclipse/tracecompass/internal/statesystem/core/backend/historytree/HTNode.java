@@ -24,8 +24,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.IntegerRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -37,6 +41,8 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
  * @author Alexandre Montplaisir
  */
 public abstract class HTNode {
+
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(HTNode.class);
 
     // ------------------------------------------------------------------------
     // Class fields
@@ -522,7 +528,9 @@ public abstract class HTNode {
      */
     public Iterable<HTInterval> iterable2D(IntegerRangeCondition quarks, TimeRangeCondition times) {
         fRwl.readLock().lock();
-        try {
+        try  (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINEST, "HTNode:query2D", //$NON-NLS-1$
+                "quarks", quarks, //$NON-NLS-1$
+                "times", times)) { //$NON-NLS-1$
             /*
              * Narrow Down the RangeConditions to faster evaluation of the .test and
              * .intersects conditions.

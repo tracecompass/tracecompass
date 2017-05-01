@@ -21,8 +21,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.IntegerRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
@@ -46,6 +50,8 @@ import com.google.common.collect.Iterables;
  * @author Alexandre Montplaisir
  */
 public class InMemoryBackend implements IStateHistoryBackend {
+
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(InMemoryBackend.class);
 
     private final @NonNull String ssid;
     private final NavigableSet<@NonNull ITmfStateInterval> intervals;
@@ -215,10 +221,15 @@ public class InMemoryBackend implements IStateHistoryBackend {
     @Override
     public Iterable<@NonNull ITmfStateInterval> query2D(IntegerRangeCondition quarks, TimeRangeCondition times)
             throws TimeRangeException {
-        synchronized (intervals) {
-            return Iterables.filter(searchforEndTime(intervals, quarks.min(), times.min()),
-                    interval -> quarks.test(interval.getAttribute())
-                            && times.intersects(interval.getStartTime(), interval.getEndTime()));
+        try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "InMemoryBackend:query2D", //$NON-NLS-1$
+                "ssid", getSSID(), //$NON-NLS-1$
+                "quarks", quarks, //$NON-NLS-1$
+                "times", times)) { //$NON-NLS-1$
+            synchronized (intervals) {
+                return Iterables.filter(searchforEndTime(intervals, quarks.min(), times.min()),
+                        interval -> quarks.test(interval.getAttribute())
+                                && times.intersects(interval.getStartTime(), interval.getEndTime()));
+            }
         }
     }
 

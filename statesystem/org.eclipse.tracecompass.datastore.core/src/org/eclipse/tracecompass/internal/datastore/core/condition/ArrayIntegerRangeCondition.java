@@ -113,4 +113,9 @@ public class ArrayIntegerRangeCondition implements IntegerRangeCondition {
         return new ArrayIntegerRangeCondition(Arrays.copyOfRange(fQuarkArray, fromIndex, toIndex));
     }
 
+    @Override
+    public String toString() {
+        return "ArrayIntegerRangeCondition[" + fQuarkArray.length + "](" + min() + '\u2025' + max() + ')'; //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
 }

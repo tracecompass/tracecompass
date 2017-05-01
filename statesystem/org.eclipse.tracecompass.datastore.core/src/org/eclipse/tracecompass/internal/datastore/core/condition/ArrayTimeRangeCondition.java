@@ -113,4 +113,9 @@ public class ArrayTimeRangeCondition implements TimeRangeCondition {
         return new ArrayTimeRangeCondition(Arrays.copyOfRange(fTimeArray, fromIndex, toIndex));
     }
 
+    @Override
+    public String toString() {
+        return "ArrayTimeRangeCondition[" + fTimeArray.length + "](" + min() + '\u2025' + max() + ')'; //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
 }

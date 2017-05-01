@@ -69,4 +69,9 @@ public class ContinuousTimeRangeCondition implements TimeRangeCondition {
         return new ContinuousTimeRangeCondition(low, high);
     }
 
+    @Override
+    public String toString() {
+        return "ContinuousTimeRangeCondition: (" + min() + '\u2025' + max() + ')'; //$NON-NLS-1$
+    }
+
 }

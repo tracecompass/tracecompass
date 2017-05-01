@@ -22,9 +22,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -46,6 +50,8 @@ import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
  */
 @NonNullByDefault
 public class TransientState {
+
+    private static final Logger LOGGER = TraceCompassLog.getLogger(TransientState.class);
 
     /* Indicates where to insert state changes that we generate */
     private final IStateHistoryBackend fBackend;
@@ -371,7 +377,10 @@ public class TransientState {
      */
     public Iterable<ITmfStateInterval> query2D(Collection<Integer> quarks, TimeRangeCondition timeCondition) {
         fRWLock.readLock().lock();
-        try {
+        try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINEST, "TransientState:query2D", //$NON-NLS-1$
+                "ssid", fBackend.getSSID(), //$NON-NLS-1$
+                "quarks", quarks, //$NON-NLS-1$
+                "time", timeCondition)) { //$NON-NLS-1$
             if (!fIsActive) {
                 return Collections.EMPTY_LIST;
             }

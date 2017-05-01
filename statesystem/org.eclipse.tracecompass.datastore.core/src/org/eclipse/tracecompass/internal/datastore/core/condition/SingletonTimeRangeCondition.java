@@ -59,4 +59,9 @@ public class SingletonTimeRangeCondition implements TimeRangeCondition {
         return null;
     }
 
+    @Override
+    public String toString() {
+        return "SingletonTimeRangeCondition: (" + fValue + ')'; //$NON-NLS-1$
+    }
+
 }

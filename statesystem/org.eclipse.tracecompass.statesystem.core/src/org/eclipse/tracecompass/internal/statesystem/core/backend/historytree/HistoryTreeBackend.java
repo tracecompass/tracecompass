@@ -357,41 +357,58 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
 
     @Override
     public Iterable<@NonNull ITmfStateInterval> query2D(IntegerRangeCondition quarks, TimeRangeCondition times) {
-        return () -> new Iterator<@NonNull ITmfStateInterval>() {
-            private final Deque<Integer> seqNumberQueue = new LinkedList<>(Collections.singleton(getSHT().getRootNode().getSequenceNumber()));
-            private Iterator<@NonNull HTInterval> intervalQueue = Collections.emptyIterator();
+        try (TraceCompassLogUtils.FlowScopeLog log = new TraceCompassLogUtils.FlowScopeLogBuilder(LOGGER, Level.FINER,
+                "HistoryTreeBackend:query2D:init", //$NON-NLS-1$
+                "ssid", getSSID(), //$NON-NLS-1$
+                "quarks", quarks, //$NON-NLS-1$
+                "timeCondition", times).build()) { //$NON-NLS-1$
+            return () -> new Iterator<@NonNull ITmfStateInterval>() {
+                private final Deque<Integer> seqNumberQueue = new LinkedList<>(Collections.singleton(getSHT().getRootNode().getSequenceNumber()));
+                private Iterator<@NonNull HTInterval> intervalQueue = Collections.emptyIterator();
 
-            @Override
-            public boolean hasNext() {
-                while (!intervalQueue.hasNext() && !seqNumberQueue.isEmpty()) {
-                    try {
-                        HTNode currentNode = getSHT().readNode(seqNumberQueue);
-                        /* Compute reduced conditions here to reduce complexity in queuing operations. */
-                        IntegerRangeCondition subQuarks = quarks.subCondition(currentNode.getMinQuark(), currentNode.getMaxQuark());
-                        TimeRangeCondition subTimes = times.subCondition(currentNode.getNodeStart(), currentNode.getNodeEnd());
-                        /*
-                         * During the SHT construction, the bounds of the children are not final, so we
-                         * may have queued some nodes which don't overlap the query.
-                         */
-                        if (subQuarks != null && subTimes != null) {
-                            if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
-                                // Queue the relevant children nodes for BFS.
-                                seqNumberQueue.addAll(((ParentNode) currentNode).selectNextChildren2D(subQuarks, subTimes));
+                @Override
+                public boolean hasNext() {
+                    while (!intervalQueue.hasNext() && !seqNumberQueue.isEmpty()) {
+                        try {
+                            HTNode currentNode = getSHT().readNode(seqNumberQueue);
+                            /*
+                             * Compute reduced conditions here to reduce complexity in queuing operations.
+                             */
+                            IntegerRangeCondition subQuarks = quarks.subCondition(currentNode.getMinQuark(), currentNode.getMaxQuark());
+                            TimeRangeCondition subTimes = times.subCondition(currentNode.getNodeStart(), currentNode.getNodeEnd());
+                            /*
+                             * During the SHT construction, the bounds of the children are not final, so we
+                             * may have queued some nodes which don't overlap the query.
+                             */
+                            if (subQuarks != null && subTimes != null) {
+                                if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
+                                    // Queue the relevant children nodes for BFS.
+                                    seqNumberQueue.addAll(((ParentNode) currentNode).selectNextChildren2D(subQuarks, subTimes));
+                                }
+                                intervalQueue = currentNode.iterable2D(subQuarks, subTimes).iterator();
                             }
-                            intervalQueue = currentNode.iterable2D(subQuarks, subTimes).iterator();
+                        } catch (ClosedChannelException e) {
+                            try (TraceCompassLogUtils.FlowScopeLog closedChannelLog = new TraceCompassLogUtils.FlowScopeLogBuilder(LOGGER, Level.FINER,
+                                    "HistoryTreeBackend:query2D:channelClosed").setParentScope(log).build()) { //$NON-NLS-1$
+                                return false;
+                            }
                         }
-                    } catch (ClosedChannelException e) {
-                        return false;
                     }
+                    boolean hasNext = intervalQueue.hasNext();
+                    if (!hasNext) {
+                        try (TraceCompassLogUtils.FlowScopeLog noNext = new TraceCompassLogUtils.FlowScopeLogBuilder(LOGGER, Level.FINER,
+                                "HistoryTreeBackend:query2D:iteratorEnd").setParentScope(log).build()) { //$NON-NLS-1$
+                        }
+                    }
+                    return intervalQueue.hasNext();
                 }
-                return intervalQueue.hasNext();
-            }
 
-            @Override
-            public ITmfStateInterval next() {
-                return intervalQueue.next();
-            }
-        };
+                @Override
+                public ITmfStateInterval next() {
+                    return intervalQueue.next();
+                }
+            };
+        }
     }
 
     /**
