@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -27,10 +28,12 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
 import org.eclipse.swtbot.swt.finder.results.ArrayResult;
 import org.eclipse.swtbot.swt.finder.results.IntResult;
+import org.eclipse.swtbot.swt.finder.results.ListResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.TableCollection;
 import org.eclipse.swtbot.swt.finder.utils.TableRow;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 
@@ -92,24 +95,34 @@ public class SWTBotTimeGraph extends AbstractSWTBotControl<TimeGraphControl> {
      *             if the entry was not found.
      */
     public SWTBotTimeGraphEntry getEntry(String... names) throws WidgetNotFoundException {
-        List<ITimeGraphEntry> entries = Arrays.asList(widget.getExpandedElements());
-        ITableLabelProvider labelProvider = widget.getLabelProvider();
-        ITimeGraphEntry parent = null;
-        for (String name : names) {
-            boolean found = false;
-            for (ITimeGraphEntry entry : entries) {
-                String label = labelProvider == null ? entry.getName() : labelProvider.getColumnText(entry, 0);
-                if (Objects.equals(entry.getParent(), parent) && name.equals(label)) {
-                    parent = entry;
-                    found = true;
-                    break;
+        AtomicReference<ITimeGraphEntry> parent = new AtomicReference<>();
+        AtomicReference<String> missing = new AtomicReference<>();
+        WaitUtils.waitUntil(timegraph -> {
+            List<ITimeGraphEntry> entries = syncExec(new ListResult<ITimeGraphEntry>() {
+                @Override
+                public List<ITimeGraphEntry> run() {
+                    return Arrays.asList(timegraph.getExpandedElements());
+                }
+            });
+            ITableLabelProvider labelProvider = timegraph.getLabelProvider();
+            for (String name : names) {
+                boolean found = false;
+                for (ITimeGraphEntry entry : entries) {
+                    String label = labelProvider == null ? entry.getName() : labelProvider.getColumnText(entry, 0);
+                    if (Objects.equals(entry.getParent(), parent.get()) && name.equals(label)) {
+                        parent.set(entry);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    missing.set(name);
+                    return false;
                 }
             }
-            if (!found) {
-                throw new WidgetNotFoundException("Timed out waiting for time graph entry " + name); //$NON-NLS-1$
-            }
-        }
-        return new SWTBotTimeGraphEntry(widget, parent);
+            return true;
+        }, widget, "Timed out waiting for time graph entry " + missing.get());
+        return new SWTBotTimeGraphEntry(widget, parent.get());
     }
 
     /**

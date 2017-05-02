@@ -13,7 +13,9 @@
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.SWT;
@@ -26,12 +28,14 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.ArrayResult;
+import org.eclipse.swtbot.swt.finder.results.ListResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.WaitForObjectCondition;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRootMenu;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
@@ -156,21 +160,27 @@ public class SWTBotTimeGraphEntry extends AbstractSWTBotControl<TimeGraphControl
      * @return the child entry
      */
     public SWTBotTimeGraphEntry getEntry(String name) {
-        return syncExec(new Result<SWTBotTimeGraphEntry>() {
-            @Override
-            public SWTBotTimeGraphEntry run() {
-                ITableLabelProvider labelProvider = widget.getLabelProvider();
-                for (ITimeGraphEntry entry : widget.getExpandedElements()) {
-                    if (fEntry.equals(entry.getParent())) {
-                        String label = labelProvider == null ? entry.getName() : labelProvider.getColumnText(entry, 0);
-                        if (name.equals(label)) {
-                            return new SWTBotTimeGraphEntry(widget, entry);
-                        }
+        AtomicReference<ITimeGraphEntry> found = new AtomicReference<>();
+        WaitUtils.waitUntil(timegraph -> {
+            List<ITimeGraphEntry> entries = syncExec(new ListResult<ITimeGraphEntry>() {
+                @Override
+                public List<ITimeGraphEntry> run() {
+                    return Arrays.asList(timegraph.getExpandedElements());
+                }
+            });
+            ITableLabelProvider labelProvider = timegraph.getLabelProvider();
+            for (ITimeGraphEntry entry : entries) {
+                if (fEntry.equals(entry.getParent())) {
+                    String label = labelProvider == null ? entry.getName() : labelProvider.getColumnText(entry, 0);
+                    if (name.equals(label)) {
+                        found.set(entry);
+                        return true;
                     }
                 }
-                throw new WidgetNotFoundException("Timed out waiting for time graph entry " + name); //$NON-NLS-1$
             }
-        });
+            return false;
+        }, widget, "Timed out waiting for time graph entry " + name);
+        return new SWTBotTimeGraphEntry(widget, found.get());
     }
 
     /**
