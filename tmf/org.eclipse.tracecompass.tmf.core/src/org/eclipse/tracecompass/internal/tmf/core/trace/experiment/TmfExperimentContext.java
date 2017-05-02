@@ -14,13 +14,15 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.trace.experiment;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.PriorityQueue;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * The experiment context in TMF.
@@ -28,30 +30,81 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
  * The experiment keeps track of the next event from each of its traces so it
  * can pick the next one in chronological order.
  * <p>
- * This implies that the "next" event from each trace has already been
- * read and that we at least know its timestamp.
+ * This implies that the "next" event from each trace has already been read and
+ * that we at least know its timestamp.
  * <p>
  * The last trace refers to the trace from which the last event was "consumed"
  * at the experiment level.
  */
 public final class TmfExperimentContext extends TmfContext {
 
-    // ------------------------------------------------------------------------
-    // Constants
-    // ------------------------------------------------------------------------
-
     /**
-     * No last trace read indicator
+     * Inline class describing the contexts, containing the index of the trace
+     * in the experiment, its content and current event.
      */
-    public static final int NO_TRACE = -1;
+    public class ContextTuple implements Comparable<ContextTuple>{
+
+        private final int fIndex;
+        private final @NonNull ITmfEvent fEvent;
+        private final @NonNull ITmfContext fContext;
+
+        private ContextTuple(int index, @NonNull ITmfEvent event, @NonNull ITmfContext context) {
+            fIndex = index;
+            fEvent = event;
+            fContext = context;
+        }
+
+        /**
+         * Getter for the experiment index.
+         *
+         * @return this ContextTuple's index in the enclosing experiment.
+         */
+        public int getIndex() {
+            return fIndex;
+        }
+
+        /**
+         * Getter for the current event
+         *
+         * @return this ContextTuple's current event
+         */
+        public @NonNull ITmfEvent getEvent() {
+            return fEvent;
+        }
+
+        /**
+         * Getter for the context
+         *
+         * @return this ContextTuple's context field
+         */
+        public @NonNull ITmfContext getContext() {
+            return fContext;
+        }
+
+        @Override
+        public int compareTo(ContextTuple o) {
+            int timeStampComparison = fEvent.getTimestamp().compareTo(o.fEvent.getTimestamp());
+            if (timeStampComparison != 0) {
+                return timeStampComparison;
+            }
+            /**
+             * if two context tuple's events have the same timestamp, compare
+             * their index in the context to resolve indetermination.
+             */
+            return Integer.compare(fIndex, o.fIndex);
+        }
+    }
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final List<ITmfContext> fContexts;
-    private final List<ITmfEvent> fEvents;
-    private int fLastTraceRead;
+    private final ITmfContext[] fContexts;
+    /**
+     * fPriority is a PriorityQueue of initial capacity fContexts.length,
+     * ordered by increasing timestamps of the ContextTuple events.
+     */
+    private final PriorityQueue<ContextTuple> fPriority;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -63,18 +116,13 @@ public final class TmfExperimentContext extends TmfContext {
      * @param nbTraces
      *            The number of traces in the experiment
      */
-    public TmfExperimentContext(final int nbTraces) {
+    public TmfExperimentContext(int nbTraces) {
         super();
-        fLastTraceRead = NO_TRACE;
-        fContexts = new ArrayList<>(nbTraces);
-        fEvents = new ArrayList<>(nbTraces);
-
-
-        /* Initialize the arrays to the requested size */
-        for (int i = 0; i < nbTraces; i++) {
-            fContexts.add(null);
-            fEvents.add(null);
+        if (nbTraces < 0) {
+            throw new IllegalArgumentException("TmfExperimentContext size cannot be negative"); //$NON-NLS-1$
         }
+        fContexts = new ITmfContext[nbTraces];
+        fPriority = new PriorityQueue<>(Math.max(1, nbTraces), null);
     }
 
     @Override
@@ -90,82 +138,42 @@ public final class TmfExperimentContext extends TmfContext {
     // ------------------------------------------------------------------------
 
     /**
-     * Return how many traces this experiment context tracks the contexts of
-     * (a.k.a., the number of traces in the experiment).
-     *
-     * @return The number of traces in the experiment
-     */
-    public int getNbTraces() {
-        return fContexts.size();
-    }
-
-    /**
-     * Get the current context of a specific trace
-     *
-     * @param traceIndex
-     *            The index of the trace in the experiment
-     * @return The matching context object for that trace
-     */
-    @Nullable
-    public ITmfContext getContext(int traceIndex) {
-        return fContexts.get(traceIndex);
-    }
-
-    /**
-     * Set the context of a trace
+     * Set the context and event of a trace
      *
      * @param traceIndex
      *            The index of the trace in the experiment
      * @param ctx
      *            The new context object for that trace
-     */
-    public void setContext(int traceIndex, ITmfContext ctx) {
-        fContexts.set(traceIndex, ctx);
-    }
-
-    /**
-     * Get the current event for a specific trace in the experiment.
-     *
-     * @param traceIndex
-     *            The index of the trace in the experiment
-     * @return The event matching the trace/context
-     *
-     */
-    @Nullable
-    public ITmfEvent getEvent(int traceIndex) {
-        return fEvents.get(traceIndex);
-    }
-
-    /**
-     * Set the context's event for a specific trace
-     *
-     * @param traceIndex
-     *            The index of the trace in the experiment
      * @param event
      *            The event at the context in the trace
      */
-    public void setEvent(int traceIndex, ITmfEvent event) {
-        fEvents.set(traceIndex, event);
+    public void setContent(int traceIndex, ITmfContext ctx, ITmfEvent event) {
+        fContexts[traceIndex] = ctx;
+        if (event != null && ctx != null) {
+            fPriority.add(new ContextTuple(traceIndex, event, ctx));
+        }
     }
 
     /**
-     * Get the index of the trace that was last read (so the trace whose
-     * current context will match this experiment's).
+     * Get the tuple containing the index, context and event of the for the
+     * trace with the earliest event, and the trace with the lowest index in the
+     * Experiment in case of indetermination.
      *
-     * @return The index of the trace
+     * @return The information concerning the next trace in the context's
+     *         priority queue.
      */
-    public int getLastTrace() {
-        return fLastTraceRead;
+    public ContextTuple getNext() {
+        return fPriority.poll();
     }
 
     /**
-     * Set the last trace read index
+     * Getter for the sub contexts of this experiment context.
      *
-     * @param newIndex
-     *            The new value to assign
+     * @return a copy of the array of contexts
      */
-    public void setLastTrace(final int newIndex) {
-        fLastTraceRead = newIndex;
+    @VisibleForTesting
+    public ITmfContext[] getContexts() {
+        return Arrays.copyOf(fContexts, fContexts.length);
     }
 
     // ------------------------------------------------------------------------
@@ -174,15 +182,11 @@ public final class TmfExperimentContext extends TmfContext {
 
     @Override
     public int hashCode() {
-        int result = 17;
-        for (int i = 0; i < fContexts.size(); i++) {
-            result = 37 * result + fContexts.get(i).hashCode();
-        }
-        return result;
+        return Arrays.hashCode(fContexts);
     }
 
     @Override
-    public boolean equals(final Object other) {
+    public boolean equals(Object other) {
         if (this == other) {
             return true;
         }
@@ -192,14 +196,8 @@ public final class TmfExperimentContext extends TmfContext {
         if (!(other instanceof TmfExperimentContext)) {
             return false;
         }
-        final TmfExperimentContext o = (TmfExperimentContext) other;
-        boolean isEqual = true;
-        int i = 0;
-        while (isEqual && (i < fContexts.size())) {
-            isEqual &= fContexts.get(i).equals(o.fContexts.get(i));
-            i++;
-        }
-        return isEqual;
+        TmfExperimentContext o = (TmfExperimentContext) other;
+        return Arrays.equals(fContexts, o.fContexts);
     }
 
     @Override
@@ -208,15 +206,9 @@ public final class TmfExperimentContext extends TmfContext {
         StringBuilder sb = new StringBuilder("TmfExperimentContext [\n");
         sb.append("\tfLocation=" + getLocation() + ", fRank=" + getRank() + "\n");
         sb.append("\tfContexts=[");
-        for (int i = 0; i < fContexts.size(); i++) {
-            sb.append("(" + fContexts.get(i).getLocation() + "," + fContexts.get(i).getRank() + ((i < fContexts.size() - 1) ? ")," : ")]\n"));
+        for (int i = 0; i < fContexts.length; i++) {
+            sb.append("(" + fContexts[i].getLocation() + "," + fContexts[i].getRank() + ((i < fContexts.length - 1) ? ")," : ")]\n"));
         }
-        sb.append("\tfEvents=[");
-        for (int i = 0; i < fEvents.size(); i++) {
-            ITmfEvent event = fEvents.get(i);
-            sb.append(((event != null) ? fEvents.get(i).getTimestamp() : "(null)")  + ((i < fEvents.size() - 1) ? "," : "]\n"));
-        }
-        sb.append("\tfLastTraceRead=" + fLastTraceRead + "\n");
         sb.append("]");
         return sb.toString();
     }

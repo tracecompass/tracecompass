@@ -385,19 +385,17 @@ public class TmfMultiTraceExperimentTest {
         assertTrue("Experiment context type", context instanceof TmfExperimentContext);
         TmfExperimentContext ctx = (TmfExperimentContext) context;
 
-        int nbTraces = ctx.getNbTraces();
+        ITmfContext[] subContexts = ctx.getContexts();
 
-        // expRank = sum(trace ranks) - nbTraces + 1 (if lastTraceRead != NO_TRACE)
-        long expRank = -nbTraces + ((ctx.getLastTrace() != TmfExperimentContext.NO_TRACE) ? 1 : 0);
-        for (int i = 0; i < nbTraces; i++) {
-            ITmfContext subContext = ctx.getContext(i);
+        long expRank = 0;
+        for (ITmfContext subContext : subContexts) {
             assertNotNull(subContext);
             long rank = subContext.getRank();
             if (rank == -1) {
                 expRank = -1;
                 break;
             }
-            expRank += rank;
+            expRank += rank - 1;
         }
         assertEquals("Experiment context rank", expRank, ctx.getRank());
     }

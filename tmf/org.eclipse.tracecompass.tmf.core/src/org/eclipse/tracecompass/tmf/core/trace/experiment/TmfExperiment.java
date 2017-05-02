@@ -42,6 +42,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfTimestampTransform;
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentContext;
+import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentContext.ContextTuple;
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentLocation;
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfLocationArray;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
@@ -406,17 +407,15 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
         for (int i = 0; i < length; i++) {
             // Get the relevant trace attributes
             final ITmfContext traceContext = ((ITmfTrace) getChild(i)).seekEvent(locations[i]);
-            context.setContext(i, traceContext);
             traceContext.setRank(ranks[i]);
             // update location after seek
             locations[i] = traceContext.getLocation();
-            context.setEvent(i, ((ITmfTrace) getChild(i)).getNext(traceContext));
+            context.setContent(i, traceContext, ((ITmfTrace) getChild(i)).getNext(traceContext));
             rank += ranks[i];
         }
 
         // Finalize context
         context.setLocation(new TmfExperimentLocation(new TmfLocationArray(locations, ranks)));
-        context.setLastTrace(TmfExperimentContext.NO_TRACE);
         context.setRank(rank);
 
         return context;
@@ -465,64 +464,38 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
     @Override
     public synchronized ITmfEvent getNext(ITmfContext context) {
 
+        // Make sure that we have something to read from
+        if (getNbChildren() == 0) {
+            return null;
+        }
+
         // Validate the context
         if (!(context instanceof TmfExperimentContext)) {
             return null; // Throw an exception?
         }
+        TmfExperimentContext experimentContext = (TmfExperimentContext) context;
 
-        int length = getNbChildren();
-
-        // Make sure that we have something to read from
-        if (length == 0) {
-            return null;
-        }
-
-        TmfExperimentContext expContext = (TmfExperimentContext) context;
-
-        // If an event was consumed previously, first get the next one from that
-        // trace
-        final int lastTrace = expContext.getLastTrace();
-        if (lastTrace != TmfExperimentContext.NO_TRACE) {
-            final ITmfContext traceContext = expContext.getContext(lastTrace);
-            expContext.setEvent(lastTrace, ((ITmfTrace) getChild(lastTrace)).getNext(traceContext));
-            expContext.setLastTrace(TmfExperimentContext.NO_TRACE);
-        }
-
-        // Scan the candidate events and identify the "next" trace to read from
-        int trace = TmfExperimentContext.NO_TRACE;
-        ITmfTimestamp timestamp = TmfTimestamp.BIG_CRUNCH;
-        for (int i = 0; i < length; i++) {
-            final ITmfEvent event = expContext.getEvent(i);
-
-            if (event != null) {
-                final ITmfTimestamp otherTS = event.getTimestamp();
-                if (otherTS.compareTo(timestamp) < 0) {
-                    trace = i;
-                    timestamp = otherTS;
-                }
-            }
-        }
+        // Identify the "next" trace to read from
+        ContextTuple next = experimentContext.getNext();
 
         ITmfEvent event = null;
-        if (trace != TmfExperimentContext.NO_TRACE) {
-            event = expContext.getEvent(trace);
-            if (event != null) {
-                updateAttributes(expContext, event);
-                expContext.increaseRank();
-                expContext.setLastTrace(trace);
-                final ITmfContext traceContext = expContext.getContext(trace);
-                if (traceContext == null) {
-                    throw new IllegalStateException();
-                }
+        if (next != null) {
+            event = next.getEvent();
+            updateAttributes(experimentContext, event);
+            experimentContext.increaseRank();
 
-                // Update the experiment location
-                ITmfLocation location = expContext.getLocation();
-                if (location instanceof TmfExperimentLocation) {
-                    TmfLocationArray locationArray = new TmfLocationArray(
-                            ((TmfExperimentLocation) location).getLocationInfo(),
-                            trace, traceContext.getLocation(), traceContext.getRank());
-                    expContext.setLocation(new TmfExperimentLocation(locationArray));
-                }
+            // Update the experiment location
+            ITmfLocation location = experimentContext.getLocation();
+            if (location instanceof TmfExperimentLocation) {
+                int trace = next.getIndex();
+                ITmfContext traceContext = next.getContext();
+                TmfLocationArray locationArray = new TmfLocationArray(
+                        ((TmfExperimentLocation) location).getLocationInfo(),
+                        trace, traceContext.getLocation(), traceContext.getRank());
+                experimentContext.setLocation(new TmfExperimentLocation(locationArray));
+                // queue the next event
+                ITmfEvent nextEvent = ((ITmfTrace) getChild(trace)).getNext(traceContext);
+                experimentContext.setContent(trace, traceContext, nextEvent);
             }
         }
 
