@@ -6,18 +6,7 @@
 
     <property name="document.title" value="Trace Compass Developer Guide" />
 
-    <path id="wikitext.tasks.classpath">
-        <!-- Search in the local Eclipse plugins directory for the Wikitext plugin -->
-        <fileset dir="${osgi.syspath}" erroronmissingdir="false">
-            <include name="org.eclipse.mylyn.wikitext.*core*.jar" />
-            <include name="com.google.guava_*.jar" />
-        </fileset>
-
-        <!-- For Maven builds: use the compile_classpath -->
-        <pathelement path="${compile_classpath}" />
-    </path>
-
-    <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/wikitext/core/ant/tasks.properties" />
+    <taskdef resource="org/eclipse/mylyn/wikitext/ant/tasks.properties"/>
 
     <target name="build" description="Generate Eclipse help content for the Trace Compass Developer Guide">
         <wikitext-to-eclipse-help markupLanguage="MediaWiki"
