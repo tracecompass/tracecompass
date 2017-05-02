@@ -6,7 +6,7 @@
       <module
             analysis_module="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphAnalysis"
             applies_experiment="true"
-            automatic="true"
+            automatic="false"
             icon="icons/callgraph.png"
             id="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.callgraphanalysis"
             name="%callgraph.analysis">
