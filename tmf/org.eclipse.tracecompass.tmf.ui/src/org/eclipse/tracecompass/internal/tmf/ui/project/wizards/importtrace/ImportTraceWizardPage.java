@@ -67,7 +67,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -91,6 +90,7 @@ import org.eclipse.ui.dialogs.WizardResourceImportPage;
 import org.eclipse.ui.ide.dialogs.IElementFilter;
 import org.eclipse.ui.ide.dialogs.ResourceTreeAndListGroup;
 import org.eclipse.ui.internal.ide.DialogUtil;
+import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.model.WorkbenchViewerComparator;
@@ -160,16 +160,11 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     // Attributes
     // ------------------------------------------------------------------------
 
-    // Target import directory ('Traces' folder)
-    private IFolder fTargetFolder;
     // Target Trace folder element
     private TmfTraceFolder fTraceFolderElement;
     // The workspace experiment folder
     private TmfExperimentFolder fExperimentFolderElement;
     private  String fPreviousSource;
-    // Flag to handle destination folder change event
-    private Boolean fIsDestinationChanged = false;
-    private final Object fSyncObject = new Object();
     // Combo box containing trace types
     private Combo fTraceTypes;
     // Button to ignore unrecognized traces or not
@@ -256,7 +251,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         // Set the target trace folder
         if (traceFolder != null) {
-            fTargetFolder = traceFolder;
             String path = traceFolder.getFullPath().toString();
             setContainerFieldValue(path);
         }
@@ -314,6 +308,23 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         createFileSelectionGroup(parent);
         createTraceTypeGroup(parent);
         validateSourceGroup();
+    }
+
+    @Override
+    protected void createDestinationGroup(Composite parent) {
+        Composite containerComposite = new Composite(parent, SWT.NONE);
+        containerComposite.setLayout(new GridLayout(2, false));
+        containerComposite.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
+
+        Label destinationLabel = new Label(containerComposite, SWT.NONE);
+        destinationLabel.setText(IDEWorkbenchMessages.WizardImportPage_folder);
+
+        Text containerText = new Text(containerComposite, SWT.SINGLE);
+        containerText.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
+        containerText.setEnabled(false);
+
+        // Initialize the field with the container path
+        containerText.setText(getContainerFullPath().toString());
     }
 
     @Override
@@ -566,38 +577,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     // ------------------------------------------------------------------------
     // Browse for the source directory
     // ------------------------------------------------------------------------
-
-    @Override
-    public void handleEvent(Event event) {
-        if (event.widget == directoryBrowseButton) {
-            handleSourceDirectoryBrowseButtonPressed();
-        }
-
-        // Avoid overwriting destination path without repeatedly trigger
-        // call of handleEvent();
-        synchronized (fSyncObject) {
-            if (!fIsDestinationChanged) {
-                event.display.asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        synchronized (fSyncObject) {
-                            fIsDestinationChanged = true;
-                            String path = fTargetFolder.getFullPath().toString();
-                            setContainerFieldValue(path);
-                        }
-                    }
-                });
-            } else {
-                fIsDestinationChanged = false;
-            }
-        }
-        super.handleEvent(event);
-    }
-
-    @Override
-    protected void handleContainerBrowseButtonPressed() {
-        // Do nothing so that destination directory cannot be changed.
-    }
 
     /**
      * Handle the button pressed event

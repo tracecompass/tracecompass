@@ -22,7 +22,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportTraceWizardPage;
@@ -54,8 +53,8 @@ public final class SWTBotImportWizardUtils {
         sourceCombo.setText(traceFolderParent.getAbsolutePath());
 
         /* the resource tree gets updated when the combo loses focus */
-        SWTBotText text = bot.text();
-        text.setFocus();
+        SWTBotTree tree = bot.tree();
+        tree.setFocus();
     }
 
     /**
@@ -76,8 +75,8 @@ public final class SWTBotImportWizardUtils {
         sourceCombo.setText(new File(archivePath).getAbsolutePath());
 
         /* the resource tree gets updated when the combo loses focus */
-        SWTBotText text = bot.text();
-        text.setFocus();
+        SWTBotTree tree = bot.tree();
+        tree.setFocus();
     }
 
     /**

@@ -43,7 +43,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportTraceWizard;
@@ -211,8 +210,8 @@ public class StandardImportGzipTraceTest {
 
         sourceCombo.setText(new File(archivePath).getAbsolutePath());
 
-        SWTBotText text = fBot.text();
-        text.setFocus();
+        SWTBotTree tree = fBot.tree();
+        tree.setFocus();
     }
 
     private void openImportWizard() {
