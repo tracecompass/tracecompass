@@ -30,6 +30,8 @@
    <bundle id="org.eclipse.tracecompass.common.core"/>
    <bundle id="org.eclipse.tracecompass.common.core.source"/>
    <bundle id="org.antlr.runtime"/>
+   <bundle id="org.apache.commons.compress"/>
+   <bundle id="org.apache.commons.lang3"/>
    <bundle id="org.apache.commons.io"/>
    <bundle id="org.swtchart"/>
    <bundle id="com.google.guava"/>
