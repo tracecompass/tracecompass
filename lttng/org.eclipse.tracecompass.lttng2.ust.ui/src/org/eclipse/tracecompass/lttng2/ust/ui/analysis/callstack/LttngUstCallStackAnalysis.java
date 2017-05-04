@@ -63,8 +63,11 @@ public class LttngUstCallStackAnalysis extends AbstractCallStackAnalysis {
         return super.setTrace(trace);
     }
 
+    /**
+     * @since 2.1
+     */
     @Override
-    protected LttngUstTrace getTrace() {
+    public LttngUstTrace getTrace() {
         return (LttngUstTrace) super.getTrace();
     }
 

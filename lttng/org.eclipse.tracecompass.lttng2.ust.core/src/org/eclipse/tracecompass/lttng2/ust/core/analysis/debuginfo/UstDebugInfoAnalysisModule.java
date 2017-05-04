@@ -66,8 +66,12 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
         return super.setTrace(trace);
     }
 
+    /**
+     * @since 2.2
+     */
     @Override
-    protected @Nullable LttngUstTrace getTrace() {
+    @Nullable
+    public LttngUstTrace getTrace() {
         return (LttngUstTrace) super.getTrace();
     }
 

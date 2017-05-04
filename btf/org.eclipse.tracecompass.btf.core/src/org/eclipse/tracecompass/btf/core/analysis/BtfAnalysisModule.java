@@ -35,8 +35,11 @@ public class BtfAnalysisModule extends TmfStateSystemAnalysisModule {
         return super.setTrace(trace);
     }
 
+    /**
+     * @since 2.1
+     */
     @Override
-    protected BtfTrace getTrace() {
+    public BtfTrace getTrace() {
         return (BtfTrace) super.getTrace();
     }
 

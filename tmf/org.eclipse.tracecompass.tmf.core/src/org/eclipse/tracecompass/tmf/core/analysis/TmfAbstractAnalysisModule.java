@@ -158,8 +158,9 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
      * Gets the trace
      *
      * @return The trace
+     * @since 2.4
      */
-    protected @Nullable ITmfTrace getTrace() {
+    @Nullable public ITmfTrace getTrace() {
         return fTrace;
     }
 

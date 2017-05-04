@@ -49,7 +49,7 @@ public class LttngUstCallStackAnalysis extends CallStackAnalysis {
     }
 
     @Override
-    protected LttngUstTrace getTrace() {
+    public LttngUstTrace getTrace() {
         return (LttngUstTrace) super.getTrace();
     }
 
