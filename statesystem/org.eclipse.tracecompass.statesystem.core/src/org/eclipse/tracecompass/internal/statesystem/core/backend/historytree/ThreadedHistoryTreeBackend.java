@@ -135,6 +135,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
      * TODO but what about streaming??
      */
 
+    @Deprecated
     @Override
     public void insertPastState(long stateStartTime, long stateEndTime,
             int quark, ITmfStateValue value) throws TimeRangeException {
@@ -143,8 +144,19 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
          * underneath, we'll put them in the Queue. They will then be taken and
          * processed by the other thread executing the run() method.
          */
+        insertPastState(stateStartTime, stateEndTime, quark, value.unboxValue());
+    }
+
+    @Override
+    public void insertPastState(long stateStartTime, long stateEndTime,
+            int quark, Object value) throws TimeRangeException {
+        /*
+         * Here, instead of directly inserting the elements in the History Tree
+         * underneath, we'll put them in the Queue. They will then be taken and
+         * processed by the other thread executing the run() method.
+         */
         HTInterval interval = new HTInterval(stateStartTime, stateEndTime,
-                quark, (TmfStateValue) value);
+                quark, value);
         intervalQueue.put(interval);
         fEndTime = Math.max(fEndTime, stateEndTime);
     }

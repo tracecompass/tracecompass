@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.statesystem.core.statevalue;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.statesystem.core.statevalue.CustomStateValue;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 
@@ -190,5 +191,32 @@ public abstract class TmfStateValue implements ITmfStateValue {
     @Override
     public String unboxStr() {
         throw new StateValueTypeException(unboxErrMsg("String")); //$NON-NLS-1$
+    }
+
+    /**
+     * Factory constructor from Object state values
+     *
+     * @param value
+     *            The Object value to contain
+     * @return The newly-created TmfStateValue object
+     * @since 3.0
+     */
+    public static ITmfStateValue newValue(@Nullable Object value) {
+        if (value == null) {
+            return nullValue;
+        } else if (value instanceof ITmfStateValue) {
+            return (ITmfStateValue) value;
+        } else if (value instanceof Integer) {
+            return newValueInt((int) value);
+        } else if (value instanceof Long) {
+            return newValueLong((long) value);
+        } else if (value instanceof Double) {
+            return newValueDouble((double) value);
+        } else if (value instanceof String) {
+            return newValueString((String) value);
+        } else if (value instanceof CustomStateValue) {
+            return (CustomStateValue) value;
+        }
+        throw new IllegalArgumentException("Unsupported type: " + value.getClass()); //$NON-NLS-1$
     }
 }

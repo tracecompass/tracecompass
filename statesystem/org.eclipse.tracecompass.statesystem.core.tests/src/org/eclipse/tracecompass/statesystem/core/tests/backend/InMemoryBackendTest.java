@@ -56,9 +56,9 @@ public class InMemoryBackendTest extends StateHistoryBackendTestBase {
                 try {
                     final int stateEndTime = (timeStart * 100) + 90 + attribute;
                     final int stateStartTime = timeStart * 100 + attribute;
-                    backend.insertPastState(stateStartTime, stateEndTime, attribute, TmfStateValue.newValueInt(timeStart % 100));
+                    backend.insertPastState(stateStartTime, stateEndTime, attribute, timeStart % 100);
                     if (timeStart != 999) {
-                        backend.insertPastState(stateEndTime + 1, stateEndTime + 9, attribute, TmfStateValue.nullValue());
+                        backend.insertPastState(stateEndTime + 1, stateEndTime + 9, attribute, (Object) null);
                     }
                 } catch (TimeRangeException e) {
                     /* Should not happen here */

@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -377,6 +378,25 @@ public interface ITmfStateSystem {
      *             If the attribute quark is out of range
      */
     @NonNull ITmfStateValue queryOngoingState(int attributeQuark);
+
+    /**
+     * Returns the current state value we have (in the Transient State) for the
+     * given attribute.
+     *
+     * This is useful even for a StateHistorySystem, as we are guaranteed it
+     * will only do a memory access and not go look on disk (and we don't even
+     * have to provide a timestamp!)
+     *
+     * @param attributeQuark
+     *            For which attribute we want the current state
+     * @return The State value that's "current" for this attribute
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
+     * @since 2.3
+     */
+    default @Nullable Object queryOngoing(int attributeQuark){
+        return queryOngoingState(attributeQuark).unboxValue();
+    }
 
     /**
      * Get the start time of the current ongoing state, for the specified

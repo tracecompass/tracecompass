@@ -9,10 +9,9 @@
 
 package org.eclipse.tracecompass.statesystem.core;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 /**
  * Provide utility methods for building the state system
@@ -43,14 +42,14 @@ public final class StateSystemBuilderUtils {
      */
     public static void incrementAttributeLong(ITmfStateSystemBuilder ssb, long t, int attributeQuark, long increment)
             throws StateValueTypeException, AttributeNotFoundException {
-        ITmfStateValue stateValue = ssb.queryOngoingState(attributeQuark);
+        @Nullable Object stateValue = ssb.queryOngoing(attributeQuark);
 
         /* if the attribute was previously null, start counting at 0 */
         long prevValue = 0;
-        if (!stateValue.isNull()) {
-            prevValue = stateValue.unboxLong();
+        if (stateValue != null && stateValue instanceof Long) {
+            prevValue = (long) stateValue;
         }
-        ssb.modifyAttribute(t, TmfStateValue.newValueLong(prevValue + increment), attributeQuark);
+        ssb.modifyAttribute(t, prevValue + increment, attributeQuark);
     }
 
     /**
@@ -72,14 +71,14 @@ public final class StateSystemBuilderUtils {
      */
     public static void incrementAttributeInt(ITmfStateSystemBuilder ssb, long t, int attributeQuark, int increment)
             throws StateValueTypeException, AttributeNotFoundException {
-        ITmfStateValue stateValue = ssb.queryOngoingState(attributeQuark);
+        @Nullable Object stateValue = ssb.queryOngoing(attributeQuark);
 
         /* if the attribute was previously null, start counting at 0 */
         int prevValue = 0;
-        if (!stateValue.isNull()) {
-            prevValue = stateValue.unboxInt();
+        if (stateValue != null && stateValue instanceof Integer) {
+            prevValue = (int) stateValue;
         }
-        ssb.modifyAttribute(t, TmfStateValue.newValueInt(prevValue + increment), attributeQuark);
+        ssb.modifyAttribute(t, prevValue + increment, attributeQuark);
     }
 
 }

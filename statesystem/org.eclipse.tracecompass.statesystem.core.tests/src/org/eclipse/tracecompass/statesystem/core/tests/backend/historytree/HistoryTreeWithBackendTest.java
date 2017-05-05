@@ -20,7 +20,6 @@ import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HT
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTNode;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HistoryTreeBackend;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.IHistoryTree;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.tests.stubs.backend.HistoryTreeBackendStub;
 import org.eclipse.tracecompass.statesystem.core.tests.stubs.backend.HistoryTreeBackendStub.HistoryTreeType;
 import org.junit.Test;
@@ -88,9 +87,9 @@ public class HistoryTreeWithBackendTest {
             int quarkTest = nbAttr;
             long time = startTime + duration;
 
-            HTInterval interval = new HTInterval(startTime, time, quarkTest, TmfStateValue.newValueLong(time));
+            HTInterval interval = new HTInterval(startTime, time, quarkTest, time);
             // Insert a first interval for the test attribute
-            backend.insertPastState(interval.getStartTime(), interval.getEndTime(), interval.getAttribute(), interval.getStateValue());
+            backend.insertPastState(interval.getStartTime(), interval.getEndTime(), interval.getAttribute(), interval.getValue());
 
             /*
              * insert cascading intervals to fill 2 levels of history tree, so
@@ -101,7 +100,7 @@ public class HistoryTreeWithBackendTest {
                         Math.max(startTime, time - duration),
                         time - 1,
                         (int) time % nbAttr,
-                        TmfStateValue.newValueLong(time));
+                        time);
                 time++;
             }
 
@@ -116,13 +115,13 @@ public class HistoryTreeWithBackendTest {
                         Math.max(startTime, time - duration),
                         time - 1,
                         (int) time % nbAttr,
-                        TmfStateValue.newValueLong(time));
+                        time);
                 time++;
             }
 
             // Add an interval that does not fit in latest leaf, but starts
             // before the current branch
-            backend.insertPastState(interval.getEndTime() + 1, time, quarkTest, TmfStateValue.newValueLong(time));
+            backend.insertPastState(interval.getEndTime() + 1, time, quarkTest, time);
 
             backend.getHistoryTree().assertIntegrity();
 

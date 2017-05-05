@@ -34,8 +34,6 @@ import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFact
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -110,18 +108,18 @@ public class HistoryTreeBackendBenchmark {
 
     /* A list of values to use for the intervals */
     private enum HTBValues {
-        INTEGERS(ImmutableList.of(TmfStateValue.newValueInt(1), TmfStateValue.newValueInt(2), TmfStateValue.newValueInt(3))),
-        STRINGS(ImmutableList.of(TmfStateValue.newValueString("abc"), TmfStateValue.newValueString("def"), TmfStateValue.newValueString("wihi!"))),
-        LONGS(ImmutableList.of(TmfStateValue.newValueLong(Long.MAX_VALUE), TmfStateValue.newValueLong(1L), TmfStateValue.newValueLong(1234567L))),
-        DOUBLES(ImmutableList.of(TmfStateValue.newValueDouble(Double.MAX_VALUE), TmfStateValue.newValueDouble(1.0), TmfStateValue.newValueDouble(123.456)));
+        INTEGERS(ImmutableList.of(1, 2, 3)),
+        STRINGS(ImmutableList.of("abc", "def", "wihi!")),
+        LONGS(ImmutableList.of(Long.MAX_VALUE, 1L, 1234567L)),
+        DOUBLES(ImmutableList.of(Double.MAX_VALUE, 1.0, 123.456));
 
-        private final List<ITmfStateValue> fValues;
+        private final List<Object> fValues;
 
-        private HTBValues(List<ITmfStateValue> values) {
+        private HTBValues(List<Object> values) {
             fValues = values;
         }
 
-        public List<ITmfStateValue> getValues() {
+        public List<Object> getValues() {
             return fValues;
         }
     }
@@ -211,10 +209,10 @@ public class HistoryTreeBackendBenchmark {
     private static class QuarkEvent implements Comparable<QuarkEvent> {
         private final int fQuark;
         private long fNextEventTime;
-        private final List<ITmfStateValue> fPossibleValues;
+        private final List<Object> fPossibleValues;
         private int fNextValue = 0;
 
-        public QuarkEvent(int quark, long nextEventTime, List<ITmfStateValue> valuesList) {
+        public QuarkEvent(int quark, long nextEventTime, List<Object> valuesList) {
             fQuark = quark;
             fNextEventTime = nextEventTime;
             fPossibleValues = valuesList;
@@ -232,8 +230,8 @@ public class HistoryTreeBackendBenchmark {
             fNextEventTime = t;
         }
 
-        public ITmfStateValue getNextValue() {
-            ITmfStateValue value = fPossibleValues.get(fNextValue);
+        public Object getNextValue() {
+            Object value = fPossibleValues.get(fNextValue);
             fNextValue++;
             if (fNextValue >= fPossibleValues.size()) {
                 fNextValue = 0;

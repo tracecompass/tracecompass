@@ -24,6 +24,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 /**
  * The main difference between StateSystem and StateHistorySystem is that SHS
@@ -77,10 +78,31 @@ public interface IStateHistoryBackend {
      *            The StateValue represented by this interval
      * @throws TimeRangeException
      *             If the start or end time are invalid
+     * @deprecated use {@link #insertPastState(long, long, int, Object)} instead
      */
-    // FIXME change to IStateInterval?
+    @Deprecated
     void insertPastState(long stateStartTime, long stateEndTime,
             int quark, @NonNull ITmfStateValue value) throws TimeRangeException;
+
+    /**
+     * Main method to insert state intervals into the history.
+     *
+     * @param stateStartTime
+     *            The start time of the interval
+     * @param stateEndTime
+     *            The end time of the interval
+     * @param quark
+     *            The quark of the attribute this interval refers to
+     * @param value
+     *            The StateValue represented by this interval
+     * @throws TimeRangeException
+     *             If the start or end time are invalid
+     * @since 2.2
+     */
+    default void insertPastState(long stateStartTime, long stateEndTime,
+            int quark, @Nullable Object value) throws TimeRangeException {
+        insertPastState(stateStartTime, stateEndTime, quark, TmfStateValue.newValue(value));
+    }
 
     /**
      * Indicate to the provider that we are done building the history (so it can

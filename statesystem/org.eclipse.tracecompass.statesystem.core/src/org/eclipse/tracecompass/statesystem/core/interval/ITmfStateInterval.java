@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.statesystem.core.interval;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 
 /**
@@ -62,4 +63,15 @@ public interface ITmfStateInterval {
      * @return True if the interval and timestamp intersect, false if they don't
      */
     boolean intersects(long timestamp);
+
+    /**
+     * Retrieve this state interval's value
+     *
+     * @return the Object contained by this interval
+     * @since 3.0
+     */
+    default @Nullable Object getValue() {
+        return getStateValue().unboxValue();
+    }
+
 }

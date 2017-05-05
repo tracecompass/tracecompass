@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.statesystem.core.statevalue;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 
 /**
@@ -92,5 +93,15 @@ public interface ITmfStateValue extends Comparable<ITmfStateValue> {
      *             If the contained value cannot be read as a String
      */
     String unboxStr();
+
+    /**
+     * Getter for this {@link ITmfStateValue}'s Object
+     *
+     * @return the object in this {@link ITmfStateValue}
+     * @since 3.0
+     */
+    default @Nullable Object unboxValue() {
+        return null;
+    }
 
 }

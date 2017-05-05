@@ -91,4 +91,9 @@ final class NullStateValue extends TmfStateValue {
         return -(other.compareTo(this));
     }
 
+    @Override
+    public @Nullable Object unboxValue() {
+        return null;
+    }
+
 }

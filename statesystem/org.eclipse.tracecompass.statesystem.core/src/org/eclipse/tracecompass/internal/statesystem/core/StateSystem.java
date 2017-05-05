@@ -158,9 +158,9 @@ public class StateSystem implements ITmfStateSystemBuilder {
         backend.dispose();
     }
 
-    //--------------------------------------------------------------------------
-    //        General methods related to the attribute tree
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
+    // General methods related to the attribute tree
+    // --------------------------------------------------------------------------
 
     /**
      * Get the attribute tree associated with this state system. This should be
@@ -202,9 +202,9 @@ public class StateSystem implements ITmfStateSystemBuilder {
         return getAttributeTree().getFullAttributePathArray(attributeQuark);
     }
 
-    //--------------------------------------------------------------------------
-    //        Methods related to the storage backend
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
+    // Methods related to the storage backend
+    // --------------------------------------------------------------------------
 
     @Override
     public long getStartTime() {
@@ -244,9 +244,9 @@ public class StateSystem implements ITmfStateSystemBuilder {
         finishedLatch.countDown(); /* Mark the history as finished building */
     }
 
-    //--------------------------------------------------------------------------
-    //        Quark-retrieving methods
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
+    // Quark-retrieving methods
+    // --------------------------------------------------------------------------
 
     @Override
     public int getQuarkAbsolute(String... attribute)
@@ -347,7 +347,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
         } else {
             if (element.equals(WILDCARD)) {
                 getSubAttributes(quark, false).forEach(subquark -> getQuarks(builder, subquark, remainder));
-            } else if (element.equals(PARENT)){
+            } else if (element.equals(PARENT)) {
                 getQuarks(builder, getParentAttributeQuark(quark), remainder);
             } else {
                 int subQuark = optQuarkRelative(quark, element);
@@ -358,35 +358,61 @@ public class StateSystem implements ITmfStateSystemBuilder {
         }
     }
 
-    //--------------------------------------------------------------------------
-    //        Methods related to insertions in the history
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
+    // Methods related to insertions in the history
+    // --------------------------------------------------------------------------
 
+    @Deprecated
     @Override
     public void modifyAttribute(long t, @NonNull ITmfStateValue value, int attributeQuark)
+            throws TimeRangeException, StateValueTypeException {
+        transState.processStateChange(t, value.unboxValue(), attributeQuark);
+    }
+    @Override
+    public void modifyAttribute(long t, Object value, int attributeQuark)
             throws TimeRangeException, StateValueTypeException {
         transState.processStateChange(t, value, attributeQuark);
     }
 
+    @Deprecated
+    @Override
+    public void incrementAttribute(long t, int attributeQuark)
+            throws StateValueTypeException, TimeRangeException {
+        @Nullable Object stateValue = queryOngoing(attributeQuark);
+        int prevValue = 0;
+        /* if the attribute was previously null, start counting at 0 */
+        if (stateValue != null && stateValue instanceof Integer) {
+            prevValue = (int) stateValue;
+        }
+        modifyAttribute(t, prevValue + 1, attributeQuark);
+    }
+
+    @Deprecated
     @Override
     public void pushAttribute(long t, @NonNull ITmfStateValue value, int attributeQuark)
             throws TimeRangeException, StateValueTypeException {
+        pushAttribute(t, value.unboxValue(), attributeQuark);
+    }
+
+    @Override
+    public void pushAttribute(long t, Object value, int attributeQuark)
+            throws TimeRangeException, StateValueTypeException {
         int stackDepth;
         int subAttributeQuark;
-        ITmfStateValue previousSV = transState.getOngoingStateValue(attributeQuark);
+        Object previousSV = transState.getOngoingStateValue(attributeQuark);
 
-        if (previousSV.isNull()) {
+        if (previousSV == null) {
             /*
              * If the StateValue was null, this means this is the first time we
              * use this attribute. Leave stackDepth at 0.
              */
             stackDepth = 0;
-        } else if (previousSV.getType() == Type.INTEGER) {
+        } else if (previousSV instanceof Integer) {
             /* Previous value was an integer, all is good, use it */
-            stackDepth = previousSV.unboxInt();
+            stackDepth = (int) previousSV;
         } else {
             /* Previous state of this attribute was another type? Not good! */
-            throw new StateValueTypeException(getSSID() + " Quark:" + attributeQuark + ", Type:" + previousSV.getType() + ", Expected:" + Type.INTEGER); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            throw new StateValueTypeException(getSSID() + " Quark:" + attributeQuark + ", Type:" + previousSV.getClass() + ", Expected:" + Type.INTEGER); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
 
         if (stackDepth >= MAX_STACK_DEPTH) {
@@ -401,17 +427,24 @@ public class StateSystem implements ITmfStateSystemBuilder {
         stackDepth++;
         subAttributeQuark = getQuarkRelativeAndAdd(attributeQuark, String.valueOf(stackDepth));
 
-        modifyAttribute(t, TmfStateValue.newValueInt(stackDepth), attributeQuark);
+        modifyAttribute(t, stackDepth, attributeQuark);
         modifyAttribute(t, value, subAttributeQuark);
     }
 
     @Override
     public ITmfStateValue popAttribute(long t, int attributeQuark)
             throws TimeRangeException, StateValueTypeException {
-        /* These are the state values of the stack-attribute itself */
-        ITmfStateValue previousSV = transState.getOngoingStateValue(attributeQuark);
+        Object pop = popAttributeObject(t, attributeQuark);
+        return pop != null ? TmfStateValue.newValue(pop) : null;
+    }
 
-        if (previousSV.isNull()) {
+    @Override
+    public Object popAttributeObject(long t, int attributeQuark)
+            throws TimeRangeException, StateValueTypeException {
+        /* These are the state values of the stack-attribute itself */
+        @Nullable Object previousSV = transState.getOngoingStateValue(attributeQuark);
+
+        if (previousSV == null) {
             /*
              * Trying to pop an empty stack. This often happens at the start of
              * traces, for example when we see a syscall_exit, without having
@@ -420,17 +453,13 @@ public class StateSystem implements ITmfStateSystemBuilder {
              */
             return null;
         }
-        if (previousSV.getType() != Type.INTEGER) {
-            /*
-             * The existing value was not an integer (which is expected for
-             * stack tops), this doesn't look like a valid stack attribute.
-             */
-            throw new StateValueTypeException(getSSID() + " Quark:" + attributeQuark + ", Type:" + previousSV.getType() + ", Expected:" + Type.INTEGER); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        }
 
-        int stackDepth = previousSV.unboxInt();
 
-        if (stackDepth <= 0) {
+        int stackDepth = 0;
+
+        if (previousSV instanceof Integer) {
+            stackDepth = (int) previousSV;
+        } else {
             /* This on the other hand should not happen... */
             throw new StateValueTypeException(getSSID() + " Quark:" + attributeQuark + ", Stack depth:" + stackDepth); //$NON-NLS-1$//$NON-NLS-2$
         }
@@ -443,15 +472,15 @@ public class StateSystem implements ITmfStateSystemBuilder {
             String message = " Stack attribute missing sub-attribute for depth:" + stackDepth; //$NON-NLS-1$
             throw new IllegalStateException(getSSID() + " Quark:" + attributeQuark + message); //$NON-NLS-1$
         }
-        ITmfStateValue poppedValue = queryOngoingState(subAttributeQuark);
+        Object poppedValue = queryOngoing(subAttributeQuark);
 
         /* Update the state value of the stack-attribute */
-        ITmfStateValue nextSV;
+        Integer nextSV;
         if (--stackDepth == 0) {
             /* Store a null state value */
-            nextSV = TmfStateValue.nullValue();
+            nextSV = null;
         } else {
-            nextSV = TmfStateValue.newValueInt(stackDepth);
+            nextSV = stackDepth;
         }
         modifyAttribute(t, nextSV, attributeQuark);
 
@@ -478,7 +507,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
         }
         /* Nullify ourselves */
         try {
-            transState.processStateChange(t, TmfStateValue.nullValue(), attributeQuark);
+            transState.processStateChange(t, null, attributeQuark);
         } catch (StateValueTypeException e) {
             /*
              * Will not happen since we're inserting null values only, but poor
@@ -488,12 +517,17 @@ public class StateSystem implements ITmfStateSystemBuilder {
         }
     }
 
-    //--------------------------------------------------------------------------
-    //        "Current" query/update methods
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
+    // "Current" query/update methods
+    // --------------------------------------------------------------------------
 
     @Override
     public ITmfStateValue queryOngoingState(int attributeQuark) {
+        return TmfStateValue.newValue(queryOngoing(attributeQuark));
+    }
+
+    @Override
+    public Object queryOngoing(int attributeQuark) {
         return transState.getOngoingStateValue(attributeQuark);
     }
 
@@ -519,9 +553,9 @@ public class StateSystem implements ITmfStateSystemBuilder {
         transState.replaceOngoingState(newStateIntervals);
     }
 
-    //--------------------------------------------------------------------------
-    //        Regular query methods (sent to the back-end)
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
+    // Regular query methods (sent to the back-end)
+    // --------------------------------------------------------------------------
 
     @Override
     public List<ITmfStateInterval> queryFullState(long t)
@@ -575,9 +609,9 @@ public class StateSystem implements ITmfStateSystemBuilder {
             throw new StateSystemDisposedException();
         }
         try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "StateSystem:SingleQuery", //$NON-NLS-1$
-                "ssid" , this.getSSID(), //$NON-NLS-1$
+                "ssid", this.getSSID(), //$NON-NLS-1$
                 "ts", t, //$NON-NLS-1$
-                "attribute" ,attributeQuark)) { //$NON-NLS-1$
+                "attribute", attributeQuark)) { //$NON-NLS-1$
             ITmfStateInterval ret = transState.getIntervalAt(t, attributeQuark);
             if (ret == null) {
                 /*
@@ -642,9 +676,9 @@ public class StateSystem implements ITmfStateSystemBuilder {
         backend.removeFiles();
     }
 
-    //--------------------------------------------------------------------------
-    //        Debug methods
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
+    // Debug methods
+    // --------------------------------------------------------------------------
 
     static void logMissingInterval(int attribute, long timestamp) {
         Activator.getDefault().logInfo("No data found in history for attribute " + //$NON-NLS-1$

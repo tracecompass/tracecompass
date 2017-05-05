@@ -20,7 +20,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Objects;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferReader;
 import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWriter;
 import org.eclipse.tracecompass.datastore.core.serialization.SafeByteBufferFactory;
@@ -53,7 +52,7 @@ public final class HTInterval implements ITmfStateInterval {
     private final long start;
     private final long end;
     private final int attribute;
-    private final @NonNull TmfStateValue sv;
+    private final Object sv;
 
     /** Number of bytes used by this interval when it is written to disk */
     private final int fSizeOnDisk;
@@ -74,7 +73,7 @@ public final class HTInterval implements ITmfStateInterval {
      *             If the start time or end time are invalid
      */
     public HTInterval(long intervalStart, long intervalEnd, int attribute,
-            @NonNull TmfStateValue value) throws TimeRangeException {
+            Object value) throws TimeRangeException {
         if (intervalStart > intervalEnd) {
             throw new TimeRangeException("Start:" + intervalStart + ", End:" + intervalEnd); //$NON-NLS-1$ //$NON-NLS-2$
         }
@@ -82,7 +81,7 @@ public final class HTInterval implements ITmfStateInterval {
         this.start = intervalStart;
         this.end = intervalEnd;
         this.attribute = attribute;
-        this.sv = value;
+        this.sv = (value instanceof TmfStateValue) ? ((ITmfStateValue) value).unboxValue() : value;
         this.fSizeOnDisk = computeSizeOnDisk(sv);
     }
 
@@ -90,24 +89,23 @@ public final class HTInterval implements ITmfStateInterval {
      * Compute how much space (in bytes) an interval will take in its serialized
      * form on disk. This is dependent on its state value.
      */
-    private static int computeSizeOnDisk(ITmfStateValue sv) {
+    private static int computeSizeOnDisk(Object sv) {
         /*
          * Minimum size is 2x long (start and end), 1x int (attribute) and 1x
          * byte (value type).
          */
         int minSize = Long.BYTES + Long.BYTES + Integer.BYTES + Byte.BYTES;
 
-        switch (sv.getType()) {
-        case NULL:
+        if (sv == null) {
             return minSize;
-        case INTEGER:
+        } else if (sv instanceof Integer) {
             return (minSize + Integer.BYTES);
-        case LONG:
+        } else if (sv instanceof Long) {
             return (minSize + Long.BYTES);
-        case DOUBLE:
+        } else if (sv instanceof Double) {
             return (minSize + Double.BYTES);
-        case STRING:
-            String str = sv.unboxStr();
+        } else if (sv instanceof String) {
+            String str = (String) sv;
             int strLength = str.getBytes(CHARSET).length;
 
             if (strLength > Short.MAX_VALUE) {
@@ -118,16 +116,15 @@ public final class HTInterval implements ITmfStateInterval {
              * String's length + 3 (2 bytes for size, 1 byte for \0 at the end)
              */
             return (minSize + strLength + 3);
-        case CUSTOM:
+        } else if (sv instanceof CustomStateValue) {
             /* Length of serialized value (short) + state value */
             return (minSize + Short.BYTES + ((CustomStateValue) sv).getSerializedSize());
-        default:
-            /*
-             * It's very important that we know how to write the state value in
-             * the file!!
-             */
-            throw new IllegalStateException();
         }
+        /*
+         * It's very important that we know how to write the state value in the
+         * file!!
+         */
+        throw new IllegalStateException();
     }
 
     /**
@@ -137,7 +134,7 @@ public final class HTInterval implements ITmfStateInterval {
      * {@link #computeStringsEntrySize()} and do an extra copy.
      */
     private HTInterval(long intervalStart, long intervalEnd, int attribute,
-            @NonNull TmfStateValue value, int size) throws TimeRangeException {
+            Object value, int size) throws TimeRangeException {
         if (intervalStart > intervalEnd) {
             throw new TimeRangeException("Start:" + intervalStart + ", End:" + intervalEnd); //$NON-NLS-1$ //$NON-NLS-2$
         }
@@ -171,7 +168,7 @@ public final class HTInterval implements ITmfStateInterval {
      *             If there was an error reading from the buffer
      */
     public static final HTInterval readFrom(ByteBuffer buffer) throws IOException {
-        TmfStateValue value;
+        Object value;
 
         int posStart = buffer.position();
         /* Read the Data Section entry */
@@ -184,11 +181,11 @@ public final class HTInterval implements ITmfStateInterval {
         switch (valueType) {
 
         case TYPE_NULL:
-            value = TmfStateValue.nullValue();
+            value = null;
             break;
 
         case TYPE_INTEGER:
-            value = TmfStateValue.newValueInt(buffer.getInt());
+            value = buffer.getInt();
             break;
 
         case TYPE_STRING: {
@@ -197,7 +194,7 @@ public final class HTInterval implements ITmfStateInterval {
 
             byte[] array = new byte[valueSize];
             buffer.get(array);
-            value = TmfStateValue.newValueString(new String(array, CHARSET));
+            value = new String(array, CHARSET);
 
             /* Confirm the 0'ed byte at the end */
             byte res = buffer.get();
@@ -209,12 +206,12 @@ public final class HTInterval implements ITmfStateInterval {
 
         case TYPE_LONG:
             /* Go read the matching entry in the Strings section of the block */
-            value = TmfStateValue.newValueLong(buffer.getLong());
+            value = buffer.getLong();
             break;
 
         case TYPE_DOUBLE:
             /* Go read the matching entry in the Strings section of the block */
-            value = TmfStateValue.newValueDouble(buffer.getDouble());
+            value = buffer.getDouble();
             break;
 
         case TYPE_CUSTOM: {
@@ -255,7 +252,7 @@ public final class HTInterval implements ITmfStateInterval {
      *            The already-allocated ByteBuffer corresponding to a SHT Node
      */
     public void writeInterval(ByteBuffer buffer) {
-        final byte byteFromType = getByteFromType(sv.getType());
+        final byte byteFromType = getByteFromType(sv);
 
         buffer.putLong(start);
         buffer.putLong(end);
@@ -266,11 +263,11 @@ public final class HTInterval implements ITmfStateInterval {
         case TYPE_NULL:
             break;
         case TYPE_INTEGER:
-            buffer.putInt(sv.unboxInt());
+            buffer.putInt((int) sv);
             break;
 
         case TYPE_STRING: {
-            String string = sv.unboxStr();
+            String string = (String) sv;
             byte[] strArray = string.getBytes(CHARSET);
 
             /*
@@ -284,11 +281,11 @@ public final class HTInterval implements ITmfStateInterval {
         }
 
         case TYPE_LONG:
-            buffer.putLong(sv.unboxLong());
+            buffer.putLong((long) sv);
             break;
 
         case TYPE_DOUBLE:
-            buffer.putDouble(sv.unboxDouble());
+            buffer.putDouble((double) sv);
             break;
 
         case TYPE_CUSTOM: {
@@ -321,6 +318,11 @@ public final class HTInterval implements ITmfStateInterval {
 
     @Override
     public ITmfStateValue getStateValue() {
+        return TmfStateValue.newValue(sv);
+    }
+
+    @Override
+    public Object getValue() {
         return sv;
     }
 
@@ -389,23 +391,21 @@ public final class HTInterval implements ITmfStateInterval {
      * Here we determine how state values "types" are written in the 8-bit field
      * that indicates the value type in the file.
      */
-    private static byte getByteFromType(ITmfStateValue.Type type) {
-        switch (type) {
-        case NULL:
+    private static byte getByteFromType(Object type) {
+        if (type == null) {
             return TYPE_NULL;
-        case INTEGER:
+        } else if (type instanceof Integer) {
             return TYPE_INTEGER;
-        case STRING:
+        } else if (type instanceof String) {
             return TYPE_STRING;
-        case LONG:
+        } else if (type instanceof Long) {
             return TYPE_LONG;
-        case DOUBLE:
+        } else if (type instanceof Double) {
             return TYPE_DOUBLE;
-        case CUSTOM:
+        } else if (type instanceof CustomStateValue) {
             return TYPE_CUSTOM;
-        default:
-            /* Should not happen if the switch is fully covered */
-            throw new IllegalStateException();
         }
+        /* Should not happen if the switch is fully covered */
+        throw new IllegalStateException();
     }
 }

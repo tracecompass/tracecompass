@@ -80,7 +80,7 @@ public abstract class TmfMipmapFeature implements ITmfMipmapFeature {
 
         /* if the ongoing state value is not null, create and store a state interval */
         if (!currentValue.isNull()) {
-            ITmfStateInterval interval = new TmfStateInterval(currentStartTime, ts, getLevelQuark(0), currentValue);
+            ITmfStateInterval interval = new TmfStateInterval(currentStartTime, ts, getLevelQuark(0), currentValue.unboxValue());
             intervals.get(0).add(interval);
         }
 
@@ -100,7 +100,7 @@ public abstract class TmfMipmapFeature implements ITmfMipmapFeature {
     @Override
     public void updateAndCloseMipmap() {
         if (!currentValue.isNull()) {
-            ITmfStateInterval interval = new TmfStateInterval(currentStartTime, currentStartTime, getLevelQuark(0), currentValue);
+            ITmfStateInterval interval = new TmfStateInterval(currentStartTime, currentStartTime, getLevelQuark(0), currentValue.unboxValue());
             intervals.get(0).add(interval);
         }
         for (int level = 1; level <= getNbLevels(); level++) {
@@ -143,7 +143,7 @@ public abstract class TmfMipmapFeature implements ITmfMipmapFeature {
             }
 
             /* add new interval to current-level list */
-            ITmfStateInterval interval = new TmfStateInterval(startTime, endTime, levelQuark, value);
+            ITmfStateInterval interval = new TmfStateInterval(startTime, endTime, levelQuark, value.unboxValue());
             intervals.get(level).add(interval);
 
             /* update the current-level attribute */

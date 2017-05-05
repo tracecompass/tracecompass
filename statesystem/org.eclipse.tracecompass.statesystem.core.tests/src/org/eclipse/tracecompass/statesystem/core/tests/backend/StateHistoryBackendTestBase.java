@@ -25,7 +25,6 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.tests.stubs.statevalues.CustomStateValueStub;
 import org.junit.Test;
 
@@ -41,14 +40,14 @@ import com.google.common.collect.ImmutableList;
 public abstract class StateHistoryBackendTestBase {
 
     /* Some state values of each type */
-    private static final ITmfStateValue INT_VAL1 = TmfStateValue.newValueInt(-42);
-    private static final ITmfStateValue INT_VAL2 = TmfStateValue.newValueInt(675893);
-    private static final ITmfStateValue LONG_VAL1 = TmfStateValue.newValueLong(-78L);
-    private static final ITmfStateValue LONG_VAL2 = TmfStateValue.newValueLong(2234L);
-    private static final ITmfStateValue DOUBLE_VAL1 = TmfStateValue.newValueDouble(-9.87);
-    private static final ITmfStateValue DOUBLE_VAL2 = TmfStateValue.newValueDouble(50324.131643);
-    private static final ITmfStateValue STR_VAL1 = TmfStateValue.newValueString("A string");
-    private static final ITmfStateValue STR_VAL2 = TmfStateValue.newValueString("Another éèstr");
+    private static final Object INT_VAL1 = -42;
+    private static final Object INT_VAL2 = 675893;
+    private static final Object LONG_VAL1 = -78L;
+    private static final Object LONG_VAL2 = 2234L;
+    private static final Object DOUBLE_VAL1 = -9.87;
+    private static final Object DOUBLE_VAL2 = 50324.131643;
+    private static final Object STR_VAL1 = "A string";
+    private static final Object STR_VAL2 = "Another éèstr";
 
     /**
      * Gets the backend to be used for building.
@@ -116,7 +115,7 @@ public abstract class StateHistoryBackendTestBase {
      */
     protected static void insertIntervals(IStateHistoryBackend backend, List<ITmfStateInterval> intervals) {
         for (ITmfStateInterval interval : intervals) {
-            backend.insertPastState(interval.getStartTime(), interval.getEndTime(), interval.getAttribute(), interval.getStateValue());
+            backend.insertPastState(interval.getStartTime(), interval.getEndTime(), interval.getAttribute(), interval.getValue());
         }
     }
 
@@ -218,7 +217,7 @@ public abstract class StateHistoryBackendTestBase {
                     Math.max(startTime, t - duration),
                     Math.min(endTime, t - 1),
                     (int) t % nbAttr,
-                    TmfStateValue.newValueLong(t)));
+                    t));
         }
 
         buildAndQueryFullRange(startTime, endTime, nbAttr, intervals, false);
@@ -251,7 +250,7 @@ public abstract class StateHistoryBackendTestBase {
                     startTime,
                     endTime,
                     attr,
-                    TmfStateValue.newValueLong(attr)));
+                    attr));
         }
 
         buildAndQueryFullRange(startTime, endTime, nbAttr, intervals, false);
@@ -284,7 +283,7 @@ public abstract class StateHistoryBackendTestBase {
 
             assertEquals("Int interval start time", startTime, interval.getStartTime());
             assertEquals("Int interval end time", startTime + timeStep, interval.getEndTime());
-            assertEquals("Int interval value", INT_VAL1, interval.getStateValue());
+            assertEquals("Int interval value", INT_VAL1, interval.getValue());
 
             /* Long interval */
             backend.insertPastState(startTime, startTime + timeStep, longQuark, LONG_VAL1);
@@ -292,7 +291,7 @@ public abstract class StateHistoryBackendTestBase {
 
             assertEquals("Long interval start time", startTime, interval.getStartTime());
             assertEquals("Long interval end time", startTime + timeStep, interval.getEndTime());
-            assertEquals("Long interval value", LONG_VAL1, interval.getStateValue());
+            assertEquals("Long interval value", LONG_VAL1, interval.getValue());
 
             /* Double interval */
             backend.insertPastState(startTime, startTime + timeStep, doubleQuark, DOUBLE_VAL1);
@@ -300,7 +299,7 @@ public abstract class StateHistoryBackendTestBase {
 
             assertEquals("Double interval start time", startTime, interval.getStartTime());
             assertEquals("Double interval end time", startTime + timeStep, interval.getEndTime());
-            assertEquals("Double interval value", DOUBLE_VAL1, interval.getStateValue());
+            assertEquals("Double interval value", DOUBLE_VAL1, interval.getValue());
 
             /* String interval */
             backend.insertPastState(startTime, startTime + timeStep, strQuark, STR_VAL1);
@@ -308,15 +307,15 @@ public abstract class StateHistoryBackendTestBase {
 
             assertEquals("String interval start time", startTime, interval.getStartTime());
             assertEquals("String interval end time", startTime + timeStep, interval.getEndTime());
-            assertEquals("String interval value", STR_VAL1, interval.getStateValue());
+            assertEquals("String interval value", STR_VAL1, interval.getValue());
 
             /* Custom state values */
-            backend.insertPastState(startTime, startTime + timeStep, customQuark, customVal);
+            backend.insertPastState(startTime, startTime + timeStep, customQuark, (Object) customVal);
             interval = backend.doSingularQuery(startTime, customQuark);
 
             assertEquals("Custom interval start time", startTime, interval.getStartTime());
             assertEquals("Custom interval end time", startTime + timeStep, interval.getEndTime());
-            assertEquals("Custom interval value", customVal, interval.getStateValue());
+            assertEquals("Custom interval value", customVal, interval.getValue());
 
             /*
              * Add other intervals for the int quark and query at different
@@ -326,16 +325,16 @@ public abstract class StateHistoryBackendTestBase {
             backend.insertPastState(startTime + (2 * timeStep) + 1, startTime + (3 * timeStep), intQuark, INT_VAL1);
 
             interval = backend.doSingularQuery(startTime + timeStep, intQuark);
-            assertEquals("Int interval value", INT_VAL1, interval.getStateValue());
+            assertEquals("Int interval value", INT_VAL1, interval.getValue());
 
             interval = backend.doSingularQuery(startTime + timeStep + 1, intQuark);
-            assertEquals("Int interval value", INT_VAL2, interval.getStateValue());
+            assertEquals("Int interval value", INT_VAL2, interval.getValue());
 
             interval = backend.doSingularQuery(startTime + (2 * timeStep), intQuark);
-            assertEquals("Int interval value", INT_VAL2, interval.getStateValue());
+            assertEquals("Int interval value", INT_VAL2, interval.getValue());
 
             interval = backend.doSingularQuery(startTime + (2 * timeStep) + 1, intQuark);
-            assertEquals("Int interval value", INT_VAL1, interval.getStateValue());
+            assertEquals("Int interval value", INT_VAL1, interval.getValue());
 
         } catch (TimeRangeException | StateSystemDisposedException | IOException e) {
             fail(e.getMessage());
@@ -374,12 +373,12 @@ public abstract class StateHistoryBackendTestBase {
                     new TmfStateInterval(startTime, startTime + timeStep, longQuark, LONG_VAL1),
                     new TmfStateInterval(startTime, startTime + timeStep, doubleQuark, DOUBLE_VAL1),
                     new TmfStateInterval(startTime, startTime + timeStep, strQuark, STR_VAL1),
-                    new TmfStateInterval(startTime, startTime + timeStep, customQuark, customVal),
+                    new TmfStateInterval(startTime, startTime + timeStep, customQuark, (Object) customVal),
                     new TmfStateInterval(nextStart, endTime, intQuark, INT_VAL2),
                     new TmfStateInterval(nextStart, endTime, longQuark, LONG_VAL2),
                     new TmfStateInterval(nextStart, endTime, doubleQuark, DOUBLE_VAL2),
                     new TmfStateInterval(nextStart, endTime, strQuark, STR_VAL2),
-                    new TmfStateInterval(nextStart, endTime, customQuark, customVal2)));
+                    new TmfStateInterval(nextStart, endTime, customQuark, (Object) customVal2)));
 
             backend.finishedBuilding(endTime);
 
@@ -399,16 +398,16 @@ public abstract class StateHistoryBackendTestBase {
 
             ITmfStateInterval interval = intervals.get(intQuark);
             assertNotNull(interval);
-            assertEquals("Int value after read", INT_VAL1, interval.getStateValue());
+            assertEquals("Int value after read", INT_VAL1, interval.getValue());
             interval = intervals.get(longQuark);
             assertNotNull(interval);
-            assertEquals("Long value after read", LONG_VAL1, interval.getStateValue());
+            assertEquals("Long value after read", LONG_VAL1, interval.getValue());
             interval = intervals.get(doubleQuark);
             assertNotNull(interval);
-            assertEquals("Double value after read", DOUBLE_VAL1, interval.getStateValue());
+            assertEquals("Double value after read", DOUBLE_VAL1, interval.getValue());
             interval = intervals.get(strQuark);
             assertNotNull(interval);
-            assertEquals("String value after read", STR_VAL1, interval.getStateValue());
+            assertEquals("String value after read", STR_VAL1, interval.getValue());
             /* Custom */
             interval = intervals.get(customQuark);
             assertNotNull(interval);
@@ -419,16 +418,16 @@ public abstract class StateHistoryBackendTestBase {
 
             interval = intervals.get(intQuark);
             assertNotNull(interval);
-            assertEquals("Int value after read", INT_VAL2, interval.getStateValue());
+            assertEquals("Int value after read", INT_VAL2, interval.getValue());
             interval = intervals.get(longQuark);
             assertNotNull(interval);
-            assertEquals("Long value after read", LONG_VAL2, interval.getStateValue());
+            assertEquals("Long value after read", LONG_VAL2, interval.getValue());
             interval = intervals.get(doubleQuark);
             assertNotNull(interval);
-            assertEquals("Double value after read", DOUBLE_VAL2, interval.getStateValue());
+            assertEquals("Double value after read", DOUBLE_VAL2, interval.getValue());
             interval = intervals.get(strQuark);
             assertNotNull(interval);
-            assertEquals("String value after read", STR_VAL2, interval.getStateValue());
+            assertEquals("String value after read", STR_VAL2, interval.getValue());
             /* Custom */
             interval = intervals.get(customQuark);
             assertNotNull(interval);

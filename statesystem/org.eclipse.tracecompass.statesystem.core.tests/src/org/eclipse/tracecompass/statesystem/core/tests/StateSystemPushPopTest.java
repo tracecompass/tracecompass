@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.statesystem.core.tests;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -23,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.statesystem.core.StateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
@@ -34,8 +34,6 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,11 +55,11 @@ public class StateSystemPushPopTest {
 
     /* State values that will be used */
     //private final static ITmfStateValue nullValue = TmfStateValue.nullValue();
-    private final static @NonNull ITmfStateValue value1 = TmfStateValue.newValueString("A");
-    private final static @NonNull ITmfStateValue value2 = TmfStateValue.newValueInt(10);
-    private final static @NonNull ITmfStateValue value3 = TmfStateValue.nullValue();
-    private final static @NonNull ITmfStateValue value4 = TmfStateValue.newValueString("D");
-    private final static @NonNull ITmfStateValue value5 = TmfStateValue.newValueLong(Long.MAX_VALUE);
+    private final static String value1 = "A";
+    private final static int value2 = 10;
+    private final static Object  value3 = null;
+    private final static String value4 = "D";
+    private final static long value5 = Long.MAX_VALUE;
 
     /**
      * Initialization. We run the checks for the return values of
@@ -80,7 +78,7 @@ public class StateSystemPushPopTest {
     @Before
     public void setUp() throws IOException, TimeRangeException,
             AttributeNotFoundException, StateValueTypeException {
-        ITmfStateValue value;
+        Object value;
         testHtFile = File.createTempFile("test", ".ht");
 
         IStateHistoryBackend backend = StateHistoryBackendFactory.createHistoryTreeBackendNewFile(
@@ -96,36 +94,36 @@ public class StateSystemPushPopTest {
         ss.pushAttribute( 8, value4, attrib);
         ss.pushAttribute(10, value5, attrib);
 
-        value = ss.popAttribute(11, attrib);
+        value = ss.popAttributeObject(11, attrib);
         assertEquals(value5, value);
 
-        value = ss.popAttribute(12, attrib);
+        value = ss.popAttributeObject(12, attrib);
         assertEquals(value4, value);
 
-        value = ss.popAttribute(14, attrib);
+        value = ss.popAttributeObject(14, attrib);
         assertEquals(value3, value);
 
-        value = ss.popAttribute(16, attrib);
+        value = ss.popAttributeObject(16, attrib);
         assertEquals(value2, value);
 
-        value = ss.popAttribute(17, attrib);
+        value = ss.popAttributeObject(17, attrib);
         assertEquals(value1, value);
 
-        value = ss.popAttribute(20, attrib);
+        value = ss.popAttributeObject(20, attrib);
         assertEquals(null, value); // Stack should already be empty here.
 
         ss.pushAttribute(21, value1, attrib);
         //ss.pushAttribute(22, value1, attrib); //FIXME pushing twice the same value bugs out atm
         ss.pushAttribute(22, value2, attrib);
 
-        value = ss.popAttribute(24, attrib);
+        value = ss.popAttributeObject(24, attrib);
         //assertEquals(value1, value);
         assertEquals(value2, value);
 
-        value = ss.popAttribute(26, attrib);
+        value = ss.popAttributeObject(26, attrib);
         assertEquals(value1, value);
 
-        value = ss.popAttribute(28, attrib);
+        value = ss.popAttributeObject(28, attrib);
         assertEquals(null, value); // Stack should already be empty here.
 
         ss.closeHistory(30);
@@ -180,13 +178,13 @@ public class StateSystemPushPopTest {
 
             /* Go retrieve the user values manually */
             interval = ss.querySingleState(10, subAttribute1);
-            assertEquals(value1, interval.getStateValue()); //
+            assertEquals(value1, interval.getValue()); //
 
             interval = ss.querySingleState(22, subAttribute2);
-            assertEquals(value2, interval.getStateValue());
+            assertEquals(value2, interval.getValue());
 
             interval = ss.querySingleState(25, subAttribute2);
-            assertTrue(interval.getStateValue().isNull()); // Stack depth is 1 at that point.
+            assertNull(interval.getValue()); // Stack depth is 1 at that point.
 
         } catch (AttributeNotFoundException | TimeRangeException | StateSystemDisposedException e) {
             fail(errMsg + e.toString());
@@ -204,23 +202,23 @@ public class StateSystemPushPopTest {
         try {
             ITmfStateInterval interval = StateSystemUtils.querySingleStackTop(ss2, 10, attribute);
             assertNotNull(interval);
-            assertEquals(value5, interval.getStateValue());
+            assertEquals(value5, interval.getValue());
 
             interval = StateSystemUtils.querySingleStackTop(ss2, 9, attribute);
             assertNotNull(interval);
-            assertEquals(value4, interval.getStateValue());
+            assertEquals(value4, interval.getValue());
 
             interval = StateSystemUtils.querySingleStackTop(ss2, 13, attribute);
             assertNotNull(interval);
-            assertEquals(value3, interval.getStateValue());
+            assertEquals(value3, interval.getValue());
 
             interval = StateSystemUtils.querySingleStackTop(ss2, 16, attribute);
             assertNotNull(interval);
-            assertEquals(value1, interval.getStateValue());
+            assertEquals(value1, interval.getValue());
 
             interval = StateSystemUtils.querySingleStackTop(ss2, 25, attribute);
             assertNotNull(interval);
-            assertEquals(value1, interval.getStateValue());
+            assertEquals(value1, interval.getValue());
 
         } catch (AttributeNotFoundException | TimeRangeException | StateSystemDisposedException e) {
             fail(errMsg + e.toString());
@@ -274,10 +272,10 @@ public class StateSystemPushPopTest {
             /* Stack depth = 5 */
             state = ss.queryFullState(10);
             assertEquals(5, state.get(attribute).getStateValue().unboxInt());
-            assertEquals(value1, state.get(subAttrib1).getStateValue());
-            assertEquals(value2, state.get(subAttrib2).getStateValue());
-            assertEquals(value3, state.get(subAttrib3).getStateValue());
-            assertEquals(value4, state.get(subAttrib4).getStateValue());
+            assertEquals(value1, state.get(subAttrib1).getValue());
+            assertEquals(value2, state.get(subAttrib2).getValue());
+            assertEquals(value3, state.get(subAttrib3).getValue());
+            assertEquals(value4, state.get(subAttrib4).getValue());
 
             /* Stack is empty */
             state = ss.queryFullState(18);
@@ -290,10 +288,10 @@ public class StateSystemPushPopTest {
             /* Stack depth = 1 */
             state = ss.queryFullState(21);
             assertEquals(1, state.get(attribute).getStateValue().unboxInt());
-            assertEquals(value1, state.get(subAttrib1).getStateValue());
-            assertTrue(state.get(subAttrib2).getStateValue().isNull());
-            assertTrue(state.get(subAttrib3).getStateValue().isNull());
-            assertTrue(state.get(subAttrib4).getStateValue().isNull());
+            assertEquals(value1, state.get(subAttrib1).getValue());
+            assertNull(state.get(subAttrib2).getValue());
+            assertNull(state.get(subAttrib3).getValue());
+            assertNull(state.get(subAttrib4).getValue());
 
         } catch (AttributeNotFoundException | TimeRangeException | StateSystemDisposedException e) {
             fail(errMsg + e.toString());

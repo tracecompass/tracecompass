@@ -96,4 +96,9 @@ final class StringStateValue extends TmfStateValue {
 
     }
 
+    @Override
+    public @Nullable Object unboxValue() {
+        return value;
+    }
+
 }

@@ -29,7 +29,6 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 
 /**
  * Provide utility methods for the state system
@@ -74,13 +73,16 @@ public final class StateSystemUtils {
     public static @Nullable ITmfStateInterval querySingleStackTop(ITmfStateSystem ss,
             long t, int stackAttributeQuark)
             throws AttributeNotFoundException, StateSystemDisposedException {
-        ITmfStateValue curStackStateValue = ss.querySingleState(t, stackAttributeQuark).getStateValue();
+        @Nullable Object curStackStateValue = ss.querySingleState(t, stackAttributeQuark).getValue();
 
-        if (curStackStateValue.isNull()) {
+        if (curStackStateValue == null) {
             /* There is nothing stored in this stack at this moment */
             return null;
         }
-        int curStackDepth = curStackStateValue.unboxInt();
+        if (!(curStackStateValue instanceof Integer)) {
+            throw new IllegalStateException(ss.getSSID() + "Quark: " + stackAttributeQuark + ", expected Integer.class, value was " + curStackStateValue.getClass()); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        int curStackDepth = (int) curStackStateValue;
         if (curStackDepth <= 0) {
             /*
              * This attribute is an integer attribute, but it doesn't seem like
@@ -269,9 +271,9 @@ public final class StateSystemUtils {
         try {
             while (current < t2) {
                 ITmfStateInterval currentInterval = ss.querySingleState(current, attributeQuark);
-                ITmfStateValue value = currentInterval.getStateValue();
+                @Nullable Object value = currentInterval.getValue();
 
-                if (!value.isNull()) {
+                if (value != null) {
                     return currentInterval;
                 }
                 current = currentInterval.getEndTime() + 1;

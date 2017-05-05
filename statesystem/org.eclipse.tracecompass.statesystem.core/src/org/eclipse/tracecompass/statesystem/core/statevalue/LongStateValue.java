@@ -94,4 +94,9 @@ final class LongStateValue extends TmfStateValue {
 
     }
 
+    @Override
+    public @Nullable Object unboxValue() {
+        return value;
+    }
+
 }

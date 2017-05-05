@@ -30,7 +30,6 @@ import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.In
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 import com.google.common.collect.Iterables;
 
@@ -545,7 +544,7 @@ public abstract class HTNode {
          * 't'. We search for a dummy interval from [Long.MIN_VALUE, t], which
          * will return the first interval that ends with a time >= t.
          */
-        HTInterval dummy = new HTInterval(Long.MIN_VALUE, t, 0, TmfStateValue.nullValue());
+        HTInterval dummy = new HTInterval(Long.MIN_VALUE, t, 0, null);
         int index = Collections.binarySearch(fIntervals, dummy, NODE_ORDER);
 
         /* Handle negative binarySearch return */

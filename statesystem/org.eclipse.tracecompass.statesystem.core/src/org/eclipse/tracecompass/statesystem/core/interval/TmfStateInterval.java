@@ -14,7 +14,9 @@ package org.eclipse.tracecompass.statesystem.core.interval;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 /**
  * The StateInterval represents the "state" a particular attribute was in, at a
@@ -25,10 +27,10 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
  */
 public final class TmfStateInterval implements ITmfStateInterval {
 
-    private final long start;
-    private final long end;
-    private final int attribute;
-    private final @NonNull ITmfStateValue sv;
+    private final long fStart;
+    private final long fEnd;
+    private final int fAttribute;
+    private final Object fValue;
 
     /**
      * Construct an interval from its given parameters
@@ -42,38 +44,59 @@ public final class TmfStateInterval implements ITmfStateInterval {
      * @param sv
      *            State value this interval will contain
      */
+    @Deprecated
     public TmfStateInterval(long start, long end, int attribute,
             @NonNull ITmfStateValue sv) {
-        this.start = start;
-        this.end = end;
-        this.attribute = attribute;
-        this.sv = sv;
+        fStart = start;
+        fEnd = end;
+        fAttribute = attribute;
+        fValue = sv.unboxValue();
+    }
+
+    /**
+    * Construct an interval from its given parameters
+    *
+    * @param start
+    *            Start time
+    * @param end
+    *            End time
+    * @param attribute
+    *            Attribute linked to this interval
+    * @param value
+    *            {@link Object} this interval will contain
+     * @since 2.3
+    */
+   public TmfStateInterval(long start, long end, int attribute, @Nullable Object value) {
+        fStart = start;
+        fEnd = end;
+        fAttribute = attribute;
+        fValue = value;
     }
 
     @Override
     public long getStartTime() {
-        return start;
+        return fStart;
     }
 
     @Override
     public long getEndTime() {
-        return end;
+        return fEnd;
     }
 
     @Override
     public int getAttribute() {
-        return attribute;
+        return fAttribute;
     }
 
     @Override
     public ITmfStateValue getStateValue() {
-        return sv;
+        return TmfStateValue.newValue(fValue);
     }
 
     @Override
     public boolean intersects(long timestamp) {
-        if (start <= timestamp) {
-            if (end >= timestamp) {
+        if (fStart <= timestamp) {
+            if (fEnd >= timestamp) {
                 return true;
             }
         }
@@ -84,10 +107,10 @@ public final class TmfStateInterval implements ITmfStateInterval {
     public String toString() {
         /* Only used for debugging */
         return new ToStringBuilder(this)
-            .append("start", start) //$NON-NLS-1$
-            .append("end", end) //$NON-NLS-1$
-            .append("key", attribute) //$NON-NLS-1$
-            .append("value", sv.toString()) //$NON-NLS-1$
+            .append("start", fStart) //$NON-NLS-1$
+            .append("end", fEnd) //$NON-NLS-1$
+            .append("key", fAttribute) //$NON-NLS-1$
+            .append("value", fValue.toString()) //$NON-NLS-1$
             .toString();
     }
 

@@ -19,7 +19,9 @@ import java.util.Comparator;
  * even values), so separate comparators are provided.
  *
  * @author Alexandre Montplaisir
+ * @deprecated Use {@code Comparator.comparingLong(ITmfStateInterval::getEndTime)} instead.
  */
+@Deprecated
 public class TmfIntervalEndComparator implements Comparator<ITmfStateInterval> {
 
     @Override

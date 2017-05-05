@@ -64,10 +64,22 @@ public class NullBackend implements IStateHistoryBackend {
 
     /**
      * The interval will be discarded when using a null backend.
+     * @deprecated use insertPastState(long stateStartTime, long stateEndTime,
+            int quark, Object value) instead
      */
+    @Deprecated
     @Override
     public void insertPastState(long stateStartTime, long stateEndTime,
             int quark, ITmfStateValue value) {
+        /* The interval is always discarded. */
+    }
+
+    /**
+     * The interval will be discarded when using a null backend.
+     */
+    @Override
+    public void insertPastState(long stateStartTime, long stateEndTime,
+            int quark, Object value) {
         /* The interval is always discarded. */
     }
 

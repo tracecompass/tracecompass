@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -30,9 +31,6 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 /**
  * The Transient State is used to build intervals from punctual state changes.
@@ -58,9 +56,9 @@ public class TransientState {
     private volatile long fLatestTime;
 
     /* A method accessing these arrays will have to go through the lock */
-    private List<ITmfStateValue> fOngoingStateInfo;
+    private List<@Nullable Object> fOngoingStateInfo;
     private List<Long> fOngoingStateStartTimes;
-    private List<Type> fStateValueTypes;
+    private List<@Nullable Class<?>> fStateValueTypes;
 
     /**
      * Constructor
@@ -96,7 +94,7 @@ public class TransientState {
      * @throws IndexOutOfBoundsException
      *             If the quark is out of range
      */
-    public ITmfStateValue getOngoingStateValue(int quark) {
+    public @Nullable Object getOngoingStateValue(int quark) {
         fRWLock.readLock().lock();
         try {
             return fOngoingStateInfo.get(quark);
@@ -134,7 +132,7 @@ public class TransientState {
      * @throws IndexOutOfBoundsException
      *             If the quark is out of range
      */
-    public void changeOngoingStateValue(int quark, ITmfStateValue newValue) {
+    public void changeOngoingStateValue(int quark, Object newValue) {
         fRWLock.writeLock().lock();
         try {
             fOngoingStateInfo.set(quark, newValue);
@@ -212,9 +210,11 @@ public class TransientState {
             fStateValueTypes = new ArrayList<>(size);
 
             for (ITmfStateInterval interval : newStateIntervals) {
-                fOngoingStateInfo.add(interval.getStateValue());
+                Object value = interval.getValue();
+                fOngoingStateInfo.add(value);
                 fOngoingStateStartTimes.add(interval.getStartTime());
-                fStateValueTypes.add(interval.getStateValue().getType());
+                Class<?> objectClass = value != null ? value.getClass() : null;
+                fStateValueTypes.add(objectClass);
             }
         } finally {
             fRWLock.writeLock().unlock();
@@ -235,8 +235,8 @@ public class TransientState {
              * covering for all timestamps). A null interval will then get added
              * at the first state change.
              */
-            fOngoingStateInfo.add(TmfStateValue.nullValue());
-            fStateValueTypes.add(Type.NULL);
+            fOngoingStateInfo.add(null);
+            fStateValueTypes.add(null);
 
             fOngoingStateStartTimes.add(fBackend.getStartTime());
         } finally {
@@ -261,7 +261,7 @@ public class TransientState {
      *             If the state value to be inserted is of a different type of
      *             what was inserted so far for this attribute.
      */
-    public void processStateChange(long eventTime, ITmfStateValue value, int quark)
+    public void processStateChange(long eventTime, @Nullable Object value, int quark)
             throws TimeRangeException, StateValueTypeException {
         if (!this.fIsActive) {
             return;
@@ -269,28 +269,28 @@ public class TransientState {
 
         fRWLock.writeLock().lock();
         try {
-            Type expectedSvType = fStateValueTypes.get(quark);
+            Class<?> expectedSvType = fStateValueTypes.get(quark);
 
             /*
              * Make sure the state value type we're inserting is the same as the
              * one registered for this attribute.
              */
-            if (expectedSvType == Type.NULL) {
+            if (expectedSvType == null) {
                 /*
                  * The value hasn't been used yet, set it to the value we're
                  * currently inserting (which might be null/-1 again).
                  */
-                fStateValueTypes.set(quark, value.getType());
-            } else if ((value.getType() != Type.NULL) && (value.getType() != expectedSvType)) {
+                fStateValueTypes.set(quark, value != null ? value.getClass() : null);
+            } else if ((value != null) && (value.getClass() != expectedSvType)) {
                 /*
                  * We authorize inserting null values in any type of attribute,
                  * but for every other types, it needs to match our
                  * expectations!
                  */
-                throw new StateValueTypeException(fBackend.getSSID() + " Quark:" + quark + ", Type:" + value.getType() + ", Expected:" + expectedSvType); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                throw new StateValueTypeException(fBackend.getSSID() + " Quark:" + quark + ", Type:" + value.getClass() + ", Expected:" + expectedSvType); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
 
-            if (fOngoingStateInfo.get(quark).equals(value)) {
+            if (Objects.equals(fOngoingStateInfo.get(quark),value)) {
                 /*
                  * This is the case where the new value and the one already
                  * present in the Builder are the same. We do not need to create
@@ -473,7 +473,7 @@ public class TransientState {
         writer.println("\nAttribute\tStateValue\tValid since time"); //$NON-NLS-1$
         for (int i = 0; i < fOngoingStateInfo.size(); i++) {
             writer.format("%d\t\t", i); //$NON-NLS-1$
-            writer.print(fOngoingStateInfo.get(i).toString() + "\t\t"); //$NON-NLS-1$
+            writer.print(String.valueOf(fOngoingStateInfo.get(i)) + "\t\t"); //$NON-NLS-1$
             writer.println(fOngoingStateStartTimes.get(i).toString());
         }
         writer.println('\n');

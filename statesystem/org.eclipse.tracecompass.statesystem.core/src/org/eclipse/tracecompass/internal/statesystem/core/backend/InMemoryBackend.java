@@ -30,7 +30,6 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 import com.google.common.collect.Iterables;
 
@@ -91,9 +90,16 @@ public class InMemoryBackend implements IStateHistoryBackend {
         return latestTime;
     }
 
+    @Deprecated
     @Override
     public void insertPastState(long stateStartTime, long stateEndTime,
             int quark, ITmfStateValue value) throws TimeRangeException {
+        insertPastState(stateStartTime, stateEndTime, quark, value.unboxValue());
+    }
+
+    @Override
+    public void insertPastState(long stateStartTime, long stateEndTime,
+            int quark, Object value) throws TimeRangeException {
         /* Make sure the passed start/end times make sense */
         if (stateStartTime > stateEndTime || stateStartTime < startTime) {
             throw new TimeRangeException(ssid + " Interval Start:" + stateStartTime + ", Interval End:" + stateEndTime + ", Backend Start:" + startTime); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -202,7 +208,7 @@ public class InMemoryBackend implements IStateHistoryBackend {
     }
 
     private static Iterable<@NonNull ITmfStateInterval> searchforEndTime(NavigableSet<@NonNull ITmfStateInterval> tree, int quark, long time) {
-        ITmfStateInterval dummyInterval = new TmfStateInterval(-1, time, quark, TmfStateValue.nullValue());
+        ITmfStateInterval dummyInterval = new TmfStateInterval(-1, time, quark, (Object) null);
         return tree.tailSet(dummyInterval);
     }
 

@@ -31,7 +31,6 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundExc
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,8 +59,8 @@ public class StateSystemUtilsTest {
             fStateSystem = StateSystemFactory.newStateSystem(backend);
             int quark = fStateSystem.getQuarkAbsoluteAndAdd(DUMMY_STRING);
 
-            fStateSystem.modifyAttribute(1200L, TmfStateValue.newValueInt(10), quark);
-            fStateSystem.modifyAttribute(1500L, TmfStateValue.newValueInt(20), quark);
+            fStateSystem.modifyAttribute(1200L, 10, quark);
+            fStateSystem.modifyAttribute(1500L, 20, quark);
             fStateSystem.closeHistory(2000L);
         } catch (StateValueTypeException e) {
             fail(e.getMessage());
@@ -211,8 +210,8 @@ public class StateSystemUtilsTest {
             ITmfStateSystemBuilder ss = StateSystemFactory.newStateSystem(backend);
             int quark = ss.getQuarkAbsoluteAndAdd(DUMMY_STRING);
 
-            ss.modifyAttribute(1200L, TmfStateValue.newValueInt(10), quark);
-            ss.modifyAttribute(1500L, TmfStateValue.newValueInt(20), quark);
+            ss.modifyAttribute(1200L, 10, quark);
+            ss.modifyAttribute(1500L, 20, quark);
 
             /* We should have 2 intervals if we iterate at this point */
             QuarkIterator iterator = new QuarkIterator(ss, quark, 0);

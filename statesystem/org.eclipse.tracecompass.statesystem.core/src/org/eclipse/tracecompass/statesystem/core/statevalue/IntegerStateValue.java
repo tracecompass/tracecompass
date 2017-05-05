@@ -100,4 +100,9 @@ final class IntegerStateValue extends TmfStateValue {
 
     }
 
+    @Override
+    public @Nullable Object unboxValue() {
+        return value;
+    }
+
 }

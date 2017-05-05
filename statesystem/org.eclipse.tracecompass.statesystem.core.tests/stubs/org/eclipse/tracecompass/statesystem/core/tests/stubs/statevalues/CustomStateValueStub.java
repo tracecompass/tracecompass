@@ -125,4 +125,9 @@ public class CustomStateValueStub extends CustomStateValue {
         return Integer.BYTES + SafeByteBufferFactory.getStringSizeInBuffer(fStringField);
     }
 
+    @Override
+    public @Nullable Object unboxValue() {
+        return this;
+    }
+
 }

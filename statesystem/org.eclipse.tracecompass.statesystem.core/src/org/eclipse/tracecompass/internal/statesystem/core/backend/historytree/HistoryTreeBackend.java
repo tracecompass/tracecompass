@@ -35,7 +35,6 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
@@ -220,11 +219,18 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         return getSHT().getTreeEnd();
     }
 
+    @Deprecated
     @Override
     public void insertPastState(long stateStartTime, long stateEndTime,
             int quark, ITmfStateValue value) throws TimeRangeException {
+        insertPastState(stateStartTime, stateEndTime, quark, value.unboxValue());
+    }
+
+    @Override
+    public void insertPastState(long stateStartTime, long stateEndTime,
+            int quark, Object value) throws TimeRangeException {
         HTInterval interval = new HTInterval(stateStartTime, stateEndTime,
-                quark, (TmfStateValue) value);
+                quark, value);
 
         /* Start insertions at the "latest leaf" */
         getSHT().insertInterval(interval);

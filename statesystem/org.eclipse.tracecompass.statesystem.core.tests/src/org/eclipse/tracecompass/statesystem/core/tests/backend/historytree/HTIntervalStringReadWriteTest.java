@@ -27,7 +27,6 @@ import java.util.stream.IntStream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -132,17 +131,16 @@ public class HTIntervalStringReadWriteTest {
         assertEquals(fNbChars, str.length());
         assertEquals(fNbChars * fCharLength, str.getBytes(CHARSET).length);
 
-        TmfStateValue value = TmfStateValue.newValueString(str);
         if (fNbChars * fCharLength > Short.MAX_VALUE) {
             /* For sizes that are known to be too long, expect an exception */
             try {
-                new HTInterval(0, 10, 1, value);
+                new HTInterval(0, 10, 1, str);
             } catch (IllegalArgumentException e) {
                 return;
             }
             fail();
         }
-        HTInterval interval = new HTInterval(0, 10, 1, value);
+        HTInterval interval = new HTInterval(0, 10, 1, str);
         writeAndReadInterval(interval);
     }
 

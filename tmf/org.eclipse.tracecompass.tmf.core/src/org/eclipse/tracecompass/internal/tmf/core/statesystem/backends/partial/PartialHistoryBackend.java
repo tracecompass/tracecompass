@@ -12,7 +12,6 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNullContents;
 
 import java.io.File;
@@ -150,9 +149,16 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
         return fLatestTime;
     }
 
+    @Deprecated
+    @Override
+    public void insertPastState(long stateStartTime, long stateEndTime, int quark,
+            @NonNull ITmfStateValue value) throws TimeRangeException {
+        insertPastState(stateStartTime, stateEndTime, quark, value.unboxValue());
+    }
+
     @Override
     public void insertPastState(long stateStartTime, long stateEndTime,
-            int quark, ITmfStateValue value) throws TimeRangeException {
+            int quark, Object value) throws TimeRangeException {
         waitForCheckpoints();
 
         /* Update the latest time */
@@ -256,9 +262,9 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
         for (int i = 0; i < currentStateInfo.size(); i++) {
             long start = 0;
             start = ((ITmfStateSystem) fPartialSS).getOngoingStartTime(i);
-            ITmfStateValue val = ((ITmfStateSystem) fPartialSS).queryOngoingState(i);
+            @Nullable Object val = ((ITmfStateSystem) fPartialSS).queryOngoing(i);
 
-            ITmfStateInterval interval = new TmfStateInterval(start, t, i, checkNotNull(val));
+            ITmfStateInterval interval = new TmfStateInterval(start, t, i, val);
             currentStateInfo.set(i, interval);
         }
 

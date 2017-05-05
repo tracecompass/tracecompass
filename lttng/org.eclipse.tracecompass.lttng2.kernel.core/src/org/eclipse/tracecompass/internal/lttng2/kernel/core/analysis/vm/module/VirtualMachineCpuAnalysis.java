@@ -205,7 +205,7 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
                         }
                         Integer threadOnCpu = KernelThreadInformationProvider.getThreadOnCpu(kernelModule, virtualCPU, cpuInterval.getStartTime());
                         if (threadOnCpu != null) {
-                            map.put(threadOnCpu, new TmfStateInterval(cpuInterval.getStartTime(), cpuInterval.getEndTime(), threadOnCpu, VCPU_PREEMPT_VALUE));
+                            map.put(threadOnCpu, new TmfStateInterval(cpuInterval.getStartTime(), cpuInterval.getEndTime(), threadOnCpu, VcpuStateValues.VCPU_PREEMPT));
                         }
                     }
                 }

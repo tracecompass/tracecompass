@@ -16,6 +16,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 /**
  * This is the external interface to build or modify an existing state history.
@@ -132,6 +133,55 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
             throws StateValueTypeException;
 
     /**
+     * Basic attribute modification method, we simply specify a new value, for a
+     * given attribute, effective at the given timestamp.
+     *
+     * @param t
+     *            Timestamp of the state change
+     * @param value
+     *            The State Value we want to assign to the attribute
+     * @param attributeQuark
+     *            Integer value of the quark corresponding to the attribute we
+     *            want to modify
+     * @throws TimeRangeException
+     *             If the requested time is outside of the trace's range
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
+     * @throws StateValueTypeException
+     *             If the inserted state value's type does not match what is
+     *             already assigned to this attribute.
+     * @since 3.0
+     */
+    default void modifyAttribute(long t, Object value, int attributeQuark)
+            throws StateValueTypeException {
+        modifyAttribute(t, TmfStateValue.newValue(value), attributeQuark);
+    }
+
+    /**
+     * Increment attribute method. Reads the current value of a given integer
+     * attribute (this value is right now in the Transient State), and increment
+     * it by 1. Useful for statistics.
+     *
+     * @param t
+     *            Timestamp of the state change
+     * @param attributeQuark
+     *            Attribute to increment. If it doesn't exist it will be added,
+     *            with a new value of 1.
+     * @throws StateValueTypeException
+     *             If the attribute already exists but is not of type Integer
+     * @throws TimeRangeException
+     *             If the given timestamp is invalid
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
+     * @deprecated Use
+     *             {@link StateSystemBuilderUtils#incrementAttributeInt(ITmfStateSystemBuilder, long, int, int)}
+     *             instead
+     */
+    @Deprecated
+    void incrementAttribute(long t, int attributeQuark)
+            throws StateValueTypeException;
+
+    /**
      * "Push" helper method. This uses the given integer attribute as a stack:
      * The value of that attribute will represent the stack depth (always >= 1).
      * Sub-attributes will be created, their base-name will be the position in
@@ -157,6 +207,34 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
             throws StateValueTypeException;
 
     /**
+     * "Push" helper method. This uses the given integer attribute as a stack:
+     * The value of that attribute will represent the stack depth (always >= 1).
+     * Sub-attributes will be created, their base-name will be the position in
+     * the stack (1, 2, etc.) and their value will be the state value 'value'
+     * that was pushed to this position.
+     *
+     * @param t
+     *            Timestamp of the state change
+     * @param value
+     *            State value to assign to this stack position.
+     * @param attributeQuark
+     *            The base attribute to use as a stack. If it does not exist if
+     *            will be created (with depth = 1)
+     * @throws TimeRangeException
+     *             If the requested timestamp is invalid
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
+     * @throws StateValueTypeException
+     *             If the attribute 'attributeQuark' already exists, but is not
+     *             of integer type.
+     * @since 3.0
+     */
+    default void pushAttribute(long t, Object value, int attributeQuark)
+            throws StateValueTypeException {
+        pushAttribute(t, TmfStateValue.newValue(value), attributeQuark);
+    }
+
+    /**
      * Antagonist of the pushAttribute(), pops the top-most attribute on the
      * stack-attribute. If this brings it back to depth = 0, the attribute is
      * kept with depth = 0. If the value is already 0, or if the attribute
@@ -178,6 +256,32 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      */
     ITmfStateValue popAttribute(long t, int attributeQuark)
             throws StateValueTypeException;
+
+    /**
+     * Antagonist of the pushAttribute(), pops the top-most attribute on the
+     * stack-attribute. If this brings it back to depth = 0, the attribute is
+     * kept with depth = 0. If the value is already 0, or if the attribute
+     * doesn't exist, nothing is done.
+     *
+     * @param t
+     *            Timestamp of the state change
+     * @param attributeQuark
+     *            Quark of the stack-attribute to pop
+     * @return The state value that was popped, or 'null' if nothing was
+     *         actually removed from the stack.
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
+     * @throws TimeRangeException
+     *             If the timestamp is invalid
+     * @throws StateValueTypeException
+     *             If the target attribute already exists, but its state value
+     *             type is invalid (not an integer)
+     * @since 3.0
+     */
+    default Object popAttributeObject(long t, int attributeQuark)
+            throws StateValueTypeException {
+        return popAttribute(t, attributeQuark).unboxValue();
+    }
 
     /**
      * Remove attribute method. Similar to the above modify- methods, with value
