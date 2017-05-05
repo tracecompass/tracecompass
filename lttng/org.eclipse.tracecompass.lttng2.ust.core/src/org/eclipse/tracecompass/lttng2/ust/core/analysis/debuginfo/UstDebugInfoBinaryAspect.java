@@ -34,7 +34,8 @@ public class UstDebugInfoBinaryAspect implements ITmfEventAspect<BinaryCallsite>
     /** Singleton instance */
     public static final UstDebugInfoBinaryAspect INSTANCE = new UstDebugInfoBinaryAspect();
 
-    private UstDebugInfoBinaryAspect() {}
+    private UstDebugInfoBinaryAspect() {
+    }
 
     @Override
     public String getName() {
@@ -59,6 +60,9 @@ public class UstDebugInfoBinaryAspect implements ITmfEventAspect<BinaryCallsite>
         /* We need both the vpid and ip contexts */
         ITmfEventField vpidField = event.getContent().getField(layout.contextVpid());
         ITmfEventField ipField = event.getContent().getField(layout.contextIp());
+        if (ipField == null) {
+            ipField = event.getContent().getField(layout.fieldAddr());
+        }
         if (vpidField == null || ipField == null) {
             return null;
         }
@@ -89,13 +93,12 @@ public class UstDebugInfoBinaryAspect implements ITmfEventAspect<BinaryCallsite>
          * First match the IP to the correct binary or library, by using the
          * UstDebugInfoAnalysis.
          */
-        UstDebugInfoAnalysisModule module =
-                TmfTraceUtils.getAnalysisModuleOfClass(trace,
-                        UstDebugInfoAnalysisModule.class, UstDebugInfoAnalysisModule.ID);
+        UstDebugInfoAnalysisModule module = TmfTraceUtils.getAnalysisModuleOfClass(trace,
+                UstDebugInfoAnalysisModule.class, UstDebugInfoAnalysisModule.ID);
         if (module == null) {
             /*
-             * The analysis is not available for this trace, we won't be
-             * able to find the information.
+             * The analysis is not available for this trace, we won't be able to
+             * find the information.
              */
             return null;
         }
@@ -112,8 +115,8 @@ public class UstDebugInfoBinaryAspect implements ITmfEventAspect<BinaryCallsite>
             offset = ip - file.getBaseAddress();
         } else {
             /*
-             * In the case of the object being non-position-independent, we
-             * must pass the actual 'ip' address directly to addr2line.
+             * In the case of the object being non-position-independent, we must
+             * pass the actual 'ip' address directly to addr2line.
              */
             offset = ip;
         }
