@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2011, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -174,9 +174,9 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
      * Returns a list of trace elements under the folder element, recursively.
      * @return list of trace model elements
      */
-    public List<TmfTraceElement> getTraces() {
+    public List<@NonNull TmfTraceElement> getTraces() {
         List<ITmfProjectModelElement> children = getChildren();
-        List<TmfTraceElement> traces = new ArrayList<>();
+        List<@NonNull TmfTraceElement> traces = new ArrayList<>();
         for (ITmfProjectModelElement child : children) {
             if (child instanceof TmfTraceElement) {
                 traces.add((TmfTraceElement) child);

@@ -153,7 +153,16 @@ public class SelectElementTypeContributionItem extends CompoundContributionItem 
         return list.toArray(new IContributionItem[list.size()]);
     }
 
-    private static void addContributionItem(List<IContributionItem> list,
+    /**
+     * Returns the command id to use for contribution items
+     *
+     * @return the command id
+     */
+    protected String getContributionItemCommandId() {
+        return SELECT_TRACE_TYPE_COMMAND_ID;
+    }
+
+    private void addContributionItem(List<IContributionItem> list,
             String traceTypeId, String label, boolean selected, MenuManager subMenu) {
         Map<String, String> params = new HashMap<>();
         params.put(TYPE_PARAMETER, traceTypeId);
@@ -166,7 +175,7 @@ public class SelectElementTypeContributionItem extends CompoundContributionItem 
         CommandContributionItemParameter param = new CommandContributionItemParameter(
                 PlatformUI.getWorkbench().getActiveWorkbenchWindow(), // serviceLocator
                 "my.parameterid", // id //$NON-NLS-1$
-                SELECT_TRACE_TYPE_COMMAND_ID, // commandId
+                getContributionItemCommandId(), // commandId
                 CommandContributionItem.STYLE_PUSH // style
         );
         param.parameters = params;

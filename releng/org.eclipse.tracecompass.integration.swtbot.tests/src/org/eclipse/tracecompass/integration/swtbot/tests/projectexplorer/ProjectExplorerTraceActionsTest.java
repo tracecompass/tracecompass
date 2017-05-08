@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -142,7 +142,7 @@ public class ProjectExplorerTraceActionsTest {
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
 
-        final List<String> EXPECTED_MENU_LABELS = ImmutableList.of("Open", "Open With", "", "Copy...", "Rename...", "Delete", "", "Delete Supplementary Files...", "", "Export Trace Package...", "", "Select Trace Type...", "", "Apply Time Offset...",
+        final List<String> EXPECTED_MENU_LABELS = ImmutableList.of("Open", "Open As Experiment...", "Open With", "", "Copy...", "Rename...", "Delete", "", "Delete Supplementary Files...", "", "Export Trace Package...", "", "Select Trace Type...", "", "Apply Time Offset...",
                 "Clear Time Offset", "", "Refresh");
         List<String> menuItems = traceItem.contextMenu().menuItems();
         assertEquals(EXPECTED_MENU_LABELS, menuItems);

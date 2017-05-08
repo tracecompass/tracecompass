@@ -235,6 +235,7 @@ public class ProjectExplorerTracesFolderTest {
 
         final List<String> EXPECTED_MENU_LABELS = ImmutableList.of(
                 "Open Trace...",
+                "Open As Experiment...",
                 "",
                 "Import...",
                 "",

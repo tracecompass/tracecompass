@@ -482,7 +482,7 @@ When opening a trace or experiment, all currently opened views which are relevan
 
 If a trace resource is a file (and not a directory), then the '''Open With''' menu item is available in the context-sensitive menu and can be used to open the trace source file with any applicable internal or external editor. In that case the trace will not be processed by the tracing application.
 
-=== Creating a Experiment ===
+=== Creating an Experiment ===
 
 An experiment consists in an arbitrary number of aggregated traces for purpose of correlation. In the degenerate case, an experiment can consist of a single trace. The experiment provides a unified, time-ordered stream of the individual trace events.
 
@@ -509,6 +509,14 @@ Now the selected traces will be linked to the experiment and will be shown under
 [[Image:images/ExplorerWithExperiment.png]]
 
 Alternatively, traces can be added to an experiment using [[#Drag_and_Drop | Drag and Drop]].
+
+=== Creating an Experiment from Selection ===
+
+An experiment can be quickly created and opened automatically by selecting one or more traces and/or trace folders in the '''Project Explorer''' view, and then selecting the '''Open as Experiment...''' context menu. A sub-menu with the available experiment types is opened. Select the desired experiment type from the sub-menu. All selected traces and traces recursively found in selected trace folders will be added to the experiment.
+
+If a single trace or trace folder is selected, its name will be used for the experiment, otherwise a default name will be used, possibly appended with a number to avoid name clashes.
+
+If an experiment with the same name and traces already exists, it will be reopened (or selected if it is already opened). Otherwise, a new experiment will be created and opened.
 
 === Removing Traces from an Experiment ===
 
@@ -3766,7 +3774,7 @@ To better understand what is happening in such an environment, it is necessary t
 
 A trace has to be taken for each machine, guest and host, in the virtualized environment. The host trace is the most important to have, as missing guests will only give an incomplete view of the system, but missing hosts usually won't allow to identify the hypervisor, nor determine when a guest is preempted from the host CPUs. The virtual machine analysis only makes sense if the host trace is available.
 
-Once all the traces are imported in Trace Compass, they can be [[#Creating a Experiment | added to an experiment]]. The type of the experiment should by set to '''Virtual Machine Experiment''' by clicking on the right mouse button over the experiment name, then selecting '''Select Experiment Type...'''.
+Once all the traces are imported in Trace Compass, they can be [[#Creating an Experiment | added to an experiment]]. The type of the experiment should by set to '''Virtual Machine Experiment''' by clicking on the right mouse button over the experiment name, then selecting '''Select Experiment Type...'''.
 
 [[Image:images/vmAnalysis/VM_experiment.png | Virtual Machine Experiment]]
 

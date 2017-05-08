@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,8 +15,10 @@ package org.eclipse.tracecompass.internal.tmf.ui.project.handlers;
 import java.util.Iterator;
 
 import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectModelElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 
@@ -34,6 +36,7 @@ public class TracePropertyTester extends PropertyTester {
     private static final String IS_EXPERIMENT_TRACE = "isExperimentTrace"; //$NON-NLS-1$
     private static final String HAS_SUPPLEMENTARY_FILES = "hasSupplementaryFiles"; //$NON-NLS-1$
     private static final String TRACE_TYPE = "traceType"; //$NON-NLS-1$
+    private static final String IS_SAME_PROJECT = "isSameProject"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -106,6 +109,26 @@ public class TracePropertyTester extends PropertyTester {
                 }
             }
             return false;
+        }
+
+        // Check if the selected elements are all in the same project
+        if (IS_SAME_PROJECT.equals(property)) {
+            if (receiver instanceof IStructuredSelection) {
+                IProject sameProject = null;
+                for (Object element : ((IStructuredSelection) receiver).toList()) {
+                    if (element instanceof TmfProjectModelElement) {
+                        IProject project = ((TmfProjectModelElement) element).getProject().getResource();
+                        if (sameProject == null) {
+                            sameProject = project;
+                        } else if (!sameProject.equals(project)) {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                }
+                return true;
+            }
         }
 
         return false;

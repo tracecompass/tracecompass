@@ -393,6 +393,49 @@
                </with>
             </visibleWhen>
          </command>
+         <menu
+               label="%command.open_as_experiment"
+               mnemonic="%command.open_as_experiment.mnemonic"
+               tooltip="%command.open_as_experiment.description">
+            <dynamic
+                  class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.OpenAsExperimentContributionItem"
+                  id="org.eclipse.tracecompass.tmf.ui.command.open_as_experiment.dynamic">
+            </dynamic>
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <and>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.linuxtools.tmf.ui.isSameProject">
+                     </test>
+                     <or>
+                        <iterate
+                              ifEmpty="false"
+                              operator="and">
+                           <or>
+                              <instanceof
+                                    value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
+                              </instanceof>
+                              <and>
+                                 <instanceof
+                                       value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
+                                 </instanceof>
+                                 <not>
+                                    <test
+                                          forcePluginActivation="true"
+                                          property="org.eclipse.linuxtools.tmf.ui.isExperimentTrace">
+                                    </test>
+                                 </not>
+                              </and>
+                           </or>
+                        </iterate>
+                     </or>
+                  </and>
+               </with>
+            </visibleWhen>
+         </menu>
       </menuContribution>
       <menuContribution
             locationURI="popup:org.eclipse.ui.popup.any?after=additions">
@@ -1207,6 +1250,18 @@
             name="%command.OpenFile.name">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.file"
+            defaultHandler="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.OpenAsExperimentHandler"
+            description="%command.open_as_experiment.description"
+            id="org.eclipse.tracecompass.tmf.ui.command.open_as_experiment"
+            name="%command.open_as_experiment">
+         <commandParameter
+               id="org.eclipse.linuxtools.tmf.ui.commandparameter.select_trace_type.type"
+               name="%command.select_trace_type.type"
+               optional="false">
+         </commandParameter>
+      </command>
+      <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
             description="%command.offset_traces.description"
             id="org.eclipse.linuxtools.tmf.ui.command.offset_traces"
@@ -1845,6 +1900,13 @@
             namespace="org.eclipse.linuxtools.tmf.ui"
             properties="isExperimentTrace,hasSupplementaryFiles,traceType"
             type="org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectModelElement">
+      </propertyTester>
+      <propertyTester
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.TracePropertyTester"
+            id="org.eclipse.linuxtools.tmf.ui.tracePropertyTester"
+            namespace="org.eclipse.linuxtools.tmf.ui"
+            properties="isSameProject"
+            type="org.eclipse.jface.viewers.ISelection">
       </propertyTester>
       <propertyTester
             class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.EditorInputPropertyTester"
