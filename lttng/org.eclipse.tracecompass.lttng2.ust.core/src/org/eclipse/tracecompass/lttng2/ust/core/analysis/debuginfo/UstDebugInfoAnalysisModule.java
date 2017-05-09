@@ -67,7 +67,7 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
     }
 
     /**
-     * @since 2.2
+     * @since 3.0
      */
     @Override
     @Nullable

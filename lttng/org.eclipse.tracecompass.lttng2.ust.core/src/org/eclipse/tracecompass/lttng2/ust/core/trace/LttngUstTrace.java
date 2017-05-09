@@ -88,7 +88,7 @@ public class LttngUstTrace extends CtfTmfTrace {
      *
      * @param factory
      *            The event factory for this specific trace
-     * @since 2.2
+     * @since 3.0
      */
     protected LttngUstTrace(@NonNull CtfTmfEventFactory factory) {
         super(factory);

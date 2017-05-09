@@ -66,7 +66,7 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
     }
 
     /**
-     * @since 2.2
+     * @since 3.0
      */
     @Override
     public LttngUstTrace getTrace() {
