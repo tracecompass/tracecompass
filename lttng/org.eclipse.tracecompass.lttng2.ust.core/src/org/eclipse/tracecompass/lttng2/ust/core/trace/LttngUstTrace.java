@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.Activator;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.DefaultUstEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst20EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst27EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst28EventLayout;
@@ -121,8 +122,8 @@ public class LttngUstTrace extends CtfTmfTrace {
             }
         }
 
-        /* Fallback to the UST 2.0 layout and hope for the best */
-        return LttngUst20EventLayout.getInstance();
+        /* Fallback to the Default layout and hope for the best */
+        return DefaultUstEventLayout.getInstance();
     }
 
     @Override
