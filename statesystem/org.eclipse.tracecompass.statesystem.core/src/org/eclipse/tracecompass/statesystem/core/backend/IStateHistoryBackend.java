@@ -194,7 +194,7 @@ public interface IStateHistoryBackend {
      * @return An un-ordered iterable over the queried intervals
      * @throws TimeRangeException
      *             if the time bounds are outside the range of the HistoryTree
-     * @since 2.3
+     * @since 3.0
      */
     default Iterable<@NonNull ITmfStateInterval> query2D(IntegerRangeCondition quarkCondition, TimeRangeCondition timeCondition)
             throws TimeRangeException {

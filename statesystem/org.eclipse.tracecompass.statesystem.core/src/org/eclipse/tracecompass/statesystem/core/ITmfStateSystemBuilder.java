@@ -31,6 +31,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
  * @author Alexandre Montplaisir
  * @noimplement Only the internal StateSystem class should implement this
  *              interface.
+ * @since 3.0
  */
 public interface ITmfStateSystemBuilder extends ITmfStateSystem {
 
@@ -128,30 +129,6 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *             already assigned to this attribute.
      */
     void modifyAttribute(long t, @NonNull ITmfStateValue value, int attributeQuark)
-            throws StateValueTypeException;
-
-    /**
-     * Increment attribute method. Reads the current value of a given integer
-     * attribute (this value is right now in the Transient State), and increment
-     * it by 1. Useful for statistics.
-     *
-     * @param t
-     *            Timestamp of the state change
-     * @param attributeQuark
-     *            Attribute to increment. If it doesn't exist it will be added,
-     *            with a new value of 1.
-     * @throws StateValueTypeException
-     *             If the attribute already exists but is not of type Integer
-     * @throws TimeRangeException
-     *             If the given timestamp is invalid
-     * @throws IndexOutOfBoundsException
-     *             If the attribute quark is out of range
-     * @deprecated Use
-     *             {@link StateSystemBuilderUtils#incrementAttributeInt(ITmfStateSystemBuilder, long, int, int)}
-     *             instead
-     */
-    @Deprecated
-    void incrementAttribute(long t, int attributeQuark)
             throws StateValueTypeException;
 
     /**

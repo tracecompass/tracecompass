@@ -456,7 +456,7 @@ public interface ITmfStateSystem {
      *             the number of attributes.
      * @throws TimeRangeException
      *             If the smallest time is before the state system start time.
-     * @since 2.3
+     * @since 3.0
      */
     Iterable<@NonNull ITmfStateInterval> query2D(@NonNull Collection<Integer> quarks,
             @NonNull Collection<Long> times) throws StateSystemDisposedException, IndexOutOfBoundsException, TimeRangeException;
@@ -481,7 +481,7 @@ public interface ITmfStateSystem {
      *             the number of attributes.
      * @throws TimeRangeException
      *             If the smallest time is before the state system start time.
-     * @since 2.3
+     * @since 3.0
      */
     Iterable<@NonNull ITmfStateInterval> query2D(@NonNull Collection<Integer> quarks,
             long start, long end) throws StateSystemDisposedException, IndexOutOfBoundsException, TimeRangeException;

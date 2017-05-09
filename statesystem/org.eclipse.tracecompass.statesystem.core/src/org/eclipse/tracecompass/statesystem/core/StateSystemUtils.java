@@ -407,7 +407,7 @@ public final class StateSystemUtils {
      *         resolution, or consecutive timestamps if resolution == 0.
      * @throws IllegalArgumentException
      *             if end < start or resolution < 0.
-     * @since 2.3
+     * @since 3.0
      */
     public static List<Long> getTimes(long from, long to, long resolution) {
         if (to < from || resolution < 0) {

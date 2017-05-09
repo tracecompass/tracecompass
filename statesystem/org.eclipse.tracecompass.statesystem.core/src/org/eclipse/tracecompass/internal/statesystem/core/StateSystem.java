@@ -368,20 +368,6 @@ public class StateSystem implements ITmfStateSystemBuilder {
         transState.processStateChange(t, value, attributeQuark);
     }
 
-    @Deprecated
-    @Override
-    public void incrementAttribute(long t, int attributeQuark)
-            throws StateValueTypeException, TimeRangeException {
-        ITmfStateValue stateValue = queryOngoingState(attributeQuark);
-        int prevValue = 0;
-        /* if the attribute was previously null, start counting at 0 */
-        if (!stateValue.isNull()) {
-            prevValue = stateValue.unboxInt();
-        }
-        modifyAttribute(t, TmfStateValue.newValueInt(prevValue + 1),
-                attributeQuark);
-    }
-
     @Override
     public void pushAttribute(long t, @NonNull ITmfStateValue value, int attributeQuark)
             throws TimeRangeException, StateValueTypeException {
