@@ -28,7 +28,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.IEventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
-import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
 import org.eclipse.tracecompass.ctf.core.trace.ICTFStream;
 import org.eclipse.tracecompass.tmf.core.event.ITmfCustomAttributes;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
@@ -50,6 +49,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  * of Declaration to native Java types.
  *
  * @author Alexandre Montplaisir
+ * @since 3.0
  */
 @NonNullByDefault
 public class CtfTmfEvent extends TmfEvent
@@ -218,17 +218,6 @@ public class CtfTmfEvent extends TmfEvent
     }
 
     /**
-     * Return this event's reference.
-     *
-     * @return The event's reference
-     * @deprecated This method was replaced by {@link #getChannel()}.
-     */
-    @Deprecated
-    public String getReference() {
-        return getChannel();
-    }
-
-    /**
      * Get the stream Id
      *
      * @return the stream ID or -1 if the stream is null
@@ -247,7 +236,7 @@ public class CtfTmfEvent extends TmfEvent
      * some cases it is the same as the actual timestamp.
      *
      * @return the event unscaled time in long format.
-     * @since 2.2
+     * @since 3.0
      */
     public long getUnscaledTime() {
         return fEvent.getTimestamp();
@@ -309,7 +298,7 @@ public class CtfTmfEvent extends TmfEvent
         if (structFields != null) {
             if (structFields.getFieldNames() != null) {
                 for (String fn : structFields.getFieldNames()) {
-                    fields.add(CtfTmfEventField.parseField((IDefinition) structFields.getDefinition(fn), fn));
+                    fields.add(CtfTmfEventField.parseField(structFields.getDefinition(fn), fn));
                 }
             }
         }
@@ -319,7 +308,7 @@ public class CtfTmfEvent extends TmfEvent
             for (String contextName : structContext.getFieldNames()) {
                 /* Prefix field name */
                 String curContextName = CtfConstants.CONTEXT_FIELD_PREFIX + contextName;
-                fields.add(CtfTmfEventField.parseField((IDefinition) structContext.getDefinition(contextName), curContextName));
+                fields.add(CtfTmfEventField.parseField(structContext.getDefinition(contextName), curContextName));
             }
         }
 
@@ -356,7 +345,7 @@ public class CtfTmfEvent extends TmfEvent
      * Get the call site for this event.
      *
      * @return the call site information, or null if there is none
-     * @since 2.2
+     * @since 3.0
      */
     @Override
     public @Nullable ITmfCallsite getCallsite() {

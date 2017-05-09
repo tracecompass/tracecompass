@@ -467,7 +467,7 @@ public class CtfTmfTrace extends TmfTrace
      * @param eventName
      *            The event name to look for
      * @return The best callsite candidate
-     * @since 2.2
+     * @since 3.0
      */
     public @Nullable CtfTmfCallsite getCallsite(String eventName) {
         for (ICTFStream stream : fTrace.getStreams()) {
@@ -490,7 +490,7 @@ public class CtfTmfTrace extends TmfTrace
      * @param ip
      *            The instruction pointer
      * @return The closest matching callsite
-     * @since 2.2
+     * @since 3.0
      */
     public @Nullable CtfTmfCallsite getCallsite(String eventName, long ip) {
         CtfTmfCallsite callsite = null;
@@ -794,7 +794,7 @@ public class CtfTmfTrace extends TmfTrace
     }
 
     /**
-     * @since 2.2
+     * @since 3.0
      */
     @Override
     public long cyclesToNanos(long cycles) {
@@ -803,7 +803,7 @@ public class CtfTmfTrace extends TmfTrace
     }
 
     /**
-     * @since 2.2
+     * @since 3.0
      */
     @Override
     public long nanosToCycles(long nanos) {
@@ -812,7 +812,7 @@ public class CtfTmfTrace extends TmfTrace
     }
 
     /**
-     * @since 2.2
+     * @since 3.0
      */
     @Override
     public ITmfTimestamp readStart() {
@@ -820,7 +820,7 @@ public class CtfTmfTrace extends TmfTrace
     }
 
     /**
-     * @since 2.2
+     * @since 3.0
      */
     @Override
     public ITmfTimestamp readEnd() {

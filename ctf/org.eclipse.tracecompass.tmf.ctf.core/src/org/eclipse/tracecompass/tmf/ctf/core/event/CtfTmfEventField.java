@@ -93,22 +93,6 @@ public abstract class CtfTmfEventField extends TmfEventField {
      * @param fieldName
      *            String The name to assign to this field
      * @return The resulting CtfTmfEventField object
-     * @deprecated use {@link CtfTmfEventField#parseField(IDefinition, String)}
-     */
-    @Deprecated
-    public static CtfTmfEventField parseField(Definition fieldDef,
-            @NonNull String fieldName) {
-        return parseField((IDefinition) fieldDef, fieldName);
-    }
-
-    /**
-     * Factory method to instantiate CtfTmfEventField objects.
-     *
-     * @param fieldDef
-     *            The CTF Definition of this event field
-     * @param fieldName
-     *            String The name to assign to this field
-     * @return The resulting CtfTmfEventField object
      */
     public static @NonNull CtfTmfEventField parseField(IDefinition fieldDef,
             @NonNull String fieldName) {
@@ -198,7 +182,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
             List<ITmfEventField> list = new ArrayList<>();
             /* Recursively parse the fields */
             for (String fn : strDef.getFieldNames()) {
-                list.add(CtfTmfEventField.parseField((IDefinition) strDef.getDefinition(fn), fn));
+                list.add(CtfTmfEventField.parseField(strDef.getDefinition(fn), fn));
             }
             field = new CTFStructField(fieldName, list.toArray(new CtfTmfEventField[list.size()]));
 
