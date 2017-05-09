@@ -19,7 +19,7 @@ import org.eclipse.ui.views.IViewDescriptor;
 /**
  * Generic view for showing segment store statistics analysis data
  *
- * @since 1.4
+ * @since 2.0
  */
 public class SegmentStoreStatisticsView extends AbstractSegmentsStatisticsView {
 

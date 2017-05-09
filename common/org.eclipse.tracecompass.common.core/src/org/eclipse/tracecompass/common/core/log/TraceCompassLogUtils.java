@@ -95,7 +95,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * expected.
  *
  * @author Matthew Khouzam
- * @since 2.3
+ * @since 3.0
  * @noinstantiate This class is not intended to be instantiated by clients. It
  *                is a helper class.
  */

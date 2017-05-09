@@ -13,7 +13,6 @@
 package org.eclipse.tracecompass.common.core;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -24,6 +23,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * annotations.
  *
  * @author Alexandre Montplaisir
+ * @since 3.0
  */
 public final class NonNullUtils {
 
@@ -45,28 +45,6 @@ public final class NonNullUtils {
         }
         String str = obj.toString();
         return (str == null ? "" : str); //$NON-NLS-1$
-    }
-
-    /**
-     * Checks equality with two nullable objects
-     *
-     * @param o1
-     *            the first object to compare
-     * @param o2
-     *            the second object to compare
-     * @return true if o1.equals(o2) or o1 == o2
-     * @since 1.0
-     * @deprecated use {@link Objects#equals(Object)} instead
-     */
-    @Deprecated
-    public static boolean equalsNullable(final @Nullable Object o1, final @Nullable Object o2) {
-        if (o1 == o2) {
-            return true;
-        }
-        if (o1 == null) {
-            return false;
-        }
-        return o1.equals(o2);
     }
 
     // ------------------------------------------------------------------------

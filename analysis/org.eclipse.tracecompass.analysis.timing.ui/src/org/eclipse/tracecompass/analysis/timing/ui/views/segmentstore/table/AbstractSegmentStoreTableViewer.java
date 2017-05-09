@@ -157,7 +157,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
      *            for table viewers who are part of another view who update the
      *            table's data, this value can be <code>false</code> so only the
      *            other listeners will update the data
-     * @since 1.4
+     * @since 2.0
      */
     public AbstractSegmentStoreTableViewer(TableViewer tableViewer, boolean withListener) {
         super(tableViewer);

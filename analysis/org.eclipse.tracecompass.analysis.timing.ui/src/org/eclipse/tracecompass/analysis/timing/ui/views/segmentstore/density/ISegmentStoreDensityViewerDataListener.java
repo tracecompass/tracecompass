@@ -44,7 +44,7 @@ public interface ISegmentStoreDensityViewerDataListener {
      *
      * @param newData
      *            the new data
-     * @since 1.4
+     * @since 2.0
      */
     default void viewDataChanged(Iterable<? extends ISegment> newData) {
         // To be implemented by children
@@ -55,7 +55,7 @@ public interface ISegmentStoreDensityViewerDataListener {
      *
      * @param newSelectionData
      *            the new selection of the data
-     * @since 1.4
+     * @since 2.0
      */
     default void selectedDataChanged(@Nullable Iterable<? extends ISegment> newSelectionData) {
         // To be implemented in children

@@ -54,7 +54,7 @@ public class SegmentStoreTableViewer extends AbstractSegmentStoreTableViewer {
      *            for table viewers who are part of another view who update the
      *            table's data, this value can be <code>false</code> so only the
      *            other listeners will update the data
-     * @since 1.4
+     * @since 2.0
      */
     public SegmentStoreTableViewer(TableViewer tableViewer, String analysisId, boolean withListener) {
         super(tableViewer, withListener);

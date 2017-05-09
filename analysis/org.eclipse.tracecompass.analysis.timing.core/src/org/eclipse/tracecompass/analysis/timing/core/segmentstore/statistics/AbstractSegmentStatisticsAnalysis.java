@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Function;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -35,6 +34,7 @@ import com.google.common.collect.ImmutableList;
  * Abstract analysis to build statistics data for a segment store
  *
  * @author Jean-Christian Kouame
+ * @since 3.0
  */
 public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnalysisModule {
 
@@ -102,29 +102,6 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
      *            The progress monitor
      * @return The total statistics, or null if segment store is not valid or if
      *         the request is canceled
-     * @since 1.2
-     * @deprecated use {@link #getStatsForRange(long, long, IProgressMonitor)} instead
-     */
-    @Deprecated
-    public @Nullable SegmentStoreStatistics getTotalStatsForRange(long start, long end, IProgressMonitor monitor) {
-        IStatistics<@NonNull ISegment> stats = getStatsForRange(start, end, monitor);
-        return (stats == null) ? null : new SegmentStoreStatistics(stats);
-    }
-
-    /**
-     * Get the total statistics for a specific range. If the range start is
-     * TmfTimeRange.ETERNITY.getStartTime().toNanos() and the range end is
-     * TmfTimeRange.ETERNITY.getEndTime().toNanos(), it will return the
-     * statistics for the whole trace.
-     *
-     * @param start
-     *            The start time of the range
-     * @param end
-     *            The end time of the range
-     * @param monitor
-     *            The progress monitor
-     * @return The total statistics, or null if segment store is not valid or if
-     *         the request is canceled
      * @since 1.3
      */
     public @Nullable IStatistics<ISegment> getStatsForRange(long start, long end, IProgressMonitor monitor) {
@@ -142,33 +119,6 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
             return Collections.EMPTY_MAP;
         }
         return calculateTotalPerType(store, monitor);
-    }
-
-    /**
-     * Get the per segment type statistics for a specific range. If the range
-     * start is TmfTimeRange.ETERNITY.getStartTime().toNanos() and the range end
-     * is TmfTimeRange.ETERNITY.getEndTime().toNanos(), it will return the
-     * statistics for the whole trace.
-     *
-     * @param start
-     *            The start time of the range
-     * @param end
-     *            The end time of the range
-     * @param monitor
-     *            The progress monitor
-     * @return The per segment type statistics, or null if segment store is not
-     *         valid or if the request is canceled
-     * @since 1.2
-     * @deprecated use {@link #getStatsPerTypeForRange(long, long, IProgressMonitor)} instead
-     */
-    @Deprecated
-    public @Nullable Map<String, SegmentStoreStatistics> getPerSegmentTypeStatsForRange(long start, long end, IProgressMonitor monitor) {
-        Map<String, IStatistics<ISegment>> stats = getStatsPerTypeForRange(start, end, monitor);
-        Map<String, SegmentStoreStatistics> map = new HashMap<>();
-        for (Entry<String, IStatistics<ISegment>> entry : stats.entrySet()) {
-            map.put(entry.getKey(), new SegmentStoreStatistics(entry.getValue()));
-        }
-        return map;
     }
 
     /**
@@ -275,18 +225,6 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
     }
 
     /**
-     * The total statistics
-     *
-     * @return the total statistics
-     * @deprecated use {@link #getStatsTotal()} instead
-     */
-    @Deprecated
-    public @Nullable SegmentStoreStatistics getTotalStats() {
-        IStatistics<@NonNull ISegment> totalStats = fTotalStats;
-        return totalStats == null ? null : new SegmentStoreStatistics(totalStats);
-    }
-
-    /**
      * Get the statistics for the full segment store
      *
      * @return The complete statistics
@@ -294,21 +232,6 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
      */
     public @Nullable IStatistics<ISegment> getStatsTotal() {
         return fTotalStats;
-    }
-
-    /**
-     * The per syscall statistics
-     *
-     * @return the per syscall statistics
-     * @deprecated use {@link #getStatsPerType()} instead
-     */
-    @Deprecated
-    public @Nullable Map<String, SegmentStoreStatistics> getPerSegmentTypeStats() {
-        Map<String, SegmentStoreStatistics> map = new HashMap<>();
-        for (Entry<String, IStatistics<ISegment>> entry : fPerSegmentTypeStats.entrySet()) {
-            map.put(entry.getKey(), new SegmentStoreStatistics(entry.getValue()));
-        }
-        return map;
     }
 
     /**

@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 /**
  * Generic viewer to show segment store statistics analysis data.
  *
- * @since 1.4
+ * @since 2.0
  */
 public class SegmentStoreStatisticsViewer extends AbstractSegmentsStatisticsViewer {
 
