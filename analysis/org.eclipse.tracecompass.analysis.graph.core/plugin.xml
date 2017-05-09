@@ -17,9 +17,6 @@
          <parameter
                name="algorithm">
          </parameter>
-         <tracetype
-               class="org.eclipse.tracecompass.tmf.core.trace.TmfTrace">
-         </tracetype>
       </module>
    </extension>
 </plugin>

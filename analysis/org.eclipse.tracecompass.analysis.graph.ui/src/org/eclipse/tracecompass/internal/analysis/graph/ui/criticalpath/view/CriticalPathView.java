@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
 import org.eclipse.tracecompass.analysis.graph.core.building.TmfGraphBuilderModule;
 import org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathModule;
+import org.eclipse.tracecompass.analysis.graph.core.criticalpath.ICriticalPathProvider;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.graph.core.base.TmfGraphStatistics;
 import org.eclipse.tracecompass.internal.analysis.graph.core.base.TmfGraphVisitor;
@@ -195,24 +196,19 @@ public class CriticalPathView extends AbstractTimeGraphView {
         }
 
         private class BuildThread extends Thread {
-            private final ITmfTrace fBuildTrace;
+            private final CriticalPathModule fModule;
             private final IProgressMonitor fMonitor;
 
-            public BuildThread(final ITmfTrace trace) {
+            public BuildThread(final CriticalPathModule module) {
                 super("Critical path view build"); //$NON-NLS-1$
-                fBuildTrace = trace;
+                fModule = module;
                 fMonitor = new NullProgressMonitor();
             }
 
             @Override
             public void run() {
                 try {
-                    CriticalPathModule module = Iterables.<@Nullable CriticalPathModule> getFirst(
-                            TmfTraceUtils.getAnalysisModulesOfClass(fBuildTrace, CriticalPathModule.class),
-                            null);
-                    if (module == null) {
-                        return;
-                    }
+                    CriticalPathModule module = fModule;
                     module.schedule();
                     if (module.waitForCompletion(fMonitor)) {
                         // Module is completed, set the start and end time of
@@ -320,8 +316,8 @@ public class CriticalPathView extends AbstractTimeGraphView {
         }
 
         private @Nullable TmfGraph getGraph(final ITmfTrace trace) {
-            CriticalPathModule module = Iterables.<@Nullable CriticalPathModule> getFirst(
-                    TmfTraceUtils.getAnalysisModulesOfClass(trace, CriticalPathModule.class),
+            ICriticalPathProvider module = Iterables.<@Nullable ICriticalPathProvider> getFirst(
+                    TmfTraceUtils.getAnalysisModulesOfClass(trace, ICriticalPathProvider.class),
                     null);
             if (module == null) {
                 throw new IllegalStateException("View requires an analysis module"); //$NON-NLS-1$
@@ -349,8 +345,8 @@ public class CriticalPathView extends AbstractTimeGraphView {
                 return getLinksInRange(links, startTime, endTime);
             }
 
-            CriticalPathModule module = Iterables.<@Nullable CriticalPathModule> getFirst(
-                    TmfTraceUtils.getAnalysisModulesOfClass(trace, CriticalPathModule.class), null);
+            ICriticalPathProvider module = Iterables.<@Nullable ICriticalPathProvider> getFirst(
+                    TmfTraceUtils.getAnalysisModulesOfClass(trace, ICriticalPathProvider.class), null);
             if (module == null) {
                 throw new IllegalStateException("View requires an analysis module"); //$NON-NLS-1$
             }
@@ -411,10 +407,12 @@ public class CriticalPathView extends AbstractTimeGraphView {
             if (list.isEmpty()) {
                 return;
             }
-            final ITmfTrace trace = getTrace();
-            if (trace == null) {
+
+            Object first = list.get(0);
+            if (!(first instanceof CriticalPathBaseEntry)) {
                 return;
             }
+            CriticalPathModule module = ((CriticalPathBaseEntry) first).getModule();
 
             fSyncLock.lock();
             try {
@@ -422,7 +420,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
                 if (buildThread != null) {
                     buildThread.cancel();
                 }
-                buildThread = new BuildThread(trace);
+                buildThread = new BuildThread(module);
                 buildThread.start();
                 fBuildThread = buildThread;
             } finally {
@@ -600,7 +598,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
         }
         IGraphWorker worker = (IGraphWorker) obj;
 
-        TimeGraphEntry tge = new CriticalPathBaseEntry(worker);
+        TimeGraphEntry tge = new CriticalPathBaseEntry(worker, module);
         List<TimeGraphEntry> list = Collections.singletonList(tge);
         putEntryList(trace, list);
         refresh();

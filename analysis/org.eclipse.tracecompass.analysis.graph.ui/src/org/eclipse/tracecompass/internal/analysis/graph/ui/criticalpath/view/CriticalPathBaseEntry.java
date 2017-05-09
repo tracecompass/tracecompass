@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.internal.analysis.graph.ui.criticalpath.view;
 
 import org.eclipse.tracecompass.analysis.graph.core.base.IGraphWorker;
+import org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathModule;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
 /**
@@ -21,16 +22,20 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 public class CriticalPathBaseEntry extends TimeGraphEntry {
 
     private final IGraphWorker fWorker;
+    private final CriticalPathModule fModule;
 
     /**
      * Constructor
      *
      * @param worker
      *            The worker associated with this entry
+     * @param module
+     *            The critical path module associated with this entry
      */
-    public CriticalPathBaseEntry(IGraphWorker worker) {
+    public CriticalPathBaseEntry(IGraphWorker worker, CriticalPathModule module) {
         super("Base entry", Long.MIN_VALUE, Long.MAX_VALUE); //$NON-NLS-1$
         fWorker = worker;
+        fModule = module;
     }
 
     /**
@@ -40,6 +45,15 @@ public class CriticalPathBaseEntry extends TimeGraphEntry {
      */
     public IGraphWorker getWorker() {
         return fWorker;
+    }
+
+    /**
+     * Get the critical path module associated with this entry
+     *
+     * @return The critical path module
+     */
+    public CriticalPathModule getModule() {
+        return fModule;
     }
 
 }

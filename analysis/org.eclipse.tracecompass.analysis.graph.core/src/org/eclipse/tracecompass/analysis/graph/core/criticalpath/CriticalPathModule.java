@@ -33,7 +33,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  * @author Francis Giraldeau
  * @author Geneviève Bastien
  */
-public class CriticalPathModule extends TmfAbstractAnalysisModule {
+public class CriticalPathModule extends TmfAbstractAnalysisModule implements ICriticalPathProvider {
 
     /**
      * Analysis ID for this module
@@ -55,6 +55,9 @@ public class CriticalPathModule extends TmfAbstractAnalysisModule {
      */
     public CriticalPathModule() {
         super();
+        addParameter(PARAM_GRAPH);
+        addParameter(PARAM_WORKER);
+        setId(ANALYSIS_ID);
     }
 
     @Override
@@ -188,6 +191,7 @@ public class CriticalPathModule extends TmfAbstractAnalysisModule {
      *
      * @return The critical path graph
      */
+    @Override
     public @Nullable TmfGraph getCriticalPath() {
         return fCriticalPath;
     }

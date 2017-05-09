@@ -10,15 +10,20 @@
 package org.eclipse.tracecompass.analysis.graph.core.building;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
+import org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathModule;
+import org.eclipse.tracecompass.analysis.graph.core.criticalpath.ICriticalPathProvider;
 import org.eclipse.tracecompass.internal.analysis.graph.core.Activator;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
  * Base class for all modules building graphs
@@ -26,10 +31,11 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
  * @author Francis Giraldeau
  * @author Geneviève Bastien
  */
-public abstract class TmfGraphBuilderModule extends TmfAbstractAnalysisModule {
+public abstract class TmfGraphBuilderModule extends TmfAbstractAnalysisModule implements ICriticalPathProvider {
 
     private @Nullable TmfGraph fGraph;
     private @Nullable ITmfEventRequest fRequest;
+    private final CriticalPathModule fCriticalPathModule = new CriticalPathModule();
 
     /**
      * Gets the graph provider to build this graph
@@ -69,11 +75,30 @@ public abstract class TmfGraphBuilderModule extends TmfAbstractAnalysisModule {
     }
 
     @Override
+    public boolean setTrace(@NonNull ITmfTrace trace) throws TmfAnalysisException {
+        boolean ret = super.setTrace(trace);
+        if (!ret) {
+            return ret;
+        }
+        ret = fCriticalPathModule.setTrace(trace);
+        if (ret) {
+            fCriticalPathModule.setParameter(CriticalPathModule.PARAM_GRAPH, getId());
+        }
+        return ret;
+    }
+
+    @Override
     protected void canceling() {
         ITmfEventRequest req = fRequest;
         if ((req != null) && (!req.isCompleted())) {
             req.cancel();
         }
+    }
+
+    @Override
+    public void dispose() {
+        fCriticalPathModule.dispose();
+        super.dispose();
     }
 
     // ------------------------------------------------------------------------
@@ -145,6 +170,14 @@ public abstract class TmfGraphBuilderModule extends TmfAbstractAnalysisModule {
             super.handleCancel();
         }
 
+    }
+
+    /**
+     * @since 1.1
+     */
+    @Override
+    public @Nullable TmfGraph getCriticalPath() {
+        return fCriticalPathModule.getCriticalPath();
     }
 
 }

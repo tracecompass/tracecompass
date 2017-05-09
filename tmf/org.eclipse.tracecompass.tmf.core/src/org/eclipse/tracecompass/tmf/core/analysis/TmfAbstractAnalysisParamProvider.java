@@ -40,8 +40,11 @@ public abstract class TmfAbstractAnalysisParamProvider implements IAnalysisParam
             return;
         }
         IAnalysisModule selectedModule = selectedTrace.getAnalysisModule(module.getId());
-        /* register only if the module is for the currently selected trace */
-        if (selectedModule == module) {
+        /*
+         * register only if the module is for the currently selected trace or
+         * the current trace has no such module
+         */
+        if (selectedModule == null || selectedModule == module) {
             fModule = module;
         }
     }

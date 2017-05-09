@@ -22,5 +22,8 @@
                class="org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathModule">
          </analysisModuleClass>
       </output>
+      <listener
+            class="org.eclipse.tracecompass.internal.analysis.graph.ui.criticalpath.view.CriticalPathModuleListener">
+      </listener>
    </extension>
 </plugin>
