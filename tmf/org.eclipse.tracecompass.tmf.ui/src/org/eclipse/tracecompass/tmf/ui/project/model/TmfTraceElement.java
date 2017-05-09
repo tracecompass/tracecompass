@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2010, 2017 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -43,7 +43,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
@@ -750,7 +749,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      *
      * @param startTime
      *            updated start time for this trace
-     * @since 2.4
+     * @since 3.0
      */
     public void setStartTime(ITmfTimestamp startTime) {
         fStartTime = startTime;
@@ -762,7 +761,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      * @return the start time from the trace if available, or from self when
      *         read in advance from supplementary files or from fast trace read.
      *         Return null if completely unknown.
-     * @since 2.4
+     * @since 3.0
      */
     public ITmfTimestamp getStartTime() {
         ITmfTrace trace = getTrace();
@@ -777,7 +776,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      *
      * @param end
      *            updated end time for this trace
-     * @since 2.4
+     * @since 3.0
      */
     public void setEndTime(@NonNull ITmfTimestamp end) {
         if (fEndTime == null || end.compareTo(fEndTime) > 0) {
@@ -791,7 +790,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      * @return the end time from the trace if available, or from self when read
      *         in advance from supplementary files or from fast trace read.
      *         Return null if completely unknown.
-     * @since 2.4
+     * @since 3.0
      */
     public ITmfTimestamp getEndTime() {
         ITmfTrace trace = getTrace();

@@ -28,11 +28,11 @@ public class Messages extends NLS {
      */
     public static String AbstractTimeGraphView_BuildJob;
 
-    /** @since 2.4*/
+    /** @since 3.0*/
     public static String AbstractTimeGraphView_MarkerSetEditActionText;
-    /** @since 2.4*/
+    /** @since 3.0*/
     public static String AbstractTimeGraphView_MarkerSetMenuText;
-    /** @since 2.4*/
+    /** @since 3.0*/
     public static String AbstractTimeGraphView_MarkerSetNoneActionText;
     public static String AbstractTimeGraphView_NextTooltip;
     public static String AbstractTimeGraphView_PreviousText;

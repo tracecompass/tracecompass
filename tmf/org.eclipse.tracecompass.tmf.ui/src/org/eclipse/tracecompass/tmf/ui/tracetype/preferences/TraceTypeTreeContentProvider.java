@@ -22,7 +22,7 @@ import com.google.common.collect.Iterables;
  * This class implements a trace type tree content provider
  *
  * @author Jean-Christian Kouame
- * @since 2.4
+ * @since 3.0
  *
  */
 public class TraceTypeTreeContentProvider implements ITreeContentProvider {

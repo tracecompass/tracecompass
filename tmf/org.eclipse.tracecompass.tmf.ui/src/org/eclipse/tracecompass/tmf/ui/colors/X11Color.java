@@ -30,7 +30,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
  * @see <a href=
  *      "http://cgit.freedesktop.org/xorg/app/rgb/tree/rgb.txt">http://cgit.freedesktop.org/xorg/app/rgb/tree/rgb.txt</a>
  *
- * @since 2.4
+ * @since 3.0
  */
 public class X11Color {
 

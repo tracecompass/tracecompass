@@ -39,7 +39,7 @@ import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
  * and creating links for each imported trace in the target folder, overwriting
  * any existing trace without warning.
  *
- * @since 2.4
+ * @since 3.0
  */
 public class TraceImportOperation extends WorkspaceModifyOperation {
 

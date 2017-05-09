@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2016 Ericsson
+ * Copyright (c) 2013, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -59,7 +59,7 @@ public class Messages extends NLS {
 
     /**
      * Name for the job that updates a trace's time range in the Project Explorer.
-     * @since 2.4
+     * @since 3.0
      */
     public static String TmfNavigatorLabelProvider_UpdateBoundsJobName;
 

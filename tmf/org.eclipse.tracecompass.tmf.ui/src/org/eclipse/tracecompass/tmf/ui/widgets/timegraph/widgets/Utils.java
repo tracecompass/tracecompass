@@ -265,7 +265,7 @@ public class Utils {
      * @param rgb
      *            An RGB color
      * @return The black or white system color, whichever is more distinct.
-     * @since 2.4
+     * @since 3.0
      */
     public static Color getDistinctColor(RGB rgb) {
         /* Calculate the relative luminance of the color, high value is bright */

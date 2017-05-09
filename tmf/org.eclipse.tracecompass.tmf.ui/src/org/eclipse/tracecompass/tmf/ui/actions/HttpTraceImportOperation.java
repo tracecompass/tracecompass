@@ -41,7 +41,7 @@ import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
  * An operation which downloads and imports traces from a http/https source.
  *
  * @author Simon Delisle
- * @since 2.4
+ * @since 3.0
  *
  */
 public class HttpTraceImportOperation extends WorkspaceModifyOperation {

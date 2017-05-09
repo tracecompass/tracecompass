@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -185,7 +185,7 @@ public interface ITimeGraphPresentationProvider {
      * @param event
      *            the time event
      * @return the style map, as detailed in {@link ITimeEventStyleStrings}
-     * @since 2.4
+     * @since 3.0
      */
     default Map<String, Object> getEventStyle(ITimeEvent event) {
         StateItem stateItem = null;
@@ -211,7 +211,7 @@ public interface ITimeGraphPresentationProvider {
      *            the time event
      * @return a style map containing the elements as detailed in
      *         {@link ITimeEventStyleStrings} to override
-     * @since 2.4
+     * @since 3.0
      */
     default Map<String, Object> getSpecificEventStyle(ITimeEvent event) {
         return Collections.emptyMap();

@@ -118,7 +118,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationP
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphBookmarkEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphCombo;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphContentProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphRangeUpdateEvent;
@@ -481,7 +480,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
          *
          * @param scopeId
          *            The ID of the calling flow scope
-         * @since 2.4
+         * @since 3.0
          */
         public void setScopeId(int scopeId) {
             fScopeId = scopeId;
@@ -583,17 +582,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     // ------------------------------------------------------------------------
     // Getters and setters
     // ------------------------------------------------------------------------
-
-    /**
-     * Getter for the time graph combo. No longer used.
-     *
-     * @return null
-     * @deprecated Use {@link #getTimeGraphViewer()} instead.
-     */
-    @Deprecated
-    protected TimeGraphCombo getTimeGraphCombo() {
-        return null;
-    }
 
     /**
      * Getter for the time graph viewer
@@ -1737,7 +1725,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * Get the marker set menu
      *
      * @return the menu manager object
-     * @since 2.4
+     * @since 3.0
      */
     protected MenuManager getMarkerSetMenu() {
         if (fMarkerSetMenu != null) {

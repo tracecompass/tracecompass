@@ -69,7 +69,7 @@ public interface IMarkerEventSource {
      * @param monitor
      *            The progress monitor object
      * @return The list of marker events
-     * @since 2.4
+     * @since 3.0
      */
     default @NonNull List<@NonNull IMarkerEvent> getMarkerList(long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor) {
         List<@NonNull IMarkerEvent> markers = new ArrayList<>();

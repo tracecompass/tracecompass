@@ -37,7 +37,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  *
  * @author Matthew Khouzam
  * @noimplement This interface is not intended to be implemented by clients.
- * @since 2.4
+ * @since 3.0
  */
 @NonNullByDefault
 public interface ITimeEventStyleStrings {
