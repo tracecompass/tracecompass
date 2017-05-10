@@ -17,7 +17,7 @@ import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.
 import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTNode;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTNodeTest;
-import org.eclipse.tracecompass.internal.provisional.segmentstore.core.BasicSegment2;
+import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.tests.historytree.SegmentTreeNodeStub;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -31,12 +31,12 @@ import org.junit.runners.Parameterized.Parameters;
  */
 @NonNullByDefault
 @RunWith(Parameterized.class)
-public class SegmentTreeNodeTest extends HTNodeTest<BasicSegment2, SegmentTreeNodeStub> {
+public class SegmentTreeNodeTest extends HTNodeTest<BasicSegment, SegmentTreeNodeStub> {
 
     /**
      * A factory to create base objects for test
      */
-    private static final ObjectFactory<BasicSegment2> BASE_SEGMENT_FACTORY = (s, e) -> new BasicSegment2(s, e);
+    private static final ObjectFactory<BasicSegment> BASE_SEGMENT_FACTORY = (s, e) -> new BasicSegment(s, e);
 
     /**
      * Constructor
@@ -56,9 +56,9 @@ public class SegmentTreeNodeTest extends HTNodeTest<BasicSegment2, SegmentTreeNo
      */
     public SegmentTreeNodeTest(String name,
             int headerSize,
-            IHTNodeFactory<BasicSegment2, SegmentTreeNodeStub> factory,
-            IHTIntervalReader<BasicSegment2> objReader,
-            ObjectFactory<BasicSegment2> objFactory) throws IOException {
+            IHTNodeFactory<BasicSegment, SegmentTreeNodeStub> factory,
+            IHTIntervalReader<BasicSegment> objReader,
+            ObjectFactory<BasicSegment> objFactory) throws IOException {
         super(name, headerSize, factory, objReader, objFactory);
     }
 
@@ -71,7 +71,7 @@ public class SegmentTreeNodeTest extends HTNodeTest<BasicSegment2, SegmentTreeNo
                 { "Segment tree node",
                         HTNode.COMMON_HEADER_SIZE,
                         SegmentTreeNodeStub.NODE_FACTORY,
-                        BasicSegment2.BASIC_SEGMENT_READ_FACTORY,
+                        BasicSegment.BASIC_SEGMENT_READ_FACTORY,
                         BASE_SEGMENT_FACTORY
                 },
         });

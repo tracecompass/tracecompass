@@ -21,7 +21,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
-import org.eclipse.tracecompass.internal.provisional.segmentstore.core.ISegment2;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 
@@ -39,9 +38,9 @@ import com.google.common.collect.Iterables;
  * @author Loic Prieur-Drevon
  * @author Geneviève Bastien
  * @param <E>
- *            type of {@link ISegment2}
+ *            type of {@link ISegment}
  */
-public class HistoryTreeSegmentStore<E extends ISegment2> implements ISegmentStore<E> {
+public class HistoryTreeSegmentStore<E extends ISegment> implements ISegmentStore<E> {
 
     private static final int PROVIDER_VERSION = 1;
     // TODO: these values were taken from the state system implementation. Maybe

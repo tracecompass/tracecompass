@@ -23,10 +23,10 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.internal.provisional.segmentstore.core.BasicSegment2;
 import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.ArrayListStore;
 import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.LazyArrayListStore;
 import org.eclipse.tracecompass.internal.segmentstore.core.treemap.TreeMapStore;
+import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
@@ -57,7 +57,7 @@ public class SegmentStoreBenchmark {
     private static final int DEFAULT_SAMPLE = 1000;
     private static final int DEFAULT_LOOP_COUNT = 10;
 
-    private final ISegmentStore<@NonNull BasicSegment2> fSegStore;
+    private final ISegmentStore<@NonNull BasicSegment> fSegStore;
     private final String fName;
     private final Performance fPerf;
 
@@ -72,7 +72,7 @@ public class SegmentStoreBenchmark {
                 { "Array list store", new ArrayListStore<>() },
                 { "Lazy array list store", new LazyArrayListStore<>() },
                 { "Treemap store", new TreeMapStore<>() },
-                { "HT store", new HistoryTreeSegmentStoreStub<>(NonNullUtils.checkNotNull(Files.createTempFile("tmpSegStore", null)), 0, BasicSegment2.BASIC_SEGMENT_READ_FACTORY) },
+                { "HT store", new HistoryTreeSegmentStoreStub<>(NonNullUtils.checkNotNull(Files.createTempFile("tmpSegStore", null)), 0, BasicSegment.BASIC_SEGMENT_READ_FACTORY) },
         });
     }
 
@@ -84,7 +84,7 @@ public class SegmentStoreBenchmark {
      * @param segStore
      *            The segment store to fill for the benchmarks
      */
-    public SegmentStoreBenchmark(String name, ISegmentStore<@NonNull BasicSegment2> segStore) {
+    public SegmentStoreBenchmark(String name, ISegmentStore<@NonNull BasicSegment> segStore) {
         fSegStore = segStore;
         fName = name;
         fPerf = NonNullUtils.checkNotNull(Performance.getDefault());
@@ -244,9 +244,9 @@ public class SegmentStoreBenchmark {
         pMiterate2.commit();
     }
 
-    private static int iterate(Iterable<@NonNull BasicSegment2> store) {
+    private static int iterate(Iterable<@NonNull BasicSegment> store) {
         int count = 0;
-        Iterator<@NonNull BasicSegment2> iterator = store.iterator();
+        Iterator<@NonNull BasicSegment> iterator = store.iterator();
         while (iterator.hasNext()) {
             count++;
             iterator.next();
@@ -254,15 +254,15 @@ public class SegmentStoreBenchmark {
         return count;
     }
 
-    private static int sortedIterate(ISegmentStore<@NonNull BasicSegment2> store, Comparator<ISegment> order) {
-        Iterable<@NonNull BasicSegment2> iterable = store.iterator(order);
+    private static int sortedIterate(ISegmentStore<@NonNull BasicSegment> store, Comparator<ISegment> order) {
+        Iterable<@NonNull BasicSegment> iterable = store.iterator(order);
         return iterate(iterable);
     }
 
-    private static void populate(int size, int[] fuzz, ISegmentStore<@NonNull BasicSegment2> store, long low, long high) {
+    private static void populate(int size, int[] fuzz, ISegmentStore<@NonNull BasicSegment> store, long low, long high) {
         for (long i = low; i < high; i++) {
             long start = i + fuzz[(int) (i % size)];
-            store.add(new BasicSegment2(start, start + 10));
+            store.add(new BasicSegment(start, start + 10));
         }
     }
 }

@@ -22,8 +22,8 @@ import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.Ti
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.AbstractHistoryTree.IHTNodeFactory;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTCoreNodeTest;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTNode;
-import org.eclipse.tracecompass.internal.provisional.segmentstore.core.BasicSegment2;
 import org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree.SegmentTreeNode;
+import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.tests.historytree.SegmentTreeNodeStub;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,12 +40,12 @@ import com.google.common.collect.ImmutableSet;
  */
 @NonNullByDefault
 @RunWith(Parameterized.class)
-public class SegmentTreeCoreNodeTest extends HTCoreNodeTest<BasicSegment2, SegmentTreeNodeStub> {
+public class SegmentTreeCoreNodeTest extends HTCoreNodeTest<BasicSegment, SegmentTreeNodeStub> {
 
     /**
      * A factory to create base objects for test
      */
-    private static final ObjectFactory<BasicSegment2> BASE_SEGMENT_FACTORY = (s, e) -> new BasicSegment2(s, e);
+    private static final ObjectFactory<BasicSegment> BASE_SEGMENT_FACTORY = (s, e) -> new BasicSegment(s, e);
 
     /**
      * Constructor
@@ -65,9 +65,9 @@ public class SegmentTreeCoreNodeTest extends HTCoreNodeTest<BasicSegment2, Segme
      */
     public SegmentTreeCoreNodeTest(String name,
             int headerSize,
-            IHTNodeFactory<BasicSegment2, SegmentTreeNodeStub> factory,
-            IHTIntervalReader<BasicSegment2> objReader,
-            ObjectFactory<BasicSegment2> objFactory) throws IOException {
+            IHTNodeFactory<BasicSegment, SegmentTreeNodeStub> factory,
+            IHTIntervalReader<BasicSegment> objReader,
+            ObjectFactory<BasicSegment> objFactory) throws IOException {
         super(name, headerSize, factory, objReader, objFactory);
     }
 
@@ -80,7 +80,7 @@ public class SegmentTreeCoreNodeTest extends HTCoreNodeTest<BasicSegment2, Segme
                 { "Segment tree core node",
                     HTNode.COMMON_HEADER_SIZE + Integer.BYTES + Integer.BYTES * NB_CHILDREN + 6 * Long.BYTES * NB_CHILDREN,
                     SegmentTreeNodeStub.NODE_FACTORY,
-                    BasicSegment2.BASIC_SEGMENT_READ_FACTORY,
+                    BasicSegment.BASIC_SEGMENT_READ_FACTORY,
                     BASE_SEGMENT_FACTORY },
         });
     }
@@ -102,7 +102,7 @@ public class SegmentTreeCoreNodeTest extends HTCoreNodeTest<BasicSegment2, Segme
         assertEquals(0, stub.getLongest());
 
         // Add a new element and verify the data
-        BasicSegment2 segment = new BasicSegment2(start, start + shortLen);
+        BasicSegment segment = new BasicSegment(start, start + shortLen);
         stub.add(segment);
         assertEquals(start, stub.getMaxStart());
         assertEquals(start + shortLen, stub.getMinEnd());
@@ -111,7 +111,7 @@ public class SegmentTreeCoreNodeTest extends HTCoreNodeTest<BasicSegment2, Segme
 
         // Add a new element and verify the data: longest length and max start
         // should be updated
-        segment = new BasicSegment2(start + shortLen, start + longLen);
+        segment = new BasicSegment(start + shortLen, start + longLen);
         stub.add(segment);
         assertEquals(start + shortLen, stub.getMaxStart());
         assertEquals(start + shortLen, stub.getMinEnd());
@@ -142,9 +142,9 @@ public class SegmentTreeCoreNodeTest extends HTCoreNodeTest<BasicSegment2, Segme
         assertEquals(0, parentStub.getLongest(0));
 
         // Add a few segments to the child and verify its own data
-        BasicSegment2 segment = new BasicSegment2(start, start + shortLen);
+        BasicSegment segment = new BasicSegment(start, start + shortLen);
         stub.add(segment);
-        segment = new BasicSegment2(start + shortLen, start + longLen);
+        segment = new BasicSegment(start + shortLen, start + longLen);
         stub.add(segment);
 
         assertEquals(start + shortLen, stub.getMaxStart());

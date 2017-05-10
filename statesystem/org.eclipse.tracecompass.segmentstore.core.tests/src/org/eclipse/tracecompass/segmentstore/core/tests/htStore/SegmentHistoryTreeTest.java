@@ -24,9 +24,9 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.AbstractHistoryTree;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.overlapping.AbstractOverlappingHistoryTreeTestBase;
-import org.eclipse.tracecompass.internal.provisional.segmentstore.core.BasicSegment2;
 import org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree.SegmentHistoryTree;
 import org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree.SegmentTreeNode;
+import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.tests.historytree.SegmentHistoryTreeStub;
 import org.junit.Test;
 
@@ -39,34 +39,34 @@ import com.google.common.collect.Iterators;
  * @author Geneviève Bastien
  */
 @NonNullByDefault
-public class SegmentHistoryTreeTest extends AbstractOverlappingHistoryTreeTestBase<BasicSegment2, SegmentTreeNode<BasicSegment2>> {
+public class SegmentHistoryTreeTest extends AbstractOverlappingHistoryTreeTestBase<BasicSegment, SegmentTreeNode<BasicSegment>> {
 
-    private static final BasicSegment2 DEFAULT_OBJECT = new BasicSegment2(0, 0);
+    private static final BasicSegment DEFAULT_OBJECT = new BasicSegment(0, 0);
 
     @Override
-    protected SegmentHistoryTreeStub<BasicSegment2> createHistoryTree(@NonNull File stateHistoryFile, int blockSize, int maxChildren, int providerVersion, long treeStart)
+    protected SegmentHistoryTreeStub<BasicSegment> createHistoryTree(@NonNull File stateHistoryFile, int blockSize, int maxChildren, int providerVersion, long treeStart)
             throws IOException {
         return new SegmentHistoryTreeStub<>(stateHistoryFile,
                 blockSize,
                 maxChildren,
                 providerVersion,
                 treeStart,
-                BasicSegment2.BASIC_SEGMENT_READ_FACTORY);
+                BasicSegment.BASIC_SEGMENT_READ_FACTORY);
     }
 
     @Override
-    protected SegmentHistoryTreeStub<BasicSegment2> createHistoryTree(@NonNull File existingStateFile, int expectedProviderVersion) throws IOException {
+    protected SegmentHistoryTreeStub<BasicSegment> createHistoryTree(@NonNull File existingStateFile, int expectedProviderVersion) throws IOException {
         return new SegmentHistoryTreeStub<>(existingStateFile, expectedProviderVersion,
-                BasicSegment2.BASIC_SEGMENT_READ_FACTORY);
+                BasicSegment.BASIC_SEGMENT_READ_FACTORY);
     }
 
     @Override
-    protected BasicSegment2 createInterval(long start, long end) {
-        return new BasicSegment2(start, end);
+    protected BasicSegment createInterval(long start, long end) {
+        return new BasicSegment(start, end);
     }
 
     @Override
-    protected long fillValues(@NonNull AbstractHistoryTree<@NonNull BasicSegment2, SegmentTreeNode<@NonNull BasicSegment2>> ht, int fillSize, long start) {
+    protected long fillValues(@NonNull AbstractHistoryTree<@NonNull BasicSegment, SegmentTreeNode<@NonNull BasicSegment>> ht, int fillSize, long start) {
         int nbValues = fillSize / DEFAULT_OBJECT.getSizeOnDisk();
         for (int i = 0; i < nbValues; i++) {
             ht.insert(createInterval(start + i, start + i + 1));
@@ -80,7 +80,7 @@ public class SegmentHistoryTreeTest extends AbstractOverlappingHistoryTreeTestBa
     @Test
     public void testIsEmpty() {
         long start = 10L;
-        SegmentHistoryTreeStub<BasicSegment2> oht = (SegmentHistoryTreeStub<BasicSegment2>) setupSmallTree(3, start);
+        SegmentHistoryTreeStub<BasicSegment> oht = (SegmentHistoryTreeStub<BasicSegment>) setupSmallTree(3, start);
 
         assertTrue(oht.isEmpty());
 
@@ -89,7 +89,7 @@ public class SegmentHistoryTreeTest extends AbstractOverlappingHistoryTreeTestBa
         assertFalse(oht.isEmpty());
 
         /* Fill a first node */
-        SegmentTreeNode<BasicSegment2> node = oht.getLatestLeaf();
+        SegmentTreeNode<BasicSegment> node = oht.getLatestLeaf();
         long time = fillValues(oht, node.getNodeFreeSpace(), start);
 
         /*
@@ -109,7 +109,7 @@ public class SegmentHistoryTreeTest extends AbstractOverlappingHistoryTreeTestBa
     @Test
     public void testSizeAndIterator() throws IOException {
         long start = 10L;
-        SegmentHistoryTreeStub<BasicSegment2> oht = (SegmentHistoryTreeStub<BasicSegment2>) setupSmallTree(3, start);
+        SegmentHistoryTreeStub<BasicSegment> oht = (SegmentHistoryTreeStub<BasicSegment>) setupSmallTree(3, start);
 
         int nbSegments = 0;
         assertEquals(nbSegments, oht.size());
@@ -120,7 +120,7 @@ public class SegmentHistoryTreeTest extends AbstractOverlappingHistoryTreeTestBa
         assertEquals(nbSegments, oht.size());
 
         /* Fill a first node */
-        SegmentTreeNode<BasicSegment2> node = oht.getLatestLeaf();
+        SegmentTreeNode<BasicSegment> node = oht.getLatestLeaf();
         nbSegments += node.getNodeFreeSpace() / DEFAULT_OBJECT.getSizeOnDisk();
         long time = fillValues(oht, node.getNodeFreeSpace(), start);
         assertEquals(nbSegments, oht.size());
@@ -149,24 +149,24 @@ public class SegmentHistoryTreeTest extends AbstractOverlappingHistoryTreeTestBa
         oht.closeTree(oht.getTreeEnd());
 
         // Create a reader history tree
-        oht = (SegmentHistoryTreeStub<BasicSegment2>) createHistoryTreeReader();
+        oht = (SegmentHistoryTreeStub<BasicSegment>) createHistoryTreeReader();
         assertEquals(nbSegments, oht.size());
 
         // Test the iterator on that tree
-        Iterator<BasicSegment2> iterator = oht.iterator();
+        Iterator<BasicSegment> iterator = oht.iterator();
         assertNotNull(iterator);
         int count = Iterators.size(iterator);
         assertEquals(nbSegments, count);
 
         // Test the intersecting elements
-        Iterable<BasicSegment2> intersectingElements = oht.getIntersectingElements(start, time);
+        Iterable<BasicSegment> intersectingElements = oht.getIntersectingElements(start, time);
         count = 0;
         // While doing this iterator, count the number of segments of a smaller
         // time range, it will be needed later
         long rangeStart = (long) (start + (time - start) * 0.4);
         long rangeEnd = (long) (time - (time - start) * 0.4);
         int nbInRange = 0;
-        for (BasicSegment2 segment : intersectingElements) {
+        for (BasicSegment segment : intersectingElements) {
             count++;
             if (segment.getStart() <= rangeEnd && rangeStart <= segment.getEnd()) {
                 nbInRange++;
@@ -179,22 +179,22 @@ public class SegmentHistoryTreeTest extends AbstractOverlappingHistoryTreeTestBa
         assertEquals(nbInRange, count);
 
         // Test intersecting elements with start time ordering
-        Comparator<BasicSegment2> cmp = NonNullUtils.checkNotNull(Comparator.comparing(BasicSegment2::getStart));
+        Comparator<BasicSegment> cmp = NonNullUtils.checkNotNull(Comparator.comparing(BasicSegment::getStart));
         assertSortedIteration(oht, rangeStart, rangeEnd, cmp, nbInRange);
 
         // Test intersecting elements with end time ordering
-        cmp = NonNullUtils.checkNotNull(Comparator.comparing(BasicSegment2::getEnd));
+        cmp = NonNullUtils.checkNotNull(Comparator.comparing(BasicSegment::getEnd));
         assertSortedIteration(oht, rangeStart, rangeEnd, cmp, nbInRange);
 
         // Test intersecting elements with duration ordering
-        cmp = NonNullUtils.checkNotNull(Comparator.comparing(BasicSegment2::getLength));
+        cmp = NonNullUtils.checkNotNull(Comparator.comparing(BasicSegment::getLength));
         assertSortedIteration(oht, rangeStart, rangeEnd, cmp, nbInRange);
     }
 
-    private static void assertSortedIteration(SegmentHistoryTreeStub<@NonNull BasicSegment2> oht, long rangeStart, long rangeEnd, Comparator<@NonNull BasicSegment2> cmp, int nbInRange) {
+    private static void assertSortedIteration(SegmentHistoryTreeStub<@NonNull BasicSegment> oht, long rangeStart, long rangeEnd, Comparator<@NonNull BasicSegment> cmp, int nbInRange) {
         int count = 0;
-        BasicSegment2 prev = DEFAULT_OBJECT;
-        for (BasicSegment2 segment : oht.getIntersectingElements(rangeStart, rangeEnd, cmp)) {
+        BasicSegment prev = DEFAULT_OBJECT;
+        for (BasicSegment segment : oht.getIntersectingElements(rangeStart, rangeEnd, cmp)) {
             count++;
             assertTrue("Segment comparison at " + count, cmp.compare(prev, segment) <= 0);
         }

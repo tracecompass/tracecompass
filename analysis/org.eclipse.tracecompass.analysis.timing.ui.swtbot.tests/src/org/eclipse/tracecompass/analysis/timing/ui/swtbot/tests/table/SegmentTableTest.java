@@ -46,7 +46,6 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgr
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableView;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
-import org.eclipse.tracecompass.internal.provisional.segmentstore.core.BasicSegment2;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -403,9 +402,9 @@ public class SegmentTableTest {
         Path segmentFile = Files.createTempFile("tmpSegStore", ".tmp");
         try {
             final int size = 1000000;
-            ISegmentStore<@NonNull BasicSegment2> fixture = SegmentStoreFactory.createOnDiskSegmentStore(segmentFile, BasicSegment2.BASIC_SEGMENT_READ_FACTORY);
+            ISegmentStore<@NonNull BasicSegment> fixture = SegmentStoreFactory.createOnDiskSegmentStore(segmentFile, BasicSegment.BASIC_SEGMENT_READ_FACTORY);
             for (int i = 0; i < size; i++) {
-                fixture.add(new BasicSegment2(i, 2 * i));
+                fixture.add(new BasicSegment(i, 2 * i));
             }
             assertNotNull(getTable());
             getTable().updateModel(fixture);

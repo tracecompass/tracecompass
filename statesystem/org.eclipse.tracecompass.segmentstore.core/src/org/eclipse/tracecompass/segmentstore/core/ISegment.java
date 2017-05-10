@@ -15,6 +15,8 @@ package org.eclipse.tracecompass.segmentstore.core;
 import java.io.Serializable;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.datastore.core.interval.IHTInterval;
+import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWriter;
 
 /**
  * Generic interface for any segment (like a time range) that can be used in the
@@ -22,21 +24,7 @@ import org.eclipse.jdt.annotation.NonNull;
  *
  * @author Alexandre Montplaisir
  */
-public interface ISegment extends Serializable, Comparable<@NonNull ISegment> {
-
-    /**
-     * The start position/time of the segment.
-     *
-     * @return The start position
-     */
-    long getStart();
-
-    /**
-     * The end position/time of the segment
-     *
-     * @return The end position
-     */
-    long getEnd();
+public interface ISegment extends Serializable, Comparable<@NonNull ISegment>, IHTInterval {
 
     @Override
     default int compareTo(@NonNull ISegment arg0) {
@@ -53,4 +41,21 @@ public interface ISegment extends Serializable, Comparable<@NonNull ISegment> {
     default long getLength() {
         return getEnd() - getStart();
     }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    default int getSizeOnDisk() {
+        return 0;
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    default void writeSegment(@NonNull ISafeByteBufferWriter buffer) {
+
+    }
+
 }

@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
-import org.eclipse.tracecompass.internal.provisional.segmentstore.core.ISegment2;
 import org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree.HistoryTreeSegmentStore;
+import org.eclipse.tracecompass.segmentstore.core.ISegment;
 
 /**
  * Base stub class, that resolves the node type of the tree to the stub node
@@ -24,7 +24,7 @@ import org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree.Hi
  * @param <E>
  *            The type of segments accepted in this store
  */
-public class HistoryTreeSegmentStoreStub<E extends ISegment2> extends HistoryTreeSegmentStore<E> {
+public class HistoryTreeSegmentStoreStub<E extends ISegment> extends HistoryTreeSegmentStore<E> {
 
     /**
      * Constructor for new history files. Use this when creating a new history

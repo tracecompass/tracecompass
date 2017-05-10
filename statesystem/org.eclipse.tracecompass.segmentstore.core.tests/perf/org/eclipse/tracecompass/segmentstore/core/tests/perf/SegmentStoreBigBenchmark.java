@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.tracecompass.internal.provisional.segmentstore.core.BasicSegment2;
+import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.tests.historytree.HistoryTreeSegmentStoreStub;
 import org.junit.runners.Parameterized.Parameters;
@@ -36,7 +36,7 @@ public class SegmentStoreBigBenchmark extends SegmentStoreBenchmark {
      * @param segStore
      *            The segment store to use
      */
-    public SegmentStoreBigBenchmark(String name, ISegmentStore<@NonNull BasicSegment2> segStore) {
+    public SegmentStoreBigBenchmark(String name, ISegmentStore<@NonNull BasicSegment> segStore) {
         super(name, segStore);
     }
 
@@ -48,7 +48,7 @@ public class SegmentStoreBigBenchmark extends SegmentStoreBenchmark {
     @Parameters(name = "{index}: {0}")
     public static Iterable<Object[]> getParameters() throws IOException {
         return Arrays.asList(new Object[][] {
-                { "HT store", new HistoryTreeSegmentStoreStub<>(Files.createTempFile("tmpSegStore", null), 1, BasicSegment2.BASIC_SEGMENT_READ_FACTORY) },
+                { "HT store", new HistoryTreeSegmentStoreStub<>(Files.createTempFile("tmpSegStore", null), 1, BasicSegment.BASIC_SEGMENT_READ_FACTORY) },
         });
     }
 

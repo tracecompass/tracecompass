@@ -10,8 +10,8 @@
 package org.eclipse.tracecompass.segmentstore.core.tests.historytree;
 
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.AbstractHistoryTree.IHTNodeFactory;
-import org.eclipse.tracecompass.internal.provisional.segmentstore.core.BasicSegment2;
 import org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree.SegmentTreeNode;
+import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 
 /**
  * A stub segment tree node to expose some functionalities of the segment tree
@@ -19,10 +19,10 @@ import org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree.Se
  *
  * @author Geneviève Bastien
  */
-public class SegmentTreeNodeStub extends SegmentTreeNode<BasicSegment2> {
+public class SegmentTreeNodeStub extends SegmentTreeNode<BasicSegment> {
 
     /** Factory to create nodes of this type */
-    public static final IHTNodeFactory<BasicSegment2, SegmentTreeNodeStub> NODE_FACTORY =
+    public static final IHTNodeFactory<BasicSegment, SegmentTreeNodeStub> NODE_FACTORY =
             (t, b, m, seq, p, start) -> new SegmentTreeNodeStub(t, b, m, seq, p, start);
 
     /**

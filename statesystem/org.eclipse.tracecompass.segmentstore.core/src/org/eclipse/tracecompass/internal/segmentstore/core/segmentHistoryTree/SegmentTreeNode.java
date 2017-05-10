@@ -21,8 +21,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.IHTNode;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.overlapping.OverlappingNode;
-import org.eclipse.tracecompass.internal.provisional.segmentstore.core.BasicSegment2;
-import org.eclipse.tracecompass.internal.provisional.segmentstore.core.ISegment2;
+import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
+import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 
 /**
@@ -34,9 +34,9 @@ import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
  * @author Loic Prieur-Drevon
  * @author Geneviève Bastien
  * @param <E>
- *            type of {@link ISegment2}
+ *            type of {@link ISegment}
  */
-public class SegmentTreeNode<E extends ISegment2> extends OverlappingNode<E> {
+public class SegmentTreeNode<E extends ISegment> extends OverlappingNode<E> {
 
     // These values represent the values for the current node only, not its
     // children
@@ -70,9 +70,9 @@ public class SegmentTreeNode<E extends ISegment2> extends OverlappingNode<E> {
      * Adds the data concerning the segment nodes, max start/min end and
      * durations
      *
-     * @param <E>  type of {@link ISegment2}
+     * @param <E>  type of {@link ISegment}
      */
-    protected static class OverlappingSegmentCoreData<E extends ISegment2> extends OverlappingExtraData {
+    protected static class OverlappingSegmentCoreData<E extends ISegment> extends OverlappingExtraData {
 
         // These values cover the full subtrees of the child nodes
         // Max start of an interval
@@ -305,22 +305,22 @@ public class SegmentTreeNode<E extends ISegment2> extends OverlappingNode<E> {
          * @return A segment whose value for the field that correspond to the
          *         comparator is the least value of the child node
          */
-        public ISegment2 getIndex(int index, Comparator<E> order) {
+        public ISegment getIndex(int index, Comparator<E> order) {
             if (order.equals(SegmentComparators.INTERVAL_START_COMPARATOR)) {
-                return new BasicSegment2(getChildStart(index), getChildStart(index));
+                return new BasicSegment(getChildStart(index), getChildStart(index));
             } else if (order.equals(SegmentComparators.INTERVAL_START_COMPARATOR.reversed())) {
-                return new BasicSegment2(fChildMaxStart[index], fChildMaxStart[index]);
+                return new BasicSegment(fChildMaxStart[index], fChildMaxStart[index]);
             } else if (order.equals(SegmentComparators.INTERVAL_END_COMPARATOR)) {
-                return new BasicSegment2(fChildMinEnd[index], fChildMinEnd[index]);
+                return new BasicSegment(fChildMinEnd[index], fChildMinEnd[index]);
             } else if (order.equals(SegmentComparators.INTERVAL_END_COMPARATOR.reversed())) {
-                return new BasicSegment2(getChildEnd(index), getChildEnd(index));
+                return new BasicSegment(getChildEnd(index), getChildEnd(index));
             } else if (order.equals(SegmentComparators.INTERVAL_LENGTH_COMPARATOR)) {
-                return new BasicSegment2(0, fMinLength[index]);
+                return new BasicSegment(0, fMinLength[index]);
             } else if (order.equals(SegmentComparators.INTERVAL_LENGTH_COMPARATOR.reversed())) {
-                return new BasicSegment2(0, fMaxLength[index]);
+                return new BasicSegment(0, fMaxLength[index]);
             }
             // TODO: Don't know what to do with other comparators yet
-            return new BasicSegment2(getChild(index), getChild(index));
+            return new BasicSegment(getChild(index), getChild(index));
         }
 
     }
@@ -395,10 +395,10 @@ public class SegmentTreeNode<E extends ISegment2> extends OverlappingNode<E> {
      * @return For each intersecting child, a Tuple with the segment with the
      *         least value for the comparator
      */
-    public Set<Tuple<ISegment2>> selectNextChildren(TimeRangeCondition range, Comparator<E> order) {
+    public Set<Tuple<ISegment>> selectNextChildren(TimeRangeCondition range, Comparator<E> order) {
         OverlappingSegmentCoreData<E> extraData = getCoreNodeData();
         if (extraData != null) {
-            Set<Tuple<ISegment2>> set = new HashSet<>();
+            Set<Tuple<ISegment>> set = new HashSet<>();
             for (Integer index : extraData.selectNextIndices(range)) {
                 set.add(new Tuple<>(extraData.getIndex(index, order), extraData.getChild(index)));
             }

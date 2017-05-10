@@ -11,6 +11,7 @@ Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.tmf.core,
+ org.eclipse.tracecompass.datastore.core,
  org.eclipse.tracecompass.segmentstore.core,
  org.eclipse.tracecompass.analysis.timing.core
 Export-Package: org.eclipse.tracecompass.internal.tmf.analysis.xml.core;x-friends:="org.eclipse.tracecompass.tmf.analysis.xml.core.tests",

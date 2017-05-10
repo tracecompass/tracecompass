@@ -9,12 +9,24 @@
 
 package org.eclipse.tracecompass.segmentstore.core;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
+import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWriter;
+
 /**
  * Basic implementation of {@link ISegment}.
  *
  * @author Alexandre Montplaisir
  */
 public class BasicSegment implements ISegment {
+
+    /**
+     * The factory to read an object from a buffer
+     * @since 2.0
+     */
+    public static final IHTIntervalReader<BasicSegment> BASIC_SEGMENT_READ_FACTORY = buffer -> {
+            return new BasicSegment(buffer.getLong(), buffer.getLong());
+    };
 
     private static final long serialVersionUID = -3257452887960883177L;
 
@@ -49,8 +61,27 @@ public class BasicSegment implements ISegment {
         return fEnd;
     }
 
+    /**
+     * @since 2.0
+     */
+    @Override
+    public int getSizeOnDisk() {
+        // Save the start and end time
+        return Long.BYTES * 2;
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public void writeSegment(@NonNull ISafeByteBufferWriter buffer) {
+        buffer.putLong(getStart());
+        buffer.putLong(getEnd());
+    }
+
     @Override
     public String toString() {
         return new String('[' + String.valueOf(fStart) + ", " + String.valueOf(fEnd) + ']'); //$NON-NLS-1$
     }
+
 }

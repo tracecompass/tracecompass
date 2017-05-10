@@ -20,7 +20,6 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
-import org.eclipse.tracecompass.internal.provisional.segmentstore.core.ISegment2;
 import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.ArrayListStore;
 import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.LazyArrayListStore;
 import org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree.HistoryTreeSegmentStore;
@@ -131,7 +130,7 @@ public final class SegmentStoreFactory<E> {
      *             Exceptions when creating the segment store
      * @since 2.0
      */
-    public static <E extends ISegment2> ISegmentStore<E> createOnDiskSegmentStore(Path segmentFile, IHTIntervalReader<E> segmentReader) throws IOException {
+    public static <E extends ISegment> ISegmentStore<E> createOnDiskSegmentStore(Path segmentFile, IHTIntervalReader<E> segmentReader) throws IOException {
         return new HistoryTreeSegmentStore<>(segmentFile, segmentReader);
     }
 

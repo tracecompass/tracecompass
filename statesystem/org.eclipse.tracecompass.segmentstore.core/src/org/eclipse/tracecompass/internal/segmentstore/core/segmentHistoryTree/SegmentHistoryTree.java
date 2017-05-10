@@ -28,7 +28,6 @@ import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.Ti
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTNode;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.IHTNode;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.overlapping.AbstractOverlappingHistoryTree;
-import org.eclipse.tracecompass.internal.provisional.segmentstore.core.ISegment2;
 import org.eclipse.tracecompass.internal.segmentstore.core.Activator;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
@@ -44,7 +43,7 @@ import com.google.common.annotations.VisibleForTesting;
  * @param <E>
  *            type of {@link ISegment}
  */
-public class SegmentHistoryTree<E extends ISegment2> extends AbstractOverlappingHistoryTree<E, SegmentTreeNode<E>> {
+public class SegmentHistoryTree<E extends ISegment> extends AbstractOverlappingHistoryTree<E, SegmentTreeNode<E>> {
 
     private static final int HISTORY_MAGIC_NUMBER = 0x05FFC600;
 

@@ -14,9 +14,9 @@ import java.io.IOException;
 
 import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.IHistoryTree;
-import org.eclipse.tracecompass.internal.provisional.segmentstore.core.ISegment2;
 import org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree.SegmentHistoryTree;
 import org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree.SegmentTreeNode;
+import org.eclipse.tracecompass.segmentstore.core.ISegment;
 
 /**
  * A stub segment history tree that extends the base segment history tree and
@@ -26,7 +26,7 @@ import org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree.Se
  * @param <E>
  *            The type of segments that goes in this tree
  */
-public class SegmentHistoryTreeStub<E extends ISegment2> extends SegmentHistoryTree<E> {
+public class SegmentHistoryTreeStub<E extends ISegment> extends SegmentHistoryTree<E> {
 
     private int fLastInsertionIndex;
 

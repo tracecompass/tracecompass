@@ -28,7 +28,6 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWriter;
 import org.eclipse.tracecompass.datastore.core.serialization.SafeByteBufferFactory;
-import org.eclipse.tracecompass.internal.provisional.segmentstore.core.ISegment2;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -90,7 +89,7 @@ public abstract class AbstractTestSegmentStore {
      *
      * @author Geneviève Bastien
      */
-    protected static final class TestSegment implements ISegment2 {
+    protected static final class TestSegment implements ISegment {
 
         /**
          * The reader for this class
