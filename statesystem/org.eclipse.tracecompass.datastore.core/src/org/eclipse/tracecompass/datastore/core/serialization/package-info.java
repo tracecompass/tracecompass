@@ -8,4 +8,4 @@
  *******************************************************************************/
 
 @org.eclipse.jdt.annotation.NonNullByDefault
-package org.eclipse.tracecompass.internal.provisional.datastore.core.serialization;
+package org.eclipse.tracecompass.datastore.core.serialization;

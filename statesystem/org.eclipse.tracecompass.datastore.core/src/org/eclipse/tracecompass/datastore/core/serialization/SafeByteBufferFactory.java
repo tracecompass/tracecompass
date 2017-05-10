@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.provisional.datastore.core.serialization;
+package org.eclipse.tracecompass.datastore.core.serialization;
 
 import java.nio.ByteBuffer;
 
@@ -18,6 +18,7 @@ import org.eclipse.tracecompass.internal.datastore.core.serialization.SafeByteBu
  * ByteBuffer instance
  *
  * @author Geneviève Bastien
+ * @since 1.1
  */
 public final class SafeByteBufferFactory {
 

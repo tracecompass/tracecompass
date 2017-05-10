@@ -14,12 +14,13 @@ import java.util.StringJoiner;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferWriter;
+import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWriter;
 
 /**
  * Basic implementation of {@link IHTInterval}.
  *
  * @author Geneviève Bastien
+ * @since 1.1
  */
 public class HTInterval implements IHTInterval {
 

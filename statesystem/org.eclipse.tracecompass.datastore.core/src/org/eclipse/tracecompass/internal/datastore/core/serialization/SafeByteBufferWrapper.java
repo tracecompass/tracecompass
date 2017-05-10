@@ -11,8 +11,8 @@ package org.eclipse.tracecompass.internal.datastore.core.serialization;
 
 import java.nio.ByteBuffer;
 
-import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferReader;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferWriter;
+import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferReader;
+import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWriter;
 
 /**
  * This class is a wrapper around a ByteBuffer. The size to read/write to the

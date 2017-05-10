@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.datastore.core.interval;
  *
  * @author Alexandre Montplaisir
  * @author Geneviève Bastien
+ * @since 1.1
  */
 public interface IHTInterval extends ISerializableObject {
 

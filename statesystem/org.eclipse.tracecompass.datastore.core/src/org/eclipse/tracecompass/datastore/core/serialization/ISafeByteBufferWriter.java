@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.provisional.datastore.core.serialization;
+package org.eclipse.tracecompass.datastore.core.serialization;
 
 /**
  * Interface for a safe ByteBuffer for writing purposes. This interface allows
@@ -17,6 +17,7 @@ package org.eclipse.tracecompass.internal.provisional.datastore.core.serializati
  *
  * @author Geneviève Bastien
  * @noimplement This interface is not intended to be implemented by clients.
+ * @since 1.1
  */
 public interface ISafeByteBufferWriter {
 

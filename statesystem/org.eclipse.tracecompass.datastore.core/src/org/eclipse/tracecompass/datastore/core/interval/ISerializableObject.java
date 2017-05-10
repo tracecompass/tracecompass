@@ -9,12 +9,13 @@
 
 package org.eclipse.tracecompass.datastore.core.interval;
 
-import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferWriter;
+import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWriter;
 
 /**
  * An object that can be serialized
  *
  * @author Geneviève Bastien
+ * @since 1.1
  */
 public interface ISerializableObject {
 

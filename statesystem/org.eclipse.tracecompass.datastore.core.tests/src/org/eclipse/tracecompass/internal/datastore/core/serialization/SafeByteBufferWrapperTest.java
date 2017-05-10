@@ -16,9 +16,9 @@ import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferReader;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferWriter;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.SafeByteBufferFactory;
+import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferReader;
+import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWriter;
+import org.eclipse.tracecompass.datastore.core.serialization.SafeByteBufferFactory;
 import org.junit.Test;
 
 /**

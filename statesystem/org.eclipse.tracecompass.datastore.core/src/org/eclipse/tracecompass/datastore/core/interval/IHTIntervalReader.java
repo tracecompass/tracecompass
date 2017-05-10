@@ -9,7 +9,7 @@
 
 package org.eclipse.tracecompass.datastore.core.interval;
 
-import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferReader;
+import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferReader;
 
 /**
  * A factory that reads object from a byte buffer and create a new object
@@ -17,6 +17,7 @@ import org.eclipse.tracecompass.internal.provisional.datastore.core.serializatio
  * @author Geneviève Bastien
  * @param <E>
  *            The type of objects that will be read
+ * @since 1.1
  */
 @FunctionalInterface
 public interface IHTIntervalReader<E extends IHTInterval> {
