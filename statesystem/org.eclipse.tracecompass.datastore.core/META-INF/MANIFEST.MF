@@ -11,7 +11,8 @@ Bundle-ActivationPolicy: lazy
 Eclipse-ExtensibleAPI: true
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.common.core
-Export-Package: org.eclipse.tracecompass.internal.datastore.core;x-internal:=true,
+Export-Package: org.eclipse.tracecompass.datastore.core.interval,
+ org.eclipse.tracecompass.internal.datastore.core;x-internal:=true,
  org.eclipse.tracecompass.internal.datastore.core.condition;x-internal:=true,
  org.eclipse.tracecompass.internal.datastore.core.historytree;x-internal:=true,
  org.eclipse.tracecompass.internal.datastore.core.serialization;x-internal:=true,
@@ -20,11 +21,10 @@ Export-Package: org.eclipse.tracecompass.internal.datastore.core;x-internal:=tru
  org.eclipse.tracecompass.internal.provisional.datastore.core.historytree;x-friends:="org.eclipse.tracecompass.segmentstore.core,org.eclipse.tracecompass.segmentstore.core.tests",
  org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.classic;x-friends:="org.eclipse.tracecompass.statesystem.core,org.eclipse.tracecompass.statesystem.core.tests",
  org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.overlapping;x-friends:="org.eclipse.tracecompass.segmentstore.core,org.eclipse.tracecompass.segmentstore.core.tests",
- org.eclipse.tracecompass.internal.provisional.datastore.core.interval;x-friends:="org.eclipse.tracecompass.segmentstore.core,org.eclipse.tracecompass.segmentstore.core.tests",
  org.eclipse.tracecompass.internal.provisional.datastore.core.serialization;
   x-friends:="org.eclipse.tracecompass.statesystem.core,
-  org.eclipse.tracecompass.statesystem.core.tests,
-  org.eclipse.tracecompass.segmentstore.core,
+   org.eclipse.tracecompass.statesystem.core.tests,
+   org.eclipse.tracecompass.segmentstore.core,
    org.eclipse.tracecompass.segmentstore.core.tests"
 Import-Package: com.google.common.annotations,
  com.google.common.base,

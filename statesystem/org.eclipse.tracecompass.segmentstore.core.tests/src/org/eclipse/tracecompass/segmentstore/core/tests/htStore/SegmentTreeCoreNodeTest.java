@@ -17,11 +17,11 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.AbstractHistoryTree.IHTNodeFactory;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTCoreNodeTest;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTNode;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.internal.provisional.segmentstore.core.BasicSegment2;
 import org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree.SegmentTreeNode;
 import org.eclipse.tracecompass.segmentstore.core.tests.historytree.SegmentTreeNodeStub;

@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.provisional.datastore.core.interval;
+package org.eclipse.tracecompass.datastore.core.interval;
 
 import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferReader;
 

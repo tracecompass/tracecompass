@@ -12,8 +12,8 @@ package org.eclipse.tracecompass.segmentstore.core.tests.historytree;
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.IHistoryTree;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.internal.provisional.segmentstore.core.ISegment2;
 import org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree.SegmentHistoryTree;
 import org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree.SegmentTreeNode;

@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.provisional.datastore.core.interval;
+package org.eclipse.tracecompass.datastore.core.interval;
 
 import java.util.Objects;
 import java.util.StringJoiner;

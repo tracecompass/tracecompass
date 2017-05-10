@@ -9,7 +9,7 @@
 
 package org.eclipse.tracecompass.internal.provisional.segmentstore.core;
 
-import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
+import org.eclipse.tracecompass.datastore.core.interval.IHTInterval;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 
 /**

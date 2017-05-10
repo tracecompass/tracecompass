@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.provisional.datastore.core.interval;
+package org.eclipse.tracecompass.datastore.core.interval;
 
 /**
  * Generic interface for any serializable object (like a time range) that can be used in the

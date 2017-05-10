@@ -12,10 +12,10 @@ package org.eclipse.tracecompass.internal.provisional.datastore.core.historytree
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.tracecompass.datastore.core.interval.HTInterval;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.AbstractHistoryTree;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTNode;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HistoryTreeStub;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.HTInterval;
 
 /**
  * Test the default abstract implementation of the tree, with a concrete stub.

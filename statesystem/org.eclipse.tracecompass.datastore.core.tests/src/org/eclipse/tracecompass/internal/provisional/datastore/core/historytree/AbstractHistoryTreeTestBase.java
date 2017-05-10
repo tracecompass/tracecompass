@@ -21,9 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.datastore.core.interval.IHTInterval;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.AbstractHistoryTree;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTNode;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -13,10 +13,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.eclipse.tracecompass.datastore.core.interval.IHTInterval;
+import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.AbstractHistoryTree;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTIntervalReader;
 
 import com.google.common.annotations.VisibleForTesting;
 

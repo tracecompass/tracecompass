@@ -12,9 +12,9 @@ package org.eclipse.tracecompass.internal.provisional.datastore.core.historytree
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.tracecompass.datastore.core.interval.HTInterval;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.classic.ClassicHistoryTree;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.classic.ClassicNode;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.HTInterval;
 
 /**
  * A stub for the classic history tree. Limits type "E" to {@link HTInterval}.

@@ -16,10 +16,10 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.datastore.core.interval.HTInterval;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.AbstractHistoryTree;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.AbstractHistoryTreeTestBase;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HtTestUtils;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.HTInterval;
 import org.junit.Test;
 
 /**

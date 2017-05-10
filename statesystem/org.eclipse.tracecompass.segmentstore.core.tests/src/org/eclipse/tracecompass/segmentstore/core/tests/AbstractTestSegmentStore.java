@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTIntervalReader;
+import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.ISafeByteBufferWriter;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.serialization.SafeByteBufferFactory;
 import org.eclipse.tracecompass.internal.provisional.segmentstore.core.ISegment2;

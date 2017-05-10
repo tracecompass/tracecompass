@@ -14,9 +14,9 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.tracecompass.datastore.core.interval.IHTInterval;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.AbstractHistoryTreeTestBase;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HtTestUtils;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
 import org.junit.Test;
 
 /**

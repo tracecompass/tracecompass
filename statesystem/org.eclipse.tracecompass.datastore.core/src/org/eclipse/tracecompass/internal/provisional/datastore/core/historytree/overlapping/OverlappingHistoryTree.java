@@ -12,8 +12,8 @@ package org.eclipse.tracecompass.internal.provisional.datastore.core.historytree
 import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTInterval;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTIntervalReader;
+import org.eclipse.tracecompass.datastore.core.interval.IHTInterval;
+import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 
 /**
  * Basic implementation of {@link AbstractOverlappingHistoryTree} that can

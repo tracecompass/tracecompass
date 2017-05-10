@@ -9,8 +9,8 @@
 
 package org.eclipse.tracecompass.internal.provisional.segmentstore.core;
 
-import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.HTInterval;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.IHTIntervalReader;
+import org.eclipse.tracecompass.datastore.core.interval.HTInterval;
+import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 
 /**
  * Extension of the BasicSegment, to implement ISegment2 so that it can be

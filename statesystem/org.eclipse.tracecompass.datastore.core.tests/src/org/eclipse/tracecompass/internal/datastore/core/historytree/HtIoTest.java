@@ -20,12 +20,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.datastore.core.interval.HTInterval;
 import org.eclipse.tracecompass.internal.datastore.core.historytree.HtIo;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTNode;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HistoryTreeStub;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HtTestUtils;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.IHTNode.NodeType;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.interval.HTInterval;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
