@@ -37,6 +37,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
+import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventFactory;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTraceValidationStatus;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfUtils;
@@ -78,6 +79,19 @@ public class LttngUstTrace extends CtfTmfTrace {
      */
     public LttngUstTrace() {
         super(LttngUstEventFactory.instance());
+    }
+
+    /**
+     * Protected constructor for child classes. Classes extending this one may
+     * have extra fields coming from the event itself and may pass their own
+     * event factory.
+     *
+     * @param factory
+     *            The event factory for this specific trace
+     * @since 2.2
+     */
+    protected LttngUstTrace(@NonNull CtfTmfEventFactory factory) {
+        super(factory);
     }
 
     /**
