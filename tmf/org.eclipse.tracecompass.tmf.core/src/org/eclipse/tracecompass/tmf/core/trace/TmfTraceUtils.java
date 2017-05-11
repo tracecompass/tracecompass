@@ -156,6 +156,44 @@ public final class TmfTraceUtils {
     }
 
     /**
+     * Return the first result of the first aspect that resolves as non null for
+     * the event received in parameter. If the returned value is not null, it
+     * can be safely cast to the aspect's class proper return type.
+     *
+     * @param trace
+     *            The trace for which you want the event aspects
+     * @param aspectName
+     *            The class of the aspect(s) to resolve
+     * @param event
+     *            The event for which to get the aspect
+     * @return The first result of the
+     *         {@link ITmfEventAspect#resolve(ITmfEvent)} that returns non null
+     *         for the event or {@code null} otherwise
+     * @since 2.4
+     */
+    public static @Nullable Object resolveAspectOfNameForEvent(ITmfTrace trace, String aspectName, ITmfEvent event) {
+        // First look in the trace aspects
+        Object value = StreamUtils.getStream(trace.getEventAspects())
+                .filter(aspect -> aspectName.equalsIgnoreCase(aspect.getName()))
+                .map(aspect -> aspect.resolve(event))
+                .filter(obj -> obj != null)
+                .findFirst().orElse(null);
+        if (value != null) {
+            return value;
+        }
+        // If the value is not found, look at the global aspects
+        for (ITmfEventAspect<?> aspect : EXTRA_ASPECTS) {
+            if (aspectName.equalsIgnoreCase(aspect.getName())) {
+                value = aspect.resolve(event);
+                if (value != null) {
+                    return value;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Return the first result of the first aspect that resolves as a non-null
      * Integer for the event received in parameter. If no matching aspects are
      * found then null is returned.

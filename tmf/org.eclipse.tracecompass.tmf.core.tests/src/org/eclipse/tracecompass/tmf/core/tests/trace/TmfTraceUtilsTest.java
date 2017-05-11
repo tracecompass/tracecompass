@@ -85,15 +85,16 @@ public class TmfTraceUtilsTest {
     private static class TestEventAspect implements ITmfEventAspect<Integer> {
 
         public static final Integer RESOLVED_VALUE = 2;
+        public static final @NonNull String ASPECT_NAME = "test";
 
         @Override
         public @NonNull String getName() {
-            return "test";
+            return ASPECT_NAME;
         }
 
         @Override
         public @NonNull String getHelpText() {
-            return "test";
+            return ASPECT_NAME;
         }
 
         @Override
@@ -187,7 +188,29 @@ public class TmfTraceUtilsTest {
     }
 
     /**
-     * Test the {@link TmfTraceUtils#registerEventAspect(ITmfEventAspect)} method
+     * Test the
+     * {@link TmfTraceUtils#resolveAspectOfNameForEvent(ITmfTrace, String, ITmfEvent)}
+     * method.
+     */
+    @Test
+    public void testResolveEventAspectsOfNameForEvent() {
+        TmfTrace trace = fTrace;
+        assertNotNull(trace);
+
+        ITmfContext context = trace.seekEvent(0L);
+        ITmfEvent event = trace.getNext(context);
+        assertNotNull(event);
+
+        /* Make sure the CPU aspect returns the expected value */
+        Object cpuObj = TmfTraceUtils.resolveAspectOfNameForEvent(trace, "cpu", event);
+        assertNotNull(cpuObj);
+        assertEquals(1, cpuObj);
+
+    }
+
+    /**
+     * Test the {@link TmfTraceUtils#registerEventAspect(ITmfEventAspect)}
+     * method
      */
     @Test
     public void testAdditionalAspects() {
@@ -199,13 +222,22 @@ public class TmfTraceUtilsTest {
         ITmfEvent event = trace.getNext(context);
         assertNotNull(event);
 
+        // Make sure the aspect is not resolved
         Object obj = TmfTraceUtils.resolveEventAspectOfClassForEvent(trace, TestEventAspect.class, event);
+        assertNull(obj);
+
+        obj = TmfTraceUtils.resolveAspectOfNameForEvent(trace, TestEventAspect.ASPECT_NAME, event);
         assertNull(obj);
 
         // Register the aspect
         TmfTraceUtils.registerEventAspect(new TestEventAspect());
         // See that the aspect is resolved now
         obj = TmfTraceUtils.resolveEventAspectOfClassForEvent(trace, TestEventAspect.class, event);
+        assertNotNull(obj);
+        assertEquals(TestEventAspect.RESOLVED_VALUE, obj);
+
+        // See if it is resolved by name as well
+        obj = TmfTraceUtils.resolveAspectOfNameForEvent(trace, TestEventAspect.ASPECT_NAME, event);
         assertNotNull(obj);
         assertEquals(TestEventAspect.RESOLVED_VALUE, obj);
     }
