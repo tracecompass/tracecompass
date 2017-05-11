@@ -14,12 +14,14 @@ package org.eclipse.tracecompass.tmf.core.tests.trace;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Collection;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
@@ -76,6 +78,27 @@ public class TmfTraceUtilsTest {
         @Override
         public Iterable<ITmfEventAspect<?>> getEventAspects() {
             return EVENT_ASPECTS;
+        }
+
+    }
+
+    private static class TestEventAspect implements ITmfEventAspect<Integer> {
+
+        public static final Integer RESOLVED_VALUE = 2;
+
+        @Override
+        public @NonNull String getName() {
+            return "test";
+        }
+
+        @Override
+        public @NonNull String getHelpText() {
+            return "test";
+        }
+
+        @Override
+        public @Nullable Integer resolve(@NonNull ITmfEvent event) {
+            return RESOLVED_VALUE;
         }
 
     }
@@ -157,9 +180,33 @@ public class TmfTraceUtilsTest {
         assertNotNull(event);
 
         /* Make sure the CPU aspect returns the expected value */
-        Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(trace,  TmfCpuAspect.class, event);
+        Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(trace, TmfCpuAspect.class, event);
         assertNotNull(cpuObj);
         assertEquals(1, cpuObj);
 
+    }
+
+    /**
+     * Test the {@link TmfTraceUtils#registerEventAspect(ITmfEventAspect)} method
+     */
+    @Test
+    public void testAdditionalAspects() {
+        TmfTrace trace = fTrace;
+
+        assertNotNull(trace);
+
+        ITmfContext context = trace.seekEvent(0L);
+        ITmfEvent event = trace.getNext(context);
+        assertNotNull(event);
+
+        Object obj = TmfTraceUtils.resolveEventAspectOfClassForEvent(trace, TestEventAspect.class, event);
+        assertNull(obj);
+
+        // Register the aspect
+        TmfTraceUtils.registerEventAspect(new TestEventAspect());
+        // See that the aspect is resolved now
+        obj = TmfTraceUtils.resolveEventAspectOfClassForEvent(trace, TestEventAspect.class, event);
+        assertNotNull(obj);
+        assertEquals(TestEventAspect.RESOLVED_VALUE, obj);
     }
 }

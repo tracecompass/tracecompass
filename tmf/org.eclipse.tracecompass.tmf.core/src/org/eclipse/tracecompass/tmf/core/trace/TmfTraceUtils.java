@@ -19,8 +19,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -46,6 +48,7 @@ import com.google.common.collect.Lists;
 public final class TmfTraceUtils {
 
     private static final int MAX_NB_BINARY_BYTES = 2048;
+    private static final Set<ITmfEventAspect<?>> EXTRA_ASPECTS = new HashSet<>();
 
     private TmfTraceUtils() {
     }
@@ -72,6 +75,21 @@ public final class TmfTraceUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * Registers an extra event aspect that may apply to all traces, not
+     * directly linked to a trace type. These can be used to retrieve values
+     * using the
+     * {@link #resolveEventAspectOfClassForEvent(ITmfTrace, Class, ITmfEvent)}
+     * method, but will not appear where trace aspects are being displayed.
+     *
+     * @param aspect
+     *            The event aspect to register
+     * @since 2.4
+     */
+    public static void registerEventAspect(ITmfEventAspect<?> aspect) {
+        EXTRA_ASPECTS.add(aspect);
     }
 
     /**
@@ -120,11 +138,21 @@ public final class TmfTraceUtils {
      */
     public static <T extends ITmfEventAspect<?>> @Nullable Object resolveEventAspectOfClassForEvent(
             ITmfTrace trace, Class<T> aspectClass, ITmfEvent event) {
-            return StreamUtils.getStream(trace.getEventAspects())
-                    .filter(aspect -> aspectClass.isAssignableFrom(aspect.getClass()))
-                    .map(aspect -> aspect.resolve(event))
-                    .filter(obj -> obj != null)
-                    .findFirst().orElse(null);
+        // First look in the trace aspects
+        Object value = StreamUtils.getStream(trace.getEventAspects())
+                .filter(aspect -> aspectClass.isAssignableFrom(aspect.getClass()))
+                .map(aspect -> aspect.resolve(event))
+                .filter(obj -> obj != null)
+                .findFirst().orElse(null);
+        if (value != null) {
+            return value;
+        }
+        // If the value is not found, look at the global aspects
+        return EXTRA_ASPECTS.stream()
+                .filter(aspect -> aspectClass.isAssignableFrom(aspect.getClass()))
+                .map(aspect -> aspect.resolve(event))
+                .filter(obj -> obj != null)
+                .findFirst().orElse(null);
     }
 
     /**
