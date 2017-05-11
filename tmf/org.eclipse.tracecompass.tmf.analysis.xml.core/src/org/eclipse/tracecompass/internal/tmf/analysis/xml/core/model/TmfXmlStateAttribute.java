@@ -31,7 +31,6 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
-import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.w3c.dom.Element;
@@ -240,12 +239,7 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                         return IXmlStateSystemContainer.ERROR_QUARK;
                     }
                     /* Search between the trace event aspects */
-                    for (ITmfEventAspect<?> aspect : event.getTrace().getEventAspects()) {
-                        if (aspect.getName().equals(fName)) {
-                            fieldValue = aspect.resolve(event);
-                            break;
-                        }
-                    }
+                    fieldValue = TmfTraceUtils.resolveAspectOfNameForEvent(event.getTrace(), name, event);
                 } else {
                     fieldValue = field.getValue();
                 }

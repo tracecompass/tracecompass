@@ -30,7 +30,6 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
-import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.w3c.dom.Element;
@@ -316,12 +315,7 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
                 return TmfStateValue.newValueLong(event.getTimestamp().getValue());
             }
             // This will allow to use any column as input
-            for (ITmfEventAspect<?> aspect : event.getTrace().getEventAspects()) {
-                if (aspect.getName().equals(fieldName)) {
-                    fieldValue = aspect.resolve(event);
-                    break;
-                }
-            }
+            fieldValue = TmfTraceUtils.resolveAspectOfNameForEvent(event.getTrace(), fieldName, event);
             if (fieldValue == null) {
                 return value;
             }
