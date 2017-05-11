@@ -611,13 +611,13 @@
         <plugin>
           <groupId>org.jboss.tools.tycho-plugins</groupId>
           <artifactId>repository-utils</artifactId>
-          <version>0.26.1</version>
+          <version>1.0.0</version>
         </plugin>
 
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>sonar-maven-plugin</artifactId>
-          <version>3.2</version>
+          <version>3.3.0.603</version>
         </plugin>
 
         <plugin>
