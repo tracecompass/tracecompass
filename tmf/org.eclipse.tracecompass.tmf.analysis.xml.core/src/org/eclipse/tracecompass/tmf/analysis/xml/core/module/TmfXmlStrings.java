@@ -85,6 +85,7 @@ public interface TmfXmlStrings {
     String STACK_PUSH = "push";
     String STACK_PEEK = "peek";
     String CPU = "cpu";
+    String HOSTID = "hostId";
 
     String TIMESTAMP = "timestamp";
 

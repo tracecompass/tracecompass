@@ -313,6 +313,9 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
                  * event
                  */
                 return TmfStateValue.newValueLong(event.getTimestamp().getValue());
+            } else if (fieldName.equalsIgnoreCase(TmfXmlStrings.HOSTID)) {
+                /* Return the host ID of the trace containing the event */
+                return TmfStateValue.newValueString(event.getTrace().getHostId());
             }
             // This will allow to use any column as input
             fieldValue = TmfTraceUtils.resolveAspectOfNameForEvent(event.getTrace(), fieldName, event);

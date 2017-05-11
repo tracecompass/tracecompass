@@ -34,6 +34,10 @@
 				<stateValue type="string" value="UNKNOWN" />
 			</stateChange>
 			<stateChange>
+				<stateAttribute type="constant" value="hostID" />
+				<stateValue type="eventField" value="hostID" />
+			</stateChange>
+			<stateChange>
 				<stateAttribute type="constant" value="stack"/>
 				<stateValue stack="push" type="eventField" value="timestamp" />
 			</stateChange>

@@ -237,6 +237,9 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                             return getQuarkRelativeAndAdd(startQuark, cpu.toString());
                         }
                         return IXmlStateSystemContainer.ERROR_QUARK;
+                    } else if (name.equalsIgnoreCase(TmfXmlStrings.HOSTID)) {
+                        /* Return the host ID of the trace containing the event */
+                        return getQuarkRelativeAndAdd(startQuark, event.getTrace().getHostId());
                     }
                     /* Search between the trace event aspects */
                     fieldValue = TmfTraceUtils.resolveAspectOfNameForEvent(event.getTrace(), name, event);

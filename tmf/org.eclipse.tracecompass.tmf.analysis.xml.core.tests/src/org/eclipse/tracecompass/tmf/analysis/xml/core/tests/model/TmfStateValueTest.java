@@ -169,4 +169,28 @@ public class TmfStateValueTest {
         XmlUtilsTest.verifyStateIntervals("testMappingGroups", ss, quark, expectedStarts, expectedValues);
 
     }
+
+    /**
+     * Test using the HostID event field. It should give the host ID for value
+     *
+     * @throws StateSystemDisposedException
+     *             Exceptions thrown during state system verification
+     * @throws AttributeNotFoundException
+     *             Exceptions thrown during state system verification
+     */
+    @Test
+    public void testStateValueHostId() throws AttributeNotFoundException, StateSystemDisposedException {
+        XmlStateSystemModule module = fModule;
+        assertNotNull(module);
+
+        ITmfStateSystem ss = module.getStateSystem();
+        assertNotNull(ss);
+
+        int quark = ss.getQuarkAbsolute("hostID");
+
+        final int[] expectedStarts = { 1, 7 };
+        ITmfStateValue[] expectedValues = { TmfStateValue.newValueString("testTrace4.xml") };
+        XmlUtilsTest.verifyStateIntervals("testHostId", ss, quark, expectedStarts, expectedValues);
+
+    }
 }
