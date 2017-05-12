@@ -62,6 +62,15 @@
 							<xs:documentation>The text to name this pattern provider (and the analysis it will generate).</xs:documentation></xs:annotation></xs:attribute>
 				</xs:complexType>
 			</xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="viewLabelPrefix">
+                <xs:annotation>
+                    <xs:documentation>Adds a label prefix to the pattern latency views. If provided, this text will be used as prefix for the name of the latency views associated with this analysis</xs:documentation></xs:annotation>
+                <xs:complexType>
+                    <xs:attribute name="value" >
+                        <xs:annotation>
+                            <xs:documentation>The text to use as prefix name this pattern latency views.</xs:documentation></xs:annotation></xs:attribute>
+                </xs:complexType>
+            </xs:element>
 		</xs:sequence>
 	</xs:complexType>
 

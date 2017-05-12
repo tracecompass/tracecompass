@@ -98,6 +98,7 @@ TRYLOCK_PI	136		264
 	<head>
 		<traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
 		<label value="XML Futex Contention Analysis" />
+		<viewLabelPrefix value="Contention" />
 	</head>
 
 	<location id="CurrentCPU">

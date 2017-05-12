@@ -109,6 +109,27 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
         return name;
     }
 
+    /**
+     * Get the XML view prefix label
+     *
+     * @return XML view prefix label or empty string if the value is missing in
+     *         the XML element
+     */
+    public @NonNull String getViewLabelPrefix() {
+        if (!fType.equals(XmlAnalysisModuleType.PATTERN)) {
+            return TmfXmlStrings.EMPTY_STRING;
+        }
+        String viewLabel = TmfXmlStrings.EMPTY_STRING;
+        List<Element> head = TmfXmlUtils.getChildElements(fSourceElement, TmfXmlStrings.HEAD);
+        if (head.size() == 1) {
+            List<Element> labels = TmfXmlUtils.getChildElements(head.get(0), TmfXmlStrings.VIEW_LABEL_PREFIX);
+            if (!labels.isEmpty()) {
+                viewLabel = labels.get(0).getAttribute(TmfXmlStrings.VALUE);
+            }
+        }
+        return viewLabel;
+    }
+
     @Override
     public boolean isAutomatic() {
         return false;
@@ -121,12 +142,12 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
 
     @Override
     public String getHelpText() {
-        return ""; //$NON-NLS-1$
+        return TmfXmlStrings.EMPTY_STRING;
     }
 
     @Override
     public String getHelpText(@NonNull ITmfTrace trace) {
-        return ""; //$NON-NLS-1$
+        return TmfXmlStrings.EMPTY_STRING;
     }
 
     @Override
@@ -193,6 +214,7 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
             module.setId(analysisid);
             XmlPatternAnalysis paModule = (XmlPatternAnalysis) module;
             paModule.setXmlFile(fSourceFile.toPath());
+            paModule.setViewLabelPrefix(getViewLabelPrefix());
 
             break;
         case OTHER:

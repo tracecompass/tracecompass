@@ -46,6 +46,7 @@ public class PatternScatterGraphView extends TmfChartView {
                     if (newValue instanceof String) {
                         String data = (String) newValue;
                         fViewInfo.setViewData(data);
+                        setPartName(fViewInfo.getLabel());
                         loadLatencyView();
                     }
                 }

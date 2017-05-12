@@ -51,6 +51,15 @@ public class XmlLatencyViewInfo extends AbstractXmlViewInfo {
     }
 
     /**
+     * Get the view label
+     *
+     * @return The view label
+     */
+    public String getLabel() {
+        return fLabel;
+    }
+
+    /**
      * Set the data for this view and retrieves from it the analysis ID of the
      * pattern analysis this view belongs to and the view label.
      *

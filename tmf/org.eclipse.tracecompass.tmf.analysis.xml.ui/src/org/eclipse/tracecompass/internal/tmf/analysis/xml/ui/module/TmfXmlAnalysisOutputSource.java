@@ -50,6 +50,7 @@ import org.xml.sax.SAXException;
  */
 public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener {
 
+    private static final String LATENCY_STRING = "Latency"; //$NON-NLS-1$
     /** String separating data elements for the output properties */
     public static final @NonNull String DATA_SEPARATOR = ";;;"; //$NON-NLS-1$
 
@@ -189,8 +190,10 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
                 // Add the latency views for pattern analysis
                 if (module instanceof XmlPatternAnalysis) {
                     for (LatencyViewType viewType : LatencyViewType.values()) {
-                        IAnalysisOutput output = new TmfXmlLatencyViewOutput(viewType.getViewId(), viewType.getLabel());
-                        output.setOutputProperty(TmfXmlUiStrings.XML_LATENCY_OUTPUT_DATA, module.getId() + DATA_SEPARATOR + viewType.getLabel(), false);
+                        String viewLabelPrefix = ((XmlPatternAnalysis) module).getViewLabelPrefix();
+                        String label = viewLabelPrefix.isEmpty() ? viewType.getLabel() : viewType.getLabel().replaceFirst(LATENCY_STRING, viewLabelPrefix);
+                        IAnalysisOutput output = new TmfXmlLatencyViewOutput(viewType.getViewId(), label);
+                        output.setOutputProperty(TmfXmlUiStrings.XML_LATENCY_OUTPUT_DATA, module.getId() + DATA_SEPARATOR + output.getName(), false);
                         module.registerOutput(output);
                     }
                 }

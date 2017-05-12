@@ -50,6 +50,7 @@ public class PatternDensityView extends AbstractSegmentStoreDensityView {
                     if (newValue instanceof String) {
                         String data = (String) newValue;
                         fViewInfo.setViewData(data);
+                        setPartName(fViewInfo.getLabel());
                         loadTableViewer();
                         loadDensityViewer();
                     }

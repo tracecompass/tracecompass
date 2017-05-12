@@ -61,6 +61,7 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
     private XmlPatternStateSystemModule fStateSystemModule;
     private XmlPatternSegmentStoreModule fSegmentStoreModule;
     private boolean fInitializationSucceeded;
+    private String fViewLabelPrefix;
 
     /**
      * Constructor
@@ -84,6 +85,25 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
     @Override
     public @NonNull Iterable<@NonNull ITmfStateSystem> getStateSystems() {
         return fStateSystemModule.getStateSystems();
+    }
+
+    /**
+     * Set the associated view label prefix
+     *
+     * @param viewLabelPrefix
+     *            The view label prefix
+     */
+    public void setViewLabelPrefix(String viewLabelPrefix) {
+        fViewLabelPrefix = viewLabelPrefix;
+    }
+
+    /**
+     * Get the associated view label prefix
+     *
+     * @return The view label prefix
+     */
+    public String getViewLabelPrefix() {
+        return fViewLabelPrefix;
     }
 
     @Override

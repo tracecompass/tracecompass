@@ -43,6 +43,7 @@ public class PatternLatencyTableView extends AbstractSegmentStoreTableView {
                     if (newValue instanceof String) {
                         String data = (String) newValue;
                         fViewInfo.setViewData(data);
+                        setPartName(fViewInfo.getLabel());
                         loadLatencyView();
                     }
                 }
