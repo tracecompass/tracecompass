@@ -13,7 +13,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.Test;
@@ -34,13 +38,41 @@ public class CtfTmfReadBoundsTest {
     @Test
     public void testRapidBounds() {
         CtfTmfTrace trace = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.TRACE2);
-        trace.init(trace.getPath());
         try {
+            ITmfTimestamp start = trace.readStart();
+            assertNotNull("Failed to read CtfTmfTrace start time", start);
+            assertEquals(1331668247314038062L, start.toNanos());
             ITmfTimestamp end = trace.readEnd();
             assertNotNull("Failed to read CtfTmfTrace end time", end);
             assertEquals(1331668259053641544L, end.toNanos());
         } finally {
-            trace.dispose();
+            CtfTmfTestTraceUtils.dispose(CtfTestTrace.TRACE2);
+        }
+    }
+
+    /**
+     * Test that the methods for reading the trace without indexing it return
+     * the right values, using a trace with a timestamp transform.
+     *
+     * @throws TmfTraceException if an exception occurs
+     */
+    @Test
+    public void testRapidBoundsWithTransform() throws TmfTraceException {
+        CtfTmfTrace trace = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.TRACE2);
+        CtfTmfTrace traceWithOffset = new CtfTmfTrace();
+        traceWithOffset.setTimestampTransform(TimestampTransformFactory.createWithOffset(500000000L));
+        traceWithOffset.initTrace(null, trace.getPath(), CtfTmfEvent.class);
+        try {
+            ITmfTimestamp start = traceWithOffset.readStart();
+            assertNotNull("Failed to read CtfTmfTrace start time", start);
+            assertEquals(1331668247814038062L, start.toNanos());
+            ITmfTimestamp end = traceWithOffset.readEnd();
+            assertNotNull("Failed to read CtfTmfTrace end time", end);
+            assertEquals(1331668259553641544L, end.toNanos());
+        } finally {
+            traceWithOffset.dispose();
+            TmfTraceManager.deleteSupplementaryFiles(traceWithOffset);
+            CtfTmfTestTraceUtils.dispose(CtfTestTrace.TRACE2);
         }
     }
 

@@ -823,11 +823,11 @@ public class CtfTmfTrace extends TmfTrace
      * @since 2.2
      */
     @Override
-    public ITmfTimestamp readEnd()  {
-        try (CTFTraceReader reader = new CTFTraceReader(fTrace);) {
+    public ITmfTimestamp readEnd() {
+        try (CTFTraceReader reader = new CTFTraceReader(fTrace)) {
             reader.goToLastEvent();
             long end = reader.getEndTime();
-            return TmfTimestamp.fromNanos(end);
+            return createTimestamp(end);
         } catch (CTFException e) {
             return null;
         }
