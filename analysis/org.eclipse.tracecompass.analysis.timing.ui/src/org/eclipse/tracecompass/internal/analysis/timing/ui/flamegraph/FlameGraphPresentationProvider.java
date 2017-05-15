@@ -20,8 +20,6 @@ import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondT
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.AggregatedCalledFunctionStatistics;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.ICalledFunction;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.SymbolAspect;
-import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
-import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
@@ -125,10 +123,8 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
      *
      * @param fGEvent
      *            An event
-     * @param symbolProvider
-     *            A symbol provider
      */
-    private static String getFuntionSymbol(FlamegraphEvent event, ISymbolProvider symbolProvider) {
+    private static String getFunctionSymbol(FlamegraphEvent event) {
         String funcSymbol = ""; //$NON-NLS-1$
         if (event.getSymbol() instanceof Long || event.getSymbol() instanceof Integer) {
 
@@ -162,8 +158,7 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
         ITmfTrace activeTrace = TmfTraceManager.getInstance().getActiveTrace();
         if (activeTrace != null) {
             FlamegraphEvent fgEvent = (FlamegraphEvent) event;
-            ISymbolProvider symbolProvider = SymbolProviderManager.getInstance().getSymbolProvider(activeTrace);
-            funcSymbol = getFuntionSymbol(fgEvent, symbolProvider);
+            funcSymbol = getFunctionSymbol(fgEvent);
         }
         gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
         Utils.drawText(gc, funcSymbol, bounds.x, bounds.y, bounds.width, bounds.height, true, true);

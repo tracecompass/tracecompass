@@ -13,6 +13,8 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -117,8 +119,14 @@ public final class SymbolProviderManager {
      * @param trace
      *            The trace to create a provider for
      * @return a valid {@link ISymbolProvider}, never null
+     * @deprecated Use {@link #getSymbolProviders(ITmfTrace)} instead
      */
+    @Deprecated
     public ISymbolProvider getSymbolProvider(ITmfTrace trace) {
+        return localGetSymbolProvider(trace);
+    }
+
+    private ISymbolProvider localGetSymbolProvider(ITmfTrace trace) {
         // Check to see if we already have a provider for this trace
         synchronized (fInstances) {
             WeakReference<ISymbolProvider> reference = fInstances.get(trace);
@@ -140,6 +148,21 @@ public final class SymbolProviderManager {
         }
         // No provider found, return the default one
         return new DefaultSymbolProvider(trace);
+    }
+
+    /**
+     * Locate the {@link ISymbolProvider}s capable to resolve symbols from the
+     * given trace. If no such provider is defined an instance of
+     * {@link DefaultSymbolProvider} will be returned
+     *
+     * @param trace
+     *            The trace to create a provider for
+     * @return The collection of symbol providers for this trace. It will
+     *         contain at least one valid {@link ISymbolProvider}.
+     */
+    public Collection<ISymbolProvider> getSymbolProviders(ITmfTrace trace) {
+        // TODO Implement support for multiple symbol providers
+        return Collections.singleton(localGetSymbolProvider(trace));
     }
 
 }

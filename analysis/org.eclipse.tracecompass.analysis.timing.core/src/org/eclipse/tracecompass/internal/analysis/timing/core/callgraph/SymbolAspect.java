@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;
 
+import java.util.Collection;
 import java.util.Comparator;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -69,12 +70,17 @@ public final class SymbolAspect implements ISegmentAspect {
             // FIXME work around this trace
             ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
             if (trace != null) {
-                String symbolText;
+                String symbolText = null;
                 Object symbol = calledFunction.getSymbol();
                 if (symbol instanceof Long) {
                     Long longAddress = (Long) symbol;
-                    ISymbolProvider provider = SymbolProviderManager.getInstance().getSymbolProvider(trace);
-                    symbolText = provider.getSymbolText(longAddress);
+                    Collection<ISymbolProvider> providers = SymbolProviderManager.getInstance().getSymbolProviders(trace);
+                    for (ISymbolProvider provider: providers) {
+                        symbolText = provider.getSymbolText(longAddress);
+                        if (symbolText != null) {
+                            break;
+                        }
+                    }
                     if (symbolText == null) {
                         return "0x" + Long.toHexString(longAddress); //$NON-NLS-1$
                     }
@@ -82,9 +88,11 @@ public final class SymbolAspect implements ISegmentAspect {
                     long time = segment.getStart();
                     int pid = calledFunction.getProcessId();
                     if (pid > 0) {
-                        String text = provider.getSymbolText(pid, time, longAddress);
-                        if (text != null) {
-                            return text;
+                        for (ISymbolProvider provider: providers) {
+                            String text = provider.getSymbolText(pid, time, longAddress);
+                            if (text != null) {
+                                return text;
+                            }
                         }
                     }
                     return symbolText;

@@ -8,6 +8,8 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.statistics;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -31,31 +33,31 @@ public class CallGraphStatisticsViewer extends AbstractSegmentsStatisticsViewer 
 
     private static final class SymbolFormatter implements Function<SegmentStoreStatisticsEntry, String> {
 
-        private final @Nullable ISymbolProvider fSymbolProvider;
+        private final Collection<ISymbolProvider> fSymbolProviders;
 
         public SymbolFormatter(@Nullable ITmfTrace trace) {
-            fSymbolProvider = trace != null ? SymbolProviderManager.getInstance().getSymbolProvider(trace) : null;
+            fSymbolProviders = trace != null ? SymbolProviderManager.getInstance().getSymbolProviders(trace) : Collections.EMPTY_SET;
         }
 
         @Override
         public String apply(@Nullable SegmentStoreStatisticsEntry stat) {
-
-            String original = (stat == null) ? "null" : stat.getName(); //$NON-NLS-1$
-            ISymbolProvider symbolProvider = fSymbolProvider;
-            if (symbolProvider == null) {
-                return original;
+            if (stat == null) {
+                return "null"; //$NON-NLS-1$
             }
+            String original = stat.getName();
             try {
                 Long address = Long.decode(original);
-                String res = symbolProvider.getSymbolText(address);
-                if (res != null) {
-                    return res;
+                Collection<ISymbolProvider> symbolProviders = fSymbolProviders;
+                for (ISymbolProvider symbol : symbolProviders) {
+                    String res = symbol.getSymbolText(address);
+                    if (res != null) {
+                        return res;
+                    }
                 }
                 return "0x" + Long.toHexString(address); //$NON-NLS-1$
             } catch (NumberFormatException e) {
-                // it's OK, ignore it
+                return original;
             }
-            return original;
         }
     }
 
