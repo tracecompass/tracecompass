@@ -14,11 +14,9 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.timegraph;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
@@ -32,7 +30,6 @@ import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.w3c.dom.Element;
 
@@ -40,13 +37,14 @@ import org.w3c.dom.Element;
  * An XML-defined entry, or row, to display in the XML state system view
  *
  * @author Florian Wininger
+ * @author Mikael Ferland
  */
-public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer, Comparable<XmlEntry> {
+public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer {
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
     /** Type of resource */
-    public static enum EntryDisplayType {
+    public enum EntryDisplayType {
         /** Entries without events to display (filler rows, etc.) */
         NULL,
         /** Entries with time events */
@@ -54,7 +52,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
     }
 
     private final @NonNull ITmfTrace fTrace;
-    private final EntryDisplayType fType;
+    private final @NonNull EntryDisplayType fType;
     private final int fBaseQuark;
     private final int fDisplayQuark;
     private final String fParentId;
@@ -93,7 +91,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
      *            used to determine, if available, the parent, ID, name and
      *            other display option of this entry
      */
-    public XmlEntry(int baseQuark, int displayQuark, @NonNull ITmfTrace trace, String name, long startTime, long endTime, EntryDisplayType type, @NonNull ITmfStateSystem ss, Element entryElement) {
+    public XmlEntry(int baseQuark, int displayQuark, @NonNull ITmfTrace trace, String name, long startTime, long endTime, @NonNull EntryDisplayType type, @NonNull ITmfStateSystem ss, Element entryElement) {
         super(name, startTime, endTime);
         fTrace = trace;
         fType = type;
@@ -104,7 +102,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
 
         /* Get the parent if specified */
         List<Element> elements = TmfXmlUtils.getChildElements(fElement, TmfXmlUiStrings.PARENT_ELEMENT);
-        if (elements.size() > 0) {
+        if (!elements.isEmpty()) {
             fParentId = getFirstValue(elements.get(0));
         } else {
             fParentId = EMPTY_STRING;
@@ -112,7 +110,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
 
         /* Get the name of this entry */
         elements = TmfXmlUtils.getChildElements(fElement, TmfXmlUiStrings.NAME_ELEMENT);
-        if (elements.size() > 0) {
+        if (!elements.isEmpty()) {
             String nameFromSs = getFirstValue(elements.get(0));
             if (!nameFromSs.isEmpty()) {
                 setName(nameFromSs);
@@ -121,7 +119,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
 
         /* Get the id of this entry */
         elements = TmfXmlUtils.getChildElements(fElement, TmfXmlUiStrings.ID_ELEMENT);
-        if (elements.size() > 0) {
+        if (!elements.isEmpty()) {
             fId = getFirstValue(elements.get(0));
         } else {
             fId = name;
@@ -219,10 +217,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
 
     @Override
     public boolean hasTimeEvents() {
-        if (fType == EntryDisplayType.NULL) {
-            return false;
-        }
-        return true;
+        return fType != EntryDisplayType.NULL;
     }
 
     /**
@@ -244,12 +239,14 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
 
     @Override
     public Iterable<TmfXmlLocation> getLocations() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
-    @Override
-    public Iterator<@NonNull ITimeEvent> getTimeEventsIterator() {
-        return super.getTimeEventsIterator();
+    /**
+     * @return The XML element describing this entry.
+     */
+    public Element getElement() {
+        return fElement;
     }
 
     @Override
@@ -262,26 +259,4 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
         }
         return pattern.matcher(fParentId).find();
     }
-
-    @Override
-    public int compareTo(XmlEntry other) {
-        // First compare by type
-        int cmp = getType().compareTo(other.getType());
-        if (cmp != 0) {
-            return cmp;
-        }
-        // For equal type, then compare by element's attribute (to not mix
-        // different element's entries)
-        Element element = fElement;
-        String attrib = (element == null) ? StringUtils.EMPTY : element.getAttribute(TmfXmlUiStrings.PATH);
-        element = other.fElement;
-        String otherAttrib = (element == null) ? StringUtils.EMPTY : element.getAttribute(TmfXmlUiStrings.PATH);
-        cmp = attrib.compareTo(otherAttrib);
-        if (cmp != 0) {
-            return cmp;
-        }
-        // Then compare by name
-        return getName().compareTo(other.getName());
-    }
-
 }

@@ -79,6 +79,7 @@ import com.google.common.collect.Iterables;
  * etc)
  *
  * @author Florian Wininger
+ * @author Mikael Ferland
  */
 public class XmlTimeGraphView extends AbstractTimeGraphView {
 
@@ -102,6 +103,12 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
     private static final @NonNull String SPLIT_STRING = "/"; //$NON-NLS-1$
 
+    private static final Comparator<XmlEntry> XML_ENTRY_COMPARATOR = Comparator.comparing(XmlEntry::getType)
+            .thenComparing(XmlEntry::getElement, Comparator.nullsFirst(Comparator.comparing(element -> element.getAttribute(TmfXmlUiStrings.PATH))))
+            .thenComparing(XmlEntry::getName).thenComparingLong(XmlEntry::getStartTime);
+
+    private static final Comparator<ITimeGraphEntry> ENTRY_COMPARATOR = Comparator.comparing(x -> (XmlEntry) x, XML_ENTRY_COMPARATOR);
+
     private final @NonNull XmlViewInfo fViewInfo = new XmlViewInfo(ID);
     private final ITmfXmlModelFactory fFactory;
     private final Map<String, Integer> fStringValueMap = new HashMap<>();
@@ -120,7 +127,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         setTreeLabelProvider(new XmlTreeLabelProvider());
         setFilterColumns(DEFAULT_FILTER_COLUMN_NAMES);
         setFilterLabelProvider(new XmlTreeLabelProvider());
-        setEntryComparator(new XmlEntryComparator());
+        setEntryComparator(ENTRY_COMPARATOR);
         this.addPartPropertyListener(new IPropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent event) {
@@ -158,7 +165,6 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
                 setPartName(title);
             }
         });
-
     }
 
     @Override
@@ -212,27 +218,6 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             return EMPTY_STRING;
         }
 
-    }
-
-    private static class XmlEntryComparator implements Comparator<ITimeGraphEntry> {
-
-        @Override
-        public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
-
-            int result = 0;
-
-            if ((o1 instanceof XmlEntry) && (o2 instanceof XmlEntry)) {
-                XmlEntry entry1 = (XmlEntry) o1;
-                XmlEntry entry2 = (XmlEntry) o2;
-                result = entry1.compareTo(entry2);
-            }
-
-            if (result == 0) {
-                result = o1.getStartTime() < o2.getStartTime() ? -1 : o1.getStartTime() > o2.getStartTime() ? 1 : 0;
-            }
-
-            return result;
-        }
     }
 
     // ------------------------------------------------------------------------
@@ -351,7 +336,8 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             return;
         }
 
-        // Get the state system to use to populate those entries, by default, it is the same as the parent
+        // Get the state system to use to populate those entries, by default, it
+        // is the same as the parent
         String analysisId = entryElement.getAttribute(TmfXmlUiStrings.ANALYSIS_ID);
         ITmfStateSystem parentSs = parentEntry.getStateSystem();
         ITmfStateSystem ss = parentSs;
@@ -371,7 +357,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         if (matcher.find()) {
             path = matcher.replaceFirst(path);
         }
-        String regexName = path.replaceAll("\\*", "(.*)");  //$NON-NLS-1$//$NON-NLS-2$
+        String regexName = path.replaceAll("\\*", "(.*)"); //$NON-NLS-1$//$NON-NLS-2$
 
         /* Get the list of quarks to process with this path */
         String[] paths = regexName.split(SPLIT_STRING);
@@ -392,7 +378,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         }
 
         /* Process each quark */
-        XmlEntry currentEntry = parentEntry;
+        XmlEntry currentEntry;
         Element displayElement = null;
         Map<String, XmlEntry> entryMap = new HashMap<>();
         if (!displayElements.isEmpty()) {
@@ -513,7 +499,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
     @Override
     protected List<ITimeEvent> getEventList(TimeGraphEntry entry, long startTime, long endTime, long resolution, IProgressMonitor monitor) {
         if (!(entry instanceof XmlEntry)) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         XmlEntry xmlEntry = (XmlEntry) entry;
         ITmfStateSystem ssq = xmlEntry.getStateSystem();
@@ -604,7 +590,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
     @Override
     protected List<ILinkEvent> getLinkList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
         /* TODO: not implemented yet, need XML to go along */
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override
@@ -613,7 +599,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
          * Return the current trace only. Experiments will return their
          * children's analyses
          */
-        return (trace != null) ? Collections.singleton(trace) : Collections.EMPTY_LIST;
+        return (trace != null) ? Collections.singleton(trace) : Collections.emptyList();
     }
 
 }
