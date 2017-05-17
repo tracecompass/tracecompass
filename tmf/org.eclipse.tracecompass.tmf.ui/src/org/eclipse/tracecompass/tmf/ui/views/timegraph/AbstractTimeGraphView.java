@@ -19,6 +19,7 @@ package org.eclipse.tracecompass.tmf.ui.views.timegraph;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -629,8 +630,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     protected void setTreeColumns(final String[] columns, final Comparator<ITimeGraphEntry>[] comparators, int initialSortColumn) {
         checkPartNotCreated();
-        fColumns = columns;
-        fColumnComparators = comparators;
+        fColumns = (columns != null) ? Arrays.copyOf(columns, columns.length) : columns;
+        fColumnComparators = (comparators != null) ? Arrays.copyOf(comparators, comparators.length) : comparators;
         fInitialSortColumn = initialSortColumn;
     }
 
@@ -670,7 +671,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *            The array of relative weights of each part of the viewer
      */
     protected void setWeight(final int[] weights) {
-        fWeight = weights;
+        fWeight = Arrays.copyOf(weights, weights.length);
         if (fTimeGraphViewer != null) {
             fTimeGraphViewer.setWeights(weights);
         }
@@ -686,7 +687,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     protected void setFilterColumns(final String[] filterColumns) {
         checkPartNotCreated();
-        fFilterColumns = filterColumns;
+        fFilterColumns = Arrays.copyOf(filterColumns, filterColumns.length);
     }
 
     /**
