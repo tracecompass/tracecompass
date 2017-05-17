@@ -139,12 +139,16 @@ public class OpenAsExperimentHandler extends AbstractHandler {
             return null;
         }
 
-        if (exists && !experimentElement.getTraceType().equals(traceTypeHelper.getTraceTypeId())) {
-            experimentElement.closeEditors();
+        if (!exists || !experimentElement.getTraceType().equals(traceTypeHelper.getTraceTypeId())) {
+            if (exists) {
+                experimentElement.closeEditors();
+            }
             TmfWorkspaceModifyOperation operation = new TmfWorkspaceModifyOperation() {
                 @Override
                 public void execute(IProgressMonitor monitor) throws CoreException {
-                    experimentElement.deleteSupplementaryResources();
+                    if (exists) {
+                        experimentElement.deleteSupplementaryResources();
+                    }
                     TmfTraceTypeUIUtils.setTraceType(experimentFolder, traceTypeHelper, false);
                 }
             };
