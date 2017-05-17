@@ -15,7 +15,6 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -36,8 +35,6 @@ public class XmlViewInfo extends AbstractXmlViewInfo {
     private static final String XML_VIEW_ID_PROPERTY = "XmlViewId"; //$NON-NLS-1$
     private static final String XML_VIEW_FILE_PROPERTY = "XmlViewFile"; //$NON-NLS-1$
 
-    /* Initialization is completed when name is set */
-    private final CountDownLatch fInitialized = new CountDownLatch(1);
     /** This is the ID of the view described in the XML file */
     private @Nullable String fId = null;
     private @Nullable String fFilePath = null;
@@ -53,21 +50,6 @@ public class XmlViewInfo extends AbstractXmlViewInfo {
     public XmlViewInfo(String viewId) {
         super(viewId);
         /* Cannot get the properties yet, need to wait for the name */
-    }
-
-    /**
-     * Waits for the view info's initialization to be completed. This happens
-     * once the name has been set
-     *
-     * @return Whether the initialization has completed successfully
-     */
-    public boolean waitForInitialization() {
-        try {
-            fInitialized.await();
-        } catch (InterruptedException e) {
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -102,7 +84,6 @@ public class XmlViewInfo extends AbstractXmlViewInfo {
             fId = settings.get(XML_VIEW_ID_PROPERTY);
             fFilePath = settings.get(XML_VIEW_FILE_PROPERTY);
         }
-        fInitialized.countDown();
     }
 
     @Override

@@ -26,6 +26,8 @@ public class XmlLatencyViewInfo extends AbstractXmlViewInfo {
 
     private @Nullable String fAnalysisId = null;
     private @Nullable String fLabel = null;
+    // If true, properties were set but not saved to persistent storage
+    private boolean fIsDirty = false;
 
     /**
      * Constructor
@@ -59,6 +61,18 @@ public class XmlLatencyViewInfo extends AbstractXmlViewInfo {
         return fLabel;
     }
 
+    @Override
+    public synchronized void setName(String name) {
+        super.setName(name);
+        if (fIsDirty) {
+            savePersistentData();
+        } else {
+            IDialogSettings settings = getPersistentPropertyStore();
+            fAnalysisId = settings.get(XML_LATENCY_VIEW_ANALYSIS_ID_PROPERTY);
+            fLabel = settings.get(XML_LATENCY_VIEW_LABEL_PROPERTY);
+        }
+    }
+
     /**
      * Set the data for this view and retrieves from it the analysis ID of the
      * pattern analysis this view belongs to and the view label.
@@ -73,7 +87,12 @@ public class XmlLatencyViewInfo extends AbstractXmlViewInfo {
         String[] idFile = data.split(TmfXmlAnalysisOutputSource.DATA_SEPARATOR);
         fAnalysisId = (idFile.length > 0) ? idFile[0] : null;
         fLabel = (idFile.length > 1) ? idFile[1] : null;
-        savePersistentData();
+        String viewSubsectionName = getName();
+        if (viewSubsectionName != null) {
+            savePersistentData();
+        } else {
+            fIsDirty = true;
+        }
     }
 
     @Override

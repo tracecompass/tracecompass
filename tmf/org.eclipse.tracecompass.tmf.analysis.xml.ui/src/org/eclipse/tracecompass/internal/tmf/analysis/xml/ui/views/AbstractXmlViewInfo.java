@@ -22,7 +22,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.TmfXmlAnalys
 public abstract class AbstractXmlViewInfo {
 
     private final String fViewId;
-    private @Nullable String fViewName;
+    private @Nullable String fSubsectionName;
 
     /**
      * Constructor
@@ -32,27 +32,27 @@ public abstract class AbstractXmlViewInfo {
      */
     public AbstractXmlViewInfo(String viewId) {
         fViewId = viewId;
-        fViewName = null;
+        fSubsectionName = null;
     }
 
     /**
-     * Set the view's name, which should correspond to a secondary ID
+     * Set the name of the view property subsection, which should correspond to a secondary ID
      *
      * @param name
-     *            The view's name
+     *            The name of the view property subsection
      */
     public void setName(@NonNull String name) {
-        fViewName = name;
+        fSubsectionName = name;
     }
 
     /**
-     * Get the name of the view, which should correspond to the view's secondary
+     * Get the name of the view property subsection, which should correspond to the view's secondary
      * ID. If this name is not null, it will never be null again
      *
-     * @return The name of the view
+     * @return The name of the view property subsection
      */
     protected @Nullable String getName() {
-        return fViewName;
+        return fSubsectionName;
     }
 
     /**
@@ -70,15 +70,15 @@ public abstract class AbstractXmlViewInfo {
                 throw new IllegalStateException("The persistent property section could not be added " + fViewId); //$NON-NLS-1$
             }
         }
-        if (fViewName == null) {
+        if (fSubsectionName == null) {
             return section;
         }
         // FIXME: when a file is removed from TraceCompass, its view section should also be deleted
-        IDialogSettings subSection = section.getSection(fViewName);
+        IDialogSettings subSection = section.getSection(fSubsectionName);
         if (subSection == null) {
-            subSection = section.addNewSection(fViewName);
+            subSection = section.addNewSection(fSubsectionName);
             if (subSection == null) {
-                throw new IllegalStateException("The persistent property section could not be added: " + fViewName); //$NON-NLS-1$
+                throw new IllegalStateException("The persistent property section could not be added: " + fSubsectionName); //$NON-NLS-1$
             }
         }
         return subSection;

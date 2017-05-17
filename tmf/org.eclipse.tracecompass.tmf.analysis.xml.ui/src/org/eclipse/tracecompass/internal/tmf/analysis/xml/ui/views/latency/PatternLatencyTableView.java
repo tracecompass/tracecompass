@@ -9,9 +9,12 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableView;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
@@ -47,6 +50,22 @@ public class PatternLatencyTableView extends AbstractSegmentStoreTableView {
                         loadLatencyView();
                     }
                 }
+            }
+        });
+    }
+
+    @Override
+    public void createPartControl(@Nullable Composite parent) {
+        String name = getViewSite().getSecondaryId();
+        if (name != null) {
+            /* must initialize view info before calling super */
+            fViewInfo.setName(name);
+        }
+        super.createPartControl(parent);
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                setPartName(fViewInfo.getLabel());
             }
         });
     }

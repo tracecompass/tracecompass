@@ -9,11 +9,13 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityView;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityViewer;
@@ -55,6 +57,22 @@ public class PatternDensityView extends AbstractSegmentStoreDensityView {
                         loadDensityViewer();
                     }
                 }
+            }
+        });
+    }
+
+    @Override
+    public void createPartControl(@Nullable Composite parent) {
+        String name = getViewSite().getSecondaryId();
+        if (name != null) {
+            /* must initialize view info before calling super */
+            fViewInfo.setName(name);
+        }
+        super.createPartControl(parent);
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                setPartName(fViewInfo.getLabel());
             }
         });
     }

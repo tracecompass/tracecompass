@@ -27,7 +27,7 @@ public class TmfXmlLatencyViewOutput extends TmfAnalysisViewOutput {
      *            The label of view
      */
     public TmfXmlLatencyViewOutput(String viewid, String label) {
-        super(viewid);
+        super(viewid, label);
         fLabel = label;
     }
 
