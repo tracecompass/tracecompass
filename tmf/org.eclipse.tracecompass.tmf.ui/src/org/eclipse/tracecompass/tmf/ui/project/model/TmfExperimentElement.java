@@ -233,7 +233,7 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
     }
 
     @Override
-    public List<TmfAnalysisElement> getChildrenAvailableAnalysis() {
+    public List<TmfAnalysisElement> getAvailableChildrenAnalyses() {
         List<TmfTraceElement> traces = getChildren().stream()
                         .filter(elem -> (elem instanceof TmfTraceElement))
                         .map(elem -> ((TmfTraceElement) elem).getElementUnderTraceFolder())
@@ -415,7 +415,7 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         });
 
         /* Remove all trace analyses from experiment view */
-        List<TmfAnalysisElement> analysisElements = trace.getElementUnderTraceFolder().getAvailableAnalysis();
+        List<@NonNull TmfAnalysisElement> analysisElements = trace.getElementUnderTraceFolder().getAvailableAnalysis();
         TmfViewsElement view = getChildElementViews();
 
         if (view != null) {

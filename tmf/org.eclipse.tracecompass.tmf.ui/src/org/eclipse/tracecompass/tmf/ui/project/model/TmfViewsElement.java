@@ -10,10 +10,8 @@
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -119,7 +117,7 @@ public class TmfViewsElement extends TmfProjectModelElement {
             }
         } else if (parent != null) {
             /* In experiment case collect trace analyses in the aggregate analyses element */
-            Map<String, TmfAggregateAnalysisElement> analysisMap = new LinkedHashMap<>();
+            Map<String, TmfAggregateAnalysisElement> analysisMap = new HashMap<>();
 
             /* Add all new analysis modules or refresh outputs of existing ones */
             for (IAnalysisModuleHelper module : TmfAnalysisManager.getAnalysisModules(traceClass).values()) {
@@ -144,8 +142,8 @@ public class TmfViewsElement extends TmfProjectModelElement {
                 analysisMap.put(analysis.getAnalysisId(), aggregateAnalysisElement);
             }
 
-            /* Now add available all trace analyses */
-            for (TmfAnalysisElement analysis : getParent().getChildrenAvailableAnalysis()) {
+            /* Now add all available trace analyses */
+            for (TmfAnalysisElement analysis : getParent().getAvailableChildrenAnalyses()) {
                 /* If the analysis is not a child of the trace, create it */
                 TmfAnalysisElement a = childrenMap.remove(analysis.getAnalysisId());
 
@@ -186,29 +184,23 @@ public class TmfViewsElement extends TmfProjectModelElement {
      *
      * @since 3.0
      */
-    public void removeChildrenAnalysis(List<TmfAnalysisElement> analysisElements) {
+    public void removeChildrenAnalysis(List<@NonNull TmfAnalysisElement> analysisElements) {
         for (TmfAnalysisElement tmfAnalysisElement : analysisElements) {
-            if (tmfAnalysisElement != null) {
-                TmfAggregateAnalysisElement aggrElement = getAggregateAnalysisElement(tmfAnalysisElement);
-                if (aggrElement != null) {
-                    aggrElement.removeAnalyses(tmfAnalysisElement);
-                    if (aggrElement.isEmpty()) {
-                        removeChild(aggrElement);
-                    }
+            TmfAggregateAnalysisElement aggrElement = getAggregateAnalysisElement(tmfAnalysisElement);
+            if (aggrElement != null) {
+                aggrElement.removeAnalyses(tmfAnalysisElement);
+                if (aggrElement.isEmpty()) {
+                    removeChild(aggrElement);
                 }
             }
         }
     }
 
     private TmfAggregateAnalysisElement getAggregateAnalysisElement(TmfAnalysisElement element) {
-        Optional<TmfAggregateAnalysisElement> aggrElem = getChildren().stream()
+        return getChildren().stream()
                 .filter(elem -> (elem instanceof TmfAggregateAnalysisElement))
                 .map(elem -> ((TmfAggregateAnalysisElement) elem))
                 .filter(elem -> elem.getAnalysisHelper().getId().equals(element.getAnalysisHelper().getId()))
-                .findFirst();
-        if (aggrElem.isPresent()) {
-            return aggrElem.get();
-        }
-        return null;
+                .findFirst().orElse(null);
     }
 }
