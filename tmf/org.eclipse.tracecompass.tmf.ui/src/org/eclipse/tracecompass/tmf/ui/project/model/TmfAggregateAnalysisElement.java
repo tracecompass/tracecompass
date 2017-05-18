@@ -9,11 +9,16 @@
 
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
+import org.eclipse.ui.views.properties.IPropertyDescriptor;
 
 import com.google.common.base.Joiner;
 
@@ -99,6 +104,7 @@ public class TmfAggregateAnalysisElement extends TmfAnalysisElement {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+
     /**
      * Gets the help message for this analysis
      *
@@ -123,5 +129,30 @@ public class TmfAggregateAnalysisElement extends TmfAnalysisElement {
     @Override
     public void activateParentTrace() {
         TmfOpenTraceHelper.openTraceFromElement(fExperimentParent);
+    }
+
+    @Override
+    public IPropertyDescriptor[] getPropertyDescriptors() {
+        Set<TmfAnalysisElement> analyses = fContainedAnalyses;
+        List<IPropertyDescriptor> descs = new ArrayList<>();
+        for (TmfAnalysisElement analysis : analyses) {
+            if (analysis.canExecute()) {
+                descs.add(new ReadOnlyTextPropertyDescriptor(analysis.getResource(), analysis.getParent().getParent().getLabelText()));
+            }
+        }
+        return descs.toArray(new IPropertyDescriptor[0]);
+    }
+
+    @Override
+    public Object getPropertyValue(Object id) {
+        if (id instanceof IResource) {
+            Set<TmfAnalysisElement> analyses = fContainedAnalyses;
+            for (TmfAnalysisElement tmfAnalysisElement : analyses) {
+                if (id.equals(tmfAnalysisElement.getResource())) {
+                    return tmfAnalysisElement;
+                }
+            }
+        }
+        return null;
     }
 }
