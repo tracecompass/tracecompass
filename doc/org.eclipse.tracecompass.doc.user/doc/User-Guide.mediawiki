@@ -2562,6 +2562,12 @@ A timegraph view of the futex wait/lock and wake/unlock scenarios (from futex en
 
 [[Image:images/futex/scenario.png| scenario example]]
 
+
+== Latency analysis for IRQ handlers ==
+
+The '''Latency analysis for IRQ handlers''' measures the latency between the IRQ handlers entry and exit events.
+The durations are visualized using the '''Latency''' views. For more information about the '''Latency''' views see chapter [[#Latency_Analyses | Latency Analyses]].
+
 == LTTng Kernel Events Editor ==
 
 The LTTng Kernel Events editor '''is''' the plain TMF [[#Events_Editor | Events Editor]], except that it provides its own specialized viewer to replace the standard one. In short, it has exactly the same behaviour but the layout is slightly different:
