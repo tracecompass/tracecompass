@@ -29,6 +29,8 @@
     <module>org.eclipse.tracecompass.rcp.branding.feature</module>
     <module>org.eclipse.tracecompass.rcp</module>
     <module>org.eclipse.tracecompass.rcp.ui</module>
+    <module>org.eclipse.tracecompass.rcp.incubator</module>
+    <module>org.eclipse.tracecompass.rcp.incubator.ui</module>
   </modules>
 
   <profiles>

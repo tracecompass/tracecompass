@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.tracecompass.rcp.incubator"
+      label="%featureName"
+      version="1.0.0.qualifier"
+      provider-name="%featureProvider"
+      plugin="org.eclipse.tracecompass.rcp.branding"
+      license-feature="org.eclipse.license"
+      license-feature-version="0.0.0">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.equinox.p2.ui.sdk"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui.browser"/>
+      <import plugin="org.eclipse.equinox.p2.core" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.ui" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.p2.metadata" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.operations" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.repository" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.engine" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.core.runtime" version="3.3.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.p2.core" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.p2.discovery" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.p2.repository" version="2.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.p2.transport.ecf" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.p2.discovery" version="1.0.0"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.tracecompass.rcp.incubator.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.p2.ui.discovery"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.p2.discovery"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.p2.discovery.compatibility"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

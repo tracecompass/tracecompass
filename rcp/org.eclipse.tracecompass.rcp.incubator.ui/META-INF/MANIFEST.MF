@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-Vendor: %Bundle-Vendor
+Bundle-Version: 1.0.0.qualifier
+Bundle-Localization: plugin
+Bundle-SymbolicName: org.eclipse.tracecompass.rcp.incubator.ui;singleton:=true
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.eclipse.equinox.p2.ui.sdk,
+ org.eclipse.equinox.p2.ui.discovery,
+ org.eclipse.equinox.p2.discovery.compatibility
