@@ -6,6 +6,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
+ * Contributors:
+ *   Robert Kiss - Initial API and implementation
+ *   Mikael Ferland - Adjust title of preference pages for multiple symbol providers
+ *
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.ui.symbols;
@@ -33,7 +37,6 @@ public abstract class AbstractSymbolProviderPreferencePage extends PreferencePag
      */
     public AbstractSymbolProviderPreferencePage(ISymbolProvider provider) {
         fProvider = provider;
-        setTitle(provider.getTrace().getName());
         noDefaultAndApplyButton();
     }
 

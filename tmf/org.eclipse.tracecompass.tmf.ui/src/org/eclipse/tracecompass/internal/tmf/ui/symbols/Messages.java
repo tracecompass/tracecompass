@@ -32,6 +32,7 @@ public class Messages extends NLS {
     public static String BasicSymbolProviderPrefPage_radioMappingFile_tooltip;
     public static String BasicSymbolProviderPrefPage_btnBrowse;
     public static String BasicSymbolProviderPrefPage_description;
+    public static String BasicSymbolProviderPrefPage_tabTitle;
     public static String BasicSymbolProviderPrefPage_ImportMappingDialogTitle;
     public static String BasicSymbolProviderPrefPage_ImportBinaryFileDialogTitle;
     public static String BasicSymbolProviderPrefPage_errorFileDoesNotExists;

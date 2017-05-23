@@ -5,6 +5,10 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors
+ *    Robert Kiss - Initial API and implementation
+ *    Mikael Ferland - Support multiple symbol providers for a trace
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.core.symbols;
@@ -17,8 +21,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -26,6 +28,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * This class offer services around the
@@ -50,7 +55,7 @@ public final class SymbolProviderManager {
 
     private final List<SymbolProviderFactoryWrapper> fProviders;
 
-    private final Map<ITmfTrace, WeakReference<ISymbolProvider>> fInstances = new WeakHashMap<>();
+    private final Multimap<ITmfTrace, WeakReference<ISymbolProvider>> fInstances = LinkedHashMultimap.create();
 
     /**
      * Internal class used to store extension point information
@@ -112,48 +117,9 @@ public final class SymbolProviderManager {
     }
 
     /**
-     * Locate an {@link ISymbolProvider} capable to resolve symbols from the
-     * given trace. If no such provider is defined an instance of
-     * {@link DefaultSymbolProvider} will be returned
-     *
-     * @param trace
-     *            The trace to create a provider for
-     * @return a valid {@link ISymbolProvider}, never null
-     * @deprecated Use {@link #getSymbolProviders(ITmfTrace)} instead
-     */
-    @Deprecated
-    public ISymbolProvider getSymbolProvider(ITmfTrace trace) {
-        return localGetSymbolProvider(trace);
-    }
-
-    private ISymbolProvider localGetSymbolProvider(ITmfTrace trace) {
-        // Check to see if we already have a provider for this trace
-        synchronized (fInstances) {
-            WeakReference<ISymbolProvider> reference = fInstances.get(trace);
-            if (reference != null) {
-                ISymbolProvider provider = reference.get();
-                if (provider != null) {
-                    return provider;
-                }
-            }
-            // we don't have yet an instance, build one
-            for (SymbolProviderFactoryWrapper wrapper : fProviders) {
-                ISymbolProviderFactory factory = wrapper.factory;
-                ISymbolProvider provider = factory.createProvider(trace);
-                if (provider != null) {
-                    fInstances.put(trace, new WeakReference<>(provider));
-                    return provider;
-                }
-            }
-        }
-        // No provider found, return the default one
-        return new DefaultSymbolProvider(trace);
-    }
-
-    /**
-     * Locate the {@link ISymbolProvider}s capable to resolve symbols from the
-     * given trace. If no such provider is defined an instance of
-     * {@link DefaultSymbolProvider} will be returned
+     * Locate the {@link ISymbolProvider}s capable of resolving symbols from the
+     * given trace. If no such provider(s) are defined, a collection containing
+     * an instance of {@link DefaultSymbolProvider} will be returned
      *
      * @param trace
      *            The trace to create a provider for
@@ -161,8 +127,47 @@ public final class SymbolProviderManager {
      *         contain at least one valid {@link ISymbolProvider}.
      */
     public Collection<ISymbolProvider> getSymbolProviders(ITmfTrace trace) {
-        // TODO Implement support for multiple symbol providers
-        return Collections.singleton(localGetSymbolProvider(trace));
+        synchronized (fInstances) {
+            Collection<ISymbolProvider> symbolProviders = new ArrayList<>();
+
+            // Verify if there are already provider(s) for this trace
+            for (WeakReference<ISymbolProvider> reference : fInstances.get(trace)) {
+                ISymbolProvider provider = reference.get();
+                if (provider != null) {
+                    symbolProviders.add(provider);
+                }
+            }
+
+            // Build the appropriate provider(s)
+            if (symbolProviders.isEmpty()) {
+                for (SymbolProviderFactoryWrapper wrapper : fProviders) {
+                    ISymbolProviderFactory factory = wrapper.factory;
+                    ISymbolProvider provider = factory.createProvider(trace);
+                    if (provider != null) {
+                        symbolProviders.add(provider);
+                        fInstances.put(trace, new WeakReference<>(provider));
+                    }
+                }
+            }
+
+            // Build the default provider if required
+            return !symbolProviders.isEmpty() ? symbolProviders : Collections.singleton(new DefaultSymbolProvider(trace));
+        }
+    }
+
+   /**
+    * Locate an {@link ISymbolProvider} capable to resolve symbols from the
+    * given trace. If no such provider is defined an instance of
+    * {@link DefaultSymbolProvider} will be returned
+    *
+    * @param trace
+    *            The trace to create a provider for
+    * @return a valid {@link ISymbolProvider}, never null
+    * @deprecated Use {@link #getSymbolProviders(ITmfTrace)} instead
+    */
+    @Deprecated
+    public ISymbolProvider getSymbolProvider(ITmfTrace trace) {
+        return getSymbolProviders(trace).iterator().next();
     }
 
 }

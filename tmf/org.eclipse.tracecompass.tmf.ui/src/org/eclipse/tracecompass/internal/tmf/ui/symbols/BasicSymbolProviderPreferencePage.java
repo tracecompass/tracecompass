@@ -6,6 +6,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
+ * Contributors:
+ *   Robert Kiss - Initial API and implementation
+ *   Mikael Ferland - Adjust title of preference pages for multiple symbol providers
+ *
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.ui.symbols;
@@ -54,6 +58,7 @@ public class BasicSymbolProviderPreferencePage extends AbstractSymbolProviderPre
         super(provider);
         setDescription(MessageFormat.format(Messages.BasicSymbolProviderPrefPage_description, provider.getTrace().getName()));
         setValid(true);
+        setTitle(MessageFormat.format(Messages.BasicSymbolProviderPrefPage_tabTitle, provider.getTrace().getName()));
     }
 
     @Override
@@ -187,8 +192,6 @@ public class BasicSymbolProviderPreferencePage extends AbstractSymbolProviderPre
             if (!file.isFile()) {
                 errorMessage = Messages.BasicSymbolProviderPrefPage_errorFileDoesNotExists;
             }
-        } else {
-            errorMessage = Messages.BasicSymbolProviderPrefPage_errorSpecifyFile;
         }
         setErrorMessage(errorMessage);
         setValid(errorMessage == null);

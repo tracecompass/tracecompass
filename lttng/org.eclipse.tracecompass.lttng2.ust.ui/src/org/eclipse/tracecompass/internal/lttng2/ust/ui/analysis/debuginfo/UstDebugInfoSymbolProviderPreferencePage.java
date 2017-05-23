@@ -5,6 +5,10 @@
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Alexandre Montplaisir - Initial API and implementation
+ *   Mikael Ferland - Adjust title of preference pages for multiple symbol providers
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.lttng2.ust.ui.analysis.debuginfo;
@@ -56,6 +60,7 @@ public class UstDebugInfoSymbolProviderPreferencePage extends AbstractSymbolProv
         super(provider);
         setDescription(MessageFormat.format(Messages.PreferencePage_WindowDescription, provider.getTrace().getName()));
         setValid(true);
+        setTitle(MessageFormat.format(Messages.PreferencePage_TabTitle, provider.getTrace().getName()));
     }
 
     @Override

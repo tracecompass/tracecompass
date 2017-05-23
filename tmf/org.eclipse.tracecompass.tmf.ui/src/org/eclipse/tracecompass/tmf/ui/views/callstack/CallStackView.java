@@ -10,11 +10,13 @@
  *   Patrick Tasse - Initial API and implementation
  *   Bernd Hufmann - Updated signal handling
  *   Marc-Andre Laperle - Map from binary file
+ *   Mikael Ferland - Support multiple symbol providers for a trace
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.ui.views.callstack;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -89,6 +91,9 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphContro
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
+
 /**
  * Main implementation for the Call Stack view
  *
@@ -146,7 +151,7 @@ public class CallStackView extends AbstractTimeGraphView {
     // Fields
     // ------------------------------------------------------------------------
 
-    private final Map<ITmfTrace, ISymbolProvider> fSymbolProviders = new HashMap<>();
+    private final Multimap<ITmfTrace, ISymbolProvider> fSymbolProviders = LinkedHashMultimap.create();
 
     // The next event action
     private Action fNextEventAction;
@@ -505,7 +510,7 @@ public class CallStackView extends AbstractTimeGraphView {
         super.traceClosed(signal);
         synchronized (fSymbolProviders) {
             for (ITmfTrace trace : getTracesToBuild(signal.getTrace())) {
-                fSymbolProviders.remove(trace);
+                fSymbolProviders.removeAll(trace);
             }
         }
     }
@@ -530,11 +535,11 @@ public class CallStackView extends AbstractTimeGraphView {
          * provide a call stack analysis module. See
          * https://bugs.eclipse.org/bugs/show_bug.cgi?id=494212
          */
-        ISymbolProvider provider = fSymbolProviders.get(trace);
-        if (provider == null) {
-            provider = SymbolProviderManager.getInstance().getSymbolProvider(trace);
-            provider.loadConfiguration(new NullProgressMonitor());
-            fSymbolProviders.put(trace, provider);
+        Collection<ISymbolProvider> providers = fSymbolProviders.get(trace);
+        if (providers.isEmpty()) {
+            providers = SymbolProviderManager.getInstance().getSymbolProviders(trace);
+            providers.forEach( (provider) -> provider.loadConfiguration(new NullProgressMonitor()));
+            fSymbolProviders.putAll(trace, providers);
         }
 
         /* Continue with the call stack view specific operations */
@@ -909,8 +914,7 @@ public class CallStackView extends AbstractTimeGraphView {
         } catch (StateValueTypeException e) {
         }
         if (address != Long.MAX_VALUE) {
-            ISymbolProvider provider = fSymbolProviders.get(trace);
-            if (provider != null) {
+            for (ISymbolProvider provider : fSymbolProviders.get(trace)) {
                 String symbol = provider.getSymbolText(processId, timestamp, address);
                 if (symbol != null) {
                     name = symbol;
@@ -1269,12 +1273,13 @@ public class CallStackView extends AbstractTimeGraphView {
         ITmfTrace trace = getTrace();
         if (trace != null) {
             for (ITmfTrace subTrace : getTracesToBuild(trace)) {
-                ISymbolProvider provider = fSymbolProviders.get(subTrace);
-                if (provider instanceof org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider) {
-                    org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider provider2 = (org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider) provider;
-                    ISymbolProviderPreferencePage page = provider2.createPreferencePage();
-                    if (page != null) {
-                        pages.add(page);
+                for (ISymbolProvider provider : fSymbolProviders.get(subTrace)) {
+                    if (provider instanceof org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider) {
+                        org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider provider2 = (org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider) provider;
+                        ISymbolProviderPreferencePage page = provider2.createPreferencePage();
+                        if (page != null) {
+                            pages.add(page);
+                        }
                     }
                 }
             }

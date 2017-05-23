@@ -31,6 +31,7 @@ public class Messages extends NLS {
     }
 
     public static String PreferencePage_WindowDescription;
+    public static String PreferencePage_TabTitle;
 
     public static String PreferencePage_CheckboxLabel;
     public static String PreferencePage_CheckboxTooltip;
