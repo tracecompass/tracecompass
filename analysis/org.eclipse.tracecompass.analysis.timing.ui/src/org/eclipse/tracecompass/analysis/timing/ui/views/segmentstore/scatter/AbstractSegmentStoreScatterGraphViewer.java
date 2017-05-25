@@ -47,12 +47,8 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.IYSeries;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
-import org.swtchart.ILineSeries;
-import org.swtchart.ILineSeries.PlotSymbolType;
-import org.swtchart.ISeries.SeriesType;
-import org.swtchart.ISeriesSet;
-import org.swtchart.LineStyle;
 
 import com.google.common.primitives.Doubles;
 
@@ -359,17 +355,6 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
         super.setWindowRange(windowStartTime, windowEndTime);
     }
 
-    @Override
-    protected ILineSeries addSeries(@Nullable String seriesName) {
-        ISeriesSet seriesSet = getSwtChart().getSeriesSet();
-        ILineSeries series = (ILineSeries) seriesSet.createSeries(SeriesType.LINE, seriesName);
-        series.setVisible(true);
-        series.enableArea(false);
-        series.setLineStyle(LineStyle.NONE);
-        series.setSymbolType(PlotSymbolType.DIAMOND);
-        return series;
-    }
-
     /**
      * Set the data into the viewer. If the provider is an analysis, it will
      * update the model if the analysis is completed or run the analysis if not
@@ -474,6 +459,11 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
         compactingJob = new CompactingSegmentStoreQuery(getWindowStartTime(), getWindowEndTime());
         fCompactingJob = compactingJob;
         compactingJob.schedule();
+    }
+
+    @Override
+    public String getSeriesType(String seriesName) {
+        return IYSeries.SCATTER;
     }
 
     /**

@@ -12,18 +12,23 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
@@ -32,6 +37,7 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLo
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ui.colors.X11Color;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfChartTimeStampFormat;
@@ -44,6 +50,9 @@ import org.swtchart.ISeries.SeriesType;
 import org.swtchart.ISeriesSet;
 import org.swtchart.LineStyle;
 import org.swtchart.Range;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 
 /**
  * Abstract line chart viewer class implementation. All series in this viewer
@@ -61,16 +70,36 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     /* The desired number of points per pixel */
     private static final double RESOLUTION = 1.0;
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(TmfCommonXLineChartViewer.class);
+    private final Map<String, Color> fColors = new HashMap<>();
 
-    private static final int[] LINE_COLORS = { SWT.COLOR_BLUE, SWT.COLOR_RED, SWT.COLOR_GREEN,
-            SWT.COLOR_MAGENTA, SWT.COLOR_CYAN,
-            SWT.COLOR_DARK_BLUE, SWT.COLOR_DARK_RED, SWT.COLOR_DARK_GREEN,
-            SWT.COLOR_DARK_MAGENTA, SWT.COLOR_DARK_CYAN, SWT.COLOR_DARK_YELLOW,
-            SWT.COLOR_BLACK, SWT.COLOR_GRAY };
-    private static final LineStyle[] LINE_STYLES = { LineStyle.SOLID, LineStyle.DASH, LineStyle.DOT, LineStyle.DASHDOT };
+    private static final Map<@NonNull String, Color> SYSTEM_COLORS = new LinkedHashMap<>();
+    static {
+        SYSTEM_COLORS.put("BLUE", Display.getDefault().getSystemColor(SWT.COLOR_BLUE)); //$NON-NLS-1$
+        SYSTEM_COLORS.put("RED", Display.getDefault().getSystemColor(SWT.COLOR_RED)); //$NON-NLS-1$
+        SYSTEM_COLORS.put("GREEN", Display.getDefault().getSystemColor(SWT.COLOR_GREEN)); //$NON-NLS-1$
+        SYSTEM_COLORS.put("MAGENTA", Display.getDefault().getSystemColor(SWT.COLOR_MAGENTA)); //$NON-NLS-1$
+        SYSTEM_COLORS.put("CYAN", Display.getDefault().getSystemColor(SWT.COLOR_CYAN)); //$NON-NLS-1$
+        SYSTEM_COLORS.put("DARK_BLUE", Display.getDefault().getSystemColor(SWT.COLOR_DARK_BLUE)); //$NON-NLS-1$
+        SYSTEM_COLORS.put("DARK_RED", Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED)); //$NON-NLS-1$
+        SYSTEM_COLORS.put("DARK_GREEN", Display.getDefault().getSystemColor(SWT.COLOR_DARK_GREEN)); //$NON-NLS-1$
+        SYSTEM_COLORS.put("DARK_MAGENTA", Display.getDefault().getSystemColor(SWT.COLOR_DARK_MAGENTA)); //$NON-NLS-1$
+        SYSTEM_COLORS.put("DARK_CYAN", Display.getDefault().getSystemColor(SWT.COLOR_DARK_CYAN)); //$NON-NLS-1$
+        SYSTEM_COLORS.put("DARK_YELLOW", Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW)); //$NON-NLS-1$
+        SYSTEM_COLORS.put("BLACK", Display.getDefault().getSystemColor(SWT.COLOR_BLACK)); //$NON-NLS-1$
+        SYSTEM_COLORS.put("GRAY", Display.getDefault().getSystemColor(SWT.COLOR_GRAY)); //$NON-NLS-1$
+        SYSTEM_COLORS.put("YELLOW", Display.getDefault().getSystemColor(SWT.COLOR_YELLOW)); //$NON-NLS-1$
+    }
 
-    private final Map<String, double[]> fSeriesValues = new LinkedHashMap<>();
-    private double[] fXValues;
+    private static final Pattern PATTERN = Pattern.compile("\\s*(\\d{1,3})\\s*(\\d{1,3})\\s*(\\d{1,3})"); //$NON-NLS-1$
+    private static final Map<String, LineStyle> LINE_STYLES = ImmutableMap.of(
+            IYSeries.SOLID, LineStyle.SOLID,
+            IYSeries.DASH, LineStyle.DASH,
+            IYSeries.DOT, LineStyle.DOT,
+            IYSeries.DASHDOT, LineStyle.DASHDOT,
+            IYSeries.DASHDOTDOT, LineStyle.DASHDOTDOT);
+
+    private final CommonXAxisModelBuilder fModelBuilder = new CommonXAxisModelBuilder();
+
     private double fResolution;
 
     private UpdateThread fUpdateThread;
@@ -96,6 +125,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      */
     public TmfCommonXLineChartViewer(Composite parent, String title, String xLabel, String yLabel) {
         super(parent, title, xLabel, yLabel);
+        fModelBuilder.setTitle(title);
         getSwtChart().getTitle().setVisible(false);
         getSwtChart().getLegend().setPosition(SWT.BOTTOM);
         getSwtChart().getAxisSet().getXAxes()[0].getTitle().setVisible(false);
@@ -123,20 +153,32 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
         return getClass().getName();
     }
 
+    /**
+     * Get the model
+     *
+     * @return the model
+     * @since 3.1
+     */
+    public ICommonXAxisModel getModel() {
+        return fModelBuilder.build();
+    }
+
     private Runnable newUiInitializeRunnable(@NonNull FlowScopeLog enclosingScope) {
         return () -> {
             try (FlowScopeLog uiScope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:UiInitialization").setParentScope(enclosingScope).build()) { //$NON-NLS-1$
-                if (!getSwtChart().isDisposed()) {
-                    /* Delete the old series */
-                    try {
-                        clearContent();
-                        createSeries();
-                    } finally {
-                        /*
-                         * View is cleared, decrement fDirty
-                         */
-                        fDirty.decrementAndGet();
-                    }
+                if (getSwtChart().isDisposed()) {
+                    return;
+                }
+
+                /* Delete the old series */
+                try {
+                    clearContent();
+                    createSeries();
+                } finally {
+                    /*
+                     * View is cleared, decrement fDirty
+                     */
+                    fDirty.decrementAndGet();
                 }
             }
         };
@@ -146,9 +188,10 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
         return () -> {
             try (FlowScopeLog tracer = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:InitializeThread").setParentScope(scope).build()) { //$NON-NLS-1$
                 initializeDataSource();
-                if (!getSwtChart().isDisposed()) {
-                    getDisplay().asyncExec(newUiInitializeRunnable(tracer));
+                if (getSwtChart().isDisposed()) {
+                    return;
                 }
+                getDisplay().asyncExec(newUiInitializeRunnable(tracer));
             }
         };
     }
@@ -159,7 +202,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      */
     protected void reinitialize() {
         try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:ReinitializeRequested").setCategory(getViewerId()).build()) { //$NON-NLS-1$
-            fSeriesValues.clear();
+            fModelBuilder.setXValues(new double[0]);
             /* Initializing data: the content is not current */
             fDirty.incrementAndGet();
             // Don't use TmfUiRefreshHandler (bug 467751)
@@ -323,7 +366,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      *            values.
      */
     protected final void setXAxis(double[] xaxis) {
-        fXValues = xaxis;
+        fModelBuilder.setXValues(xaxis);
     }
 
     /**
@@ -358,21 +401,82 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      * If the series does not exist, it will automatically be created at display
      * time, with the default values.
      *
+     * Warning, do not override if possible.
+     *
      * @param seriesName
      *            The name of the series for which to set the values
      * @param seriesValues
      *            The array of values for the series
      */
     protected void setSeries(String seriesName, double[] seriesValues) {
-        if (fXValues.length != seriesValues.length) {
-            throw new IllegalStateException("All series in list must be of length : " + fXValues.length); //$NON-NLS-1$
+        if (seriesName == null) {
+            throw new IllegalArgumentException("seriesName cannot be null"); //$NON-NLS-1$
         }
-        fSeriesValues.put(seriesName, seriesValues);
+        if (seriesValues == null) {
+            throw new IllegalArgumentException("Series values cannot be null"); //$NON-NLS-1$
+        }
+        String seriesType = getSeriesType(seriesName);
+        fModelBuilder.addYSeries(
+                new YSeries(
+                        seriesType,
+                        getSeriesColor(seriesName),
+                        getWidth(seriesName),
+                        getSeriesStyle(seriesType),
+                        seriesName,
+                        seriesValues));
+    }
+
+    /**
+     * Get the width
+     *
+     * @param seriesName
+     *            The series
+     * @return the width
+     * @since 3.1
+     */
+    protected int getWidth(@NonNull String seriesName) {
+        return 1;
+    }
+
+    /**
+     * @param seriesName
+     *            The series
+     * @return the series type, see {@link IYSeries}'s strings
+     * @since 3.1
+     */
+    protected @NonNull String getSeriesType(@NonNull String seriesName) {
+        return IYSeries.LINE;
+    }
+
+    /**
+     * Get the color
+     *
+     * @param seriesName
+     *            The series
+     * @return The color
+     * @since 3.1
+     */
+    protected @Nullable String getSeriesColor(@NonNull String seriesName) {
+        return Iterables.get(SYSTEM_COLORS.keySet(), getModel().getSeries().size() % SYSTEM_COLORS.size());
+    }
+
+    /**
+     * Get the series style
+     *
+     * @param seriesType
+     *            the series type, obtained by {@link #getSeriesType(String)}
+     * @return the series style
+     * @since 3.1
+     */
+    protected @Nullable String getSeriesStyle(@NonNull String seriesType) {
+        return getLineStyle(seriesType, getModel().getSeries().size());
     }
 
     /**
      * Add a new series to the XY line chart. By default, it is a simple solid
      * line.
+     *
+     * Warning do not override
      *
      * @param seriesName
      *            The name of the series to create
@@ -380,15 +484,83 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      *         if required
      */
     protected ILineSeries addSeries(String seriesName) {
+        if (seriesName == null) {
+            return null;
+        }
         ISeriesSet seriesSet = getSwtChart().getSeriesSet();
         int seriesCount = seriesSet.getSeries().length;
+        ICommonXAxisModel currentModel = getModel();
+        IYSeries ySeries = currentModel.findSeries(seriesName);
+        if (ySeries == null) {
+            // if it does not exist, create a dummy series
+            setSeries(seriesName, new double[currentModel.getXAxis().length]);
+            currentModel = getModel();
+            ySeries = currentModel.findSeries(seriesName);
+        }
+        if (ySeries == null) {
+            return null;
+        }
         ILineSeries series = (ILineSeries) seriesSet.createSeries(SeriesType.LINE, seriesName);
+        boolean isScatter = IYSeries.SCATTER.equals(ySeries.getSeriesType());
         series.setVisible(true);
-        series.enableArea(false);
-        series.setLineStyle(LINE_STYLES[(seriesCount / (LINE_COLORS.length)) % LINE_STYLES.length]);
-        series.setSymbolType(PlotSymbolType.NONE);
-        series.setLineColor(Display.getDefault().getSystemColor(LINE_COLORS[seriesCount % LINE_COLORS.length]));
+        series.enableArea(IYSeries.AREA.equals(ySeries.getSeriesType()));
+        series.setLineStyle(!isScatter ? LINE_STYLES.get(getLineStyle(ySeries.getSeriesType(), seriesCount)) : LineStyle.NONE);
+        series.setSymbolType(isScatter ? PlotSymbolType.DIAMOND : PlotSymbolType.NONE);
+        String colorTxt = ySeries.getColor();
+        series.setLineColor(getColor(seriesName, colorTxt));
         return series;
+    }
+
+    private Color getColor(String seriesName, String colorTxt) {
+        Color sysColor = SYSTEM_COLORS.get(colorTxt);
+        if (sysColor != null) {
+            return sysColor;
+        }
+        Color color;
+        // Try with the names
+        RGB rgb = X11Color.toRGB(colorTxt);
+        // Try with 124 80 223
+        if (rgb == null) {
+            rgb = parseX11Rgb(colorTxt);
+        }
+        // Try with ff2234
+        if (rgb == null) {
+            rgb = parseWebRgb(colorTxt);
+        }
+        if (rgb != null) {
+            color = new Color(Display.getDefault(), rgb);
+            fColors.put(seriesName, color);
+        } else {
+            color = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
+        }
+        return color;
+    }
+
+    private static RGB parseWebRgb(String colorTxt) {
+        java.awt.Color elem = java.awt.Color.decode(colorTxt);
+        if (elem != null) {
+            return new RGB(elem.getRed(), elem.getGreen(), elem.getBlue());
+        }
+        return null;
+    }
+
+    private static RGB parseX11Rgb(String colorTxt) {
+        Matcher matcher = PATTERN.matcher(colorTxt);
+        if (matcher.matches()) {
+            int r = Integer.parseInt(matcher.group(1));
+            int g = Integer.parseInt(matcher.group(2));
+            int b = Integer.parseInt(matcher.group(3));
+            return new RGB(r, g, b);
+        }
+        return null;
+    }
+
+    private static String getLineStyle(String seriesType, int seriesCount) {
+        if (!IYSeries.SCATTER.equals(seriesType)) {
+            String[] styleStrings = LINE_STYLES.keySet().toArray(new String[LINE_STYLES.size()]);
+            return styleStrings[(seriesCount / (SYSTEM_COLORS.size())) % styleStrings.length];
+        }
+        return IYSeries.NONE;
     }
 
     /**
@@ -398,11 +570,16 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      *            Name of the series to delete
      */
     protected void deleteSeries(String seriesName) {
-        ISeries series = getSwtChart().getSeriesSet().getSeries(seriesName);
+        ISeriesSet seriesSet = getSwtChart().getSeriesSet();
+        ISeries series = seriesSet.getSeries(seriesName);
         if (series != null) {
-            getSwtChart().getSeriesSet().deleteSeries(series.getId());
+            seriesSet.deleteSeries(series.getId());
         }
-        fSeriesValues.remove(seriesName);
+        Color color = fColors.get(seriesName);
+        if (color != null) {
+            color.dispose();
+        }
+        fModelBuilder.deleteSeries(seriesName);
     }
 
     /**
@@ -411,6 +588,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     protected void updateDisplay() {
         try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:UpdateDisplayRequested").setCategory(getViewerId()).build()) { //$NON-NLS-1$
             /* Content is not up to date, increment dirtiness */
+            final ICommonXAxisModel seriesValues = getModel();
             fDirty.incrementAndGet();
             Display.getDefault().asyncExec(new Runnable() {
                 final TmfChartTimeStampFormat tmfChartTimeStampFormat = new TmfChartTimeStampFormat(getTimeOffset());
@@ -419,24 +597,27 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                 public void run() {
                     try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:UpdateDisplay").setParentScope(scope).build()) { //$NON-NLS-1$
                         if (!getSwtChart().isDisposed()) {
-                            double[] xValues = fXValues;
+                            double[] xValues = seriesValues.getXAxis();
                             double maxy = DEFAULT_MAXY;
                             double miny = DEFAULT_MINY;
-                            for (Entry<String, double[]> entry : fSeriesValues.entrySet()) {
-                                ILineSeries series = (ILineSeries) getSwtChart().getSeriesSet().getSeries(entry.getKey());
+                            for (IYSeries entry : seriesValues.getSeries().values()) {
+                                ILineSeries series = (ILineSeries) getSwtChart().getSeriesSet().getSeries(entry.getLabel());
                                 if (series == null) {
-                                    series = addSeries(entry.getKey());
+                                    series = addSeries(entry.getLabel());
+                                }
+                                if (series == null) {
+                                    return;
                                 }
                                 series.setXSeries(xValues);
                                 /*
                                  * Find the minimal and maximum values in this
                                  * series
                                  */
-                                for (double value : entry.getValue()) {
+                                for (double value : entry.getDatapoints()) {
                                     maxy = Math.max(maxy, value);
                                     miny = Math.min(miny, value);
                                 }
-                                series.setYSeries(entry.getValue());
+                                series.setYSeries(entry.getDatapoints());
                             }
                             if (maxy == DEFAULT_MAXY) {
                                 maxy = 1.0;
@@ -454,10 +635,11 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                             getSwtChart().redraw();
 
                             if (isSendTimeAlignSignals()) {
-                                // The width of the chart might have changed and
-                                // its
-                                // time axis might be misaligned with the other
-                                // views
+                                /*
+                                 * The width of the chart might have changed and
+                                 * its time axis might be misaligned with the
+                                 * other views
+                                 */
                                 Point viewPos = TmfCommonXLineChartViewer.this.getParent().getParent().toDisplay(0, 0);
                                 int axisPos = getSwtChart().toDisplay(0, 0).x + getPointAreaOffset();
                                 int timeAxisOffset = axisPos - viewPos.x;

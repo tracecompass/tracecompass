@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.io.diskioac
 import java.util.Collection;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -24,6 +25,7 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.IYSeries;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 import org.swtchart.Chart;
 
@@ -54,6 +56,11 @@ public class DisksIOActivityViewer extends TmfCommonXLineChartViewer {
         Chart chart = getSwtChart();
         chart.getAxisSet().getYAxis(0).getTick().setFormat(DataSpeedWithUnitFormat.getInstance());
         chart.getLegend().setPosition(SWT.LEFT);
+    }
+
+    @Override
+    protected String getSeriesType(@NonNull String seriesName) {
+        return IYSeries.AREA;
     }
 
     @Override

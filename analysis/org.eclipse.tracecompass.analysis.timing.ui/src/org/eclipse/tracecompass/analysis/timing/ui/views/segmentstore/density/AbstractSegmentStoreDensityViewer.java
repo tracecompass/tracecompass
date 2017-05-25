@@ -173,7 +173,11 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
         range.lower = minX - range.upper + maxLength;
         xAxis.setRange(range);
         xAxis.getTick().setFormat(DENSITY_TIME_FORMATTER);
-        fChart.getAxisSet().getYAxis(0).setRange(new Range(1.0, maxY));
+        /*
+         * Set the range to slightly under 1 but above 0 so that log scales
+         * display properly.
+         */
+        fChart.getAxisSet().getYAxis(0).setRange(new Range(0.9, maxY));
         fChart.getAxisSet().getYAxis(0).enableLogScale(true);
         fChart.redraw();
     }

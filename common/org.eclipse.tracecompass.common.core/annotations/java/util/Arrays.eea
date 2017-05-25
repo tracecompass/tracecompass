@@ -2,6 +2,9 @@ class java/util/Arrays
 asList
  <T:Ljava/lang/Object;>([TT;)Ljava/util/List<TT;>;
  <T:Ljava/lang/Object;>([TT;)L1java/util/List<TT;>;
+copyOf
+ ([DI)[D
+ ([DI)[1D
 copyOfRange
  ([BII)[B
  ([BII)[1B

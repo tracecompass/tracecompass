@@ -36,6 +36,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.IYSeries;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 
 import com.google.common.base.Joiner;
@@ -222,6 +223,14 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
             Activator.getDefault().logError("Error updating the data of the CPU usage view", e); //$NON-NLS-1$
         }
 
+    }
+
+    @Override
+    protected String getSeriesType(String seriesName) {
+        if (seriesName.equals(Messages.CpuUsageXYViewer_Total)) {
+            return IYSeries.LINE;
+        }
+        return IYSeries.AREA;
     }
 
     /**
