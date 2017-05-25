@@ -6,6 +6,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
+ * Contributors:
+ *   Robert Kiss - Initial API and implementation
+ *   Mikael Ferland - Enable resizing of symbol provider dialogs
+ *
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.ui.symbols;
@@ -124,6 +128,11 @@ public class SymbolProviderConfigDialog extends TitleAreaDialog implements IPref
             });
         }
         return composite;
+    }
+
+    @Override
+    protected boolean isResizable() {
+        return true;
     }
 
     @Override

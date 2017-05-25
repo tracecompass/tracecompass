@@ -5,6 +5,11 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Robert Kiss - Initial messages for basic symbol provider preference page
+ *   Mikael Ferland - Add new messages to support multiple symbol files
+ *
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.ui.symbols;
@@ -26,16 +31,14 @@ public class Messages extends NLS {
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
     }
 
-    public static String BasicSymbolProviderPrefPage_radioBinaryFile_text;
-    public static String BasicSymbolProviderPrefPage_radioBinaryFile_tooltip;
-    public static String BasicSymbolProviderPrefPage_radioMappingFile_text;
-    public static String BasicSymbolProviderPrefPage_radioMappingFile_tooltip;
-    public static String BasicSymbolProviderPrefPage_btnBrowse;
+    public static String BasicSymbolProviderPrefPage_addFile_text;
+    public static String BasicSymbolProviderPrefPage_removeFile_text;
+    public static String BasicSymbolProviderPrefPage_priorityUp_text;
+    public static String BasicSymbolProviderPrefPage_priorityUp_tooltip;
+    public static String BasicSymbolProviderPrefPage_priorityDown_text;
+    public static String BasicSymbolProviderPrefPage_priorityDown_tooltip;
     public static String BasicSymbolProviderPrefPage_description;
     public static String BasicSymbolProviderPrefPage_tabTitle;
-    public static String BasicSymbolProviderPrefPage_ImportMappingDialogTitle;
-    public static String BasicSymbolProviderPrefPage_ImportBinaryFileDialogTitle;
-    public static String BasicSymbolProviderPrefPage_errorFileDoesNotExists;
-    public static String BasicSymbolProviderPrefPage_errorSpecifyFile;
-
+    public static String BasicSymbolProviderPrefPage_invalidMappingFileDialogHeader;
+    public static String BasicSymbolProviderPrefPage_invalidMappingFileMessage;
 }

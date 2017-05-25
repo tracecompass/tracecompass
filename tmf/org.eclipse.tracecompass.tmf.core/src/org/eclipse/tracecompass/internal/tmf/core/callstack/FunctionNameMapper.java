@@ -9,6 +9,7 @@
  * Contributors:
  *   Alexandre Montplaisir - Initial API and implementation
  *   Marc-Andre Laperle - Map from binary file
+ *   Mikael Ferland - Improve validation for function name mapping from a text file
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.core.callstack;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.cdt.core.CCorePlugin;
@@ -68,13 +70,12 @@ public final class FunctionNameMapper {
 
         try (FileReader fr = new FileReader(mappingFile);
                 BufferedReader reader = new BufferedReader(fr);) {
+            final Pattern pattern = Pattern.compile("([0-9a-f]+)([\\s][a-zA-Z][\\s])(.+)"); //$NON-NLS-1$
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-                line = line.trim();
-                /* Only lines with 3 elements contain addresses */
-                String[] elems = line.split(" ", 3); //$NON-NLS-1$
-                if (elems.length == 3) {
-                    String address = stripLeadingZeros(elems[0]);
-                    String name = elems[elems.length - 1];
+                Matcher matcher = pattern.matcher(line);
+                if (matcher.find()) {
+                    String address = stripLeadingZeros(matcher.group(1));
+                    String name = matcher.group(3);
                     map.put(address, name);
                 }
             }

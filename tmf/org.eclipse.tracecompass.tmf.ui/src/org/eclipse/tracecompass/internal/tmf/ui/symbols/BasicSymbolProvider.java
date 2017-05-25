@@ -6,56 +6,40 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
+ * Contributors:
+ *   Robert Kiss - Initial API and implementation
+ *   Mikael Ferland - Refactor API to support multiple symbol files
+ *
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.ui.symbols;
 
-import java.io.File;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.core.callstack.FunctionNameMapper;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * The {@link BasicSymbolProvider} can use either an executable or a simple
  * symbol mapping file to resolve symbols.
  *
  * @author Robert Kiss
+ * @author Mikael Ferland
  *
  */
 public class BasicSymbolProvider implements ISymbolProvider {
 
     private final @NonNull ITmfTrace fTrace;
 
-    private @NonNull Map<String, String> fMapping = Collections.emptyMap();
-
-    private String fSource;
-
-    private @NonNull SourceKind fKind = SourceKind.BINARY;
-
-    private boolean fConfigured;
-
-    /**
-     * The kind of source this provider is configured with
-     *
-     */
-    public static enum SourceKind {
-        /**
-         * Literal for binary configuration
-         */
-        BINARY,
-
-        /**
-         * Literal for mapping configuration
-         */
-        MAPPING;
-    }
+    private final @NonNull List<@NonNull MappingFile> fMappingFiles = new ArrayList<>();
 
     /**
      * Create a new {@link BasicSymbolProvider} for the given trace
@@ -67,73 +51,45 @@ public class BasicSymbolProvider implements ISymbolProvider {
         fTrace = trace;
     }
 
-    /**
-     *
-     * @return the configured source
-     */
-    public String getConfiguredSource() {
-        return fSource;
-    }
-
-    /**
-     * @return the configured source kind
-     */
-    public @NonNull SourceKind getConfiguredSourceKind() {
-        return fKind;
-    }
-
-    /**
-     * Set the configuration to the given source and kind.
-     *
-     * @param fileSource
-     *            File path to either a binary file or a mapping file.
-     * @param kind
-     *            the type of the referenced file
-     */
-    public void setConfiguredSource(String fileSource, @NonNull SourceKind kind) {
-        fSource = fileSource;
-        fKind = kind;
-        fConfigured = false;
-    }
-
     @Override
     public @NonNull ITmfTrace getTrace() {
         return fTrace;
     }
 
+    /**
+     * @return mapping files for a given trace
+     * @since 3.0
+     */
+    public synchronized @NonNull List<@NonNull MappingFile> getMappingFiles() {
+        return ImmutableList.copyOf(fMappingFiles);
+    }
+
+    /**
+     * @param mappingFiles
+     *            List of mapping files for symbol resolving
+     * @since 3.0
+     */
+    public synchronized void setMappingFiles(@NonNull List<@NonNull MappingFile> mappingFiles) {
+        fMappingFiles.clear();
+        fMappingFiles.addAll(mappingFiles);
+    }
+
     @Override
     public void loadConfiguration(IProgressMonitor monitor) {
-        if (!fConfigured) {
-            synchronized (this) {
-                if (!fConfigured) {
-                    try {
-                        fMapping = Collections.emptyMap();
-                        if (fSource != null) {
-                            File file = new File(fSource);
-                            if (file.isFile()) {
-                                Map<String, String> result;
-                                if (fKind == SourceKind.BINARY) {
-                                    result = FunctionNameMapper.mapFromBinaryFile(file);
-                                } else {
-                                    result = FunctionNameMapper.mapFromNmTextFile(file);
-                                }
-                                if (result != null) {
-                                    fMapping = result;
-                                }
-                            }
-                        }
-                    } finally {
-                        fConfigured = true;
-                    }
-                }
-            }
-        }
+        // Do nothing because the resolved symbols are already stored in
+        // fMappingFiles
     }
 
     @Override
     public @Nullable String getSymbolText(long address) {
-        loadConfiguration(null);
-        return fMapping.get(Long.toHexString(address));
+        for (MappingFile mf : fMappingFiles) {
+            String key = Long.toHexString(address);
+            Map<String, String> symbolMapping = mf.getSymbolMapping();
+            if (symbolMapping.containsKey(key)) {
+                return symbolMapping.get(key);
+            }
+        }
+        return null;
     }
 
     @Override

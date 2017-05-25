@@ -318,8 +318,7 @@ public class CallStackViewTest {
         fBot.waitUntil(Conditions.shellIsActive(shellTitle));
         SWTBot shellBot = fBot.shell(shellTitle).bot();
         SWTBotShell activeShell = shellBot.activeShell();
-        shellBot.radio(1).click();
-        shellBot.button("Browse...", 1).click();
+        shellBot.button("Add...").click();
         shellBot.button("OK").click();
         shellBot.waitUntil(Conditions.shellCloses(activeShell));
         /*
