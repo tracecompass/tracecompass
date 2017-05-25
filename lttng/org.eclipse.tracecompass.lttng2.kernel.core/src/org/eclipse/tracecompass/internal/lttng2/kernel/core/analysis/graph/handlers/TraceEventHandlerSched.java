@@ -83,10 +83,13 @@ public class TraceEventHandlerSched extends BaseHandler {
 
         HostThread prevHt = new HostThread(host, prev);
         LttngWorker prevTask = system.findWorker(prevHt);
+        String name = EventField.getOrDefault(event, eventLayout.fieldPrevComm(), NonNullUtils.checkNotNull(Messages.TraceEventHandlerSched_UnknownThreadName));
         if (prevTask == null) {
-            String name = EventField.getOrDefault(event, eventLayout.fieldPrevComm(), NonNullUtils.checkNotNull(Messages.TraceEventHandlerSched_UnknownThreadName));
             prevTask = new LttngWorker(prevHt, name, ts);
             system.addWorker(prevTask);
+        } else if (prev != 0) {
+            /* update the process name if changed at runtime */
+            prevTask.setName(name);
         }
         /* prev_state == 0 means runnable, thus waits for cpu */
         if (prev_state == 0) {
