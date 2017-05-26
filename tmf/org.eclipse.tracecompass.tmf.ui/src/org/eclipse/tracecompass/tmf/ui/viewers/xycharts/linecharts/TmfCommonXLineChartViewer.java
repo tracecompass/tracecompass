@@ -600,34 +600,37 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                             double[] xValues = seriesValues.getXAxis();
                             double maxy = DEFAULT_MAXY;
                             double miny = DEFAULT_MINY;
-                            for (IYSeries entry : seriesValues.getSeries().values()) {
-                                ILineSeries series = (ILineSeries) getSwtChart().getSeriesSet().getSeries(entry.getLabel());
-                                if (series == null) {
-                                    series = addSeries(entry.getLabel());
+                            double end = getWindowEndTime() - getWindowStartTime();
+                            if (end > 0.0) {
+                                for (IYSeries entry : seriesValues.getSeries().values()) {
+                                    ILineSeries series = (ILineSeries) getSwtChart().getSeriesSet().getSeries(entry.getLabel());
+                                    if (series == null) {
+                                        series = addSeries(entry.getLabel());
+                                    }
+                                    if (series == null) {
+                                        return;
+                                    }
+                                    series.setXSeries(xValues);
+                                    /*
+                                     * Find the minimal and maximum values in this series
+                                     */
+                                    for (double value : entry.getDatapoints()) {
+                                        maxy = Math.max(maxy, value);
+                                        miny = Math.min(miny, value);
+                                    }
+                                    series.setYSeries(entry.getDatapoints());
                                 }
-                                if (series == null) {
-                                    return;
+                                if (maxy == DEFAULT_MAXY) {
+                                    maxy = 1.0;
                                 }
-                                series.setXSeries(xValues);
-                                /*
-                                 * Find the minimal and maximum values in this
-                                 * series
-                                 */
-                                for (double value : entry.getDatapoints()) {
-                                    maxy = Math.max(maxy, value);
-                                    miny = Math.min(miny, value);
-                                }
-                                series.setYSeries(entry.getDatapoints());
-                            }
-                            if (maxy == DEFAULT_MAXY) {
-                                maxy = 1.0;
-                            }
 
+                            }else {
+                                clearContent();
+                                end =1;
+                            }
                             IAxisTick xTick = getSwtChart().getAxisSet().getXAxis(0).getTick();
                             xTick.setFormat(tmfChartTimeStampFormat);
-
                             final double start = 0.0;
-                            double end = getWindowEndTime() - getWindowStartTime();
                             getSwtChart().getAxisSet().getXAxis(0).setRange(new Range(start, end));
                             if (maxy > miny) {
                                 getSwtChart().getAxisSet().getYAxis(0).setRange(new Range(miny, maxy));
