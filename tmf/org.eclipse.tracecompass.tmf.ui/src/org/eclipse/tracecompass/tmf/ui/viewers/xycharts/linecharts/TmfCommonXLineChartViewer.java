@@ -78,6 +78,11 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     private final AtomicInteger fDirty = new AtomicInteger();
 
     /**
+     * Used for testing
+     */
+    private int fOverrideNbPoints = 0;
+
+    /**
      * Constructor
      *
      * @param parent
@@ -186,7 +191,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
         @Override
         public void run() {
-            try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:UpdateThread", "numRequests=" , fNumRequests).setParentScope(fScope).build()) { //$NON-NLS-1$ //$NON-NLS-2$
+            try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:UpdateThread", "numRequests=", fNumRequests).setParentScope(fScope).build()) { //$NON-NLS-1$ //$NON-NLS-2$
                 try {
                     updateData(getWindowStartTime(), getWindowEndTime(), fNumRequests, fMonitor);
                 } finally {
@@ -208,11 +213,30 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     private synchronized void newUpdateThread(@NonNull FlowScopeLog fScope) {
         cancelUpdate();
-        if (!getSwtChart().isDisposed()) {
-            final int numRequests = (int) (getSwtChart().getPlotArea().getBounds().width * fResolution);
-            fUpdateThread = new UpdateThread(numRequests, fScope);
-            fUpdateThread.start();
+        if (getSwtChart().isDisposed()) {
+            return;
         }
+        int numRequests = fOverrideNbPoints != 0 ? fOverrideNbPoints : (int) (getSwtChart().getPlotArea().getBounds().width * fResolution);
+        fUpdateThread = new UpdateThread(numRequests, fScope);
+        fUpdateThread.start();
+    }
+
+    /**
+     * Force the number of points to a fixed value
+     *
+     * @param nbPoints
+     *            The number of points to display, cannot be negative. 0 means
+     *            use native resolution. any positive integer means that number
+     *            of points
+     *
+     * @since 3.0
+     */
+    public synchronized void setNbPoints(int nbPoints) {
+        if (nbPoints < 0) {
+            throw new IllegalArgumentException("Number of points cannot be negative"); //$NON-NLS-1$
+        }
+        fOverrideNbPoints = nbPoints;
+        updateContent();
     }
 
     private synchronized void updateThreadFinished(UpdateThread thread) {
