@@ -155,6 +155,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
      * Create an experiment with imported traces.
      */
     public static final int OPTION_CREATE_EXPERIMENT = 1 << 5;
+    /**
+     * Skip archive detection and extraction.
+     */
+    public static final int OPTION_SKIP_ARCHIVE_EXTRACTION = 1 << 6;
 
     // ------------------------------------------------------------------------
     // Attributes

@@ -222,18 +222,22 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
                     // Even if the files were extracted to temporary folder, they
                     // have to look like they originate from the source archive
                     baseSourceLocation = getRootElement(selectedFileSystemElements.get(0)).getSourceLocation();
-                    // Extract additional archives contained in the extracted files
-                    // (archives in archives)
-                    List<TraceFileSystemElement> tempFolderFileSystemElements = createElementsForFolder(destTempFolder);
-                    extractAllArchiveFiles(tempFolderFileSystemElements, destTempFolder, destTempFolder.getLocation(), archiveMonitor.newChild(1));
+                    if ((fImportOptionFlags & ImportTraceWizardPage.OPTION_SKIP_ARCHIVE_EXTRACTION) == 0) {
+                        // Extract additional archives contained in the extracted files
+                        // (archives in archives)
+                        List<TraceFileSystemElement> tempFolderFileSystemElements = createElementsForFolder(destTempFolder);
+                        extractAllArchiveFiles(tempFolderFileSystemElements, destTempFolder, destTempFolder.getLocation(), archiveMonitor.newChild(1));
+                    }
                 }
             } else {
                 SubMonitor directoryMonitor = SubMonitor.convert(subMonitor.newChild(ARCHIVE_OR_DIRECTORY_PROGRESS), 2);
                 // Import selected files, excluding archives (done in a later step)
                 importFileSystemElements(directoryMonitor.newChild(1), selectedFileSystemElements);
 
-                // Extract archives in selected files (if any) to temporary folder
-                extractAllArchiveFiles(selectedFileSystemElements, destTempFolder, fBaseSourceContainerPath, directoryMonitor.newChild(1));
+                if ((fImportOptionFlags & ImportTraceWizardPage.OPTION_SKIP_ARCHIVE_EXTRACTION) == 0) {
+                    // Extract archives in selected files (if any) to temporary folder
+                    extractAllArchiveFiles(selectedFileSystemElements, destTempFolder, fBaseSourceContainerPath, directoryMonitor.newChild(1));
+                }
                 // Even if the files were extracted to temporary folder, they
                 // have to look like they originate from the source folder
                 baseSourceLocation = URIUtil.toUnencodedString(fBaseSourceContainerPath.toFile().getCanonicalFile().toURI());
@@ -543,11 +547,13 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
         String path = fileSystemElement.getFileSystemObject().getAbsolutePath();
         TraceTypeHelper traceTypeHelper = null;
 
-        File file = (File) fileSystemElement.getFileSystemObject().getRawFileSystemObject();
-        boolean isArchiveFileElement = fileSystemElement.getFileSystemObject() instanceof FileFileSystemObject && ArchiveUtil.isArchiveFile(file);
-        if (isArchiveFileElement) {
-            // We'll be extracting this later, do not import as a trace
-            return;
+        if ((fImportOptionFlags & ImportTraceWizardPage.OPTION_SKIP_ARCHIVE_EXTRACTION) == 0) {
+            File file = (File) fileSystemElement.getFileSystemObject().getRawFileSystemObject();
+            boolean isArchiveFileElement = fileSystemElement.getFileSystemObject() instanceof FileFileSystemObject && ArchiveUtil.isArchiveFile(file);
+            if (isArchiveFileElement) {
+                // We'll be extracting this later, do not import as a trace
+                return;
+            }
         }
 
         if (fTraceType == null) {

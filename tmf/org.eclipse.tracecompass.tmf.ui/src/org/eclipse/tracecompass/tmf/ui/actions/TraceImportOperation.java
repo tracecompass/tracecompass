@@ -46,6 +46,8 @@ public class TraceImportOperation extends WorkspaceModifyOperation {
     private final String fSourcePath;
     private final TmfTraceFolder fDestFolder;
 
+    private boolean fSkipArchiveExtraction = false;
+
     /**
      * Constructor
      *
@@ -59,12 +61,26 @@ public class TraceImportOperation extends WorkspaceModifyOperation {
         fDestFolder = destFolder;
     }
 
+    /**
+     * Sets the skip archive extraction option. When set to true, archive files
+     * will be imported directly without being detected or extracted.
+     *
+     * @param skipArchiveExtraction
+     *            true to skip archive extraction
+     */
+    public void setSkipArchiveExtraction(boolean skipArchiveExtraction) {
+        fSkipArchiveExtraction = skipArchiveExtraction;
+    }
+
     @Override
     protected void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException, InterruptedException {
         int importOptionFlags =
                 ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE |
                 ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES |
                 ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE;
+        if (fSkipArchiveExtraction) {
+            importOptionFlags |= ImportTraceWizardPage.OPTION_SKIP_ARCHIVE_EXTRACTION;
+        }
         IPath baseSourceContainerPath = new Path(fSourcePath);
         IPath destinationContainerPath = fDestFolder.getPath();
         FileSystemObjectImportStructureProvider provider = new FileSystemObjectImportStructureProvider(FileSystemStructureProvider.INSTANCE, null);
