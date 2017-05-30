@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.LinuxTidAspect;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst20EventLayout;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
@@ -28,6 +29,7 @@ import org.eclipse.tracecompass.tmf.core.callstack.CallStackStateProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 
 import com.google.common.collect.ImmutableSet;
@@ -121,8 +123,8 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
         if (!(event instanceof CtfTmfEvent)) {
             return false;
         }
-        ITmfEventField content = ((CtfTmfEvent) event).getContent();
-        if (content.getField(fLayout.contextVtid()) == null) {
+        Object tid = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), LinuxTidAspect.class, event);
+        if (!(tid instanceof Integer)) {
             return false;
         }
         return true;
@@ -170,8 +172,11 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
     @Override
     protected long getThreadId(ITmfEvent event) {
         /* We checked earlier that the "vtid" context is present */
-        ITmfEventField content = event.getContent();
-        return ((Long) content.getField(fLayout.contextVtid()).getValue()).longValue();
+        Integer tid = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), LinuxTidAspect.class, event);
+        if (tid == null) {
+            return UNKNOWN_PID;
+        }
+        return tid.longValue();
     }
 
     @Override

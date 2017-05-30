@@ -16,7 +16,8 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.tracecompass.tmf.ctf.core,
  org.eclipse.tracecompass.tmf.ctf.core.tests,
  org.eclipse.tracecompass.lttng2.ust.core,
- org.eclipse.tracecompass.lttng2.control.core
+ org.eclipse.tracecompass.lttng2.control.core,
+ org.eclipse.tracecompass.analysis.os.linux.core
 Export-Package: org.eclipse.tracecompass.lttng2.ust.core.tests,
  org.eclipse.tracecompass.lttng2.ust.core.tests.analysis.debuginfo,
  org.eclipse.tracecompass.lttng2.ust.core.tests.analysis.memory,

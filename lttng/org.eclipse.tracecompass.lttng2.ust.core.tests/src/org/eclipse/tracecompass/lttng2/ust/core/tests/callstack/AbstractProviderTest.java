@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.callstack.LttngUstCallStackProvider;
+import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -33,7 +34,9 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.callstack.CallStackStateProvider;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -102,12 +105,17 @@ public abstract class AbstractProviderTest {
 
     /**
      * Perform pre-class initialization.
+     *
+     * @throws TmfTraceException
+     *             Exception initiating the trace
      */
     @Before
-    public void setUp() {
+    public void setUp() throws TmfTraceException {
         CtfTestTrace testTrace = getTestTrace();
 
-        CtfTmfTrace trace = CtfTmfTestTraceUtils.getTrace(testTrace);
+        CtfTmfTrace ctftrace = CtfTmfTestTraceUtils.getTrace(testTrace);
+        LttngUstTrace trace = new LttngUstTrace();
+        trace.initTrace(null, ctftrace.getPath(), ITmfEvent.class);
         fTrace = trace;
         fModule = new TestLttngCallStackModule();
         try {

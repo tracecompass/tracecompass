@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.LinuxTidAspect;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -30,6 +31,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -178,12 +180,13 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
         return VERSION;
     }
 
-    private Long getVtid(ITmfEvent event) {
-        ITmfEventField field = event.getContent().getField(fLayout.contextVtid());
-        if (field == null) {
+    private static Long getVtid(ITmfEvent event) {
+        /* We checked earlier that the "vtid" context is present */
+        Integer tid = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), LinuxTidAspect.class, event);
+        if (tid == null) {
             return MINUS_ONE;
         }
-        return (Long) field.getValue();
+        return tid.longValue();
     }
 
     private String getProcname(ITmfEvent event) {

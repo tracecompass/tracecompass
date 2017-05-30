@@ -15,6 +15,7 @@
 package org.eclipse.tracecompass.lttng2.ust.core.trace;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
@@ -24,6 +25,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.Activator;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.ContextVtidAspect;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.DefaultUstEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst20EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst27EventLayout;
@@ -72,6 +74,8 @@ public class LttngUstTrace extends CtfTmfTrace {
         LTTNG_UST_ASPECTS = builder.build();
     }
 
+    private @NonNull Collection<ITmfEventAspect<?>> fUstTraceAspects = new HashSet<>(LTTNG_UST_ASPECTS);
+
     private @Nullable ILttngUstEventLayout fLayout = null;
 
     /**
@@ -116,6 +120,11 @@ public class LttngUstTrace extends CtfTmfTrace {
 
         /* Determine the event layout to use from the tracer's version */
         fLayout = getLayoutFromEnv();
+
+        ImmutableSet.Builder<ITmfEventAspect<?>> builder = ImmutableSet.builder();
+        builder.addAll(LTTNG_UST_ASPECTS);
+        builder.add(new ContextVtidAspect(fLayout));
+        fUstTraceAspects = builder.build();
     }
 
     private @NonNull ILttngUstEventLayout getLayoutFromEnv() {
@@ -142,7 +151,7 @@ public class LttngUstTrace extends CtfTmfTrace {
 
     @Override
     public Iterable<ITmfEventAspect<?>> getEventAspects() {
-        return LTTNG_UST_ASPECTS;
+        return fUstTraceAspects;
     }
 
     /**
