@@ -82,7 +82,7 @@ public class TmfTraceUtilsTest {
 
     }
 
-    private static class TestEventAspect implements ITmfEventAspect<Integer> {
+    private static class TestEventAspect implements ITmfEventAspect<@NonNull Integer> {
 
         public static final Integer RESOLVED_VALUE = 2;
         public static final @NonNull String ASPECT_NAME = "test";
@@ -229,6 +229,9 @@ public class TmfTraceUtilsTest {
         obj = TmfTraceUtils.resolveAspectOfNameForEvent(trace, TestEventAspect.ASPECT_NAME, event);
         assertNull(obj);
 
+        Integer val = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(trace, TestEventAspect.class, event);
+        assertNull(val);
+
         // Register the aspect
         TmfTraceUtils.registerEventAspect(new TestEventAspect());
         // See that the aspect is resolved now
@@ -240,5 +243,10 @@ public class TmfTraceUtilsTest {
         obj = TmfTraceUtils.resolveAspectOfNameForEvent(trace, TestEventAspect.ASPECT_NAME, event);
         assertNotNull(obj);
         assertEquals(TestEventAspect.RESOLVED_VALUE, obj);
+
+        // See if it is resolved by Integer type as well
+        val = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(trace, TestEventAspect.class, event);
+        assertNotNull(val);
+        assertEquals(TestEventAspect.RESOLVED_VALUE, val);
     }
 }
