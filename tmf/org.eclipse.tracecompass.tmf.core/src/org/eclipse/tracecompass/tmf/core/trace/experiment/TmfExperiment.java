@@ -86,6 +86,11 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
     // ------------------------------------------------------------------------
 
     /**
+     * The file name of the Synchronization
+     */
+    private static final String SYNCHRONIZATION_FILE_NAME = "synchronization.bin"; //$NON-NLS-1$
+
+    /**
      * The name of the directory containing trace synchronization data. This
      * directory typically will be preserved when traces are synchronized.
      * Analysis involved in synchronization can put their supplementary files in
@@ -614,7 +619,7 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
         try {
             String syncDirectory = getSynchronizationFolder(true);
 
-            final File syncFile = (syncDirectory != null) ? new File(syncDirectory + File.separator + getSynchronizationFolder(true)) : null;
+            final File syncFile = (syncDirectory != null) ? new File(syncDirectory + File.separator + SYNCHRONIZATION_FILE_NAME) : null;
 
             final SynchronizationAlgorithm syncAlgo = SynchronizationManager.synchronizeTraces(syncFile, Collections.singleton(this), doSync);
 
