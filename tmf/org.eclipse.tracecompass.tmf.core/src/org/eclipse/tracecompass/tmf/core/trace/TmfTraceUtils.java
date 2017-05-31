@@ -211,12 +211,21 @@ public final class TmfTraceUtils {
      */
     public static <T extends ITmfEventAspect<Integer>> @Nullable Integer resolveIntEventAspectOfClassForEvent(
             ITmfTrace trace, Class<T> aspectClass, ITmfEvent event) {
-            return StreamUtils.getStream(trace.getEventAspects())
+            Integer value = StreamUtils.getStream(trace.getEventAspects())
                 .filter(aspect -> aspectClass.isAssignableFrom(aspect.getClass()))
                 /* Enforced by the T parameter bounding */
                 .map(aspect -> (Integer) aspect.resolve(event))
                 .filter(obj -> obj != null)
                 .findFirst().orElse(null);
+            if (value != null) {
+                return value;
+            }
+            // If the value is not found, look at the global aspects
+            return EXTRA_ASPECTS.stream()
+                    .filter(aspect -> aspectClass.isAssignableFrom(aspect.getClass()))
+                    .map(aspect -> (Integer) aspect.resolve(event))
+                    .filter(obj -> obj != null)
+                    .findFirst().orElse(null);
     }
 
     /**
