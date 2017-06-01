@@ -431,9 +431,13 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      * @return Array of analysis elements
      */
     public List<@NonNull TmfAnalysisElement> getAvailableAnalysis() {
-        return getChildElementViews().getChildren().stream()
-            .map(elem -> (TmfAnalysisElement) elem)
-            .collect(Collectors.toList());
+        TmfViewsElement viewsElement = getChildElementViews();
+        if (viewsElement != null) {
+            return viewsElement.getChildren().stream()
+                    .map(elem -> (TmfAnalysisElement) elem)
+                    .collect(Collectors.toList());
+        }
+        return Collections.EMPTY_LIST;
     }
 
     /**
