@@ -415,10 +415,9 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         });
 
         /* Remove all trace analyses from experiment view */
-        List<@NonNull TmfAnalysisElement> analysisElements = trace.getElementUnderTraceFolder().getAvailableAnalysis();
         TmfViewsElement view = getChildElementViews();
-
         if (view != null) {
+            List<@NonNull TmfAnalysisElement> analysisElements = trace.getElementUnderTraceFolder().getAvailableAnalysis();
             view.removeChildrenAnalysis(analysisElements);
         }
 
