@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2017 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -71,6 +71,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
     private static final Map<Integer, StateItem> STATE_MAP;
 
     private static final List<StateItem> STATE_LIST;
+    private static final StateItem[] STATE_TABLE;
 
     private static StateItem createState(LinuxStyle style) {
         int rgbInt = (int) style.toMap().getOrDefault(ITimeEventStyleStrings.fillColor(), 0);
@@ -88,6 +89,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
         builder.put(StateValues.CPU_STATUS_SOFT_IRQ_RAISED, createState(LinuxStyle.SOFT_IRQ_RAISED));
         STATE_MAP = builder.build();
         STATE_LIST = ImmutableList.copyOf(STATE_MAP.values());
+        STATE_TABLE = STATE_LIST.toArray(new StateItem[STATE_LIST.size()]);
     }
 
     /**
@@ -130,7 +132,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
     @Override
     public StateItem[] getStateTable() {
-        return STATE_LIST.toArray(new StateItem[STATE_LIST.size()]);
+        return STATE_TABLE;
     }
 
     @Override

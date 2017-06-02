@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 École Polytechnique de Montréal
+ * Copyright (c) 2016, 2017 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -57,6 +57,16 @@ public class VirtualMachinePresentationProvider extends TimeGraphPresentationPro
 
         private State(RGB rgb) {
             fRgb = rgb;
+        }
+    }
+
+    private static final StateItem[] STATE_TABLE;
+    static {
+        State[] states = getStateValues();
+        STATE_TABLE = new StateItem[states.length];
+        for (int i = 0; i < STATE_TABLE.length; i++) {
+            State state = states[i];
+            STATE_TABLE[i] = new StateItem(state.fRgb, state.toString());
         }
     }
 
@@ -139,13 +149,7 @@ public class VirtualMachinePresentationProvider extends TimeGraphPresentationPro
 
     @Override
     public StateItem[] getStateTable() {
-        State[] states = getStateValues();
-        StateItem[] stateTable = new StateItem[states.length];
-        for (int i = 0; i < stateTable.length; i++) {
-            State state = states[i];
-            stateTable[i] = new StateItem(state.fRgb, state.toString());
-        }
-        return stateTable;
+        return STATE_TABLE;
     }
 
     @Override

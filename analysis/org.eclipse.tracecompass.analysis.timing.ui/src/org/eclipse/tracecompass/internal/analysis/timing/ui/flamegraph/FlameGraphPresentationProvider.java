@@ -40,6 +40,18 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
     /** Number of colors used for flameGraph events */
     public static final int NUM_COLORS = 360;
 
+    private static final StateItem[] STATE_TABLE;
+    static {
+        final float saturation = 0.6f;
+        final float brightness = 0.6f;
+        STATE_TABLE = new StateItem[NUM_COLORS + 1];
+        STATE_TABLE[0] = new StateItem(State.MULTIPLE.rgb, State.MULTIPLE.toString());
+        for (int i = 0; i < NUM_COLORS; i++) {
+            RGB rgb = new RGB(i, saturation, brightness);
+            STATE_TABLE[i + 1] = new StateItem(rgb, State.EXEC.toString());
+        }
+    }
+
     private static final Format FORMATTER = new SubSecondTimeWithUnitFormat();
 
     private FlameGraphView fView;
@@ -65,15 +77,7 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
 
     @Override
     public StateItem[] getStateTable() {
-        final float saturation = 0.6f;
-        final float brightness = 0.6f;
-        StateItem[] stateTable = new StateItem[NUM_COLORS + 1];
-        stateTable[0] = new StateItem(State.MULTIPLE.rgb, State.MULTIPLE.toString());
-        for (int i = 0; i < NUM_COLORS; i++) {
-            RGB rgb = new RGB(i, saturation, brightness);
-            stateTable[i + 1] = new StateItem(rgb, State.EXEC.toString());
-        }
-        return stateTable;
+        return STATE_TABLE;
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2016 Ericsson
+ * Copyright (c) 2013, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -45,6 +45,18 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
 
     /** Number of colors used for call stack events */
     public static final int NUM_COLORS = 360;
+
+    private static final StateItem[] STATE_TABLE;
+    static {
+        final float saturation = 0.6f;
+        final float brightness = 0.6f;
+        STATE_TABLE = new StateItem[NUM_COLORS + 1];
+        STATE_TABLE[0] = new StateItem(State.MULTIPLE.rgb, State.MULTIPLE.toString());
+        for (int i = 0; i < NUM_COLORS; i++) {
+            RGB rgb = new RGB(i, saturation, brightness);
+            STATE_TABLE[i + 1] = new StateItem(rgb, State.EXEC.toString());
+        }
+    }
 
     private CallStackView fView;
 
@@ -114,15 +126,7 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
 
     @Override
     public StateItem[] getStateTable() {
-        final float saturation = 0.6f;
-        final float brightness = 0.6f;
-        StateItem[] stateTable = new StateItem[NUM_COLORS + 1];
-        stateTable[0] = new StateItem(State.MULTIPLE.rgb, State.MULTIPLE.toString());
-        for (int i = 0; i < NUM_COLORS; i++) {
-            RGB rgb = new RGB(i, saturation, brightness);
-            stateTable[i + 1] = new StateItem(rgb, State.EXEC.toString());
-        }
-        return stateTable;
+        return STATE_TABLE;
     }
 
     @Override

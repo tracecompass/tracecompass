@@ -54,7 +54,6 @@ import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSetting;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSettingsManager;
 import org.eclipse.tracecompass.tmf.ui.views.colors.IColorSettingsListener;
 import org.eclipse.tracecompass.tmf.ui.views.timechart.TimeChartEvent.RankRange;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphSelectionListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
@@ -90,7 +89,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
     private boolean fRedrawBusy = false;
     private boolean fRedrawPending = false;
     private final Object fSyncObj = new Object();
-    private ITimeGraphPresentationProvider fPresentationProvider;
+    private TimeChartAnalysisProvider fPresentationProvider;
 
     /**
      * Default constructor
@@ -581,6 +580,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
 
     @Override
     public void colorSettingsChanged(ColorSetting[] colorSettings) {
+        fPresentationProvider.colorSettingsChanged(colorSettings);
         // Set presentation provider again to trigger re-creation of new color
         // settings which are stored in the TimeGraphControl class
         fViewer.setTimeGraphProvider(fPresentationProvider);
