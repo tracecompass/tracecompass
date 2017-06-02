@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 École Polytechnique de Montréal
+ * Copyright (c) 2015, 2017 École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -60,6 +60,15 @@ public class CriticalPathPresentationProvider extends TimeGraphPresentationProvi
         }
     }
 
+    private static final StateItem[] STATE_TABLE;
+    static {
+        STATE_TABLE = new StateItem[State.values().length];
+        for (int i = 0; i < STATE_TABLE.length; i++) {
+            State state = State.values()[i];
+            STATE_TABLE[i] = new StateItem(state.rgb, state.toString());
+        }
+    }
+
     @Override
     public String getStateTypeName() {
         return Messages.getMessage(Messages.CriticalFlowView_stateTypeName);
@@ -67,12 +76,7 @@ public class CriticalPathPresentationProvider extends TimeGraphPresentationProvi
 
     @Override
     public StateItem[] getStateTable() {
-        StateItem[] stateTable = new StateItem[State.values().length];
-        for (int i = 0; i < stateTable.length; i++) {
-            State state = State.values()[i];
-            stateTable[i] = new StateItem(state.rgb, state.toString());
-        }
-        return stateTable;
+        return STATE_TABLE;
     }
 
     @Override

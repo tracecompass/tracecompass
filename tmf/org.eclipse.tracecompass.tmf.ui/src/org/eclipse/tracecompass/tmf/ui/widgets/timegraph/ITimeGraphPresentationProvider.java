@@ -22,7 +22,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 
 /**
  * Interface for the time graph widget provider
@@ -189,18 +188,21 @@ public interface ITimeGraphPresentationProvider {
      */
     default Map<String, Object> getEventStyle(ITimeEvent event) {
         StateItem stateItem = null;
-        if (event instanceof TimeEvent) {
-            int index = getStateTableIndex(event);
-            StateItem[] stateTable = getStateTable();
-            if (index >= 0 && index < stateTable.length) {
-                stateItem = stateTable[index];
-            }
+        int index = getStateTableIndex(event);
+        StateItem[] stateTable = getStateTable();
+        if (index >= 0 && index < stateTable.length) {
+            stateItem = stateTable[index];
         }
-        Map<String, Object> styleMap = new HashMap<>();
-        if (stateItem != null) {
-            styleMap.putAll(stateItem.getStyleMap());
+        Map<String, Object> styleMap = stateItem == null ? Collections.EMPTY_MAP : stateItem.getStyleMap();
+        Map<String, Object> specificEventStyles = getSpecificEventStyle(event);
+        if (specificEventStyles.isEmpty()) {
+            return styleMap;
         }
-        styleMap.putAll(getSpecificEventStyle(event));
+        if (styleMap.isEmpty()) {
+            return specificEventStyles;
+        }
+        styleMap = new HashMap<>(styleMap);
+        styleMap.putAll(specificEventStyles);
         return styleMap;
     }
 

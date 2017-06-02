@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2017 École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -58,6 +58,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
      * stateValues list
      */
     private Map<Integer, Integer> stateIndex = new HashMap<>();
+    private StateItem[] stateTable = new StateItem[0];
 
     @Override
     public int getStateTableIndex(ITimeEvent event) {
@@ -80,7 +81,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
 
     @Override
     public StateItem[] getStateTable() {
-        return stateValues.toArray(new StateItem[stateValues.size()]);
+        return stateTable;
     }
 
     @Override
@@ -143,6 +144,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
 
             addOrUpdateState(value, name, color);
         }
+        stateTable = stateValues.toArray(new StateItem[stateValues.size()]);
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -194,6 +196,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
             /* Override a previous state value */
             stateValues.set(index, item);
         }
+        stateTable = stateValues.toArray(new StateItem[stateValues.size()]);
     }
 
     private static RGB parseColor(String color) {

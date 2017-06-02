@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson
+ * Copyright (c) 2010, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,6 +19,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSetting;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSettingsManager;
+import org.eclipse.tracecompass.tmf.ui.views.colors.IColorSettingsListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
@@ -30,23 +31,26 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
  * @version 1.0
  * @author Patrick Tasse
  */
-public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider {
+public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider implements IColorSettingsListener {
 
     private static final Color BOOKMARK_INNER_COLOR = new Color(Display.getDefault(), 115, 165, 224);
     private static final Color BOOKMARK_OUTER_COLOR = new Color(Display.getDefault(), 2, 70, 140);
     private static final Color SEARCH_MATCH_COLOR = new Color(Display.getDefault(), 177, 118, 14);
 
+    private StateItem[] fStateTable;
+
     private int lastBookmarkX = Integer.MIN_VALUE;
+
+    /**
+     * Constructor
+     */
+    public TimeChartAnalysisProvider() {
+        colorSettingsChanged(ColorSettingsManager.getColorSettings());
+    }
 
     @Override
     public StateItem[] getStateTable() {
-
-        ColorSetting[] settings = ColorSettingsManager.getColorSettings();
-        StateItem[] stateItems = new StateItem[settings.length];
-        for (int i = 0; i < settings.length; i++) {
-            stateItems[i] = new StateItem(settings[i].getTickColorRGB());
-        }
-        return stateItems;
+        return fStateTable;
     }
 
     @Override
@@ -94,5 +98,14 @@ public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider {
         gc.drawPoint(r.x, r.y + r.height);
         gc.drawLine(r.x - 1, r.y + r.height + 1, r.x + 1, r.y + r.height + 1);
         gc.drawLine(r.x - 2, r.y + r.height + 2, r.x + 2, r.y + r.height + 2);
+    }
+
+    @Override
+    public void colorSettingsChanged(ColorSetting[] settings) {
+        StateItem[] stateItems = new StateItem[settings.length];
+        for (int i = 0; i < settings.length; i++) {
+            stateItems[i] = new StateItem(settings[i].getTickColorRGB());
+        }
+        fStateTable = stateItems;
     }
 }
