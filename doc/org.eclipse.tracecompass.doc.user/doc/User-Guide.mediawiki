@@ -504,7 +504,7 @@ A new dialog box will open with a list of available traces. The filter text box 
 
 [[Image:images/SelectTracesDialog.png]]
 
-Now the selected traces will be linked to the experiment and will be shown under the '''Experiments''' folder.
+Now the selected traces will be linked to the experiment and will be shown under the '''Experiments''' folder. Expanding of the '''Views''' folder will show all available analysis that are defined either for the experiment or for contained traces.  If there are multiple traces of the same trace type the "Views" folder will aggregate all available analysis that are the same to one entry in the tree. Each analysis output (view) can be opened from the experiment context. 
 
 [[Image:images/ExplorerWithExperiment.png]]
 
