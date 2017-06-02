@@ -2937,7 +2937,11 @@ It is possible to synchronize traces from different machines so that they have t
 
 To synchronize traces from different machines, they need to exchange packets through the network and have events enabled such that the data can be matched from one trace to the other. For now, only TCP packets can be matched between two traces.
 
-LTTng traces that can be synchronized are obtained using one of two methods (both methods are compatible):
+LTTng traces that can be synchronized are obtained using one of three methods below. All methods are compatible so a trace on one host taken with one method can be synchronized with a trace on another host taken with another method:
+
+=== Use LTTng-modules 2.9+ ===
+
+As of LTTng-modules 2.9, the '''net_dev_queue''' and '''net_if_receive_skb''' tracepoints contain all the necessary data to synchronize the traces.
 
 === LTTng-module network tracepoint with complete data ===
 
