@@ -98,6 +98,8 @@ public abstract class TmfXmlTraceStub extends TmfTrace {
     private static final String VALUES_SEPARATOR = " \\| "; //$NON-NLS-1$
     private static final String TYPE_INTEGER = "int"; //$NON-NLS-1$
     private static final String TYPE_LONG = "long"; //$NON-NLS-1$
+    private static final String TYPE_LONG_ARRAY = "longArray"; //$NON-NLS-1$
+    private static final String TYPE_INT_ARRAY = "intArray"; //$NON-NLS-1$
     private static final String ASPECT_CPU = "cpu";
 
     private final CustomXmlTraceDefinition fDefinition;
@@ -304,6 +306,34 @@ public abstract class TmfXmlTraceStub extends TmfTrace {
                     } catch (NumberFormatException e) {
                         Activator.logError(String.format("Get next XML event: cannot cast value %s to long", value), e); //$NON-NLS-1$
                         val = 0L;
+                    }
+                    break;
+                }
+                case TYPE_LONG_ARRAY: {
+                    try {
+                        String[] split = value.split(",");
+                        long[] arr = new long[split.length];
+                        for (int j = 0; j < split.length; j++) {
+                            arr[j] = Long.valueOf(split[j]);
+                        }
+                        val = arr;
+                    } catch (NumberFormatException e) {
+                        Activator.logError(String.format("Get next XML event: cannot cast one of the comma-separated values of %s to long", value), e); //$NON-NLS-1$
+                        val = new long[0];
+                    }
+                    break;
+                }
+                case TYPE_INT_ARRAY: {
+                    try {
+                        String[] split = value.split(",");
+                        int[] arr = new int[split.length];
+                        for (int j = 0; j < split.length; j++) {
+                            arr[j] = Integer.valueOf(split[j]);
+                        }
+                        val = arr;
+                    } catch (NumberFormatException e) {
+                        Activator.logError(String.format("Get next XML event: cannot cast one of the comma-separated values of %s to int", value), e); //$NON-NLS-1$
+                        val = new int[0];
                     }
                     break;
                 }

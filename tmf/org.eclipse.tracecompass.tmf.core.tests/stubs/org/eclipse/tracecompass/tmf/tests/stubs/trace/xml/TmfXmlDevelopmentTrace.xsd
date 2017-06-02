@@ -47,6 +47,8 @@
 					<xs:enumeration value="long"/>
 					<xs:enumeration value="string"/>
 					<xs:enumeration value="double"/>
+					<xs:enumeration value="longArray"/>
+					<xs:enumeration value="intArray"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
