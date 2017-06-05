@@ -1,0 +1,31 @@
+class java/util/concurrent/BlockingQueue
+add
+ (TE;)Z
+ (T1E;)Z
+contains
+ (Ljava/lang/Object;)Z
+ (L1java/lang/Object;)Z
+drainTo
+ (Ljava/util/Collection<-TE;>;)I
+ (L1java/util/Collection<-TE;>;)I
+drainTo
+ (Ljava/util/Collection<-TE;>;I)I
+ (L1java/util/Collection<-TE;>;I)I
+offer
+ (TE;)Z
+ (T1E;)Z
+offer
+ (TE;JLjava/util/concurrent/TimeUnit;)Z
+ (T1E;JLjava/util/concurrent/TimeUnit;)Z
+poll
+ (JLjava/util/concurrent/TimeUnit;)TE;
+ (JLjava/util/concurrent/TimeUnit;)T0E;
+put
+ (TE;)V
+ (T1E;)V
+remove
+ (Ljava/lang/Object;)Z
+ (L1java/lang/Object;)Z
+take
+ ()TE;
+ ()T1E;
