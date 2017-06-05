@@ -38,8 +38,8 @@ import org.eclipse.tracecompass.internal.ctf.core.trace.CTFStream;
  * variable size. An event packet can contain a certain amount of padding at the
  * end. The stream header is repeated at the beginning of each event packet.
  * <br>
- * The event stream header will therefore be referred to as the
- * <em>event packet header</em> throughout the rest of this document. <br>
+ * The event stream header will therefore be referred to as the <em>event packet
+ * header</em> throughout the rest of this document. <br>
  *
  * An event stream is divided in contiguous event packets of variable size.
  * These subdivisions allow the trace analyzer to perform a fast binary search
@@ -175,8 +175,8 @@ public final class StreamDeclarationParser extends AbstractScopedCommonTreeParse
                 throw new ParseException(EVENT_HEADER + SCOPE_NOT_FOUND);
             }
             DeclarationScope eventScope = new DeclarationScope(scope, MetadataStrings.EVENT);
-            eventScope.addChild(eventHeaderScope);
             eventHeaderScope.setName(CTFStrings.HEADER);
+            eventScope.addChild(eventHeaderScope);
 
             if (eventHeaderDecl instanceof StructDeclaration) {
                 stream.setEventHeader((StructDeclaration) eventHeaderDecl);
@@ -240,6 +240,9 @@ public final class StreamDeclarationParser extends AbstractScopedCommonTreeParse
             if (potentialStructName.getType() == (CTFParser.STRUCT_NAME)) {
                 final String name = potentialStructName.getChild(0).getText();
                 eventHeaderScope = scope.lookupChildRecursive(name);
+                if (eventHeaderScope == null) {
+                    eventHeaderScope = lookupScopeRecursiveStruct(name, scope);
+                }
             }
         }
         /*
@@ -248,10 +251,21 @@ public final class StreamDeclarationParser extends AbstractScopedCommonTreeParse
         if (eventHeaderScope == null) {
             eventHeaderScope = scope.lookupChildRecursive(MetadataStrings.STRUCT);
         }
+
         /*
          * This can still be null
          */
         return eventHeaderScope;
+    }
+
+    private static DeclarationScope lookupScopeRecursiveStruct(String name, DeclarationScope scope) {
+        if (scope == null) {
+            return null;
+        }
+        if (scope.lookupStruct(name) != null) {
+            return scope;
+        }
+        return lookupScopeRecursiveStruct(name, scope.getParentScope());
     }
 
 }

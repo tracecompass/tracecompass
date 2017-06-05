@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2015 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2011, 2017 Ericsson, Ecole Polytechnique de Montreal and others
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -44,8 +45,8 @@ public class DeclarationScope {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-
-    private DeclarationScope fParentScope;
+    private static final AtomicLong UNIQUE_ID_FACTORY = new AtomicLong(0);
+    private final DeclarationScope fParentScope;
     private @NonNull Map<String, DeclarationScope> fChildren = new HashMap<>();
 
     private final Map<String, StructDeclaration> fStructs = new HashMap<>();
@@ -54,6 +55,7 @@ public class DeclarationScope {
     private final Map<String, IDeclaration> fTypes = new HashMap<>();
     private final Map<String, IDeclaration> fIdentifiers = new HashMap<>();
     private String fName;
+    private long fUniqueId;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -63,6 +65,7 @@ public class DeclarationScope {
      * Creates a declaration scope with no parent.
      */
     public DeclarationScope() {
+        this(null, (String) null);
     }
 
     /**
@@ -76,13 +79,50 @@ public class DeclarationScope {
     public DeclarationScope(DeclarationScope parentScope, String name) {
         fParentScope = parentScope;
         fName = name;
+        fUniqueId = UNIQUE_ID_FACTORY.getAndIncrement();
         if (parentScope != null) {
             parentScope.registerChild(name, this);
         }
     }
 
+    /**
+     * Copy constructor with a specified parent and a scope to copy
+     *
+     * @param parentScope
+     *            the parent
+     * @param source
+     *            the scope to copy
+     */
+    private DeclarationScope(DeclarationScope parentScope, DeclarationScope source) {
+        this(parentScope, source.fName);
+        fUniqueId = source.fUniqueId;
+        fStructs.putAll(source.fStructs);
+        fEnums.putAll(source.fEnums);
+        fVariants.putAll(source.fVariants);
+        fTypes.putAll(source.fTypes);
+        fIdentifiers.putAll(source.fIdentifiers);
+        /*
+         * Copy all the children recursively
+         */
+        for (DeclarationScope child : source.fChildren.values()) {
+            addChild(child);
+        }
+    }
+
     private void registerChild(String name, DeclarationScope declarationScope) {
         fChildren.put(name, declarationScope);
+    }
+
+    private boolean checkValid(DeclarationScope childSource) {
+        long uniqueId = childSource.fUniqueId;
+        DeclarationScope parent = this;
+        while (parent != null) {
+            if (uniqueId == parent.fUniqueId) {
+                return false;
+            }
+            parent = parent.getParentScope();
+        }
+        return true;
     }
 
     // ------------------------------------------------------------------------
@@ -260,7 +300,7 @@ public class DeclarationScope {
      */
     public @Nullable DeclarationScope lookupChildRecursive(String name) {
         final DeclarationScope declarationScope = fChildren.get(name);
-        if (declarationScope == null && hasParent()) {
+        if (declarationScope == null && fParentScope != null) {
             return fParentScope.lookupChildRecursive(name);
         }
         return declarationScope;
@@ -536,12 +576,11 @@ public class DeclarationScope {
      *            the child
      */
     public void addChild(DeclarationScope scope) {
-        final DeclarationScope oldParent = scope.getParentScope();
-        if (oldParent != null) {
-            oldParent.fChildren.remove(scope.fName);
+        if (checkValid(scope)) {
+            DeclarationScope scopeCopy = new DeclarationScope(this, scope);
+            registerChild(scopeCopy.fName, scopeCopy);
         }
-        fChildren.put(scope.fName, scope);
-        scope.fParentScope = this;
+
     }
 
     @Override
