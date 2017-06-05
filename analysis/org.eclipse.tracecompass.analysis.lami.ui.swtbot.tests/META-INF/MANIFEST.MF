@@ -8,7 +8,7 @@ Bundle-SymbolicName: org.eclipse.tracecompass.analysis.lami.ui.swtbot.tests;sing
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Fragment-Host: org.eclipse.tracecompass.analysis.lami.ui
-Export-Package: org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views
+Export-Package: org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views;x-internal:=true
 Require-Bundle: org.apache.log4j,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
