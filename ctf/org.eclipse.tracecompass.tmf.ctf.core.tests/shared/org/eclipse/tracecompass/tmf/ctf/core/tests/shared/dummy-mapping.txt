@@ -1,0 +1,10 @@
+00000000006062cc b angle
+0000000000606248 d animate
+00000000006062e0 b asp
+0000000000606290 d blue.19445
+00000000006062b0 B __bss_start
+00000000006062b8 b completed.6718
+                 U cos@@GLIBC_2.2.5
+0000000000401aac t current_time
+                 U __cyg_profile_func_enter@@GLIBC_2.2.5
+                 U __cyg_profile_func_exit@@GLIBC_2.2.5

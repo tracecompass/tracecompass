@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
+ *   Mikael Ferland - Add test for BasicSymbolProvider dialog
  *******************************************************************************/
 
 package org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests;
@@ -294,6 +295,81 @@ public class CallStackViewTest {
         table.setFocus();
         TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(table.widget, TmfTimestamp.fromNanos(timestamp)));
         fBot.waitUntil(ConditionHelpers.selectionInEventsTable(fBot, timestamp));
+    }
+
+    /**
+     * Test manipulating valid and invalid mapping files (add, remove and change
+     * priority of files)
+     *
+     * @throws IOException
+     *             Missing file
+     *
+     * @author Mikael Ferland
+     */
+    @Test
+    public void testManipulatingMappingFiles() throws IOException {
+        // 1- Open symbol provider dialog
+        final SWTBotView viewBot = fBot.viewById(CallStackView.ID);
+        viewBot.setFocus();
+        viewBot.toolbarButton(CONFIGURE_SYMBOL_PROVIDERS).click();
+        String shellTitle = "Symbol mapping";
+        fBot.waitUntil(Conditions.shellIsActive(shellTitle));
+
+        // 2- Open valid mapping files and invalid mapping file
+        Object mapObjA = CtfTmfTestTraceUtils.class.getResource("cyg-profile-mapping.txt");
+        Object mapObjB = CtfTmfTestTraceUtils.class.getResource("dummy-mapping.txt");
+        Object mapObjC = CtfTmfTestTraceUtils.class.getResource("invalid-cyg-profile-mapping.txt");
+        Object mapObjD = CtfTmfTestTraceUtils.class.getResource("random.out");
+        Object mapObjE = CtfTmfTestTraceUtils.class.getResource("win32Random.exe");
+        assertTrue(mapObjA instanceof URL);
+        assertTrue(mapObjB instanceof URL);
+        assertTrue(mapObjC instanceof URL);
+        assertTrue(mapObjD instanceof URL);
+        assertTrue(mapObjE instanceof URL);
+        URL mapUrlA = (URL) mapObjA;
+        URL mapUrlB = (URL) mapObjB;
+        URL mapUrlC = (URL) mapObjC;
+        URL mapUrlD = (URL) mapObjD;
+        URL mapUrlE = (URL) mapObjE;
+        String absoluteFileA = FileLocator.toFileURL(mapUrlA).getFile();
+        String absoluteFileB = FileLocator.toFileURL(mapUrlB).getFile();
+        String absoluteFileC = FileLocator.toFileURL(mapUrlC).getFile();
+        String absoluteFileD = FileLocator.toFileURL(mapUrlD).getFile();
+        String absoluteFileE = FileLocator.toFileURL(mapUrlE).getFile();
+        String[] overrideFiles = { absoluteFileA, absoluteFileA, absoluteFileB, absoluteFileC, absoluteFileD, absoluteFileE };
+        TmfFileDialogFactory.setOverrideFiles(overrideFiles);
+
+        final SWTBot symbolDialog = fBot.shell(shellTitle).bot();
+        symbolDialog.button("Add...").click();
+        final SWTBot errorDialog = fBot.shell("Import failure").bot();
+        errorDialog.button("OK").click();
+        final SWTBotTable table = symbolDialog.table();
+        assertEquals(table.rowCount(), 4);
+        assertEquals(table.getTableItem(0).getText(), absoluteFileA);
+        assertEquals(table.getTableItem(1).getText(), absoluteFileB);
+        assertEquals(table.getTableItem(2).getText(), absoluteFileD);
+        assertEquals(table.getTableItem(3).getText(), absoluteFileE);
+
+        // 3- Change priority of mapping files
+        table.select(0);
+        symbolDialog.button("Down").click().click().click();
+        assertEquals(table.getTableItem(0).getText(), absoluteFileB);
+        assertEquals(table.getTableItem(1).getText(), absoluteFileD);
+        assertEquals(table.getTableItem(2).getText(), absoluteFileE);
+        assertEquals(table.getTableItem(3).getText(), absoluteFileA);
+        symbolDialog.button("Up").click().click().click();
+        assertEquals(table.getTableItem(0).getText(), absoluteFileA);
+        assertEquals(table.getTableItem(1).getText(), absoluteFileB);
+        assertEquals(table.getTableItem(2).getText(), absoluteFileD);
+        assertEquals(table.getTableItem(3).getText(), absoluteFileE);
+
+        // 4- Remove multiple mapping files
+        table.select(0, 1);
+        symbolDialog.button("Remove").click();
+        assertEquals(table.rowCount(), 2);
+
+        // 5- Close symbol provider dialog
+        symbolDialog.button("Cancel").click();
     }
 
     /**
