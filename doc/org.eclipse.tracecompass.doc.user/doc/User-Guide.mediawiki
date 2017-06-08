@@ -2606,7 +2606,7 @@ Double-clicking on a call stack event will zoom the time graph to the selected f
 
 Clicking the '''Select Next State Change''' or '''Select Previous State Change''' or using the left and right arrows will navigate to the next or previous call stack event, and select the function currently at the top of the call stack. Note that pressing the '''Shift''' key at the same time will update the selection end time of the current selection.
 
-Clicking the '''Configure symbol providers''' ([[Image:images/binaries_obj.gif]]) icon will open a file selection dialog, allowing you to import a text file containing mappings from function addresses to function names. If the callstack provider for the current trace type only provides function addresses, a mapping file will be required to get the function names in the view. See the following sections for an example with LTTng-UST traces.
+Clicking the '''Configure how addresses are mapped to function names''' ([[Image:images/binaries_obj.gif]]) icon will open the symbol providers dialog. Depending on the available symbol providers for the given trace, you can specify: 1) a text or binary file containing mappings from function addresses to function names or 2) the root location of the binaries of the trace target. If the call stack provider for the current trace type only provides function addresses, a mapping file will be required to get the function names in the view. See the following sections for an example with LTTng-UST traces.
 
 === Using the Callstack View with LTTng-UST traces ===
 
@@ -2646,21 +2646,23 @@ View populated with function entries and exits. However, the view will display
 the function addresses instead of names in the intervals, which are not very
 useful by themselves. To get the actual function names, you need to:
 
-* Click the '''Configure symbol providers''' ([[Image:images/binaries_obj.gif]]) button in the Callstack View.
+* Click the '''Configure how addresses are mapped to function names''' ([[Image:images/binaries_obj.gif]]) button in the Callstack View.
 
-Then either:
-* Point to the binary that was used for taking the trace
-OR
-* Generate a mapping file from the binary, using:
-** <pre>nm myprogram > mapping.txt</pre>
-** Select the ''mapping.txt'' file that was just created.
+Once again, multiple symbol providers can be available for a unique trace. Each symbol provider can be configured through its own tab. Thus, multiple sources can be used to map the function names to addresses. Below is an image of the basic symbol provider preference page which allows us to import binary or function name mapping files.
 
-(If you are dealing with C++ executables, you may want to use ''nm --demangle''
-instead to get readable function names.)
+[[Image:images/BasicSymbolProviderPreferencePage.png]]
+
+Simply click the '''Add...''' button to add one or multiple mapping files. The mapping file could be one of two options:
+
+*[[Image:images/binary_mapping_file.gif]]: a binary that was used for taking the trace.
+
+*[[Image:images/text_mapping_file.gif]]: a file generated from the binary using ''nm myprogram > mapping.txt''. Select the ''mapping.txt'' file that was just created. If you are dealing with C++ executables, you may want to use ''nm --demangle'' instead to get readable function names.
 
 The view should now update to display the function names instead. Make sure the
 binary used for taking the trace is the one used for this step too (otherwise,
 there is a good chance of the addresses not being the same).
+
+Lastly, the basic symbol provider introduces the notion of priorities between the mapping files. The resolved symbols from the file at the top of the list will have a higher priority than the files listed below. The files can be moved using the '''Up''' and '''Down''' buttons.
 
 === Navigation ===
 
