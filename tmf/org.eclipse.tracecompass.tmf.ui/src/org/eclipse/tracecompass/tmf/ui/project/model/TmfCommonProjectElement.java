@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2010, 2017 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -127,6 +127,24 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
             return;
         }
 
+        if (TmfTraceType.getTraceType(getTraceType()) == null) {
+            if (fViewsElement != null) {
+                removeChild(fViewsElement);
+                fViewsElement.dispose();
+                fViewsElement = null;
+            }
+            if (fOnDemandAnalysesElement != null) {
+                removeChild(fOnDemandAnalysesElement);
+                fOnDemandAnalysesElement.dispose();
+                fOnDemandAnalysesElement = null;
+            }
+            if (fReportsElement != null) {
+                removeChild(fReportsElement);
+                fReportsElement.dispose();
+                fReportsElement = null;
+            }
+            return;
+        }
         if (fViewsElement == null) {
             /* Add the "Views" node */
             IFolder viewsNodeRes = root.getFolder(tracePath.append(TmfViewsElement.PATH_ELEMENT));

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson
+ * Copyright (c) 2010, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -69,6 +69,7 @@ public class CustomTxtParserWizard extends Wizard implements INewWizard {
             CustomParserUtils.cleanup(CustomTxtTrace.buildTraceTypeId(initialCategoryName, initialDefinitionName));
         }
         def.save();
+        CustomParserUtils.cleanup(CustomTxtTrace.buildTraceTypeId(def.categoryName, def.definitionName));
         return true;
     }
 
