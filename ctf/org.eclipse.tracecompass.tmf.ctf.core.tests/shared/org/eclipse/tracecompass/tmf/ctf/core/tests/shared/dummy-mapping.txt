@@ -8,3 +8,8 @@
 0000000000401aac t current_time
                  U __cyg_profile_func_enter@@GLIBC_2.2.5
                  U __cyg_profile_func_exit@@GLIBC_2.2.5
+000000000040472b T mainB
+00000000004045c8 t event_loopB
+0000000000403760 t draw_frameB
+000000000040357a t draw_gearsB
+00000000004033a7 t drawB

@@ -8,7 +8,7 @@
  *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
- *   Mikael Ferland - Add test for BasicSymbolProvider dialog
+ *   Mikael Ferland - Add tests for BasicSymbolProvider dialog
  *******************************************************************************/
 
 package org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests;
@@ -78,6 +78,11 @@ public class CallStackViewTest {
     private static SWTWorkbenchBot fBot;
 
     /**
+     * Timestamp for loading mapping files test
+     */
+    private static final long TIMESTAMP = 1378850463804917148l;
+
+    /**
      * Timestamps of consecutive events in the trace
      */
     private static final long TIMESTAMPS[] = new long[] {
@@ -91,7 +96,7 @@ public class CallStackViewTest {
             1378850463804903168l,
             1378850463804903766l,
             1378850463804904165l,
-            1378850463804904970l,
+            1378850463804904970l
     };
 
     /**
@@ -303,29 +308,17 @@ public class CallStackViewTest {
      *
      * @throws IOException
      *             Missing file
-     *
-     * @author Mikael Ferland
      */
     @Test
     public void testManipulatingMappingFiles() throws IOException {
-        // 1- Open symbol provider dialog
-        final SWTBotView viewBot = fBot.viewById(CallStackView.ID);
-        viewBot.setFocus();
-        viewBot.toolbarButton(CONFIGURE_SYMBOL_PROVIDERS).click();
-        String shellTitle = "Symbol mapping";
-        fBot.waitUntil(Conditions.shellIsActive(shellTitle));
+        openSymbolProviderDialog();
 
-        // 2- Open valid mapping files and invalid mapping file
+        // 1- Open valid mapping files and invalid mapping file
         Object mapObjA = CtfTmfTestTraceUtils.class.getResource("cyg-profile-mapping.txt");
         Object mapObjB = CtfTmfTestTraceUtils.class.getResource("dummy-mapping.txt");
         Object mapObjC = CtfTmfTestTraceUtils.class.getResource("invalid-cyg-profile-mapping.txt");
         Object mapObjD = CtfTmfTestTraceUtils.class.getResource("random.out");
         Object mapObjE = CtfTmfTestTraceUtils.class.getResource("win32Random.exe");
-        assertTrue(mapObjA instanceof URL);
-        assertTrue(mapObjB instanceof URL);
-        assertTrue(mapObjC instanceof URL);
-        assertTrue(mapObjD instanceof URL);
-        assertTrue(mapObjE instanceof URL);
         URL mapUrlA = (URL) mapObjA;
         URL mapUrlB = (URL) mapObjB;
         URL mapUrlC = (URL) mapObjC;
@@ -339,7 +332,7 @@ public class CallStackViewTest {
         String[] overrideFiles = { absoluteFileA, absoluteFileA, absoluteFileB, absoluteFileC, absoluteFileD, absoluteFileE };
         TmfFileDialogFactory.setOverrideFiles(overrideFiles);
 
-        final SWTBot symbolDialog = fBot.shell(shellTitle).bot();
+        final SWTBot symbolDialog = fBot.shell("Symbol mapping").bot();
         symbolDialog.button("Add...").click();
         final SWTBot errorDialog = fBot.shell("Import failure").bot();
         errorDialog.button("OK").click();
@@ -350,7 +343,7 @@ public class CallStackViewTest {
         assertEquals(table.getTableItem(2).getText(), absoluteFileD);
         assertEquals(table.getTableItem(3).getText(), absoluteFileE);
 
-        // 3- Change priority of mapping files
+        // 2- Change priority of mapping files
         table.select(0);
         symbolDialog.button("Down").click().click().click();
         assertEquals(table.getTableItem(0).getText(), absoluteFileB);
@@ -363,13 +356,48 @@ public class CallStackViewTest {
         assertEquals(table.getTableItem(2).getText(), absoluteFileD);
         assertEquals(table.getTableItem(3).getText(), absoluteFileE);
 
-        // 4- Remove multiple mapping files
+        // 3- Remove multiple mapping files
         table.select(0, 1);
         symbolDialog.button("Remove").click();
         assertEquals(table.rowCount(), 2);
 
-        // 5- Close symbol provider dialog
+        // 4- Close symbol provider dialog
         symbolDialog.button("Cancel").click();
+    }
+
+    /**
+     * Test loading conflicting mapping files.
+     *
+     * @throws IOException
+     *             Missing file
+     */
+    @Test
+    public void testLoadingMappingFiles() throws IOException {
+        openSymbolProviderDialog();
+
+        // 1- Open conflicting mapping files
+        Object mapObjA = CtfTmfTestTraceUtils.class.getResource("cyg-profile-mapping.txt");
+        Object mapObjB = CtfTmfTestTraceUtils.class.getResource("dummy-mapping.txt");
+        URL mapUrlA = (URL) mapObjA;
+        URL mapUrlB = (URL) mapObjB;
+        String absoluteFileA = FileLocator.toFileURL(mapUrlA).getFile();
+        String absoluteFileB = FileLocator.toFileURL(mapUrlB).getFile();
+        String[] overrideFiles = { absoluteFileA, absoluteFileB };
+        TmfFileDialogFactory.setOverrideFiles(overrideFiles);
+        final SWTBot symbolDialog = fBot.shell("Symbol mapping").bot();
+        symbolDialog.button("Add...").click();
+        symbolDialog.button("OK").click();
+
+        // 2- Ensure symbols are loaded and prioritized
+        goToTime(TIMESTAMP);
+        assertEquals(Arrays.asList("main", "event_loop", "draw_frame", "draw_gears", "drawB"), getVisibleStackFrames(fBot.viewById(CallStackView.ID)));
+    }
+
+    private static void openSymbolProviderDialog() {
+        final SWTBotView viewBot = fBot.viewById(CallStackView.ID);
+        viewBot.setFocus();
+        viewBot.toolbarButton(CONFIGURE_SYMBOL_PROVIDERS).click();
+        fBot.waitUntil(Conditions.shellIsActive("Symbol mapping"));
     }
 
     /**

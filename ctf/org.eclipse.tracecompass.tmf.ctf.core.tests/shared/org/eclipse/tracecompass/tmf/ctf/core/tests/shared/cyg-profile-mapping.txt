@@ -13,7 +13,6 @@
 00000000004019f0 t deregister_tm_clones
 0000000000401a60 t __do_global_dtors_aux
 0000000000605de8 t __do_global_dtors_aux_fini_array_entry
-00000000004033a7 t draw
 0000000000403760 t draw_frame
 000000000040357a t draw_gears
 0000000000606238 D __dso_handle
