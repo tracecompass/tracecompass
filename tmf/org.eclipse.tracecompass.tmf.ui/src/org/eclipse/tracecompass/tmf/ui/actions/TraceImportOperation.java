@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.IFil
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportTraceWizardPage;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.TraceFileSystemElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.TraceValidateAndImportOperation;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
@@ -47,6 +48,9 @@ public class TraceImportOperation extends WorkspaceModifyOperation {
     private final TmfTraceFolder fDestFolder;
 
     private boolean fSkipArchiveExtraction = false;
+
+    private ITmfTimestamp fStartTimeRange = null;
+    private ITmfTimestamp fEndTimeRange = null;
 
     /**
      * Constructor
@@ -73,6 +77,22 @@ public class TraceImportOperation extends WorkspaceModifyOperation {
         fSkipArchiveExtraction = skipArchiveExtraction;
     }
 
+    /**
+     * Sets the range for timestamps based filtering import.
+     *
+     * @param start
+     *            Start time of the range
+     * @param end
+     *            End time of the range
+     * @since 3.1
+     */
+    public void setFilteringTimeRange(ITmfTimestamp start, ITmfTimestamp end) {
+        if (start.compareTo(end) < 0) {
+            fStartTimeRange = start;
+            fEndTimeRange = end;
+        }
+    }
+
     @Override
     protected void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException, InterruptedException {
         int importOptionFlags =
@@ -81,6 +101,9 @@ public class TraceImportOperation extends WorkspaceModifyOperation {
                 ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE;
         if (fSkipArchiveExtraction) {
             importOptionFlags |= ImportTraceWizardPage.OPTION_SKIP_ARCHIVE_EXTRACTION;
+        }
+        if(fStartTimeRange != null && fEndTimeRange != null) {
+            importOptionFlags |= ImportTraceWizardPage.OPTION_FILTER_TIMERANGE;
         }
         IPath baseSourceContainerPath = new Path(fSourcePath);
         IPath destinationContainerPath = fDestFolder.getPath();
@@ -92,7 +115,7 @@ public class TraceImportOperation extends WorkspaceModifyOperation {
         final TraceValidateAndImportOperation importOperation = new TraceValidateAndImportOperation(
                 null, fileSystemElements, null,
                 baseSourceContainerPath, destinationContainerPath, false,
-                importOptionFlags, fDestFolder);
+                importOptionFlags, fDestFolder, fStartTimeRange, fEndTimeRange);
         try {
             importOperation.run(monitor);
         } catch (InvocationTargetException e) {

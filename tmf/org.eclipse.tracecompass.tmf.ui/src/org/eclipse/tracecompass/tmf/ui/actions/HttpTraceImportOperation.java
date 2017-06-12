@@ -131,7 +131,7 @@ public class HttpTraceImportOperation extends WorkspaceModifyOperation {
         IPath sourceContainerPath = new Path(tempDestinationFolderPath);
         IPath destinationContainerPath = fDestinationFolder.getPath();
 
-        TraceValidateAndImportOperation validateAndImportOperation = new TraceValidateAndImportOperation(null, fileSystemElements, null, sourceContainerPath, destinationContainerPath, isArchive, importOptionFlags, fDestinationFolder);
+        TraceValidateAndImportOperation validateAndImportOperation = new TraceValidateAndImportOperation(null, fileSystemElements, null, sourceContainerPath, destinationContainerPath, isArchive, importOptionFlags, fDestinationFolder, null, null);
         validateAndImportOperation.run(monitor);
 
         // Clean the temporary directory

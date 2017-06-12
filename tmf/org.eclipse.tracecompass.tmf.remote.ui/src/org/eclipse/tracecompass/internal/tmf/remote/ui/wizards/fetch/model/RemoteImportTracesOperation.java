@@ -372,7 +372,7 @@ public class RemoteImportTracesOperation extends TmfWorkspaceModifyOperation {
                 final TraceValidateAndImportOperation operation = new TraceValidateAndImportOperation(
                         fShell, list, null, intermediateTempFolder.getLocation(), destFolder.getFullPath(), false,
                         ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE | ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES,
-                        fDestination);
+                        fDestination, null, null);
                 operation.setConflictHandler(fConflictHandler);
                 operation.run(SubMonitor.convert(monitor));
                 monitor.done();

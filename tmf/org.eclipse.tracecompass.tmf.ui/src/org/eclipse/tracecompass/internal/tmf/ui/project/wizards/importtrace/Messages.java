@@ -191,6 +191,26 @@ public class Messages extends NLS {
      * The label to indicate that trace type auto detection shall be used.
      */
     public static String ImportTraceWizard_AutoDetection;
+    /**
+     * The label of the checkbox to enable time range filtering
+     */
+    public static String ImportTraceWizard_TimeRangeOptionButton;
+    /**
+     * The Label of the field to enter start time.
+     */
+    public static String ImportTraceWizard_StartTime;
+    /**
+     * The Label of the field to enter end time.
+     */
+    public static String ImportTraceWizard_EndTime;
+    /**
+     * The time range filtering task name
+     */
+    public static String ImportTraceWizard_FilteringOperationTaskName;
+    /**
+     * The error message when the time range is invalid
+     */
+    public static String ImportTraceWizard_TimeRangeErrorMessage;
 
     static {
         // initialize resource bundle

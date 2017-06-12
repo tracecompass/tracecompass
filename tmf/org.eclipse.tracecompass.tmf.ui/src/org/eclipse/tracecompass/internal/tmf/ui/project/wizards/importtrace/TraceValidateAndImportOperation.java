@@ -32,6 +32,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -44,9 +45,14 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.operations.TmfWorkspaceModifyOperation;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceTypeUIUtils;
@@ -76,6 +82,9 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
     private TmfTraceFolder fTraceFolderElement;
     private List<TraceFileSystemElement> fSelectedFileSystemElements;
 
+    private ITmfTimestamp fStartTimeRange;
+    private ITmfTimestamp fEndTimeRange;
+
     private IStatus fStatus;
     private ImportConflictHandler fConflictHandler;
     private String fCurrentPath;
@@ -93,29 +102,31 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
      *            the trace type to import the traces as (can be set to null for
      *            automatic detection)
      * @param baseSourceContainerPath
-     *            the path to the container of the source. This is used as a
-     *            "base" to generate the folder structure for the
-     *            "preserve folder structure" option.
+     *            the path to the container of the source. This is used as a "base"
+     *            to generate the folder structure for the "preserve folder
+     *            structure" option.
      * @param destinationContainerPath
-     *            the destination path of the import operation, typically a
-     *            trace folder path.
+     *            the destination path of the import operation, typically a trace
+     *            folder path.
      * @param importFromArchive
      *            whether or not the source is an archive
      * @param importOptionFlags
      *            bit-wise 'or' of import option flag constants (
-     *            {@link ImportTraceWizardPage#OPTION_PRESERVE_FOLDER_STRUCTURE}
-     *            ,
-     *            {@link ImportTraceWizardPage#OPTION_CREATE_LINKS_IN_WORKSPACE}
-     *            ,
-     *            {@link ImportTraceWizardPage#OPTION_IMPORT_UNRECOGNIZED_TRACES}
-     *            , and
+     *            {@link ImportTraceWizardPage#OPTION_PRESERVE_FOLDER_STRUCTURE} ,
+     *            {@link ImportTraceWizardPage#OPTION_CREATE_LINKS_IN_WORKSPACE} ,
+     *            {@link ImportTraceWizardPage#OPTION_IMPORT_UNRECOGNIZED_TRACES} ,
+     *            and
      *            {@link ImportTraceWizardPage#OPTION_OVERWRITE_EXISTING_RESOURCES}
      *            )
      * @param traceFolderElement
      *            the destination trace folder of the import operation.
+     * @param startTimeRange
+     *            Timestamp representing the start time of the range
+     * @param endTimeRange
+     *            Timestamp representing the end time of the range
      */
     public TraceValidateAndImportOperation(Shell shell, List<TraceFileSystemElement> traceFileSystemElements, String traceId, IPath baseSourceContainerPath, IPath destinationContainerPath, boolean importFromArchive, int importOptionFlags,
-            TmfTraceFolder traceFolderElement) {
+            TmfTraceFolder traceFolderElement, ITmfTimestamp startTimeRange, ITmfTimestamp endTimeRange) {
         fTraceType = traceId;
         fBaseSourceContainerPath = baseSourceContainerPath;
         fDestinationContainerPath = destinationContainerPath;
@@ -123,6 +134,8 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
         fImportFromArchive = importFromArchive;
         fShell = shell;
         fTraceFolderElement = traceFolderElement;
+        fStartTimeRange = startTimeRange;
+        fEndTimeRange = endTimeRange;
 
         boolean overwriteExistingResources = (importOptionFlags & ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES) != 0;
         if (overwriteExistingResources) {
@@ -185,7 +198,7 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
             final int ARCHIVE_OR_DIRECTORY_PROGRESS = 45;
             final int EXTRA_IMPORT_OPERATION_PROGRESS = 45;
             final int DELETE_PROGRESS = 10;
-            final int TOTAL_PROGRESS = ARCHIVE_OR_DIRECTORY_PROGRESS +
+            int TOTAL_PROGRESS = ARCHIVE_OR_DIRECTORY_PROGRESS +
                     EXTRA_IMPORT_OPERATION_PROGRESS + DELETE_PROGRESS;
 
             final List<TraceFileSystemElement> selectedFileSystemElements = fSelectedFileSystemElements;
@@ -259,7 +272,7 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
                 // temporary directory that will be deleted
                 fImportOptionFlags = fImportOptionFlags & ~ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
                 SubMonitor importTempMonitor = subMonitor.newChild(EXTRA_IMPORT_OPERATION_PROGRESS);
-                importFileSystemElements(importTempMonitor, tempFolderFileSystemElements);
+                importFileSystemElements(importTempMonitor.newChild(1), tempFolderFileSystemElements);
             }
 
             if (destTempFolder.exists()) {
@@ -275,6 +288,60 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
             Activator.getDefault().logError(errorMessage, e);
             setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, errorMessage, e));
         }
+    }
+
+    private TraceFileSystemElement filterSelectedFileSystemElement(TraceFileSystemElement selectedFileSystemElements, IProgressMonitor monitor) {
+        if ((fImportOptionFlags & ImportTraceWizardPage.OPTION_FILTER_TIMERANGE) != 0 && fStartTimeRange != null && fEndTimeRange != null) {
+            return filterByTimerange(selectedFileSystemElements, monitor);
+        }
+
+        return selectedFileSystemElements;
+    }
+
+    private TraceFileSystemElement filterByTimerange(TraceFileSystemElement selectedFileSystemElements, IProgressMonitor monitor) {
+        SubMonitor subMonitor = SubMonitor.convert(monitor, 1);
+        subMonitor.subTask(Messages.ImportTraceWizard_FilteringOperationTaskName);
+
+        String tracePath = selectedFileSystemElements.getFileSystemObject().getAbsolutePath();
+        ITmfTrace trace = null;
+        try {
+            TraceTypeHelper traceTypeHelper = TmfTraceTypeUIUtils.selectTraceType(tracePath, null, null);
+            if (traceTypeHelper == null) {
+                return null;
+            }
+
+            IConfigurationElement ce = TmfTraceType.getTraceAttributes(traceTypeHelper.getTraceTypeId());
+            if (ce == null) {
+                return null;
+            }
+            trace = (ITmfTrace) ce.createExecutableExtension(TmfTraceType.TRACE_TYPE_ATTR);
+            ITmfEvent event = (ITmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
+
+            trace.initTrace(null, tracePath, event.getClass());
+
+            if (isInTimerange(trace)) {
+                return selectedFileSystemElements;
+            }
+
+        } catch (TmfTraceImportException | CoreException | TmfTraceException e) {
+            String errorMessage = Messages.ImportTraceWizard_ImportProblem + ": " + tracePath; //$NON-NLS-1$
+            Activator.getDefault().logError(errorMessage, e);
+        } finally {
+            if (trace != null) {
+                trace.dispose();
+                TmfTraceManager.deleteSupplementaryFolder(trace);
+            }
+            subMonitor.worked(1);
+        }
+
+        return null;
+    }
+
+    private boolean isInTimerange(ITmfTrace trace) {
+        ITmfTimestamp startTimestamp = trace.readStart();
+        ITmfTimestamp endTimestamp = trace.readEnd();
+
+        return (startTimestamp != null && endTimestamp != null) && (startTimestamp.compareTo(fEndTimeRange) <= 0 && endTimestamp.compareTo(fStartTimeRange) >= 0);
     }
 
     /**
@@ -592,7 +659,11 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
         }
 
         // Finally import trace
-        IResource importedResource = importResource(fileSystemElement, monitor);
+        TraceFileSystemElement resourceToImport = filterSelectedFileSystemElement(fileSystemElement, monitor);
+        if(resourceToImport == null) {
+            return;
+        }
+        IResource importedResource = importResource(resourceToImport, monitor);
         if (importedResource != null) {
             TmfTraceTypeUIUtils.setTraceType(importedResource, traceTypeHelper, false);
             fImportedResources.add(importedResource);

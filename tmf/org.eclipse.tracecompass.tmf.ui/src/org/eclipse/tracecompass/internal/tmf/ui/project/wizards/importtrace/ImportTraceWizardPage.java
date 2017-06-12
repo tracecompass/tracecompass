@@ -23,11 +23,11 @@ package org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -44,6 +44,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -77,6 +79,9 @@ import org.eclipse.tracecompass.internal.tmf.ui.project.operations.SelectTracesO
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
@@ -159,6 +164,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
      * Skip archive detection and extraction.
      */
     public static final int OPTION_SKIP_ARCHIVE_EXTRACTION = 1 << 6;
+    /**
+     * Filter by time range
+     */
+    public static final int OPTION_FILTER_TIMERANGE = 1 << 7;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -191,6 +200,13 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     // Flag to remember the "create links" checkbox when it gets disabled by
     // the import from archive radio button
     private Boolean fPreviousCreateLinksValue = true;
+    // Button to enable time range filtering
+    private Button fTimeRangeCheckbox;
+    private Text fStartTimeRangeText;
+    private Text fEndTimeRangeText;
+    // Time range timestamps
+    private ITmfTimestamp fStartTimestamp;
+    private ITmfTimestamp fEndTimestamp;
 
     /** The archive name field */
     protected Combo fArchiveNameField;
@@ -206,6 +222,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     // Keep trace of the selection root so that we can dispose its related
     // resources
     private TraceFileSystemElement fSelectionGroupRoot;
+
+    private static final TmfTimestampFormat TIMESTAMP_FORMAT = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss.SSS SSS SSS"); //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -903,6 +921,49 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             }
         });
 
+        fTimeRangeCheckbox = new Button(optionsGroup, SWT.CHECK);
+        fTimeRangeCheckbox.setText(Messages.ImportTraceWizard_TimeRangeOptionButton + " (" + TIMESTAMP_FORMAT.toPattern() + ")"); //$NON-NLS-1$//$NON-NLS-2$
+
+        Composite timeRangeComposite = new Composite(optionsGroup, SWT.NONE);
+        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(timeRangeComposite);
+        GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.CENTER).applyTo(timeRangeComposite);
+
+        Label startTimestampLabel = new Label(timeRangeComposite, SWT.NONE);
+        startTimestampLabel.setText(Messages.ImportTraceWizard_StartTime);
+        startTimestampLabel.setEnabled(false);
+        fStartTimeRangeText = new Text(timeRangeComposite, SWT.SINGLE);
+        fStartTimeRangeText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+        fStartTimeRangeText.setEnabled(false);
+
+        Label endTimestampLabel = new Label(timeRangeComposite, SWT.NONE);
+        endTimestampLabel.setText(Messages.ImportTraceWizard_EndTime);
+        endTimestampLabel.setEnabled(false);
+        fEndTimeRangeText = new Text(timeRangeComposite, SWT.SINGLE);
+        fEndTimeRangeText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+        fEndTimeRangeText.setEnabled(false);
+
+        ((GridData) timeRangeComposite.getLayoutData()).exclude = true;
+
+        ModifyListener timeRangeModifyListener = e -> updateWidgetEnablements();
+
+        fStartTimeRangeText.addModifyListener(timeRangeModifyListener);
+        fEndTimeRangeText.addModifyListener(timeRangeModifyListener);
+
+        fTimeRangeCheckbox.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                boolean isTimeFilteringChecked = fTimeRangeCheckbox.getSelection();
+                ((GridData) timeRangeComposite.getLayoutData()).exclude = !isTimeFilteringChecked;
+                fStartTimeRangeText.setEnabled(isTimeFilteringChecked);
+                fEndTimeRangeText.setEnabled(isTimeFilteringChecked);
+                startTimestampLabel.setEnabled(isTimeFilteringChecked);
+                endTimestampLabel.setEnabled(isTimeFilteringChecked);
+                optionsGroup.getParent().layout(true);
+                timeRangeComposite.layout(true);
+                updateWidgetEnablements();
+            }
+        });
+
         updateWidgetEnablements();
     }
 
@@ -989,8 +1050,40 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 }
             }
         }
+
+        if (fTimeRangeCheckbox != null && fTimeRangeCheckbox.getSelection() && !validateTimeRange()) {
+            fStartTimestamp = null;
+            fEndTimestamp = null;
+            setMessage(null);
+            setErrorMessage(Messages.ImportTraceWizard_TimeRangeErrorMessage);
+            return false;
+        }
         setErrorMessage(null);
         return true;
+    }
+
+    private boolean validateTimeRange() {
+        boolean isEmpty = fStartTimeRangeText.getText().isEmpty() || fEndTimeRangeText.getText().isEmpty();
+        return !isEmpty && parseTimeRange() && fStartTimestamp.compareTo(fEndTimestamp) < 0;
+    }
+
+    private boolean parseTimeRange() {
+        try {
+            TIMESTAMP_FORMAT.setTimeZone(TmfTimestampFormat.getDefaulTimeFormat().getTimeZone());
+            long startTimeValue = TIMESTAMP_FORMAT.parseValue(fStartTimeRangeText.getText());
+            long endTimeValue = TIMESTAMP_FORMAT.parseValue(fEndTimeRangeText.getText());
+            // Swap timestamps if start is after end
+            if(startTimeValue < endTimeValue) {
+                fStartTimestamp = TmfTimestamp.fromNanos(startTimeValue);
+                fEndTimestamp = TmfTimestamp.fromNanos(endTimeValue);
+            } else {
+                fStartTimestamp = TmfTimestamp.fromNanos(endTimeValue);
+                fEndTimestamp = TmfTimestamp.fromNanos(startTimeValue);
+            }
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
     }
 
     private File getSourceFile() {
@@ -1165,7 +1258,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     fSelectionGroup.getAllCheckedListItems(passThroughFilter, subMonitor);
 
                     final TraceValidateAndImportOperation operation = new TraceValidateAndImportOperation(getContainer().getShell(), selectedFileSystemElements, traceId, baseSourceContainerPath, destinationContainerPath, importFromArchive,
-                            importOptionFlags, fTraceFolderElement);
+                            importOptionFlags, fTraceFolderElement, fStartTimestamp, fEndTimestamp);
                     operation.run(monitor);
                     monitor.done();
                     operationStatus[0] = operation.getStatus();
@@ -1278,6 +1371,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         }
         if (fCreateExperimentCheckbox != null && fCreateExperimentCheckbox.getSelection()) {
             flags |= OPTION_CREATE_EXPERIMENT;
+        }
+        if (fTimeRangeCheckbox != null && fTimeRangeCheckbox.getSelection()) {
+            flags |= OPTION_FILTER_TIMERANGE;
         }
         return flags;
     }

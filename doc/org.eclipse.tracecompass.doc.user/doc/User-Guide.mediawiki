@@ -256,6 +256,8 @@ The option '''Preserve folder structure''' will create, if necessary, the struct
 
 The option '''Create Experiment''' will create an experiment with all imported traces. By default, the experiment name is the '''Root directory''' name, when importing from directory, or the ''' Archive file''' name, when importing from archive. One can change the experiment name by typing a new name in the text box beside the option.
 
+The option '''Time Range filtering''' will filter your previously selected traces using the given time range. A trace will be imported into the project only if its time range is included or overlap the provided range.
+
 [[Image:images/ProjectImportTraceDialog.png]]
 
 If a trace already exists with the same name in the target trace folder, the user can choose to rename the imported trace, overwrite the original trace or skip the trace. When rename is chosen, a number is appended to the trace name, for example smalltrace becomes smalltrace(2).

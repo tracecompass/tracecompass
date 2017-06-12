@@ -39,6 +39,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.ui.actions.TraceImportOperation;
 import org.eclipse.tracecompass.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
@@ -131,6 +134,38 @@ public class TraceImportOperationTest {
         operation.setSkipArchiveExtraction(true);
         PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
         assertEquals(0, destFolder.getTraces().size());
+        validateImport(sourceFolder.getLocation().toOSString(), destFolder, true);
+    }
+
+    /**
+     * Test the operation with time range filtering import.
+     *
+     * @throws Exception
+     *             exceptions
+     */
+    @Test
+    public void testTimeRangeFiltering() throws Exception {
+        IFolder sourceFolder = fDestFolder.getProject().getResource().getFolder("syslogFiles");
+        sourceFolder.create(false, true, null);
+
+        for (File file : FileUtils.listFiles(new File(fSourcePath), null, false)) {
+            if (file.getName().matches("syslog[1-6]")) {
+                FileUtils.copyFileToDirectory(file, new File(sourceFolder.getLocation().toOSString()));
+            }
+        }
+
+        fTracesFolder.getResource().getFolder("timeFiltering").create(false, true, null);
+        TmfTraceFolder destFolder = (TmfTraceFolder) fTracesFolder.getChild("timeFiltering");
+
+        TmfTimestampFormat tmfTimestampFormat = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss");
+        ITmfTimestamp startTimeRange = TmfTimestamp.fromNanos(tmfTimestampFormat.parseValue("2017-01-01 02:00:00"));
+        ITmfTimestamp endTimeRange = TmfTimestamp.fromNanos(tmfTimestampFormat.parseValue("2017-01-01 05:05:00"));
+
+        TraceImportOperation operation = new TraceImportOperation(sourceFolder.getLocation().toOSString(), destFolder);
+        operation.setFilteringTimeRange(startTimeRange, endTimeRange);
+        PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
+
+        assertEquals(4, destFolder.getTraces().size());
         validateImport(sourceFolder.getLocation().toOSString(), destFolder, true);
     }
 
