@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
@@ -320,8 +319,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     @Override
     public Iterable<IAnalysisModule> getAnalysisModules() {
         synchronized (fAnalysisModules) {
-            Set<IAnalysisModule> modules = new HashSet<>(fAnalysisModules.values());
-            return modules;
+            return new HashSet<>(fAnalysisModules.values());
         }
     }
 
