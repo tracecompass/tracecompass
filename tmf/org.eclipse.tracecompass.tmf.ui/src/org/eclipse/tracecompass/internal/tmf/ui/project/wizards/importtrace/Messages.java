@@ -176,6 +176,10 @@ public class Messages extends NLS {
      */
     public static String ImportTraceWizard_TraceTypeNotFound;
     /**
+     * The examine operation task name.
+     */
+    public static String ImportTraceWizard_ExamineOperationTaskName;
+    /**
      * The import operation task name.
      */
     public static String ImportTraceWizard_ImportOperationTaskName;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -217,6 +217,7 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
                 // Extract selected files from source archive to temporary
                 // folder
                 extractArchiveContent(selectedFileSystemElements.iterator(), destTempFolder, archiveMonitor.newChild(1));
+                archiveMonitor.subTask(""); //$NON-NLS-1$
 
                 if (!selectedFileSystemElements.isEmpty()) {
                     // Even if the files were extracted to temporary folder, they
@@ -314,7 +315,7 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
             element.setDestinationContainerPath(computeDestinationContainerPath(new Path(resourcePath)));
 
             fCurrentPath = resourcePath;
-            SubMonitor sub = subMonitor.newChild(1);
+            SubMonitor sub = subMonitor.split(1, SubMonitor.SUPPRESS_BEGINTASK | SubMonitor.SUPPRESS_SUBTASK);
             if (element.isDirectory()) {
                 if (!directoryTraces.containsKey(resourcePath) && isDirectoryTrace(element)) {
                     directoryTraces.put(resourcePath, element);
@@ -381,6 +382,7 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
 
             SubMonitor elementProgress = subMonitor.newChild(1);
             TraceFileSystemElement element = fileSystemElementsIter.next();
+            elementProgress.setTaskName(Messages.ImportTraceWizard_ExamineOperationTaskName + " " + element.getFileSystemObject().getAbsolutePath()); //$NON-NLS-1$
             File archiveFile = (File) element.getFileSystemObject().getRawFileSystemObject();
             boolean isArchiveFileElement = element.getFileSystemObject() instanceof FileFileSystemObject && ArchiveUtil.isArchiveFile(archiveFile);
             if (isArchiveFileElement) {
@@ -398,6 +400,7 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
                 // Rename extracted folder (.extract) to original archive name
                 folder.move(newPath, true, elementProgress.newChild(1));
                 folder = ResourcesPlugin.getWorkspace().getRoot().getFolder(newPath);
+                elementProgress.subTask(""); //$NON-NLS-1$
 
                 // Create the new import provider and root element based on
                 // the newly extracted temporary folder
@@ -546,6 +549,7 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
             throws TmfTraceImportException, CoreException, InvocationTargetException, InterruptedException {
         String path = fileSystemElement.getFileSystemObject().getAbsolutePath();
         TraceTypeHelper traceTypeHelper = null;
+        monitor.setTaskName(Messages.ImportTraceWizard_ExamineOperationTaskName + " " + fileSystemElement.getFileSystemObject().getAbsolutePath()); //$NON-NLS-1$
 
         if ((fImportOptionFlags & ImportTraceWizardPage.OPTION_SKIP_ARCHIVE_EXTRACTION) == 0) {
             File file = (File) fileSystemElement.getFileSystemObject().getRawFileSystemObject();
