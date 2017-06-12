@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2017 École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Geneviève Bastien - Initial API and implementation
+ *   Mikael Ferland - Enable usage of different tree viewer types
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.ui.viewers.tree;
@@ -175,15 +176,22 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
      *            Whether multiple selections are allowed
      */
     public AbstractTmfTreeViewer(Composite parent, boolean allowMultiSelect) {
+        this(parent, new TreeViewer(parent, SWT.FULL_SELECTION | SWT.H_SCROLL | (allowMultiSelect ? SWT.MULTI : 0)));
+    }
+
+    /**
+     * Constructor
+     *
+     * @param parent
+     *            The parent composite that holds this viewer
+     * @param treeViewer
+     *            The tree viewer to use
+     * @since 3.0
+     */
+    public AbstractTmfTreeViewer(Composite parent, TreeViewer treeViewer) {
         super(parent);
-
-        int flags = SWT.FULL_SELECTION | SWT.H_SCROLL;
-        if (allowMultiSelect) {
-            flags |= SWT.MULTI;
-        }
-
         /* Build the tree viewer part of the view */
-        fTreeViewer = new TreeViewer(parent, flags);
+        fTreeViewer = treeViewer;
         fTreeViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
         final Tree tree = fTreeViewer.getTree();
         tree.setHeaderVisible(true);
@@ -192,7 +200,6 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
         fTreeViewer.setLabelProvider(new TreeLabelProvider());
         List<TmfTreeColumnData> columns = getColumnDataProvider().getColumnData();
         this.setTreeColumns(columns);
-
     }
 
     /**
