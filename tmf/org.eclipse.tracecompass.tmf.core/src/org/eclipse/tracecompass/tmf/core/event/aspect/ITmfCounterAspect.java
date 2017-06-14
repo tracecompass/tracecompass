@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.tmf.core.event.aspect;
  * Counter aspect, used for incrementing long aspects.
  *
  * @author Matthew Khouzam
+ * @author Mikael Ferland
  * @since 3.1
  */
 public interface ITmfCounterAspect extends ITmfEventAspect<Long> {
@@ -27,4 +28,25 @@ public interface ITmfCounterAspect extends ITmfEventAspect<Long> {
     default boolean isHiddenByDefault() {
         return true;
     }
+
+    /**
+     * Indicate whether or not the counter is cumulative throughout time.
+     *
+     * The table below outlines the difference between a cumulative and a
+     * non-cumulative counter:
+     *
+     * <pre>
+     * Time | Cumulative counter | Non-cumulative counter
+     * ==================================================
+     * x    | y                  | y
+     * x+1  | 2y                 | y
+     * x+2  | 3y                 | y
+     * </pre>
+     *
+     * @return whether the counter aspect is cumulative or not
+     */
+    default boolean isCumulative() {
+        return false;
+    }
+
 }

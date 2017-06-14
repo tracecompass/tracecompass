@@ -66,7 +66,7 @@ public abstract class AbstractCounterAspect implements ITmfCounterAspect {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      *
      * This is a conservative equals. It only works on very identical aspects.
      */

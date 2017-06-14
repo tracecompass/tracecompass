@@ -24,6 +24,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.CounterAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -42,11 +43,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 /**
  * Test suite for {@link TmfTraceUtils}
  */
 public class TmfTraceUtilsTest {
+
+    private static final @NonNull TestEventAspect TEST_ASPECT = new TestEventAspect();
 
     private static final TmfTestTrace TEST_TRACE = TmfTestTrace.A_TEST_10K;
 
@@ -55,21 +59,20 @@ public class TmfTraceUtilsTest {
     // ------------------------------------------------------------------------
     // Test trace class definition
     // ------------------------------------------------------------------------
+    private static final @NonNull Collection<ITmfEventAspect<?>> EVENT_ASPECTS;
+    static {
+        ImmutableList.Builder<ITmfEventAspect<?>> builder = ImmutableList.builder();
+        builder.add(new TmfCpuAspect() {
+            @Override
+            public Integer resolve(ITmfEvent event) {
+                return 1;
+            }
+        });
+        builder.addAll(TmfTrace.BASE_ASPECTS);
+        EVENT_ASPECTS = builder.build();
+    }
 
     private static class TmfTraceStubWithAspects extends TmfTraceStub {
-
-        private static final @NonNull Collection<ITmfEventAspect<?>> EVENT_ASPECTS;
-        static {
-            ImmutableList.Builder<ITmfEventAspect<?>> builder = ImmutableList.builder();
-            builder.add(new TmfCpuAspect() {
-                @Override
-                public Integer resolve(ITmfEvent event) {
-                    return 1;
-                }
-            });
-            builder.addAll(TmfTrace.BASE_ASPECTS);
-            EVENT_ASPECTS = builder.build();
-        }
 
         public TmfTraceStubWithAspects(String path) throws TmfTraceException {
             super(path, ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
@@ -155,8 +158,8 @@ public class TmfTraceUtilsTest {
             count++;
         }
         /*
-         * FIXME: The exact count depends on the context the test is run (full
-         * test suite or this file only), but there must be at least 2 modules
+         * FIXME: The exact count depends on the context the test is run (full test
+         * suite or this file only), but there must be at least 2 modules
          */
         assertTrue(count >= 2);
 
@@ -169,7 +172,9 @@ public class TmfTraceUtilsTest {
     }
 
     /**
-     * Test the {@link TmfTraceUtils#resolveEventAspectOfClassForEvent(ITmfTrace, Class, ITmfEvent)} method.
+     * Test the
+     * {@link TmfTraceUtils#resolveEventAspectOfClassForEvent(ITmfTrace, Class, ITmfEvent)}
+     * method.
      */
     @Test
     public void testResolveEventAspectsOfClassForEvent() {
@@ -209,8 +214,30 @@ public class TmfTraceUtilsTest {
     }
 
     /**
-     * Test the {@link TmfTraceUtils#registerEventAspect(ITmfEventAspect)}
-     * method
+     * Test the {@link TmfTraceUtils#getEventAspects(ITmfTrace, Class)} method
+     */
+    @Test
+    public void testGetAspects() {
+        TmfTrace trace = fTrace;
+
+        assertNotNull(trace);
+
+        Iterable<@NonNull ITmfEventAspect<?>> aspect = TmfTraceUtils.getEventAspects(trace, TestEventAspect.class);
+        assertNotNull(aspect);
+        assertEquals(1, Iterables.size(aspect));
+        assertTrue(Iterables.contains(aspect, TEST_ASPECT));
+
+        Iterable<@NonNull ITmfEventAspect<?>> cpuAspect = TmfTraceUtils.getEventAspects(trace, TmfCpuAspect.class);
+        assertNotNull(cpuAspect);
+        assertEquals("CPU", cpuAspect.iterator().next().getName());
+
+        Iterable<@NonNull ITmfEventAspect<?>> badAspect = TmfTraceUtils.getEventAspects(trace, CounterAspect.class);
+        assertNotNull(badAspect);
+        assertTrue(Iterables.isEmpty(badAspect));
+    }
+
+    /**
+     * Test the {@link TmfTraceUtils#registerEventAspect(ITmfEventAspect)} method
      */
     @Test
     public void testAdditionalAspects() {
@@ -233,7 +260,7 @@ public class TmfTraceUtilsTest {
         assertNull(val);
 
         // Register the aspect
-        TmfTraceUtils.registerEventAspect(new TestEventAspect());
+        TmfTraceUtils.registerEventAspect(TEST_ASPECT);
         // See that the aspect is resolved now
         obj = TmfTraceUtils.resolveEventAspectOfClassForEvent(trace, TestEventAspect.class, event);
         assertNotNull(obj);

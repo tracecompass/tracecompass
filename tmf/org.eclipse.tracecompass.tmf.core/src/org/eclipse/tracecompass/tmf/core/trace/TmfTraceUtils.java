@@ -54,8 +54,8 @@ public final class TmfTraceUtils {
     }
 
     /**
-     * Return the first result of the first analysis module belonging to this trace or its children,
-     * with the specified ID and class.
+     * Return the first result of the first analysis module belonging to this trace
+     * or its children, with the specified ID and class.
      *
      * @param trace
      *            The trace for which you want the modules
@@ -63,8 +63,8 @@ public final class TmfTraceUtils {
      *            Returned modules must extend this class
      * @param id
      *            The ID of the analysis module
-     * @return The analysis module with specified class and ID, or null if no
-     *         such module exists.
+     * @return The analysis module with specified class and ID, or null if no such
+     *         module exists.
      */
     public static @Nullable <T extends IAnalysisModule> T getAnalysisModuleOfClass(ITmfTrace trace,
             Class<T> moduleClass, String id) {
@@ -78,9 +78,8 @@ public final class TmfTraceUtils {
     }
 
     /**
-     * Registers an extra event aspect that may apply to all traces, not
-     * directly linked to a trace type. These can be used to retrieve values
-     * using the
+     * Registers an extra event aspect that may apply to all traces, not directly
+     * linked to a trace type. These can be used to retrieve values using the
      * {@link #resolveEventAspectOfClassForEvent(ITmfTrace, Class, ITmfEvent)}
      * method, but will not appear where trace aspects are being displayed.
      *
@@ -98,8 +97,8 @@ public final class TmfTraceUtils {
      * are also returned.
      *
      * @param trace
-     *            The trace for which you want the modules, the children trace modules
-     *            are added as well.
+     *            The trace for which you want the modules, the children trace
+     *            modules are added as well.
      * @param moduleClass
      *            Returned modules must extend this class
      * @return List of modules of class moduleClass
@@ -122,9 +121,24 @@ public final class TmfTraceUtils {
     }
 
     /**
-     * Return the first result of the first aspect that resolves as non null for
-     * the event received in parameter. If the returned value is not null, it
-     * can be safely cast to the aspect's class proper return type.
+     * Returns all the aspects of a specified type.
+     *
+     * @param trace
+     *            The trace for which you want the event aspects
+     * @param aspectClass
+     *            The class of the aspect(s) to resolve
+     * @return An {@link Iterable<ITmfEventAspect>} containing all the aspects of
+     *         the type aspectClass
+     * @since 3.1
+     */
+    public static Iterable<ITmfEventAspect<?>> getEventAspects(ITmfTrace trace, Class<? extends ITmfEventAspect<?>> aspectClass) {
+         return Iterables.filter(Iterables.concat(trace.getEventAspects(), EXTRA_ASPECTS), aspect -> aspectClass.isAssignableFrom(aspect.getClass()));
+    }
+
+    /**
+     * Return the first result of the first aspect that resolves as non null for the
+     * event received in parameter. If the returned value is not null, it can be
+     * safely cast to the aspect's class proper return type.
      *
      * @param trace
      *            The trace for which you want the event aspects
@@ -132,9 +146,8 @@ public final class TmfTraceUtils {
      *            The class of the aspect(s) to resolve
      * @param event
      *            The event for which to get the aspect
-     * @return The first result of the
-     *         {@link ITmfEventAspect#resolve(ITmfEvent)} that returns non null
-     *         for the event or {@code null} otherwise
+     * @return The first result of the {@link ITmfEventAspect#resolve(ITmfEvent)}
+     *         that returns non null for the event or {@code null} otherwise
      */
     public static <T extends ITmfEventAspect<?>> @Nullable Object resolveEventAspectOfClassForEvent(
             ITmfTrace trace, Class<T> aspectClass, ITmfEvent event) {
@@ -156,9 +169,9 @@ public final class TmfTraceUtils {
     }
 
     /**
-     * Return the first result of the first aspect that resolves as non null for
-     * the event received in parameter. If the returned value is not null, it
-     * can be safely cast to the aspect's class proper return type.
+     * Return the first result of the first aspect that resolves as non null for the
+     * event received in parameter. If the returned value is not null, it can be
+     * safely cast to the aspect's class proper return type.
      *
      * @param trace
      *            The trace for which you want the event aspects
@@ -166,9 +179,8 @@ public final class TmfTraceUtils {
      *            The class of the aspect(s) to resolve
      * @param event
      *            The event for which to get the aspect
-     * @return The first result of the
-     *         {@link ITmfEventAspect#resolve(ITmfEvent)} that returns non null
-     *         for the event or {@code null} otherwise
+     * @return The first result of the {@link ITmfEventAspect#resolve(ITmfEvent)}
+     *         that returns non null for the event or {@code null} otherwise
      * @since 3.0
      */
     public static @Nullable Object resolveAspectOfNameForEvent(ITmfTrace trace, String aspectName, ITmfEvent event) {
@@ -195,8 +207,8 @@ public final class TmfTraceUtils {
 
     /**
      * Return the first result of the first aspect that resolves as a non-null
-     * Integer for the event received in parameter. If no matching aspects are
-     * found then null is returned.
+     * Integer for the event received in parameter. If no matching aspects are found
+     * then null is returned.
      *
      * @param trace
      *            The trace for which you want the event aspects
@@ -205,34 +217,34 @@ public final class TmfTraceUtils {
      * @param event
      *            The event for which to get the aspect
      * @return Integer of the first result of the
-     *         {@link ITmfEventAspect#resolve(ITmfEvent)} that returns non null
-     *         for the event or {@code null} otherwise
+     *         {@link ITmfEventAspect#resolve(ITmfEvent)} that returns non null for
+     *         the event or {@code null} otherwise
      * @since 2.0
      */
     public static <T extends ITmfEventAspect<Integer>> @Nullable Integer resolveIntEventAspectOfClassForEvent(
             ITmfTrace trace, Class<T> aspectClass, ITmfEvent event) {
-            Integer value = StreamUtils.getStream(trace.getEventAspects())
+        Integer value = StreamUtils.getStream(trace.getEventAspects())
                 .filter(aspect -> aspectClass.isAssignableFrom(aspect.getClass()))
                 /* Enforced by the T parameter bounding */
                 .map(aspect -> (Integer) aspect.resolve(event))
                 .filter(obj -> obj != null)
                 .findFirst().orElse(null);
-            if (value != null) {
-                return value;
-            }
-            // If the value is not found, look at the global aspects
-            return EXTRA_ASPECTS.stream()
-                    .filter(aspect -> aspectClass.isAssignableFrom(aspect.getClass()))
-                    .map(aspect -> (Integer) aspect.resolve(event))
-                    .filter(obj -> obj != null)
-                    .findFirst().orElse(null);
+        if (value != null) {
+            return value;
+        }
+        // If the value is not found, look at the global aspects
+        return EXTRA_ASPECTS.stream()
+                .filter(aspect -> aspectClass.isAssignableFrom(aspect.getClass()))
+                .map(aspect -> (Integer) aspect.resolve(event))
+                .filter(obj -> obj != null)
+                .findFirst().orElse(null);
     }
 
     /**
      * Checks for text file.
      *
-     * Note that it checks for binary value 0 in the first MAX_NB_BINARY_BYTES
-     * bytes to determine if the file is text.
+     * Note that it checks for binary value 0 in the first MAX_NB_BINARY_BYTES bytes
+     * to determine if the file is text.
      *
      * @param file
      *            the file to check. Caller has to make sure that file exists.
@@ -272,8 +284,7 @@ public final class TmfTraceUtils {
      * @param predicate
      *            The predicate to test events against
      * @param monitor
-     *            Optional progress monitor that can be used to cancel the
-     *            operation
+     *            Optional progress monitor that can be used to cancel the operation
      * @return The first event matching the predicate, or null if the end of the
      *         trace was reached and no event was found
      * @since 2.1
@@ -284,7 +295,10 @@ public final class TmfTraceUtils {
             return null;
         }
 
-        /* rank + 1 because we do not want to include the start event itself in the search */
+        /*
+         * rank + 1 because we do not want to include the start event itself in the
+         * search
+         */
         EventMatchingRequest req = new EventMatchingRequest(startRank + 1, predicate, false);
         trace.sendRequest(req);
         try {
@@ -315,8 +329,8 @@ public final class TmfTraceUtils {
      *            The rank of the event at which to start searching backwards.
      * @param predicate
      *            The predicate to test events against
-     * @param monitor Optional progress monitor that can be used to cancel the
-     *            operation
+     * @param monitor
+     *            Optional progress monitor that can be used to cancel the operation
      * @return The first event found matching the predicate, or null if the
      *         beginning of the trace was reached and no event was found
      * @since 2.1
@@ -327,15 +341,15 @@ public final class TmfTraceUtils {
             return null;
         }
         /*
-         * We are going to do a series of queries matching the trace's cache
-         * size in length (which should minimize on-disk seeks), then iterate on
-         * the found events in reverse order until we find a match.
+         * We are going to do a series of queries matching the trace's cache size in
+         * length (which should minimize on-disk seeks), then iterate on the found
+         * events in reverse order until we find a match.
          */
         int step = trace.getCacheSize();
 
         /*
-         * If we are close to the beginning of the trace, make sure we only look
-         * for the events before the startRank.
+         * If we are close to the beginning of the trace, make sure we only look for the
+         * events before the startRank.
          */
         if (startRank < step) {
             step = (int) startRank;
@@ -362,8 +376,8 @@ public final class TmfTraceUtils {
                 req.waitForCompletion();
 
                 Optional<ITmfEvent> matchingEvent = Lists.reverse(list).stream()
-                    .filter(predicate)
-                    .findFirst();
+                        .filter(predicate)
+                        .findFirst();
 
                 if (matchingEvent.isPresent()) {
                     /* We found an event matching, return it! */
@@ -377,8 +391,7 @@ public final class TmfTraceUtils {
         }
 
         /*
-         * We searched up to the beginning of the trace and didn't find
-         * anything.
+         * We searched up to the beginning of the trace and didn't find anything.
          */
         return null;
 
@@ -402,10 +415,9 @@ public final class TmfTraceUtils {
          * @param predicate
          *            The predicate to test against each event
          * @param returnLast
-         *            Should we return the last or first event found. If false,
-         *            the request ends as soon as a matching event is found. If
-         *            false, we will go through all events to find a possible
-         *            last-match.
+         *            Should we return the last or first event found. If false, the
+         *            request ends as soon as a matching event is found. If false, we
+         *            will go through all events to find a possible last-match.
          */
         public EventMatchingRequest(long startRank, Predicate<ITmfEvent> predicate, boolean returnLast) {
             super(ITmfEvent.class, startRank, ALL_DATA, ExecutionType.FOREGROUND);
@@ -423,10 +435,9 @@ public final class TmfTraceUtils {
          * @param predicate
          *            The predicate to test against each event
          * @param returnLast
-         *            Should we return the last or first event found. If false,
-         *            the request ends as soon as a matching event is found. If
-         *            false, we will go through all events to find a possible
-         *            last-match.
+         *            Should we return the last or first event found. If false, the
+         *            request ends as soon as a matching event is found. If false, we
+         *            will go through all events to find a possible last-match.
          */
         public EventMatchingRequest(long startRank, int limit, Predicate<ITmfEvent> predicate, boolean returnLast) {
             super(ITmfEvent.class, startRank, limit, ExecutionType.FOREGROUND);
