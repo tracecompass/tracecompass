@@ -35,7 +35,14 @@ public abstract class TmfGraphBuilderModule extends TmfAbstractAnalysisModule im
 
     private @Nullable TmfGraph fGraph;
     private @Nullable ITmfEventRequest fRequest;
-    private final CriticalPathModule fCriticalPathModule = new CriticalPathModule();
+    private final CriticalPathModule fCriticalPathModule;
+
+    /**
+     * Constructor
+     */
+    public TmfGraphBuilderModule() {
+        fCriticalPathModule = new CriticalPathModule(this);
+    }
 
     /**
      * Gets the graph provider to build this graph
@@ -81,9 +88,6 @@ public abstract class TmfGraphBuilderModule extends TmfAbstractAnalysisModule im
             return ret;
         }
         ret = fCriticalPathModule.setTrace(trace);
-        if (ret) {
-            fCriticalPathModule.setParameter(CriticalPathModule.PARAM_GRAPH, getId());
-        }
         return ret;
     }
 
