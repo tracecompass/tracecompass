@@ -60,6 +60,22 @@ public class CriticalPathModule extends TmfAbstractAnalysisModule implements ICr
         setId(ANALYSIS_ID);
     }
 
+    /**
+     * Default constructor
+     *
+     * @param graph
+     *            The graph module that will be used to calculate the critical
+     *            path on
+     * @since 1.1
+     */
+    public CriticalPathModule(TmfGraphBuilderModule graph) {
+        super();
+        addParameter(PARAM_GRAPH);
+        addParameter(PARAM_WORKER);
+        setId(ANALYSIS_ID);
+        fGraphModule = graph;
+    }
+
     @Override
     protected boolean executeAnalysis(final IProgressMonitor monitor) throws TmfAnalysisException {
         /* Get the graph */
