@@ -33,7 +33,6 @@ import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge.EdgeType;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
-import org.eclipse.tracecompass.analysis.graph.core.building.TmfGraphBuilderModule;
 import org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathModule;
 import org.eclipse.tracecompass.analysis.graph.core.criticalpath.ICriticalPathProvider;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
@@ -616,21 +615,17 @@ public class CriticalPathView extends AbstractTimeGraphView {
         long end = trace.getEndTime().toNanos();
 
         // Set the start/end time of the view
-        Object paramGraph = module.getParameter(CriticalPathModule.PARAM_GRAPH);
-        if (paramGraph instanceof TmfGraphBuilderModule) {
-            TmfGraphBuilderModule graphModule = (TmfGraphBuilderModule) paramGraph;
-            TmfGraph graph = graphModule.getGraph();
-            if (graph == null) {
-                return;
-            }
-            TmfVertex head = graph.getHead();
-            if (head != null) {
-                start = Math.min(start, head.getTs());
-                for (IGraphWorker w : graph.getWorkers()) {
-                    TmfVertex tail = graph.getTail(w);
-                    if (tail != null) {
-                        end = Math.max(end, tail.getTs());
-                    }
+        TmfGraph graph = module.getCriticalPath();
+        if (graph == null) {
+            return;
+        }
+        TmfVertex head = graph.getHead();
+        if (head != null) {
+            start = Math.min(start, head.getTs());
+            for (IGraphWorker w : graph.getWorkers()) {
+                TmfVertex tail = graph.getTail(w);
+                if (tail != null) {
+                    end = Math.max(end, tail.getTs());
                 }
             }
         }

@@ -9,9 +9,6 @@
             id="org.eclipse.tracecompass.analysis.graph.core.criticalpath"
             name="Critical Path">
          <parameter
-               name="graph">
-         </parameter>
-         <parameter
                name="workerid">
          </parameter>
          <parameter
