@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,17 +15,16 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.barcharts;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.graphics.Color;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfChartTimeStampFormat;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.IYSeries;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 import org.swtchart.Chart;
 import org.swtchart.IAxisTick;
-import org.swtchart.IBarSeries;
 import org.swtchart.ISeries;
-import org.swtchart.ISeries.SeriesType;
 
 /**
  * Abstract bar chart viewer class implementation. Used for displaying
@@ -34,7 +33,7 @@ import org.swtchart.ISeries.SeriesType;
  * @author Alexandre Montplaisir
  * @author Bernd Hufmann
  */
-public abstract class TmfBarChartViewer extends TmfXYChartViewer {
+public abstract class TmfBarChartViewer extends TmfCommonXLineChartViewer {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -45,12 +44,12 @@ public abstract class TmfBarChartViewer extends TmfXYChartViewer {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    /** List of series */
-    private final List<String> seriesNames = new ArrayList<>();
-    /** List of colors */
-    private final List<RGB> colors = new ArrayList<>();
     /** the bar width */
     private int fBarWidth = MINIMUM_BAR_WIDTH;
+    /** List of series */
+    private final List<String> fSeriesNames = new ArrayList<>();
+    /** List of colors */
+    private final List<RGB> fColors = new ArrayList<>();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -76,49 +75,50 @@ public abstract class TmfBarChartViewer extends TmfXYChartViewer {
         setTooltipProvider(new TmfHistogramTooltipProvider(this));
     }
 
-    // ------------------------------------------------------------------------
-    // Operations
-    // ------------------------------------------------------------------------
+    /**
+     * @since 3.0
+     */
     @Override
-    protected void updateContent() {
-
-        getDisplay().asyncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                Chart swtChart = getSwtChart();
-                int numRequests = swtChart.getPlotArea().getBounds().width / fBarWidth;
-
-                for (int i = 0; i < seriesNames.size(); i++) {
-                    ISeries series = swtChart.getSeriesSet().getSeries(seriesNames.get(i));
-                    if (series == null) {
-                        series = initSeries(seriesNames.get(i), colors.get(i));
-                    }
-                    readData(series, getWindowStartTime(), getWindowEndTime(), numRequests);
-                }
-            }
-        });
+    protected @NonNull String getSeriesType(@NonNull String seriesName) {
+        return IYSeries.BAR;
     }
 
     /**
-     * Method to add a series to the chart.
+     * @since 3.0
+     */
+    @Override
+    protected int getWidth(@NonNull String seriesName) {
+        return fBarWidth;
+    }
+
+    /**
+     * Load the data for the given series. This method should call
+     * {@link TmfBarChartViewer#drawChart} to return the results when done.
      *
-     * @param name
-     *            Name of series
-     * @param color
-     *            color to use for series
+     * Careful, this method is called by a signal handler which also happens to be
+     * in the main UI thread. This means any processing will block the UI! In most
+     * cases it's probably better to start a separate Thread/Job to do the
+     * processing, and that one can call drawChart() when done to update the view.
+     *
+     * @param series
+     *            Which series of the chart should the viewer update
+     * @param start
+     *            The start time (in nanoseconds) of the range to display
+     * @param end
+     *            The end time of the range to display.
+     * @param nb
+     *            The number of 'steps' in the bar chart (fewer steps means each bar
+     *            is wider).
+     * @deprecated use
+     *             {@link #updateData(long, long, int, org.eclipse.core.runtime.IProgressMonitor)}
      */
-    protected void addSeries(String name, RGB color) {
-        seriesNames.add(name);
-        colors.add(color);
-    }
-
-    /**
-     * Clears all series
-     */
-    protected void clearSeries() {
-        seriesNames.clear();
-        colors.clear();
+    @Deprecated
+    protected void readData(ISeries series, long start, long end, int nb) {
+        /*
+         * Remove the abstract and write an empty method. This will avoid new classes
+         * having to implement a deprecated method. So, this method is deliberately
+         * empty
+         */
     }
 
     /**
@@ -128,13 +128,14 @@ public abstract class TmfBarChartViewer extends TmfXYChartViewer {
      *            The series to display
      * @param x
      *            The X values. It can be computed with
-     *            {@link TmfBarChartViewer#getXAxis}
-     *            The values are stored in the internal time representation.
-     *            To get the trace time one has to add the time offset
-     *            {@link #getTimeOffset()}.
+     *            {@link TmfBarChartViewer#getXAxis} The values are stored in the
+     *            internal time representation. To get the trace time one has to add
+     *            the time offset {@link #getTimeOffset()}.
      * @param y
      *            The Y values that were computed by the extended class
+     * @deprecated use {@link #updateDisplay()}
      */
+    @Deprecated
     protected void drawChart(final ISeries series, final double[] x, final double[] y) {
         // Run in GUI thread to make sure that chart is ready after restart
         final Display display = getDisplay();
@@ -162,57 +163,28 @@ public abstract class TmfBarChartViewer extends TmfXYChartViewer {
     }
 
     /**
-     * Convenience method to compute the X axis values for a given time range.
+     * Method to add a series to the chart.
      *
-     * @param start
-     *            Start of the time range
-     * @param end
-     *            End of the range
-     * @param nb
-     *            Number of steps. This will be the size of the returned array.
-     * @return The time values (converted to double) that match every step
+     * @param name
+     *            Name of series
+     * @param color
+     *            color to use for series
+     * @deprecated use {@link #addSeries(String)}
      */
-    protected final static double[] getXAxis(long start, long end, int nb) {
-        double timestamps[] = new double[nb];
-        long steps = (end - start);
-        double step = steps / (double) nb;
-
-        double curTime = 1;
-        for (int i = 0; i < nb; i++) {
-            timestamps[i] = curTime;
-            curTime += step;
-        }
-        return timestamps;
+    @Deprecated
+    protected void addSeries(String name, RGB color) {
+        fSeriesNames.add(name);
+        fColors.add(color);
     }
 
     /**
-     * Load the data for the given series. This method should call
-     * {@link TmfBarChartViewer#drawChart} to return the results when done.
+     * Clears all series
      *
-     * Careful, this method is called by a signal handler which also happens to
-     * be in the main UI thread. This means any processing will block the UI! In
-     * most cases it's probably better to start a separate Thread/Job to do the
-     * processing, and that one can call drawChart() when done to update the
-     * view.
-     *
-     * @param series
-     *            Which series of the chart should the viewer update
-     * @param start
-     *            The start time (in nanoseconds) of the range to display
-     * @param end
-     *            The end time of the range to display.
-     * @param nb
-     *            The number of 'steps' in the bar chart (fewer steps means each
-     *            bar is wider).
+     * @deprecated Use {@link TmfCommonXLineChartViewer#clearContent()}
      */
-    protected abstract void readData(ISeries series, long start, long end, int nb);
-
-    // initializes a series
-    private IBarSeries initSeries(String name, RGB color) {
-        IBarSeries bs = (IBarSeries) getSwtChart().getSeriesSet().createSeries(SeriesType.BAR, name);
-        bs.enableStack(true);
-        bs.setBarColor(new Color(Display.getDefault(), color));
-        bs.setBarPadding(0);
-        return bs;
+    @Deprecated
+    protected void clearSeries() {
+        fSeriesNames.clear();
+        fColors.clear();
     }
 }

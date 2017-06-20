@@ -43,6 +43,7 @@ import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfChartTimeStampFormat;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.swtchart.IAxisTick;
+import org.swtchart.IBarSeries;
 import org.swtchart.ILineSeries;
 import org.swtchart.ILineSeries.PlotSymbolType;
 import org.swtchart.ISeries;
@@ -197,8 +198,8 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     }
 
     /**
-     * Forces a reinitialization of the data sources, even if it has already
-     * been initialized for this trace before
+     * Forces a reinitialization of the data sources, even if it has already been
+     * initialized for this trace before
      */
     protected void reinitialize() {
         try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:ReinitializeRequested").setCategory(getViewerId()).build()) { //$NON-NLS-1$
@@ -212,9 +213,9 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     }
 
     /**
-     * Initialize the source of the data for this viewer. This method is run in
-     * a separate thread, so this is where for example one can execute an
-     * analysis module and wait for its completion to initialize the series
+     * Initialize the source of the data for this viewer. This method is run in a
+     * separate thread, so this is where for example one can execute an analysis
+     * module and wait for its completion to initialize the series
      */
     protected void initializeDataSource() {
 
@@ -239,8 +240,8 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                     updateData(getWindowStartTime(), getWindowEndTime(), fNumRequests, fMonitor);
                 } finally {
                     /*
-                     * fDirty should have been incremented before creating the
-                     * thread, so we decrement it once it is finished
+                     * fDirty should have been incremented before creating the thread, so we
+                     * decrement it once it is finished
                      */
                     fDirty.decrementAndGet();
                 }
@@ -268,9 +269,9 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      * Force the number of points to a fixed value
      *
      * @param nbPoints
-     *            The number of points to display, cannot be negative. 0 means
-     *            use native resolution. any positive integer means that number
-     *            of points
+     *            The number of points to display, cannot be negative. 0 means use
+     *            native resolution. any positive integer means that number of
+     *            points
      *
      * @since 3.1
      */
@@ -289,9 +290,9 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     }
 
     /**
-     * Cancels the currently running update thread. It is automatically called
-     * when the content is updated, but child viewers may want to call it
-     * manually to do some operations before calling
+     * Cancels the currently running update thread. It is automatically called when
+     * the content is updated, but child viewers may want to call it manually to do
+     * some operations before calling
      * {@link TmfCommonXLineChartViewer#updateContent}
      */
     protected synchronized void cancelUpdate() {
@@ -304,8 +305,8 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     protected void updateContent() {
         try (FlowScopeLog parentScope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:ContentUpdateRequested").setCategory(getViewerId()).build()) { //$NON-NLS-1$
             /*
-             * Content is not up to date, so we increment fDirty. It will be
-             * decremented at the end of the update thread
+             * Content is not up to date, so we increment fDirty. It will be decremented at
+             * the end of the update thread
              */
             fDirty.incrementAndGet();
             getDisplay().asyncExec(new Runnable() {
@@ -322,11 +323,11 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     /**
      * Convenience method to compute the values of the X axis for a given time
      * range. This method will return at most nb values, equally separated from
-     * start to end. The step between values will be at least 1.0, so the number
-     * of values returned can be lower than nb.
+     * start to end. The step between values will be at least 1.0, so the number of
+     * values returned can be lower than nb.
      *
-     * The returned time values are in internal time, ie to get trace time, the
-     * time offset needs to be added to those values.
+     * The returned time values are in internal time, ie to get trace time, the time
+     * offset needs to be added to those values.
      *
      * @param start
      *            The start time of the time range
@@ -361,19 +362,18 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      * axis for all series of a line chart so it needs to be set once here.
      *
      * @param xaxis
-     *            The values for the x axis. The values must be in internal
-     *            time, ie time offset have been subtracted from trace time
-     *            values.
+     *            The values for the x axis. The values must be in internal time, ie
+     *            time offset have been subtracted from trace time values.
      */
     protected final void setXAxis(double[] xaxis) {
         fModelBuilder.setXValues(xaxis);
     }
 
     /**
-     * Update the series data because the time range has changed. The x axis
-     * values for this data update can be computed using the
-     * {@link TmfCommonXLineChartViewer#getXAxis(long, long, int)} method which
-     * will return a list of uniformely separated time values.
+     * Update the series data because the time range has changed. The x axis values
+     * for this data update can be computed using the
+     * {@link TmfCommonXLineChartViewer#getXAxis(long, long, int)} method which will
+     * return a list of uniformely separated time values.
      *
      * Each series values should be set by calling the
      * {@link TmfCommonXLineChartViewer#setSeries(String, double[])}.
@@ -394,9 +394,9 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     protected abstract void updateData(long start, long end, int nb, IProgressMonitor monitor);
 
     /**
-     * Set the data for a given series of the graph. The series does not need to
-     * be created before calling this, but it needs to have at least as many
-     * values as the x axis.
+     * Set the data for a given series of the graph. The series does not need to be
+     * created before calling this, but it needs to have at least as many values as
+     * the x axis.
      *
      * If the series does not exist, it will automatically be created at display
      * time, with the default values.
@@ -473,17 +473,17 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     }
 
     /**
-     * Add a new series to the XY line chart. By default, it is a simple solid
-     * line.
+     * Add a new series to the XY line chart. By default, it is a simple solid line.
      *
      * Warning do not override
      *
      * @param seriesName
      *            The name of the series to create
-     * @return The series so that the concrete viewer can modify its properties
-     *         if required
+     * @return The series so that the concrete viewer can modify its properties if
+     *         required
+     * @since 3.1
      */
-    protected ILineSeries addSeries(String seriesName) {
+    protected ISeries addSeries(String seriesName) {
         if (seriesName == null) {
             return null;
         }
@@ -500,15 +500,30 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
         if (ySeries == null) {
             return null;
         }
-        ILineSeries series = (ILineSeries) seriesSet.createSeries(SeriesType.LINE, seriesName);
-        boolean isScatter = IYSeries.SCATTER.equals(ySeries.getSeriesType());
-        series.setVisible(true);
-        series.enableArea(IYSeries.AREA.equals(ySeries.getSeriesType()));
-        series.setLineStyle(!isScatter ? LINE_STYLES.get(getLineStyle(ySeries.getSeriesType(), seriesCount)) : LineStyle.NONE);
-        series.setSymbolType(isScatter ? PlotSymbolType.DIAMOND : PlotSymbolType.NONE);
+
         String colorTxt = ySeries.getColor();
-        series.setLineColor(getColor(seriesName, colorTxt));
-        return series;
+        Color color = getColor(seriesName, colorTxt);
+
+        if (ySeries.getSeriesType() == IYSeries.BAR) {
+            IBarSeries barSeries = (IBarSeries) seriesSet.createSeries(SeriesType.BAR, seriesName);
+            barSeries.enableStack(true);
+            barSeries.setBarColor(color);
+            barSeries.setBarPadding(0);
+            barSeries.setVisible(true);
+            return barSeries;
+        }
+
+        /**
+         * Default is line chart
+         */
+        ILineSeries lineSeries = (ILineSeries) seriesSet.createSeries(SeriesType.LINE, seriesName);
+        boolean isScatter = IYSeries.SCATTER.equals(ySeries.getSeriesType());
+        lineSeries.enableArea(IYSeries.AREA.equals(ySeries.getSeriesType()));
+        lineSeries.setLineStyle(!isScatter ? LINE_STYLES.get(getLineStyle(ySeries.getSeriesType(), seriesCount)) : LineStyle.NONE);
+        lineSeries.setSymbolType(isScatter ? PlotSymbolType.DIAMOND : PlotSymbolType.NONE);
+        lineSeries.setLineColor(color);
+        lineSeries.setVisible(true);
+        return lineSeries;
     }
 
     private Color getColor(String seriesName, String colorTxt) {
@@ -603,7 +618,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                             double end = getWindowEndTime() - getWindowStartTime();
                             if (end > 0.0) {
                                 for (IYSeries entry : seriesValues.getSeries().values()) {
-                                    ILineSeries series = (ILineSeries) getSwtChart().getSeriesSet().getSeries(entry.getLabel());
+                                    ISeries series = getSwtChart().getSeriesSet().getSeries(entry.getLabel());
                                     if (series == null) {
                                         series = addSeries(entry.getLabel());
                                     }
@@ -623,7 +638,6 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                                 if (maxy == DEFAULT_MAXY) {
                                     maxy = 1.0;
                                 }
-
                             }else {
                                 clearContent();
                                 end =1;
@@ -639,9 +653,8 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
                             if (isSendTimeAlignSignals()) {
                                 /*
-                                 * The width of the chart might have changed and
-                                 * its time axis might be misaligned with the
-                                 * other views
+                                 * The width of the chart might have changed and its time axis might be
+                                 * misaligned with the other views
                                  */
                                 Point viewPos = TmfCommonXLineChartViewer.this.getParent().getParent().toDisplay(0, 0);
                                 int axisPos = getSwtChart().toDisplay(0, 0).x + getPointAreaOffset();
@@ -662,9 +675,9 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     /**
      * Create the series once the initialization of the viewer's data source is
-     * done. Series do not need to be created before setting their values, but
-     * if their appearance needs to be customized, this method is a good place
-     * to do so. It is called only once per trace.
+     * done. Series do not need to be created before setting their values, but if
+     * their appearance needs to be customized, this method is a good place to do
+     * so. It is called only once per trace.
      */
     protected void createSeries() {
 
@@ -681,5 +694,4 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
         /* Check the parent's or this view's own dirtiness */
         return super.isDirty() || (fDirty.get() != 0);
     }
-
 }
