@@ -7,9 +7,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
+package org.eclipse.tracecompass.tmf.core.viewmodel;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
@@ -18,7 +17,6 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author Matthew Khouzam
  * @since 3.1
  */
-@NonNullByDefault
 public interface IYSeries {
 
     /**
@@ -126,5 +124,4 @@ public interface IYSeries {
      * @return the width hint
      */
     int getWidth();
-
 }

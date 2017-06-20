@@ -16,4 +16,13 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/eclipse/tracecompass/tmf/ui/viewers/xycharts/linecharts/TmfCommonXLineChartViewer.java" type="org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer">
+        <filter comment="This API is still provisional, but plugins may start using it" id="643846161">
+            <message_arguments>
+                <message_argument value="ITmfXYDataProvider"/>
+                <message_argument value="TmfCommonXLineChartViewer"/>
+                <message_argument value="setDataProvider(ITmfXYDataProvider)"/>
+            </message_arguments>
+        </filter>
+    </resource>
 </component>

@@ -12,7 +12,6 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.examples.ui.viewers.histogram;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -98,14 +97,13 @@ public class NewHistogramViewer extends TmfBarChartViewer {
     @Override
     protected void readData(final ISeries series, final long start, final long end, final int nb) {
         if (getTrace() != null) {
-            final double y[] = new double[nb];
+            final double[] y = new double[nb];
 
             Thread thread = new Thread("Histogram viewer update") { //$NON-NLS-1$
                 @Override
                 public void run() {
-                    double x[] = getXAxis(start, end, nb);
-                    final long yLong[] = new long[nb];
-                    Arrays.fill(y, 0.0);
+                    double[] x = getXAxis(start, end, nb);
+                    final long[] yLong = new long[nb];
 
                     /* Add the values for each trace */
                     for (ITmfTrace trace : TmfTraceManager.getTraceSet(getTrace())) {
@@ -127,7 +125,7 @@ public class NewHistogramViewer extends TmfBarChartViewer {
                     }
 
                     for (int i = 0; i < nb; i++) {
-                        y[i] += yLong[i]; /* casting from long to double */
+                        y[i] = yLong[i]; /* casting from long to double */
                     }
 
                     /* Update the viewer */

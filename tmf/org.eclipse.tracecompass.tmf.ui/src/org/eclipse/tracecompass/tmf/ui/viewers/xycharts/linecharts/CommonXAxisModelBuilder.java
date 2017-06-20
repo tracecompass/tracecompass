@@ -14,6 +14,8 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.viewmodel.ICommonXAxisModel;
+import org.eclipse.tracecompass.tmf.core.viewmodel.IYSeries;
 
 /**
  * Builder for a model. Unsynchronized, developer needs to provide
@@ -72,7 +74,7 @@ class CommonXAxisModelBuilder {
         if (fXValues.length != ySeries.getDatapoints().length) {
             throw new IllegalStateException("All series in list must be of length : " + fXValues.length); //$NON-NLS-1$
         }
-        deleteSeries(ySeries.getLabel());
+
         fYSeries.put(ySeries.getLabel(), ySeries);
         fModel = null;
         return this;
@@ -102,6 +104,5 @@ class CommonXAxisModelBuilder {
             fModel = model;
         }
         return model;
-
     }
 }

@@ -7,12 +7,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
+package org.eclipse.tracecompass.tmf.core.viewmodel;
 
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
@@ -21,9 +20,9 @@ import com.google.gson.annotations.SerializedName;
  * Y series to show the height values of a chart.
  *
  * @author Matthew Khouzam
+ * @since 3.1
  */
-@NonNullByDefault
-class YSeries implements IYSeries {
+public class YSeries implements IYSeries {
     @SerializedName("label")
     private final String fLabel;
     @SerializedName("yValues")
@@ -37,6 +36,22 @@ class YSeries implements IYSeries {
     @SerializedName("style")
     private final String fStyle;
 
+    /**
+     * Constructor
+     *
+     * @param type
+     *            Type of the series (Line, Bar, Scatte, etc.)
+     * @param color
+     *            Color of the series
+     * @param width
+     *            Thickness of the series.
+     * @param lineStyle
+     *            Style of the series (Dash, Dot, etc.)
+     * @param seriesName
+     *            Name of the series
+     * @param yData
+     *            Data for Y axis
+     */
     public YSeries(String type, @Nullable String color, int width, @Nullable String lineStyle, String seriesName, double[] yData) {
         fType = type;
         fColor = color;
@@ -101,5 +116,4 @@ class YSeries implements IYSeries {
                 Objects.equals(fStyle, other.fStyle) &&
                 fWidth == other.fWidth;
     }
-
 }

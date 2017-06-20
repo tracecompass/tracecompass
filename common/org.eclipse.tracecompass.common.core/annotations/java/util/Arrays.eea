@@ -5,6 +5,9 @@ asList
 copyOf
  ([DI)[D
  ([DI)[1D
+copyOf
+ ([JI)[J
+ ([JI)[1J
 copyOfRange
  ([BII)[B
  ([BII)[1B

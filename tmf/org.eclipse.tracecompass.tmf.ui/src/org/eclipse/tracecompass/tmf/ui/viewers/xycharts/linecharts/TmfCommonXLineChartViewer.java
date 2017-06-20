@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,8 +36,16 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.viewmodel.ICommonXAxisModel;
+import org.eclipse.tracecompass.tmf.core.viewmodel.IYSeries;
+import org.eclipse.tracecompass.tmf.core.viewmodel.YSeries;
 import org.eclipse.tracecompass.tmf.ui.colors.X11Color;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
@@ -67,6 +76,9 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     private static final double DEFAULT_MAXY = Double.MIN_VALUE;
     private static final double DEFAULT_MINY = Double.MAX_VALUE;
+
+    // Timeout between updates in the updateData thread
+    private static final long BUILD_UPDATE_TIMEOUT = 500;
 
     /* The desired number of points per pixel */
     private static final double RESOLUTION = 1.0;
@@ -113,6 +125,13 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     private int fOverrideNbPoints = 0;
 
     /**
+     * Data provider for XY viewers
+     *
+     * @since 3.1
+     */
+    private ITmfXYDataProvider fXYDataProvider;
+
+    /**
      * Constructor
      *
      * @param parent
@@ -142,6 +161,17 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      */
     protected void setResolution(double resolution) {
         fResolution = resolution;
+    }
+
+    /**
+     * Set the data provider
+     *
+     * @param dataProvider
+     *            A data provider used for fetching a XY Model
+     * @since 3.1
+     */
+    protected void setDataProvider(ITmfXYDataProvider dataProvider) {
+        fXYDataProvider = dataProvider;
     }
 
     @Override
@@ -348,7 +378,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
         }
         double step = steps / (double) nbVals;
 
-        double timestamps[] = new double[nbVals];
+        double[] timestamps = new double[nbVals];
         double curTime = 1;
         for (int i = 0; i < nbVals; i++) {
             timestamps[i] = curTime;
@@ -364,23 +394,49 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      * @param xaxis
      *            The values for the x axis. The values must be in internal time, ie
      *            time offset have been subtracted from trace time values.
+     * @since 3.1
      */
-    protected final void setXAxis(double[] xaxis) {
+    protected final void setXAxis(double @NonNull [] xaxis) {
         fModelBuilder.setXValues(xaxis);
     }
 
     /**
-     * Update the series data because the time range has changed. The x axis values
-     * for this data update can be computed using the
-     * {@link TmfCommonXLineChartViewer#getXAxis(long, long, int)} method which will
-     * return a list of uniformely separated time values.
+     * Since the XY Model returned by data provider contains directly the requested
+     * time as long array, we need to convert it to double array for SWT Chart. This
+     * method is intended also to refresh the {@link CommonXAxisSeriesModel} of the
+     * viewer. <br/>
+     * <br/>
+     * See {@link ITmfCommonXAxisModel} <br/>
+     * See {@link CommonXAxisSeriesModel}. <br/>
+     * <br/>
+     * FIXME: Unify the two models and find a solution to manage colors instead of
+     * having it in the viewmodel. This is, hopefully, an intermediate solution with
+     * two "models" for a future patch that will fix the style/color problem.
      *
-     * Each series values should be set by calling the
-     * {@link TmfCommonXLineChartViewer#setSeries(String, double[])}.
-     *
-     * This method is responsible for calling the
-     * {@link TmfCommonXLineChartViewer#updateDisplay()} when needed for the new
-     * values to be displayed.
+     * @param model
+     *            The model returned by XY Data providers
+     * @since 3.1
+     */
+    private void extractXYModelAndUpdateViewModel(ITmfCommonXAxisModel model) {
+
+        long[] xValuesRequested = model.getXAxis();
+        double[] xValuesToDisplay = new double[xValuesRequested.length];
+        long offset = getTimeOffset();
+
+        for (int i = 0; i < xValuesRequested.length; ++i) {
+            xValuesToDisplay[i] = (xValuesRequested[i] - offset);
+        }
+
+        setXAxis(xValuesToDisplay);
+
+        Map<String, IYModel> yData = model.getYData();
+        for (Entry<String, IYModel> entry : yData.entrySet()) {
+            setSeries(entry.getKey(), entry.getValue().getData());
+        }
+    }
+
+    /**
+     * Update the series data because the time range has changed.
      *
      * @param start
      *            The start time of the range for which the get the data
@@ -391,12 +447,67 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      * @param monitor
      *            The progress monitor object
      */
-    protected abstract void updateData(long start, long end, int nb, IProgressMonitor monitor);
+    protected void updateData(long start, long end, int nb, IProgressMonitor monitor) {
+        TimeQueryFilter filters = new TimeQueryFilter(start, end, nb);
+        updateData(filters, monitor);
+    }
 
     /**
-     * Set the data for a given series of the graph. The series does not need to be
-     * created before calling this, but it needs to have at least as many values as
-     * the x axis.
+     * This method is responsible for calling the
+     * {@link TmfCommonXLineChartViewer#updateDisplay()} when needed for the new
+     * values to be displayed.
+     *
+     * @param filters
+     *            A query analysis filter
+     * @param monitor
+     *            A monitor for cancelling task
+     */
+    private void updateData(@NonNull TimeQueryFilter filters, IProgressMonitor monitor) {
+        if (fXYDataProvider == null) {
+            LOGGER.log(Level.WARNING, "Data provider for this viewer is not available"); //$NON-NLS-1$
+            return;
+        }
+
+        long currentEnd = 0;
+        while (currentEnd < filters.getEnd()) {
+            ITmfCommonXAxisResponse response = fXYDataProvider.fetchXY(filters, monitor);
+            ITmfCommonXAxisModel model = response.getModel();
+            if (model != null) {
+                extractXYModelAndUpdateViewModel(model);
+                updateDisplay();
+            }
+
+            ITmfCommonXAxisResponse.Status status = response.getStatus();
+            currentEnd = response.getCurrentEnd();
+
+            /* Model is complete, no need to request again the data provider */
+            if (status == ITmfCommonXAxisResponse.Status.COMPLETED) {
+                return;
+            }
+            /* Error occured, log and return */
+            else if (status == ITmfCommonXAxisResponse.Status.FAILED || status == ITmfCommonXAxisResponse.Status.CANCELLED) {
+                LOGGER.log(Level.WARNING, response.getStatusMessage());
+                return;
+            }
+            /*
+             * Status is RUNNING. Sleeping current thread to wait before request data
+             * provider again
+             */
+            else {
+                try {
+                    Thread.sleep(BUILD_UPDATE_TIMEOUT);
+                } catch (InterruptedException e) {
+                    LOGGER.log(Level.INFO, e.getMessage());
+                    return;
+                }
+            }
+        }
+    }
+
+    /**
+     * Set the data for a given series of the graph. The series does not
+     * need to be created before calling this, but it needs to have at least as many
+     * values as the x axis.
      *
      * If the series does not exist, it will automatically be created at display
      * time, with the default values.
@@ -601,9 +712,21 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      * Update the chart's values before refreshing the viewer
      */
     protected void updateDisplay() {
+        updateDisplay(getModel());
+    }
+
+    /**
+     * Update the chart's values before refreshing the viewer
+     *
+     * @param model
+     *            The model
+     * @since 3.1
+     */
+    protected void updateDisplay(ICommonXAxisModel model) {
+
         try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:UpdateDisplayRequested").setCategory(getViewerId()).build()) { //$NON-NLS-1$
             /* Content is not up to date, increment dirtiness */
-            final ICommonXAxisModel seriesValues = getModel();
+            final ICommonXAxisModel seriesValues = model;
             fDirty.incrementAndGet();
             Display.getDefault().asyncExec(new Runnable() {
                 final TmfChartTimeStampFormat tmfChartTimeStampFormat = new TmfChartTimeStampFormat(getTimeOffset());
@@ -667,7 +790,6 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                         /* Content has been updated, decrement dirtiness */
                         fDirty.decrementAndGet();
                     }
-
                 }
             });
         }

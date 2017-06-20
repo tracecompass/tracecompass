@@ -14,6 +14,8 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.viewmodel.ICommonXAxisModel;
+import org.eclipse.tracecompass.tmf.core.viewmodel.IYSeries;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -45,7 +47,7 @@ class CommonXAxisSeriesModel implements ICommonXAxisModel {
     @SerializedName("title")
     private final String fTitle;
     @SerializedName("xValues")
-    private double @NonNull [] fXValues = new double[0];
+    private final double @NonNull [] fXValues;
     @SerializedName("series")
     private final @NonNull Map<String, IYSeries> fSeries;
 
@@ -89,5 +91,4 @@ class CommonXAxisSeriesModel implements ICommonXAxisModel {
     public String toString() {
         return fGson.toJson(this);
     }
-
 }
