@@ -141,7 +141,7 @@ public class TmfStateValueTest {
 
         final int[] expectedStarts = { 1, 5, 7, 7 };
         ITmfStateValue[] expectedValues = { TmfStateValue.newValueLong(1l), TmfStateValue.newValueLong(5l), TmfStateValue.newValueLong(1l) };
-        XmlUtilsTest.verifyStackStateIntervals("testStateValueModify", ss, quark, expectedStarts, expectedValues);
+        XmlUtilsTest.verifyStackStateIntervals("testStateValuePeek", ss, quark, expectedStarts, expectedValues);
     }
 
     /**
@@ -191,6 +191,30 @@ public class TmfStateValueTest {
         final int[] expectedStarts = { 1, 7 };
         ITmfStateValue[] expectedValues = { TmfStateValue.newValueString("testTrace4.xml") };
         XmlUtilsTest.verifyStateIntervals("testHostId", ss, quark, expectedStarts, expectedValues);
+
+    }
+
+    /**
+     * Test that a script state value is returning the right value.
+     *
+     * @throws StateSystemDisposedException
+     *             Exceptions thrown during state system verification
+     * @throws AttributeNotFoundException
+     *             Exceptions thrown during state system verification
+     */
+    @Test
+    public void testStateValueScript() throws AttributeNotFoundException, StateSystemDisposedException {
+        XmlStateSystemModule module = fModule;
+        assertNotNull(module);
+
+        ITmfStateSystem ss = module.getStateSystem();
+        assertNotNull(ss);
+
+        int quark = ss.getQuarkAbsolute("script");
+
+        final int[] expectedStarts = { 1, 3, 5, 7, 7 };
+        ITmfStateValue[] expectedValues = { TmfStateValue.newValueString("TRUE"), TmfStateValue.newValueString("FALSE"), TmfStateValue.newValueString("TRUE"), TmfStateValue.newValueString("FALSE") };
+        XmlUtilsTest.verifyStateIntervals("testStateValueScript", ss, quark, expectedStarts, expectedValues);
 
     }
 }

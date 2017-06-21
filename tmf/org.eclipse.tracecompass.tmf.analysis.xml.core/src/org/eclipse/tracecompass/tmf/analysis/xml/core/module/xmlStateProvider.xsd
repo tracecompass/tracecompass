@@ -37,7 +37,7 @@
 						<xs:documentation>Define how a given event will modify the state system being built. For each event in the trace that causes a state change, a event handler should be defined.</xs:documentation></xs:annotation></xs:element>
 			</xs:sequence>
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string" use="required" >
+		<xs:attribute name="id" type="xs:ID" use="required" >
 			<xs:annotation>
 				<xs:documentation>The unique ID of this state provider. It will be used to identify the analysis that will be built from this state provider.</xs:documentation></xs:annotation></xs:attribute>
 		<xs:attribute name="version" type="xs:integer" use="required" >
@@ -94,9 +94,14 @@
 				<xs:element maxOccurs="unbounded" minOccurs="1" name="stateAttribute" type="stateAttribute" >
 					<xs:annotation>
 						<xs:documentation>Explain how to reach an attribute in the state system. It describes the path/to/attribute.</xs:documentation></xs:annotation></xs:element>
-				<xs:element maxOccurs="1" minOccurs="1" name="stateValue" type="stateValue" >
+				<xs:element maxOccurs="1" minOccurs="1" name="stateValue" type="stateValue">
 					<xs:annotation>
-						<xs:documentation>Explain how to obtain the value of the state attribute to modify.</xs:documentation></xs:annotation></xs:element>
+						<xs:documentation>Explain how to obtain the value of the state attribute to modify.</xs:documentation></xs:annotation>
+					<xs:unique name="stateValueID">
+						<xs:selector xpath="stateValue" />
+						<xs:field xpath="@id" />
+					</xs:unique>
+				</xs:element>
 			</xs:sequence>
 			<xs:sequence maxOccurs="1" minOccurs="1">
 				<xs:annotation>
@@ -251,7 +256,20 @@
 			<xs:annotation>
 				<xs:documentation>For a "query" value type, a sequence of stateAttributes will define the query whose result is the value.</xs:documentation></xs:annotation>
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="stateAttribute" type="stateAttribute" ></xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="stateValue" type="stateValue">
+				<xs:unique name="childStateValueID">
+					<xs:selector xpath="stateValue" />
+					<xs:field xpath="@id" />
+				</xs:unique>
+			</xs:element>
 		</xs:sequence>
+		<xs:attribute name="id">
+			<xs:annotation>
+				<xs:documentation>The unique ID of this state value. It will be used as a variable name in scripts.</xs:documentation></xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:minLength value="1" /></xs:restriction></xs:simpleType>
+		</xs:attribute>
 		<xs:attribute name="type" use="required">
 			<xs:annotation>
 				<xs:documentation>The type of this state value. It will describe how to obtain to value and/or what to do with it.</xs:documentation></xs:annotation>
@@ -281,6 +299,9 @@
 					<xs:enumeration value="query" >
 						<xs:annotation>
 							<xs:documentation>The value is the result of a query to the state system. If this type is selected, a sequence of stateAttributes must be defined in this stateValue element.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="script" >
+						<xs:annotation>
+							<xs:documentation>The value is the returned value from the execution of the script.</xs:documentation></xs:annotation></xs:enumeration>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
@@ -333,6 +354,16 @@
 		<xs:attribute name="value" type="xs:string" >
 			<xs:annotation>
 				<xs:documentation>Indicate what the value is. A value should be specified only if the type is int, long, string or event_field. See the documentation on types for information on what to put for value.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="scriptEngine">
+			<xs:annotation>
+				<xs:documentation>Indicate which script engine to use for state value of type script</xs:documentation></xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="nashorn">
+						<xs:annotation>
+							<xs:documentation>The value should be a JavaScript script</xs:documentation></xs:annotation></xs:enumeration></xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="eventField">

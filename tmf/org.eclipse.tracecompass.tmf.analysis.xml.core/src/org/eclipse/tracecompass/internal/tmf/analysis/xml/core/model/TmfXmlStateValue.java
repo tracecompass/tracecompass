@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
@@ -56,7 +57,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
     private final List<ITmfXmlStateAttribute> fPath;
     /* Event field to match with this state value */
     private final @Nullable String fEventField;
-
+    /* State value ID */
+    private final @Nullable String fID;
     /* Whether this state value is an increment of the previous value */
     private final boolean fIncrement;
     /* Whether to update the current attribute or create a new state */
@@ -126,6 +128,13 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
             throw new IllegalArgumentException("TmfXmlStateValue constructor: Element is not a stateValue"); //$NON-NLS-1$
         }
 
+        /*
+         * fID is set to null if the XML state value element doesn't have an id
+         * attribute. If specified it shouldn't be empty
+         */
+        String id = node.getAttribute(TmfXmlStrings.ID);
+        fID = id.isEmpty() ? null : id;
+
         /* Check if there is an increment for the value */
         fIncrement = Boolean.parseBoolean(node.getAttribute(TmfXmlStrings.INCREMENT));
 
@@ -140,22 +149,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
          * example, a process's TID in an event field may arrive with a LONG
          * format but we want to store the data in an INT
          */
-        switch (node.getAttribute(TmfXmlStrings.FORCED_TYPE)) {
-        case TmfXmlStrings.TYPE_STRING:
-            fForcedType = ITmfStateValue.Type.STRING;
-            break;
-        case TmfXmlStrings.TYPE_INT:
-            fForcedType = ITmfStateValue.Type.INTEGER;
-            break;
-        case TmfXmlStrings.TYPE_LONG:
-            fForcedType = ITmfStateValue.Type.LONG;
-            break;
-        case TmfXmlStrings.TYPE_DOUBLE:
-            fForcedType = ITmfStateValue.Type.DOUBLE;
-            break;
-        default:
-            fForcedType = ITmfStateValue.Type.NULL;
-        }
+        String forcedTypeName = node.getAttribute(TmfXmlStrings.FORCED_TYPE);
+        fForcedType = forcedTypeName.isEmpty() ? ITmfStateValue.Type.NULL : TmfXmlUtils.getTmfStateValueByName(forcedTypeName);
 
         /*
          * Stack Actions : allow to define a stack with PUSH/POP/PEEK methods
@@ -177,6 +172,15 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
      */
     protected TmfXmlStateValueBase initializeStateValue(ITmfXmlModelFactory modelFactory, Element node) {
         return new TmfXmlStateValueNull();
+    }
+
+    /**
+     * Return the state value ID.
+     *
+     * @return The state value ID
+     */
+    public @Nullable String getID() {
+        return fID;
     }
 
     /**
@@ -330,92 +334,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
          * Try to find the right type. The type can be forced by
          * "forcedType" argument.
          */
+        value = TmfXmlUtils.newTmfStateValueFromObjectWithForcedType(fieldValue, fForcedType);
 
-        if (fieldValue instanceof String) {
-            String fieldString = (String) fieldValue;
-
-            switch (fForcedType) {
-            case INTEGER:
-                value = TmfStateValue.newValueInt(Integer.parseInt(fieldString));
-                break;
-            case LONG:
-                value = TmfStateValue.newValueLong(Long.parseLong(fieldString));
-                break;
-            case DOUBLE:
-                value = TmfStateValue.newValueDouble(Double.parseDouble(fieldString));
-                break;
-            case CUSTOM:
-                throw new IllegalStateException("Custom type cannot be forced"); //$NON-NLS-1$
-            case NULL:
-            case STRING:
-            default:
-                value = TmfStateValue.newValueString(fieldString);
-                break;
-            }
-        } else if (fieldValue instanceof Long) {
-            Long fieldLong = (Long) fieldValue;
-
-            switch (fForcedType) {
-            case INTEGER:
-                value = TmfStateValue.newValueInt(fieldLong.intValue());
-                break;
-            case STRING:
-                value = TmfStateValue.newValueString(fieldLong.toString());
-                break;
-            case DOUBLE:
-                value = TmfStateValue.newValueDouble(fieldLong.doubleValue());
-                break;
-            case CUSTOM:
-                throw new IllegalStateException("Custom type cannot be forced"); //$NON-NLS-1$
-            case LONG:
-            case NULL:
-            default:
-                value = TmfStateValue.newValueLong(fieldLong);
-                break;
-            }
-        } else if (fieldValue instanceof Integer) {
-            Integer fieldInteger = (Integer) fieldValue;
-
-            switch (fForcedType) {
-            case LONG:
-                value = TmfStateValue.newValueLong(fieldInteger.longValue());
-                break;
-            case STRING:
-                value = TmfStateValue.newValueString(fieldInteger.toString());
-                break;
-            case DOUBLE:
-                value = TmfStateValue.newValueDouble(fieldInteger.doubleValue());
-                break;
-            case CUSTOM:
-                throw new IllegalStateException("Custom type cannot be forced"); //$NON-NLS-1$
-            case INTEGER:
-            case NULL:
-            default:
-                value = TmfStateValue.newValueInt(fieldInteger);
-                break;
-            }
-        } else if (fieldValue instanceof Double) {
-            Double fieldDouble = (Double) fieldValue;
-
-            switch (fForcedType) {
-            case LONG:
-                value = TmfStateValue.newValueLong(fieldDouble.longValue());
-                break;
-            case STRING:
-                value = TmfStateValue.newValueString(fieldDouble.toString());
-                break;
-            case INTEGER:
-                value = TmfStateValue.newValueInt(fieldDouble.intValue());
-                break;
-            case CUSTOM:
-                throw new IllegalStateException("Custom type cannot be forced"); //$NON-NLS-1$
-            case DOUBLE:
-            case NULL:
-            default:
-                value = TmfStateValue.newValueDouble(fieldDouble);
-                break;
-            }
-        }
         return value;
     }
 

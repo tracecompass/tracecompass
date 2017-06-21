@@ -22,6 +22,11 @@ public class Messages extends NLS {
 
     /** Message for a state undefined */
     public static @Nullable String TmfXmlFsm_StateUndefined;
+    /** Message for a missing script state value children id attribute */
+    public static @Nullable String TmfXmlStateValue_MissingScriptChildrenID;
+    /** Message for a null script */
+    public static @Nullable String TmfXmlStateValue_ScriptNullException;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

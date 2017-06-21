@@ -15,11 +15,16 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readwrite;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.Messages;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioInfo;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlStateValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
@@ -36,6 +41,7 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.w3c.dom.Element;
 
@@ -99,6 +105,8 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         /* Process the XML Element state value */
         String type = node.getAttribute(TmfXmlStrings.TYPE);
         String value = getSsContainer().getAttributeValue(node.getAttribute(TmfXmlStrings.VALUE));
+        String forcedTypeName = node.getAttribute(TmfXmlStrings.FORCED_TYPE);
+        ITmfStateValue.Type forcedType = forcedTypeName.isEmpty() ? ITmfStateValue.Type.NULL : TmfXmlUtils.getTmfStateValueByName(forcedTypeName);
 
         if (value == null && getStackType().equals(ValueTypeStack.NULL)) {
             throw new IllegalStateException();
@@ -106,33 +114,39 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
 
         List<@Nullable Element> children = XmlUtils.getChildElements(node);
         List<ITmfXmlStateAttribute> childAttributes = new ArrayList<>();
+        List<TmfXmlStateValue> childStateValues = new ArrayList<>();
         for (Element child : children) {
             if (child == null) {
                 continue;
             }
-            ITmfXmlStateAttribute queryAttribute = modelFactory.createStateAttribute(child, getSsContainer());
-            childAttributes.add(queryAttribute);
+            if (child.getNodeName().equals(TmfXmlStrings.STATE_VALUE)) {
+                TmfXmlStateValue stateValue = (TmfXmlStateValue) modelFactory.createStateValue(child, getSsContainer(), new ArrayList<ITmfXmlStateAttribute>());
+                childStateValues.add(stateValue);
+            } else {
+                ITmfXmlStateAttribute queryAttribute = modelFactory.createStateAttribute(child, getSsContainer());
+                childAttributes.add(queryAttribute);
+            }
         }
 
         switch (type) {
         case TmfXmlStrings.TYPE_INT: {
             /* Integer value */
             ITmfStateValue stateValue = value != null && !value.isEmpty() ?
-                    TmfStateValue.newValueInt(Integer.parseInt(value)) : TmfStateValue.nullValue();
+                    TmfXmlUtils.newTmfStateValueFromObjectWithForcedType(Integer.parseInt(value), forcedType) : TmfStateValue.nullValue();
             stateValueType = new TmfXmlStateValueTmf(stateValue, childAttributes);
             break;
         }
         case TmfXmlStrings.TYPE_LONG: {
             /* Long value */
             ITmfStateValue stateValue = value != null && !value.isEmpty() ?
-                    TmfStateValue.newValueLong(Long.parseLong(value)) : TmfStateValue.nullValue();
+                    TmfXmlUtils.newTmfStateValueFromObjectWithForcedType(Long.parseLong(value), forcedType) : TmfStateValue.nullValue();
             stateValueType = new TmfXmlStateValueTmf(stateValue, childAttributes);
             break;
         }
         case TmfXmlStrings.TYPE_STRING: {
             /* String value */
             ITmfStateValue stateValue = value != null ?
-                    TmfStateValue.newValueString(value) : TmfStateValue.nullValue();
+                    TmfXmlUtils.newTmfStateValueFromObjectWithForcedType(value, forcedType) : TmfStateValue.nullValue();
             stateValueType = new TmfXmlStateValueTmf(stateValue, childAttributes);
             break;
         }
@@ -160,6 +174,14 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         case TmfXmlStrings.TYPE_QUERY:
             /* Value is the result of a query */
             stateValueType = new TmfXmlStateValueQuery(childAttributes);
+            break;
+        case TmfXmlStrings.TYPE_SCRIPT:
+            /* Value is the returned value from a script execution */
+            if (value == null) {
+                throw new IllegalStateException(Messages.TmfXmlStateValue_ScriptNullException);
+            }
+            String scriptEngine = node.getAttribute(TmfXmlStrings.SCRIPT_ENGINE);
+            stateValueType = new TmfXmlStateValueScript(scriptEngine, value, childStateValues, forcedType);
             break;
         default:
             throw new IllegalArgumentException(String.format("TmfXmlStateValue constructor: unexpected element %s for stateValue type", type)); //$NON-NLS-1$
@@ -473,6 +495,68 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         @Override
         public String toString() {
             return "Query=" + fQueryValue; //$NON-NLS-1$
+        }
+    }
+
+    /* The state value uses the returned value from a script execution */
+    private class TmfXmlStateValueScript extends TmfXmlStateValueTypeReadWrite {
+
+        public static final String DEFAULT_SCRIPT_ENGINE = "nashorn"; //$NON-NLS-1$
+        private final List<TmfXmlStateValue> fChildStateValues;
+        private final String fScriptEngine;
+        private final String fScript;
+        private final ITmfStateValue.Type fForcedType;
+
+        public TmfXmlStateValueScript(String scriptEngine, String script, List<TmfXmlStateValue> childStateValues, ITmfStateValue.Type forcedType) {
+            fScriptEngine = !scriptEngine.isEmpty() ? scriptEngine : DEFAULT_SCRIPT_ENGINE;
+            fScript = script;
+            fChildStateValues = childStateValues;
+            fForcedType = forcedType;
+        }
+
+        @Override
+        public ITmfStateValue getValue(@Nullable ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException {
+            Object result = null;
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName(fScriptEngine);
+
+            for (TmfXmlStateValue stateValue : fChildStateValues) {
+                String stateValueID = stateValue.getID();
+                if (stateValueID != null) {
+                    ITmfStateValue value = stateValue.getValue(event, scenarioInfo);
+                    switch (value.getType()) {
+                    case LONG:
+                        engine.put(stateValueID, value.unboxLong());
+                        break;
+                    case INTEGER:
+                        engine.put(stateValueID, value.unboxInt());
+                        break;
+                    case STRING:
+                        engine.put(stateValueID, value.unboxStr());
+                        break;
+                    case DOUBLE:
+                    case CUSTOM:
+                    case NULL:
+                    default:
+                    }
+                } else {
+                    Activator.logWarning(Messages.TmfXmlStateValue_MissingScriptChildrenID);
+                }
+            }
+
+            try {
+                result = engine.eval(fScript);
+            } catch (ScriptException e) {
+                Activator.logError("Script execution failed", e); //$NON-NLS-1$
+                return TmfStateValue.nullValue();
+            }
+
+            return TmfXmlUtils.newTmfStateValueFromObjectWithForcedType(result, fForcedType);
+        }
+
+        @Override
+        public String toString() {
+            return "Script=" + fScript; //$NON-NLS-1$
         }
     }
 

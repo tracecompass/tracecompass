@@ -77,6 +77,9 @@ public interface TmfXmlStrings {
     String TYPE_STRING = "string";
     String TYPE_EVENT_NAME = "eventName";
     String TYPE_DELETE = "delete";
+    String TYPE_SCRIPT = "script";
+    String TYPE_CUSTOM = "custom";
+    String SCRIPT_ENGINE = "scriptEngine";
     String INCREMENT = "increment";
     String UPDATE = "update";
     String FORCED_TYPE = "forcedType";

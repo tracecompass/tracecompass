@@ -57,6 +57,12 @@
 					<stateValue type="string" value="FALSE" />
 				</else>
 			</stateChange>
+			<stateChange>
+				<stateAttribute type="constant" value="script" />
+				<stateValue type="script" value="op == 'op1' ? 'TRUE' : 'FALSE'" scriptEngine="nashorn">
+					<stateValue id="op" type="eventField" value="op" />
+				</stateValue>
+			</stateChange>
 		</eventHandler>
 		<eventHandler eventName="exit">
 			<stateChange>
@@ -103,6 +109,12 @@
 					<stateAttribute type="constant" value="mapped" />
 					<stateValue type="string" value="FALSE" />
 				</else>
+			</stateChange>
+			<stateChange>
+				<stateAttribute type="constant" value="script" />
+				<stateValue type="script" value="op == 'op1' ? 'FALSE' : 'TRUE'" scriptEngine="nashorn" >
+					<stateValue id="op" type="eventField" value="op" />
+				</stateValue>
 			</stateChange>
 		</eventHandler>
 	</stateProvider>
