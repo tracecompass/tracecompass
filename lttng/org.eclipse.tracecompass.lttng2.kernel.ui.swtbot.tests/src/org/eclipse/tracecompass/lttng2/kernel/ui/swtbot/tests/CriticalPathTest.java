@@ -21,16 +21,25 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.ControlFlowView;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
+import org.eclipse.ui.IWorkbenchPart;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,6 +55,13 @@ public class CriticalPathTest extends KernelTestBase {
     private static final String TID = String.valueOf(TID_NO);
     private static final String PROCESS = "weston";
     private static final @NonNull String CP_ID = "org.eclipse.linuxtools.tmf.analysis.graph.ui.criticalpath.view.criticalpathview";
+    private static final String CRIT_PATH_MAIN_ENTRY = "[" + PROCESS + "," + TID + "]";
+    private static final String CRIT_PATH_OTHER_ENTRY = "[kworker/u16:0,6]";
+
+    private static final String FOLLOW_FORWARD = "Follow critical path forward";
+    private static final String FOLLOW_BACKWARD = "Follow critical path backward";
+    private static final @NonNull ITmfTimestamp CPU_TIME0 = TmfTimestamp.fromNanos(1412670963793647239L);
+    private static final @NonNull ITmfTimestamp CPU_TIME1 = TmfTimestamp.fromNanos(1412670963793673139L);
     private SWTBotView fViewBotCfv;
     private SWTBotView fViewBotCp;
 
@@ -97,18 +113,39 @@ public class CriticalPathTest extends KernelTestBase {
         menu.click();
         fBot.waitUntil(new DefaultCondition() {
 
-            private final String EXPECTED_TREE_TEXT = "[" + PROCESS + "," + TID + "]";
-
             @Override
             public boolean test() throws Exception {
                 SWTBotTimeGraphEntry[] entries = timeGraphCp.getEntries();
-                return EXPECTED_TREE_TEXT.equals(entries[0].getEntries()[0].getText());
+                return CRIT_PATH_MAIN_ENTRY.equals(entries[0].getEntries()[0].getText());
             }
 
             @Override
             public String getFailureMessage() {
-                return "Could not find " + EXPECTED_TREE_TEXT + " in Critical Path view";
+                return "Could not find " + CRIT_PATH_MAIN_ENTRY + " in Critical Path view";
             }
         });
+
+        // Test navigating the critical path view with the follow arrows buttons
+        IWorkbenchPart part = fViewBotCp.getViewReference().getPart(false);
+        TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, CPU_TIME0));
+        SWTBotTimeGraphEntry critPathEntry = timeGraphCp.getEntry(trace.getHostId(), CRIT_PATH_MAIN_ENTRY);
+        critPathEntry.select();
+
+        // Condition to wait for the time graph view to refresh
+        ICondition timeGraphIsReadyCondition = ConditionHelpers.timeGraphIsReadyCondition((AbstractTimeGraphView) part, new TmfTimeRange(CPU_TIME1, CPU_TIME1), CPU_TIME1);
+        // Reach the end of the current event
+        fViewBotCp.toolbarButton(FOLLOW_FORWARD).click();
+        fBot.waitUntil(timeGraphIsReadyCondition);
+        fBot.waitUntil(ConditionHelpers.timeGraphSelectionContains(timeGraphCp, 0, CRIT_PATH_MAIN_ENTRY));
+        // Follow the arrow down to the next item
+        fViewBotCp.toolbarButton(FOLLOW_FORWARD).click();
+        fBot.waitUntil(timeGraphIsReadyCondition);
+        fBot.waitUntil(ConditionHelpers.timeGraphSelectionContains(timeGraphCp, 0, CRIT_PATH_OTHER_ENTRY));
+        // Follow it back up
+        fViewBotCp.toolbarButton(FOLLOW_BACKWARD).click();
+        fBot.waitUntil(timeGraphIsReadyCondition);
+        fBot.waitUntil(ConditionHelpers.timeGraphSelectionContains(timeGraphCp, 0, CRIT_PATH_MAIN_ENTRY));
+
     }
+
 }

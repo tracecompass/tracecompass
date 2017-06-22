@@ -35,6 +35,8 @@ public class Messages {
     public static @Nullable String CriticalPathModule_waitingForGraph;
 
     public static @Nullable String CriticalPathView_selectAlgorithm;
+    public static @Nullable String CriticalPathView_followArrowFwdText;
+    public static @Nullable String CriticalPathView_followArrowBwdText;
 
     static {
         // initialize resource bundle

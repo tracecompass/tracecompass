@@ -25,6 +25,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.tracecompass.analysis.graph.core.base.IGraphWorker;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge;
@@ -634,6 +636,23 @@ public class CriticalPathView extends AbstractTimeGraphView {
         }
         setStartTime(start);
         setEndTime(end);
+    }
+
+    @Override
+    protected void fillLocalToolBar(@Nullable IToolBarManager manager) {
+        super.fillLocalToolBar(manager);
+        if (manager == null) {
+            return;
+        }
+        IAction followArrowBwdAction = getTimeGraphViewer().getFollowArrowBwdAction();
+        followArrowBwdAction.setText(Messages.CriticalPathView_followArrowBwdText);
+        followArrowBwdAction.setToolTipText(Messages.CriticalPathView_followArrowBwdText);
+        manager.add(followArrowBwdAction);
+
+        IAction followArrowFwdAction = getTimeGraphViewer().getFollowArrowFwdAction();
+        followArrowFwdAction.setText(Messages.CriticalPathView_followArrowFwdText);
+        followArrowFwdAction.setToolTipText(Messages.CriticalPathView_followArrowFwdText);
+        manager.add(followArrowFwdAction);
     }
 
 }
