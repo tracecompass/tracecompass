@@ -10,8 +10,12 @@ package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
 import static org.junit.Assert.assertTrue;
 
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.SimpleLayout;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
@@ -20,6 +24,7 @@ import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
 import org.eclipse.swtbot.swt.finder.keyboard.KeyboardFactory;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
@@ -28,6 +33,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.tracecompass.ctf.core.tests.shared.LttngTraceGenerator;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -35,11 +41,14 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -50,8 +59,20 @@ import org.junit.runner.RunWith;
  * @author Jean-Christian Kouame
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
-public abstract class FindDialogTestBase extends KernelTestBase {
+public abstract class FindDialogTestBase {
 
+    /** LTTng kernel trace type */
+    protected static final String KERNEL_TRACE_TYPE = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
+    /** LTTng kernel perspective */
+    protected static final String KERNEL_PERSPECTIVE_ID = "org.eclipse.linuxtools.lttng2.kernel.ui.perspective";
+    /** Default project name */
+    protected static final String TRACE_PROJECT_NAME = "test";
+
+    /** The workbench bot */
+    protected static SWTWorkbenchBot fBot;
+
+    /** The Log4j logger instance. */
+    private static final Logger fLogger = Logger.getRootLogger();
     private static final Keyboard KEYBOARD = KeyboardFactory.getSWTKeyboard();
     private static final @NonNull ITmfTimestamp START_TIME = TmfTimestamp.create(1368000272650993664L, ITmfTimestamp.NANOSECOND_SCALE);
     private static final @NonNull String SPACE = " ";
@@ -60,7 +81,7 @@ public abstract class FindDialogTestBase extends KernelTestBase {
     private String fFindText;
     private SWTBotView fViewBot;
 
-    private static int fSelectionIndex;
+    private int fSelectionIndex;
 
     /**
      * Get the title of the time graph view the find dialog will use
@@ -77,10 +98,44 @@ public abstract class FindDialogTestBase extends KernelTestBase {
     protected abstract String getFindText();
 
     /**
+     * Before Class
+     */
+    @BeforeClass
+    public static void beforeClass() {
+        SWTBotUtils.initialize();
+
+        /* set up for swtbot */
+        SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
+        SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
+        fLogger.removeAllAppenders();
+        fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
+        fBot = new SWTWorkbenchBot();
+        SWTBotUtils.closeView("welcome", fBot);
+        /* Switch perspectives */
+        SWTBotUtils.switchToPerspective(KERNEL_PERSPECTIVE_ID);
+        /* Create the trace project */
+        SWTBotUtils.createProject(TRACE_PROJECT_NAME);
+        /* Open the trace */
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, LttngTraceGenerator.getPath(), KERNEL_TRACE_TYPE);
+        SWTBotUtils.activateEditor(fBot, LttngTraceGenerator.getName());
+        /* Finish waiting for eclipse to load */
+        WaitUtils.waitForJobs();
+    }
+
+    /**
+     * After Class
+     */
+    @AfterClass
+    public static void afterClass() {
+        SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
+        fLogger.removeAllAppenders();
+    }
+
+    /**
      * Initialize the test and open the timegraph view and the find dialog
      */
     @Before
-    public void init() {
+    public void before() {
         String title = getViewTitle();
         fViewBot = fBot.viewByTitle(title);
         fViewBot.show();
@@ -97,8 +152,9 @@ public abstract class FindDialogTestBase extends KernelTestBase {
      * After method to close the dialog
      */
     @After
-    public void afterTest() {
+    public void after() {
         closeDialog(getDialogBot());
+        SWTBotUtils.closeSecondaryShells(fBot);
     }
 
     private static void openDialog(SWTBotView view) {
@@ -174,7 +230,6 @@ public abstract class FindDialogTestBase extends KernelTestBase {
 
         @NonNull
         String text = fFindText.split(SPACE)[0];
-        System.out.println("Reg ex : " + text);
         SearchOptions options = getOptions(true, false, false, true, false);
         search(text, options, findButton, bot);
         verifyStatusLabel(bot, true);
@@ -191,7 +246,6 @@ public abstract class FindDialogTestBase extends KernelTestBase {
         SWTBotButton findButton = bot.button("Find");
 
         final String text = REGEX_PREFIX + fFindText.split(SPACE)[0];
-        System.out.println("Reg ex : " + text);
         SearchOptions options = getOptions(true, false, false, false, true);
         search(text, options, findButton, bot);
         verifyStatusLabel(bot, true);
@@ -278,7 +332,7 @@ public abstract class FindDialogTestBase extends KernelTestBase {
         }
     }
 
-    private static void verifySelection(String name, SearchOptions options, SWTBotView view, boolean isWrapped) {
+    private void verifySelection(String name, SearchOptions options, SWTBotView view, boolean isWrapped) {
         final String entryName = getTimegraphSelectionName(view);
         assertTrue("entry name", entryName != null && entryName.contains(name));
 
