@@ -101,6 +101,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -1167,6 +1168,20 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     /**
+     * Trace is updated: update the view range
+     *
+     * @param signal
+     *            the signal received
+     * @since 3.0
+     */
+    @TmfSignalHandler
+    public void traceUpdated(final TmfTraceUpdatedSignal signal) {
+        if (signal.getTrace() == fTrace) {
+            setTimeBoundsAndRefresh();
+        }
+    }
+
+    /**
      * Handler for the selection range signal.
      *
      * @param signal
@@ -1274,11 +1289,15 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             if (fEntryList == null) {
                 rebuild();
             } else {
-                setStartTime(fTrace.getStartTime().toNanos());
-                setEndTime(fTrace.getEndTime().toNanos());
-                refresh();
+                setTimeBoundsAndRefresh();
             }
         }
+    }
+
+    private void setTimeBoundsAndRefresh() {
+        setStartTime(fTrace.getStartTime().toNanos());
+        setEndTime(fTrace.getEndTime().toNanos());
+        refresh();
     }
 
     /**
@@ -1287,9 +1306,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     protected void rebuild() {
         try (FlowScopeLog parentLogger = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TimeGraphView:Rebuilding").setCategory(getViewId()).build()) { //$NON-NLS-1$
-            setStartTime(Long.MAX_VALUE);
-            setEndTime(Long.MIN_VALUE);
-            refresh();
+            setTimeBoundsAndRefresh();
             ITmfTrace viewTrace = fTrace;
             if (viewTrace == null) {
                 return;
