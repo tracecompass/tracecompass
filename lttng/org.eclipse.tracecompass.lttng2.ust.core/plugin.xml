@@ -43,5 +43,15 @@
                class="org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace">
          </tracetype>
       </module>
+      <module
+            analysis_module="org.eclipse.tracecompass.analysis.counters.core.CounterAnalysis"
+            automatic="true"
+            icon="icons/runtime.gif"
+            id="org.eclipse.tracecompass.analysis.counters.core.counteranalysis"
+            name="Counters">
+            <tracetype
+               class="org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace">
+            </tracetype>
+      </module>
    </extension>
 </plugin>

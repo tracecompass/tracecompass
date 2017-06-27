@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="org.eclipse.linuxtools.lttng2.ui.views.category"
+            class="org.eclipse.tracecompass.analysis.counters.ui.CounterView"
+            icon="icons/counter.png"
+            id="org.eclipse.tracecompass.analysis.counters.ui.view.counters"
+            name="%view.counters"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.analysis.counters.ui.view.counters">
+         <analysisModuleClass
+               class="org.eclipse.tracecompass.analysis.counters.core.CounterAnalysis">
+         </analysisModuleClass>
+      </output>
+   </extension>
+</plugin>
