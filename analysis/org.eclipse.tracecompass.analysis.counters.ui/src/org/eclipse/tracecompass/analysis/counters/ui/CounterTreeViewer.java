@@ -11,12 +11,16 @@ package org.eclipse.tracecompass.analysis.counters.ui;
 
 import java.util.Collections;
 
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.analysis.counters.core.CounterAnalysis;
+import org.eclipse.tracecompass.internal.analysis.counters.ui.TriStateFilteredCheckboxTree;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
@@ -47,16 +51,20 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
 public class CounterTreeViewer extends AbstractTmfTreeViewer {
 
     private TmfTreeViewerEntry fRootEntry;
+    private TriStateFilteredCheckboxTree fTriStateFilteredCheckboxTree;
 
     /**
      * Constructor
      *
      * @param parent
      *            Parent composite
+     * @param triStateFilteredCheckboxTree
+     *            <code>FilteredTree</code> wrapping a <code>CheckboxTreeViewer</code>
      */
-    public CounterTreeViewer(Composite parent) {
-        super(parent, true);
+    public CounterTreeViewer(Composite parent, TriStateFilteredCheckboxTree triStateFilteredCheckboxTree) {
+        super(parent, triStateFilteredCheckboxTree.getViewer());
 
+        fTriStateFilteredCheckboxTree = triStateFilteredCheckboxTree;
         setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
@@ -76,10 +84,9 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
 
             module = TmfTraceUtils.getAnalysisModuleOfClass(trace, CounterAnalysis.class, CounterAnalysis.ID);
             if (module != null) {
-                fRootEntry = new TmfTreeViewerEntry(trace.getName());
+                fRootEntry = new TmfTreeViewerEntry(StringUtils.EMPTY);
                 TmfTreeViewerEntry rootBranch = new TmfTreeViewerEntry(getTrace().getName());
                 fRootEntry.getChildren().add(rootBranch);
-                Display.getDefault().asyncExec(() -> getTreeViewer().setInput(fRootEntry));
 
                 module.schedule();
                 module.waitForCompletion();
@@ -116,6 +123,13 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
         return fRootEntry;
     }
 
+    @TmfSignalHandler
+    @Override
+    public void traceSelected(@Nullable TmfTraceSelectedSignal signal) {
+        super.traceSelected(signal);
+        fTriStateFilteredCheckboxTree.resetCheckboxesState();
+    }
+
     private void addTreeViewerBranch(ITmfStateSystem stateSystem, TmfTreeViewerEntry rootBranch, String branchName) {
         int quark = stateSystem.optQuarkAbsolute(branchName);
         if (quark != ITmfStateSystem.INVALID_ATTRIBUTE && !stateSystem.getSubAttributes(quark, false).isEmpty()) {
@@ -138,8 +152,4 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
         }
     }
 
-    @Override
-    public ITmfTrace getTrace() {
-        return super.getTrace();
-    }
 }

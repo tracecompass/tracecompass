@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckable;
@@ -40,13 +39,15 @@ import org.eclipse.ui.progress.WorkbenchJob;
  * On the contrary, all the "check" operations act only on what is not filtered.
  *
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
+ * @author "Mikael Ferland <mikael.ferland@ericsson.com>"
  */
 public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
 
     /**
      * Set containing only the tree items that are checked
+     * @since 3.1
      */
-    private Set<Object> fObjects = new HashSet<>();
+    protected Set<Object> fCheckedObjects = new HashSet<>();
 
     /**
      * Handle to the tree viewer
@@ -75,14 +76,11 @@ public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
     protected TreeViewer doCreateTreeViewer(Composite parentComposite, int style) {
         fCheckboxTreeViewer = new CheckboxTreeViewer(parentComposite, style);
         fCheckboxTreeViewer.setUseHashlookup(true);
-        fCheckboxTreeViewer.addCheckStateListener(new ICheckStateListener() {
-            @Override
-            public void checkStateChanged(CheckStateChangedEvent event) {
-                if (event.getChecked()) {
-                    fObjects.add(event.getElement());
-                } else {
-                    fObjects.remove(event.getElement());
-                }
+        fCheckboxTreeViewer.addCheckStateListener(event -> {
+            if (event.getChecked()) {
+                fCheckedObjects.add(event.getElement());
+            } else {
+                fCheckedObjects.remove(event.getElement());
             }
         });
         return fCheckboxTreeViewer;
@@ -106,16 +104,16 @@ public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
 
     @Override
     public boolean getChecked(Object element) {
-        return fObjects.contains(element);
+        return fCheckedObjects.contains(element);
     }
 
     @Override
     public boolean setChecked(Object element, boolean state) {
         boolean checkable = fCheckboxTreeViewer.setChecked(element, state);
         if (!state) {
-            fObjects.remove(element);
+            fCheckedObjects.remove(element);
         } else if (checkable) {
-            fObjects.add(element);
+            fCheckedObjects.add(element);
         }
         return checkable;
     }
@@ -131,12 +129,20 @@ public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
     }
 
     /**
+     * @return the handle to the tree viewer
+     * @since 3.1
+     */
+    public CheckboxTreeViewer getCheckboxTreeViewer() {
+        return fCheckboxTreeViewer;
+    }
+
+    /**
      * Returns all the checked elements of this tree, either visible or not.
      *
      * @return an array containing all the checked elements
      */
     public Object[] getCheckedElements() {
-        return fObjects.toArray();
+        return fCheckedObjects.toArray();
     }
 
     /**
@@ -146,9 +152,9 @@ public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
      *            the elements to check
      */
     public void setCheckedElements(Object[] elements) {
-        fObjects = new HashSet<>();
+        fCheckedObjects = new HashSet<>();
         for (Object element : elements) {
-            fObjects.add(element);
+            fCheckedObjects.add(element);
         }
         fCheckboxTreeViewer.setCheckedElements(elements);
     }
@@ -179,13 +185,14 @@ public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
      *            the element
      * @param state
      *            the check state to set
+     * @since 3.1
      */
-    private void checkSubtree(Object element, boolean state) {
+    protected void checkSubtree(Object element, boolean state) {
         if (!state || (fCheckboxTreeViewer.testFindItem(element) != null)) {
             if (state) {
-                fObjects.add(element);
+                fCheckedObjects.add(element);
             } else {
-                fObjects.remove(element);
+                fCheckedObjects.remove(element);
             }
             for (Object o : ((ITreeContentProvider) fCheckboxTreeViewer.getContentProvider()).getChildren(element)) {
                 checkSubtree(o, state);

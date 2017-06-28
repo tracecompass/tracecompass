@@ -9,12 +9,20 @@
 
 package org.eclipse.tracecompass.analysis.counters.ui;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.analysis.counters.core.CounterAnalysis;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -33,8 +41,10 @@ import org.swtchart.ISeries;
  */
 public final class CounterChartViewer extends TmfCommonXLineChartViewer {
 
-    private Integer fQuark;
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(CounterChartViewer.class);
+
     private CounterAnalysis fModule;
+    private @NonNull Set<@NonNull Integer> fQuarks = Collections.emptySet();
 
     /**
      * Constructor
@@ -43,15 +53,32 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer {
      *            Parent composite
      */
     public CounterChartViewer(Composite parent) {
-        /*
-         * Avoid displaying chart title (redundant with the view name) and axis titles
-         * (to reduce wasted space).
-         */
+        // Avoid displaying chart title and axis titles (to reduce wasted space)
         super(parent, null, null, null);
         Chart chart = getSwtChart();
         chart.getLegend().setPosition(SWT.BOTTOM);
         chart.getLegend().setVisible(true);
         chart.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+    }
+
+    /**
+     * Update the chart depending on the selected entries.
+     *
+     * @param quarks
+     *            IDs of the selected tree elements
+     */
+    public void updateChart(@NonNull Set<@NonNull Integer> quarks) {
+        cancelUpdate();
+        resetData();
+        fQuarks = quarks;
+        updateContent();
+    }
+
+    @TmfSignalHandler
+    @Override
+    public void traceSelected(@Nullable TmfTraceSelectedSignal signal) {
+        super.traceSelected(signal);
+        resetData();
     }
 
     @Override
@@ -63,7 +90,7 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer {
 
         if (fModule != null) {
             fModule.schedule();
-            fModule.waitForInitialization();
+            fModule.waitForCompletion();
         }
     }
 
@@ -74,30 +101,55 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer {
         }
 
         ITmfStateSystem ss = fModule.getStateSystem();
-        if (ss == null || fQuark == null) {
+        if (ss == null) {
             return;
         }
 
+        // Set the X axis according to the new window range
         double[] xAxis = getXAxis(start, end, nb);
         if (xAxis.length == 1) {
             return;
         }
         setXAxis(xAxis);
 
-        try {
-            double[] steps = new double[xAxis.length];
-            Object prev = ss.querySingleState(Math.max(ss.getStartTime(), (long) (start - (xAxis[1]))), fQuark).getValue();
+        /*
+         * TODO: avoid redrawing series already present on chart and iterate over time
+         * values first (for performance increase)
+         */
+        try (ScopeLog log = new ScopeLog(LOGGER, Level.FINE, "CounterChartViewer#updateData")) { //$NON-NLS-1$
+            for (Integer quark : fQuarks) {
+                if (monitor.isCanceled()) {
+                    return;
+                }
 
-            for (int i = 0; i < xAxis.length; i++) {
-                Object next = ss.querySingleState(start + (long) xAxis[i] - 1, fQuark).getValue();
+                // Create the array of values for the series
+                double[] steps = new double[xAxis.length];
+
+                long stateSystemStartTime = ss.getStartTime();
+                long stateSystemEndTime = ss.getCurrentEndTime();
+                long prevTime = Math.max(ss.getStartTime(), (long) (start - xAxis[1]));
+                if (prevTime > stateSystemEndTime) {
+                    return;
+                }
+
+                Object prev = ss.querySingleState(prevTime, quark).getValue();
                 long prevValue = prev instanceof Long ? (long) prev : 0;
-                long nextValue = next instanceof Long ? (long) next : 0;
-                long stateValue = (prev == null) ? nextValue : nextValue - prevValue;
-                steps[i] = (next == null) ? 0 : stateValue;
-                prev = next;
-            }
 
-            setSeries(ss.getFullAttributePath(fQuark), steps);
+                for (int i = 0; i < xAxis.length; i++) {
+                    long nextTime = start + (long) xAxis[i] - 1;
+
+                    if (nextTime < stateSystemStartTime || nextTime > stateSystemEndTime) {
+                        continue;
+                    }
+
+                    Object next = ss.querySingleState(nextTime, quark).getValue();
+                    long nextValue = next instanceof Long ? (long) next : 0;
+                    steps[i] = (next == null) ? 0 : nextValue - prevValue;
+                    prevValue = nextValue;
+                }
+
+                setSeries(ss.getFullAttributePath(quark), steps);
+            }
         } catch (StateSystemDisposedException e) {
             /*
              * Ignore exception (can take place when closing the trace during update), and
@@ -110,32 +162,13 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer {
     }
 
     /**
-     * Update the chart depending on the selected entries.
-     *
-     * @param quark
-     *            ID of the selected tree element
-     */
-    public void updateChart(Integer quark) {
-        cancelUpdate();
-        resetData();
-        fQuark = quark;
-        updateContent();
-    }
-
-    /**
      * Clear the chart.
      */
     private void resetData() {
         for (ISeries serie : getSwtChart().getSeriesSet().getSeries()) {
             deleteSeries(serie.getId());
         }
-        fQuark = null;
+        fQuarks = Collections.emptySet();
     }
 
-    @TmfSignalHandler
-    @Override
-    public void traceSelected(@Nullable TmfTraceSelectedSignal signal) {
-        super.traceSelected(signal);
-        resetData();
-    }
 }

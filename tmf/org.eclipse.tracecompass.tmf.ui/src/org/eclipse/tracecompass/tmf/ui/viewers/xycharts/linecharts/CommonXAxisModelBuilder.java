@@ -72,7 +72,7 @@ class CommonXAxisModelBuilder {
      */
     public CommonXAxisModelBuilder addYSeries(IYSeries ySeries) {
         if (fXValues.length != ySeries.getDatapoints().length) {
-            throw new IllegalStateException("All series in list must be of length : " + fXValues.length); //$NON-NLS-1$
+            throw new IllegalStateException("All series in list must be of length : " + fXValues.length + " but actual value is " + ySeries.getDatapoints().length); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         fYSeries.put(ySeries.getLabel(), ySeries);
