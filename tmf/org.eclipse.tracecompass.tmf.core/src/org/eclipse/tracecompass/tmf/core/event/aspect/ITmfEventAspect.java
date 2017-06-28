@@ -95,4 +95,14 @@ public interface ITmfEventAspect<T> {
     default @Nullable T resolve(ITmfEvent event, boolean block, IProgressMonitor monitor) throws InterruptedException {
         return resolve(event);
     }
+
+    /**
+     * This method will return a hint if this aspect should be displayed by default
+     *
+     * @return if the aspect should be hidden by default
+     * @since 3.0
+     */
+    default boolean isHiddenByDefault() {
+        return false;
+    }
 }
