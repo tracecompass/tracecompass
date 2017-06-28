@@ -43,7 +43,14 @@ public final class CommonStatusMessage {
      * {@link org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse.Status#CANCELLED}
      * status
      */
-    public static final @Nullable String PROGRESS_MONITOR_CANCELLED = Messages.CommonStatusMessage_ProgressMonitorCancelled;
+    public static final @Nullable String TASK_CANCELLED = Messages.CommonStatusMessage_TaskCancelled;
+
+    /**
+     * A possible detailed message for a
+     * {@link org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse.Status#FAILED}
+     * status
+     */
+    public static final @Nullable String ANALYSIS_INITIALIZATION_FAILED = Messages.CommonStatusMessage_AnalysisInitializationFailed;
 
     /**
      * Constructor

@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model;
 
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
@@ -65,7 +66,7 @@ public final class TmfCommonXAxisResponseFactory {
      *            A detailed message of why the response has a failed status
      * @return A {@link ITmfCommonXAxisResponse} with a failed status and null model
      */
-    public static ITmfCommonXAxisResponse createFailedResponse(String message) {
+    public static ITmfCommonXAxisResponse createFailedResponse(@Nullable String message) {
         return new TmfCommonXAxisResponse(null, ITmfCommonXAxisResponse.Status.FAILED, message, 0);
     }
 
@@ -78,7 +79,7 @@ public final class TmfCommonXAxisResponseFactory {
      * @return A {@link ITmfCommonXAxisResponse} with a cancelled status and null
      *         model
      */
-    public static ITmfCommonXAxisResponse createCancelledResponse(String message) {
+    public static ITmfCommonXAxisResponse createCancelledResponse(@Nullable String message) {
         return new TmfCommonXAxisResponse(null, ITmfCommonXAxisResponse.Status.CANCELLED, message, 0);
     }
 }

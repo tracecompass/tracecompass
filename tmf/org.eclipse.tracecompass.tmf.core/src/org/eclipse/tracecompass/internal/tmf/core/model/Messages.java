@@ -34,7 +34,13 @@ public class Messages extends NLS {
     /**
      * Detailed message for cancelled status cause by a progress monitor
      */
-    public static @Nullable String CommonStatusMessage_ProgressMonitorCancelled;
+    public static @Nullable String CommonStatusMessage_TaskCancelled;
+
+    /**
+     * Detailed message for failed status cause by an analysis initialization failure
+     */
+    public static @Nullable String CommonStatusMessage_AnalysisInitializationFailed;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

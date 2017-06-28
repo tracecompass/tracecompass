@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 3.0.0.qualifier
+Bundle-Version: 3.1.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.analysis.timing.core;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.internal.analysis.timing.core.Activator
@@ -21,4 +21,5 @@ Export-Package: org.eclipse.tracecompass.analysis.timing.core.segmentstore,
  org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;x-friends:="org.eclipse.tracecompass.analysis.timing.ui,org.eclipse.tracecompass.analysis.timing.core.tests"
 Import-Package: com.google.common.annotations,
  com.google.common.collect,
- com.google.common.hash
+ com.google.common.hash,
+ com.google.common.primitives
