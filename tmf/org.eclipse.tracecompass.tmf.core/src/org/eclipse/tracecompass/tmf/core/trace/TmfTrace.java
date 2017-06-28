@@ -646,7 +646,13 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
             Activator.log(status);
         }
 
-        TmfTraceManager.refreshSupplementaryFiles(this);
+        /* Refresh supplementary files in separate thread to prevent deadlock */
+        new Thread("Refresh supplementary files") { //$NON-NLS-1$
+            @Override
+            public void run() {
+                TmfTraceManager.refreshSupplementaryFiles(TmfTrace.this);
+            }
+        }.start();
 
         if (signal.getTrace() == this) {
             /* Additionally, the signal is directly for this trace. */
