@@ -995,6 +995,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 }
                 int pos = (int) column.getData(Key.INDEX);
                 fColumnResizable[pos] = isChecked;
+                fTable.refresh();
             }
         };
         columnMenuAction.setChecked(column.getResizable());
@@ -2685,29 +2686,32 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * this method is called, the returned value won't be ordered correctly
      * anymore.
      */
-    private static String[] getItemStrings(List<TmfEventTableColumn> columns, ITmfEvent event) {
+    private String[] getItemStrings(List<TmfEventTableColumn> columns, ITmfEvent event) {
         if (event == null) {
             return EMPTY_STRING_ARRAY;
         }
         synchronized (columns) {
-            List<String> itemStrings = new ArrayList<>(columns.size());
-            for (TmfEventTableColumn column : columns) {
+            String[] itemStrings = new String[columns.size()];
+            TableColumn[] tableColumns = fTable.getColumns();
+            for (int i = 0; i < columns.size(); i++) {
+                TmfEventTableColumn column = columns.get(i);
                 ITmfEvent passedEvent = event;
                 if (!(column instanceof TmfMarginColumn) && (event instanceof CachedEvent)) {
                     /*
-                     * Make sure that the event object from the trace is passed
-                     * to all columns but the TmfMarginColumn
+                     * Make sure that the event object from the trace is passed to all columns but
+                     * the TmfMarginColumn
                      */
                     passedEvent = ((CachedEvent) event).event;
                 }
-                if (passedEvent == null) {
-                    itemStrings.add(EMPTY_STRING);
+                // Check if column is hidden but not a margin column.
+                TableColumn tableColumn = tableColumns[fColumns.indexOf(column)];
+                if (passedEvent == null || (!tableColumn.getResizable() && tableColumn.getWidth() == 0)) {
+                    itemStrings[i] = EMPTY_STRING;
                 } else {
-                    itemStrings.add(column.getItemString(passedEvent));
+                    itemStrings[i] = column.getItemString(passedEvent);
                 }
-
             }
-            return itemStrings.toArray(new String[0]);
+            return itemStrings;
         }
     }
 
