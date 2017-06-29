@@ -150,36 +150,12 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      * @throws StateValueTypeException
      *             If the inserted state value's type does not match what is
      *             already assigned to this attribute.
-     * @since 3.0
+     * @since 3.1
      */
     default void modifyAttribute(long t, Object value, int attributeQuark)
             throws StateValueTypeException {
         modifyAttribute(t, TmfStateValue.newValue(value), attributeQuark);
     }
-
-    /**
-     * Increment attribute method. Reads the current value of a given integer
-     * attribute (this value is right now in the Transient State), and increment
-     * it by 1. Useful for statistics.
-     *
-     * @param t
-     *            Timestamp of the state change
-     * @param attributeQuark
-     *            Attribute to increment. If it doesn't exist it will be added,
-     *            with a new value of 1.
-     * @throws StateValueTypeException
-     *             If the attribute already exists but is not of type Integer
-     * @throws TimeRangeException
-     *             If the given timestamp is invalid
-     * @throws IndexOutOfBoundsException
-     *             If the attribute quark is out of range
-     * @deprecated Use
-     *             {@link StateSystemBuilderUtils#incrementAttributeInt(ITmfStateSystemBuilder, long, int, int)}
-     *             instead
-     */
-    @Deprecated
-    void incrementAttribute(long t, int attributeQuark)
-            throws StateValueTypeException;
 
     /**
      * "Push" helper method. This uses the given integer attribute as a stack:
@@ -227,7 +203,7 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      * @throws StateValueTypeException
      *             If the attribute 'attributeQuark' already exists, but is not
      *             of integer type.
-     * @since 3.0
+     * @since 3.1
      */
     default void pushAttribute(long t, Object value, int attributeQuark)
             throws StateValueTypeException {
@@ -276,7 +252,7 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      * @throws StateValueTypeException
      *             If the target attribute already exists, but its state value
      *             type is invalid (not an integer)
-     * @since 3.0
+     * @since 3.1
      */
     default Object popAttributeObject(long t, int attributeQuark)
             throws StateValueTypeException {

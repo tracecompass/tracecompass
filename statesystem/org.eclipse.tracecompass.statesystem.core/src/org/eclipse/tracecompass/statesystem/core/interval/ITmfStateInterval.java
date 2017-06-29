@@ -68,7 +68,7 @@ public interface ITmfStateInterval {
      * Retrieve this state interval's value
      *
      * @return the Object contained by this interval
-     * @since 3.0
+     * @since 3.1
      */
     default @Nullable Object getValue() {
         return getStateValue().unboxValue();

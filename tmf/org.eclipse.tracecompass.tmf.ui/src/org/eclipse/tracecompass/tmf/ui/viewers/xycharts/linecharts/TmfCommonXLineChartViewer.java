@@ -229,7 +229,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      *            use native resolution. any positive integer means that number
      *            of points
      *
-     * @since 3.0
+     * @since 3.1
      */
     public synchronized void setNbPoints(int nbPoints) {
         if (nbPoints < 0) {

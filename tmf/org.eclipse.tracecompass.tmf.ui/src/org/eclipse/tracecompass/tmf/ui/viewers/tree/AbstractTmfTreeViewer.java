@@ -186,7 +186,7 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
      *            The parent composite that holds this viewer
      * @param treeViewer
      *            The tree viewer to use
-     * @since 3.0
+     * @since 3.1
      */
     public AbstractTmfTreeViewer(Composite parent, TreeViewer treeViewer) {
         super(parent);

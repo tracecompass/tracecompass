@@ -98,7 +98,7 @@ public interface ITmfStateValue extends Comparable<ITmfStateValue> {
      * Getter for this {@link ITmfStateValue}'s Object
      *
      * @return the object in this {@link ITmfStateValue}
-     * @since 3.0
+     * @since 3.1
      */
     default @Nullable Object unboxValue() {
         return null;

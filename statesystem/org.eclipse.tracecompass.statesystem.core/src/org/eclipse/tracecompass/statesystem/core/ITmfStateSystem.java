@@ -392,7 +392,7 @@ public interface ITmfStateSystem {
      * @return The State value that's "current" for this attribute
      * @throws IndexOutOfBoundsException
      *             If the attribute quark is out of range
-     * @since 2.3
+     * @since 3.1
      */
     default @Nullable Object queryOngoing(int attributeQuark){
         return queryOngoingState(attributeQuark).unboxValue();

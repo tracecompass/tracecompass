@@ -97,7 +97,7 @@ public interface IStateHistoryBackend {
      *            The StateValue represented by this interval
      * @throws TimeRangeException
      *             If the start or end time are invalid
-     * @since 2.2
+     * @since 3.1
      */
     default void insertPastState(long stateStartTime, long stateEndTime,
             int quark, @Nullable Object value) throws TimeRangeException {

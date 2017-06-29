@@ -1172,7 +1172,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *
      * @param signal
      *            the signal received
-     * @since 3.0
+     * @since 3.1
      */
     @TmfSignalHandler
     public void traceUpdated(final TmfTraceUpdatedSignal signal) {

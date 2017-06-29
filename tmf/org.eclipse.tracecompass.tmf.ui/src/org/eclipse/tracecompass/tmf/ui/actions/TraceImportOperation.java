@@ -67,6 +67,7 @@ public class TraceImportOperation extends WorkspaceModifyOperation {
      *
      * @param skipArchiveExtraction
      *            true to skip archive extraction
+     * @since 3.1
      */
     public void setSkipArchiveExtraction(boolean skipArchiveExtraction) {
         fSkipArchiveExtraction = skipArchiveExtraction;

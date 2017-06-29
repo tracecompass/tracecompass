@@ -368,23 +368,11 @@ public class StateSystem implements ITmfStateSystemBuilder {
             throws TimeRangeException, StateValueTypeException {
         transState.processStateChange(t, value.unboxValue(), attributeQuark);
     }
+
     @Override
     public void modifyAttribute(long t, Object value, int attributeQuark)
             throws TimeRangeException, StateValueTypeException {
         transState.processStateChange(t, value, attributeQuark);
-    }
-
-    @Deprecated
-    @Override
-    public void incrementAttribute(long t, int attributeQuark)
-            throws StateValueTypeException, TimeRangeException {
-        @Nullable Object stateValue = queryOngoing(attributeQuark);
-        int prevValue = 0;
-        /* if the attribute was previously null, start counting at 0 */
-        if (stateValue != null && stateValue instanceof Integer) {
-            prevValue = (int) stateValue;
-        }
-        modifyAttribute(t, prevValue + 1, attributeQuark);
     }
 
     @Deprecated

@@ -88,7 +88,7 @@ public interface ITmfProjectModelElement {
      *            the child name
      *
      * @return the child model element with the given name, or null.
-     * @since 3.0
+     * @since 3.1
      */
     default ITmfProjectModelElement getChild(String name) {
         for (ITmfProjectModelElement child : getChildren()) {

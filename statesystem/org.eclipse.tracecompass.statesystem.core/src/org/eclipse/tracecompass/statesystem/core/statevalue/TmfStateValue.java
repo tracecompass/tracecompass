@@ -199,7 +199,7 @@ public abstract class TmfStateValue implements ITmfStateValue {
      * @param value
      *            The Object value to contain
      * @return The newly-created TmfStateValue object
-     * @since 3.0
+     * @since 3.1
      */
     public static ITmfStateValue newValue(@Nullable Object value) {
         if (value == null) {

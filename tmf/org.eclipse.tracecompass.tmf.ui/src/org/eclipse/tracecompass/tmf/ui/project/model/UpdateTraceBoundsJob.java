@@ -40,7 +40,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * reading the trace to determine start and end time of the traces.
  *
  * @author Loïc Prieur-Drevon
- * @since 3.0
+ * @since 3.1
  *
  */
 public class UpdateTraceBoundsJob extends Job {

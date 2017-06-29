@@ -64,7 +64,7 @@ public final class TmfStateInterval implements ITmfStateInterval {
     *            Attribute linked to this interval
     * @param value
     *            {@link Object} this interval will contain
-     * @since 2.3
+     * @since 3.1
     */
    public TmfStateInterval(long start, long end, int attribute, @Nullable Object value) {
         fStart = start;
