@@ -678,6 +678,76 @@ public class Utils {
     }
 
     /**
+     * Returns the time of the next event state change starting from the given time,
+     * which is the end of the current event, or the beginning of the next event, or
+     * {@link Long#MAX_VALUE}.
+     *
+     * @param entry
+     *            the entry
+     * @param time
+     *            the time to start from
+     * @return the time of the next event state change, or {@link Long#MAX_VALUE}
+     * @since 3.1
+     */
+    public static long nextChange(ITimeGraphEntry entry, long time) {
+        if (null == entry || ! entry.hasTimeEvents()) {
+            return Long.MAX_VALUE;
+        }
+        Iterator<@NonNull ? extends ITimeEvent> iterator = entry.getTimeEventsIterator();
+        if (iterator == null) {
+            return Long.MAX_VALUE;
+        }
+        while (iterator.hasNext()) {
+            ITimeEvent event = iterator.next();
+            long start = event.getTime();
+            if (start > time) {
+                return start;
+            }
+            long end = start + event.getDuration();
+            if (end > time) {
+                return end;
+            }
+        }
+        return Long.MAX_VALUE;
+    }
+
+    /**
+     * Returns the time of the previous event state change starting from the given
+     * time, which is the start of the current event, or the end of the previous
+     * event, or {@link Long#MIN_VALUE}.
+     *
+     * @param entry
+     *            the entry
+     * @param time
+     *            the time to start from
+     * @return the time of the previous event state change, or {@link Long#MIN_VALUE}
+     * @since 3.1
+     */
+    public static long prevChange(ITimeGraphEntry entry, long time) {
+        if (null == entry || ! entry.hasTimeEvents()) {
+            return Long.MIN_VALUE;
+        }
+        Iterator<@NonNull ? extends ITimeEvent> iterator = entry.getTimeEventsIterator();
+        if (iterator == null) {
+            return Long.MIN_VALUE;
+        }
+        long prevEnd = Long.MIN_VALUE;
+        while (iterator.hasNext()) {
+            ITimeEvent event = iterator.next();
+            long start = event.getTime();
+            if (start >= time) {
+                return prevEnd;
+            }
+            long end = start + event.getDuration();
+            if (end >= time) {
+                return start;
+            }
+            prevEnd = end;
+        }
+        return prevEnd;
+    }
+
+    /**
      * Pretty-print a method signature.
      *
      * @param origSig

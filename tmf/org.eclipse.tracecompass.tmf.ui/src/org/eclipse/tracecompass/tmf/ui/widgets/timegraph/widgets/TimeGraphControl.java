@@ -1054,51 +1054,22 @@ public class TimeGraphControl extends TimeGraphBaseControl
         if (null == fTimeProvider) {
             return;
         }
-        ITimeGraphEntry trace = getSelectedTrace();
-        if (trace == null) {
+        ITimeGraphEntry entry = getSelectedTrace();
+        if (entry == null) {
             return;
         }
-        long selectedTime = fTimeProvider.getSelectionEnd();
-        long endTime = fTimeProvider.getMaxTime();
-        ITimeEvent nextEvent;
-        if (n == -1 && selectedTime > endTime) {
-            nextEvent = Utils.findEvent(trace, selectedTime, 0);
+        long time = fTimeProvider.getSelectionEnd();
+        if (n > 0) {
+            time = Math.min(Utils.nextChange(entry, time), fTimeProvider.getMaxTime());
+        } else if (n < 0) {
+            time = Math.max(Utils.prevChange(entry, time), fTimeProvider.getMinTime());
+        }
+        if (extend) {
+            fTimeProvider.setSelectionRangeNotify(fTimeProvider.getSelectionBegin(), time, true);
         } else {
-            nextEvent = Utils.findEvent(trace, selectedTime, n);
+            fTimeProvider.setSelectedTimeNotify(time, true);
         }
-        if (null == nextEvent && n == -1) {
-            nextEvent = Utils.getFirstEvent(trace);
-        }
-        if (null != nextEvent) {
-            long nextTime = nextEvent.getTime();
-            // If last event detected e.g. going back or not moving to a next
-            // event
-            if (nextTime <= selectedTime && n == 1) {
-                // Select to the end of this last event
-                nextTime = nextEvent.getTime() + nextEvent.getDuration();
-                // but not beyond the end of the trace
-                if (nextTime > endTime) {
-                    nextTime = endTime;
-                }
-            } else if (n == -1 && nextEvent.getTime() + nextEvent.getDuration() < selectedTime) {
-                // for previous event go to its end time unless we were already
-                // there
-                nextTime = nextEvent.getTime() + nextEvent.getDuration();
-            }
-            if (extend) {
-                fTimeProvider.setSelectionRangeNotify(fTimeProvider.getSelectionBegin(), nextTime, true);
-            } else {
-                fTimeProvider.setSelectedTimeNotify(nextTime, true);
-            }
-            fireSelectionChanged();
-        } else if (n == 1) {
-            if (extend) {
-                fTimeProvider.setSelectionRangeNotify(fTimeProvider.getSelectionBegin(), endTime, true);
-            } else {
-                fTimeProvider.setSelectedTimeNotify(endTime, true);
-            }
-            fireSelectionChanged();
-        }
+        fireSelectionChanged();
         updateStatusLine(STATUS_WITHOUT_CURSOR_TIME);
     }
 
