@@ -645,7 +645,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
         }
 
         /* Refresh supplementary files in separate thread to prevent deadlock */
-        new Thread() {
+        new Thread("Refresh supplementary files") { //$NON-NLS-1$
             @Override
             public void run() {
                 TmfTraceManager.refreshSupplementaryFiles(TmfTrace.this);
