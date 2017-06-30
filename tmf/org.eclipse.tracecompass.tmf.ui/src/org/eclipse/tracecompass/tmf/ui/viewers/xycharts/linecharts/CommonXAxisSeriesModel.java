@@ -19,6 +19,7 @@ import org.eclipse.tracecompass.tmf.core.viewmodel.IYSeries;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -31,7 +32,7 @@ class CommonXAxisSeriesModel implements ICommonXAxisModel {
     /**
      * FIXME: make a centralized JSON factory
      */
-    private static final Gson fGson = new Gson();
+    private static Gson fGson = new GsonBuilder().setPrettyPrinting().create();
 
     /**
      * Deserialize with json string

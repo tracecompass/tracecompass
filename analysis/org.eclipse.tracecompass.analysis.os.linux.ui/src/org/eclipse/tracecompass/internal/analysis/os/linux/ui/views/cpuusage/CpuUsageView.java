@@ -109,7 +109,7 @@ public class CpuUsageView extends TmfChartView {
                             fTreeViewer.setSelectedThread(entry.getTid());
                         }
                         if (fXYViewer != null) {
-                            fXYViewer.setSelectedThread(Long.valueOf(entry.getTid()));
+                            fXYViewer.setSelectedThread(entry.getTid());
                         }
                         saveData(CPU_USAGE_SELECTED_THREAD, entry.getTid());
                     }
