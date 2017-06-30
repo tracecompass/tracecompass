@@ -255,8 +255,10 @@ public class HistoryTreeClassicStub extends HistoryTreeClassic {
                 assertTrue("Child at index " + i + " of parent " + node.getSequenceNumber() + " has correct start time",
                         node.getNodeStart() <= childNode.getNodeStart());
                 if (node.isOnDisk() && childNode.isOnDisk()) {
-                    assertTrue("Child at index " + i + " of parent " + node.getSequenceNumber() + " has correct start time",
-                            childNode.getNodeEnd() <= childNode.getNodeEnd());
+                    assertTrue("Child at index " + i + " of parent " + node.getSequenceNumber() + " has correct end time",
+                            childNode.getNodeEnd() <= node.getNodeEnd());
+                    assertEquals("End time in parent " + node.getSequenceNumber() + " of child at index " + i,
+                            childNode.getNodeEnd(), node.getChildEnd(i));
                 }
                 testIntersectingChildren(node, childNode);
             }

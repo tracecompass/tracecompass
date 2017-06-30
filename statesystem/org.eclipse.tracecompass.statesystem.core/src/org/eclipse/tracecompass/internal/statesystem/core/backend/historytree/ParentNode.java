@@ -111,4 +111,14 @@ public abstract class ParentNode extends HTNode {
      */
     public abstract Collection<Integer> selectNextChildren2D(IntegerRangeCondition quarks, TimeRangeCondition subTimes);
 
+    /**
+     * Get the end time for this child, the last child's end time will be
+     * Long.MAX_VALUE if it isn't written to disk.
+     *
+     * @param index
+     *            child position in this Parent
+     * @return the next child's endTime
+     */
+    public abstract long getChildEnd(int index);
+
 }

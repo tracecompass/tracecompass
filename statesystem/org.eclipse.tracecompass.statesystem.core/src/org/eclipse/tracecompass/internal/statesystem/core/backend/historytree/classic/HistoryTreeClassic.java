@@ -53,7 +53,7 @@ public class HistoryTreeClassic implements IHistoryTree {
     public static final int HISTORY_FILE_MAGIC_NUMBER = 0x05FFA900;
 
     /** File format version. Increment when breaking compatibility. */
-    private static final int FILE_VERSION = 7;
+    private static final int FILE_VERSION = 8;
 
     private static final IHTNodeFactory CLASSIC_NODE_FACTORY = new IHTNodeFactory() {
 
@@ -265,11 +265,7 @@ public class HistoryTreeClassic implements IHistoryTree {
              */
             fTreeEnd = requestedEndTime;
 
-            /* Close off the latest branch of the tree */
-            for (int i = 0; i < fLatestBranch.size(); i++) {
-                fLatestBranch.get(i).closeThisNode(fTreeEnd);
-                fTreeIO.writeNode(fLatestBranch.get(i));
-            }
+            closeBranch(0, requestedEndTime);
 
             try (FileChannel fc = fTreeIO.getFcOut();) {
                 ByteBuffer buffer = ByteBuffer.allocate(TREE_HEADER_SIZE);
@@ -452,7 +448,7 @@ public class HistoryTreeClassic implements IHistoryTree {
         /* Verify if there is enough room in this node to store this interval */
         if (interval.getSizeOnDisk() > targetNode.getNodeFreeSpace()) {
             /* Nope, not enough room. Insert in a new sibling instead. */
-            addSiblingNode(indexOfNode);
+            addSiblingNode(indexOfNode, interval.getStartTime());
             tryInsertAtNode(interval, fLatestBranch.size() - 1);
             return;
         }
@@ -486,7 +482,7 @@ public class HistoryTreeClassic implements IHistoryTree {
      * @param indexOfNode
      *            The index in latestBranch where we start adding
      */
-    private void addSiblingNode(int indexOfNode) {
+    private void addSiblingNode(int indexOfNode, long newNodeStartTime) {
         synchronized (fLatestBranch) {
             final long splitTime = fTreeEnd;
 
@@ -500,31 +496,31 @@ public class HistoryTreeClassic implements IHistoryTree {
 
             /* Check if we need to add a new root node */
             if (indexOfNode == 0) {
-                addNewRootNode();
+                addNewRootNode(newNodeStartTime);
                 return;
             }
 
             /* Check if we can indeed add a child to the target parent */
-            if (((ParentNode) fLatestBranch.get(indexOfNode - 1)).getNbChildren() == fConfig.getMaxChildren()) {
+            if (((ParentNode) fLatestBranch.get(indexOfNode - 1)).getNbChildren() == fConfig.getMaxChildren()
+                    || getLatestBranch().get(indexOfNode - 1).getNodeStart() > newNodeStartTime) {
                 /* If not, add a branch starting one level higher instead */
-                addSiblingNode(indexOfNode - 1);
+                addSiblingNode(indexOfNode - 1, newNodeStartTime);
                 return;
             }
 
-            /* Split off the new branch from the old one */
-            for (int i = indexOfNode; i < fLatestBranch.size(); i++) {
-                fLatestBranch.get(i).closeThisNode(splitTime);
-                fTreeIO.writeNode(fLatestBranch.get(i));
+            closeBranch(indexOfNode, splitTime);
 
+            /* Spawn new branch */
+            for (int i = indexOfNode; i < fLatestBranch.size(); i++) {
                 ParentNode prevNode = (ParentNode) fLatestBranch.get(i - 1);
                 HTNode newNode;
 
                 switch (fLatestBranch.get(i).getNodeType()) {
                 case CORE:
-                    newNode = initNewCoreNode(prevNode.getSequenceNumber(), splitTime + 1);
+                    newNode = initNewCoreNode(prevNode.getSequenceNumber(), newNodeStartTime);
                     break;
                 case LEAF:
-                    newNode = initNewLeafNode(prevNode.getSequenceNumber(), splitTime + 1);
+                    newNode = initNewLeafNode(prevNode.getSequenceNumber(), newNodeStartTime);
                     break;
                 default:
                     throw new IllegalStateException();
@@ -537,10 +533,31 @@ public class HistoryTreeClassic implements IHistoryTree {
     }
 
     /**
+     * Close the latest branch from the leaves to a specified index
+     *
+     * @param shallowIndex
+     *            index of the shallowest node to close
+     * @param splitTime
+     *            end time to apply to all the closed nodes
+     */
+    private void closeBranch(int shallowIndex, long splitTime) {
+        for (int i = fLatestBranch.size() - 1; i >= shallowIndex; i--) {
+            HTNode closeNode = fLatestBranch.get(i);
+            closeNode.closeThisNode(splitTime);
+            fTreeIO.writeNode(closeNode);
+
+            if (i > 0) {
+                CoreNode prevNode = (CoreNode) fLatestBranch.get(i - 1);
+                prevNode.setCloseTime(closeNode.getSequenceNumber(), splitTime);
+            }
+        }
+    }
+
+    /**
      * Similar to the previous method, except here we rebuild a completely new
      * latestBranch
      */
-    private void addNewRootNode() {
+    private void addNewRootNode(long newNodeStartTime) {
         final long splitTime = fTreeEnd;
 
         HTNode oldRootNode = fLatestBranch.get(0);
@@ -550,14 +567,11 @@ public class HistoryTreeClassic implements IHistoryTree {
         oldRootNode.setParentSequenceNumber(newRootNode.getSequenceNumber());
 
         /* Close off the whole current latestBranch */
-
-        for (int i = 0; i < fLatestBranch.size(); i++) {
-            fLatestBranch.get(i).closeThisNode(splitTime);
-            fTreeIO.writeNode(fLatestBranch.get(i));
-        }
+        closeBranch(0, splitTime);
 
         /* Link the new root to its first child (the previous root node) */
         newRootNode.linkNewChild(oldRootNode);
+        ((CoreNode) newRootNode).setCloseTime(oldRootNode.getSequenceNumber(), splitTime);
 
         /* Rebuild a new latestBranch */
         int depth = fLatestBranch.size();
@@ -567,15 +581,14 @@ public class HistoryTreeClassic implements IHistoryTree {
         // Create new coreNode
         for (int i = 1; i < depth; i++) {
             ParentNode prevNode = (ParentNode) fLatestBranch.get(i - 1);
-            ParentNode newNode = initNewCoreNode(prevNode.getSequenceNumber(),
-                    splitTime + 1);
+            ParentNode newNode = initNewCoreNode(prevNode.getSequenceNumber(), newNodeStartTime);
             prevNode.linkNewChild(newNode);
             fLatestBranch.add(newNode);
         }
 
         // Create the new leafNode
         ParentNode prevNode = (ParentNode) fLatestBranch.get(depth - 1);
-        LeafNode newNode = initNewLeafNode(prevNode.getSequenceNumber(), splitTime + 1);
+        LeafNode newNode = initNewLeafNode(prevNode.getSequenceNumber(), newNodeStartTime);
         prevNode.linkNewChild(newNode);
         fLatestBranch.add(newNode);
     }

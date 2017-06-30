@@ -17,7 +17,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -38,13 +37,14 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 public final class CoreNode extends ParentNode {
 
     /** Nb. of children this node has */
-    private int nbChildren;
+    private int fNbChildren;
 
     /** Seq. numbers of the children nodes (size = MAX_NB_CHILDREN) */
-    private int[] children;
+    private int[] fChildren;
 
     /** Start times of each of the children (size = MAX_NB_CHILDREN) */
-    private long[] childStart;
+    private long[] fChildStart;
+    private long[] fChildEnd;
 
     /** Seq number of this node's extension. -1 if none */
     private volatile int extension = -1;
@@ -70,17 +70,19 @@ public final class CoreNode extends ParentNode {
     public CoreNode(HTConfig config, int seqNumber, int parentSeqNumber,
             long start) {
         super(config, seqNumber, parentSeqNumber, start);
-        this.nbChildren = 0;
+        fNbChildren = 0;
         int size = config.getMaxChildren();
 
         /*
          * We instantiate the two following arrays at full size right away,
          * since we want to reserve that space in the node's header.
-         * "this.nbChildren" will tell us how many relevant entries there are in
+         * "nbChildren" will tell us how many relevant entries there are in
          * those tables.
          */
-        this.children = new int[size];
-        this.childStart = new long[size];
+        fChildren = new int[size];
+        fChildStart = new long[size];
+        fChildEnd = new long[size];
+        Arrays.fill(fChildEnd, Long.MAX_VALUE);
     }
 
     @Override
@@ -88,46 +90,42 @@ public final class CoreNode extends ParentNode {
         int size = getConfig().getMaxChildren();
 
         extension = buffer.getInt();
-        nbChildren = buffer.getInt();
+        fNbChildren = buffer.getInt();
 
-        children = new int[size];
-        for (int i = 0; i < nbChildren; i++) {
-            children[i] = buffer.getInt();
-        }
-        for (int i = nbChildren; i < size; i++) {
-            buffer.getInt();
+        fChildren = new int[size];
+        for (int i = 0; i < size; i++) {
+            fChildren[i] = buffer.getInt();
         }
 
-        this.childStart = new long[size];
-        for (int i = 0; i < nbChildren; i++) {
-            childStart[i] = buffer.getLong();
+        fChildStart = new long[size];
+        for (int i = 0; i < size; i++) {
+            fChildStart[i] = buffer.getLong();
         }
-        for (int i = nbChildren; i < size; i++) {
-            buffer.getLong();
+
+        fChildEnd = new long[size];
+        for (int i = 0; i < size; i++) {
+            fChildEnd[i] = buffer.getLong();
         }
     }
 
     @Override
     protected void writeSpecificHeader(ByteBuffer buffer) {
-        int size = getConfig().getMaxChildren();
-
         buffer.putInt(extension);
-        buffer.putInt(nbChildren);
+        buffer.putInt(fNbChildren);
 
-        /* Write the "children's seq number" array */
-        for (int i = 0; i < nbChildren; i++) {
-            buffer.putInt(children[i]);
-        }
-        for (int i = nbChildren; i < size; i++) {
-            buffer.putInt(0);
+        /* Write the "children's sequence number" array */
+        for (int child : fChildren) {
+            buffer.putInt(child);
         }
 
         /* Write the "children's start times" array */
-        for (int i = 0; i < nbChildren; i++) {
-            buffer.putLong(childStart[i]);
+        for (long start : fChildStart) {
+            buffer.putLong(start);
         }
-        for (int i = nbChildren; i < size; i++) {
-            buffer.putLong(0);
+
+        /* Write the "children's end times" array */
+        for (long end : fChildEnd) {
+            buffer.putLong(end);
         }
     }
 
@@ -135,7 +133,7 @@ public final class CoreNode extends ParentNode {
     public int getNbChildren() {
         rwl.readLock().lock();
         try {
-            return nbChildren;
+            return fNbChildren;
         } finally {
             rwl.readLock().unlock();
         }
@@ -145,7 +143,7 @@ public final class CoreNode extends ParentNode {
     public int getChild(int index) {
         rwl.readLock().lock();
         try {
-            return children[index];
+            return fChildren[index];
         } finally {
             rwl.readLock().unlock();
         }
@@ -155,7 +153,7 @@ public final class CoreNode extends ParentNode {
     public int getLatestChild() {
         rwl.readLock().lock();
         try {
-            return children[nbChildren - 1];
+            return fChildren[fNbChildren - 1];
         } finally {
             rwl.readLock().unlock();
         }
@@ -165,37 +163,21 @@ public final class CoreNode extends ParentNode {
     public long getChildStart(int index) {
         rwl.readLock().lock();
         try {
-            return childStart[index];
+            return fChildStart[index];
         } finally {
             rwl.readLock().unlock();
         }
     }
 
-    /**
-     * Get the end time for this child, the last child's end time will be
-     * Long.MAX_VALUE if it isn't written to disk.
-     *
-     * @param index
-     *            child position in this Parent
-     * @return the next child's endTime
-     */
-    private long getChildEnd(int index) {
+    @Override
+    public long getChildEnd(int index) {
         rwl.readLock().lock();
         try {
             /*
              * If this is not the last child, we can deduce its end time from
              * the following child.
              */
-            if (index < nbChildren - 1) {
-                return childStart[index + 1] - 1;
-            }
-            /*
-             * If it is the last child, it will have the same end time as its
-             * parent. However that time is unknown if the node isn't written to
-             * disk yet, so we return MAX_VALUE instead to avoid the query
-             * missing something.
-             */
-            return isOnDisk() ? getNodeEnd() : Long.MAX_VALUE;
+            return fChildEnd[index];
         } finally {
             rwl.readLock().unlock();
         }
@@ -216,17 +198,37 @@ public final class CoreNode extends ParentNode {
         }
     }
 
+    /**
+     * Updates the end time for child node in header when closing branch
+     *
+     * @param childSequenceNumber
+     *            sequence number of the child that needs to be updated
+     * @param endTime
+     *            the new end time for that child
+     * @return -1 if child was not one of this node's children or index of the
+     *         child within this node's children
+     */
+    public int setCloseTime(int childSequenceNumber, long endTime) {
+        for (int i = 0; i < getNbChildren(); i++) {
+            if (childSequenceNumber == getChild(i)) {
+                fChildEnd[i] = endTime;
+                return i;
+            }
+        }
+        return -1;
+    }
+
     @Override
     public void linkNewChild(HTNode childNode) {
         rwl.writeLock().lock();
         try {
-            if (nbChildren >= getConfig().getMaxChildren()) {
+            if (fNbChildren >= getConfig().getMaxChildren()) {
                 throw new IllegalStateException("Asked to link another child but parent already has maximum number of children"); //$NON-NLS-1$
             }
 
-            children[nbChildren] = childNode.getSequenceNumber();
-            childStart[nbChildren] = childNode.getNodeStart();
-            nbChildren++;
+            fChildren[fNbChildren] = childNode.getSequenceNumber();
+            fChildStart[fNbChildren] = childNode.getNodeStart();
+            fNbChildren++;
 
         } finally {
             rwl.writeLock().unlock();
@@ -240,19 +242,14 @@ public final class CoreNode extends ParentNode {
         }
         rwl.readLock().lock();
         try {
-            int potentialNextSeqNb = -1;
-            for (int i = 0; i < nbChildren; i++) {
-                if (t >= childStart[i]) {
-                    potentialNextSeqNb = children[i];
-                } else {
-                    break;
+            List<Integer> next = new ArrayList<>();
+            for (int i = 0; i < fNbChildren; i++) {
+                if (t >= fChildStart[i] && t <= fChildEnd[i]) {
+                    next.add(fChildren[i]);
                 }
             }
 
-            if (potentialNextSeqNb == -1) {
-                throw new IllegalStateException("No next child node found"); //$NON-NLS-1$
-            }
-            return Collections.singleton(potentialNextSeqNb);
+            return next;
         } finally {
             rwl.readLock().unlock();
         }
@@ -264,7 +261,7 @@ public final class CoreNode extends ParentNode {
         try {
             /* Selectively search children */
             List<Integer> list = new ArrayList<>();
-            for (int child = 0; child < nbChildren; child++) {
+            for (int child = 0; child < fNbChildren; child++) {
                 if (times.intersects(getChildStart(child), getChildEnd(child))) {
                     int potentialNextSeqNb = getChild(child);
                     list.add(potentialNextSeqNb);
@@ -284,24 +281,23 @@ public final class CoreNode extends ParentNode {
     @Override
     protected int getSpecificHeaderSize() {
         int maxChildren = getConfig().getMaxChildren();
-        int specificSize =
-                  Integer.BYTES /* 1x int (extension node) */
+        return    Integer.BYTES /* 1x int (extension node) */
                 + Integer.BYTES /* 1x int (nbChildren) */
 
                 /* MAX_NB * int ('children' table) */
                 + Integer.BYTES * maxChildren
 
                 /* MAX_NB * Timevalue ('childStart' table) */
+                + Long.BYTES * maxChildren
+                /* MAX_NB * Timevalue ('childEnd' table) */
                 + Long.BYTES * maxChildren;
-
-        return specificSize;
     }
 
     @Override
     public String toStringSpecific() {
         /* Only used for debugging, shouldn't be externalized */
         return String.format("Core Node, %d children %s", //$NON-NLS-1$
-                nbChildren, Arrays.toString(Arrays.copyOf(children, nbChildren)));
+                fNbChildren, Arrays.toString(Arrays.copyOf(fChildren, fNbChildren)));
     }
 
 }
