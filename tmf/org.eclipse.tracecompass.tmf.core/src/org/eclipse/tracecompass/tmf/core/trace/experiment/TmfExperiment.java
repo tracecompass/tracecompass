@@ -745,7 +745,13 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
             if (!status.isOK()) {
                 Activator.log(status);
             }
-            TmfTraceManager.refreshSupplementaryFiles(this);
+            /* Refresh supplementary files in separate thread to prevent deadlock */
+            new Thread("Refresh supplementary files") { //$NON-NLS-1$
+                @Override
+                public void run() {
+                    TmfTraceManager.refreshSupplementaryFiles(TmfExperiment.this);
+                }
+            }.start();
         }
     }
 
