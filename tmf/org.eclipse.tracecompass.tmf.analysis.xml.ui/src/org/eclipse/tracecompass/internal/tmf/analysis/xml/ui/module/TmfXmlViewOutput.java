@@ -15,7 +15,6 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource.ViewType;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
@@ -85,7 +84,7 @@ public class TmfXmlViewOutput extends TmfAnalysisViewOutput {
     public void setOutputProperty(@NonNull String key, String value, boolean immediate) {
         super.setOutputProperty(key, value, immediate);
         /* Find the label of the view */
-        if (key.equals(TmfXmlUiStrings.XML_OUTPUT_DATA)) {
+        if (key.equals(TmfXmlStrings.XML_OUTPUT_DATA)) {
             String[] idFile = value.split(TmfXmlAnalysisOutputSource.DATA_SEPARATOR);
             String viewId = (idFile.length > 0) ? idFile[0] : null;
             String filePath = (idFile.length > 1) ? idFile[1] : null;

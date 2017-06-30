@@ -24,7 +24,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternDensityView;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternLatencyTableView;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternScatterGraphView;
@@ -61,11 +60,11 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
         /**
          * Time graph view element
          */
-        TIME_GRAPH_VIEW(TmfXmlUiStrings.TIME_GRAPH_VIEW, XmlTimeGraphView.ID),
+        TIME_GRAPH_VIEW(TmfXmlStrings.TIME_GRAPH_VIEW, XmlTimeGraphView.ID),
         /**
          * XY chart view element
          */
-        XY_VIEW(TmfXmlUiStrings.XY_VIEW, XmlXYView.ID);
+        XY_VIEW(TmfXmlStrings.XY_VIEW, XmlXYView.ID);
 
         private final @NonNull String fXmlElem;
         private final String fViewId;
@@ -179,7 +178,7 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
                                 if (analysisId.equals(module.getId())) {
                                     String viewId = viewType.getViewId();
                                     IAnalysisOutput output = new TmfXmlViewOutput(viewId, viewType);
-                                    output.setOutputProperty(TmfXmlUiStrings.XML_OUTPUT_DATA, node.getAttribute(TmfXmlStrings.ID) + DATA_SEPARATOR + xmlFile.getAbsolutePath(), false);
+                                    output.setOutputProperty(TmfXmlStrings.XML_OUTPUT_DATA, node.getAttribute(TmfXmlStrings.ID) + DATA_SEPARATOR + xmlFile.getAbsolutePath(), false);
                                     module.registerOutput(output);
                                 }
                             }
@@ -193,7 +192,7 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
                         String viewLabelPrefix = ((XmlPatternAnalysis) module).getViewLabelPrefix();
                         String label = viewLabelPrefix.isEmpty() ? viewType.getLabel() : viewType.getLabel().replaceFirst(LATENCY_STRING, viewLabelPrefix);
                         IAnalysisOutput output = new TmfXmlLatencyViewOutput(viewType.getViewId(), label);
-                        output.setOutputProperty(TmfXmlUiStrings.XML_LATENCY_OUTPUT_DATA, module.getId() + DATA_SEPARATOR + output.getName(), false);
+                        output.setOutputProperty(TmfXmlStrings.XML_LATENCY_OUTPUT_DATA, module.getId() + DATA_SEPARATOR + output.getName(), false);
                         module.registerOutput(output);
                     }
                 }

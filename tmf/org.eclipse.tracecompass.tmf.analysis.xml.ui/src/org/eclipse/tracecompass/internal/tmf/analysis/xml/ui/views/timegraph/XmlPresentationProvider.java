@@ -24,7 +24,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.timegraph.XmlEntry.EntryDisplayType;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
@@ -126,7 +125,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
     }
 
     /**
-     * Loads the states from a {@link TmfXmlUiStrings#TIME_GRAPH_VIEW} XML
+     * Loads the states from a {@link TmfXmlStrings#TIME_GRAPH_VIEW} XML
      * element
      *
      * @param viewElement

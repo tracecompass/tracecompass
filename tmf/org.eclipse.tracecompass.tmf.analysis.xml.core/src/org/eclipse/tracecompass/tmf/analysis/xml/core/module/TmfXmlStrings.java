@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.module;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * This file defines all name in the XML Structure for the State Provider
+ * This file defines all name in the XML Structure for the State Provider and UI Elements
  *
  * @author Florian Wininger
  * @noimplement This interface only contains static defines
@@ -24,6 +24,80 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @SuppressWarnings({ "javadoc", "nls" })
 @NonNullByDefault
 public interface TmfXmlStrings {
+
+    // ------------------------------------------------------------------------
+    // XML Structure for UI elements
+    // ------------------------------------------------------------------------
+
+    /* XML generic Element attribute names */
+    /**
+     * @since 2.3
+     */
+    static final String TIME_GRAPH_VIEW = "timeGraphView";
+    /**
+     * @since 2.3
+     */
+    static final String XY_VIEW = "xyView";
+
+    /* View elements and attributes */
+    /**
+     * @since 2.3
+     */
+    static final String ENTRY_ELEMENT = "entry";
+
+    /* Elements and attributes of view entries */
+    /**
+     * @since 2.3
+     */
+    static final String PATH = "path";
+    /**
+     * @since 2.3
+     */
+    static final String ANALYSIS_ID = "analysisId";
+    /**
+     * @since 2.3
+     */
+    static final String DISPLAY_ELEMENT = "display";
+    /**
+     * @since 2.3
+     */
+    static final String PARENT_ELEMENT = "parent";
+    /**
+     * @since 2.3
+     */
+    static final String NAME_ELEMENT = "name";
+    /**
+     * @since 2.3
+     */
+    static final String ID_ELEMENT = "id";
+    /**
+     * @since 2.3
+     */
+    static final String DISPLAY_TYPE = "displayType";
+    /**
+     * @since 2.3
+     */
+    static final String DISPLAY_TYPE_ABSOLUTE = "absolute";
+    /**
+     * @since 2.3
+     */
+    static final String DISPLAY_TYPE_DELTA = "delta";
+
+    /* Generic strings for the XML module */
+    /**
+     * @since 2.3
+     */
+    static final String XML_OUTPUT_DATA = "xmlOutputData";
+
+    /**
+     * @since 2.3
+     */
+    static final String XML_LATENCY_OUTPUT_DATA = "xmlLatencyOutputData";
+
+
+    // ------------------------------------------------------------------------
+    // XML Structure for State Provider
+    // ------------------------------------------------------------------------
 
     /* XML generic Element attribute names */
     String VALUE = "value";

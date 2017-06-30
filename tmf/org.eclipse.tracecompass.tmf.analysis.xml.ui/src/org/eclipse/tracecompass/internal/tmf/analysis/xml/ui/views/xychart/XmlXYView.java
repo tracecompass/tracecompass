@@ -17,15 +17,15 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 import org.w3c.dom.Element;
 
 /**
  * This view displays state system data in an xy chart. It uses an XML
- * {@link TmfXmlUiStrings#XY_VIEW} element from an XML file. This element
+ * {@link TmfXmlStrings#XY_VIEW} element from an XML file. This element
  * defines which entries from the state system will be shown and also gives
  * additional information on the presentation of the view.
  *
@@ -50,7 +50,7 @@ public class XmlXYView extends TmfChartView {
                 if (event == null) {
                     return;
                 }
-                if (event.getProperty().equals(TmfXmlUiStrings.XML_OUTPUT_DATA)) {
+                if (event.getProperty().equals(TmfXmlStrings.XML_OUTPUT_DATA)) {
                     Object newValue = event.getNewValue();
                     if (newValue instanceof String) {
                         fViewInfo.setViewData((String) newValue);
@@ -59,7 +59,6 @@ public class XmlXYView extends TmfChartView {
                         if (viewer instanceof XmlXYViewer) {
                             ((XmlXYViewer) viewer).viewInfoUpdated();
                         }
-
                     }
                 }
             }
@@ -72,7 +71,7 @@ public class XmlXYView extends TmfChartView {
          * Get the view element from the XML file. If the element can't be
          * found, return.
          */
-        Element viewElement = fViewInfo.getViewElement(TmfXmlUiStrings.XY_VIEW);
+        Element viewElement = fViewInfo.getViewElement(TmfXmlStrings.XY_VIEW);
         if (viewElement == null) {
             return;
         }

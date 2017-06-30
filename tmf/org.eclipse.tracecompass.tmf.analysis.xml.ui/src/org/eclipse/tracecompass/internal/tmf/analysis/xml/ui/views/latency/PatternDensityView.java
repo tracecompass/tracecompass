@@ -21,8 +21,8 @@ import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.Ab
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityViewer;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlLatencyViewInfo;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 
 /**
  * Displays the latency density view for pattern analysis
@@ -47,7 +47,7 @@ public class PatternDensityView extends AbstractSegmentStoreDensityView {
         this.addPartPropertyListener(new IPropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent event) {
-                if (event.getProperty().equals(TmfXmlUiStrings.XML_LATENCY_OUTPUT_DATA)) {
+                if (event.getProperty().equals(TmfXmlStrings.XML_LATENCY_OUTPUT_DATA)) {
                     Object newValue = event.getNewValue();
                     if (newValue instanceof String) {
                         String data = (String) newValue;

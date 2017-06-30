@@ -42,7 +42,6 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStat
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readonly.TmfXmlReadOnlyModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.timegraph.XmlEntry.EntryDisplayType;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -73,7 +72,7 @@ import com.google.common.collect.Iterables;
 
 /**
  * This view displays state system data in a time graph view. It uses an XML
- * {@link TmfXmlUiStrings#TIME_GRAPH_VIEW} element from an XML file. This
+ * {@link TmfXmlStrings#TIME_GRAPH_VIEW} element from an XML file. This
  * element defines which entries from the state system will be shown and also
  * gives additional information on the presentation of the view (states, colors,
  * etc)
@@ -104,7 +103,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
     private static final @NonNull String SPLIT_STRING = "/"; //$NON-NLS-1$
 
     private static final Comparator<XmlEntry> XML_ENTRY_COMPARATOR = Comparator.comparing(XmlEntry::getType)
-            .thenComparing(XmlEntry::getElement, Comparator.nullsFirst(Comparator.comparing(element -> element.getAttribute(TmfXmlUiStrings.PATH))))
+            .thenComparing(XmlEntry::getElement, Comparator.nullsFirst(Comparator.comparing(element -> element.getAttribute(TmfXmlStrings.PATH))))
             .thenComparing(XmlEntry::getName).thenComparingLong(XmlEntry::getStartTime);
 
     private static final Comparator<ITimeGraphEntry> ENTRY_COMPARATOR = Comparator.comparing(x -> (XmlEntry) x, XML_ENTRY_COMPARATOR);
@@ -131,7 +130,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         this.addPartPropertyListener(new IPropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent event) {
-                if (event.getProperty().equals(TmfXmlUiStrings.XML_OUTPUT_DATA)) {
+                if (event.getProperty().equals(TmfXmlStrings.XML_OUTPUT_DATA)) {
                     Object newValue = event.getNewValue();
                     if (newValue instanceof String) {
                         String data = (String) newValue;
@@ -230,7 +229,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
          * Get the view element from the XML file. If the element can't be
          * found, return.
          */
-        Element viewElement = fViewInfo.getViewElement(TmfXmlUiStrings.TIME_GRAPH_VIEW);
+        Element viewElement = fViewInfo.getViewElement(TmfXmlStrings.TIME_GRAPH_VIEW);
         if (viewElement == null) {
             return;
         }
@@ -254,7 +253,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
 
         Set<String> analysisIds = fViewInfo.getViewAnalysisIds(viewElement);
 
-        List<Element> entries = TmfXmlUtils.getChildElements(viewElement, TmfXmlUiStrings.ENTRY_ELEMENT);
+        List<Element> entries = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.ENTRY_ELEMENT);
         Set<XmlEntry> entryList = new TreeSet<>(getEntryComparator());
         if (monitor.isCanceled()) {
             return;
@@ -318,7 +317,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
 
     private void buildEntry(Element entryElement, XmlEntry parentEntry, int prevBaseQuark, String prevRegex) {
         /* Get the attribute string to display */
-        String path = entryElement.getAttribute(TmfXmlUiStrings.PATH);
+        String path = entryElement.getAttribute(TmfXmlStrings.PATH);
         if (path.isEmpty()) {
             path = TmfXmlStrings.WILDCARD;
         }
@@ -328,8 +327,8 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
          * otherwise issue a warning
          */
 
-        List<Element> displayElements = TmfXmlUtils.getChildElements(entryElement, TmfXmlUiStrings.DISPLAY_ELEMENT);
-        List<Element> entryElements = TmfXmlUtils.getChildElements(entryElement, TmfXmlUiStrings.ENTRY_ELEMENT);
+        List<Element> displayElements = TmfXmlUtils.getChildElements(entryElement, TmfXmlStrings.DISPLAY_ELEMENT);
+        List<Element> entryElements = TmfXmlUtils.getChildElements(entryElement, TmfXmlStrings.ENTRY_ELEMENT);
 
         if (displayElements.isEmpty() && entryElements.isEmpty()) {
             Activator.logWarning(String.format("XML view: entry for %s should have either a display element or entry elements", path)); //$NON-NLS-1$
@@ -338,7 +337,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
 
         // Get the state system to use to populate those entries, by default, it
         // is the same as the parent
-        String analysisId = entryElement.getAttribute(TmfXmlUiStrings.ANALYSIS_ID);
+        String analysisId = entryElement.getAttribute(TmfXmlStrings.ANALYSIS_ID);
         ITmfStateSystem parentSs = parentEntry.getStateSystem();
         ITmfStateSystem ss = parentSs;
         int baseQuark = prevBaseQuark;
