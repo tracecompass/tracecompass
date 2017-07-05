@@ -16,4 +16,15 @@ package org.eclipse.tracecompass.tmf.core.event.aspect;
  * @since 3.0
  */
 public interface ITmfCounterAspect extends ITmfEventAspect<Long> {
+
+    /**
+     * Avoid cluttering the trace's event table if there are too many counters.
+     *
+     * Note: The counter aspects columns could still be visible depending on the
+     * cached configuration of the event table.
+     */
+    @Override
+    default boolean isHiddenByDefault() {
+        return true;
+    }
 }
