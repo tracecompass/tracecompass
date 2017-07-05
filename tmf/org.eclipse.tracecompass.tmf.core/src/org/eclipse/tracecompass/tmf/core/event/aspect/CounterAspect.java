@@ -12,60 +12,47 @@ package org.eclipse.tracecompass.tmf.core.event.aspect;
 import java.util.Arrays;
 import java.util.Objects;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
- * Counter aspect, an aspect that can be grouped. This can allow a counter to be
- * associated to a given resource such as a CPU, a thread, a disk, a GPU or a
- * DSP.
+ * Counter aspect that can be grouped and associated to a given resource such as
+ * a CPU, a thread, a disk, a GPU or a DSP.
  *
  * @author Matthew Khouzam
  * @since 3.0
  */
 public class CounterAspect extends AbstractCounterAspect {
 
-    /*
-     * TODO: change for ITmfEventAspects<?>
-     */
-    private final String[] fGroupIds;
+    private final Class<? extends ITmfEventAspect<?>>[] fGroups;
 
     /**
      * Counter aspect constructor
-     *
      *
      * @param fieldName
      *            the field to follow
      * @param label
      *            display name
-     * @param groupIds
-     *            the grouping id, null or empty means ungrouped
-     *
-     *            TODO: Change for {@link ITmfEventAspect}
+     * @param groups
+     *            the groups, empty means ungrouped
      */
-    public CounterAspect(String fieldName, String label, String... groupIds) {
+    @SafeVarargs
+    public CounterAspect(String fieldName, String label, Class<? extends ITmfEventAspect<?>>... groups) {
         super(fieldName, label);
-        fGroupIds = groupIds;
+        fGroups = Arrays.copyOf(groups, groups.length);
     }
 
     /**
-     * Get the grouping ids
+     * Get the groups
      *
-     * TODO: Change for {@link ITmfEventAspect}
-     *
-     * @return the grouping ids
+     * @return the groups
      */
-    public String[] getGroupIds() {
-        return fGroupIds;
+    public Class<? extends ITmfEventAspect<?>>[] getGroups() {
+        return fGroups;
     }
 
     @Override
     public int hashCode() {
-        String @NonNull [] groupIds = getGroupIds();
-        if (groupIds.length == 0) {
-            return super.hashCode();
-        }
-        return Objects.hash(Arrays.deepHashCode(groupIds), super.hashCode());
+        return (fGroups.length == 0) ? super.hashCode() : Objects.hash(Arrays.deepHashCode(fGroups), super.hashCode());
     }
 
     @Override
@@ -83,7 +70,7 @@ public class CounterAspect extends AbstractCounterAspect {
             return false;
         }
         CounterAspect other = (CounterAspect) obj;
-        return Arrays.deepEquals(fGroupIds, other.getGroupIds());
+        return Arrays.deepEquals(fGroups, other.getGroups());
     }
 
 }

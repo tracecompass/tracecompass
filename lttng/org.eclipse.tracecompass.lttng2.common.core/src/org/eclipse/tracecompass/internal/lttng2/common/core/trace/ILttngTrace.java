@@ -11,10 +11,11 @@ package org.eclipse.tracecompass.internal.lttng2.common.core.trace;
 
 import java.util.Collection;
 import java.util.regex.Pattern;
-
+import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.LinuxTidAspect;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.aspect.CounterAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfCounterAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
 
 import com.google.common.collect.ImmutableSet;
@@ -49,22 +50,12 @@ public interface ILttngTrace {
     Pattern CONTEXT_PERF_THREAD = Pattern.compile("^context\\._perf.thread.+$"); //$NON-NLS-1$
 
     /**
-     * CPU grouping name
-     */
-    String CPU_GROUPING = "cpu"; //$NON-NLS-1$
-
-    /**
-     * Thread grouping name
-     */
-    String THREAD_GROUPING = "thread"; //$NON-NLS-1$
-
-    /**
      * Make counter aspects for a trace
      *
      * @param trace
      *            The trace
      *
-     * @return a Collection of aspects that are related to a given trace
+     * @return a collection of aspects that are related to a given trace
      */
     default Collection<ITmfCounterAspect> createCounterAspects(ITmfTraceWithPreDefinedEvents trace) {
         ImmutableSet.Builder<ITmfCounterAspect> perfBuilder = new ImmutableSet.Builder<>();
@@ -72,9 +63,9 @@ public interface ILttngTrace {
             for (String fieldName : eventType.getFieldNames()) {
                 if (fieldName != null) {
                     if (CONTEXT_PERF_CPU.matcher(fieldName).matches()) {
-                        perfBuilder.add(new CounterAspect(fieldName, fieldName.substring(CONTEXT_PERF_PREFIX.length()), CPU_GROUPING));
+                        perfBuilder.add(new CounterAspect(fieldName, fieldName.substring(CONTEXT_PERF_PREFIX.length()), TmfCpuAspect.class));
                     } else if (CONTEXT_PERF_THREAD.matcher(fieldName).matches()) {
-                        perfBuilder.add(new CounterAspect(fieldName, fieldName.substring(CONTEXT_PERF_PREFIX.length()), THREAD_GROUPING));
+                        perfBuilder.add(new CounterAspect(fieldName, fieldName.substring(CONTEXT_PERF_PREFIX.length()), LinuxTidAspect.class));
                     } else if (CONTEXT_PERF_UNKNOWN.matcher(fieldName).matches()) {
                         perfBuilder.add(new CounterAspect(fieldName, fieldName.substring(CONTEXT_PERF_PREFIX.length())));
                     }
