@@ -1913,6 +1913,20 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
     }
 
     /**
+     * Set the expanded state of a given list of entries
+     *
+     * @param entries
+     *            The list of entries
+     * @param expanded
+     *            True if expanded, false if collapsed
+     * @since 3.1
+     */
+    public void setExpandedState(Iterable<ITimeGraphEntry> entries, boolean expanded) {
+        fTimeGraphCtrl.setExpandedState(entries, expanded);
+        adjustVerticalScrollBar();
+    }
+
+    /**
      * Collapses all nodes of the viewer's tree, starting with the root.
      */
     public void collapseAll() {
@@ -1963,6 +1977,41 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
      */
     public ITimeGraphEntry[] getExpandedElements() {
         return fTimeGraphCtrl.getExpandedElements();
+    }
+
+    /**
+     * Get the collapsed (visible or not) time graph entries.
+     *
+     * @return The array of collapsed time graph entries
+     * @since 3.1
+     */
+    public @NonNull Set<@NonNull ITimeGraphEntry> getAllCollapsedElements() {
+        @NonNull Set<@NonNull ITimeGraphEntry> collapsedEntries = new HashSet<>();
+        ITimeGraphEntry[] elements = fTimeGraphContentProvider.getElements(getInput());
+        for (ITimeGraphEntry entry : elements) {
+            if (entry != null) {
+                getAllCollapsedElements(entry, collapsedEntries);
+            }
+        }
+        return collapsedEntries;
+    }
+
+    /**
+     * Get all collapsed entries. This method is called recursively to add collapse
+     * entries to the given set
+     *
+     * @param entry
+     *            The current entry
+     * @param collapsedEntries
+     *            The set of collapsed entries
+     */
+    private void getAllCollapsedElements(@NonNull ITimeGraphEntry entry, @NonNull Set<@NonNull ITimeGraphEntry> collapsedEntries) {
+        if (entry.hasChildren() && !fTimeGraphCtrl.getExpandedState(entry)) {
+            collapsedEntries.add(entry);
+        }
+        for (ITimeGraphEntry child : entry.getChildren()) {
+            getAllCollapsedElements(child, collapsedEntries);
+        }
     }
 
     /**
@@ -2729,5 +2778,4 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
         layout.marginRight = Math.max(0, marginSize);
         fTimeAlignedComposite.layout();
     }
-
 }

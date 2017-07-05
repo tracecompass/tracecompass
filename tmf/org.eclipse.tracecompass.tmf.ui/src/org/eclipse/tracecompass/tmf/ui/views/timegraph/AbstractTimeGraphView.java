@@ -146,6 +146,8 @@ import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.ide.IDE;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * An abstract view all time graph views can inherit
  *
@@ -1276,7 +1278,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         if (fTrace != null) {
             /* save the filters of the previous trace */
             fFiltersMap.put(fTrace, fTimeGraphViewer.getFilters());
-            fViewContext.put(fTrace, new ViewContext(fCurrentSortColumn, fSortDirection, fTimeGraphViewer.getSelection()));
+            fViewContext.put(fTrace, new ViewContext(fCurrentSortColumn, fSortDirection, fTimeGraphViewer.getSelection(), fTimeGraphViewer.getAllCollapsedElements()));
         }
         fTrace = trace;
 
@@ -1898,8 +1900,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
         // Dirty if the zoom thread is not done or if it hasn't zoomed all the
         // way to the end of the window range. In the latter case, there should
-        // be
-        // a subsequent zoom thread that will be triggered.
+        // be a subsequent zoom thread that will be triggered.
         return fDirty.get() != 0 || fZoomThread.getZoomStartTime() != startTime || fZoomThread.getZoomEndTime() != endTime;
     }
 
@@ -1966,7 +1967,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     private void applyViewContext() {
-        ViewContext viewContext = fViewContext.get(fTrace);
+        ViewContext viewContext = fViewContext.remove(fTrace);
+        applyExpandedStateContext(viewContext);
         if (fColumnComparators != null) {
             final Tree tree = fTimeGraphViewer.getTree();
             final TreeColumn column = tree.getColumn(fCurrentSortColumn);
@@ -1978,18 +1980,26 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         if ((viewContext != null) && (viewContext.getSelection() != null)) {
             fTimeGraphViewer.setSelection(viewContext.getSelection(), true);
         }
-        fViewContext.remove(fTrace);
+    }
+
+    private void applyExpandedStateContext(ViewContext viewContext) {
+        if (viewContext != null) {
+            fTimeGraphViewer.expandAll();
+            fTimeGraphViewer.setExpandedState(viewContext.getCollapsedEntries(), false);
+        }
     }
 
     private static class ViewContext {
-        private int fSortColumnIndex;
-        private int fSortDirection;
-        private @Nullable ITimeGraphEntry fSelection;
+        private final int fSortColumnIndex;
+        private final int fSortDirection;
+        private final @Nullable ITimeGraphEntry fSelection;
+        private final @NonNull Set<@NonNull ITimeGraphEntry> fCollapsedEntries;
 
-        ViewContext(int sortColunm, int sortDirection, ITimeGraphEntry selection) {
+        ViewContext(int sortColunm, int sortDirection, ITimeGraphEntry selection, @NonNull Set<@NonNull ITimeGraphEntry> collapsedEntries) {
             fSortColumnIndex = sortColunm;
             fSortDirection = sortDirection;
             fSelection = selection;
+            fCollapsedEntries = ImmutableSet.copyOf(collapsedEntries);
         }
 
         /**
@@ -2011,6 +2021,15 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
          */
         public ITimeGraphEntry getSelection() {
             return fSelection;
+        }
+
+        /**
+         * Get the set of collapsed entries
+         *
+         * @return The set of collapsed entries
+         */
+        public @NonNull Set<@NonNull ITimeGraphEntry> getCollapsedEntries() {
+            return fCollapsedEntries;
         }
     }
 

@@ -713,6 +713,26 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
+     * Set the expanded state of a given list of entries
+     *
+     * @param entries
+     *            The list of entries
+     * @param expanded
+     *            True if expanded, false if collapsed
+     * @since 3.1
+     */
+    public void setExpandedState(Iterable<ITimeGraphEntry> entries, boolean expanded) {
+        for (ITimeGraphEntry entry : entries) {
+            Item item = fItemData.findItem(entry);
+            if (item != null) {
+                item.fExpanded = expanded;
+            }
+        }
+        fItemData.updateExpandedItems();
+        redraw();
+    }
+
+    /**
      * Set the expanded state of a given entry to certain relative level. It
      * will call fireTreeEvent() for each changed entry. At the end it will call
      * redraw().
