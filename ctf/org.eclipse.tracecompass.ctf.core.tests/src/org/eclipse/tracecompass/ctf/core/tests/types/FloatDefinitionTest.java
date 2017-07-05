@@ -100,6 +100,35 @@ public class FloatDefinitionTest {
     }
 
     @Test
+    public void testFloat32BitNeg() throws CTFException {
+        for (int i = 1; i < 31; i++) {
+            parent = new FloatDeclaration(i, 32 - i, ByteOrder.nativeOrder(), 0);
+
+            BitBuffer create32BitNegativeFloatByteBuffer = create32BitNegativeFloatByteBuffer();
+            fixture = parent.createDefinition(null, fieldName, create32BitNegativeFloatByteBuffer);
+            assertNotNull(fixture);
+            assertEquals("test" + i, "-2.0", fixture.toString());
+        }
+    }
+
+    @Test
+    public void testFloat64BitNeg() throws CTFException {
+        for (int i = 1; i < 63; i++) {
+            parent = new FloatDeclaration(i, 64 - i, ByteOrder.nativeOrder(), 0);
+            BitBuffer floatBuffer = create64BitNegativeFloatByteBuffer();
+            fixture = parent.createDefinition(null, fieldName, floatBuffer);
+            assertNotNull(fixture);
+            if (i <= 32) {
+                assertEquals("test" + i, "-2.0", fixture.toString());
+            } else if (i == 33) {
+                assertEquals("test" + i, "-1.0", fixture.toString());
+            } else {
+                assertNotNull(fixture.getValue());
+            }
+        }
+    }
+
+    @Test
     public void testFloat48Bit() throws CTFException {
         parent = new FloatDeclaration(12, 32, ByteOrder.nativeOrder(), 0);
         fixture = parent.createDefinition(null, fieldName, create64BitFloatByteBuffer());
@@ -155,6 +184,36 @@ public class FloatDefinitionTest {
         double[] data = new double[2];
         data[0] = 2.0f;
         data[1] = 3.14f;
+        ByteBuffer byb = ByteBuffer.allocate(128);
+        byb.order(ByteOrder.nativeOrder());
+        byb.mark();
+        byb.putDouble(data[0]);
+        byb.putDouble(data[1]);
+        byb.reset();
+        BitBuffer bb = new BitBuffer(byb);
+        return bb;
+    }
+
+    @NonNull
+    private static BitBuffer create32BitNegativeFloatByteBuffer() {
+        float[] data = new float[2];
+        data[0] = -2.0f;
+        data[1] = -3.14f;
+        ByteBuffer byb = ByteBuffer.allocate(128);
+        byb.order(ByteOrder.nativeOrder());
+        byb.mark();
+        byb.putFloat(data[0]);
+        byb.putFloat(data[1]);
+        byb.reset();
+        BitBuffer bb = new BitBuffer(byb);
+        return bb;
+    }
+
+    @NonNull
+    private static BitBuffer create64BitNegativeFloatByteBuffer() {
+        double[] data = new double[2];
+        data[0] = -2.0f;
+        data[1] = -3.14f;
         ByteBuffer byb = ByteBuffer.allocate(128);
         byb.order(ByteOrder.nativeOrder());
         byb.mark();

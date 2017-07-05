@@ -168,7 +168,7 @@ public final class FloatDeclaration extends Declaration implements ISimpleDataty
         long manShift = 1L << (manBits);
         long manMask = manShift - 1;
         long expMask = (1L << expBits) - 1;
-
+        boolean isNegative = (rawValue & (1L << (manBits + expBits))) != 0;
         int exp = (int) ((rawValue >> (manBits)) & expMask) + 1;
         long man = (rawValue & manMask);
         final int offsetExponent = exp - (1 << (expBits - 1));
@@ -177,7 +177,8 @@ public final class FloatDeclaration extends Declaration implements ISimpleDataty
         ret /= manShift;
         ret += 1.0;
         ret *= expPow;
-        return ret;
+
+        return isNegative ? -ret : ret;
     }
 
     @Override
@@ -185,11 +186,8 @@ public final class FloatDeclaration extends Declaration implements ISimpleDataty
         final int prime = 31;
         int result = 1;
         result = prime * result + (int) (fAlignement ^ (fAlignement >>> 32));
-        result = prime * result + fByteOrder.toString().hashCode(); // don't
-                                                                    // evaluate
-                                                                    // object
-                                                                    // but
-                                                                    // string
+        // don't evaluate object but string
+        result = prime * result + fByteOrder.toString().hashCode();
         result = prime * result + fExponent;
         result = prime * result + fMantissa;
         return result;
