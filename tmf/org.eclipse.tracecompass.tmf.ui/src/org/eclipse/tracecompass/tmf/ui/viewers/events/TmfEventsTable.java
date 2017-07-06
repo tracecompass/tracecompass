@@ -891,11 +891,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 column.pack();
                 column.setMoveable(true);
                 column.setData(Key.WIDTH, column.getWidth());
-                fColumnSize[i] = column.getWidth();
                 if (col.getEventAspect().isHiddenByDefault()) {
                     column.setWidth(0);
                     column.setResizable(false);
                 }
+                fColumnSize[i] = column.getWidth();
             }
             column.addControlListener(new ColumnListener());
             fColumnResizable[i] = column.getResizable();
