@@ -86,19 +86,7 @@ public class RenameTraceDialog extends SelectionStatusDialog {
         folderGroup.setLayout(layout);
         folderGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        // Old trace name label
-        Label oldTraceLabel = new Label(folderGroup, SWT.NONE);
-        oldTraceLabel.setFont(font);
-        oldTraceLabel.setText(Messages.RenameTraceDialog_TraceName);
-
-        // Old trace name field
-        Text oldTraceName = new Text(folderGroup, SWT.BORDER);
-        GridData data = new GridData(GridData.FILL_HORIZONTAL);
-        data.widthHint = IDialogConstants.ENTRY_FIELD_WIDTH;
-        oldTraceName.setLayoutData(data);
-        oldTraceName.setFont(font);
-        oldTraceName.setText(fTrace.getName());
-        oldTraceName.setEnabled(false);
+        String name = fTrace.getName();
 
         // New trace name label
         Label newTaceLabel = new Label(folderGroup, SWT.NONE);
@@ -107,10 +95,13 @@ public class RenameTraceDialog extends SelectionStatusDialog {
 
         // New trace name entry field
         fNewTraceNameText = new Text(folderGroup, SWT.BORDER);
-        data = new GridData(GridData.FILL_HORIZONTAL);
+        GridData data = new GridData(GridData.FILL_HORIZONTAL);
         data.widthHint = IDialogConstants.ENTRY_FIELD_WIDTH;
         fNewTraceNameText.setLayoutData(data);
         fNewTraceNameText.setFont(font);
+        fNewTraceNameText.setFocus();
+        fNewTraceNameText.setText(name);
+        fNewTraceNameText.setSelection(0, name.length());
         fNewTraceNameText.addListener(SWT.Modify, new Listener() {
             @Override
             public void handleEvent(Event event) {

@@ -106,19 +106,7 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
         folderGroup.setLayout(layout);
         folderGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        // Old experiment name label
-        Label oldExperimentLabel = new Label(folderGroup, SWT.NONE);
-        oldExperimentLabel.setFont(font);
-        oldExperimentLabel.setText(Messages.CopyExperimentDialog_ExperimentName);
-
-        // Old experiment name field
-        Text oldExperimentName = new Text(folderGroup, SWT.BORDER);
-        GridData data = new GridData(GridData.FILL_HORIZONTAL);
-        data.widthHint = IDialogConstants.ENTRY_FIELD_WIDTH;
-        oldExperimentName.setLayoutData(data);
-        oldExperimentName.setFont(font);
-        oldExperimentName.setText(fExperiment.getName());
-        oldExperimentName.setEnabled(false);
+        String name = fExperiment.getName();
 
         // New experiment name label
         Label newExperimentLabel = new Label(folderGroup, SWT.NONE);
@@ -127,10 +115,13 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
 
         // New experiment name entry field
         fNewExperimentName = new Text(folderGroup, SWT.BORDER);
-        data = new GridData(GridData.FILL_HORIZONTAL);
+        GridData data = new GridData(GridData.FILL_HORIZONTAL);
         data.widthHint = IDialogConstants.ENTRY_FIELD_WIDTH;
         fNewExperimentName.setLayoutData(data);
         fNewExperimentName.setFont(font);
+        fNewExperimentName.setFocus();
+        fNewExperimentName.setText(name);
+        fNewExperimentName.setSelection(0, name.length());
         fNewExperimentName.addListener(SWT.Modify, new Listener() {
             @Override
             public void handleEvent(Event event) {

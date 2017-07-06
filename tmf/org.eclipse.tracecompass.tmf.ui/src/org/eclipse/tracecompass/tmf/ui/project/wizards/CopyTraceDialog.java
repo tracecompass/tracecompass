@@ -101,19 +101,7 @@ public class CopyTraceDialog extends SelectionStatusDialog {
         folderGroup.setLayout(layout);
         folderGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        // Old trace name label
-        Label oldTraceLabel = new Label(folderGroup, SWT.NONE);
-        oldTraceLabel.setFont(font);
-        oldTraceLabel.setText(Messages.CopyTraceDialog_TraceName);
-
-        // Old trace name field
-        Text oldTraceName = new Text(folderGroup, SWT.BORDER);
-        GridData data = new GridData(GridData.FILL_HORIZONTAL);
-        data.widthHint = IDialogConstants.ENTRY_FIELD_WIDTH;
-        oldTraceName.setLayoutData(data);
-        oldTraceName.setFont(font);
-        oldTraceName.setText(fTrace.getName());
-        oldTraceName.setEnabled(false);
+        String name = fTrace.getName();
 
         // New trace name label
         Label newTraceLabel = new Label(folderGroup, SWT.NONE);
@@ -122,10 +110,13 @@ public class CopyTraceDialog extends SelectionStatusDialog {
 
         // New trace name entry field
         fNewTraceName = new Text(folderGroup, SWT.BORDER);
-        data = new GridData(GridData.FILL_HORIZONTAL);
+        GridData data = new GridData(GridData.FILL_HORIZONTAL);
         data.widthHint = IDialogConstants.ENTRY_FIELD_WIDTH;
         fNewTraceName.setLayoutData(data);
         fNewTraceName.setFont(font);
+        fNewTraceName.setFocus();
+        fNewTraceName.setText(name);
+        fNewTraceName.setSelection(0, name.length());
         fNewTraceName.addListener(SWT.Modify, new Listener() {
             @Override
             public void handleEvent(Event event) {
