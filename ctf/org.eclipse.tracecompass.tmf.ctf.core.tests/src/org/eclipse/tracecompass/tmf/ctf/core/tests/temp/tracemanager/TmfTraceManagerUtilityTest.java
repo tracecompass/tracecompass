@@ -39,6 +39,8 @@ public class TmfTraceManagerUtilityTest {
 
     private ITmfTrace fTrace;
 
+    private static final String TEMP_DIR_NAME = ".tracecompass-temp";
+
     /**
      * Test initialization
      */
@@ -54,6 +56,21 @@ public class TmfTraceManagerUtilityTest {
     @AfterClass
     public static void teardown() {
         CtfTmfTestTraceUtils.dispose(CtfTestTrace.TRACE2);
+    }
+
+    /**
+     * Test the {@link TmfTraceManager#getTemporaryDirPath} method.
+     */
+    @Test
+    public void testTemporaryDirPath() {
+        String basePath = TmfTraceManager.getTemporaryDirPath();
+        assertTrue(basePath.endsWith(TEMP_DIR_NAME));
+
+        String property = System.getProperty("osgi.instance.area"); //$NON-NLS-1$
+        if (property != null) {
+            basePath = basePath.substring(0, basePath.length() - TEMP_DIR_NAME.length());
+            assertTrue(property.contains(basePath));
+        }
     }
 
     /**
@@ -99,5 +116,24 @@ public class TmfTraceManagerUtilityTest {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
             return !stream.iterator().hasNext();
         }
+    }
+
+    /**
+     * Test the {@link TmfTraceManager#deleteSupplementaryFiles} method.
+     */
+    @Test
+    public void testDeleteSupplementaryFolder() throws IOException {
+        ITmfTrace trace = fTrace;
+        assertNotNull(trace);
+        String suppFilesPath = TmfTraceManager.getSupplementaryFileDir(trace);
+        /*
+         * Initializing/indexing the trace should have produced some
+         * supplementary files already.
+         */
+        assertFalse(isDirectoryEmpty(suppFilesPath));
+        trace.dispose();
+        TmfTraceManager.deleteSupplementaryFolder(trace);
+        File parent = new File(suppFilesPath);
+        assertFalse(parent.exists());
     }
 }

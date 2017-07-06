@@ -78,7 +78,7 @@ public final class TmfTraceManager {
     /** The currently-selected trace. Should always be part of the trace map */
     private @Nullable ITmfTrace fCurrentTrace = null;
 
-    private static final String TEMP_DIR_NAME = ".temp"; //$NON-NLS-1$
+    private static final String TEMP_DIR_NAME = ".tracecompass-temp"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -318,6 +318,24 @@ public final class TmfTraceManager {
             Activator.logError("Error deleting supplementary files for trace " + trace.getName(), e); //$NON-NLS-1$
         }
         refreshSupplementaryFiles(trace);
+    }
+
+    /**
+     * Deletes the supplementary folder for the given trace
+     *
+     * @param trace
+     *            trace to delete the folder for
+     *
+     * @since 3.1
+     */
+    public static void deleteSupplementaryFolder(ITmfTrace trace) {
+        deleteSupplementaryFiles(trace);
+        File parent = new File(TmfTraceManager.getSupplementaryFileDir(trace));
+        try {
+            deleteFolder(parent, getTemporaryDirPath());
+        } catch (IOException e) {
+            Activator.logError("Error deleting supplementary folder for trace " + trace.getName(), e); //$NON-NLS-1$
+        }
     }
 
     /**
@@ -569,5 +587,19 @@ public final class TmfTraceManager {
             dir.mkdirs();
         }
         return pathName;
+    }
+
+    /*
+     * Deletes a folder recursively and deletes the parent(s) until a non-empty
+     * parent is found or till stopPath is reached.
+     */
+    private static void deleteFolder(File folder, String stopPath) throws IOException {
+        if (folder.exists()) {
+            FileUtils.deleteDirectory(folder);
+        }
+        File parent = folder.getParentFile();
+        if (!parent.getAbsolutePath().equals(stopPath) && (parent.list().length == 0)) {
+            deleteFolder(parent, stopPath);
+        }
     }
 }
