@@ -1,0 +1,10 @@
+class org/eclipse/core/runtime/SubMonitor
+convert
+ (Lorg/eclipse/core/runtime/IProgressMonitor;)Lorg/eclipse/core/runtime/SubMonitor;
+ (Lorg/eclipse/core/runtime/IProgressMonitor;)L1org/eclipse/core/runtime/SubMonitor;
+convert
+ (Lorg/eclipse/core/runtime/IProgressMonitor;I)Lorg/eclipse/core/runtime/SubMonitor;
+ (Lorg/eclipse/core/runtime/IProgressMonitor;I)L1org/eclipse/core/runtime/SubMonitor;
+convert
+ (Lorg/eclipse/core/runtime/IProgressMonitor;Ljava/lang/String;I)Lorg/eclipse/core/runtime/SubMonitor;
+ (Lorg/eclipse/core/runtime/IProgressMonitor;Ljava/lang/String;I)L1org/eclipse/core/runtime/SubMonitor;

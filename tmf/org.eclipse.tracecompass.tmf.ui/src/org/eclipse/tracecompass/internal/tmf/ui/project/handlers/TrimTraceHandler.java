@@ -16,14 +16,20 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -35,6 +41,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.operations.TmfWorkspaceModifyOperation;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.snapshot.StateSnapshot;
+import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -164,19 +174,51 @@ public class TrimTraceHandler extends AbstractHandler {
             public void execute(@Nullable IProgressMonitor monitor) throws CoreException {
                 SubMonitor mon = SubMonitor.convert(monitor, 2);
 
-                /* Perform the trace-specific trim operation. */
+                /* Retrieve the state system modules to use */
+                long snapshotTime = tr.getStartTime().toNanos();
+
+                List<@NonNull ITmfAnalysisModuleWithStateSystems> statesystemModules = new ArrayList<>();
+                for (IAnalysisModule module : trace.getAnalysisModules()) {
+                    if (module instanceof ITmfAnalysisModuleWithStateSystems) {
+                        statesystemModules.add((ITmfAnalysisModuleWithStateSystems) module);
+                    }
+                }
+
+                /*
+                 * Perform the trace-specific trim operation. This should create the trace
+                 * file(s) in the destination path.
+                 */
                 Path path = trimmableTrace.trim(tr, tracePath, mon.split(1));
                 if (path == null) {
                     Activator.getDefault().logWarning("Could not trim trace " + tracePath); //$NON-NLS-1$
                     return;
                 }
 
+                SubMonitor ssMon = SubMonitor.convert(mon, statesystemModules.size());
+                /* Write the snapshot files in the new trace's location. */
+                try {
+                    for (ITmfAnalysisModuleWithStateSystems module : statesystemModules) {
+                        ssMon.split(1);
+                        Map<String, Integer> versions = module.getProviderVersions();
+                        Iterable<ITmfStateSystem> sss = module.getStateSystems();
+                        for (ITmfStateSystem ss : sss) {
+                            Integer version = versions.get(ss.getSSID());
+                            if (snapshotTime <= ss.getCurrentEndTime() && version != null) {
+                                StateSnapshot snapshot = new StateSnapshot(ss, Math.max(snapshotTime, ss.getStartTime()), version);
+                                snapshot.write(tracePath);
+                            }
+                        }
+                    }
+
+                } catch (IOException e) {
+                    throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "An error occured while attempting to save the initial state")); //$NON-NLS-1$
+                }
+
                 /* Import the new trace into the current project, at the top-level. */
                 TmfProjectElement currentProjectElement = traceElem.getProject();
                 TmfTraceFolder traceFolder = currentProjectElement.getTracesFolder();
-                mon.worked(1);
                 if (traceFolder != null) {
-                    Display.getCurrent().asyncExec(() -> {
+                    Display.getDefault().asyncExec(() -> {
                         try {
                             TmfOpenTraceHelper.openTraceFromPath(traceFolder, path.toString(), shell);
                         } catch (CoreException e) {

@@ -46,7 +46,7 @@ public interface ITmfStateSystem {
      *
      * @return The state system's ID
      */
-    String getSSID();
+    @NonNull String getSSID();
 
     /**
      * Return the start time of this history. It usually matches the start time

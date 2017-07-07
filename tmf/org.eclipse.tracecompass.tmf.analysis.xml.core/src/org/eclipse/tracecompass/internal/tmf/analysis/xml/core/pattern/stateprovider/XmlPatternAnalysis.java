@@ -14,6 +14,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
@@ -70,6 +71,11 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
         super();
         fSegmentStoreModule = new XmlPatternSegmentStoreModule(this);
         fStateSystemModule = new XmlPatternStateSystemModule(fSegmentStoreModule);
+    }
+
+    @Override
+    public Map<@NonNull String, @NonNull Integer> getProviderVersions() {
+        return fStateSystemModule.getProviderVersions();
     }
 
     @Override

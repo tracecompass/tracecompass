@@ -12,6 +12,9 @@
 
 package org.eclipse.tracecompass.tmf.core.statesystem;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
@@ -22,6 +25,18 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
  * @author Geneviève Bastien
  */
 public interface ITmfAnalysisModuleWithStateSystems extends IAnalysisModule {
+
+
+    /**
+     * Return the versions of this module's state providers.
+     *
+     * @return The providers' versions, key is the state system ID, value is the
+     *         version number.
+     * @since 3.3
+     */
+    default Map<String, Integer> getProviderVersions() {
+        return Collections.emptyMap();
+    }
 
     /**
      * Return a specific state system provided by this analysis.

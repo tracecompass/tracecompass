@@ -52,6 +52,8 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 
 /**
  * Abstract analysis module to generate a state system. It is a base class that
@@ -82,6 +84,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     private boolean fInitializationSucceeded;
 
     private volatile @Nullable ITmfStateProvider fStateProvider;
+    private @Nullable Integer fProviderVersion = null;
 
     /**
      * State system backend types
@@ -167,6 +170,19 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         return fStateSystem;
     }
 
+    @Override
+    public Map<String, Integer> getProviderVersions() {
+        Integer providerVersion = fProviderVersion;
+        if (providerVersion == null) {
+            return Collections.emptyMap();
+        }
+        ImmutableMap.Builder<String, Integer> builder = new Builder<>();
+        for (ITmfStateSystem ss : getStateSystems()) {
+            builder.put(ss.getSSID(), providerVersion);
+        }
+        return builder.build();
+    }
+
     /**
      * @since 2.0
      */
@@ -227,6 +243,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     protected boolean executeAnalysis(@Nullable final IProgressMonitor monitor) {
         IProgressMonitor mon = (monitor == null ? new NullProgressMonitor() : monitor);
         final ITmfStateProvider provider = createStateProvider();
+        fProviderVersion = provider.getVersion();
 
         String id = getId();
 
