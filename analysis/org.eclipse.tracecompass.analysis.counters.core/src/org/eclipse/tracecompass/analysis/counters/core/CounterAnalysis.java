@@ -12,7 +12,7 @@ package org.eclipse.tracecompass.analysis.counters.core;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfCounterAspect;
+import org.eclipse.tracecompass.analysis.counters.core.aspects.ITmfCounterAspect;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;

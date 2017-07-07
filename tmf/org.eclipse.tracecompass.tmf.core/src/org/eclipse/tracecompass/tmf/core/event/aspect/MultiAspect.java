@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.counters.core;
+package org.eclipse.tracecompass.tmf.core.event.aspect;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 
 import com.google.common.collect.Iterables;
 
@@ -30,6 +29,8 @@ import com.google.common.collect.Iterables;
  *
  * @author Matthew Khouzam
  * @author Mikael Ferland
+ *
+ * @since 3.1
  */
 public class MultiAspect<T> implements ITmfEventAspect<T> {
 

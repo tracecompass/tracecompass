@@ -7,16 +7,28 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.core.event.aspect;
+package org.eclipse.tracecompass.analysis.counters.core.aspects;
 
 import java.util.Arrays;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 
 /**
  * Counter aspect that can be grouped and associated to a given resource such as
  * a CPU, a thread, a disk, a GPU or a DSP.
+ * <br><br>
+ * The concatenation of the aspect's groups form a single entry in the state
+ * system:
+ * <pre>
+ * {root}
+ *   +- {group id}
+ *       +- {group element}
+ *           +- {group id}
+ *               +- {group element}
+ *                   +- ...
+ * </pre>
  *
  * @author Matthew Khouzam
  * @since 3.1

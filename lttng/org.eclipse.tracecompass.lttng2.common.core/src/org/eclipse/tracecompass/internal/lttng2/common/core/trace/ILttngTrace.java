@@ -11,10 +11,11 @@ package org.eclipse.tracecompass.internal.lttng2.common.core.trace;
 
 import java.util.Collection;
 import java.util.regex.Pattern;
+
+import org.eclipse.tracecompass.analysis.counters.core.aspects.CounterAspect;
+import org.eclipse.tracecompass.analysis.counters.core.aspects.ITmfCounterAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.LinuxTidAspect;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
-import org.eclipse.tracecompass.tmf.core.event.aspect.CounterAspect;
-import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfCounterAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
 

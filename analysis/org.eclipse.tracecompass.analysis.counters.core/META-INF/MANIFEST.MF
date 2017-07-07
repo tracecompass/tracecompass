@@ -14,6 +14,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.tmf.core
 Export-Package: org.eclipse.tracecompass.analysis.counters.core,
+ org.eclipse.tracecompass.analysis.counters.core.aspects,
  org.eclipse.tracecompass.internal.analysis.counters.core;x-internal:=true
 Import-Package: com.google.common.base,
  com.google.common.collect

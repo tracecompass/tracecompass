@@ -7,7 +7,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.core.event.aspect;
+package org.eclipse.tracecompass.analysis.counters.core.aspects;
+
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 
 /**
  * Counter aspect, used for incrementing long aspects.
