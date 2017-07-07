@@ -81,6 +81,7 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.core.histogram
  org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint,
  org.eclipse.tracecompass.tmf.core.trace.location,
  org.eclipse.tracecompass.tmf.core.trace.text,
+ org.eclipse.tracecompass.tmf.core.trace.trim,
  org.eclipse.tracecompass.tmf.core.uml2sd,
  org.eclipse.tracecompass.tmf.core.util,
  org.eclipse.tracecompass.tmf.core.viewmodel

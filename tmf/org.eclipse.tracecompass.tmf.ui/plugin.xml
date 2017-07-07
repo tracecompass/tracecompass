@@ -814,6 +814,15 @@
               </with>
            </visibleWhen>
         </command>
+        <!--  <command
+               commandId="org.eclipse.tracecompass.tmf.ui.command.trim_trace"
+               label="%command.trim_trace"
+               style="push"
+               tooltip="%command.trim_trace.description">
+            <visibleWhen
+                  checkEnabled="true">
+            </visibleWhen>
+         </command> -->
          <separator
                name="org.eclipse.linuxtools.tmf.ui.separator3"
                visible="true">
@@ -1298,6 +1307,11 @@
             description="%command.convert.description"
             id="org.eclipse.tracecompass.tmf.ui.command.convert_project"
             name="%command.convert">
+            </command>
+      <command
+            description="%command.trim_trace.description"
+            id="org.eclipse.tracecompass.tmf.ui.command.trim_trace"
+            name="%command.trim_trace">
       </command>
       <command
             defaultHandler="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.RemoveTraceFromExperimentHandler"
@@ -1547,6 +1561,24 @@
                </or>
             </iterate>
          </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.TrimTraceHandler"
+            commandId="org.eclipse.tracecompass.tmf.ui.command.trim_trace">
+            <enabledWhen>
+              <and>
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
+                     </instanceof>
+                  </iterate>
+               </and>
+            </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.NewFolderHandler"

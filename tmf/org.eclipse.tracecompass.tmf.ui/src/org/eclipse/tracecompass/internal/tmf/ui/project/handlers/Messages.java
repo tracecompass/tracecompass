@@ -71,6 +71,16 @@ public class Messages extends NLS {
     public static String DeleteSupplementaryFiles_DeletionTask;
     public static String DeleteSupplementaryFiles_ProjectRefreshTask;
 
+    public static String TrimTraceHandler_failMsg;
+
+    public static String TrimTraces_JobName;
+    public static String TrimTraces_DirectoryChooser_DialogTitle;
+    public static String TrimTraces_InvalidTimeRange_DialogTitle;
+    public static String TrimTraces_InvalidTimeRange_DialogText;
+    public static String TrimTraces_InvalidDirectory_DialogTitle;
+    public static String TrimTraces_InvalidDirectory_DialogText;
+    public static String TrimTraces_NoWriteAccess_DialogText;
+
     public static String AnalysisModule_Help;
 
     public static String TmfActionProvider_OpenWith;
