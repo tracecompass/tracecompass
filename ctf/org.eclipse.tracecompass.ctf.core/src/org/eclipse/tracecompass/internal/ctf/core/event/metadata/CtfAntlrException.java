@@ -95,21 +95,19 @@ public class CtfAntlrException extends CTFException {
                 if (isInt) {
                     value = ((Integer) f.get(null)).intValue();
                     if (value == m.expecting) {
-                        this.fExpectingName = name;
-                        this.fExpectedValue = value;
+                        fExpectingName = name;
+                        fExpectedValue = value;
                     }
-                    if (value == m.c) {
-                        this.fActualName = name;
-                        this.fActualValue = value;
+                    if (value == m.getUnexpectedType()) {
+                        fActualName = name;
+                        fActualValue = value;
                     }
                 }
             } catch (NullPointerException e1) {
                 // Pokemon, gotta catch em all!
                 // actually useful since f may not have a
                 // value
-            } catch (IllegalArgumentException e1) {
-                // Catch these exceptions (reflexion)
-            } catch (IllegalAccessException e1) {
+            } catch (IllegalArgumentException | IllegalAccessException e1) {
                 // Catch these exceptions (reflexion)
             }
             if (!this.fExpectingName.isEmpty() && !this.fActualName.isEmpty()) {
@@ -124,10 +122,10 @@ public class CtfAntlrException extends CTFException {
         if (fErrorLine == -1) {
             return message;
         }
-        String expected = "" + this.fExpectedValue; //$NON-NLS-1$
-        String actual = "" + this.fActualValue; //$NON-NLS-1$
-        String newMessage = message.replaceAll(expected, this.fExpectingName);
-        newMessage = newMessage.replaceAll(actual, this.fActualName);
+        String expected = Integer.toString(fExpectedValue);
+        String actual = Integer.toString(fActualValue);
+        String newMessage = message.replaceAll(expected, fExpectingName);
+        newMessage = newMessage.replaceAll(actual, fActualName);
         return newMessage + " at " + fFile + ":" + fErrorLine + ":" + fCharPositionInLine; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 

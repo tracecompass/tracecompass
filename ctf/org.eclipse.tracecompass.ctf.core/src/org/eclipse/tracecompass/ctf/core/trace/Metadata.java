@@ -150,9 +150,8 @@ public class Metadata {
     public void parseFile() throws CTFException {
 
         /*
-         * Reader. It will contain a StringReader if we are using packet-based
-         * metadata and it will contain a FileReader if we have text-based
-         * metadata.
+         * Reader. It will contain a StringReader if we are using packet-based metadata
+         * and it will contain a FileReader if we have text-based metadata.
          */
 
         try (FileInputStream fis = new FileInputStream(getMetadataPath());
@@ -166,9 +165,12 @@ public class Metadata {
             throw new CTFException("Cannot find metadata file!", e); //$NON-NLS-1$
         } catch (IOException | ParseException e) {
             throw new CTFException(e);
-        } catch (RecognitionException | RewriteCardinalityException e) {
+        } catch (RecognitionException e) {
+            throw new CtfAntlrException(e);
+        } catch (RewriteCardinalityException e) { /* needs to be separate to avoid casting as exception */
             throw new CtfAntlrException(e);
         }
+
     }
 
     private Reader readBinaryMetaData(FileChannel metadataFileChannel) throws CTFException {
@@ -176,8 +178,7 @@ public class Metadata {
         StringBuffer metadataText = new StringBuffer();
 
         /*
-         * Read metadata packet one by one, appending the text to the
-         * StringBuffer
+         * Read metadata packet one by one, appending the text to the StringBuffer
          */
         MetadataPacketHeader packetHeader = readMetadataPacket(
                 metadataFileChannel, metadataText);
@@ -196,8 +197,7 @@ public class Metadata {
      * <ul>
      * <li>For text-only metadata, the file starts with "/* CTF" (without the
      * quotes)</li>
-     * <li>For packet-based metadata, the file starts with correct magic number
-     * </li>
+     * <li>For packet-based metadata, the file starts with correct magic number</li>
      * </ul>
      *
      * @param path
@@ -313,9 +313,9 @@ public class Metadata {
     }
 
     /**
-     * Determines whether the metadata file is packet-based by looking at the
-     * TSDL magic number. If it is packet-based, it also gives information about
-     * the endianness of the trace using the detectedByteOrder attribute.
+     * Determines whether the metadata file is packet-based by looking at the TSDL
+     * magic number. If it is packet-based, it also gives information about the
+     * endianness of the trace using the detectedByteOrder attribute.
      *
      * @param metadataFileChannel
      *            FileChannel of the metadata file.
@@ -325,8 +325,7 @@ public class Metadata {
     private boolean isPacketBased(FileChannel metadataFileChannel)
             throws CTFException {
         /*
-         * Create a ByteBuffer to read the TSDL magic number (default is
-         * big-endian)
+         * Create a ByteBuffer to read the TSDL magic number (default is big-endian)
          */
         ByteBuffer magicByteBuffer = ByteBuffer.allocate(Utils.TSDL_MAGIC_LEN);
 
@@ -368,20 +367,20 @@ public class Metadata {
     }
 
     /**
-     * Reads a metadata packet from the given metadata FileChannel, do some
-     * basic validation and append the text to the StringBuffer.
+     * Reads a metadata packet from the given metadata FileChannel, do some basic
+     * validation and append the text to the StringBuffer.
      *
      * @param metadataFileChannel
      *            Metadata FileChannel
      * @param metadataText
      *            StringBuffer to which the metadata text will be appended.
-     * @return A structure describing the header of the metadata packet, or null
-     *         if the end of the file is reached.
+     * @return A structure describing the header of the metadata packet, or null if
+     *         the end of the file is reached.
      * @throws CTFException
      */
     private MetadataPacketHeader readMetadataPacket(
             FileChannel metadataFileChannel, StringBuffer metadataText)
-                    throws CTFException {
+            throws CTFException {
         /* Allocate a ByteBuffer for the header */
         ByteBuffer headerByteBuffer = ByteBuffer.allocate(METADATA_PACKET_HEADER_SIZE);
 
