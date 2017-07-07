@@ -189,7 +189,7 @@ public class CTFTraceWriterTest {
                         IEventDefinition def = reader.getCurrentEventDef();
                         end = def.getTimestamp();
                         if (start == null) {
-                            start = outTrace.getClock().getClockOffset() + reader.getStartTime();
+                            start = reader.getStartTime();
                         }
                         reader.advance();
                     }

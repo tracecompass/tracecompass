@@ -77,7 +77,7 @@ public interface IEventDefinition {
     int getCPU();
 
     /**
-     * Get the timestamp, it is offsetted
+     * Get the timestamp, it is offsetted but not scaled
      *
      * @return the timestamp
      */

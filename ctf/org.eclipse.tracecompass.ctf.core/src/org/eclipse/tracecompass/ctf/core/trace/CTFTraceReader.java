@@ -108,12 +108,12 @@ public class CTFTraceReader implements AutoCloseable {
         populateStreamInputReaderHeap();
 
         /**
-         * Get the start Time of this trace bear in mind that the trace could be
-         * empty.
+         * Get the start time of this trace bear in mind that the trace could be
+         * empty. Set the start time should be in nanoseconds in UTC.
          */
         fStartTime = 0;
         if (hasMoreEvents()) {
-            fStartTime = checkNotNull(getTopStream().getCurrentEvent()).getTimestamp();
+            fStartTime = fTrace.timestampCyclesToNanos(checkNotNull(getTopStream().getCurrentEvent()).getTimestamp());
             setEndTime(fStartTime);
         }
     }
@@ -130,7 +130,7 @@ public class CTFTraceReader implements AutoCloseable {
 
         newReader = new CTFTraceReader(fTrace);
         newReader.fStartTime = fStartTime;
-        newReader.setEndTime(fEndTime);
+        newReader.fEndTime = fEndTime;
         return newReader;
     }
 
@@ -160,7 +160,8 @@ public class CTFTraceReader implements AutoCloseable {
     // ------------------------------------------------------------------------
 
     /**
-     * Return the start time of this trace (== timestamp of the first event)
+     * Return the start time of this trace (== timestamp of the first event) in UTC
+     * nanoseconds
      *
      * @return the trace start time
      */
@@ -169,10 +170,10 @@ public class CTFTraceReader implements AutoCloseable {
     }
 
     /**
-     * Set the trace's end time
+     * Set the trace's end time, must be in nanoseconds in UTC
      *
      * @param endTime
-     *            The end time to use
+     *            The end time to use.
      */
     protected final void setEndTime(long endTime) {
         fEndTime = endTime;
@@ -370,7 +371,6 @@ public class CTFTraceReader implements AutoCloseable {
             final long topEnd = fTrace.timestampCyclesToNanos(currentEvent.getTimestamp());
             setEndTime(Math.max(topEnd, getEndTime()));
             fEventCountPerTraceFile[top.getName()]++;
-            fEndTime = Math.max(currentEvent.getTimestamp(), fEndTime);
             break;
         }
         case WAIT: {
@@ -397,7 +397,7 @@ public class CTFTraceReader implements AutoCloseable {
      *             if an error occurs
      */
     public void goToLastEvent() throws CTFException {
-        seek(getEndTime());
+        seek(fTrace.timestampNanoToCycles(getEndTime()));
         while (fPrio.size() > 1) {
             advance();
         }
@@ -405,15 +405,17 @@ public class CTFTraceReader implements AutoCloseable {
 
     /**
      * Seeks to a given timestamp. It will seek to the nearest event greater or
-     * equal to timestamp. If a trace is [10 20 30 40] and you are looking for
-     * 19, it will give you 20. If you want 20, you will get 20, if you want 21,
-     * you will get 30. The value -inf will seek to the first element and the
-     * value +inf will seek to the end of the file (past the last event).
+     * equal to timestamp. If a trace is [10 20 30 40] and you are looking for 19,
+     * it will give you 20. If you want 20, you will get 20, if you want 21, you
+     * will get 30. The value -inf will seek to the first element and the value +inf
+     * will seek to the end of the file (past the last event). The seek method
+     * requires relative time, so use {@link CTFTrace#timestampNanoToCycles(long)}
+     * to convert the time if it is in UTC nanoseconds.
      *
      * @param timestamp
-     *            the timestamp to seek to
-     * @return true if there are events above or equal the seek timestamp, false
-     *         if seek at the end of the trace (no valid event).
+     *            the "timestamp" to seek to in ctf relative time (cycles)
+     * @return true if there are events above or equal the seek timestamp, false if
+     *         seek at the end of the trace (no valid event).
      * @throws CTFException
      *             if an error occurs
      */
@@ -453,7 +455,7 @@ public class CTFTraceReader implements AutoCloseable {
      * @return true if yes.
      */
     public final boolean hasMoreEvents() {
-        return fPrio.size() > 0;
+        return !fPrio.isEmpty();
     }
 
     /**
@@ -502,8 +504,9 @@ public class CTFTraceReader implements AutoCloseable {
     }
 
     /**
-     * Gets the last event timestamp that was read. This is NOT necessarily the
-     * last event in a trace, just the last one read so far.
+     * Gets the last event timestamp that was read. This is NOT necessarily the last
+     * event in a trace, just the last one read so far. Time is in nanoseconds in
+     * UTC
      *
      * @return the last event
      */
@@ -597,6 +600,5 @@ public class CTFTraceReader implements AutoCloseable {
             sir.goToLastEvent();
         }
         seek(0);
-
     }
 }
