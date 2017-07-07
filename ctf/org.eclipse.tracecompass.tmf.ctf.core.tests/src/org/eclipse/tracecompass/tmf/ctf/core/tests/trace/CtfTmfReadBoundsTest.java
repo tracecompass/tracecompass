@@ -44,7 +44,7 @@ public class CtfTmfReadBoundsTest {
             assertEquals(1331668247314038062L, start.toNanos());
             ITmfTimestamp end = trace.readEnd();
             assertNotNull("Failed to read CtfTmfTrace end time", end);
-            assertEquals(1331668259053641544L, end.toNanos());
+            assertEquals(1331668259054285979L, end.toNanos());
         } finally {
             CtfTmfTestTraceUtils.dispose(CtfTestTrace.TRACE2);
         }
@@ -68,7 +68,7 @@ public class CtfTmfReadBoundsTest {
             assertEquals(1331668247814038062L, start.toNanos());
             ITmfTimestamp end = traceWithOffset.readEnd();
             assertNotNull("Failed to read CtfTmfTrace end time", end);
-            assertEquals(1331668259553641544L, end.toNanos());
+            assertEquals(1331668259554285979L, end.toNanos());
         } finally {
             traceWithOffset.dispose();
             TmfTraceManager.deleteSupplementaryFiles(traceWithOffset);

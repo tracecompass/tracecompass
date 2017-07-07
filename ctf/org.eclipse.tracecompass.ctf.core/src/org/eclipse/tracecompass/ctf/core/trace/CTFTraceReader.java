@@ -245,7 +245,8 @@ public class CTFTraceReader implements AutoCloseable {
             Set<CTFStreamInput> streamInputs = stream.getStreamInputs();
             for (CTFStreamInput streamInput : streamInputs) {
                 /*
-                 * Create a reader to check if it already exists in the list. If it doesn't, add it.
+                 * Create a reader to check if it already exists in the list. If it doesn't, add
+                 * it.
                  */
                 try (CTFStreamInputReader streamInputReader = new CTFStreamInputReader(checkNotNull(streamInput))) {
                     if (!fStreamInputReaders.contains(streamInputReader)) {
@@ -282,8 +283,8 @@ public class CTFTraceReader implements AutoCloseable {
     }
 
     /**
-     * Initializes the priority queue used to choose the trace file with the
-     * lower next event timestamp.
+     * Initializes the priority queue used to choose the trace file with the lower
+     * next event timestamp.
      *
      * @throws CTFException
      *             if an error occurs
@@ -296,8 +297,8 @@ public class CTFTraceReader implements AutoCloseable {
         }
 
         /*
-         * Create the priority queue with a size twice as bigger as the number
-         * of reader in order to avoid constant resizing.
+         * Create the priority queue with a size twice as bigger as the number of reader
+         * in order to avoid constant resizing.
          */
         fPrio = new PriorityQueue<>(
                 Math.max(fStreamInputReaders.size() * 2, MIN_PRIO_SIZE),
@@ -307,8 +308,8 @@ public class CTFTraceReader implements AutoCloseable {
 
         for (CTFStreamInputReader reader : fStreamInputReaders) {
             /*
-             * Add each trace file reader in the priority queue, if we are able
-             * to read an event from it.
+             * Add each trace file reader in the priority queue, if we are able to read an
+             * event from it.
              */
             CTFResponse readNextEvent = reader.readNextEvent();
             if (readNextEvent == CTFResponse.OK || readNextEvent == CTFResponse.WAIT) {
@@ -323,11 +324,11 @@ public class CTFTraceReader implements AutoCloseable {
     }
 
     /**
-     * Get the current event, which is the current event of the trace file
-     * reader with the lowest timestamp.
+     * Get the current event, which is the current event of the trace file reader
+     * with the lowest timestamp.
      *
-     * @return An event definition, or null of the trace reader reached the end
-     *         of the trace.
+     * @return An event definition, or null of the trace reader reached the end of
+     *         the trace.
      * @since 2.0
      */
     public IEventDefinition getCurrentEventDef() {
@@ -364,8 +365,8 @@ public class CTFTraceReader implements AutoCloseable {
              */
             fPrio.add(top);
             /*
-             * We're in OK, there's a guaranteed top#getCurrentEvent() unless another
-             * thread does something bad.
+             * We're in OK, there's a guaranteed top#getCurrentEvent() unless another thread
+             * does something bad.
              */
             IEventDefinition currentEvent = checkNotNull(top.getCurrentEvent());
             final long topEnd = fTrace.timestampCyclesToNanos(currentEvent.getTimestamp());
@@ -384,8 +385,8 @@ public class CTFTraceReader implements AutoCloseable {
             // something bad happend
         }
         /*
-         * If there is no reader in the queue, it means the trace reader reached
-         * the end of the trace.
+         * If there is no reader in the queue, it means the trace reader reached the end
+         * of the trace.
          */
         return hasMoreEvents();
     }
@@ -397,10 +398,18 @@ public class CTFTraceReader implements AutoCloseable {
      *             if an error occurs
      */
     public void goToLastEvent() throws CTFException {
-        seek(fTrace.timestampNanoToCycles(getEndTime()));
-        while (fPrio.size() > 1) {
-            advance();
+        long endTime = Long.MIN_VALUE;
+        for (CTFStreamInputReader sir : fPrio) {
+            sir.goToLastEvent();
+            IEventDefinition currentEvent = sir.getCurrentEvent();
+            if (currentEvent != null) {
+                endTime = Math.max(currentEvent.getTimestamp(), endTime);
+            }
         }
+        setEndTime(fTrace.timestampCyclesToNanos(endTime));
+        // Go right before the end time, may be several events before the end but they
+        // would all be the "last" event occurring at the same time
+        seek(endTime);
     }
 
     /**
@@ -586,8 +595,8 @@ public class CTFTraceReader implements AutoCloseable {
     }
 
     /**
-     * This will read the entire trace and populate all the indexes. The reader
-     * will then be reset to the first event in the trace.
+     * This will read the entire trace and populate all the indexes. The reader will
+     * then be reset to the first event in the trace.
      *
      * Do not call in the fast path.
      *
