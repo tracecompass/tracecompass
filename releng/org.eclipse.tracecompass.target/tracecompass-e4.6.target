@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="tracecompass-e4.6" sequenceNumber="31">
+<?pde version="3.8"?><target name="tracecompass-e4.6" sequenceNumber="32">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.cdt.gnu.dsf.feature.group" version="0.0.0"/>
@@ -61,8 +61,8 @@
 <repository location="http://download.eclipse.org/eclipse/updates/4.6/R-4.6.3-201703010400"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf" version="1.6.0"/>
-<repository location="http://archive.eclipse.org/tracecompass/tracecompass-test-traces/repository/1.6.0"/>
+<unit id="org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf" version="1.7.2"/>
+<repository location="http://archive.eclipse.org/tracecompass/tracecompass-test-traces/repository/1.7.2"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.wst.xml.core" version="0.0.0"/>

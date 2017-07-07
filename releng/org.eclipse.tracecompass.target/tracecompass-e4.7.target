@@ -63,8 +63,8 @@
 <repository location="http://download.eclipse.org/eclipse/updates/4.7/R-4.7-201706120950/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf" version="1.6.0"/>
-<repository location="http://archive.eclipse.org/tracecompass/tracecompass-test-traces/repository/1.6.0"/>
+<unit id="org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf" version="1.7.2"/>
+<repository location="http://archive.eclipse.org/tracecompass/tracecompass-test-traces/repository/1.7.2"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.wst.xml.core" version="0.0.0"/>
