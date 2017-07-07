@@ -18,6 +18,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,6 +33,7 @@ import java.util.UUID;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
@@ -44,6 +46,7 @@ import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInput;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
+import org.eclipse.tracecompass.ctf.core.trace.CTFTraceWriter;
 import org.eclipse.tracecompass.ctf.core.trace.ICTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.Metadata;
 import org.eclipse.tracecompass.internal.tmf.ctf.core.Activator;
@@ -57,6 +60,7 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ICyclesConverter;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
@@ -70,6 +74,7 @@ import org.eclipse.tracecompass.tmf.core.trace.indexer.TmfBTreeTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.ITmfCheckpoint;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.TmfCheckpoint;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
+import org.eclipse.tracecompass.tmf.core.trace.trim.ITmfTrimmableTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.CtfConstants;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocation;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocationInfo;
@@ -92,7 +97,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class CtfTmfTrace extends TmfTrace
         implements ITmfPropertiesProvider, ITmfPersistentlyIndexable,
-        ITmfTraceWithPreDefinedEvents, ITmfTraceKnownSize, ICyclesConverter {
+        ITmfTraceWithPreDefinedEvents, ITmfTraceKnownSize, ICyclesConverter, ITmfTrimmableTrace {
 
     // -------------------------------------------
     // Constants
@@ -879,4 +884,22 @@ public class CtfTmfTrace extends TmfTrace
             return null;
         }
     }
+
+    @Override
+    public Path trim(@NonNull TmfTimeRange range, @NonNull Path destinationPath, @NonNull IProgressMonitor monitor) throws CoreException {
+        CTFTrace trace = fTrace;
+        if (trace == null) {
+            return null;
+        }
+        try {
+            CTFTraceWriter ctfWriter = new CTFTraceWriter(trace);
+            String tracePath = destinationPath.toAbsolutePath().toString();
+            ctfWriter.copyPackets(range.getStartTime().toNanos(), range.getEndTime().toNanos(), tracePath);
+            return destinationPath;
+        } catch (CTFException e) {
+            Activator.getDefault().logError("Error writing trace : " + destinationPath, e); //$NON-NLS-1$
+        }
+        return null;
+    }
+
 }
