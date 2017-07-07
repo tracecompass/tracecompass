@@ -23,10 +23,16 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
  */
 final class IntegerStateValue extends TmfStateValue {
 
-    private final int value;
+    private final int fValue;
 
+    /**
+     * Integer state value
+     *
+     * @param valueAsInt
+     *            the value
+     */
     public IntegerStateValue(int valueAsInt) {
-        this.value = valueAsInt;
+        fValue = valueAsInt;
     }
 
     @Override
@@ -45,17 +51,17 @@ final class IntegerStateValue extends TmfStateValue {
             return false;
         }
         IntegerStateValue other = (IntegerStateValue) object;
-        return (this.value == other.value);
+        return (this.fValue == other.fValue);
     }
 
     @Override
     public int hashCode() {
-        return value;
+        return fValue;
     }
 
     @Override
     public @Nullable String toString() {
-        return String.format("%3d", value); //$NON-NLS-1$
+        return String.format("%3d", fValue); //$NON-NLS-1$
     }
 
     // ------------------------------------------------------------------------
@@ -64,13 +70,13 @@ final class IntegerStateValue extends TmfStateValue {
 
     @Override
     public int unboxInt() {
-        return value;
+        return fValue;
     }
 
     @Override
     public long unboxLong() {
         /* It's always safe to up-cast an int into a long */
-        return value;
+        return fValue;
     }
 
     @Override
@@ -82,15 +88,15 @@ final class IntegerStateValue extends TmfStateValue {
         switch (other.getType()) {
         case INTEGER:
             IntegerStateValue otherIntValue = (IntegerStateValue) other;
-            return Integer.compare(this.value, otherIntValue.value);
+            return Integer.compare(this.fValue, otherIntValue.fValue);
         case DOUBLE:
             double otherDoubleValue = ((DoubleStateValue) other).unboxDouble();
-            return Double.compare(this.value, otherDoubleValue);
+            return Double.compare(this.fValue, otherDoubleValue);
         case LONG:
             long otherLongValue = ((LongStateValue) other).unboxLong();
-            return Long.compare(this.value, otherLongValue);
+            return Long.compare(this.fValue, otherLongValue);
         case NULL:
-            return Integer.compare(this.value, other.unboxInt());
+            return Integer.compare(this.fValue, other.unboxInt());
         case STRING:
             throw new StateValueTypeException("An Integer state value cannot be compared to a String state value."); //$NON-NLS-1$
         case CUSTOM:
@@ -102,7 +108,7 @@ final class IntegerStateValue extends TmfStateValue {
 
     @Override
     public @Nullable Object unboxValue() {
-        return value;
+        return fValue;
     }
 
 }

@@ -23,10 +23,16 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
  */
 final class StringStateValue extends TmfStateValue {
 
-    private final String value;
+    private final String fValue;
 
+    /**
+     * String state value constructor
+     *
+     * @param valueAsString
+     *            string
+     */
     public StringStateValue(String valueAsString) {
-        this.value = valueAsString;
+        fValue = valueAsString;
     }
 
     @Override
@@ -45,17 +51,17 @@ final class StringStateValue extends TmfStateValue {
             return false;
         }
         StringStateValue other = (StringStateValue) object;
-        return value.equals(other.value);
+        return fValue.equals(other.fValue);
     }
 
     @Override
     public int hashCode() {
-        return value.hashCode();
+        return fValue.hashCode();
     }
 
     @Override
     public String toString() {
-        return value;
+        return fValue;
     }
 
     // ------------------------------------------------------------------------
@@ -64,7 +70,7 @@ final class StringStateValue extends TmfStateValue {
 
     @Override
     public String unboxStr() {
-        return value;
+        return fValue;
     }
 
     @Override
@@ -82,13 +88,12 @@ final class StringStateValue extends TmfStateValue {
             throw new StateValueTypeException("A String state value cannot be compared to a Long state value."); //$NON-NLS-1$
         case NULL:
             /*
-             * We assume that every string state value is greater than a null
-             * state value.
+             * We assume that every string state value is greater than a null state value.
              */
             return 1;
         case STRING:
             StringStateValue otherStringValue = (StringStateValue) other;
-            return value.compareTo(otherStringValue.value);
+            return fValue.compareTo(otherStringValue.fValue);
         case CUSTOM:
         default:
             throw new StateValueTypeException("A String state value cannot be compared to the type " + other.getType()); //$NON-NLS-1$
@@ -98,7 +103,7 @@ final class StringStateValue extends TmfStateValue {
 
     @Override
     public @Nullable Object unboxValue() {
-        return value;
+        return fValue;
     }
 
 }

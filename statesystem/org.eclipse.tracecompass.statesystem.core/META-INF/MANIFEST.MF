@@ -17,13 +17,18 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.statesystem.core.s
  org.eclipse.tracecompass.internal.statesystem.core.backend;x-internal:=true,
  org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;x-friends:="org.eclipse.tracecompass.statesystem.core.tests",
  org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.classic;x-friends:="org.eclipse.tracecompass.statesystem.core.tests",
+ org.eclipse.tracecompass.internal.statesystem.core.interval.json;x-internal:=true,
  org.eclipse.tracecompass.statesystem.core,
  org.eclipse.tracecompass.statesystem.core.backend,
  org.eclipse.tracecompass.statesystem.core.exceptions,
  org.eclipse.tracecompass.statesystem.core.interval,
+ org.eclipse.tracecompass.statesystem.core.snapshot,
  org.eclipse.tracecompass.statesystem.core.statevalue
 Import-Package: com.google.common.annotations;version="15.0.0",
  com.google.common.base,
  com.google.common.cache,
  com.google.common.collect;version="12.0.0",
+ com.google.gson,
+ com.google.gson.annotations,
+ com.google.gson.stream,
  org.apache.commons.lang3.builder;version="3.1.0"

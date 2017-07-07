@@ -25,7 +25,19 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 final class NullStateValue extends TmfStateValue {
 
-    private final String value = "nullValue"; //$NON-NLS-1$
+    /**
+     * Instance
+     */
+    public static final TmfStateValue INSTANCE = new NullStateValue();
+
+    /**
+     * Private constructor
+     */
+    private NullStateValue() {
+        // Do nothing
+    }
+
+    private static final String VALUE = "nullValue"; //$NON-NLS-1$
 
     @Override
     public Type getType() {
@@ -49,7 +61,7 @@ final class NullStateValue extends TmfStateValue {
 
     @Override
     public String toString() {
-        return value;
+        return VALUE;
     }
 
     // ------------------------------------------------------------------------
@@ -73,7 +85,7 @@ final class NullStateValue extends TmfStateValue {
 
     @Override
     public String unboxStr() {
-        return value;
+        return VALUE;
     }
 
     @Override
@@ -85,10 +97,14 @@ final class NullStateValue extends TmfStateValue {
             return 0;
         }
         /*
-         * For every other state value type, we defer to how that type wants to
-         * be compared against null values.
+         * For every other state value type, we defer to how that type wants to be
+         * compared against null values.
          */
-        return -(other.compareTo(this));
+        int result = Math.max(-100, Math.min(100, other.compareTo(this)));
+        /*
+         * Result is clamped between 100 and -100 so it is safe to invert it
+         */
+        return -result;
     }
 
     @Override

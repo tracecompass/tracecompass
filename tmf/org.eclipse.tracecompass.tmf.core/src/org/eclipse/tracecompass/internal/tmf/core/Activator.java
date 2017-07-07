@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.internal.tmf.core;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -39,7 +40,7 @@ public class Activator extends Plugin {
     /**
      * The plug-in ID
      */
-    public static final String PLUGIN_ID = "org.eclipse.tracecompass.tmf.core"; //$NON-NLS-1$
+    public static final @NonNull String PLUGIN_ID = "org.eclipse.tracecompass.tmf.core"; //$NON-NLS-1$
 
     /**
      * The shared instance

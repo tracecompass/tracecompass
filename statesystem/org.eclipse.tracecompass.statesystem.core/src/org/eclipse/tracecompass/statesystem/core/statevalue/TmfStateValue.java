@@ -49,19 +49,13 @@ public abstract class TmfStateValue implements ITmfStateValue {
     // Factory methods to instantiate new state values
     // ------------------------------------------------------------------------
 
-    /*
-     * Since all "null state values" are the same, we only need one copy in
-     * memory.
-     */
-    private static TmfStateValue nullValue = new NullStateValue();
-
     /**
      * Return an instance of a "null" value. Only one copy exists in memory.
      *
      * @return A null value
      */
     public static final TmfStateValue nullValue() {
-        return nullValue;
+        return NullStateValue.INSTANCE;
     }
 
     /**
@@ -203,7 +197,7 @@ public abstract class TmfStateValue implements ITmfStateValue {
      */
     public static ITmfStateValue newValue(@Nullable Object value) {
         if (value == null) {
-            return nullValue;
+            return NullStateValue.INSTANCE;
         } else if (value instanceof ITmfStateValue) {
             return (ITmfStateValue) value;
         } else if (value instanceof Integer) {
