@@ -176,9 +176,9 @@ public class CTFTraceGrowingTest {
      * Test adding a bad stream
      *
      * @throws CTFException
-     *             should happen
+     *             should not happen
      */
-    @Test(expected = CTFException.class)
+    @Test
     public void testAddStreamFail() throws CTFException {
         File stream = new File(fPathName + "/" + "metadata");
         try (CTFTraceReader reader = new CTFTraceReader(fixture);) {

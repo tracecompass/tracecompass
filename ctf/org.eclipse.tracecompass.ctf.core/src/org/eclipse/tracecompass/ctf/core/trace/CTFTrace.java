@@ -457,6 +457,7 @@ public class CTFTrace implements IDefinitionScope {
      * @param index
      *            Which index in the class' streamFileChannel array this file must
      *            use
+     * @return the {@link CTFStream} or null if invalid
      * @throws CTFException
      *             if there is a file error
      */
@@ -490,7 +491,9 @@ public class CTFTrace implements IDefinitionScope {
         }
         final StructDefinition packetHeaderDef = getPacketHeaderDef();
         if (packetHeaderDef != null) {
-            validateMagicNumber(packetHeaderDef);
+            if (!validateMagicNumber(packetHeaderDef)) {
+                return null;
+            }
 
             validateUUID(packetHeaderDef);
 
@@ -538,14 +541,13 @@ public class CTFTrace implements IDefinitionScope {
         }
     }
 
-    private static void validateMagicNumber(StructDefinition packetHeaderDef) throws CTFException {
+    private static boolean validateMagicNumber(StructDefinition packetHeaderDef) {
         IntegerDefinition magicDef = (IntegerDefinition) packetHeaderDef.lookupDefinition(CTFStrings.MAGIC);
         if (magicDef != null) {
             int magic = (int) magicDef.getValue();
-            if (magic != Utils.CTF_MAGIC) {
-                throw new CTFException("CTF magic mismatch"); //$NON-NLS-1$
-            }
+            return (magic == Utils.CTF_MAGIC);
         }
+        return true;
     }
 
     /**
