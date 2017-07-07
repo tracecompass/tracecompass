@@ -16,7 +16,10 @@ package org.eclipse.tracecompass.tmf.core.statesystem;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,6 +40,8 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemFactory;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
+import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.statesystem.core.snapshot.StateSnapshot;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -103,8 +108,8 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     }
 
     /**
-     * Retrieve a state system belonging to trace, by passing the ID of the
-     * relevant analysis module.
+     * Retrieve a state system belonging to trace, by passing the ID of the relevant
+     * analysis module.
      *
      * This will start the execution of the analysis module, and start the
      * construction of the state system, if needed.
@@ -113,12 +118,11 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      *            The trace for which you want the state system
      * @param moduleId
      *            The ID of the state system analysis module
-     * @return The state system, or null if there was no match or the module was
-     *         not initialized correctly
+     * @return The state system, or null if there was no match or the module was not
+     *         initialized correctly
      */
     public static @Nullable ITmfStateSystem getStateSystem(ITmfTrace trace, String moduleId) {
-        TmfStateSystemAnalysisModule module =
-                TmfTraceUtils.getAnalysisModuleOfClass(trace, TmfStateSystemAnalysisModule.class, moduleId);
+        TmfStateSystemAnalysisModule module = TmfTraceUtils.getAnalysisModuleOfClass(trace, TmfStateSystemAnalysisModule.class, moduleId);
         if (module != null) {
             ITmfStateSystem ss = module.getStateSystem();
             if (ss != null) {
@@ -150,8 +154,8 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     }
 
     /**
-     * Get the supplementary file name where to save this state system. The
-     * default is the ID of the analysis followed by the extension.
+     * Get the supplementary file name where to save this state system. The default
+     * is the ID of the analysis followed by the extension.
      *
      * @return The supplementary file name
      */
@@ -210,7 +214,10 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      */
     @Override
     public boolean isQueryable(long ts) {
-        /* Return true if there is no state provider available (the analysis is not being built) */
+        /*
+         * Return true if there is no state provider available (the analysis is not
+         * being built)
+         */
         ITmfStateProvider provider = fStateProvider;
         if (provider == null) {
             return true;
@@ -260,22 +267,21 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                 analysisReady(false);
                 return false;
             }
+            File htFile;
             switch (backend) {
-            case FULL: {
-                File htFile = getSsFile();
+            case FULL:
+                htFile = getSsFile();
                 if (htFile == null) {
                     return false;
                 }
                 createFullHistory(id, provider, htFile);
-            }
                 break;
-            case PARTIAL: {
-                File htFile = getSsFile();
+            case PARTIAL:
+                htFile = getSsFile();
                 if (htFile == null) {
                     return false;
                 }
                 createPartialHistory(id, provider, htFile);
-            }
                 break;
             case INMEM:
                 createInMemoryHistory(id, provider);
@@ -327,9 +333,8 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     // ------------------------------------------------------------------------
 
     /*
-     * Load the history file matching the target trace. If the file already
-     * exists, it will be opened directly. If not, it will be created from
-     * scratch.
+     * Load the history file matching the target trace. If the file already exists,
+     * it will be opened directly. If not, it will be created from scratch.
      */
     private void createFullHistory(String id, ITmfStateProvider provider, File htFile) throws TmfTraceException {
 
@@ -338,7 +343,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         // at least if its range matches the trace's range.
 
         if (htFile.exists()) {
-           /* Load an existing history */
+            /* Load an existing history */
             final int version = provider.getVersion();
             try {
                 IStateHistoryBackend backend = StateHistoryBackendFactory.createHistoryTreeBackendExistingFile(
@@ -348,9 +353,9 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                 return;
             } catch (IOException e) {
                 /*
-                 * There was an error opening the existing file. Perhaps it was
-                 * corrupted, perhaps it's an old version? We'll just
-                 * fall-through and try to build a new one from scratch instead.
+                 * There was an error opening the existing file. Perhaps it was corrupted,
+                 * perhaps it's an old version? We'll just fall-through and try to build a new
+                 * one from scratch instead.
                  */
             }
         }
@@ -366,41 +371,42 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             build(provider);
         } catch (IOException e) {
             /*
-             * If it fails here however, it means there was a problem writing to
-             * the disk, so throw a real exception this time.
+             * If it fails here however, it means there was a problem writing to the disk,
+             * so throw a real exception this time.
              */
             throw new TmfTraceException(e.toString(), e);
         }
     }
 
     /*
-     * Create a new state system backed with a partial history. A partial
-     * history is similar to a "full" one (which you get with
-     * {@link #newFullHistory}), except that the file on disk is much smaller,
-     * but queries are a bit slower.
+     * Create a new state system backed with a partial history. A partial history is
+     * similar to a "full" one (which you get with {@link #newFullHistory}), except
+     * that the file on disk is much smaller, but queries are a bit slower.
      *
-     * Also note that single-queries are implemented using a full-query
-     * underneath, (which are much slower), so this might not be a good fit for
-     * a use case where you have to do lots of single queries.
+     * Also note that single-queries are implemented using a full-query underneath,
+     * (which are much slower), so this might not be a good fit for a use case where
+     * you have to do lots of single queries.
      */
     private void createPartialHistory(String id, ITmfStateProvider provider, File htPartialFile)
             throws TmfTraceException {
         /*
-         * The order of initializations is very tricky (but very important!)
-         * here. We need to follow this pattern:
-         * (1 is done before the call to this method)
-         *
-         * 1- Instantiate realStateProvider
-         * 2- Instantiate realBackend
-         * 3- Instantiate partialBackend, with prereqs:
-         *  3a- Instantiate partialProvider, via realProvider.getNew()
-         *  3b- Instantiate nullBackend (partialSS's backend)
-         *  3c- Instantiate partialSS
-         *  3d- partialProvider.assignSS(partialSS)
-         * 4- Instantiate realSS
-         * 5- partialSS.assignUpstream(realSS)
-         * 6- realProvider.assignSS(realSS)
-         * 7- Call HistoryBuilder(realProvider, realSS, partialBackend) to build the thing.
+         * The order of initializations is very tricky (but very important!) here. We
+         * need to follow this pattern: (1 is done before the call to this method)
+         * <ol>
+         * <li>Instantiate realStateProvider</li>
+         * <li>Instantiate realBackend</li>
+         * <li>Instantiate partialBackend, with prereqs:
+         * <ol>
+         * <li>Instantiate partialProvider, via realProvider.getNew()</li>
+         * <li>Instantiate nullBackend (partialSS's backend)</li>
+         * <li>Instantiate partialSS</li>
+         * <li>partialProvider.assignSS(partialSS)</li>
+         * </ol>
+         * <li>Instantiate realSS</li>
+         * <li>partialSS.assignUpstream(realSS)</li>
+         * <li>realProvider.assignSS (realSS)</li>
+         * <li>Call HistoryBuilder(realProvider, realSS, partialBackend) to build the
+         * thing.</li></li>
          */
 
         /* Size of the blocking queue to use when building a state history */
@@ -445,9 +451,9 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     }
 
     /*
-     * Create a new state system using a null history back-end. This means that
-     * no history intervals will be saved anywhere, and as such only
-     * {@link ITmfStateSystem#queryOngoingState} will be available.
+     * Create a new state system using a null history back-end. This means that no
+     * history intervals will be saved anywhere, and as such only {@link
+     * ITmfStateSystem#queryOngoingState} will be available.
      */
     private void createNullHistory(String id, ITmfStateProvider provider) {
         IStateHistoryBackend backend = StateHistoryBackendFactory.createNullBackend(id);
@@ -457,9 +463,9 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     }
 
     /*
-     * Create a new state system using in-memory interval storage. This should
-     * only be done for very small state system, and will be naturally limited
-     * to 2^31 intervals.
+     * Create a new state system using in-memory interval storage. This should only
+     * be done for very small state system, and will be naturally limited to 2^31
+     * intervals.
      */
     private void createInMemoryHistory(String id, ITmfStateProvider provider) {
         IStateHistoryBackend backend = StateHistoryBackendFactory.createInMemoryBackend(id, provider.getStartTime());
@@ -475,8 +481,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             provider.dispose();
             Throwable failureCause = provider.getFailureCause();
             /*
-             * Fail the analysis if the provider failed and force the
-             * file deletion
+             * Fail the analysis if the provider failed and force the file deletion
              */
             if (failureCause != null) {
                 fail(failureCause);
@@ -510,6 +515,14 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             throw new IllegalArgumentException();
         }
 
+        /*
+         * Note we have to do this before fStateProvider is assigned. After that, the
+         * signal listener below will start sending real trace events through the state
+         * provider.
+         */
+        loadInitialState(provider);
+
+        /* Continue on initializing the event request to read trace events. */
         ITmfEventRequest request = fRequest;
         if ((request != null) && (!request.isCompleted())) {
             request.cancel();
@@ -534,8 +547,8 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         analysisReady(true);
 
         /*
-         * Block the executeAnalysis() construction is complete (so that the
-         * progress monitor displays that it is running).
+         * Block the executeAnalysis() construction is complete (so that the progress
+         * monitor displays that it is running).
          */
         try {
             if (request != null) {
@@ -550,7 +563,43 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                 }
             }
         } catch (InterruptedException e) {
-             fail(e);
+            fail(e);
+        }
+    }
+
+    /**
+     * Batch-load the initial state, if there is any.
+     */
+    private void loadInitialState(ITmfStateProvider provider) {
+        final ITmfTrace trace = provider.getTrace();
+        File path = new File(trace.getPath());
+        path = path.isDirectory() ? path : path.getParentFile();
+        if (path == null) {
+            return;
+        }
+        for (ITmfStateSystem ss : getStateSystems()) {
+            if (ss instanceof ITmfStateSystemBuilder) {
+                ITmfStateSystemBuilder ssb = (ITmfStateSystemBuilder) ss;
+                StateSnapshot snapshot = StateSnapshot.read(path.toPath(), ss.getSSID());
+                if (snapshot == null || provider.getVersion() != snapshot.getVersion()) {
+                    /*
+                     * No statedump found, nothing to pre-load or Do not load the statedump if its
+                     * version does not match the current provider.
+                     */
+
+                    continue;
+                }
+
+                /* Load the statedump into the statesystem */
+                for (Entry<List<String>, ITmfStateInterval> attributeSnapshot : snapshot.getStates().entrySet()) {
+                    List<String> attributePath = Objects.requireNonNull(attributeSnapshot.getKey());
+                    int quark = ssb.getQuarkAbsoluteAndAdd(attributePath.toArray(new String[attributePath.size()]));
+                    ITmfStateInterval interval = Objects.requireNonNull(attributeSnapshot.getValue());
+                    Object initialState = interval.getValue();
+
+                    ssb.modifyAttribute(Math.max(interval.getStartTime(), ssb.getStartTime()), initialState, quark);
+                }
+            }
         }
     }
 
@@ -561,6 +610,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      */
     @VisibleForTesting
     protected class StateSystemEventRequest extends TmfEventRequest {
+
         private final ITmfStateProvider sci;
         private final ITmfTrace trace;
 
@@ -593,8 +643,8 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                 sci.processEvent(event);
             } else if (trace instanceof TmfExperiment) {
                 /*
-                 * If the request is for an experiment, check if the event is
-                 * from one of the child trace
+                 * If the request is for an experiment, check if the event is from one of the
+                 * child trace
                  */
                 for (ITmfTrace childTrace : ((TmfExperiment) trace).getTraces()) {
                     if (childTrace == event.getTrace()) {
@@ -613,10 +663,8 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                 fNbRead += getNbRead();
                 synchronized (fRequestSyncObj) {
                     final TmfTimeRange timeRange = fTimeRange;
-                    if (timeRange != null) {
-                        if (getRange().getEndTime().getValue() < timeRange.getEndTime().getValue()) {
-                            startRequest();
-                        }
+                    if (timeRange != null && getRange().getEndTime().toNanos() < timeRange.getEndTime().toNanos()) {
+                        startRequest();
                     }
                 }
             }
@@ -633,6 +681,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             super.handleFailure();
             disposeProvider(true);
         }
+
     }
 
     // ------------------------------------------------------------------------
@@ -652,7 +701,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     public @NonNull Iterable<@NonNull ITmfStateSystem> getStateSystems() {
         ITmfStateSystemBuilder stateSystem = fStateSystem;
         if (stateSystem == null) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
         return Collections.singleton(stateSystem);
     }
@@ -660,7 +709,8 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     /**
      * Signal handler for the TmfTraceRangeUpdatedSignal signal
      *
-     * @param signal The incoming signal
+     * @param signal
+     *            The incoming signal
      */
     @TmfSignalHandler
     public void traceRangeUpdated(final TmfTraceRangeUpdatedSignal signal) {

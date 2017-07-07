@@ -2,3 +2,6 @@ class java/io/File
 getName
  ()Ljava/lang/String;
  ()L1java/lang/String;
+toPath
+ ()Ljava/nio/file/Path;
+ ()L1java/nio/file/Path;
