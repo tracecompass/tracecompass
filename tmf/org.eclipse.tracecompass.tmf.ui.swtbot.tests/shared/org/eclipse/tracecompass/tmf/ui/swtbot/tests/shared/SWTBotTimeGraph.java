@@ -125,6 +125,50 @@ public class SWTBotTimeGraph extends AbstractSWTBotControl<TimeGraphControl> {
         return new SWTBotTimeGraphEntry(widget, parent.get());
     }
 
+
+    /**
+     * Set the expand state of a time graph entry
+     *
+     * @param names
+     *            the path of names
+     * @param expanded
+     *            The expand state
+     * @throws WidgetNotFoundException
+     *             if the entry was not found.
+     *
+     */
+    public void expandEntry(boolean expanded, String... names) {
+        SWTBotTimeGraphEntry entryBot = getEntry(names);
+        if (expanded) {
+            entryBot.expand();
+        } else {
+            entryBot.collapse();
+        }
+    }
+
+    /**
+     * Get the number of expanded (visible) elements in the time graph
+     *
+     * @return The count
+     */
+    public int getExpandedElementCount() {
+        return syncExec(widget::getExpandedElementCount);
+    }
+
+    /**
+     * Expand all time graph entries
+     */
+    public void expandAll() {
+        syncExec(widget::expandAll);
+    }
+
+    /**
+     * Collapse all time graph entries
+     */
+    public void collapseAll() {
+        syncExec(widget::collapseAll);
+    }
+
     /**
      * Gets the table collection representing the selection.
      *

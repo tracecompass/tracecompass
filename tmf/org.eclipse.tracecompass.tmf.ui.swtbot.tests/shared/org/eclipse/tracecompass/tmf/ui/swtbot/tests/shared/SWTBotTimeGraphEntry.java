@@ -221,4 +221,18 @@ public class SWTBotTimeGraphEntry extends AbstractSWTBotControl<TimeGraphControl
         });
         return this;
     }
+
+    /**
+     * Expand the time graph entry
+     */
+    public void expand() {
+        syncExec(() -> widget.setExpandedState(fEntry, true));
+    }
+
+    /**
+     * Expand the time graph entry
+     */
+    public void collapse() {
+        syncExec(() -> widget.setExpandedState(fEntry, false));
+    }
 }
