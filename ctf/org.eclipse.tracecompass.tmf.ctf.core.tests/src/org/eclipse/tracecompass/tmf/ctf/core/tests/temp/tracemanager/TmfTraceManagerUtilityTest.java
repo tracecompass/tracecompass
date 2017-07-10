@@ -119,7 +119,10 @@ public class TmfTraceManagerUtilityTest {
     }
 
     /**
-     * Test the {@link TmfTraceManager#deleteSupplementaryFiles} method.
+     * Test the {@link TmfTraceManager#deleteSupplementaryFolder(ITmfTrace)} method.
+     *
+     * @throws IOException
+     *             if IOException happens
      */
     @Test
     public void testDeleteSupplementaryFolder() throws IOException {
