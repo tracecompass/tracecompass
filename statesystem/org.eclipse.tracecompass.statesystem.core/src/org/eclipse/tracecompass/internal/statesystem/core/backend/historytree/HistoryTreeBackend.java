@@ -344,7 +344,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
             HTNode currentNode = getSHT().readNode(sequenceNumber);
             if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
                 /* Here we add the relevant children nodes for BFS */
-                queue.addAll(((ParentNode) currentNode).selectNextChildren(t));
+                queue.addAll(((ParentNode) currentNode).selectNextChildren(t, key));
             }
             interval = currentNode.getRelevantInterval(key, t);
         }
@@ -374,6 +374,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         if (node.getNodeStart() > node.getNodeEnd()) {
             return Collections.emptyList();
         }
+        IntegerRangeCondition subQuarks = quarks.subCondition(node.getMinQuark(), node.getMaxQuark());
         TimeRangeCondition subTimes = times.subCondition(node.getNodeStart(), node.getNodeEnd());
         /*
          * Transform the children's sequence numbers into the children's
@@ -382,7 +383,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         Iterable<Iterable<HTNode>> children = Iterables.transform(parent.selectNextChildren2D(quarks, subTimes), seqNum -> {
             try {
                 /* Recursive call to flatten children */
-                return flatten(getSHT().readNode(seqNum), quarks, subTimes);
+                return flatten(getSHT().readNode(seqNum), subQuarks, subTimes);
             } catch (ClosedChannelException e) {
                 /**
                  * return node since we were able to read it.

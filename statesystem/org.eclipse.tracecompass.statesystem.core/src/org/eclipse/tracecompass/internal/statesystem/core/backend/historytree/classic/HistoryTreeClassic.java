@@ -53,7 +53,7 @@ public class HistoryTreeClassic implements IHistoryTree {
     public static final int HISTORY_FILE_MAGIC_NUMBER = 0x05FFA900;
 
     /** File format version. Increment when breaking compatibility. */
-    private static final int FILE_VERSION = 8;
+    private static final int FILE_VERSION = 9;
 
     private static final IHTNodeFactory CLASSIC_NODE_FACTORY = new IHTNodeFactory() {
 
@@ -548,7 +548,7 @@ public class HistoryTreeClassic implements IHistoryTree {
 
             if (i > 0) {
                 CoreNode prevNode = (CoreNode) fLatestBranch.get(i - 1);
-                prevNode.setCloseTime(closeNode.getSequenceNumber(), splitTime);
+                prevNode.closeChild(closeNode);
             }
         }
     }
@@ -571,7 +571,7 @@ public class HistoryTreeClassic implements IHistoryTree {
 
         /* Link the new root to its first child (the previous root node) */
         newRootNode.linkNewChild(oldRootNode);
-        ((CoreNode) newRootNode).setCloseTime(oldRootNode.getSequenceNumber(), splitTime);
+        ((CoreNode) newRootNode).closeChild(oldRootNode);
 
         /* Rebuild a new latestBranch */
         int depth = fLatestBranch.size();

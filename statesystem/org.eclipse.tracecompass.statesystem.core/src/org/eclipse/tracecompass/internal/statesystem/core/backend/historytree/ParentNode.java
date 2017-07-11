@@ -98,6 +98,22 @@ public abstract class ParentNode extends HTNode {
     public abstract @NonNull Collection<@NonNull Integer> selectNextChildren(long t);
 
     /**
+     * Inner method to select the sequence numbers for the children of the current
+     * node that intersect the given timestamp and key. Useful for moving down the
+     * tree.
+     *
+     * @param t
+     *            The timestamp to choose which child is the next one
+     * @param k
+     *            The quark key for the query
+     * @return Collection of sequence numbers of the child nodes that intersect t
+     *         and k, non-null empty collection if this is a Leaf Node
+     * @throws TimeRangeException
+     *             If t is out of the node's range
+     */
+    public abstract @NonNull Collection<@NonNull Integer> selectNextChildren(long t, int k);
+
+    /**
      * Get a collection of sequence numbers for the children nodes that contain
      * intervals with quarks from quarks, and times intersecting times from
      * times.

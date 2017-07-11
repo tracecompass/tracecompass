@@ -47,7 +47,7 @@ public abstract class HTNode {
     /**
      * The type of node
      */
-    public static enum NodeType {
+    public enum NodeType {
         /**
          * Core node, which is a "front" node, at any level of the tree except
          * the bottom-most one. It has children, and may have extensions.
@@ -102,12 +102,14 @@ public abstract class HTNode {
      *  1 - byte (type)
      * 16 - 2x long (start time, end time)
      * 16 - 3x int (seq number, parent seq number, intervalcount)
+     * 16 - 2x int (minimum quark and maximum quark)
      *  1 - byte (done or not)
      * </pre>
      */
     private static final int COMMON_HEADER_SIZE = Byte.BYTES
             + 2 * Long.BYTES
             + 3 * Integer.BYTES
+            + 2 * Integer.BYTES
             + Byte.BYTES;
 
     // ------------------------------------------------------------------------
@@ -120,6 +122,8 @@ public abstract class HTNode {
     /* Time range of this node */
     private final long fNodeStart;
     private long fNodeEnd;
+    private int fMinQuark = Integer.MAX_VALUE;
+    private int fMaxQuark = Integer.MIN_VALUE;
 
     /* Sequence number = position in the node section of the file */
     private final int fSequenceNumber;
@@ -198,6 +202,8 @@ public abstract class HTNode {
         NodeType type = NodeType.fromByte(typeByte);
         long start = buffer.getLong();
         long end = buffer.getLong();
+        int min = buffer.getInt();
+        int max = buffer.getInt();
         int seqNb = buffer.getInt();
         int parentSeqNb = buffer.getInt();
         int intervalCount = buffer.getInt();
@@ -234,6 +240,8 @@ public abstract class HTNode {
 
         /* Assign the node's other information we have read previously */
         newNode.fNodeEnd = end;
+        newNode.fMinQuark = min;
+        newNode.fMaxQuark = max;
         newNode.fIsOnDisk = true;
 
         return newNode;
@@ -265,6 +273,8 @@ public abstract class HTNode {
             buffer.put(getNodeType().toByte());
             buffer.putLong(fNodeStart);
             buffer.putLong(fNodeEnd);
+            buffer.putInt(fMinQuark);
+            buffer.putInt(fMaxQuark);
             buffer.putInt(fSequenceNumber);
             buffer.putInt(fParentSequenceNumber);
             buffer.putInt(fIntervals.size());
@@ -394,6 +404,8 @@ public abstract class HTNode {
             }
 
             fIntervals.add(index, newInterval);
+            fMinQuark = Integer.min(fMinQuark, newInterval.getAttribute());
+            fMaxQuark = Integer.max(fMaxQuark, newInterval.getAttribute());
             fSizeOfIntervalSection += newInterval.getSizeOnDisk();
 
         } finally {
@@ -597,6 +609,34 @@ public abstract class HTNode {
                     * 100F;
             return (long) (100L - freePercent);
 
+        } finally {
+            fRwl.readLock().unlock();
+        }
+    }
+
+    /**
+     * Getter for the minimum quark value for this node
+     *
+     * @return the minimum quark for the intervals stored in this node
+     */
+    public int getMinQuark() {
+        fRwl.readLock().lock();
+        try {
+            return fMinQuark;
+        } finally {
+            fRwl.readLock().unlock();
+        }
+    }
+
+    /**
+     * Getter for the maximum quark value for this node
+     *
+     * @return the maximum quark for the intervals stored in this node
+     */
+    public int getMaxQuark() {
+        fRwl.readLock().lock();
+        try {
+            return fMaxQuark;
         } finally {
             fRwl.readLock().unlock();
         }

@@ -45,6 +45,8 @@ public final class CoreNode extends ParentNode {
     /** Start times of each of the children (size = MAX_NB_CHILDREN) */
     private long[] fChildStart;
     private long[] fChildEnd;
+    private int[] fChildMin;
+    private int[] fChildMax;
 
     /** Seq number of this node's extension. -1 if none */
     private volatile int extension = -1;
@@ -83,6 +85,9 @@ public final class CoreNode extends ParentNode {
         fChildStart = new long[size];
         fChildEnd = new long[size];
         Arrays.fill(fChildEnd, Long.MAX_VALUE);
+        fChildMin = new int[size];
+        fChildMax = new int[size];
+        Arrays.fill(fChildMax, Integer.MAX_VALUE);
     }
 
     @Override
@@ -106,6 +111,16 @@ public final class CoreNode extends ParentNode {
         for (int i = 0; i < size; i++) {
             fChildEnd[i] = buffer.getLong();
         }
+
+        fChildMin = new int[size];
+        for (int i = 0; i < size; i++) {
+            fChildMin[i] = buffer.getInt();
+        }
+
+        fChildMax = new int[size];
+        for (int i = 0; i < size; i++) {
+            fChildMax[i] = buffer.getInt();
+        }
     }
 
     @Override
@@ -126,6 +141,16 @@ public final class CoreNode extends ParentNode {
         /* Write the "children's end times" array */
         for (long end : fChildEnd) {
             buffer.putLong(end);
+        }
+
+        /* Write the "children's min quark" array */
+        for (int min : fChildMin) {
+            buffer.putInt(min);
+        }
+
+        /* Write the "children's max quark" array */
+        for (int max : fChildMax) {
+            buffer.putInt(max);
         }
     }
 
@@ -173,11 +198,25 @@ public final class CoreNode extends ParentNode {
     public long getChildEnd(int index) {
         rwl.readLock().lock();
         try {
-            /*
-             * If this is not the last child, we can deduce its end time from
-             * the following child.
-             */
             return fChildEnd[index];
+        } finally {
+            rwl.readLock().unlock();
+        }
+    }
+
+    private int getChildMin(int index) {
+        rwl.readLock().lock();
+        try {
+            return fChildMin[index];
+        } finally {
+            rwl.readLock().unlock();
+        }
+    }
+
+    private int getChildMax(int index) {
+        rwl.readLock().lock();
+        try {
+            return fChildMax[index];
         } finally {
             rwl.readLock().unlock();
         }
@@ -201,17 +240,18 @@ public final class CoreNode extends ParentNode {
     /**
      * Updates the end time for child node in header when closing branch
      *
-     * @param childSequenceNumber
-     *            sequence number of the child that needs to be updated
-     * @param endTime
-     *            the new end time for that child
-     * @return -1 if child was not one of this node's children or index of the
-     *         child within this node's children
+     * @param child
+     *            Child node whose bounds we must apply
+     * @return -1 if child was not one of this node's children or index of the child
+     *         within this node's children
      */
-    public int setCloseTime(int childSequenceNumber, long endTime) {
+    public int closeChild(HTNode child) {
+        int childSequenceNumber = child.getSequenceNumber();
         for (int i = 0; i < getNbChildren(); i++) {
             if (childSequenceNumber == getChild(i)) {
-                fChildEnd[i] = endTime;
+                fChildEnd[i] = child.getNodeEnd();
+                fChildMin[i] = child.getMinQuark();
+                fChildMax[i] = child.getMaxQuark();
                 return i;
             }
         }
@@ -256,13 +296,35 @@ public final class CoreNode extends ParentNode {
     }
 
     @Override
+    public Collection<Integer> selectNextChildren(long t, int k) throws TimeRangeException {
+        if (t < getNodeStart() || (isOnDisk() && t > getNodeEnd())) {
+            throw new TimeRangeException("Requesting children outside the node's range: " + t); //$NON-NLS-1$
+        }
+        rwl.readLock().lock();
+        try {
+            List<Integer> next = new ArrayList<>();
+            for (int i = 0; i < fNbChildren; i++) {
+                if (t >= fChildStart[i] && t <= fChildEnd[i]
+                        && k >= fChildMin[i] && k <= fChildMax[i]) {
+                    next.add(fChildren[i]);
+                }
+            }
+
+            return next;
+        } finally {
+            rwl.readLock().unlock();
+        }
+    }
+
+    @Override
     public Collection<Integer> selectNextChildren2D(IntegerRangeCondition quarks, TimeRangeCondition times) {
         rwl.readLock().lock();
         try {
             /* Selectively search children */
             List<Integer> list = new ArrayList<>();
             for (int child = 0; child < fNbChildren; child++) {
-                if (times.intersects(getChildStart(child), getChildEnd(child))) {
+                if (times.intersects(getChildStart(child), getChildEnd(child))
+                        && quarks.intersects(getChildMin(child), getChildMax(child))) {
                     int potentialNextSeqNb = getChild(child);
                     list.add(potentialNextSeqNb);
                 }
@@ -290,7 +352,38 @@ public final class CoreNode extends ParentNode {
                 /* MAX_NB * Timevalue ('childStart' table) */
                 + Long.BYTES * maxChildren
                 /* MAX_NB * Timevalue ('childEnd' table) */
-                + Long.BYTES * maxChildren;
+                + Long.BYTES * maxChildren
+
+                /* MAX_NB * quark ('childMin' and 'childMax' table) */
+                + 2 * Integer.BYTES * maxChildren;
+    }
+
+    @Override
+    public int getMinQuark() {
+        int min = super.getMinQuark();
+        rwl.readLock().lock();
+        try {
+            for (int i = 0; i < fNbChildren; i++) {
+                min = Integer.min(min, fChildMin[i]);
+            }
+            return min;
+        } finally {
+            rwl.readLock().unlock();
+        }
+    }
+
+    @Override
+    public int getMaxQuark() {
+        int max = super.getMaxQuark();
+        rwl.readLock().lock();
+        try {
+            for (int i = 0; i < fNbChildren; i++) {
+                max = Integer.max(max, fChildMax[i]);
+            }
+            return max;
+        } finally {
+            rwl.readLock().unlock();
+        }
     }
 
     @Override
