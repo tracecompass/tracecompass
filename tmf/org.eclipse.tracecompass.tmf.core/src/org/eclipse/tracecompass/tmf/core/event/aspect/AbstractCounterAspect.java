@@ -21,7 +21,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * implementation of {@link ITmfCounterAspect}
  *
  * @author Matthew Khouzam
- * @since 3.0
+ * @since 3.1
  */
 public abstract class AbstractCounterAspect implements ITmfCounterAspect {
     private final String fFieldName;

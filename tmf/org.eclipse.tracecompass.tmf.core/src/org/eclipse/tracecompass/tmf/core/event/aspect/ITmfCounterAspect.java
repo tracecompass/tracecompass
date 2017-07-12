@@ -13,7 +13,7 @@ package org.eclipse.tracecompass.tmf.core.event.aspect;
  * Counter aspect, used for incrementing long aspects.
  *
  * @author Matthew Khouzam
- * @since 3.0
+ * @since 3.1
  */
 public interface ITmfCounterAspect extends ITmfEventAspect<Long> {
 
