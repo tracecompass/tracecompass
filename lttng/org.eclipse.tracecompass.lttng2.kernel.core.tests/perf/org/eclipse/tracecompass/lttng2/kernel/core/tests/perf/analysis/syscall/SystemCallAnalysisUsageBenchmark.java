@@ -24,6 +24,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.tid.TidAnalysisModule;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
 import org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.analysis.kernel.KernelAnalysisBenchmark;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
+import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
@@ -37,6 +38,8 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.junit.Test;
+
+import com.google.common.collect.Iterables;
 
 /**
  * Benchmarks the system call latency analysis
@@ -208,7 +211,11 @@ public class SystemCallAnalysisUsageBenchmark {
             long intersectEnd = end;
             pmCpu.start();
             for (int j = 0; j < 10; j++) {
-                ss.getIntersectingElements(intersectStart, intersectEnd);
+                /**
+                 * Iterate through the intersection -- this forces lazily evaluated iterables to
+                 * do queries
+                 */
+                Iterables.getLast(ss.getIntersectingElements(intersectStart, intersectEnd), new BasicSegment(0l, 1l));
                 long step = (long) ((intersectEnd - intersectStart) * 0.1);
                 intersectStart += step;
                 intersectEnd -= step;
@@ -226,6 +233,11 @@ public class SystemCallAnalysisUsageBenchmark {
             pmMemory.start();
             for (int j = 0; j < 5; j++) {
                 Iterable<@NonNull ISegment> elements = ss.getIntersectingElements(intersectStart, intersectEnd);
+                /**
+                 * Iterate through the intersection -- this forces lazily evaluated iterables to
+                 * do queries, and identify lingering data structures.
+                 */
+                Iterables.getLast(elements, new BasicSegment(0l, 1l));
                 lists.add(elements);
                 long step = (long) ((intersectEnd - intersectStart) * 0.2);
                 intersectStart += step;
