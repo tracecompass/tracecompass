@@ -22,7 +22,6 @@ import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.tracecompass.analysis.os.linux.core.tid.TidAnalysisModule;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
-import org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.analysis.kernel.KernelAnalysisBenchmark;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
@@ -59,7 +58,7 @@ public class SystemCallAnalysisUsageBenchmark {
 
     private static final int LOOP_COUNT = 25;
 
-    private static void deleteSupplementaryFiles(ITmfTrace trace) {
+    private static void deleteSupplementaryFiles(@NonNull ITmfTrace trace) {
         /*
          * Delete the supplementary files at the beginning and end of the benchmarks
          */
@@ -145,10 +144,10 @@ public class SystemCallAnalysisUsageBenchmark {
     private static long benchmarkIteration(String testName, SystemCallLatencyAnalysis module) {
 
         Performance perf = Performance.getDefault();
-        PerformanceMeter pmCpu = perf.createPerformanceMeter(KernelAnalysisBenchmark.TEST_ID + String.format(TEST_ITERATE_CPU, testName));
+        PerformanceMeter pmCpu = perf.createPerformanceMeter(TEST_ID + String.format(TEST_ITERATE_CPU, testName));
         perf.tagAsSummary(pmCpu, "Syscall " + String.format(TEST_ITERATE_CPU, testName), Dimension.CPU_TIME);
 
-        PerformanceMeter pmMemory = perf.createPerformanceMeter(KernelAnalysisBenchmark.TEST_ID + String.format(TEST_ITERATE_MEMORY, testName));
+        PerformanceMeter pmMemory = perf.createPerformanceMeter(TEST_ID + String.format(TEST_ITERATE_MEMORY, testName));
         perf.tagAsSummary(pmMemory, "Syscall " + String.format(TEST_ITERATE_MEMORY, testName), Dimension.USED_JAVA_HEAP);
 
         ISegmentStore<@NonNull ISegment> ss = module.getSegmentStore();
@@ -192,10 +191,10 @@ public class SystemCallAnalysisUsageBenchmark {
     private static void benchmarkIntersection(String testName, SystemCallLatencyAnalysis module, long start, long end) {
 
         Performance perf = Performance.getDefault();
-        PerformanceMeter pmCpu = perf.createPerformanceMeter(KernelAnalysisBenchmark.TEST_ID + String.format(TEST_INTERSECTION_CPU, testName));
+        PerformanceMeter pmCpu = perf.createPerformanceMeter(TEST_ID + String.format(TEST_INTERSECTION_CPU, testName));
         perf.tagAsSummary(pmCpu, "Syscall " + String.format(TEST_INTERSECTION_CPU, testName), Dimension.CPU_TIME);
 
-        PerformanceMeter pmMemory = perf.createPerformanceMeter(KernelAnalysisBenchmark.TEST_ID + String.format(TEST_INTERSECTION_MEMORY, testName));
+        PerformanceMeter pmMemory = perf.createPerformanceMeter(TEST_ID + String.format(TEST_INTERSECTION_MEMORY, testName));
         perf.tagAsSummary(pmMemory, "Syscall " + String.format(TEST_INTERSECTION_MEMORY, testName), Dimension.USED_JAVA_HEAP);
 
         ISegmentStore<@NonNull ISegment> ss = module.getSegmentStore();
