@@ -14,6 +14,7 @@ import java.util.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.counters.core.CounterAnalysis;
@@ -28,6 +29,8 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
+
+import com.google.common.primitives.Longs;
 
 /**
  * Display the state system as a filtered checkbox tree:
@@ -50,6 +53,20 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
  */
 public class CounterTreeViewer extends AbstractTmfTreeViewer {
 
+    private static final ViewerComparator COMPARATOR = new ViewerComparator() {
+        @Override
+        public int compare(Viewer viewer, Object e1, Object e2) {
+            TmfTreeViewerEntry entry1 = (TmfTreeViewerEntry) e1;
+            TmfTreeViewerEntry entry2 = (TmfTreeViewerEntry) e2;
+            String name1 = entry1.getName();
+            String name2 = entry2.getName();
+            Long longValue1 = Longs.tryParse(name1);
+            Long longValue2 = Longs.tryParse(name2);
+
+            return (longValue1 == null || longValue2 == null) ? name1.compareTo(name2) : longValue1.compareTo(longValue2);
+        }
+    };
+
     private TmfTreeViewerEntry fRootEntry;
     private TriStateFilteredCheckboxTree fTriStateFilteredCheckboxTree;
 
@@ -65,6 +82,7 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
         super(parent, triStateFilteredCheckboxTree.getViewer());
 
         fTriStateFilteredCheckboxTree = triStateFilteredCheckboxTree;
+        fTriStateFilteredCheckboxTree.getViewer().setComparator(COMPARATOR);
         setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
@@ -109,7 +127,6 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
     protected ITmfTreeColumnDataProvider getColumnDataProvider() {
         return () -> {
             TmfTreeColumnData column = new TmfTreeColumnData("Counters"); //$NON-NLS-1$
-            column.setComparator(new ViewerComparator());
             return Collections.singletonList(column);
         };
     }
