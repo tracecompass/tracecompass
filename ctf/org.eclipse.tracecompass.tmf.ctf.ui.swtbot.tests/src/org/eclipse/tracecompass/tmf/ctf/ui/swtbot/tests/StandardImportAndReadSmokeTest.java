@@ -68,6 +68,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.wizards.SWTBotImportWizardUtils;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -511,7 +512,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         if (!defaultExperiment) {
             experimentName = verifyExperimentNameHandling(experimentName);
         }
-        checkFinishButton(true);
+        SWTBotImportWizardUtils.checkFinishButton(fBot, true);
 
         importFinish(confirmationMode);
 
@@ -754,21 +755,21 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         return ResourcesPlugin.getWorkspace().getRoot().getProject(TRACE_PROJECT_NAME);
     }
 
-    private @NonNull String verifyExperimentNameHandling(String aExperimentName) {
+    private @NonNull static String verifyExperimentNameHandling(String aExperimentName) {
         String experimentName = aExperimentName;
 
         // experiment already exists
-        checkFinishButton(false);
+        SWTBotImportWizardUtils.checkFinishButton(fBot, false);
 
         SWTBotText expText = fBot.textInGroup("Options");
 
         // Invalid experiment name (only whitespaces)
         expText.setText(String.valueOf(' '));
-        checkFinishButton(false);
+        SWTBotImportWizardUtils.checkFinishButton(fBot, false);
 
         // Invalid experiment name
         expText.setText(String.valueOf('/'));
-        checkFinishButton(false);
+        SWTBotImportWizardUtils.checkFinishButton(fBot, false);
 
         // Set valid experiment name
         experimentName += '_';

@@ -7,7 +7,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests;
+package org.eclipse.tracecompass.tmf.ui.swtbot.tests.wizards;
+
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Arrays;
@@ -17,6 +19,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
@@ -219,6 +222,28 @@ public final class SWTBotImportWizardUtils {
         } else {
             checkBox.deselect();
         }
+
+        checkBox = bot.checkBox(Messages.ImportTraceWizard_TimeRangeOptionButton + " (yyyy-MM-dd HH:mm:ss.SSS SSS SSS)");
+        if ((optionFlags & ImportTraceWizardPage.OPTION_FILTER_TIMERANGE) != 0) {
+            checkBox.select();
+        } else {
+            checkBox.deselect();
+        }
+    }
+
+    /**
+     * Checks finish button enablement
+     *
+     * @param bot
+     *            SWTBot
+     *
+     * @param isEnabled
+     *            state to check against
+     *
+     */
+    public static void checkFinishButton(SWTBot bot, boolean isEnabled) {
+        SWTBotButton finishButton = bot.button("Finish");
+        assertTrue(finishButton.isEnabled() == isEnabled);
     }
 
     /**
