@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -159,6 +159,7 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
 
     private long fCacheMisses = 0;
     private boolean fCreatedFromScratch;
+    private boolean fIsDirty = false;
 
     /**
      * File handle for the file being read/written
@@ -201,7 +202,9 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
             }
         }
 
+        /* delete above may have reset the value */
         if (isCreatedFromScratch()) {
+            fIsDirty = true;
             header = initialize();
         }
 
@@ -291,17 +294,32 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
                 return null;
             }
             TmfCoreTracer.traceIndexer(CheckpointCollectionFileHeader.class.getSimpleName() + " read " + fFile + " nbEvents: " + header.fNbEvents + " fTimeRange: " + header.fTimeRange); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
-            // Write an invalid version until the very last moment when dispose
-            // the index. This is how we know if it's corrupted or not.
-            fRandomAccessFile.seek(0);
-            fRandomAccessFile.writeInt(INVALID_VERSION);
         } catch (IOException e) {
             Activator.logError(MessageFormat.format(Messages.IOErrorReadingHeader, fFile), e);
             return null;
         }
 
         return header;
+    }
+
+    /**
+     * Marks the index as dirty. Writes an invalid file header, and sets the dirty
+     * flag which will cause the new file header to be serialized when the index is
+     * disposed.
+     */
+    protected void markDirty() {
+        if (fIsDirty) {
+            return;
+        }
+        try {
+            // Write an invalid version until the very last moment when dispose
+            // the index. This is how we know if it's corrupted or not.
+            fRandomAccessFile.seek(0);
+            fRandomAccessFile.writeInt(INVALID_VERSION);
+        } catch (IOException e) {
+            Activator.logError(MessageFormat.format(Messages.IOErrorWritingHeader, fFile), e);
+        }
+        fIsDirty = true;
     }
 
     /**
@@ -357,6 +375,9 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
      */
     @Override
     public void setTimeRange(TmfTimeRange timeRange) {
+        if (!fHeader.fTimeRange.equals(timeRange)) {
+            markDirty();
+        }
         fHeader.fTimeRange = timeRange;
     }
 
@@ -378,6 +399,9 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
      */
     @Override
     public void setNbEvents(long nbEvents) {
+        if (fHeader.fNbEvents != nbEvents) {
+            markDirty();
+        }
         fHeader.fNbEvents = nbEvents;
     }
 
@@ -458,13 +482,14 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
     private void dispose(boolean deleting) {
         try {
             if (fRandomAccessFile != null) {
-                if (!deleting) {
+                if (!deleting && fIsDirty) {
                     if (fHeader != null) {
                         fHeader.serialize(fRandomAccessFile);
                     }
 
                     fRandomAccessFile.seek(0);
                     fRandomAccessFile.writeInt(getVersion());
+                    fIsDirty = false;
                 }
 
                 fRandomAccessFile.close();

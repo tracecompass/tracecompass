@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2016 Ericsson
+ * Copyright (c) 2013, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -67,6 +67,7 @@ public class FlatArray extends AbstractFileCheckpointCollection {
      */
     @Override
     public void insert(ITmfCheckpoint checkpoint) {
+        markDirty();
         try {
             CheckpointCollectionFileHeader header = getHeader();
             ++header.fSize;
