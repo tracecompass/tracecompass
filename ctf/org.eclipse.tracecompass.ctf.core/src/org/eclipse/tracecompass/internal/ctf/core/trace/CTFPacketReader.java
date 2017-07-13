@@ -85,8 +85,8 @@ public final class CTFPacketReader implements IPacketReader, IDefinitionScope {
      * @param declarations
      *            event declarations for this packet reader
      * @param eventHeaderDeclaration
-     *            event header declaration, what to read before any given event,
-     *            to find it's id
+     *            event header declaration, what to read before any given event, to
+     *            find it's id
      * @param streamContext
      *            the context declaration
      * @param packetHeader
@@ -94,7 +94,8 @@ public final class CTFPacketReader implements IPacketReader, IDefinitionScope {
      * @param packetScope
      *            the scope of the packetHeader
      */
-    public CTFPacketReader(BitBuffer input, ICTFPacketDescriptor packetContext, List<@Nullable IEventDeclaration> declarations, @Nullable IDeclaration eventHeaderDeclaration, @Nullable StructDeclaration streamContext, @Nullable ICompositeDefinition packetHeader,
+    public CTFPacketReader(BitBuffer input, ICTFPacketDescriptor packetContext, List<@Nullable IEventDeclaration> declarations, @Nullable IDeclaration eventHeaderDeclaration, @Nullable StructDeclaration streamContext,
+            @Nullable ICompositeDefinition packetHeader,
             IDefinitionScope packetScope) {
         fInput = input;
         fPacketContext = packetContext;
@@ -122,8 +123,8 @@ public final class CTFPacketReader implements IPacketReader, IDefinitionScope {
         int eventID = (int) IEventDeclaration.UNSET_EVENT_ID;
         final long posStart = fInput.position();
         /*
-         * Return the Lost Event after all other events in this packet. We need
-         * to check if the bytebuffer is at the beginning too.
+         * Return the Lost Event after all other events in this packet. We need to check
+         * if the bytebuffer is at the beginning too.
          */
         if (fHasLost && (posStart >= fPacketContext.getContentSizeBits())) {
             fHasLost = false;
@@ -157,8 +158,8 @@ public final class CTFPacketReader implements IPacketReader, IDefinitionScope {
                 StructDefinition variantCurrentField = (StructDefinition) ((VariantDefinition) variantDef).getCurrentField();
 
                 /*
-                 * Try to get the id field in the current field of the variant.
-                 * If it is present, it overrides the previously read event id.
+                 * Try to get the id field in the current field of the variant. If it is
+                 * present, it overrides the previously read event id.
                  */
                 IDefinition vIdDef = variantCurrentField.lookupDefinition("id"); //$NON-NLS-1$
                 if (vIdDef instanceof IntegerDefinition) {
@@ -174,17 +175,19 @@ public final class CTFPacketReader implements IPacketReader, IDefinitionScope {
         if (eventID == IEventDeclaration.UNSET_EVENT_ID && fDeclarations.size() == 1) {
             eventID = 0;
         }
+        if (eventID < 0 || eventID >= fDeclarations.size()) {
+            throw new CTFIOException("Invalid event id : " + eventID + " File position : " + fInput.position() / 8 + '/' + fPacketContext.getContentSizeBits() / 8); //$NON-NLS-1$ //$NON-NLS-2$
+        }
         /* Get the right event definition using the event id. */
         IEventDeclaration eventDeclaration = fDeclarations.get(eventID);
         if (!(eventDeclaration instanceof EventDeclaration)) {
-            throw new CTFIOException("Incorrect event id : " + eventID); //$NON-NLS-1$
+            throw new CTFIOException("Invalid event id : " + eventID); //$NON-NLS-1$
         }
         EventDeclaration declaration = (EventDeclaration) eventDeclaration;
         EventDefinition eventDef = declaration.createDefinition(fStreamContext, fPacketContext, fTracePacketHeader, fEventHeader, fInput, fLastTimestamp);
         fLastTimestamp = eventDef.getTimestamp();
         /*
-         * Set the event timestamp using the timestamp calculated by
-         * updateTimestamp.
+         * Set the event timestamp using the timestamp calculated by updateTimestamp.
          */
 
         if (posStart == fInput.position()) {
