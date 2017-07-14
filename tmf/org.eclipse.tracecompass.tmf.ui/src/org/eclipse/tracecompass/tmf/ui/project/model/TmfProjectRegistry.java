@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2016 Ericsson
+ * Copyright (c) 2011, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -23,6 +23,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
@@ -35,6 +36,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
@@ -54,6 +58,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
 
     private TmfProjectRegistry() {
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
+        TmfSignalManager.register(this);
     }
 
     /**
@@ -63,6 +68,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
      */
     public static void dispose() {
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(INSTANCE);
+        TmfSignalManager.deregister(INSTANCE);
         registry.values().forEach(projectElement -> projectElement.dispose());
     }
 
@@ -212,4 +218,62 @@ public class TmfProjectRegistry implements IResourceChangeListener {
         }
     }
 
+    // -------------------------------------------------------
+    // Signal handlers
+    // -------------------------------------------------------
+
+    /**
+     * Handler for the Trace Opened signal
+     *
+     * @param signal
+     *            The incoming signal
+     * @since 3.1
+     */
+    @TmfSignalHandler
+    public void traceOpened(TmfTraceOpenedSignal signal) {
+        ITmfProjectModelElement element = findElement(signal.getTrace().getResource());
+        if (element != null) {
+            element.refresh();
+            if (element instanceof TmfExperimentElement) {
+                TmfExperimentElement experiment = (TmfExperimentElement) element;
+                for (TmfTraceElement trace : experiment.getTraces()) {
+                    trace.getElementUnderTraceFolder().refresh();
+                }
+            }
+        }
+    }
+
+    /**
+     * Finds the existing project model element that matches the given resource.
+     * Elements are not created if they do not already exist.
+     *
+     * @param resource
+     *            the resource
+     * @return the element, or null
+     * @since 3.1
+     */
+    public static ITmfProjectModelElement findElement(IResource resource) {
+        if (resource == null) {
+            return null;
+        }
+        ITmfProjectModelElement element = getProject(resource.getProject());
+        if (element == null) {
+            return null;
+        }
+        for (String segment : resource.getProjectRelativePath().segments()) {
+            List<ITmfProjectModelElement> children = element.getChildren();
+            element = null;
+            for (ITmfProjectModelElement child : children) {
+                IResource childResource = child.getResource();
+                if (childResource != null && segment.equals(childResource.getName())) {
+                    element = child;
+                    break;
+                }
+            }
+            if (element == null) {
+                return null;
+            }
+        }
+        return element;
+    }
 }

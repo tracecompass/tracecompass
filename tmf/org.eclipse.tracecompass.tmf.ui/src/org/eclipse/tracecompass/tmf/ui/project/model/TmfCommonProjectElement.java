@@ -45,8 +45,6 @@ import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstant
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType.TraceElementType;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -98,7 +96,6 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
     public TmfCommonProjectElement(String name, IResource resource, TmfProjectModelElement parent) {
         super(name, resource, parent);
         refreshTraceType();
-        TmfSignalManager.register(this);
     }
 
     // ------------------------------------------------------------------------
@@ -108,10 +105,10 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
     /**
      * @since 2.3
      */
+    // TODO: Remove this method when major version changes
     @Override
     public void dispose() {
         super.dispose();
-        TmfSignalManager.deregister(this);
     }
 
     /**
@@ -633,24 +630,13 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
         return supplFolder;
     }
 
-    // -------------------------------------------------------
-    // Signal handlers
-    // -------------------------------------------------------
-
     /**
-     * Handler for the Trace Opened signal
-     *
      * @param signal
      *            The incoming signal
+     * @deprecated No longer used
      */
-    @TmfSignalHandler
+    @Deprecated
     public void traceOpened(TmfTraceOpenedSignal signal) {
-        IResource resource = signal.getTrace().getResource();
-        if ((resource == null) || !resource.equals(getResource())) {
-            return;
-        }
-
-        getParent().refresh();
     }
 
 }
