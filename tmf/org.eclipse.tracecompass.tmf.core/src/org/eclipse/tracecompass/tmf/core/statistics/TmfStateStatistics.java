@@ -13,8 +13,8 @@
 
 package org.eclipse.tracecompass.tmf.core.statistics;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -95,8 +95,8 @@ public class TmfStateStatistics implements ITmfStatistics {
     }
 
     @Override
-    public List<Long> histogramQuery(final long start, final long end, final int nb) {
-        final List<Long> list = new LinkedList<>();
+    public List<@NonNull Long> histogramQuery(final long start, final long end, final int nb) {
+        final List<@NonNull Long> list = new ArrayList<>();
         final long increment = (end - start) / nb;
 
         if (totalsStats.isCancelled()) {

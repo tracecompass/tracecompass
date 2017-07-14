@@ -68,7 +68,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
     }
 
     @Override
-    public List<Long> histogramQuery(long start, long end, int nb) {
+    public List<@NonNull Long> histogramQuery(long start, long end, int nb) {
         final long[] borders = new long[nb];
         final long increment = (end - start) / nb;
 
@@ -81,7 +81,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
         HistogramQueryRequest req = new HistogramQueryRequest(borders, end);
         sendAndWait(req);
 
-        List<Long> results = new LinkedList<>(req.getResults());
+        List<@NonNull Long> results = new LinkedList<>(req.getResults());
         return results;
 
     }
@@ -232,7 +232,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
     private class HistogramQueryRequest extends TmfEventRequest {
 
         /** Map of <borders, number of events> */
-        private final TreeMap<Long, Long> results;
+        private final TreeMap<Long, @NonNull Long> results;
 
         /**
          * New histogram request
@@ -260,7 +260,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
             }
         }
 
-        public Collection<Long> getResults() {
+        public Collection<@NonNull Long> getResults() {
             return results.values();
         }
 

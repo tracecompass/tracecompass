@@ -50,7 +50,7 @@ public interface ITmfStatistics {
      * @return The array representing the number of events found in each
      *         sub-range.
      */
-    List<Long> histogramQuery(long start, long end, int nb);
+    List<@NonNull Long> histogramQuery(long start, long end, int nb);
 
     /**
      * Return the total number of events in the trace.
