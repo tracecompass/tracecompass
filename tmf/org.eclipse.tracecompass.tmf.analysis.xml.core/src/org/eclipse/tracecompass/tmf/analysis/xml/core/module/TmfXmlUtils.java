@@ -121,6 +121,7 @@ public final class TmfXmlUtils {
      *              The ITmfStateValue.Type name.
      *
      * @return The ITmfStateValue.Type
+     * @since 2.3
      */
      public static ITmfStateValue.@NonNull Type getTmfStateValueByName(@NonNull String typeName){
 
@@ -157,7 +158,7 @@ public final class TmfXmlUtils {
       * @param objValue
       *            The object value to contain
       * @return The newly-created TmfStateValue object
-      * @since 3.0
+      * @since 2.3
       */
     public static @NonNull TmfStateValue newTmfStateValueFromObject(@Nullable Object objValue) {
         TmfStateValue value = TmfStateValue.nullValue();
@@ -181,7 +182,7 @@ public final class TmfXmlUtils {
      * @param forcedType
      *            The forced type
      * @return The newly-created TmfStateValue object
-     * @since 3.0
+     * @since 2.3
      */
     public static @NonNull TmfStateValue newTmfStateValueFromObjectWithForcedType(@Nullable Object objValue, ITmfStateValue.@NonNull Type forcedType) {
         if (objValue == null) {

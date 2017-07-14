@@ -77,8 +77,17 @@ public interface TmfXmlStrings {
     String TYPE_STRING = "string";
     String TYPE_EVENT_NAME = "eventName";
     String TYPE_DELETE = "delete";
+    /**
+     * @since 2.3
+     */
     String TYPE_SCRIPT = "script";
+    /**
+     * @since 2.3
+     */
     String TYPE_CUSTOM = "custom";
+    /**
+     * @since 2.3
+     */
     String SCRIPT_ENGINE = "scriptEngine";
     String INCREMENT = "increment";
     String UPDATE = "update";

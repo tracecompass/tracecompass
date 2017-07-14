@@ -100,7 +100,7 @@ public interface ITmfEventAspect<T> {
      * This method will return a hint if this aspect should be displayed by default
      *
      * @return if the aspect should be hidden by default
-     * @since 3.0
+     * @since 3.1
      */
     default boolean isHiddenByDefault() {
         return false;
