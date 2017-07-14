@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.NonNull;
@@ -157,7 +158,6 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
 
             TmfTreeViewerEntry rootBranch = new TmfTreeViewerEntry(moduleTrace.getName());
             root.addChild(rootBranch);
-
             module.schedule();
             module.waitForCompletion();
 
@@ -167,8 +167,8 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
                  * Add grouped and ungrouped counters branches along with their entries (if
                  * applicable).
                  */
-                addTreeViewerBranch(stateSystem, rootBranch, CounterAnalysis.GROUPED_COUNTER_ASPECTS_ATTRIB);
-                addTreeViewerBranch(stateSystem, rootBranch, CounterAnalysis.UNGROUPED_COUNTER_ASPECTS_ATTRIB);
+                addTreeViewerBranch(stateSystem, rootBranch, CounterAnalysis.GROUPED_COUNTER_ASPECTS_ATTRIB, moduleTrace.getUUID());
+                addTreeViewerBranch(stateSystem, rootBranch, CounterAnalysis.UNGROUPED_COUNTER_ASPECTS_ATTRIB, moduleTrace.getUUID());
             }
         }
     }
@@ -240,30 +240,30 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
         }
     }
 
-    private void addTreeViewerBranch(ITmfStateSystem stateSystem, TmfTreeViewerEntry rootBranch, String branchName) {
+    private void addTreeViewerBranch(ITmfStateSystem stateSystem, TmfTreeViewerEntry rootBranch, String branchName, UUID traceID) {
         int quark = stateSystem.optQuarkAbsolute(branchName);
         if (quark != ITmfStateSystem.INVALID_ATTRIBUTE && !stateSystem.getSubAttributes(quark, false).isEmpty()) {
             TmfTreeViewerEntry branch = new TmfTreeViewerEntry(branchName);
             rootBranch.addChild(branch);
-            addTreeViewerEntries(stateSystem, branch, quark);
+            addTreeViewerEntries(branch, quark, traceID, stateSystem);
         }
     }
 
     /**
      * Recursively add all child entries of a parent branch from the state system.
      */
-    private void addTreeViewerEntries(ITmfStateSystem stateSystem, TmfTreeViewerEntry parentBranch, int quark) {
-        for (int childQuark : stateSystem.getSubAttributes(quark, false)) {
+    private void addTreeViewerEntries(TmfTreeViewerEntry parentBranch, int quark, UUID traceID, ITmfStateSystem ss) {
+        for (int childQuark : ss.getSubAttributes(quark, false)) {
             TmfTreeViewerEntry childBranch;
-            if (stateSystem.getSubAttributes(childQuark, false).isEmpty()) {
-                String fullPath = retrieveTraceName(parentBranch) + '/' + stateSystem.getFullAttributePath(childQuark);
-                childBranch = new CounterTreeViewerEntry(childQuark, stateSystem, fullPath);
+            if (ss.getSubAttributes(childQuark, false).isEmpty()) {
+                String fullPath = retrieveTraceName(parentBranch) + '/' + ss.getFullAttributePath(childQuark);
+                childBranch = new CounterTreeViewerEntry(childQuark, ss.getAttributeName(childQuark), fullPath, traceID);
             } else {
-                childBranch = new TmfTreeViewerEntry(stateSystem.getAttributeName(childQuark));
+                childBranch = new TmfTreeViewerEntry(ss.getAttributeName(childQuark));
             }
 
             parentBranch.addChild(childBranch);
-            addTreeViewerEntries(stateSystem, childBranch, childQuark);
+            addTreeViewerEntries(childBranch, childQuark, traceID, ss);
         }
     }
 

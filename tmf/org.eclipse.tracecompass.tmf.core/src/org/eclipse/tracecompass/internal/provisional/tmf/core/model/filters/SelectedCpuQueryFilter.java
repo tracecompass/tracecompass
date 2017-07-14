@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableSet;
  * @author Yonni Chen
  * @since 3.0
  */
-public class SelectedCpuQueryFilter extends SelectedThreadQueryFilter {
+public class SelectedCpuQueryFilter extends SelectedThreadQueryFilter implements IMultipleSelectionQueryFilter<Set<Integer>> {
 
     private final Set<Integer> fCpus;
 
@@ -51,7 +51,8 @@ public class SelectedCpuQueryFilter extends SelectedThreadQueryFilter {
      *
      * @return A set of cpu id
      */
-    public Set<Integer> getCpu() {
+    @Override
+    public Set<Integer> getSelectedItems() {
         return fCpus;
     }
 }

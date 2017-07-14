@@ -9,8 +9,9 @@
 
 package org.eclipse.tracecompass.internal.analysis.counters.ui;
 
+import java.util.UUID;
+
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
 
 /**
@@ -22,45 +23,52 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
 public class CounterTreeViewerEntry extends TmfTreeViewerEntry {
 
     private final int fQuark;
-    private final ITmfStateSystem fStateSystem;
-    private final @NonNull String fFullPath;
+    private final String fFullPath;
+    private final UUID fTraceID;
 
     /**
      * Constructor
      *
      * @param quark
      *            ID of the entry
-     * @param stateSystem
-     *            State system which contains the counter
+     * @param name
+     *            Name of this entry
      * @param fullPath
      *            Slash-separated path of the entry in the state system
+     * @param traceID
+     *            The ID of the trace associated to this entry
      */
-    public CounterTreeViewerEntry(int quark, ITmfStateSystem stateSystem, @NonNull String fullPath) {
-        super(stateSystem.getAttributeName(quark));
+    public CounterTreeViewerEntry(int quark, String name, @NonNull String fullPath, UUID traceID) {
+        super(name);
         fQuark = quark;
-        fStateSystem = stateSystem;
         fFullPath = fullPath;
+        fTraceID = traceID;
     }
 
     /**
-     * @return the ID of the entry
+     * Gets the quark associated with this entry
+     *
+     * @return The quark of the entry
      */
     public int getQuark() {
         return fQuark;
     }
 
     /**
-     * @return the state system which contains the counter
+     * Gets the slash-separated path of the entry in the state system
+     *
+     * @return The full path of this entry
      */
-    public ITmfStateSystem getStateSystem() {
-        return fStateSystem;
-    }
-
-    /**
-     * @return the slash-separated path of the entry in the state system
-     */
-    public @NonNull String getFullPath() {
+    public String getFullPath() {
         return fFullPath;
     }
 
+    /**
+     * Gets the trace's ID of this entry
+     *
+     * @return The ID of the trace associated to this entry
+     */
+    public UUID getTraceID() {
+        return fTraceID;
+    }
 }

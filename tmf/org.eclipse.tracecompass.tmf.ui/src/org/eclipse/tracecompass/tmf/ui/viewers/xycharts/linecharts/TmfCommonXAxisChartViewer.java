@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
@@ -36,7 +37,9 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.XYPre
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
@@ -447,5 +450,13 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
         int numRequests = fOverrideNbPoints != 0 ? fOverrideNbPoints : (int) Math.min(getWindowEndTime() - getWindowStartTime() + 1, (long) (getSwtChart().getPlotArea().getBounds().width * fResolution));
         fUpdateThread = new UpdateThread(numRequests, fScope, fXYDataProvider);
         fUpdateThread.start();
+    }
+
+    @TmfSignalHandler
+    @Override
+    public void traceClosed(@Nullable TmfTraceClosedSignal signal) {
+        cancelUpdate();
+        super.traceClosed(signal);
+        setDataProvider(null);
     }
 }

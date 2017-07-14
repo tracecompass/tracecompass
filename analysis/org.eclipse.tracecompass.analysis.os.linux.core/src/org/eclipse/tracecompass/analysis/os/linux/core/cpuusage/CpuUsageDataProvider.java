@@ -97,7 +97,7 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
             selectedThread = ((SelectedThreadQueryFilter) filter).getSelectedThread();
 
             if (filter instanceof SelectedCpuQueryFilter) {
-                cpus = ((SelectedCpuQueryFilter) filter).getCpu();
+                cpus = ((SelectedCpuQueryFilter) filter).getSelectedItems();
             }
         }
 

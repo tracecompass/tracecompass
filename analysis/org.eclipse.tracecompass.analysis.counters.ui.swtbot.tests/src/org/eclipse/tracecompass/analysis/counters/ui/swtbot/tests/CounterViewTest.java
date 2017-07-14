@@ -28,8 +28,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.XYDataProviderBaseTest;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
-import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.ui.IViewPart;
 import org.junit.Test;
 import org.swtchart.Chart;
@@ -104,7 +103,7 @@ public class CounterViewTest extends XYDataProviderBaseTest {
         // Setup the chart viewer
         IViewPart viewSite = getSWTBotView().getViewReference().getView(true);
         assertTrue(viewSite instanceof CounterView);
-        final TmfCommonXLineChartViewer chartViewer = (TmfCommonXLineChartViewer) getChartViewer(viewSite);
+        final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewSite);
         assertNotNull(chartViewer);
         fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
         chartViewer.setNbPoints(NUMBER_OF_POINTS);

@@ -9,43 +9,29 @@
 
 package org.eclipse.tracecompass.analysis.counters.ui;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableSet;
-import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.UUID;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
-import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
-import org.eclipse.tracecompass.internal.analysis.counters.ui.Activator;
+import org.eclipse.tracecompass.analysis.counters.core.CompositeCounterDataProvider;
 import org.eclipse.tracecompass.internal.analysis.counters.ui.CounterTreeViewerEntry;
-import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
-import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCounterQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.swtchart.Chart;
 
-import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.TreeMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * XY line chart which displays the counters data.
@@ -53,12 +39,10 @@ import com.google.common.collect.TreeMultimap;
  * @author Matthew Khouzam
  * @author Mikael Ferland
  */
-public final class CounterChartViewer extends TmfCommonXLineChartViewer implements ITreeViewerListener {
-
-    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(CounterChartViewer.class);
+public final class CounterChartViewer extends TmfCommonXAxisChartViewer implements ITreeViewerListener {
 
     private boolean fIsCumulative = false;
-    private Collection<ITmfTreeViewerEntry> fEntries = Collections.emptyList();
+    private Multimap<UUID, Integer> fSelectedQuarks = HashMultimap.create();
 
     /**
      * Constructor
@@ -68,7 +52,7 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer implemen
      */
     public CounterChartViewer(Composite parent) {
         // Avoid displaying chart title and axis titles (to reduce wasted space)
-        super(parent, null, null, null);
+        super(parent, new TmfXYChartSettings(null, null, null, 1));
         Chart chart = getSwtChart();
         chart.getLegend().setPosition(SWT.BOTTOM);
         chart.getLegend().setVisible(true);
@@ -94,7 +78,12 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer implemen
     public void handleCheckStateChangedEvent(Collection<ITmfTreeViewerEntry> entries) {
         cancelUpdate();
         clearContent();
-        fEntries = entries;
+
+        Multimap<UUID, Integer> selected = HashMultimap.create();
+        Iterable<CounterTreeViewerEntry> counterEntries = Iterables.filter(entries, CounterTreeViewerEntry.class);
+        counterEntries.forEach(c -> selected.put(c.getTraceID(), c.getQuark()));
+        fSelectedQuarks = selected;
+
         updateContent();
     }
 
@@ -103,135 +92,26 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer implemen
     public void traceSelected(@Nullable TmfTraceSelectedSignal signal) {
         super.traceSelected(signal);
         clearContent();
-        fEntries = Collections.emptyList();
+        fSelectedQuarks = HashMultimap.create();
+    }
+
+    @TmfSignalHandler
+    @Override
+    public void traceClosed(@Nullable TmfTraceClosedSignal signal) {
+        super.traceClosed(signal);
+        if (signal != null) {
+            fSelectedQuarks.removeAll(signal.getTrace().getUUID());
+        }
     }
 
     @Override
-    protected void updateData(long start, long end, int nb, IProgressMonitor monitor) {
-        // Set the X axis according to the new window range
-        double[] xAxis = getXAxis(start, end, nb);
-        if (xAxis.length == 1) {
-            return;
-        }
-
-        Display.getDefault().syncExec(() -> {
-            if (monitor.isCanceled()) {
-                return;
-            }
-            setXAxis(xAxis);
-        });
-
-        // Associate the counter entries to the state systems
-        Iterable<CounterTreeViewerEntry> filtered = Iterables.filter(fEntries, CounterTreeViewerEntry.class);
-        ImmutableListMultimap<ITmfStateSystem, CounterTreeViewerEntry> fStateSystems = Multimaps.index(filtered, CounterTreeViewerEntry::getStateSystem);
-
-        /*
-         * TODO: avoid redrawing series already present on chart and iterate over time
-         * values first (for performance increase)
-         */
-        TreeMultimap<Integer, ITmfStateInterval> countersIntervals = TreeMultimap.create(Comparator.naturalOrder(), Comparator.comparingLong(ITmfStateInterval::getStartTime));
-        for (Map.Entry<ITmfStateSystem, Collection<CounterTreeViewerEntry>> entry : fStateSystems.asMap().entrySet()) {
-            ITmfStateSystem ss = entry.getKey();
-            Collection<Long> times = retrieve2dQueryTimestamps(ss, xAxis, start);
-
-            try (ScopeLog log = new ScopeLog(LOGGER, Level.FINE, "CounterChartViewer#querySS")) { //$NON-NLS-1$
-                // Extract the quarks for 2D querying
-                List<CounterTreeViewerEntry> counters = (List<CounterTreeViewerEntry>) entry.getValue();
-                Collection<@NonNull Integer> quarks = Objects.requireNonNull(Lists.transform(counters, CounterTreeViewerEntry::getQuark));
-
-                Iterable<@NonNull ITmfStateInterval> query2d = ss.query2D(quarks, times);
-                for (ITmfStateInterval interval : query2d) {
-                    if (monitor.isCanceled()) {
-                        return;
-                    }
-
-                    countersIntervals.put(interval.getAttribute(), interval);
-                }
-
-                for (CounterTreeViewerEntry counter : counters) {
-                    if (monitor.isCanceled()) {
-                        return;
-                    }
-
-                    double[] yValues = buildYValues(countersIntervals.get(counter.getQuark()), xAxis, start);
-                    Display.getDefault().syncExec(() -> {
-                        if (monitor.isCanceled()) {
-                            return;
-                        }
-                        setSeries(counter.getFullPath(), yValues);
-                    });
-                }
-            } catch (IndexOutOfBoundsException | TimeRangeException e) {
-                Activator.logError(e.getMessage(), e);
-            } catch (StateSystemDisposedException e) {
-                /*
-                 * Ignore exception (can take place when closing the trace during update), and
-                 * continue with the other state system(s)
-                 */
-            } finally {
-                countersIntervals.clear();
-            }
-        }
-
-        updateDisplay();
+    protected TimeQueryFilter createQueryFilter(long start, long end, int nb) {
+        return new SelectedCounterQueryFilter(start, end, nb, fSelectedQuarks, fIsCumulative);
     }
 
-    private Collection<Long> retrieve2dQueryTimestamps(ITmfStateSystem ss, double[] xAxis, long start) {
-        Collection<Long> times = new ArrayList<>();
-
-        long stateSystemStartTime = ss.getStartTime();
-        long stateSystemEndTime = ss.getCurrentEndTime();
-        long prevTime = Long.max(stateSystemStartTime, start - (long) xAxis[1]);
-
-        // We only need the previous time for differential mode
-        if (!fIsCumulative && prevTime <= stateSystemEndTime) {
-            times.add(prevTime);
-        }
-
-        for (double t : xAxis) {
-            long nextTime = start + (long) t - 1;
-            if (nextTime > stateSystemEndTime) {
-                break;
-            } else if (nextTime >= stateSystemStartTime) {
-                times.add(nextTime);
-            }
-        }
-        return times;
+    @Override
+    protected void initializeDataProvider() {
+        ITmfTrace trace = getTrace();
+        setDataProvider(CompositeCounterDataProvider.create(trace));
     }
-
-    private double[] buildYValues(NavigableSet<ITmfStateInterval> countersIntervals, double[] xAxis, long start) {
-        double[] yValues = new double[xAxis.length];
-        long prevValue = 0L;
-        if (!countersIntervals.isEmpty()) {
-            Object value = countersIntervals.first().getValue();
-            if (value instanceof Number) {
-                prevValue = ((Number) value).longValue();
-            }
-        }
-        int to = 0;
-
-        for (ITmfStateInterval interval : countersIntervals) {
-            int from = Arrays.binarySearch(xAxis, (interval.getStartTime() - start));
-            from = (from >= 0) ? from : -1 - from;
-            Number value = (Number) interval.getValue();
-            long l = value != null ? value.longValue() : 0l;
-            if (!fIsCumulative) {
-                yValues[from] = (l - prevValue);
-            } else {
-                /* Fill in all the time stamps that the interval overlaps */
-                to = Arrays.binarySearch(xAxis, (interval.getEndTime() - start));
-                to = (to >= 0) ? to + 1 : -1 - to;
-                Arrays.fill(yValues, from, to, l);
-            }
-            prevValue = l;
-        }
-
-        /* Fill the time stamps after the state system, if any. */
-        if (fIsCumulative) {
-            Arrays.fill(yValues, to, yValues.length, prevValue);
-        }
-
-        return yValues;
-    }
-
 }
