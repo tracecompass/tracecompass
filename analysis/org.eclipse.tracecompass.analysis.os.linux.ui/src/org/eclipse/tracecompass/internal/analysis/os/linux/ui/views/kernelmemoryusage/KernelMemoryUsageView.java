@@ -22,6 +22,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -54,7 +55,8 @@ public class KernelMemoryUsageView extends TmfChartView {
 
     @Override
     protected TmfXYChartViewer createChartViewer(Composite parent) {
-        return new KernelMemoryUsageViewer(parent);
+        TmfXYChartSettings settings = new TmfXYChartSettings(Messages.MemoryUsageViewer_title, Messages.MemoryUsageViewer_xAxis, Messages.MemoryUsageViewer_yAxis, 1);
+        return new KernelMemoryUsageViewer(parent, settings);
     }
 
     private final class SelectionChangeListener implements ISelectionChangedListener {

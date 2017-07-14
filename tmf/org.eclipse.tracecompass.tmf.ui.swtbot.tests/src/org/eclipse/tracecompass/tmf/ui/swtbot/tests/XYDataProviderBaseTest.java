@@ -29,7 +29,7 @@ import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 import org.eclipse.ui.IViewPart;
 import org.hamcrest.Matcher;
@@ -165,7 +165,7 @@ public abstract class XYDataProviderBaseTest {
      *            Name of other series to extract from Chart
      * @return A {@link TmfCommonXAxisModel}
      */
-    protected TmfCommonXAxisModel extractModelFromChart(Chart chart, String... otherSeries) {
+    protected TmfCommonXAxisModel extractModelFromChart(final Chart chart, String... otherSeries) {
         String mainSeriesName = getMainSeriesName();
         ISeries mainSeries = chart.getSeriesSet().getSeries(mainSeriesName);
         assertNotNull(mainSeries);
@@ -213,14 +213,14 @@ public abstract class XYDataProviderBaseTest {
      * @throws InvocationTargetException
      *             Reflection exception should not happen
      */
-    protected static TmfCommonXLineChartViewer getChartViewer(IViewPart viewSite)
+    protected static TmfXYChartViewer getChartViewer(IViewPart viewSite)
             throws NoSuchMethodException, SecurityException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
 
         TmfChartView chartView = (TmfChartView) viewSite;
         Method viewer = TmfChartView.class.getDeclaredMethod("getChartViewer");
         viewer.setAccessible(true);
-        TmfCommonXLineChartViewer chartViewer = (TmfCommonXLineChartViewer) viewer.invoke(chartView);
+        TmfXYChartViewer chartViewer = (TmfXYChartViewer) viewer.invoke(chartView);
         return chartViewer;
     }
 

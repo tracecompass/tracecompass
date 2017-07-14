@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.io.diskioac
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
 /**
@@ -23,6 +24,7 @@ public class DiskIOActivityView extends TmfChartView {
 
     /** ID string */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.views.diskioactivity"; //$NON-NLS-1$
+    private static final double RESOLUTION = 0.2;
 
     /**
      * Constructor
@@ -33,6 +35,7 @@ public class DiskIOActivityView extends TmfChartView {
 
     @Override
     protected TmfXYChartViewer createChartViewer(@Nullable Composite parent) {
-        return new DisksIOActivityViewer(parent);
+        TmfXYChartSettings settings = new TmfXYChartSettings(Messages.DiskIOActivityViewer_Title, Messages.DiskIOActivityViewer_XAxis, Messages.DiskIOActivityViewer_YAxis, RESOLUTION);
+        return new DisksIOActivityViewer(parent, settings);
     }
 }

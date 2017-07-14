@@ -12,7 +12,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterGraphViewer;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterChartViewer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -22,7 +22,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  *
  * @author Jean-Christian Kouame
  */
-public class PatternScatterGraphViewer extends AbstractSegmentStoreScatterGraphViewer {
+public class PatternScatterGraphViewer extends AbstractSegmentStoreScatterChartViewer {
 
     private String fAnalysisId;
 
@@ -56,7 +56,7 @@ public class PatternScatterGraphViewer extends AbstractSegmentStoreScatterGraphV
     public void updateViewer(String analysisId) {
         if (analysisId != null) {
             fAnalysisId = analysisId;
-            initializeDataSource();
+            initializeDataProvider();
         }
     }
 }

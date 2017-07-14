@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
 /**
@@ -35,6 +36,7 @@ public class MemoryUsageView extends TmfChartView {
 
     @Override
     protected TmfXYChartViewer createChartViewer(Composite parent) {
-        return new MemoryUsageViewer(parent);
+        TmfXYChartSettings settings = new TmfXYChartSettings(Messages.MemoryUsageViewer_Title, Messages.MemoryUsageViewer_XAxis, Messages.MemoryUsageViewer_YAxis, 1);
+        return new MemoryUsageViewer(parent, settings);
     }
 }

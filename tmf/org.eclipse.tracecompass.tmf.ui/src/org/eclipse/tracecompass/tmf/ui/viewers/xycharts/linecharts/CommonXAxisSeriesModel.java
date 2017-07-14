@@ -26,7 +26,9 @@ import com.google.gson.annotations.SerializedName;
  * View Model of Common X Line Chart
  *
  * @author Matthew Khouzam
+ * @deprecated Use {@link TmfCommonXAxisModel} instead
  */
+@Deprecated
 class CommonXAxisSeriesModel implements ICommonXAxisModel {
 
     /**

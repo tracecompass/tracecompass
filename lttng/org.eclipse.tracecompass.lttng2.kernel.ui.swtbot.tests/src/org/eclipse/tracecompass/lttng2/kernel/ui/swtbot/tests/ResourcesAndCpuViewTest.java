@@ -12,70 +12,72 @@ package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
+import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
-import org.eclipse.swtbot.swt.finder.utils.FileUtils;
-import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.analysis.os.linux.core.signals.TmfCpuSelectedSignal;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.cpuusage.CpuUsageView;
+import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources.ResourcesView;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.core.viewmodel.ICommonXAxisModel;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.XYDataProviderBaseTest;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
-import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.ui.IViewPart;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.swtchart.Chart;
+import org.swtchart.ISeries;
+import org.swtchart.LineStyle;
 
 /**
  * SWTBot tests for Resources view
  *
  * @author Matthew Khouzam
  */
-public class ResourcesAndCpuViewTest extends KernelTestBase {
+public class ResourcesAndCpuViewTest extends XYDataProviderBaseTest {
+
+    private static final RGB RED = new RGB(255, 0, 0);
+    private static final RGB BLUE = new RGB(0, 0, 255);
+
+    private static final @NonNull String TOTAL_SERIES_NAME = "Total";
+    private static final @NonNull String TITLE = "CPU Usage";
+
+    private static final @NonNull ITmfTimestamp TRACE_START = TmfTimestamp.fromNanos(1412670961211260539L);
+    private static final @NonNull ITmfTimestamp TRACE_END = TmfTimestamp.fromNanos(1412670967217750839L);
 
     private SWTBotView fViewBotRv;
-    private SWTBotView fViewBotCpu;
 
     /**
      * Before Test
      */
     @Override
     @Before
-    public void before() {
-        fViewBotRv = fBot.viewByPartName("Resources");
-        SWTBotUtils.openView(CpuUsageView.ID);
-        fViewBotCpu = fBot.viewById(CpuUsageView.ID);
-        fViewBotCpu.show();
-        fViewBotRv.show();
-        try {
-            SWTBotUtils.openTrace(TRACE_PROJECT_NAME, Paths.get(FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).toURI()).toString(), KERNEL_TRACE_TYPE);
-        } catch (IOException | URISyntaxException e) {
-            fail(e.getMessage());
-        }
-        SWTBotUtils.activateEditor(fBot, "bug446190");
-        fViewBotRv.setFocus();
+    public void setup() {
+        super.setup();
+
+        SWTBotUtils.openView(ResourcesView.ID);
+        fViewBotRv = fBot.viewById(ResourcesView.ID);
+        getSWTBotView().setFocus();
     }
 
     /**
@@ -91,99 +93,135 @@ public class ResourcesAndCpuViewTest extends KernelTestBase {
         // clear everything
         TmfCpuSelectedSignal signal = new TmfCpuSelectedSignal(widget, -1, activeTrace);
         broadcast(signal);
-        assertEquals("Before signal - CPU Usage Title", "CPU Usage", getTitle());
+        assertEquals("Before signal - CPU Usage Title", "CPU Usage", getChartTitle());
         assertEquals("Before signal - Thread Table", 12, getTableCount());
         fViewBotRv.setFocus();
 
         // select cpu 1
         signal = new TmfCpuSelectedSignal(widget, 1, activeTrace);
         broadcast(signal);
-        assertEquals("After signal - CPU Usage Title", "CPU Usage 1", getTitle());
+        assertEquals("After signal - CPU Usage Title", "CPU Usage 1", getChartTitle());
         assertEquals("After signal - Thread Table", 4, getTableCount());
 
         // select cpu 3 and 1
         signal = new TmfCpuSelectedSignal(widget, 3, activeTrace);
         broadcast(signal);
-        assertEquals("After signal 2 - CPU Usage Title", "CPU Usage 1, 3", getTitle());
+        assertEquals("After signal 2 - CPU Usage Title", "CPU Usage 1, 3", getChartTitle());
         assertEquals("After signal 2 - Thread Table", 8, getTableCount());
 
         // reset
         signal = new TmfCpuSelectedSignal(widget, -1, activeTrace);
         broadcast(signal);
-        assertEquals("After signal clear - CPU Usage Title", "CPU Usage", getTitle());
+        assertEquals("After signal clear - CPU Usage Title", "CPU Usage", getChartTitle());
         assertEquals("After signal clear - Thread Table", 12, getTableCount());
     }
 
     /**
      * Simple test to check the CPU Usage view after getting signals.
+     *
+     * @throws NoSuchMethodException
+     *             Reflection exception should not happen
+     * @throws SecurityException
+     *             Reflection exception should not happen
+     * @throws IllegalAccessException
+     *             Reflection exception should not happen
+     * @throws IllegalArgumentException
+     *             Reflection exception should not happen
+     * @throws InvocationTargetException
+     *             Reflection exception should not happen
      */
     @Test
-    public void testCpuView() {
-        IViewPart viewSite = fViewBotCpu.getViewReference().getView(true);
+    public void testCpuView() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        IViewPart viewSite = getSWTBotView().getViewReference().getView(true);
         assertTrue(viewSite instanceof CpuUsageView);
-        final TmfCommonXLineChartViewer chartViewer = getChartViewer(viewSite);
+        final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewSite);
         assertNotNull(chartViewer);
-        try {
-            SWTBotUtils.waitUntil(viewer -> !viewer.getModel().getSeries().isEmpty(), chartViewer, "No data available");
-            chartViewer.setNbPoints(10);
-            ICondition xyViewerIsReadyCondition = ConditionHelpers.xyViewerIsReadyCondition(chartViewer);
-            fBot.waitUntil(xyViewerIsReadyCondition);
-            UIThreadRunnable.syncExec(chartViewer::refresh);
-            String jsonT0 = FileUtils.read("resources/t0-res10.json");
-            ICommonXAxisModel model = chartViewer.getModel();
-            assertEquals(jsonT0, model.toString());
-            /*
-             * Select a task
-             */
-            SWTBotTree treeBot = fViewBotCpu.bot().tree();
-            SWTBotUtils.waitUntil(tree -> tree.rowCount() >= 7, treeBot, "Did not finish loading");
-            treeBot.getTreeItem("496").click();
-            SWTBotUtils.waitUntil(viewer -> viewer.getModel().getSeries().size() > 1, chartViewer, "Only total available");
-            UIThreadRunnable.syncExec(() -> chartViewer.refresh());
-            String jsonT1 = FileUtils.read("resources/t0-res10Selected.json");
-            fBot.waitUntil(xyViewerIsReadyCondition);
-            model = chartViewer.getModel();
-            assertEquals(jsonT1, model.toString());
+        fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
 
-            /*
-             * Test in hd
-             */
-            chartViewer.setNbPoints(100);
-            UIThreadRunnable.syncExec(() -> chartViewer.refresh());
-            SWTBotUtils.waitUntil(viewer -> viewer.getModel().getXAxis().length >= 99, chartViewer, "Too few elements");
+        final Chart chart = getChart();
+        assertNotNull(chart);
 
-            String jsonHD = FileUtils.read("resources/t0-res100Selected.json");
-            fBot.waitUntil(xyViewerIsReadyCondition);
-            model = chartViewer.getModel();
-            assertEquals(jsonHD, model.toString());
+        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length > 0, chart, "No data available");
+        chartViewer.setNbPoints(10);
+        fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
 
-            /*
-             * Test new TimeRange
-             */
-            chartViewer.setNbPoints(10);
-            ITmfTrace activeTrace = TmfTraceManager.getInstance().getActiveTrace();
-            assertNotNull(activeTrace);
-            fViewBotRv.getToolbarButtons().stream().filter(button -> button.getToolTipText().contains("Reset")).findAny().get().click();
-            String jsonAll = FileUtils.read("resources/tAll-res10.json");
-            fBot.waitUntil(xyViewerIsReadyCondition);
-            model = chartViewer.getModel();
-            assertEquals(jsonAll, model.toString());
-        } finally {
-            chartViewer.setNbPoints(0);
+        /* Test data model */
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json), "resources/t0-res10.json", "Chart data is not valid");
+
+        /* Test chart style */
+        verifyChartStyle(null);
+
+        /* Select a task */
+        String selectedThread = "496";
+        SWTBotTree treeBot = getSWTBotView().bot().tree();
+        SWTBotUtils.waitUntil(tree -> tree.rowCount() >= 7, treeBot, "Did not finish loading");
+        treeBot.getTreeItem(selectedThread).click();
+        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 2, chart, "Only total available");
+
+        /* Test data model */
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, selectedThread), "resources/t0-res10Selected.json", "Chart data is not valid");
+
+        /* Test chart style */
+        verifyChartStyle(selectedThread);
+
+        /* Test in hd */
+        chartViewer.setNbPoints(100);
+        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries()[0].getXSeries().length >= 99, chart, "Too few elements");
+        fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
+
+        /* Test data model */
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, selectedThread), "resources/t0-res100Selected.json", "Chart data is not valid");
+
+        /* Test chart style */
+        verifyChartStyle(selectedThread);
+
+        /*
+         * Test new TimeRange
+         */
+        chartViewer.setNbPoints(10);
+        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 2, chart, "Only total available");
+        fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
+
+        ITmfTrace activeTrace = TmfTraceManager.getInstance().getActiveTrace();
+        assertNotNull(activeTrace);
+        fViewBotRv.getToolbarButtons().stream().filter(button -> button.getToolTipText().contains("Reset")).findAny().get().click();
+        fBot.waitUntil(ConditionHelpers.windowRange(new TmfTimeRange(TRACE_START, TRACE_END)));
+        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 2, chart, "Only total available");
+        fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
+
+        /* Test data model */
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, selectedThread), "resources/tAll-res10.json", "Chart data is not valid");
+
+        /* Test chart style */
+        verifyChartStyle(selectedThread);
+    }
+
+    private void verifyChartStyle(String selectedThread) {
+        verifySeriesStyle(TOTAL_SERIES_NAME, ISeries.SeriesType.LINE, BLUE, LineStyle.SOLID, false);
+
+        if (selectedThread != null) {
+            verifySeriesStyle(selectedThread, ISeries.SeriesType.LINE, RED, LineStyle.SOLID, true);
         }
     }
 
-    private static TmfCommonXLineChartViewer getChartViewer(IViewPart viewSite) {
-        try {
-            CpuUsageView cpuView = (CpuUsageView) viewSite;
-            Method viewer = TmfChartView.class.getDeclaredMethod("getChartViewer");
-            viewer.setAccessible(true);
-            TmfCommonXLineChartViewer chartViewer = (TmfCommonXLineChartViewer) viewer.invoke(cpuView);
-            return chartViewer;
-        } catch (Exception e) {
-            fail("Reflection error: " + e.getMessage());
-        }
-        return null;
+    @Override
+    protected String getMainSeriesName() {
+        return TOTAL_SERIES_NAME;
+    }
+
+    @Override
+    protected String getTitle() {
+        return TITLE;
+    }
+
+    @Override
+    protected String getViewID() {
+        return CpuUsageView.ID;
+    }
+
+    @Override
+    protected ITmfTrace getTestTrace() {
+        return CtfTmfTestTraceUtils.getTrace(CtfTestTrace.ARM_64_BIT_HEADER);
     }
 
     private static void broadcast(TmfSignal signal) {
@@ -191,19 +229,19 @@ public class ResourcesAndCpuViewTest extends KernelTestBase {
         WaitUtils.waitForJobs();
     }
 
-    private String getTitle() {
-        fViewBotCpu.setFocus();
+    private String getChartTitle() {
+        getSWTBotView().setFocus();
         // Do some basic validation
         Matcher<Chart> matcher = WidgetOfType.widgetOfType(Chart.class);
-        Chart chart = fViewBotCpu.bot().widget(matcher);
+        Chart chart = getSWTBotView().bot().widget(matcher);
         return chart.getTitle().getText();
     }
 
     private int getTableCount() {
-        fViewBotCpu.setFocus();
+        getSWTBotView().setFocus();
         // Do some basic validation
         Matcher<Tree> matcher = WidgetOfType.widgetOfType(Tree.class);
-        SWTBotTree treeBot = new SWTBotTree(fViewBotCpu.bot().widget(matcher));
+        SWTBotTree treeBot = new SWTBotTree(getSWTBotView().bot().widget(matcher));
         int count = 0;
         for (SWTBotTreeItem bot : treeBot.getAllItems()) {
             final String text = bot.getText();

@@ -18,7 +18,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryUsageDataProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.swtchart.Chart;
 
 /**
@@ -26,23 +27,25 @@ import org.swtchart.Chart;
  *
  * @author Matthew Khouzam
  */
-public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
+public class MemoryUsageViewer extends TmfCommonXAxisChartViewer {
 
     /**
      * Constructor
      *
      * @param parent
      *            parent view
+     * @param settings
+     *            See {@link TmfXYChartSettings} to know what it contains
      */
-    public MemoryUsageViewer(Composite parent) {
-        super(parent, Messages.MemoryUsageViewer_Title, Messages.MemoryUsageViewer_XAxis, Messages.MemoryUsageViewer_YAxis);
+    public MemoryUsageViewer(Composite parent, TmfXYChartSettings settings) {
+        super(parent, settings);
         Chart chart = getSwtChart();
         chart.getLegend().setPosition(SWT.LEFT);
         chart.getAxisSet().getYAxis(0).getTick().setFormat(DataSizeWithUnitFormat.getInstance());
     }
 
     @Override
-    protected void initializeDataSource() {
+    protected void initializeDataProvider() {
         ITmfTrace trace = getTrace();
         setDataProvider(UstMemoryUsageDataProvider.create(trace));
     }

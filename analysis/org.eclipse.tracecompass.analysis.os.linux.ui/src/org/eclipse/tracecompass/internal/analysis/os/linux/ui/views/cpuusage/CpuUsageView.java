@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
 import com.google.common.base.Predicates;
@@ -60,6 +61,12 @@ public class CpuUsageView extends TmfChartView {
     private @Nullable CpuUsageComposite fTreeViewer = null;
     private @Nullable CpuUsageXYViewer fXYViewer = null;
 
+    /*
+     * To avoid up and downs CPU usage when process is in and out of CPU frequently,
+     * use a smaller resolution to get better averages.
+     */
+    private static final double RESOLUTION = 0.4;
+
     /**
      * Constructor
      */
@@ -86,7 +93,8 @@ public class CpuUsageView extends TmfChartView {
 
     @Override
     protected TmfXYChartViewer createChartViewer(Composite parent) {
-        CpuUsageXYViewer viewer = new CpuUsageXYViewer(parent);
+        TmfXYChartSettings settings = new TmfXYChartSettings(Messages.CpuUsageXYViewer_Title, Messages.CpuUsageXYViewer_TimeXAxis, Messages.CpuUsageXYViewer_CpuYAxis, RESOLUTION);
+        CpuUsageXYViewer viewer = new CpuUsageXYViewer(parent, settings);
         viewer.setSendTimeAlignSignals(true);
         fXYViewer = viewer;
         return viewer;

@@ -12,20 +12,16 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.examples.ui.viewers.histogram;
 
-import java.util.List;
-import java.util.Objects;
-
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.examples.histogram.HistogramDataProvider;
-import org.eclipse.tracecompass.tmf.core.statistics.ITmfStatistics;
-import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsModule;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.barcharts.TmfBarChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.barcharts.TmfHistogramTooltipProvider;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
-import org.swtchart.ISeries;
 import org.swtchart.LineStyle;
 
 /**
@@ -34,7 +30,8 @@ import org.swtchart.LineStyle;
  * @author Alexandre Montplaisir
  * @author Bernd Hufmann
  */
-public class NewHistogramViewer extends TmfBarChartViewer {
+@SuppressWarnings("restriction")
+public class NewHistogramViewer extends TmfCommonXAxisChartViewer {
 
     /**
      * Creates a Histogram Viewer instance.
@@ -42,7 +39,7 @@ public class NewHistogramViewer extends TmfBarChartViewer {
      *            The parent composite to draw in.
      */
     public NewHistogramViewer(Composite parent) {
-        super(parent, null, null, null, TmfBarChartViewer.MINIMUM_BAR_WIDTH);
+        super(parent, new TmfXYChartSettings(null, null, null, 1));
 
         Chart swtChart = getSwtChart();
 
@@ -55,55 +52,17 @@ public class NewHistogramViewer extends TmfBarChartViewer {
 
         /* Hide the legend */
         swtChart.getLegend().setVisible(false);
+        setTooltipProvider(new TmfHistogramTooltipProvider(this));
     }
 
     @Override
-    protected void initializeDataSource() {
+    protected void initializeDataProvider() {
         ITmfTrace trace = getTrace();
         setDataProvider(new HistogramDataProvider(trace));
     }
 
-    @Deprecated
     @Override
-    protected void readData(final ISeries series, final long start, final long end, final int nb) {
-        if (getTrace() != null) {
-            final double[] y = new double[nb];
-
-            Thread thread = new Thread("Histogram viewer update") { //$NON-NLS-1$
-                @Override
-                public void run() {
-                    double[] x = getXAxis(start, end, nb);
-                    final long[] yLong = new long[nb];
-
-                    /* Add the values for each trace */
-                    for (ITmfTrace trace : TmfTraceManager.getTraceSet(getTrace())) {
-                        /* Retrieve the statistics object */
-                        final TmfStatisticsModule statsMod =
-                               TmfTraceUtils.getAnalysisModuleOfClass(trace, TmfStatisticsModule.class, TmfStatisticsModule.ID);
-                        if (statsMod == null) {
-                            /* No statistics module available for this trace */
-                            continue;
-                        }
-                        statsMod.waitForInitialization();
-                        ITmfStatistics stats = Objects.requireNonNull(statsMod.getStatistics());
-
-                        List<Long> values = stats.histogramQuery(start, end, nb);
-
-                        for (int i = 0; i < nb; i++) {
-                            yLong[i] += values.get(i);
-                        }
-                    }
-
-                    for (int i = 0; i < nb; i++) {
-                        y[i] = yLong[i]; /* casting from long to double */
-                    }
-
-                    /* Update the viewer */
-                    drawChart(series, x, y);
-                }
-            };
-            thread.start();
-        }
-        return;
+    protected IYAppearance getSeriesAppearance(@NonNull String seriesName) {
+        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.BAR);
     }
 }

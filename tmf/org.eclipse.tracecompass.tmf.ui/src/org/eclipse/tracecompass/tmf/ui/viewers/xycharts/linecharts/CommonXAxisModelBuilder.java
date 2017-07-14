@@ -24,7 +24,9 @@ import org.eclipse.tracecompass.tmf.core.viewmodel.IYSeries;
  *
  * @author Yonni Chen
  * @author Matthew Khouzam
+ * @deprecated No longer used
  */
+@Deprecated
 class CommonXAxisModelBuilder {
 
     private String fTitle;

@@ -21,7 +21,8 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.swtchart.Chart;
 
 /**
@@ -30,7 +31,8 @@ import org.swtchart.Chart;
  * @author Samuel Gagnon
  * @author Wassim Nasrallah
  */
-public class KernelMemoryUsageViewer extends TmfCommonXLineChartViewer {
+@SuppressWarnings("restriction")
+public class KernelMemoryUsageViewer extends TmfCommonXAxisChartViewer {
 
     private static final @NonNull String NOT_SELECTED = "-1"; //$NON-NLS-1$
     private @NonNull String fSelectedThread = NOT_SELECTED;
@@ -40,9 +42,11 @@ public class KernelMemoryUsageViewer extends TmfCommonXLineChartViewer {
      *
      * @param parent
      *            parent view
+     * @param settings
+     *            See {@link TmfXYChartSettings} to know what it contains
      */
-    public KernelMemoryUsageViewer(Composite parent) {
-        super(parent, Messages.MemoryUsageViewer_title, Messages.MemoryUsageViewer_xAxis, Messages.MemoryUsageViewer_yAxis);
+    public KernelMemoryUsageViewer(Composite parent, TmfXYChartSettings settings) {
+        super(parent, settings);
         Chart chart = getSwtChart();
         chart.getAxisSet().getYAxis(0).getTick().setFormat(DataSizeWithUnitFormat.getInstance());
         chart.getLegend().setPosition(SWT.BOTTOM);
@@ -50,7 +54,7 @@ public class KernelMemoryUsageViewer extends TmfCommonXLineChartViewer {
     }
 
     @Override
-    protected void initializeDataSource() {
+    protected void initializeDataProvider() {
         ITmfTrace trace = getTrace();
         setDataProvider(KernelMemoryUsageDataProvider.create(trace));
     }
@@ -67,9 +71,8 @@ public class KernelMemoryUsageViewer extends TmfCommonXLineChartViewer {
      *            The selected thread ID
      */
     public void setSelectedThread(@NonNull String tid) {
-        cancelUpdate();
-        deleteSeries(fSelectedThread);
         fSelectedThread = tid;
+        clearContent();
         updateContent();
     }
 

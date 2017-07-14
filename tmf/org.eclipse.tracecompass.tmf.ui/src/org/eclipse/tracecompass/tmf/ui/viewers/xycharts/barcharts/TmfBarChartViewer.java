@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.tmf.core.viewmodel.IYSeries;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfChartTimeStampFormat;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 import org.swtchart.Chart;
 import org.swtchart.IAxisTick;
@@ -32,7 +33,9 @@ import org.swtchart.ISeries;
  *
  * @author Alexandre Montplaisir
  * @author Bernd Hufmann
+ * @deprecated Use {@link TmfCommonXAxisChartViewer}
  */
+@Deprecated
 public abstract class TmfBarChartViewer extends TmfCommonXLineChartViewer {
 
     // ------------------------------------------------------------------------

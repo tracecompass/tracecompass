@@ -13,7 +13,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyStrin
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterGraphViewer;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterChartViewer;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
@@ -32,7 +32,7 @@ public class SystemCallLatencyScatterView extends TmfChartView {
     /** The view's ID */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.views.latency.scatter"; //$NON-NLS-1$
 
-    private @Nullable AbstractSegmentStoreScatterGraphViewer fScatterViewer;
+    private @Nullable AbstractSegmentStoreScatterChartViewer fScatterViewer;
 
     // ------------------------------------------------------------------------
     // Constructor

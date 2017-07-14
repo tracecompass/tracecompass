@@ -74,6 +74,8 @@ import com.google.common.collect.Iterables;
  * series appearance can be overridden when creating it.
  *
  * @author - Geneviève Bastien
+ * TODO Use {@link TmfCommonXAxisChartViewer} if possible
+ * TODO Deprecate this class when no longer used
  */
 public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 

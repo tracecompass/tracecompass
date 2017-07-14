@@ -28,7 +28,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.XYDataProviderBaseTest;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.ui.IViewPart;
 import org.junit.Test;
 import org.swtchart.Chart;
@@ -75,7 +75,7 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
     public void testDiskView() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         IViewPart viewSite = getSWTBotView().getViewReference().getView(true);
         assertTrue(viewSite instanceof DiskIOActivityView);
-        final TmfCommonXLineChartViewer chartViewer = getChartViewer(viewSite);
+        final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewSite);
         assertNotNull(chartViewer);
         fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
 

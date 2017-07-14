@@ -20,14 +20,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCpuQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.core.viewmodel.IYSeries;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 
 import com.google.common.base.Joiner;
 
@@ -37,18 +38,12 @@ import com.google.common.base.Joiner;
  *
  * @author Geneviève Bastien
  */
-public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
+@SuppressWarnings("restriction")
+public class CpuUsageXYViewer extends TmfCommonXAxisChartViewer {
 
     private static final @NonNull String NOT_SELECTED = "-1"; //$NON-NLS-1$
 
     private final @NonNull Set<@NonNull Integer> fCpus = new TreeSet<>();
-
-    /*
-     * To avoid up and downs CPU usage when process is in and out of CPU frequently,
-     * use a smaller resolution to get better averages.
-     */
-    private static final double RESOLUTION = 0.4;
-
     private @NonNull String fSelectedThread = NOT_SELECTED;
 
     /**
@@ -56,16 +51,17 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
      *
      * @param parent
      *            parent composite
+     * @param settings
+     *            See {@link TmfXYChartSettings} to know what it contains
      */
-    public CpuUsageXYViewer(Composite parent) {
-        super(parent, Messages.CpuUsageXYViewer_Title, Messages.CpuUsageXYViewer_TimeXAxis, Messages.CpuUsageXYViewer_CpuYAxis);
-        setResolution(RESOLUTION);
+    public CpuUsageXYViewer(Composite parent, TmfXYChartSettings settings) {
+        super(parent, settings);
         getSwtChart().getTitle().setVisible(true);
         getSwtChart().getLegend().setVisible(false);
     }
 
     @Override
-    protected void initializeDataSource() {
+    protected void initializeDataProvider() {
         ITmfTrace trace = getTrace();
         setDataProvider(CpuUsageDataProvider.create(trace));
     }
@@ -76,11 +72,11 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
     }
 
     @Override
-    protected String getSeriesType(String seriesName) {
+    protected IYAppearance getSeriesAppearance(@NonNull String seriesName) {
         if (seriesName.equals(Messages.CpuUsageXYViewer_Total)) {
-            return IYSeries.LINE;
+            return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.LINE);
         }
-        return IYSeries.AREA;
+        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.AREA);
     }
 
     /**
@@ -90,9 +86,8 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
      *            The selected thread ID
      */
     public void setSelectedThread(@NonNull String tid) {
-        cancelUpdate();
-        deleteSeries(fSelectedThread);
         fSelectedThread = tid;
+        clearContent();
         updateContent();
     }
 
@@ -105,7 +100,6 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
      */
     public void addCpu(int core) {
         fCpus.add(core);
-        cancelUpdate();
         updateContent();
         getSwtChart().getTitle().setText(Messages.CpuUsageView_Title + ' ' + getCpuList());
     }
@@ -119,7 +113,6 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
      */
     public void removeCpu(int core) {
         fCpus.remove(core);
-        cancelUpdate();
         updateContent();
         getSwtChart().getTitle().setText(Messages.CpuUsageView_Title + ' ' + getCpuList());
     }
@@ -135,7 +128,6 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
      */
     public void clearCpu() {
         fCpus.clear();
-        cancelUpdate();
         updateContent();
         getSwtChart().getTitle().setText(Messages.CpuUsageView_Title);
     }

@@ -18,10 +18,6 @@ import org.eclipse.tracecompass.tmf.core.viewmodel.IYSeries;
  * {@link IYModel} contains strict minimum informations. It's highly recommended
  * to used this class for data providers instead of {@link IYSeries}.
  *
- * <br/>
- * FIXME: Please deprecated {@link IYSeries} and implement a
- * PresentationProvider for XY viewers.
- *
  * @author Yonni Chen
  */
 public interface IYModel {

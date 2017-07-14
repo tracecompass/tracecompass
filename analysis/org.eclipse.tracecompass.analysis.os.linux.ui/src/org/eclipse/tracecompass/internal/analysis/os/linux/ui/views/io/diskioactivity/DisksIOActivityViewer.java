@@ -15,9 +15,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.DisksIODataProvider;
 import org.eclipse.tracecompass.common.core.format.DataSpeedWithUnitFormat;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.viewmodel.IYSeries;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.swtchart.Chart;
 
 /**
@@ -25,31 +26,31 @@ import org.swtchart.Chart;
  *
  * @author Houssem Daoud
  */
-public class DisksIOActivityViewer extends TmfCommonXLineChartViewer {
-
-    private static final double RESOLUTION = 0.2;
+@SuppressWarnings("restriction")
+public class DisksIOActivityViewer extends TmfCommonXAxisChartViewer {
 
     /**
      * Constructor
      *
      * @param parent
      *            parent view
+     * @param settings
+     *            See {@link TmfXYChartSettings} to know what it contains
      */
-    public DisksIOActivityViewer(@Nullable Composite parent) {
-        super(parent, Messages.DiskIOActivityViewer_Title, Messages.DiskIOActivityViewer_XAxis, Messages.DiskIOActivityViewer_YAxis);
-        setResolution(RESOLUTION);
+    public DisksIOActivityViewer(@Nullable Composite parent, TmfXYChartSettings settings) {
+        super(parent, settings);
         Chart chart = getSwtChart();
         chart.getAxisSet().getYAxis(0).getTick().setFormat(DataSpeedWithUnitFormat.getInstance());
         chart.getLegend().setPosition(SWT.LEFT);
     }
 
     @Override
-    protected String getSeriesType(@NonNull String seriesName) {
-        return IYSeries.AREA;
+    protected IYAppearance getSeriesAppearance(@NonNull String seriesName) {
+        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.AREA);
     }
 
     @Override
-    protected void initializeDataSource() {
+    protected void initializeDataProvider() {
         ITmfTrace trace = getTrace();
         setDataProvider(DisksIODataProvider.create(trace));
     }
