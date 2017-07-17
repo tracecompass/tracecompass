@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 Ericsson
+ * Copyright (c) 2010, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -138,32 +138,7 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
         // make sure the model is updated in the current thread
         refreshChildren();
 
-        Display.getDefault().asyncExec(new Runnable(){
-            @Override
-            public void run() {
-                IWorkbench wb = PlatformUI.getWorkbench();
-                IWorkbenchWindow wbWindow = wb.getActiveWorkbenchWindow();
-                if (wbWindow == null) {
-                    return;
-                }
-                IWorkbenchPage activePage = wbWindow.getActivePage();
-                if (activePage == null) {
-                    return;
-                }
-
-                for (IViewReference viewReference : activePage.getViewReferences()) {
-                    IViewPart viewPart = viewReference.getView(false);
-                    if (viewPart instanceof CommonNavigator) {
-                        CommonViewer commonViewer = ((CommonNavigator) viewPart).getCommonViewer();
-                        Object element = TmfProjectModelElement.this;
-                        if (element instanceof TmfProjectElement) {
-                            // for the project element the viewer uses the IProject resource
-                            element = getResource();
-                        }
-                        commonViewer.refresh(element);
-                    }
-                }
-            }});
+        refreshViewer();
     }
 
     // ------------------------------------------------------------------------
@@ -205,6 +180,39 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
      * @since 2.0
      */
     protected abstract void refreshChildren();
+
+    /**
+     * Refresh the common navigator viewer starting with this element. Does not
+     * refresh the model.
+     *
+     * @since 3.1
+     */
+    public void refreshViewer() {
+        Display.getDefault().asyncExec(() -> {
+            IWorkbench wb = PlatformUI.getWorkbench();
+            IWorkbenchWindow wbWindow = wb.getActiveWorkbenchWindow();
+            if (wbWindow == null) {
+                return;
+            }
+            IWorkbenchPage activePage = wbWindow.getActivePage();
+            if (activePage == null) {
+                return;
+            }
+
+            for (IViewReference viewReference : activePage.getViewReferences()) {
+                IViewPart viewPart = viewReference.getView(false);
+                if (viewPart instanceof CommonNavigator) {
+                    CommonViewer commonViewer = ((CommonNavigator) viewPart).getCommonViewer();
+                    Object element = TmfProjectModelElement.this;
+                    if (element instanceof TmfProjectElement) {
+                        // for the project element the viewer uses the IProject resource
+                        element = getResource();
+                    }
+                    commonViewer.refresh(element);
+                }
+            }
+        });
+    }
 
     /**
      * Add a new child element to this element.

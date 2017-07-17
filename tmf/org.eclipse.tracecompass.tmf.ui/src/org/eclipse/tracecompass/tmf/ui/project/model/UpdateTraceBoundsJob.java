@@ -142,7 +142,7 @@ public class UpdateTraceBoundsJob extends Job {
                      * Intermediate refresh when we get the start time, will not
                      * re-trigger a job.
                      */
-                    traceElement.refresh();
+                    traceElement.refreshViewer();
 
                     end = trace.readEnd();
                     traceElement.setEndTime((end != null) ? end : TmfTimestamp.BIG_BANG);
@@ -245,7 +245,7 @@ public class UpdateTraceBoundsJob extends Job {
                 } else {
                     traceElement.setEndTime(TmfTimestamp.fromNanos(tmp));
                 }
-                traceElement.refresh();
+                traceElement.refreshViewer();
             } catch (IOException e) {
                 boundsFile.delete();
                 LOGGER.config("Failed to read time bounds supplementary file for trace: " + traceElement.getName()); //$NON-NLS-1$

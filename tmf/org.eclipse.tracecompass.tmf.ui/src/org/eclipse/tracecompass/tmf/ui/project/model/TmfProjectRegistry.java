@@ -17,8 +17,10 @@ package org.eclipse.tracecompass.tmf.ui.project.model;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -202,8 +204,36 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                     try {
                         if (delta.getKind() == IResourceDelta.CHANGED &&
                                 project.isOpen() && project.hasNature(TmfProjectNature.ID)) {
-                            TmfProjectElement projectElement = getProject(project, true);
-                            projectElement.refresh();
+                            Set<IResource> resourcesToRefresh = new HashSet<>();
+                            event.getDelta().accept(visited -> {
+                                if (resourcesToRefresh.contains(visited.getResource().getParent())) {
+                                    return false;
+                                } else if ((visited.getFlags() & IResourceDelta.CONTENT) != 0) {
+                                    // visited resource content has changed
+                                    resourcesToRefresh.add(visited.getResource());
+                                    return false;
+                                } else if (visited.getKind() != IResourceDelta.CHANGED) {
+                                    // visited resource is added or removed
+                                    IResource parent = visited.getResource().getParent();
+                                    resourcesToRefresh.add(parent);
+                                    resourcesToRefresh.removeIf(resource -> resource.getParent().equals(parent));
+                                    return false;
+                                }
+                                return true;
+                            });
+                            Set<ITmfProjectModelElement> elementsToRefresh = new HashSet<>();
+                            for (IResource resource : resourcesToRefresh) {
+                                ITmfProjectModelElement element = findElement(resource, false);
+                                if (element != null) {
+                                    elementsToRefresh.add(element);
+                                }
+                            }
+                            elementsToRefresh.forEach(element -> element.refresh());
+                            TmfProjectElement projectElement = registry.get(project);
+                            if (projectElement != null) {
+                                // refresh only the viewer for the affected project
+                                projectElement.refreshViewer();
+                            }
                         } else if (delta.getKind() == IResourceDelta.REMOVED) {
                             TmfProjectElement projectElement = registry.remove(project);
                             if (projectElement != null) {
@@ -231,7 +261,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
      */
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
-        ITmfProjectModelElement element = findElement(signal.getTrace().getResource());
+        ITmfProjectModelElement element = findElement(signal.getTrace().getResource(), true);
         if (element != null) {
             element.refresh();
             if (element instanceof TmfExperimentElement) {
@@ -244,15 +274,20 @@ public class TmfProjectRegistry implements IResourceChangeListener {
     }
 
     /**
-     * Finds the existing project model element that matches the given resource.
-     * Elements are not created if they do not already exist.
+     * Finds an existing project model element that matches the given resource.
+     * Elements are not created if they do not already exist. If an exact match is
+     * not found and <code>exact</code> is false, returns the nearest existing
+     * parent element.
      *
      * @param resource
      *            the resource
-     * @return the element, or null
+     * @param exact
+     *            if an exact match is not found, returns <code>null</code> if true,
+     *            or the nearest parent if false
+     * @return the element, or <code>null</code>
      * @since 3.1
      */
-    public static ITmfProjectModelElement findElement(IResource resource) {
+    public static ITmfProjectModelElement findElement(IResource resource, boolean exact) {
         if (resource == null) {
             return null;
         }
@@ -262,16 +297,18 @@ public class TmfProjectRegistry implements IResourceChangeListener {
         }
         for (String segment : resource.getProjectRelativePath().segments()) {
             List<ITmfProjectModelElement> children = element.getChildren();
-            element = null;
+            boolean match = false;
             for (ITmfProjectModelElement child : children) {
                 IResource childResource = child.getResource();
                 if (childResource != null && segment.equals(childResource.getName())) {
                     element = child;
+                    match = true;
                     break;
                 }
             }
-            if (element == null) {
-                return null;
+            if (!match) {
+                /* do not return project as nearest parent */
+                return exact ? null : element instanceof TmfProjectElement ? null : element;
             }
         }
         return element;
