@@ -16,7 +16,9 @@ package org.eclipse.tracecompass.ctf.core.trace;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -443,14 +445,14 @@ public class CTFTrace implements IDefinitionScope {
     }
 
     /**
-     * Tries to open the given file, reads the first packet header of the file
-     * and check its validity. This will add a file to a stream as a streaminput
+     * Tries to open the given file, reads the first packet header of the file and
+     * check its validity. This will add a file to a stream as a streaminput
      *
      * @param streamFile
      *            A trace file in the trace directory.
      * @param index
-     *            Which index in the class' streamFileChannel array this file
-     *            must use
+     *            Which index in the class' streamFileChannel array this file must
+     *            use
      * @throws CTFException
      *             if there is a file error
      */
@@ -514,8 +516,7 @@ public class CTFTrace implements IDefinitionScope {
         }
         CTFStream ctfStream = (CTFStream) stream;
         /*
-         * Create the stream input and add a reference to the streamInput in the
-         * stream.
+         * Create the stream input and add a reference to the streamInput in the stream.
          */
         ctfStream.addInput(new CTFStreamInput(ctfStream, streamFile));
         return ctfStream;
@@ -540,6 +541,51 @@ public class CTFTrace implements IDefinitionScope {
                 throw new CTFException("CTF magic mismatch"); //$NON-NLS-1$
             }
         }
+    }
+
+    /**
+     * Determines whether the file is packet-based by looking at the TSDL or CTF
+     * magic number. If it is packet-based, it also gives information about the
+     * endianness of the trace using the detectedByteOrder attribute.
+     *
+     * @param file
+     *            the file to test.
+     * @param magicNumber
+     *            The magic number to verify
+     * @return The byte order if the file is packet-based. (starts with a magic
+     *         number), null if not packet based
+     * @throws CTFException
+     *             If the file is not found.
+     * @since 2.2
+     */
+    public static ByteOrder startsWithMagicNumber(File file, int magicNumber)
+            throws CTFException {
+
+        int magicSize = Integer.BYTES;
+        if (file.length() < magicSize) {
+            return null;
+        }
+        byte[] magic = new byte[magicSize];
+        try (InputStream is = new FileInputStream(file)) {
+            is.read(magic, 0, magic.length);
+        } catch (IOException e) {
+            throw new CTFIOException(e);
+        }
+        ByteBuffer bb = ByteBuffer.wrap(magic);
+        if (isMagicWithEndianness(bb, ByteOrder.LITTLE_ENDIAN, magicNumber)) {
+            return ByteOrder.LITTLE_ENDIAN;
+        }
+        if (isMagicWithEndianness(bb, ByteOrder.BIG_ENDIAN, magicNumber)) {
+            return ByteOrder.BIG_ENDIAN;
+        }
+        return null;
+    }
+
+    private static boolean isMagicWithEndianness(ByteBuffer byteBuffer, ByteOrder endianness, int magicNumber) {
+        byteBuffer.position(0);
+        byteBuffer.order(endianness);
+        int magic = byteBuffer.getInt();
+        return (magic == magicNumber);
     }
 
     // ------------------------------------------------------------------------
@@ -575,8 +621,7 @@ public class CTFTrace implements IDefinitionScope {
     // ------------------------------------------------------------------------
 
     /**
-     * Add a new stream file to support new streams while the trace is being
-     * read.
+     * Add a new stream file to support new streams while the trace is being read.
      *
      * @param streamFile
      *            the file of the stream
@@ -598,16 +643,16 @@ public class CTFTrace implements IDefinitionScope {
      */
     public void addStream(ICTFStream stream) throws ParseException {
         /*
-         * If there is already a stream without id (the null key), it must be
-         * the only one
+         * If there is already a stream without id (the null key), it must be the only
+         * one
          */
         if (fStreams.get(null) != null) {
             throw new ParseException("Stream without id with multiple streams"); //$NON-NLS-1$
         }
 
         /*
-         * If the stream we try to add has no key set, it must be the only one.
-         * Thus, if the streams container is not empty, it is not valid.
+         * If the stream we try to add has no key set, it must be the only one. Thus, if
+         * the streams container is not empty, it is not valid.
          */
         if ((!stream.isIdSet()) && (!fStreams.isEmpty())) {
             throw new ParseException("Stream without id with multiple streams"); //$NON-NLS-1$
@@ -628,8 +673,8 @@ public class CTFTrace implements IDefinitionScope {
     /**
      * Gets the Environment variables from the trace metadata (See CTF spec)
      *
-     * @return The environment variables in the form of an unmodifiable map
-     *         (key, value)
+     * @return The environment variables in the form of an unmodifiable map (key,
+     *         value)
      */
     public Map<String, String> getEnvironment() {
         return Collections.unmodifiableMap(fEnvironment);
@@ -763,8 +808,8 @@ public class CTFTrace implements IDefinitionScope {
     public long timestampCyclesToNanos(long cycles) {
         long retVal = cycles + getOffset();
         /*
-         * this fix is since quite often the offset will be > than 53 bits and
-         * therefore the conversion will be lossy
+         * this fix is since quite often the offset will be > than 53 bits and therefore
+         * the conversion will be lossy
          */
         if (clockNeedsScale()) {
             retVal = (long) (retVal * getTimeScale());
@@ -782,8 +827,8 @@ public class CTFTrace implements IDefinitionScope {
     public long timestampNanoToCycles(long nanos) {
         long retVal;
         /*
-         * this fix is since quite often the offset will be > than 53 bits and
-         * therefore the conversion will be lossy
+         * this fix is since quite often the offset will be > than 53 bits and therefore
+         * the conversion will be lossy
          */
         if (clockNeedsScale()) {
             retVal = (long) (nanos * getInverseTimeScale());

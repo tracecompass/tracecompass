@@ -15,6 +15,7 @@
 
 package org.eclipse.tracecompass.ctf.core.trace;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,7 +30,6 @@ import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.UUID;
 
 import org.antlr.runtime.ANTLRReaderStream;
@@ -154,10 +154,13 @@ public class Metadata {
          * and it will contain a FileReader if we have text-based metadata.
          */
 
-        try (FileInputStream fis = new FileInputStream(getMetadataPath());
+        File metadataFile = new File(getMetadataPath());
+        ByteOrder byteOrder = CTFTrace.startsWithMagicNumber(metadataFile, Utils.TSDL_MAGIC);
+        fDetectedByteOrder = byteOrder;
+        try (FileInputStream fis = new FileInputStream(metadataFile);
                 FileChannel metadataFileChannel = fis.getChannel();
                 /* Check if metadata is packet-based, if not it is text based */
-                Reader metadataTextInput = (isPacketBased(metadataFileChannel) ? readBinaryMetaData(metadataFileChannel) : new FileReader(fis.getFD()));) {
+                Reader metadataTextInput = ( byteOrder!= null ? readBinaryMetaData(metadataFileChannel) : new FileReader(metadataFile));) {
 
             readMetaDataText(metadataTextInput);
 
@@ -211,22 +214,11 @@ public class Metadata {
         String metadataPath = path + Utils.SEPARATOR + METADATA_FILENAME;
         File metadataFile = new File(metadataPath);
         if (metadataFile.exists() && metadataFile.length() > PREVALIDATION_SIZE) {
-            try (FileChannel fc = FileChannel.open(metadataFile.toPath(), StandardOpenOption.READ)) {
-                ByteBuffer bb = ByteBuffer.allocate(PREVALIDATION_SIZE);
-                bb.clear();
-                fc.read(bb);
-                bb.flip();
-                if (bb.getInt(0) == Utils.TSDL_MAGIC) {
-                    return true;
-                }
-                bb.order(ByteOrder.LITTLE_ENDIAN);
-                if (bb.getInt(0) == Utils.TSDL_MAGIC) {
-                    return true;
-                }
-                bb.position(0);
-                byte bytes[] = new byte[PREVALIDATION_SIZE];
-                bb.get(bytes);
-                String text = new String(bytes, ASCII_CHARSET);
+            if (CTFTrace.startsWithMagicNumber(metadataFile, Utils.TSDL_MAGIC) != null) {
+                return true;
+            }
+            try (BufferedReader br = new BufferedReader(new FileReader(metadataFile))) {
+                String text = br.readLine();
                 return text.startsWith(TEXT_ONLY_METADATA_HEADER_PREFIX);
             } catch (IOException e) {
                 throw new CTFException(e.getMessage(), e);
@@ -310,51 +302,6 @@ public class Metadata {
 
         parse_return pr = ctfParser.parse();
         return pr.getTree();
-    }
-
-    /**
-     * Determines whether the metadata file is packet-based by looking at the TSDL
-     * magic number. If it is packet-based, it also gives information about the
-     * endianness of the trace using the detectedByteOrder attribute.
-     *
-     * @param metadataFileChannel
-     *            FileChannel of the metadata file.
-     * @return True if the metadata is packet-based.
-     * @throws CTFException
-     */
-    private boolean isPacketBased(FileChannel metadataFileChannel)
-            throws CTFException {
-        /*
-         * Create a ByteBuffer to read the TSDL magic number (default is big-endian)
-         */
-        ByteBuffer magicByteBuffer = ByteBuffer.allocate(Utils.TSDL_MAGIC_LEN);
-
-        /* Read without changing file position */
-        try {
-            metadataFileChannel.read(magicByteBuffer, 0);
-        } catch (IOException e) {
-            throw new CTFException("Unable to read metadata file channel.", e); //$NON-NLS-1$
-        }
-
-        /* Get the first int from the file */
-        int magic = magicByteBuffer.getInt(0);
-
-        /* Check if it matches */
-        if (Utils.TSDL_MAGIC == magic) {
-            fDetectedByteOrder = ByteOrder.BIG_ENDIAN;
-            return true;
-        }
-
-        /* Try the same thing, but with little-endian */
-        magicByteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        magic = magicByteBuffer.getInt(0);
-
-        if (Utils.TSDL_MAGIC == magic) {
-            fDetectedByteOrder = ByteOrder.LITTLE_ENDIAN;
-            return true;
-        }
-
-        return false;
     }
 
     private String getMetadataPath() {
