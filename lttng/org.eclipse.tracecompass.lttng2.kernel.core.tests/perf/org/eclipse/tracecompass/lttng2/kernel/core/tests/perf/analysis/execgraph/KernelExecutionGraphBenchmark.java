@@ -18,7 +18,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecutionGraph;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraph;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
@@ -101,7 +101,7 @@ public class KernelExecutionGraphBenchmark {
 
             try {
                 trace = new LttngKernelTrace();
-                module = new LttngKernelExecutionGraph();
+                module = new OsExecutionGraph();
                 module.setId("test");
                 trace.initTrace(null, path, CtfTmfEvent.class);
                 module.setTrace(trace);

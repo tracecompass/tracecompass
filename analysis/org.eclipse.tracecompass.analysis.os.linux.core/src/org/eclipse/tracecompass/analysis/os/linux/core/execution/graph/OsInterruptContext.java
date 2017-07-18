@@ -7,9 +7,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model;
+package org.eclipse.tracecompass.analysis.os.linux.core.execution.graph;
 
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider.Context;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider.Context;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -21,13 +21,14 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
  *
  * @author Francis Giraldeau
  * @author Geneviève Bastien
+ * @since 2.4
  */
-public class LttngInterruptContext {
+public class OsInterruptContext {
 
     /**
      * The default context when none is defined
      */
-    public static final LttngInterruptContext DEFAULT_CONTEXT = new LttngInterruptContext(new TmfEvent(null, ITmfContext.UNKNOWN_RANK, TmfTimestamp.BIG_BANG, null, null), Context.NONE);
+    public static final OsInterruptContext DEFAULT_CONTEXT = new OsInterruptContext(new TmfEvent(null, ITmfContext.UNKNOWN_RANK, TmfTimestamp.BIG_BANG, null, null), Context.NONE);
 
     private final ITmfEvent fEvent;
     private final Context fContext;
@@ -40,7 +41,7 @@ public class LttngInterruptContext {
      * @param ctx
      *            The context type
      */
-    public LttngInterruptContext(ITmfEvent event, Context ctx) {
+    public OsInterruptContext(ITmfEvent event, Context ctx) {
         fEvent = event;
         fContext = ctx;
     }

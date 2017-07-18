@@ -18,6 +18,26 @@ package org.eclipse.tracecompass.analysis.graph.core.building;
 public abstract class AbstractTraceEventHandler implements ITraceEventHandler {
 
     private volatile boolean fHandlerCancelled = false;
+    private final int fPriority;
+
+    /**
+     * Default constructor
+     * @deprecated Use the constructor with priority instead
+     */
+    @Deprecated
+    public AbstractTraceEventHandler() {
+        fPriority = 5;
+    }
+
+    /**
+     * Constructor with priority
+     *
+     * @param priority The priority of this handler
+     * @since 1.2
+     */
+    public AbstractTraceEventHandler(int priority) {
+        fPriority = priority;
+    }
 
     @Override
     public boolean isCancelled() {
@@ -27,6 +47,11 @@ public abstract class AbstractTraceEventHandler implements ITraceEventHandler {
     @Override
     public void cancel() {
         fHandlerCancelled = true;
+    }
+
+    @Override
+    public int getPriority() {
+        return fPriority;
     }
 
 }

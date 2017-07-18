@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model;
+package org.eclipse.tracecompass.internal.analysis.os.linux.core.execution.graph;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
@@ -18,11 +18,11 @@ import org.eclipse.osgi.util.NLS;
  * @author Geneviève Bastien
  */
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.core.execution.graph.messages"; //$NON-NLS-1$
     /**
      * Thread priority text
      */
-    public static @Nullable String LttngWorker_threadPriority;
+    public static @Nullable String OsWorker_threadPriority;
 
     static {
         // initialize resource bundle

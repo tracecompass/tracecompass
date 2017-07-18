@@ -28,8 +28,8 @@ import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex.EdgeDirection;
 import org.eclipse.tracecompass.analysis.graph.core.building.TmfGraphBuilderModule;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsWorker;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngWorker;
 import org.eclipse.tracecompass.lttng2.kernel.core.tests.Activator;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
@@ -46,7 +46,7 @@ import org.junit.Test;
  */
 public class LttngExecutionGraphTest {
 
-    private static final @NonNull String TEST_ANALYSIS_ID = "org.eclipse.tracecompass.lttng2.kernel.core.tests.kernelgraph";
+    private static final @NonNull String TEST_ANALYSIS_ID = "org.eclipse.tracecompass.analysis.os.linux.execgraph";
 
     /**
      * Setup the trace for the tests
@@ -99,8 +99,8 @@ public class LttngExecutionGraphTest {
         Set<IGraphWorker> workers = graph.getWorkers();
         assertEquals(2, workers.size());
         for (IGraphWorker worker: workers) {
-            assertTrue(worker instanceof LttngWorker);
-            LttngWorker lttngWorker = (LttngWorker) worker;
+            assertTrue(worker instanceof OsWorker);
+            OsWorker lttngWorker = (OsWorker) worker;
             switch(lttngWorker.getHostThread().getTid()) {
             case 1:
             {

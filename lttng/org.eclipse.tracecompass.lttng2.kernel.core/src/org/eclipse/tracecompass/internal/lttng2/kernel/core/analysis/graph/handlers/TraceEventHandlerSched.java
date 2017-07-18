@@ -9,15 +9,15 @@
 
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.handlers;
 
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsSystemModel;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsWorker;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.LinuxValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider.ProcessStatus;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.EventField;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngSystemModel;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngWorker;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -35,9 +35,12 @@ public class TraceEventHandlerSched extends BaseHandler {
      *
      * @param provider
      *            The parent graph provider
+     * @param priority
+     *            The priority of this handler. It will determine when it will be
+     *            executed
      */
-    public TraceEventHandlerSched(LttngKernelExecGraphProvider provider) {
-        super(provider);
+    public TraceEventHandlerSched(OsExecutionGraphProvider provider, int priority) {
+        super(provider, priority);
     }
 
     @Override
@@ -61,7 +64,7 @@ public class TraceEventHandlerSched extends BaseHandler {
     private void handleSchedSwitch(ITmfEvent event) {
         Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
-        LttngSystemModel system = getProvider().getSystem();
+        OsSystemModel system = getProvider().getSystem();
 
         Integer next = EventField.getInt(event, eventLayout.fieldNextTid());
         Integer prev = EventField.getInt(event, eventLayout.fieldPrevTid());
@@ -73,19 +76,19 @@ public class TraceEventHandlerSched extends BaseHandler {
         system.cacheTidOnCpu(cpu, new HostThread(event.getTrace().getHostId(), next));
 
         HostThread nextHt = new HostThread(host, next);
-        LttngWorker nextTask = system.findWorker(nextHt);
+        OsWorker nextTask = system.findWorker(nextHt);
         if (nextTask == null) {
             String name = EventField.getOrDefault(event, eventLayout.fieldNextComm(), NonNullUtils.checkNotNull(Messages.TraceEventHandlerSched_UnknownThreadName));
-            nextTask = new LttngWorker(nextHt, name, ts);
+            nextTask = new OsWorker(nextHt, name, ts);
             system.addWorker(nextTask);
         }
         nextTask.setStatus(ProcessStatus.RUN);
 
         HostThread prevHt = new HostThread(host, prev);
-        LttngWorker prevTask = system.findWorker(prevHt);
+        OsWorker prevTask = system.findWorker(prevHt);
         String name = EventField.getOrDefault(event, eventLayout.fieldPrevComm(), NonNullUtils.checkNotNull(Messages.TraceEventHandlerSched_UnknownThreadName));
         if (prevTask == null) {
-            prevTask = new LttngWorker(prevHt, name, ts);
+            prevTask = new OsWorker(prevHt, name, ts);
             system.addWorker(prevTask);
         } else if (prev != 0) {
             /* update the process name if changed at runtime */
@@ -102,7 +105,7 @@ public class TraceEventHandlerSched extends BaseHandler {
     private void handleSchedProcessFork(ITmfEvent event) {
         String host = event.getTrace().getHostId();
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
-        LttngSystemModel system = getProvider().getSystem();
+        OsSystemModel system = getProvider().getSystem();
 
         Integer childTid = EventField.getInt(event, eventLayout.fieldChildTid());
         String name = EventField.getString(event, eventLayout.fieldChildComm());
@@ -110,9 +113,9 @@ public class TraceEventHandlerSched extends BaseHandler {
 
         HostThread childHt = new HostThread(host, childTid);
 
-        LttngWorker childTask = system.findWorker(childHt);
+        OsWorker childTask = system.findWorker(childHt);
         if (childTask == null) {
-            childTask = new LttngWorker(childHt, name, ts);
+            childTask = new OsWorker(childHt, name, ts);
             system.addWorker(childTask);
         }
 
@@ -123,17 +126,17 @@ public class TraceEventHandlerSched extends BaseHandler {
         String host = event.getTrace().getHostId();
         Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
-        LttngSystemModel system = getProvider().getSystem();
+        OsSystemModel system = getProvider().getSystem();
 
         Integer tid = EventField.getInt(event, eventLayout.fieldTid());
         HostThread targetHt = new HostThread(host, tid);
 
-        LttngWorker target = system.findWorker(targetHt);
-        LttngWorker current = system.getWorkerOnCpu(host, cpu);
+        OsWorker target = system.findWorker(targetHt);
+        OsWorker current = system.getWorkerOnCpu(host, cpu);
 
         if (target == null) {
             String name = EventField.getOrDefault(event, eventLayout.fieldComm(), NonNullUtils.checkNotNull(Messages.TraceEventHandlerSched_UnknownThreadName));
-            target = new LttngWorker(targetHt, name, event.getTimestamp().getValue());
+            target = new OsWorker(targetHt, name, event.getTimestamp().getValue());
             system.addWorker(target);
             target.setStatus(ProcessStatus.WAIT_BLOCKED);
         }
@@ -154,10 +157,10 @@ public class TraceEventHandlerSched extends BaseHandler {
     private void handleSchedProcessExit(ITmfEvent event) {
         String host = event.getTrace().getHostId();
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
-        LttngSystemModel system = getProvider().getSystem();
+        OsSystemModel system = getProvider().getSystem();
 
         Integer tid = EventField.getInt(event, eventLayout.fieldTid());
-        LttngWorker task = system.findWorker(new HostThread(host, tid));
+        OsWorker task = system.findWorker(new HostThread(host, tid));
         if (task == null) {
             return;
         }
@@ -168,10 +171,10 @@ public class TraceEventHandlerSched extends BaseHandler {
         String host = event.getTrace().getHostId();
         Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
-        LttngSystemModel system = getProvider().getSystem();
+        OsSystemModel system = getProvider().getSystem();
 
         String filename = EventField.getString(event, eventLayout.fieldFilename());
-        LttngWorker task = system.getWorkerOnCpu(host, cpu);
+        OsWorker task = system.getWorkerOnCpu(host, cpu);
         if (task == null) {
             return;
         }

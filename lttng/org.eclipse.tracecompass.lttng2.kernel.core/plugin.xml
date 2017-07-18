@@ -30,15 +30,6 @@
             </tracetype>
       </module>
       <module
-            analysis_module="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecutionGraph"
-            applies_experiment="true"
-            id="org.eclipse.tracecompass.lttng2.kernel.core.execgraph"
-            name="LTTng Kernel Exec Graph">
-         <tracetype
-               class="org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace">
-         </tracetype>
-      </module>
-      <module
             analysis_module="org.eclipse.tracecompass.analysis.counters.core.CounterAnalysis"
             automatic="true"
             icon="icons/runtime.gif"
@@ -57,5 +48,20 @@
       <xmlfile
             file="analysis.xml/org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.xml.irq/irq_analysis_lttng.xml">
       </xmlfile>
+   </extension>
+   <extension
+         point="org.eclipse.tracecompass.analysis.os.linux.core.graph.handler">
+      <handler
+         class="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngGraphHandlerBuilder$HandlerBuilderStatedump"
+         priority="3" />
+      <handler
+         class="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngGraphHandlerBuilder$HandlerBuilderSched"
+         priority="4" />
+      <handler
+         class="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngGraphHandlerBuilder$HandlerBuilderEventContext"
+         priority="5" />
+      <handler
+         class="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngGraphHandlerBuilder$HandlerBuilderExecutionGraph"
+         priority="10" />
    </extension>
 </plugin>

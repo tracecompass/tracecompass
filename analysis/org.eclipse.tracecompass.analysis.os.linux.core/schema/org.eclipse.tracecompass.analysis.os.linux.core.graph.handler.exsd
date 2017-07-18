@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.tracecompass.analysis.os.linux.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.tracecompass.analysis.os.linux.core" id="graph.handler" name="Operating System Execution Graph Handler"/>
+      </appinfo>
+      <documentation>
+         This extension point is used to contribute handlers to build the operating system execution graph, from which the critical path can be computed.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="1" maxOccurs="unbounded">
+            <element ref="handler"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a fully qualified identifier of the target extension point
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  an optional identifier of the extension instance
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  an optional name of the extension instance
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="handler">
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The class of the execution graph event handler. It will be registered to the os execution graph analysis.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.IOsExecutionGraphHandlerBuilder"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="priority" type="string">
+            <annotation>
+               <documentation>
+                  A number identifying the priority at which the handler will be registered. A lower number means a higher priority. A handler at priority 0 will handle the event before handlers wiht higher priorities.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         2.3
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+For an example implementation of handlers see:
+&lt;pre&gt;
+plug-in: org.eclipse.tracecompass.lttng2.kernel.core
+package: org.eclipse.tracecompass.lttng2.kernel.core.analysis.graph.*
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+The following is an example usage of the extension point:
+&lt;pre&gt;
+&lt;extension
+         point=&quot;org.eclipse.tracecompass.analysis.os.linux.core.graph.handler&quot;&gt;
+      &lt;handler
+       class=&quot;org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.HandlerBuilderStatedump&quot;
+       priority=&quot;3&quot; /&gt;
+      &lt;handler
+       class=&quot;org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.HandlerBuilderExecutionGraph&quot;
+       priority=&quot;10&quot; /&gt;
+   &lt;/extension&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+This extension point advertises a class implementing IOsExecutionGraphHandlerBuilder. This class is a functional interface that creates an ITraceEventHandler object by sending the graph provider and the priority. It is this object that is responsible for building the model of the system and creating the execution graph.
+&lt;/p&gt;
+&lt;p&gt;
+The handlers will be registered to the graph provider by their priority if specified. The lower the number, the earlier it will handle the event. If no priority is specified, the handler will be assigned an arbitrary value and there is no guarantee as to when it will be executed.
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2017 École Polytechnique de montréal
+
+All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at &amp;lt;a href=&amp;quot;http://www.eclipse.org/legal/epl-v10.html&amp;quot;&amp;gt;http://www.eclipse.org/legal/epl-v10.html&amp;lt;/a&amp;gt;
+      </documentation>
+   </annotation>
+
+</schema>

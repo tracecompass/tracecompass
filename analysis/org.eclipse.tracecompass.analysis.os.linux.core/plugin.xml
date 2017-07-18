@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="org.eclipse.tracecompass.analysis.os.linux.core.graph.handler" name="%extensionpoint.graphhandler.name" schema="schema/org.eclipse.tracecompass.analysis.os.linux.core.graph.handler.exsd"/>
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <module
@@ -74,6 +75,15 @@
             name="%analysis.io">
          <tracetype
                applies="true"
+               class="org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace">
+         </tracetype>
+      </module>
+      <module
+            analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraph"
+            applies_experiment="true"
+            id="org.eclipse.tracecompass.analysis.os.linux.execgraph"
+            name="%analysis.execgraph">
+         <tracetype
                class="org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace">
          </tracetype>
       </module>

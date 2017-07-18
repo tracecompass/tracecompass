@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building;
+package org.eclipse.tracecompass.analysis.os.linux.core.execution.graph;
 
 import org.eclipse.tracecompass.analysis.graph.core.building.ITmfGraphProvider;
 import org.eclipse.tracecompass.analysis.graph.core.building.TmfGraphBuilderModule;
@@ -18,13 +18,14 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  *
  * @author Francis Giraldeau
  * @author Geneviève Bastien
+ * @since 2.4
  */
-public class LttngKernelExecutionGraph extends TmfGraphBuilderModule {
+public class OsExecutionGraph extends TmfGraphBuilderModule {
 
     /**
      * Analysis id of this module
      */
-    public static final String ANALYSIS_ID = "org.eclipse.tracecompass.lttng2.kernel.core.execgraph"; //$NON-NLS-1$
+    public static final String ANALYSIS_ID = "org.eclipse.tracecompass.analysis.os.linux.execgraph"; //$NON-NLS-1$
 
     @Override
     public boolean canExecute(ITmfTrace trace) {
@@ -41,7 +42,7 @@ public class LttngKernelExecutionGraph extends TmfGraphBuilderModule {
         if (trace == null) {
             throw new NullPointerException();
         }
-        return new LttngKernelExecGraphProvider(trace);
+        return new OsExecutionGraphProvider(trace);
     }
 
     @Override

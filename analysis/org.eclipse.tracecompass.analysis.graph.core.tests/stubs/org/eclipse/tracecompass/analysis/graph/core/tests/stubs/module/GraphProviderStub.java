@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.analysis.graph.core.tests.stubs.module;
 
+import java.util.List;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.graph.core.base.IGraphWorker;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge.EdgeType;
@@ -16,6 +18,7 @@ import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
 import org.eclipse.tracecompass.analysis.graph.core.building.AbstractTmfGraphProvider;
 import org.eclipse.tracecompass.analysis.graph.core.building.AbstractTraceEventHandler;
+import org.eclipse.tracecompass.analysis.graph.core.building.ITraceEventHandler;
 import org.eclipse.tracecompass.analysis.graph.core.tests.stubs.TestGraphWorker;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -41,6 +44,10 @@ public class GraphProviderStub extends AbstractTmfGraphProvider {
     }
 
     private class StubEventHandler extends AbstractTraceEventHandler {
+
+        public StubEventHandler() {
+            super(5);
+        }
 
         @Override
         public void handleEvent(ITmfEvent event) {
@@ -80,5 +87,13 @@ public class GraphProviderStub extends AbstractTmfGraphProvider {
         }
 
     }
+
+    // Change the visibility of this method to be used in tests
+    @Override
+    public @NonNull List<@NonNull ITraceEventHandler> getHandlers() {
+        return super.getHandlers();
+    }
+
+
 
 }

@@ -10,9 +10,9 @@
 package org.eclipse.tracecompass.internal.lttng2.kernel.ui.criticalpath;
 
 import org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathModule;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsWorker;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
 import org.eclipse.tracecompass.analysis.os.linux.core.signals.TmfThreadSelectedSignal;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngWorker;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisParamProvider;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -61,7 +61,7 @@ public class CriticalPathParameterProvider extends TmfAbstractAnalysisParamProvi
             /* Try to find the worker for the critical path */
             IAnalysisModule mod = getModule();
             if ((mod != null) && (mod instanceof CriticalPathModule)) {
-                LttngWorker worker = new LttngWorker(currentHostThread, "", 0); //$NON-NLS-1$
+                OsWorker worker = new OsWorker(currentHostThread, "", 0); //$NON-NLS-1$
                 return worker;
             }
         }

@@ -20,24 +20,35 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  */
 public interface ITraceEventHandler {
 
-	/**
-	 * Handles an event
-	 *
-	 * @param event
-	 *            The event to handle
-	 */
-	void handleEvent(ITmfEvent event);
+    /**
+     * Handles an event
+     *
+     * @param event
+     *            The event to handle
+     */
+    void handleEvent(ITmfEvent event);
 
-	/**
-	 * Indicate if this handler is cancelled
-	 *
-	 * @return true if this handler is cancelled
-	 */
-	boolean isCancelled();
+    /**
+     * Indicate if this handler is cancelled
+     *
+     * @return true if this handler is cancelled
+     */
+    boolean isCancelled();
 
-	/**
-	 * Cancels this event handler
-	 */
-	void cancel();
+    /**
+     * Cancels this event handler
+     */
+    void cancel();
+
+    /**
+     * Get a priority level associated with this handler. The lower the number, the
+     * higher the priority.
+     *
+     * @return The priority level associated with this handler
+     * @since 1.2
+     */
+    default int getPriority() {
+        return 10;
+    }
 
 }

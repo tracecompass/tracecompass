@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model;
+package org.eclipse.tracecompass.analysis.os.linux.core.execution.graph;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,12 +30,13 @@ import com.google.common.collect.Table;
  *
  * @author Francis Giraldeau
  * @author Geneviève Bastien
+ * @since 2.4
  */
-public class LttngSystemModel {
+public class OsSystemModel {
 
     private final Table<String, Integer, HostThread> fCurrentTids = HashBasedTable.create();
-    private final Table<String, Integer, Stack<LttngInterruptContext>> fIntCtxStacks = HashBasedTable.create();
-    private final Map<HostThread, LttngWorker> fWorkerMap = new HashMap<>();
+    private final Table<String, Integer, Stack<OsInterruptContext>> fIntCtxStacks = HashBasedTable.create();
+    private final Map<HostThread, OsWorker> fWorkerMap = new HashMap<>();
 
     /**
      * Cache the TID currently on the CPU of a host, for easier access later on
@@ -50,16 +51,16 @@ public class LttngSystemModel {
     }
 
     /**
-     * Get the {@link LttngWorker} object that is currently running on the CPU
+     * Get the {@link OsWorker} object that is currently running on the CPU
      * of a host
      *
      * @param host
      *            The identifier of the trace/machine of the CPU
      * @param cpu
      *            The CPU ID on which the worker is running
-     * @return The {@link LttngWorker} running on the CPU
+     * @return The {@link OsWorker} running on the CPU
      */
-    public @Nullable LttngWorker getWorkerOnCpu(String host, Integer cpu) {
+    public @Nullable OsWorker getWorkerOnCpu(String host, Integer cpu) {
         HostThread ht = fCurrentTids.get(host, cpu);
         if (ht == null) {
             return null;
@@ -72,9 +73,9 @@ public class LttngSystemModel {
      *
      * @param ht
      *            The host thread associated with a worker
-     * @return The {@link LttngWorker} associated with a host thread
+     * @return The {@link OsWorker} associated with a host thread
      */
-    public @Nullable LttngWorker findWorker(HostThread ht) {
+    public @Nullable OsWorker findWorker(HostThread ht) {
         return fWorkerMap.get(ht);
     }
 
@@ -84,7 +85,7 @@ public class LttngSystemModel {
      * @param worker
      *            The worker to add
      */
-    public void addWorker(LttngWorker worker) {
+    public void addWorker(OsWorker worker) {
         fWorkerMap.put(worker.getHostThread(), worker);
     }
 
@@ -93,7 +94,7 @@ public class LttngSystemModel {
      *
      * @return The list of workers on the system
      */
-    public Collection<LttngWorker> getWorkers() {
+    public Collection<OsWorker> getWorkers() {
         return fWorkerMap.values();
     }
 
@@ -108,8 +109,8 @@ public class LttngSystemModel {
      * @param interruptCtx
      *            The interrupt context to push on the stack
      */
-    public void pushContextStack(String hostId, Integer cpu, LttngInterruptContext interruptCtx) {
-        Stack<LttngInterruptContext> stack = fIntCtxStacks.get(hostId, cpu);
+    public void pushContextStack(String hostId, Integer cpu, OsInterruptContext interruptCtx) {
+        Stack<OsInterruptContext> stack = fIntCtxStacks.get(hostId, cpu);
         if (stack == null) {
             stack = new Stack<>();
             fIntCtxStacks.put(hostId, cpu, stack);
@@ -128,15 +129,15 @@ public class LttngSystemModel {
      *            The CPU this interrupt happened on
      * @return The latest interrupt context on the CPU of the host
      */
-    public LttngInterruptContext peekContextStack(String hostId, Integer cpu) {
-        Stack<LttngInterruptContext> stack = fIntCtxStacks.get(hostId, cpu);
+    public OsInterruptContext peekContextStack(String hostId, Integer cpu) {
+        Stack<OsInterruptContext> stack = fIntCtxStacks.get(hostId, cpu);
         if (stack == null) {
-            return LttngInterruptContext.DEFAULT_CONTEXT;
+            return OsInterruptContext.DEFAULT_CONTEXT;
         }
         if (stack.empty()) {
-            return LttngInterruptContext.DEFAULT_CONTEXT;
+            return OsInterruptContext.DEFAULT_CONTEXT;
         }
-        LttngInterruptContext peek = stack.peek();
+        OsInterruptContext peek = stack.peek();
         return peek;
     }
 
@@ -151,8 +152,8 @@ public class LttngSystemModel {
      *            The CPU this interrupt happened on
      * @return The latest interrupt context on the CPU of the host
      */
-    public @Nullable LttngInterruptContext popContextStack(String hostId, Integer cpu) {
-        Stack<LttngInterruptContext> stack = fIntCtxStacks.get(hostId, cpu);
+    public @Nullable OsInterruptContext popContextStack(String hostId, Integer cpu) {
+        Stack<OsInterruptContext> stack = fIntCtxStacks.get(hostId, cpu);
         if (stack == null) {
             return null;
         }

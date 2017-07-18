@@ -11,16 +11,22 @@ package org.eclipse.tracecompass.analysis.graph.core.tests.graph;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex.EdgeDirection;
+import org.eclipse.tracecompass.analysis.graph.core.building.AbstractTraceEventHandler;
+import org.eclipse.tracecompass.analysis.graph.core.building.ITraceEventHandler;
 import org.eclipse.tracecompass.analysis.graph.core.building.TmfGraphBuilderModule;
 import org.eclipse.tracecompass.analysis.graph.core.tests.Activator;
 import org.eclipse.tracecompass.analysis.graph.core.tests.stubs.TestGraphWorker;
 import org.eclipse.tracecompass.analysis.graph.core.tests.stubs.module.GraphBuilderModuleStub;
+import org.eclipse.tracecompass.analysis.graph.core.tests.stubs.module.GraphProviderStub;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -50,7 +56,7 @@ public class TmfGraphBuilderModuleTest {
      *
      * @return
      */
-    private TmfGraphBuilderModule getModule(TmfTrace trace) {
+    private GraphBuilderModuleStub getModule(TmfTrace trace) {
         trace.traceOpened(new TmfTraceOpenedSignal(this, trace, null));
         GraphBuilderModuleStub module = null;
         for (GraphBuilderModuleStub mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, GraphBuilderModuleStub.class)) {
@@ -116,6 +122,83 @@ public class TmfGraphBuilderModuleTest {
         }
 
         trace.dispose();
+    }
+
+    private class TestEventHandler extends AbstractTraceEventHandler {
+        public TestEventHandler(int priority) {
+            super(priority);
+        }
+
+        @Override
+        public void handleEvent(@NonNull ITmfEvent event) {
+            // Nothing to do, just stubs
+        }
+    }
+
+    private class TestEventHandler2 extends TestEventHandler {
+        public TestEventHandler2(int priority) {
+            super(priority);
+        }
+    }
+
+    /**
+     * Test adding handlers to the graph provider
+     */
+    @Test
+    public void testHandlers() {
+        TmfXmlTraceStub trace = TmfXmlTraceStubNs.setupTrace(Activator.getAbsoluteFilePath(STUB_TRACE_FILE));
+
+        try {
+            GraphBuilderModuleStub module = getModule(trace);
+            GraphProviderStub graphProvider = module.getGraphProvider();
+            int origSize = graphProvider.getHandlers().size();
+            // Add an handler with priority 5
+            graphProvider.registerHandler(new TestEventHandler(5));
+            List<@NonNull ITraceEventHandler> handlers = graphProvider.getHandlers();
+            int newSize = handlers.size();
+            assertTrue(areHandlersSorted(handlers));
+            assertEquals(origSize + 1, newSize);
+
+            // Add a new instance of the same handler, with same priority, it should not be
+            // added
+            graphProvider.registerHandler(new TestEventHandler(5));
+            handlers = graphProvider.getHandlers();
+            newSize = handlers.size();
+            assertTrue(areHandlersSorted(handlers));
+            assertEquals(origSize + 1, newSize);
+
+            // Add the same handler with another priority, it should be added
+            graphProvider.registerHandler(new TestEventHandler(7));
+            handlers = graphProvider.getHandlers();
+            newSize = handlers.size();
+            assertTrue(areHandlersSorted(handlers));
+            assertEquals(origSize + 2, newSize);
+
+            // Add another class of handler with same priority as another one
+            graphProvider.registerHandler(new TestEventHandler2(5));
+            handlers = graphProvider.getHandlers();
+            newSize = handlers.size();
+            assertTrue(areHandlersSorted(handlers));
+            assertEquals(origSize + 3, newSize);
+        } finally {
+            trace.dispose();
+        }
+    }
+
+    private static boolean areHandlersSorted(List<@NonNull ITraceEventHandler> handlers) {
+        // Verify that handlers are sorted by priority
+        if (handlers.isEmpty()) {
+            return true;
+        }
+        int prevPrio = -1;
+        for (int i = 0; i < handlers.size(); i++) {
+            int prio = handlers.get(i).getPriority();
+            if (prevPrio > prio) {
+                return false;
+            }
+            prevPrio = prio;
+        }
+        return true;
     }
 
 }

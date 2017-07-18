@@ -11,13 +11,13 @@ package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.hand
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsSystemModel;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsWorker;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider.ProcessStatus;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.EventField;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngSystemModel;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngWorker;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
@@ -33,15 +33,18 @@ public class TraceEventHandlerStatedump extends BaseHandler {
      *
      * @param provider
      *            The parent graph provider
+     * @param priority
+     *            The priority of this handler. It will determine when it will be
+     *            executed
      */
-    public TraceEventHandlerStatedump(LttngKernelExecGraphProvider provider) {
-        super(provider);
+    public TraceEventHandlerStatedump(OsExecutionGraphProvider provider, int priority) {
+        super(provider, priority);
     }
 
     @Override
     public void handleEvent(ITmfEvent event) {
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
-        LttngSystemModel system = getProvider().getSystem();
+        OsSystemModel system = getProvider().getSystem();
         String eventName = event.getName();
         if (!eventName.equals(eventLayout.eventStatedumpProcessState())) {
             return;
@@ -55,9 +58,9 @@ public class TraceEventHandlerStatedump extends BaseHandler {
         long ts = event.getTimestamp().getValue();
 
         HostThread ht = new HostThread(host, tid);
-        LttngWorker task = system.findWorker(ht);
+        OsWorker task = system.findWorker(ht);
         if (task == null) {
-            task = new LttngWorker(ht, name, ts);
+            task = new OsWorker(ht, name, ts);
             system.addWorker(task);
         } else {
             task.setName(name);

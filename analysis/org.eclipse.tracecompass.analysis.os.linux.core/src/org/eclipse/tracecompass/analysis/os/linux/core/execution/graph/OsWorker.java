@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model;
+package org.eclipse.tracecompass.analysis.os.linux.core.execution.graph;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,11 +17,12 @@ import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.graph.core.base.IGraphWorker;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelThreadInformationProvider;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider.ProcessStatus;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.execution.graph.Messages;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
@@ -31,8 +32,9 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  * TODO: See if this class could be integrated inside HostThread instead.
  *
  * @author Geneviève Bastien
+ * @since 2.4
  */
-public class LttngWorker implements IGraphWorker {
+public class OsWorker implements IGraphWorker {
 
     private final HostThread fHostTid;
     private final long fStart;
@@ -51,7 +53,7 @@ public class LttngWorker implements IGraphWorker {
      * @param ts
      *            The timestamp
      */
-    public LttngWorker(HostThread ht, String name, long ts) {
+    public OsWorker(HostThread ht, String name, long ts) {
         fHostTid = ht;
         fThreadName = name;
         fStart = ts;
@@ -84,7 +86,7 @@ public class LttngWorker implements IGraphWorker {
 
         int priority = KernelThreadInformationProvider.getThreadPriority(module, tid, t);
         if (priority != -1) {
-            info.put(NonNullUtils.nullToEmptyString(Messages.LttngWorker_threadPriority), Integer.toString(priority));
+            info.put(NonNullUtils.nullToEmptyString(Messages.OsWorker_threadPriority), Integer.toString(priority));
         }
         return info;
     }
@@ -110,7 +112,7 @@ public class LttngWorker implements IGraphWorker {
 
     /**
      * Set the status, saving the old value that can still be accessed using
-     * {@link LttngWorker#getOldStatus()}
+     * {@link OsWorker#getOldStatus()}
      *
      * @param status
      *            The new status of this
@@ -158,8 +160,8 @@ public class LttngWorker implements IGraphWorker {
 
     @Override
     public boolean equals(@Nullable Object obj) {
-        if (obj instanceof LttngWorker) {
-            return getHostThread().equals(((LttngWorker) obj).getHostThread());
+        if (obj instanceof OsWorker) {
+            return getHostThread().equals(((OsWorker) obj).getHostThread());
         }
         return false;
     }

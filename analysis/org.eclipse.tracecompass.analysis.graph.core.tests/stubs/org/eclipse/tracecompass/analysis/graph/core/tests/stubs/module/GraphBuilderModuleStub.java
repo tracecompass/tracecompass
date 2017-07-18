@@ -9,7 +9,6 @@
 
 package org.eclipse.tracecompass.analysis.graph.core.tests.stubs.module;
 
-import org.eclipse.tracecompass.analysis.graph.core.building.ITmfGraphProvider;
 import org.eclipse.tracecompass.analysis.graph.core.building.TmfGraphBuilderModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
@@ -24,8 +23,9 @@ public class GraphBuilderModuleStub extends TmfGraphBuilderModule {
     /** The analysis id */
     public static final String ANALYSIS_ID = "org.eclipse.linuxtools.tmf.analysis.graph.tests.stub";
 
+    /* Make it public so unit tests can use the graph provider */
     @Override
-    protected ITmfGraphProvider getGraphProvider() {
+    public GraphProviderStub getGraphProvider() {
         ITmfTrace trace = getTrace();
         if (trace == null) {
             throw new NullPointerException();

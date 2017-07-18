@@ -10,12 +10,16 @@
 package org.eclipse.tracecompass.analysis.graph.core.building;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Base class for graph providers. It implements most methods common for all
@@ -25,6 +29,23 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * @author Francis Giraldeau
  */
 public abstract class AbstractTmfGraphProvider implements ITmfGraphProvider {
+
+    private static final Comparator<ITraceEventHandler> HANDLER_COMPARATOR = new Comparator<ITraceEventHandler>() {
+
+        @Override
+        public int compare(@Nullable ITraceEventHandler o1, @Nullable ITraceEventHandler o2) {
+            if (o1 == null) {
+                return 1;
+            }
+            if (o2 == null) {
+                return -1;
+            }
+            int res = Integer.compare(o1.getPriority(), o2.getPriority());
+            // If the handlers have the same priority, arbitrarily compare their names
+            return (res != 0 ? res : o1.getClass().getName().compareTo(o2.getClass().getName()));
+        }
+
+    };
 
     private final ITmfTrace fTrace;
 
@@ -112,7 +133,22 @@ public abstract class AbstractTmfGraphProvider implements ITmfGraphProvider {
      *            The trace event handler
      */
     public void registerHandler(ITraceEventHandler handler) {
-        fHandlers.add(handler);
+        int pos = Collections.binarySearch(fHandlers, handler, HANDLER_COMPARATOR);
+        if (pos < 0) {
+            fHandlers.add(-pos - 1, handler);
+        }
+        // If pos >= 0, the handler is already in the list
+    }
+
+    /**
+     * Get the list of handlers for this class. Used for unit testing only.
+     *
+     * @return The list of handlers
+     * @since 1.2
+     */
+    @VisibleForTesting
+    protected List<ITraceEventHandler> getHandlers() {
+        return ImmutableList.copyOf(fHandlers);
     }
 
 }

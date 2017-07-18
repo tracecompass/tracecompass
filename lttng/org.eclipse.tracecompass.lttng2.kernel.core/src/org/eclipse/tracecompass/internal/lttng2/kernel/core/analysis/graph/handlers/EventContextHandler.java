@@ -15,12 +15,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsInterruptContext;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsSystemModel;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider.Context;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider.Context;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngInterruptContext;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngSystemModel;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -53,9 +53,12 @@ public class EventContextHandler extends BaseHandler {
      *
      * @param provider
      *            The parent graph provider
+     * @param priority
+     *            The priority of this handler. It will determine when it will be
+     *            executed
      */
-    public EventContextHandler(LttngKernelExecGraphProvider provider) {
-        super(provider);
+    public EventContextHandler(OsExecutionGraphProvider provider, int priority) {
+        super(provider, priority);
     }
 
     @Override
@@ -85,21 +88,19 @@ public class EventContextHandler extends BaseHandler {
 
     private void pushInterruptContext(ITmfEvent event, Context ctx) {
         Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
-        LttngSystemModel system = getProvider().getSystem();
+        OsSystemModel system = getProvider().getSystem();
 
-        LttngInterruptContext interruptCtx = new LttngInterruptContext(event, ctx);
+        OsInterruptContext interruptCtx = new OsInterruptContext(event, ctx);
 
         system.pushContextStack(event.getTrace().getHostId(), cpu, interruptCtx);
     }
 
     private void popInterruptContext(ITmfEvent event, Context ctx) {
         Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
-        LttngSystemModel system = getProvider().getSystem();
+        OsSystemModel system = getProvider().getSystem();
 
-        /*
-         * TODO: add a warning bookmark if the interrupt context is not coherent
-         */
-        LttngInterruptContext interruptCtx = system.peekContextStack(event.getTrace().getHostId(), cpu);
+        /* TODO: add a warning bookmark if the interrupt context is not coherent */
+        OsInterruptContext interruptCtx = system.peekContextStack(event.getTrace().getHostId(), cpu);
         if (interruptCtx.getContext() == ctx) {
             system.popContextStack(event.getTrace().getHostId(), cpu);
         }

@@ -7,27 +7,26 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building;
+package org.eclipse.tracecompass.analysis.os.linux.core.execution.graph;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.tracecompass.analysis.graph.core.base.IGraphWorker;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex.EdgeDirection;
 import org.eclipse.tracecompass.analysis.graph.core.building.AbstractTmfGraphProvider;
+import org.eclipse.tracecompass.analysis.graph.core.building.ITraceEventHandler;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.DefaultEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.handlers.EventContextHandler;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.handlers.TraceEventHandlerExecutionGraph;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.handlers.TraceEventHandlerSched;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.handlers.TraceEventHandlerStatedump;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngSystemModel;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngWorker;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
-import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -49,10 +48,18 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  *
  * @author Geneviève Bastien
  * @author Francis Giraldeau
+ * @since 2.4
  */
-public class LttngKernelExecGraphProvider extends AbstractTmfGraphProvider {
+public class OsExecutionGraphProvider extends AbstractTmfGraphProvider {
 
-    private final LttngSystemModel fSystem;
+    /** Extension point ID */
+    private static final String TMF_GRAPH_HANDLER_ID = "org.eclipse.tracecompass.analysis.os.linux.core.graph.handler"; //$NON-NLS-1$
+    private static final String HANDLER = "handler"; //$NON-NLS-1$
+    private static final String ATTRIBUTE_CLASS = "class"; //$NON-NLS-1$
+    private static final String ATTRIBUTE_PRIORITY = "priority"; //$NON-NLS-1$
+    private static final int DEFAULT_PRIORITY = 10;
+
+    private final OsSystemModel fSystem;
 
     /**
      * Represents an interrupt context
@@ -80,7 +87,8 @@ public class LttngKernelExecGraphProvider extends AbstractTmfGraphProvider {
         WAIT_FORK(1),
         /** Waiting for the CPU */
         WAIT_CPU(2),
-        /** The thread has exited, but is not dead yet */
+        /** The thread has exited, but is not dead yet
+         * @since 2.3*/
         EXIT(3),
         /** The thread is a zombie thread */
         ZOMBIE(4),
@@ -123,14 +131,32 @@ public class LttngKernelExecGraphProvider extends AbstractTmfGraphProvider {
      * @param trace
      *            The trace on which to build graph
      */
-    public LttngKernelExecGraphProvider(ITmfTrace trace) {
+    public OsExecutionGraphProvider(ITmfTrace trace) {
         super(trace, "LTTng Kernel"); //$NON-NLS-1$
-        fSystem = new LttngSystemModel();
+        fSystem = new OsSystemModel();
 
-        registerHandler(new TraceEventHandlerStatedump(this));
-        registerHandler(new TraceEventHandlerSched(this));
-        registerHandler(new EventContextHandler(this));
-        registerHandler(new TraceEventHandlerExecutionGraph(this));
+        IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(TMF_GRAPH_HANDLER_ID);
+        for (IConfigurationElement ce : config) {
+            String elementName = ce.getName();
+            if (HANDLER.equals(elementName)) {
+                IOsExecutionGraphHandlerBuilder builder;
+                try {
+                    builder = (IOsExecutionGraphHandlerBuilder) ce.createExecutableExtension(ATTRIBUTE_CLASS);
+                } catch (CoreException e1) {
+                    Activator.getDefault().logWarning("Error create execution graph handler builder", e1); //$NON-NLS-1$
+                    continue;
+                }
+                String priorityStr = ce.getAttribute(ATTRIBUTE_PRIORITY);
+                int priority = DEFAULT_PRIORITY;
+                try {
+                    priority = Integer.valueOf(priorityStr);
+                } catch (NumberFormatException e) {
+                    // Nothing to do, use default value
+                }
+                ITraceEventHandler handler = builder.createHandler(this, priority);
+                registerHandler(handler);
+            }
+        }
     }
 
     /**
@@ -143,17 +169,17 @@ public class LttngKernelExecGraphProvider extends AbstractTmfGraphProvider {
             throw new NullPointerException();
         }
         Set<IGraphWorker> keys = graph.getWorkers();
-        List<LttngWorker> kernelWorker = new ArrayList<>();
+        List<OsWorker> kernelWorker = new ArrayList<>();
         /* build the set of worker to eliminate */
         for (Object k : keys) {
-            if (k instanceof LttngWorker) {
-                LttngWorker w = (LttngWorker) k;
+            if (k instanceof OsWorker) {
+                OsWorker w = (OsWorker) k;
                 if (w.getHostThread().getTid() == -1) {
                     kernelWorker.add(w);
                 }
             }
         }
-        for (LttngWorker k : kernelWorker) {
+        for (OsWorker k : kernelWorker) {
             List<TmfVertex> nodes = graph.getNodesOf(k);
             for (TmfVertex node : nodes) {
                 /*
@@ -191,10 +217,10 @@ public class LttngKernelExecGraphProvider extends AbstractTmfGraphProvider {
      * @return the eventLayout
      */
     public IKernelAnalysisEventLayout getEventLayout(ITmfTrace trace) {
-        if (trace instanceof LttngKernelTrace) {
-            return ((LttngKernelTrace) trace).getKernelEventLayout();
+        if (trace instanceof IKernelTrace) {
+            return ((IKernelTrace) trace).getKernelEventLayout();
         }
-        return LttngEventLayout.getInstance();
+        return DefaultEventLayout.getInstance();
     }
 
     /**
@@ -202,7 +228,7 @@ public class LttngKernelExecGraphProvider extends AbstractTmfGraphProvider {
      *
      * @return the system
      */
-    public LttngSystemModel getSystem() {
+    public OsSystemModel getSystem() {
         return fSystem;
     }
 

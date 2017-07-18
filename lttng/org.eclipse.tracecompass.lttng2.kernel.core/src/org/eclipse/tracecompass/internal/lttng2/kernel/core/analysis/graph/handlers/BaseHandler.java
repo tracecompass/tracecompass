@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.tracecompass.analysis.graph.core.building.AbstractTraceEventHandler;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng28EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -35,7 +35,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
  */
 public class BaseHandler extends AbstractTraceEventHandler {
 
-    private final LttngKernelExecGraphProvider fProvider;
+    private final OsExecutionGraphProvider fProvider;
 
     /**
      * The fWakeupEventMap is populated with the prefered wake-up event for a
@@ -62,7 +62,8 @@ public class BaseHandler extends AbstractTraceEventHandler {
      */
     private Map<ITmfTrace, String> fWakeupEventMap;
 
-    BaseHandler(LttngKernelExecGraphProvider provider) {
+    BaseHandler(OsExecutionGraphProvider provider, int priority) {
+        super(priority);
         fProvider = provider;
         fWakeupEventMap = new HashMap<>();
         ITmfTrace trace = getProvider().getTrace();
@@ -102,7 +103,7 @@ public class BaseHandler extends AbstractTraceEventHandler {
      *
      * @return the graph provider
      */
-    public LttngKernelExecGraphProvider getProvider() {
+    public OsExecutionGraphProvider getProvider() {
         return fProvider;
     }
 

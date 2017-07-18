@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 2.3.0.qualifier
+Bundle-Version: 2.4.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.analysis.os.linux.core;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator
@@ -16,7 +16,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.segmentstore.core,
  org.eclipse.tracecompass.analysis.timing.core,
  org.eclipse.tracecompass.statesystem.core,
- org.eclipse.tracecompass.datastore.core
+ org.eclipse.tracecompass.datastore.core,
+ org.eclipse.tracecompass.analysis.graph.core
 Import-Package: com.google.common.base,
  com.google.common.collect,
  com.google.common.hash,
@@ -25,6 +26,7 @@ Import-Package: com.google.common.base,
 Export-Package: org.eclipse.tracecompass.analysis.os.linux.core.contextswitch,
  org.eclipse.tracecompass.analysis.os.linux.core.cpuusage,
  org.eclipse.tracecompass.analysis.os.linux.core.event.aspect,
+ org.eclipse.tracecompass.analysis.os.linux.core.execution.graph,
  org.eclipse.tracecompass.analysis.os.linux.core.inputoutput;x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui,org.eclipse.tracecompass.analysis.os.linux.core.tests,org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests",
  org.eclipse.tracecompass.analysis.os.linux.core.kernel,
  org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage,
@@ -33,10 +35,13 @@ Export-Package: org.eclipse.tracecompass.analysis.os.linux.core.contextswitch,
  org.eclipse.tracecompass.analysis.os.linux.core.tid,
  org.eclipse.tracecompass.analysis.os.linux.core.trace,
  org.eclipse.tracecompass.internal.analysis.os.linux.core;x-internal:=true,
+ org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage;x-internal:=true,
+ org.eclipse.tracecompass.internal.analysis.os.linux.core.execution.graph;x-internal:=true,
  org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput;x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui,org.eclipse.tracecompass.analysis.os.linux.core.tests",
  org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.handlers;x-internal:=true,
  org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel;x-friends:="org.eclipse.tracecompass.analysis.os.linux.core.tests,org.eclipse.tracecompass.analysis.os.linux.ui,org.eclipse.tracecompass.lttng2.kernel.core.tests",
  org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers;x-friends:="org.eclipse.tracecompass.analysis.os.linux.core.tests",
+ org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelmemoryusage;x-internal:=true,
  org.eclipse.tracecompass.internal.analysis.os.linux.core.latency;
   x-friends:="org.eclipse.tracecompass.analysis.os.linux.core.tests,
    org.eclipse.tracecompass.analysis.os.linux.ui,
