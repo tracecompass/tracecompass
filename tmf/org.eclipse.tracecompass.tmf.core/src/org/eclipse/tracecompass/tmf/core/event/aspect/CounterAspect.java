@@ -19,7 +19,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * a CPU, a thread, a disk, a GPU or a DSP.
  *
  * @author Matthew Khouzam
- * @since 3.0
+ * @since 3.1
  */
 public class CounterAspect extends AbstractCounterAspect {
 
