@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -27,7 +27,6 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
@@ -115,9 +114,9 @@ public class TestRefreshTextTrace {
             appendToTrace(NEW_EVENTS_PER_REFRESH);
 
             // Refresh
-            SWTBotTreeItem tracesFolder = SWTBotUtils.selectTracesFolder(fBot, PROJECT_NAME);
-            SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, activeTrace.getName());
-            traceItem.contextMenu("Refresh").click();
+            SWTBotEditor eventsEditor = SWTBotUtils.activeEventsEditor(fBot);
+            eventsEditor.setFocus();
+            fBot.menu().menu("File", "Refresh").click();
 
             // Make sure the refresh is completed
             fBot.waitUntil(new NumberOfEventsCondition(activeTrace, getNbWrittenEvents()), INDEXING_TIMEOUT);

@@ -960,23 +960,12 @@
                   checkEnabled="false">
                <with
                      variable="selection">
-                  <count
-                        value="1">
-                  </count>
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <or>
-                        <instanceof
-                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
-                        </instanceof>
-                     </or>
+                     <instanceof
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.ITmfProjectModelElement">
+                     </instanceof>
                   </iterate>
                </with>
             </visibleWhen>
@@ -1011,31 +1000,22 @@
               style="push">
            <visibleWhen
                  checkEnabled="false">
-               <or>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <instanceof
-                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
-                     </instanceof>
-                  </iterate>
-                  <and>
-                     <with
-                         variable="activePart">
-                        <instanceof
-                              value="org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor">
-                        </instanceof>
-                     </with>
-                     <not>
-                        <with
-                            variable="activeEditorInput">
-                           <test
-                                 property="org.eclipse.tracecompass.tmf.ui.isExperimentEditorInput">
-                           </test>
-                        </with>
-                     </not>
-                  </and>
-               </or>
+              <and>
+                 <with
+                       variable="activePart">
+                    <instanceof
+                          value="org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor">
+                    </instanceof>
+                 </with>
+                 <not>
+                    <with
+                          variable="activeEditorInput">
+                       <test
+                             property="org.eclipse.tracecompass.tmf.ui.isExperimentEditorInput">
+                       </test>
+                    </with>
+                 </not>
+              </and>
            </visibleWhen>
         </command>
       </menuContribution>
@@ -1285,23 +1265,12 @@
             commandId="org.eclipse.ui.file.refresh">
          <activeWhen>
             <and>
-               <count
-                     value="1">
-               </count>
                <iterate
                      ifEmpty="false"
                      operator="and">
-                  <or>
-                     <instanceof
-                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
-                     </instanceof>
-                     <instanceof
-                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder">
-                     </instanceof>
-                     <instanceof
-                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
-                     </instanceof>
-                  </or>
+                  <instanceof
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.ITmfProjectModelElement">
+                  </instanceof>
                </iterate>
             </and>
          </activeWhen>
@@ -1756,34 +1725,25 @@
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.RefreshTraceContentHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.editors.handlers.RefreshTraceContentHandler"
             commandId="org.eclipse.ui.file.refresh">
          <activeWhen>
-            <or>
-               <iterate
-                     ifEmpty="false"
-                     operator="and">
+            <and>
+               <with
+                   variable="activePart">
                   <instanceof
-                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
+                        value="org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor">
                   </instanceof>
-               </iterate>
-               <and>
+               </with>
+               <not>
                   <with
-                      variable="activePart">
-                     <instanceof
-                           value="org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor">
-                     </instanceof>
+                      variable="activeEditorInput">
+                     <test
+                           property="org.eclipse.tracecompass.tmf.ui.isExperimentEditorInput">
+                     </test>
                   </with>
-                  <not>
-                     <with
-                         variable="activeEditorInput">
-                        <test
-                              property="org.eclipse.tracecompass.tmf.ui.isExperimentEditorInput">
-                        </test>
-                     </with>
-                  </not>
-               </and>
-            </or>
+               </not>
+            </and>
          </activeWhen>
       </handler>
    </extension>
