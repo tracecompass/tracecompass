@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -135,11 +136,11 @@ public class CtfTmfTrace extends TmfTrace
 
     /**
      * Average CTF event size, used to estimate the trace size. (Inspired by
-     * empirical observations with LTTng kernel traces, to avoid hanging at 100%
-     * for too long)
+     * empirical observations with LTTng kernel traces, to avoid hanging at 100% for
+     * too long)
      *
-     * TODO: Find a more suitable approximation, perhaps per concrete trace type
-     * or per trace directly with the metadata
+     * TODO: Find a more suitable approximation, perhaps per concrete trace type or
+     * per trace directly with the metadata
      */
     private static final int CTF_AVG_EVENT_SIZE = 16;
 
@@ -201,8 +202,8 @@ public class CtfTmfTrace extends TmfTrace
     public void initTrace(final IResource resource, final String path, final Class<? extends ITmfEvent> eventType)
             throws TmfTraceException {
         /*
-         * Set the cache size. This has to be done before the call to super()
-         * because the super needs to know the cache size.
+         * Set the cache size. This has to be done before the call to super() because
+         * the super needs to know the cache size.
          */
         setCacheSize();
 
@@ -223,8 +224,8 @@ public class CtfTmfTrace extends TmfTrace
                 this.setEndTime(curTime);
             }
             /*
-             * Register every event type. When you call getType, it will
-             * register a trace to that type in the TmfEventTypeManager
+             * Register every event type. When you call getType, it will register a trace to
+             * that type in the TmfEventTypeManager
              */
             try (CtfIterator iter = fIteratorManager.getIterator(ctx)) {
                 Set<@NonNull ITmfEventField> streamContextNames = new HashSet<>();
@@ -267,9 +268,9 @@ public class CtfTmfTrace extends TmfTrace
             ctx.dispose();
         } catch (final CTFException e) {
             /*
-             * If it failed at the init(), we can assume it's because the file
-             * was not found or was not recognized as a CTF trace. Throw into
-             * the new type of exception expected by the rest of TMF.
+             * If it failed at the init(), we can assume it's because the file was not found
+             * or was not recognized as a CTF trace. Throw into the new type of exception
+             * expected by the rest of TMF.
              */
             throw new TmfTraceException(e.getMessage(), e);
         }
@@ -289,15 +290,13 @@ public class CtfTmfTrace extends TmfTrace
      * <p>
      * The default implementation of a CTF trace.
      *
-     * Firstly a weak validation of the metadata is done to determine if the
-     * path is actually for a CTF trace. After that a full validation is done.
+     * Firstly a weak validation of the metadata is done to determine if the path is
+     * actually for a CTF trace. After that a full validation is done.
      *
-     * If the weak and full validation are successful the confidence is set to
-     * 10.
+     * If the weak and full validation are successful the confidence is set to 10.
      *
      * If the weak validation was successful, but the full validation fails a
-     * TraceValidationStatus with severity warning and confidence of 1 is
-     * returned.
+     * TraceValidationStatus with severity warning and confidence of 1 is returned.
      *
      * If both weak and full validation fails an error status is returned.
      */
@@ -379,9 +378,8 @@ public class CtfTmfTrace extends TmfTrace
             return context;
         }
         /*
-         * The rank is set to 0 if the iterator seeks the beginning. If not, it
-         * will be set to UNKNOWN_RANK, since CTF traces don't support seeking
-         * by rank for now.
+         * The rank is set to 0 if the iterator seeks the beginning. If not, it will be
+         * set to UNKNOWN_RANK, since CTF traces don't support seeking by rank for now.
          */
         if (currentLocation == null) {
             currentLocation = new CtfLocation(new CtfLocationInfo(0L, 0L));
@@ -443,9 +441,9 @@ public class CtfTmfTrace extends TmfTrace
     }
 
     /**
-     * Ctf traces have a clock with a unique uuid that will be used to identify
-     * the host. Traces with the same clock uuid will be known to have been made
-     * on the same machine.
+     * Ctf traces have a clock with a unique uuid that will be used to identify the
+     * host. Traces with the same clock uuid will be known to have been made on the
+     * same machine.
      *
      * Note: uuid is an optional field, it may not be there for a clock.
      */
@@ -509,13 +507,22 @@ public class CtfTmfTrace extends TmfTrace
     }
 
     /**
-     * Get the CTF environment variables defined in this CTF trace, in <name,
-     * value> form. This comes from the trace's CTF metadata.
+     * Get the CTF environment variables defined in this CTF trace, in <name, value>
+     * form. This comes from the trace's CTF metadata.
      *
      * @return The CTF environment
      */
     public Map<String, String> getEnvironment() {
         return fTrace.getEnvironment();
+    }
+
+    /**
+     * @since 3.0
+     */
+    @Override
+    public UUID getUUID() {
+        UUID uuid = fTrace.getUUID();
+        return uuid == null ? super.getUUID() : uuid;
     }
 
     // -------------------------------------------
@@ -551,8 +558,8 @@ public class CtfTmfTrace extends TmfTrace
     }
 
     /**
-     * Convert a CTF timestamp in CPU cycles to its equivalent in nanoseconds
-     * for this trace.
+     * Convert a CTF timestamp in CPU cycles to its equivalent in nanoseconds for
+     * this trace.
      *
      * @param cycles
      *            The timestamp in cycles, relative to the clock offset
@@ -563,8 +570,8 @@ public class CtfTmfTrace extends TmfTrace
     }
 
     /**
-     * Convert a CTF timestamp in nanoseconds to its equivalent in CPU cycles
-     * for this trace.
+     * Convert a CTF timestamp in nanoseconds to its equivalent in CPU cycles for
+     * this trace.
      *
      * @param nanos
      *            The timestamp in nanoseconds, relative to POSIX.1 Epoch
@@ -677,12 +684,11 @@ public class CtfTmfTrace extends TmfTrace
     }
 
     /**
-     * Dispose an iterator that was create with
-     * {@link #createIteratorFromContext}
+     * Dispose an iterator that was create with {@link #createIteratorFromContext}
      *
      * @param context
-     *            The last context that was pointed to by the iterator (this is
-     *            the 'key' to find the correct iterator to dispose).
+     *            The last context that was pointed to by the iterator (this is the
+     *            'key' to find the correct iterator to dispose).
      * @since 1.0
      */
     public void disposeContext(CtfTmfContext context) {
@@ -763,10 +769,10 @@ public class CtfTmfTrace extends TmfTrace
     }
 
     /**
-     * @return the number of estimated chunks of events read. This reads the
-     *         file size of the trace and divides it by a factor and the average
-     *         event size, this is not accurate but can give a ball park figure
-     *         of how much is done.
+     * @return the number of estimated chunks of events read. This reads the file
+     *         size of the trace and divides it by a factor and the average event
+     *         size, this is not accurate but can give a ball park figure of how
+     *         much is done.
      * @since 2.1
      */
     @Override

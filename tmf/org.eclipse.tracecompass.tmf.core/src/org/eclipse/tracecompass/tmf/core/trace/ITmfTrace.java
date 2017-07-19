@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2009, 2017 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,6 +15,11 @@
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.core.trace;
+
+import java.io.File;
+import java.nio.charset.Charset;
+import java.util.Objects;
+import java.util.UUID;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -37,11 +42,11 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 /**
  * The event stream structure in TMF. In its basic form, a trace has:
  * <ul>
- * <li> an associated Eclipse resource
- * <li> a path to its location on the file system
- * <li> the type of the events it contains
- * <li> the number of events it contains
- * <li> the time range (span) of the events it contains
+ * <li>an associated Eclipse resource
+ * <li>a path to its location on the file system
+ * <li>the type of the events it contains
+ * <li>the number of events it contains
+ * <li>the time range (span) of the events it contains
  * </ul>
  * Concrete ITmfTrace classes have to provide a parameter-less constructor and
  * an initialization method (<i>initTrace</i>) if they are to be opened from the
@@ -57,6 +62,7 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
  * timestamp) or for a plain trace location.
  * <p>
  * <b>Example 1</b>: Process a whole trace
+ *
  * <pre>
  * ITmfContext context = trace.seekEvent(0);
  * ITmfEvent event = trace.getNext(context);
@@ -65,7 +71,9 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
  *     event = trace.getNext(context);
  * }
  * </pre>
+ *
  * <b>Example 2</b>: Process 50 events starting from the 1000th event
+ *
  * <pre>
  * int nbEventsRead = 0;
  * ITmfContext context = trace.seekEvent(1000);
@@ -76,7 +84,9 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
  *     event = trace.getNext(context);
  * }
  * </pre>
+ *
  * <b>Example 3</b>: Process the events between 2 timestamps (inclusive)
+ *
  * <pre>
  * ITmfTimestamp startTime = ...;
  * ITmfTimestamp endTime = ...;
@@ -92,8 +102,8 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
  * asynchronously (and coalesce compatible, concurrent requests).
  * <p>
  *
- * <b>Example 4</b>: Process a whole trace (see ITmfEventRequest for
- * variants)
+ * <b>Example 4</b>: Process a whole trace (see ITmfEventRequest for variants)
+ *
  * <pre>
  * ITmfRequest request = new TmfEventRequest&lt;MyEventType&gt;(MyEventType.class) {
  *     &#064;Override
@@ -476,5 +486,43 @@ public interface ITmfTrace extends ITmfEventProvider {
          */
         indexTrace(true);
         return (getNbEvents() != 0) ? getEndTime() : null;
+    }
+
+    /**
+     * Get the trace {@link UUID}, a unique identifier that should always be the
+     * same if the trace and the children do not change.
+     *
+     * The default implementation relies on the trace name, the length of the file
+     * and the last modified date.
+     *
+     * @return A {@link UUID} that when it changes is a good indication that the
+     *         trace files have changed. An unchanged {@link UUID} may or may not
+     *         indicate that the trace has changed.
+     * @since 3.1
+     */
+    default @Nullable UUID getUUID() {
+        /*
+         * Best effort get UUID, if an implementation has more info, it should override
+         * this.
+         */
+        StringBuilder sb = new StringBuilder();
+        File file = new File(getPath());
+        if (file.isDirectory()) {
+            for (File childFile : file.listFiles()) {
+                sb.append(childFile.getName());
+                sb.append(childFile.length());
+                sb.append(childFile.lastModified());
+            }
+        } else if (file.exists()) {
+            sb.append(file.getName());
+            sb.append(file.length());
+            sb.append(file.lastModified());
+        }
+        for (ITmfEventProvider child : getChildren()) {
+            if (child instanceof ITmfTrace) {
+                sb.append(String.valueOf(((ITmfTrace) child).getUUID()));
+            }
+        }
+        return UUID.nameUUIDFromBytes(Objects.requireNonNull(sb.toString().getBytes(Charset.defaultCharset())));
     }
 }
