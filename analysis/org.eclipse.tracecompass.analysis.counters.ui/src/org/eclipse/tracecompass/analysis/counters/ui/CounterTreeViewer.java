@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.analysis.counters.ui;
 import java.util.Collections;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -67,7 +68,7 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
         }
     };
 
-    private TmfTreeViewerEntry fRootEntry;
+    private TmfTreeViewerEntry fRoot;
     private TriStateFilteredCheckboxTree fTriStateFilteredCheckboxTree;
 
     /**
@@ -95,30 +96,35 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
 
     @Override
     public void initializeDataSource() {
-        fRootEntry = null;
-        CounterAnalysis module = null;
         ITmfTrace trace = getTrace();
-        if (trace != null) {
+        if (trace == null) {
+            return;
+        }
 
-            module = TmfTraceUtils.getAnalysisModuleOfClass(trace, CounterAnalysis.class, CounterAnalysis.ID);
-            if (module != null) {
-                fRootEntry = new TmfTreeViewerEntry(StringUtils.EMPTY);
-                TmfTreeViewerEntry rootBranch = new TmfTreeViewerEntry(getTrace().getName());
-                fRootEntry.getChildren().add(rootBranch);
+        fRoot = new TmfTreeViewerEntry(StringUtils.EMPTY);
+        Iterable<@NonNull CounterAnalysis> modules = TmfTraceUtils.getAnalysisModulesOfClass(trace, CounterAnalysis.class);
 
-                module.schedule();
-                module.waitForCompletion();
+        for (CounterAnalysis module : modules) {
 
-                ITmfStateSystem stateSystem = module.getStateSystem();
-                if (stateSystem != null) {
+            ITmfTrace moduleTrace = module.getTrace();
+            if (moduleTrace == null) {
+                continue;
+            }
 
-                    /*
-                     * Add grouped and ungrouped counters branches along with their entries (if
-                     * applicable).
-                     */
-                    addTreeViewerBranch(stateSystem, rootBranch, CounterAnalysis.GROUPED_COUNTER_ASPECTS_ATTRIB);
-                    addTreeViewerBranch(stateSystem, rootBranch, CounterAnalysis.UNGROUPED_COUNTER_ASPECTS_ATTRIB);
-                }
+            TmfTreeViewerEntry rootBranch = new TmfTreeViewerEntry(moduleTrace.getName());
+            fRoot.addChild(rootBranch);
+
+            module.schedule();
+            module.waitForCompletion();
+
+            ITmfStateSystem stateSystem = module.getStateSystem();
+            if (stateSystem != null) {
+                /*
+                 * Add grouped and ungrouped counters branches along with their entries (if
+                 * applicable).
+                 */
+                addTreeViewerBranch(stateSystem, rootBranch, CounterAnalysis.GROUPED_COUNTER_ASPECTS_ATTRIB);
+                addTreeViewerBranch(stateSystem, rootBranch, CounterAnalysis.UNGROUPED_COUNTER_ASPECTS_ATTRIB);
             }
         }
     }
@@ -137,7 +143,7 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
          * The tree displaying the trace's counters does not change when manipulating
          * the corresponding chart.
          */
-        return fRootEntry;
+        return fRoot;
     }
 
     @TmfSignalHandler
@@ -161,12 +167,28 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
      */
     private void addTreeViewerEntries(ITmfStateSystem stateSystem, TmfTreeViewerEntry parentBranch, int quark) {
         for (int childQuark : stateSystem.getSubAttributes(quark, false)) {
-            TmfTreeViewerEntry childBranch = stateSystem.getSubAttributes(childQuark, false).isEmpty()
-                    ? new CounterTreeViewerEntry(stateSystem.getAttributeName(childQuark), childQuark)
-                    : new TmfTreeViewerEntry(stateSystem.getAttributeName(childQuark));
+            TmfTreeViewerEntry childBranch;
+            if (stateSystem.getSubAttributes(childQuark, false).isEmpty()) {
+                String fullPath = retrieveTraceName(parentBranch) + '/' + stateSystem.getFullAttributePath(childQuark);
+                childBranch = new CounterTreeViewerEntry(childQuark, stateSystem, fullPath);
+            } else {
+                childBranch = new TmfTreeViewerEntry(stateSystem.getAttributeName(childQuark));
+            }
+
             parentBranch.addChild(childBranch);
             addTreeViewerEntries(stateSystem, childBranch, childQuark);
         }
+    }
+
+    /**
+     * Retrieve the name of the trace associated to an entry through recursion.
+     */
+    private String retrieveTraceName(ITmfTreeViewerEntry entry) {
+        if (entry.getParent().getParent() == null) {
+            // The child of the hidden root entry contains the trace name
+            return entry.getName();
+        }
+        return retrieveTraceName(entry.getParent());
     }
 
 }

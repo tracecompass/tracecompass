@@ -9,8 +9,8 @@
 
 package org.eclipse.tracecompass.analysis.counters.ui;
 
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -90,16 +90,16 @@ public class CounterView extends TmfChartView {
 
             ICheckable checkboxTree = event.getCheckable();
             if (checkboxTree instanceof CheckboxTreeViewer) {
-                Set<@NonNull Integer> quarks = new TreeSet<>();
+                List<CounterTreeViewerEntry> entries = new ArrayList<>();
                 for (Object checkedElement : fTriStateFilteredCheckboxTree.getCheckedElements()) {
                     if (checkedElement instanceof CounterTreeViewerEntry) {
-                        quarks.add(((CounterTreeViewerEntry) checkedElement).getQuark());
+                        entries.add((CounterTreeViewerEntry) checkedElement);
                     }
                 }
 
                 // The chart uses the quarks to display data for each counters
                 if (chartViewer instanceof CounterChartViewer) {
-                    ((CounterChartViewer) chartViewer).updateChart(quarks);
+                    ((CounterChartViewer) chartViewer).updateChart(entries);
                 }
             }
         }

@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.analysis.counters.ui;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
 
 /**
@@ -21,18 +22,24 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
 public class CounterTreeViewerEntry extends TmfTreeViewerEntry {
 
     private final int fQuark;
+    private final ITmfStateSystem fStateSystem;
+    private final @NonNull String fFullPath;
 
     /**
      * Constructor
      *
-     * @param name
-     *            Name of the entry
      * @param quark
      *            ID of the entry
+     * @param stateSystem
+     *            State system which contains the counter
+     * @param fullPath
+     *            Slash-separated path of the entry in the state system
      */
-    public CounterTreeViewerEntry(@NonNull String name, int quark) {
-        super(name);
+    public CounterTreeViewerEntry(int quark, ITmfStateSystem stateSystem, @NonNull String fullPath) {
+        super(stateSystem.getAttributeName(quark));
         fQuark = quark;
+        fStateSystem = stateSystem;
+        fFullPath = fullPath;
     }
 
     /**
@@ -40,6 +47,20 @@ public class CounterTreeViewerEntry extends TmfTreeViewerEntry {
      */
     public int getQuark() {
         return fQuark;
+    }
+
+    /**
+     * @return the state system which contains the counter
+     */
+    public ITmfStateSystem getStateSystem() {
+        return fStateSystem;
+    }
+
+    /**
+     * @return the slash-separated path of the entry in the state system
+     */
+    public @NonNull String getFullPath() {
+        return fFullPath;
     }
 
 }
