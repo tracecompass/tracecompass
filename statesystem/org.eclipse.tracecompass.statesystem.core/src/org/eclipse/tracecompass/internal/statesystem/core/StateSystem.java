@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -626,6 +627,9 @@ public class StateSystem implements ITmfStateSystemBuilder {
         if (isDisposed) {
             throw new StateSystemDisposedException();
         }
+        if (times.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         TimeRangeCondition timeCondition = TimeRangeCondition.forDiscreteRange(times);
         return query2D(quarks, timeCondition);
@@ -646,6 +650,10 @@ public class StateSystem implements ITmfStateSystemBuilder {
             throws TimeRangeException, IndexOutOfBoundsException {
         if (timeCondition.min() < getStartTime()) {
             throw new TimeRangeException();
+        }
+
+        if (quarks.isEmpty()) {
+            return Collections.emptyList();
         }
 
         IntegerRangeCondition quarkCondition = IntegerRangeCondition.forDiscreteRange(quarks);

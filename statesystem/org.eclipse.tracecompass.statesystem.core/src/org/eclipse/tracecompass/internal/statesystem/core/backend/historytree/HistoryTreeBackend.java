@@ -384,7 +384,10 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
                 /* Recursive call to flatten children */
                 return flatten(getSHT().readNode(seqNum), quarks, subTimes);
             } catch (ClosedChannelException e) {
-                return null;
+                /**
+                 * return node since we were able to read it.
+                 */
+                return Collections.singleton(node);
             }
         });
         /* BFS */
