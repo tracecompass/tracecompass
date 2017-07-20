@@ -26,6 +26,7 @@
 
   <modules>
     <module>org.eclipse.tracecompass.analysis.counters.core</module>
+    <module>org.eclipse.tracecompass.analysis.counters.core.tests</module>
     <module>org.eclipse.tracecompass.analysis.graph.core</module>
     <module>org.eclipse.tracecompass.analysis.graph.core.tests</module>
     <module>org.eclipse.tracecompass.analysis.lami.core</module>
