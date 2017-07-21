@@ -20,6 +20,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Objects;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferReader;
 import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWriter;
 import org.eclipse.tracecompass.datastore.core.serialization.SafeByteBufferFactory;
@@ -52,7 +54,7 @@ public final class HTInterval implements ITmfStateInterval {
     private final long start;
     private final long end;
     private final int attribute;
-    private final Object sv;
+    private final @Nullable Object sv;
 
     /** Number of bytes used by this interval when it is written to disk */
     private final int fSizeOnDisk;
@@ -252,52 +254,44 @@ public final class HTInterval implements ITmfStateInterval {
      *            The already-allocated ByteBuffer corresponding to a SHT Node
      */
     public void writeInterval(ByteBuffer buffer) {
-        final byte byteFromType = getByteFromType(sv);
-
         buffer.putLong(start);
         buffer.putLong(end);
         buffer.putInt(attribute);
-        buffer.put(byteFromType);
 
-        switch (byteFromType) {
-        case TYPE_NULL:
-            break;
-        case TYPE_INTEGER:
-            buffer.putInt((int) sv);
-            break;
+        if (sv != null) {
+            @NonNull Object value = sv;
+            if (value instanceof Integer) {
+                buffer.put(TYPE_INTEGER);
+                buffer.putInt((int) value);
+            } else if (value instanceof Long) {
+                buffer.put(TYPE_LONG);
+                buffer.putLong((long) value);
+            } else if (value instanceof Double) {
+                buffer.put(TYPE_DOUBLE);
+                buffer.putDouble((double) value);
+            } else if (value instanceof String) {
+                buffer.put(TYPE_STRING);
+                String string = (String) value;
+                byte[] strArray = string.getBytes(CHARSET);
 
-        case TYPE_STRING: {
-            String string = (String) sv;
-            byte[] strArray = string.getBytes(CHARSET);
-
-            /*
-             * Write the Strings entry (1st byte = size, then the bytes, then
-             * the 0). We have checked the string length at the constructor.
-             */
-            buffer.putShort((short) strArray.length);
-            buffer.put(strArray);
-            buffer.put((byte) 0);
-            break;
-        }
-
-        case TYPE_LONG:
-            buffer.putLong((long) sv);
-            break;
-
-        case TYPE_DOUBLE:
-            buffer.putDouble((double) sv);
-            break;
-
-        case TYPE_CUSTOM: {
-            int size = ((CustomStateValue) sv).getSerializedSize();
-            buffer.putShort((short) size);
-            ISafeByteBufferWriter safeBuffer = SafeByteBufferFactory.wrapWriter(buffer, size);
-            ((CustomStateValue) sv).serialize(safeBuffer);
-            break;
-        }
-
-        default:
-            break;
+                /*
+                 * Write the Strings entry (1st byte = size, then the bytes, then the 0). We
+                 * have checked the string length at the constructor.
+                 */
+                buffer.putShort((short) strArray.length);
+                buffer.put(strArray);
+                buffer.put((byte) 0);
+            } else if (value instanceof CustomStateValue) {
+                buffer.put(TYPE_CUSTOM);
+                int size = ((CustomStateValue) value).getSerializedSize();
+                buffer.putShort((short) size);
+                ISafeByteBufferWriter safeBuffer = SafeByteBufferFactory.wrapWriter(buffer, size);
+                ((CustomStateValue) value).serialize(safeBuffer);
+            } else {
+                throw new IllegalStateException("Type: " + value.getClass() + " is not implemented in the state system"); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+        } else {
+            buffer.put(TYPE_NULL);
         }
     }
 
@@ -328,12 +322,7 @@ public final class HTInterval implements ITmfStateInterval {
 
     @Override
     public boolean intersects(long timestamp) {
-        if (start <= timestamp) {
-            if (end >= timestamp) {
-                return true;
-            }
-        }
-        return false;
+        return (start <= timestamp && end >= timestamp);
     }
 
     /**
@@ -360,7 +349,7 @@ public final class HTInterval implements ITmfStateInterval {
         return (start == other.start &&
                 end == other.end &&
                 attribute == other.attribute &&
-                sv.equals(other.sv));
+                Objects.equals(sv, other.sv));
     }
 
     @Override
@@ -382,30 +371,8 @@ public final class HTInterval implements ITmfStateInterval {
         sb.append(attribute);
 
         sb.append(", value = "); //$NON-NLS-1$
-        sb.append(sv.toString());
+        sb.append(String.valueOf(sv));
 
         return sb.toString();
-    }
-
-    /**
-     * Here we determine how state values "types" are written in the 8-bit field
-     * that indicates the value type in the file.
-     */
-    private static byte getByteFromType(Object type) {
-        if (type == null) {
-            return TYPE_NULL;
-        } else if (type instanceof Integer) {
-            return TYPE_INTEGER;
-        } else if (type instanceof String) {
-            return TYPE_STRING;
-        } else if (type instanceof Long) {
-            return TYPE_LONG;
-        } else if (type instanceof Double) {
-            return TYPE_DOUBLE;
-        } else if (type instanceof CustomStateValue) {
-            return TYPE_CUSTOM;
-        }
-        /* Should not happen if the switch is fully covered */
-        throw new IllegalStateException();
     }
 }

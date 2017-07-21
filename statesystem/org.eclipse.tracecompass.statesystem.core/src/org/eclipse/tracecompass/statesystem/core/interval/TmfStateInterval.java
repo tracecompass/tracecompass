@@ -30,7 +30,7 @@ public final class TmfStateInterval implements ITmfStateInterval {
     private final long fStart;
     private final long fEnd;
     private final int fAttribute;
-    private final Object fValue;
+    private final @Nullable Object fValue;
 
     /**
      * Construct an interval from its given parameters
@@ -95,12 +95,7 @@ public final class TmfStateInterval implements ITmfStateInterval {
 
     @Override
     public boolean intersects(long timestamp) {
-        if (fStart <= timestamp) {
-            if (fEnd >= timestamp) {
-                return true;
-            }
-        }
-        return false;
+        return fStart <= timestamp && fEnd >= timestamp;
     }
 
     @Override
@@ -110,7 +105,7 @@ public final class TmfStateInterval implements ITmfStateInterval {
             .append("start", fStart) //$NON-NLS-1$
             .append("end", fEnd) //$NON-NLS-1$
             .append("key", fAttribute) //$NON-NLS-1$
-            .append("value", fValue.toString()) //$NON-NLS-1$
+            .append("value", String.valueOf(fValue)) //$NON-NLS-1$
             .toString();
     }
 
