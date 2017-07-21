@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 Ericsson
+ * Copyright (c) 2014, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -22,6 +22,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -57,6 +58,8 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.core.trace.location.TmfLongLocation;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterators;
+import com.google.common.primitives.Longs;
 
 /**
  * BTF reader. Reads Best Trace Format traces.
@@ -268,13 +271,9 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
                 line = rafile.getNextLine();
             }
             while ((line != null) && (lineCount++ < MAX_LINES)) {
-                try {
-                    ITmfEvent event = parseLine(0, line);
-                    if (event != null) {
-                        matches++;
-                    }
-                } catch (RuntimeException e) {
-                    confidence = Integer.MIN_VALUE;
+                ITmfEvent event = parseLine(0, line);
+                if (event != null) {
+                    matches++;
                 }
 
                 confidence = MAX_CONFIDENCE * matches / lineCount;
@@ -411,7 +410,7 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
      *            the rank of the event
      * @param line
      *            the raw string of the event
-     * @return the event
+     * @return the event, or null if the line is not a valid format
      */
     private ITmfEvent parseLine(long rank, String line) {
         if (line == null) {
@@ -421,24 +420,26 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
         if (tokens.length < MAX_FIELDS) {
             return null;
         }
-        int i = 0;
-        long timestamp = Long.parseLong(tokens[i++]);
-        String source = tokens[i++];
-        long sourceInstance = -1;
-        try {
-            sourceInstance = Long.parseLong(tokens[i++]);
-        } catch (NumberFormatException e) {
-            // this field can be empty
+        Iterator<String> token = Iterators.forArray(tokens);
+        Long timestamp = Longs.tryParse(token.next());
+        if (timestamp == null) {
+            return null;
         }
-        BtfEventType type = BtfEventTypeFactory.parse(tokens[i++]);
-        String target = tokens[i++];
-        long targetInstance = -1;
-        try {
-            targetInstance = Long.parseLong(tokens[i++]);
-        } catch (NumberFormatException e) {
-            // this field can be empty
+        String source = token.next();
+        Long sourceInstance = Longs.tryParse(token.next());
+        if (sourceInstance == null) {
+            sourceInstance = -1L;
         }
-        String event = tokens[i++];
+        BtfEventType type = BtfEventTypeFactory.parse(token.next());
+        if (type == null) {
+            return null;
+        }
+        String target = token.next();
+        Long targetInstance = Longs.tryParse(token.next());
+        if (targetInstance == null) {
+            targetInstance = -1L;
+        }
+        String event = token.next();
 
         ITmfEventField content = type.generateContent(event, sourceInstance, targetInstance);
 
