@@ -155,6 +155,8 @@ import com.google.common.collect.ImmutableSet;
  */
 public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeAligned, IResourceChangeListener {
 
+    private static final String DIRTY_UNDERFLOW_ERROR = "Dirty underflow error"; //$NON-NLS-1$
+
     /**
      * Constant indicating that all levels of the time graph should be expanded
      */
@@ -448,7 +450,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         public final void run() {
             try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TimeGraphView:ZoomThread", "start", fZoomStartTime, "end", fZoomEndTime).setCategoryAndId(getViewId(), fScopeId).build()) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 doRun();
-                fDirty.decrementAndGet();
+            } finally {
+                if (fDirty.decrementAndGet() < 0) {
+                    Activator.getDefault().logError(DIRTY_UNDERFLOW_ERROR, new Throwable());
+                }
             }
         }
 
@@ -1546,61 +1551,67 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                             return;
                         }
                         fDirty.incrementAndGet();
-
-                        synchronized (fEntryListMap) {
-                            fEntryList = fEntryListMap.get(fTrace);
-                            if (fEntryList == null) {
-                                fEntryList = new CopyOnWriteArrayList<>();
-                            } else if (fEntryComparator != null) {
-                                List<TimeGraphEntry> list = new ArrayList<>(fEntryList);
-                                Collections.sort(list, fEntryComparator);
-                                for (ITimeGraphEntry entry : list) {
-                                    sortChildren(entry, fEntryComparator);
+                        try {
+                            synchronized (fEntryListMap) {
+                                fEntryList = fEntryListMap.get(fTrace);
+                                if (fEntryList == null) {
+                                    fEntryList = new CopyOnWriteArrayList<>();
+                                } else if (fEntryComparator != null) {
+                                    List<TimeGraphEntry> list = new ArrayList<>(fEntryList);
+                                    Collections.sort(list, fEntryComparator);
+                                    for (ITimeGraphEntry entry : list) {
+                                        sortChildren(entry, fEntryComparator);
+                                    }
+                                    fEntryList.clear();
+                                    fEntryList.addAll(list);
                                 }
-                                fEntryList.clear();
-                                fEntryList.addAll(list);
+                            }
+                            boolean inputChanged = fEntryList != fTimeGraphViewer.getInput();
+                            if (inputChanged) {
+                                fTimeGraphViewer.setInput(fEntryList);
+                                /*
+                                 * restore the previously saved filters, if any
+                                 */
+                                fTimeGraphViewer.setFilters(fFiltersMap.get(fTrace));
+                                fTimeGraphViewer.setLinks(null);
+                                fTimeGraphViewer.setBookmarks(refreshBookmarks(fEditorFile));
+                                fTimeGraphViewer.setMarkerCategories(getMarkerCategories());
+                                fTimeGraphViewer.setMarkers(null);
+                                applyViewContext();
+                            } else {
+                                fTimeGraphViewer.refresh();
+                            }
+                            // reveal selection
+                            if (fIsRevealSelection) {
+                                fIsRevealSelection = false;
+                                fTimeGraphViewer.setSelection(fTimeGraphViewer.getSelection(), true);
+                            }
+                            long startBound = (fStartTime == Long.MAX_VALUE ? SWT.DEFAULT : fStartTime);
+                            long endBound = (fEndTime == Long.MIN_VALUE ? SWT.DEFAULT : fEndTime);
+                            fTimeGraphViewer.setTimeBounds(startBound, endBound);
+
+                            TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+                            long selectionBeginTime = fTrace == null ? SWT.DEFAULT : ctx.getSelectionRange().getStartTime().toNanos();
+                            long selectionEndTime = fTrace == null ? SWT.DEFAULT : ctx.getSelectionRange().getEndTime().toNanos();
+                            long startTime = fTrace == null ? SWT.DEFAULT : ctx.getWindowRange().getStartTime().toNanos();
+                            long endTime = fTrace == null ? SWT.DEFAULT : ctx.getWindowRange().getEndTime().toNanos();
+                            startTime = (fStartTime == Long.MAX_VALUE ? SWT.DEFAULT : Math.max(startTime, fStartTime));
+                            endTime = (fEndTime == Long.MIN_VALUE ? SWT.DEFAULT : Math.min(endTime, fEndTime));
+                            fTimeGraphViewer.setSelectionRange(selectionBeginTime, selectionEndTime, false);
+                            fTimeGraphViewer.setStartFinishTime(startTime, endTime);
+
+                            if (inputChanged && selectionBeginTime != SWT.DEFAULT) {
+                                synchingToTime(selectionBeginTime);
+                            }
+
+                            if (!zoomThread) {
+                                startZoomThread(startTime, endTime);
+                            }
+                        } finally {
+                            if (fDirty.decrementAndGet() < 0) {
+                                Activator.getDefault().logError(DIRTY_UNDERFLOW_ERROR, new Throwable());
                             }
                         }
-                        boolean inputChanged = fEntryList != fTimeGraphViewer.getInput();
-                        if (inputChanged) {
-                            fTimeGraphViewer.setInput(fEntryList);
-                            /* restore the previously saved filters, if any */
-                            fTimeGraphViewer.setFilters(fFiltersMap.get(fTrace));
-                            fTimeGraphViewer.setLinks(null);
-                            fTimeGraphViewer.setBookmarks(refreshBookmarks(fEditorFile));
-                            fTimeGraphViewer.setMarkerCategories(getMarkerCategories());
-                            fTimeGraphViewer.setMarkers(null);
-                            applyViewContext();
-                        } else {
-                            fTimeGraphViewer.refresh();
-                        }
-                        // reveal selection
-                        if (fIsRevealSelection) {
-                            fIsRevealSelection = false;
-                            fTimeGraphViewer.setSelection(fTimeGraphViewer.getSelection(), true);
-                        }
-                        long startBound = (fStartTime == Long.MAX_VALUE ? SWT.DEFAULT : fStartTime);
-                        long endBound = (fEndTime == Long.MIN_VALUE ? SWT.DEFAULT : fEndTime);
-                        fTimeGraphViewer.setTimeBounds(startBound, endBound);
-
-                        TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
-                        long selectionBeginTime = fTrace == null ? SWT.DEFAULT : ctx.getSelectionRange().getStartTime().toNanos();
-                        long selectionEndTime = fTrace == null ? SWT.DEFAULT : ctx.getSelectionRange().getEndTime().toNanos();
-                        long startTime = fTrace == null ? SWT.DEFAULT : ctx.getWindowRange().getStartTime().toNanos();
-                        long endTime = fTrace == null ? SWT.DEFAULT : ctx.getWindowRange().getEndTime().toNanos();
-                        startTime = (fStartTime == Long.MAX_VALUE ? SWT.DEFAULT : Math.max(startTime, fStartTime));
-                        endTime = (fEndTime == Long.MIN_VALUE ? SWT.DEFAULT : Math.min(endTime, fEndTime));
-                        fTimeGraphViewer.setSelectionRange(selectionBeginTime, selectionEndTime, false);
-                        fTimeGraphViewer.setStartFinishTime(startTime, endTime);
-
-                        if (inputChanged && selectionBeginTime != SWT.DEFAULT) {
-                            synchingToTime(selectionBeginTime);
-                        }
-
-                        if (!zoomThread) {
-                            startZoomThread(startTime, endTime);
-                        }
-                        fDirty.decrementAndGet();
                     }
                 }
             });
@@ -1685,9 +1696,13 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 // overwrite the new results if it finishes after.
                 synchronized (fZoomThreadResultLock) {
                     zoomThread.start();
+                    // zoomThread decrements, so we increment here
+                    fDirty.incrementAndGet();
                 }
-            } else {
-                fDirty.decrementAndGet();
+            }
+        } finally {
+            if (fDirty.decrementAndGet() < 0) {
+                Activator.getDefault().logError(DIRTY_UNDERFLOW_ERROR, new Throwable());
             }
         }
     }

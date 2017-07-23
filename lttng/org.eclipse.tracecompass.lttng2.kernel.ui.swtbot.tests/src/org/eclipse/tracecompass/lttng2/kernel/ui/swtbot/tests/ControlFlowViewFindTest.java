@@ -9,14 +9,14 @@
 package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
 /**
- * SWTBot test for Resources view Find dialod
+ * SWTBot test for Control Flow View Find dialog
  *
  * @author Jean-Christian Kouame
  */
 public class ControlFlowViewFindTest extends FindDialogTestBase {
 
     private static final String TITLE = "Control Flow";
-    private static final String TEXT = "IDLE";
+    private static final String TEXT = "lttng";
 
     @Override
     protected String getViewTitle() {

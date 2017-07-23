@@ -534,7 +534,7 @@ public final class SWTBotUtils {
         });
 
         WaitUtils.waitForJobs();
-        SWTBotUtils.delay(1000);
+        activeEventsEditor(bot);
         assertNotNull(tmfEd);
         return editorBot;
     }

@@ -10,9 +10,12 @@ package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -33,7 +36,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.tracecompass.ctf.core.tests.shared.LttngTraceGenerator;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -41,7 +44,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
-import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
@@ -74,7 +76,7 @@ public abstract class FindDialogTestBase {
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
     private static final Keyboard KEYBOARD = KeyboardFactory.getSWTKeyboard();
-    private static final @NonNull ITmfTimestamp START_TIME = TmfTimestamp.create(1368000272650993664L, ITmfTimestamp.NANOSECOND_SCALE);
+    private static final @NonNull ITmfTimestamp START_TIME = TmfTimestamp.create(1412670961211260539L, ITmfTimestamp.NANOSECOND_SCALE);
     private static final @NonNull String SPACE = " ";
     private static final String REGEX_PREFIX = "\\A";
     private static final String DIALOG_TITLE = "Find";
@@ -99,9 +101,12 @@ public abstract class FindDialogTestBase {
 
     /**
      * Before Class
+     *
+     * @throws IOException
+     *             When the trace could not be opened
      */
     @BeforeClass
-    public static void beforeClass() {
+    public static void beforeClass() throws IOException {
         SWTBotUtils.initialize();
 
         /* set up for swtbot */
@@ -116,10 +121,10 @@ public abstract class FindDialogTestBase {
         /* Create the trace project */
         SWTBotUtils.createProject(TRACE_PROJECT_NAME);
         /* Open the trace */
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, LttngTraceGenerator.getPath(), KERNEL_TRACE_TYPE);
-        SWTBotUtils.activateEditor(fBot, LttngTraceGenerator.getName());
+        String tracePath = FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).getPath();
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, tracePath, KERNEL_TRACE_TYPE);
         /* Finish waiting for eclipse to load */
-        WaitUtils.waitForJobs();
+        SWTBotUtils.activateEditor(fBot, CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL().getPath().replaceAll("/", ""));
     }
 
     /**
@@ -212,11 +217,13 @@ public abstract class FindDialogTestBase {
     public void testCaseSensitive() {
         SWTBot bot = getDialogBot();
         SWTBotButton findButton = bot.button("Find");
+        String upper = fFindText.toUpperCase();
+        String lower = fFindText.toLowerCase();
 
         SearchOptions options = getOptions(true, true, false, false, false);
         search(fFindText, options, findButton, bot);
         verifyStatusLabel(bot, true);
-        search(fFindText.toLowerCase(), options, findButton, bot);
+        search(fFindText.equals(upper) ? lower : upper, options, findButton, bot);
         verifyStatusLabel(bot, false);
     }
 
