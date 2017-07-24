@@ -18,7 +18,7 @@ import org.eclipse.osgi.util.NLS;
  * @since 3.0
  */
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelmemoryusage.messages"; //$NON-NLS-1$
 
     /**
      * Kernel Memory Usage's title view

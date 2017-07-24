@@ -109,10 +109,11 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
 
                 long time = xValues[i];
                 if (time >= ss.getStartTime() && time <= ss.getCurrentEndTime()) {
-                    List<ITmfStateInterval> kernelState = ss.queryFullState(time);
-
                     /* The subattributes of the root are the different threads */
                     List<Integer> threadQuarkList = ss.getSubAttributes(-1, false);
+
+                    List<ITmfStateInterval> kernelState = ss.queryFullState(time);
+
                     /* We add the value of each thread to the total quantity */
                     for (Integer threadQuark : threadQuarkList) {
                         Object val = kernelState.get(threadQuark).getValue();
