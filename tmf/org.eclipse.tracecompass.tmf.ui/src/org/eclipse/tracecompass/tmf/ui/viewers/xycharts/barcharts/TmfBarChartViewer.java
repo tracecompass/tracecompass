@@ -169,7 +169,7 @@ public abstract class TmfBarChartViewer extends TmfCommonXLineChartViewer {
      *            Name of series
      * @param color
      *            color to use for series
-     * @deprecated use {@link #addSeries(String)}
+     * @deprecated use {@link #addSeries2(String)}
      */
     @Deprecated
     protected void addSeries(String name, RGB color) {

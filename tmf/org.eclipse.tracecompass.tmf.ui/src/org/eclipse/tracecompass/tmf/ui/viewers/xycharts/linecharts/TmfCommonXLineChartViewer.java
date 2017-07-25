@@ -592,9 +592,33 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      *            The name of the series to create
      * @return The series so that the concrete viewer can modify its properties if
      *         required
+     *
+     * @deprecated Use {@link TmfCommonXLineChartViewer#addSeries2(String)} instead.
+     */
+    @Deprecated
+    protected ILineSeries addSeries(String seriesName) {
+        if (seriesName == null) {
+            return null;
+        }
+        IYSeries ySeries = getModel().findSeries(seriesName);
+        if (ySeries != null && ySeries.getSeriesType() == IYSeries.BAR) {
+            return null;
+        }
+        return (ILineSeries) addSeries2(seriesName);
+    }
+
+    /**
+     * Add a new series to the XY line chart. By default, it is a simple solid line.
+     *
+     * Warning do not override
+     *
+     * @param seriesName
+     *            The name of the series to create
+     * @return The series so that the concrete viewer can modify its properties if
+     *         required
      * @since 3.1
      */
-    protected ISeries addSeries(String seriesName) {
+    protected ISeries addSeries2(String seriesName) {
         if (seriesName == null) {
             return null;
         }
@@ -743,7 +767,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                                 for (IYSeries entry : seriesValues.getSeries().values()) {
                                     ISeries series = getSwtChart().getSeriesSet().getSeries(entry.getLabel());
                                     if (series == null) {
-                                        series = addSeries(entry.getLabel());
+                                        series = addSeries2(entry.getLabel());
                                     }
                                     if (series == null) {
                                         return;
