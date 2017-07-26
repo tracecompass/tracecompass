@@ -701,6 +701,26 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      *             thrown when IResource.delete fails
      */
     public void delete(IProgressMonitor progressMonitor) throws CoreException {
+        delete(progressMonitor, false);
+    }
+
+    /**
+     * Delete the trace resource, and optionally remove it from experiments and
+     * delete its supplementary files.
+     *
+     * @param progressMonitor
+     *            a progress monitor, or null if progress reporting is not desired
+     * @param overwriting
+     *            if true, keep the trace in experiments and only delete non-hidden
+     *            supplementary files (keeping the properties sub-folder), otherwise
+     *            remove the trace from experiments and delete the supplementary
+     *            folder completely
+     *
+     * @throws CoreException
+     *             thrown when IResource.delete fails
+     * @since 3.1
+     */
+    public void delete(IProgressMonitor progressMonitor, boolean overwriting) throws CoreException {
         // Close editors in UI Thread
         Display.getDefault().syncExec(new Runnable() {
             @Override
@@ -714,8 +734,8 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
             if (getParent() instanceof TmfTraceFolder) {
                 TmfExperimentFolder experimentFolder = getProject().getExperimentsFolder();
 
-                // Propagate the removal to traces
-                if (experimentFolder != null) {
+                // Propagate the removal to experiments
+                if (experimentFolder != null && !overwriting) {
                     for (TmfExperimentElement experiment : experimentFolder.getExperiments()) {
                         List<TmfTraceElement> toRemove = new LinkedList<>();
                         for (TmfTraceElement trace : experiment.getTraces()) {
@@ -729,7 +749,11 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
                     }
                 }
                 // Delete supplementary files
-                deleteSupplementaryFolder();
+                if (overwriting) {
+                    deleteSupplementaryResources();
+                } else {
+                    deleteSupplementaryFolder();
+                }
 
             } else if (getParent() instanceof TmfExperimentElement) {
                 TmfExperimentElement experimentElement = (TmfExperimentElement) getParent();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -260,7 +260,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
             TmfTraceElement existingTrace = getMatchingTraceElement(traceElement);
             if (existingTrace != null) {
                 try {
-                    existingTrace.delete(SubMonitor.convert(progressMonitor));
+                    existingTrace.delete(SubMonitor.convert(progressMonitor), true);
                 } catch (CoreException e) {
                     return new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation, e);
                 }

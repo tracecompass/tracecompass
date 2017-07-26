@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 Ericsson
+ * Copyright (c) 2014, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -101,6 +101,8 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
     private static final boolean IS_WIN32 = System.getProperty("os.name").startsWith("Windows");  //$NON-NLS-1$//$NON-NLS-2$
     private static final String URI_DEVICE_SEPARATOR = IS_WIN32 ? URI_SEPARATOR : "";
 
+    private static final int TEST_OPTION_CHECK_EXPERIMENT = 1 << 15;
+
     /** Test Class setup */
     @BeforeClass
     public static void beforeClass() {
@@ -155,6 +157,18 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
     @Test
     public void testImportWithExperimentValidation() throws Exception {
         testImport(ImportTraceWizardPage.OPTION_CREATE_EXPERIMENT, false, false, false, true, ImportConfirmation.CONTINUE);
+    }
+
+    /**
+     * Test import from directory, create experiment, overwrite traces
+     *
+     * @throws Exception
+     *             on error
+     */
+    @Test
+    public void testImportWithExperimentOverwriteTraces() throws Exception {
+        testImport(ImportTraceWizardPage.OPTION_CREATE_EXPERIMENT, false, false, true, false, ImportConfirmation.CONTINUE);
+        testImport(ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES | TEST_OPTION_CHECK_EXPERIMENT, false, false);
     }
 
     /**
@@ -535,8 +549,8 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
 
         fBot.closeAllEditors();
 
-        SWTBotUtils.clearExperimentFolder(fBot, TRACE_PROJECT_NAME);
         if (clearTraces) {
+            SWTBotUtils.clearExperimentFolder(fBot, TRACE_PROJECT_NAME);
             SWTBotUtils.clearTracesFolder(fBot, TRACE_PROJECT_NAME);
         }
     }
@@ -740,7 +754,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
 
         TmfExperimentFolder expFolder = tmfProject.getExperimentsFolder();
         assertNotNull(expFolder);
-        if ((optionFlags & ImportTraceWizardPage.OPTION_CREATE_EXPERIMENT) != 0) {
+        if ((optionFlags & (ImportTraceWizardPage.OPTION_CREATE_EXPERIMENT | TEST_OPTION_CHECK_EXPERIMENT)) != 0) {
             if (experimentName != null) {
                 TmfExperimentElement expElement = expFolder.getExperiment(experimentName);
                 assertNotNull(expElement);
