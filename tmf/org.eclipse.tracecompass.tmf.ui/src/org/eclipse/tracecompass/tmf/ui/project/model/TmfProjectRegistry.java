@@ -16,10 +16,13 @@ package org.eclipse.tracecompass.tmf.ui.project.model;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFolder;
@@ -34,13 +37,18 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
@@ -57,6 +65,8 @@ public class TmfProjectRegistry implements IResourceChangeListener {
 
     // The map of project resource to project model elements
     private static Map<IProject, TmfProjectElement> registry = new HashMap<>();
+
+    private static Queue<TmfTraceElement> promptQueue = new ArrayDeque<>();
 
     private TmfProjectRegistry() {
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
@@ -206,18 +216,12 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                                 project.isOpen() && project.hasNature(TmfProjectNature.ID)) {
                             Set<IResource> resourcesToRefresh = new HashSet<>();
                             event.getDelta().accept(visited -> {
-                                if (resourcesToRefresh.contains(visited.getResource().getParent())) {
-                                    return false;
-                                } else if ((visited.getFlags() & IResourceDelta.CONTENT) != 0) {
-                                    // visited resource content has changed
+                                if ((visited.getFlags() & IResourceDelta.CONTENT) != 0) {
+                                    // visited resource content has changed, refresh it
                                     resourcesToRefresh.add(visited.getResource());
-                                    return false;
                                 } else if (visited.getKind() != IResourceDelta.CHANGED) {
-                                    // visited resource is added or removed
-                                    IResource parent = visited.getResource().getParent();
-                                    resourcesToRefresh.add(parent);
-                                    resourcesToRefresh.removeIf(resource -> resource.getParent().equals(parent));
-                                    return false;
+                                    // visited resource is added or removed, refresh its parent
+                                    resourcesToRefresh.add(visited.getResource().getParent());
                                 }
                                 return true;
                             });
@@ -228,7 +232,27 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                                     elementsToRefresh.add(element);
                                 }
                             }
-                            elementsToRefresh.forEach(element -> element.refresh());
+                            Set<TmfTraceElement> changedTraces = new HashSet<>();
+                            Iterator<ITmfProjectModelElement> iterator = elementsToRefresh.iterator();
+                            while (iterator.hasNext()) {
+                                ITmfProjectModelElement element = iterator.next();
+                                if (element instanceof TmfTraceElement) {
+                                    changedTraces.add(((TmfTraceElement) element).getElementUnderTraceFolder());
+                                }
+                                for (ITmfProjectModelElement parent : elementsToRefresh) {
+                                    // remove element if any of its parents is included
+                                    if (parent.getPath().isPrefixOf(element.getPath()) && !parent.equals(element)) {
+                                        iterator.remove();
+                                        break;
+                                    }
+                                }
+                            }
+                            for (TmfTraceElement trace : changedTraces) {
+                                handleTraceContentChanged(trace);
+                            }
+                            for (ITmfProjectModelElement element : elementsToRefresh) {
+                                element.refresh();
+                            }
                             TmfProjectElement projectElement = registry.get(project);
                             if (projectElement != null) {
                                 // refresh only the viewer for the affected project
@@ -312,5 +336,42 @@ public class TmfProjectRegistry implements IResourceChangeListener {
             }
         }
         return element;
+    }
+
+    private static void handleTraceContentChanged(TmfTraceElement traceElement) {
+        Display.getDefault().asyncExec(() -> {
+            boolean opened = false;
+            for (ITmfTrace openedTrace : TmfTraceManager.getInstance().getOpenedTraces()) {
+                for (ITmfTrace trace : TmfTraceManager.getTraceSet(openedTrace)) {
+                    if (traceElement.getResource().equals(trace.getResource())) {
+                        opened = true;
+                        break;
+                    }
+                }
+            }
+            if (!opened) {
+                traceElement.deleteSupplementaryResources();
+                return;
+            }
+            if (!promptQueue.isEmpty()) {
+                /* already prompting the user */
+                if (!promptQueue.contains(traceElement)) {
+                    promptQueue.add(traceElement);
+                }
+                return;
+            }
+            promptQueue.add(traceElement);
+            TmfTraceElement prompting = traceElement;
+            while (prompting != null) {
+                Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+                if (MessageDialog.openQuestion(shell, Messages.TmfProjectRegistry_TraceChangedDialogTitle,
+                        NLS.bind(Messages.TmfProjectRegistry_TraceChangedDialogMessage, prompting.getElementPath()))) {
+                    traceElement.closeEditors();
+                    traceElement.deleteSupplementaryResources();
+                }
+                promptQueue.remove();
+                prompting = promptQueue.peek();
+            }
+        });
     }
 }

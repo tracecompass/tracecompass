@@ -155,6 +155,18 @@ public class Messages extends NLS {
      * @since 2.3
      */
     public static String TmfProject_TracesFolderNotExists;
+
+    /**
+     * Trace Changed dialog title
+     * @since 3.1
+     */
+    public static String TmfProjectRegistry_TraceChangedDialogTitle;
+    /**
+     * Trace Changed dialog message
+     * @since 3.1
+     */
+    public static String TmfProjectRegistry_TraceChangedDialogMessage;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

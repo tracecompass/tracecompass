@@ -120,32 +120,32 @@ public class TestDirectoryStructureUtil {
      *      │   ├── ExampleCustomTxt.log
      *      │   ├── ExampleCustomXml.xml
      *      │   ├── kernel-overlap-testing
-     *      │   │   ├── stream
+     *      │   │   ├── channel0
      *      │   │   └── metadata
      *      │   ├── simple_server-thread1
-     *      │   │   ├── stream
+     *      │   │   ├── channel0
      *      │   │   └── metadata
      *      │   ├── simple_server-thread2
-     *      │   │   ├── stream
+     *      │   │   ├── channel0
      *      │   │   └── metadata
      *      │   └── ust-overlap-testing
-     *      │       ├── stream
+     *      │       ├── channel0
      *      │       └── metadata
      *      ├── empty
      *      ├── ExampleCustomTxt.log
      *      ├── ExampleCustomXml.xml
      *      ├── kernel-overlap-testing
-     *      │   ├── stream
+     *      │   ├── channel0
      *      │   └── metadata
      *      ├── simple_server-thread1
-     *      │   ├── metadata
-     *      │   └── stream
+     *      │   ├── channel0
+     *      │   └── metadata
      *      ├── simple_server-thread2
-     *      │   ├── metadata
-     *      │   └── stream
+     *      │   ├── channel0
+     *      │   └── metadata
      *      ├── unrecognized.log
      *      └── ust-overlap-testing
-     *          ├── stream
+     *          ├── channel0
      *          └── metadata
      * </pre>
      *
