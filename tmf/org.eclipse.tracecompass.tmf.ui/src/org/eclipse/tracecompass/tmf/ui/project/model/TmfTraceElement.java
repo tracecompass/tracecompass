@@ -806,4 +806,25 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         super.deleteSupplementaryResources(resources);
     }
 
+    /**
+     * Deletes all supplementary resources in the supplementary directory. Also
+     * delete the supplementary resources of experiments that contain this trace.
+     */
+    @Override
+    public void deleteSupplementaryResources() {
+        super.deleteSupplementaryResources();
+
+        // Propagate the deletion to experiments
+        TmfExperimentFolder experimentFolder = getProject().getExperimentsFolder();
+        if (experimentFolder != null) {
+            for (TmfExperimentElement experiment : experimentFolder.getExperiments()) {
+                for (TmfTraceElement trace : experiment.getTraces()) {
+                    if (trace.getElementPath().equals(getElementPath())) {
+                        experiment.deleteSupplementaryResources();
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }

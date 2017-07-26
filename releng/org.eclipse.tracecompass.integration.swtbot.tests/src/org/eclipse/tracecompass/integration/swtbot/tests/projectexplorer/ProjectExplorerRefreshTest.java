@@ -149,13 +149,20 @@ public class ProjectExplorerRefreshTest {
         SWTBotTreeItem kernelTrace = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, TEST_FILE_KERNEL.getName());
         kernelTrace.contextMenu().menu("Open").click();
         SWTBotUtils.activateEditor(fBot, TEST_FILE_KERNEL.getName());
+        tracesFolder.contextMenu().menu("Open As Experiment...", "Generic Experiment").click();
+        SWTBotUtils.activateEditor(fBot, "Experiment");
+        SWTBotTreeItem project = SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME);
+        SWTBotTreeItem experiment = SWTBotUtils.getTraceProjectItem(fBot, project, "Experiments", "Experiment");
         FileUtils.copyDirectory(TEST_FILE_KERNEL_CLASH, FileUtils.getFile(fTracesFolder, TEST_FILE_KERNEL.getName()), false);
         assertTrue(kernelTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
+        assertTrue(experiment.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         tracesFolder.contextMenu().menu("Refresh").click();
         SWTBotShell shell = fBot.shell("Trace Changed");
         shell.bot().button("No").click();
         assertTrue(kernelTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
+        assertTrue(experiment.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         SWTBotUtils.activateEditor(fBot, TEST_FILE_KERNEL.getName());
+        SWTBotUtils.activateEditor(fBot, "Experiment");
         FileUtils.copyDirectory(TEST_FILE_KERNEL, FileUtils.getFile(fTracesFolder, TEST_FILE_KERNEL.getName()), false);
         assertTrue(kernelTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         tracesFolder.contextMenu().menu("Refresh").click();
@@ -174,12 +181,23 @@ public class ProjectExplorerRefreshTest {
     public void test16_03RefreshClosedTraceContentModified() throws IOException {
         SWTBotTreeItem tracesFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
         SWTBotTreeItem kernelTrace = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, TEST_FILE_KERNEL.getName());
+        SWTBotTreeItem ustTrace = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, TEST_FILE_UST.getName());
+        kernelTrace.contextMenu().menu("Select Trace Type...", "Common Trace Format", "Linux Kernel Trace").click();
         kernelTrace.contextMenu().menu("Open").click();
         SWTBotUtils.activateEditor(fBot, TEST_FILE_KERNEL.getName()).close();
+        tracesFolder.contextMenu().menu("Open As Experiment...", "Generic Experiment").click();
+        SWTBotUtils.activateEditor(fBot, "Experiment").close();
+        SWTBotTreeItem project = SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME);
+        SWTBotTreeItem experiment = SWTBotUtils.getTraceProjectItem(fBot, project, "Experiments", "Experiment");
         FileUtils.touch(FileUtils.getFile(fTracesFolder, TEST_FILE_KERNEL.getName(), "channel1"));
+        FileUtils.deleteQuietly(FileUtils.getFile(fTracesFolder, TEST_FILE_UST.getName(), "channel0"));
         assertTrue(kernelTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
+        assertTrue(ustTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
+        assertTrue(experiment.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         tracesFolder.select().pressShortcut(Keystrokes.F5);
         assertFalse(kernelTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
+        assertFalse(ustTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
+        assertFalse(experiment.contextMenu().menuItems().contains("Delete Supplementary Files..."));
     }
 
     /**
