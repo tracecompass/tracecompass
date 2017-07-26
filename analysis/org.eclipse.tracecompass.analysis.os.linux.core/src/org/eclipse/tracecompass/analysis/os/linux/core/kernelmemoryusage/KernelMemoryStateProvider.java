@@ -10,6 +10,7 @@ package org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelTidAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
@@ -108,7 +109,7 @@ public class KernelMemoryStateProvider extends AbstractTmfStateProvider {
             ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
             long ts = event.getTimestamp().toNanos();
 
-            Integer tidField = KernelTidAspect.INSTANCE.resolve(event);
+            Integer tidField = KernelTidAspect.INSTANCE.resolve(event, true, new NullProgressMonitor());
             String tid;
             if (tidField == null) {
                 // if the TID is not available
@@ -122,9 +123,8 @@ public class KernelMemoryStateProvider extends AbstractTmfStateProvider {
             long currentMemoryValue = ss.queryOngoingState(tidQuark).unboxLong();
 
             /**
-             * We add an attribute to keep the lowest memory value for each
-             * thread. This quantity is used when we plot to avoid negative
-             * values.
+             * We add an attribute to keep the lowest memory value for each thread. This
+             * quantity is used when we plot to avoid negative values.
              */
             int lowestMemoryQuark = ss.getQuarkRelativeAndAdd(tidQuark, KernelMemoryAnalysisModule.THREAD_LOWEST_MEMORY_VALUE);
             ITmfStateValue lowestMemoryValue = ss.queryOngoingState(lowestMemoryQuark);
@@ -133,9 +133,8 @@ public class KernelMemoryStateProvider extends AbstractTmfStateProvider {
             if (previousLowest > currentMemoryValue) {
                 ss.modifyAttribute(ts, TmfStateValue.newValueLong(currentMemoryValue), lowestMemoryQuark);
             }
-        } catch (AttributeNotFoundException e) {
+        } catch (AttributeNotFoundException | InterruptedException e) {
             Activator.getDefault().logError(String.valueOf(e.getMessage()), e);
         }
     }
-
 }
