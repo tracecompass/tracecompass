@@ -270,7 +270,9 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
         IFolder folder = getTraceSupplementaryFolder(supplFolderPath);
         try {
             if (createFolder) {
-                TraceUtils.createFolder(folder, new NullProgressMonitor());
+                IFolder propertiesFolder = folder.getFolder(TmfCommonConstants.TRACE_PROPERTIES_FOLDER);
+                TraceUtils.createFolder(propertiesFolder, new NullProgressMonitor());
+                propertiesFolder.setHidden(true);
             } else {
                 TraceUtils.createFolder((IFolder) folder.getParent(), new NullProgressMonitor());
             }
