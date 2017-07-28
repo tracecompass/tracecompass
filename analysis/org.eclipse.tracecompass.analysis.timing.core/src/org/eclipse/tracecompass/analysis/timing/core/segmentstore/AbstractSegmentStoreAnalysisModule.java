@@ -107,7 +107,9 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
      *             in memory, no in between anymore
      */
     @Deprecated
-    protected abstract Object[] readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException;
+    protected Object[] readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        return checkNotNull((Object[]) ois.readObject());
+    }
 
     /**
      * Fills the segment store. This is the main method that children classes
