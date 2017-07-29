@@ -175,6 +175,12 @@ public class ControlFlowView extends AbstractVirtualTimeGraphView {
 
     private IAction fHierarchicalAction;
 
+    /**
+     * Cache trace and threadID to a {@link ControlFlowEntry} for faster lookups
+     * when building link list
+     */
+    private Map<ITmfTrace, TreeMultimap<Integer, ControlFlowEntry>> fEntryCache = new HashMap<>();
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -585,6 +591,7 @@ public class ControlFlowView extends AbstractVirtualTimeGraphView {
         super.traceClosed(signal);
         synchronized (fFlatTraces) {
             fFlatTraces.remove(signal.getTrace());
+            fEntryCache.remove(signal.getTrace());
         }
     }
 
@@ -620,9 +627,13 @@ public class ControlFlowView extends AbstractVirtualTimeGraphView {
         final TreeMultimap<Integer, ITmfStateInterval> execNamesPPIDs = TreeMultimap.create(
                 Comparator.naturalOrder(),
                 Comparator.comparing(ITmfStateInterval::getStartTime));
+        final TreeMultimap<Integer, ControlFlowEntry> pidMap = TreeMultimap.create(
+                Comparator.naturalOrder(),
+                Comparator.comparing(ControlFlowEntry::getStartTime));
+        fEntryCache.put(trace, pidMap);
 
         long start = ssq.getStartTime();
-        setStartTime(Math.min(getStartTime(), start));
+        setStartTime(Long.min(getStartTime(), start));
 
         TraceEntry traceEntry = new TraceEntry(trace, ssq, ssq.getCurrentEndTime() + 1);
         addToEntryList(parentTrace, Collections.singletonList(traceEntry));
@@ -636,13 +647,13 @@ public class ControlFlowView extends AbstractVirtualTimeGraphView {
                 continue;
             }
             traceEntry.updateEndTime(end + 1);
-            setEndTime(Math.max(getEndTime(), end + 1));
+            setEndTime(Long.max(getEndTime(), end + 1));
 
             /* Create a List with the threads' PPID and EXEC_NAME quarks for the 2D query .*/
             List<Integer> quarks = new ArrayList<>(ssq.getQuarks(Attributes.THREADS, WILDCARD, Attributes.EXEC_NAME));
             quarks.addAll(ssq.getQuarks(Attributes.THREADS, WILDCARD, Attributes.PPID));
 
-            long queryStart = Long.max(ssq.getStartTime(), start);
+            long queryStart = Long.max(start, ssq.getStartTime());
             long queryEnd = Long.min(end, ssq.getCurrentEndTime());
             execNamesPPIDs.clear();
             try {
@@ -697,6 +708,7 @@ public class ControlFlowView extends AbstractVirtualTimeGraphView {
                         entry.setParentThreadId(ppid);
                         entry.updateEndTime(endTime);
                     }
+                    pidMap.put(threadId, entry);
                 }
             }
 
@@ -708,7 +720,7 @@ public class ControlFlowView extends AbstractVirtualTimeGraphView {
                 }
             }
 
-            final long resolution = Math.max(1, (end - ssq.getStartTime()) / getDisplayWidth());
+            final long resolution = Long.max(1, (end - ssq.getStartTime()) / getDisplayWidth());
             /* Transform is just to change the type. */
             Iterable<ITimeGraphEntry> entries = Iterables.transform(entryList, e -> (ITimeGraphEntry) e);
             zoomEntries(entries, ssq.getStartTime(), end, resolution, monitor);
@@ -1055,11 +1067,11 @@ public class ControlFlowView extends AbstractVirtualTimeGraphView {
                 prevEntry = null;
                 prevEnd = 0;
             }
-            Integer thread = (Integer) currentThreadInterval.getValue();
+            Integer tid = (Integer) currentThreadInterval.getValue();
             lastEnd = currentThreadInterval.getEndTime() + 1;
             ITimeGraphEntry nextEntry = null;
-            if (thread != null && thread > 0) {
-                nextEntry = findEntry(entry.getChildren(), entry.getTrace(), thread);
+            if (tid != null && tid > 0) {
+                nextEntry = findEntry(entry.getTrace(), tid, time);
                 if (prevEntry != null) {
                     linkList.add(new TimeLinkEvent(prevEntry, nextEntry, prevEnd, time - prevEnd, 0));
                 }
@@ -1068,6 +1080,19 @@ public class ControlFlowView extends AbstractVirtualTimeGraphView {
             }
         }
         return linkList;
+    }
+
+    private ControlFlowEntry findEntry(@NonNull ITmfTrace trace, int tid, long time) {
+        TreeMultimap<Integer, ControlFlowEntry> pidMap = fEntryCache.get(trace);
+        if (pidMap == null) {
+            return null;
+        }
+        /*
+         * FIXME TreeMultimap values are Navigable Sets sorted by start time, find the
+         * values using floor and the relevant anonymous class if ever the iteration
+         * below slows down.
+         */
+        return Iterables.find(pidMap.get(tid), cfe -> cfe.getStartTime() <= time && time <= cfe.getEndTime(), null);
     }
 
     /**
@@ -1124,23 +1149,5 @@ public class ControlFlowView extends AbstractVirtualTimeGraphView {
                 }
             }
         }
-    }
-
-    private ControlFlowEntry findEntry(List<TimeGraphEntry> entryList, ITmfTrace trace, int threadId) {
-        for (TimeGraphEntry entry : entryList) {
-            if (entry instanceof ControlFlowEntry) {
-                ControlFlowEntry controlFlowEntry = (ControlFlowEntry) entry;
-                if (controlFlowEntry.getThreadId() == threadId && controlFlowEntry.getTrace() == trace) {
-                    return controlFlowEntry;
-                }
-            }
-            if (entry.hasChildren()) {
-                ControlFlowEntry controlFlowEntry = findEntry(entry.getChildren(), trace, threadId);
-                if (controlFlowEntry != null) {
-                    return controlFlowEntry;
-                }
-            }
-        }
-        return null;
     }
 }
