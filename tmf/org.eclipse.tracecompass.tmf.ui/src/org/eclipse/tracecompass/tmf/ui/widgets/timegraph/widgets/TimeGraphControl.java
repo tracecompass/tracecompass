@@ -2057,7 +2057,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
      */
     public void drawItems(Rectangle bounds, ITimeDataProvider timeProvider,
             Item[] items, int topIndex, int nameSpace, GC gc) {
-        for (int i = topIndex; i < items.length; i++) {
+        int bottomIndex = Integer.min(topIndex + countPerPage() + 1, items.length);
+        for (int i = topIndex; i < bottomIndex; i++) {
             Item item = items[i];
             drawItem(item, bounds, timeProvider, i, nameSpace, gc);
         }
