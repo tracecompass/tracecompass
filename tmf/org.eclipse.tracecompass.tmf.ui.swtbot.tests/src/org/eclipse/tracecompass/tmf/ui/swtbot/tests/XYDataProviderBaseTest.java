@@ -174,7 +174,6 @@ public abstract class XYDataProviderBaseTest {
         double[] xMain = mainSeries.getXSeries();
         double[] yMain = mainSeries.getYSeries();
 
-        @NonNull
         Map<@NonNull String, @NonNull IYModel> yModels = new LinkedHashMap<>();
         yModels.put(mainSeriesName, new YModel(mainSeriesName, Objects.requireNonNull(yMain)));
 
