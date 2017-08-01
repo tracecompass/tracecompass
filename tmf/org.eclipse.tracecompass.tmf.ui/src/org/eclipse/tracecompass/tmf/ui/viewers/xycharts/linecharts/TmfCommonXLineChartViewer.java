@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -449,8 +450,28 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      *            The progress monitor object
      */
     protected void updateData(long start, long end, int nb, IProgressMonitor monitor) {
-        TimeQueryFilter filters = new TimeQueryFilter(start, end, nb);
+        TimeQueryFilter filters = createQueryFilter(start, end, nb);
         updateData(filters, monitor);
+    }
+
+    /**
+     * Create an instance of {@link TimeQueryFilter} that will be used by
+     * updateData method. If a viewer need a more specialized instance of
+     * {@link TimeQueryFilter}, it's his responsability to override this method
+     * and provide the desired instance.
+     *
+     * @param start
+     *            The starting value
+     * @param end
+     *            The ending value
+     * @param nb
+     *            The number of entries
+     * @return An {@link TimeQueryFilter} instance that data provider will use to
+     *         extract a model
+     * @since 3.1
+     */
+    protected @NonNull TimeQueryFilter createQueryFilter(long start, long end, int nb) {
+        return new TimeQueryFilter(start, end, nb);
     }
 
     /**
@@ -521,12 +542,8 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      *            The array of values for the series
      */
     protected void setSeries(String seriesName, double[] seriesValues) {
-        if (seriesName == null) {
-            throw new IllegalArgumentException("seriesName cannot be null"); //$NON-NLS-1$
-        }
-        if (seriesValues == null) {
-            throw new IllegalArgumentException("Series values cannot be null"); //$NON-NLS-1$
-        }
+        Objects.requireNonNull(seriesName, "Series name cannot be null"); //$NON-NLS-1$
+        Objects.requireNonNull(seriesValues, "Series values cannot be null"); //$NON-NLS-1$
         String seriesType = getSeriesType(seriesName);
         fModelBuilder.addYSeries(
                 new YSeries(

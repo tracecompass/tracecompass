@@ -27,6 +27,13 @@ public class Messages extends NLS {
     /** Example of how to execute the application with the libc wrapper */
     public static String UstMemoryAnalysisModule_EventsLoadingExampleInformation;
 
+    /**
+     * Chart title
+     *
+     * @since 3.1
+     */
+    public static String MemoryUsageDataProvider_Title;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

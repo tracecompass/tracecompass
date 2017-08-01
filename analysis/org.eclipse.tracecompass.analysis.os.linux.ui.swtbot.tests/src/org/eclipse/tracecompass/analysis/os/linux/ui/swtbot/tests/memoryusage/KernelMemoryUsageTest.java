@@ -208,8 +208,8 @@ public class KernelMemoryUsageTest {
         for (double data : series[0].getYSeries()) {
             stats.accept(data);
         }
-        assertEquals(839684, stats.getMin(), 1.0);
-        assertEquals(929796, stats.getMax(), 1.0);
+        assertEquals(839680, stats.getMin(), 1.0);
+        assertEquals(929792, stats.getMax(), 1.0);
         // average can have some variance depending on sampling
         assertEquals(870849.823129, stats.getAverage(), 1000.0);
         bot.closeAllEditors();
