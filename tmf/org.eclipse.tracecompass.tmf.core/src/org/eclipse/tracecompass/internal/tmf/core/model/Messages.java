@@ -41,6 +41,16 @@ public class Messages extends NLS {
      */
     public static @Nullable String CommonStatusMessage_AnalysisInitializationFailed;
 
+    /**
+     * Detailed message for failed status cause by trying to access to statesystem
+     */
+    public static @Nullable String CommonStatusMessage_StateSystemFailed;
+
+    /**
+     * Detailed message for failed status cause by incorrect start/end time query
+     */
+    public static @Nullable String CommonStatusMessage_IncorrectQueryInterval;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

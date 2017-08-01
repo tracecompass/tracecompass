@@ -53,6 +53,20 @@ public final class CommonStatusMessage {
     public static final @Nullable String ANALYSIS_INITIALIZATION_FAILED = Messages.CommonStatusMessage_AnalysisInitializationFailed;
 
     /**
+     * A possible detailed message for a
+     * {@link org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse.Status#FAILED}
+     * status
+     */
+    public static final @Nullable String STATE_SYSTEM_FAILED = Messages.CommonStatusMessage_StateSystemFailed;
+
+    /**
+     * A possible detailed message for a
+     * {@link org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse.Status#FAILED}
+     * status
+     */
+    public static final @Nullable String INCORRECT_QUERY_INTERVAL = Messages.CommonStatusMessage_IncorrectQueryInterval;
+
+    /**
      * Constructor
      */
     private CommonStatusMessage() {

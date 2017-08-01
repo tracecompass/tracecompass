@@ -76,6 +76,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     private static final double DEFAULT_MAXY = Double.MIN_VALUE;
     private static final double DEFAULT_MINY = Double.MAX_VALUE;
+    private static final int DEFAULT_WIDTH = 1;
 
     // Timeout between updates in the updateData thread
     private static final long BUILD_UPDATE_TIMEOUT = 500;
@@ -546,7 +547,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      * @since 3.1
      */
     protected int getWidth(@NonNull String seriesName) {
-        return 1;
+        return DEFAULT_WIDTH;
     }
 
     /**
