@@ -370,25 +370,16 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
             return Collections.singleton(node);
         }
         ParentNode parent = (ParentNode) node;
-        /* Reduce the condition to this node's bounds. */
-        if (node.getNodeStart() > node.getNodeEnd()) {
-            return Collections.emptyList();
-        }
-        IntegerRangeCondition subQuarks = quarks.subCondition(node.getMinQuark(), node.getMaxQuark());
-        TimeRangeCondition subTimes = times.subCondition(node.getNodeStart(), node.getNodeEnd());
         /*
          * Transform the children's sequence numbers into the children's
          * flattened subtrees.
          */
-        Iterable<Iterable<HTNode>> children = Iterables.transform(parent.selectNextChildren2D(quarks, subTimes), seqNum -> {
+        Iterable<Iterable<HTNode>> children = Iterables.transform(parent.selectNextChildren2D(quarks, times), seqNum -> {
             try {
                 /* Recursive call to flatten children */
-                return flatten(getSHT().readNode(seqNum), subQuarks, subTimes);
+                return flatten(getSHT().readNode(seqNum), quarks, times);
             } catch (ClosedChannelException e) {
-                /**
-                 * return node since we were able to read it.
-                 */
-                return Collections.singleton(node);
+                return Collections.emptyList();
             }
         });
         /* BFS */

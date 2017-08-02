@@ -423,23 +423,12 @@ public abstract class HTNode {
     public void closeThisNode(long endtime) {
         fRwl.writeLock().lock();
         try {
-            /**
-             * FIXME: was assert (endtime >= fNodeStart); but that exception
-             * is reached with an empty node that has start time endtime + 1
+            /*
+             * Make sure there are no intervals in this node with their EndTime > the one
+             * requested. Only need to check the last one since they are sorted
              */
-//            if (endtime < fNodeStart) {
-//                throw new IllegalArgumentException("Endtime " + endtime + " cannot be lower than start time " + fNodeStart);
-//            }
-
-            if (!fIntervals.isEmpty()) {
-                /*
-                 * Make sure there are no intervals in this node with their
-                 * EndTime > the one requested. Only need to check the last one
-                 * since they are sorted
-                 */
-                if (endtime < Iterables.getLast(fIntervals).getEndTime()) {
-                    throw new IllegalArgumentException("Closing end time should be greater than or equal to the end time of the intervals of this node"); //$NON-NLS-1$
-                }
+            if (!fIntervals.isEmpty() && endtime < Iterables.getLast(fIntervals).getEndTime()) {
+                throw new IllegalArgumentException("Closing end time should be greater than or equal to the end time of the intervals of this node"); //$NON-NLS-1$
             }
 
             fNodeEnd = endtime;
@@ -531,13 +520,27 @@ public abstract class HTNode {
     public Iterable<HTInterval> iterable2D(IntegerRangeCondition quarks, TimeRangeCondition times) {
         fRwl.readLock().lock();
         try {
-            if (getNodeStart() > getNodeEnd()) {
+            /*
+             * Narrow Down the RangeConditions to faster evaluation of the .test and
+             * .intersects conditions.
+             */
+            IntegerRangeCondition subQuarks = quarks.subCondition(fMinQuark, fMaxQuark);
+            if (subQuarks == null) {
                 return Collections.emptyList();
             }
-            long start = times.min();
-            return Iterables.filter(fIntervals.subList(getStartIndexFor(start), fIntervals.size()),
-                    interval -> quarks.test(interval.getAttribute())
-                            && times.intersects(interval.getStartTime(), interval.getEndTime()));
+            TimeRangeCondition subTimes = times.subCondition(fNodeStart, fNodeEnd);
+            if (subTimes == null) {
+                return Collections.emptyList();
+            }
+            long start = subTimes.min();
+            List<HTInterval> intervals = new ArrayList<>();
+            for (HTInterval interval : fIntervals.subList(getStartIndexFor(start), fIntervals.size())) {
+                if (subQuarks.test(interval.getAttribute())
+                        && subTimes.intersects(interval.getStartTime(), interval.getEndTime())) {
+                    intervals.add(interval);
+                }
+            }
+            return intervals;
         } finally {
             fRwl.readLock().unlock();
         }
