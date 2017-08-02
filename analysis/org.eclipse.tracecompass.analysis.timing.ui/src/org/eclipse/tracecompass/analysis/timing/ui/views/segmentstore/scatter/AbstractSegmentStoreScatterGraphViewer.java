@@ -14,7 +14,6 @@
 package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter;
 
 import java.text.Format;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
@@ -47,8 +46,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLin
 public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXLineChartViewer {
 
     private static final Format FORMAT = new SubSecondTimeWithUnitFormat();
-
-    private final AtomicInteger fDirty = new AtomicInteger();
 
     /**
      * Constructor
@@ -194,11 +191,5 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             clearContent();
         }
         refresh();
-    }
-
-    @Override
-    public boolean isDirty() {
-        /* Check the parent's or this view's own dirtiness */
-        return super.isDirty() || (fDirty.get() != 0);
     }
 }

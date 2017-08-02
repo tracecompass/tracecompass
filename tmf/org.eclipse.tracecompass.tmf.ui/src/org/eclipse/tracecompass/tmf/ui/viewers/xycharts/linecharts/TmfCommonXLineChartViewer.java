@@ -42,6 +42,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommo
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.viewmodel.ICommonXAxisModel;
@@ -74,6 +75,8 @@ import com.google.common.collect.Iterables;
  * @author - Geneviève Bastien
  */
 public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
+
+    private static final String DIRTY_UNDERFLOW_ERROR = "Dirty underflow error"; //$NON-NLS-1$
 
     private static final double DEFAULT_MAXY = Double.MIN_VALUE;
     private static final double DEFAULT_MINY = Double.MAX_VALUE;
@@ -211,7 +214,9 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                     /*
                      * View is cleared, decrement fDirty
                      */
-                    fDirty.decrementAndGet();
+                    if (fDirty.decrementAndGet() < 0) {
+                        Activator.getDefault().logError(DIRTY_UNDERFLOW_ERROR, new Throwable());
+                    }
                 }
             }
         };
@@ -275,7 +280,9 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                      * fDirty should have been incremented before creating the thread, so we
                      * decrement it once it is finished
                      */
-                    fDirty.decrementAndGet();
+                    if (fDirty.decrementAndGet() < 0) {
+                        Activator.getDefault().logError(DIRTY_UNDERFLOW_ERROR, new Throwable());
+                    }
                 }
                 updateThreadFinished(this);
             }
@@ -830,7 +837,9 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                         }
                     } finally {
                         /* Content has been updated, decrement dirtiness */
-                        fDirty.decrementAndGet();
+                        if (fDirty.decrementAndGet() < 0) {
+                            Activator.getDefault().logError(DIRTY_UNDERFLOW_ERROR, new Throwable());
+                        }
                     }
                 }
             });
