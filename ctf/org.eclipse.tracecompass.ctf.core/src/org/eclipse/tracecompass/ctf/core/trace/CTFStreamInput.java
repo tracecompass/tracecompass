@@ -20,6 +20,7 @@ import java.nio.channels.FileChannel.MapMode;
 import java.nio.file.StandardOpenOption;
 import java.util.UUID;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFException;
@@ -32,6 +33,7 @@ import org.eclipse.tracecompass.ctf.core.event.types.Definition;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
+import org.eclipse.tracecompass.internal.ctf.core.Activator;
 import org.eclipse.tracecompass.internal.ctf.core.SafeMappedByteBuffer;
 import org.eclipse.tracecompass.internal.ctf.core.trace.StreamInputPacketIndex;
 import org.eclipse.tracecompass.internal.ctf.core.trace.StreamInputPacketIndexEntry;
@@ -87,6 +89,8 @@ public class CTFStreamInput implements IDefinitionScope {
      * Total number of lost events in this stream
      */
     private long fLostSoFar = 0;
+
+    private boolean fUUIDMismatchWarning = false;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -340,8 +344,9 @@ public class CTFStreamInput implements IDefinitionScope {
         if (uuidDef != null) {
             UUID uuid = Utils.getUUIDfromDefinition(uuidDef);
 
-            if (!getStream().getTrace().getUUID().equals(uuid)) {
-                throw new CTFException("UUID mismatch"); //$NON-NLS-1$
+            if (!getStream().getTrace().getUUID().equals(uuid) && !fUUIDMismatchWarning ) {
+                fUUIDMismatchWarning = true;
+                Activator.log(IStatus.WARNING, "Reading CTF trace: UUID mismatch for trace " + getStream().getTrace()); //$NON-NLS-1$
             }
         }
 

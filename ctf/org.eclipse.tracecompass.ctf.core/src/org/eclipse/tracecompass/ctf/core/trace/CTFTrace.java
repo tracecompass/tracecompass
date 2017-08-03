@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
@@ -49,6 +50,7 @@ import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
+import org.eclipse.tracecompass.internal.ctf.core.Activator;
 import org.eclipse.tracecompass.internal.ctf.core.SafeMappedByteBuffer;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.MetadataStrings;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ParseException;
@@ -142,6 +144,8 @@ public class CTFTrace implements IDefinitionScope {
     private static final Comparator<File> METADATA_COMPARATOR = new MetadataComparator();
 
     private final DeclarationScope fScope = new DeclarationScope(null, MetadataStrings.TRACE);
+
+    private boolean fUUIDMismatchWarning = false;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -527,8 +531,9 @@ public class CTFTrace implements IDefinitionScope {
         AbstractArrayDefinition uuidDef = (AbstractArrayDefinition) lookupDefinition;
         if (uuidDef != null) {
             UUID otheruuid = Utils.getUUIDfromDefinition(uuidDef);
-            if (!fUuid.equals(otheruuid)) {
-                throw new CTFException("UUID mismatch"); //$NON-NLS-1$
+            if (!fUuid.equals(otheruuid) && !fUUIDMismatchWarning) {
+                fUUIDMismatchWarning = true;
+                Activator.log(IStatus.WARNING, "Reading CTF trace: UUID mismatch for trace " + this); //$NON-NLS-1$
             }
         }
     }
