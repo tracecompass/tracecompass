@@ -19,10 +19,12 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.datastore.core.interval.IHTInterval;
 import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.internal.datastore.core.Activator;
@@ -101,7 +103,7 @@ public class HtIo<E extends IHTInterval, N extends HTNode<E>> {
                     HtIo<IHTInterval, HTNode<IHTInterval>> io = key.fHistoryTreeIo;
                     int seqNb = key.fSeqNumber;
 
-                    LOGGER.finest(() -> "[HtIo:CacheMiss] seqNum=" + seqNb); //$NON-NLS-1$
+                    TraceCompassLogUtils.traceInstant(LOGGER, Level.FINEST, "HtIo:CacheMiss", "seqNum", seqNb); //$NON-NLS-1$ //$NON-NLS-2$
 
                     synchronized (io) {
                         io.seekFCToNodePos(io.fFileChannelIn, seqNb);
@@ -235,7 +237,7 @@ public class HtIo<E extends IHTInterval, N extends HTNode<E>> {
     @SuppressWarnings("unchecked")
     public N readNode(int seqNumber) throws ClosedChannelException {
         /* Do a cache lookup. If it's not present it will be loaded from disk */
-        LOGGER.finest(() -> "[HtIo:CacheLookup] seqNum=" + seqNumber); //$NON-NLS-1$
+        TraceCompassLogUtils.traceInstant(LOGGER, Level.FINEST, "HtIo:CacheLookup", "seqNum", seqNumber); //$NON-NLS-1$ //$NON-NLS-2$
         CacheKey key = new CacheKey((HtIo<IHTInterval, HTNode<IHTInterval>>) this, seqNumber);
         try {
             return (N) checkNotNull(NODE_CACHE.get(key));

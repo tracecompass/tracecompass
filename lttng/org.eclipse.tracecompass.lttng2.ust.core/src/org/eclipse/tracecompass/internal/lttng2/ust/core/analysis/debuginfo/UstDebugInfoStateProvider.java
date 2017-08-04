@@ -13,11 +13,13 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst28EventLayout;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
@@ -372,7 +374,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
                 hasBuildIdValue == null ||
                 hasDebugLinkValue == null ||
                 (statedump && isPicValue == null)) {
-            LOGGER.warning(() -> "[UstDebugInfoStateProvider:InvalidBinInfoEvent] event=" + event.toString()); //$NON-NLS-1$
+            TraceCompassLogUtils.traceInstant(LOGGER, Level.CONFIG, "UstDebugInfoStateProvider:InvalidBinInfoEvent", "event", event); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
 
@@ -405,7 +407,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
         Long baddr = event.getContent().getFieldValue(Long.class, fLayout.fieldBaddr());
 
         if (buildIdArray == null || baddr == null) {
-            LOGGER.warning(() -> "[UstDebugInfoStateProvider:InvalidBuildIdEvent] event=" + event.toString()); //$NON-NLS-1$
+            TraceCompassLogUtils.traceInstant(LOGGER, Level.CONFIG, "UstDebugInfoStateProvider:InvalidBinIdEvent", "event", event); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
 
@@ -437,7 +439,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
         String debugLink = event.getContent().getFieldValue(String.class, fLayout.fieldDebugLinkFilename());
 
         if (baddr == null || debugLink == null) {
-            LOGGER.warning(() -> "[UstDebugInfoStateProvider:InvalidDebugLinkEvent] event=" + event.toString()); //$NON-NLS-1$
+            TraceCompassLogUtils.traceInstant(LOGGER, Level.CONFIG, "UstDebugInfoStateProvider:InvalidDebugLinkEvent", "event", event); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
 
@@ -461,7 +463,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
         Long baddr = event.getContent().getFieldValue(Long.class, fLayout.fieldBaddr());
 
         if (baddr == null) {
-            LOGGER.warning(() -> "[UstDebugInfoStateProvider:InvalidDlCloseEvent] event=" + event.toString()); //$NON-NLS-1$
+            TraceCompassLogUtils.traceInstant(LOGGER, Level.CONFIG, "UstDebugInfoStateProvider:InvalidDlCloseEvent", "event", event); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
 
@@ -511,7 +513,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
     }
 
     /**
-     * Until we can use Java 8 IntStream, see
+     * FIXME: Until we can use Java 8 IntStream, see
      * http://stackoverflow.com/a/28008477/4227853.
      */
     private static byte[] longArrayToByteArray(long[] array) {

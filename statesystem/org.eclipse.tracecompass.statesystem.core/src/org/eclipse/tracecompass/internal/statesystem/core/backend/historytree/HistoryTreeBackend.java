@@ -23,10 +23,12 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.IntegerRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
@@ -47,7 +49,7 @@ import com.google.common.collect.Iterables;
  */
 public class HistoryTreeBackend implements IStateHistoryBackend {
 
-    private static final Logger LOGGER = TraceCompassLog.getLogger(HistoryTreeBackend.class);
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(HistoryTreeBackend.class);
 
     private final @NonNull String fSsid;
 
@@ -171,6 +173,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      */
     @VisibleForTesting
     protected @NonNull IHistoryTree initializeSHT(@NonNull HTConfig conf) throws IOException {
+        TraceCompassLogUtils.traceObjectCreation(LOGGER, Level.FINER, this);
         return HistoryTreeFactory.createHistoryTree(conf);
     }
 
@@ -265,7 +268,8 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     @Override
     public void dispose() {
         if (fFinishedBuilding) {
-            LOGGER.info(() -> "[HistoryTreeBackend:ClosingFile] size=" + getSHT().getFileSize());  //$NON-NLS-1$
+            TraceCompassLogUtils.traceInstant(LOGGER, Level.FINE, "HistoryTreeBackend:ClosingFile", "size", getSHT().getFileSize()); //$NON-NLS-1$ //$NON-NLS-2$
+            TraceCompassLogUtils.traceObjectDestruction(LOGGER, Level.FINER, this);
             getSHT().closeFile();
         } else {
             /*

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -36,6 +37,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.process.ProcessUtils;
 import org.eclipse.tracecompass.common.core.process.ProcessUtils.OutputReaderFunction;
 import org.eclipse.tracecompass.internal.analysis.lami.core.Activator;
@@ -93,8 +95,16 @@ public class LamiAnalysis implements IOnDemandAnalysis {
     private static final String END_FLAG = "--end"; //$NON-NLS-1$
 
     /* Log messages */
-    private static final String LOG_RUNNING_MESSAGE = "[LamiAnalysis:RunningCommand] "; //$NON-NLS-1$
-    private static final String LOG_NO_MI_VERSION_FMT = "[LamiAnalysis:InvalidMIVersionReport] Command \"%s\" reports no specific or invalid MI version"; //$NON-NLS-1$
+    private static final String LOG_VERSION = "LamiAnalysis:MIVersionReport"; //$NON-NLS-1$
+    private static final String VERSION = "version"; //$NON-NLS-1$
+    private static final String INVALID_MI_VERSION = "No specific or invalid MI version"; //$NON-NLS-1$
+    private static final String LOG_NO_MI_VERSION = "LamiAnalysis:InvalidMIVersionReport"; //$NON-NLS-1$
+    private static final String LOG_RUNNING_MESSAGE = "LamiAnalysis:RunningCommand"; //$NON-NLS-1$
+    private static final String ERROR_PARSING_METADATA = "LamiAnalysis:ErrorParsingMetadata"; //$NON-NLS-1$
+    private static final String RUNNING_METADATA_COMMAND = "LamiAnalysis:RunningMetadataCommand"; //$NON-NLS-1$
+    private static final String COMMAND = "command"; //$NON-NLS-1$
+    private static final String ERROR_PARSING_EXECUTION_OUTPUT = "LamiAnalysis:ErrorParsingExecutionOutput"; //$NON-NLS-1$
+    private static final String RUNNING_EXECUTE_COMMAND = "LamiAnalysis:RunningExecuteCommand"; //$NON-NLS-1$
 
     /* Tokens of the complete command */
     private final List<String> fScriptCommand;
@@ -266,19 +276,19 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         final String output = getOutputFromCommand(commandLine);
 
         if (output == null) {
-            LOGGER.info(() -> String.format(LOG_NO_MI_VERSION_FMT, command));
+            TraceCompassLogUtils.traceInstant(LOGGER, Level.INFO, LOG_NO_MI_VERSION, INVALID_MI_VERSION, command);
             return;
         }
 
         final String versionString = output.trim();
 
         if (!versionString.matches("\\d{1,3}\\.\\d{1,3}")) { //$NON-NLS-1$
-            LOGGER.info(() -> String.format(LOG_NO_MI_VERSION_FMT, command));
+            TraceCompassLogUtils.traceInstant(LOGGER, Level.INFO, LOG_NO_MI_VERSION, COMMAND, command, VERSION, versionString);
             return;
         }
 
-        LOGGER.info(() -> String.format("[LamiAnalysis:MIVersionReport] Command \"%s\" reports MI version %s", //$NON-NLS-1$
-                command, versionString));
+        TraceCompassLogUtils.traceInstant(LOGGER, Level.FINE, LOG_VERSION, COMMAND, command, VERSION, versionString);
+
 
         final String[] parts = versionString.split("\\."); //$NON-NLS-1$
         final int major = Integer.valueOf(parts[0]);
@@ -363,7 +373,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
          */
         List<String> command = ImmutableList.<@NonNull String> builder()
                 .addAll(fScriptCommand).add(METADATA_FLAG).build();
-        LOGGER.info(() -> "[LamiAnalysis:RunningMetadataCommand] " + command.toString()); //$NON-NLS-1$
+        TraceCompassLogUtils.traceInstant(LOGGER, Level.INFO, RUNNING_METADATA_COMMAND, COMMAND, command);
         String output = getOutputFromCommand(command);
         if (output == null || output.isEmpty()) {
             return false;
@@ -448,7 +458,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
 
         } catch (JSONException e) {
             /* Error in the parsing of the JSON, script is broken? */
-            LOGGER.severe(() -> "[LamiAnalysis:ErrorParsingMetadata] msg=" + e.getMessage()); //$NON-NLS-1$
+            TraceCompassLogUtils.traceInstant(LOGGER, Level.WARNING, ERROR_PARSING_METADATA, e.getMessage());
             return false;
         }
         return true;
@@ -648,7 +658,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         builder.addAll(extraParams);
         builder.add(tracePath);
         List<String> command = builder.build();
-        LOGGER.info(() -> "[LamiAnalysis:RunningExecuteCommand] " + command.toString()); //$NON-NLS-1$
+        TraceCompassLogUtils.traceInstant(LOGGER, Level.INFO, RUNNING_EXECUTE_COMMAND, COMMAND, command);
         String output = getResultsFromCommand(command, monitor);
 
         if (output.isEmpty()) {
@@ -797,7 +807,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
             }
 
         } catch (JSONException e) {
-            LOGGER.severe(() -> "[LamiAnalysis:ErrorParsingExecutionOutput] msg=" + e.getMessage()); //$NON-NLS-1$
+            TraceCompassLogUtils.traceInstant(LOGGER, Level.WARNING, ERROR_PARSING_EXECUTION_OUTPUT, e.getMessage());
             IStatus status = new Status(IStatus.ERROR, Activator.instance().getPluginId(), e.getMessage(), e);
             throw new CoreException(status);
         }
@@ -827,7 +837,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
      */
     @VisibleForTesting
     protected @Nullable String getOutputFromCommand(List<String> command) {
-        LOGGER.info(() -> LOG_RUNNING_MESSAGE + ' ' + command.toString());
+        TraceCompassLogUtils.traceInstant(LOGGER, Level.FINE, LOG_RUNNING_MESSAGE, COMMAND, command);
         List<String> lines = ProcessUtils.getOutputFromCommand(command);
         if (lines == null) {
             return null;

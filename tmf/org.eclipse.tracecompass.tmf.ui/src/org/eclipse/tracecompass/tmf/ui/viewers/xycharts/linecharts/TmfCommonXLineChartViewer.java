@@ -493,7 +493,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      */
     private void updateData(@NonNull TimeQueryFilter filters, IProgressMonitor monitor) {
         if (fXYDataProvider == null) {
-            LOGGER.log(Level.WARNING, "Data provider for this viewer is not available"); //$NON-NLS-1$
+            TraceCompassLogUtils.traceInstant(LOGGER, Level.WARNING, "Data provider for this viewer is not available"); //$NON-NLS-1$
             return;
         }
 
@@ -515,7 +515,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
             }
             /* Error occured, log and return */
             else if (status == ITmfCommonXAxisResponse.Status.FAILED || status == ITmfCommonXAxisResponse.Status.CANCELLED) {
-                LOGGER.log(Level.WARNING, response.getStatusMessage());
+                TraceCompassLogUtils.traceInstant(LOGGER, Level.WARNING, String.valueOf(response.getStatusMessage()));
                 return;
             }
             /*
@@ -526,7 +526,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                 try {
                     Thread.sleep(BUILD_UPDATE_TIMEOUT);
                 } catch (InterruptedException e) {
-                    LOGGER.log(Level.INFO, e.getMessage());
+                    TraceCompassLogUtils.traceInstant(LOGGER, Level.INFO, e.getMessage());
                     return;
                 }
             }

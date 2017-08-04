@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -28,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.IHistoryTree.IHTNodeFactory;
 
@@ -97,7 +99,7 @@ public class HT_IO {
                     HT_IO io = key.fStateHistory;
                     int seqNb = key.fSeqNumber;
 
-                    LOGGER.finest(() -> "[HtIo:CacheMiss] seqNum=" + seqNb); //$NON-NLS-1$
+                    TraceCompassLogUtils.traceInstant(LOGGER, Level.FINEST, "Ht_Io:CacheMiss", "seqNum", seqNb); //$NON-NLS-1$ //$NON-NLS-2$
 
                     synchronized (io) {
                         io.seekFCToNodePos(io.fFileChannelIn, seqNb);
@@ -185,7 +187,7 @@ public class HT_IO {
      */
     public @NonNull HTNode readNode(int seqNumber) throws ClosedChannelException {
         /* Do a cache lookup. If it's not present it will be loaded from disk */
-        LOGGER.finest(() -> "[HtIo:CacheLookup] seqNum=" + seqNumber); //$NON-NLS-1$
+        TraceCompassLogUtils.traceInstant(LOGGER, Level.FINEST, "Ht_Io:CacheLookup", "seqNum", seqNumber); //$NON-NLS-1$ //$NON-NLS-2$
         CacheKey key = new CacheKey(this, seqNumber);
         try {
             return checkNotNull(NODE_CACHE.get(key));

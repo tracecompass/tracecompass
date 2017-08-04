@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 import com.google.common.collect.Iterables;
@@ -69,7 +70,7 @@ public class MultiAspect<T> implements ITmfEventAspect<T> {
         if (names.size() != 1) {
             StringJoiner sj = new StringJoiner(", "); //$NON-NLS-1$
             names.forEach(sj::add);
-            LOGGER.log(Level.WARNING, () -> "Aspects do not have the same name: " + sj.toString()); //$NON-NLS-1$);
+            TraceCompassLogUtils.traceInstant(LOGGER, Level.WARNING, "Aspects do not have the same name: ", sj.toString()); //$NON-NLS-1$ );
         }
 
         return new MultiAspect<>(Iterables.get(names, 0), aspects);

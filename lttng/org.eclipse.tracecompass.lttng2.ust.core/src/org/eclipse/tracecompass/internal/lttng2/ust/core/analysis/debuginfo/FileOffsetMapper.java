@@ -18,12 +18,15 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
 import org.eclipse.tracecompass.common.core.process.ProcessUtils;
 import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 
@@ -177,14 +180,18 @@ public final class FileOffsetMapper {
     private static final LoadingCache<FileOffset, @NonNull Iterable<Addr2lineInfo>> ADDR2LINE_INFO_CACHE;
     static {
         ADDR2LINE_INFO_CACHE = checkNotNull(CacheBuilder.newBuilder()
-            .maximumSize(CACHE_SIZE)
-            .build(new CacheLoader<FileOffset, @NonNull Iterable<Addr2lineInfo>>() {
-                @Override
-                public @NonNull Iterable<Addr2lineInfo> load(FileOffset fo) {
-                    LOGGER.fine(() -> "[FileOffsetMapper:CacheMiss] file/offset=" + fo.toString()); //$NON-NLS-1$
-                    return callAddr2line(fo);
-                }
-            }));
+                .maximumSize(CACHE_SIZE)
+                .build(new CacheLoader<FileOffset, @NonNull Iterable<Addr2lineInfo>>() {
+                    @Override
+                    public @NonNull Iterable<Addr2lineInfo> load(FileOffset fo) {
+                        try (ScopeLog sl = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "FileOffsetMapper:CacheMiss",  //$NON-NLS-1$
+                                "File", fo.fFilePath,  //$NON-NLS-1$
+                                "Offset", fo.fOffset, //$NON-NLS-1$
+                                "Build id", fo.fBuildId)) { //$NON-NLS-1$
+                            return callAddr2line(fo);
+                        }
+                    }
+                }));
     }
 
     private static class Addr2lineInfo {
@@ -210,20 +217,26 @@ public final class FileOffsetMapper {
     }
 
     private static @Nullable Iterable<Addr2lineInfo> getAddr2lineInfo(File file, @Nullable String buildId, long offset) {
-        LOGGER.finer(() -> String.format("[FileOffsetMapper:Addr2lineRequest] file=%s, buildId=%s, offset=0x%h", //$NON-NLS-1$
-                file.toString(), buildId, offset));
+        try (ScopeLog sl = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "FileOffsetMapper:Addr2lineInfo", //$NON-NLS-1$
+                "File", file,  //$NON-NLS-1$
+                "Offset", offset, //$NON-NLS-1$
+                "Build id", buildId)) { //$NON-NLS-1$
 
-        if (!Files.exists((file.toPath()))) {
-            LOGGER.finer(() -> "[FileOffsetMapper:RequestFailed] File not found"); //$NON-NLS-1$
-            return null;
+            if (!Files.exists((file.toPath()))) {
+                sl.addData("file not found", file.toPath());
+                return null;
+            }
+            /*
+             * TODO We should also eventually verify that the passed buildId
+             * matches the file we are attempting to open.
+             */
+            FileOffset fo = new FileOffset(checkNotNull(file.toString()), buildId, offset);
+
+            @Nullable
+            Iterable<Addr2lineInfo> callsites = ADDR2LINE_INFO_CACHE.getUnchecked(fo);
+            sl.addData("callsites", callsites); //$NON-NLS-1$
+            return callsites;
         }
-        // TODO We should also eventually verify that the passed buildId matches
-        // the file we are attempting to open.
-        FileOffset fo = new FileOffset(checkNotNull(file.toString()), buildId, offset);
-
-        @Nullable Iterable<Addr2lineInfo> callsites = ADDR2LINE_INFO_CACHE.getUnchecked(fo);
-        LOGGER.finer(() -> String.format("[FileOffsetMapper:RequestComplete] callsites=%s", callsites)); //$NON-NLS-1$
-        return callsites;
     }
 
     private static Iterable<Addr2lineInfo> callAddr2line(FileOffset fo) {

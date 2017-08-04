@@ -19,6 +19,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.Queue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.core.resources.IFolder;
@@ -29,7 +30,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -45,7 +48,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  */
 public class UpdateTraceBoundsJob extends Job {
 
-    private static final Logger LOGGER = TraceCompassLog.getLogger(UpdateTraceBoundsJob.class);
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(UpdateTraceBoundsJob.class);
     private static final String BOUNDS_FILE_NAME = "bounds"; //$NON-NLS-1$
 
     private final Queue<TmfTraceElement> fTraceBoundsToUpdate;
@@ -157,7 +160,7 @@ public class UpdateTraceBoundsJob extends Job {
                  */
                 traceElement.setStartTime(TmfTimestamp.BIG_BANG);
                 traceElement.setEndTime(TmfTimestamp.BIG_BANG);
-                LOGGER.config("Failed to read time bounds from trace: " + traceElement.getName()); //$NON-NLS-1$
+                TraceCompassLogUtils.traceInstant(LOGGER, Level.CONFIG, "Failed to read time bounds", "trace", traceElement.getName()); //$NON-NLS-1$ //$NON-NLS-2$
             } finally {
                 /*
                  * Leave the trace at the same initialization status as
@@ -204,9 +207,9 @@ public class UpdateTraceBoundsJob extends Job {
              */
             newChild.subTask(""); //$NON-NLS-1$
         } catch (IOException e) {
-            LOGGER.config("Failed to write time bounds supplementary file for trace: " + traceElement.getName()); //$NON-NLS-1$
+            TraceCompassLogUtils.traceInstant(LOGGER, Level.CONFIG, "Failed to write time bounds to supplementary file", "trace", traceElement.getName(), "supplementary file", folder.getName()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         } catch (CoreException e) {
-            LOGGER.config("Failed to refresh supplementary files for trace: " + traceElement.getName()); //$NON-NLS-1$
+            TraceCompassLogUtils.traceInstant(LOGGER, Level.CONFIG, "Failed to refresh supplementary file", "trace", traceElement.getName(), "supplementary file", folder.getName()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
     }
 
@@ -247,8 +250,8 @@ public class UpdateTraceBoundsJob extends Job {
                 }
                 traceElement.refreshViewer();
             } catch (IOException e) {
+                TraceCompassLogUtils.traceInstant(LOGGER, Level.CONFIG, "Failed to read time bounds", "trace", traceElement.getName(), "bounds file", boundsFile.getAbsoluteFile()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 boundsFile.delete();
-                LOGGER.config("Failed to read time bounds supplementary file for trace: " + traceElement.getName()); //$NON-NLS-1$
             }
         }
     }

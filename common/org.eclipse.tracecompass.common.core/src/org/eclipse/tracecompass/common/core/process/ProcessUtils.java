@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.CoreException;
@@ -24,6 +26,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.internal.common.core.Activator;
 
 import com.google.common.base.Charsets;
@@ -36,6 +40,8 @@ import com.google.common.base.Charsets;
  * @since 2.2
  */
 public final class ProcessUtils {
+
+    private static final Logger LOGGER = TraceCompassLog.getLogger(ProcessUtils.class);
 
     private static final int PROGRESS_DURATION = 1000;
 
@@ -50,7 +56,7 @@ public final class ProcessUtils {
      * @return The process's standard output upon completion
      */
     public static @Nullable List<String> getOutputFromCommand(List<String> command) {
-        try {
+        try (TraceCompassLogUtils.ScopeLog sl = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ProcessUtils#getOutputFromComment", "args", command)) { //$NON-NLS-1$ //$NON-NLS-2$
             ProcessBuilder builder = new ProcessBuilder(command);
             builder.redirectErrorStream(true);
 
@@ -135,7 +141,7 @@ public final class ProcessUtils {
         CancellableRunnable cancellerRunnable = null;
         Thread cancellerThread = null;
 
-        try {
+        try (TraceCompassLogUtils.ScopeLog sl = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ProcessUtils#getOutputFromCommandCancellable", "MainTaskName", mainTaskName, "args", command)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             monitor.beginTask(mainTaskName, PROGRESS_DURATION);
 
             ProcessBuilder builder = new ProcessBuilder(command);

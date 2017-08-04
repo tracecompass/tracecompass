@@ -73,5 +73,4 @@ public class LttngUstCallStackAnalysis extends CallStackAnalysis {
         }
         return requirements;
     }
-
 }
