@@ -13,11 +13,10 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources;
 
-import java.util.Iterator;
+import java.util.Comparator;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
@@ -29,7 +28,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 public class ResourcesEntry extends TimeGraphEntry implements Comparable<ITimeGraphEntry> {
 
     /** Type of resource */
-    public static enum Type {
+    public enum Type {
         /** Null resources (filler rows, etc.) */
         NULL,
         /** Entries for CPUs */
@@ -39,6 +38,15 @@ public class ResourcesEntry extends TimeGraphEntry implements Comparable<ITimeGr
         /** Entries for Soft IRQ */
         SOFT_IRQ
     }
+
+    /**
+     * Resources entry names should all be of type "ABC 123"
+     *
+     * We want to filter on the Type first (the "ABC" part), then on the ID ("123")
+     * in numerical order (so we get 1,2,10 and not 1,10,2).
+     */
+    private static final Comparator<ResourcesEntry> COMPARATOR = Comparator.comparing(ResourcesEntry::getType)
+            .thenComparingInt(ResourcesEntry::getId);
 
     private final int fId;
     private final @NonNull ITmfTrace fTrace;
@@ -157,10 +165,7 @@ public class ResourcesEntry extends TimeGraphEntry implements Comparable<ITimeGr
 
     @Override
     public boolean hasTimeEvents() {
-        if (fType == Type.NULL) {
-            return false;
-        }
-        return true;
+        return fType != Type.NULL;
     }
 
     @Override
@@ -171,24 +176,7 @@ public class ResourcesEntry extends TimeGraphEntry implements Comparable<ITimeGr
              */
             return -1;
         }
-        ResourcesEntry o = (ResourcesEntry) other;
-
-        /*
-         * Resources entry names should all be of type "ABC 123"
-         *
-         * We want to filter on the Type first (the "ABC" part), then on the ID
-         * ("123") in numerical order (so we get 1,2,10 and not 1,10,2).
-         */
-        int ret = this.getType().compareTo(o.getType());
-        if (ret != 0) {
-            return ret;
-        }
-        return Integer.compare(this.getId(), o.getId());
-    }
-
-    @Override
-    public Iterator<@NonNull ITimeEvent> getTimeEventsIterator() {
-        return super.getTimeEventsIterator();
+        return COMPARATOR.compare(this, (ResourcesEntry) other);
     }
 
 }
