@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 
@@ -28,6 +29,56 @@ import org.eclipse.swt.SWT;
  * An entry for use in the time graph views
  */
 public class TimeGraphEntry implements ITimeGraphEntry {
+
+    /**
+     * Class to describe on which time range and resolution the zoomed entry list is
+     * sampled.
+     *
+     * @author Loic Prieur-Drevon
+     * @since 3.1
+     */
+    public static final class Sampling {
+        private final long fZoomStart;
+        private final long fZoomEnd;
+        private final long fResolution;
+
+        /**
+         * Constructor for a zoom sampling object
+         *
+         * @param zoomStart
+         *            the start time of the zoom
+         * @param zoomEnd
+         *            the end time of the zoom
+         * @param resolution
+         *            the resolution of the zoom
+         */
+        public Sampling(long zoomStart, long zoomEnd, long resolution) {
+            fZoomStart = zoomStart;
+            fZoomEnd = zoomEnd;
+            fResolution = resolution;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(fZoomStart, fZoomEnd, fResolution);
+        }
+
+        @Override
+        public boolean equals(Object arg0) {
+            if (arg0 == this) {
+                return true;
+            }
+            if (arg0 == null) {
+                return false;
+            }
+            if (arg0 instanceof Sampling) {
+                Sampling other = (Sampling) arg0;
+                return fZoomStart == other.fZoomStart && fZoomEnd == other.fZoomEnd && fResolution == other.fResolution;
+            }
+            return false;
+        }
+
+    }
 
     /** Entry's parent */
     private TimeGraphEntry fParent = null;
@@ -42,6 +93,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     private @NonNull List<ITimeEvent> fEventList = new ArrayList<>();
     private @NonNull List<ITimeEvent> fZoomedEventList = new ArrayList<>();
     private Comparator<ITimeGraphEntry> fComparator;
+    private Sampling fSampling;
 
     /**
      * Constructor
@@ -201,6 +253,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
             fZoomedEventList = eventList;
         } else {
             fZoomedEventList = new ArrayList<>();
+            fSampling = null;
         }
     }
 
@@ -331,6 +384,28 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     public boolean matches(@NonNull Pattern pattern) {
         // Default implementation
         return pattern.matcher(fName).find();
+    }
+
+    /**
+     * Getter for the zoom sampling of this entry
+     *
+     * @return the zoom parameters of the current zoom event sampling.
+     * @since 3.1
+     */
+    public Sampling getSampling() {
+        return fSampling;
+    }
+
+    /**
+     * Setter for the zoom sampling of this entry.
+     *
+     * @param sampling
+     *            the sampling parameters used to compute the current zoomed event
+     *            list.
+     * @since 3.1
+     */
+    public void setSampling(Sampling sampling) {
+        fSampling = sampling;
     }
 
 }

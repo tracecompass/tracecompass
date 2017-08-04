@@ -20,9 +20,11 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +74,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -132,6 +136,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.MarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sampling;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 import org.eclipse.ui.IActionBars;
@@ -147,6 +152,7 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.ide.IDE;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 /**
  * An abstract view all time graph views can inherit
@@ -165,6 +171,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private static final Pattern RGBA_PATTERN = Pattern.compile("RGBA \\{(\\d+), (\\d+), (\\d+), (\\d+)\\}"); //$NON-NLS-1$
 
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(AbstractTimeGraphView.class);
+
+    private static final int DEFAULT_BUFFER_SIZE = 10;
 
     /**
      * Redraw state enum
@@ -276,6 +284,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     /** Flag to indicate to reveal selection */
     private volatile boolean fIsRevealSelection = false;
+
+    /**
+     * Set of visible entries to zoom on.
+     */
+    private @NonNull Set<@NonNull TimeGraphEntry> fVisibleEntries = Collections.emptySet();
 
     /**
      * Menu Manager for context-sensitive menu for time graph entries. This will
@@ -511,31 +524,29 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     private class ZoomThreadByEntry extends ZoomThread {
-        private final @NonNull List<TimeGraphEntry> fZoomEntryList;
+        private final @NonNull Collection<@NonNull TimeGraphEntry> fEntries;
 
-        public ZoomThreadByEntry(@NonNull List<TimeGraphEntry> entryList, long startTime, long endTime, long resolution) {
+        public ZoomThreadByEntry(@NonNull Collection<@NonNull TimeGraphEntry> entries, long startTime, long endTime, long resolution) {
             super(startTime, endTime, resolution);
-            fZoomEntryList = entryList;
+            fEntries = entries;
         }
 
         @Override
         public void doRun() {
+            Sampling sampling = new Sampling(getZoomStartTime(), getZoomEndTime(), getResolution());
             try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStates")) { //$NON-NLS-1$
-                for (TimeGraphEntry entry : fZoomEntryList) {
-                    if (getMonitor().isCanceled()) {
-                        log.addData("canceled", true); //$NON-NLS-1$
-                        return;
-                    }
-                    if (entry == null) {
-                        break;
-                    }
-                    zoom(entry, getMonitor());
+                if (getZoomStartTime() <= fStartTime && getZoomEndTime() >= fEndTime) {
+                    // Fall back on the full event list
+                    applyResults(() -> fEntries.forEach(entry -> entry.setZoomedEventList(null)));
+                } else {
+                    Iterable<@NonNull TimeGraphEntry> incorrectSample = Iterables.filter(fEntries, entry -> !sampling.equals(entry.getSampling()));
+                    zoomEntries(incorrectSample, getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
                 }
             }
-            List<ILinkEvent> events;
+            List<ILinkEvent> links;
             try (TraceCompassLogUtils.ScopeLog linkLog = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingLinks")) { //$NON-NLS-1$
                 /* Refresh the arrows when zooming */
-                events = getLinkList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
+                links = getLinkList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
             }
             /* Refresh the view-specific markers when zooming */
             try (TraceCompassLogUtils.ScopeLog markerLoglog = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingMarkers")) { //$NON-NLS-1$
@@ -543,8 +554,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 /* Refresh the trace-specific markers when zooming */
                 markers.addAll(getTraceMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
                 applyResults(() -> {
-                    if (events != null) {
-                        fTimeGraphViewer.setLinks(events);
+                    if (links != null) {
+                        fTimeGraphViewer.setLinks(links);
                     }
                     fTimeGraphViewer.setMarkerCategories(getMarkerCategories());
                     fTimeGraphViewer.setMarkers(markers);
@@ -553,28 +564,40 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             }
         }
 
-        private void zoom(@NonNull TimeGraphEntry entry, @NonNull IProgressMonitor monitor) {
-            if (getZoomStartTime() <= fStartTime && getZoomEndTime() >= fEndTime) {
-                applyResults(() -> {
-                    entry.setZoomedEventList(null);
-                });
-            } else {
-                List<ITimeEvent> zoomedEventList = getEventList(entry, getZoomStartTime(), getZoomEndTime(), getResolution(), monitor);
-                if (zoomedEventList != null) {
-                    applyResults(() -> {
-                        entry.setZoomedEventList(zoomedEventList);
-                    });
-                }
+    }
+
+    /**
+     * Add events from the queried time range to the queried entries.
+     * <p>
+     * Called from the ZoomThread for every entry to update the zoomed event list.
+     * <p>
+     * The implementation should call {@link TimeGraphEntry#setSampling(Sampling)}
+     * if the zoomed event list is successfully set.
+     *
+     * @param entries
+     *            List of entries to zoom on.
+     * @param zoomStartTime
+     *            Start of the time range
+     * @param zoomEndTime
+     *            End of the time range
+     * @param resolution
+     *            The resolution
+     * @param monitor
+     *            The progress monitor object
+     * @since 3.1
+     */
+    protected void zoomEntries(@NonNull Iterable<@NonNull TimeGraphEntry> entries,
+            long zoomStartTime, long zoomEndTime, long resolution, @NonNull IProgressMonitor monitor) {
+        for (TimeGraphEntry entry : entries) {
+            List<ITimeEvent> zoomedEventList = getEventList(entry, zoomStartTime, zoomEndTime, resolution, monitor);
+            if (monitor.isCanceled()) {
+                return;
             }
-            redraw();
-            for (TimeGraphEntry child : entry.getChildren()) {
-                if (monitor.isCanceled()) {
-                    return;
-                }
-                zoom(child, monitor);
+            if (zoomedEventList != null) {
+                applyResults(() -> entry.setZoomedEventList(zoomedEventList));
             }
         }
-
+        redraw();
     }
 
     // ------------------------------------------------------------------------
@@ -1049,6 +1072,35 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             }
         });
 
+        fTimeGraphViewer.getTimeGraphControl().addPaintListener(new PaintListener() {
+
+            /**
+             * This paint control allows the virtual time graph refresh to occur on paint
+             * events instead of just scrolling the time axis or zooming. To avoid
+             * refreshing the model on every paint event, we use a TmfUiRefreshHandler to
+             * coalesce requests and only execute the last one, we also check if the entries
+             * have changed to avoid useless model refresh.
+             *
+             * @param e
+             *            paint event on the visible area
+             */
+            @Override
+            public void paintControl(PaintEvent e) {
+                TmfUiRefreshHandler.getInstance().queueUpdate(this, () -> {
+                    Set<@NonNull TimeGraphEntry> newSet = getVisibleItems(DEFAULT_BUFFER_SIZE);
+                    if (!fVisibleEntries.equals(newSet)) {
+                        /*
+                         * Start a zoom thread if the set of visible entries has changed. We do not use
+                         * lists as the order is not important. We cannot use the start index / size of
+                         * the visible entries as we can collapse / reorder events.
+                         */
+                        fVisibleEntries = newSet;
+                        startZoomThread(getTimeGraphViewer().getTime0(), getTimeGraphViewer().getTime1());
+                    }
+                });
+            }
+        });
+
         fTimeGraphViewer.setTimeFormat(TimeFormat.CALENDAR);
 
         IStatusLineManager statusLineManager = getViewSite().getActionBars().getStatusLineManager();
@@ -1071,6 +1123,38 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         createContextMenu();
         fPartListener = new TimeGraphPartListener();
         getSite().getPage().addPartListener(fPartListener);
+    }
+
+    /**
+     * Find which items are visible in the view
+     *
+     * @param buffer
+     *            number of Items above and below border that we want to add to the
+     *            list
+     * @return a list of Items visible in the view with buffer above and below limit
+     */
+    private @NonNull Set<@NonNull TimeGraphEntry> getVisibleItems(int buffer) {
+        TimeGraphControl timeGraphControl = fTimeGraphViewer.getTimeGraphControl();
+        if (timeGraphControl.isDisposed()) {
+            return Collections.emptySet();
+        }
+
+        int start = Integer.max(0, fTimeGraphViewer.getTopIndex() - buffer);
+        int end = Integer.min(fTimeGraphViewer.getExpandedElementCount() - 1,
+                fTimeGraphViewer.getTopIndex() + timeGraphControl.countPerPage() + buffer);
+
+        Set<@NonNull TimeGraphEntry> visible = new HashSet<>(end - start + 1);
+        for (int i = start; i <= end; i++) {
+            /*
+             * Use the getExpandedElement by index to avoid creating a copy of all the the
+             * elements.
+             */
+            TimeGraphEntry element = (TimeGraphEntry) timeGraphControl.getExpandedElement(i);
+            if (element != null) {
+                visible.add(element);
+            }
+        }
+        return visible;
     }
 
     @Override
@@ -1443,9 +1527,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *            The progress monitor object
      * @return The list of events for the entry
      */
-    protected abstract @Nullable List<@NonNull ITimeEvent> getEventList(@NonNull TimeGraphEntry entry,
-            long startTime, long endTime, long resolution,
-            @NonNull IProgressMonitor monitor);
+    protected @Nullable List<@NonNull ITimeEvent> getEventList(@NonNull TimeGraphEntry entry,
+            long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor) {
+        return new ArrayList<>();
+    }
 
     /**
      * Gets the list of links (displayed as arrows) for a trace in a given
@@ -1704,10 +1789,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             fZoomThread = zoomThread;
             if (zoomThread != null) {
                 zoomThread.setScopeId(log.getId());
-                // Don't start a new thread right away if results are being
-                // applied
-                // from an old ZoomThread. Otherwise, the old results might
-                // overwrite the new results if it finishes after.
+                /*
+                 * Don't start a new thread right away if results are being applied from an old
+                 * ZoomThread. Otherwise, the old results might overwrite the new results if it
+                 * finishes after.
+                 */
                 synchronized (fZoomThreadResultLock) {
                     zoomThread.start();
                     // zoomThread decrements, so we increment here
@@ -1736,11 +1822,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @since 1.1
      */
     protected @Nullable ZoomThread createZoomThread(long startTime, long endTime, long resolution, boolean restart) {
-        final List<TimeGraphEntry> entryList = fEntryList;
-        if (entryList == null) {
-            return null;
-        }
-        return new ZoomThreadByEntry(entryList, startTime, endTime, resolution);
+        return new ZoomThreadByEntry(getVisibleItems(DEFAULT_BUFFER_SIZE), startTime, endTime, resolution);
     }
 
     private void makeActions() {

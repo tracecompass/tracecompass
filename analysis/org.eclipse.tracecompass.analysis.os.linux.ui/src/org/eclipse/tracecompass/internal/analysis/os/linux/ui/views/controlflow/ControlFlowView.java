@@ -75,15 +75,15 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
-import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractVirtualTimeGraphView;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sampling;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.VirtualTimeGraphEntry.Sampling;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
@@ -98,7 +98,7 @@ import com.google.common.collect.TreeMultimap;
 /**
  * The Control Flow view main object
  */
-public class ControlFlowView extends AbstractVirtualTimeGraphView {
+public class ControlFlowView extends AbstractTimeGraphView {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -722,7 +722,7 @@ public class ControlFlowView extends AbstractVirtualTimeGraphView {
 
             final long resolution = Long.max(1, (end - ssq.getStartTime()) / getDisplayWidth());
             /* Transform is just to change the type. */
-            Iterable<ITimeGraphEntry> entries = Iterables.transform(entryList, e -> (ITimeGraphEntry) e);
+            Iterable<TimeGraphEntry> entries = Iterables.transform(entryList, e -> (TimeGraphEntry) e);
             zoomEntries(entries, ssq.getStartTime(), end, resolution, monitor);
 
             if (parentTrace.equals(getTrace())) {
@@ -824,9 +824,9 @@ public class ControlFlowView extends AbstractVirtualTimeGraphView {
     }
 
     @Override
-    protected void zoomEntries(@NonNull Iterable<ITimeGraphEntry> entries, long zoomStartTime, long zoomEndTime,
+    protected void zoomEntries(@NonNull Iterable<@NonNull TimeGraphEntry> entries, long zoomStartTime, long zoomEndTime,
             long resolution, @NonNull IProgressMonitor monitor) {
-        boolean isZoomThread = Thread.currentThread() instanceof ZoomThreadVisible;
+        boolean isZoomThread = Thread.currentThread() instanceof ZoomThread;
         Table<ITmfStateSystem, Integer, ControlFlowEntry> table = filterGroupEntries(entries, zoomStartTime, zoomEndTime);
         TreeMultimap<Integer, ITmfStateInterval> intervals = TreeMultimap.create(Comparator.naturalOrder(),
                 Comparator.comparingLong(ITmfStateInterval::getStartTime));
@@ -891,7 +891,7 @@ public class ControlFlowView extends AbstractVirtualTimeGraphView {
      * @return A Table of the visible entries keyed by their state system and status
      *         interval quark.
      */
-    private static Table<ITmfStateSystem, Integer, ControlFlowEntry> filterGroupEntries(Iterable<ITimeGraphEntry> visible,
+    private static Table<ITmfStateSystem, Integer, ControlFlowEntry> filterGroupEntries(Iterable<TimeGraphEntry> visible,
             long zoomStartTime, long zoomEndTime) {
         Table<ITmfStateSystem, Integer, ControlFlowEntry> quarksToEntries = HashBasedTable.create();
         for (ControlFlowEntry entry : Iterables.filter(visible, ControlFlowEntry.class)) {
