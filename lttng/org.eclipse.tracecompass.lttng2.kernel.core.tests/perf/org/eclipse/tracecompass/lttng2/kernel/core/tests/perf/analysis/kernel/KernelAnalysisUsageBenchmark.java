@@ -9,9 +9,12 @@
 
 package org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.analysis.kernel;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -25,8 +28,10 @@ import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelThreadInform
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -37,6 +42,8 @@ import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.junit.Test;
 
+import com.google.common.collect.Iterables;
+
 /**
  * Benchmarks some typical usages of the kernel analysis
  *
@@ -45,11 +52,15 @@ import org.junit.Test;
 public class KernelAnalysisUsageBenchmark {
 
     private static final String TEST_GET_RUNNING_THREAD = "Kernel: Threads On CPU";
-    private static final String TEST_FULL_QUERIES = "Kernel: Full Queries";
+    private static final String TEST_CFV_ZOOM = "Kernel: Zoom control flow";
+    private static final String TEST_BUILD_ENTRY_LIST = "Kernel: build control flow entries";
     private static final int LOOP_COUNT = 25;
     private static final long SEED = 65423897234L;
     private static final int NUM_CPU_QUERIES = 20000;
-    private static final int NUM_FULL_QUERIES = 20000;
+    private static final String WILDCARD = "*";
+    private static final int STEP = 32;
+    private static final int TYPICAL_MONITOR_WIDTH = 2000;
+    private static final int NUM_DISJOINT_TIME_ARRAYS = 10;
 
     /**
      * Run the benchmark with "trace2"
@@ -191,37 +202,60 @@ public class KernelAnalysisUsageBenchmark {
     private static void benchmarkFullQueries(String testName, KernelAnalysisModule module) {
 
         Performance perf = Performance.getDefault();
-        PerformanceMeter pmRunningThread = perf.createPerformanceMeter(KernelAnalysisBenchmark.TEST_ID + testName + ": " + TEST_FULL_QUERIES);
-        perf.tagAsSummary(pmRunningThread, TEST_FULL_QUERIES + '(' + testName + ')', Dimension.CPU_TIME);
+        PerformanceMeter pmRunningThread = perf.createPerformanceMeter(KernelAnalysisBenchmark.TEST_ID + testName + ": " + TEST_CFV_ZOOM);
+        perf.tagAsSummary(pmRunningThread, TEST_CFV_ZOOM + '(' + testName + ')', Dimension.CPU_TIME);
+        PerformanceMeter buildEntryList = perf.createPerformanceMeter(KernelAnalysisBenchmark.TEST_ID + testName + ": " + TEST_BUILD_ENTRY_LIST);
+        perf.tagAsSummary(buildEntryList, TEST_BUILD_ENTRY_LIST + '(' + testName + ')', Dimension.CPU_TIME);
 
         @Nullable
         ITmfStateSystem ss = module.getStateSystem();
-        if (ss == null) {
-            fail("The state system is null");
-            return;
-        }
+        assertNotNull("The state system is null", ss);
 
         /* Get the step and start time of the queries */
         long startTime = ss.getStartTime();
         long endTime = ss.getCurrentEndTime();
-        long step = Math.floorDiv(endTime - startTime, NUM_FULL_QUERIES);
+        long delta = (endTime - startTime) / NUM_DISJOINT_TIME_ARRAYS;
+        assertFalse("Trace is too short to run the get full queries benchmark", delta < 1l);
 
-        if (step < 1) {
-            fail("Trace is too short to run the get full queries benchmark");
-        }
+        /* Create a List with the threads' PPID and EXEC_NAME quarks for the 2D query .*/
+        List<Integer> entryListQuarks = new ArrayList<>(ss.getQuarks(Attributes.THREADS, WILDCARD, Attributes.EXEC_NAME));
+        entryListQuarks.addAll(ss.getQuarks(Attributes.THREADS, WILDCARD, Attributes.PPID));
+        List<@NonNull Integer> threadQuarks = ss.getQuarks(Attributes.THREADS, WILDCARD);
 
         for (int i = 0; i < LOOP_COUNT; i++) {
-            /* Make a full query at fixed intervals */
+            buildEntryList.start();
+            try {
+                Iterables.size(ss.query2D(entryListQuarks, startTime, endTime));
+            } catch (IndexOutOfBoundsException | TimeRangeException | StateSystemDisposedException e) {
+                fail(e.getMessage());
+            }
+            buildEntryList.stop();
+
+            Random randomGenerator = new Random(SEED);
             pmRunningThread.start();
-            for (long nextTime = startTime; nextTime < endTime; nextTime += step) {
-                try {
-                    ss.queryFullState(nextTime);
-                } catch (StateSystemDisposedException e) {
-                    fail(e.getMessage());
+            try {
+                for (long t = startTime; t < endTime - delta; t += delta) {
+                    /*
+                     * Create a list of threads to zoom on, limit it to 32 because the timegraph is
+                     * virtual
+                     */
+                    int startPos = Math.abs(randomGenerator.nextInt()) % threadQuarks.size();
+                    List<Integer> zoomQuarks = threadQuarks.subList(startPos, Math.min(startPos + STEP, threadQuarks.size() - 1));
+
+                    /*
+                     * sample the number of points to display on each 10th of the trace range for 2k
+                     * points. Do the loop inside the zoom PerformanceMeter for benchmark parity
+                     * with the previous full queries.
+                     */
+                    List<Long> times = StateSystemUtils.getTimes(startTime, t + delta, delta / TYPICAL_MONITOR_WIDTH);
+                    Iterables.size(ss.query2D(zoomQuarks, times));
                 }
+            } catch (IndexOutOfBoundsException | TimeRangeException | StateSystemDisposedException e) {
+                fail(e.getMessage());
             }
             pmRunningThread.stop();
         }
+        buildEntryList.commit();
         pmRunningThread.commit();
     }
 }
