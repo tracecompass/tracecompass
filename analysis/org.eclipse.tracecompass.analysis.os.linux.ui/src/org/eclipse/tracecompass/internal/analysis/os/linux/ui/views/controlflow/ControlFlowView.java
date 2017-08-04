@@ -83,6 +83,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.VirtualTimeGraphEntry.Sampling;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
@@ -815,6 +816,8 @@ public class ControlFlowView extends AbstractVirtualTimeGraphView {
             long resolution, @NonNull IProgressMonitor monitor) {
         boolean isZoomThread = Thread.currentThread() instanceof ZoomThreadVisible;
         Table<ITmfStateSystem, Integer, ControlFlowEntry> table = filterGroupEntries(entries, zoomStartTime, zoomEndTime);
+        TreeMultimap<Integer, ITmfStateInterval> intervals = TreeMultimap.create(Comparator.naturalOrder(),
+                Comparator.comparingLong(ITmfStateInterval::getStartTime));
 
         for (Entry<ITmfStateSystem, Map<Integer, ControlFlowEntry>> ssEntries : table.rowMap().entrySet()) {
             ITmfStateSystem ss = ssEntries.getKey();
@@ -824,6 +827,7 @@ public class ControlFlowView extends AbstractVirtualTimeGraphView {
             if (start > end) {
                 continue;
             }
+            Sampling clampedSampling = new Sampling(start, end, resolution);
             List<Long> times = StateSystemUtils.getTimes(start, end, resolution);
             Map<Integer, ControlFlowEntry> quarksToEntries = ssEntries.getValue();
             /* Do the actual query */
@@ -832,16 +836,32 @@ public class ControlFlowView extends AbstractVirtualTimeGraphView {
                     if (monitor.isCanceled()) {
                         return;
                     }
-                    /* Find the associated ControlFlowEntry */
-                    ControlFlowEntry controlFlowEntry = quarksToEntries.get(interval.getAttribute());
-                    if (controlFlowEntry != null) {
-                        addTimeEvent(interval, controlFlowEntry, isZoomThread);
+                    intervals.put(interval.getAttribute(), interval);
+                }
+                for (Entry<Integer, Collection<ITmfStateInterval>> e : intervals.asMap().entrySet()) {
+                    ControlFlowEntry controlFlowEntry = quarksToEntries.get(e.getKey());
+                    if (controlFlowEntry == null) {
+                        continue;
+                    }
+                    List<ITimeEvent> events = createTimeEvents(controlFlowEntry, e.getValue());
+                    if (monitor.isCanceled()) {
+                        return;
+                    }
+                    if (isZoomThread) {
+                        applyResults(() -> {
+                            controlFlowEntry.setZoomedEventList(events);
+                            controlFlowEntry.setSampling(clampedSampling);
+                        });
+                    } else {
+                        controlFlowEntry.setEventList(events);
                     }
                 }
             } catch (TimeRangeException e) {
                 Activator.getDefault().logError("CFV: incorrect query times for zoomEvent", e); //$NON-NLS-1$
             } catch (StateSystemDisposedException e) {
                 // If the state system was disposed, the trace was closed, nothing to do here.
+            } finally {
+                intervals.clear();
             }
         }
     }
@@ -891,26 +911,41 @@ public class ControlFlowView extends AbstractVirtualTimeGraphView {
         return null;
     }
 
+    private static List<ITimeEvent> createTimeEvents(ControlFlowEntry controlFlowEntry, Collection<ITmfStateInterval> value) {
+        List<ITimeEvent> events = new ArrayList<>(value.size());
+        ITimeEvent prev = null;
+        for (ITmfStateInterval interval : value) {
+            ITimeEvent event = createTimeEvent(interval, controlFlowEntry);
+            if (prev != null) {
+                long prevEnd = prev.getTime() + prev.getDuration();
+                if (prevEnd < event.getTime()) {
+                    // fill in the gap.
+                    events.add(new TimeEvent(controlFlowEntry, prevEnd, event.getTime() - prevEnd));
+                }
+            }
+            prev = event;
+            events.add(event);
+        }
+        return events;
+    }
+
     /**
-     * Insert a {@link TimeEvent} from an {@link ITmfStateInterval} into a
+     * Create a {@link TimeEvent} from an {@link ITmfStateInterval} for a
      * {@link ControlFlowEntry}.
      *
      * @param controlFlowEntry
      *            control flow entry which receives the new entry.
      * @param interval
      *            state interval which will generate the new event
-     * @param isZoomThread
-     *            if we add this event to the zoomed event list or not
      */
-    private static void addTimeEvent(ITmfStateInterval interval, ControlFlowEntry controlFlowEntry, boolean isZoomThread) {
+    private static TimeEvent createTimeEvent(ITmfStateInterval interval, ControlFlowEntry controlFlowEntry) {
         long startTime = interval.getStartTime();
         long duration = interval.getEndTime() - startTime + 1;
         Object status = interval.getValue();
         if (status instanceof Integer) {
-            controlFlowEntry.insertEvent(new TimeEvent(controlFlowEntry, startTime, duration, (int) status), isZoomThread);
-        } else {
-            controlFlowEntry.insertEvent(new NullTimeEvent(controlFlowEntry, startTime, duration), isZoomThread);
+            return new TimeEvent(controlFlowEntry, startTime, duration, (int) status);
         }
+        return new NullTimeEvent(controlFlowEntry, startTime, duration);
     }
 
     @Override

@@ -468,11 +468,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
          * @since 2.0
          */
         protected void applyResults(Runnable runnable) {
-            synchronized (fZoomThreadResultLock) {
-                if (this == fZoomThread) {
-                    runnable.run();
-                }
-            }
+            AbstractTimeGraphView.this.applyResults(runnable);
         }
 
         /**
@@ -493,6 +489,24 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
          */
         public void setScopeId(int scopeId) {
             fScopeId = scopeId;
+        }
+    }
+
+    /**
+     * Applies the results of the ZoomThread calculations.
+     *
+     * Note: This method makes sure that only the results of the last
+     * created ZoomThread are applied.
+     *
+     * @param runnable
+     *            the code to run in order to apply the results
+     * @since 3.1
+     */
+    protected void applyResults(Runnable runnable) {
+        synchronized (fZoomThreadResultLock) {
+            if (Thread.currentThread() == fZoomThread) {
+                runnable.run();
+            }
         }
     }
 

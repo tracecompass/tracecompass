@@ -37,8 +37,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.VirtualTimeGraphE
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.VirtualTimeGraphEntry.Sampling;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 
-import com.google.common.collect.Iterables;
-
 /**
  * An abstract time graph view where only the visible elements are queried. This
  * largely reduces the amount of processing to do on views with large numbers of
@@ -81,11 +79,8 @@ public abstract class AbstractVirtualTimeGraphView extends AbstractTimeGraphView
         public void doRun() {
             final @NonNull Sampling sampling = new Sampling(getZoomStartTime(), getZoomEndTime(), getResolution());
             Iterable<ITimeGraphEntry> newVisibleEntries = filterEntries(fVisibleEntries, sampling);
-            Iterable<VirtualTimeGraphEntry> virtualGraphEntryList = Iterables.filter(newVisibleEntries, VirtualTimeGraphEntry.class);
 
-            virtualGraphEntryList.forEach(v -> v.setZoomedEventList(null));
             zoomEntries(newVisibleEntries, getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
-            completeZoom(virtualGraphEntryList, sampling);
 
             List<ILinkEvent> links = getLinks(sampling);
             /* Refresh the view-specific markers when zooming */
@@ -102,8 +97,8 @@ public abstract class AbstractVirtualTimeGraphView extends AbstractTimeGraphView
         }
 
         /**
-         * Filter the visible entries to keep only the {@link VirtualTimeGraphEntry}s
-         * with an invalid {@link Sampling},
+         * Filter the visible entries to keep {@link TimeGraphEntry}s and only the
+         * {@link VirtualTimeGraphEntry}s with an invalid {@link Sampling}.
          *
          * @param visibleEntries
          *            list of entries to filter.
@@ -112,25 +107,17 @@ public abstract class AbstractVirtualTimeGraphView extends AbstractTimeGraphView
          */
         private @NonNull Iterable<ITimeGraphEntry> filterEntries(@NonNull Set<ITimeGraphEntry> visibleEntries, Sampling sampling) {
             List<ITimeGraphEntry> filter = new ArrayList<>(visibleEntries.size());
-            for (VirtualTimeGraphEntry entry : Iterables.filter(visibleEntries, VirtualTimeGraphEntry.class)) {
-                if (!sampling.equals(entry.getSampling())) {
+            for (ITimeGraphEntry entry : visibleEntries) {
+                if (entry instanceof VirtualTimeGraphEntry) {
+                    VirtualTimeGraphEntry virtual = (VirtualTimeGraphEntry) entry;
+                    if (!sampling.equals(virtual.getSampling())) {
+                        filter.add(virtual);
+                    }
+                } else if (entry instanceof TimeGraphEntry && entry.hasTimeEvents()) {
                     filter.add(entry);
                 }
             }
             return filter;
-        }
-
-        private void completeZoom(Iterable<VirtualTimeGraphEntry> entries, final Sampling sampling) {
-            if (!getMonitor().isCanceled()) {
-                for (VirtualTimeGraphEntry entry : entries) {
-                    entry.fillZoomedEventList();
-                    entry.setSampling(sampling);
-                }
-            } else {
-                for (VirtualTimeGraphEntry entry : entries) {
-                    entry.setSampling(null);
-                }
-            }
         }
 
         /**
@@ -244,6 +231,9 @@ public abstract class AbstractVirtualTimeGraphView extends AbstractTimeGraphView
      * Add events from the queried time range to the queried entries.
      * <p>
      * Called from the ZoomThread for every entry to update the zoomed event list.
+     * <p>
+     * The implementation should update the sampling in the
+     * {@link VirtualTimeGraphEntry} if the zoomed event list is successfully set.
      *
      * @param entries
      *            List of entries to zoom on.
