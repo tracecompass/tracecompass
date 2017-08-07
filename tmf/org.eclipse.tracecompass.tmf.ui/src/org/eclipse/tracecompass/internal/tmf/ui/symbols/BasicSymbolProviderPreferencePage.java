@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -268,7 +267,7 @@ public class BasicSymbolProviderPreferencePage extends AbstractSymbolProviderPre
             boolean isBinaryFile = isBinaryFile(fullPath);
             if (isBinaryFile) {
                 results = FunctionNameMapper.mapFromBinaryFile(file);
-            } else if ("txt".equals(FilenameUtils.getExtension(fileName))) { //$NON-NLS-1$
+            } else {
                 results = FunctionNameMapper.mapFromNmTextFile(file);
             }
 
