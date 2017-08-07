@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,8 +39,10 @@ import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -65,8 +68,8 @@ public final class FunctionNameMapper {
      *            The file to import
      * @return A map&lt;address, function name&gt; of the results
      */
-    public static @Nullable Map<Long, String> mapFromNmTextFile(File mappingFile) {
-        Map<Long, String> map = new TreeMap<>();
+    public static @Nullable Map<Long, TmfResolvedSymbol> mapFromNmTextFile(File mappingFile) {
+        Map<Long, TmfResolvedSymbol> map = new TreeMap<>();
 
         try (FileReader fr = new FileReader(mappingFile);
                 BufferedReader reader = new BufferedReader(fr);) {
@@ -75,8 +78,8 @@ public final class FunctionNameMapper {
                 Matcher matcher = pattern.matcher(line);
                 if (matcher.find()) {
                     long address = Long.parseLong(stripLeadingZeros(matcher.group(1)), 16);
-                    String name = matcher.group(3);
-                    map.put(address, name);
+                    String name = Objects.requireNonNull(matcher.group(3));
+                    map.put(address, new TmfResolvedSymbol(address, name));
                 }
             }
         } catch (FileNotFoundException e) {
@@ -98,14 +101,15 @@ public final class FunctionNameMapper {
      *            The file to import
      * @return A map&lt;address, function name&gt; of the results
      */
-    public static @Nullable Map<Long, String> mapFromBinaryFile(File file) {
-        Map<Long, String> map = new TreeMap<>();
+    public static Map<@NonNull Long, @NonNull TmfResolvedSymbol> mapFromBinaryFile(File file) {
+        Map<@NonNull Long, @NonNull TmfResolvedSymbol> map = new TreeMap<>();
         IBinaryParser.IBinaryObject binaryObject = getBinaryObject(file);
         if (binaryObject != null) {
             ISymbol[] symbols = binaryObject.getSymbols();
             for (ISymbol symbol : symbols) {
                 String address = symbol.getAddress().toHexAddressString();
-                map.put(Long.decode(address), symbol.getName());
+                Long decodedAddr = Long.decode(address);
+                map.put(decodedAddr, new TmfResolvedSymbol(decodedAddr, Objects.requireNonNull(symbol.getName())));
             }
         }
 

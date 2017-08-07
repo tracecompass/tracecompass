@@ -16,12 +16,11 @@ package org.eclipse.tracecompass.internal.tmf.ui.symbols;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.NavigableMap;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
@@ -83,34 +82,30 @@ public class BasicSymbolProvider implements ISymbolProvider {
 
     @Override
     public @Nullable String getSymbolText(long address) {
-        Entry<Long, String> currentFloorEntry = null;
+        TmfResolvedSymbol currentFloorEntry = null;
         for (MappingFile mf : fMappingFiles) {
-            NavigableMap<Long, String> symbolMapping = mf.getSymbolMapping();
-            Entry<Long, String> floorEntry = symbolMapping.floorEntry(address);
+            TmfResolvedSymbol floorEntry = mf.getSymbolEntry(address);
             if (floorEntry == null) {
                 continue;
             }
-            // See if the symbol returned is the end of a block, in this case, don't
-            // use the floor unless it hits the exact address
-            String value = floorEntry.getValue();
-            long floorValue = floorEntry.getKey().longValue();
-            if (value.endsWith(mf.getEndSuffix()) && floorValue != address) {
-                continue;
-            }
+            long floorValue = floorEntry.getBaseAddress();
             // A symbol may come from different file, prioritize the symbol
             // closest to value
             if (floorValue == address) {
-                return value;
+                return floorEntry.getSymbolName();
             }
             if (currentFloorEntry == null) {
                 currentFloorEntry = floorEntry;
             } else {
-                if (address - floorValue < address - currentFloorEntry.getKey().longValue()) {
+                if (address - floorValue < address - currentFloorEntry.getBaseAddress()) {
                     currentFloorEntry = floorEntry;
                 }
             }
         }
-        return null;
+        if (currentFloorEntry == null) {
+            return null;
+        }
+        return currentFloorEntry.getSymbolName();
     }
 
     @Override

@@ -23,12 +23,14 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import org.eclipse.tracecompass.internal.tmf.core.callstack.FunctionNameMapper;
+import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
 import org.junit.Test;
 
 /**
  * Unit tests for the {@link FunctionNameMapper} class.
  *
  * @author Alexandre Montplaisir
+ * @author Geneviève Bastien
  */
 public class FunctionNameMapperTest {
 
@@ -40,40 +42,45 @@ public class FunctionNameMapperTest {
         Path nmOutput = Paths.get("..", "..", "tmf", "org.eclipse.tracecompass.tmf.core.tests",
                 "testfiles", "callstack" , "nm-output-example");
         assertTrue(Files.exists(nmOutput));
-        Map<Long, String> results = FunctionNameMapper.mapFromNmTextFile(nmOutput.toFile());
+        Map<Long, TmfResolvedSymbol> results = FunctionNameMapper.mapFromNmTextFile(nmOutput.toFile());
 
         assertNotNull(results);
         assertEquals(28, results.size());
-        assertNull(results.get(""));
+        assertNull(results.get(null));
 
-        assertEquals("completed.7259", results.get(Long.valueOf("601190", 16)));
-        assertEquals("data_start", results.get(Long.valueOf("601048", 16)));
-        assertEquals("deregister_tm_clones", results.get(Long.valueOf("400690", 16)));
-        assertEquals("__do_global_dtors_aux", results.get(Long.valueOf("400710", 16)));
-        assertEquals("__dso_handle", results.get(Long.valueOf("601050", 16)));
-        assertEquals("_DYNAMIC", results.get(Long.valueOf("600e18", 16)));
-        assertEquals("_end", results.get(Long.valueOf("601198", 16)));
-        assertEquals("_fini", results.get(Long.valueOf("400874", 16)));
-        assertEquals("frame_dummy", results.get(Long.valueOf("400730", 16)));
-        assertEquals("__FRAME_END__", results.get(Long.valueOf("400a28", 16)));
-        assertEquals("_GLOBAL_OFFSET_TABLE_", results.get(Long.valueOf("601000", 16)));
-        assertEquals("_GLOBAL__sub_I_main", results.get(Long.valueOf("4007ad", 16)));
-        assertEquals("_init", results.get(Long.valueOf("4005d0", 16)));
-        assertEquals("__init_array_end", results.get(Long.valueOf("600e08", 16)));
-        assertEquals("__init_array_start", results.get(Long.valueOf("600df8", 16)));
-        assertEquals("_IO_stdin_used", results.get(Long.valueOf("400880", 16)));
-        assertEquals("__JCR_LIST__", results.get(Long.valueOf("600e10", 16)));
-        assertEquals("__libc_csu_fini", results.get(Long.valueOf("400870", 16)));
-        assertEquals("__libc_csu_init", results.get(Long.valueOf("400800", 16)));
-        assertEquals("main", results.get(Long.valueOf("400756", 16)));
-        assertEquals("register_tm_clones", results.get(Long.valueOf("4006d0", 16)));
-        assertEquals("_start", results.get(Long.valueOf("400660", 16)));
-        assertEquals("__TMC_END__", results.get(Long.valueOf("601058", 16)));
-        assertEquals("Bar<int, int>* foo<int, int>(int, int)", results.get(Long.valueOf("4007c2", 16)));
-        assertEquals("__static_initialization_and_destruction_0(int, int)", results.get(Long.valueOf("400770", 16)));
-        assertEquals("std::cout@@GLIBCXX_3.4", results.get(Long.valueOf("601080", 16)));
-        assertEquals("std::piecewise_construct", results.get(Long.valueOf("400884", 16)));
-        assertEquals("std::__ioinit", results.get(Long.valueOf("601191", 16)));
+        assertSymbolString("completed.7259", "601190", results);
+        assertSymbolString("data_start", "601048", results);
+        assertSymbolString("deregister_tm_clones", "400690", results);
+        assertSymbolString("__do_global_dtors_aux", "400710", results);
+        assertSymbolString("__dso_handle", "601050", results);
+        assertSymbolString("_DYNAMIC", "600e18", results);
+        assertSymbolString("_end", "601198", results);
+        assertSymbolString("_fini", "400874", results);
+        assertSymbolString("frame_dummy", "400730", results);
+        assertSymbolString("__FRAME_END__", "400a28", results);
+        assertSymbolString("_GLOBAL_OFFSET_TABLE_", "601000", results);
+        assertSymbolString("_GLOBAL__sub_I_main", "4007ad", results);
+        assertSymbolString("_init", "4005d0", results);
+        assertSymbolString("__init_array_end", "600e08", results);
+        assertSymbolString("__init_array_start", "600df8", results);
+        assertSymbolString("_IO_stdin_used", "400880", results);
+        assertSymbolString("__JCR_LIST__", "600e10", results);
+        assertSymbolString("__libc_csu_fini", "400870", results);
+        assertSymbolString("__libc_csu_init", "400800", results);
+        assertSymbolString("main", "400756", results);
+        assertSymbolString("register_tm_clones", "4006d0", results);
+        assertSymbolString("_start", "400660", results);
+        assertSymbolString("__TMC_END__", "601058", results);
+        assertSymbolString("Bar<int, int>* foo<int, int>(int, int)", "4007c2", results);
+        assertSymbolString("__static_initialization_and_destruction_0(int, int)", "400770", results);
+        assertSymbolString("std::cout@@GLIBCXX_3.4", "601080", results);
+        assertSymbolString("std::piecewise_construct", "400884", results);
+        assertSymbolString("std::__ioinit", "601191", results);
+    }
 
+    private static void assertSymbolString(String expected, String address, Map<Long, TmfResolvedSymbol> results) {
+        TmfResolvedSymbol symbol = results.get(Long.parseUnsignedLong(address, 16));
+        assertNotNull(symbol);
+        assertEquals(expected, symbol.getSymbolName());
     }
 }

@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.tracecompass.internal.tmf.core.callstack.FunctionNameMapper;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
 import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.symbols.AbstractSymbolProviderPreferencePage;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -263,7 +264,7 @@ public class BasicSymbolProviderPreferencePage extends AbstractSymbolProviderPre
             String fullPath = filterPath + File.separator + fileName;
             File file = new File(fullPath);
 
-            Map<Long, String> results = null;
+            Map<Long, TmfResolvedSymbol> results = null;
             boolean isBinaryFile = isBinaryFile(fullPath);
             if (isBinaryFile) {
                 results = FunctionNameMapper.mapFromBinaryFile(file);

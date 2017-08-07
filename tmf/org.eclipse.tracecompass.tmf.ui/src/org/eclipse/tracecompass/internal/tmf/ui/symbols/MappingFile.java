@@ -17,16 +17,17 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
 
 /**
  * The {@link MappingFile} represents a mapping file selected by a user through
  * the basic symbol provider preference page
  *
  * @author Mikael Ferland
- * @since 3.0
  */
 public final class MappingFile {
 
@@ -34,7 +35,7 @@ public final class MappingFile {
 
     private final String fFullPath;
     private final boolean fIsBinaryFile;
-    private final @NonNull NavigableMap<Long, String> fSymbolMapping;
+    private final @NonNull NavigableMap<Long, TmfResolvedSymbol> fSymbolMapping;
 
     /**
      * Create a new {@link MappingFile}
@@ -46,7 +47,7 @@ public final class MappingFile {
      * @param results
      *            Resolved symbols for the given mapping file
      */
-    public MappingFile(String path, boolean isBinaryFile, Map<Long, String> results) {
+    public MappingFile(String path, boolean isBinaryFile, Map<Long, TmfResolvedSymbol> results) {
         fFullPath = path;
         fIsBinaryFile = isBinaryFile;
         fSymbolMapping = new TreeMap<>(results);
@@ -67,10 +68,22 @@ public final class MappingFile {
     }
 
     /**
-     * @return resolved symbols for the given mapping file
+     * Get the entry that may correspond to the symbol
+     *
+     * @param address
+     *            The address of the symbol to look for
+     * @return The entry with its address/symbol if it's within this mapping's space
      */
-    public NavigableMap<Long, String> getSymbolMapping() {
-        return fSymbolMapping;
+    public TmfResolvedSymbol getSymbolEntry(long address) {
+        Entry<Long, TmfResolvedSymbol> floorEntry = fSymbolMapping.floorEntry(address);
+        if (floorEntry == null) {
+            return null;
+        }
+        // See if the symbol returned is the end of a block, in this case, don't
+        // use the floor unless it hits the exact address
+        TmfResolvedSymbol symbol = floorEntry.getValue();
+        long floorValue = symbol.getBaseAddress();
+        return (symbol.getSymbolName().endsWith(getEndSuffix()) && floorValue != address) ? null : symbol;
     }
 
     /**
