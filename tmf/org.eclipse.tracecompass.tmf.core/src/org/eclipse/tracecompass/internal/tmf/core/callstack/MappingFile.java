@@ -11,31 +11,37 @@
  *
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.tmf.ui.symbols;
+package org.eclipse.tracecompass.internal.tmf.core.callstack;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.symbols.IMappingFile;
 import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
 
 /**
- * The {@link MappingFile} represents a mapping file selected by a user through
- * the basic symbol provider preference page
+ * This class maps addresses to their symbol text. The mappings may contain
+ * several areas of addresses. Each area should end with a symbol with suffix
+ * 'END__', so that if the requested symbol is not an exact match to one of the
+ * mapped symbol, it will return the closest symbol that is lesser than the
+ * requested address, unless that symbol has the end suffix, it is out of the
+ * area of this mapping.
  *
  * @author Mikael Ferland
  */
-public final class MappingFile {
+@NonNullByDefault
+public final class MappingFile implements IMappingFile {
 
-    private final @NonNull String DEFAULT_END_SUFFIX = "END__"; //$NON-NLS-1$
+    private final String DEFAULT_END_SUFFIX = "END__"; //$NON-NLS-1$
 
     private final String fFullPath;
     private final boolean fIsBinaryFile;
-    private final @NonNull NavigableMap<Long, TmfResolvedSymbol> fSymbolMapping;
+    private final NavigableMap<Long, TmfResolvedSymbol> fSymbolMapping;
 
     /**
      * Create a new {@link MappingFile}
@@ -53,35 +59,25 @@ public final class MappingFile {
         fSymbolMapping = new TreeMap<>(results);
     }
 
-    /**
-     * @return path leading to mapping file
-     */
+    @Override
     public String getFullPath() {
         return fFullPath;
     }
 
-    /**
-     * @return type of the mapping file
-     */
+    @Override
     public boolean isBinaryFile() {
         return fIsBinaryFile;
     }
 
-    /**
-     * Get the entry that may correspond to the symbol
-     *
-     * @param address
-     *            The address of the symbol to look for
-     * @return The entry with its address/symbol if it's within this mapping's space
-     */
-    public TmfResolvedSymbol getSymbolEntry(long address) {
+    @Override
+    public @Nullable TmfResolvedSymbol getSymbolEntry(long address) {
         Entry<Long, TmfResolvedSymbol> floorEntry = fSymbolMapping.floorEntry(address);
         if (floorEntry == null) {
             return null;
         }
         // See if the symbol returned is the end of a block, in this case, don't
         // use the floor unless it hits the exact address
-        TmfResolvedSymbol symbol = floorEntry.getValue();
+        TmfResolvedSymbol symbol = Objects.requireNonNull(floorEntry.getValue());
         long floorValue = symbol.getBaseAddress();
         return (symbol.getSymbolName().endsWith(getEndSuffix()) && floorValue != address) ? null : symbol;
     }

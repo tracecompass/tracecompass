@@ -68,8 +68,8 @@ public final class FunctionNameMapper {
      *            The file to import
      * @return A map&lt;address, function name&gt; of the results
      */
-    public static @Nullable Map<Long, TmfResolvedSymbol> mapFromNmTextFile(File mappingFile) {
-        Map<Long, TmfResolvedSymbol> map = new TreeMap<>();
+    public static @Nullable Map<@NonNull Long, @NonNull TmfResolvedSymbol> mapFromNmTextFile(File mappingFile) {
+        Map<@NonNull Long, @NonNull TmfResolvedSymbol> map = new TreeMap<>();
 
         try (FileReader fr = new FileReader(mappingFile);
                 BufferedReader reader = new BufferedReader(fr);) {

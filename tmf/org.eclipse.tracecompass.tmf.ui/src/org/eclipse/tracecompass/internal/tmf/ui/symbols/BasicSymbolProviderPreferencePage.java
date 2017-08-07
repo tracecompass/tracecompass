@@ -21,7 +21,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.jdt.annotation.NonNull;
@@ -44,9 +43,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.tracecompass.internal.tmf.core.callstack.FunctionNameMapper;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
-import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
+import org.eclipse.tracecompass.tmf.core.symbols.IMappingFile;
 import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.symbols.AbstractSymbolProviderPreferencePage;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -78,21 +76,21 @@ public class BasicSymbolProviderPreferencePage extends AbstractSymbolProviderPre
     private Button fPriorityUp;
     private Button fPriorityDown;
     private TableViewer fMappingTable;
-    private final @NonNull List<@NonNull MappingFile> fMappingFiles = new ArrayList<>();
+    private final @NonNull List<@NonNull IMappingFile> fMappingFiles = new ArrayList<>();
 
     ColumnLabelProvider clp = new ColumnLabelProvider() {
 
         @Override
         public String getText(Object element) {
-            if (element instanceof MappingFile) {
-                return ((MappingFile) element).getFullPath();
+            if (element instanceof IMappingFile) {
+                return ((IMappingFile) element).getFullPath();
             }
             return null;
         }
 
         @Override
         public Image getImage(Object element) {
-            if (element instanceof MappingFile) {
+            if (element instanceof IMappingFile) {
                 // Add binary/mapping icons to the image registry if needed
                 ImageRegistry registry = Activator.getDefault().getImageRegistry();
                 Image binImage = registry.get(BIN_ICON.toString());
@@ -106,7 +104,7 @@ public class BasicSymbolProviderPreferencePage extends AbstractSymbolProviderPre
                     txtImage = registry.get(TXT_ICON.toString());
                 }
 
-                return ((MappingFile) element).isBinaryFile() ? binImage : txtImage;
+                return ((IMappingFile) element).isBinaryFile() ? binImage : txtImage;
             }
 
             return null;
@@ -262,19 +260,9 @@ public class BasicSymbolProviderPreferencePage extends AbstractSymbolProviderPre
 
         for (String fileName : fileNames) {
             String fullPath = filterPath + File.separator + fileName;
-            File file = new File(fullPath);
-
-            Map<Long, TmfResolvedSymbol> results = null;
             boolean isBinaryFile = isBinaryFile(fullPath);
-            if (isBinaryFile) {
-                results = FunctionNameMapper.mapFromBinaryFile(file);
-            } else {
-                results = FunctionNameMapper.mapFromNmTextFile(file);
-            }
-
-            // results is null if mapping file is invalid
-            if (results != null) {
-                MappingFile mf = new MappingFile(file.getAbsolutePath(), isBinaryFile, results);
+            IMappingFile mf = IMappingFile.create(fullPath, isBinaryFile);
+            if (mf != null) {
                 if (!fMappingFiles.contains(mf)) {
                     fMappingFiles.add(mf);
                 }

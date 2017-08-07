@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
+import org.eclipse.tracecompass.tmf.core.symbols.IMappingFile;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
@@ -39,7 +40,7 @@ public class BasicSymbolProvider implements ISymbolProvider {
 
     private final @NonNull ITmfTrace fTrace;
 
-    private final @NonNull List<@NonNull MappingFile> fMappingFiles = new ArrayList<>();
+    private final @NonNull List<@NonNull IMappingFile> fMappingFiles = new ArrayList<>();
 
     /**
      * Create a new {@link BasicSymbolProvider} for the given trace
@@ -60,7 +61,7 @@ public class BasicSymbolProvider implements ISymbolProvider {
      * @return mapping files for a given trace
      * @since 3.0
      */
-    public synchronized @NonNull List<@NonNull MappingFile> getMappingFiles() {
+    public synchronized @NonNull List<@NonNull IMappingFile> getMappingFiles() {
         return ImmutableList.copyOf(fMappingFiles);
     }
 
@@ -69,7 +70,7 @@ public class BasicSymbolProvider implements ISymbolProvider {
      *            List of mapping files for symbol resolving
      * @since 3.0
      */
-    public synchronized void setMappingFiles(@NonNull List<@NonNull MappingFile> mappingFiles) {
+    public synchronized void setMappingFiles(@NonNull List<@NonNull IMappingFile> mappingFiles) {
         fMappingFiles.clear();
         fMappingFiles.addAll(mappingFiles);
     }
@@ -83,7 +84,7 @@ public class BasicSymbolProvider implements ISymbolProvider {
     @Override
     public @Nullable String getSymbolText(long address) {
         TmfResolvedSymbol currentFloorEntry = null;
-        for (MappingFile mf : fMappingFiles) {
+        for (IMappingFile mf : fMappingFiles) {
             TmfResolvedSymbol floorEntry = mf.getSymbolEntry(address);
             if (floorEntry == null) {
                 continue;
