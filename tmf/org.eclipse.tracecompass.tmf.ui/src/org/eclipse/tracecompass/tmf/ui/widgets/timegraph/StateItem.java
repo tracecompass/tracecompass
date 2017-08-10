@@ -11,12 +11,13 @@
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Class that contains the color of a state and the corresponding state string
@@ -41,9 +42,8 @@ public class StateItem {
     // Attributes
     // ------------------------------------------------------------------------
 
+    private final Map<String, Object> fOriginalStyleMap;
     private final Map<String, Object> fStyleMap;
-
-    private final Map<String, Object> fReadOnlyStyleMap;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -60,6 +60,20 @@ public class StateItem {
     }
 
     /**
+     * Copy constructor, from a map
+     *
+     * @param style
+     *            the map of styles
+     * @since 3.2
+     */
+    public StateItem(Map<String, Object> style) {
+        Map<String, Object> styleMap = new HashMap<>();
+        styleMap.putAll(style);
+        fStyleMap = styleMap;
+        fOriginalStyleMap = ImmutableMap.copyOf(styleMap);
+    }
+
+    /**
      * Creates a state color - state string pair.
      *
      * @param stateColor
@@ -69,11 +83,12 @@ public class StateItem {
      */
     public StateItem(RGB stateColor, String stateString) {
         int stateColorInt = stateColor.red << 24 | stateColor.green << 16 | stateColor.blue << 8 | 0xff;
-        fStyleMap = new HashMap<>();
-        fReadOnlyStyleMap = Collections.unmodifiableMap(fStyleMap);
-        fStyleMap.put(ITimeEventStyleStrings.fillStyle(), ITimeEventStyleStrings.solidColorFillStyle());
-        fStyleMap.put(ITimeEventStyleStrings.fillColor(), stateColorInt);
-        fStyleMap.put(ITimeEventStyleStrings.label(), stateString);
+        Map<String, Object> styleMap = new HashMap<>();
+        styleMap.put(ITimeEventStyleStrings.fillStyle(), ITimeEventStyleStrings.solidColorFillStyle());
+        styleMap.put(ITimeEventStyleStrings.fillColor(), stateColorInt);
+        styleMap.put(ITimeEventStyleStrings.label(), stateString);
+        fStyleMap = styleMap;
+        fOriginalStyleMap = ImmutableMap.copyOf(styleMap);
     }
 
     // ------------------------------------------------------------------------
@@ -96,7 +111,10 @@ public class StateItem {
      *            A state color to set
      */
     public void setStateColor(RGB stateColor) {
-        fStyleMap.put(ITimeEventStyleStrings.fillColor(), stateColor);
+        if (stateColor != null) {
+            int rbgVal = stateColor.red << 24 | stateColor.green << 16 | stateColor.blue << 8 | 0xff;
+            fStyleMap.put(ITimeEventStyleStrings.fillColor(), rbgVal);
+        }
     }
 
     /**
@@ -106,6 +124,16 @@ public class StateItem {
      */
     public String getStateString() {
         return String.valueOf(fStyleMap.getOrDefault(ITimeEventStyleStrings.label(), UNDEFINED_STATE_NAME));
+    }
+
+    /**
+     * Reset the style to the original values
+     *
+     * @since 3.2
+     */
+    public void reset() {
+        fStyleMap.clear();
+        fStyleMap.putAll(fOriginalStyleMap);
     }
 
     /**
@@ -127,6 +155,6 @@ public class StateItem {
      * @since 3.0
      */
     public Map<String, Object> getStyleMap() {
-        return fReadOnlyStyleMap;
+        return fStyleMap;
     }
 }

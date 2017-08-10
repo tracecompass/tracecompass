@@ -53,6 +53,7 @@ public interface ITmfImageConstants {
     String IMG_UI_SHOW_HIST_TRACES = ICONS_PATH + "elcl16/show_hist_traces.gif";
     String IMG_UI_LINK = ICONS_PATH + "elcl16/link_obj.png";
     String IMG_UI_NEW_VIEW = ICONS_PATH + "elcl16/new_view.png";
+    String IMG_RESET_BUTTON = ICONS_PATH + "ovr16/undo_edit.gif";
 
     /* eview16 */
     String IMG_UI_SEQ_DIAGRAM_OBJ = ICONS_PATH + "eview16/sequencediagram_view.gif";

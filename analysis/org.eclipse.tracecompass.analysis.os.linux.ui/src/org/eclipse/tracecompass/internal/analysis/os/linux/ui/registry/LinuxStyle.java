@@ -121,7 +121,7 @@ public enum LinuxStyle {
      * @return the label to display
      */
     public String getLabel() {
-        return (String) fMap.get(ITimeEventStyleStrings.label());
+        return (String) toMap().get(ITimeEventStyleStrings.label());
     }
 
     /**

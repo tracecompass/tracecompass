@@ -15,17 +15,28 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -33,10 +44,14 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 
 /**
  * Legend for the colors used in the time graph view
@@ -47,6 +62,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
  */
 public class TimeGraphLegend extends TitleAreaDialog {
 
+    private static final ImageDescriptor RESET_IMAGE = Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_RESET_BUTTON);
     private final ITimeGraphPresentationProvider provider;
     private final LocalResourceManager fResourceManager = new LocalResourceManager(JFaceResources.getResources());
 
@@ -99,7 +115,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
     }
 
     private void createStatesGroup(Composite composite) {
-        ScrolledComposite sc = new ScrolledComposite(composite, SWT.V_SCROLL|SWT.H_SCROLL);
+        ScrolledComposite sc = new ScrolledComposite(composite, SWT.V_SCROLL | SWT.H_SCROLL);
         sc.setExpandHorizontal(true);
         sc.setExpandVertical(true);
         Group gs = new Group(sc, SWT.H_SCROLL);
@@ -117,33 +133,17 @@ public class TimeGraphLegend extends TitleAreaDialog {
         gs.setText(buffer.toString());
 
         GridLayout layout = new GridLayout();
-        layout.numColumns = 2;
         layout.marginWidth = 20;
         layout.marginBottom = 10;
         gs.setLayout(layout);
 
-        // Go through all the defined pairs of state color and state name and display them.
+        // Go through all the defined pairs of state color and state name and
+        // display them.
         StateItem[] stateItems = provider.getStateTable();
         for (int i = 0; i < stateItems.length; i++) {
-            //Get the color related to the index
-            RGB rgb = stateItems[i].getStateColor();
-
-            //Get the given name, provided by the interface to the application
-            String stateName = stateItems[i].getStateString();
 
             // draw color with name
-            Bar bar = new Bar(gs, rgb);
-            gd = new GridData();
-            gd.widthHint = 40;
-            gd.heightHint = 20;
-            gd.verticalIndent = 8;
-            bar.setLayoutData(gd);
-            Label name = new Label(gs, SWT.NONE);
-            name.setText(stateName);
-            gd = new GridData();
-            gd.horizontalIndent = 10;
-            gd.verticalIndent = 8;
-            name.setLayoutData(gd);
+            new LegendEntry(gs, stateItems[i]);
         }
         sc.setMinSize(gs.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
@@ -160,13 +160,120 @@ public class TimeGraphLegend extends TitleAreaDialog {
                 true);
     }
 
-    class Bar extends Canvas {
-        private final Color color;
+    private class LegendEntry extends Composite {
+        private final Swatch fBar;
+        private final Scale fScale;
+        private final Button fReset;
 
-        public Bar(Composite parent, RGB rgb) {
+        public LegendEntry(Composite parent, StateItem si) {
             super(parent, SWT.NONE);
+            RGB rgb = si.getStateColor();
+            String name = si.getStateString();
+            float width = (float) si.getStyleMap().getOrDefault(ITimeEventStyleStrings.heightFactor(), 1.0f);
+            setLayout(GridLayoutFactory.swtDefaults().numColumns(4).create());
+            setLayoutData(GridDataFactory.swtDefaults().grab(true, false).create());
+            fBar = new Swatch(this, rgb);
+            fBar.setToolTipText(Messages.TimeGraphLegend_swatchClick);
+            fBar.addMouseListener(new MouseAdapter() {
 
-            color = fResourceManager.createColor(rgb);
+                @Override
+                public void mouseUp(MouseEvent e) {
+                    Shell shell = new Shell();
+                    ColorDialog cd = new ColorDialog(shell, SWT.NONE);
+                    cd.setRGB(fBar.fColor.getRGB());
+                    RGB color = cd.open();
+                    fBar.setColor(color);
+                    si.setStateColor(color);
+                    provider.refresh();
+                }
+            });
+            fBar.addMouseTrackListener(new MouseTrackListener() {
+
+                @Override
+                public void mouseHover(MouseEvent e) {
+                    // Do nothing
+                }
+
+                @Override
+                public void mouseExit(MouseEvent e) {
+                    Shell shell = parent.getShell();
+                    Cursor old = shell.getCursor();
+                    shell.setCursor(new Cursor(e.display, SWT.CURSOR_ARROW));
+                    if(old != null) {
+                        old.dispose();
+                    }
+                }
+
+                @Override
+                public void mouseEnter(MouseEvent e) {
+                    Shell shell = parent.getShell();
+                    Cursor old = shell.getCursor();
+                    shell.setCursor(new Cursor(e.display, SWT.CURSOR_HAND));
+                    if(old != null) {
+                        old.dispose();
+                    }
+                }
+            });
+
+            fBar.setLayoutData(GridDataFactory.swtDefaults().hint(30, 20).create());
+            Label label = new Label(this, SWT.NONE);
+            label.setText(name);
+            label.setLayoutData(GridDataFactory.fillDefaults().hint(160, 20).grab(true, true).align(SWT.BEGINNING, SWT.CENTER).create());
+            fScale = new Scale(this, SWT.NONE);
+            fScale.setMaximum(100);
+            fScale.setMinimum(1);
+            fScale.setSelection((int) (100 * width));
+            fScale.setToolTipText(Messages.TimeGraphLegend_widthTooltip);
+            fScale.addSelectionListener(new SelectionListener() {
+
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    si.getStyleMap().put(ITimeEventStyleStrings.heightFactor(), fScale.getSelection() * 0.01f);
+                    provider.refresh();
+                }
+
+                @Override
+                public void widgetDefaultSelected(SelectionEvent e) {
+                    // do nothing
+                }
+            });
+            fScale.setLayoutData(GridDataFactory.swtDefaults().hint(120, 20).create());
+            fReset = new Button(this, SWT.FLAT);
+            fReset.addSelectionListener(new SelectionListener() {
+
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    si.reset();
+                    fBar.setColor(si.getStateColor());
+                    fScale.setSelection((int) (100 * (float) si.getStyleMap().getOrDefault(ITimeEventStyleStrings.heightFactor(), 1.0f)));
+                    provider.refresh();
+                }
+
+                @Override
+                public void widgetDefaultSelected(SelectionEvent e) {
+                    // do nothing
+                }
+            });
+            fReset.setToolTipText(Messages.TimeGraphLegend_resetTooltip);
+            fReset.setImage(RESET_IMAGE.createImage());
+            fReset.setLayoutData(GridDataFactory.swtDefaults().align(SWT.END, SWT.CENTER).create());
+        }
+
+        @Override
+        public void dispose() {
+            fReset.getImage().dispose();
+            super.dispose();
+        }
+    }
+
+    private class Swatch extends Canvas {
+        private Color fColor;
+
+        public Swatch(Composite parent, RGB rgb) {
+            super(parent, SWT.FLAT);
+
+            fColor = fResourceManager.createColor(rgb);
+            setForeground(fColor);
             addListener(SWT.Paint, new Listener() {
                 @Override
                 public void handleEvent(Event event) {
@@ -175,13 +282,21 @@ public class TimeGraphLegend extends TitleAreaDialog {
             });
         }
 
+        public void setColor(RGB rgb) {
+            if (rgb != null) {
+                fColor = fResourceManager.createColor(rgb);
+                setForeground(fColor);
+                redraw();
+            }
+        }
+
         private void draw(GC gc) {
             Rectangle r = getClientArea();
-            gc.setBackground(color);
+            gc.setBackground(fColor);
             gc.fillRectangle(r);
             gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
-            gc.drawRectangle(0, 0, r.width - 1, r.height - 1);
+            gc.setLineWidth(2);
+            gc.drawRectangle(1, 1, r.width - 2, r.height - 2);
         }
     }
-
 }

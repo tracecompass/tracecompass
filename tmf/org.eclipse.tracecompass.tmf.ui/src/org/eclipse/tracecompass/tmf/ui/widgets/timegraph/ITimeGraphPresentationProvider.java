@@ -219,4 +219,12 @@ public interface ITimeGraphPresentationProvider {
         return Collections.emptyMap();
     }
 
+    /**
+     * Signal the provider that its color settings have changed
+     * @since 3.2
+     */
+    default void refresh(){
+        // do nothing
+    }
+
 }

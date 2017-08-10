@@ -155,7 +155,16 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
     /**
      * Notifies listeners of the state table change
      */
-    protected void fireColorSettingsChanged() {
+    protected void fireColorSettingsChanged(){
+        refresh();
+    }
+
+    /**
+     * Notifies listeners of the state table change
+     * @since 3.2
+     */
+    @Override
+    public void refresh() {
         for (ITimeGraphColorListener listener : fListeners) {
             listener.colorSettingsChanged(getStateTable());
         }
