@@ -77,7 +77,7 @@ public final class FunctionNameMapper {
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 Matcher matcher = pattern.matcher(line);
                 if (matcher.find()) {
-                    long address = Long.parseLong(stripLeadingZeros(matcher.group(1)), 16);
+                    long address = Long.parseUnsignedLong(stripLeadingZeros(matcher.group(1)), 16);
                     String name = Objects.requireNonNull(matcher.group(3));
                     map.put(address, new TmfResolvedSymbol(address, name));
                 }

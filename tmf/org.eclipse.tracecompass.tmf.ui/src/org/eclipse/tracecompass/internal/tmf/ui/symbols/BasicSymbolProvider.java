@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.internal.tmf.ui.symbols;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -59,7 +60,6 @@ public class BasicSymbolProvider implements ISymbolProvider {
 
     /**
      * @return mapping files for a given trace
-     * @since 3.0
      */
     public synchronized @NonNull List<@NonNull IMappingFile> getMappingFiles() {
         return ImmutableList.copyOf(fMappingFiles);
@@ -83,8 +83,28 @@ public class BasicSymbolProvider implements ISymbolProvider {
 
     @Override
     public @Nullable String getSymbolText(long address) {
+        return getSymbolText(address, fMappingFiles);
+    }
+
+    @Override
+    public @Nullable String getSymbolText(int pid, long timestamp, long address) {
+        // First look at the mapping files that are specific for the process
+        String symbolText = getSymbolText(address, fMappingFiles.stream()
+                .filter(mf -> mf.getPid() == pid)
+                .collect(Collectors.toList()));
+        if (symbolText != null) {
+            return symbolText;
+        }
+
+        // The symbol was not found, look in global mapping files
+        return getSymbolText(address, fMappingFiles.stream()
+                .filter(mf -> mf.getPid() < 0)
+                .collect(Collectors.toList()));
+    }
+
+    private static @Nullable String getSymbolText(long address, List<IMappingFile> mappingFiles) {
         TmfResolvedSymbol currentFloorEntry = null;
-        for (IMappingFile mf : fMappingFiles) {
+        for (IMappingFile mf : mappingFiles) {
             TmfResolvedSymbol floorEntry = mf.getSymbolEntry(address);
             if (floorEntry == null) {
                 continue;

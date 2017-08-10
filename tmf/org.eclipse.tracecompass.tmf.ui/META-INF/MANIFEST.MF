@@ -45,7 +45,7 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.ui;x-friends:="org.eclipse
  org.eclipse.tracecompass.internal.tmf.ui.project.dialogs.offset;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.project.handlers;x-friends:="org.eclipse.tracecompass.tmf.ui.tests",
  org.eclipse.tracecompass.internal.tmf.ui.project.model;x-friends:="org.eclipse.tracecompass.lttng2.ui,org.eclipse.tracecompass.tmf.ui.tests,org.eclipse.tracecompass.tmf.ctf.ui.tests",
- org.eclipse.tracecompass.internal.tmf.ui.project.operations;x-friends:="org.eclipse.tracecompass.tmf.remote.ui, org.eclipse.tracecompass.tmf.ui.tests",
+ org.eclipse.tracecompass.internal.tmf.ui.project.operations;x-friends:="org.eclipse.tracecompass.tmf.remote.ui,org.eclipse.tracecompass.tmf.ui.tests",
  org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace;
   x-friends:="org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests,
    org.eclipse.tracecompass.tmf.ui,
@@ -55,7 +55,7 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.ui;x-friends:="org.eclipse
    org.eclipse.tracecompass.tmf.ui.tests",
  org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg;x-friends:="org.eclipse.tracecompass.tmf.remote.ui,org.eclipse.tracecompass.tmf.remote.ui.tests,org.eclipse.tracecompass.lttng2.control.ui",
  org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.importexport;x-friends:="org.eclipse.tracecompass.tmf.remote.ui",
- org.eclipse.tracecompass.internal.tmf.ui.symbols;x-internal:=true,
+ org.eclipse.tracecompass.internal.tmf.ui.symbols;x-friends:="org.eclipse.tracecompass.tmf.ui.tests",
  org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts;x-friends:="org.eclipse.tracecompass.tmf.ui.tests",
  org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.model;x-friends:="org.eclipse.tracecompass.tmf.ui.tests",
  org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics;x-friends:="org.eclipse.tracecompass.tmf.ui.tests",

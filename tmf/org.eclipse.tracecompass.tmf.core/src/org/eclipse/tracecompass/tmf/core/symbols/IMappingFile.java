@@ -9,8 +9,11 @@
 
 package org.eclipse.tracecompass.tmf.core.symbols;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.callstack.FunctionNameMapper;
@@ -26,29 +29,64 @@ import org.eclipse.tracecompass.internal.tmf.core.callstack.MappingFile;
 public interface IMappingFile {
 
     /**
-     * Create a mapping file from a path
+     * Create a mapping file from a path.
+     *
+     * If the file name before the extension finishes by -[0-9]+, then the number is
+     * taken as the ID of the process this mapping applies to.
      *
      * @param fullPath
-     *            The full path of the file to load
+     *            The full path of the file to load.
      * @param isBinaryFile
      *            <code>true</code> if the file is a binary file
      * @return The MappingFile object, or <code>null</code> if the file is invalid
      */
     public static @Nullable IMappingFile create(String fullPath, boolean isBinaryFile) {
-        File file = new File(fullPath);
+        Path path = Paths.get(fullPath);
+
+        // Look for a process ID at the end of the filename.
+        String filename = path.getFileName().toString();
+        final Pattern pattern = Pattern.compile("(.+)-([0-9]+)\\.(.+)"); //$NON-NLS-1$
+        Matcher matcher = pattern.matcher(filename);
+        int pid = -1;
+        if (matcher.find()) {
+            try {
+                pid = Integer.parseInt(matcher.group(2));
+            } catch (NumberFormatException e) {
+                // The number did not match to a proper integer, maybe it's a
+                // long, ignore it then
+            }
+        }
+
+        return create(fullPath, isBinaryFile, pid);
+    }
+
+    /**
+     * Create a mapping file from a path and associate it with the PID this mapping
+     * applies to.
+     *
+     * @param fullPath
+     *            The full path of the file to load.
+     * @param isBinaryFile
+     *            <code>true</code> if the file is a binary file
+     * @param pid
+     *            The ID of the process that this mapping describes
+     * @return The MappingFile object, or <code>null</code> if the file is invalid
+     */
+    public static @Nullable IMappingFile create(String fullPath, boolean isBinaryFile, int pid) {
+        Path path = Paths.get(fullPath);
 
         Map<Long, TmfResolvedSymbol> results = null;
         if (isBinaryFile) {
-            results = FunctionNameMapper.mapFromBinaryFile(file);
+            results = FunctionNameMapper.mapFromBinaryFile(path.toFile());
         } else {
-            results = FunctionNameMapper.mapFromNmTextFile(file);
+            results = FunctionNameMapper.mapFromNmTextFile(path.toFile());
         }
 
         // results is null if mapping file is invalid
         if (results == null) {
             return null;
         }
-        return new MappingFile(fullPath, isBinaryFile, results);
+        return new MappingFile(fullPath, isBinaryFile, results, pid);
     }
 
     /**
@@ -60,6 +98,14 @@ public interface IMappingFile {
      * @return type of the mapping file
      */
     boolean isBinaryFile();
+
+    /**
+     * Get the ID of the process this mapping is for.
+     *
+     * @return the process ID that this mapping applies to. A negative value means
+     *         it applies to no specific process.
+     */
+    int getPid();
 
     /**
      * Get the entry that may correspond to the symbol

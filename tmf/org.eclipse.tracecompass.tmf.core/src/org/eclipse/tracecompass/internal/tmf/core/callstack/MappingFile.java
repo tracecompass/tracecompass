@@ -37,11 +37,12 @@ import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
 @NonNullByDefault
 public final class MappingFile implements IMappingFile {
 
-    private final String DEFAULT_END_SUFFIX = "END__"; //$NON-NLS-1$
+    private static final String DEFAULT_END_SUFFIX = "END__"; //$NON-NLS-1$
 
     private final String fFullPath;
     private final boolean fIsBinaryFile;
     private final NavigableMap<Long, TmfResolvedSymbol> fSymbolMapping;
+    private final int fPid;
 
     /**
      * Create a new {@link MappingFile}
@@ -52,11 +53,15 @@ public final class MappingFile implements IMappingFile {
      *            Type of the mapping file
      * @param results
      *            Resolved symbols for the given mapping file
+     * @param pid
+     *            The ID of the process this mapping applies to. A negative value
+     *            means it applies to all processes
      */
-    public MappingFile(String path, boolean isBinaryFile, Map<Long, TmfResolvedSymbol> results) {
+    public MappingFile(String path, boolean isBinaryFile, Map<Long, TmfResolvedSymbol> results, int pid) {
         fFullPath = path;
         fIsBinaryFile = isBinaryFile;
         fSymbolMapping = new TreeMap<>(results);
+        fPid = pid;
     }
 
     @Override
@@ -83,13 +88,17 @@ public final class MappingFile implements IMappingFile {
     }
 
     /**
-     * Get the suffix for symbols that mark the end of address blocks in the
-     * file
+     * Get the suffix for symbols that mark the end of address blocks in the file
      *
      * @return The suffix for symbols that end blocks of mapping addresses
      */
-    public String getEndSuffix() {
+    private static String getEndSuffix() {
         return DEFAULT_END_SUFFIX;
+    }
+
+    @Override
+    public int getPid() {
+        return fPid;
     }
 
     @Override

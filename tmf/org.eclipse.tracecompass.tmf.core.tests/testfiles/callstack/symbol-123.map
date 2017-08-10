@@ -1,0 +1,6 @@
+00000000004005d0 T same address as nm_output
+0000000000400720 t A little bit before nm_ouput's frame_dummy
+0000000000400750 t A little bit after nm_ouput's frame_dummy
+0000000000400a28 r __FRAME_END__
+ffeeddccbbaa0090 T One huge symbol from nm mapping
+ffeeddccbbaa9990 T The__END__

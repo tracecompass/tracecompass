@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.core.tests.callstack;
+package org.eclipse.tracecompass.tmf.core.tests.symbols;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

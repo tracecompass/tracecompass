@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.core.tests.callstack;
+package org.eclipse.tracecompass.tmf.core.tests.symbols;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -17,7 +17,11 @@ import static org.junit.Assert.assertTrue;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.symbols.IMappingFile;
 import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
 import org.junit.Test;
@@ -33,14 +37,57 @@ public class MappingFileTest {
      * Test the {@link IMappingFile#create(String, boolean)} method
      */
     @Test
-    public void testValidMappingTextFile() {
+    public void testValidTextFile() {
+        IMappingFile mf = getMappingFile("nm-output-example");
+        assertNotNull("global symbol file", mf);
+        assertTrue(mf.getPid() < 0);
+
+        // Test a file name ending by number without '-'
+        mf = getMappingFile("symbol123.map");
+        assertNotNull("Global symbol numbered file", mf);
+        assertTrue(mf.getPid() < 0);
+
+        // Test a file name with process ID in the name
+        mf = getMappingFile("symbol-123.map");
+        assertNotNull("Symbol file with pid", mf);
+        assertEquals(123, mf.getPid());
+
+        // Use the symbol-123.map file for another process
         Path nmOutput = Paths.get("..", "..", "tmf", "org.eclipse.tracecompass.tmf.core.tests",
-                "testfiles", "callstack" , "nm-output-example");
+                "testfiles", "callstack" , "symbol-123.map");
         assertTrue(Files.exists(nmOutput));
         String filePath = nmOutput.toFile().getAbsolutePath();
         assertNotNull(filePath);
-        IMappingFile mf = IMappingFile.create(filePath, false);
-        assertNotNull(mf);
+        mf = IMappingFile.create(filePath, false, 2);
+        assertNotNull("Symbol file for different pid", mf);
+        assertEquals(2, mf.getPid());
+    }
+
+    private static @Nullable IMappingFile getMappingFile(String fileName) {
+        Path nmOutput = Paths.get("..", "..", "tmf", "org.eclipse.tracecompass.tmf.core.tests",
+                "testfiles", "callstack" , fileName);
+        assertTrue(Files.exists(nmOutput));
+        String filePath = nmOutput.toFile().getAbsolutePath();
+        assertNotNull(filePath);
+        return IMappingFile.create(filePath, false);
+    }
+
+    /**
+     * Get the test mapping files. These can be used by symbol providers.
+     *
+     * @return The list of MappingFile
+     */
+    public static @NonNull List<@NonNull IMappingFile> getMappingFiles() {
+        List<@NonNull IMappingFile> list = new ArrayList<>();
+        IMappingFile mf = getMappingFile("nm-output-example");
+        if (mf != null) {
+            list.add(mf);
+        }
+        mf = getMappingFile("symbol-123.map");
+        if (mf != null) {
+            list.add(mf);
+        }
+        return list;
     }
 
     /**
@@ -90,12 +137,7 @@ public class MappingFileTest {
         assertNull(mf);
 
         // File does not contain any data
-        Path nmOutput = Paths.get("..", "..", "tmf", "org.eclipse.tracecompass.tmf.core.tests",
-                "testfiles", "callstack" , "emptyFile");
-        assertTrue(Files.exists(nmOutput));
-        String filePath = nmOutput.toFile().getAbsolutePath();
-        assertNotNull(filePath);
-        mf = IMappingFile.create(filePath, false);
+        mf = getMappingFile("emptyFile");
         assertNull(mf);
     }
 }
