@@ -19,7 +19,6 @@ import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.TreeMap;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.symbols.IMappingFile;
 import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
@@ -34,7 +33,6 @@ import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
  *
  * @author Mikael Ferland
  */
-@NonNullByDefault
 public final class MappingFile implements IMappingFile {
 
     private static final String DEFAULT_END_SUFFIX = "END__"; //$NON-NLS-1$

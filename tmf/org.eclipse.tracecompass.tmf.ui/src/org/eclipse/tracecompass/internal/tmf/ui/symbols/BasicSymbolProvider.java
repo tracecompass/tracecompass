@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
 import org.eclipse.tracecompass.tmf.core.symbols.IMappingFile;
+import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
@@ -82,27 +82,27 @@ public class BasicSymbolProvider implements ISymbolProvider {
     }
 
     @Override
-    public @Nullable String getSymbolText(long address) {
-        return getSymbolText(address, fMappingFiles);
+    public @Nullable TmfResolvedSymbol getSymbol(long address) {
+        return getSymbol(address, fMappingFiles);
     }
 
     @Override
-    public @Nullable String getSymbolText(int pid, long timestamp, long address) {
+    public @Nullable TmfResolvedSymbol getSymbol(int pid, long timestamp, long address) {
         // First look at the mapping files that are specific for the process
-        String symbolText = getSymbolText(address, fMappingFiles.stream()
+        TmfResolvedSymbol symbol = getSymbol(address, fMappingFiles.stream()
                 .filter(mf -> mf.getPid() == pid)
                 .collect(Collectors.toList()));
-        if (symbolText != null) {
-            return symbolText;
+        if (symbol != null) {
+            return symbol;
         }
 
         // The symbol was not found, look in global mapping files
-        return getSymbolText(address, fMappingFiles.stream()
+        return getSymbol(address, fMappingFiles.stream()
                 .filter(mf -> mf.getPid() < 0)
                 .collect(Collectors.toList()));
     }
 
-    private static @Nullable String getSymbolText(long address, List<IMappingFile> mappingFiles) {
+    private static @Nullable TmfResolvedSymbol getSymbol(long address, List<IMappingFile> mappingFiles) {
         TmfResolvedSymbol currentFloorEntry = null;
         for (IMappingFile mf : mappingFiles) {
             TmfResolvedSymbol floorEntry = mf.getSymbolEntry(address);
@@ -113,7 +113,7 @@ public class BasicSymbolProvider implements ISymbolProvider {
             // A symbol may come from different file, prioritize the symbol
             // closest to value
             if (floorValue == address) {
-                return floorEntry.getSymbolName();
+                return floorEntry;
             }
             if (currentFloorEntry == null) {
                 currentFloorEntry = floorEntry;
@@ -126,12 +126,22 @@ public class BasicSymbolProvider implements ISymbolProvider {
         if (currentFloorEntry == null) {
             return null;
         }
-        return currentFloorEntry.getSymbolName();
+        return currentFloorEntry;
     }
 
     @Override
     public ISymbolProviderPreferencePage createPreferencePage() {
         return new BasicSymbolProviderPreferencePage(this);
+    }
+
+    @Deprecated
+    @Override
+    public @Nullable String getSymbolText(long address) {
+        TmfResolvedSymbol symbol = getSymbol(address);
+        if (symbol == null) {
+            return null;
+        }
+        return symbol.getSymbolName();
     }
 
 }

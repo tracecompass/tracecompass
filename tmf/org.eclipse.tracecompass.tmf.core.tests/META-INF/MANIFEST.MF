@@ -15,7 +15,9 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.tracecompass.tmf.core,
  org.eclipse.test.performance,
  org.eclipse.cdt.core,
- org.eclipse.tracecompass.analysis.counters.core
+ org.eclipse.tracecompass.analysis.counters.core,
+ org.eclipse.tracecompass.datastore.core,
+ org.eclipse.tracecompass.segmentstore.core
 Export-Package: org.eclipse.tracecompass.tmf.core.tests,
  org.eclipse.tracecompass.tmf.core.tests.analysis,
  org.eclipse.tracecompass.tmf.core.tests.analysis.ondemand,

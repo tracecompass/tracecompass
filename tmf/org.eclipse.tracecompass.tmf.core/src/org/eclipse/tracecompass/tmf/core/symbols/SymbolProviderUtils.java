@@ -11,8 +11,12 @@ package org.eclipse.tracecompass.tmf.core.symbols;
 
 import java.util.Collection;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 
 /**
  * Utility class to resolve symbols from providers
@@ -21,6 +25,8 @@ import org.eclipse.jdt.annotation.Nullable;
  * @since 3.1
  */
 public final class SymbolProviderUtils {
+
+    private static final Logger LOGGER = TraceCompassLog.getLogger(SymbolProviderUtils.class);
 
     private SymbolProviderUtils() {
         // Nothing to do
@@ -67,6 +73,7 @@ public final class SymbolProviderUtils {
         for (ISymbolProvider provider : providers) {
             TmfResolvedSymbol currentSymbol = func.apply(provider);
             if (currentSymbol != null) {
+                TraceCompassLogUtils.traceInstant(LOGGER, Level.FINER, "Symbol found", "address", address, "provider", provider, "found symbol", currentSymbol); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
                 if (resolvedSymbol == null) {
                     resolvedSymbol = currentSymbol;
                 } else {
@@ -74,7 +81,9 @@ public final class SymbolProviderUtils {
                 }
             }
         }
-        return resolvedSymbol != null ? resolvedSymbol.getSymbolName() : "0x" + Long.toHexString(address); //$NON-NLS-1$
+        String symbolText = resolvedSymbol != null ? resolvedSymbol.getSymbolName() : "0x" + Long.toHexString(address);//$NON-NLS-1$
+        TraceCompassLogUtils.traceInstant(LOGGER, Level.FINER, "Symbol returned", "address", address, "symbolText", symbolText); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+        return symbolText;
     }
 
 }

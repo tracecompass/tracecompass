@@ -53,9 +53,40 @@ import com.google.common.collect.ImmutableMap;
  */
 public final class FunctionNameMapper {
 
-    private FunctionNameMapper() {}
-
+    /**
+     * Arbitrary value used to guess the mapping type, if one pattern has this more
+     * hits than others, stop
+     */
+    private static final int DIFF_LIMIT = 10;
     private static final Pattern REMOVE_ZEROS_PATTERN = Pattern.compile("^0+(?!$)"); //$NON-NLS-1$
+    private static final Pattern NM_PATTERN = Pattern.compile("([0-9a-f]+)([\\s][a-zA-Z][\\s])(.+)"); //$NON-NLS-1$
+    private static final Pattern MAP_WITH_SIZE_PATTERN = Pattern.compile("([0-9a-f]+)[\\s]([a-f0-9]+)[\\s](.+)"); //$NON-NLS-1$
+
+    /**
+     * The type of mapping used in a file. Each type of mapping has its pattern and
+     * they may overlap
+     *
+     * @author Geneviève Bastien
+     */
+    public enum MappingType {
+        /**
+         * The format of the mapping is the same as the one generated with the nm
+         * command
+         */
+        NM,
+        /**
+         * The format of the mapping is address size symbol_text
+         */
+        MAP_WITH_SIZE,
+        /**
+         * The format is unknown
+         */
+        UNKNOWN
+    }
+
+    private FunctionNameMapper() {
+        // No to be instantiated
+    }
 
     /**
      * Get the function name mapping from a text file obtained by doing
@@ -73,9 +104,8 @@ public final class FunctionNameMapper {
 
         try (FileReader fr = new FileReader(mappingFile);
                 BufferedReader reader = new BufferedReader(fr);) {
-            final Pattern pattern = Pattern.compile("([0-9a-f]+)([\\s][a-zA-Z][\\s])(.+)"); //$NON-NLS-1$
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-                Matcher matcher = pattern.matcher(line);
+                Matcher matcher = NM_PATTERN.matcher(line);
                 if (matcher.find()) {
                     long address = Long.parseUnsignedLong(stripLeadingZeros(matcher.group(1)), 16);
                     String name = Objects.requireNonNull(matcher.group(3));
@@ -88,10 +118,76 @@ public final class FunctionNameMapper {
             /* Stop reading the file at this point */
         }
 
-        if (map.isEmpty()) {
+        return map.isEmpty() ? null : ImmutableMap.copyOf(map);
+    }
+
+    /**
+     * Get the function name mapping from a text file formatted as address size
+     * name, for example, files obtained using the perf-map-agent for java
+     *
+     * @param mappingFile
+     *            The file to import
+     * @return A map&lt;address, function name&gt; of the results
+     */
+    public static @Nullable Map<@NonNull Long, @NonNull TmfResolvedSymbol> mapFromSizedTextFile(File mappingFile) {
+        Map<@NonNull Long, @NonNull TmfResolvedSymbol> map = new TreeMap<>();
+
+        try (FileReader fr = new FileReader(mappingFile);
+                BufferedReader reader = new BufferedReader(fr);) {
+            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                Matcher matcher = MAP_WITH_SIZE_PATTERN.matcher(line);
+                if (matcher.find()) {
+                    long address = Long.parseUnsignedLong(stripLeadingZeros(matcher.group(1)), 16);
+                    long size = Long.parseUnsignedLong(stripLeadingZeros(matcher.group(2)), 16);
+                    String name = Objects.requireNonNull(matcher.group(3));
+                    map.put(address, new TmfResolvedSizedSymbol(address, name, size));
+                }
+            }
+        } catch (FileNotFoundException e) {
             return null;
+        } catch (IOException e) {
+            /* Stop reading the file at this point */
         }
-        return ImmutableMap.copyOf(map);
+
+        return map.isEmpty() ? null : ImmutableMap.copyOf(map);
+    }
+
+    /**
+     * Guesses the type of mapping in this file by parsing its line and finding the
+     * one with the most hits
+     *
+     * @param mappingFile
+     *            The file containing the symbol mapping
+     * @return The most likely mapping type or {@link MappingType#UNKNOWN} if the
+     *         file corresponds to no known mapping
+     */
+    public static MappingType guessMappingType(File mappingFile) {
+        int nmHits = 0;
+        int sizeHits = 0;
+        try (FileReader fr = new FileReader(mappingFile);
+                BufferedReader reader = new BufferedReader(fr);) {
+            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                Matcher matcher = NM_PATTERN.matcher(line);
+                if (matcher.find()) {
+                    nmHits++;
+                }
+                matcher = MAP_WITH_SIZE_PATTERN.matcher(line);
+                if (matcher.find()) {
+                    sizeHits++;
+                }
+                if (Math.abs(sizeHits - nmHits) > DIFF_LIMIT) {
+                    break;
+                }
+            }
+            // No hits either way, return null
+            if (!(nmHits > 0 || sizeHits > 0)) {
+                return MappingType.UNKNOWN;
+            }
+            return nmHits > sizeHits ? MappingType.NM : MappingType.MAP_WITH_SIZE;
+        } catch (IOException e) {
+            // Simply return unknown type
+        }
+        return MappingType.UNKNOWN;
     }
 
     /**
@@ -116,10 +212,9 @@ public final class FunctionNameMapper {
         return ImmutableMap.copyOf(map);
     }
 
-
     /**
      * Strip the leading zeroes from the address
-     * */
+     */
     private static String stripLeadingZeros(String address) {
         return REMOVE_ZEROS_PATTERN.matcher(address).replaceFirst(""); //$NON-NLS-1$
     }
@@ -142,7 +237,7 @@ public final class FunctionNameMapper {
                     }
 
                     @Override
-                    public void handleException(Throwable exception) {
+                    public void handleException(@Nullable Throwable exception) {
                         Activator.logError("Error creating binary parser", exception); //$NON-NLS-1$
                     }
                 });
@@ -160,7 +255,7 @@ public final class FunctionNameMapper {
         /* Read the initial "hint" bytes */
         byte[] hintBuffer = new byte[hintBufferSize];
         if (hintBufferSize > 0) {
-            try (InputStream is = new FileInputStream(file) ){
+            try (InputStream is = new FileInputStream(file)) {
 
                 int count = 0;
                 // Make sure we read up to 'hints' bytes if we possibly can
@@ -189,7 +284,7 @@ public final class FunctionNameMapper {
                 try {
                     binFile = parser.getBinary(hintBuffer, filePath);
                     if (binFile instanceof IBinaryParser.IBinaryObject) {
-                        return (IBinaryParser.IBinaryObject)binFile;
+                        return (IBinaryParser.IBinaryObject) binFile;
                     }
                 } catch (IOException e) {
                     Activator.logError("Error parsing binary file", e); //$NON-NLS-1$

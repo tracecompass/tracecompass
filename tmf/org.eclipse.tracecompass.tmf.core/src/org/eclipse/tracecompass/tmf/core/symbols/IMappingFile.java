@@ -1,9 +1,9 @@
 /*******************************************************************************
  * Copyright (c) 2017 École Polytechnique de Montréal
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.callstack.FunctionNameMapper;
 import org.eclipse.tracecompass.internal.tmf.core.callstack.MappingFile;
+import org.eclipse.tracecompass.internal.tmf.core.callstack.SizedMappingFile;
 
 /**
  * Interface that mapping file classes must implement. This interface also
@@ -40,7 +41,7 @@ public interface IMappingFile {
      *            <code>true</code> if the file is a binary file
      * @return The MappingFile object, or <code>null</code> if the file is invalid
      */
-    public static @Nullable IMappingFile create(String fullPath, boolean isBinaryFile) {
+    static @Nullable IMappingFile create(String fullPath, boolean isBinaryFile) {
         Path path = Paths.get(fullPath);
 
         // Look for a process ID at the end of the filename.
@@ -72,21 +73,25 @@ public interface IMappingFile {
      *            The ID of the process that this mapping describes
      * @return The MappingFile object, or <code>null</code> if the file is invalid
      */
-    public static @Nullable IMappingFile create(String fullPath, boolean isBinaryFile, int pid) {
+    static @Nullable IMappingFile create(String fullPath, boolean isBinaryFile, int pid) {
         Path path = Paths.get(fullPath);
 
         Map<Long, TmfResolvedSymbol> results = null;
         if (isBinaryFile) {
             results = FunctionNameMapper.mapFromBinaryFile(path.toFile());
-        } else {
-            results = FunctionNameMapper.mapFromNmTextFile(path.toFile());
+            return new MappingFile(fullPath, isBinaryFile, results, pid);
         }
-
-        // results is null if mapping file is invalid
-        if (results == null) {
+        switch(FunctionNameMapper.guessMappingType(path.toFile())) {
+        case MAP_WITH_SIZE:
+            results = FunctionNameMapper.mapFromSizedTextFile(path.toFile());
+            return results == null ? null : new SizedMappingFile(fullPath, isBinaryFile, results, pid);
+        case NM:
+            results = FunctionNameMapper.mapFromNmTextFile(path.toFile());
+            return results == null ? null : new MappingFile(fullPath, isBinaryFile, results, pid);
+        case UNKNOWN: // Fall-through
+        default:
             return null;
         }
-        return new MappingFile(fullPath, isBinaryFile, results, pid);
     }
 
     /**
@@ -100,22 +105,19 @@ public interface IMappingFile {
     boolean isBinaryFile();
 
     /**
+     * Get the entry that may correspond to the symbol
+     *
+     * @param address
+     *            The address of the symbol to look for
+     * @return The entry with its address/symbol if it's within this mapping's space
+     */
+    @Nullable TmfResolvedSymbol getSymbolEntry(long address);
+
+    /**
      * Get the ID of the process this mapping is for.
      *
      * @return the process ID that this mapping applies to. A negative value means
      *         it applies to no specific process.
      */
     int getPid();
-
-    /**
-     * Get the entry that may correspond to the symbol
-     *
-     * @param address
-     *            The address of the symbol to look for
-     * @return The entry with its address/symbol if it's within this mapping's
-     *         space, or <code>null</code> if this address is not mapped in this
-     *         file
-     */
-    @Nullable TmfResolvedSymbol getSymbolEntry(long address);
-
 }
