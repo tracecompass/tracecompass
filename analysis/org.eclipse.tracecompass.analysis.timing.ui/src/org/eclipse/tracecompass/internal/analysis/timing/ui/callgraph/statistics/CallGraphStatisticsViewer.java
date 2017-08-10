@@ -21,6 +21,7 @@ import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGrap
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
 import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
+import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderUtils;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -33,7 +34,7 @@ public class CallGraphStatisticsViewer extends AbstractSegmentsStatisticsViewer 
 
     private static final class SymbolFormatter implements Function<SegmentStoreStatisticsEntry, String> {
 
-        private final Collection<ISymbolProvider> fSymbolProviders;
+        private final @NonNull Collection<@NonNull ISymbolProvider> fSymbolProviders;
 
         public SymbolFormatter(@Nullable ITmfTrace trace) {
             fSymbolProviders = trace != null ? SymbolProviderManager.getInstance().getSymbolProviders(trace) : Collections.EMPTY_SET;
@@ -47,14 +48,8 @@ public class CallGraphStatisticsViewer extends AbstractSegmentsStatisticsViewer 
             String original = stat.getName();
             try {
                 Long address = Long.decode(original);
-                Collection<ISymbolProvider> symbolProviders = fSymbolProviders;
-                for (ISymbolProvider symbol : symbolProviders) {
-                    String res = symbol.getSymbolText(address);
-                    if (res != null) {
-                        return res;
-                    }
-                }
-                return "0x" + Long.toHexString(address); //$NON-NLS-1$
+                return SymbolProviderUtils.getSymbolText(fSymbolProviders, address);
+
             } catch (NumberFormatException e) {
                 return original;
             }

@@ -51,13 +51,20 @@ public class DefaultSymbolProvider implements ISymbolProvider {
      * @param address
      *            the symbol address
      * @return the hex representation of the given address
+     * @deprecated Use the {@link #getSymbol(long)} method instead
      */
+    @Deprecated
     @Override
     public @NonNull String getSymbolText(long address) {
+        return getSymbol(address).getSymbolName();
+    }
+
+    @Override
+    public @NonNull TmfResolvedSymbol getSymbol(long address) {
         if ((address & (0xFFFFFFFF << 32)) == 0) {
-            return String.format("%08x", address); //$NON-NLS-1$
+            return new TmfResolvedSymbol(address, String.format("%08x", address)); //$NON-NLS-1$
         }
-        return String.format("%016x", address); //$NON-NLS-1$
+        return new TmfResolvedSymbol(address, String.format("%016x", address)); //$NON-NLS-1$
     }
 
 }

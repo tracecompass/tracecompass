@@ -18,6 +18,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.ui.symbols.BasicSymbolProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.symbols.BasicSymbolProviderFactory;
 import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
+import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.tests.symbols.MappingFileTest;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -73,34 +74,40 @@ public class BasicSymbolProviderTest {
         symbolProvider.setMappingFiles(MappingFileTest.getMappingFiles());
 
         // Test a symbol without pid, that is in one mapping only
-        String symbolText = symbolProvider.getSymbolText(Long.parseUnsignedLong("601050", 16));
-        assertEquals("__dso_handle", symbolText);
+        TmfResolvedSymbol symbol = symbolProvider.getSymbol(Long.parseUnsignedLong("601050", 16));
+        assertNotNull(symbol);
+        assertEquals("__dso_handle", symbol.getSymbolName());
 
         // No pid, should return the symbol closer to the value in all files
         // FIXME: If no pid specified, should we ignore mappings with pid?
-        symbolText = symbolProvider.getSymbolText(Long.parseUnsignedLong("400752", 16));
-        assertEquals("A little bit after nm_ouput's frame_dummy", symbolText);
+        symbol = symbolProvider.getSymbol(Long.parseUnsignedLong("400752", 16));
+        assertNotNull(symbol);
+        assertEquals("A little bit after nm_ouput's frame_dummy", symbol.getSymbolName());
 
         // Different pid, should ignore the symbol from 123 mapping file
-        symbolText = symbolProvider.getSymbolText(1, 0L, Long.parseUnsignedLong("400752", 16));
-        assertEquals("frame_dummy", symbolText);
+        symbol = symbolProvider.getSymbol(1, 0L, Long.parseUnsignedLong("400752", 16));
+        assertNotNull(symbol);
+        assertEquals("frame_dummy", symbol.getSymbolName());
 
         // A symbol for process 123 that hits the mark
-        symbolText = symbolProvider.getSymbolText(123, 0L, Long.parseUnsignedLong("4005d0", 16));
-        assertEquals("same address as nm_output", symbolText);
+        symbol = symbolProvider.getSymbol(123, 0L, Long.parseUnsignedLong("4005d0", 16));
+        assertNotNull(symbol);
+        assertEquals("same address as nm_output", symbol.getSymbolName());
 
         // A symbol for process 123 that is closer to a symbol from the global nm, shoud
         // resolve to the process's value
-        symbolText = symbolProvider.getSymbolText(123, 0L, Long.parseUnsignedLong("400735", 16));
-        assertEquals("A little bit before nm_ouput's frame_dummy", symbolText);
+        symbol = symbolProvider.getSymbol(123, 0L, Long.parseUnsignedLong("400735", 16));
+        assertNotNull(symbol);
+        assertEquals("A little bit before nm_ouput's frame_dummy", symbol.getSymbolName());
 
         // process 123, outside the address space of the global mapping file
-        symbolText = symbolProvider.getSymbolText(123, 0L, Long.parseUnsignedLong("ffeeddccbbaa0090", 16));
-        assertEquals("One huge symbol from nm mapping", symbolText);
+        symbol = symbolProvider.getSymbol(123, 0L, Long.parseUnsignedLong("ffeeddccbbaa0090", 16));
+        assertNotNull(symbol);
+        assertEquals("One huge symbol from nm mapping", symbol.getSymbolName());
 
         // process 1, outside the address space of the global mapping file
-        symbolText = symbolProvider.getSymbolText(1, 0L, Long.parseUnsignedLong("ffeeddccbbaa0090", 16));
-        assertNull(symbolText);
+        symbol = symbolProvider.getSymbol(1, 0L, Long.parseUnsignedLong("ffeeddccbbaa0090", 16));
+        assertNull(symbol);
     }
 
 }

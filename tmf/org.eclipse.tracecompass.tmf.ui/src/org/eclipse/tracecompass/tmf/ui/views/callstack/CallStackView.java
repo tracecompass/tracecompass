@@ -68,6 +68,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
 import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
+import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderUtils;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -914,12 +915,8 @@ public class CallStackView extends AbstractTimeGraphView {
         } catch (StateValueTypeException e) {
         }
         if (address != Long.MAX_VALUE) {
-            for (ISymbolProvider provider : fSymbolProviders.get(trace)) {
-                String symbol = provider.getSymbolText(processId, timestamp, address);
-                if (symbol != null) {
-                    name = symbol;
-                }
-            }
+            @NonNull Collection<ISymbolProvider> providers = fSymbolProviders.get(trace);
+            name = SymbolProviderUtils.getSymbolText(providers, processId, timestamp, address);
         }
         return name;
     }
