@@ -31,8 +31,6 @@ import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.Ti
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 
-import com.google.common.collect.Iterables;
-
 /**
  * The base class for all the types of nodes that go in the History Tree.
  *
@@ -336,10 +334,12 @@ public abstract class HTNode {
      * @return The end time of this node
      */
     public long getNodeEnd() {
-        if (fIsOnDisk) {
+        fRwl.readLock().lock();
+        try {
             return fNodeEnd;
+        } finally {
+            fRwl.readLock().unlock();
         }
-        return 0;
     }
 
     /**
@@ -404,6 +404,7 @@ public abstract class HTNode {
             }
 
             fIntervals.add(index, newInterval);
+            fNodeEnd = Long.max(fNodeEnd, newInterval.getEndTime());
             fMinQuark = Integer.min(fMinQuark, newInterval.getAttribute());
             fMaxQuark = Integer.max(fMaxQuark, newInterval.getAttribute());
             fSizeOfIntervalSection += newInterval.getSizeOnDisk();
@@ -425,9 +426,9 @@ public abstract class HTNode {
         try {
             /*
              * Make sure there are no intervals in this node with their EndTime > the one
-             * requested. Only need to check the last one since they are sorted
+             * requested.
              */
-            if (!fIntervals.isEmpty() && endtime < Iterables.getLast(fIntervals).getEndTime()) {
+            if (fNodeEnd > endtime) {
                 throw new IllegalArgumentException("Closing end time should be greater than or equal to the end time of the intervals of this node"); //$NON-NLS-1$
             }
 

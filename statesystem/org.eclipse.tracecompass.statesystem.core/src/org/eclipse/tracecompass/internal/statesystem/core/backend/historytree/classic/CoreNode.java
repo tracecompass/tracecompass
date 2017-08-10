@@ -204,24 +204,6 @@ public final class CoreNode extends ParentNode {
         }
     }
 
-    private int getChildMin(int index) {
-        rwl.readLock().lock();
-        try {
-            return fChildMin[index];
-        } finally {
-            rwl.readLock().unlock();
-        }
-    }
-
-    private int getChildMax(int index) {
-        rwl.readLock().lock();
-        try {
-            return fChildMax[index];
-        } finally {
-            rwl.readLock().unlock();
-        }
-    }
-
     /**
      * Get the sequence number of the extension to this node (if there is one).
      *
@@ -323,9 +305,9 @@ public final class CoreNode extends ParentNode {
             /* Selectively search children */
             List<Integer> list = new ArrayList<>();
             for (int child = 0; child < fNbChildren; child++) {
-                if (times.intersects(getChildStart(child), getChildEnd(child))
-                        && quarks.intersects(getChildMin(child), getChildMax(child))) {
-                    int potentialNextSeqNb = getChild(child);
+                if (times.intersects(fChildStart[child], fChildEnd[child])
+                        && quarks.intersects(fChildMin[child], fChildMax[child])) {
+                    int potentialNextSeqNb = fChildren[child];
                     list.add(potentialNextSeqNb);
                 }
             }
