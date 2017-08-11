@@ -9,12 +9,19 @@
 
 package org.eclipse.tracecompass.analysis.counters.ui;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.widgets.Composite;
@@ -22,6 +29,8 @@ import org.eclipse.tracecompass.analysis.counters.core.CounterAnalysis;
 import org.eclipse.tracecompass.internal.analysis.counters.ui.TriStateFilteredCheckboxTree;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -31,6 +40,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
 
+import com.google.common.collect.Iterables;
 import com.google.common.primitives.Longs;
 
 /**
@@ -68,22 +78,39 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
         }
     };
 
-    private TmfTreeViewerEntry fRoot;
-    private TriStateFilteredCheckboxTree fTriStateFilteredCheckboxTree;
+    private final class CheckStateChangedListener implements ICheckStateListener {
+        @Override
+        public void checkStateChanged(CheckStateChangedEvent event) {
+            if (fListener != null) {
+                fListener.handleCheckStateChangedEvent(getCheckedCounterEntries());
+            }
+        }
+    }
+
+    private ITreeViewerListener fListener;
+    private TriStateFilteredCheckboxTree fCheckboxTree;
+    private Map<ITmfTrace, Object[]> fViewContext = new HashMap<>();
+    private Map<ITmfTrace, TmfTreeViewerEntry> fRoots = new HashMap<>();
 
     /**
      * Constructor
      *
      * @param parent
      *            Parent composite
-     * @param triStateFilteredCheckboxTree
-     *            <code>FilteredTree</code> wrapping a <code>CheckboxTreeViewer</code>
+     * @param checkboxTree
+     *            <code>TriStateFilteredTree</code> wrapping a
+     *            <code>CheckboxTreeViewer</code>
      */
-    public CounterTreeViewer(Composite parent, TriStateFilteredCheckboxTree triStateFilteredCheckboxTree) {
-        super(parent, triStateFilteredCheckboxTree.getViewer());
+    public CounterTreeViewer(Composite parent, TriStateFilteredCheckboxTree checkboxTree) {
+        super(parent, checkboxTree.getViewer());
 
-        fTriStateFilteredCheckboxTree = triStateFilteredCheckboxTree;
-        fTriStateFilteredCheckboxTree.getViewer().setComparator(COMPARATOR);
+        TreeViewer treeViewer = checkboxTree.getViewer();
+        treeViewer.setComparator(COMPARATOR);
+        if (treeViewer instanceof CheckboxTreeViewer) {
+            ((CheckboxTreeViewer) treeViewer).addCheckStateListener(new CheckStateChangedListener());
+        }
+        fCheckboxTree = checkboxTree;
+
         setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
@@ -94,6 +121,14 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
         });
     }
 
+    /**
+     * @param listener
+     *            Chart listening to changes in the tree's selected entries
+     */
+    public void setTreeListener(ITreeViewerListener listener) {
+        fListener = listener;
+    }
+
     @Override
     public void initializeDataSource() {
         ITmfTrace trace = getTrace();
@@ -101,9 +136,15 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
             return;
         }
 
-        fRoot = new TmfTreeViewerEntry(StringUtils.EMPTY);
-        Iterable<@NonNull CounterAnalysis> modules = TmfTraceUtils.getAnalysisModulesOfClass(trace, CounterAnalysis.class);
+        if (fRoots.containsKey(trace)) {
+            // Return if the trace has already been initialized
+            return;
+        }
 
+        TmfTreeViewerEntry root = new TmfTreeViewerEntry(StringUtils.EMPTY);
+        fRoots.put(trace, root);
+
+        Iterable<@NonNull CounterAnalysis> modules = TmfTraceUtils.getAnalysisModulesOfClass(trace, CounterAnalysis.class);
         for (CounterAnalysis module : modules) {
 
             ITmfTrace moduleTrace = module.getTrace();
@@ -112,7 +153,7 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
             }
 
             TmfTreeViewerEntry rootBranch = new TmfTreeViewerEntry(moduleTrace.getName());
-            fRoot.addChild(rootBranch);
+            root.addChild(rootBranch);
 
             module.schedule();
             module.waitForCompletion();
@@ -126,6 +167,19 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
                 addTreeViewerBranch(stateSystem, rootBranch, CounterAnalysis.GROUPED_COUNTER_ASPECTS_ATTRIB);
                 addTreeViewerBranch(stateSystem, rootBranch, CounterAnalysis.UNGROUPED_COUNTER_ASPECTS_ATTRIB);
             }
+        }
+    }
+
+    /**
+     * Select previously checked entries when going back to trace.
+     */
+    @Override
+    protected void contentChanged(ITmfTreeViewerEntry rootEntry) {
+        Object[] checkedElements = fViewContext.get(getTrace());
+        fCheckboxTree.setCheckedElements(checkedElements != null ? checkedElements : new Object[0]);
+
+        if (fListener != null) {
+            fListener.handleCheckStateChangedEvent(getCheckedCounterEntries());
         }
     }
 
@@ -143,14 +197,44 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
          * The tree displaying the trace's counters does not change when manipulating
          * the corresponding chart.
          */
-        return fRoot;
+        return fRoots.get(getTrace());
+    }
+
+    @TmfSignalHandler
+    @Override
+    public void traceOpened(@Nullable TmfTraceOpenedSignal signal) {
+        saveViewContext();
+        super.traceOpened(signal);
     }
 
     @TmfSignalHandler
     @Override
     public void traceSelected(@Nullable TmfTraceSelectedSignal signal) {
+        if (signal != null && getTrace() != signal.getTrace()) {
+            saveViewContext();
+        }
         super.traceSelected(signal);
-        fTriStateFilteredCheckboxTree.resetCheckboxesState();
+    }
+
+    @TmfSignalHandler
+    @Override
+    public void traceClosed(@Nullable TmfTraceClosedSignal signal) {
+        if (signal != null) {
+            fViewContext.remove(signal.getTrace());
+            fRoots.remove(signal.getTrace());
+        }
+        super.traceClosed(signal);
+    }
+
+    /**
+     * Save the checked entries in the view context before changing trace.
+     */
+    private void saveViewContext() {
+        ITmfTrace previousTrace = getTrace();
+        Object[] checkedElements = fCheckboxTree.getCheckedElements();
+        if (previousTrace != null) {
+            fViewContext.put(previousTrace, checkedElements);
+        }
     }
 
     private void addTreeViewerBranch(ITmfStateSystem stateSystem, TmfTreeViewerEntry rootBranch, String branchName) {
@@ -189,6 +273,11 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
             return entry.getName();
         }
         return retrieveTraceName(entry.getParent());
+    }
+
+    private Iterable<ITmfTreeViewerEntry> getCheckedCounterEntries() {
+        Object[] checkedElements = fCheckboxTree.getCheckedElements();
+        return Iterables.filter(Arrays.asList(checkedElements), ITmfTreeViewerEntry.class);
     }
 
 }

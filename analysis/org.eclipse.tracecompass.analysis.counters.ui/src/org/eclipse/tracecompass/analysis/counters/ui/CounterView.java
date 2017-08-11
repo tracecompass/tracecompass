@@ -9,14 +9,7 @@
 
 package org.eclipse.tracecompass.analysis.counters.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
-import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.analysis.counters.ui.TriStateFilteredCheckboxTree;
@@ -48,13 +41,22 @@ public class CounterView extends TmfChartView {
      */
     public static final String VIEW_TITLE = "Counters"; //$NON-NLS-1$
 
-    private TriStateFilteredCheckboxTree fTriStateFilteredCheckboxTree;
-
     /**
      * Constructor
      */
     public CounterView() {
         super(VIEW_TITLE);
+    }
+
+    @Override
+    public void createPartControl(Composite parent) {
+        super.createPartControl(parent);
+
+        TmfViewer tree = getLeftChildViewer();
+        TmfXYChartViewer chart = getChartViewer();
+        if (tree instanceof CounterTreeViewer && chart instanceof CounterChartViewer) {
+            ((CounterTreeViewer) tree).setTreeListener((CounterChartViewer) chart);
+        }
     }
 
     @Override
@@ -65,9 +67,10 @@ public class CounterView extends TmfChartView {
     @Override
     protected @NonNull TmfViewer createLeftChildViewer(Composite parent) {
         // Create the tree viewer with a filtered checkbox
-        fTriStateFilteredCheckboxTree = new TriStateFilteredCheckboxTree(parent, SWT.MULTI | SWT.H_SCROLL | SWT.FULL_SELECTION, new CounterTreePatternFilter(), true);
-        fTriStateFilteredCheckboxTree.addCheckStateListener(new CheckStateChangedListener());
-        CounterTreeViewer treeViewer = new CounterTreeViewer(parent, fTriStateFilteredCheckboxTree);
+        int treeStyle = SWT.MULTI | SWT.H_SCROLL | SWT.FULL_SELECTION;
+        CounterTreePatternFilter filter = new CounterTreePatternFilter();
+        TriStateFilteredCheckboxTree triStateFilteredCheckboxTree = new TriStateFilteredCheckboxTree(parent, treeStyle, filter, true);
+        CounterTreeViewer treeViewer = new CounterTreeViewer(parent, triStateFilteredCheckboxTree);
 
         // Initialize the tree viewer with the currently selected trace
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
@@ -77,33 +80,6 @@ public class CounterView extends TmfChartView {
         }
 
         return treeViewer;
-    }
-
-    private final class CheckStateChangedListener implements ICheckStateListener {
-
-        @Override
-        public void checkStateChanged(CheckStateChangedEvent event) {
-            TmfXYChartViewer chartViewer = getChartViewer();
-            if (chartViewer == null) {
-                return;
-            }
-
-            ICheckable checkboxTree = event.getCheckable();
-            if (checkboxTree instanceof CheckboxTreeViewer) {
-                List<CounterTreeViewerEntry> entries = new ArrayList<>();
-                for (Object checkedElement : fTriStateFilteredCheckboxTree.getCheckedElements()) {
-                    if (checkedElement instanceof CounterTreeViewerEntry) {
-                        entries.add((CounterTreeViewerEntry) checkedElement);
-                    }
-                }
-
-                // The chart uses the quarks to display data for each counters
-                if (chartViewer instanceof CounterChartViewer) {
-                    ((CounterChartViewer) chartViewer).updateChart(entries);
-                }
-            }
-        }
-
     }
 
 }

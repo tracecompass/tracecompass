@@ -53,14 +53,10 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
         super(parent, treeStyle, filter, useNewLook);
     }
 
-    /**
-     * Reset the state of the checkboxes.
-     *
-     * @since 3.1
-     */
-    public void resetCheckboxesState() {
-        fCheckedObjects.clear();
-        fGrayedObjects.clear();
+    @Override
+    public void setCheckedElements(Object[] elements) {
+        super.setCheckedElements(elements);
+        maintainAllCheckIntegrity();
     }
 
     @Override

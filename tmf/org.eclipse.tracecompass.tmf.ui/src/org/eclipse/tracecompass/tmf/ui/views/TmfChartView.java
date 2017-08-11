@@ -37,6 +37,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
  * into the viewer when the view is created.
  *
  * @author Bernd Hufmann
+ * @author Mikael Ferland
  */
 public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
 
@@ -78,6 +79,16 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
      */
     protected TmfXYChartViewer getChartViewer() {
         return fChartViewer;
+    }
+
+    /**
+     * Returns the left TMF viewer implementation.
+     *
+     * @return the left TMF viewer {@link TmfViewer}
+     * @since 3.1
+     */
+    protected TmfViewer getLeftChildViewer() {
+        return fTmfViewer;
     }
 
     /**

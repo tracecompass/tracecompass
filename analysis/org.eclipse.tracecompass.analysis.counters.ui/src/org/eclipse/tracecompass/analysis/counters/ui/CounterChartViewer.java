@@ -9,9 +9,7 @@
 
 package org.eclipse.tracecompass.analysis.counters.ui;
 
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,9 +25,11 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 import org.swtchart.Chart;
-import org.swtchart.ISeries;
+
+import com.google.common.collect.Iterables;
 
 /**
  * XY line chart which displays the counters data.
@@ -37,11 +37,11 @@ import org.swtchart.ISeries;
  * @author Matthew Khouzam
  * @author Mikael Ferland
  */
-public final class CounterChartViewer extends TmfCommonXLineChartViewer {
+public final class CounterChartViewer extends TmfCommonXLineChartViewer implements ITreeViewerListener {
 
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(CounterChartViewer.class);
 
-    private Collection<CounterTreeViewerEntry> fEntries = Collections.emptyList();
+    private Iterable<ITmfTreeViewerEntry> fEntries = Collections.emptyList();
 
     /**
      * Constructor
@@ -64,18 +64,12 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer {
      * @param entries
      *            Counters to display on the chart
      */
-    public void updateChart(List<CounterTreeViewerEntry> entries) {
+    @Override
+    public void handleCheckStateChangedEvent(Iterable<ITmfTreeViewerEntry> entries) {
         cancelUpdate();
-        resetData();
+        clearContent();
         fEntries = entries;
         updateContent();
-    }
-
-    @TmfSignalHandler
-    @Override
-    public void traceSelected(@Nullable TmfTraceSelectedSignal signal) {
-        super.traceSelected(signal);
-        resetData();
     }
 
     @Override
@@ -92,7 +86,7 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer {
          * values first (for performance increase)
          */
         try (ScopeLog log = new ScopeLog(LOGGER, Level.FINE, "CounterChartViewer#updateData")) { //$NON-NLS-1$
-            for (CounterTreeViewerEntry entry : fEntries) {
+            for (CounterTreeViewerEntry counterEntry : Iterables.filter(fEntries, CounterTreeViewerEntry.class)) {
                 if (monitor.isCanceled()) {
                     return;
                 }
@@ -100,8 +94,8 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer {
                 // Create the array of values for the series
                 double[] steps = new double[xAxis.length];
 
-                ITmfStateSystem ss = entry.getStateSystem();
-                Integer quark = entry.getQuark();
+                ITmfStateSystem ss = counterEntry.getStateSystem();
+                Integer quark = counterEntry.getQuark();
 
                 long stateSystemStartTime = ss.getStartTime();
                 long stateSystemEndTime = ss.getCurrentEndTime();
@@ -121,7 +115,7 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer {
                         }
                     }
                 }
-                setSeries(entry.getFullPath(), steps);
+                setSeries(counterEntry.getFullPath(), steps);
             }
         } catch (StateSystemDisposedException e) {
             /*
@@ -134,13 +128,10 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer {
         updateDisplay();
     }
 
-    /**
-     * Clear the chart.
-     */
-    private void resetData() {
-        for (ISeries serie : getSwtChart().getSeriesSet().getSeries()) {
-            deleteSeries(serie.getId());
-        }
+    @TmfSignalHandler
+    @Override
+    public void traceSelected(@Nullable TmfTraceSelectedSignal signal) {
+        super.traceSelected(signal);
         fEntries = Collections.emptyList();
     }
 
