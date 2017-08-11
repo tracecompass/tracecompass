@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 Ericsson
+ * Copyright (c) 2014, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.commands.ExecutionException;
@@ -70,6 +71,7 @@ import org.eclipse.swtbot.swt.finder.results.IntResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.utils.MessageFormat;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
@@ -97,6 +99,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers.ProjectElementHasChild;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitTimeoutException;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.TracingPerspectiveFactory;
 import org.eclipse.ui.IEditorPart;
@@ -1208,5 +1211,22 @@ public final class SWTBotUtils {
         }
 
         bot.button(OK_BUTTON).click();
+    }
+
+    /**
+     * Wait for a predicate to succeed.
+     *
+     * @param predicate
+     *            The predicate
+     * @param argument
+     *            The argument used by the predicate for match
+     * @param failureMessage
+     *            The failure message
+     * @throws WaitTimeoutException
+     *             if the waiting time passes the {@link SWTBotPreferences#TIMEOUT}
+     *             value
+     */
+    public static <E> void waitUntil(final Predicate<E> predicate, final E argument, final String failureMessage) {
+        WaitUtils.waitUntil(predicate, argument, failureMessage, SWTBotPreferences.TIMEOUT);
     }
 }

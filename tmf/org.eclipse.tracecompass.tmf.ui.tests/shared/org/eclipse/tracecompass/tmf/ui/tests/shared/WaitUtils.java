@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -93,7 +93,7 @@ public final class WaitUtils {
     }
 
     /**
-     * Wait for a predicate to succeed
+     * Wait for a predicate to succeed.
      *
      * @param predicate
      *            The predicate
@@ -101,6 +101,8 @@ public final class WaitUtils {
      *            The argument used by the predicate for match
      * @param failureMessage
      *            The failure message
+     * @throws WaitTimeoutException
+     *             once the waiting time passes the maximum value
      */
     public static <E> void waitUntil(final Predicate<E> predicate, final E argument, final String failureMessage) {
         IWaitCondition condition = new IWaitCondition() {
@@ -124,9 +126,8 @@ public final class WaitUtils {
      * @param condition
      *            the condition to be met
      * @param maxWait
-     *            the maximum time to wait, in milliseconds. Once the waiting
-     *            time passes the maximum value, a WaitTimeoutException is
-     *            thrown
+     *            the maximum time to wait, in milliseconds. Once the waiting time
+     *            passes the maximum value, a WaitTimeoutException is thrown
      * @throws WaitTimeoutException
      *             once the waiting time passes the maximum value
      */
@@ -161,5 +162,36 @@ public final class WaitUtils {
         } catch (Exception e) {
             throw new WaitTimeoutException(condition.getFailureMessage()); //$NON-NLS-1$
         }
+    }
+
+    /**
+     * Wait for a predicate to succeed.
+     *
+     * @param predicate
+     *            The predicate
+     * @param argument
+     *            The argument used by the predicate for match
+     * @param failureMessage
+     *            The failure message
+     * @param maxWait
+     *            the maximum time to wait, in milliseconds. Once the waiting time
+     *            passes the maximum value, a WaitTimeoutException is thrown
+     * @throws WaitTimeoutException
+     *             once the waiting time passes the maximum value
+     */
+    public static <E> void waitUntil(final Predicate<E> predicate, final E argument, final String failureMessage, long maxWait) {
+        IWaitCondition condition = new IWaitCondition() {
+
+            @Override
+            public boolean test() throws Exception {
+                return predicate.test(argument);
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return failureMessage;
+            }
+        };
+        waitUntil(condition, maxWait);
     }
 }

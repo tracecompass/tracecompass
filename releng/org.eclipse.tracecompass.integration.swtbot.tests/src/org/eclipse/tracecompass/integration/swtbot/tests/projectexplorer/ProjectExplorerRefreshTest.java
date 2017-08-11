@@ -19,12 +19,14 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -131,7 +133,7 @@ public class ProjectExplorerRefreshTest {
         FileUtils.copyDirectory(TEST_FILE_UST, FileUtils.getFile(fTracesFolder, TEST_FILE_UST.getName()));
         SWTBotTreeItem tracesFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
         assertEquals(0, tracesFolder.getItems().length);
-        tracesFolder.contextMenu().menu("Refresh").click();
+        refresh(() -> tracesFolder.contextMenu().menu("Refresh").click());
         SWTBotTreeItem kernelTrace = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, TEST_FILE_KERNEL.getName());
         kernelTrace.contextMenu().menu("Select Trace Type...", "Common Trace Format", "Linux Kernel Trace").click();
         SWTBotTreeItem ustTrace = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, TEST_FILE_UST.getName());
@@ -156,7 +158,7 @@ public class ProjectExplorerRefreshTest {
         FileUtils.copyDirectory(TEST_FILE_KERNEL_CLASH, FileUtils.getFile(fTracesFolder, TEST_FILE_KERNEL.getName()), false);
         assertTrue(kernelTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         assertTrue(experiment.contextMenu().menuItems().contains("Delete Supplementary Files..."));
-        tracesFolder.contextMenu().menu("Refresh").click();
+        refresh(() -> tracesFolder.contextMenu().menu("Refresh").click());
         SWTBotShell shell = fBot.shell("Trace Changed");
         shell.bot().button("No").click();
         assertTrue(kernelTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
@@ -165,7 +167,7 @@ public class ProjectExplorerRefreshTest {
         SWTBotUtils.activateEditor(fBot, "Experiment");
         FileUtils.copyDirectory(TEST_FILE_KERNEL, FileUtils.getFile(fTracesFolder, TEST_FILE_KERNEL.getName()), false);
         assertTrue(kernelTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
-        tracesFolder.contextMenu().menu("Refresh").click();
+        refresh(() -> tracesFolder.contextMenu().menu("Refresh").click());
         shell = fBot.shell("Trace Changed");
         shell.bot().button("Yes").click();
         assertFalse(kernelTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
@@ -194,7 +196,7 @@ public class ProjectExplorerRefreshTest {
         assertTrue(kernelTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         assertTrue(ustTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         assertTrue(experiment.contextMenu().menuItems().contains("Delete Supplementary Files..."));
-        tracesFolder.select().pressShortcut(Keystrokes.F5);
+        refresh(() -> tracesFolder.select().pressShortcut(Keystrokes.F5));
         assertFalse(kernelTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         assertFalse(ustTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         assertFalse(experiment.contextMenu().menuItems().contains("Delete Supplementary Files..."));
@@ -212,9 +214,24 @@ public class ProjectExplorerRefreshTest {
         SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, TEST_FILE_KERNEL.getName());
         SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, TEST_FILE_UST.getName());
         FileUtils.deleteDirectory(FileUtils.getFile(fTracesFolder, TEST_FILE_UST.getName()));
-        fBot.menu().menu("File", "Refresh").click();
+        refresh(() -> fBot.menu().menu("File", "Refresh").click());
         assertEquals(1, tracesFolder.getItems().length);
         SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, TEST_FILE_KERNEL.getName());
     }
 
+    private static void refresh(Runnable runnable) {
+        AtomicBoolean resourceChanged = new AtomicBoolean();
+        IResourceChangeListener listener = event -> {
+            resourceChanged.set(true);
+        };
+        try {
+            ResourcesPlugin.getWorkspace().addResourceChangeListener(listener);
+            SWTBotUtils.waitUntil(refresh -> {
+                refresh.run();
+                return resourceChanged.get();
+            }, runnable, "Resource change event not received");
+        } finally {
+            ResourcesPlugin.getWorkspace().removeResourceChangeListener(listener);
+        }
+    }
 }
