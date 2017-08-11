@@ -24,3 +24,4 @@ Import-Package: com.google.common.base,
  com.google.common.primitives,
  org.apache.commons.lang3,
  org.swtchart
+Export-Package: org.eclipse.tracecompass.analysis.counters.ui

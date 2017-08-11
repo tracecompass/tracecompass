@@ -52,6 +52,7 @@
         </property>
       </activation>
       <modules>
+        <module>org.eclipse.tracecompass.analysis.counters.ui.swtbot.tests</module>
         <module>org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests</module>
         <module>org.eclipse.tracecompass.analysis.timing.ui.swtbot.tests</module>
         <module>org.eclipse.tracecompass.analysis.lami.ui.swtbot.tests</module>
