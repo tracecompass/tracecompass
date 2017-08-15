@@ -23,6 +23,9 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.test.performance.Dimension;
+import org.eclipse.test.performance.Performance;
+import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -207,12 +210,18 @@ public abstract class ViewsResponseTest {
         TmfTimeRange selectionRange = TmfTraceManager.getInstance().getCurrentTraceContext().getSelectionRange();
         IWorkbenchPart part = view.getViewReference().getPart(false);
 
+        Performance perf = Performance.getDefault();
+        PerformanceMeter pmBuild = perf.createPerformanceMeter("UI responsiveness: " + view.getTitle());
+        perf.tagAsSummary(pmBuild, view.getTitle() + " CPU", Dimension.CPU_TIME);
+
         // Set the time range to the full trace range
         ITmfTrace activeTrace = TmfTraceManager.getInstance().getActiveTrace();
         assertNotNull(activeTrace);
         TmfTimeRange fullRange = new TmfTimeRange(activeTrace.getStartTime(), activeTrace.getEndTime());
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, fullRange));
+        pmBuild.start();
         waitViewReady(part, selectionRange, fullRange.getEndTime());
+        pmBuild.stop();
         TmfTimeRange windowRange = fullRange;
 
         // Zoom in 10 times 15 percent of the range and wait for the view to be
@@ -221,36 +230,50 @@ public abstract class ViewsResponseTest {
             double delta = (windowRange.getEndTime().getValue() - windowRange.getStartTime().getValue()) * 0.15;
             TmfTimeRange newWindowRange = new TmfTimeRange(TmfTimestamp.fromNanos((long) (windowRange.getStartTime().toNanos() + delta)), TmfTimestamp.fromNanos((long) (windowRange.getEndTime().toNanos() - delta)));
             TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, newWindowRange));
+            pmBuild.start();
             windowRange = newWindowRange;
             waitViewReady(part, selectionRange, newWindowRange.getEndTime());
+            pmBuild.stop();
         }
 
         // At this zoom level, go to the end
         long scrollTime = (windowRange.getEndTime().toNanos() - windowRange.getStartTime().toNanos()) / 2;
         windowRange = new TmfTimeRange(TmfTimestamp.fromNanos(fullRange.getEndTime().toNanos() - (2 * scrollTime)), fullRange.getEndTime());
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, windowRange));
+        pmBuild.start();
         waitViewReady(part, selectionRange, windowRange.getEndTime());
+        pmBuild.stop();
 
         // Scroll back horizontally half the range at a time
         for (int i = 0; i < 10; i++) {
             TmfTimeRange newWindowRange = new TmfTimeRange(TmfTimestamp.fromNanos(windowRange.getStartTime().toNanos() - scrollTime), TmfTimestamp.fromNanos(windowRange.getEndTime().toNanos() - scrollTime));
             TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, newWindowRange));
+            pmBuild.start();
             windowRange = newWindowRange;
             waitViewReady(part, selectionRange, newWindowRange.getEndTime());
+            pmBuild.stop();
         }
 
         // then go all the way back to the beginning
         windowRange = new TmfTimeRange(fullRange.getStartTime(), TmfTimestamp.fromNanos(fullRange.getStartTime().toNanos() + scrollTime));
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, windowRange));
+        pmBuild.start();
         waitViewReady(part, selectionRange, windowRange.getEndTime());
+        pmBuild.stop();
 
         // and zoom out again
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, fullRange));
+        pmBuild.start();
         waitViewReady(part, selectionRange, fullRange.getEndTime());
+        pmBuild.stop();
 
         // Reset the original window range
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, originalWindowRange));
+        pmBuild.start();
         waitViewReady(part, selectionRange, originalWindowRange.getEndTime());
+        pmBuild.stop();
+
+        pmBuild.commit();
     }
 
     private void waitViewReady(IWorkbenchPart part, @NonNull TmfTimeRange selectionRange, @NonNull ITmfTimestamp visibleTime) {

@@ -36,6 +36,7 @@ Import-Package: com.google.common.collect,
  org.eclipse.swtbot.swt.finder.utils,
  org.eclipse.swtbot.swt.finder.waits,
  org.eclipse.swtbot.swt.finder.widgets,
+ org.eclipse.test.performance,
  org.swtchart
 Export-Package: org.eclipse.tracecompass.tmf.ui.swtbot.tests,
  org.eclipse.tracecompass.tmf.ui.swtbot.tests.parsers.custom;x-internal:=true,
