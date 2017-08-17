@@ -41,6 +41,7 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer implemen
 
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(CounterChartViewer.class);
 
+    private boolean isCumulative = false;
     private Iterable<ITmfTreeViewerEntry> fEntries = Collections.emptyList();
 
     /**
@@ -56,6 +57,15 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer implemen
         chart.getLegend().setPosition(SWT.BOTTOM);
         chart.getLegend().setVisible(true);
         chart.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+    }
+
+    /**
+     * Display the counters data cumulatively or not.
+     */
+    public void toggleCumulative() {
+        cancelUpdate();
+        isCumulative ^= true;
+        updateContent();
     }
 
     /**
@@ -110,8 +120,11 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer implemen
                         if (nextTime >= stateSystemStartTime && nextTime <= stateSystemEndTime) {
                             Object next = ss.querySingleState(nextTime, quark).getValue();
                             long nextValue = next instanceof Long ? (long) next : 0;
-                            steps[i] = (next == null) ? 0 : nextValue - prevValue;
+                            long differentialValue = (next == null) ? 0 : nextValue - prevValue;
+                            steps[i] = isCumulative ? nextValue : differentialValue;
                             prevValue = nextValue;
+                        } else if (isCumulative) {
+                            steps[i] = prevValue;
                         }
                     }
                 }

@@ -10,6 +10,8 @@
 package org.eclipse.tracecompass.analysis.counters.ui;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.analysis.counters.ui.TriStateFilteredCheckboxTree;
@@ -19,6 +21,8 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * Main implementation for the counters view.
@@ -57,6 +61,10 @@ public class CounterView extends TmfChartView {
         if (tree instanceof CounterTreeViewer && chart instanceof CounterChartViewer) {
             ((CounterTreeViewer) tree).setTreeListener((CounterChartViewer) chart);
         }
+
+        // Add a tool bar button to display counters data cumulatively
+        IActionBars bars = getViewSite().getActionBars();
+        bars.getToolBarManager().add(getCumulativeAction());
     }
 
     @Override
@@ -80,6 +88,26 @@ public class CounterView extends TmfChartView {
         }
 
         return treeViewer;
+    }
+
+    private Action getCumulativeAction() {
+        Action action = new Action(Messages.CounterView_CumulativeAction_Text, IAction.AS_CHECK_BOX) {
+            private boolean isCumulative = false;
+
+            @Override
+            public void run() {
+                isCumulative ^= true;
+                setToolTipText(isCumulative ? Messages.CounterView_CumulativeAction_DifferentialTooltipText : Messages.CounterView_CumulativeAction_CumulativeTooltipText);
+                TmfXYChartViewer chart = getChartViewer();
+                if (chart instanceof CounterChartViewer) {
+                    ((CounterChartViewer) chart).toggleCumulative();
+                }
+            }
+        };
+
+        action.setToolTipText(Messages.CounterView_CumulativeAction_CumulativeTooltipText);
+        action.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.tracecompass.tmf.ui", "icons/elcl16/sigma.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+        return action;
     }
 
 }
