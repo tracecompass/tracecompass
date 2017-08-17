@@ -24,9 +24,10 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAx
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCpuQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedThreadQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -81,8 +82,8 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
     }
 
     @Override
-    public ITmfCommonXAxisResponse fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        ITmfCommonXAxisResponse res = verifyParameters(fModule, filter, monitor);
+    public TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        TmfModelResponse<ITmfCommonXAxisModel> res = verifyParameters(fModule, filter, monitor);
         if (res != null) {
             return res;
         }
@@ -107,9 +108,11 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
         double[] selectedThreadValues = new double[xValues.length];
 
         long prevTime = Math.max(filter.getStart(), ss.getStartTime());
+        long currentEnd = ss.getCurrentEndTime();
+
         for (int i = 1; i < xValues.length; i++) {
             long time = xValues[i];
-            if (time >= ss.getStartTime() && time <= ss.getCurrentEndTime() && prevTime < time) {
+            if (time >= ss.getStartTime() && time <= currentEnd && prevTime < time) {
                 Map<String, Long> cpuUsageMap = Maps.filterKeys(fModule.getCpuUsageInRange(cpus, prevTime, time),
                     key -> key.startsWith(KernelCpuUsageAnalysis.TOTAL)
                 );
@@ -143,9 +146,8 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
             ySeries.put(selectedThread, new YModel(selectedThread, selectedThreadValues));
         }
 
-        long currentEnd = ss.getCurrentEndTime();
-        boolean complete = ss.waitUntilBuilt(0);
-        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.CpuUsageDataProvider_title), xValues, ySeries.build(), currentEnd, complete);
+        boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
+        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.CpuUsageDataProvider_title), xValues, ySeries.build(), complete);
     }
 
     private static double normalize(long prevTime, long time, long value) {

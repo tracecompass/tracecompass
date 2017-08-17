@@ -39,9 +39,10 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLo
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -497,40 +498,39 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
             return;
         }
 
-        long currentEnd = 0;
-        while (currentEnd < filters.getEnd()) {
-            ITmfCommonXAxisResponse response = fXYDataProvider.fetchXY(filters, monitor);
+        boolean isComplete = false;
+        do {
+            TmfModelResponse<ITmfCommonXAxisModel> response = fXYDataProvider.fetchXY(filters, monitor);
             ITmfCommonXAxisModel model = response.getModel();
             if (model != null) {
                 extractXYModelAndUpdateViewModel(model);
                 updateDisplay();
             }
 
-            ITmfCommonXAxisResponse.Status status = response.getStatus();
-            currentEnd = response.getCurrentEnd();
-
-            /* Model is complete, no need to request again the data provider */
-            if (status == ITmfCommonXAxisResponse.Status.COMPLETED) {
-                return;
-            }
-            /* Error occured, log and return */
-            else if (status == ITmfCommonXAxisResponse.Status.FAILED || status == ITmfCommonXAxisResponse.Status.CANCELLED) {
-                TraceCompassLogUtils.traceInstant(LOGGER, Level.WARNING, String.valueOf(response.getStatusMessage()));
-                return;
-            }
-            /*
-             * Status is RUNNING. Sleeping current thread to wait before request data
-             * provider again
-             */
-            else {
+            ITmfResponse.Status status = response.getStatus();
+            if (status == ITmfResponse.Status.COMPLETED) {
+                /* Model is complete, no need to request again the data provider */
+                isComplete = true;
+            } else if (status == ITmfResponse.Status.FAILED || status == ITmfResponse.Status.CANCELLED) {
+                /* Error occurred, log and return */
+                TraceCompassLogUtils.traceInstant(LOGGER, Level.WARNING, response.getStatusMessage());
+                isComplete = true;
+            } else {
+                /**
+                 * Status is RUNNING. Sleeping current thread to wait before request data
+                 * provider again
+                 **/
                 try {
                     Thread.sleep(BUILD_UPDATE_TIMEOUT);
                 } catch (InterruptedException e) {
+                    /**
+                     * InterruptedException is throw by Thread.Sleep and we should retry querying
+                     * the data provider
+                     **/
                     TraceCompassLogUtils.traceInstant(LOGGER, Level.INFO, e.getMessage());
-                    return;
                 }
             }
-        }
+        } while (!isComplete);
     }
 
     /**

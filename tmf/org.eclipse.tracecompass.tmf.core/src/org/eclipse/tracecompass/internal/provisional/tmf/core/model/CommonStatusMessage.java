@@ -9,12 +9,13 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model;
 
-import org.eclipse.jdt.annotation.Nullable;
+import java.util.Objects;
+
 import org.eclipse.tracecompass.internal.tmf.core.model.Messages;
 
 /**
  * Data providers will return a response and it may contains a detailed message
- * if necessary. This class regroups common status messages that data providers
+ * if necessary. This class regroup common status messages that data providers
  * can send.
  *
  * Since we don't want to expose Messages class, CommonStatusMessage is a
@@ -26,45 +27,45 @@ public final class CommonStatusMessage {
 
     /**
      * A possible detailed message for a
-     * {@link org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse.Status#RUNNING}
+     * {@link org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse.Status#RUNNING}
      * status
      */
-    public static final @Nullable String RUNNING = Messages.CommonStatusMessage_Running;
+    public static final String RUNNING = Objects.requireNonNull(Messages.CommonStatusMessage_Running);
 
     /**
      * A possible detailed message for a
-     * {@link org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse.Status#COMPLETED}
+     * {@link org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse.Status#COMPLETED}
      * status
      */
-    public static final @Nullable String COMPLETED = Messages.CommonStatusMessage_Completed;
+    public static final String COMPLETED = Objects.requireNonNull(Messages.CommonStatusMessage_Completed);
 
     /**
      * A possible detailed message for a
-     * {@link org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse.Status#CANCELLED}
+     * {@link org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse.Status#CANCELLED}
      * status
      */
-    public static final @Nullable String TASK_CANCELLED = Messages.CommonStatusMessage_TaskCancelled;
+    public static final String TASK_CANCELLED = Objects.requireNonNull(Messages.CommonStatusMessage_TaskCancelled);
 
     /**
      * A possible detailed message for a
-     * {@link org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse.Status#FAILED}
+     * {@link org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse.Status#FAILED}
      * status
      */
-    public static final @Nullable String ANALYSIS_INITIALIZATION_FAILED = Messages.CommonStatusMessage_AnalysisInitializationFailed;
+    public static final String ANALYSIS_INITIALIZATION_FAILED = Objects.requireNonNull(Messages.CommonStatusMessage_AnalysisInitializationFailed);
 
     /**
      * A possible detailed message for a
-     * {@link org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse.Status#FAILED}
+     * {@link org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse.Status#FAILED}
      * status
      */
-    public static final @Nullable String STATE_SYSTEM_FAILED = Messages.CommonStatusMessage_StateSystemFailed;
+    public static final String STATE_SYSTEM_FAILED = Objects.requireNonNull(Messages.CommonStatusMessage_StateSystemFailed);
 
     /**
      * A possible detailed message for a
-     * {@link org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse.Status#FAILED}
+     * {@link org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse.Status#FAILED}
      * status
      */
-    public static final @Nullable String INCORRECT_QUERY_INTERVAL = Messages.CommonStatusMessage_IncorrectQueryInterval;
+    public static final String INCORRECT_QUERY_INTERVAL = Objects.requireNonNull(Messages.CommonStatusMessage_IncorrectQueryInterval);
 
     /**
      * Constructor

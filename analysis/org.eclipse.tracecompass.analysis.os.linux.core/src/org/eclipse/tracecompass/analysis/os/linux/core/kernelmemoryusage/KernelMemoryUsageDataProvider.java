@@ -22,9 +22,10 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatus
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedThreadQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -77,8 +78,8 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
     }
 
     @Override
-    public @NonNull ITmfCommonXAxisResponse fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        ITmfCommonXAxisResponse res = verifyParameters(fModule, filter, monitor);
+    public @NonNull TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        TmfModelResponse<ITmfCommonXAxisModel> res = verifyParameters(fModule, filter, monitor);
         if (res != null) {
             return res;
         }
@@ -100,6 +101,7 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
         double[] selectedThreadValues = new double[xValues.length];
 
         int selectedThreadKey = ss.optQuarkAbsolute(selectedThread);
+        long currentEnd = ss.getCurrentEndTime();
 
         try {
             for (int i = 0; i < xValues.length; i++) {
@@ -108,7 +110,7 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
                 }
 
                 long time = xValues[i];
-                if (time >= ss.getStartTime() && time <= ss.getCurrentEndTime()) {
+                if (time >= ss.getStartTime() && time <= currentEnd) {
                     /* The subattributes of the root are the different threads */
                     List<Integer> threadQuarkList = ss.getSubAttributes(-1, false);
 
@@ -127,7 +129,7 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
                 }
             }
 
-            Pair<Double, Double> values = extractValuesShift(ss, filter.getEnd(), selectedThreadKey);
+            Pair<Double, Double> values = extractValuesShift(ss, Long.min(filter.getEnd(), currentEnd), selectedThreadKey);
 
             /**
              * We shift the two displayed lines up.
@@ -149,14 +151,11 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
             ySeries.put(selectedThread, new YModel(selectedThread, selectedThreadValues));
         }
 
-        boolean complete = ss.waitUntilBuilt(0);
-        long currentEnd = ss.getCurrentEndTime();
-        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.KernelMemoryUsageDataProvider_title), xValues, ySeries.build(), currentEnd, complete);
+        boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
+        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.KernelMemoryUsageDataProvider_title), xValues, ySeries.build(), complete);
     }
 
     private static Pair<Double, Double> extractValuesShift(ITmfStateSystem ss, long time, int selectedThreadKey) throws StateSystemDisposedException {
-
-        long clampedEnd = Math.min(time, ss.getCurrentEndTime());
 
         /**
          * For each thread, we look for its lowest value since the beginning of the
@@ -168,7 +167,7 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
         /*
          * The lowest value we are searching is at the end of the current selected zone
          */
-        List<ITmfStateInterval> kernelState = ss.queryFullState(clampedEnd);
+        List<ITmfStateInterval> kernelState = ss.queryFullState(time);
         List<Integer> threadQuarkList = ss.getQuarks("*", KernelMemoryAnalysisModule.THREAD_LOWEST_MEMORY_VALUE); //$NON-NLS-1$
         /* We add the lowest value of each thread */
         for (Integer threadQuark : threadQuarkList) {

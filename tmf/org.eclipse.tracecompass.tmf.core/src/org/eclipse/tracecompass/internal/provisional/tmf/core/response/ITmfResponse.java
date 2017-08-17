@@ -7,23 +7,20 @@
  * http://www.eclipse.org/legal/epl-v10.html
  **********************************************************************/
 
-package org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy;
-
-import org.eclipse.jdt.annotation.Nullable;
+package org.eclipse.tracecompass.internal.provisional.tmf.core.response;
 
 /**
- * This class represents a response from a XY data providers. Some analyses may
- * take too long so we return a partial model wrapped in a response. Depending
- * on the status, it's the responsability of the viewer to request again the XY
- * data provider for an updated model. Instances of this class should be
- * immutables.
+ * A response interface. It contains informations about the status and a
+ * detailed message of it. Data providers that return partial models may
+ * implements this interface.
  *
  * @author Yonni Chen
+ * @since 3.1
  */
-public interface ITmfCommonXAxisResponse {
+public interface ITmfResponse {
 
     /**
-     * The status of the response can be either a running, completed, failed or
+     * The status of the response can be either a runing, completed, failed or
      * cancelled
      *
      * @author Yonni Chen
@@ -50,16 +47,7 @@ public interface ITmfCommonXAxisResponse {
     }
 
     /**
-     * Gets the model encapsulated by the response. This model should never be null
-     * if the status is running or completed, but is expected to be null when failed
-     * or cancelled.
-     *
-     * @return The XY model.
-     */
-    @Nullable ITmfCommonXAxisModel getModel();
-
-    /**
-     * Gets the status of the response.
+     * Gets the status of the response
      *
      * @return A {@link Status}
      */
@@ -70,12 +58,5 @@ public interface ITmfCommonXAxisResponse {
      *
      * @return An associated message with the status.
      */
-    @Nullable String getStatusMessage();
-
-    /**
-     * Get current end of the state system
-     *
-     * @return the current end
-     */
-    long getCurrentEnd();
+    String getStatusMessage();
 }

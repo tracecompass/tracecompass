@@ -19,9 +19,10 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsModule;
@@ -52,7 +53,7 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
     }
 
     @Override
-    public @NonNull ITmfCommonXAxisResponse fetchXY(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<ITmfCommonXAxisModel> fetchXY(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
 
         long[] xValues = filter.getTimesRequested();
         int n = xValues.length;
@@ -84,6 +85,6 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
         String title = Objects.requireNonNull(Messages.HistogramDataProvider_Title);
         String seriesName = Objects.requireNonNull(Messages.HistogramDataProvider_NumberOfEvent);
         Map<String, IYModel> ySeries = ImmutableMap.of(seriesName, new YModel(seriesName, y));
-        return TmfCommonXAxisResponseFactory.create(title, xValues, ySeries, filter.getEnd(), true);
+        return TmfCommonXAxisResponseFactory.create(title, xValues, ySeries, true);
     }
 }

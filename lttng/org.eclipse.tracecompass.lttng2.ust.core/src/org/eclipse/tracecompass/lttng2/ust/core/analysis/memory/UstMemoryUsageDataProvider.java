@@ -23,9 +23,10 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractStat
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -76,8 +77,8 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
     }
 
     @Override
-    public ITmfCommonXAxisResponse fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        ITmfCommonXAxisResponse res = verifyParameters(fModule, filter, monitor);
+    public TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        TmfModelResponse<ITmfCommonXAxisModel> res = verifyParameters(fModule, filter, monitor);
         if (res != null) {
             return res;
         }
@@ -87,6 +88,8 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
         List<Integer> tidQuarks = ss.getSubAttributes(-1, false);
         Map<Integer, String> processName = new HashMap<>();
         long[] xValues = filter.getTimesRequested();
+
+        long currentEnd = ss.getCurrentEndTime();
 
         /*
          * TODO: It should only show active threads in the time range. If a tid does not
@@ -99,7 +102,7 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
                     return TmfCommonXAxisResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
                 }
                 long time = xValues[i];
-                if (time >= ss.getStartTime() && time <= ss.getCurrentEndTime()) {
+                if (time >= ss.getStartTime() && time <= currentEnd) {
                     List<ITmfStateInterval> fullState = ss.queryFullState(time);
                     for (int quark : tidQuarks) {
                         int memoryAttribute = ss.optQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_MEMORY_ATTRIBUTE);
@@ -133,9 +136,8 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
             ySeries.put(name, new YModel(name, tempEntry.getValue()));
         }
 
-        boolean complete = ss.waitUntilBuilt(0);
-        long currentEnd = ss.getCurrentEndTime();
-        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.MemoryUsageDataProvider_Title), xValues, ySeries.build(), currentEnd, complete);
+        boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
+        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.MemoryUsageDataProvider_Title), xValues, ySeries.build(), complete);
     }
 
     private static String beautifyName(@Nullable String name, ITmfStateSystem ss, int quark) {

@@ -24,9 +24,10 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractTmfT
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -161,7 +162,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
     }
 
     @Override
-    public ITmfCommonXAxisResponse fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
 
         if (!(fProvider instanceof IAnalysisModule)) {
             return TmfCommonXAxisResponseFactory.createFailedResponse(Messages.SegmentStoreDataProvider_SegmentMustBeAnIAnalysisModule);
@@ -196,7 +197,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
 
         IYModel yModel = new YModel(Objects.requireNonNull(Messages.SegmentStoreDataProvider_Duration), Objects.requireNonNull(Doubles.toArray(yValues)));
         Map<String, IYModel> ySeries = ImmutableMap.of(Objects.requireNonNull(Messages.SegmentStoreDataProvider_Duration), yModel);
-        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.SegmentStoreScatterGraphViewer_title), Objects.requireNonNull(Longs.toArray(xSeries)), ySeries, filter.getEnd(), true);
+        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.SegmentStoreScatterGraphViewer_title), Objects.requireNonNull(Longs.toArray(xSeries)), ySeries, true);
     }
 
     private Iterable<ISegment> compactList(final long startTime, final Iterable<@NonNull ISegment> iterableToCompact) {

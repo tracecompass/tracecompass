@@ -20,9 +20,10 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractStat
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -72,9 +73,9 @@ public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider
     }
 
     @Override
-    public ITmfCommonXAxisResponse fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
 
-        ITmfCommonXAxisResponse res = verifyParameters(fModule, filter, monitor);
+        TmfModelResponse<ITmfCommonXAxisModel> res = verifyParameters(fModule, filter, monitor);
         if (res != null) {
             return res;
         }
@@ -86,6 +87,7 @@ public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider
 
         ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
         Collection<Disk> disks = InputOutputInformationProvider.getDisks(fModule);
+        long currentEnd = ss.getCurrentEndTime();
 
         for (Disk disk : Iterables.filter(disks, Disk::hasActivity)) {
             String diskName = disk.getDiskName();
@@ -106,7 +108,7 @@ public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider
                 }
 
                 long time = xValues[i];
-                if (time >= ss.getStartTime() && time <= ss.getCurrentEndTime()) {
+                if (time >= ss.getStartTime() && time <= currentEnd) {
                     long count = disk.getSectorsAt(time, IoOperationType.WRITE);
                     yValuesWritten[i] = interpolate(prevTime, time, prevCountWrite, count);
                     prevCountWrite = count;
@@ -123,7 +125,8 @@ public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider
                 return TmfCommonXAxisResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
             }
         }
-        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.DisksIODataProvider_title), xValues, ySeries.build(), ss.getCurrentEndTime(), ss.waitUntilBuilt(0));
+        boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
+        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.DisksIODataProvider_title), xValues, ySeries.build(), complete);
     }
 
     /**
