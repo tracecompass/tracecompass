@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 
 /**
  * This interface represents an XY data provider. It returns a response that
@@ -24,16 +25,16 @@ public interface ITmfXYDataProvider {
 
     /**
      * This methods computes a XY model. Then, it returns a
-     * {@link ITmfCommonXAxisResponse} that contains the model. XY model will be
+     * {@link TmfModelResponse} that contains the model. XY model will be
      * used to draw XY charts. See {@link TmfCommonXAxisResponseFactory} methods for
-     * creating {@link ITmfCommonXAxisResponse}.
+     * creating {@link TmfModelResponse}.
      *
      * @param filter
      *            A query filter that contains an array of time. Times are used for
      *            requesting data.
      * @param monitor
      *            A ProgressMonitor to cancel task
-     * @return A {@link ITmfCommonXAxisResponse} instance
+     * @return A {@link TmfModelResponse} instance
      */
-    ITmfCommonXAxisResponse fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor);
+    TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor);
 }

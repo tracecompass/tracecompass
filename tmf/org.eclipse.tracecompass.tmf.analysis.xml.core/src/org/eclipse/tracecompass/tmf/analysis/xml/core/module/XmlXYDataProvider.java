@@ -26,9 +26,10 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Messages;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
@@ -190,7 +191,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
     }
 
     @Override
-    public ITmfCommonXAxisResponse fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         ITmfXmlStateAttribute display = fDisplay;
         XmlXYEntry entry = fXmlEntry;
 
@@ -201,10 +202,12 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
         Map<String, double[]> tempModel = new HashMap<>();
         long[] xValues = filter.getTimesRequested();
 
+        long currentEnd = ss.getCurrentEndTime();
+
         try {
             for (int i = 0; i < xValues.length; i++) {
                 long time = xValues[i];
-                if (ss.getStartTime() <= time && time <= ss.getCurrentEndTime()) {
+                if (ss.getStartTime() <= time && time <= currentEnd) {
                     List<@NonNull ITmfStateInterval> full = ss.queryFullState(time);
                     for (int quark : quarks) {
                         String seriesName = (String) full.get(quark).getValue();
@@ -232,9 +235,8 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
             ySeries.put(tempEntry.getKey(), new YModel(tempEntry.getKey(), tempEntry.getValue()));
         }
 
-        boolean complete = ss.waitUntilBuilt(0);
-        long currentEnd = ss.getCurrentEndTime();
-        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.XmlDataProvider_DefaultXYTitle), xValues, ySeries.build(), currentEnd, complete);
+        boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
+        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.XmlDataProvider_DefaultXYTitle), xValues, ySeries.build(), complete);
     }
 
     private static void setYValue(int index, double[] y, double value, DisplayType type) {

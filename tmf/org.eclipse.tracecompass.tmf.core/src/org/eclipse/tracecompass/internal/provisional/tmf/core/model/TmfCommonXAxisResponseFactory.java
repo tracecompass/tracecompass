@@ -10,16 +10,16 @@
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model;
 
 import java.util.Map;
+import java.util.Objects;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.core.model.TmfCommonXAxisModel;
-import org.eclipse.tracecompass.internal.tmf.core.model.TmfCommonXAxisResponse;
 
 /**
- * This class creates concrete instance of {@link ITmfCommonXAxisResponse}
+ * This class creates instance of {@link TmfModelResponse}
  *
  * @author Yonni Chen
  */
@@ -33,8 +33,8 @@ public final class TmfCommonXAxisResponseFactory {
     }
 
     /**
-     * Create a concrete {@link ITmfCommonXAxisResponse} with a either RUNNING or
-     * COMPLETED status. Model is not null, it's either partial or full.
+     * Create a {@link TmfModelResponse} with a either RUNNING or COMPLETED status.
+     * Model is not null, it's either partial or full.
      *
      * @param title
      *            Chart title
@@ -42,44 +42,41 @@ public final class TmfCommonXAxisResponseFactory {
      *            The x values requested by the viewer
      * @param yModels
      *            Collection of IYModel
-     * @param currentEnd
-     *            The current end that was being processed
      * @param isComplete
      *            Tells whether the computed model is complete or partial
-     * @return A {@link ITmfCommonXAxisResponse} with either a running status or a
+     * @return A {@link TmfModelResponse} with either a running status or a
      *         completed status
      */
-    public static ITmfCommonXAxisResponse create(String title, long[] xValues, Map<String, IYModel> yModels, long currentEnd, boolean isComplete) {
+    public static TmfModelResponse<ITmfCommonXAxisModel> create(String title, long[] xValues, Map<String, IYModel> yModels, boolean isComplete) {
         ITmfCommonXAxisModel model = new TmfCommonXAxisModel(title, xValues, yModels);
 
         if (isComplete) {
-            return new TmfCommonXAxisResponse(model, ITmfCommonXAxisResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED, currentEnd);
+            return new TmfModelResponse<>(model, ITmfResponse.Status.COMPLETED, Objects.requireNonNull(CommonStatusMessage.COMPLETED));
         }
-        return new TmfCommonXAxisResponse(model, ITmfCommonXAxisResponse.Status.RUNNING, CommonStatusMessage.RUNNING, currentEnd);
+        return new TmfModelResponse<>(model, ITmfResponse.Status.RUNNING, Objects.requireNonNull(CommonStatusMessage.RUNNING));
     }
 
     /**
-     * Create a concrete {@link ITmfCommonXAxisResponse} with a FAILED status. Model
-     * inside of returned response is null.
+     * Create a {@link TmfModelResponse} with a FAILED status. Model inside of
+     * returned response is null.
      *
      * @param message
      *            A detailed message of why the response has a failed status
-     * @return A {@link ITmfCommonXAxisResponse} with a failed status and null model
+     * @return A {@link TmfModelResponse} with a failed status and null model
      */
-    public static ITmfCommonXAxisResponse createFailedResponse(@Nullable String message) {
-        return new TmfCommonXAxisResponse(null, ITmfCommonXAxisResponse.Status.FAILED, message, 0);
+    public static TmfModelResponse<ITmfCommonXAxisModel> createFailedResponse(String message) {
+        return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, message);
     }
 
     /**
-     * Create a concrete {@link ITmfCommonXAxisResponse} with a CANCELLED status.
-     * Model inside of returned response is null.
+     * Create a {@link TmfModelResponse} with a CANCELLED status. Model inside of
+     * returned response is null.
      *
      * @param message
      *            A detailed message of why the response has a cancelled status
-     * @return A {@link ITmfCommonXAxisResponse} with a cancelled status and null
-     *         model
+     * @return A {@link TmfModelResponse} with a cancelled status and null model
      */
-    public static ITmfCommonXAxisResponse createCancelledResponse(@Nullable String message) {
-        return new TmfCommonXAxisResponse(null, ITmfCommonXAxisResponse.Status.CANCELLED, message, 0);
+    public static TmfModelResponse<ITmfCommonXAxisModel> createCancelledResponse(String message) {
+        return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, message);
     }
 }
