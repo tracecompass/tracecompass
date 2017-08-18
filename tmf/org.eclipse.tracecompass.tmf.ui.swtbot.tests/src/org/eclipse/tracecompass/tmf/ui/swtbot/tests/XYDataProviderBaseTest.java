@@ -245,17 +245,17 @@ public abstract class XYDataProviderBaseTest {
         assertTrue(series.isVisible());
 
         /* Color, type and style */
-        assertEquals(series.getType(), expectedType);
+        assertEquals(expectedType, series.getType());
 
         if (expectedType == ISeries.SeriesType.LINE) {
             ILineSeries line = (ILineSeries) series;
-            assertEquals(line.getLineColor().getRGB(), expectedColor);
-            assertEquals(line.getLineStyle(), expectedLineStyle);
-            assertEquals(line.isAreaEnabled(), isArea);
+            assertEquals(expectedColor, line.getLineColor().getRGB());
+            assertEquals(expectedLineStyle, line.getLineStyle());
+            assertEquals(isArea, line.isAreaEnabled());
         } else if (expectedType == ISeries.SeriesType.BAR) {
             IBarSeries bar = (IBarSeries) series;
-            assertEquals(bar.getBarColor().getRGB(), expectedColor);
-            assertEquals(bar.isStackEnabled(), true);
+            assertEquals(expectedColor, bar.getBarColor().getRGB());
+            assertTrue(bar.isStackEnabled());
         }
     }
 
