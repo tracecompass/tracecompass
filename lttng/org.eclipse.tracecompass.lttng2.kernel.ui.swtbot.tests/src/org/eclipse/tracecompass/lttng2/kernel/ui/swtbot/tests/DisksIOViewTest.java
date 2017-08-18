@@ -52,8 +52,8 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
     private static final @NonNull String READ_SERIES_NAME = "8,0 read";
     private static final @NonNull String WRITE_SERIES_NAME = "8,0 write";
 
-    private static final @NonNull ITmfTimestamp START_TIME_WHERE_THERE_IS_DISK_ACTIVITY = TmfTimestamp.fromNanos(1332170686646030906L);
-    private static final @NonNull ITmfTimestamp END_TIME_WHERE_THERE_IS_DISK_ACTIVITY = TmfTimestamp.fromNanos(1332170686658688158L);
+    private static final @NonNull ITmfTimestamp ZOOM_START_TIME = TmfTimestamp.fromNanos(1361214078967381303L);
+    private static final @NonNull ITmfTimestamp ZOOM_END_TIME = TmfTimestamp.fromNanos(1361214078967971599L);
 
     /**
      * Test to check the Disks IO Activity view. First, when trace opened, there
@@ -89,8 +89,8 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
         SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk0-res50.json", "Chart data is not valid");
 
         /* Change time range where there is disks activity */
-        TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, new TmfTimeRange(START_TIME_WHERE_THERE_IS_DISK_ACTIVITY, END_TIME_WHERE_THERE_IS_DISK_ACTIVITY)));
-        fBot.waitUntil(ConditionHelpers.windowRange(new TmfTimeRange(START_TIME_WHERE_THERE_IS_DISK_ACTIVITY, END_TIME_WHERE_THERE_IS_DISK_ACTIVITY)));
+        TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, new TmfTimeRange(ZOOM_START_TIME, ZOOM_END_TIME)));
+        fBot.waitUntil(ConditionHelpers.windowRange(new TmfTimeRange(ZOOM_START_TIME, ZOOM_END_TIME)));
         fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
 
         /* Test type, style and color of series */
@@ -131,6 +131,6 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
 
     @Override
     protected ITmfTrace getTestTrace() {
-        return CtfTmfTestTraceUtils.getTrace(CtfTestTrace.KERNEL);
+        return CtfTmfTestTraceUtils.getTrace(CtfTestTrace.SYNC_DEST);
     }
 }
