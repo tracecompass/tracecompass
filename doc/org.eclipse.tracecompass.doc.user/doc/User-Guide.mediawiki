@@ -3865,6 +3865,42 @@ The following tracepoints will be available
 
 Host and guests can now be traced together and their traces added to an experiment. Because each guest has a different clock than the host, it is necessary to synchronize the traces together. Unfortunately, automatic synchronization with the virtual machine events is not completely implemented yet, so another kind of synchronization needs to be done, with TCP packets for instance. See section on [[#Trace synchronization | trace synchronization]] for information on how to obtain synchronizable traces.
 
+= Counters Analysis =
+
+The '''Counters View''' allows the user to inspect the values of hardware performance counters during the trace's lifetime. The counters store data concerning hardware-related activities such as page faults. The Counters View is currently available for LTTng UST and kernel traces.
+The Counters View supports experiments.
+
+== Creating an LTTng trace with performance counters ==
+
+For the Counters View to display any data, the trace needs to collect information related to performance counters. There are two ways to configure a trace for this type of logging. On the command line, add a new context field to an LTTng channel using the <code>lttng-add-context</code> command (for more information, refer to the [http://lttng.org/docs/ LTTng documentation]). On the LTTng Tracer Control, add a new context field using the ''Add Context..." window (see [[#Adding Contexts to Channels and Events of a Domain]]).
+
+== Counters View ==
+
+To open the view, double-click on the '''Counters''' tree element of the ''Project Explorer'' or type "Counters" in the ''Quick Access'' search bar.
+
+[[Image:images/counters/OpenCountersView.png]]
+
+The Counters View contains a filtered checkbox tree on the left-hand side and a chart on the right-hand side. The checkbox tree also contains a '''Legend''' column whose purpose is to display the styling of the entry in the chart. Thus, when checking a tree element, its data will appear in the chart and its styling will appear next to the element. An entry will conserve the same styling whether it is displayed on the chart or not.
+
+[[Image:images/counters/CountersView.png]]
+
+The counters data can also be visualized cumulatively throughout time thanks to the [[Image:images/counters/sigma.gif]] tool bar button.
+By default the view is displayed differentially, with each data point's value being the counter value at that point's timestamp minus that of the previous point's timestamp.
+
+[[Image:images/counters/CumulativeCountersView.png]]
+
+The view's checkbox tree has enhanced functionalities. First, the checkboxes have three visual states. They are determined according to the visible elements of the tree.
+
+[[Image:images/counters/UncheckedCheckbox.png]] - The entry is not checked.<br>
+[[Image:images/counters/GrayedCheckbox.png]] - The entry is checked, but not all of its children.<br>
+[[Image:images/counters/CheckedCheckbox.png]] - The entry and all of its children are checked.
+
+Second, the checkbox tree has a search bar which allows users to apply filters on the tree elements. Multiple filters need to be separated with the "/" symbol. A match is detected when the subsequence of a tree element matches the pattern entered by the user. When checking an element of a filtered tree, the check state is only propagated to the visible elements. Below are different examples of filters being applied to the same tree:
+
+[[Image:images/counters/FilteredTree1.png]] [[Image:images/counters/FilteredTree2.png]] [[Image:images/counters/FilteredTree3.png]] [[Image:images/counters/FilteredTree4.png]]
+
+Finally, the tree's checkboxes are remembered when switching from one trace to another.
+
 = Java Logging =
 
 Trace Compass contains some Java Utility Logging (JUL) tracepoints in various places in the code. To diagnose issues with Trace Compass or when reporting problems with the application, a JUL trace may be useful to help pinpoint the problem. The following sections explain how to enable JUL logging in Trace Compass and use various handlers to handle the data.
