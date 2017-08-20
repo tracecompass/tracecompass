@@ -201,7 +201,7 @@ public class HT_IO {
              * Other types of IOExceptions shouldn't happen at this point though.
              */
             Activator.getDefault().logError(e.getMessage(), e);
-            throw new IllegalStateException();
+            throw new IllegalStateException(e);
         }
     }
 
