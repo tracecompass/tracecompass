@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.analysis.counters.ui;
 
+import java.util.Collection;
+
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 
 /**
@@ -27,6 +29,6 @@ public interface ITreeViewerListener {
      * @param entries
      *            Entries which have been checked in the tree
      */
-    public void handleCheckStateChangedEvent(Iterable<ITmfTreeViewerEntry> entries);
+    public void handleCheckStateChangedEvent(Collection<ITmfTreeViewerEntry> entries);
 
 }

@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.analysis.counters.ui;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +42,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 
 /**
@@ -275,9 +277,9 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
         return retrieveTraceName(entry.getParent());
     }
 
-    private Iterable<ITmfTreeViewerEntry> getCheckedCounterEntries() {
+    private Collection<ITmfTreeViewerEntry> getCheckedCounterEntries() {
         Object[] checkedElements = fCheckboxTree.getCheckedElements();
-        return Iterables.filter(Arrays.asList(checkedElements), ITmfTreeViewerEntry.class);
+        return Lists.newArrayList(Iterables.filter(Arrays.asList(checkedElements), ITmfTreeViewerEntry.class));
     }
 
 }
