@@ -40,15 +40,15 @@ public interface ITmfCounterAspect extends ITmfEventAspect<Long> {
      * <pre>
      * Time | Cumulative counter | Non-cumulative counter
      * ==================================================
-     * x    | y                  | y
-     * x+1  | 2y                 | y
-     * x+2  | 3y                 | y
+     * x    | y1                  | y1
+     * x+1  | y1 + y2             | y2
+     * x+2  | y1 + y2 + y3        | y3
      * </pre>
      *
      * @return whether the counter aspect is cumulative or not
      */
     default boolean isCumulative() {
-        return false;
+        return true;
     }
 
 }
