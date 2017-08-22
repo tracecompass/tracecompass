@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="tracecompass-e4.7" sequenceNumber="5">
+<?pde version="3.8"?><target name="tracecompass-e4.7" sequenceNumber="6">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.cdt.gnu.dsf.feature.group" version="0.0.0"/>
-<repository location="http://download.eclipse.org/tools/cdt/releases/9.3/cdt9.3.0/"/>
+<repository location="http://download.eclipse.org/tools/cdt/releases/9.3/cdt9.3.1/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.mylyn.wikitext_feature.feature.group" version="0.0.0"/>
@@ -31,7 +31,7 @@
 <repository location="http://download.eclipse.org/tm/terminal/updates/4.3milestones/20170516"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-<repository location="http://download.eclipse.org/tools/cdt/launchbar/oxygen/"/>
+<repository location="http://download.eclipse.org/tools/cdt/launchbar/oxygen.0.1/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.antlr.runtime" version="3.2.0.v201101311130"/>
@@ -44,7 +44,7 @@
 <unit id="org.json" version="0.0.0"/>
 <unit id="org.apache.derby" version="0.0.0"/>
 <unit id="org.hamcrest" version="0.0.0"/>
-<repository location="http://download.eclipse.org/tools/orbit/R-builds/R20170516192513/repository/"/>
+<repository location="http://download.eclipse.org/tools/orbit/M-builds/M20170818183741/repository/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.license.feature.group" version="0.0.0"/>
@@ -70,7 +70,7 @@
 <unit id="org.eclipse.wst.xml.core" version="0.0.0"/>
 <unit id="org.eclipse.wst.xml.ui" version="0.0.0"/>
 <unit id="org.eclipse.wst.xsd.core" version="0.0.0"/>
-<repository location="http://download.eclipse.org/webtools/downloads/drops/R3.9.0/R-3.9.0-20170613094504/repository/"/>
+<repository location="http://download.eclipse.org/webtools/downloads/drops/R3.9.1/S-3.9.1RC1-20170822000154/repository/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.xsd" version="0.0.0"/>
