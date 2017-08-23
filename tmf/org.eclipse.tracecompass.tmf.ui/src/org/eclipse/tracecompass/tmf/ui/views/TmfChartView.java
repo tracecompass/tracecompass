@@ -292,4 +292,16 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
         }
     }
 
+    /**
+     * Returns whether or not this chart viewer is dirty. The viewer is considered
+     * dirty if it has yet to completely update its model. This method is meant to
+     * be used by tests in order to know when it is safe to proceed.
+     *
+     * @return true if the time graph view has yet to completely update its model,
+     *         false otherwise
+     */
+    public boolean isDirty() {
+        return fChartViewer.isDirty();
+    }
+
 }

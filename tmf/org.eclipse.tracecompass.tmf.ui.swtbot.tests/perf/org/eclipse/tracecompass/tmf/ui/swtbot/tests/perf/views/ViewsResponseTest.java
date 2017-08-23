@@ -36,6 +36,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
+import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.ui.IWorkbenchPart;
 import org.junit.After;
@@ -145,6 +146,7 @@ public abstract class ViewsResponseTest {
         for (String viewID : viewIDs) {
             SWTBotUtils.openView(viewID);
             view = fBot.viewById(viewID);
+            prepareView(view);
             navigateTrace(view);
             SWTBotUtils.closeViewById(viewID, fBot);
         }
@@ -280,8 +282,21 @@ public abstract class ViewsResponseTest {
     private void waitViewReady(IWorkbenchPart part, @NonNull TmfTimeRange selectionRange, @NonNull ITmfTimestamp visibleTime) {
         if (part instanceof AbstractTimeGraphView) {
             fBot.waitUntil(ConditionHelpers.timeGraphIsReadyCondition((AbstractTimeGraphView) part, selectionRange, visibleTime));
+        } else if (part instanceof TmfChartView) {
+            TmfChartView tmfChartView = (TmfChartView) part;
+            WaitUtils.waitUntil(cv -> !cv.isDirty(), tmfChartView, "TmfChartView is dirty");
         }
         // TODO Add conditions for other kind of views
+    }
+
+    /**
+     * Actions to run on the view before benchmarking
+     *
+     * @param view
+     *            view to benchmark
+     */
+    public void prepareView(SWTBotView view) {
+        // do nothing by default
     }
 
 }

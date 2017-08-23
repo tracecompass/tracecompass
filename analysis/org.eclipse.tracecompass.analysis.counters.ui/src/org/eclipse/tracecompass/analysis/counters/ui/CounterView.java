@@ -46,6 +46,9 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  */
 public class CounterView extends TmfChartView {
 
+    /** View ID. */
+    public static final String ID = "org.eclipse.tracecompass.analysis.counters.ui.view.counters"; //$NON-NLS-1$
+
     /**
      * Title of the chart viewer
      */
