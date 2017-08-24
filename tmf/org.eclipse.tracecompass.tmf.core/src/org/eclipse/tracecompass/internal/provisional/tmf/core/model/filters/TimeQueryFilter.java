@@ -11,7 +11,7 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;
 
 /**
  * This represents a time query filter used by data providers. It encapsulates
- * an array of times used for requesting data. It's the responsability of
+ * an array of times used for requesting data. It's the responsibility of
  * viewers using data provider to create a time query filter and pass it to data
  * providers if needed.
  *
@@ -104,12 +104,9 @@ public class TimeQueryFilter {
 
         double stepSize = delta / ((double) n - 1);
         long[] result = new long[n];
-        result[0] = start;
-        double curTime = start + stepSize;
 
-        for (int i = 1; i < n; i++) {
-            result[i] = Math.round(curTime);
-            curTime += stepSize;
+        for (int i = 0; i < n; i++) {
+            result[i] = start + Math.round(i * stepSize);
         }
 
         /* This is to make sure that last value will always be end */

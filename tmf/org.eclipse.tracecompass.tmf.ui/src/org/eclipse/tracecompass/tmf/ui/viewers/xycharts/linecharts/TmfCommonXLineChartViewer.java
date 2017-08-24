@@ -299,7 +299,8 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
         if (getSwtChart().isDisposed()) {
             return;
         }
-        int numRequests = fOverrideNbPoints != 0 ? fOverrideNbPoints : (int) (getSwtChart().getPlotArea().getBounds().width * fResolution);
+        int numRequests = fOverrideNbPoints != 0 ? fOverrideNbPoints :
+            (int) Math.min(getWindowEndTime() - getWindowStartTime() + 1, (long) (getSwtChart().getPlotArea().getBounds().width * fResolution));
         fUpdateThread = new UpdateThread(numRequests, fScope);
         fUpdateThread.start();
     }
@@ -463,10 +464,10 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     }
 
     /**
-     * Create an instance of {@link TimeQueryFilter} that will be used by
-     * updateData method. If a viewer need a more specialized instance of
-     * {@link TimeQueryFilter}, it's his responsability to override this method
-     * and provide the desired instance.
+     * Create an instance of {@link TimeQueryFilter} that will be used by updateData
+     * method. If a viewer needs a more specialized instance of
+     * {@link TimeQueryFilter}, it is its responsibility to override this method and
+     * provide the desired instance.
      *
      * @param start
      *            The starting value
@@ -787,8 +788,8 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                             double[] xValues = seriesValues.getXAxis();
                             double maxy = DEFAULT_MAXY;
                             double miny = DEFAULT_MINY;
-                            double end = getWindowEndTime() - getWindowStartTime();
-                            if (end > 0.0) {
+                            double delta = getWindowEndTime() - getWindowStartTime();
+                            if (delta > 0.0) {
                                 for (IYSeries entry : seriesValues.getSeries().values()) {
                                     ISeries series = getSwtChart().getSeriesSet().getSeries(entry.getLabel());
                                     if (series == null) {
@@ -810,14 +811,14 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                                 if (maxy == DEFAULT_MAXY) {
                                     maxy = 1.0;
                                 }
-                            }else {
+                            } else {
                                 clearContent();
-                                end =1;
+                                delta = 0.0;
                             }
                             IAxisTick xTick = getSwtChart().getAxisSet().getXAxis(0).getTick();
                             xTick.setFormat(tmfChartTimeStampFormat);
-                            final double start = 0.0;
-                            getSwtChart().getAxisSet().getXAxis(0).setRange(new Range(start, end));
+                            final double start = 1.0;
+                            getSwtChart().getAxisSet().getXAxis(0).setRange(new Range(start, start + delta));
                             if (maxy > miny) {
                                 getSwtChart().getAxisSet().getYAxis(0).setRange(new Range(miny, maxy));
                             }
