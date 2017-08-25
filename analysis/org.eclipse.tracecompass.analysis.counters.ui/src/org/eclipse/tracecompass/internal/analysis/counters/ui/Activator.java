@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.analysis.counters.ui;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -30,6 +32,7 @@ public class Activator extends AbstractUIPlugin {
      * The constructor
      */
     public Activator() {
+        // do nothing
     }
 
     @Override
@@ -53,5 +56,18 @@ public class Activator extends AbstractUIPlugin {
         return plugin;
     }
 
+    /**
+     * Logs a message and exception with severity ERROR in the runtime log of the
+     * plug-in.
+     *
+     * @param message
+     *            A message to log
+     * @param exception
+     *            The corresponding exception
+     */
+    public static void logError(String message, Throwable exception) {
+        if (plugin != null) {
+            plugin.getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, exception));
+        }
+    }
 }
-

@@ -89,7 +89,13 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer implemen
         if (xAxis.length == 1) {
             return;
         }
-        setXAxis(xAxis);
+
+        Display.getDefault().syncExec(() -> {
+            if (monitor.isCanceled()) {
+                return;
+            }
+            setXAxis(xAxis);
+        });
 
         /*
          * TODO: avoid redrawing series already present on chart and iterate over time
@@ -128,7 +134,13 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer implemen
                         }
                     }
                 }
-                setSeries(counterEntry.getFullPath(), steps);
+                Display.getDefault().syncExec(() -> {
+                    if (monitor.isCanceled()) {
+                        return;
+                    }
+                    setSeries(counterEntry.getFullPath(), steps);
+                });
+
             }
         } catch (StateSystemDisposedException e) {
             /*
