@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
+import org.eclipse.tracecompass.internal.analysis.counters.ui.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -110,7 +111,13 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer implemen
         if (xAxis.length == 1) {
             return;
         }
-        setXAxis(xAxis);
+
+        Display.getDefault().syncExec(() -> {
+            if (monitor.isCanceled()) {
+                return;
+            }
+            setXAxis(xAxis);
+        });
 
         // Associate the counter entries to the state systems
         Iterable<@NonNull CounterTreeViewerEntry> filtered = Iterables.filter(fEntries, CounterTreeViewerEntry.class);
@@ -145,10 +152,15 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer implemen
                     }
 
                     double[] yValues = buildYValues(countersIntervals.get(counter.getQuark()), xAxis, start);
-                    setSeries(counter.getFullPath(), yValues);
+                    Display.getDefault().syncExec(() -> {
+                        if (monitor.isCanceled()) {
+                            return;
+                        }
+                        setSeries(counter.getFullPath(), yValues);
+                    });
                 }
             } catch (IndexOutOfBoundsException | TimeRangeException e) {
-                LOGGER.log(Level.SEVERE, e.getMessage());
+                Activator.logError(e.getMessage(), e);
             } catch (StateSystemDisposedException e) {
                 /*
                  * Ignore exception (can take place when closing the trace during update), and

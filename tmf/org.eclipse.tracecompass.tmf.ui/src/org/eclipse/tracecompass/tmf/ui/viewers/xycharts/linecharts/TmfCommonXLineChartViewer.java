@@ -296,7 +296,6 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     }
 
     private synchronized void newUpdateThread(@NonNull FlowScopeLog fScope) {
-        cancelUpdate();
         if (getSwtChart().isDisposed()) {
             return;
         }
@@ -343,6 +342,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     @Override
     protected void updateContent() {
+        cancelUpdate();
         try (FlowScopeLog parentScope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:ContentUpdateRequested").setCategory(getViewerId()).build()) { //$NON-NLS-1$
             /*
              * Content is not up to date, so we increment fDirty. It will be decremented at
