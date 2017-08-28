@@ -89,4 +89,11 @@
          </tracetype>
       </module>
    </extension>
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.dataprovider">
+      <dataProviderFactory
+            class="org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage.KernelMemoryDataProviderFactory"
+            id="org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage">
+      </dataProviderFactory>
+   </extension>
 </plugin>

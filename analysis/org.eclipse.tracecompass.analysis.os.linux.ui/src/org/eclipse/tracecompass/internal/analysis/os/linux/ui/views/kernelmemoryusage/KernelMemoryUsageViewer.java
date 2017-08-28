@@ -8,13 +8,15 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.kernelmemoryusage;
 
-import org.eclipse.jdt.annotation.NonNull;
+import java.util.Collections;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage.KernelMemoryUsageDataProvider;
 import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedThreadQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
@@ -34,8 +36,7 @@ import org.swtchart.Chart;
 @SuppressWarnings("restriction")
 public class KernelMemoryUsageViewer extends TmfCommonXAxisChartViewer {
 
-    private static final @NonNull String NOT_SELECTED = "-1"; //$NON-NLS-1$
-    private @NonNull String fSelectedThread = NOT_SELECTED;
+    private Long fSelectedEntry = null;
 
     /**
      * Constructor
@@ -56,22 +57,25 @@ public class KernelMemoryUsageViewer extends TmfCommonXAxisChartViewer {
     @Override
     protected void initializeDataProvider() {
         ITmfTrace trace = getTrace();
-        setDataProvider(KernelMemoryUsageDataProvider.create(trace));
+        KernelMemoryUsageDataProvider provider = DataProviderManager.getInstance().getDataProvider(trace,
+                KernelMemoryUsageDataProvider.ID, KernelMemoryUsageDataProvider.class);
+        setDataProvider(provider);
     }
 
     @Override
     protected TimeQueryFilter createQueryFilter(long start, long end, int nb) {
-        return new SelectedThreadQueryFilter(start, end, nb, fSelectedThread);
+        return fSelectedEntry != null ? new SelectionTimeQueryFilter(start, end, nb, Collections.singleton(fSelectedEntry))
+                : new TimeQueryFilter(start, end, nb);
     }
 
     /**
-     * Set the selected thread ID, which will be graphed in this viewer
+     * Set the selected entry's ID, which will be graphed in this viewer
      *
-     * @param tid
-     *            The selected thread ID
+     * @param id
+     *            The selected entry's ID
      */
-    public void setSelectedThread(@NonNull String tid) {
-        fSelectedThread = tid;
+    public void setSelectedEntry(Long id) {
+        fSelectedEntry = id;
         clearContent();
         getPresentationProvider().clear();
         updateContent();
@@ -94,7 +98,7 @@ public class KernelMemoryUsageViewer extends TmfCommonXAxisChartViewer {
     private void initSelection() {
         TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
         Object data = ctx.getData(KernelMemoryUsageView.KERNEL_MEMORY);
-        String thread = data instanceof String ? (String) data : NOT_SELECTED;
-        setSelectedThread(thread);
+        Long id = data instanceof Long ? (Long) data : null;
+        setSelectedEntry(id);
     }
 }

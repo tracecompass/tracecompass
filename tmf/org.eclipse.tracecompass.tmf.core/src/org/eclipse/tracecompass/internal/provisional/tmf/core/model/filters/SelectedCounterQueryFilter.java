@@ -11,8 +11,6 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;
 
 import java.util.Collection;
 
-import com.google.common.collect.ImmutableList;
-
 /**
  * This represents a specialized query filter used by some data providers. In
  * addition to base query filters, it encapsulated the selected quarks
@@ -21,13 +19,8 @@ import com.google.common.collect.ImmutableList;
  * @author Yonni Chen
  * @since 3.1
  */
-public class SelectedCounterQueryFilter extends TimeQueryFilter implements ICumulativeQueryFilter, IMultipleSelectionQueryFilter<Collection<Long>> {
+public class SelectedCounterQueryFilter extends SelectionTimeQueryFilter implements ICumulativeQueryFilter {
 
-    /*
-     * The set of selected quarks would be applied to a certain trace. We use
-     * trace's UUID to identify trace
-     */
-    private final Collection<Long> fSelectedIds;
     private final boolean fIsCumulative;
 
     /**
@@ -48,19 +41,8 @@ public class SelectedCounterQueryFilter extends TimeQueryFilter implements ICumu
      *            Give true if cumulative, false either
      */
     public SelectedCounterQueryFilter(long start, long end, int n, Collection<Long> ids, boolean isCumulative) {
-        super(start, end, n);
-        fSelectedIds = ImmutableList.copyOf(ids);
+        super(start, end, n, ids);
         fIsCumulative = isCumulative;
-    }
-
-    /**
-     * Gets a set of selected quarks
-     *
-     * @return A set of quarks
-     */
-    @Override
-    public Collection<Long> getSelectedItems() {
-        return fSelectedIds;
     }
 
     @Override

@@ -8,7 +8,9 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.kernelmemoryusage;
 
-import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage.KernelMemoryUsageTreeModel;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
 
 /**
  * This class represents an entry in the tree viewer of the kernel memory usage
@@ -16,40 +18,15 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
  *
  * @author mahdi zolnouri
  */
-public class KernelMemoryUsageEntry extends TmfTreeViewerEntry {
-
-    private final String fTid;
-    private final String fProcessName;
+public class KernelMemoryUsageEntry extends TmfGenericTreeEntry<KernelMemoryUsageTreeModel> {
 
     /**
      * Constructor
      *
-     * @param tid
-     *            The TID of the process
-     * @param name
-     *            The thread's name
+     * @param model
+     *            The data provider model
      */
-    public KernelMemoryUsageEntry(String tid, String name) {
-        super(tid);
-        fTid = tid;
-        fProcessName = name;
-    }
-
-    /**
-     * Get the TID of the thread represented by this entry
-     *
-     * @return The thread's TID
-     */
-    public String getTid() {
-        return fTid;
-    }
-
-    /**
-     * Get the process name
-     *
-     * @return The process name
-     */
-    public String getProcessName() {
-        return fProcessName;
+    public KernelMemoryUsageEntry(@NonNull KernelMemoryUsageTreeModel model) {
+        super(model);
     }
 }

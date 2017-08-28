@@ -76,14 +76,11 @@ public class KernelMemoryUsageView extends TmfChartView {
                 Object structSelection = ((IStructuredSelection) selection).getFirstElement();
                 if (structSelection instanceof KernelMemoryUsageEntry) {
                     KernelMemoryUsageEntry entry = (KernelMemoryUsageEntry) structSelection;
-                    String tid = entry.getTid();
-                    if (tid == null) {
-                        return;
-                    }
-                    treeViewer.setSelectedThread(tid);
-                    chartViewer.setSelectedThread(tid);
+                    long id = entry.getModel().getId();
+                    treeViewer.setSelectedEntry(id);
+                    chartViewer.setSelectedEntry(id);
                     TmfTraceManager.getInstance().updateTraceContext(trace,
-                            builder -> builder.setData(KERNEL_MEMORY, tid));
+                            builder -> builder.setData(KERNEL_MEMORY, id));
                 }
             }
         }
