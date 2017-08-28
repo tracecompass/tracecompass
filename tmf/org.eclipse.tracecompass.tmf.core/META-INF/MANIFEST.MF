@@ -17,6 +17,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.datastore.core
 Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.core.model;x-friends:="org.eclipse.tracecompass.tmf.ui,org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;x-friends:="org.eclipse.tracecompass.tmf.ui,org.eclipse.tracecompass.tmf.core.tests",
+ org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree;x-friends:="org.eclipse.tracecompass.tmf.ui",
  org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy;x-friends:="org.eclipse.tracecompass.tmf.ui",
  org.eclipse.tracecompass.internal.provisional.tmf.core.presentation;x-friends:="org.eclipse.tracecompass.tmf.ui,org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.provisional.tmf.core.response;x-friends:="org.eclipse.tracecompass.tmf.ui",
