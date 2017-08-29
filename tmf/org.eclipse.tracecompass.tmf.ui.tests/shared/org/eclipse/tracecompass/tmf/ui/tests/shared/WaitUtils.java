@@ -94,6 +94,9 @@ public final class WaitUtils {
 
     /**
      * Wait for a predicate to succeed.
+     * <p>
+     * Note: When testing with SWTBot, use SWTBotUtils.waitUntil() to use SWTBot's
+     * timeout preference value.
      *
      * @param predicate
      *            The predicate

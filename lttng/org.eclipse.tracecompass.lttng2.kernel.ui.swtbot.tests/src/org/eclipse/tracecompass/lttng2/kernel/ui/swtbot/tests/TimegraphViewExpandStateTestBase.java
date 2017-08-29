@@ -148,7 +148,7 @@ public abstract class TimegraphViewExpandStateTestBase {
         // Select editor
         SWTBotTimeGraph timegraphBot = new SWTBotTimeGraph(getViewBot().bot());
         SWTBotUtils.activateEditor(fBot, BUG446190);
-        WaitUtils.waitUntil(root -> timegraphBot.getEntries()[0].getText().equals(root), BUG446190, "Failed to activate editor " + BUG446190);
+        SWTBotUtils.waitUntil(root -> timegraphBot.getEntries()[0].getText().equals(root), BUG446190, "Failed to activate editor " + BUG446190);
 
         // expand all entries
         timegraphBot.expandAll();
@@ -176,9 +176,9 @@ public abstract class TimegraphViewExpandStateTestBase {
     private static int switchBetweenTraces(SWTBotTimeGraph timegraphBot) {
         // Switch between traces
         SWTBotUtils.activateEditor(fBot, FLIPPING_ENDIANNESS);
-        WaitUtils.waitUntil(root -> timegraphBot.getEntries()[0].getText().equals(root), FLIPPING_ENDIANNESS, "Failed to activate editor " + FLIPPING_ENDIANNESS);
+        SWTBotUtils.waitUntil(root -> timegraphBot.getEntries()[0].getText().equals(root), FLIPPING_ENDIANNESS, "Failed to activate editor " + FLIPPING_ENDIANNESS);
         SWTBotUtils.activateEditor(fBot, BUG446190);
-        WaitUtils.waitUntil(root -> timegraphBot.getEntries()[0].getText().equals(root), BUG446190, "Failed to activate editor " + BUG446190);
+        SWTBotUtils.waitUntil(root -> timegraphBot.getEntries()[0].getText().equals(root), BUG446190, "Failed to activate editor " + BUG446190);
         return timegraphBot.getExpandedElementCount();
     }
 }

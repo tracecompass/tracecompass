@@ -25,7 +25,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.XYDataProviderBaseTest;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
-import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 import org.eclipse.ui.IViewPart;
 import org.hamcrest.Matcher;
@@ -105,11 +105,11 @@ public class MemoryUsageViewTest extends XYDataProviderBaseTest {
         final Chart chart = getChart();
         assertNotNull(chart);
 
-        WaitUtils.waitUntil(c -> c.getSeriesSet().getSeries().length > 3, chart, "No data available");
+        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length > 3, chart, "No data available");
         chartViewer.setNbPoints(50);
 
         /* Test data model*/
-        WaitUtils.waitUntil(json -> isChartDataValid(chart, json, SECOND_SERIES_NAME, THIRD_SERIES_NAME, FOURTH_SERIES_NAME), "resources/memory-res50.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, SECOND_SERIES_NAME, THIRD_SERIES_NAME, FOURTH_SERIES_NAME), "resources/memory-res50.json", "Chart data is not valid");
 
         /* Test type, style and color of series */
         verifyChartStyle();

@@ -33,7 +33,6 @@ import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.TableCollection;
 import org.eclipse.swtbot.swt.finder.utils.TableRow;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
-import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 
@@ -97,7 +96,7 @@ public class SWTBotTimeGraph extends AbstractSWTBotControl<TimeGraphControl> {
     public SWTBotTimeGraphEntry getEntry(String... names) throws WidgetNotFoundException {
         AtomicReference<ITimeGraphEntry> parent = new AtomicReference<>();
         AtomicReference<String> missing = new AtomicReference<>();
-        WaitUtils.waitUntil(timegraph -> {
+        SWTBotUtils.waitUntil(timegraph -> {
             List<ITimeGraphEntry> entries = syncExec(new ListResult<ITimeGraphEntry>() {
                 @Override
                 public List<ITimeGraphEntry> run() {

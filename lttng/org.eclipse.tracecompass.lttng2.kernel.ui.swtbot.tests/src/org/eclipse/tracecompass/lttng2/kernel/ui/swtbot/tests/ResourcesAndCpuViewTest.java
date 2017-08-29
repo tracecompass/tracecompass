@@ -124,7 +124,7 @@ public class ResourcesAndCpuViewTest extends KernelTestBase {
         final TmfCommonXLineChartViewer chartViewer = getChartViewer(viewSite);
         assertNotNull(chartViewer);
         try {
-            WaitUtils.waitUntil(viewer -> !viewer.getModel().getSeries().isEmpty(), chartViewer, "No data available");
+            SWTBotUtils.waitUntil(viewer -> !viewer.getModel().getSeries().isEmpty(), chartViewer, "No data available");
             chartViewer.setNbPoints(10);
             ICondition xyViewerIsReadyCondition = ConditionHelpers.xyViewerIsReadyCondition(chartViewer);
             fBot.waitUntil(xyViewerIsReadyCondition);
@@ -136,9 +136,9 @@ public class ResourcesAndCpuViewTest extends KernelTestBase {
              * Select a task
              */
             SWTBotTree treeBot = fViewBotCpu.bot().tree();
-            WaitUtils.waitUntil(tree -> tree.rowCount() >= 7, treeBot, "Did not finish loading");
+            SWTBotUtils.waitUntil(tree -> tree.rowCount() >= 7, treeBot, "Did not finish loading");
             treeBot.getTreeItem("496").click();
-            WaitUtils.waitUntil(viewer -> viewer.getModel().getSeries().size() > 1, chartViewer, "Only total available");
+            SWTBotUtils.waitUntil(viewer -> viewer.getModel().getSeries().size() > 1, chartViewer, "Only total available");
             UIThreadRunnable.syncExec(() -> chartViewer.refresh());
             String jsonT1 = FileUtils.read("resources/t0-res10Selected.json");
             fBot.waitUntil(xyViewerIsReadyCondition);
@@ -150,7 +150,7 @@ public class ResourcesAndCpuViewTest extends KernelTestBase {
              */
             chartViewer.setNbPoints(100);
             UIThreadRunnable.syncExec(() -> chartViewer.refresh());
-            WaitUtils.waitUntil(viewer -> viewer.getModel().getXAxis().length >= 99, chartViewer, "Too few elements");
+            SWTBotUtils.waitUntil(viewer -> viewer.getModel().getXAxis().length >= 99, chartViewer, "Too few elements");
 
             String jsonHD = FileUtils.read("resources/t0-res100Selected.json");
             fBot.waitUntil(xyViewerIsReadyCondition);

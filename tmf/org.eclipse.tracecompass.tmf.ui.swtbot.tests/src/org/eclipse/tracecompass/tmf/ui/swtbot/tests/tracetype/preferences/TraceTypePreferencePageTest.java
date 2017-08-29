@@ -182,13 +182,13 @@ public class TraceTypePreferencePageTest {
         checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
         assertEquals(0, checked);
         bot.text(1).setText("Custom XML");
-        WaitUtils.waitUntil(tree -> tree.visibleRowCount() == 2, treeBot, "Visible row count: Default expected 2, but actual value is " + treeBot.visibleRowCount());
+        SWTBotUtils.waitUntil(tree -> tree.visibleRowCount() == 2, treeBot, "Visible row count: Default expected 2, but actual value is " + treeBot.visibleRowCount());
         assertEquals("Filtered no checked", 0, checked);
         bot.button(CHECK_ALL).click();
         checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
         assertEquals("Filtered check all", 2, checked);
         bot.text(1).setText("");
-        WaitUtils.waitUntil(tree -> tree.visibleRowCount() == defaultCount, treeBot, "Visible row count: Default expected " + defaultCount +", but actual value is " + treeBot.visibleRowCount());
+        SWTBotUtils.waitUntil(tree -> tree.visibleRowCount() == defaultCount, treeBot, "Visible row count: Default expected " + defaultCount +", but actual value is " + treeBot.visibleRowCount());
         bot.button(CHECK_ALL).click();
         checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
         assertEquals("Filtered removed all check", defaultCount, checked);
@@ -299,7 +299,7 @@ public class TraceTypePreferencePageTest {
             fail("Failed to add a filter");
         }
         viewBot.toolbarButton("Import filters").click();
-        WaitUtils.waitUntil(tree -> tree.rowCount() > 0, viewBot.bot().tree(0), "Failed to import test filter");
+        SWTBotUtils.waitUntil(tree -> tree.rowCount() > 0, viewBot.bot().tree(0), "Failed to import test filter");
     }
 
     private static void setTraceTypePreferences(@NonNull String button, @NonNull String... pathToCheck) {

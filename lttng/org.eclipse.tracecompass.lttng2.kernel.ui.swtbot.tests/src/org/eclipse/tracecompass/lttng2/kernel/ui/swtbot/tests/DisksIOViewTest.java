@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.XYDataProviderBaseTest;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
-import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 import org.eclipse.ui.IViewPart;
 import org.junit.Test;
@@ -82,11 +82,11 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
         final Chart chart = getChart();
         assertNotNull(chart);
 
-        WaitUtils.waitUntil(c -> c.getSeriesSet().getSeries().length > 0, chart, "No data available");
+        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length > 0, chart, "No data available");
         chartViewer.setNbPoints(NUMBER_OF_POINT);
 
         /* Initially, no disk activity */
-        WaitUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk0-res50.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk0-res50.json", "Chart data is not valid");
 
         /* Change time range where there is disks activity */
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, new TmfTimeRange(START_TIME_WHERE_THERE_IS_DISK_ACTIVITY, END_TIME_WHERE_THERE_IS_DISK_ACTIVITY)));
@@ -97,7 +97,7 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
         verifyChartStyle();
 
         /* Test data model */
-        WaitUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk1-res50.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk1-res50.json", "Chart data is not valid");
 
         /* Change Zoom and number of points */
         chartViewer.setNbPoints(MORE_POINTS);
@@ -106,7 +106,7 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
         verifyChartStyle();
 
         /* Test data model */
-        WaitUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk2-res100.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk2-res100.json", "Chart data is not valid");
     }
 
     private void verifyChartStyle() {

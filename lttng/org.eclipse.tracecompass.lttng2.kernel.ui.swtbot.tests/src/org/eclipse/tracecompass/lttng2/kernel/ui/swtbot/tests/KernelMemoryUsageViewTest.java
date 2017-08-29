@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.XYDataProviderBaseTest;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
-import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 import org.eclipse.ui.IViewPart;
 import org.junit.Test;
@@ -72,29 +72,29 @@ public class KernelMemoryUsageViewTest extends XYDataProviderBaseTest {
         final Chart chart = getChart();
         assertNotNull(chart);
 
-        WaitUtils.waitUntil(c -> c.getSeriesSet().getSeries().length > 0, chart, "No data available");
+        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length > 0, chart, "No data available");
         chartViewer.setNbPoints(NUMBER_OF_POINT);
 
         /* Test type, style and color of series */
         verifyChartStyle(null);
 
         /* Test data model*/
-        WaitUtils.waitUntil(json -> isChartDataValid(chart, json), "resources/kernel-memory-res50.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json), "resources/kernel-memory-res50.json", "Chart data is not valid");
 
         /*
          * Select a thread and change zoom
          */
         String selectedThread = "496";
         SWTBotTree treeBot = getSWTBotView().bot().tree();
-        WaitUtils.waitUntil(tree -> tree.rowCount() >= 5, treeBot, "Did not finish loading");
+        SWTBotUtils.waitUntil(tree -> tree.rowCount() >= 5, treeBot, "Did not finish loading");
         treeBot.getTreeItem(selectedThread).click();
         chartViewer.setNbPoints(MORE_POINTS);
-        WaitUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 2, chart, "Only total available");
+        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 2, chart, "Only total available");
 
         /* Test type, style and color of series */
         verifyChartStyle(selectedThread);
 
-        WaitUtils.waitUntil(json -> isChartDataValid(chart, json, selectedThread), "resources/kernel-memory-res100Selected.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, selectedThread), "resources/kernel-memory-res100Selected.json", "Chart data is not valid");
     }
 
     /**
