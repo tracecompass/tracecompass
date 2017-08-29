@@ -17,6 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,6 +30,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
 import org.eclipse.tracecompass.internal.analysis.counters.ui.Activator;
+import org.eclipse.tracecompass.internal.analysis.counters.ui.CounterTreeViewerEntry;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -120,8 +122,8 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer implemen
         });
 
         // Associate the counter entries to the state systems
-        Iterable<@NonNull CounterTreeViewerEntry> filtered = Iterables.filter(fEntries, CounterTreeViewerEntry.class);
-        ImmutableListMultimap<ITmfStateSystem, @NonNull CounterTreeViewerEntry> fStateSystems = Multimaps.index(filtered, CounterTreeViewerEntry::getStateSystem);
+        Iterable<CounterTreeViewerEntry> filtered = Iterables.filter(fEntries, CounterTreeViewerEntry.class);
+        ImmutableListMultimap<ITmfStateSystem, CounterTreeViewerEntry> fStateSystems = Multimaps.index(filtered, CounterTreeViewerEntry::getStateSystem);
 
         /*
          * TODO: avoid redrawing series already present on chart and iterate over time
@@ -135,7 +137,7 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer implemen
             try (ScopeLog log = new ScopeLog(LOGGER, Level.FINE, "CounterChartViewer#querySS")) { //$NON-NLS-1$
                 // Extract the quarks for 2D querying
                 List<CounterTreeViewerEntry> counters = (List<CounterTreeViewerEntry>) entry.getValue();
-                Collection<@NonNull Integer> quarks = Lists.transform(counters, CounterTreeViewerEntry::getQuark);
+                Collection<@NonNull Integer> quarks = Objects.requireNonNull(Lists.transform(counters, CounterTreeViewerEntry::getQuark));
 
                 Iterable<@NonNull ITmfStateInterval> query2d = ss.query2D(quarks, times);
                 for (ITmfStateInterval interval : query2d) {
@@ -194,7 +196,6 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer implemen
                 times.add(nextTime);
             }
         }
-
         return times;
     }
 

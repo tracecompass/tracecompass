@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.counters.ui;
+package org.eclipse.tracecompass.internal.analysis.counters.ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
