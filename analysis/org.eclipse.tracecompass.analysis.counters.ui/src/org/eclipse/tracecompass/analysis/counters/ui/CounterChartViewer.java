@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -161,31 +162,39 @@ public final class CounterChartViewer extends TmfCommonXLineChartViewer implemen
         updateDisplay();
     }
 
-    private static Collection<Long> retrieve2dQueryTimestamps(ITmfStateSystem ss, double[] xAxis, long start) {
+    private Collection<Long> retrieve2dQueryTimestamps(ITmfStateSystem ss, double[] xAxis, long start) {
         Collection<Long> times = new ArrayList<>();
 
         long stateSystemStartTime = ss.getStartTime();
         long stateSystemEndTime = ss.getCurrentEndTime();
-        long prevTime = Math.max(stateSystemStartTime, (long) (start - (xAxis[1])));
+        long prevTime = Long.max(stateSystemStartTime, start - (long) xAxis[1]);
 
-        if (prevTime <= stateSystemEndTime) {
+        // We only need the previous time for differential mode
+        if (!fIsCumulative && prevTime <= stateSystemEndTime) {
             times.add(prevTime);
-            for (double t : xAxis) {
-                long nextTime = start + (long) t - 1;
-                if (nextTime > stateSystemEndTime) {
-                    break;
-                } else if (nextTime >= stateSystemStartTime) {
-                    times.add(nextTime);
-                }
+        }
+
+        for (double t : xAxis) {
+            long nextTime = start + (long) t - 1;
+            if (nextTime > stateSystemEndTime) {
+                break;
+            } else if (nextTime >= stateSystemStartTime) {
+                times.add(nextTime);
             }
         }
 
         return times;
     }
 
-    private double[] buildYValues(Collection<ITmfStateInterval> countersIntervals, double[] xAxis, long start) {
+    private double[] buildYValues(NavigableSet<ITmfStateInterval> countersIntervals, double[] xAxis, long start) {
         double[] yValues = new double[xAxis.length];
-        long prevValue = 0l;
+        long prevValue = 0L;
+        if (!countersIntervals.isEmpty()) {
+            Object value = countersIntervals.first().getValue();
+            if (value instanceof Number) {
+                prevValue = ((Number) value).longValue();
+            }
+        }
         int to = 0;
 
         for (ITmfStateInterval interval : countersIntervals) {
