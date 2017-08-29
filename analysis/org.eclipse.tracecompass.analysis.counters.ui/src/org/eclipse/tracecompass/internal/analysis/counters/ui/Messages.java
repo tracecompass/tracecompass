@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.counters.ui;
+package org.eclipse.tracecompass.internal.analysis.counters.ui;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -22,7 +22,7 @@ public class Messages extends NLS {
     private Messages() {
     }
 
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.analysis.counters.ui.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.counters.ui.messages"; //$NON-NLS-1$
 
     static {
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

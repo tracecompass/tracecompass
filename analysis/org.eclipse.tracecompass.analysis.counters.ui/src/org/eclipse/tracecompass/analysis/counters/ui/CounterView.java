@@ -14,6 +14,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.internal.analysis.counters.ui.Messages;
 import org.eclipse.tracecompass.internal.analysis.counters.ui.TriStateFilteredCheckboxTree;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
