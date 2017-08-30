@@ -171,15 +171,16 @@ public class TmfEventThread implements Runnable {
         int nbRequested = fRequest.getNbRequested();
         int nbRead = 0;
 
-        // Initialize the execution
-        ITmfContext context = fProvider.armRequest(fRequest);
-        if (context == null) {
-            isCompleted = true;
-            fRequest.cancel();
-            return;
-        }
-
+        ITmfContext context = null;
         try {
+            // Initialize the execution
+            context = fProvider.armRequest(fRequest);
+            if (context == null) {
+                isCompleted = true;
+                fRequest.cancel();
+                return;
+            }
+
             // Get the ordered events
             ITmfEvent event = fProvider.getNext(context);
             TmfCoreTracer.traceRequest(fRequest.getRequestId(), "read first event"); //$NON-NLS-1$
@@ -218,7 +219,9 @@ public class TmfEventThread implements Runnable {
         }
 
         // Cleanup
-        context.dispose();
+        if (context != null) {
+            context.dispose();
+        }
     }
 
     // ------------------------------------------------------------------------
