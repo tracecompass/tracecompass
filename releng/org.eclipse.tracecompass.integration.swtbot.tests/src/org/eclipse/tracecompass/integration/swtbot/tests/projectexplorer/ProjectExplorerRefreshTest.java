@@ -156,6 +156,7 @@ public class ProjectExplorerRefreshTest {
         SWTBotTreeItem project = SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME);
         SWTBotTreeItem experiment = SWTBotUtils.getTraceProjectItem(fBot, project, "Experiments", "Experiment");
         FileUtils.copyDirectory(TEST_FILE_KERNEL_CLASH, FileUtils.getFile(fTracesFolder, TEST_FILE_KERNEL.getName()), false);
+        // false -> last modified times are copied file time stamps
         assertTrue(kernelTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         assertTrue(experiment.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         refresh(() -> tracesFolder.contextMenu().menu("Refresh").click());
@@ -165,7 +166,8 @@ public class ProjectExplorerRefreshTest {
         assertTrue(experiment.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         SWTBotUtils.activateEditor(fBot, TEST_FILE_KERNEL.getName());
         SWTBotUtils.activateEditor(fBot, "Experiment");
-        FileUtils.copyDirectory(TEST_FILE_KERNEL, FileUtils.getFile(fTracesFolder, TEST_FILE_KERNEL.getName()), false);
+        FileUtils.copyDirectory(TEST_FILE_KERNEL, FileUtils.getFile(fTracesFolder, TEST_FILE_KERNEL.getName()), true);
+        // true -> last modified times are original file time stamps
         assertTrue(kernelTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         refresh(() -> tracesFolder.contextMenu().menu("Refresh").click());
         shell = fBot.shell("Trace Changed");
