@@ -199,6 +199,62 @@ public class StateSystemUtilsTest {
     }
 
     /**
+     * Test that getIteratorOverQuark returns the correct intervals for a range
+     * included in the state system range
+     */
+    @Test
+    public void testIteratorOverQuarkEndTime() {
+        ITmfStateSystem ss = fStateSystem;
+        assertNotNull(ss);
+
+        int quark;
+        try {
+            quark = ss.getQuarkAbsolute(DUMMY_STRING);
+
+            QuarkIterator iterator = new QuarkIterator(ss, quark, Long.MIN_VALUE, 1199);
+
+            /* There should be one interval ranging from 1000L to 1199L */
+            assertTrue(iterator.hasNext());
+            ITmfStateInterval interval = iterator.next();
+            assertNotNull(interval);
+            assertEquals(1000L, interval.getStartTime());
+            assertEquals(1199L, interval.getEndTime());
+
+            /* There should not be a next interval */
+            assertFalse(iterator.hasNext());
+
+            iterator = new QuarkIterator(ss, quark, Long.MIN_VALUE, 1200);
+            /* There should be 2 intervals ranging from 1000L to 1199L and 1200L to 1499L */
+            assertTrue(iterator.hasNext());
+            interval = iterator.next();
+            assertNotNull(interval);
+            assertEquals(1000L, interval.getStartTime());
+            assertEquals(1199L, interval.getEndTime());
+
+            assertTrue(iterator.hasNext());
+            interval = iterator.next();
+            assertNotNull(interval);
+            assertEquals(1200L, interval.getStartTime());
+            assertEquals(1499L, interval.getEndTime());
+
+            /* There should not be a next interval */
+            assertFalse(iterator.hasNext());
+
+
+            iterator = new QuarkIterator(ss, quark, 1800, 5000);
+            /* There should be one interval ranging from 1500L to 2000L*/
+            assertTrue(iterator.hasNext());
+            interval = iterator.next();
+            assertNotNull(interval);
+            assertEquals(1500L, interval.getStartTime());
+            assertEquals(2000L, interval.getEndTime());
+        } catch (AttributeNotFoundException e) {
+            fail(e.getMessage());
+        }
+    }
+
+
+    /**
      * With the query end > ss.end, query some intervals, then add a few
      * intervals to the ss such that end now becomes < ss.end and make sure
      * those new intervals are picked up

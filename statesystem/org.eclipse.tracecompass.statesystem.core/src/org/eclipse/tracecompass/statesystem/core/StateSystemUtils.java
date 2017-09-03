@@ -295,6 +295,7 @@ public final class StateSystemUtils {
         private final ITmfStateSystem fSS;
         private final int fQuark;
         private final long fInitialTime;
+        private final long fEndTime;
 
         private @Nullable ITmfStateInterval fCurrent;
 
@@ -312,14 +313,42 @@ public final class StateSystemUtils {
          *            start at the StateSystem's start, on bigger than the
          *            StateSystem's current end time, in which case iteration
          *            will start at the StateSystem's current end time.
-         * @throws TimeRangeException
-         *             If end < start.
          * @since 2.1
          */
         public QuarkIterator(ITmfStateSystem ss, int quark, long initialTime) {
+            this (ss, quark, initialTime, Long.MAX_VALUE);
+        }
+
+        /**
+         * Constructor
+         *
+         * @param ss
+         *            The state system on which to query intervals
+         * @param quark
+         *            The key to the attribute to iterate over
+         * @param initialTime
+         *            The timestamp that the first returned interval will
+         *            intersect. This timestamp can be smaller than the
+         *            StateSystem's start time, in which case, iteration will
+         *            start at the StateSystem's start, on bigger than the
+         *            StateSystem's current end time, in which case iteration
+         *            will start at the StateSystem's current end time.
+         * @param endTime
+         *            The end of the range of intervals to iterate over, it can be
+         *            greater than the current state system's end time, iteration
+         *            will end at the smallest of the two.
+         * @throws TimeRangeException
+         *             If endTime < initialTime.
+         * @since 3.1
+         */
+        public QuarkIterator(ITmfStateSystem ss, int quark, long initialTime, long endTime) {
+            if (endTime < initialTime) {
+                throw new TimeRangeException("iterateOverQuark: end < start !"); //$NON-NLS-1$
+            }
             fSS = ss;
             fQuark = quark;
             fInitialTime = initialTime;
+            fEndTime = endTime;
         }
 
         private long getNextQueryTime() {
@@ -341,11 +370,17 @@ public final class StateSystemUtils {
         @Override
         public boolean hasNext() {
             /*
+             * Compute the query's real end time here, to update it if the
+             * iterator is used during state system build
+             */
+            long end = Long.min(fEndTime, fSS.getCurrentEndTime());
+
+            /*
              * Ensure that the next query time falls within state system and
              * query time range. By definition getNextQueryTime() is larger than
              * the state system's start time.
              */
-            return (getNextQueryTime() <= fSS.getCurrentEndTime());
+            return (getNextQueryTime() <= end);
         }
 
         @Override
