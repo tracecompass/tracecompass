@@ -191,7 +191,8 @@ public class ControlFlowView extends AbstractTimeGraphView {
      * when building link list
      */
     private final Map<ITmfTrace, TreeMultimap<Integer, ControlFlowEntry>> fEntryCache = new HashMap<>();
-    private @NonNull ActiveThreadsFilter fActiveThreadsFilter = new ActiveThreadsFilter(null, false);
+
+    private @NonNull ActiveThreadsFilter fActiveThreadsFilter = new ActiveThreadsFilter(null, false, null);
 
     private final ActiveThreadsFilterAction fActiveThreadsRapidToggle = new ActiveThreadsFilterAction();
 
@@ -224,8 +225,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
                     } else {
                         fActiveThreadsFilter.setEnabled(false);
                     }
-
-                    refresh();
+                    startZoomThread(getTimeGraphViewer().getTime0(), getTimeGraphViewer().getTime1());
                 }
             });
         }
@@ -424,7 +424,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
         return new Action(PackageMessages.ControlFlowView_DynamicFiltersConfigureLabel, IAction.AS_PUSH_BUTTON) {
             @Override
             public void run() {
-                DynamicFilterDialog dialog = new DynamicFilterDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), fActiveThreadsFilter);
+                DynamicFilterDialog dialog = new DynamicFilterDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), fActiveThreadsFilter, getTrace());
                 if (dialog.open() == Window.OK) {
                     /* Remove the previous Active Threads filter */
                     checkNotNull(getTimeGraphViewer()).removeFilter(fActiveThreadsFilter);
@@ -725,7 +725,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
         }
 
         if (activeThreadFilter == null) {
-            fActiveThreadsFilter = new ActiveThreadsFilter(null, false);
+            fActiveThreadsFilter = new ActiveThreadsFilter(null, false, getTrace());
         } else {
             fActiveThreadsFilter = (@NonNull ActiveThreadsFilter) checkNotNull(activeThreadFilter);
         }
@@ -1004,7 +1004,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
                 intervals.clear();
             }
         }
-        fActiveThreadsFilter.updateData();
+        fActiveThreadsFilter.updateData(zoomStartTime, zoomEndTime);
     }
 
     /**

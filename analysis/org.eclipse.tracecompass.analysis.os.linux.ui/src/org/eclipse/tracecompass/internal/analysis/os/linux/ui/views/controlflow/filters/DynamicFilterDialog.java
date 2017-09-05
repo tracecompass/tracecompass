@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 EfficiOS Inc.
+ * Copyright (c) 2016 EfficiOS Inc., Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
@@ -30,6 +31,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import com.google.common.collect.Range;
 
 /**
@@ -44,6 +46,7 @@ public class DynamicFilterDialog extends TitleAreaDialog {
 
     /** The internal ActiveThreadsFilter result */
     private @NonNull ActiveThreadsFilter fInternalActiveThreadsFilter;
+    private @Nullable final ITmfTrace fTrace;
 
     private Button fActiveThreadEnabledButton;
     private Button fAllActiveThreadsRadionButton;
@@ -59,10 +62,13 @@ public class DynamicFilterDialog extends TitleAreaDialog {
      *            An
      *            {@link org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.filters.ActiveThreadsFilter
      *            ActiveThreadFilter} instance.
+     * @param trace
+     *            The relevant trace
      */
-    public DynamicFilterDialog(Shell parentShell, @NonNull ActiveThreadsFilter filter) {
+    public DynamicFilterDialog(Shell parentShell, @NonNull ActiveThreadsFilter filter, @Nullable ITmfTrace trace) {
         super(parentShell);
         fInternalActiveThreadsFilter = filter;
+        fTrace = trace;
     }
 
     @Override
@@ -235,7 +241,7 @@ public class DynamicFilterDialog extends TitleAreaDialog {
         List<Range<Long>> ranges = null;
         ranges = parseCpuRangesText(fCpuRangesField.getText());
 
-        fInternalActiveThreadsFilter = new ActiveThreadsFilter(ranges, fCpuRangesRadioButton.getSelection());
+        fInternalActiveThreadsFilter = new ActiveThreadsFilter(ranges, fCpuRangesRadioButton.getSelection(), fTrace);
         fInternalActiveThreadsFilter.setEnabled(fActiveThreadEnabledButton.getSelection());
     }
 

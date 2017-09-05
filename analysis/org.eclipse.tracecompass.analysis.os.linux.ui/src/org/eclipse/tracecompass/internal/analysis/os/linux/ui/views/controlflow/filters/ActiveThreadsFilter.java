@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 EfficiOS Inc.
+ * Copyright (c) 2016 EfficiOS Inc., Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,12 +10,15 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.filters;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
@@ -24,7 +27,6 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
@@ -39,21 +41,24 @@ import com.google.common.collect.Range;
  * range of CPUs or show all threads considered active
  *
  * @author Jonathan Rajotte Julien
+ *
  */
 public class ActiveThreadsFilter extends ViewerFilter {
 
     /** The filtering CPU ranges */
     private final @NonNull List<Range<Long>> fCpuRanges;
     /** The local cache for On CPU filtering */
-    private @NonNull Set<Integer> fCachedOnCpusThreadForTimeRange = new HashSet<>();
+    private @NonNull Map<ITmfTrace, Set<Integer>> fCachedOnCpusThreadForTimeRange = new HashMap<>();
     /** The local cache for Active Threads filtering */
-    private @NonNull Set<Integer> fCachedActiveThreadForTimeRange = new HashSet<>();
+    private @NonNull Map<ITmfTrace, Set<Integer>> fCachedActiveThreadForTimeRange = new HashMap<>();
     /** The cached time range */
     private TmfTimeRange fCachedTimeRange;
     /** Whether the filter is enabled */
     private boolean fEnabled = false;
     /** Whether the filter is an On CPU filter */
     private boolean fCpuRangesBasedFiltering = false;
+    /** The Trace */
+    private final @Nullable ITmfTrace fTrace;
 
     /**
      * Create an Active Threads filter with CPU ranges criteria.
@@ -62,8 +67,10 @@ public class ActiveThreadsFilter extends ViewerFilter {
      *            The CPU ranges for the filter if any.
      * @param cpuRangesBasedFiltering
      *            Whether or not to filter based on CPU ranges.
+     * @param trace
+     *            The trace the filter is for
      */
-    public ActiveThreadsFilter(List<Range<Long>> cpuRanges, boolean cpuRangesBasedFiltering) {
+    public ActiveThreadsFilter(List<Range<Long>> cpuRanges, boolean cpuRangesBasedFiltering, @Nullable ITmfTrace trace) {
         super();
         if (cpuRanges != null) {
             fCpuRanges = ImmutableList.copyOf(cpuRanges);
@@ -71,6 +78,8 @@ public class ActiveThreadsFilter extends ViewerFilter {
             fCpuRanges = new ArrayList<>();
         }
         fCpuRangesBasedFiltering = cpuRangesBasedFiltering;
+
+        fTrace = trace;
     }
 
     /**
@@ -114,10 +123,15 @@ public class ActiveThreadsFilter extends ViewerFilter {
         }
         ControlFlowEntry cfe = (ControlFlowEntry) element;
 
+        ITmfTrace trace = cfe.getTrace();
+
+        Set<Integer> onCpusThreadForTimeRange = fCachedOnCpusThreadForTimeRange.get(trace);
+        Set<Integer> activeThreadForTimeRange = fCachedActiveThreadForTimeRange.get(trace);
+
         /* Check if on CPU */
-        if (fCpuRangesBasedFiltering && fCachedOnCpusThreadForTimeRange.contains(cfe.getThreadId())) {
+        if (fCpuRangesBasedFiltering && (onCpusThreadForTimeRange != null) && onCpusThreadForTimeRange.contains(cfe.getThreadId())) {
             return true;
-        } else if (fCachedActiveThreadForTimeRange.contains(cfe.getThreadId())) {
+        } else if ((activeThreadForTimeRange != null) && activeThreadForTimeRange.contains(cfe.getThreadId())) {
             return true;
         }
 
@@ -132,25 +146,15 @@ public class ActiveThreadsFilter extends ViewerFilter {
         return false;
     }
 
-    private static @NonNull Set<Integer> getOnCpuThreads(List<Range<Long>> cpuRanges) {
+    private static @NonNull Set<Integer> getOnCpuThreads(List<Range<Long>> cpuRanges, TmfTimeRange winRange, @NonNull ITmfTrace trace) {
         if ((cpuRanges == null) || cpuRanges.isEmpty()) {
             return new HashSet<>();
         }
 
-        TmfTraceManager traceManager = TmfTraceManager.getInstance();
-        TmfTraceContext traceContext = traceManager.getCurrentTraceContext();
-        TmfTimeRange winRange = traceContext.getWindowRange();
-
-        ITmfTrace trace = traceManager.getActiveTrace();
-
-        if (trace == null) {
-            return new HashSet<>();
-        }
-
-        KernelAnalysisModule kernelAnalysisModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelAnalysisModule.class, KernelAnalysisModule.ID);
-
         long beginTS = winRange.getStartTime().getValue();
         long endTS = winRange.getEndTime().getValue();
+
+        KernelAnalysisModule kernelAnalysisModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelAnalysisModule.class, KernelAnalysisModule.ID);
 
         if (kernelAnalysisModule == null) {
             return new HashSet<>();
@@ -174,16 +178,7 @@ public class ActiveThreadsFilter extends ViewerFilter {
         return set;
     }
 
-    private static @NonNull Set<Integer> getActiveThreads() {
-        TmfTraceManager traceManager = TmfTraceManager.getInstance();
-        TmfTraceContext traceContext = traceManager.getCurrentTraceContext();
-        TmfTimeRange winRange = traceContext.getWindowRange();
-
-        ITmfTrace trace = traceManager.getActiveTrace();
-
-        if (trace == null) {
-            return new HashSet<>();
-        }
+    private static @NonNull Set<Integer> getActiveThreads(TmfTimeRange winRange, @NonNull ITmfTrace trace) {
 
         KernelAnalysisModule kernelModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelAnalysisModule.class, KernelAnalysisModule.ID);
 
@@ -203,23 +198,32 @@ public class ActiveThreadsFilter extends ViewerFilter {
 
     /**
      * Update the filter internal data
+     *
+     * @param beginTS
+     *            start timestamp to update the filter for
+     * @param endTS
+     *            end timestamp to update the filter for
      */
-    public void updateData() {
-        TmfTraceManager traceManager = TmfTraceManager.getInstance();
-        TmfTraceContext traceContext = traceManager.getCurrentTraceContext();
-        TmfTimeRange winRange = traceContext.getWindowRange();
-        long beginTS = winRange.getStartTime().getValue();
-        long endTS = winRange.getEndTime().getValue();
+    public void updateData(long beginTS, long endTS) {
 
         TmfTimeRange timeRange = new TmfTimeRange(TmfTimestamp.fromNanos(beginTS), TmfTimestamp.fromNanos(endTS));
 
-        /* Caching result for subsequent select() call for other entry */
+        ITmfTrace parentTrace = fTrace;
+        if (parentTrace == null) {
+            return;
+        }
+
         if (fEnabled && (fCachedTimeRange == null || !fCachedTimeRange.equals(timeRange))) {
             fCachedTimeRange = timeRange;
-            if (fCpuRangesBasedFiltering) {
-                fCachedOnCpusThreadForTimeRange = getOnCpuThreads(fCpuRanges);
-            } else {
-                fCachedActiveThreadForTimeRange = getActiveThreads();
+            for (ITmfTrace trace : TmfTraceManager.getTraceSet(parentTrace)) {
+                /* Caching result for subsequent select() call for other entry */
+                if (fCpuRangesBasedFiltering) {
+                    Set<Integer> onCpusThreadForTimeRange = getOnCpuThreads(fCpuRanges, timeRange, trace);
+                    fCachedOnCpusThreadForTimeRange.put(trace, onCpusThreadForTimeRange);
+                } else {
+                    Set<Integer> activeThreadForTimeRange = getActiveThreads(timeRange, trace);
+                    fCachedActiveThreadForTimeRange.put(trace, activeThreadForTimeRange);
+                }
             }
         }
     }
