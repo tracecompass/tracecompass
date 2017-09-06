@@ -25,8 +25,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
@@ -35,7 +38,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.operations.TmfWorkspaceModifyOperation;
@@ -277,10 +279,10 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
                             Display.getDefault().asyncExec(new Runnable() {
                                 @Override
                                 public void run() {
-                                    final MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-                                    mb.setText(getTraceErrorMessage(deleteType) + ' ' + trace.getName());
-                                    mb.setMessage(e.getMessage());
-                                    mb.open();
+                                    ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                                            null,
+                                            null,
+                                            new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, getTraceErrorMessage(deleteType) + ' ' + trace.getName(), e));
                                 }
                             });
                             Activator.getDefault().logError(getTraceErrorMessage(deleteType) + trace.getName(), e);
@@ -323,10 +325,10 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
                             Display.getDefault().asyncExec(new Runnable() {
                                 @Override
                                 public void run() {
-                                    final MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-                                    mb.setText(getFolderErrorMessage(deleteType) + ' ' + folder.getName());
-                                    mb.setMessage(e.getMessage());
-                                    mb.open();
+                                    ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                                            null,
+                                            null,
+                                            new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, getFolderErrorMessage(deleteType) + ' ' + folder.getName(), e));
                                 }
                             });
                             Activator.getDefault().logError(getFolderErrorMessage(deleteType) + folder.getName(), e);
