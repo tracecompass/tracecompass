@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -57,7 +58,7 @@ class CommonXAxisModelBuilder {
      * @return The builder
      */
     public CommonXAxisModelBuilder setXValues(double @NonNull [] xValues) {
-        fXValues = xValues;
+        fXValues = Arrays.copyOf(xValues, xValues.length);
         fYSeries.clear();
         fModel = null;
         return this;
@@ -89,6 +90,7 @@ class CommonXAxisModelBuilder {
      */
     public CommonXAxisModelBuilder deleteSeries(String seriesName) {
         fYSeries.remove(seriesName);
+        fModel = null;
         return this;
     }
 
