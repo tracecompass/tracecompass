@@ -18,7 +18,6 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -28,6 +27,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -140,18 +140,36 @@ public final class SymbolProviderManager {
 
             // Build the appropriate provider(s)
             if (symbolProviders.isEmpty()) {
-                for (SymbolProviderFactoryWrapper wrapper : fProviders) {
-                    ISymbolProviderFactory factory = wrapper.factory;
-                    ISymbolProvider provider = factory.createProvider(trace);
-                    if (provider != null) {
-                        symbolProviders.add(provider);
-                        fInstances.put(trace, new WeakReference<>(provider));
+                for (ITmfTrace subTrace : TmfTraceManager.getTraceSet(trace)) {
+                    // Not the same trace, so get the sub trace's symbol providers
+                    if (subTrace != trace) {
+                        Collection<ISymbolProvider> traceSymbolProviders = getSymbolProviders(subTrace);
+                        traceSymbolProviders.forEach(sp -> {
+                            symbolProviders.add(sp);
+                            fInstances.put(trace, new WeakReference<>(sp));
+                        });
+                    } else {
+                        // Create the symbol providers for this trace
+                        for (SymbolProviderFactoryWrapper wrapper : fProviders) {
+                            ISymbolProviderFactory factory = wrapper.factory;
+                            ISymbolProvider provider = factory.createProvider(trace);
+                            if (provider != null) {
+
+                                symbolProviders.add(provider);
+                                fInstances.put(trace, new WeakReference<>(provider));
+                            }
+                        }
                     }
                 }
             }
 
             // Build the default provider if required
-            return !symbolProviders.isEmpty() ? symbolProviders : Collections.singleton(new DefaultSymbolProvider(trace));
+            if (symbolProviders.isEmpty()) {
+                DefaultSymbolProvider defaultSymbolProvider = new DefaultSymbolProvider(trace);
+                fInstances.put(trace, new WeakReference<>(defaultSymbolProvider));
+                symbolProviders.add(defaultSymbolProvider);
+            }
+            return symbolProviders;
         }
     }
 
