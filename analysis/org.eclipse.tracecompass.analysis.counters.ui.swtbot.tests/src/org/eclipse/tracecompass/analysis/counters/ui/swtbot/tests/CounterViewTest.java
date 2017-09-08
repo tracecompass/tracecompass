@@ -63,7 +63,9 @@ public class CounterViewTest extends XYDataProviderBaseTest {
         SWTBotTree treeBot = getSWTBotView().bot().tree();
         WaitUtils.waitUntil(tree -> tree.rowCount() >= 1, treeBot, "The tree viewer did not finish loading.");
         SWTBotTreeItem root = treeBot.getTreeItem(TRACE_NAME);
+        assertNotNull(root);
         SWTBotTreeItem counter = retrieveTreeItem(root, COUNTER_NAME);
+        assertNotNull(counter);
 
         // Check all elements of the tree
         root.check();
@@ -118,6 +120,7 @@ public class CounterViewTest extends XYDataProviderBaseTest {
         WaitUtils.waitUntil(tree -> tree.rowCount() >= 1, treeBot, "The tree viewer did not finish loading.");
         SWTBotTreeItem root = treeBot.getTreeItem(TRACE_NAME);
         SWTBotTreeItem counter = retrieveTreeItem(root, COUNTER_NAME);
+        assertNotNull(counter);
         counter.check();
         fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
         WaitUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 1, chart, "The data series did not load.");
@@ -130,7 +133,7 @@ public class CounterViewTest extends XYDataProviderBaseTest {
                 "resources/minor_faults-res50.json", "The chart data is not valid.");
     }
 
-    private @Nullable SWTBotTreeItem retrieveTreeItem(@NonNull SWTBotTreeItem rootItem, @NonNull String id) {
+    private @Nullable SWTBotTreeItem retrieveTreeItem(SWTBotTreeItem rootItem, @NonNull String id) {
         if (rootItem.getNodes().contains(id)) {
             return rootItem.getNode(id);
         }

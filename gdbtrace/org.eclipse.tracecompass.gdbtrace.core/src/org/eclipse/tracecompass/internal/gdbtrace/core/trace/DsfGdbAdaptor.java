@@ -464,6 +464,7 @@ public class DsfGdbAdaptor {
                                     protected void handleSuccess() {
                                         MIBreakpoint[] breakpoints = getData().getMIBreakpoints();
                                         for (int i = 0; i < breakpoints.length; i++) {
+                                            // Use deprecated constructor for Neon backward compatibility
                                             MIBreakpointDMData breakpoint = new MIBreakpointDMData(breakpoints[i]);
                                             String type = breakpoint.getBreakpointType();
                                             // Only save info if the current breakpoint is of type tracepoint

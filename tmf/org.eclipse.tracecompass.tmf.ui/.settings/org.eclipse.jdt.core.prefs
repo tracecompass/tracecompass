@@ -32,6 +32,7 @@ org.eclipse.jdt.core.compiler.problem.assertIdentifier=error
 org.eclipse.jdt.core.compiler.problem.autoboxing=ignore
 org.eclipse.jdt.core.compiler.problem.comparingIdentical=error
 org.eclipse.jdt.core.compiler.problem.deadCode=error
+# changed to warning due to TmfViewerSorter
 org.eclipse.jdt.core.compiler.problem.deprecation=warning
 org.eclipse.jdt.core.compiler.problem.deprecationInDeprecatedCode=disabled
 org.eclipse.jdt.core.compiler.problem.deprecationWhenOverridingDeprecatedMethod=enabled
@@ -107,6 +108,9 @@ org.eclipse.jdt.core.compiler.problem.uncheckedTypeOperation=warning
 org.eclipse.jdt.core.compiler.problem.unclosedCloseable=error
 org.eclipse.jdt.core.compiler.problem.undocumentedEmptyBlock=ignore
 org.eclipse.jdt.core.compiler.problem.unhandledWarningToken=error
+org.eclipse.jdt.core.compiler.problem.unlikelyCollectionMethodArgumentType=warning
+org.eclipse.jdt.core.compiler.problem.unlikelyCollectionMethodArgumentTypeStrict=disabled
+org.eclipse.jdt.core.compiler.problem.unlikelyEqualsArgumentType=info
 org.eclipse.jdt.core.compiler.problem.unnecessaryElse=error
 org.eclipse.jdt.core.compiler.problem.unnecessaryTypeCheck=error
 org.eclipse.jdt.core.compiler.problem.unqualifiedFieldAccess=ignore

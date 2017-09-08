@@ -17,7 +17,7 @@ import org.eclipse.jface.viewers.ViewerSorter;
 /**
  * Viewer sorter for TMF project model elements
  */
-// TODO: Follow-up with Bug 484248
+// Use deprecated base class for Neon backward compatibility
 public class TmfViewerSorter extends ViewerSorter {
 
     private static int UNSET_PRIO = Integer.MAX_VALUE;

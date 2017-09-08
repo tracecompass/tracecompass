@@ -32,6 +32,7 @@ org.eclipse.jdt.core.compiler.problem.assertIdentifier=error
 org.eclipse.jdt.core.compiler.problem.autoboxing=ignore
 org.eclipse.jdt.core.compiler.problem.comparingIdentical=error
 org.eclipse.jdt.core.compiler.problem.deadCode=error
+# changed to warning due to DsfGdbAdaptor
 org.eclipse.jdt.core.compiler.problem.deprecation=warning
 org.eclipse.jdt.core.compiler.problem.deprecationInDeprecatedCode=disabled
 org.eclipse.jdt.core.compiler.problem.deprecationWhenOverridingDeprecatedMethod=enabled
