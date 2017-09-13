@@ -1343,6 +1343,15 @@ and only read the ones you need. Single queries should be used for cases where
 you only want one attribute per timestamp (for example, if you follow the state
 of the same attribute over a time range).
 
+==== 2D queries ====
+
+2D queries are useful and more efficient than the previous two when querying several attributes at multiple time stamps.
+This type of query returns an iterable of the intervals matching the queried attributes and that overlap the queried time range or one of the queried time stamps.
+It is more efficient because it batches the queries and searches the backend for all the desired intervals in a single pass.
+The returned iterable is lazily evaluated, so it can be interrupted in an intermediate state at no cost.
+This type of query is recommended for querying backends to populate views where a subset of attributes are queried on a sampled time range.
+The returned iterable is '''not ordered''' to limit overhead.
+
 
 == Relevant interfaces/classes ==
 
