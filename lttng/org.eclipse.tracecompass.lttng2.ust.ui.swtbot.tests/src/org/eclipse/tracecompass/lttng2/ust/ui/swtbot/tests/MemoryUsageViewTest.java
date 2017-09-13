@@ -29,6 +29,7 @@ import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 import org.eclipse.ui.IViewPart;
 import org.hamcrest.Matcher;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.swtchart.Chart;
@@ -40,6 +41,7 @@ import org.swtchart.LineStyle;
 /**
  * Test for the Memory Usage view in trace compass
  */
+@Ignore("Intermittent failure in test cases. Fixed in master branch")
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class MemoryUsageViewTest extends XYDataProviderBaseTest {
 

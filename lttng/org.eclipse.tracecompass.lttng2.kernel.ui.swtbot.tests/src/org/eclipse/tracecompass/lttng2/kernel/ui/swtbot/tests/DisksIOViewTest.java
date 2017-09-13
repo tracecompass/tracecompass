@@ -30,6 +30,7 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 import org.eclipse.ui.IViewPart;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.swtchart.Chart;
 import org.swtchart.ISeries;
@@ -40,6 +41,7 @@ import org.swtchart.LineStyle;
  *
  * @author Yonni Chen
  */
+@Ignore("Intermittent failure in test cases. Fixed in master branch")
 public class DisksIOViewTest extends XYDataProviderBaseTest {
 
     private static final RGB RED = new RGB(255, 0, 0);

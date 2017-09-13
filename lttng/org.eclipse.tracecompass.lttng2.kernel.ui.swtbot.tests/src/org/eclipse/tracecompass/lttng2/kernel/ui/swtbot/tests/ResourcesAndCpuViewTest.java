@@ -45,6 +45,7 @@ import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 import org.eclipse.ui.IViewPart;
 import org.hamcrest.Matcher;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.swtchart.Chart;
 
@@ -53,6 +54,7 @@ import org.swtchart.Chart;
  *
  * @author Matthew Khouzam
  */
+@Ignore("Intermittent failure in test cases. Fixed in master branch")
 public class ResourcesAndCpuViewTest extends KernelTestBase {
 
     private SWTBotView fViewBotRv;
