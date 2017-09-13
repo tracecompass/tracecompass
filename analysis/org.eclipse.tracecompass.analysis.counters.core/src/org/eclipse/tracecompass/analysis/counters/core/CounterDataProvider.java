@@ -55,6 +55,9 @@ import com.google.common.primitives.Longs;
 @SuppressWarnings("restriction")
 public class CounterDataProvider extends AbstractStateSystemAnalysisDataProvider implements ITmfXYDataProvider {
 
+    /**
+     * Chart's title
+     */
     private static final String TITLE = Objects.requireNonNull(Messages.CounterDataProvider_ChartTitle);
 
     private final CounterAnalysis fModule;
@@ -213,5 +216,14 @@ public class CounterDataProvider extends AbstractStateSystemAnalysisDataProvider
         }
 
         return yValues;
+    }
+
+    /**
+     * Get the {@link CounterDataProvider}'s TITLE
+     *
+     * @return the provider's title
+     */
+    public static String getTitle() {
+        return TITLE;
     }
 }
