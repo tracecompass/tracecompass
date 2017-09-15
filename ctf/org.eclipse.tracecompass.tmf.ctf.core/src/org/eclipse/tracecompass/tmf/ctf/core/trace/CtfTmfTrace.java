@@ -157,6 +157,8 @@ public class CtfTmfTrace extends TmfTrace
     /** Reference to the CTF Trace */
     private CTFTrace fTrace;
 
+    private UUID fUUID;
+
     // -------------------------------------------
     // Constructor
     // -------------------------------------------
@@ -266,6 +268,7 @@ public class CtfTmfTrace extends TmfTrace
                 }
             }
             ctx.dispose();
+            fUUID = fTrace.getUUID();
         } catch (final CTFException e) {
             /*
              * If it failed at the init(), we can assume it's because the file was not found
@@ -534,11 +537,7 @@ public class CtfTmfTrace extends TmfTrace
      */
     @Override
     public UUID getUUID() {
-        CTFTrace trace = fTrace;
-        if (trace == null) {
-            return null;
-        }
-        UUID uuid = trace.getUUID();
+        UUID uuid = fUUID;
         return uuid == null ? super.getUUID() : uuid;
     }
 
