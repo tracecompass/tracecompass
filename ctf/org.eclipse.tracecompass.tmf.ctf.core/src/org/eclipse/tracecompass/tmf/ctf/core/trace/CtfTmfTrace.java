@@ -449,11 +449,14 @@ public class CtfTmfTrace extends TmfTrace
      */
     @Override
     public String getHostId() {
-        CTFClock clock = fTrace.getClock();
-        if (clock != null) {
-            String clockHost = (String) clock.getProperty(CLOCK_HOST_PROPERTY);
-            if (clockHost != null) {
-                return clockHost;
+        CTFTrace trace = fTrace;
+        if (trace != null) {
+            CTFClock clock = trace.getClock();
+            if (clock != null) {
+                String clockHost = (String) clock.getProperty(CLOCK_HOST_PROPERTY);
+                if (clockHost != null) {
+                    return clockHost;
+                }
             }
         }
         return super.getHostId();
@@ -468,11 +471,14 @@ public class CtfTmfTrace extends TmfTrace
      * @since 3.0
      */
     public @Nullable CtfTmfCallsite getCallsite(String eventName) {
-        for (ICTFStream stream : fTrace.getStreams()) {
-            for (IEventDeclaration eventDeclaration : stream.getEventDeclarations()) {
-                if (eventDeclaration != null && Objects.equals(eventDeclaration.getName(), eventName) &&
-                        !eventDeclaration.getCallsites().isEmpty()) {
-                    return new CtfTmfCallsite(eventDeclaration.getCallsites().get(0));
+        CTFTrace trace = fTrace;
+        if (trace != null) {
+            for (ICTFStream stream : fTrace.getStreams()) {
+                for (IEventDeclaration eventDeclaration : stream.getEventDeclarations()) {
+                    if (eventDeclaration != null && Objects.equals(eventDeclaration.getName(), eventName) &&
+                            !eventDeclaration.getCallsites().isEmpty()) {
+                        return new CtfTmfCallsite(eventDeclaration.getCallsites().get(0));
+                    }
                 }
             }
         }
@@ -492,12 +498,15 @@ public class CtfTmfTrace extends TmfTrace
      */
     public @Nullable CtfTmfCallsite getCallsite(String eventName, long ip) {
         CtfTmfCallsite callsite = null;
-        for (ICTFStream stream : fTrace.getStreams()) {
-            for (IEventDeclaration eventDeclaration : stream.getEventDeclarations()) {
-                if (eventDeclaration != null && Objects.equals(eventDeclaration.getName(), eventName)) {
-                    for (CTFCallsite cs : eventDeclaration.getCallsites()) {
-                        if (cs.getIp() >= ip && (callsite == null || cs.getIp() < callsite.getIntructionPointer())) {
-                            callsite = new CtfTmfCallsite(cs);
+        CTFTrace trace = fTrace;
+        if (trace != null) {
+            for (ICTFStream stream : trace.getStreams()) {
+                for (IEventDeclaration eventDeclaration : stream.getEventDeclarations()) {
+                    if (eventDeclaration != null && Objects.equals(eventDeclaration.getName(), eventName)) {
+                        for (CTFCallsite cs : eventDeclaration.getCallsites()) {
+                            if (cs.getIp() >= ip && (callsite == null || cs.getIp() < callsite.getIntructionPointer())) {
+                                callsite = new CtfTmfCallsite(cs);
+                            }
                         }
                     }
                 }
@@ -513,7 +522,11 @@ public class CtfTmfTrace extends TmfTrace
      * @return The CTF environment
      */
     public Map<String, String> getEnvironment() {
-        return fTrace.getEnvironment();
+        CTFTrace trace = fTrace;
+        if (trace == null) {
+            return Collections.emptyMap();
+        }
+        return trace.getEnvironment();
     }
 
     /**
@@ -521,7 +534,11 @@ public class CtfTmfTrace extends TmfTrace
      */
     @Override
     public UUID getUUID() {
-        UUID uuid = fTrace.getUUID();
+        CTFTrace trace = fTrace;
+        if (trace == null) {
+            return null;
+        }
+        UUID uuid = trace.getUUID();
         return uuid == null ? super.getUUID() : uuid;
     }
 
@@ -535,8 +552,12 @@ public class CtfTmfTrace extends TmfTrace
     @Override
     public Map<String, String> getProperties() {
         Map<String, String> properties = new HashMap<>();
-        properties.putAll(fTrace.getEnvironment());
-        properties.put(CLOCK_OFFSET, Long.toUnsignedString(fTrace.getOffset()));
+        CTFTrace trace = fTrace;
+        if( trace == null) {
+            return properties;
+        }
+        properties.putAll(trace.getEnvironment());
+        properties.put(CLOCK_OFFSET, Long.toUnsignedString(trace.getOffset()));
         properties.put(Messages.CtfTmfTrace_HostID, getHostId());
         return properties;
     }
@@ -551,8 +572,9 @@ public class CtfTmfTrace extends TmfTrace
      * @return the clock offset with respect to POSIX.1 Epoch in cycles
      */
     public long getOffset() {
-        if (fTrace != null) {
-            return fTrace.getOffset();
+        CTFTrace trace = fTrace;
+        if (trace != null) {
+            return trace.getOffset();
         }
         return 0;
     }
@@ -566,7 +588,11 @@ public class CtfTmfTrace extends TmfTrace
      * @return The timestamp in nanoseconds, relative to POSIX.1 Epoch
      */
     public long timestampCyclesToNanos(long cycles) {
-        return fTrace.timestampCyclesToNanos(cycles);
+        CTFTrace trace = fTrace;
+        if (trace != null) {
+            return trace.timestampCyclesToNanos(cycles);
+        }
+        return 0;
     }
 
     /**
@@ -578,7 +604,11 @@ public class CtfTmfTrace extends TmfTrace
      * @return The timestamp in cycles, relative to the clock offset
      */
     public long timestampNanoToCycles(long nanos) {
-        return fTrace.timestampNanoToCycles(nanos);
+        CTFTrace trace = fTrace;
+        if( trace != null) {
+            return trace.timestampNanoToCycles(nanos);
+        }
+        return 0;
     }
 
     /**
@@ -805,7 +835,11 @@ public class CtfTmfTrace extends TmfTrace
     @Override
     public long cyclesToNanos(long cycles) {
         // CTFTrace adds the clock offset in cycles to the input
-        return fTrace.timestampCyclesToNanos(cycles - fTrace.getOffset());
+        CTFTrace trace = fTrace;
+        if (trace != null) {
+            return fTrace.timestampCyclesToNanos(cycles - trace.getOffset());
+        }
+        return 0;
     }
 
     /**
@@ -814,7 +848,11 @@ public class CtfTmfTrace extends TmfTrace
     @Override
     public long nanosToCycles(long nanos) {
         // CTFTrace subtracts the clock offset in cycles from the output
-        return fTrace.timestampNanoToCycles(nanos) + fTrace.getOffset();
+        CTFTrace trace = fTrace;
+        if (trace != null) {
+            return trace.timestampNanoToCycles(nanos) + fTrace.getOffset();
+        }
+        return 0;
     }
 
     /**
