@@ -50,7 +50,6 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -368,12 +367,10 @@ public final class TmfTraceManager {
     public synchronized void traceOpened(final TmfTraceOpenedSignal signal) {
         final ITmfTrace trace = signal.getTrace();
         final IFile editorFile = signal.getEditorFile();
-        final ITmfTimestamp startTs = trace.getStartTime();
 
-        long offset = trace.getInitialRangeOffset().toNanos();
-        long endTime = startTs.toNanos() + offset;
+        final TmfTimeRange windowRange = trace.getInitialTimeRange();
+        final ITmfTimestamp startTs = windowRange.getStartTime();
         final TmfTimeRange selectionRange = new TmfTimeRange(startTs, startTs);
-        final TmfTimeRange windowRange = new TmfTimeRange(startTs, TmfTimestamp.fromNanos(endTime));
 
         final TmfTraceContext startCtx = trace.createTraceContext(selectionRange, windowRange, editorFile, null);
 

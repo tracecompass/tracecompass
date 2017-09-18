@@ -27,6 +27,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -36,6 +37,7 @@ import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 
@@ -524,5 +526,16 @@ public interface ITmfTrace extends ITmfEventProvider {
             }
         }
         return UUID.nameUUIDFromBytes(Objects.requireNonNull(sb.toString().getBytes(Charset.defaultCharset())));
+    }
+
+    /**
+     * Get initial time range
+     *
+     * @return get the initial time range
+     * @since 3.1
+     */
+    public default TmfTimeRange getInitialTimeRange() {
+        ITmfTimestamp startTime = getStartTime();
+        return new TmfTimeRange(startTime, TmfTimestamp.fromNanos(SaturatedArithmetic.add(startTime.toNanos(), getInitialRangeOffset().toNanos())));
     }
 }
