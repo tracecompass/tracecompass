@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 
 /**
  * This handler offers "coalescing" of UI updates.
@@ -123,7 +124,11 @@ public class TmfUiRefreshHandler {
                         break;
                     }
                 }
-                Display.getDefault().syncExec(nextTask);
+                try {
+                    Display.getDefault().syncExec(nextTask);
+                } catch (Exception e) {
+                    Activator.getDefault().logError("Exception thrown by TmfUiRefreshHandler task", e); //$NON-NLS-1$
+                }
             }
         }
     }
