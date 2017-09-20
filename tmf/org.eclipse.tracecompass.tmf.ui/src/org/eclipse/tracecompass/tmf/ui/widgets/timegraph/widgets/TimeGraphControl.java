@@ -27,11 +27,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.IStatusLineManager;
@@ -92,6 +94,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationP
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTreeListener;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphViewerFilterListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphTreeExpansionEvent;
@@ -201,13 +204,14 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private List<ITimeGraphTimeListener> fDragSelectionListeners;
     private final List<ISelectionChangedListener> fSelectionChangedListeners = new ArrayList<>();
     private final List<ITimeGraphTreeListener> fTreeListeners = new ArrayList<>();
+    private final List<ITimeGraphViewerFilterListener> fViewerFilterListeners = new ArrayList<>();
     private final List<MenuDetectListener> fTimeGraphEntryMenuListeners = new ArrayList<>();
     private final List<MenuDetectListener> fTimeEventMenuListeners = new ArrayList<>();
     private final Cursor fDragCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_HAND);
     private final Cursor fResizeCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_IBEAM);
     private final Cursor fWaitCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_WAIT);
     private final Cursor fZoomCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_SIZEWE);
-    private final List<@NonNull ViewerFilter> fFilters = new ArrayList<>();
+    private final Set<@NonNull ViewerFilter> fFilters = new LinkedHashSet<>();
     private MenuDetectEvent fPendingMenuDetectEvent = null;
     private boolean fGridLinesVisible = true;
     private Color fGridLineColor = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
@@ -896,6 +900,74 @@ public class TimeGraphControl extends TimeGraphBaseControl
             } else {
                 listener.treeCollapsed(event);
             }
+        }
+    }
+
+    /**
+     * Add a viewer filter listener
+     *
+     * @param listener
+     *            The listener to add
+     * @since 3.2
+     */
+    public void addViewerFilterListener(ITimeGraphViewerFilterListener listener) {
+        if (!fViewerFilterListeners.contains(listener)) {
+            fViewerFilterListeners.add(listener);
+        }
+    }
+
+    /**
+     * Remove a viewer filter listener
+     *
+     * @param listener
+     *            The listener to remove
+     * @since 3.2
+     */
+    public void removeViewerFilterListener(ITimeGraphViewerFilterListener listener) {
+        if (fViewerFilterListeners.contains(listener)) {
+            fViewerFilterListeners.remove(listener);
+        }
+    }
+
+    /**
+     * Viewer filter added callback
+     *
+     * @param filters
+     *            The added filters
+     *
+     * @since 3.1
+     */
+    private void fireFiltersAdded(@NonNull Iterable<ViewerFilter> filters) {
+        for (ITimeGraphViewerFilterListener listener : fViewerFilterListeners) {
+            listener.filtersAdded(filters);
+        }
+    }
+
+    /**
+     * Viewer filter changed callback
+     *
+     * @param filters
+     *            The changed filters
+     *
+     * @since 3.1
+     */
+    private void fireFiltersChanged(@NonNull Iterable<ViewerFilter> filters) {
+        for (ITimeGraphViewerFilterListener listener : fViewerFilterListeners) {
+            listener.filtersChanged(filters);
+        }
+    }
+
+    /**
+     * Viewer filter removed callback
+     *
+     * @param filters
+     *            The removed filters
+     *
+     * @since 3.1
+     */
+    private void fireFiltersRemoved(@NonNull Iterable<ViewerFilter> filters) {
+        for (ITimeGraphViewerFilterListener listener : fViewerFilterListeners) {
+            listener.filtersRemoved(filters);
         }
     }
 
@@ -3326,21 +3398,40 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
+     * Add a new viewer filter object
+     *
      * @param filter
      *            The filter object to be attached to the view
+     * @since 3.1
      */
     public void addFilter(@NonNull ViewerFilter filter) {
-        if (!fFilters.contains(filter)) {
-            fFilters.add(filter);
-        }
+        fFilters.add(filter);
+        fireFiltersAdded(Collections.singleton(filter));
     }
 
     /**
+     * Change the viewer filter object
+     *
+     * The filter elements are already updated, we only let the listener know that a
+     * change happened at this point
+     *
+     * @param filter
+     *            The filter object to be attached to the view
+     * @since 3.2
+     */
+    public void changeFilter(@NonNull ViewerFilter filter) {
+        fireFiltersChanged(Collections.singleton(filter));
+    }
+
+    /**
+     * Remove a viewer filter object
+     *
      * @param filter
      *            The filter object to be attached to the view
      */
     public void removeFilter(@NonNull ViewerFilter filter) {
         fFilters.remove(filter);
+        fireFiltersRemoved(Collections.singleton(filter));
     }
 
     /**
@@ -3363,7 +3454,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
     public void setFilters(@NonNull ViewerFilter[] filters) {
         fFilters.clear();
         if (filters != null) {
-            fFilters.addAll(Arrays.asList(filters));
+            List<@NonNull ViewerFilter> filtersList = Arrays.asList(filters);
+            fFilters.addAll(filtersList);
+            fireFiltersChanged(filtersList);
         }
     }
 

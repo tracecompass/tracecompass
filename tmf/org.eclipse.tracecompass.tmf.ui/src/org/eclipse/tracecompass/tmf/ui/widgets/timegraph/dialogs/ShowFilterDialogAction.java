@@ -117,7 +117,7 @@ public class ShowFilterDialogAction extends Action {
                         addFilter(rawViewerFilter);
                     } else {
                         rawViewerFilter.setFiltered(filteredElements);
-                        refresh();
+                        changeFilter(rawViewerFilter);
                     }
                 } else if (rawViewerFilter != null) {
                     removeFilter(rawViewerFilter);
@@ -143,6 +143,17 @@ public class ShowFilterDialogAction extends Action {
      */
     protected void addFilter(@NonNull ViewerFilter filter) {
         fTimeGraphViewer.addFilter(filter);
+    }
+
+    /**
+     * Update a viewer filter.
+     *
+     * @param filter
+     *            The updated filter object
+     * @since 3.2
+     */
+    protected void changeFilter(@NonNull ViewerFilter filter) {
+        fTimeGraphViewer.changeFilter(filter);
     }
 
     /**

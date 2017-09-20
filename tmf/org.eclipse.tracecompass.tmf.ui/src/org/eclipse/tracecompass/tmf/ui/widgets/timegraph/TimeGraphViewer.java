@@ -2035,6 +2035,28 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
     }
 
     /**
+     * Add a viewer filter listener
+     *
+     * @param listener
+     *            The listener to add
+     * @since 3.1
+     */
+    public void addViewerFilterListener(ITimeGraphViewerFilterListener listener) {
+        fTimeGraphCtrl.addViewerFilterListener(listener);
+    }
+
+    /**
+     * Remove a viewer filter listener
+     *
+     * @param listener
+     *            The listener to remove
+     * @since 3.1
+     */
+    public void removeViewerFilterListener(ITimeGraphViewerFilterListener listener) {
+        fTimeGraphCtrl.removeViewerFilterListener(listener);
+    }
+
+    /**
      * Get the reset scale action.
      *
      * @return The Action object
@@ -2688,6 +2710,8 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
     }
 
     /**
+     * Add a new viewer filter object
+     *
      * @param filter
      *            The filter object to be attached to the view
      */
@@ -2697,6 +2721,20 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
     }
 
     /**
+     * Change the viewer filter object
+     *
+     * @param filter
+     *            The filter object to be attached to the view
+     * @since 3.1
+     */
+    public void changeFilter(@NonNull ViewerFilter filter) {
+        fTimeGraphCtrl.changeFilter(filter);
+        refresh();
+    }
+
+    /**
+     * Remove the viewer filter object
+     *
      * @param filter
      *            The filter object to be attached to the view
      */
