@@ -144,12 +144,14 @@ import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -1420,6 +1422,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
             List<IMarkerEventSource> markerEventSources = new ArrayList<>();
             synchronized (fBuildJobMap) {
+                // Run the build jobs through the site progress service if available
+                IWorkbenchSiteProgressService service = null;
+                IWorkbenchPartSite site = getSite();
+                if (site != null) {
+                    service = site.getService(IWorkbenchSiteProgressService.class);
+                }
                 for (ITmfTrace trace : getTracesToBuild(viewTrace)) {
                     if (trace == null) {
                         break;
@@ -1436,7 +1444,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                         }
                     };
                     fBuildJobMap.put(trace, buildJob);
-                    buildJob.schedule();
+                    if (service != null) {
+                        service.schedule(buildJob);
+                    } else {
+                        buildJob.schedule();
+                    }
                 }
             }
             fMarkerEventSourcesMap.put(viewTrace, markerEventSources);
