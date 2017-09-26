@@ -452,12 +452,12 @@ public class CTFStreamInputReader implements AutoCloseable {
         while (fPacketReader.getCurrentPacket() != null) {
             goToNextPacket();
         }
-
         final int lastPacketIndex = fStreamInput.getIndex().size() - 1;
+
         /*
          * Go to the last packet that contains events.
          */
-        for (int pos = lastPacketIndex; pos > 0; pos--) {
+        for (int pos = lastPacketIndex; pos >= 0; pos--) {
             fPacketIndex = pos;
             fPacketReader = getCurrentPacketReader(getPacket());
 
