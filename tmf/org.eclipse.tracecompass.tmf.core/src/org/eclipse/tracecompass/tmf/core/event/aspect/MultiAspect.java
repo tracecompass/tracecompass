@@ -59,7 +59,7 @@ public class MultiAspect<T> implements ITmfEventAspect<T> {
         Set<String> names = new HashSet<>();
         for (ITmfEventAspect<?> aspect : aspects) {
             // Ensure all aspects belong to the same class as the "aspectClass" parameter
-            if (aspect.getClass().isAssignableFrom(aspectClass)) {
+            if (aspectClass.isAssignableFrom(aspect.getClass())) {
                 names.add(aspect.getName());
             } else {
                 throw new IllegalArgumentException("Aspects must belong to the same class as the \"aspectClass\" parameter."); //$NON-NLS-1$
