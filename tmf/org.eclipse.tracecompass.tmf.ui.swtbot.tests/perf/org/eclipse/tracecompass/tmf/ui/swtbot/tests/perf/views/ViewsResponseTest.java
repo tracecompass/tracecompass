@@ -210,13 +210,14 @@ public abstract class ViewsResponseTest {
         TmfTimeRange selectionRange = TmfTraceManager.getInstance().getCurrentTraceContext().getSelectionRange();
         IWorkbenchPart part = view.getViewReference().getPart(false);
 
+        ITmfTrace activeTrace = TmfTraceManager.getInstance().getActiveTrace();
+        assertNotNull(activeTrace);
+
         Performance perf = Performance.getDefault();
-        PerformanceMeter pmBuild = perf.createPerformanceMeter("UI responsiveness: " + view.getTitle());
+        PerformanceMeter pmBuild = perf.createPerformanceMeter("UI responsiveness: " + activeTrace.getName() + "/" + view.getTitle());
         perf.tagAsSummary(pmBuild, view.getTitle() + " CPU", Dimension.CPU_TIME);
 
         // Set the time range to the full trace range
-        ITmfTrace activeTrace = TmfTraceManager.getInstance().getActiveTrace();
-        assertNotNull(activeTrace);
         TmfTimeRange fullRange = new TmfTimeRange(activeTrace.getStartTime(), activeTrace.getEndTime());
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, fullRange));
         pmBuild.start();
