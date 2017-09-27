@@ -753,6 +753,10 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
                         for (TmfTraceElement child : toRemove) {
                             experiment.removeTrace(child);
                         }
+                        if (!toRemove.isEmpty() && experiment.getTraces().isEmpty()) {
+                            // If experiment becomes empty, delete it
+                            experiment.getResource().delete(true, progressMonitor);
+                        }
                     }
                 }
                 // Delete supplementary files

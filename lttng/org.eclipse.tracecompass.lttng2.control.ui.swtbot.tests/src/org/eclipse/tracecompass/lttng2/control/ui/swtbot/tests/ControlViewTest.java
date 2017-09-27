@@ -226,6 +226,7 @@ public class ControlViewTest {
          * Import with experiment creation, test experiment already exists and
          * with experiment name validation
          */
+        SWTBotUtils.createExperiment(fBot, ControlViewSwtBotUtil.DEFAULT_REMOTE_PROJECT, "mysession-20151201-205959");
         testImport(true, false);
         SWTBotUtils.clearExperimentFolder(fBot, ControlViewSwtBotUtil.DEFAULT_REMOTE_PROJECT);
         testDestroySession();
