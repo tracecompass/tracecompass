@@ -17,7 +17,7 @@ import org.eclipse.swt.graphics.Image;
  * created.
  *
  * @author Yonni Chen
- * @since 3.1
+ * @since 3.2
  */
 public interface ILegendImageProvider {
 

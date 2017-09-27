@@ -35,9 +35,9 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      * sampled.
      *
      * @author Loic Prieur-Drevon
-     * @since 3.1
+     * @since 3.2
      */
-    public static final class Sampling {
+    public static class Sampling {
         private final long fZoomStart;
         private final long fZoomEnd;
         private final long fResolution;
@@ -390,7 +390,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      * Getter for the zoom sampling of this entry
      *
      * @return the zoom parameters of the current zoom event sampling.
-     * @since 3.1
+     * @since 3.2
      */
     public Sampling getSampling() {
         return fSampling;
@@ -402,7 +402,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      * @param sampling
      *            the sampling parameters used to compute the current zoomed event
      *            list.
-     * @since 3.1
+     * @since 3.2
      */
     public void setSampling(Sampling sampling) {
         fSampling = sampling;

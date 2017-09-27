@@ -164,7 +164,7 @@ public interface TmfXmlStrings {
      */
     String SCRIPT_ENGINE = "scriptEngine";
     /**
-     * @since 2.3
+     * @since 2.4
      */
     String TYPE_POOL = "pool";
     String INCREMENT = "increment";

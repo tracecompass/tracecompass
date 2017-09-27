@@ -22,7 +22,6 @@ import org.eclipse.jdt.annotation.Nullable;
  * @param <T>
  *            A specific model computed by a specific data provider. This object
  *            must be serializable.
- * @since 3.1
  */
 public class TmfModelResponse<T> implements ITmfResponse {
 

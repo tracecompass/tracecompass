@@ -28,7 +28,7 @@ import org.swtchart.LineStyle;
  * and width, an image is created.
  *
  * @author Yonni Chen
- * @since 3.1
+ * @since 3.2
  */
 public class XYChartLegendImageProvider implements ILegendImageProvider {
 

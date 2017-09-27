@@ -60,7 +60,7 @@ public interface ISymbolProvider {
      * @param address
      *            the address of the symbol
      * @return the symbol or <code>null</code> if the symbol cannot be found
-     * @since 3.1
+     * @since 3.2
      */
     default @Nullable TmfResolvedSymbol getSymbol(long address) {
         String symbolText = getSymbolText(address);
@@ -112,7 +112,7 @@ public interface ISymbolProvider {
      * @param address
      *            the address of the symbol
      * @return the symbol or <code>null</code> if the symbol cannot be found
-     * @since 3.1
+     * @since 3.2
      */
     default @Nullable TmfResolvedSymbol getSymbol(int pid, long timestamp, long address) {
         String symbolText = getSymbolText(pid, timestamp, address);

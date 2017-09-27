@@ -14,7 +14,7 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
  * x and y label and resolution.
  *
  * @author Yonni Chen
- * @since 3.1
+ * @since 3.2
  */
 public class TmfXYChartSettings {
 

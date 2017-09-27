@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 3.1.0.qualifier
+Bundle-Version: 3.2.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.tmf.core;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.internal.tmf.core.Activator
@@ -18,8 +18,8 @@ Require-Bundle: org.eclipse.core.runtime,
 Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.core.model;x-friends:="org.eclipse.tracecompass.tmf.ui,org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;x-friends:="org.eclipse.tracecompass.tmf.ui,org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy;x-friends:="org.eclipse.tracecompass.tmf.ui",
- org.eclipse.tracecompass.internal.provisional.tmf.core.response;x-friends:="org.eclipse.tracecompass.tmf.ui",
  org.eclipse.tracecompass.internal.provisional.tmf.core.presentation;x-friends:="org.eclipse.tracecompass.tmf.ui,org.eclipse.tracecompass.tmf.core.tests",
+ org.eclipse.tracecompass.internal.provisional.tmf.core.response;x-friends:="org.eclipse.tracecompass.tmf.ui",
  org.eclipse.tracecompass.internal.tmf.core;x-friends:="org.eclipse.tracecompass.tmf.core.tests,org.eclipse.tracecompass.tmf.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.tmf.core.analysis;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.tmf.core.callstack;x-friends:="org.eclipse.tracecompass.tmf.ui,org.eclipse.tracecompass.tmf.core.tests",
@@ -28,6 +28,7 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.core.model;x-f
  org.eclipse.tracecompass.internal.tmf.core.markers;x-friends:="org.eclipse.tracecompass.tmf.ui,org.eclipse.tracecompass.tmf.core.tests,org.eclipse.tracecompass.tmf.ui.tests",
  org.eclipse.tracecompass.internal.tmf.core.model;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.tmf.core.parsers.custom;x-friends:="org.eclipse.tracecompass.tmf.ui",
+ org.eclipse.tracecompass.internal.tmf.core.presentation;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.core.project.model;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.core.request;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial;x-friends:="org.eclipse.tracecompass.statesystem.core.tests",

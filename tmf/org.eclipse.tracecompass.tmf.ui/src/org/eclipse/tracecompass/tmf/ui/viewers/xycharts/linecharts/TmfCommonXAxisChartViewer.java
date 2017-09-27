@@ -65,7 +65,7 @@ import org.swtchart.Range;
  * can be overridden when creating it.
  *
  * @author Yonni Chen
- * @since 3.1
+ * @since 3.2
  */
 public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
 

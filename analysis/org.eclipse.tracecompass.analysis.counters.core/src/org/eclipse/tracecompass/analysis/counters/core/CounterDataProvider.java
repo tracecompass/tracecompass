@@ -51,6 +51,7 @@ import com.google.common.primitives.Longs;
  *
  * @author Mikael Ferland
  * @author Yonni Chen
+ * @since 1.1
  */
 @SuppressWarnings("restriction")
 public class CounterDataProvider extends AbstractStateSystemAnalysisDataProvider implements ITmfXYDataProvider {

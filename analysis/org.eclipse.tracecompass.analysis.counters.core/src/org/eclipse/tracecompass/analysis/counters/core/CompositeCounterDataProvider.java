@@ -37,6 +37,7 @@ import com.google.common.collect.ImmutableMap;
  * encapsulates a list of data providers
  *
  * @author Yonni Chen
+ * @since 1.1
  */
 @SuppressWarnings("restriction")
 public class CompositeCounterDataProvider extends AbstractTmfTraceDataProvider implements ITmfXYDataProvider {

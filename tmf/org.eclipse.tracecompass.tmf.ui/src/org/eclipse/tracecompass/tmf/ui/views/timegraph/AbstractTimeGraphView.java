@@ -584,7 +584,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *            The resolution
      * @param monitor
      *            The progress monitor object
-     * @since 3.1
+     * @since 3.2
      */
     protected void zoomEntries(@NonNull Iterable<@NonNull TimeGraphEntry> entries,
             long zoomStartTime, long zoomEndTime, long resolution, @NonNull IProgressMonitor monitor) {

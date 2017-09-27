@@ -25,7 +25,7 @@ import org.eclipse.tracecompass.internal.tmf.core.callstack.SizedMappingFile;
  * provides factory method to create the mappings from binary or text files.
  *
  * @author Geneviève Bastien
- * @since 3.1
+ * @since 3.2
  */
 public interface IMappingFile {
 

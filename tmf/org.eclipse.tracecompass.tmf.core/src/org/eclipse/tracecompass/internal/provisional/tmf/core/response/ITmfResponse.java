@@ -15,7 +15,6 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.response;
  * implements this interface.
  *
  * @author Yonni Chen
- * @since 3.1
  */
 public interface ITmfResponse {
 

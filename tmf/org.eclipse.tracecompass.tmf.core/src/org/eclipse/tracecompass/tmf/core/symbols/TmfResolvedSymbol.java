@@ -19,7 +19,7 @@ import com.google.common.base.Objects;
  * A class that matches the base address of a symbol with the associated name.
  *
  * @author Geneviève Bastien
- * @since 3.1
+ * @since 3.2
  */
 public class TmfResolvedSymbol {
 
