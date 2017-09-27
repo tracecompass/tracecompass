@@ -431,7 +431,7 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         resource.delete(true, null);
         IContainer parent = resource.getParent();
         // delete empty folders up to the parent experiment folder
-        if (!parent.equals(getResource()) && parent.members().length == 0) {
+        if (!parent.equals(getResource()) && parent.exists() && parent.members().length == 0) {
             deleteTraceResource(parent);
         }
     }
