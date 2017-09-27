@@ -22,6 +22,7 @@ import java.util.TimeZone;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimePreferencesConstants;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
@@ -34,7 +35,7 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public class TmfTimestampFormatTest {
 
-    private static final String TEST_PATTERN = "HH:mm:ss.SSS";
+    private static final @NonNull String TEST_PATTERN = "HH:mm:ss.SSS";
     private static final TimeZone TEST_TIME_ZONE = TimeZone.getTimeZone(TimeZone.getAvailableIDs(0)[0]);
     private static final TimeZone GMT = TimeZone.getTimeZone("GMT");
     private static final Locale CA = Locale.CANADA;
