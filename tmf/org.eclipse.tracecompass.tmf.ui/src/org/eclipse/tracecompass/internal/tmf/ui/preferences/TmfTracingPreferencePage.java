@@ -37,6 +37,7 @@ public class TmfTracingPreferencePage extends FieldEditorPreferencePage implemen
     // ------------------------------------------------------------------------
 
     BooleanFieldEditor fExplorerRange;
+    BooleanFieldEditor fConfirmDeletionSupplementaryFiles;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -67,6 +68,10 @@ public class TmfTracingPreferencePage extends FieldEditorPreferencePage implemen
         fExplorerRange = new BooleanFieldEditor(ITmfUIPreferences.TRACE_DISPLAY_RANGE_PROJECTEXPLORER,
                 Messages.TmfTracingPreferencePage_TraceRangeInProjectExplorer, getFieldEditorParent());
         addField(fExplorerRange);
+
+        fConfirmDeletionSupplementaryFiles = new BooleanFieldEditor(ITmfUIPreferences.CONFIRM_DELETION_SUPPLEMENTARY_FILES,
+                Messages.TmfTracingPreferencePage_ConfirmDeletionSupplementaryFiles, getFieldEditorParent());
+        addField(fConfirmDeletionSupplementaryFiles);
     }
 
     @Override

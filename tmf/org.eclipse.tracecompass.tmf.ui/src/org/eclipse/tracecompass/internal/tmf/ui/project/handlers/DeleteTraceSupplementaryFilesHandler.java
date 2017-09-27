@@ -37,6 +37,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.ITmfUIPreferences;
 import org.eclipse.tracecompass.internal.tmf.ui.project.dialogs.SelectSupplementaryResourcesDialog;
 import org.eclipse.tracecompass.internal.tmf.ui.project.operations.TmfWorkspaceModifyOperation;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfCommonProjectElement;
@@ -59,19 +60,8 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
     // Inner classes
     // ------------------------------------------------------------------------
 
-    private class ElementComparator implements Comparator<TmfCommonProjectElement> {
-        @Override
-        public int compare(TmfCommonProjectElement e1, TmfCommonProjectElement e2) {
-            return e1.getPath().toString().compareTo(e2.getPath().toString());
-        }
-    }
-
-    private class ResourceComparator implements Comparator<IResource> {
-        @Override
-        public int compare(IResource r1, IResource r2) {
-            return r1.getFullPath().toString().compareTo(r2.getFullPath().toString());
-        }
-    }
+    private static final Comparator<TmfCommonProjectElement> ELEMENT_COMPARATOR = Comparator.comparing(e -> e.getPath().toString());
+    private static final Comparator<IResource> RESOURCE_COMPARATOR = Comparator.comparing(e -> e.getFullPath().toString());
 
     // ------------------------------------------------------------------------
     // Execution
@@ -91,8 +81,7 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
         if (!(selection instanceof IStructuredSelection)) {
             return null;
         }
-        final Multimap<TmfCommonProjectElement, IResource> resourceMap =
-                TreeMultimap.create(new ElementComparator(), new ResourceComparator());
+        final Multimap<TmfCommonProjectElement, IResource> resourceMap = TreeMultimap.create(ELEMENT_COMPARATOR, RESOURCE_COMPARATOR);
         final Iterator<Object> iterator = ((IStructuredSelection) selection).iterator();
 
         while (iterator.hasNext()) {
@@ -120,10 +109,16 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
             }
         }
 
-        final SelectSupplementaryResourcesDialog dialog =
-                new SelectSupplementaryResourcesDialog(window.getShell(), resourceMap);
-        if (dialog.open() != Window.OK) {
-            return null;
+        final List<IResource> allResourcesToDelete;
+        boolean confirm = Activator.getDefault().getPreferenceStore().getBoolean(ITmfUIPreferences.CONFIRM_DELETION_SUPPLEMENTARY_FILES);
+        if (confirm) {
+            final SelectSupplementaryResourcesDialog dialog = new SelectSupplementaryResourcesDialog(window.getShell(), resourceMap);
+            if (dialog.open() != Window.OK) {
+                return null;
+            }
+            allResourcesToDelete = Arrays.asList(dialog.getResources());
+        } else {
+            allResourcesToDelete = new ArrayList<>(resourceMap.values());
         }
 
         TmfWorkspaceModifyOperation operation = new TmfWorkspaceModifyOperation() {
@@ -131,9 +126,6 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
             public void execute(IProgressMonitor monitor) throws CoreException {
 
                 Set<IProject> projectsToRefresh = new HashSet<>();
-
-                // Delete the resources that were selected
-                List<IResource> allResourcesToDelete = Arrays.asList(dialog.getResources());
 
                 SubMonitor subMonitor = SubMonitor.convert(monitor, allResourcesToDelete.size());
 
@@ -146,12 +138,7 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
                     if (!traceResourcesToDelete.isEmpty()) {
                         subMonitor.setTaskName(NLS.bind(Messages.DeleteSupplementaryFiles_DeletionTask, element.getElementPath()));
                         // Delete the selected resources
-                        Display.getDefault().syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                element.closeEditors();
-                            }
-                        });
+                        Display.getDefault().syncExec(element::closeEditors);
                         element.deleteSupplementaryResources(traceResourcesToDelete.toArray(new IResource[0]));
                         projectsToRefresh.add(element.getProject().getResource());
                     }

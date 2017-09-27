@@ -27,5 +27,6 @@ public class TmfUIPreferenceInitializer extends AbstractPreferenceInitializer {
         IEclipsePreferences defaultPreferences = DefaultScope.INSTANCE.getNode(Activator.PLUGIN_ID);
         defaultPreferences.putBoolean(ITmfUIPreferences.PREF_ALIGN_VIEWS, true);
         defaultPreferences.put(ITmfUIPreferences.SWITCH_TO_PERSPECTIVE, MessageDialogWithToggle.PROMPT);
+        defaultPreferences.putBoolean(ITmfUIPreferences.CONFIRM_DELETION_SUPPLEMENTARY_FILES, true);
     }
 }

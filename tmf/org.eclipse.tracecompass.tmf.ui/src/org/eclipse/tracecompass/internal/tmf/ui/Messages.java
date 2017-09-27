@@ -357,6 +357,7 @@ public class Messages extends NLS {
     public static String TmfPerspectiveManager_SwitchPerspectiveErrorTitle;
 
     public static String TmfTracingPreferencePage_TraceRangeInProjectExplorer;
+    public static String TmfTracingPreferencePage_ConfirmDeletionSupplementaryFiles;
 
     static {
         // initialize resource bundle

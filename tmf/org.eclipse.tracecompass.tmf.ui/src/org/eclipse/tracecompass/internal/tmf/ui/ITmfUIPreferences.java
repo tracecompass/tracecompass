@@ -37,4 +37,9 @@ public interface ITmfUIPreferences {
      * Preference to display a trace's time range in the project explorer
      */
     String TRACE_DISPLAY_RANGE_PROJECTEXPLORER = "EXPLORER_TIMERANGE"; //$NON-NLS-1$
+
+    /**
+     * Preference to confirm before deleting supplementary files
+     */
+    String CONFIRM_DELETION_SUPPLEMENTARY_FILES = "CONFIRM_DELETION_SUPPLEMENTARY_FILES"; //$NON-NLS-1$
 }
