@@ -166,6 +166,11 @@ public class Messages extends NLS {
      * @since 3.1
      */
     public static String TmfProjectRegistry_TraceChangedDialogMessage;
+    /**
+     * Always button label
+     * @since 3.2
+     */
+    public static String TmfProjectRegistry_Always;
 
     static {
         // initialize resource bundle

@@ -37,11 +37,13 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.ITmfUIPreferences;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -81,7 +83,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
     public static void dispose() {
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(INSTANCE);
         TmfSignalManager.deregister(INSTANCE);
-        registry.values().forEach(projectElement -> projectElement.dispose());
+        registry.values().forEach(TmfProjectElement::dispose);
     }
 
     /**
@@ -192,14 +194,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                             final List<TmfTraceElement> traces = tracesFolder.getTraces();
                             if (!traces.isEmpty()) {
                                 // Close editors in UI Thread
-                                Display.getDefault().syncExec(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        for (TmfTraceElement traceElement : traces) {
-                                            traceElement.closeEditors();
-                                        }
-                                    }
-                                });
+                                Display.getDefault().syncExec(() -> traces.forEach(TmfTraceElement::closeEditors));
                             }
                         }
                     }
@@ -363,12 +358,39 @@ public class TmfProjectRegistry implements IResourceChangeListener {
             promptQueue.add(traceElement);
             TmfTraceElement prompting = traceElement;
             while (prompting != null) {
-                Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-                if (MessageDialog.openQuestion(shell, Messages.TmfProjectRegistry_TraceChangedDialogTitle,
-                        NLS.bind(Messages.TmfProjectRegistry_TraceChangedDialogMessage, prompting.getElementPath()))) {
-                    traceElement.closeEditors();
-                    traceElement.deleteSupplementaryResources();
+                boolean always = Activator.getDefault().getPreferenceStore().getBoolean(ITmfUIPreferences.ALWAYS_CLOSE_ON_RESOURCE_CHANGE);
+                if (always) {
+                    prompting.closeEditors();
+                    prompting.deleteSupplementaryResources();
+                } else {
+                    Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+
+                    MessageDialog messageDialog = new MessageDialog(shell,
+                            Messages.TmfProjectRegistry_TraceChangedDialogTitle,
+                            null,
+                            NLS.bind(Messages.TmfProjectRegistry_TraceChangedDialogMessage, prompting.getElementPath()),
+                            MessageDialog.QUESTION,
+                            2, // Always is the default.
+                            IDialogConstants.NO_LABEL,
+                            IDialogConstants.YES_LABEL,
+                            Messages.TmfProjectRegistry_Always);
+                    int returnCode = messageDialog.open();
+                    if (returnCode >= 1) {
+                        // yes or always.
+                        prompting.closeEditors();
+                        prompting.deleteSupplementaryResources();
+                    }
+                    if (returnCode == 2) {
+                        // remember to always delete supplementary files and close editors
+                        Activator.getDefault().getPreferenceStore().setValue(ITmfUIPreferences.ALWAYS_CLOSE_ON_RESOURCE_CHANGE, true);
+                    }
                 }
+                /**
+                 * Poll at end of the loop: The element must remain in the queue while prompting
+                 * the user, so that another element being handled will be added to the queue
+                 * instead of opening another dialog, and also to prevent the user from being
+                 * prompted twice for the same element.
+                 */
                 promptQueue.remove();
                 prompting = promptQueue.peek();
             }

@@ -33,13 +33,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class TmfTracingPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
     // ------------------------------------------------------------------------
-    // Attributes
-    // ------------------------------------------------------------------------
-
-    BooleanFieldEditor fExplorerRange;
-    BooleanFieldEditor fConfirmDeletionSupplementaryFiles;
-
-    // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
@@ -65,13 +58,17 @@ public class TmfTracingPreferencePage extends FieldEditorPreferencePage implemen
 
     @Override
     protected void createFieldEditors() {
-        fExplorerRange = new BooleanFieldEditor(ITmfUIPreferences.TRACE_DISPLAY_RANGE_PROJECTEXPLORER,
+        BooleanFieldEditor explorerRange = new BooleanFieldEditor(ITmfUIPreferences.TRACE_DISPLAY_RANGE_PROJECTEXPLORER,
                 Messages.TmfTracingPreferencePage_TraceRangeInProjectExplorer, getFieldEditorParent());
-        addField(fExplorerRange);
+        addField(explorerRange);
 
-        fConfirmDeletionSupplementaryFiles = new BooleanFieldEditor(ITmfUIPreferences.CONFIRM_DELETION_SUPPLEMENTARY_FILES,
+        BooleanFieldEditor confirmDeletionSupplementaryFiles = new BooleanFieldEditor(ITmfUIPreferences.CONFIRM_DELETION_SUPPLEMENTARY_FILES,
                 Messages.TmfTracingPreferencePage_ConfirmDeletionSupplementaryFiles, getFieldEditorParent());
-        addField(fConfirmDeletionSupplementaryFiles);
+        addField(confirmDeletionSupplementaryFiles);
+
+        BooleanFieldEditor resourceRefresh = new BooleanFieldEditor(ITmfUIPreferences.ALWAYS_CLOSE_ON_RESOURCE_CHANGE,
+                Messages.TmfTracingPreferencePage_AlwaysCloseOnResourceChange, getFieldEditorParent());
+        addField(resourceRefresh);
     }
 
     @Override

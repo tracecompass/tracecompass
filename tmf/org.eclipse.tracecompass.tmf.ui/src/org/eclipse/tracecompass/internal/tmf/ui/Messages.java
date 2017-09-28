@@ -358,6 +358,7 @@ public class Messages extends NLS {
 
     public static String TmfTracingPreferencePage_TraceRangeInProjectExplorer;
     public static String TmfTracingPreferencePage_ConfirmDeletionSupplementaryFiles;
+    public static String TmfTracingPreferencePage_AlwaysCloseOnResourceChange;
 
     static {
         // initialize resource bundle

@@ -42,4 +42,9 @@ public interface ITmfUIPreferences {
      * Preference to confirm before deleting supplementary files
      */
     String CONFIRM_DELETION_SUPPLEMENTARY_FILES = "CONFIRM_DELETION_SUPPLEMENTARY_FILES"; //$NON-NLS-1$
+
+    /**
+     * Preference for behavior on resource refresh: always delete supplementary files and close editors.
+     */
+    String ALWAYS_CLOSE_ON_RESOURCE_CHANGE = "ALWAYS_CLOSE_ON_RESOURCE_CHANGE"; //$NON-NLS-1$
 }
