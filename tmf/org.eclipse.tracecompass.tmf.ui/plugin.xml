@@ -324,15 +324,26 @@
             location="BOTTOM_RIGHT"
             state="true">
          <enablement>
-            <and>
-               <objectClass
-                     name="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
-               </objectClass>
-               <objectState
-                     name="isLinked"
-                     value="true">
-               </objectState>
-            </and>
+            <or>
+               <and>
+                  <objectClass
+                        name="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
+                  </objectClass>
+                  <objectState
+                        name="isLinked"
+                        value="true">
+                  </objectState>
+               </and>
+               <and>
+                  <objectClass
+                        name="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
+                  </objectClass>
+                  <objectState
+                        name="isLinked"
+                        value="true">
+                  </objectState>
+               </and>
+            </or>
          </enablement>
       </decorator>
    </extension>

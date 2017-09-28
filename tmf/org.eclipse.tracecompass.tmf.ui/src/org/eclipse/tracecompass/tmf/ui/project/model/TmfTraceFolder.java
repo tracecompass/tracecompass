@@ -26,6 +26,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
+import org.eclipse.ui.IActionFilter;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource2;
 
@@ -36,7 +37,7 @@ import org.eclipse.ui.views.properties.IPropertySource2;
  * @version 1.0
  * @author Francois Chouinard
  */
-public class TmfTraceFolder extends TmfProjectModelElement implements IPropertySource2 {
+public class TmfTraceFolder extends TmfProjectModelElement implements IActionFilter, IPropertySource2 {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -46,17 +47,22 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
     private static final String NAME = "name"; //$NON-NLS-1$
     private static final String PATH = "path"; //$NON-NLS-1$
     private static final String LOCATION = "location"; //$NON-NLS-1$
+    /** IsLinked attribute name. */
+    private static final String IS_LINKED = "isLinked"; //$NON-NLS-1$
+    private static final String IS_LINKED_PROPERTY = Messages.TmfTraceElement_IsLinked;
 
     private static final ReadOnlyTextPropertyDescriptor NAME_DESCRIPTOR = new ReadOnlyTextPropertyDescriptor(NAME, NAME);
     private static final ReadOnlyTextPropertyDescriptor PATH_DESCRIPTOR = new ReadOnlyTextPropertyDescriptor(PATH, PATH);
     private static final ReadOnlyTextPropertyDescriptor LOCATION_DESCRIPTOR = new ReadOnlyTextPropertyDescriptor(LOCATION, LOCATION);
+    private static final ReadOnlyTextPropertyDescriptor IS_LINKED_DESCRIPTOR = new ReadOnlyTextPropertyDescriptor(IS_LINKED_PROPERTY, IS_LINKED_PROPERTY);
 
-    private static final IPropertyDescriptor[] DESCRIPTORS = { NAME_DESCRIPTOR, PATH_DESCRIPTOR, LOCATION_DESCRIPTOR };
+    private static final IPropertyDescriptor[] DESCRIPTORS = { NAME_DESCRIPTOR, PATH_DESCRIPTOR, LOCATION_DESCRIPTOR, IS_LINKED_DESCRIPTOR };
 
     static {
         NAME_DESCRIPTOR.setCategory(INFO_CATEGORY);
         PATH_DESCRIPTOR.setCategory(INFO_CATEGORY);
         LOCATION_DESCRIPTOR.setCategory(INFO_CATEGORY);
+        IS_LINKED_DESCRIPTOR.setCategory(INFO_CATEGORY);
     }
 
     // ------------------------------------------------------------------------
@@ -214,6 +220,20 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
     }
 
     // ------------------------------------------------------------------------
+    // IActionFilter
+    // ------------------------------------------------------------------------
+
+    @Override
+    public boolean testAttribute(Object target, String name, String value) {
+        if (name.equals(IS_LINKED)) {
+            boolean isLinked = getResource().isLinked();
+            return Boolean.toString(isLinked).equals(value);
+        }
+        return false;
+    }
+
+
+    // ------------------------------------------------------------------------
     // IPropertySource2
     // ------------------------------------------------------------------------
 
@@ -240,6 +260,10 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
 
         if (LOCATION.equals(id)) {
             return getLocation().toString();
+        }
+
+        if (IS_LINKED_PROPERTY.equals(id)) {
+            return Boolean.toString(getResource().isLinked());
         }
 
         return null;
