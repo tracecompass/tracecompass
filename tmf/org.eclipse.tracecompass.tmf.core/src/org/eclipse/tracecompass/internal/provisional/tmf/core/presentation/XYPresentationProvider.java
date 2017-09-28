@@ -46,7 +46,7 @@ public class XYPresentationProvider implements IXYPresentationProvider {
     private final Map<String, IYAppearance> fYAppearances = new HashMap<>();
 
     @Override
-    public synchronized IYAppearance getAppearance(String serieName, String seriesType) {
+    public synchronized IYAppearance getAppearance(String serieName, String seriesType, int width) {
         IYAppearance appearance = fYAppearances.get(serieName);
         if (appearance != null) {
             return appearance;
@@ -56,7 +56,7 @@ public class XYPresentationProvider implements IXYPresentationProvider {
             throw new UnsupportedOperationException("Series type: " + seriesType + " is not supported."); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        appearance = createAppearance(serieName, seriesType);
+        appearance = createAppearance(serieName, seriesType, width);
         fYAppearances.put(serieName, appearance);
         return appearance;
     }
@@ -66,10 +66,10 @@ public class XYPresentationProvider implements IXYPresentationProvider {
         fYAppearances.clear();
     }
 
-    private IYAppearance createAppearance(String seriesName, String seriesType) {
+    private IYAppearance createAppearance(String seriesName, String seriesType, int width) {
         RGBColor color = generateColor();
         String style = generateStyle(seriesType);
-        return new YAppearance(seriesName, seriesType, style, color);
+        return new YAppearance(seriesName, seriesType, style, color, width);
     }
 
     /**

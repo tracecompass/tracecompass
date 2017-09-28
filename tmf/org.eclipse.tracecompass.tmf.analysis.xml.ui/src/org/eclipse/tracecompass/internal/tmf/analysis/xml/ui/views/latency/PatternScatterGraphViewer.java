@@ -16,6 +16,7 @@ import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.Ab
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 
 /**
  * Displays the latency analysis data in a scatter graph
@@ -39,7 +40,7 @@ public class PatternScatterGraphViewer extends AbstractSegmentStoreScatterChartV
      *            The y axis label
      */
     public PatternScatterGraphViewer(@NonNull Composite parent, @NonNull String title, @NonNull String xLabel, @NonNull String yLabel) {
-        super(parent, title, xLabel, yLabel);
+        super(parent, new TmfXYChartSettings(title, xLabel, yLabel, 1));
     }
 
     @Override

@@ -20,8 +20,12 @@ import org.eclipse.tracecompass.internal.analysis.counters.ui.TriStateFilteredCh
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.viewers.ILegendImageProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.XYChartLegendImageProvider;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -61,7 +65,10 @@ public class CounterView extends TmfChartView {
         TmfViewer tree = getLeftChildViewer();
         TmfXYChartViewer chart = getChartViewer();
         if (tree instanceof CounterTreeViewer && chart instanceof CounterChartViewer) {
-            ((CounterTreeViewer) tree).setTreeListener((CounterChartViewer) chart);
+            ILegendImageProvider legendImageProvider = new XYChartLegendImageProvider((TmfCommonXAxisChartViewer) chart);
+            CounterTreeViewer counterTree = (CounterTreeViewer) tree;
+            counterTree.setTreeListener((CounterChartViewer) chart);
+            counterTree.setLegendImageProvider(legendImageProvider);
         }
 
         // Add a tool bar button to display counters data cumulatively
@@ -71,7 +78,7 @@ public class CounterView extends TmfChartView {
 
     @Override
     protected TmfXYChartViewer createChartViewer(Composite parent) {
-        return new CounterChartViewer(parent);
+        return new CounterChartViewer(parent, new TmfXYChartSettings(null, null, null, 1));
     }
 
     @Override

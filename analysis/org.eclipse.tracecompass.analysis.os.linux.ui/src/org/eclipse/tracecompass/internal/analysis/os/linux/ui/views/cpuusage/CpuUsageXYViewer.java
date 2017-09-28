@@ -42,6 +42,7 @@ import com.google.common.base.Joiner;
 public class CpuUsageXYViewer extends TmfCommonXAxisChartViewer {
 
     private static final @NonNull String NOT_SELECTED = "-1"; //$NON-NLS-1$
+    private static final int DEFAULT_SERIES_WIDTH = 1;
 
     private final @NonNull Set<@NonNull Integer> fCpus = new TreeSet<>();
     private @NonNull String fSelectedThread = NOT_SELECTED;
@@ -72,11 +73,11 @@ public class CpuUsageXYViewer extends TmfCommonXAxisChartViewer {
     }
 
     @Override
-    protected IYAppearance getSeriesAppearance(@NonNull String seriesName) {
+    public IYAppearance getSeriesAppearance(@NonNull String seriesName) {
         if (seriesName.equals(Messages.CpuUsageXYViewer_Total)) {
-            return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.LINE);
+            return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH);
         }
-        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.AREA);
+        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.AREA, DEFAULT_SERIES_WIDTH);
     }
 
     /**
@@ -88,6 +89,7 @@ public class CpuUsageXYViewer extends TmfCommonXAxisChartViewer {
     public void setSelectedThread(@NonNull String tid) {
         fSelectedThread = tid;
         clearContent();
+        getPresentationProvider().clear();
         updateContent();
     }
 
@@ -135,17 +137,17 @@ public class CpuUsageXYViewer extends TmfCommonXAxisChartViewer {
     @Override
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
+        super.traceSelected(signal);
         initSelection();
         initCPU();
-        super.traceSelected(signal);
     }
 
     @Override
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
+        super.traceOpened(signal);
         initSelection();
         initCPU();
-        super.traceOpened(signal);
     }
 
     private void initSelection() {

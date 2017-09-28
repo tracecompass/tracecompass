@@ -73,21 +73,22 @@ public class KernelMemoryUsageViewer extends TmfCommonXAxisChartViewer {
     public void setSelectedThread(@NonNull String tid) {
         fSelectedThread = tid;
         clearContent();
+        getPresentationProvider().clear();
         updateContent();
     }
 
     @Override
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
-        initSelection();
         super.traceSelected(signal);
+        initSelection();
     }
 
     @Override
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
-        initSelection();
         super.traceOpened(signal);
+        initSelection();
     }
 
     private void initSelection() {

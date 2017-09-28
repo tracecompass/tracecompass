@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.examples.ui.views.histogram;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.examples.ui.viewers.histogram.NewHistogramViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
 /**
@@ -34,6 +35,6 @@ public class NewHistogramView extends TmfChartView {
 
     @Override
     protected TmfXYChartViewer createChartViewer(Composite parent) {
-        return new NewHistogramViewer(parent);
+        return new NewHistogramViewer(parent, new TmfXYChartSettings(null, null, null, 1));
     }
 }

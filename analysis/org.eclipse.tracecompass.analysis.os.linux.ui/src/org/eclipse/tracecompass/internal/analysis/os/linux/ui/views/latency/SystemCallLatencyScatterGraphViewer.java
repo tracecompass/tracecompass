@@ -20,6 +20,7 @@ import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.Ab
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 
 /**
  * Displays the latency analysis data in a scatter graph
@@ -43,7 +44,7 @@ public class SystemCallLatencyScatterGraphViewer extends AbstractSegmentStoreSca
      *            name of the y axis
      */
     public SystemCallLatencyScatterGraphViewer(Composite parent, String title, String xLabel, String yLabel) {
-        super(parent, title, xLabel, yLabel);
+        super(parent, new TmfXYChartSettings(title, xLabel, yLabel, 1));
     }
 
     @Override

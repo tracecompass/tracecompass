@@ -39,21 +39,18 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSet
 public abstract class AbstractSegmentStoreScatterChartViewer extends TmfCommonXAxisChartViewer {
 
     private static final Format FORMAT = new SubSecondTimeWithUnitFormat();
+    private static final int DEFAULT_SERIES_WIDTH = 1;
 
     /**
      * Constructor
      *
      * @param parent
      *            parent composite
-     * @param title
-     *            name of the graph
-     * @param xLabel
-     *            name of the x axis
-     * @param yLabel
-     *            name of the y axis
+     * @param settings
+     *            See {@link TmfXYChartSettings} to know what it contains
      */
-    public AbstractSegmentStoreScatterChartViewer(Composite parent, String title, String xLabel, String yLabel) {
-        super(parent, new TmfXYChartSettings(title, xLabel, yLabel, 1));
+    public AbstractSegmentStoreScatterChartViewer(Composite parent, TmfXYChartSettings settings) {
+        super(parent, settings);
         setTooltipProvider(new SegmentStoreScatterGraphTooltipProvider(this));
         getSwtChart().getLegend().setVisible(false);
         getSwtChart().getAxisSet().getYAxis(0).getTick().setFormat(FORMAT);
@@ -116,8 +113,8 @@ public abstract class AbstractSegmentStoreScatterChartViewer extends TmfCommonXA
     }
 
     @Override
-    protected IYAppearance getSeriesAppearance(@NonNull String seriesName) {
-        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.SCATTER);
+    public IYAppearance getSeriesAppearance(@NonNull String seriesName) {
+        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.SCATTER, DEFAULT_SERIES_WIDTH);
     }
 
     /**

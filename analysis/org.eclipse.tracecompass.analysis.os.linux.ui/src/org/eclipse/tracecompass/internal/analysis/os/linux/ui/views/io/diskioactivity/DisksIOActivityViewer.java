@@ -29,6 +29,8 @@ import org.swtchart.Chart;
 @SuppressWarnings("restriction")
 public class DisksIOActivityViewer extends TmfCommonXAxisChartViewer {
 
+    private static final int DEFAULT_SERIES_WIDTH = 1;
+
     /**
      * Constructor
      *
@@ -45,8 +47,8 @@ public class DisksIOActivityViewer extends TmfCommonXAxisChartViewer {
     }
 
     @Override
-    protected IYAppearance getSeriesAppearance(@NonNull String seriesName) {
-        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.AREA);
+    public IYAppearance getSeriesAppearance(@NonNull String seriesName) {
+        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.AREA, DEFAULT_SERIES_WIDTH);
     }
 
     @Override

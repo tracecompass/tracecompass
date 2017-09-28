@@ -130,4 +130,11 @@ public interface IYAppearance {
      * @return the type of the Y serie
      */
     String getType();
+
+    /**
+     * Gets Y serie width.
+     *
+     * @return the width of the Y serie
+     */
+    int getWidth();
 }

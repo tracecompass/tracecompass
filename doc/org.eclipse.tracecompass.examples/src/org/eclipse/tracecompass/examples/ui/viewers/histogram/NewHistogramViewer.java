@@ -33,13 +33,15 @@ import org.swtchart.LineStyle;
 @SuppressWarnings("restriction")
 public class NewHistogramViewer extends TmfCommonXAxisChartViewer {
 
+    private static final int DEFAULT_SERIES_WIDTH = 1;
+
     /**
      * Creates a Histogram Viewer instance.
      * @param parent
      *            The parent composite to draw in.
      */
-    public NewHistogramViewer(Composite parent) {
-        super(parent, new TmfXYChartSettings(null, null, null, 1));
+    public NewHistogramViewer(Composite parent, TmfXYChartSettings settings) {
+        super(parent, settings);
 
         Chart swtChart = getSwtChart();
 
@@ -62,7 +64,7 @@ public class NewHistogramViewer extends TmfCommonXAxisChartViewer {
     }
 
     @Override
-    protected IYAppearance getSeriesAppearance(@NonNull String seriesName) {
-        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.BAR);
+    public IYAppearance getSeriesAppearance(@NonNull String seriesName) {
+        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.BAR, DEFAULT_SERIES_WIDTH);
     }
 }

@@ -146,34 +146,36 @@ public class ResourcesAndCpuViewTest extends XYDataProviderBaseTest {
         fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
 
         /* Test data model */
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json), "resources/t0-res10.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json), "resources/cpuusage/cpu-usage-res10.json", "Chart data is not valid");
 
         /* Test chart style */
         verifyChartStyle(null);
 
-        /* Select a task */
-        String selectedThread = "496";
+        /* Select a thread */
+        String selectedThread = "482";
         SWTBotTree treeBot = getSWTBotView().bot().tree();
         SWTBotUtils.waitUntil(tree -> tree.rowCount() >= 7, treeBot, "Did not finish loading");
         treeBot.getTreeItem(selectedThread).click();
         SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 2, chart, "Only total available");
 
         /* Test data model */
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, selectedThread), "resources/t0-res10Selected.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, selectedThread), "resources/cpuusage/cpu-usage-res10Selected.json", "Chart data is not valid");
 
         /* Test chart style */
         verifyChartStyle(selectedThread);
 
-        /* Test in hd */
+        /* Selected an another thread and test in HD */
+        String otherSelectedThread = "496";
+        treeBot.getTreeItem(otherSelectedThread).click();
         chartViewer.setNbPoints(100);
-        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries()[0].getXSeries().length >= 99, chart, "Too few elements");
+        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 2, chart, "Only total available");
         fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
 
         /* Test data model */
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, selectedThread), "resources/t0-res100Selected.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, otherSelectedThread), "resources/cpuusage/cpu-usage-res100Selected.json", "Chart data is not valid");
 
         /* Test chart style */
-        verifyChartStyle(selectedThread);
+        verifyChartStyle(otherSelectedThread);
 
         /*
          * Test new TimeRange
@@ -190,10 +192,10 @@ public class ResourcesAndCpuViewTest extends XYDataProviderBaseTest {
         fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
 
         /* Test data model */
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, selectedThread), "resources/tAll-res10.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, otherSelectedThread), "resources/cpuusage/cpu-usage-all-res10.json", "Chart data is not valid");
 
         /* Test chart style */
-        verifyChartStyle(selectedThread);
+        verifyChartStyle(otherSelectedThread);
     }
 
     private void verifyChartStyle(String selectedThread) {

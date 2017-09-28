@@ -21,16 +21,18 @@ public interface IXYPresentationProvider {
 
     /**
      * Returns the {@link IYAppearance} to which the specified series name is
-     * mapped. If no appearance is found, a new one will be created and added to
-     * this presentation provider
+     * mapped. If no appearance is found, a new one will be created with given
+     * paramters and added to this presentation provider
      *
      * @param seriesName
      *            The name of the series
      * @param type
      *            The series type
+     * @param width
+     *            The series width
      * @return The {@link IYAppearance} instance of the Y series.
      */
-    IYAppearance getAppearance(String seriesName, String type);
+    IYAppearance getAppearance(String seriesName, String type, int width);
 
     /**
      * Remove all {@link IYAppearance}

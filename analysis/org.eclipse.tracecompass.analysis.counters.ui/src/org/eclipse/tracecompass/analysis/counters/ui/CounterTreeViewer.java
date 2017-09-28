@@ -9,10 +9,11 @@
 
 package org.eclipse.tracecompass.analysis.counters.ui;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -22,11 +23,12 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.analysis.counters.core.CounterAnalysis;
 import org.eclipse.tracecompass.internal.analysis.counters.ui.CounterTreeViewerEntry;
 import org.eclipse.tracecompass.internal.analysis.counters.ui.TriStateFilteredCheckboxTree;
@@ -37,7 +39,9 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+import org.eclipse.tracecompass.tmf.ui.viewers.ILegendImageProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.ICheckboxTreeViewerListener;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData;
@@ -82,19 +86,41 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
         }
     };
 
+    private final class CounterTreeLabelProvider extends TreeLabelProvider {
+
+        @Override
+        public Image getColumnImage(Object element, int columnIndex) {
+            if (columnIndex == 1 && element instanceof CounterTreeViewerEntry && fCheckboxTree.getChecked(element)) {
+                /* If the image height match the row height, row height will increment */
+                int imageHeight = getTreeViewer().getTree().getItemHeight() - 1;
+                String name = ((CounterTreeViewerEntry) element).getFullPath();
+                if (fLegendImageProvider != null) {
+                    return fLegendImageProvider.getLegendImage(imageHeight, fLegendColumnWidth, name);
+                }
+                return null;
+            }
+            return null;
+        }
+    }
+
     private final class CheckStateChangedListener implements ICheckStateListener {
         @Override
         public void checkStateChanged(CheckStateChangedEvent event) {
-            if (fListener != null) {
-                fListener.handleCheckStateChangedEvent(getCheckedCounterEntries());
+            if (fCounterChartViewer != null) {
+                fCounterChartViewer.handleCheckStateChangedEvent(getCheckedCounterEntries());
+
+                // Legend image might have changed
+                refresh();
             }
         }
     }
 
-    private ITreeViewerListener fListener;
+    private ICheckboxTreeViewerListener fCounterChartViewer;
     private TriStateFilteredCheckboxTree fCheckboxTree;
+    private ILegendImageProvider fLegendImageProvider;
     private Map<ITmfTrace, Object[]> fViewContext = new HashMap<>();
     private Map<ITmfTrace, TmfTreeViewerEntry> fRoots = new HashMap<>();
+    private final int fLegendColumnWidth;
 
     /**
      * Constructor
@@ -114,23 +140,28 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
             ((CheckboxTreeViewer) treeViewer).addCheckStateListener(new CheckStateChangedListener());
         }
         fCheckboxTree = checkboxTree;
+        setLabelProvider(new CounterTreeLabelProvider());
 
-        setLabelProvider(new LabelProvider() {
-            @Override
-            public String getText(Object element) {
-                return (element instanceof TmfTreeViewerEntry)
-                        ? ((TmfTreeViewerEntry) element).getName()
-                        : super.getText(element);
-            }
-        });
+        /* Legend column is at index 1 */
+        TreeColumn legend = getTreeViewer().getTree().getColumn(1);
+        legend.pack();
+        fLegendColumnWidth = legend.getWidth() != 0 ? legend.getWidth() : 50;
     }
 
     /**
      * @param listener
      *            Chart listening to changes in the tree's selected entries
      */
-    public void setTreeListener(ITreeViewerListener listener) {
-        fListener = listener;
+    public void setTreeListener(ICheckboxTreeViewerListener listener) {
+        fCounterChartViewer = listener;
+    }
+
+    /**
+     * @param legendImageProvider
+     *            Provides an image legend associated with a name
+     */
+    public void setLegendImageProvider(ILegendImageProvider legendImageProvider) {
+        fLegendImageProvider = legendImageProvider;
     }
 
     @Override
@@ -181,16 +212,21 @@ public class CounterTreeViewer extends AbstractTmfTreeViewer {
         Object[] checkedElements = fViewContext.get(getTrace());
         fCheckboxTree.setCheckedElements(checkedElements != null ? checkedElements : new Object[0]);
 
-        if (fListener != null) {
-            fListener.handleCheckStateChangedEvent(getCheckedCounterEntries());
+        if (fCounterChartViewer != null) {
+            fCounterChartViewer.handleCheckStateChangedEvent(getCheckedCounterEntries());
         }
+        getTreeViewer().refresh();
     }
 
     @Override
     protected ITmfTreeColumnDataProvider getColumnDataProvider() {
         return () -> {
+            List<TmfTreeColumnData> columns = new ArrayList<>();
             TmfTreeColumnData column = new TmfTreeColumnData("Counters"); //$NON-NLS-1$
-            return Collections.singletonList(column);
+            columns.add(column);
+            column = new TmfTreeColumnData("Legend"); //$NON-NLS-1$
+            columns.add(column);
+            return columns;
         };
     }
 

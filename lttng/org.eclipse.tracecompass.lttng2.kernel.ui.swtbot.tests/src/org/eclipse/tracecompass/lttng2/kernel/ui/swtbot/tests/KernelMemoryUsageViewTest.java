@@ -79,22 +79,34 @@ public class KernelMemoryUsageViewTest extends XYDataProviderBaseTest {
         verifyChartStyle(null);
 
         /* Test data model*/
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json), "resources/kernel-memory-res50.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json), "resources/kernelmemory/kernel-memory-res50.json", "Chart data is not valid");
 
         /*
-         * Select a thread and change zoom
+         * Select a thread
          */
-        String selectedThread = "496";
+        String selectedThread = "482";
         SWTBotTree treeBot = getSWTBotView().bot().tree();
         SWTBotUtils.waitUntil(tree -> tree.rowCount() >= 5, treeBot, "Did not finish loading");
         treeBot.getTreeItem(selectedThread).click();
-        chartViewer.setNbPoints(MORE_POINTS);
         SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 2, chart, "Only total available");
 
         /* Test type, style and color of series */
         verifyChartStyle(selectedThread);
 
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, selectedThread), "resources/kernel-memory-res100Selected.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, selectedThread), "resources/kernelmemory/kernel-memory-res50Selected.json", "Chart data is not valid");
+
+        /*
+         * Select an another thread and change zoom
+         */
+        String otherSelectedThread = "496";
+        treeBot.getTreeItem(otherSelectedThread).click();
+        chartViewer.setNbPoints(MORE_POINTS);
+        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 2, chart, "Only total available");
+
+        /* Test type, style and color of series */
+        verifyChartStyle(otherSelectedThread);
+
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, otherSelectedThread), "resources/kernelmemory/kernel-memory-res100Selected.json", "Chart data is not valid");
     }
 
     /**

@@ -9,6 +9,9 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -75,12 +78,13 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
     private static final long BUILD_UPDATE_TIMEOUT = 500;
 
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(TmfCommonXAxisChartViewer.class);
+    private static final int DEFAULT_SERIES_WIDTH = 1;
 
-    private UpdateThread fUpdateThread;
     private final double fResolution;
     private final AtomicInteger fDirty = new AtomicInteger();
-    private final IXYPresentationProvider fXYPresentationProvider = new XYPresentationProvider();
+    private final Map<ITmfTrace, IXYPresentationProvider> fXYPresentationProvider;
     private ITmfXYDataProvider fXYDataProvider;
+    private UpdateThread fUpdateThread;
 
     /** Used for testing **/
     private int fOverrideNbPoints = 0;
@@ -100,11 +104,13 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
         getSwtChart().getAxisSet().getXAxes()[0].getTitle().setVisible(false);
         fResolution = settings.getResolution();
         setTooltipProvider(new TmfCommonXLineChartTooltipProvider(this));
+        fXYPresentationProvider = new HashMap<>();
     }
 
     @Override
     public void loadTrace(ITmfTrace trace) {
         super.loadTrace(trace);
+        fXYPresentationProvider.putIfAbsent(trace, new XYPresentationProvider());
         initializeDataProvider();
     }
 
@@ -141,7 +147,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      * @return The presentation provider
      */
     protected IXYPresentationProvider getPresentationProvider() {
-        return fXYPresentationProvider;
+        return Objects.requireNonNull(fXYPresentationProvider.get(getTrace()));
     }
 
     /**
@@ -181,8 +187,8 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      *            The name of the series
      * @return An {@link IYAppearance} instance for the series
      */
-    protected IYAppearance getSeriesAppearance(@NonNull String seriesName) {
-        return fXYPresentationProvider.getAppearance(seriesName, IYAppearance.Type.LINE);
+    public @NonNull IYAppearance getSeriesAppearance(@NonNull String seriesName) {
+        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH);
     }
 
     /**
@@ -216,7 +222,6 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
 
     @Override
     protected void clearContent() {
-        fXYPresentationProvider.clear();
         getSwtChart().getAxisSet().getXAxis(0).getTick().setFormat(null);
         super.clearContent();
     }
@@ -433,6 +438,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             lineSeries.setSymbolType(isScatter ? PlotSymbolType.DIAMOND : PlotSymbolType.NONE);
             lineSeries.setLineColor(color);
             lineSeries.setVisible(true);
+            lineSeries.setLineWidth(appearance.getWidth());
             return lineSeries;
         }
 
@@ -458,5 +464,8 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
         cancelUpdate();
         super.traceClosed(signal);
         setDataProvider(null);
+        if (signal != null) {
+            fXYPresentationProvider.remove(signal.getTrace());
+        }
     }
 }

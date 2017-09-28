@@ -9,9 +9,7 @@
 
 package org.eclipse.tracecompass.analysis.counters.ui;
 
-import java.util.Collection;
-
-import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.ICheckboxTreeViewerListener;
 
 /**
  * Listens to changes in the accompanying tree viewer.
@@ -20,15 +18,9 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
  * data depending on the selected entries in the tree.
  *
  * @author Mikael Ferland
+ * @deprecated Use {@link ICheckboxTreeViewerListener}
  */
-public interface ITreeViewerListener {
-
-    /**
-     * Handler for events where the tree viewer's selection has changed.
-     *
-     * @param entries
-     *            Entries which have been checked in the tree
-     */
-    public void handleCheckStateChangedEvent(Collection<ITmfTreeViewerEntry> entries);
+@Deprecated
+public interface ITreeViewerListener extends ICheckboxTreeViewerListener {
 
 }

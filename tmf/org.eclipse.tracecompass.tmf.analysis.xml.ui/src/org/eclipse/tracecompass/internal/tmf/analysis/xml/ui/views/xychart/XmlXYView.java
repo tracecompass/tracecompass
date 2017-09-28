@@ -106,5 +106,4 @@ public class XmlXYView extends TmfChartView {
         TmfXYChartSettings settings = new TmfXYChartSettings(Messages.XmlXYViewer_DefaultViewerTitle, Messages.XmlXYViewer_DefaultXAxis, Messages.XmlXYViewer_DefaultYAxis, 1);
         return new XmlXYViewer(parent, settings, fViewInfo);
     }
-
 }

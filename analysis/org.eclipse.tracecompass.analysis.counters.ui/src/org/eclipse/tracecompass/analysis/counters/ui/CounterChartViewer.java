@@ -26,12 +26,14 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.Sele
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfXYCompositeDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.ICheckboxTreeViewerListener;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
@@ -47,7 +49,9 @@ import com.google.common.collect.Multimap;
  * @author Matthew Khouzam
  * @author Mikael Ferland
  */
-public final class CounterChartViewer extends TmfCommonXAxisChartViewer implements ITreeViewerListener {
+public final class CounterChartViewer extends TmfCommonXAxisChartViewer implements ICheckboxTreeViewerListener {
+
+    private static final int DEFAULT_SERIES_WIDTH = 2;
 
     private boolean fIsCumulative = false;
     private Multimap<UUID, Integer> fSelectedQuarks = HashMultimap.create();
@@ -58,12 +62,11 @@ public final class CounterChartViewer extends TmfCommonXAxisChartViewer implemen
      * @param parent
      *            Parent composite
      */
-    public CounterChartViewer(Composite parent) {
+    public CounterChartViewer(Composite parent, TmfXYChartSettings settings) {
         // Avoid displaying chart title and axis titles (to reduce wasted space)
-        super(parent, new TmfXYChartSettings(null, null, null, 1));
+        super(parent, settings);
         Chart chart = getSwtChart();
-        chart.getLegend().setPosition(SWT.BOTTOM);
-        chart.getLegend().setVisible(true);
+        chart.getLegend().setVisible(false);
         chart.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
     }
 
@@ -100,16 +103,16 @@ public final class CounterChartViewer extends TmfCommonXAxisChartViewer implemen
     public void traceSelected(@Nullable TmfTraceSelectedSignal signal) {
         super.traceSelected(signal);
         clearContent();
-        fSelectedQuarks = HashMultimap.create();
+        fSelectedQuarks.clear();
     }
 
     @TmfSignalHandler
     @Override
     public void traceClosed(@Nullable TmfTraceClosedSignal signal) {
-        super.traceClosed(signal);
-        if (signal != null) {
-            fSelectedQuarks.removeAll(signal.getTrace().getUUID());
+        if (signal != null && signal.getTrace().equals(getTrace())) {
+            fSelectedQuarks.clear();
         }
+        super.traceClosed(signal);
     }
 
     @Override
@@ -143,5 +146,10 @@ public final class CounterChartViewer extends TmfCommonXAxisChartViewer implemen
             }
         }
         return dataProviders;
+    }
+
+    @Override
+    public @NonNull IYAppearance getSeriesAppearance(@NonNull String seriesName) {
+        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH);
     }
 }

@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.viewers.IContentProvider;
-import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -65,13 +65,13 @@ public class CounterTreePatternFilter extends TreePatternFilter {
     protected boolean isLeafMatch(Viewer viewer, Object element) {
         Object node = element;
         StructuredViewer structuredViewer = (StructuredViewer) viewer;
-        ILabelProvider labelProvider = (ILabelProvider) structuredViewer.getLabelProvider();
+        ITableLabelProvider labelProvider = (ITableLabelProvider) structuredViewer.getLabelProvider();
 
         // Ensure the tree element and its parent(s) match the filter text
         ListIterator<Pattern> iter = fPatterns.listIterator(fPatterns.size());
         while (iter.hasPrevious()) {
-            // Retrieve tree element text and make verification
-            String labelText = labelProvider.getText(node);
+            // Retrieve tree element text and make verification. Text is at column 0
+            String labelText = labelProvider.getColumnText(node, 0);
             if (!wordMatches(labelText, iter.previous())) {
                 return false;
             }

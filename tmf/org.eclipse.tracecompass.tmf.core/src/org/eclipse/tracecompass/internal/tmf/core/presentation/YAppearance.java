@@ -24,6 +24,7 @@ public class YAppearance implements IYAppearance {
     private final String fStyle;
     private final String fType;
     private final RGBColor fColor;
+    private final int fWidth;
 
     /**
      * Constructor
@@ -36,12 +37,15 @@ public class YAppearance implements IYAppearance {
      *            The Y series style
      * @param color
      *            The Y series color
+     * @param width
+     *            The Y series width
      */
-    public YAppearance(String name, String type, String style, RGBColor color) {
+    public YAppearance(String name, String type, String style, RGBColor color, int width) {
         fName = name;
         fStyle = style;
         fType = type;
         fColor = color;
+        fWidth = width;
     }
 
     @Override
@@ -62,5 +66,10 @@ public class YAppearance implements IYAppearance {
     @Override
     public String getType() {
         return fType;
+    }
+
+    @Override
+    public int getWidth() {
+        return fWidth;
     }
 }
