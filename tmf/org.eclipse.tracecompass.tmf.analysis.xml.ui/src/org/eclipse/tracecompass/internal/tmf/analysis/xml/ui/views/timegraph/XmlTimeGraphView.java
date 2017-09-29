@@ -562,14 +562,22 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         switch (stateValue.getType()) {
         case INTEGER:
         case NULL:
+        {
             status = stateValue.unboxInt();
+            XmlPresentationProvider pres = getPresentationProvider();
+            if (!pres.hasIndex(status)) {
+                status = getStringIndex(String.valueOf(status));
+            }
+        }
             break;
         case LONG:
+        {
             status = (int) stateValue.unboxLong();
-            XmlPresentationProvider pres = this.getPresentationProvider();
+            XmlPresentationProvider pres = getPresentationProvider();
             if (!pres.hasIndex(status)) {
                 status = getStringIndex("0x" + Long.toHexString(stateValue.unboxLong())); //$NON-NLS-1$
             }
+        }
             break;
         case STRING:
             String statusStr = stateValue.unboxStr();
