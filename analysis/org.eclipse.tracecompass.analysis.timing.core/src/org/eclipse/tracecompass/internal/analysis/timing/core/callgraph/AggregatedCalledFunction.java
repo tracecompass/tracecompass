@@ -12,7 +12,9 @@ package org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 
@@ -31,7 +33,7 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
  * @author Sonia Farrah
  *
  */
-public class AggregatedCalledFunction {
+public class AggregatedCalledFunction implements Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -87,6 +89,26 @@ public class AggregatedCalledFunction {
     }
 
     /**
+     * copy constructor, used by the clone method
+     *
+     * @param toCopy Object to copy
+     */
+    private AggregatedCalledFunction(AggregatedCalledFunction toCopy) {
+        fSymbol = toCopy.fSymbol;
+        for (Entry<Object, AggregatedCalledFunction> entry : toCopy.fChildren.entrySet()) {
+            fChildren.put(entry.getKey(), entry.getValue().clone());
+        }
+        fParent = toCopy.fParent;
+        fMaxDepth = toCopy.fMaxDepth;
+        fDepth = toCopy.fDepth;
+        fStatistics = new AggregatedCalledFunctionStatistics();
+        fStatistics.merge(toCopy.fStatistics);
+        fProcessId = toCopy.fProcessId;
+        fDuration = toCopy.fDuration;
+        fSelfTime = toCopy.fSelfTime;
+    }
+
+    /**
      * The function's symbol (address or name)
      *
      * @return The function's symbol
@@ -129,11 +151,18 @@ public class AggregatedCalledFunction {
         aggregatedChild.getFunctionStatistics().update(child);
         AggregatedCalledFunction node = fChildren.get(aggregatedChild.getSymbol());
         if (node == null) {
-            fChildren.put(aggregatedChild.getSymbol(), aggregatedChild);
+            fChildren.put(aggregatedChild.getSymbol(), aggregatedChild.clone());
         } else {
             merge(node, aggregatedChild);
             fChildren.replace(node.getSymbol(), node);
         }
+    }
+
+    @Override
+    public @NonNull AggregatedCalledFunction clone() {
+        // We use a constructor instead of super.clone, otherwise some fields cannot be
+        // final
+        return new AggregatedCalledFunction(this);
     }
 
     /**
