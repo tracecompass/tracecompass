@@ -15,6 +15,7 @@
 package org.eclipse.tracecompass.tmf.ui.views;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.events.ControlAdapter;
@@ -137,7 +138,7 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
     public void createPartControl(final Composite parent) {
         fParentComposite = parent;
         if (this instanceof ITmfTimeAligned) {
-            contributeAlignViewsActionToToolbar();
+            contributeAlignViewsActionToLocalMenu();
 
             fControlListener = new ControlAdapter() {
                 @Override
@@ -188,17 +189,15 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
         }
     }
 
-    private void contributeAlignViewsActionToToolbar() {
+    private void contributeAlignViewsActionToLocalMenu() {
         if (fAlignViewsAction == null) {
             fAlignViewsAction = new TimeAlignViewsAction();
         }
 
-        IToolBarManager toolBarManager = getViewSite().getActionBars()
-                .getToolBarManager();
-        toolBarManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-        toolBarManager.add(fAlignViewsAction);
+        IMenuManager menuManager = getViewSite().getActionBars().getMenuManager();
+        menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        menuManager.add(fAlignViewsAction);
     }
-
     /**
      * Returns the parent control of the view
      *

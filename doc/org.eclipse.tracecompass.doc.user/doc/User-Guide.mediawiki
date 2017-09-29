@@ -756,7 +756,7 @@ The Histogram View displays the trace events distribution with respect to time. 
 
 [[Image:images/HistogramView.png]]
 
-The '''Align Views''' toggle button [[Image:images/link.gif]] in the local toolbar allows to disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the Histogram view will disable this feature across all the views because it's a workspace preference.
+The '''Align Views''' toggle button [[Image:images/link.gif]] in the view menu allows to disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the Histogram view will disable this feature across all the views because it's a workspace preference.
 
 The '''Hide Lost Events''' toggle button [[Image:images/hide_lost_events.gif]] in the local toolbar allows to hide the bars of lost events. When the button is selected it can be toggled again to show the lost events.
 
@@ -882,7 +882,7 @@ When a filter is applied in the events table, the non-matching ticks are removed
 
 The Time Chart only supports traces that are opened in an editor. The use of an editor is specified in the plug-in extension for that trace type, or is enabled by default for custom traces.
 
-The '''Align Views''' toggle button [[Image:images/link.gif]] in the local toolbar allows to disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the this view will disable this feature across all the views because it's a workspace preference.
+The '''Align Views''' toggle button [[Image:images/link.gif]] in the view menu allows to disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the this view will disable this feature across all the views because it's a workspace preference.
 
 == State System Explorer View ==
 
@@ -1158,7 +1158,7 @@ The trace will be opened in an editor showing the events table, and an entry wil
 
 == Automatic Time Axis Alignment ==
 
-Trace Compass supports automatic alignment of the time axis for time base views. The user now can resize the time window of one view and all other open views will align to the new window size and position. The automatic alignment is optional and can be disabled and enabled using the '''Align Views''' toolbar button. Disabling or enabling it in one view it will disable and enable it for all view since it's a workspace wide setting.
+Trace Compass supports automatic alignment of the time axis for time base views. The user now can resize the time window of one view and all other open views will align to the new window size and position. The automatic alignment is optional and can be disabled and enabled using the '''Align Views''' button of the view menu. Disabling or enabling it in one view it will disable and enable it for all view since it's a workspace wide setting.
 
 [[Image:images/TimeAlignment_sash.png]]
 
@@ -2118,10 +2118,6 @@ The tooltip indicates:
 The Control Flow View '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
 
 {|
-| [[Image:images/link.gif]]
-| Align Views
-| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
-|-
 | [[Image:images/filter_items.gif]]
 | Show View Filter
 | Opens the process filter dialog. Filter settings will be preserved when switching between open traces.
@@ -2203,6 +2199,10 @@ View Menu
 
 {|
 |
+| Align Views
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
+|-
+|
 | Show Markers
 | A marker highlights a time interval. A marker can be used for instance to indicate a time range where lost events occurred or to bookmark an interesting interval for future reference. Selecting a category name will toggle the visibility of markers of that category.
 |-
@@ -2276,10 +2276,6 @@ See Control Flow View's '''[[#Incomplete_regions | Incomplete regions]]'''.
 The Resources View '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
 
 {|
-| [[Image:images/link.gif]]
-| Align Views
-| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
-|-
 | [[Image:images/filter_items.gif]]
 | Show View Filter
 | Opens the resources filter dialog. Filter settings will be preserved when switching between open traces.
@@ -2337,9 +2333,14 @@ View Menu
 
 {|
 |
+| Align Views
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
+|-
+|
 | Show Markers
 | A marker highlights a time interval. A marker can be used for instance to indicate a time range where lost events occurred or to bookmark an interesting interval for future reference. Selecting a category name will toggle the visibility of markers of that category.
-
+|-
+|
 | Marker Set
 | The user can select from one of the configured market sets, or choose '''None''' to use no marker set. The setting applies to all views that support marker sets. The marker set configuration can be edited by selecting the '''Edit...''' menu item (see [[#Marker Set Configuration XML Format]]). After saving the changes in the opened editor, the marker set should then be re-selected to update the view.
 |}
@@ -2391,12 +2392,12 @@ Hover the cursor over a line of the chart and a tooltip will pop up with the fol
 * '''Total''': The total CPU usage
 
 
-==== Toolbar ====
+==== View Menu ====
 
-The CPU Usage View '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
+The CPU Usage View '''view menu''', located at the top right of the view, has shortcut buttons to perform common actions:
 
 {|
-| [[Image:images/link.gif]]
+|
 | Align Views
 | Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the this view will disable this feature across all the views because it's a workspace preference
 |-
@@ -2825,12 +2826,12 @@ The Memory Usage chart is usable with the mouse. The following actions are set:
 * '''Shift-mouse wheel up/down''': scroll left or right
 * '''Ctrl-mouse wheel up/down''': zoom in or out horizontally
 
-=== Toolbar ===
+=== View Menu ===
 
-The Memory Usage View '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
+The Memory Usage View '''view menu''', located at the top right of the view, has shortcut buttons to perform common actions:
 
 {|
-| [[Image:images/link.gif]]
+|
 | Align Views
 | Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the this view will disable this feature across all the views because it's a workspace preference
 |-

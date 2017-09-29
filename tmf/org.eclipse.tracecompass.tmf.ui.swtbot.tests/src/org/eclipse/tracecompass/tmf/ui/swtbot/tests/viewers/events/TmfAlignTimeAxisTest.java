@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.viewers.events;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +33,8 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotRootMenu;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.ui.project.wizards.NewTmfProjectWizard;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotSash;
@@ -72,6 +75,9 @@ public class TmfAlignTimeAxisTest {
 
     private static final String PROJET_NAME = "TestAxisAlignment";
     private static final int NUM_EVENTS = 100;
+
+    private static final String ALIGN_VIEWS_ACTION_NAME = "Align Views";
+
     /**
      * Using a small ratio for the editor so that other views have enough space
      * to be drawn, even when a low screen resolution is used.
@@ -222,6 +228,20 @@ public class TmfAlignTimeAxisTest {
         fBot = new SWTWorkbenchBot();
         switchToPerspective(AlignPerspectiveFactory3.ID);
         testNotAligned(CallStackView.ID, HistogramView.ID, TimeChartView.ID);
+    }
+
+    /**
+     * Test for the "Align Views" menu item
+     */
+    @Test
+    public void testMenuItem() {
+        fBot = new SWTWorkbenchBot();
+        switchToPerspective(AlignPerspectiveFactory1.ID);
+        SWTBotView viewBot = fBot.viewById(CallStackView.ID);
+        SWTBotRootMenu viewMenu = viewBot.viewMenu();
+
+        SWTBotMenu menuItems = viewMenu.menu(ALIGN_VIEWS_ACTION_NAME);
+        assertTrue("Align views", menuItems.isChecked());
     }
 
     private static void switchToPerspective(String id) {
