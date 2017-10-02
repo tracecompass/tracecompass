@@ -163,7 +163,7 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME), START_TIME);
 
         /* select first item */
-        KEYBOARD.pressShortcut(Keystrokes.HOME);
+        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.HOME);
 
         /* click "Next Marker" 3 times */
         nextMarker.run();
@@ -209,7 +209,7 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME), START_TIME);
 
         /* select first item */
-        KEYBOARD.pressShortcut(Keystrokes.HOME);
+        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.HOME);
 
         /* check that "Next Marker" and "Previous Marker" are enabled */
         assertTrue(viewBot.toolbarButton(NEXT_MARKER).isEnabled());
@@ -243,7 +243,7 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME), START_TIME);
 
         /* select first item */
-        KEYBOARD.pressShortcut(Keystrokes.HOME);
+        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.HOME);
 
         /* disable Lost Events navigation */
         viewBot.toolbarDropDownButton(NEXT_MARKER).menuItem(LOST_EVENTS).click();
@@ -276,8 +276,8 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME), START_TIME);
 
         /* select first CPU resource */
-        KEYBOARD.pressShortcut(Keystrokes.HOME);
-        KEYBOARD.pressShortcut(Keystrokes.DOWN);
+        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.HOME);
+        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.DOWN);
 
         /* click "Select Next State Change" 2 times */
         viewBot.toolbarButton(SELECT_NEXT_STATE_CHANGE).click();

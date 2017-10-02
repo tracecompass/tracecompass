@@ -24,6 +24,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
@@ -95,8 +96,9 @@ public abstract class KernelTimeGraphViewTestBase extends KernelTestBase {
         List<String> labelValues = getLegendValues();
         SWTBotToolbarButton legendButton = getViewBot().toolbarButton("Show Legend");
         legendButton.click();
-        fBot.waitUntil(org.eclipse.swtbot.swt.finder.waits.Conditions.shellIsActive("States Transition Visualizer"));
-        SWTBot bot = fBot.activeShell().bot();
+        SWTBotShell shell = fBot.shell("States Transition Visualizer");
+        shell.activate();
+        SWTBot bot = shell.bot();
         for (int i = 1; i <= labelValues.size(); i++) {
             SWTBotLabel label = bot.label(i);
             assertNotNull(label);

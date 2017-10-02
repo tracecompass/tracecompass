@@ -161,8 +161,8 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         timeGraph.setFocus();
 
         /* select first item */
-        KEYBOARD.pressShortcut(Keystrokes.HOME);
-        KEYBOARD.pressShortcut(Keystrokes.DOWN);
+        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.HOME);
+        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.DOWN);
 
         /* click "Select Next State Change" 3 times */
         selectNext.run();
@@ -337,8 +337,8 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         timeGraph.setFocus();
 
         /* select first item */
-        KEYBOARD.pressShortcut(Keystrokes.HOME);
-        KEYBOARD.pressShortcut(Keystrokes.DOWN);
+        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.HOME);
+        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.DOWN);
 
         /* click "Follow CPU Forward" 3 times */
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
