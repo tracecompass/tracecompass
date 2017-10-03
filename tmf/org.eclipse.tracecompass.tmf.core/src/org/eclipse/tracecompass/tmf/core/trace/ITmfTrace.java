@@ -532,7 +532,7 @@ public interface ITmfTrace extends ITmfEventProvider {
      * Get initial time range
      *
      * @return get the initial time range
-     * @since 3.1
+     * @since 3.2
      */
     public default TmfTimeRange getInitialTimeRange() {
         ITmfTimestamp startTime = getStartTime();
