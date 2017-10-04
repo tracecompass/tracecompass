@@ -81,6 +81,7 @@
       <module
             analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraph"
             applies_experiment="true"
+            icon="icons/critical-path.png"
             id="org.eclipse.tracecompass.analysis.os.linux.execgraph"
             name="%analysis.execgraph">
          <tracetype
