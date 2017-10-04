@@ -207,6 +207,10 @@ public abstract class AbstractVirtualTimeGraphView extends AbstractTimeGraphView
         TimeGraphViewer timeGraphViewer = getTimeGraphViewer();
         TimeGraphControl timeGraphControl = timeGraphViewer.getTimeGraphControl();
 
+        if (timeGraphControl.isDisposed()) {
+            return Collections.emptySet();
+        }
+
         int start = Math.max(0, timeGraphViewer.getTopIndex() - buffer);
         int end = Math.min(timeGraphViewer.getExpandedElementCount() - 1,
                 timeGraphViewer.getTopIndex() + timeGraphControl.countPerPage() + buffer);
