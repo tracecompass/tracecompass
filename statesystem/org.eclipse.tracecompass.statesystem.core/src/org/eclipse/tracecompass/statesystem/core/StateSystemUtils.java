@@ -339,7 +339,7 @@ public final class StateSystemUtils {
          *            will end at the smallest of the two.
          * @throws TimeRangeException
          *             If endTime < initialTime.
-         * @since 3.1
+         * @since 3.2
          */
         public QuarkIterator(ITmfStateSystem ss, int quark, long initialTime, long endTime) {
             if (endTime < initialTime) {

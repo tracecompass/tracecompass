@@ -299,6 +299,7 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
      *
      * @return true if the time graph view has yet to completely update its model,
      *         false otherwise
+     * @since 3.2
      */
     public boolean isDirty() {
         return fChartViewer.isDirty();
