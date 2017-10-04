@@ -12,8 +12,10 @@ package org.eclipse.tracecompass.analysis.os.linux.core.execution.graph;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Stack;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
 
@@ -130,14 +132,14 @@ public class OsSystemModel {
      * @return The latest interrupt context on the CPU of the host
      */
     public OsInterruptContext peekContextStack(String hostId, Integer cpu) {
-        Stack<OsInterruptContext> stack = fIntCtxStacks.get(hostId, cpu);
+        Stack<@NonNull OsInterruptContext> stack = fIntCtxStacks.get(hostId, cpu);
         if (stack == null) {
             return OsInterruptContext.DEFAULT_CONTEXT;
         }
         if (stack.empty()) {
             return OsInterruptContext.DEFAULT_CONTEXT;
         }
-        OsInterruptContext peek = stack.peek();
+        OsInterruptContext peek = Objects.requireNonNull(stack.peek());
         return peek;
     }
 
