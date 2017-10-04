@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IFile;
@@ -149,6 +150,20 @@ public final class TmfTraceManager {
      */
     public synchronized Set<ITmfTrace> getOpenedTraces() {
         return Collections.unmodifiableSet(fTraces.keySet());
+    }
+
+    /**
+     * Get the currently-opened traces that belong to a given host, as an
+     * unmodifiable set.
+     *
+     * @param hostId
+     *            The ID of the host
+     * @return A set containing the opened traces for a host
+     * @since 3.2
+     */
+    public synchronized Set<ITmfTrace> getTracesForHost(String hostId) {
+        return Collections.unmodifiableSet(fTraces.keySet().stream().filter(t -> hostId.equals(t.getHostId()))
+                .collect(Collectors.toSet()));
     }
 
     /**

@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.tmf.ctf.core.tests.temp.tracemanager;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -188,6 +189,35 @@ public class TmfTraceManagerTest {
 
         assertEquals(1, actual.size());
         assertEquals(expected, actual);
+    }
+
+    /**
+     * Test getting the traces for a host
+     */
+    @Test
+    public void testTraceSetForHost() {
+        openTrace(trace1);
+        openTrace(trace2);
+        selectTrace(trace2);
+
+        // Test the currently selected trace
+        Collection<ITmfTrace> expected = Collections.singleton(trace2);
+        Collection<ITmfTrace> actual = tm.getTracesForHost(trace2.getHostId());
+
+        assertEquals(1, actual.size());
+        assertEquals(expected, actual);
+
+        // Test an opened trace, even though it is not selected
+        expected = Collections.singleton(trace1);
+        actual = tm.getTracesForHost(trace1.getHostId());
+
+        assertEquals(1, actual.size());
+        assertEquals(expected, actual);
+
+        // Test a closed trace, should not return anything
+        actual = tm.getTracesForHost(trace3.getHostId());
+
+        assertTrue(actual.isEmpty());
     }
 
     /**
