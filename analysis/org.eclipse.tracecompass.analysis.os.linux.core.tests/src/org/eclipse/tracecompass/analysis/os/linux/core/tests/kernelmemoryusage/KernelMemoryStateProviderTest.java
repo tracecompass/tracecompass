@@ -26,10 +26,12 @@ import org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage.KernelM
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage.KernelMemoryStateProvider;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.Activator;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub;
+import org.eclipse.tracecompass.analysis.os.linux.core.tid.TidAnalysisModule;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -81,6 +83,7 @@ public class KernelMemoryStateProviderTest {
             fail(e.getMessage());
         }
         deleteSuppFiles(trace);
+
         ((TmfTrace) trace).traceOpened(new TmfTraceOpenedSignal(this, trace, null));
         fModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelMemoryAnalysisModule.class, KernelMemoryAnalysisModule.ID);
         assertNotNull(fModule);
@@ -103,6 +106,14 @@ public class KernelMemoryStateProviderTest {
     public void testAnalysisExecution() {
         /* Make sure the analysis hasn't run yet */
         assertNull(fModule.getStateSystem());
+
+        /* Make sure dependent analysis is executed for so that it ready for KernelMemoryAnalysisModule */
+        ITmfTrace trace = fTrace;
+        assertNotNull(trace);
+        IAnalysisModule module = TmfTraceUtils.getAnalysisModuleOfClass(trace, TidAnalysisModule.class, TidAnalysisModule.ID);
+        assertNotNull(module);
+        module.schedule();
+        module.waitForCompletion();
 
         /* Execute the analysis */
         assertTrue(TmfTestHelper.executeAnalysis(fModule));
