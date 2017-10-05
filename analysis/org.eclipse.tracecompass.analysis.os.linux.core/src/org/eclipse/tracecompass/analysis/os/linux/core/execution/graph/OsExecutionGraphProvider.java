@@ -79,7 +79,10 @@ public class OsExecutionGraphProvider extends AbstractTmfGraphProvider {
 
     /**
      * A list of status a thread can be in
+     *
+     * @deprecated Use {@link org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus} instead
      */
+    @Deprecated
     public enum ProcessStatus {
         /** Unknown process status */
         UNKNOWN(0),

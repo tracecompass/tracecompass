@@ -26,9 +26,9 @@ import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecuti
 import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsSystemModel;
 import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsWorker;
 import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider.Context;
-import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.LinuxValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.TcpEventStrings;

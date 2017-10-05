@@ -14,8 +14,8 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyStrin
 import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider;
 import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsSystemModel;
 import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsWorker;
-import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.EventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
