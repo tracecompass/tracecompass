@@ -14,8 +14,8 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.LinuxValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -92,44 +92,10 @@ public class SchedSwitchHandler extends KernelEventHandler {
     }
 
     private static void setOldProcessStatus(ITmfStateSystemBuilder ss, Long prevState, Integer formerThreadNode, long timestamp) {
-        ITmfStateValue value;
-        /*
-         * Empirical observations and look into the linux code have
-         * shown that the TASK_STATE_MAX flag is used internally and
-         * |'ed with other states, most often the running state, so it
-         * is ignored from the prevState value.
-         *
-         * Since Linux 4.1, the TASK_NOLOAD state was created and
-         * TASK_STATE_MAX is now 2048. We use TASK_NOLOAD as the new max
-         * because it does not modify the displayed state value.
-         */
-        int state = (int) (prevState & (LinuxValues.TASK_NOLOAD - 1));
+        ITmfStateValue value = ProcessStatus.getStatusFromKernelState(prevState).getStateValue();
 
-        if (isRunning(state)) {
-            value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
-        } else if (isWaiting(state)) {
-            value = StateValues.PROCESS_STATUS_WAIT_BLOCKED_VALUE;
-        } else if (isDead(state)) {
-            value = TmfStateValue.nullValue();
-        } else {
-            value = StateValues.PROCESS_STATUS_WAIT_UNKNOWN_VALUE;
-        }
         ss.modifyAttribute(timestamp, value, formerThreadNode);
 
-    }
-
-    private static boolean isDead(int state) {
-        return (state & LinuxValues.TASK_DEAD) != 0;
-    }
-
-    private static boolean isWaiting(int state) {
-        return (state & (LinuxValues.TASK_INTERRUPTIBLE | LinuxValues.TASK_UNINTERRUPTIBLE)) != 0;
-    }
-
-    private static boolean isRunning(int state) {
-        // special case, this means ALL STATES ARE 0
-        // this is effectively an anti-state
-        return state == 0;
     }
 
     private static void setCpuStatus(ITmfStateSystemBuilder ss, Integer nextTid, Integer newCurrentThreadNode, long timestamp, int currentCPUNode) {

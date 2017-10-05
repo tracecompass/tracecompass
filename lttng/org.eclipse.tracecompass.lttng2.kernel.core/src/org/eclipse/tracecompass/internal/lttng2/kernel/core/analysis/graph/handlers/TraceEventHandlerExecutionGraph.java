@@ -171,6 +171,8 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
             break;
         case EXIT:
         case RUN:
+        case RUN_SYTEMCALL:
+        case INTERRUPTED:
             ret = EdgeType.RUNNING;
             break;
         case UNKNOWN:
@@ -181,6 +183,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
             break;
         case WAIT_CPU:
         case WAIT_FORK:
+        case WAIT_UNKNOWN:
             ret = EdgeType.PREEMPTED;
             break;
         case ZOMBIE:
@@ -241,7 +244,9 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         case UNKNOWN:
         case WAIT_CPU:
         case ZOMBIE:
-            break;
+        case INTERRUPTED:
+        case RUN_SYTEMCALL:
+        case WAIT_UNKNOWN:
         default:
             break;
         }

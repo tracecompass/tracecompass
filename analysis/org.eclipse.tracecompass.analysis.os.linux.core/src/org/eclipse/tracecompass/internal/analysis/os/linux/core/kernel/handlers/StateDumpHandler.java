@@ -14,8 +14,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.LinuxValues;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -47,7 +46,7 @@ public class StateDumpHandler extends KernelEventHandler {
         int tid = ((Long) content.getField("tid").getValue()).intValue(); //$NON-NLS-1$
         int pid = ((Long) content.getField("pid").getValue()).intValue(); //$NON-NLS-1$
         int ppid = ((Long) content.getField("ppid").getValue()).intValue(); //$NON-NLS-1$
-        int status = ((Long) content.getField("status").getValue()).intValue(); //$NON-NLS-1$
+        long status = ((Long) content.getField("status").getValue()).longValue(); //$NON-NLS-1$
         String name = checkNotNull((String) content.getField("name").getValue()); //$NON-NLS-1$
         /*
          * "mode" could be interesting too, but it doesn't seem to be populated
@@ -71,25 +70,10 @@ public class StateDumpHandler extends KernelEventHandler {
         setStatus(ss, status, curThreadNode, timestamp);
     }
 
-    private static void setStatus(ITmfStateSystemBuilder ss, int status, int curThreadNode, long timestamp) {
+    private static void setStatus(ITmfStateSystemBuilder ss, long status, int curThreadNode, long timestamp) {
         ITmfStateValue value;
         if (ss.queryOngoingState(curThreadNode).isNull()) {
-            switch (status) {
-            case LinuxValues.STATEDUMP_PROCESS_STATUS_WAIT_CPU:
-                value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
-                break;
-            case LinuxValues.STATEDUMP_PROCESS_STATUS_WAIT:
-                /*
-                 * We have no information on what the process is waiting on
-                 * (unlike a sched_switch for example), so we will use the
-                 * WAIT_UNKNOWN state instead of the "normal" WAIT_BLOCKED
-                 * state.
-                 */
-                value = StateValues.PROCESS_STATUS_WAIT_UNKNOWN_VALUE;
-                break;
-            default:
-                value = StateValues.PROCESS_STATUS_UNKNOWN_VALUE;
-            }
+            value = ProcessStatus.getStatusFromStatedump(status).getStateValue();
             ss.modifyAttribute(timestamp, value, curThreadNode);
         }
     }

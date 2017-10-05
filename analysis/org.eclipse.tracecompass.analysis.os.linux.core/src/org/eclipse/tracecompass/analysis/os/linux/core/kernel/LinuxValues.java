@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.analysis.os.linux.core.kernel;
  * be added here first.
  *
  * @author Alexandre Montplaisir
+ * @noimplement This interface is not intended to be implemented by clients.
  * @since 2.0
  */
 public interface LinuxValues {
@@ -134,11 +135,28 @@ public interface LinuxValues {
      * </pre>
      */
 
+    /** Task is initially unnamed
+     * @since 2.4*/
+    int STATEDUMP_PROCESS_STATUS_UNNAMED = 0;
+    /** Task is initially waitiing for a fork
+     * @since 2.4*/
+    int STATEDUMP_PROCESS_STATUS_WAIT_FORK = 1;
     /** Task is initially preempted */
     int STATEDUMP_PROCESS_STATUS_WAIT_CPU = 2;
-
-    /** Task is initially blocked */
+    /** Task is exited but not yet dead
+     * @since 2.4*/
+    int STATEDUMP_PROCESS_STATUS_EXIT = 3;
+    /** Task is initially in a zombie state
+     * @since 2.4*/
+    int STATEDUMP_PROCESS_STATUS_ZOMBIE = 4;
+    /** Task is initially waiting for unknown cause */
     int STATEDUMP_PROCESS_STATUS_WAIT = 5;
+    /** Task is initially running
+     * @since 2.4*/
+    int STATEDUMP_PROCESS_STATUS_RUN = 6;
+    /** Task is initially dead, oh glorious beginnings!
+     * @since 2.4*/
+    int STATEDUMP_PROCESS_STATUS_DEAD = 7;
 
     /**
      * SoftIRQ definitions

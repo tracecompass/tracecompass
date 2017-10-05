@@ -66,7 +66,7 @@ public class TraceEventHandlerStatedump extends BaseHandler {
             task.setName(name);
         }
 
-        task.setStatus(ProcessStatus.getStatus(status));
+        task.setStatus(ProcessStatus.getStatusFromStatedump(status));
     }
 
 }
