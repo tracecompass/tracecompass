@@ -9,9 +9,7 @@
 
 package org.eclipse.tracecompass.analysis.counters.ui;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -19,20 +17,16 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.analysis.counters.core.CounterAnalysis;
-import org.eclipse.tracecompass.analysis.counters.core.CounterDataProvider;
+import org.eclipse.tracecompass.analysis.counters.core.CompositeCounterDataProvider;
 import org.eclipse.tracecompass.internal.analysis.counters.ui.CounterTreeViewerEntry;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCounterQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfXYCompositeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ICheckboxTreeViewerListener;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
@@ -123,29 +117,8 @@ public final class CounterChartViewer extends TmfCommonXAxisChartViewer implemen
     @Override
     protected void initializeDataProvider() {
         ITmfTrace trace = getTrace();
-        ITmfXYDataProvider provider = new TmfXYCompositeDataProvider<>(createProviders(trace), CounterDataProvider.getTitle());
+        ITmfXYDataProvider provider = CompositeCounterDataProvider.create(trace);
         setDataProvider(provider);
-    }
-
-    /**
-     * Create a list of providers for all the traces in the experiment, or just a
-     * singleton if the trace is not a singleton.
-     *
-     * @param trace
-     *            the trace or experiment for which we need a provider
-     * @return A list of {@link CounterDataProvider} for all the traces in the
-     *         experiment which support the analysis
-     */
-    private static @NonNull List<CounterDataProvider> createProviders(@NonNull ITmfTrace trace) {
-        List<CounterDataProvider> dataProviders = new ArrayList<>();
-        for (ITmfTrace child : TmfTraceManager.getTraceSet(trace)) {
-            CounterAnalysis module = TmfTraceUtils.getAnalysisModuleOfClass(child, CounterAnalysis.class, CounterAnalysis.ID);
-            CounterDataProvider provider = CounterDataProvider.create(child, module);
-            if (provider != null) {
-                dataProviders.add(provider);
-            }
-        }
-        return dataProviders;
     }
 
     @Override
