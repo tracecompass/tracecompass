@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.analysis.os.linux.core.kernel;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -21,6 +22,7 @@ import java.util.TreeSet;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
@@ -224,6 +226,35 @@ public final class KernelThreadInformationProvider {
         } catch (AttributeNotFoundException | StateSystemDisposedException | TimeRangeException e) {
         }
         return Collections.EMPTY_LIST;
+    }
+
+    /**
+     * Get an iterator for the status intervals of a given thread in a time range
+     *
+     * @param module
+     *            The kernel analysis instance to run this method on
+     * @param threadId
+     *            The ID of the thread to get the intervals for
+     * @param start
+     *            The start time of the requested range
+     * @param end
+     *            The end time of the requested range
+     * @return The list of status intervals for this thread, an empty list is
+     *         returned if either the state system is {@code null} or the quark
+     *         is not found
+     * @since 2.4
+     */
+    public static Iterator<ITmfStateInterval> getStatusIntervalsForThread(KernelAnalysisModule module, Integer threadId, long start, long end) {
+        ITmfStateSystem ss = module.getStateSystem();
+        if (ss == null) {
+            return NonNullUtils.checkNotNull(Collections.emptyListIterator());
+        }
+
+        int threadQuark = ss.optQuarkAbsolute(Attributes.THREADS, threadId.toString());
+        if (threadQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+            return NonNullUtils.checkNotNull(Collections.emptyListIterator());
+        }
+        return new StateSystemUtils.QuarkIterator(ss, threadQuark, start, end - 1);
     }
 
 }
