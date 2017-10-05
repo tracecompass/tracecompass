@@ -808,11 +808,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     /**
-     * Gets the trace displayed in the view
-     *
-     * @return The trace
+     * @since 3.2
      */
-    protected ITmfTrace getTrace() {
+    @Override
+    public ITmfTrace getTrace() {
         return fTrace;
     }
 

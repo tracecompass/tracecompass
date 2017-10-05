@@ -320,7 +320,10 @@ public class Messages extends NLS {
 
     public static String TmfView_AlignViewsActionNameText;
     public static String TmfView_AlignViewsActionToolTipText;
-    public static String TmfView_NewTmfViewNameText;
+    public static String TmfView_NewViewActionPinnedNewInstanceText;
+    public static String TmfView_NewViewActionPinnedText;
+    public static String TmfView_NewViewActionText;
+    public static String TmfView_NewViewActionUnpinnedText;
     public static String TmfView_PinActionNameText;
     public static String TmfView_PinActionToolTipText;
     public static String TmfView_PinToActionText;

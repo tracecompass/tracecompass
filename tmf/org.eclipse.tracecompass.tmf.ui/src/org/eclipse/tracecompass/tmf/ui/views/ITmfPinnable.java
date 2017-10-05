@@ -26,4 +26,11 @@ public interface ITmfPinnable {
      *            The trace that the view should be pinned to, or null to unpin
      */
     void setPinned(@Nullable ITmfTrace trace);
+
+    /**
+     * Gets the trace displayed in the view.
+     *
+     * @return the trace
+     */
+    ITmfTrace getTrace();
 }

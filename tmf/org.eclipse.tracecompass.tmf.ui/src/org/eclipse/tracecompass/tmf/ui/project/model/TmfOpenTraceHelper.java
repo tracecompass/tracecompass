@@ -24,10 +24,12 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
@@ -360,38 +362,84 @@ public class TmfOpenTraceHelper {
             return;
         }
 
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                final ITmfTrace trace = openProjectElement(traceElement);
+        Job job = new OpenProjectElementJob(traceElement, file);
+        job.schedule();
+    }
 
-                if (trace == null) {
-                    return;
-                }
+    /**
+     * Job that creates a new trace instance for the specified project element and
+     * opens its associated editor.
+     *
+     * @since 3.2
+     */
+    public static class OpenProjectElementJob extends Job {
 
-                // Get the editor id from the extension point
-                String traceEditorId = traceElement.getEditorId();
-                final String editorId = (traceEditorId != null) ? traceEditorId : TmfEventsEditor.ID;
-                final IEditorInput editorInput = new TmfEditorInput(file, trace);
+        private final TmfCommonProjectElement fTraceElement;
+        private final IFile fFile;
+        private ITmfTrace fTrace = null;
 
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            activePage.openEditor(editorInput, editorId);
-                            IDE.setDefaultEditor(file, editorId);
-                            // editor should dispose the trace on close
-                        } catch (final PartInitException e) {
-                            TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
-                                    NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getTypeName()) + ENDL + ENDL + e.getMessage());
-                            Activator.getDefault().logError(NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getTypeName()) + ' ' + traceElement.getName());
-                            trace.dispose();
-                        }
-                    }
-                });
+        /**
+         * Constructor
+         *
+         * @param traceElement
+         *            the trace element
+         * @param file
+         *            the editor file
+         */
+        public OpenProjectElementJob(TmfCommonProjectElement traceElement, IFile file) {
+            super("Opening " + traceElement.getName()); //$NON-NLS-1$
+            setSystem(true);
+            this.fTraceElement = traceElement;
+            this.fFile = file;
+        }
+
+        @Override
+        public IStatus run(IProgressMonitor monitor) {
+
+            fTrace = openProjectElement(fTraceElement);
+            if (fTrace == null) {
+                return Status.OK_STATUS;
             }
-        };
-        thread.start();
+
+            // Get the editor id from the extension point
+            String traceEditorId = fTraceElement.getEditorId();
+            final String editorId = (traceEditorId != null) ? traceEditorId : TmfEventsEditor.ID;
+            final IEditorInput editorInput = new TmfEditorInput(fFile, fTrace);
+
+            Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+                    if (window == null) {
+                        return;
+                    }
+                    final IWorkbenchPage activePage = window.getActivePage();
+                    if (activePage == null) {
+                        return;
+                    }
+                    try {
+                        activePage.openEditor(editorInput, editorId);
+                        IDE.setDefaultEditor(fFile, editorId);
+                        // editor should dispose the trace on close
+                    } catch (final PartInitException e) {
+                        TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, fTraceElement.getTypeName()),
+                                NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, fTraceElement.getTypeName()) + ENDL + ENDL + e.getMessage());
+                        Activator.getDefault().logError(NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, fTraceElement.getTypeName()) + ' ' + fTraceElement.getName());
+                        fTrace.dispose();
+                    }
+                }
+            });
+            return Status.OK_STATUS;
+        }
+
+        /**
+         * Get the new trace instance.
+         *
+         * @return the new trace instance
+         */
+        public ITmfTrace getTrace() {
+            return fTrace;
+        }
     }
 
     /**

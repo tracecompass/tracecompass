@@ -14,20 +14,28 @@
 
 package org.eclipse.tracecompass.tmf.ui.views;
 
+import java.text.MessageFormat;
+import java.util.Set;
+
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuListener2;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
+import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.internal.tmf.ui.views.TimeAlignViewsAction;
 import org.eclipse.tracecompass.internal.tmf.ui.views.TmfAlignmentSynchronizer;
 import org.eclipse.tracecompass.tmf.core.component.ITmfComponent;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewSite;
@@ -228,12 +236,40 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
      * of the same type as the caller.
      */
     private void contributeNewViewActionToLocalMenu(IMenuManager menuManager) {
-        IAction newViewAction = new NewTmfViewAction(TmfView.this);
-
         if (!menuManager.isEmpty()) {
             menuManager.add(new Separator());
         }
-        menuManager.add(newViewAction);
+        if (this instanceof ITmfPinnable) {
+            MenuManager newViewMenu = new MenuManager(MessageFormat.format(Messages.TmfView_NewViewActionText, this.getTitle()));
+            newViewMenu.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NEW_VIEW));
+            newViewMenu.setRemoveAllWhenShown(true);
+            newViewMenu.addMenuListener(new IMenuListener2() {
+                @Override
+                public void menuAboutToShow(IMenuManager mgr) {
+                    Set<@NonNull ITmfTrace> openedTraces = TmfTraceManager.getInstance().getOpenedTraces();
+                    ITmfTrace activeTrace = ((ITmfPinnable) TmfView.this).getTrace();
+                    if (activeTrace != null) {
+                        mgr.add(new NewTmfViewAction(TmfView.this, activeTrace, true));
+                        mgr.add(new Separator());
+                    }
+                    for (ITmfTrace trace : openedTraces) {
+                        mgr.add(new NewTmfViewAction(TmfView.this, trace));
+                    }
+                    mgr.add(new Separator());
+                    mgr.add(new NewTmfViewAction(TmfView.this, null));
+                }
+
+                @Override
+                public void menuAboutToHide(IMenuManager manager) {
+                    /* Clear menu to release action references to trace instances */
+                    manager.removeAll();
+                }
+            });
+            menuManager.add(newViewMenu);
+        } else {
+            NewTmfViewAction action = new NewTmfViewAction(TmfView.this);
+            menuManager.add(action);
+        }
     }
 
     private static void contributeAlignViewsActionToLocalMenu(IMenuManager menuManager) {
