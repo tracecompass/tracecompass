@@ -121,14 +121,41 @@ public final class TmfTraceUtils {
     }
 
     /**
+     * Return the analysis modules that are of a given class for a host. The modules
+     * will be cast to the requested class. Only the modules for the specific host
+     * traces will be returned.
+     *
+     * @param hostId
+     *            The trace for which you want the modules, the children trace
+     *            modules are added as well.
+     * @param moduleClass
+     *            Returned modules must extend this class
+     * @return List of modules of class moduleClass
+     * @since 3.2
+     */
+    public static <T> Iterable<@NonNull T> getAnalysisModulesOfClass(String hostId, Class<T> moduleClass) {
+        Set<ITmfTrace> traces = TmfTraceManager.getInstance().getTracesForHost(hostId);
+        List<@NonNull T> modules = new ArrayList<>();
+        for (ITmfTrace trace : traces) {
+            Iterable<IAnalysisModule> analysisModules = trace.getAnalysisModules();
+            for (IAnalysisModule module : analysisModules) {
+                if (moduleClass.isAssignableFrom(module.getClass())) {
+                    modules.add(checkNotNull(moduleClass.cast(module)));
+                }
+            }
+        }
+        return modules;
+    }
+
+    /**
      * Returns all the aspects of a specified type.
      *
      * @param trace
      *            The trace for which you want the event aspects
      * @param aspectClass
      *            The class of the aspect(s) to resolve
-     * @return An {@link Iterable<ITmfEventAspect>} containing all the aspects of
-     *         the type aspectClass
+     * @return An {@link Iterable} containing all the aspects of the type
+     *         aspectClass
      * @since 3.1
      */
     public static Iterable<ITmfEventAspect<?>> getEventAspects(ITmfTrace trace, Class<? extends ITmfEventAspect<?>> aspectClass) {

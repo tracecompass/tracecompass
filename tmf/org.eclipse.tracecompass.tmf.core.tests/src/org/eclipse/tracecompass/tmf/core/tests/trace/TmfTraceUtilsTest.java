@@ -35,6 +35,7 @@ import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestAnalysis;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
@@ -151,17 +152,11 @@ public class TmfTraceUtilsTest {
 
         Iterable<TestAnalysis> testModules = TmfTraceUtils.getAnalysisModulesOfClass(trace, TestAnalysis.class);
         assertTrue(testModules.iterator().hasNext());
-
-        int count = 0;
-        for (TestAnalysis module : testModules) {
-            assertNotNull(module);
-            count++;
-        }
         /*
          * FIXME: The exact count depends on the context the test is run (full test
          * suite or this file only), but there must be at least 2 modules
          */
-        assertTrue(count >= 2);
+        assertTrue(Iterables.size(testModules) >= 2);
 
         TestAnalysis module = TmfTraceUtils.getAnalysisModuleOfClass(trace, TestAnalysis.class, AnalysisManagerTest.MODULE_PARAM);
         assertNotNull(module);
@@ -169,6 +164,31 @@ public class TmfTraceUtilsTest {
         assertNotNull(traceModule);
         assertEquals(module, traceModule);
 
+    }
+
+    /**
+     * Test the {@link TmfTraceUtils#getAnalysisModuleOfClass} method.
+     */
+    @Test
+    public void testGetModulesByClassForHost() {
+        TmfTrace trace = fTrace;
+        assertNotNull(trace);
+
+        /*
+         * Open the trace, the modules should be populated and make sure the signal is
+         * received by the trace manager
+         */
+        TmfTraceOpenedSignal signal = new TmfTraceOpenedSignal(this, trace, null);
+        trace.traceOpened(signal);
+        TmfTraceManager.getInstance().traceOpened(signal);
+
+        Iterable<TestAnalysis> testModules = TmfTraceUtils.getAnalysisModulesOfClass(trace.getHostId(), TestAnalysis.class);
+        assertTrue(testModules.iterator().hasNext());
+        /*
+         * FIXME: The exact count depends on the context the test is run (full test
+         * suite or this file only), but there must be at least 2 modules
+         */
+        assertTrue(Iterables.size(testModules) >= 2);
     }
 
     /**
