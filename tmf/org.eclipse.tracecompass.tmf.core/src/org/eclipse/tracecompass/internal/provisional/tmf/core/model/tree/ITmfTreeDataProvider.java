@@ -24,7 +24,6 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelR
  * @param <T>
  *            Tree model extending {@link ITmfTreeDataModel}
  */
-@FunctionalInterface
 public interface ITmfTreeDataProvider<T extends ITmfTreeDataModel> {
 
     /**
@@ -40,4 +39,11 @@ public interface ITmfTreeDataProvider<T extends ITmfTreeDataModel> {
      * @return A {@link TmfModelResponse} instance
      */
     TmfModelResponse<List<T>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor);
+
+    /**
+     * This method return the extension point ID of this provider
+     *
+     * @return The ID
+     */
+    String getId();
 }

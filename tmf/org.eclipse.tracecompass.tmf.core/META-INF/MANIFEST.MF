@@ -45,6 +45,7 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.core.model;x-f
  org.eclipse.tracecompass.tmf.core.analysis.requirements,
  org.eclipse.tracecompass.tmf.core.callstack,
  org.eclipse.tracecompass.tmf.core.component,
+ org.eclipse.tracecompass.tmf.core.dataprovider,
  org.eclipse.tracecompass.tmf.core.event,
  org.eclipse.tracecompass.tmf.core.event.aspect,
  org.eclipse.tracecompass.tmf.core.event.collapse,
