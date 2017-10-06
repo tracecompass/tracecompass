@@ -105,7 +105,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             int value = event.getValue();
 
             if (entry.getType() == Type.CPU) {
-                return STATE_MAP.getOrDefault(value, STATE_MAP.get(StateValues.PROCESS_STATUS_UNKNOWN));
+                return STATE_MAP.getOrDefault(value, STATE_MAP.get(StateValues.CPU_STATUS_IDLE));
             } else if (entry.getType() == Type.IRQ) {
                 return STATE_MAP.get(StateValues.CPU_STATUS_IRQ);
             } else if (entry.getType() == Type.SOFT_IRQ) {

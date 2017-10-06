@@ -12,7 +12,7 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers;
 
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -56,12 +56,11 @@ public class SchedWakeupHandler extends KernelEventHandler {
          * Assign it to the "wait for cpu" state, but only if it was not already
          * running.
          */
-        int status = ss.queryOngoingState(threadNode).unboxInt();
+        ProcessStatus status = ProcessStatus.getStatusFromStateValue(ss.queryOngoingState(threadNode));
         ITmfStateValue value = null;
         long timestamp = KernelEventHandlerUtils.getTimestamp(event);
-        if (status != StateValues.PROCESS_STATUS_RUN_SYSCALL &&
-                status != StateValues.PROCESS_STATUS_RUN_USERMODE) {
-            value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
+        if (status != ProcessStatus.RUN && status != ProcessStatus.RUN_SYTEMCALL) {
+            value = ProcessStatus.WAIT_CPU.getStateValue();
             ss.modifyAttribute(timestamp, value, threadNode);
         }
 

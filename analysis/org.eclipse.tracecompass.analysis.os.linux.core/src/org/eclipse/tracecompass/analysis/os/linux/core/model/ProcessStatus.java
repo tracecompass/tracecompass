@@ -10,7 +10,7 @@
 package org.eclipse.tracecompass.analysis.os.linux.core.model;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.LinuxValues;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 

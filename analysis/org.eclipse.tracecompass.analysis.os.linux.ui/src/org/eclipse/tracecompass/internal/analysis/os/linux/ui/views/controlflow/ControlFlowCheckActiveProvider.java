@@ -13,7 +13,7 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -115,10 +115,10 @@ public class ControlFlowCheckActiveProvider implements ITimeGraphEntryActiveProv
     }
 
     private static boolean isIntervalInStateActive (ITmfStateInterval ival) {
-        int value = ival.getStateValue().unboxInt();
+        ProcessStatus value = ProcessStatus.getStatusFromStateValue(ival.getStateValue());
         /* An entry is only active when running */
-        if (value == StateValues.PROCESS_STATUS_RUN_USERMODE || value == StateValues.PROCESS_STATUS_RUN_SYSCALL ||
-                value == StateValues.PROCESS_STATUS_INTERRUPTED) {
+        if (value == ProcessStatus.RUN || value == ProcessStatus.RUN_SYTEMCALL ||
+                value == ProcessStatus.INTERRUPTED) {
             return true;
         }
 

@@ -12,7 +12,7 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers;
 
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -73,7 +73,7 @@ public class ProcessForkHandler extends KernelEventHandler {
         ss.modifyAttribute(timestamp, value, quark);
 
         /* Set the new process' status */
-        value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
+        value = ProcessStatus.WAIT_CPU.getStateValue();
         ss.modifyAttribute(timestamp, value, childTidNode);
 
         /* Set the process' syscall name, to be the same as the parent's */

@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -50,7 +51,7 @@ public class SysEntryHandler extends KernelEventHandler {
         ss.modifyAttribute(timestamp, value, quark);
 
         /* Put the process in system call mode */
-        value = StateValues.PROCESS_STATUS_RUN_SYSCALL_VALUE;
+        value = ProcessStatus.RUN_SYTEMCALL.getStateValue();
         ss.modifyAttribute(timestamp, value, currentThreadNode);
 
         /* Put the CPU in system call (kernel) mode */

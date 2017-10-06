@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -55,7 +56,7 @@ public class IPIEntryHandler extends KernelEventHandler {
 
         /* Change the status of the running process to interrupted */
         quark = KernelEventHandlerUtils.getCurrentThreadNode(cpu, ss);
-        value = StateValues.PROCESS_STATUS_INTERRUPTED_VALUE;
+        value = ProcessStatus.INTERRUPTED.getStateValue();
         ss.modifyAttribute(timestamp, value, quark);
 
         /* Change the status of the CPU to interrupted */

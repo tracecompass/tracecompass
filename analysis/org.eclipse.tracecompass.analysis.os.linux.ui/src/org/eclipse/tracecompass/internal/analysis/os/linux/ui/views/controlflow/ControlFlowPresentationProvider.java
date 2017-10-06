@@ -22,7 +22,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
@@ -74,13 +74,13 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         /*
          * ADD STATE MAPPING HERE
          */
-        builder.put(StateValues.PROCESS_STATUS_UNKNOWN, createState(LinuxStyle.UNKNOWN));
-        builder.put(StateValues.PROCESS_STATUS_RUN_USERMODE, createState(LinuxStyle.USERMODE));
-        builder.put(StateValues.PROCESS_STATUS_RUN_SYSCALL, createState(LinuxStyle.SYSCALL));
-        builder.put(StateValues.PROCESS_STATUS_INTERRUPTED, createState(LinuxStyle.INTERRUPTED));
-        builder.put(StateValues.PROCESS_STATUS_WAIT_BLOCKED, createState(LinuxStyle.WAIT_BLOCKED));
-        builder.put(StateValues.PROCESS_STATUS_WAIT_FOR_CPU, createState(LinuxStyle.WAIT_FOR_CPU));
-        builder.put(StateValues.PROCESS_STATUS_WAIT_UNKNOWN, createState(LinuxStyle.WAIT_UNKNOWN));
+        builder.put(ProcessStatus.UNKNOWN.getStateValue().unboxInt(), createState(LinuxStyle.UNKNOWN));
+        builder.put(ProcessStatus.RUN.getStateValue().unboxInt(), createState(LinuxStyle.USERMODE));
+        builder.put(ProcessStatus.RUN_SYTEMCALL.getStateValue().unboxInt(), createState(LinuxStyle.SYSCALL));
+        builder.put(ProcessStatus.INTERRUPTED.getStateValue().unboxInt(), createState(LinuxStyle.INTERRUPTED));
+        builder.put(ProcessStatus.WAIT_BLOCKED.getStateValue().unboxInt(), createState(LinuxStyle.WAIT_BLOCKED));
+        builder.put(ProcessStatus.WAIT_CPU.getStateValue().unboxInt(), createState(LinuxStyle.WAIT_FOR_CPU));
+        builder.put(ProcessStatus.WAIT_UNKNOWN.getStateValue().unboxInt(), createState(LinuxStyle.WAIT_UNKNOWN));
         /*
          * DO NOT MODIFY AFTER
          */
@@ -131,7 +131,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
     }
 
     private static StateItem getMatchingState(int status) {
-        return STATE_MAP.getOrDefault(status, STATE_MAP.get(StateValues.PROCESS_STATUS_WAIT_UNKNOWN));
+        return STATE_MAP.getOrDefault(status, STATE_MAP.get(ProcessStatus.WAIT_UNKNOWN.getStateValue().unboxInt()));
     }
 
     @Override
@@ -171,7 +171,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
             /* Ignored */
         }
         int status = ((TimeEvent) event).getValue();
-        if (status == StateValues.PROCESS_STATUS_RUN_SYSCALL) {
+        if (status == ProcessStatus.RUN_SYTEMCALL.getStateValue().unboxInt()) {
             int syscallQuark = ssq.optQuarkRelative(entry.getThreadQuark(), Attributes.SYSTEM_CALL);
             if (syscallQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
                 return retMap;
@@ -211,7 +211,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         }
         int status = ((TimeEvent) event).getValue();
 
-        if (status != StateValues.PROCESS_STATUS_RUN_SYSCALL) {
+        if (status != ProcessStatus.RUN_SYTEMCALL.getStateValue().unboxInt()) {
             return;
         }
         int syscallQuark = ss.optQuarkRelative(entry.getThreadQuark(), Attributes.SYSTEM_CALL);

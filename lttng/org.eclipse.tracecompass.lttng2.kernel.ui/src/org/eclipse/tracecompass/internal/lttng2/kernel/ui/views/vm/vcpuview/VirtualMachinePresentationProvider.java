@@ -16,7 +16,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.VcpuStateValues;
 import org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.vm.vcpuview.VirtualMachineCommon.Type;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
@@ -31,6 +31,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
  *
  * @author Mohamad Gebai
  */
+@SuppressWarnings("restriction")
 public class VirtualMachinePresentationProvider extends TimeGraphPresentationProvider {
 
     private static final int ALPHA = 70;

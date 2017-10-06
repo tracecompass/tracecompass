@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  ******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.core.kernel;
+package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel;
 
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
@@ -20,64 +20,101 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
  * use integer values whenever possible, since those take much less space in the
  * history file.
  *
+ * Here is the standard Linux Process model. Each state corresponds to a status
+ * in the state system.
+ *
+ * <pre>
+ * @startuml
+ *
+ * state Preempted {
+ *    state "wait for cpu" as wcpu
+ *    state "wait for fork"
+ *    state "wait for blocked" as wblock
+ *    wblock -> wcpu : sched_switch
+ * }
+ *
+ * state Running {
+ *   user --> kernel : syscall
+ *   user --> kernel : interrupt
+ *   kernel --> user : return
+ *   kernel --> kernel : interrupt
+ * }
+ *
+ * [*] --> created : fork()
+ *
+ * created -> Preempted
+ *
+ * kernel --> zombie : exit()
+ *
+ * kernel --> sleep : sleep
+ * sleep --> Preempted : wakeup
+ * kernel --> Preempted : preempt
+ * Preempted --> user : return
+ *
+ * @enduml
+ * </pre>
+ *
  * @author Alexandre Montplaisir
- * @since 2.0
  */
-@SuppressWarnings("javadoc")
 public interface StateValues {
 
-    /* Process status */
-    @Deprecated
+    /**
+     * Unknown state.
+     */
     int PROCESS_STATUS_UNKNOWN = 0;
-    @Deprecated
+    /**
+     * Wait blocked -> sleep
+     */
     int PROCESS_STATUS_WAIT_BLOCKED = 1;
-    @Deprecated
+    /**
+     * Run Usermode -> user
+     */
     int PROCESS_STATUS_RUN_USERMODE = 2;
-    @Deprecated
+    /**
+     * Run syscall -> kernel
+     */
     int PROCESS_STATUS_RUN_SYSCALL = 3;
-    @Deprecated
+    /**
+     * Interrupted -> Part of the CPU context
+     */
     int PROCESS_STATUS_INTERRUPTED = 4;
-    @Deprecated
+    /**
+     * Waiting for CPU -> Preempted
+     */
     int PROCESS_STATUS_WAIT_FOR_CPU = 5;
-    @Deprecated
+    /**
+     * Unknown wait state -> not part of the state system.
+     */
     int PROCESS_STATUS_WAIT_UNKNOWN = 6;
 
-    @Deprecated
+    /**
+     * Unknown state {@link StateValues#PROCESS_STATUS_UNKNOWN}
+     */
     ITmfStateValue PROCESS_STATUS_UNKNOWN_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_UNKNOWN);
-    @Deprecated
+    /**
+     * Wait for unknown reason state value
+     * {@link StateValues#PROCESS_STATUS_WAIT_UNKNOWN}
+     */
     ITmfStateValue PROCESS_STATUS_WAIT_UNKNOWN_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_WAIT_UNKNOWN);
-    @Deprecated
+    /**
+     * Wait blocked state value {@link StateValues#PROCESS_STATUS_WAIT_BLOCKED}
+     */
     ITmfStateValue PROCESS_STATUS_WAIT_BLOCKED_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_WAIT_BLOCKED);
-    @Deprecated
+    /**
+     * Run in usermode state value {@link StateValues#PROCESS_STATUS_RUN_USERMODE}
+     */
     ITmfStateValue PROCESS_STATUS_RUN_USERMODE_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_RUN_USERMODE);
-    @Deprecated
+    /**
+     * Run in kernel mode state value {@link StateValues#PROCESS_STATUS_RUN_SYSCALL}
+     */
     ITmfStateValue PROCESS_STATUS_RUN_SYSCALL_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_RUN_SYSCALL);
-    @Deprecated
+    /**
+     * Interrupted state value {@link StateValues#PROCESS_STATUS_INTERRUPTED}
+     */
     ITmfStateValue PROCESS_STATUS_INTERRUPTED_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_INTERRUPTED);
-    @Deprecated
+    /**
+     * Wait for CPU state value {@link StateValues#PROCESS_STATUS_WAIT_FOR_CPU}
+     */
     ITmfStateValue PROCESS_STATUS_WAIT_FOR_CPU_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_WAIT_FOR_CPU);
 
-    /* CPU Status */
-    int CPU_STATUS_IDLE = 0;
-    /**
-     * Soft IRQ raised, could happen in the CPU attribute but should not since
-     * this means that the CPU went idle when a softirq was raised.
-     */
-    int CPU_STATUS_SOFT_IRQ_RAISED = (1 << 0);
-    int CPU_STATUS_RUN_USERMODE = (1 << 1);
-    int CPU_STATUS_RUN_SYSCALL = (1 << 2);
-    int CPU_STATUS_SOFTIRQ = (1 << 3);
-    int CPU_STATUS_IRQ = (1 << 4);
-
-    ITmfStateValue CPU_STATUS_IDLE_VALUE = TmfStateValue.newValueInt(CPU_STATUS_IDLE);
-    ITmfStateValue CPU_STATUS_RUN_USERMODE_VALUE = TmfStateValue.newValueInt(CPU_STATUS_RUN_USERMODE);
-    ITmfStateValue CPU_STATUS_RUN_SYSCALL_VALUE = TmfStateValue.newValueInt(CPU_STATUS_RUN_SYSCALL);
-    ITmfStateValue CPU_STATUS_IRQ_VALUE = TmfStateValue.newValueInt(CPU_STATUS_IRQ);
-    ITmfStateValue CPU_STATUS_SOFTIRQ_VALUE = TmfStateValue.newValueInt(CPU_STATUS_SOFTIRQ);
-
-    /** Soft IRQ is raised, CPU is in user mode */
-    ITmfStateValue SOFT_IRQ_RAISED_VALUE = TmfStateValue.newValueInt(CPU_STATUS_SOFT_IRQ_RAISED);
-
-    /** If the softirq is running and another is raised at the same time. */
-    ITmfStateValue SOFT_IRQ_RAISED_RUNNING_VALUE = TmfStateValue.newValueInt(CPU_STATUS_SOFT_IRQ_RAISED | CPU_STATUS_SOFTIRQ);
 }
