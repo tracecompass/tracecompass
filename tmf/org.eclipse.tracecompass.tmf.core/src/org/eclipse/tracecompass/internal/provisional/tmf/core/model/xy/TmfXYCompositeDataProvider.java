@@ -16,9 +16,12 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -33,10 +36,12 @@ import com.google.common.collect.ImmutableMap;
  *            encapsulate
  * @author Yonni Chen
  */
-public class TmfXYCompositeDataProvider<E extends ITmfXYDataProvider> implements ITmfXYDataProvider {
+public class TmfXYCompositeDataProvider<E extends ITmfXYDataProvider, T extends ITmfTreeDataModel>
+    implements ITmfXYDataProvider, ITmfTreeDataProvider<T> {
 
     private final List<E> fProviders;
     private final String fTitle;
+    private final String fID;
 
     /**
      * Constructor
@@ -46,10 +51,12 @@ public class TmfXYCompositeDataProvider<E extends ITmfXYDataProvider> implements
      *            should be associated to a different trace.
      * @param title
      *            Chart's title
+     * @param id the provider's ID
      */
-    public TmfXYCompositeDataProvider(List<E> providers, String title) {
+    public TmfXYCompositeDataProvider(List<E> providers, String title, String id) {
         fProviders = providers;
         fTitle = title;
+        fID = id;
     }
 
     @Override
@@ -70,5 +77,33 @@ public class TmfXYCompositeDataProvider<E extends ITmfXYDataProvider> implements
             }
         }
         return TmfCommonXAxisResponseFactory.create(fTitle, filter.getTimesRequested(), series.build(), isComplete); // $NON-NLS-1$
+    }
+
+    @Override
+    public TmfModelResponse<List<T>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        boolean isComplete = true;
+        ImmutableList.Builder<T> series = ImmutableList.builder();
+
+        for (E dataProvider : fProviders) {
+            TmfModelResponse<List<T>> response = ((ITmfTreeDataProvider<T>) dataProvider).fetchTree(filter, monitor);
+            isComplete &= response.getStatus() == ITmfResponse.Status.COMPLETED;
+            List<T> model = response.getModel();
+            if (model != null) {
+                series.addAll(model);
+            }
+
+            if (monitor != null && monitor.isCanceled()) {
+                return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
+            }
+        }
+        if (isComplete) {
+            return new TmfModelResponse<>(series.build(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        }
+        return new TmfModelResponse<>(series.build(), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
+    }
+
+    @Override
+    public String getId() {
+        return fID;
     }
 }

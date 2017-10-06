@@ -10,32 +10,33 @@
 package org.eclipse.tracecompass.analysis.counters.ui;
 
 import java.util.Collection;
-import java.util.UUID;
+import java.util.Collections;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.analysis.counters.core.CompositeCounterDataProvider;
-import org.eclipse.tracecompass.internal.analysis.counters.ui.CounterTreeViewerEntry;
+import org.eclipse.tracecompass.analysis.counters.core.CounterDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCounterQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfXYCompositeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ICheckboxTreeViewerListener;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.swtchart.Chart;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.Lists;
 
 /**
  * XY line chart which displays the counters data.
@@ -48,7 +49,7 @@ public final class CounterChartViewer extends TmfCommonXAxisChartViewer implemen
     private static final int DEFAULT_SERIES_WIDTH = 2;
 
     private boolean fIsCumulative = false;
-    private Multimap<UUID, Integer> fSelectedQuarks = HashMultimap.create();
+    private Collection<Long> fSelectedIds = Collections.emptyList();
 
     /**
      * Constructor
@@ -84,10 +85,8 @@ public final class CounterChartViewer extends TmfCommonXAxisChartViewer implemen
         cancelUpdate();
         clearContent();
 
-        Multimap<UUID, Integer> selected = HashMultimap.create();
-        Iterable<CounterTreeViewerEntry> counterEntries = Iterables.filter(entries, CounterTreeViewerEntry.class);
-        counterEntries.forEach(c -> selected.put(c.getTraceID(), c.getQuark()));
-        fSelectedQuarks = selected;
+        Iterable<TmfGenericTreeEntry> counterEntries = Iterables.filter(entries, TmfGenericTreeEntry.class);
+        fSelectedIds = Lists.newArrayList(Iterables.transform(counterEntries, e -> e.getModel().getId()));
 
         updateContent();
     }
@@ -97,27 +96,27 @@ public final class CounterChartViewer extends TmfCommonXAxisChartViewer implemen
     public void traceSelected(@Nullable TmfTraceSelectedSignal signal) {
         super.traceSelected(signal);
         clearContent();
-        fSelectedQuarks.clear();
+        fSelectedIds.clear();
     }
 
     @TmfSignalHandler
     @Override
     public void traceClosed(@Nullable TmfTraceClosedSignal signal) {
         if (signal != null && signal.getTrace().equals(getTrace())) {
-            fSelectedQuarks.clear();
+            fSelectedIds.clear();
         }
         super.traceClosed(signal);
     }
 
     @Override
     protected TimeQueryFilter createQueryFilter(long start, long end, int nb) {
-        return new SelectedCounterQueryFilter(start, end, nb, fSelectedQuarks, fIsCumulative);
+        return new SelectedCounterQueryFilter(start, end, nb, fSelectedIds, fIsCumulative);
     }
 
     @Override
     protected void initializeDataProvider() {
         ITmfTrace trace = getTrace();
-        ITmfXYDataProvider provider = CompositeCounterDataProvider.create(trace);
+        ITmfXYDataProvider provider = DataProviderManager.getInstance().getDataProvider(trace, CounterDataProvider.ID, TmfXYCompositeDataProvider.class);
         setDataProvider(provider);
     }
 

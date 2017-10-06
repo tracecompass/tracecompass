@@ -14,9 +14,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Objects;
-import java.util.UUID;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -27,9 +33,11 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatus
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCounterQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -54,14 +62,24 @@ import com.google.common.primitives.Longs;
  * @since 1.1
  */
 @SuppressWarnings("restriction")
-public class CounterDataProvider extends AbstractStateSystemAnalysisDataProvider implements ITmfXYDataProvider {
+public class CounterDataProvider extends AbstractStateSystemAnalysisDataProvider implements ITmfXYDataProvider, ITmfTreeDataProvider<CounterEntryModel> {
+
+    /**
+     * This data provider's extension point ID
+     */
+    public static final String ID = "org.eclipse.tracecompass.analysis.counters.core.CounterDataProvider"; //$NON-NLS-1$
 
     /**
      * Chart's title
      */
     private static final String TITLE = Objects.requireNonNull(Messages.CounterDataProvider_ChartTitle);
 
+    private static final AtomicLong COUNTER_ENTRY_ID = new AtomicLong();
+
     private final CounterAnalysis fModule;
+    private final Map<Long, Integer> fIdToQuark = new HashMap<>();
+    private final Map<Integer, CounterEntryModel> fQuarkToEntry = new LinkedHashMap<>();
+    private @Nullable TmfModelResponse<List<CounterEntryModel>> fCached = null;
 
     /**
      * Create an instance of {@link CounterDataProvider}. Returns a null instance if
@@ -95,13 +113,85 @@ public class CounterDataProvider extends AbstractStateSystemAnalysisDataProvider
     }
 
     @Override
+    public TmfModelResponse<List<CounterEntryModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        if (fCached != null) {
+            return fCached;
+        }
+        // FIXME remove this when the tree viewer supports updates.
+        fModule.waitForCompletion();
+        ITmfStateSystem ss = fModule.getStateSystem();
+        if (ss == null) {
+            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
+        }
+
+        CounterEntryModel trace = fQuarkToEntry.get(-1);
+        if (trace == null) {
+            trace = new CounterEntryModel(COUNTER_ENTRY_ID.getAndIncrement(), -1, getTrace().getName(), null);
+            fQuarkToEntry.put(-1, trace);
+        }
+
+        addTreeViewerBranch(ss, trace, CounterAnalysis.GROUPED_COUNTER_ASPECTS_ATTRIB);
+        addTreeViewerBranch(ss, trace, CounterAnalysis.UNGROUPED_COUNTER_ASPECTS_ATTRIB);
+
+        TmfModelResponse<List<CounterEntryModel>> response = new TmfModelResponse<>(new ArrayList<>(fQuarkToEntry.values()), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        if (ss.waitUntilBuilt(0)) {
+            fCached = response;
+        }
+        return response;
+    }
+
+    private void addTreeViewerBranch(ITmfStateSystem stateSystem, CounterEntryModel rootBranch, String branchName) {
+        int quark = stateSystem.optQuarkAbsolute(branchName);
+        if (quark != ITmfStateSystem.INVALID_ATTRIBUTE && !stateSystem.getSubAttributes(quark, false).isEmpty()) {
+            CounterEntryModel branch = fQuarkToEntry.get(quark);
+            if (branch == null) {
+                branch = new CounterEntryModel(COUNTER_ENTRY_ID.getAndIncrement(), rootBranch.getId(), branchName, null);
+                fQuarkToEntry.put(quark, branch);
+            }
+            addTreeViewerEntries(stateSystem, branch, quark);
+        }
+    }
+
+    /**
+     * Recursively add all child entries of a parent branch from the state system.
+     */
+    private void addTreeViewerEntries(ITmfStateSystem ss, CounterEntryModel parentBranch, int quark) {
+        for (int childQuark : ss.getSubAttributes(quark, false)) {
+            CounterEntryModel childBranch = fQuarkToEntry.get(childQuark);
+            if (childBranch == null) {
+                long id = COUNTER_ENTRY_ID.getAndIncrement();
+                if (ss.getSubAttributes(childQuark, false).isEmpty()) {
+                    String fullPath = getTrace().getName() + '/' + ss.getFullAttributePath(childQuark);
+                    fIdToQuark.put(id, childQuark);
+                    childBranch = new CounterEntryModel(id, parentBranch.getId(), ss.getAttributeName(childQuark), fullPath);
+                } else {
+                    childBranch = new CounterEntryModel(id, parentBranch.getId(), ss.getAttributeName(childQuark), null);
+                }
+                fQuarkToEntry.put(childQuark, childBranch);
+            }
+
+            addTreeViewerEntries(ss, childBranch, childQuark);
+        }
+    }
+
+    @Override
     public TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         if (filter instanceof SelectedCounterQueryFilter) {
             SelectedCounterQueryFilter selection = (SelectedCounterQueryFilter) filter;
-            UUID traceUUID = Objects.requireNonNull(getTrace().getUUID());
-            return internalFetch(selection.getSelectedItems().get(traceUUID), selection, monitor);
+            return internalFetch(getSelectedQuarks(selection), selection, monitor);
         }
         return TmfCommonXAxisResponseFactory.create(TITLE, filter.getTimesRequested(), Collections.emptyMap(), true);
+    }
+
+    private Collection<Integer> getSelectedQuarks(SelectedCounterQueryFilter filter) {
+        Set<Integer> quarks = new HashSet<>();
+        for (Long selectedItem : filter.getSelectedItems()) {
+            Integer quark = fIdToQuark.get(selectedItem);
+            if (quark != null) {
+                quarks.add(quark);
+            }
+        }
+        return quarks;
     }
 
     private TmfModelResponse<ITmfCommonXAxisModel> internalFetch(Collection<Integer> selectedQuarks, SelectedCounterQueryFilter filter, @Nullable IProgressMonitor monitor) {
@@ -226,5 +316,10 @@ public class CounterDataProvider extends AbstractStateSystemAnalysisDataProvider
      */
     public static String getTitle() {
         return TITLE;
+    }
+
+    @Override
+    public String getId() {
+        return ID;
     }
 }

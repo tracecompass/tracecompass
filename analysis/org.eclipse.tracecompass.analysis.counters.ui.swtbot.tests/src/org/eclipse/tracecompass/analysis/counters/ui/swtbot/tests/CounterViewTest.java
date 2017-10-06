@@ -69,7 +69,7 @@ public class CounterViewTest extends XYDataProviderBaseTest {
 
         // Check all elements of the tree
         root.check();
-        assertTrue(root.isChecked());
+        WaitUtils.waitUntil(SWTBotTreeItem::isChecked, root, "Root entry was not checked");
         assertTrue(counter.isChecked());
         assertFalse(root.isGrayed());
         assertFalse(counter.isGrayed());

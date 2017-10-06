@@ -9,10 +9,9 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;
 
-import java.util.UUID;
+import java.util.Collection;
 
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.ImmutableList;
 
 /**
  * This represents a specialized query filter used by some data providers. In
@@ -22,13 +21,13 @@ import com.google.common.collect.Multimap;
  * @author Yonni Chen
  * @since 3.1
  */
-public class SelectedCounterQueryFilter extends TimeQueryFilter implements ICumulativeQueryFilter, IMultipleSelectionQueryFilter<Multimap<UUID, Integer>> {
+public class SelectedCounterQueryFilter extends TimeQueryFilter implements ICumulativeQueryFilter, IMultipleSelectionQueryFilter<Collection<Long>> {
 
     /*
      * The set of selected quarks would be applied to a certain trace. We use
      * trace's UUID to identify trace
      */
-    private final Multimap<UUID, Integer> fSelectedQuarks;
+    private final Collection<Long> fSelectedIds;
     private final boolean fIsCumulative;
 
     /**
@@ -42,15 +41,15 @@ public class SelectedCounterQueryFilter extends TimeQueryFilter implements ICumu
      *            The ending value
      * @param n
      *            The number of entries
-     * @param quark
-     *            The selected quarks
+     * @param ids
+     *            The selected IDs
      * @param isCumulative
      *            To know if we want to fetch model as cumulative or differential.
      *            Give true if cumulative, false either
      */
-    public SelectedCounterQueryFilter(long start, long end, int n, Multimap<UUID, Integer> quark, boolean isCumulative) {
+    public SelectedCounterQueryFilter(long start, long end, int n, Collection<Long> ids, boolean isCumulative) {
         super(start, end, n);
-        fSelectedQuarks = ImmutableMultimap.copyOf(quark);
+        fSelectedIds = ImmutableList.copyOf(ids);
         fIsCumulative = isCumulative;
     }
 
@@ -60,8 +59,8 @@ public class SelectedCounterQueryFilter extends TimeQueryFilter implements ICumu
      * @return A set of quarks
      */
     @Override
-    public Multimap<UUID, Integer> getSelectedItems() {
-        return fSelectedQuarks;
+    public Collection<Long> getSelectedItems() {
+        return fSelectedIds;
     }
 
     @Override
