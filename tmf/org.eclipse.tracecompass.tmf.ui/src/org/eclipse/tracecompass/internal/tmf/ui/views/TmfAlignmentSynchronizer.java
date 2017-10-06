@@ -316,7 +316,7 @@ public class TmfAlignmentSynchronizer {
         synchronized(fPendingOperations) {
             fCurrentTask.cancel();
             for (AlignmentOperation pendingOperation : fPendingOperations) {
-                if (isDisposedView(pendingOperation.fView) || isSameAlignment(operation, pendingOperation)) {
+                if (!isDisposedView(pendingOperation.fView) && isSameAlignment(operation, pendingOperation)) {
                     fPendingOperations.remove(pendingOperation);
                     break;
                 }
