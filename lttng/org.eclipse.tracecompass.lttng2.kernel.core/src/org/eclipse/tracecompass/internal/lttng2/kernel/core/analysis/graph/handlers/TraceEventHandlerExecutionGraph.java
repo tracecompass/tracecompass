@@ -167,7 +167,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
     private static EdgeType resolveProcessStatus(ProcessStatus status) {
         EdgeType ret = EdgeType.UNKNOWN;
         switch (status) {
-        case DEAD:
+        case NOT_ALIVE:
             break;
         case EXIT:
         case RUN:
@@ -238,7 +238,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         case WAIT_BLOCKED:
             waitBlocked(event, graph, host, cpu, eventLayout, system, ts, target, current);
             break;
-        case DEAD:
+        case NOT_ALIVE:
         case EXIT:
         case RUN:
         case UNKNOWN:

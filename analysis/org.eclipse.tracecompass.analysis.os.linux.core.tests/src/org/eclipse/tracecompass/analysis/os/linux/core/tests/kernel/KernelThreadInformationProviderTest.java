@@ -29,12 +29,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelThreadInformationProvider;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.LinuxTestCase;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.kernel.KernelAnalysisTestFactory;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -230,18 +228,18 @@ public class KernelThreadInformationProviderTest {
 
     }
 
-    private static void testIntervals(String info, List<ITmfStateInterval> intervals, ITmfStateValue[] values) {
+    private static void testIntervals(String info, List<ITmfStateInterval> intervals, ProcessStatus[] values) {
         assertEquals(info + " interval count", values.length, intervals.size());
         for (int i = 0; i < values.length; i++) {
-            assertEquals(info + " interval " + i, values[i], intervals.get(i).getStateValue());
+            assertEquals(info + " interval " + i, values[i], ProcessStatus.getStatusFromStateValue(intervals.get(i).getStateValue()));
         }
     }
 
-    private static void testIterator(String info, Iterator<ITmfStateInterval> intervals, ITmfStateValue[] values) {
+    private static void testIterator(String info, Iterator<ITmfStateInterval> intervals, ProcessStatus[] values) {
         for (int i = 0; i < values.length; i++) {
             assertTrue(intervals.hasNext());
             ITmfStateInterval interval = intervals.next();
-            assertEquals(info + " interval " + i, values[i], interval.getStateValue());
+            assertEquals(info + " interval " + i, values[i], ProcessStatus.getStatusFromStateValue(interval.getStateValue()));
         }
         assertFalse(intervals.hasNext());
     }
@@ -274,37 +272,37 @@ public class KernelThreadInformationProviderTest {
         assertTrue(intervals.isEmpty());
 
         /* Check different time ranges and resolutions */
-        ITmfStateValue[] values = { TmfStateValue.nullValue(), StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE,
-                StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE, StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE,
-                StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE };
+        ProcessStatus[] values = { ProcessStatus.NOT_ALIVE, ProcessStatus.WAIT_CPU,
+                ProcessStatus.RUN, ProcessStatus.WAIT_CPU,
+                ProcessStatus.RUN };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 0, 70L, 3, monitor);
         testIntervals("tid 21 [0,70,3]", intervals, values);
 
-        ITmfStateValue[] values2 = { TmfStateValue.nullValue(), StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE,
-                StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE };
+        ProcessStatus[] values2 = { ProcessStatus.NOT_ALIVE, ProcessStatus.RUN,
+                ProcessStatus.RUN };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 1, 70L, 30, monitor);
         testIntervals("tid 21 [0,70,30]", intervals, values2);
 
-        ITmfStateValue[] values3 = { StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE,
-                StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE };
+        ProcessStatus[] values3 = { ProcessStatus.WAIT_CPU,
+                ProcessStatus.RUN };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 25, 50L, 3, monitor);
         testIntervals("tid 21 [25,50,3]", intervals, values3);
 
-        ITmfStateValue[] values4 = { TmfStateValue.nullValue(), StateValues.PROCESS_STATUS_WAIT_UNKNOWN_VALUE,
-                StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE, StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE };
+        ProcessStatus[] values4 = { ProcessStatus.NOT_ALIVE, ProcessStatus.WAIT_UNKNOWN,
+                ProcessStatus.RUN, ProcessStatus.WAIT_CPU };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process20, 0, 70L, 3, monitor);
         testIntervals("tid 20 [0,70,3]", intervals, values4);
 
-        ITmfStateValue[] values5 = { TmfStateValue.nullValue(), StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE };
+        ProcessStatus[] values5 = { ProcessStatus.NOT_ALIVE, ProcessStatus.WAIT_CPU };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process20, 1, 70L, 30, monitor);
         testIntervals("tid 20 [0,70,30]", intervals, values5);
 
-        ITmfStateValue[] values6 = { StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE,
-                StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE };
+        ProcessStatus[] values6 = { ProcessStatus.RUN,
+                ProcessStatus.WAIT_CPU };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process20, 25, 50L, 3, monitor);
         testIntervals("tid 20 [25,50,3]", intervals, values6);
 
-        ITmfStateValue[] values7 = { StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE };
+        ProcessStatus[] values7 = { ProcessStatus.WAIT_CPU };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process20, 80L, 85L, 3, monitor);
         testIntervals("tid 20 [80,85,3]", intervals, values7);
     }
@@ -336,30 +334,30 @@ public class KernelThreadInformationProviderTest {
         assertFalse(intervals.hasNext());
 
         /* Check different time ranges */
-        ITmfStateValue[] values = { TmfStateValue.nullValue(), StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE,
-                StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE, StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE,
-                StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE };
+        ProcessStatus[] values = { ProcessStatus.NOT_ALIVE, ProcessStatus.WAIT_CPU,
+                ProcessStatus.RUN, ProcessStatus.WAIT_CPU,
+                ProcessStatus.RUN };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 0, 70L);
         testIterator("tid 21 [0,70]", intervals, values);
 
-        ITmfStateValue[] values3 = { StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE,
-                StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE };
+        ProcessStatus[] values2 = { ProcessStatus.WAIT_CPU,
+                ProcessStatus.RUN };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 25, 50L);
-        testIterator("tid 21 [25,50]", intervals, values3);
+        testIterator("tid 21 [25,50]", intervals, values2);
 
-        ITmfStateValue[] values4 = { TmfStateValue.nullValue(), StateValues.PROCESS_STATUS_WAIT_UNKNOWN_VALUE,
-                StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE, StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE };
+        ProcessStatus[] values3 = { ProcessStatus.NOT_ALIVE, ProcessStatus.WAIT_UNKNOWN,
+                ProcessStatus.RUN, ProcessStatus.WAIT_CPU };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process20, 0, 70L);
-        testIterator("tid 20 [0,70]", intervals, values4);
+        testIterator("tid 20 [0,70]", intervals, values3);
 
-        ITmfStateValue[] values6 = { StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE,
-                StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE };
+        ProcessStatus[] values4 = { ProcessStatus.RUN,
+                ProcessStatus.WAIT_CPU };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process20, 25, 50L);
-        testIterator("tid 20 [25,50]", intervals, values6);
+        testIterator("tid 20 [25,50]", intervals, values4);
 
-        ITmfStateValue[] values7 = { StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE };
+        ProcessStatus[] values5 = { ProcessStatus.WAIT_CPU };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process20, 80L, 85L);
-        testIterator("tid 20 [80,85]", intervals, values7);
+        testIterator("tid 20 [80,85]", intervals, values5);
     }
 
 }

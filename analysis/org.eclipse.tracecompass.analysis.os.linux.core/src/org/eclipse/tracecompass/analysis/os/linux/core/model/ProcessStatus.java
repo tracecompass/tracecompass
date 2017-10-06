@@ -26,7 +26,7 @@ public enum ProcessStatus {
     /** Unknown process status */
     UNKNOWN(StateValues.PROCESS_STATUS_UNKNOWN_VALUE),
     /** Waiting for a fork */
-    WAIT_FORK(StateValues.PROCESS_STATUS_WAIT_UNKNOWN_VALUE),
+    WAIT_FORK(StateValues.PROCESS_STATUS_WAIT_FORK_VALUE),
     /** Waiting for the CPU */
     WAIT_CPU(StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE),
     /**
@@ -41,14 +41,14 @@ public enum ProcessStatus {
     WAIT_BLOCKED(StateValues.PROCESS_STATUS_WAIT_BLOCKED_VALUE),
     /** The thread is running */
     RUN(StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE),
-    /** The thread is dead */
-    DEAD(TmfStateValue.nullValue()),
+    /** The thread is dead or hasn't started yet */
+    NOT_ALIVE(TmfStateValue.nullValue()),
     /** The thread is running in system call */
     RUN_SYTEMCALL(StateValues.PROCESS_STATUS_RUN_SYSCALL_VALUE),
     /** The thread is running but interrupted */
     INTERRUPTED(StateValues.PROCESS_STATUS_INTERRUPTED_VALUE),
     /** Waiting for an unknown reason */
-    WAIT_UNKNOWN(StateValues.PROCESS_STATUS_WAIT_UNKNOWN_VALUE),;
+    WAIT_UNKNOWN(StateValues.PROCESS_STATUS_WAIT_UNKNOWN_VALUE);
 
     private final ITmfStateValue fValue;
 
@@ -95,7 +95,7 @@ public enum ProcessStatus {
         case LinuxValues.STATEDUMP_PROCESS_STATUS_RUN:
             return RUN;
         case LinuxValues.STATEDUMP_PROCESS_STATUS_DEAD:
-            return DEAD;
+            return NOT_ALIVE;
         default:
             return UNKNOWN;
         }
@@ -155,7 +155,7 @@ public enum ProcessStatus {
         } else if (isWaiting(state)) {
             return WAIT_BLOCKED;
         } else if (isDead(state)) {
-            return DEAD;
+            return NOT_ALIVE;
         } else {
             return WAIT_UNKNOWN;
         }

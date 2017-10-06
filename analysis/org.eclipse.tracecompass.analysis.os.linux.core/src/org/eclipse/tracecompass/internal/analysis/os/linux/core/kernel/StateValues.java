@@ -20,8 +20,8 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
  * use integer values whenever possible, since those take much less space in the
  * history file.
  *
- * Here is the standard Linux Process model. Each state corresponds to a status
- * in the state system.
+ * Here is the standard Linux Process model. Each state in this state machine
+ * corresponds to a status in the state system.
  *
  * <pre>
  * @startuml
@@ -34,22 +34,22 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
  * }
  *
  * state Running {
- *   user --> kernel : syscall
- *   user --> kernel : interrupt
- *   kernel --> user : return
- *   kernel --> kernel : interrupt
+ *   User --> Kernel : syscall
+ *   User --> Kernel : interrupt
+ *   Kernel --> User : return
+ *   Kernel --> Kernel : interrupt
  * }
  *
- * [*] --> created : fork()
+ * [*] --> Created : fork()
  *
- * created -> Preempted
+ * Created -> Preempted
  *
- * kernel --> zombie : exit()
+ * Kernel --> zombie : exit()
  *
- * kernel --> sleep : sleep
- * sleep --> Preempted : wakeup
- * kernel --> Preempted : preempt
- * Preempted --> user : return
+ * Kernel --> Sleep : sleep
+ * Sleep --> Preempted : wakeup
+ * Kernel --> Preempted : preempt
+ * Preempted --> User : return
  *
  * @enduml
  * </pre>
@@ -63,58 +63,62 @@ public interface StateValues {
      */
     int PROCESS_STATUS_UNKNOWN = 0;
     /**
-     * Wait blocked -> sleep
+     * Wait blocked, corresponds to the 'Sleep' state
      */
     int PROCESS_STATUS_WAIT_BLOCKED = 1;
     /**
-     * Run Usermode -> user
+     * Run Usermode, corresponds to the 'User' state
      */
     int PROCESS_STATUS_RUN_USERMODE = 2;
     /**
-     * Run syscall -> kernel
+     * Run syscall, corresponds to the 'Kernel' state
      */
     int PROCESS_STATUS_RUN_SYSCALL = 3;
     /**
-     * Interrupted -> Part of the CPU context
+     * Interrupted, not in the state machine, it's part of the CPU context
      */
     int PROCESS_STATUS_INTERRUPTED = 4;
     /**
-     * Waiting for CPU -> Preempted
+     * Waiting for CPU, corresponds to the 'Preempted' state
      */
     int PROCESS_STATUS_WAIT_FOR_CPU = 5;
     /**
-     * Unknown wait state -> not part of the state system.
+     * Unknown wait state, not part of the state machine
      */
     int PROCESS_STATUS_WAIT_UNKNOWN = 6;
+    /** Waiting for CPU after being forked -> a statedump state */
+    int PROCESS_STATUS_WAIT_FORK = 7;
 
     /**
-     * Unknown state {@link StateValues#PROCESS_STATUS_UNKNOWN}
+     * Unknown state {@link #PROCESS_STATUS_UNKNOWN}
      */
     ITmfStateValue PROCESS_STATUS_UNKNOWN_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_UNKNOWN);
     /**
      * Wait for unknown reason state value
-     * {@link StateValues#PROCESS_STATUS_WAIT_UNKNOWN}
+     * {@link #PROCESS_STATUS_WAIT_UNKNOWN}
      */
     ITmfStateValue PROCESS_STATUS_WAIT_UNKNOWN_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_WAIT_UNKNOWN);
     /**
-     * Wait blocked state value {@link StateValues#PROCESS_STATUS_WAIT_BLOCKED}
+     * Wait blocked state value {@link #PROCESS_STATUS_WAIT_BLOCKED}
      */
     ITmfStateValue PROCESS_STATUS_WAIT_BLOCKED_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_WAIT_BLOCKED);
     /**
-     * Run in usermode state value {@link StateValues#PROCESS_STATUS_RUN_USERMODE}
+     * Run in usermode state value {@link #PROCESS_STATUS_RUN_USERMODE}
      */
     ITmfStateValue PROCESS_STATUS_RUN_USERMODE_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_RUN_USERMODE);
     /**
-     * Run in kernel mode state value {@link StateValues#PROCESS_STATUS_RUN_SYSCALL}
+     * Run in kernel mode state value {@link #PROCESS_STATUS_RUN_SYSCALL}
      */
     ITmfStateValue PROCESS_STATUS_RUN_SYSCALL_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_RUN_SYSCALL);
     /**
-     * Interrupted state value {@link StateValues#PROCESS_STATUS_INTERRUPTED}
+     * Interrupted state value {@link #PROCESS_STATUS_INTERRUPTED}
      */
     ITmfStateValue PROCESS_STATUS_INTERRUPTED_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_INTERRUPTED);
     /**
-     * Wait for CPU state value {@link StateValues#PROCESS_STATUS_WAIT_FOR_CPU}
+     * Wait for CPU state value {@link #PROCESS_STATUS_WAIT_FOR_CPU}
      */
     ITmfStateValue PROCESS_STATUS_WAIT_FOR_CPU_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_WAIT_FOR_CPU);
+    /** Wait for CPU after a fork state value {@link #PROCESS_STATUS_WAIT_FORK} */
+    ITmfStateValue PROCESS_STATUS_WAIT_FORK_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_WAIT_FORK);
 
 }
