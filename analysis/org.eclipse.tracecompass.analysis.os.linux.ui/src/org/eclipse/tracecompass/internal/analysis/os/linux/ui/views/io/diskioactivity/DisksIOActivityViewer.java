@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.DisksIODataProvider;
 import org.eclipse.tracecompass.common.core.format.DataSpeedWithUnitFormat;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
@@ -54,6 +55,8 @@ public class DisksIOActivityViewer extends TmfCommonXAxisChartViewer {
     @Override
     protected void initializeDataProvider() {
         ITmfTrace trace = getTrace();
-        setDataProvider(DisksIODataProvider.create(trace));
+        DisksIODataProvider provider = DataProviderManager.getInstance().getDataProvider(trace,
+                DisksIODataProvider.ID, DisksIODataProvider.class);
+        setDataProvider(provider);
     }
 }

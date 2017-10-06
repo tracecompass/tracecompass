@@ -9,8 +9,13 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.core.inputoutput;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -20,9 +25,12 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractStat
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -40,11 +48,20 @@ import com.google.common.collect.Iterables;
  * @author Yonni Chen
  */
 @SuppressWarnings("restriction")
-public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider implements ITmfXYDataProvider {
+public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider implements ITmfXYDataProvider, ITmfTreeDataProvider<TmfTreeDataModel> {
+
+    /**
+     * Extension point ID.
+     */
+    public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.DisksIODataProvider"; //$NON-NLS-1$
 
     private static final int BYTES_PER_SECTOR = 512;
     private static final double SECONDS_PER_NANOSECOND = Math.pow(10, -9);
+    private static final AtomicLong ENTRY_ID = new AtomicLong();
+
     private final InputOutputAnalysisModule fModule;
+    private final Map<Long, Integer> fIdToSectorQuark = new HashMap<>();
+    private @Nullable TmfModelResponse<List<TmfTreeDataModel>> fCached = null;
 
     /**
      * Create an instance of {@link DisksIODataProvider}. Returns a null instance if
@@ -70,6 +87,55 @@ public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider
     private DisksIODataProvider(ITmfTrace trace, InputOutputAnalysisModule module) {
         super(trace);
         fModule = module;
+    }
+
+    @Override
+    public String getId() {
+        return ID;
+    }
+
+    @Override
+    public TmfModelResponse<List<TmfTreeDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        if (fCached != null) {
+            return fCached;
+        }
+        fModule.waitForCompletion();
+        ITmfStateSystem ss = fModule.getStateSystem();
+        if (ss == null) {
+            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
+        }
+
+        List<TmfTreeDataModel> nodes = new ArrayList<>();
+
+        long traceId = ENTRY_ID.getAndIncrement();
+        nodes.add(new TmfTreeDataModel(traceId, -1, getTrace().getName()));
+
+        String readName = Objects.requireNonNull(Messages.DisksIODataProvider_read);
+        String writeName = Objects.requireNonNull(Messages.DisksIODataProvider_write);
+
+        for (Integer diskQuark : ss.getQuarks(Attributes.DISKS, "*")) { //$NON-NLS-1$
+            String diskName = ss.getAttributeName(diskQuark);
+            long diskId = ENTRY_ID.getAndIncrement();
+            nodes.add(new TmfTreeDataModel(diskId, traceId, diskName));
+
+            int readQuark = ss.optQuarkRelative(diskQuark, Attributes.SECTORS_READ);
+            if (readQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
+                long readId = ENTRY_ID.getAndIncrement();
+                fIdToSectorQuark.put(readId, readQuark);
+                nodes.add(new TmfTreeDataModel(readId, diskId, readName));
+            }
+
+            int writeQuark = ss.optQuarkRelative(diskQuark, Attributes.SECTORS_WRITTEN);
+            if (writeQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
+                long writeId = ENTRY_ID.getAndIncrement();
+                fIdToSectorQuark.put(writeId, writeQuark);
+                nodes.add(new TmfTreeDataModel(writeId, diskId, writeName));
+            }
+        }
+
+        TmfModelResponse<List<TmfTreeDataModel>> response = new TmfModelResponse<>(nodes, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        fCached = response;
+        return response;
     }
 
     @Override
