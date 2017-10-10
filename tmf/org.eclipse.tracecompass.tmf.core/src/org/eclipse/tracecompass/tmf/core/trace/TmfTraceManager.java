@@ -162,7 +162,9 @@ public final class TmfTraceManager {
      * @since 3.2
      */
     public synchronized Set<ITmfTrace> getTracesForHost(String hostId) {
-        return Collections.unmodifiableSet(fTraces.keySet().stream().filter(t -> hostId.equals(t.getHostId()))
+        return Collections.unmodifiableSet(fTraces.keySet().stream()
+                .flatMap(t -> getTraceSet(t).stream())
+                .filter(t -> hostId.equals(t.getHostId()))
                 .collect(Collectors.toSet()));
     }
 

@@ -241,6 +241,27 @@ public class TmfTraceManagerTest {
     }
 
     /**
+     * Test the contents of a trace set for a host that is part of an experiment
+     */
+    @Test
+    public void testTraceSetExperimentForHost() {
+        final ITmfTrace localTrace1 = trace1;
+        final ITmfTrace localTrace2 = trace2;
+        assertNotNull(localTrace1);
+        assertNotNull(localTrace2);
+        TmfExperiment exp = createExperiment(localTrace1, localTrace2);
+        openTrace(exp);
+        selectTrace(exp);
+
+        Collection<ITmfTrace> expected = Collections.singleton(trace2);
+        Collection<ITmfTrace> actual = tm.getTracesForHost(trace2.getHostId());
+
+        assertEquals(1, actual.size());
+        assertEquals(expected, actual);
+
+    }
+
+    /**
      * Test the contents of a trace set with a nested experiment.
      */
     @Test
