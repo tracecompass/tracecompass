@@ -13,11 +13,14 @@
 package org.eclipse.tracecompass.internal.tmf.ui.project.handlers;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -134,9 +137,9 @@ public class RenameFolderHandler extends AbstractHandler {
         operation = new WorkspaceModifyOperation() {
             @Override
             protected void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException, InterruptedException {
-
                 IPath oldFolderElementPath = oldFolder.getPath().makeRelativeTo(tracesFolder.getPath());
                 IPath newFolderElementPath = oldFolderElementPath.removeLastSegments(1).append(newName);
+                Set<IFolder> affectedExperiments = new HashSet<>();
                 for (TmfExperimentElement experiment : experimentFolder.getExperiments()) {
                     for (TmfTraceElement oldTrace : experiment.getTraces()) {
                         if (oldTrace.getElementPath().startsWith(oldFolderElementPath.toString())) {
@@ -145,6 +148,7 @@ public class RenameFolderHandler extends AbstractHandler {
                             String newTraceElementPath = newFolderElementPath.append(relativePath).toString();
                             for (TmfTraceElement newTrace : tracesFolder.getTraces()) {
                                 if (newTrace.getElementPath().equals(newTraceElementPath)) {
+                                    affectedExperiments.add(experiment.getResource());
                                     experiment.addTrace(newTrace);
                                     break;
                                 }
@@ -152,6 +156,21 @@ public class RenameFolderHandler extends AbstractHandler {
                         }
                     }
                 }
+
+                // --- Begin workaround for platform bug 525833 ---
+                // Delete directory under Traces folder created by platform
+                IResource resourceToDelete = oldFolder.getResource();
+                if (resourceToDelete.exists()) {
+                    resourceToDelete.delete(true, monitor);
+                }
+                // Delete directories under Experiment folder created by platform
+                for (IFolder experiment : affectedExperiments) {
+                    IFolder expResourceToDelete = experiment.getFolder(oldFolderElementPath);
+                    if (expResourceToDelete.exists()) {
+                        expResourceToDelete.delete(true, monitor);
+                    }
+                }
+                // --- End workaround for platform bug 525833 ---
             }
         };
 

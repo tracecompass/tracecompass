@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.integration.swtbot.tests.projectexplorer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,18 +21,24 @@ import java.util.function.Supplier;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.varia.NullAppender;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
+import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportConfirmation;
@@ -39,6 +46,8 @@ import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.Impo
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.wizards.SWTBotImportWizardUtils;
@@ -1411,6 +1420,99 @@ public class ProjectExplorerTracesFolderTest {
         assertEquals(1, clashesFolderItem.getItems().length);
     }
 
+    @Test
+    public void test_RenameFolderWorkaroundBug525833() {
+        // Create Folder 'aaa'
+        SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        tracesFolderItem.contextMenu().menu("New Folder...").click();
+        final String NEW_FOLDER_DIALOG_TITLE = "New Folder";
+        fBot.waitUntil(Conditions.shellIsActive(NEW_FOLDER_DIALOG_TITLE));
+        SWTBotShell shell = fBot.shell(NEW_FOLDER_DIALOG_TITLE);
+        shell.activate();
+
+        SWTBotText text = shell.bot().textWithLabel("Folder name:");
+        final String FOLDER_NAME = "aaa";
+        text.setText(FOLDER_NAME);
+        shell.bot().button("OK").click();
+        fBot.waitUntil(Conditions.shellCloses(shell));
+
+        // Import (link) CTF trace to folder 'aaa'
+        SWTBotTreeItem folderItem = SWTBotUtils.getTraceProjectItem(fBot, tracesFolderItem, FOLDER_NAME);
+        shell = openTraceFoldersImport(folderItem);
+        importTrace(shell, null, null, ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE, new ImportConfirmationSupplier(ImportConfirmation.CONTINUE), LTTNG_KERNEL_TRACE.getTracePath());
+
+        // Create Experiment
+        final String EXP_NAME = "exp";
+        SWTBotUtils.createExperiment(fBot, TRACE_PROJECT_NAME, EXP_NAME);
+        SWTBotTreeItem project = SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME);
+        SWTBotTreeItem experiment = SWTBotUtils.getTraceProjectItem(fBot, project, "Experiments", EXP_NAME);
+
+        folderItem.expand();
+        folderItem.getNode(LTTNG_KERNEL_TRACE.getTraceName()).dragAndDrop(experiment);
+        experiment.expand();
+
+        // Rename Trace Folder
+        final String NEW_FOLDER_NAME = "bbb";
+        folderItem.contextMenu().menu("Rename...").click();
+        final String RENAME_FOLDER_DIALOG_TITLE = "Rename Folder";
+        fBot.waitUntil(Conditions.shellIsActive(RENAME_FOLDER_DIALOG_TITLE));
+        shell = fBot.shell(RENAME_FOLDER_DIALOG_TITLE);
+        shell.activate();
+        text = shell.bot().textWithLabel("New Folder name:");
+        text.setText(NEW_FOLDER_NAME);
+        shell.bot().button("OK").click();
+        fBot.waitUntil(Conditions.shellCloses(shell));
+
+        // verify that trace reference have been updated after rename
+        SWTBotTreeItem expTrace = SWTBotUtils.getTraceProjectItem(fBot, project, "Experiments", EXP_NAME, NEW_FOLDER_NAME + "/" + LTTNG_KERNEL_TRACE.getTraceName());
+        assertEquals(NEW_FOLDER_NAME + "/" + LTTNG_KERNEL_TRACE.getTraceName(), expTrace.getText());
+
+        // verify that workaround for bug 525833 deleted all lingering directories
+        IStatus status = UIThreadRunnable.syncExec(new Result<IStatus>() {
+            @Override
+            public IStatus run() {
+                final String PLUGIN_ID = "org.eclipse.tracecompass.integration.swtbot.tests";
+                // Check that no lingering directories in experiment folder
+                SWTBotTreeItem exp = SWTBotUtils.getTraceProjectItem(fBot, project, "Experiments", EXP_NAME);
+                Object expObj = exp.widget.getData();
+                if (expObj instanceof TmfExperimentElement) {
+                    TmfExperimentElement tmfExp = (TmfExperimentElement) expObj;
+                    IFolder expFolder = tmfExp.getResource();
+                    String path = expFolder.getLocation().toOSString();
+                    File fileSystemPath = new File(path);
+                    if (fileSystemPath.isDirectory()) {
+                        for (File file : fileSystemPath.listFiles()) {
+                            if (FOLDER_NAME.equals(file.getName())) {
+                                return new Status(IStatus.ERROR, PLUGIN_ID, FOLDER_NAME + " exists under experiment!", null);
+                            }
+                        }
+                    }
+                }
+                // Check that no lingering directories in traces folder
+                SWTBotTreeItem tracesItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+                Object tracesFolderObj = tracesItem.widget.getData();
+                if (tracesFolderObj instanceof TmfTracesFolder) {
+                    TmfTracesFolder tmfTracesFolder = (TmfTracesFolder) tracesFolderObj;
+                    IFolder tFolder = tmfTracesFolder.getResource();
+                    String path = tFolder.getLocation().toOSString();
+                    File fileSystemPath = new File(path);
+                    if (fileSystemPath.isDirectory()) {
+                        for (File file : fileSystemPath.listFiles()) {
+                            if (FOLDER_NAME.equals(file.getName())) {
+                                return new Status(IStatus.ERROR, PLUGIN_ID, FOLDER_NAME + " exists in trace folder!", null);
+                            }
+                        }
+                    }
+                }
+                return Status.OK_STATUS;
+            }
+        });
+
+        if (!status.isOK()) {
+            fail(status.getMessage());
+        }
+    }
+
     private static void verifyTrace(TestTraceInfo traceInfo, int importOptionFlags) {
         verifyTrace(traceInfo, importOptionFlags, traceInfo.getTraceName());
     }
@@ -1560,4 +1662,5 @@ public class ProjectExplorerTracesFolderTest {
         SWTBotShell shell = fBot.shell("Trace Import");
         return shell;
     }
+
 }
