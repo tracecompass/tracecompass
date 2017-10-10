@@ -367,9 +367,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                         xTick.setFormat(tmfChartTimeStampFormat);
                         final double start = 1.0;
                         getSwtChart().getAxisSet().getXAxis(0).setRange(new Range(start, start + delta));
-                        if (maxy > miny) {
-                            getSwtChart().getAxisSet().getYAxis(0).setRange(new Range(miny, maxy));
-                        }
+                        getSwtChart().getAxisSet().getYAxis(0).adjustRange();
                         getSwtChart().redraw();
 
                         if (isSendTimeAlignSignals()) {
