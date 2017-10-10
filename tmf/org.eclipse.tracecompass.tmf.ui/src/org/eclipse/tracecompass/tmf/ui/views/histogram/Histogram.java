@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2015 Ericsson
+ * Copyright (c) 2011, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -370,6 +370,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         gridData = new GridData();
         gridData.horizontalAlignment = SWT.LEFT;
         gridData.verticalAlignment = SWT.BOTTOM;
+        gridData.grabExcessHorizontalSpace = true;
         fTimeRangeStartLabel = new Label(composite, SWT.NONE);
         fTimeRangeStartLabel.setFont(fFont);
         fTimeRangeStartLabel.setLayoutData(gridData);
@@ -378,6 +379,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         gridData = new GridData();
         gridData.horizontalAlignment = SWT.RIGHT;
         gridData.verticalAlignment = SWT.BOTTOM;
+        gridData.grabExcessHorizontalSpace = true;
         fTimeRangeEndLabel = new Label(composite, SWT.NONE);
         fTimeRangeEndLabel.setFont(fFont);
         fTimeRangeEndLabel.setLayoutData(gridData);
@@ -931,7 +933,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     public int getPointAreaWidth() {
         if (!fCanvas.isDisposed()) {
             // Retrieve and normalize the data
-            return fComposite.getBounds().width;
+            return fCanvas.getBounds().width;
         }
         return 0;
     }
