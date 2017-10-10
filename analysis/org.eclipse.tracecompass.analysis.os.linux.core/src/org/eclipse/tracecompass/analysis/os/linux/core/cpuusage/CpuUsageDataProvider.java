@@ -9,27 +9,40 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.core.cpuusage;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.Messages;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractStateSystemAnalysisDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCpuQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedThreadQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
+import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
@@ -45,13 +58,24 @@ import com.google.common.collect.Maps;
  * @since 2.3
  */
 @SuppressWarnings("restriction")
-public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvider implements ITmfXYDataProvider {
+public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvider
+    implements ITmfXYDataProvider, ITmfTreeDataProvider<CpuUsageEntryModel> {
+
+    private static final TmfModelResponse<List<CpuUsageEntryModel>> FAILED_TREE_RESPONSE = new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
+
+    /**
+     * This provider's extension point ID.
+     */
+    public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageDataProvider"; //$NON-NLS-1$
 
     private static final String NOT_SELECTED = "-1"; //$NON-NLS-1$
     private static final String TOTAL_SERIES_NAME = Objects.requireNonNull(Messages.CpuUsageDataProvider_total);
 
-    /* Empty set gets all the cores */
-    private static final Set<Integer> ALL_CPUS = Collections.emptySet();
+    private static final AtomicLong CPU_USAGE_ID = new AtomicLong();
+
+    /* A map that caches the mapping of a thread ID to its executable name */
+    private final Map<String, String> fProcessNameMap = new HashMap<>();
+    private final Map<String, Long> fTidToId = new HashMap<>();
 
     private final KernelCpuUsageAnalysis fModule;
 
@@ -91,7 +115,7 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
         ITmfStateSystem ss = Objects.requireNonNull(fModule.getStateSystem(), "Statesystem should have been verified by verifyParameters"); //$NON-NLS-1$
 
         String selectedThread = NOT_SELECTED;
-        Set<Integer> cpus = ALL_CPUS;
+        Set<Integer> cpus = Collections.emptySet();
 
         if (filter instanceof SelectedThreadQueryFilter) {
             selectedThread = ((SelectedThreadQueryFilter) filter).getSelectedThread();
@@ -160,5 +184,106 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
             return strings[1];
         }
         return null;
+    }
+
+    @Override
+    public TmfModelResponse<List<CpuUsageEntryModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+
+        if (!(filter instanceof SelectedCpuQueryFilter)) {
+            return new TmfModelResponse<>(Collections.emptyList(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        }
+
+        SelectedCpuQueryFilter cpuQueryFilter = (SelectedCpuQueryFilter) filter;
+        long end = filter.getEnd();
+
+        /* Initialize the data */
+        fModule.waitForInitialization();
+        ITmfStateSystem ss = fModule.getStateSystem();
+        if (ss == null) {
+            return FAILED_TREE_RESPONSE;
+        }
+        ssWait(ss, end);
+
+        ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystem(getTrace(), KernelAnalysisModule.ID);
+        if (kernelSs == null) {
+            return FAILED_TREE_RESPONSE;
+        }
+        ssWait(kernelSs, end);
+
+        Map<String, Long> cpuUsageMap = fModule.getCpuUsageInRange(cpuQueryFilter.getSelectedItems(), filter.getStart(), end);
+
+        List<CpuUsageEntryModel> entryList = new ArrayList<>();
+        for (Entry<String, Long> entry : cpuUsageMap.entrySet()) {
+            /*
+             * Process only entries representing the total of all CPUs and that
+             * have time on CPU
+             */
+            String key = entry.getKey();
+            if (entry.getValue() == 0 || !key.startsWith(KernelCpuUsageAnalysis.TOTAL)) {
+                continue;
+            }
+            String[] strings = key.split(KernelCpuUsageAnalysis.SPLIT_STRING, 2);
+
+            if (strings.length > 1) {
+                String tid = strings[1];
+                if (!tid.equals(KernelCpuUsageAnalysis.TID_ZERO)) {
+                    Long id = fTidToId.get(tid);
+                    if (id == null) {
+                        id = CPU_USAGE_ID.getAndIncrement();
+                        fTidToId.put(tid, id);
+                    }
+                    entryList.add(new CpuUsageEntryModel(id, -1, tid, getProcessName(tid, filter.getStart()), entry.getValue()));
+                }
+            }
+        }
+        return new TmfModelResponse<>(entryList, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+    }
+
+    private static void ssWait(ITmfStateSystem ss, long desiredEnd) {
+        while (ss.getCurrentEndTime() < desiredEnd && !ss.waitUntilBuilt(100)) {
+            // wait.
+        }
+    }
+
+    /*
+     * Get the process name from its TID by using the LTTng kernel analysis
+     * module
+     */
+    private String getProcessName(String tid, long start) {
+        String execName = fProcessNameMap.get(tid);
+        if (execName != null) {
+            return execName;
+        }
+
+        ITmfStateSystem kernelSs = fModule.getStateSystem();
+        if (kernelSs == null) {
+            return tid;
+        }
+
+        /* Retrieve the quark for process tid's execName */
+        int execNameQuark = kernelSs.optQuarkAbsolute(Attributes.THREADS, tid, Attributes.EXEC_NAME);
+        if (execNameQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+            /*
+             * No information on this thread (yet?), skip it for now
+             */
+            return tid;
+        }
+
+        /* Find a name in this attribute's intervals */
+        Iterator<ITmfStateInterval> iterator = new StateSystemUtils.QuarkIterator(kernelSs, execNameQuark, start);
+        while (iterator.hasNext()) {
+            ITmfStateInterval execNameInterval = iterator.next();
+            if (execNameInterval.getStateValue().getType() == ITmfStateValue.Type.STRING) {
+                execName = execNameInterval.getStateValue().unboxStr();
+                fProcessNameMap.put(tid, execName);
+                return execName;
+            }
+        }
+        return tid;
+    }
+
+    @Override
+    public String getId() {
+        return ID;
     }
 }

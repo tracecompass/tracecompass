@@ -21,10 +21,10 @@ import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageDataProv
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCpuQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
@@ -63,8 +63,8 @@ public class CpuUsageXYViewer extends TmfCommonXAxisChartViewer {
 
     @Override
     protected void initializeDataProvider() {
-        ITmfTrace trace = getTrace();
-        setDataProvider(CpuUsageDataProvider.create(trace));
+        CpuUsageDataProvider provider = DataProviderManager.getInstance().getDataProvider(getTrace(), CpuUsageDataProvider.ID, CpuUsageDataProvider.class);
+        setDataProvider(provider);
     }
 
     @Override

@@ -114,12 +114,12 @@ public class CpuUsageView extends TmfChartView {
                     if (structSelection instanceof CpuUsageEntry) {
                         CpuUsageEntry entry = (CpuUsageEntry) structSelection;
                         if (fTreeViewer != null) {
-                            fTreeViewer.setSelectedThread(entry.getTid());
+                            fTreeViewer.setSelectedThread(entry.getName());
                         }
                         if (fXYViewer != null) {
-                            fXYViewer.setSelectedThread(entry.getTid());
+                            fXYViewer.setSelectedThread(entry.getName());
                         }
-                        saveData(CPU_USAGE_SELECTED_THREAD, entry.getTid());
+                        saveData(CPU_USAGE_SELECTED_THREAD, entry.getName());
                     }
                 }
             }

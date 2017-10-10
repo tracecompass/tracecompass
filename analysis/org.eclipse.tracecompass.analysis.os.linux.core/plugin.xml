@@ -96,4 +96,11 @@
             id="org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage">
       </dataProviderFactory>
    </extension>
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.dataprovider">
+      <dataProviderFactory
+            class="org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageProviderFactory"
+            id="org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageDataProvider">
+      </dataProviderFactory>
+   </extension>
 </plugin>

@@ -12,15 +12,10 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.cpuusage;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -29,27 +24,25 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.KernelCpuUsageAnalysis;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
-import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
-import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageDataProvider;
+import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageEntryModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCpuQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
-import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData;
-import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData.ITmfColumnPercentageProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
+
+import com.google.common.collect.Iterables;
 
 /**
  * Tree viewer to display CPU usage information in a specified time range. It
@@ -60,23 +53,12 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
  */
 public class CpuUsageComposite extends AbstractTmfTreeViewer {
 
-    // Timeout between to wait for in the updateElements method
-    private static final long BUILD_UPDATE_TIMEOUT = 500;
-
-    private KernelCpuUsageAnalysis fModule = null;
-    private String fSelectedThread = null;
-
     private static final String[] COLUMN_NAMES = new String[] {
             Messages.CpuUsageComposite_ColumnTID,
             Messages.CpuUsageComposite_ColumnProcess,
             Messages.CpuUsageComposite_ColumnPercent,
             Messages.CpuUsageComposite_ColumnTime
     };
-
-    /* A map that saves the mapping of a thread ID to its executable name */
-    private final Map<String, String> fProcessNameMap = new HashMap<>();
-
-    private final @NonNull Set<@NonNull Integer> fCpus = new TreeSet<>();
 
     /** Provides label for the CPU usage tree viewer cells */
     protected static class CpuLabelProvider extends TreeLabelProvider {
@@ -85,19 +67,22 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
         public String getColumnText(Object element, int columnIndex) {
             CpuUsageEntry obj = (CpuUsageEntry) element;
             if (columnIndex == 0) {
-                return obj.getTid();
+                return obj.getName();
             } else if (columnIndex == 1) {
-                return obj.getProcessName();
+                return obj.getModel().getProcessName();
             } else if (columnIndex == 2) {
                 return String.format(Messages.CpuUsageComposite_TextPercent, obj.getPercent());
             } else if (columnIndex == 3) {
-                return NLS.bind(Messages.CpuUsageComposite_TextTime, obj.getTime());
+                return NLS.bind(Messages.CpuUsageComposite_TextTime, obj.getModel().getTime());
             }
 
             return element.toString();
         }
-
     }
+
+    private String fSelectedThread = null;
+    private final @NonNull Set<@NonNull Integer> fCpus = new TreeSet<>();
+    private CpuUsageDataProvider fProvider;
 
     /**
      * Constructor
@@ -125,7 +110,7 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
                         CpuUsageEntry n1 = (CpuUsageEntry) e1;
                         CpuUsageEntry n2 = (CpuUsageEntry) e2;
 
-                        return n1.getTid().compareTo(n2.getTid());
+                        return n1.getName().compareTo(n2.getName());
 
                     }
                 });
@@ -137,7 +122,7 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
                         CpuUsageEntry n1 = (CpuUsageEntry) e1;
                         CpuUsageEntry n2 = (CpuUsageEntry) e2;
 
-                        return n1.getProcessName().compareTo(n2.getProcessName());
+                        return n1.getModel().getProcessName().compareTo(n2.getModel().getProcessName());
 
                     }
                 });
@@ -149,18 +134,11 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
                         CpuUsageEntry n1 = (CpuUsageEntry) e1;
                         CpuUsageEntry n2 = (CpuUsageEntry) e2;
 
-                        return n1.getPercent().compareTo(n2.getPercent());
+                        return Double.compare(n1.getPercent(), n2.getPercent());
 
                     }
                 });
-                column.setPercentageProvider(new ITmfColumnPercentageProvider() {
-
-                    @Override
-                    public double getPercentage(Object data) {
-                        CpuUsageEntry parent = (CpuUsageEntry) data;
-                        return parent.getPercent() / 100;
-                    }
-                });
+                column.setPercentageProvider(data -> ((CpuUsageEntry) data).getPercent() / 100);
                 columns.add(column);
                 column = new TmfTreeColumnData(COLUMN_NAMES[3]);
                 column.setComparator(new ViewerComparator() {
@@ -169,7 +147,7 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
                         CpuUsageEntry n1 = (CpuUsageEntry) e1;
                         CpuUsageEntry n2 = (CpuUsageEntry) e2;
 
-                        return n1.getTime().compareTo(n2.getTime());
+                        return Long.compare(n1.getModel().getTime(), n2.getModel().getTime());
 
                     }
                 });
@@ -195,13 +173,11 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
         String selectedThread = fSelectedThread;
         if (selectedThread != null) {
             /* Find the selected thread among the inputs */
-            for (ITmfTreeViewerEntry entry : rootEntry.getChildren()) {
-                if (entry instanceof CpuUsageEntry) {
-                    if (selectedThread.equals(((CpuUsageEntry) entry).getTid())) {
-                        List<ITmfTreeViewerEntry> list = Collections.singletonList(entry);
-                        super.setSelection(list);
-                        return;
-                    }
+            for (CpuUsageEntry entry : Iterables.filter(rootEntry.getChildren(), CpuUsageEntry.class)) {
+                if (selectedThread.equals(entry.getName())) {
+                    List<ITmfTreeViewerEntry> list = Collections.singletonList(entry);
+                    super.setSelection(list);
+                    return;
                 }
             }
         }
@@ -210,15 +186,8 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
     @Override
     public void initializeDataSource() {
         /* Should not be called while trace is still null */
-        ITmfTrace trace = checkNotNull(getTrace());
-
-        fModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelCpuUsageAnalysis.class, KernelCpuUsageAnalysis.ID);
-        if (fModule == null) {
-            return;
-        }
-        fModule.schedule();
-        fModule.waitForInitialization();
-        fProcessNameMap.clear();
+        ITmfTrace trace = Objects.requireNonNull(getTrace());
+        fProvider = DataProviderManager.getInstance().getDataProvider(trace, CpuUsageDataProvider.ID, CpuUsageDataProvider.class);
     }
 
     @Override
@@ -226,89 +195,26 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
         if (isSelection || (start == end)) {
             return null;
         }
-        if (getTrace() == null || fModule == null) {
-            return null;
-        }
-        fModule.waitForInitialization();
-        ITmfStateSystem ss = fModule.getStateSystem();
-        if (ss == null) {
+        ITmfTrace trace = getTrace();
+        if (trace == null || fProvider == null) {
             return null;
         }
 
-        boolean complete = false;
-        long currentEnd = Math.max(start, ss.getStartTime());
-
-        while (!complete && currentEnd < end) {
-            complete = ss.waitUntilBuilt(BUILD_UPDATE_TIMEOUT);
-            currentEnd = ss.getCurrentEndTime();
+        TimeQueryFilter filter = new SelectedCpuQueryFilter(Long.max(start, getStartTime()), Long.min(end, getEndTime()), 2, fSelectedThread, fCpus);
+        TmfModelResponse<List<@NonNull CpuUsageEntryModel>> response = fProvider.fetchTree(filter, null);
+        List<@NonNull CpuUsageEntryModel> model = response.getModel();
+        if (model == null) {
+            return null;
         }
 
-        /* Initialize the data */
-        Map<String, Long> cpuUsageMap = fModule.getCpuUsageInRange(fCpus, Math.max(start, getStartTime()), Math.min(end, getEndTime()));
-
+        double time = end - start;
         TmfTreeViewerEntry root = new TmfTreeViewerEntry(""); //$NON-NLS-1$
         List<ITmfTreeViewerEntry> entryList = root.getChildren();
-
-        for (Entry<String, Long> entry : cpuUsageMap.entrySet()) {
-            /*
-             * Process only entries representing the total of all CPUs and that
-             * have time on CPU
-             */
-            if (entry.getValue() == 0) {
-                continue;
-            }
-            if (!entry.getKey().startsWith(KernelCpuUsageAnalysis.TOTAL)) {
-                continue;
-            }
-            String[] strings = entry.getKey().split(KernelCpuUsageAnalysis.SPLIT_STRING, 2);
-
-            if ((strings.length > 1) && !(strings[1].equals(KernelCpuUsageAnalysis.TID_ZERO))) {
-                CpuUsageEntry obj = new CpuUsageEntry(strings[1], getProcessName(strings[1]), (double) entry.getValue() / (double) (end - start) * 100, entry.getValue());
-                entryList.add(obj);
-            }
+        for (CpuUsageEntryModel entryModel : model) {
+            entryList.add(new CpuUsageEntry(entryModel, entryModel.getTime() / time));
         }
 
         return root;
-    }
-
-    /*
-     * Get the process name from its TID by using the LTTng kernel analysis
-     * module
-     */
-    private String getProcessName(String tid) {
-        String execName = fProcessNameMap.get(tid);
-        if (execName != null) {
-            return execName;
-        }
-        ITmfTrace trace = getTrace();
-        if (trace == null) {
-            return tid;
-        }
-        ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
-        if (kernelSs == null) {
-            return tid;
-        }
-
-        /* Retrieve the quark for process tid's execName */
-        int execNameQuark = kernelSs.optQuarkAbsolute(Attributes.THREADS, tid, Attributes.EXEC_NAME);
-        if (execNameQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
-            /*
-             * No information on this thread (yet?), skip it for now
-             */
-            return tid;
-        }
-
-        /* Find a name in this attribute's intervals */
-        Iterator<ITmfStateInterval> iterator = new StateSystemUtils.QuarkIterator(kernelSs, execNameQuark, getStartTime());
-        while (iterator.hasNext()) {
-            ITmfStateInterval execNameInterval = iterator.next();
-            if (execNameInterval.getStateValue().getType() == ITmfStateValue.Type.STRING) {
-                execName = execNameInterval.getStateValue().unboxStr();
-                fProcessNameMap.put(tid, execName);
-                return execName;
-            }
-        }
-        return tid;
     }
 
     /**
@@ -381,7 +287,7 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
     private void initCPU() {
         clearCpu();
         TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
-        Object data =  ctx.getData(CpuUsageView.CPU_USAGE_FOLLOW_CPU);
+        Object data = ctx.getData(CpuUsageView.CPU_USAGE_FOLLOW_CPU);
         if (data instanceof Set<?>) {
             Set<?> set = (Set<?>) data;
             for (Object coreObject : set) {

@@ -12,7 +12,8 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.cpuusage;
 
-import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
+import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageEntryModel;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
 
 /**
  * Represents an entry in the tree viewer of the CPU usage view. An entry is a
@@ -20,67 +21,30 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
  *
  * @author Geneviève Bastien
  */
-public class CpuUsageEntry extends TmfTreeViewerEntry {
-    private final String fTid;
-    private final String fProcessName;
-    private final Double fPercent;
-    private final Long fTime;
+public class CpuUsageEntry extends TmfGenericTreeEntry<CpuUsageEntryModel> {
+
+    private final double fPercent;
 
     /**
      * Constructor
      *
-     * @param tid
-     *            The TID of the process
-     * @param name
-     *            The thread's name
+     * @param model
+     *            {@link CpuUsageEntryModel} from the data provider
      * @param percent
      *            The percentage CPU usage
-     * @param time
-     *            The total amount of time spent on CPU
      */
-    public CpuUsageEntry(String tid, String name, double percent, long time) {
-        super(tid);
-        fTid = tid;
-        fProcessName = name;
+    public CpuUsageEntry(CpuUsageEntryModel model, double percent) {
+        super(model);
         fPercent = percent;
-        fTime = time;
     }
 
     /**
-     * Get the TID of the thread represented by this entry
-     *
-     * @return The thread's TID
-     */
-    public String getTid() {
-        return fTid;
-    }
-
-    /**
-     * Get the process name
-     *
-     * @return The process name
-     */
-    public String getProcessName() {
-        return fProcessName;
-    }
-
-    /**
-     * Get the percentage of time spent on CPU in the time interval represented
-     * by this entry.
+     * Get the percentage of time spent on CPU in the time interval represented by
+     * this entry.
      *
      * @return The percentage of time spent on CPU
      */
-    public Double getPercent() {
+    public double getPercent() {
         return fPercent;
-    }
-
-    /**
-     * Get the total time spent on CPU in the time interval represented by this
-     * entry.
-     *
-     * @return The total time spent on CPU
-     */
-    public Long getTime() {
-        return fTime;
     }
 }
