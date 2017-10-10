@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.analysis.counters.ui;
+package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,7 +18,6 @@ import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.FilteredCheckboxTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.progress.WorkbenchJob;
 

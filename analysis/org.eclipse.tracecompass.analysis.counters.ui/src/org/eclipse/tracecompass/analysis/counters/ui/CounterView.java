@@ -16,7 +16,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.analysis.counters.ui.CounterTreePatternFilter;
 import org.eclipse.tracecompass.internal.analysis.counters.ui.Messages;
-import org.eclipse.tracecompass.internal.analysis.counters.ui.TriStateFilteredCheckboxTree;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -27,6 +26,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.XYChartLegendImageProvid
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TriStateFilteredCheckboxTree;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
