@@ -12,7 +12,14 @@
 
 package org.eclipse.tracecompass.tmf.ui.tests;
 
-import org.eclipse.core.runtime.Plugin;
+import java.net.URL;
+
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -22,7 +29,7 @@ import org.osgi.framework.BundleContext;
  *
  * @author Marc-Andre Laperle
  */
-public class TmfUITestPlugin extends Plugin {
+public class TmfUITestPlugin extends AbstractUIPlugin {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -79,6 +86,33 @@ public class TmfUITestPlugin extends Plugin {
     public void stop(BundleContext context) throws Exception {
         setDefault(null);
         super.stop(context);
+    }
+
+    /**
+     * Loads icons into the bundle's image registry
+     *
+     * @param bundle
+     *          the bundle
+     * @param url
+     *          the icon url
+     * @return the image
+     */
+    public static @Nullable Image loadIcon(Bundle bundle, String url) {
+        if (bundle == null) {
+            return null;
+        }
+        Activator plugin = Activator.getDefault();
+        String key = bundle.getSymbolicName() + "/" + url; //$NON-NLS-1$
+        Image icon = plugin.getImageRegistry().get(key);
+        if (icon == null) {
+            URL imageURL = bundle.getResource(url);
+            ImageDescriptor descriptor = ImageDescriptor.createFromURL(imageURL);
+            if (descriptor != null) {
+                icon = descriptor.createImage();
+                plugin.getImageRegistry().put(key, icon);
+            }
+        }
+        return icon;
     }
 
 }

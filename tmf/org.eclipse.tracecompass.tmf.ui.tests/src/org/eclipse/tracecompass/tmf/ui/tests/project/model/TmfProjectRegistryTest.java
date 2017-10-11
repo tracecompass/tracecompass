@@ -38,6 +38,7 @@ import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfNavigatorContentProvider;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectModelPreferences;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.junit.AfterClass;
@@ -133,6 +134,8 @@ public class TmfProjectRegistryTest {
         TmfProjectElement projectElement = TmfProjectRegistry.getProject(fSomeProject, true);
         TmfProjectElement projectElement2 = TmfProjectRegistry.getProject(fShadowSomeProject, true);
         assertEquals(projectElement2, projectElement);
+        assertEquals(TmfProjectModelPreferences.getProjectModelLabel(), projectElement.getLabelText());
+        assertEquals(TmfProjectModelPreferences.getProjectModelIcon(), projectElement.getIcon());
 
         // Supplementary folder
         IFolder supplFolder = projectElement.getSupplementaryFolder();
@@ -341,6 +344,7 @@ public class TmfProjectRegistryTest {
         expFolder = projectElement.getExperimentsFolder();
         assertNotNull(expFolder);
         assertFalse(expFolder.getResource().exists());
+
     }
 
     /**
@@ -379,5 +383,4 @@ public class TmfProjectRegistryTest {
             }
         }
     }
-
 }

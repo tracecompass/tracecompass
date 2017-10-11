@@ -37,7 +37,6 @@ public class TmfProjectElement extends TmfProjectModelElement {
     // Constants
     // ------------------------------------------------------------------------
     static final String TRACECOMPASS_PROJECT_FILE = ".tracecompass"; //$NON-NLS-1$
-    private static final String DEFAULT_LABEL_NAME = "Trace Compass"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
 
@@ -188,12 +187,12 @@ public class TmfProjectElement extends TmfProjectModelElement {
      */
     @Override
     public Image getIcon() {
-        return TmfProjectModelIcons.TRACECOMPASS_ICON;
+        return TmfProjectModelPreferences.getProjectModelIcon();
     }
 
     @Override
     public String getLabelText() {
-        return DEFAULT_LABEL_NAME;
+        return TmfProjectModelPreferences.getProjectModelLabel();
     }
 
     static void createFolderStructure(IContainer parent) throws CoreException {
