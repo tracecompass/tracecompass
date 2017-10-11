@@ -421,6 +421,7 @@ public class Utils {
         case CYCLES:
             return NumberFormat.getInstance().format(time) + Messages.Utils_ClockCyclesUnit;
         case RELATIVE:
+            return formatTimeRelative(time, resolution);
         default:
         }
 
@@ -498,6 +499,36 @@ public class Utils {
             return formatDeltaAbs(delta, resolution);
         }
         return formatTime(delta, format, resolution);
+    }
+
+    /**
+     * Formats relative time to second
+     *
+     * @param time
+     *            The relative time in ns
+     * @param resolution
+     *            The resolution to use
+     * @return The formatted time in second
+     */
+    private static String formatTimeRelative(long time, Resolution resolution) {
+        StringBuffer str = new StringBuffer();
+        if (time < 0) {
+            str.append('-');
+        }
+
+        long ns = Math.abs(time);
+        long seconds = TimeUnit.NANOSECONDS.toSeconds(ns);
+        str.append(seconds);
+        str.append('.');
+        // append the ms, us and ns as specified in the resolution
+        str.append(formatNs(time, resolution));
+        str.append('s');
+        if (seconds == 0) {
+            str.append(" ("); //$NON-NLS-1$
+            str.append(new DecimalUnitFormat(1.0 / SEC_IN_NS).format(time));
+            str.append("s)"); //$NON-NLS-1$
+        }
+        return str.toString();
     }
 
     /**
