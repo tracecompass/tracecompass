@@ -3343,7 +3343,7 @@ If there are corrections to make, you may modify the XML state provider file, an
 If modifications are made to the XML state provider after it has been "published", the '''version''' attribute of the '''xmlStateProvider''' element should be updated. This avoids having to delete each trace's supplementary file manually. If the saved state system used a previous version, it will automatically be rebuilt from the XML file.
 
 == Defining an XML pattern provider ==
-It exists patterns within an execution trace that can provide high level details about the system execution. A '''pattern''' is a particular combination of events or states that are expected to occur within a trace. It may be composed of several state machines that inherit or communicate through a common state system.
+There are patterns within a trace that can provide high level details about the system execution. A '''pattern''' is a particular combination of events or states that are expected to occur within a trace. It may be composed of several state machines that inherit or communicate through a common state system.
 
 We may have multiple instances (scenarios) of a running state machine within a pattern. Each scenario which has its own path in the state system can generate segments to populate the data-driven views
 
@@ -3390,6 +3390,8 @@ Stored values can be added before the pattern handler. The predefined action '''
 <storedField id="offset" alias="offset"/>
 </pre>
 
+The ''id'' of the stored field is used as the field name in the event. If the field is not available, a null value will be saved for it. The ''alias'' is the name by which this field will be accessible in the state system.
+
 The behavior of the pattern and the models it needs are described in the pattern handler element.
 
 The structure of the state machine (FSM) is based on the SCXML structure. The following example describe an FSM that matches all the system call in an LTTng kernel trace.
@@ -3397,29 +3399,26 @@ The structure of the state machine (FSM) is based on the SCXML structure. The fo
 <pre>
 <fsm id="syscall" initial="start">
     <state id="start">
-        <transition event="syscall_entry_*" target="syscall_entry_x" action="sys_x_founded" saveStoredFields="true"/>
+        <transition event="syscall_entry_*" target="in_progress" action="sys_x_founded" saveStoredFields="true"/>
     </state>
     <state id="in_progress" >
-        <transition event="syscall_exit_*" cond="thread_condition" target="syscall_exit_x" action="exit_syscall_found" saveStoredFields="true" clearStoredFields="true"/>
+        <transition event="syscall_exit_*" cond="thread_condition" target="end" action="exit_syscall_found" saveStoredFields="true" clearStoredFields="true"/>
     </state>
     <final id="end"/>
 </fsm>
 </pre>
 
-The value of the target attribute corresponds to the 'id' of a test element described in the XML file and is a reference to it. Similarly, the value of the action attribute corresponds to the 'id' of an action element described in the XML file and is a reference to it.
+The value of the '''target''' attribute corresponds to the 'id' of a state in the same FSM. Similarly, the value of the '''action''' attribute corresponds to the 'id' of an action element described in the XML file and is a reference to it. Multiple actions can be executed by separating their names by ':', like ''action1:action2''
 
-Conditions are used in the transitions to switch between the state of an FSM. They are defined under the '''test''' element. Two types of conditions are allowed : '''Data condition''' and '''Time condition'''. It is possible to combine several conditions using a logical operator (OR, AND, ...).
+Conditions are used in the transitions to switch between the state of an FSM. They can be specified by setting the '''cond''' attribute in the transition and they correspond to a '''test''' element. Two types of conditions are allowed : '''Data condition''' and '''Time condition'''. It is possible to combine several conditions using a logical operator (OR, AND, ...).
 
-Data conditions tests the ongoing event information against the data in the state system or constant values. The following condition tests whether the current thread running on the CPU is also the ongoing scenario thread.
+Data conditions tests the ongoing event information against the data in the state system or constant values. The following condition tests whether the current thread of the event is also the ongoing scenario thread.
 
 <pre>
 <test id="thread_condition">
     <if>
         <condition>
-            <stateValue type="query" >
-                <stateAttribute type="location" value="CurrentCPU" />
-                <stateAttribute type="constant" value="Current_thread" />
-            </stateValue>
+            <stateValue type="eventField" value="tid" />
             <stateValue type="query">
                 <stateAttribute type="constant" value="#CurrentScenario" />
                 <stateAttribute type="constant" value="thread" />
@@ -3430,7 +3429,7 @@ Data conditions tests the ongoing event information against the data in the stat
 </pre>
 
 Two types of time conditions are available:
-* Time range conditions tests whether the ongoing event happens between a specific range of time. The following condition tests whether the ongoing event happens between 1 nanosecond and 3 nanoseconds.
+* Time range conditions test whether the ongoing event happens between a specific range of time. The following condition tests whether the ongoing event happens between 1 nanosecond and 3 nanoseconds.
 
 <pre>
 <test id="time_condition">
@@ -3451,7 +3450,7 @@ Two types of time conditions are available:
     <if>
         <condition>
             <elapsedTime unit="ns">
-                <less since="syscall_entry_x" value="3" />
+                <less since="in_progress" value="3" />
             </elapsedTime>
         </condition>
     </if>
@@ -3462,16 +3461,20 @@ Two types of actions are allowed :
 * State changes update values of attributes into the state system. The following example set the value of the thread for the current scenario.
 
 <pre>
-    <action id="sys_x_found">
-        <stateChange>
-            <stateAttribute type="constant" value="#CurrentScenario" />
-            <stateAttribute type="constant" value="thread" />
-            <stateValue type="query">
-                <stateAttribute type="location" value="CurrentCPU" />
-                <stateAttribute type="constant" value="Current_thread" />
-            </stateValue>
-        </stateChange>
-    </action>
+<action id="sys_x_founded">
+    <stateChange>
+        <stateAttribute type="constant" value="#CurrentScenario" />
+        <stateAttribute type="constant" value="syscall" />
+        <stateAttribute type="constant" value="name" />
+        <stateValue type="eventName"/>
+    </stateChange>
+
+    <stateChange>
+        <stateAttribute type="constant" value="#CurrentScenario" />
+        <stateAttribute type="constant" value="thread" />
+        <stateValue type="eventField" value="tid"/>
+    </stateChange>
+</action>
 </pre>
 
 * Generate segments. The following example represents a system call segment.
@@ -3497,125 +3500,99 @@ When existing, the stored fields will be added as fields for the generated segme
 Here is the complete XML file by combining all the examples models above:
 
 <pre>
-<?xml version="1.0" encoding="UTF-8"?>
-<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+    <?xml version="1.0" encoding="UTF-8"?>
+    <tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
 
-<pattern version="1" id="my.test.pattern">
-    <head>
-        <traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
-        <label value="xml syscall" />
-    </head>
+    <pattern version="1" id="my.test.pattern">
+        <head>
+            <traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
+            <label value="xml syscall" />
+        </head>
 
-    <storedField id="filename"/>
-    <storedField id="fd"/>
-    <storedField id="ret" alias="ret"/>
-    <storedField id="flags" alias="flags"/>
-    <storedField id="offset" alias="offset"/>
-    <storedField id="fd_in" alias="fd_in"/>
-    <storedField id="fd_out" alias="fd_out"/>
-    <storedField id="uservaddr" alias="uservaddr"/>
-    <storedField id="upeer_sockaddr" alias="upeer_sockaddr"/>
+        <storedField id="filename"/>
+        <storedField id="fd"/>
+        <storedField id="ret" alias="ret"/>
+        <storedField id="flags" alias="flags"/>
+        <storedField id="offset" alias="offset"/>
+        <storedField id="fd_in" alias="fd_in"/>
+        <storedField id="fd_out" alias="fd_out"/>
+        <storedField id="uservaddr" alias="uservaddr"/>
+        <storedField id="upeer_sockaddr" alias="upeer_sockaddr"/>
 
-    <location id="CurrentThread">
-        <stateAttribute type="constant" value="Threads" />
-        <stateAttribute type="query">
-        <stateAttribute type="constant" value="CPUs" />
-        <stateAttribute type="eventField" value="cpu" />
-        <stateAttribute type="constant" value="Current_thread" />
-        </stateAttribute>
-    </location>
-
-    <location id="CurrentCPU">
-        <stateAttribute type="constant" value="CPUs" />
-        <stateAttribute type="eventField" value="cpu" />
-    </location>
-
-    <patternHandler>
-        <test id="time_condition">
-            <if>
-                <or>
-                    <not>
+        <patternHandler>
+            <test id="time_condition">
+                <if>
+                    <or>
+                        <not>
+                            <condition>
+                                <timerange unit="ns">
+                                    <in begin="1" end="3" />
+                                </timerange>
+                            </condition>
+                        </not>
                         <condition>
-                            <timerange unit="ns">
-                                <in begin="1" end="3" />
-                            </timerange>
+                            <elapsedTime unit="ns">
+                                <less since="syscall_entry_x" value="3" />
+                            </elapsedTime>
                         </condition>
-                    </not>
+                    </or>
+                </if>
+            </test>
+
+            <test id="thread_condition">
+                <if>
                     <condition>
-                        <elapsedTime unit="ns">
-                            <less since="syscall_entry_x" value="3" />
-                        </elapsedTime>
-                    </condition>
-                </or>
-            </if>
-        </test>
-
-        <test id="thread_condition">
-            <if>
-                <condition>
-                    <stateValue type="query" >
-                        <stateAttribute type="location" value="CurrentCPU" />
-                        <stateAttribute type="constant" value="Current_thread" />
-                    </stateValue>
-                    <stateValue type="query">
-                        <stateAttribute type="constant" value="#CurrentScenario" />
-                        <stateAttribute type="constant" value="thread" />
-                    </stateValue>
-                </condition>
-            </if>
-        </test>
-
-        <action id="sys_x_founded">
-            <stateChange>
-                <stateAttribute type="constant" value="#CurrentScenario" />
-                <stateAttribute type="constant" value="syscall" />
-                <stateAttribute type="constant" value="name" />
-                <stateValue type="eventName"/>
-            </stateChange>
-
-            <stateChange>
-                <stateAttribute type="constant" value="#CurrentScenario" />
-                <stateAttribute type="constant" value="cpu" />
-                <stateValue type="eventField" value="cpu"/>
-            </stateChange>
-
-            <stateChange>
-                <stateAttribute type="constant" value="#CurrentScenario" />
-                <stateAttribute type="constant" value="thread" />
-                <stateValue type="query">
-                    <stateAttribute type="location" value="CurrentCPU" />
-                    <stateAttribute type="constant" value="Current_thread" />
-                </stateValue>
-            </stateChange>
-        </action>
-
-        <action id="exit_syscall_founded">
-            <segment>
-                <segType>
-                    <segName>
+                        <stateValue type="eventField" value="tid" />
                         <stateValue type="query">
                             <stateAttribute type="constant" value="#CurrentScenario" />
-                            <stateAttribute type="constant" value="syscall" />
-                            <stateAttribute type="constant" value="name" />
+                            <stateAttribute type="constant" value="thread" />
                         </stateValue>
-                    </segName>
-                </segType>
-            </segment>
-        </action>
+                    </condition>
+                </if>
+            </test>
 
-        <fsm id="syscall" initial="start">
-            <state id="start">
-                <transition event="syscall_entry_*" target="syscall_entry_x" action="sys_x_founded" saveStoredFields="true"/>
-            </state>
-            <state id="in_progress" >
-                <transition event="syscall_exit_*" cond="thread_condition" target="syscall_exit_x" action="exit_syscall_found" saveStoredFields="true" clearStoredFields="true"/>
-            </state>
-            <final id="end"/>
-        </fsm>
-    </patternHandler>
-</pattern>
-</tmfxml>
+            <action id="sys_x_founded">
+                <stateChange>
+                    <stateAttribute type="constant" value="#CurrentScenario" />
+                    <stateAttribute type="constant" value="syscall" />
+                    <stateAttribute type="constant" value="name" />
+                    <stateValue type="eventName"/>
+                </stateChange>
+
+                <stateChange>
+                    <stateAttribute type="constant" value="#CurrentScenario" />
+                    <stateAttribute type="constant" value="thread" />
+                    <stateValue type="eventField" value="tid"/>
+                </stateChange>
+            </action>
+
+            <action id="exit_syscall_found">
+                <segment>
+                    <segType>
+                        <segName>
+                            <stateValue type="query">
+                                <stateAttribute type="constant" value="#CurrentScenario" />
+                                <stateAttribute type="constant" value="syscall" />
+                                <stateAttribute type="constant" value="name" />
+                            </stateValue>
+                        </segName>
+                    </segType>
+                </segment>
+            </action>
+
+            <fsm id="syscall" initial="start">
+                <state id="start">
+                    <transition event="syscall_entry_*" target="in_progress" action="sys_x_founded" saveStoredFields="true"/>
+                </state>
+                <state id="in_progress" >
+                    <transition event="syscall_exit_*" cond="thread_condition" target="end" action="exit_syscall_found" saveStoredFields="true" clearStoredFields="true"/>
+                </state>
+                <final id="end"/>
+            </fsm>
+        </patternHandler>
+    </pattern>
+    </tmfxml>
 </pre>
 
 === Representing the scenarios ===
