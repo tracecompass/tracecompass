@@ -25,6 +25,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Messages;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
@@ -87,7 +88,7 @@ public class TidAnalysisModule extends TmfStateSystemAnalysisModule {
      */
     public @Nullable Integer getThreadOnCpuAtTime(int cpu, long time) {
         ITmfStateSystem stateSystem = getStateSystem();
-        if (stateSystem == null) {
+        if (stateSystem == null || time < stateSystem.getStartTime()) {
             return null;
         }
 
@@ -101,7 +102,7 @@ public class TidAnalysisModule extends TmfStateSystemAnalysisModule {
             if (value.getType().equals(Type.INTEGER)) {
                 tid = value.unboxInt();
             }
-        } catch (StateSystemDisposedException e) {
+        } catch (StateSystemDisposedException | TimeRangeException e) {
             Activator.getDefault().logError(NonNullUtils.nullToEmptyString(e.getMessage()), e);
         }
         return tid;
