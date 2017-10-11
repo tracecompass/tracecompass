@@ -17,6 +17,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryUsageDataProvider;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
@@ -47,6 +48,8 @@ public class MemoryUsageViewer extends TmfCommonXAxisChartViewer {
     @Override
     protected void initializeDataProvider() {
         ITmfTrace trace = getTrace();
-        setDataProvider(UstMemoryUsageDataProvider.create(trace));
+        UstMemoryUsageDataProvider provider = DataProviderManager.getInstance().getDataProvider(trace,
+                UstMemoryUsageDataProvider.ID, UstMemoryUsageDataProvider.class);
+        setDataProvider(provider);
     }
 }
