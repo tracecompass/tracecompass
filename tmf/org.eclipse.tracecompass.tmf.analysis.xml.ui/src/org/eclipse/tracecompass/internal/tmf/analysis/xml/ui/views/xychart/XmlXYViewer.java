@@ -12,13 +12,11 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.xychart;
 
-import java.util.Set;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlDataProviderManager;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
@@ -56,13 +54,11 @@ public class XmlXYViewer extends TmfCommonXAxisChartViewer {
     protected void initializeDataProvider() {
         ITmfTrace trace = getTrace();
         Element viewElement = fViewInfo.getViewElement(TmfXmlStrings.XY_VIEW);
-        if (viewElement == null) {
+        if (trace == null || viewElement == null) {
             return;
         }
-
-        Set<String> analysisIds = fViewInfo.getViewAnalysisIds(viewElement);
-        Element entry = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.ENTRY_ELEMENT).get(0);
-        setDataProvider(XmlXYDataProvider.create(trace, analysisIds, entry));
+        XmlXYDataProvider provider = XmlDataProviderManager.getInstance().getXyProvider(trace, viewElement);
+        setDataProvider(provider);
     }
 
     /**

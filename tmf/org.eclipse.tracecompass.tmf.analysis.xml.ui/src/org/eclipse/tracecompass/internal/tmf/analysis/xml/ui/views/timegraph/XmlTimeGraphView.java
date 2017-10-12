@@ -251,7 +251,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         // Empty the additional state values
         fStringValueMap.clear();
 
-        Set<String> analysisIds = fViewInfo.getViewAnalysisIds(viewElement);
+        Set<String> analysisIds = TmfXmlUtils.getViewAnalysisIds(viewElement);
 
         List<Element> entries = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.ENTRY_ELEMENT);
         Set<XmlEntry> entryList = new TreeSet<>(getEntryComparator());

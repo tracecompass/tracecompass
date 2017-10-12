@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.module;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -25,11 +27,15 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractTmfTraceDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Messages;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
@@ -46,6 +52,9 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.w3c.dom.Element;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -58,10 +67,20 @@ import com.google.common.collect.ImmutableMap;
  */
 @NonNullByDefault
 @SuppressWarnings("restriction")
-public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements ITmfXYDataProvider {
+public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
+        implements ITmfXYDataProvider, ITmfTreeDataProvider<TmfTreeDataModel> {
 
+    private static final String ID = "org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlXYDataProvider"; //$NON-NLS-1$
     private static final String SPLIT_STRING = "/"; //$NON-NLS-1$
     private static final Pattern WILDCARD_PATTERN = Pattern.compile("\\*"); //$NON-NLS-1$
+    private static final AtomicLong ENTRY_IDS = new AtomicLong();
+
+    /**
+     * Two way association between quarks and entry IDs, ensures that a single ID is
+     * reused per every quark, and finds the quarks to query for the XY models.
+     */
+    private final BiMap<Long, Integer> fIdToQuark = HashBiMap.create();
+    private @Nullable TmfModelResponse<List<TmfTreeDataModel>> fCached;
 
     private static class XmlXYEntry implements IXmlStateSystemContainer {
 
@@ -114,8 +133,9 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
             /* Get the list of quarks to process with this path */
             List<Integer> quarks = Collections.singletonList(IXmlStateSystemContainer.ROOT_QUARK);
 
+            //recursively find the paths
             for (String path : paths) {
-                List<Integer> subQuarks = new LinkedList<>();
+                List<Integer> subQuarks = new ArrayList<>();
                 /* Replace * by .* to have a regex string */
                 String name = WILDCARD_PATTERN.matcher(path).replaceAll(".*"); //$NON-NLS-1$
                 for (int relativeQuark : quarks) {
@@ -169,10 +189,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
          * charts.
          */
         ITmfXmlModelFactory fFactory = TmfXmlReadOnlyModelFactory.getInstance();
-        String path = entryElement.getAttribute(TmfXmlStrings.PATH);
-        if (path.isEmpty()) {
-            path = TmfXmlStrings.WILDCARD;
-        }
+        String path = entryElement.hasAttribute(TmfXmlStrings.PATH) ? entryElement.getAttribute(TmfXmlStrings.PATH) : TmfXmlStrings.WILDCARD;
         XmlXYEntry entry = new XmlXYEntry(ss, path, entryElement);
 
         /* Get the display element to use */
@@ -199,12 +216,14 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
     public TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         ITmfXmlStateAttribute display = fDisplay;
         XmlXYEntry entry = fXmlEntry;
+        ITmfXmlStateAttribute seriesNameAttrib = fSeriesNameAttrib;
 
         ITmfStateSystem ss = entry.getStateSystem();
         List<Integer> quarks = entry.getQuarks();
 
         /* Series are lazily created in the HashMap */
-        Map<String, double[]> tempModel = new HashMap<>();
+        Map<Integer, double[]> tempModel = new HashMap<>();
+        Map<Integer, String> tempNames = new HashMap<>();
         long[] xValues = filter.getTimesRequested();
 
         long currentEnd = ss.getCurrentEndTime();
@@ -215,34 +234,22 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
                 if (ss.getStartTime() <= time && time <= currentEnd) {
                     List<@NonNull ITmfStateInterval> full = ss.queryFullState(time);
                     for (int quark : quarks) {
-                        String seriesName = null;
-                        ITmfXmlStateAttribute seriesNameAttrib = fSeriesNameAttrib;
-                        if (seriesNameAttrib == null) {
-                            // No name attribute, just use the quark text
-                            seriesName = ss.getAttributeName(quark);
-                        } else {
+                        if (seriesNameAttrib != null) {
                             // Use the value of the series name attribute
                             int seriesNameQuark = seriesNameAttrib.getAttributeQuark(quark, null);
                             Object value = full.get(seriesNameQuark).getValue();
-                            if (value == null) {
-                                seriesName = ss.getAttributeName(quark);
-                            } else {
-                                seriesName = String.valueOf(value);
+                            if (value != null) {
+                                tempNames.put(quark, String.valueOf(value));
                             }
                         }
 
                         Object value = full.get(display.getAttributeQuark(quark, null)).getValue();
-
-                        // FIXME: What if the name changes during the model? Chances are the values will
-                        // be for different series. It should be associated with the quark
-                        double[] yValues = tempModel.get(seriesName);
-                        if (yValues != null) {
-                            setYValue(i, yValues, extractValue(value), entry.getType());
-                        } else {
+                        double[] yValues = tempModel.get(quark);
+                        if (yValues == null) {
                             yValues = new double[xValues.length];
-                            setYValue(i, yValues, extractValue(value), entry.getType());
-                            tempModel.put(seriesName, yValues);
+                            tempModel.put(quark, yValues);
                         }
+                        setYValue(i, yValues, extractValue(value), entry.getType());
                     }
                 }
             }
@@ -251,8 +258,9 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
         }
 
         ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
-        for (Entry<String, double[]> tempEntry : tempModel.entrySet()) {
-            ySeries.put(tempEntry.getKey(), new YModel(tempEntry.getKey(), tempEntry.getValue()));
+        for (Entry<Integer, double[]> tempEntry : tempModel.entrySet()) {
+            String name = tempNames.getOrDefault(tempEntry.getKey(), ss.getAttributeName(tempEntry.getKey()));
+            ySeries.put(name, new YModel(name, tempEntry.getValue()));
         }
 
         boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
@@ -310,5 +318,57 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
         }
 
         return null;
+    }
+
+    /**
+     * @since 2.4
+     */
+    @Override
+    public TmfModelResponse<List<TmfTreeDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        if (fCached != null) {
+            return fCached;
+        }
+
+        ITmfStateSystem ss = fXmlEntry.getStateSystem();
+
+        // Get the quarks before the full states to ensure that the attributes will be present in the full state
+        boolean isComplete = ss.waitUntilBuilt(0);
+        List<Integer> quarks = fXmlEntry.getQuarks();
+        List<ITmfStateInterval> fullState;
+        try {
+            fullState = ss.queryFullState(ss.getCurrentEndTime());
+        } catch (StateSystemDisposedException e) {
+            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
+        }
+
+        ImmutableList.Builder<TmfTreeDataModel> builder = ImmutableList.builder();
+        for (int quark : quarks) {
+            String seriesName = (String) fullState.get(quark).getValue();
+            if (seriesName != null && !seriesName.isEmpty()) {
+                // Check if an ID has already been created for this quark.
+                Long id = fIdToQuark.inverse().get(quark);
+                if (id == null) {
+                    id = ENTRY_IDS.getAndIncrement();
+                    fIdToQuark.put(id, quark);
+                }
+                builder.add(new TmfTreeDataModel(id, -1, seriesName));
+            }
+        }
+
+        ImmutableList<TmfTreeDataModel> list = builder.build();
+        if (isComplete) {
+            TmfModelResponse<List<TmfTreeDataModel>> tmfModelResponse = new TmfModelResponse<>(list, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+            fCached = tmfModelResponse;
+            return tmfModelResponse;
+        }
+        return new TmfModelResponse<>(list, ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
+    }
+
+    /**
+     * @since 2.4
+     */
+    @Override
+    public String getId() {
+        return ID;
     }
 }

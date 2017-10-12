@@ -12,7 +12,9 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.module;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -271,5 +273,30 @@ public final class TmfXmlUtils {
             }
         }
         return value;
+    }
+
+    /**
+     * Get the list of analysis IDs this view is for, as listed in the header of
+     * the XML element
+     *
+     * @param viewElement
+     *            The XML view element from which to get the analysis IDs
+     * @return The list of all analysis IDs this view is for
+     * @since 2.4
+     */
+    public static @NonNull Set<@NonNull String> getViewAnalysisIds(Element viewElement) {
+        List<Element> heads = getChildElements(viewElement, TmfXmlStrings.HEAD);
+
+        Set<@NonNull String> analysisIds = new HashSet<>();
+        if (!heads.isEmpty()) {
+            Element head = heads.get(0);
+
+            /* Get the application analysis from the view's XML header */
+            List<Element> applicableAnalysis = getChildElements(head, TmfXmlStrings.ANALYSIS);
+            for (Element oneAnalysis : applicableAnalysis) {
+                analysisIds.add(oneAnalysis.getAttribute(TmfXmlStrings.ID));
+            }
+        }
+        return analysisIds;
     }
 }

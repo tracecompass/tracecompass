@@ -12,9 +12,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -134,29 +132,5 @@ public class XmlViewInfo extends AbstractXmlViewInfo {
             }
         }
         return title;
-    }
-
-    /**
-     * Get the list of analysis IDs this view is for, as listed in the header of
-     * the XML element
-     *
-     * @param viewElement
-     *            The XML view element from which to get the analysis IDs
-     * @return The list of all analysis IDs this view is for
-     */
-    public Set<String> getViewAnalysisIds(Element viewElement) {
-        List<Element> heads = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.HEAD);
-
-        Set<String> analysisIds = new HashSet<>();
-        if (!heads.isEmpty()) {
-            Element head = heads.get(0);
-
-            /* Get the application analysis from the view's XML header */
-            List<Element> applicableAnalysis = TmfXmlUtils.getChildElements(head, TmfXmlStrings.ANALYSIS);
-            for (Element oneAnalysis : applicableAnalysis) {
-                analysisIds.add(oneAnalysis.getAttribute(TmfXmlStrings.ID));
-            }
-        }
-        return analysisIds;
     }
 }
