@@ -129,14 +129,16 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
     /** XML Model elements to use to create the series */
     private final ITmfXmlStateAttribute fDisplay;
     private final XmlXYEntry fXmlEntry;
+    private final @Nullable ITmfXmlStateAttribute fSeriesNameAttrib;
 
     /**
      * Constructor
      */
-    private XmlXYDataProvider(ITmfTrace trace, XmlXYEntry entry, ITmfXmlStateAttribute display) {
+    private XmlXYDataProvider(ITmfTrace trace, XmlXYEntry entry, ITmfXmlStateAttribute display, @Nullable ITmfXmlStateAttribute seriesName) {
         super(trace);
         fXmlEntry = entry;
         fDisplay = display;
+        fSeriesNameAttrib = seriesName;
     }
 
     /**
@@ -184,10 +186,8 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
             seriesName = fFactory.createStateAttribute(seriesNameElement, entry);
         }
 
-        if (seriesName != null) {
-            return new XmlXYDataProvider(trace, entry, display);
-        }
-        return null;
+        return new XmlXYDataProvider(trace, entry, display, seriesName);
+
     }
 
     @Override
@@ -210,18 +210,33 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
                 if (ss.getStartTime() <= time && time <= currentEnd) {
                     List<@NonNull ITmfStateInterval> full = ss.queryFullState(time);
                     for (int quark : quarks) {
-                        String seriesName = (String) full.get(quark).getValue();
-                        if (seriesName != null && !seriesName.isEmpty()) {
-                            Object value = full.get(display.getAttributeQuark(quark, null)).getValue();
-
-                            double[] yValues = tempModel.get(seriesName);
-                            if (yValues != null) {
-                                setYValue(i, yValues, extractValue(value), entry.getType());
+                        String seriesName = null;
+                        ITmfXmlStateAttribute seriesNameAttrib = fSeriesNameAttrib;
+                        if (seriesNameAttrib == null) {
+                            // No name attribute, just use the quark text
+                            seriesName = ss.getAttributeName(quark);
+                        } else {
+                            // Use the value of the series name attribute
+                            int seriesNameQuark = seriesNameAttrib.getAttributeQuark(quark, null);
+                            Object value = full.get(seriesNameQuark).getValue();
+                            if (value == null) {
+                                seriesName = ss.getAttributeName(quark);
                             } else {
-                                yValues = new double[xValues.length];
-                                setYValue(i, yValues, extractValue(value), entry.getType());
-                                tempModel.put(seriesName, yValues);
+                                seriesName = String.valueOf(value);
                             }
+                        }
+
+                        Object value = full.get(display.getAttributeQuark(quark, null)).getValue();
+
+                        // FIXME: What if the name changes during the model? Chances are the values will
+                        // be for different series. It should be associated with the quark
+                        double[] yValues = tempModel.get(seriesName);
+                        if (yValues != null) {
+                            setYValue(i, yValues, extractValue(value), entry.getType());
+                        } else {
+                            yValues = new double[xValues.length];
+                            setYValue(i, yValues, extractValue(value), entry.getType());
+                            tempModel.put(seriesName, yValues);
                         }
                     }
                 }
