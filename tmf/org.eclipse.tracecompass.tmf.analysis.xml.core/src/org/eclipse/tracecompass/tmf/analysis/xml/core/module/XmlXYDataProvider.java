@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.module;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.w3c.dom.Element;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 
 /**
  * This data provider will return a XY model (wrapped in a response) based on a
@@ -65,12 +65,12 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
 
     private static class XmlXYEntry implements IXmlStateSystemContainer {
 
-        private final ITmfStateSystem fStateSystem;
+        private final ITmfAnalysisModuleWithStateSystems fStateSystemModule;
         private final String fPath;
         private final DisplayType fType;
 
-        public XmlXYEntry(ITmfStateSystem stateSystem, String path, Element entryElement) {
-            fStateSystem = stateSystem;
+        public XmlXYEntry(ITmfAnalysisModuleWithStateSystems stateSystem, String path, Element entryElement) {
+            fStateSystemModule = stateSystem;
             fPath = path;
             switch (entryElement.getAttribute(TmfXmlStrings.DISPLAY_TYPE)) {
             case TmfXmlStrings.DISPLAY_TYPE_DELTA:
@@ -91,7 +91,12 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
 
         @Override
         public ITmfStateSystem getStateSystem() {
-            return fStateSystem;
+            fStateSystemModule.waitForInitialization();
+            Iterator<ITmfStateSystem> stateSystems = fStateSystemModule.getStateSystems().iterator();
+            if (!stateSystems.hasNext()) {
+                throw new NullPointerException("Analysis " + fStateSystemModule.getId() + " has no state system"); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            return stateSystems.next();
         }
 
         @Override
@@ -114,7 +119,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
                 /* Replace * by .* to have a regex string */
                 String name = WILDCARD_PATTERN.matcher(path).replaceAll(".*"); //$NON-NLS-1$
                 for (int relativeQuark : quarks) {
-                    subQuarks.addAll(fStateSystem.getSubAttributes(relativeQuark, false, name));
+                    subQuarks.addAll(getStateSystem().getSubAttributes(relativeQuark, false, name));
                 }
                 quarks = subQuarks;
             }
@@ -154,7 +159,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
      * @return A XmlDataProvider
      */
     public static @Nullable XmlXYDataProvider create(ITmfTrace trace, Set<String> analysisIds, Element entryElement) {
-        ITmfStateSystem ss = getStateSystemFromAnalyses(analysisIds, trace);
+        ITmfAnalysisModuleWithStateSystems ss = getStateSystemFromAnalyses(analysisIds, trace);
         if (ss == null) {
             return null;
         }
@@ -279,7 +284,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
         return 0;
     }
 
-    private static @Nullable ITmfStateSystem getStateSystemFromAnalyses(Set<String> analysisIds, ITmfTrace trace) {
+    private static @Nullable ITmfAnalysisModuleWithStateSystems getStateSystemFromAnalyses(Set<String> analysisIds, ITmfTrace trace) {
         List<ITmfAnalysisModuleWithStateSystems> stateSystemModules = new LinkedList<>();
         if (analysisIds.isEmpty()) {
             /*
@@ -301,10 +306,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider implements I
         for (ITmfAnalysisModuleWithStateSystems module : stateSystemModules) {
             module.schedule();
 
-            /* If module succeeded, we get the first statesystem */
-            if (module.waitForInitialization()) {
-                return Iterables.getFirst(module.getStateSystems(), null);
-            }
+            return module;
         }
 
         return null;
