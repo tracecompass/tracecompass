@@ -112,7 +112,7 @@ public class DataProviderManager {
      *            Returned data provider must extend this class
      * @return Collection of data provider
      */
-    public <T> Collection<T> getDataProvider(@NonNull ITmfTrace trace, Class<T> dataProviderClass) {
+    public synchronized <T> Collection<T> getDataProvider(@NonNull ITmfTrace trace, Class<T> dataProviderClass) {
         Collection<T> dataProviders = new ArrayList<>();
         for (ITmfTreeDataProvider<? extends ITmfTreeDataModel> dataProvider : fInstances.get(trace)) {
             if (dataProvider != null && dataProviderClass.isAssignableFrom(dataProvider.getClass())) {
