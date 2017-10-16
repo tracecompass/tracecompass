@@ -17,7 +17,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTree
  * encapsulates a model from an {@link ITmfTreeDataProvider}.
  *
  * @param <M>
- *            type of model paryload
+ *            type of model payload
  * @author Loic Prieur-Drevon
  */
 public class TmfGenericTreeEntry<M extends TmfTreeDataModel> extends TmfTreeViewerEntry {

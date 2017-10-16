@@ -9,8 +9,12 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.tree;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -140,13 +144,45 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     @Override
     protected void contentChanged(ITmfTreeViewerEntry rootEntry) {
         TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
-        Object[] checkedElements = (Object[]) ctx.getData(getClass() + CHECKED_ELEMENTS);
-        fCheckboxTree.setCheckedElements(checkedElements != null ? checkedElements : new Object[0]);
+        Set<Long> ids = (Set<Long>) ctx.getData(getClass() + CHECKED_ELEMENTS);
+        if (ids != null && rootEntry != null) {
+            List<ITmfTreeViewerEntry> checkedElements = new ArrayList<>();
+            checkEntries(ids, rootEntry, checkedElements);
+            fCheckboxTree.setCheckedElements(checkedElements.toArray());
+        }
 
         if (fChartViewer != null) {
             fChartViewer.handleCheckStateChangedEvent(getCheckedViewerEntries());
         }
         getTreeViewer().refresh();
+    }
+
+    private Collection<ITmfTreeViewerEntry> getCheckedViewerEntries() {
+        Object[] checkedElements = fCheckboxTree.getCheckedElements();
+        return Lists.newArrayList(Iterables.filter(Arrays.asList(checkedElements), ITmfTreeViewerEntry.class));
+    }
+
+    /**
+     * Recursively find entries which were previously checked and check them again
+     * by id.
+     *
+     * @param ids
+     *            Set of previously checked IDs
+     * @param root
+     *            {@link ITmfTreeViewerEntry} to compare to the set of checked
+     *            entries
+     * @param checkedElements
+     *            list of checked entries to which we add the root entry if it was
+     *            previously checked
+     */
+    private void checkEntries(Set<Long> ids, ITmfTreeViewerEntry root, List<ITmfTreeViewerEntry> checkedElements) {
+        if (root instanceof TmfGenericTreeEntry
+                && ids.contains(((TmfGenericTreeEntry) root).getModel().getId())) {
+            checkedElements.add(root);
+        }
+        for (ITmfTreeViewerEntry child : root.getChildren()) {
+            checkEntries(ids, child, checkedElements);
+        }
     }
 
     /**
@@ -183,21 +219,33 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         }
     }
 
+    @Override
+    protected void updateContent(long start, long end, boolean isSelection) {
+        /*
+         * save the view context before updating the content (windows and selection
+         * range update) to save the checked entries' IDs and check them again in the
+         * new tree.
+         */
+        saveViewContext();
+        super.updateContent(start, end, isSelection);
+    }
+
     /**
      * Save the checked entries in the view context before changing trace.
      */
     private void saveViewContext() {
         ITmfTrace previousTrace = getTrace();
-        Object[] checkedElements = fCheckboxTree.getCheckedElements();
         if (previousTrace != null) {
+            Object[] checkedElements = fCheckboxTree.getCheckedElements();
+            Set<Long> ids = new HashSet<>();
+            for (Object checkedElement : checkedElements) {
+                if (checkedElement instanceof TmfGenericTreeEntry) {
+                    ids.add(((TmfGenericTreeEntry) checkedElement).getModel().getId());
+                }
+            }
             TmfTraceManager.getInstance().updateTraceContext(previousTrace,
-                    builder -> builder.setData(getClass() + CHECKED_ELEMENTS, checkedElements));
+                    builder -> builder.setData(getClass() + CHECKED_ELEMENTS, ids));
         }
-    }
-
-    private Collection<ITmfTreeViewerEntry> getCheckedViewerEntries() {
-        Object[] checkedElements = fCheckboxTree.getCheckedElements();
-        return Lists.newArrayList(Iterables.filter(Arrays.asList(checkedElements), ITmfTreeViewerEntry.class));
     }
 
 }

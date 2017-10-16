@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeColumn;
@@ -25,12 +24,9 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.Time
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.ILegendImageProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
-import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData;
@@ -77,7 +73,7 @@ public class CounterTreeViewer extends AbstractSelectTreeViewer {
             return null;
         }
     }
-    private Map<ITmfTrace, TmfTreeViewerEntry> fRoots = new HashMap<>();
+
     private final int fLegendColumnWidth;
 
     /**
@@ -105,25 +101,33 @@ public class CounterTreeViewer extends AbstractSelectTreeViewer {
         if (trace == null) {
             return;
         }
+        DataProviderManager.getInstance().getDataProvider(trace, CounterDataProvider.ID, ITmfTreeDataProvider.class);
+    }
 
-        if (fRoots.containsKey(trace)) {
-            // Return if the trace has already been initialized
-            return;
+    @Override
+    protected ITmfTreeColumnDataProvider getColumnDataProvider() {
+        return () -> Lists.newArrayList(new TmfTreeColumnData("Counters"), new TmfTreeColumnData("Legend")); //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
+    @Override
+    protected ITmfTreeViewerEntry updateElements(long start, long end, boolean isSelection) {
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            return null;
         }
 
         ITmfTreeDataProvider provider = DataProviderManager.getInstance().getDataProvider(trace, CounterDataProvider.ID, ITmfTreeDataProvider.class);
         if (provider == null) {
-            return;
+            return null;
         }
 
         TmfModelResponse<List<CounterEntryModel>> tree = provider.fetchTree(new TimeQueryFilter(0l, Long.MAX_VALUE, 2), null);
 
         List<CounterEntryModel> model = tree.getModel();
         if (model == null) {
-            return;
+            return null;
         }
         TmfTreeViewerEntry root = new TmfTreeViewerEntry(StringUtils.EMPTY);
-        fRoots.put(trace, root);
 
         Map<Long, TmfTreeViewerEntry> map = new HashMap<>();
         map.put(-1L, root);
@@ -141,38 +145,7 @@ public class CounterTreeViewer extends AbstractSelectTreeViewer {
                 parent.addChild(viewerEntry);
             }
         }
-    }
-
-    @Override
-    protected ITmfTreeColumnDataProvider getColumnDataProvider() {
-        return () -> Lists.newArrayList(new TmfTreeColumnData("Counters"), new TmfTreeColumnData("Legend")); //$NON-NLS-1$ //$NON-NLS-2$
-    }
-
-    @Override
-    protected ITmfTreeViewerEntry updateElements(long start, long end, boolean isSelection) {
-        /*
-         * The tree displaying the trace's counters does not change when manipulating
-         * the corresponding chart.
-         */
-        return fRoots.get(getTrace());
-    }
-
-    /**
-     * Method called when the trace is closed
-     * <p>
-     * renamed so that it does not override
-     * {@link AbstractTmfTreeViewer#traceClosed(TmfTraceClosedSignal)}
-     * <p>
-     * final - do not call
-     *
-     * @param signal
-     *            unused
-     */
-    @TmfSignalHandler
-    public final void traceClosedCounter(@Nullable TmfTraceClosedSignal signal) {
-        if (signal != null) {
-            fRoots.remove(signal.getTrace());
-        }
+        return root;
     }
 
 }
