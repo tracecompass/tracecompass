@@ -20,7 +20,8 @@ public class Messages {
     public static String MemoryUsageViewer_title;
     public static String MemoryUsageViewer_xAxis;
     public static String MemoryUsageViewer_yAxis;
-    public static String MemoryUsageViewer_Total;
+    public static String KernelMemoryUsageComposite_Legend;
+    public static String KernelMemoryUsageComposite_Total;
 
     static {
         // initialize resource bundle

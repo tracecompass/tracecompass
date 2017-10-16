@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.kernelmemoryusage.KernelMemoryUsageView;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -32,17 +33,21 @@ import org.swtchart.ISeries;
 import org.swtchart.LineStyle;
 
 /**
- * SWTBot tests for Kernel Memory Usage view
+ * SWTBot tests for {@link KernelMemoryUsageView}
  *
  * @author Yonni Chen
  */
 public class KernelMemoryUsageViewTest extends XYDataProviderBaseTest {
 
-    private static final @NonNull String TOTAL_SERIES_NAME = "Total";
     private static final @NonNull String TITLE = "Relative Kernel Memory Usage";
+
+    private static final @NonNull String TOTAL_PID = "bug446190:total";
+    private static final @NonNull String SESSIOND_PID = "bug446190:482";
+    private static final @NonNull String CONSUMERD_PID = "bug446190:496";
 
     private static final RGB RED = new RGB(255, 0, 0);
     private static final RGB BLUE = new RGB(0, 0, 255);
+    private static final RGB GREEN = new RGB(0, 255, 0);
 
     private static final int NUMBER_OF_POINT = 50;
     private static final int MORE_POINTS = 100;
@@ -71,12 +76,20 @@ public class KernelMemoryUsageViewTest extends XYDataProviderBaseTest {
 
         final Chart chart = getChart();
         assertNotNull(chart);
-
-        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length > 0, chart, "No data available");
         chartViewer.setNbPoints(NUMBER_OF_POINT);
 
+        SWTBotTree treeBot = getSWTBotView().bot().tree();
+        SWTBotTreeItem totalNode = treeBot.getTreeItem(getTestTrace().getName());
+        SWTBotUtils.waitUntil(root -> root.getItems().length >= 5, totalNode, "Did not finish loading");
+
+        /*
+         * Select the total entry, which should be the first entry with an empty pid
+         * column.
+         */
+        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 1, chart, "No data available");
+
         /* Test type, style and color of series */
-        verifyChartStyle(null);
+        verifySeriesStyle(TOTAL_PID, ISeries.SeriesType.LINE, BLUE, LineStyle.SOLID, false);
 
         /* Test data model*/
         SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json), "resources/kernelmemory/kernel-memory-res50.json", "Chart data is not valid");
@@ -84,50 +97,32 @@ public class KernelMemoryUsageViewTest extends XYDataProviderBaseTest {
         /*
          * Select a thread
          */
-        String selectedThread = "482";
-        SWTBotTree treeBot = getSWTBotView().bot().tree();
-        SWTBotUtils.waitUntil(tree -> tree.rowCount() >= 5, treeBot, "Did not finish loading");
-        treeBot.getTreeItem(selectedThread).click();
+        SWTBotTreeItem sessiondEntry = totalNode.getNode("482");
+        sessiondEntry.check();
         SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 2, chart, "Only total available");
 
         /* Test type, style and color of series */
-        verifyChartStyle(selectedThread);
+        verifySeriesStyle(SESSIOND_PID, ISeries.SeriesType.LINE, RED, LineStyle.SOLID, false);
 
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, selectedThread), "resources/kernelmemory/kernel-memory-res50Selected.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, SESSIOND_PID), "resources/kernelmemory/kernel-memory-res50Selected.json", "Chart data is not valid");
 
         /*
          * Select an another thread and change zoom
          */
-        String otherSelectedThread = "496";
-        treeBot.getTreeItem(otherSelectedThread).click();
+        SWTBotTreeItem consumerdEntry = totalNode.getNode("496");
+        consumerdEntry.check();
         chartViewer.setNbPoints(MORE_POINTS);
-        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 2, chart, "Only total available");
+        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 3, chart, "Only total and sessiond available");
 
         /* Test type, style and color of series */
-        verifyChartStyle(otherSelectedThread);
+        verifySeriesStyle(CONSUMERD_PID, ISeries.SeriesType.LINE, GREEN, LineStyle.SOLID, false);
 
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, otherSelectedThread), "resources/kernelmemory/kernel-memory-res100Selected.json", "Chart data is not valid");
-    }
-
-    /**
-     * Verify the chart style. This method will test <i>Total</i> series style as well as
-     * the given selected thread series.
-     *
-     * @param selectedThread
-     *            The selected thread. If no selected thread, give <code>null</code>
-     *            as parameter.
-     */
-    private void verifyChartStyle(String selectedThread) {
-        verifySeriesStyle(TOTAL_SERIES_NAME, ISeries.SeriesType.LINE, BLUE, LineStyle.SOLID, false);
-
-        if (selectedThread != null) {
-            verifySeriesStyle(selectedThread, ISeries.SeriesType.LINE, RED, LineStyle.SOLID, false);
-        }
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, CONSUMERD_PID), "resources/kernelmemory/kernel-memory-res100Selected.json", "Chart data is not valid");
     }
 
     @Override
     protected @NonNull String getMainSeriesName() {
-        return TOTAL_SERIES_NAME;
+        return TOTAL_PID;
     }
 
     @Override
@@ -139,7 +134,6 @@ public class KernelMemoryUsageViewTest extends XYDataProviderBaseTest {
     protected String getViewID() {
         return KernelMemoryUsageView.ID;
     }
-
 
     @Override
     protected ITmfTrace getTestTrace() {

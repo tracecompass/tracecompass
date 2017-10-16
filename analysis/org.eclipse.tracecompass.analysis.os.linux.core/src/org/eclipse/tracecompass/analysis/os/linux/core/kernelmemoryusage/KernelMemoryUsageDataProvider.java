@@ -30,11 +30,10 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelmemoryusag
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractStateSystemAnalysisDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
@@ -60,19 +59,33 @@ import com.google.common.collect.ImmutableMap;
 @NonNullByDefault
 @SuppressWarnings("restriction")
 public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataProvider
-    implements ITmfXYDataProvider, ITmfTreeDataProvider<KernelMemoryUsageTreeModel> {
+    implements ITmfTreeXYDataProvider<KernelMemoryUsageTreeModel> {
 
     /**
      * This data provider's extension point ID
      * @since 2.4
      */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage"; //$NON-NLS-1$
+    /**
+     * Fake Tid used for the total entry
+     * @since 2.4
+     */
+    public static final int TOTAL_TID = -2;
+    /**
+     * Suffix to add to the trace name for the total entry.
+     * @since 2.4
+     */
+    public static final String TOTAL_SUFFIX = ":total"; //$NON-NLS-1$
     private static final AtomicLong KERNEL_MEMORY_ENTRY_ID = new AtomicLong();
 
     private final KernelMemoryAnalysisModule fModule;
     private @Nullable KernelAnalysisModule fKernelModule;
 
     private final BiMap<Long, Integer> fIdToQuark = HashBiMap.create();
+    /**
+     * This trace's total entry id
+     */
+    private final long fTotalId = KERNEL_MEMORY_ENTRY_ID.getAndIncrement();
 
     /* A map that saves the mapping of a thread ID to its executable name */
     private final Map<String, String> fProcessNameMap = new HashMap<>();
@@ -114,14 +127,15 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
 
         long[] xValues = filter.getTimesRequested();
 
+        long currentEnd = ss.getCurrentEndTime();
+        boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
+
         /**
          * For a given time range, we plot lines representing the memory allocation for
          * the total and the selected entries.
          */
         double[] totalKernelMemoryValues = new double[xValues.length];
         Map<Integer, double[]> selectedSeries = initSeries(filter);
-
-        long currentEnd = ss.getCurrentEndTime();
 
         try {
             for (int i = 0; i < xValues.length; i++) {
@@ -153,6 +167,7 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
              * We shift the series up.
              */
             List<ITmfStateInterval> endState = ss.queryFullState(Long.min(filter.getEnd(), currentEnd));
+
             double d = extractTotalValueShift(ss, endState);
             Arrays.setAll(totalKernelMemoryValues, i -> totalKernelMemoryValues[i] + d);
 
@@ -169,14 +184,15 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
         }
 
         ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
-        String total = Objects.requireNonNull(Messages.KernelMemoryUsageDataProvider_Total);
+
+        String total = getTrace().getName() + TOTAL_SUFFIX;
         ySeries.put(total, new YModel(total, totalKernelMemoryValues));
+
         for (Entry<Integer, double[]> entry : selectedSeries.entrySet()) {
-            String selectedThreadName = ss.getAttributeName(entry.getKey());
+            String selectedThreadName = getTrace().getName() + ':' + ss.getAttributeName(entry.getKey());
             ySeries.put(selectedThreadName, new YModel(selectedThreadName, entry.getValue()));
         }
 
-        boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
         return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.KernelMemoryUsageDataProvider_title), xValues, ySeries.build(), complete);
     }
 
@@ -266,11 +282,12 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
             List<ITmfStateInterval> memoryStates = ss.queryFullState(Long.max(start, ss.getStartTime()));
             List<Integer> threadQuarkList = ss.getSubAttributes(ITmfStateSystem.ROOT_ATTRIBUTE, false);
 
+            nodes.add(new KernelMemoryUsageTreeModel(fTotalId, -1, TOTAL_TID, getTrace().getName()));
             for (Integer threadQuark : threadQuarkList) {
                 ITmfStateInterval threadMemoryInterval = memoryStates.get(threadQuark);
                 if (threadMemoryInterval.getEndTime() < end) {
-                    String tid = ss.getAttributeName(threadQuark);
-                    String procname = getProcessName(tid);
+                    String tidString = ss.getAttributeName(threadQuark);
+                    String procname = getProcessName(tidString);
 
                     // Ensure that we reuse the same id for a given quark.
                     Long id = fIdToQuark.inverse().get(threadQuark);
@@ -278,13 +295,20 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
                         id = KERNEL_MEMORY_ENTRY_ID.getAndIncrement();
                         fIdToQuark.put(id, threadQuark);
                     }
-                    // model has no parent, parent ID is -1;
-                    nodes.add(new KernelMemoryUsageTreeModel(id, -1, tid, procname));
+                    nodes.add(new KernelMemoryUsageTreeModel(id, fTotalId, parseTid(tidString), procname));
                 }
             }
             return new TmfModelResponse<>(nodes, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         } catch (StateSystemDisposedException e) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
+        }
+    }
+
+    private static int parseTid(String tidString) {
+        try {
+            return Integer.parseInt(tidString);
+        } catch (NumberFormatException e) {
+            return -1;
         }
     }
 

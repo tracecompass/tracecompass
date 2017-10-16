@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTree
 @SuppressWarnings("restriction")
 public class KernelMemoryUsageTreeModel extends TmfTreeDataModel {
 
-    private final String fTid;
+    private final int fTid;
 
     /**
      * Constructor
@@ -37,7 +37,7 @@ public class KernelMemoryUsageTreeModel extends TmfTreeDataModel {
      * @param name
      *            The thread's name
      */
-    public KernelMemoryUsageTreeModel(long id, long parentId, String tid, String name) {
+    public KernelMemoryUsageTreeModel(long id, long parentId, int tid, String name) {
         super(id, parentId, name);
         fTid = tid;
     }
@@ -47,7 +47,7 @@ public class KernelMemoryUsageTreeModel extends TmfTreeDataModel {
      *
      * @return The thread's TID
      */
-    public String getTid() {
+    public int getTid() {
         return fTid;
     }
 }
