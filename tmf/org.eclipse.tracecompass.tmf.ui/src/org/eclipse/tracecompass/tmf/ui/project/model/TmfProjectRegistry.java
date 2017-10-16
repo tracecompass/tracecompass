@@ -231,8 +231,8 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                             Iterator<ITmfProjectModelElement> iterator = elementsToRefresh.iterator();
                             while (iterator.hasNext()) {
                                 ITmfProjectModelElement element = iterator.next();
-                                if (element instanceof TmfTraceElement) {
-                                    changedTraces.add(((TmfTraceElement) element).getElementUnderTraceFolder());
+                                if (element instanceof TmfTraceElement && element.getParent() instanceof TmfTraceFolder) {
+                                    changedTraces.add((TmfTraceElement) element);
                                 }
                                 for (ITmfProjectModelElement parent : elementsToRefresh) {
                                     // remove element if any of its parents is included
