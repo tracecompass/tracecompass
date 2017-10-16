@@ -182,15 +182,6 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
     protected abstract int getQuarkRelativeAndAdd(int startNodeQuark, String... path) throws AttributeNotFoundException;
 
     /**
-     * Get an attribute pool starting at the requested quark
-     *
-     * @param startNodeQuark
-     *            The quark of the attribute to get the pool for
-     * @return The attribute pool starting at the requested quark
-     */
-    protected abstract @Nullable TmfAttributePool getAttributePool(int startNodeQuark);
-
-    /**
      * Get the state system associated with this attribute's container
      *
      * @return The state system associated with this state attribute
@@ -349,7 +340,7 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                     Activator.logError("Attribute type pool: attribute pools can only be used in a context of scenarios."); //$NON-NLS-1$
                     return IXmlStateSystemContainer.ERROR_QUARK;
                 }
-                TmfAttributePool pool = getAttributePool(startQuark);
+                TmfAttributePool pool = fContainer.getAttributePool(startQuark);
                 if (pool == null) {
                     Activator.logWarning("Attribute type pool: No pool was assigned for quark"); //$NON-NLS-1$
                     return IXmlStateSystemContainer.ERROR_QUARK;
