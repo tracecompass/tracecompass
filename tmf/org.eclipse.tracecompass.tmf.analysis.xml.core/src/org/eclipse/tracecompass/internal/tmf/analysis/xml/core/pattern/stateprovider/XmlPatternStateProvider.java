@@ -26,11 +26,14 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScena
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readwrite.TmfXmlReadWriteModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
+import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
+import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool.QueueType;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -48,6 +51,8 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
 
     /** Map for defined values */
     private final Map<String, String> fDefinedValues = new HashMap<>();
+    /** Map for attribute pools */
+    private final Map<Integer, TmfAttributePool> fAttributePools = new HashMap<>();
 
     /** List of all Locations */
     private final @NonNull Set<@NonNull TmfXmlLocation> fLocations;
@@ -244,5 +249,19 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
      */
     public @Nullable Set<@NonNull TmfXmlMapEntry> getMappingGroup(@NonNull String id) {
         return fMappingGroups.get(id);
+    }
+
+    @Override
+    public @Nullable TmfAttributePool getAttributePool(int startNodeQuark) {
+        ITmfStateSystem ss = getStateSystem();
+        if (!(ss instanceof ITmfStateSystemBuilder)) {
+            throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+        }
+        TmfAttributePool pool = fAttributePools.get(startNodeQuark);
+        if (pool == null) {
+            pool = new TmfAttributePool((ITmfStateSystemBuilder) ss, startNodeQuark, QueueType.PRIORITY);
+            fAttributePools.put(startNodeQuark, pool);
+        }
+        return pool;
     }
 }

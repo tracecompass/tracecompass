@@ -139,8 +139,8 @@ public class TmfStateValueTest {
 
         int quark = ss.getQuarkAbsolute("stack");
 
-        final int[] expectedStarts = { 1, 5, 7, 7 };
-        ITmfStateValue[] expectedValues = { TmfStateValue.newValueLong(1l), TmfStateValue.newValueLong(5l), TmfStateValue.newValueLong(1l) };
+        final int[] expectedStarts = { 1, 2, 5, 7, 7 };
+        ITmfStateValue[] expectedValues = { TmfStateValue.newValueLong(1l), TmfStateValue.newValueLong(2l), TmfStateValue.newValueLong(5l), TmfStateValue.newValueLong(2l) };
         XmlUtilsTest.verifyStackStateIntervals("testStateValuePeek", ss, quark, expectedStarts, expectedValues);
     }
 

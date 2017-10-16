@@ -18,8 +18,21 @@
 <field name="cpu" type="int" value="0" />
 <field name="op" type="string" value="op2" />
 </event>
+<event timestamp="2" name="entry">
+<field name="cpu" type="int" value="1" />
+<field name="op" type="string" value="op1" />
+</event>
+<event timestamp="3" name="action">
+<field name="cpu" type="int" value="1" />
+<field name="op" type="string" value="op2" />
+</event>
 <event timestamp="3" name="exit">
 <field name="cpu" type="int" value="0" />
+<field name="curState" type="string" value="GOOD" />
+<field name="op" type="string" value="op1" />
+</event>
+<event timestamp="4" name="exit">
+<field name="cpu" type="int" value="1" />
 <field name="curState" type="string" value="GOOD" />
 <field name="op" type="string" value="op1" />
 </event>

@@ -16,9 +16,35 @@
 
 	<patternHandler initial="test">
 
+	   <test id="cpu">
+			<if>
+				<condition>
+					<stateValue type="query">
+						<stateAttribute type="constant" value="#CurrentScenario" />
+						<stateAttribute type="constant" value="cpu" />
+					</stateValue>
+					<stateValue type="eventField" value="cpu" />
+				</condition>
+			</if>
+		</test>
+
 		<!-- ACTIONS -->
 		<!-- Save a value in an attribute pool -->
 		<action id="save_pool">
+			<stateChange>
+				<stateAttribute type="constant" value="Operations" />
+				<stateAttribute type="pool" />
+				<stateValue type="eventField" value="op" />
+			</stateChange>
+			<stateChange>
+				<stateAttribute type="constant" value="#CurrentScenario" />
+				<stateAttribute type="constant" value="cpu" />
+				<stateValue type="eventField" value="cpu" />
+			</stateChange>
+		</action>
+
+		<!-- A different action, to test that the attribute pool is shared in a same analysis -->
+		<action id="save_pool2">
 			<stateChange>
 				<stateAttribute type="constant" value="Operations" />
 				<stateAttribute type="pool" />
@@ -36,8 +62,8 @@
 				<transition event="entry" target="in_scenario" action="save_pool" />
 			</state>
 			<state id="in_scenario">
-				<transition event="exit" target="end" />
-				<transition event="action" target="in_scenario" action="save_pool" />
+				<transition cond="cpu" event="exit" target="end" />
+				<transition cond="cpu" event="action" target="in_scenario" action="save_pool2" />
 			</state>
 			<final id="end"/>
 		</fsm>

@@ -13,8 +13,10 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
 
 /**
  * Interface that all XML defined objects who provide, use or contain state
@@ -49,5 +51,16 @@ public interface IXmlStateSystemContainer extends ITmfXmlTopLevelElement {
      * @return The list of {@link TmfXmlLocation}
      */
     @NonNull Iterable<@NonNull TmfXmlLocation> getLocations();
+
+    /**
+     * Get an attribute pool starting at the requested quark
+     *
+     * @param startNodeQuark
+     *            The quark of the attribute to get the pool for
+     * @return The attribute pool starting at the requested quark
+     */
+    default @Nullable TmfAttributePool getAttributePool(int startNodeQuark) {
+        return null;
+    }
 
 }
