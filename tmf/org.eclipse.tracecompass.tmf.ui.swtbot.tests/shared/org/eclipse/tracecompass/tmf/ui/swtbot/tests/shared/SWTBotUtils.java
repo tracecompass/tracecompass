@@ -12,7 +12,11 @@
 
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
 
+import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.allOf;
+import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.anyOf;
+import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withMnemonic;
+import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withStyle;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -47,23 +51,27 @@ import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
@@ -114,6 +122,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.hamcrest.Matcher;
+
+import com.google.common.collect.Lists;
 
 /**
  * SWTBot Helper functions
@@ -1098,24 +1108,33 @@ public final class SWTBotUtils {
     }
 
     /**
-     * Click the OK or "Apply and Close" button the preferences dialog. The
-     * button label changed from OK to "Apply and Close" in Eclipse version
+     * Click the "OK" or "Apply and Close" button the preferences dialog. The button
+     * label changed from "OK" to "Apply and Close" in Eclipse version
      * 4.7-I20170329-2000.
      *
      * @param bot
-     *            a given workbench bot
+     *            a given bot
      */
     public static void pressOKishButtonInPreferences(SWTBot bot) {
-        try {
-            String okIshLabel = "Apply and Close";
-            // We do it this more manual way in order to not have to timout and
-            // wait 30 secs when the button is not there
-            bot.waitUntil(Conditions.waitForWidget(withMnemonic(okIshLabel)), 100);
-            bot.button(okIshLabel).click();
-        } catch (TimeoutException e) {
-            // Doesn't exist pre-4.7-I20170329-2000, try old "OK" button
-            bot.button("OK").click();
-        }
+        anyButtonOf(bot, "Apply and Close", "OK").click();
+    }
+
+    /**
+     * Get the first push button that has any one of the specified mnemonic texts.
+     * Useful when buttons change mnemonic text between releases.
+     *
+     * @param bot
+     *            a given bot
+     * @param texts
+     *            the possible button mnemonic texts
+     * @return a SWTBotButton
+     * @throws WidgetNotFoundException
+     *             if the widget is not found or is disposed.
+     */
+    public static SWTBotButton anyButtonOf(SWTBot bot, String... texts) {
+        Matcher<Widget> anyOf = anyOf(Lists.transform(Arrays.asList(texts), text -> withMnemonic(text)));
+        Iterable<Matcher<? extends Widget>> matchers = Arrays.asList(widgetOfType(Button.class), anyOf, withStyle(SWT.PUSH, "SWT.PUSH"));
+        return new SWTBotButton((Button) bot.widget(allOf(matchers), 0), allOf(matchers));
     }
 
     /**
