@@ -53,8 +53,8 @@
     100000001
   ],
   "series": {
-    "challenger (10611)": {
-      "label": "challenger (10611)",
+    "10611": {
+      "label": "10611",
       "yValues": [
         8.0,
         8.0,
@@ -108,8 +108,8 @@
         40.0
       ]
     },
-    "master_player (10618)": {
-      "label": "master_player (10618)",
+    "10618": {
+      "label": "10618",
       "yValues": [
         0.0,
         0.0,
@@ -163,8 +163,8 @@
         0.0
       ]
     },
-    "challenger (10604)": {
-      "label": "challenger (10604)",
+    "10604": {
+      "label": "10604",
       "yValues": [
         0.0,
         0.0,
@@ -218,8 +218,8 @@
         40.0
       ]
     },
-    "master_player (10613)": {
-      "label": "master_player (10613)",
+    "10613": {
+      "label": "10613",
       "yValues": [
         0.0,
         0.0,

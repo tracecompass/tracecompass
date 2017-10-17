@@ -20,6 +20,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * {@link UstMemoryUsageDataProvider} factory using the data provider factory
  * extension point
  *
+ * @since 3.2
  * @author Loic Prieur-Drevon
  */
 public class UstMemoryDataProviderFactory implements IDataProviderFactory {
