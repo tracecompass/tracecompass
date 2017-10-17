@@ -16,7 +16,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.analysis.counters.core.CounterDataProvider;
 import org.eclipse.tracecompass.analysis.counters.core.CounterEntryModel;
 import org.eclipse.tracecompass.internal.analysis.counters.ui.CounterTreeViewerEntry;
@@ -25,7 +24,6 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTre
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ui.viewers.ILegendImageProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
@@ -61,20 +59,12 @@ public class CounterTreeViewer extends AbstractSelectTreeViewer {
         @Override
         public Image getColumnImage(Object element, int columnIndex) {
             if (columnIndex == 1 && element instanceof CounterTreeViewerEntry && isChecked(element)) {
-                /* If the image height match the row height, row height will increment */
-                int imageHeight = getTreeViewer().getTree().getItemHeight() - 1;
                 String name = ((CounterTreeViewerEntry) element).getModel().getFullPath();
-                ILegendImageProvider legendImageProvider = getLegendImageProvider();
-                if (legendImageProvider != null) {
-                    return legendImageProvider.getLegendImage(imageHeight, fLegendColumnWidth, name);
-                }
-                return null;
+                return getLegendImage(name);
             }
             return null;
         }
     }
-
-    private final int fLegendColumnWidth;
 
     /**
      * Constructor
@@ -86,13 +76,8 @@ public class CounterTreeViewer extends AbstractSelectTreeViewer {
      *            <code>CheckboxTreeViewer</code>
      */
     public CounterTreeViewer(Composite parent, TriStateFilteredCheckboxTree checkboxTree) {
-        super(parent, checkboxTree);
+        super(parent, checkboxTree, 1);
         setLabelProvider(new CounterTreeLabelProvider());
-
-        /* Legend column is at index 1 */
-        TreeColumn legend = getTreeViewer().getTree().getColumn(1);
-        legend.pack();
-        fLegendColumnWidth = legend.getWidth() != 0 ? legend.getWidth() : 50;
     }
 
     @Override

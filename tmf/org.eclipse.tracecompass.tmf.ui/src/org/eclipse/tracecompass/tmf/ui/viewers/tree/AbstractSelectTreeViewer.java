@@ -24,7 +24,9 @@ import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
@@ -77,6 +79,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     private ILegendImageProvider fLegendImageProvider;
     private ICheckboxTreeViewerListener fChartViewer;
     private TriStateFilteredCheckboxTree fCheckboxTree;
+    private int fLegendColumnIndex;
 
     /**
      * Constructor
@@ -86,8 +89,10 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
      * @param checkboxTree
      *            <code>TriStateFilteredTree</code> wrapping a
      *            <code>CheckboxTreeViewer</code>
+     * @param legendColumnIndex
+     *            index of the legend column (-1 if none)
      */
-    public AbstractSelectTreeViewer(Composite parent, TriStateFilteredCheckboxTree checkboxTree) {
+    public AbstractSelectTreeViewer(Composite parent, TriStateFilteredCheckboxTree checkboxTree, int legendColumnIndex) {
         super(parent, checkboxTree.getViewer());
 
         TreeViewer treeViewer = checkboxTree.getViewer();
@@ -96,6 +101,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
             ((CheckboxTreeViewer) treeViewer).addCheckStateListener(new CheckStateChangedListener());
         }
         fCheckboxTree = checkboxTree;
+        fLegendColumnIndex = legendColumnIndex;
     }
 
     /**
@@ -116,15 +122,6 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
      */
     public void setLegendImageProvider(ILegendImageProvider legendImageProvider) {
         fLegendImageProvider = legendImageProvider;
-    }
-
-    /**
-     * Get the legend image provider
-     *
-     * @return the legend image provider for this tree viewer
-     */
-    public ILegendImageProvider getLegendImageProvider() {
-        return fLegendImageProvider;
     }
 
     /**
@@ -246,6 +243,24 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
             TmfTraceManager.getInstance().updateTraceContext(previousTrace,
                     builder -> builder.setData(getClass() + CHECKED_ELEMENTS, ids));
         }
+    }
+
+    /**
+     * Get the legend image for a entry's name
+     *
+     * @param name
+     *            the entry's name (used in both Tree and Chart viewer
+     * @return the correctly dimensioned image if there is a legend image provider
+     */
+    protected Image getLegendImage(@NonNull String name) {
+        /* If the image height match the row height, row height will increment */
+        int imageHeight = getTreeViewer().getTree().getItemHeight() - 1;
+        ILegendImageProvider legendImageProvider = fLegendImageProvider;
+        if (legendImageProvider != null && fLegendColumnIndex >= 0) {
+            TreeColumn legend = getTreeViewer().getTree().getColumn(fLegendColumnIndex);
+            return legendImageProvider.getLegendImage(imageHeight, legend.getWidth(), name);
+        }
+        return null;
     }
 
 }
