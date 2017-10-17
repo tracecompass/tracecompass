@@ -2653,7 +2653,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
             // At the beginning of visible window
             timePos = (int) (H_SCROLLBAR_MAX * ((double) (time0 - timeMin) / delta));
         }
-        fHorizontalScrollBar.setValues(timePos, 0, H_SCROLLBAR_MAX, thumb, Math.max(1, thumb / 2), Math.max(2, thumb));
+        fHorizontalScrollBar.setValues(timePos, 0, H_SCROLLBAR_MAX, thumb, Math.max(1, thumb / 4), Math.max(2, thumb));
     }
 
     private void adjustVerticalScrollBar() {

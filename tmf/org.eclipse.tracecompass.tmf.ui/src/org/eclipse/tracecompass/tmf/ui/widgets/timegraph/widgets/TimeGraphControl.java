@@ -1206,7 +1206,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Scroll left or right by one half window size
+     * Scroll left or right by one quarter window size
      *
      * @param left
      *            true to scroll left, false to scroll right
@@ -1220,7 +1220,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         if (range <= 0) {
             return;
         }
-        long increment = Math.max(1, range / 2);
+        long increment = Math.max(1, range / 4);
         if (left) {
             time0 = Math.max(time0 - increment, timeMin);
             time1 = time0 + range;
