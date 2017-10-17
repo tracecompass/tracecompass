@@ -21,6 +21,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * Uses the DataProviderFactory extension point.
  *
  * @author Loic Prieur-Drevon
+ * @since 2.4
  */
 public class KernelMemoryDataProviderFactory implements IDataProviderFactory {
 

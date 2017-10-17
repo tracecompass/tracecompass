@@ -35,6 +35,7 @@ import com.google.common.collect.Lists;
  * XY chart viewer which queries and displays selected entries.
  *
  * @author Loic Prieur-Drevon
+ * @since 3.2
  */
 public abstract class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implements ICheckboxTreeViewerListener {
 

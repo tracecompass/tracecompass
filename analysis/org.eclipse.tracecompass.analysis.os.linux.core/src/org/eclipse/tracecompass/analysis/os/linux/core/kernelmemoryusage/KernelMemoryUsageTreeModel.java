@@ -17,7 +17,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTree
  * View. It extends {@link TmfTreeDataModel}
  *
  * @author Yonni Chen
- * @since 2.3
+ * @since 2.4
  */
 @NonNullByDefault
 @SuppressWarnings("restriction")

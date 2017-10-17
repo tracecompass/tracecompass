@@ -30,6 +30,7 @@ import com.google.common.collect.Multimap;
  * Manager for org.eclipse.tracecompass.tmf.core.dataprovider extension point.
  *
  * @author Simon Delisle
+ * @since 3.2
  */
 public class DataProviderManager {
 

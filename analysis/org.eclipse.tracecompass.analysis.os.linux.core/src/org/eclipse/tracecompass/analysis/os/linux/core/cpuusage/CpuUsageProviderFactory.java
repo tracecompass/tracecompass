@@ -19,6 +19,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * Extension point factory for the {@link CpuUsageDataProvider}.
  *
  * @author Loic Prieur-Drevon
+ * @since 2.4
  */
 public class CpuUsageProviderFactory implements IDataProviderFactory {
 

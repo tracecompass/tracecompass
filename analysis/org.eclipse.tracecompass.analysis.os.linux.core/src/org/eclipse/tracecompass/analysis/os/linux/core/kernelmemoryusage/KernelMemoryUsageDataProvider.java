@@ -64,6 +64,7 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
 
     /**
      * This data provider's extension point ID
+     * @since 2.4
      */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage"; //$NON-NLS-1$
     private static final AtomicLong KERNEL_MEMORY_ENTRY_ID = new AtomicLong();
@@ -235,6 +236,9 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
         return 0;
     }
 
+    /**
+     * @since 2.4
+     */
     @Override
     public TmfModelResponse<List<KernelMemoryUsageTreeModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
 
@@ -315,6 +319,9 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
         return fKernelModule;
     }
 
+    /**
+     * @since 2.4
+     */
     @Override
     public String getId() {
         return ID;

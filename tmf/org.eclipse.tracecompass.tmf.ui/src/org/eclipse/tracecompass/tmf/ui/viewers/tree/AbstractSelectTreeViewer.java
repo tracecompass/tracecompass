@@ -44,6 +44,7 @@ import com.google.common.primitives.Longs;
  * Abstract viewer for trees with checkboxes.
  *
  * @author Loic Prieur-Drevon
+ * @since 3.2
  */
 public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
 

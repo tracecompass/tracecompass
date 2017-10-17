@@ -16,6 +16,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTree
  * Entry Model to encapsulate the data from a {@link CounterDataProvider}.
  *
  * @author Loic Prieur-Drevon
+ * @since 1.1
  */
 public class CounterEntryModel extends TmfTreeDataModel {
 

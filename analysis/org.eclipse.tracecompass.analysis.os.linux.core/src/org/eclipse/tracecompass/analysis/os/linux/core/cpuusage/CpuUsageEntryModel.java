@@ -15,6 +15,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTree
  * Entry Model to represent entries for the {@link CpuUsageDataProvider}.
  *
  * @author Loic Prieur-Drevon
+ * @since 2.4
  */
 public class CpuUsageEntryModel extends TmfTreeDataModel {
     private final String fProcessName;

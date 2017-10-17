@@ -60,7 +60,7 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
 
     /**
      * Entry point ID.
-     * @since 3.1
+     * @since 3.2
      */
     public static final String ID = "org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryUsageDataProvider"; //$NON-NLS-1$
     private static final AtomicLong ENTRY_IDS = new AtomicLong();
@@ -188,7 +188,7 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
     }
 
     /**
-     * @since 3.1
+     * @since 3.2
      */
     @Override
     public TmfModelResponse<List<MemoryUsageTreeModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
@@ -242,7 +242,7 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
     }
 
     /**
-     * @since 3.1
+     * @since 3.2
      */
     @Override
     public String getId() {

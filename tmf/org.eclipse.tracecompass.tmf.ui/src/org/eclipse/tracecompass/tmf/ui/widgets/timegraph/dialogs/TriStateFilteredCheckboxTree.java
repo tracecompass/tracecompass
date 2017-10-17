@@ -26,6 +26,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
  * checked, grayed and empty.
  *
  * @author Mikael Ferland
+ * @since 3.2
  */
 public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
 

@@ -65,6 +65,7 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
 
     /**
      * This provider's extension point ID.
+     * @since 2.4
      */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageDataProvider"; //$NON-NLS-1$
 
@@ -186,6 +187,9 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
         return null;
     }
 
+    /**
+     * @since 2.4
+     */
     @Override
     public TmfModelResponse<List<CpuUsageEntryModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
 
@@ -282,6 +286,9 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
         return tid;
     }
 
+    /**
+     * @since 2.4
+     */
     @Override
     public String getId() {
         return ID;

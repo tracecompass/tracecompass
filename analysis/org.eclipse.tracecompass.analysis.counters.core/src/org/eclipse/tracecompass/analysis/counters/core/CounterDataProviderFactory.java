@@ -25,6 +25,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 /**
  * Factory to create instances of the {@link CompositeCounterDataProvider}. Uses the DataProviderFactory endpoint
  * @author Loic Prieur-Drevon
+ * @since 1.1
  */
 public class CounterDataProviderFactory implements IDataProviderFactory {
 

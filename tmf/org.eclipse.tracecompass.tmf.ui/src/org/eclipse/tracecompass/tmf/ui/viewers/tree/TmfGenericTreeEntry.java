@@ -19,6 +19,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTree
  * @param <M>
  *            type of model payload
  * @author Loic Prieur-Drevon
+ * @since 3.2
  */
 public class TmfGenericTreeEntry<M extends TmfTreeDataModel> extends TmfTreeViewerEntry {
 

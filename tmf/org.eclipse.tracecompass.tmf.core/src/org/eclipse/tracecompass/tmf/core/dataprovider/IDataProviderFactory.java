@@ -21,6 +21,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * create {@link ITmfTreeDataProvider}
  *
  * @author Simon Delisle
+ * @since 3.2
  */
 public interface IDataProviderFactory {
 
