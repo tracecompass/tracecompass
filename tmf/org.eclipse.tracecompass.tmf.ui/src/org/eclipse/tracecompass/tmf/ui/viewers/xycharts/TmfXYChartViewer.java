@@ -251,7 +251,9 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
 
     @Override
     public void dispose() {
-        fSwtChart.dispose();
+        if (!fSwtChart.isDisposed()) {
+            fSwtChart.dispose();
+        }
     }
 
     private void internalDispose() {

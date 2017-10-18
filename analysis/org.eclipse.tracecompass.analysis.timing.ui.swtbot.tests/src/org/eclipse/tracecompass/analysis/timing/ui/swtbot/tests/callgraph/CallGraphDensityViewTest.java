@@ -28,7 +28,6 @@ import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotCanvas;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
@@ -81,7 +80,6 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
     private SWTBotView fView;
     private CallGraphDensityView fFuncDensityView;
     private SWTBotTable fTableBot;
-    private SWTBotCanvas fDensityBot;
     private AbstractSegmentStoreDensityViewer fDensityViewer;
     private AbstractSegmentStoreTableViewer fTableViewer;
     private CountDownLatch fLatch;
@@ -127,8 +125,6 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
         assertNotNull(funcDensityView);
         fTableBot = fView.bot().table();
         assertNotNull(fTableBot);
-        fDensityBot = fView.bot().canvas();
-        assertNotNull(fDensityBot);
         fDensityViewer = funcDensityView.getDensityViewer();
         assertNotNull(fDensityViewer);
         fLatch = new CountDownLatch(1);

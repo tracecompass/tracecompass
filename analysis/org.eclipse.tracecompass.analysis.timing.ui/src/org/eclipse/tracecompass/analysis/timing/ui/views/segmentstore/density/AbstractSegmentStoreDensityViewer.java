@@ -302,7 +302,9 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
 
     @Override
     public void dispose() {
-        fChart.dispose();
+        if (!fChart.isDisposed()) {
+            fChart.dispose();
+        }
     }
 
     private void internalDispose() {

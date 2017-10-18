@@ -341,7 +341,9 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
 
     @Override
     public void dispose() {
-        fChart.dispose();
+        if (!fChart.isDisposed()) {
+            fChart.dispose();
+        }
         fParent.layout();
         super.dispose();
     }
