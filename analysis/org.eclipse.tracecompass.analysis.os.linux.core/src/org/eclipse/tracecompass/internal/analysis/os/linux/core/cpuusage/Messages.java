@@ -23,11 +23,6 @@ public class Messages extends NLS {
      * CPU Usage title
      */
     public static String CpuUsageDataProvider_title;
-
-    /**
-     * CPU usage total series name
-     */
-    public static String CpuUsageDataProvider_total;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

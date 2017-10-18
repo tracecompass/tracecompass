@@ -13,8 +13,8 @@
     100000001
   ],
   "series": {
-    "Total": {
-      "label": "Total",
+    "total:bug446190": {
+      "label": "total:bug446190",
       "yValues": [
         0.0,
         20.737800207378,

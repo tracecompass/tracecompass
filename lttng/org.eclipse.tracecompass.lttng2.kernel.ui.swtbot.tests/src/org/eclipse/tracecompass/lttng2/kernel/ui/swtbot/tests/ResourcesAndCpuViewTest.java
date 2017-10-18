@@ -50,7 +50,7 @@ import org.swtchart.ISeries;
 import org.swtchart.LineStyle;
 
 /**
- * SWTBot tests for Resources view
+ * SWTBot tests for {@link ResourcesView} and {@link CpuUsageView}
  *
  * @author Matthew Khouzam
  */
@@ -58,9 +58,14 @@ public class ResourcesAndCpuViewTest extends XYDataProviderBaseTest {
 
     private static final RGB RED = new RGB(255, 0, 0);
     private static final RGB BLUE = new RGB(0, 0, 255);
+    private static final RGB GREEN = new RGB(0, 255, 0);
 
-    private static final @NonNull String TOTAL_SERIES_NAME = "Total";
+    private static final @NonNull String TOTAL_SERIES_NAME = "total:bug446190";
+    private static final @NonNull String TRACE_NAME = "bug446190";
     private static final @NonNull String TITLE = "CPU Usage";
+    private static final @NonNull String SELECTED_THREAD_TID = "482";
+    private static final @NonNull String SELECTED_THREAD_SERIES = "bug446190:482";
+    private static final String OTHERTHREAD_SERIES = "bug446190:496";
 
     private static final @NonNull ITmfTimestamp TRACE_START = TmfTimestamp.fromNanos(1412670961211260539L);
     private static final @NonNull ITmfTimestamp TRACE_END = TmfTimestamp.fromNanos(1412670967217750839L);
@@ -149,33 +154,35 @@ public class ResourcesAndCpuViewTest extends XYDataProviderBaseTest {
         SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json), "resources/cpuusage/cpu-usage-res10.json", "Chart data is not valid");
 
         /* Test chart style */
-        verifyChartStyle(null);
+        verifySeriesStyle(TOTAL_SERIES_NAME, ISeries.SeriesType.LINE, BLUE, LineStyle.SOLID, false);
 
         /* Select a thread */
-        String selectedThread = "482";
-        SWTBotTree treeBot = getSWTBotView().bot().tree();
-        SWTBotUtils.waitUntil(tree -> tree.rowCount() >= 7, treeBot, "Did not finish loading");
-        treeBot.getTreeItem(selectedThread).click();
+        SWTBotTreeItem rootEntry = getSWTBotView().bot().tree().getTreeItem(TRACE_NAME);
+        SWTBotUtils.waitUntil(tree -> getTableCount() >= 8, rootEntry, "Did not finish loading");
+        SWTBotTreeItem selectedTheadNode = rootEntry.getNode(SELECTED_THREAD_TID);
+        selectedTheadNode.check();
         SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 2, chart, "Only total available");
 
         /* Test data model */
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, selectedThread), "resources/cpuusage/cpu-usage-res10Selected.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, SELECTED_THREAD_SERIES), "resources/cpuusage/cpu-usage-res10Selected.json", "Chart data is not valid");
 
         /* Test chart style */
-        verifyChartStyle(selectedThread);
+        verifySeriesStyle(SELECTED_THREAD_SERIES, ISeries.SeriesType.LINE, RED, LineStyle.SOLID, true);
+        selectedTheadNode.uncheck();
 
         /* Selected an another thread and test in HD */
         String otherSelectedThread = "496";
-        treeBot.getTreeItem(otherSelectedThread).click();
+        SWTBotTreeItem otherSelectedThreadNode = rootEntry.getNode(otherSelectedThread);
+        otherSelectedThreadNode.check();
         chartViewer.setNbPoints(100);
         SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 2, chart, "Only total available");
         fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
 
         /* Test data model */
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, otherSelectedThread), "resources/cpuusage/cpu-usage-res100Selected.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, OTHERTHREAD_SERIES), "resources/cpuusage/cpu-usage-res100Selected.json", "Chart data is not valid");
 
         /* Test chart style */
-        verifyChartStyle(otherSelectedThread);
+        verifySeriesStyle(OTHERTHREAD_SERIES, ISeries.SeriesType.LINE, GREEN, LineStyle.SOLID, true);
 
         /*
          * Test new TimeRange
@@ -192,18 +199,10 @@ public class ResourcesAndCpuViewTest extends XYDataProviderBaseTest {
         fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
 
         /* Test data model */
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, otherSelectedThread), "resources/cpuusage/cpu-usage-all-res10.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, OTHERTHREAD_SERIES), "resources/cpuusage/cpu-usage-all-res10.json", "Chart data is not valid");
 
         /* Test chart style */
-        verifyChartStyle(otherSelectedThread);
-    }
-
-    private void verifyChartStyle(String selectedThread) {
-        verifySeriesStyle(TOTAL_SERIES_NAME, ISeries.SeriesType.LINE, BLUE, LineStyle.SOLID, false);
-
-        if (selectedThread != null) {
-            verifySeriesStyle(selectedThread, ISeries.SeriesType.LINE, RED, LineStyle.SOLID, true);
-        }
+        verifySeriesStyle(OTHERTHREAD_SERIES, ISeries.SeriesType.LINE, GREEN, LineStyle.SOLID, true);
     }
 
     @Override
@@ -245,7 +244,7 @@ public class ResourcesAndCpuViewTest extends XYDataProviderBaseTest {
         Matcher<Tree> matcher = WidgetOfType.widgetOfType(Tree.class);
         SWTBotTree treeBot = new SWTBotTree(getSWTBotView().bot().widget(matcher));
         int count = 0;
-        for (SWTBotTreeItem bot : treeBot.getAllItems()) {
+        for (SWTBotTreeItem bot : treeBot.getTreeItem(getTestTrace().getName()).getItems()) {
             final String text = bot.getText();
             if (!text.isEmpty()) {
                 count++;

@@ -18,22 +18,26 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTree
  * @since 2.4
  */
 public class CpuUsageEntryModel extends TmfTreeDataModel {
-    private final String fProcessName;
-    private final Long fTime;
+    private final int fTid;
+    private final long fTime;
 
     /**
      * Constructor
      *
+     * @param id
+     *            the new entry's unique ID
+     * @param parentId
+     *            the entry's parent ID
      * @param tid
      *            The TID of the process
-     * @param name
-     *            The thread's name
+     * @param processName
+     *            The process's name
      * @param time
      *            The total amount of time spent on CPU
      */
-    public CpuUsageEntryModel(long id, long parentId, String tid, String name, long time) {
-        super(id, parentId, tid);
-        fProcessName = name;
+    public CpuUsageEntryModel(long id, long parentId, String processName, int tid, long time) {
+        super(id, parentId, processName);
+        fTid = tid;
         fTime = time;
     }
 
@@ -42,8 +46,8 @@ public class CpuUsageEntryModel extends TmfTreeDataModel {
      *
      * @return The thread's TID
      */
-    public String getProcessName() {
-        return fProcessName;
+    public int getTid() {
+        return fTid;
     }
 
     /**

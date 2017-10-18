@@ -29,12 +29,12 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
@@ -53,7 +53,6 @@ import com.google.common.primitives.Longs;
  *
  * @since 3.2
  * @author Loic Prieur-Drevon
- * @since 3.2
  */
 public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
 
@@ -266,11 +265,14 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
      */
     protected Image getLegendImage(@NonNull String name) {
         /* If the image height match the row height, row height will increment */
-        int imageHeight = getTreeViewer().getTree().getItemHeight() - 1;
         ILegendImageProvider legendImageProvider = fLegendImageProvider;
         if (legendImageProvider != null && fLegendColumnIndex >= 0) {
-            TreeColumn legend = getTreeViewer().getTree().getColumn(fLegendColumnIndex);
-            return legendImageProvider.getLegendImage(imageHeight, legend.getWidth(), name);
+            Tree tree = getTreeViewer().getTree();
+            int imageWidth = tree.getColumn(fLegendColumnIndex).getWidth();
+            int imageHeight = tree.getItemHeight() - 1;
+            if (imageHeight > 0 && imageWidth > 0) {
+                return legendImageProvider.getLegendImage(imageHeight, imageWidth, name);
+            }
         }
         return null;
     }

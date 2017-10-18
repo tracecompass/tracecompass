@@ -111,7 +111,7 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
      *
      * @return a collection of the IDs of the selected entries
      */
-    public Collection<Long> getSelected() {
+    public @NonNull Collection<@NonNull Long> getSelected() {
         return fSelectedIds;
     }
 

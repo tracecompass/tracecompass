@@ -30,6 +30,7 @@ public class Messages extends NLS {
     public static String CpuUsageComposite_ColumnTime;
     public static String CpuUsageComposite_TextPercent;
     public static String CpuUsageComposite_TextTime;
+    public static String CpuUsageComposite_ColumnLegend;
     public static String CpuUsageView_Title;
     public static String CpuUsageXYViewer_CpuYAxis;
     public static String CpuUsageXYViewer_TimeXAxis;

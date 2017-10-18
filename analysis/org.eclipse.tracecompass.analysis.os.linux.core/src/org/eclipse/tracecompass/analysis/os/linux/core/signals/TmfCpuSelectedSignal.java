@@ -21,6 +21,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 public class TmfCpuSelectedSignal extends TmfTraceModelSignal {
 
     private final int fCore;
+    private final ITmfTrace fTrace;
 
     /**
      * Constructor
@@ -34,6 +35,7 @@ public class TmfCpuSelectedSignal extends TmfTraceModelSignal {
      */
     public TmfCpuSelectedSignal(Object source, int core, ITmfTrace trace) {
         super(source, 0, trace.getHostId());
+        fTrace = trace;
         fCore = core;
     }
 
@@ -44,5 +46,14 @@ public class TmfCpuSelectedSignal extends TmfTraceModelSignal {
      */
     public int getCore() {
         return fCore;
+    }
+
+    /**
+     * Get the trace for which the CPUs were changed.
+     *
+     * @return the impacted trace
+     */
+    public ITmfTrace getTrace() {
+        return fTrace;
     }
 }

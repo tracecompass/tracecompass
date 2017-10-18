@@ -9,23 +9,33 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.core.cpuusage;
 
+import java.util.Collection;
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.Messages;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
 import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderFactory;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 
 /**
  * Extension point factory for the {@link CpuUsageDataProvider}.
  *
- * @author Loic Prieur-Drevon
  * @since 2.4
+ * @author Loic Prieur-Drevon
  */
 public class CpuUsageProviderFactory implements IDataProviderFactory {
 
     @Override
     public @Nullable ITmfTreeDataProvider<? extends ITmfTreeDataModel> createProvider(ITmfTrace trace) {
-        return CpuUsageDataProvider.create(trace);
+        Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
+        if (traces.size() == 1) {
+            return CpuUsageDataProvider.create(trace);
+        }
+        return TmfTreeXYCompositeDataProvider.create(traces, Objects.requireNonNull(Messages.CpuUsageDataProvider_title), CpuUsageDataProvider.ID);
     }
 
 }

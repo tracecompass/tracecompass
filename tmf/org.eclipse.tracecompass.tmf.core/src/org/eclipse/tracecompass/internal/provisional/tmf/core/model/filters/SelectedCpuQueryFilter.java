@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;
 
+import java.util.Collection;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
@@ -21,7 +22,7 @@ import com.google.common.collect.ImmutableSet;
  * @author Yonni Chen
  * @since 3.0
  */
-public class SelectedCpuQueryFilter extends SelectedThreadQueryFilter implements IMultipleSelectionQueryFilter<Set<Integer>> {
+public class SelectedCpuQueryFilter extends SelectionTimeQueryFilter {
 
     private final Set<Integer> fCpus;
 
@@ -36,13 +37,13 @@ public class SelectedCpuQueryFilter extends SelectedThreadQueryFilter implements
      *            The ending value
      * @param n
      *            The number of entries
-     * @param selectedThread
-     *            A selected thread
+     * @param selectedThreads
+     *            The selected threads
      * @param cpu
      *            The set of CPU
      */
-    public SelectedCpuQueryFilter(long start, long end, int n, String selectedThread, Set<Integer> cpu) {
-        super(start, end, n, selectedThread);
+    public SelectedCpuQueryFilter(long start, long end, int n, Collection<Long> selectedThreads, Set<Integer> cpu) {
+        super(start, end, n, selectedThreads);
         fCpus = ImmutableSet.copyOf(cpu);
     }
 
@@ -51,8 +52,7 @@ public class SelectedCpuQueryFilter extends SelectedThreadQueryFilter implements
      *
      * @return A set of cpu id
      */
-    @Override
-    public Set<Integer> getSelectedItems() {
+    public Set<Integer> getSelectedCpus() {
         return fCpus;
     }
 }
