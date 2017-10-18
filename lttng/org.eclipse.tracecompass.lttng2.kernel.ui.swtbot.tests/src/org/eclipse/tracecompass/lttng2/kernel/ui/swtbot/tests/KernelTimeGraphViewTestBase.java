@@ -21,13 +21,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.junit.Test;
 
 /**
@@ -38,6 +44,18 @@ import org.junit.Test;
  *
  */
 public abstract class KernelTimeGraphViewTestBase extends KernelTestBase {
+
+    /**
+     * The vertical scrollbar is the first slider described in the view, so its
+     * slider index is equal to 0
+     */
+    private static final int VERTICAL_SCROLLBAR_INDEX = 0;
+
+    /**
+     * The horizontal scrollbar is the second slider described in the view, so its
+     * slider index is equal to 1
+     */
+    private static final int HORIZONTAL_SCROLLBAR_INDEX = 1;
 
     /**
      * Tooltip used for separator toolbar items
@@ -122,6 +140,36 @@ public abstract class KernelTimeGraphViewTestBase extends KernelTestBase {
         assertEquals(before, after);
     }
 
+    /**
+     * Test the vertical scroll bar position
+     */
+    @Test
+    public void testVerticalScrollbar() {
+        SWTBotView viewBot = openView();
+        List<? extends @NonNull Slider> sliders = viewBot.bot().widgets(WidgetOfType.widgetOfType(Slider.class));
+        assertTrue("The view has " + sliders.size() + " sliders", sliders.size() >= 2);
+        Rectangle sliderRect = getBounds(sliders.get(VERTICAL_SCROLLBAR_INDEX));
+
+        Rectangle timegraphRect = getBounds(viewBot.bot().widget(WidgetOfType.widgetOfType(TimeGraphControl.class)));
+        assertEquals("Incorrect vertical slider start position", timegraphRect.width, sliderRect.x);
+        assertEquals("Incorrect vertical slider height", timegraphRect.height, sliderRect.height);
+    }
+
+    /**
+     * Test the horizontal scroll bar position
+     */
+    @Test
+    public void testHorizontalScrollbar() {
+        SWTBotView viewBot = openView();
+        List<? extends @NonNull Slider> sliders = viewBot.bot().widgets(WidgetOfType.widgetOfType(Slider.class));
+        assertTrue("The view has " + sliders.size() + " sliders", sliders.size() >= 2);
+        Rectangle sliderRect = getBounds(sliders.get(HORIZONTAL_SCROLLBAR_INDEX));
+
+        SWTBotTimeGraph tgBot = new SWTBotTimeGraph(viewBot.bot().widget(WidgetOfType.widgetOfType(TimeGraphControl.class)));
+        Rectangle timegraphRect = getBounds(viewBot.bot().widget(WidgetOfType.widgetOfType(TimeGraphControl.class)));
+        assertEquals("Incorrect horizontal slider start position", timegraphRect.x + tgBot.getNameSpace(), sliderRect.x);
+    }
+
     private @NonNull static Map<String, List<String>> getItemNames(SWTBotTimeGraph tgBot) {
         Map<String, List<String>> returnStructure = new HashMap<>();
         for (SWTBotTimeGraphEntry element : tgBot.getEntries()) {
@@ -135,4 +183,7 @@ public abstract class KernelTimeGraphViewTestBase extends KernelTestBase {
         return returnStructure;
     }
 
+    private static Rectangle getBounds(Control widget) {
+        return UIThreadRunnable.syncExec(() -> widget.getBounds());
+    }
 }

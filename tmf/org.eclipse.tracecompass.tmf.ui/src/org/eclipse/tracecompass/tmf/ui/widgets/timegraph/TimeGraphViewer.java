@@ -138,7 +138,6 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
     private int fMinNameWidth = MIN_NAME_WIDTH;
     private int fNameWidth;
     private int[] fWeights;
-    private Composite fDataViewer;
 
     private TimeGraphControl fTimeGraphCtrl;
     private Tree fTree;
@@ -227,7 +226,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
                         return;
                     }
                     fListenerNotifier = null;
-                    if (ListenerNotifier.this.isInterrupted() || fDataViewer.isDisposed()) {
+                    if (ListenerNotifier.this.isInterrupted() || fTimeAlignedComposite.isDisposed()) {
                         return;
                     }
                     if (fSelectionChanged) {
@@ -471,7 +470,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
      */
     protected Control createDataViewer(Composite parent, int style) {
         loadOptions();
-        fDataViewer = new Composite(parent, style) {
+        fTimeAlignedComposite = new Composite(parent, style) {
             @Override
             public void redraw() {
                 fTree.redraw();
@@ -481,32 +480,17 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
                 super.redraw();
             }
         };
-        fDataViewer.addDisposeListener((e) -> {
+        fTimeAlignedComposite.addDisposeListener((e) -> {
             if (fMarkersMenu != null) {
                 fMarkersMenu.dispose();
             }
         });
-        GridLayout gl = new GridLayout(2, false);
+        GridLayout gl = new GridLayout(3, false);
         gl.marginHeight = fBorderWidth;
         gl.marginWidth = 0;
         gl.verticalSpacing = 0;
         gl.horizontalSpacing = 0;
-        fDataViewer.setLayout(gl);
-
-        fTimeAlignedComposite = new Composite(fDataViewer, style) {
-            @Override
-            public void redraw() {
-                fDataViewer.redraw();
-                super.redraw();
-            }
-        };
-        GridLayout gl2 = new GridLayout(2, false);
-        gl2.marginHeight = fBorderWidth;
-        gl2.marginWidth = 0;
-        gl2.verticalSpacing = 0;
-        gl2.horizontalSpacing = 0;
-        fTimeAlignedComposite.setLayout(gl2);
-        fTimeAlignedComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        fTimeAlignedComposite.setLayout(gl);
 
         fTree = new Tree(fTimeAlignedComposite, SWT.NO_SCROLL);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
@@ -552,8 +536,13 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
             }
         });
 
-        fTimeGraphCtrl = createTimeGraphControl(fTimeAlignedComposite, fColorScheme);
+        // Fill the last row to match with the scroll bar position
+        // Dummy composite to fill the space
+        Composite filler = new Composite(fTimeAlignedComposite, SWT.NONE);
+        filler.setLayoutData(new GridData(SWT.LEFT, SWT.BOTTOM, false, false));
+        filler.setLayout(new FillLayout());
 
+        fTimeGraphCtrl = createTimeGraphControl(fTimeAlignedComposite, fColorScheme);
         fTimeGraphCtrl.setTimeProvider(this);
         fTimeGraphCtrl.setLabelProvider(fLabelProvider);
         fTimeGraphCtrl.setTree(fTree);
@@ -572,7 +561,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
                  * Handle the event only if not over the time graph control.
                  */
                 Point ctrlParentCoords = fTimeAlignedComposite.toControl(fTimeGraphCtrl.toDisplay(e.x, e.y));
-                Point scrollBarParentCoords = fDataViewer.toControl(fTimeGraphCtrl.toDisplay(e.x, e.y));
+                Point scrollBarParentCoords = fTimeAlignedComposite.toControl(fTimeGraphCtrl.toDisplay(e.x, e.y));
                 if (fTimeGraphCtrl.getBounds().contains(ctrlParentCoords)) {
                     /* the time graph control handles the event */
                     adjustVerticalScrollBar();
@@ -612,8 +601,17 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
             }
         });
 
+        fVerticalScrollBar = new Slider(fTimeAlignedComposite, SWT.VERTICAL | SWT.NO_FOCUS);
+        fVerticalScrollBar.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, true, 1, 1));
+        fVerticalScrollBar.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                setTopIndex(fVerticalScrollBar.getSelection());
+            }
+        });
+
         fMarkerAxisCtrl = createTimeGraphMarkerAxis(fTimeAlignedComposite, fColorScheme, this);
-        fMarkerAxisCtrl.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 2, 1));
+        fMarkerAxisCtrl.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false, 3, 1));
         fMarkerAxisCtrl.addMarkerAxisListener(this);
         fMarkerAxisCtrl.addMouseWheelListener(new MouseWheelListener() {
             @Override
@@ -629,17 +627,14 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
             }
         });
 
-        fVerticalScrollBar = new Slider(fDataViewer, SWT.VERTICAL | SWT.NO_FOCUS);
-        fVerticalScrollBar.setLayoutData(new GridData(SWT.DEFAULT, SWT.FILL, false, true, 1, 1));
-        fVerticalScrollBar.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                setTopIndex(fVerticalScrollBar.getSelection());
-            }
-        });
+        Composite filler2 = new Composite(fTimeAlignedComposite, SWT.NONE);
+        filler2.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false, false));
+        filler2.setLayout(new FillLayout());
 
-        fHorizontalScrollBar = new Slider(fDataViewer, SWT.HORIZONTAL | SWT.NO_FOCUS);
-        fHorizontalScrollBar.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
+        fHorizontalScrollBar = new Slider(fTimeAlignedComposite, SWT.HORIZONTAL | SWT.NO_FOCUS);
+        GridData layoutData = new GridData(SWT.FILL, SWT.TOP, false, false);
+        layoutData.widthHint = 0;
+        fHorizontalScrollBar.setLayoutData(layoutData); //(SWT.FILL, SWT.DEFAULT, true, false));
         fHorizontalScrollBar.addListener(SWT.MouseWheel, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -673,11 +668,9 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
             }
         });
 
-        Composite filler = new Composite(fDataViewer, SWT.NONE);
-        gd = new GridData(SWT.DEFAULT, SWT.DEFAULT, false, false);
-        gd.heightHint = fHorizontalScrollBar.getSize().y;
-        filler.setLayoutData(gd);
-        filler.setLayout(new FillLayout());
+        Composite filler3 = new Composite(fTimeAlignedComposite, SWT.NONE);
+        filler3.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
+        filler3.setLayout(new FillLayout());
 
         fTimeGraphCtrl.addControlListener(new ControlAdapter() {
             @Override
@@ -686,23 +679,23 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
             }
         });
         resizeControls();
-        fDataViewer.update();
+        fTimeAlignedComposite.update();
         adjustHorizontalScrollBar();
         adjustVerticalScrollBar();
 
-        fDataViewer.addDisposeListener((e) -> {
+        fTimeAlignedComposite.addDisposeListener((e) -> {
             saveOptions();
             fColorScheme.dispose();
         });
 
-        return fDataViewer;
+        return fTimeAlignedComposite;
     }
 
     /**
      * Dispose the time graph viewer.
      */
     public void dispose() {
-        fDataViewer.dispose();
+        fTimeAlignedComposite.dispose();
     }
 
     /**
@@ -740,7 +733,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
      * Resize the controls
      */
     public void resizeControls() {
-        Rectangle r = fDataViewer.getClientArea();
+        Rectangle r = fTimeAlignedComposite.getClientArea();
         if (r.isEmpty()) {
             return;
         }
@@ -1221,11 +1214,11 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
      * Callback for the show legend action
      */
     public void showLegend() {
-        if (fDataViewer == null || fDataViewer.isDisposed()) {
+        if (fTimeAlignedComposite == null || fTimeAlignedComposite.isDisposed()) {
             return;
         }
 
-        TimeGraphLegend.open(fDataViewer.getShell(), fTimeGraphProvider);
+        TimeGraphLegend.open(fTimeAlignedComposite.getShell(), fTimeGraphProvider);
     }
 
     /**
@@ -1635,7 +1628,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
     public void setBorderWidth(int borderWidth) {
         if (borderWidth > -1) {
             this.fBorderWidth = borderWidth;
-            GridLayout gl = (GridLayout) fDataViewer.getLayout();
+            GridLayout gl = (GridLayout) fTimeAlignedComposite.getLayout();
             gl.marginHeight = borderWidth;
         }
     }
@@ -1725,7 +1718,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
 
     @Override
     public Control getControl() {
-        return fDataViewer;
+        return fTimeAlignedComposite;
     }
 
     /**
@@ -2792,7 +2785,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
      */
     public int getAvailableWidth(int requestedOffset) {
         int totalWidth = fTimeAlignedComposite.getSize().x;
-        return Math.min(totalWidth, Math.max(0, totalWidth - requestedOffset));
+        return Math.min(totalWidth, Math.max(0, totalWidth - requestedOffset - fVerticalScrollBar.getSize().x));
     }
 
     /**
@@ -2812,7 +2805,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
         int alignmentWidth = width;
         int size = fTimeAlignedComposite.getSize().x;
         GridLayout layout = (GridLayout) fTimeAlignedComposite.getLayout();
-        int marginSize = size - alignmentWidth - offset;
+        int marginSize = size - alignmentWidth - offset - fVerticalScrollBar.getSize().x;
         layout.marginRight = Math.max(0, marginSize);
         fTimeAlignedComposite.layout();
     }
