@@ -81,8 +81,8 @@ public class InputOutputDiskTest extends AbstractTestInputOutput {
         });
     }
 
-    private static Disk getDisk(@NonNull InputOutputAnalysisModule module, Integer deviceId) {
-        return InputOutputInformationProvider.getDisks(module).stream().filter(d -> d.getDevideId().equals(deviceId)).findFirst().get();
+    private static Disk getDisk(@NonNull InputOutputAnalysisModule module, int deviceId) {
+        return InputOutputInformationProvider.getDisks(module).stream().filter(d -> deviceId == d.getDeviceId()).findFirst().get();
     }
 
     /**
@@ -97,8 +97,8 @@ public class InputOutputDiskTest extends AbstractTestInputOutput {
             Disk disk = getDisk(module, deviceId);
             assertNotNull(disk);
             for (SectorCountInfo info : fTestCase.getSectorCount().get(deviceId)) {
-                long sectorsAt = disk.getSectorsAt(info.getTimestamp(), info.getType());
-                assertEquals("Sectors at " + info.getTimestamp() + " for type " + info.getType(), info.getNbSectors(), sectorsAt);
+                double sectorsAt = disk.getSectorsAt(info.getTimestamp(), info.getType());
+                assertEquals("Sectors at " + info.getTimestamp() + " for type " + info.getType(), info.getNbSectors(), sectorsAt, 1.0);
             }
         }
     }

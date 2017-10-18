@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.io.diskioactivity.DiskIOActivityView;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -28,6 +29,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.XYDataProviderBaseTest;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.ui.IViewPart;
 import org.junit.Test;
@@ -42,15 +44,15 @@ import org.swtchart.LineStyle;
  */
 public class DisksIOViewTest extends XYDataProviderBaseTest {
 
-    private static final RGB RED = new RGB(255, 0, 0);
-    private static final RGB BLUE = new RGB(0, 0, 255);
+    private static final RGB PURPLE = new RGB(255, 0, 255);
+    private static final RGB GREEN = new RGB(0, 255, 0);
 
     private static final int NUMBER_OF_POINT = 50;
     private static final int MORE_POINTS = 100;
 
     private static final @NonNull String TITLE = "Disk I/O View";
-    private static final @NonNull String READ_SERIES_NAME = "8,0 read";
-    private static final @NonNull String WRITE_SERIES_NAME = "8,0 write";
+    private static final @NonNull String READ_SERIES_NAME = "2";
+    private static final @NonNull String WRITE_SERIES_NAME = "3";
 
     private static final @NonNull ITmfTimestamp ZOOM_START_TIME = TmfTimestamp.fromNanos(1361214078967381303L);
     private static final @NonNull ITmfTimestamp ZOOM_END_TIME = TmfTimestamp.fromNanos(1361214078967971599L);
@@ -73,6 +75,8 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
      */
     @Test
     public void testDiskView() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        // Wait for analysis to finish.
+        WaitUtils.waitForJobs();
         IViewPart viewSite = getSWTBotView().getViewReference().getView(true);
         assertTrue(viewSite instanceof DiskIOActivityView);
         final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewSite);
@@ -81,12 +85,16 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
 
         final Chart chart = getChart();
         assertNotNull(chart);
+        SWTBotTreeItem[] items = getSWTBotView().bot().tree().getAllItems();
+        for (SWTBotTreeItem item : items) {
+            item.check();
+        }
 
         SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length > 0, chart, "No data available");
         chartViewer.setNbPoints(NUMBER_OF_POINT);
 
         /* Initially, no disk activity */
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk0-res50.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk/disk0-res50.json", "Chart data is not valid");
 
         /* Change time range where there is disks activity */
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, new TmfTimeRange(ZOOM_START_TIME, ZOOM_END_TIME)));
@@ -97,7 +105,7 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
         verifyChartStyle();
 
         /* Test data model */
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk1-res50.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk/disk1-res50.json", "Chart data is not valid");
 
         /* Change Zoom and number of points */
         chartViewer.setNbPoints(MORE_POINTS);
@@ -106,12 +114,12 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
         verifyChartStyle();
 
         /* Test data model */
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk2-res100.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk/disk2-res100.json", "Chart data is not valid");
     }
 
     private void verifyChartStyle() {
-        verifySeriesStyle(READ_SERIES_NAME, ISeries.SeriesType.LINE, BLUE, LineStyle.SOLID, true);
-        verifySeriesStyle(WRITE_SERIES_NAME, ISeries.SeriesType.LINE, RED, LineStyle.SOLID, true);
+        verifySeriesStyle(READ_SERIES_NAME, ISeries.SeriesType.LINE, GREEN, LineStyle.SOLID, true);
+        verifySeriesStyle(WRITE_SERIES_NAME, ISeries.SeriesType.LINE, PURPLE, LineStyle.SOLID, true);
     }
 
     @Override

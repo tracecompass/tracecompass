@@ -27,10 +27,10 @@ public class Messages extends NLS {
     public static @Nullable String DiskIOActivityViewer_XAxis;
     /** Y axis caption */
     public static @Nullable String DiskIOActivityViewer_YAxis;
-    /** Read text */
-    public static @Nullable String DisksIOActivityViewer_Read;
-    /** Write text */
-    public static @Nullable String DisksIOActivityViewer_Write;
+    /** Disk Name column */
+    public static @Nullable String DiskIOActivityTreeViewer_DiskName;
+    /** Legend Column*/
+    public static @Nullable String DiskIOActivityTreeViewer_Legend;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

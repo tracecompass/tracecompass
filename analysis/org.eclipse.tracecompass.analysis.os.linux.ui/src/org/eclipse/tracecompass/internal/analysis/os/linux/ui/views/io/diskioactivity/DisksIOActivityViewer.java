@@ -16,9 +16,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.DisksIODataProvider;
 import org.eclipse.tracecompass.common.core.format.DataSpeedWithUnitFormat;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
-import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.swtchart.Chart;
 
@@ -28,7 +26,7 @@ import org.swtchart.Chart;
  * @author Houssem Daoud
  */
 @SuppressWarnings("restriction")
-public class DisksIOActivityViewer extends TmfCommonXAxisChartViewer {
+public class DisksIOActivityViewer extends TmfFilteredXYChartViewer {
 
     private static final int DEFAULT_SERIES_WIDTH = 1;
 
@@ -41,7 +39,7 @@ public class DisksIOActivityViewer extends TmfCommonXAxisChartViewer {
      *            See {@link TmfXYChartSettings} to know what it contains
      */
     public DisksIOActivityViewer(@Nullable Composite parent, TmfXYChartSettings settings) {
-        super(parent, settings);
+        super(parent, settings, DisksIODataProvider.ID);
         Chart chart = getSwtChart();
         chart.getAxisSet().getYAxis(0).getTick().setFormat(DataSpeedWithUnitFormat.getInstance());
         chart.getLegend().setPosition(SWT.LEFT);
@@ -50,13 +48,5 @@ public class DisksIOActivityViewer extends TmfCommonXAxisChartViewer {
     @Override
     public IYAppearance getSeriesAppearance(@NonNull String seriesName) {
         return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.AREA, DEFAULT_SERIES_WIDTH);
-    }
-
-    @Override
-    protected void initializeDataProvider() {
-        ITmfTrace trace = getTrace();
-        DisksIODataProvider provider = DataProviderManager.getInstance().getDataProvider(trace,
-                DisksIODataProvider.ID, DisksIODataProvider.class);
-        setDataProvider(provider);
     }
 }

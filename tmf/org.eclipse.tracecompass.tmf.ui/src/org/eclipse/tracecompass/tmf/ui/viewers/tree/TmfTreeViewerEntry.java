@@ -64,7 +64,7 @@ public class TmfTreeViewerEntry implements ITmfTreeViewerEntry {
 
     @Override
     public boolean hasChildren() {
-        return fChildren.size() > 0;
+        return !fChildren.isEmpty();
     }
 
     @Override

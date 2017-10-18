@@ -9,18 +9,14 @@
 package org.eclipse.tracecompass.analysis.os.linux.core.inputoutput;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
 
 /**
  * This class represents a storage device in the system that behaves like a disk
@@ -31,12 +27,10 @@ import com.google.common.hash.Hashing;
  */
 public class Disk {
 
-    private static final HashFunction HF = NonNullUtils.checkNotNull(Hashing.goodFastHash(32));
+    private static final int MINORBITS = 20;
+    private static final int MINORMASK = (1 << MINORBITS) - 1;
 
-    private static final Integer MINORBITS = 20;
-    private static final Integer MINORMASK = ((1 << MINORBITS) - 1);
-
-    private final Integer fDev;
+    private final int fDev;
     private final int fDiskQuark;
     private final ITmfStateSystem fSs;
     private @Nullable String fDiskName = null;
@@ -64,9 +58,9 @@ public class Disk {
     /**
      * Get the device ID of this device
      *
-     * @return The devide ID of this disk
+     * @return The device ID of this disk
      */
-    public Integer getDevideId() {
+    public int getDeviceId() {
         return fDev;
     }
 
@@ -113,9 +107,13 @@ public class Disk {
      * @return The device ID string as major,minor
      */
     public String getDeviceIdString() {
-        Integer major = fDev >> MINORBITS;
-        Integer minor = fDev & MINORMASK;
-        return major.toString() + ',' + minor.toString();
+        return extractDeviceIdString(fDev);
+    }
+
+    protected static String extractDeviceIdString(int dev) {
+        int major = dev >> MINORBITS;
+        int minor = dev & MINORMASK;
+        return major + "," + minor; //$NON-NLS-1$
     }
 
     /**
@@ -130,76 +128,86 @@ public class Disk {
      * @return The number of sectors affected by operation at the end of the
      *         range
      */
-    public long getSectorsAt(long ts, IoOperationType type) {
+    public double getSectorsAt(long ts, IoOperationType type) {
 
         ITmfStateSystem ss = fSs;
-        long currentCount = 0;
 
         /* Get the quark for the number of sector for the requested operation */
-        int rwSectorQuark = ITmfStateSystem.INVALID_ATTRIBUTE;
+        int rwSectorQuark;
         if (type == IoOperationType.READ) {
             rwSectorQuark = ss.optQuarkRelative(fDiskQuark, Attributes.SECTORS_READ);
         } else if (type == IoOperationType.WRITE) {
             rwSectorQuark = ss.optQuarkRelative(fDiskQuark, Attributes.SECTORS_WRITTEN);
+        } else {
+            return 0;
         }
-        if (rwSectorQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
-            return currentCount;
-        }
-
-        int rw = type == IoOperationType.READ ? StateValues.READING_REQUEST : StateValues.WRITING_REQUEST;
 
         long time = Math.max(ts, ss.getStartTime());
         time = Math.min(time, ss.getCurrentEndTime());
 
         try {
             List<ITmfStateInterval> states = ss.queryFullState(time);
-            long count = states.get(rwSectorQuark).getStateValue().unboxLong();
-            if (count == -1) {
-                count = 0;
-            }
-            Integer driverQ = ss.getQuarkRelative(fDiskQuark, Attributes.DRIVER_QUEUE);
-
-            /*
-             * Interpolate the part of the requests in progress at requested
-             * time
-             */
-            for (Integer driverSlotQuark : ss.getSubAttributes(driverQ, false)) {
-                int sizeQuark = ss.getQuarkRelative(driverSlotQuark, Attributes.REQUEST_SIZE);
-                ITmfStateInterval interval = states.get(sizeQuark);
-                if (!interval.getStateValue().isNull()) {
-                    if (states.get(driverSlotQuark).getStateValue().unboxInt() == rw) {
-                        /*
-                         * The request is fully completed (and included in the
-                         * r/w sectors) at interval end time + 1, so at interval
-                         * end time, we do not expect the size to be total size
-                         */
-                        long runningTime = interval.getEndTime() - interval.getStartTime() + 1;
-                        long runningEnd = interval.getEndTime() + 1;
-                        long startsize = interval.getStateValue().unboxLong();
-                        count = interpolateCount(count, time, runningEnd, runningTime, startsize);
-                    }
-                }
-            }
-            currentCount = count;
-        } catch (StateSystemDisposedException | AttributeNotFoundException e) {
+            return extractCount(rwSectorQuark, ss, states, time);
+        } catch (StateSystemDisposedException e) {
             Activator.getDefault().logError("Error getting disk IO Activity", e); //$NON-NLS-1$
         }
-        return currentCount;
+        return 0;
     }
 
-    private static long interpolateCount(long count, long ts, long runningEnd, long runningTime, long size) {
+    /**
+     * Get the total number of sectors either read or written at the end of a time
+     * range. This method will interpolate the requests that are in progress.
+     *
+     * @param sectorQuark
+     *            the read or write sector quark for this Disk.
+     * @param ss
+     *            this disk's state system
+     * @param states
+     *            list of full states queried at the desired time.
+     * @param ts
+     *            the desired time
+     * @return The number of sectors affected by operation at the end of the range
+     */
+    protected static double extractCount(int sectorQuark, ITmfStateSystem ss, List<ITmfStateInterval> states, long ts) {
+        // Determine if we are handling read or write requests.
+        String sectorName = ss.getAttributeName(sectorQuark);
+        int rw = sectorName.equals(Attributes.SECTORS_READ) ? StateValues.READING_REQUEST : StateValues.WRITING_REQUEST;
 
-        long newCount = count;
-        if (runningTime > 0) {
-            long runningStart = runningEnd - runningTime;
-            if (ts < runningStart) {
-                return newCount;
-            }
-            double interpolation = (double) (ts - runningStart) * (double) size / (runningTime);
-            /* Will truncate the decimal part */
-            newCount += (long) interpolation;
+        // Get the initial value.
+        Object stateValue = states.get(sectorQuark).getValue();
+        double count = (stateValue instanceof Number) ? ((Number) stateValue).doubleValue() : 0.0;
+
+        // Find the driver queue root attribute
+        int diskQuark = ss.getParentAttributeQuark(sectorQuark);
+        int driverQ = ss.optQuarkRelative(diskQuark, Attributes.DRIVER_QUEUE);
+        if (driverQ == ITmfStateSystem.INVALID_ATTRIBUTE) {
+            return count;
         }
-        return newCount;
+
+        /*
+         * Interpolate the part of the requests in progress at requested time
+         */
+        for (Integer driverSlotQuark : ss.getSubAttributes(driverQ, false)) {
+            int sizeQuark = ss.optQuarkRelative(driverSlotQuark, Attributes.REQUEST_SIZE);
+            if (sizeQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
+                ITmfStateInterval interval = states.get(sizeQuark);
+                Object size = interval.getValue();
+                if (size instanceof Number && Objects.equals(rw, states.get(driverSlotQuark).getValue())) {
+                    /*
+                     * The request is fully completed (and included in the r/w sectors) at interval
+                     * end time + 1, so at interval end time, we do not expect the size to be total
+                     * size
+                     */
+                    count += interpolate(ts, interval, (Number) size);
+                }
+            }
+        }
+        return count;
+    }
+
+    private static double interpolate(long ts, ITmfStateInterval interval, Number size) {
+        long runningTime = interval.getEndTime() - interval.getStartTime() + 1;
+        return (ts - interval.getStartTime()) * size.doubleValue() / runningTime;
     }
 
     /**
@@ -209,18 +217,12 @@ public class Disk {
      *         otherwise
      */
     public boolean hasActivity() {
-        try {
-            int wqQuark = fSs.getQuarkRelative(fDiskQuark, Attributes.WAITING_QUEUE);
-            if (fSs.getSubAttributes(wqQuark, false).size() > 0) {
-                return true;
-            }
-            int dqQuark = fSs.getQuarkRelative(fDiskQuark, Attributes.DRIVER_QUEUE);
-            if (fSs.getSubAttributes(dqQuark, false).size() > 0) {
-                return true;
-            }
-        } catch (AttributeNotFoundException e) {
-        }
-        return false;
+        return queueIsActive(Attributes.WAITING_QUEUE) && queueIsActive(Attributes.DRIVER_QUEUE);
+    }
+
+    private boolean queueIsActive(String queue) {
+        int quark = fSs.optQuarkRelative(fDiskQuark, queue);
+        return quark != ITmfStateSystem.INVALID_ATTRIBUTE && !fSs.getSubAttributes(quark, false).isEmpty();
     }
 
     // ----------------------------------------------------
@@ -234,16 +236,14 @@ public class Disk {
 
     @Override
     public int hashCode() {
-        return HF.newHasher().putInt(fDev).hash().asInt();
+        return Objects.hash(fSs, fDev);
     }
 
     @Override
     public boolean equals(@Nullable Object o) {
         if (o instanceof Disk) {
             Disk disk = (Disk) o;
-            if (fDev.equals(disk.fDev)) {
-                return true;
-            }
+            return fSs.equals(disk.fSs) && fDev == disk.fDev;
         }
         return false;
     }

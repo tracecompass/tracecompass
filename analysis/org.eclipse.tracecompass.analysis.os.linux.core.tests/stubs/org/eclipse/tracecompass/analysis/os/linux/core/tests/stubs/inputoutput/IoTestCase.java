@@ -81,7 +81,7 @@ public class IoTestCase extends LinuxTestCase {
          *
          * @return The expected number of sectors
          */
-        public long getNbSectors() {
+        public double getNbSectors() {
             return fSectors;
         }
     }
