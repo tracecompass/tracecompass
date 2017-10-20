@@ -9,9 +9,12 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
@@ -20,6 +23,8 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTre
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeCompositeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -50,11 +55,41 @@ public class TmfTreeXYCompositeDataProvider<M extends ITmfTreeDataModel, P exten
      *            should be associated to a different trace.
      * @param title
      *            Chart's title
-     * @param id the provider's ID
+     * @param id
+     *            the provider's ID
      */
     public TmfTreeXYCompositeDataProvider(List<P> providers, String title, String id) {
         super(providers, id);
         fTitle = title;
+    }
+
+    /**
+     * Return an {@link ITmfTreeXYDataProvider} from a list of trace.
+     *
+     * @param traces
+     *            A list of traces from which to generate a provider.
+     * @param title
+     *            Chart's title
+     * @param id
+     *            the provider's ID
+     * @return null if the non of the traces returns a provider, the provider if the
+     *         lists only return one, else a {@link TmfTreeXYCompositeDataProvider}
+     *         encapsulating the providers
+     */
+    public static @Nullable ITmfTreeXYDataProvider<ITmfTreeDataModel> create(Collection<ITmfTrace> traces, String title, String id) {
+        List<@NonNull ITmfTreeXYDataProvider<ITmfTreeDataModel>> providers = new ArrayList<>();
+        for (ITmfTrace child : traces) {
+            ITmfTreeXYDataProvider<ITmfTreeDataModel> provider = DataProviderManager.getInstance().getDataProvider(child, id, ITmfTreeXYDataProvider.class);
+            if (provider != null) {
+                providers.add(provider);
+            }
+        }
+        if (providers.isEmpty()) {
+            return null;
+        } else if (providers.size() == 1) {
+            return providers.get(0);
+        }
+        return new TmfTreeXYCompositeDataProvider<>(providers, title, id);
     }
 
     @Override

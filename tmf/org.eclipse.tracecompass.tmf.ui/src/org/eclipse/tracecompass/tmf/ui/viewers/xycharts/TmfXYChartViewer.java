@@ -146,8 +146,9 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      * Gets the SWT Chart reference
      *
      * @return the SWT chart to set.
+     * @since 3.2
      */
-    protected Chart getSwtChart() {
+    public Chart getSwtChart() {
         return fSwtChart;
     }
 

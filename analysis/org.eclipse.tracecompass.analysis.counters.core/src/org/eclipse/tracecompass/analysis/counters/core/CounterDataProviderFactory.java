@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.analysis.counters.core;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,6 +21,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeX
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
 import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderFactory;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 /**
@@ -35,20 +37,25 @@ public class CounterDataProviderFactory implements IDataProviderFactory {
 
     @Override
     public @Nullable ITmfTreeXYDataProvider<? extends ITmfTreeDataModel> createProvider(ITmfTrace trace) {
-        List<CounterDataProvider> dataProviders = new ArrayList<>();
-        Iterable<CounterAnalysis> modules = TmfTraceUtils.getAnalysisModulesOfClass(trace, CounterAnalysis.class);
-        for (CounterAnalysis module : modules) {
-            ITmfTrace subTrace = module.getTrace();
-            CounterDataProvider provider = CounterDataProvider.create(Objects.requireNonNull(subTrace), module);
-            if (provider != null) {
-                dataProviders.add(provider);
+        Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
+        if (traces.size() == 1) {
+            List<ITmfTreeXYDataProvider<CounterEntryModel>> dataProviders = new ArrayList<>();
+            for (CounterAnalysis module : TmfTraceUtils.getAnalysisModulesOfClass(trace, CounterAnalysis.class)) {
+                ITmfTrace subTrace = module.getTrace();
+                ITmfTreeXYDataProvider<CounterEntryModel> provider = CounterDataProvider.create(Objects.requireNonNull(subTrace), module);
+                if (provider != null) {
+                    dataProviders.add(provider);
+                }
             }
+            if (dataProviders.isEmpty()) {
+                return null;
+            } else if (dataProviders.size() == 1) {
+                return dataProviders.get(0);
+            }
+            return new TmfTreeXYCompositeDataProvider<>(dataProviders, TITLE, CounterDataProvider.ID);
         }
 
-        if (!dataProviders.isEmpty()) {
-            return new TmfTreeXYCompositeDataProvider(dataProviders, TITLE, CounterDataProvider.ID);
-        }
-        return null;
+        return TmfTreeXYCompositeDataProvider.create(traces, TITLE, CounterDataProvider.ID);
     }
 
 }

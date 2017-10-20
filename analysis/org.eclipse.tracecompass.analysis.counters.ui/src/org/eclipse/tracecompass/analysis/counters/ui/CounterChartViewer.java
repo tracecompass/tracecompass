@@ -13,10 +13,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.counters.core.CounterDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCounterQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
-import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 
@@ -35,10 +31,12 @@ public final class CounterChartViewer extends TmfFilteredXYChartViewer {
      *
      * @param parent
      *            Parent composite
+     * @param settings
+     *            See {@link TmfXYChartSettings} to know what it contains
      */
     public CounterChartViewer(Composite parent, TmfXYChartSettings settings) {
         // Avoid displaying chart title and axis titles (to reduce wasted space)
-        super(parent, settings);
+        super(parent, settings, CounterDataProvider.ID);
     }
 
     /**
@@ -53,12 +51,5 @@ public final class CounterChartViewer extends TmfFilteredXYChartViewer {
     @Override
     protected TimeQueryFilter createQueryFilter(long start, long end, int nb) {
         return new SelectedCounterQueryFilter(start, end, nb, getSelected(), fIsCumulative);
-    }
-
-    @Override
-    protected void initializeDataProvider() {
-        ITmfTrace trace = getTrace();
-        ITmfXYDataProvider provider = DataProviderManager.getInstance().getDataProvider(trace, CounterDataProvider.ID, TmfTreeXYCompositeDataProvider.class);
-        setDataProvider(provider);
     }
 }

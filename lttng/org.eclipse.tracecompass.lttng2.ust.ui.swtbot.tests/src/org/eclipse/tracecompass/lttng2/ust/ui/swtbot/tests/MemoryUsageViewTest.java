@@ -28,7 +28,6 @@ import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.XYDataProviderBaseTest;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
-import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.ui.IViewPart;
 import org.hamcrest.Matcher;
@@ -131,7 +130,6 @@ public class MemoryUsageViewTest extends XYDataProviderBaseTest {
 
     private void checkAllEntries() {
         SWTBotTree treeBot = getSWTBotView().bot().tree();
-        WaitUtils.waitUntil(tree -> tree.rowCount() >= EXPECTED_NUM_SERIES, treeBot, "The tree viewer did not finish loading.");
         for (SWTBotTreeItem entry : treeBot.getAllItems()) {
             entry.check();
         }

@@ -15,6 +15,8 @@ package org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
+import org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryUsageDataProvider;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -23,6 +25,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.XYChartLegendImageProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TreePatternFilter;
@@ -48,7 +51,9 @@ public class MemoryUsageView extends TmfChartView {
     @Override
     protected TmfXYChartViewer createChartViewer(Composite parent) {
         TmfXYChartSettings settings = new TmfXYChartSettings(Messages.MemoryUsageViewer_Title, Messages.MemoryUsageViewer_XAxis, Messages.MemoryUsageViewer_YAxis, 1);
-        return new MemoryUsageViewer(parent, settings);
+        TmfFilteredXYChartViewer chartViewer = new TmfFilteredXYChartViewer(parent, settings, UstMemoryUsageDataProvider.ID);
+        chartViewer.getSwtChart().getAxisSet().getYAxis(0).getTick().setFormat(DataSizeWithUnitFormat.getInstance());
+        return chartViewer;
     }
 
     @Override
@@ -75,10 +80,10 @@ public class MemoryUsageView extends TmfChartView {
 
         TmfViewer tree = getLeftChildViewer();
         TmfXYChartViewer chart = getChartViewer();
-        if (tree instanceof MemoryUsageTreeViewer && chart instanceof MemoryUsageViewer) {
+        if (tree instanceof MemoryUsageTreeViewer && chart instanceof TmfFilteredXYChartViewer) {
             ILegendImageProvider legendImageProvider = new XYChartLegendImageProvider((TmfCommonXAxisChartViewer) chart);
             MemoryUsageTreeViewer kernelMemoryTree = (MemoryUsageTreeViewer) tree;
-            kernelMemoryTree.setTreeListener((MemoryUsageViewer) chart);
+            kernelMemoryTree.setTreeListener((TmfFilteredXYChartViewer) chart);
             kernelMemoryTree.setLegendImageProvider(legendImageProvider);
         }
     }

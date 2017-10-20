@@ -19,10 +19,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ICheckboxTreeViewerListener;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
@@ -37,11 +40,13 @@ import com.google.common.collect.Lists;
  * @author Loic Prieur-Drevon
  * @since 3.2
  */
-public abstract class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implements ICheckboxTreeViewerListener {
+public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implements ICheckboxTreeViewerListener {
 
     private static final int DEFAULT_SERIES_WIDTH = 2;
 
     private @NonNull Collection<@NonNull Long> fSelectedIds = Collections.emptyList();
+
+    private final String fId;
 
     /**
      * Constructor
@@ -50,13 +55,16 @@ public abstract class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer
      *            The parent composite
      * @param settings
      *            See {@link TmfXYChartSettings} to know what it contains
+     * @param id
+     *            The ITmfXYDataProvider ID.
      */
-    public TmfFilteredXYChartViewer(Composite parent, TmfXYChartSettings settings) {
+    public TmfFilteredXYChartViewer(Composite parent, TmfXYChartSettings settings, String id) {
         super(parent, settings);
         Chart chart = getSwtChart();
         // Avoid displaying chart title and axis titles (to reduce wasted space)
         chart.getLegend().setVisible(false);
         chart.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+        fId = id;
     }
 
     /**
@@ -110,6 +118,17 @@ public abstract class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer
     @Override
     public @NonNull IYAppearance getSeriesAppearance(@NonNull String seriesName) {
         return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH);
+    }
+
+    @Override
+    protected void initializeDataProvider() {
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            return;
+        }
+        ITmfTreeXYDataProvider provider = DataProviderManager.getInstance().getDataProvider(trace,
+                fId, ITmfTreeXYDataProvider.class);
+        setDataProvider(provider);
     }
 
 }

@@ -1,7 +1,9 @@
 package org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.Viewer;
@@ -9,6 +11,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.MemoryUsageTreeModel;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryUsageDataProvider;
@@ -34,7 +37,8 @@ public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
         @Override
         public String getColumnText(Object element, int columnIndex) {
             MemoryUsageEntry obj = (MemoryUsageEntry) element;
-            if (columnIndex == 0) {
+            if (columnIndex == 0 && obj.getModel().getTid() >= 0) {
+                // do not display the dummy TID for the trace entry
                 return Integer.toString(obj.getModel().getTid());
             } else if (columnIndex == 1) {
                 return obj.getName();
@@ -45,8 +49,12 @@ public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
         @Override
         public Image getColumnImage(Object element, int columnIndex) {
             if (columnIndex == 2 && element instanceof MemoryUsageEntry && isChecked(element)) {
-                String name = Integer.toString(((MemoryUsageEntry) element).getModel().getTid());
-                return getLegendImage(name);
+                MemoryUsageEntry memoryEntry = (MemoryUsageEntry) element;
+                // do not display the dummy TID for the trace entry
+                if (memoryEntry.getModel().getTid() >= 0) {
+                    String name = Integer.toString(memoryEntry.getModel().getTid());
+                    return getLegendImage(name);
+                }
             }
             return null;
         }
@@ -101,19 +109,27 @@ public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
             return null;
         }
 
-        UstMemoryUsageDataProvider provider = DataProviderManager.getInstance().getDataProvider(trace,
-                UstMemoryUsageDataProvider.ID, UstMemoryUsageDataProvider.class);
+        ITmfTreeXYDataProvider<@NonNull MemoryUsageTreeModel> provider = DataProviderManager.getInstance().getDataProvider(trace,
+                UstMemoryUsageDataProvider.ID, ITmfTreeXYDataProvider.class);
         if (provider == null) {
             return null;
         }
-        TmfTreeViewerEntry root = new TmfTreeViewerEntry(""); //$NON-NLS-1$
-        List<ITmfTreeViewerEntry> entryList = root.getChildren();
 
         TmfModelResponse<@NonNull List<@NonNull MemoryUsageTreeModel>> response = provider.fetchTree(new TimeQueryFilter(start, end, 2), null);
         List<@NonNull MemoryUsageTreeModel> model = response.getModel();
-        if (model != null) {
-            for (MemoryUsageTreeModel k : model) {
-                entryList.add(new MemoryUsageEntry(k));
+        if (model == null) {
+            return null;
+        }
+        Map<Long, TmfTreeViewerEntry> map = new HashMap<>();
+        TmfTreeViewerEntry root = new TmfTreeViewerEntry(""); //$NON-NLS-1$
+        map.put(-1L, root);
+        for (MemoryUsageTreeModel m : model) {
+            MemoryUsageEntry entry = new MemoryUsageEntry(m);
+            map.put(m.getId(), entry);
+
+            TmfTreeViewerEntry parent = map.get(m.getParentId());
+            if (parent != null) {
+                parent.addChild(entry);
             }
         }
         return root;

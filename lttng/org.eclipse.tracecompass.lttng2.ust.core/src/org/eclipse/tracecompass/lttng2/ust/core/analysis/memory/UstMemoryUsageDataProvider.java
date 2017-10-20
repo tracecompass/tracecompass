@@ -27,9 +27,8 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatus
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
@@ -56,7 +55,7 @@ import com.google.common.collect.ImmutableMap;
 @NonNullByDefault
 @SuppressWarnings("restriction")
 public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataProvider
-    implements ITmfXYDataProvider, ITmfTreeDataProvider<MemoryUsageTreeModel> {
+    implements ITmfTreeXYDataProvider<MemoryUsageTreeModel> {
 
     /**
      * Entry point ID.
@@ -71,6 +70,7 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
      */
     private final BiMap<Long, Integer> fIdToQuark = HashBiMap.create();
     private @Nullable TmfModelResponse<List<MemoryUsageTreeModel>> fCached;
+    private final long fTraceId = ENTRY_IDS.getAndIncrement();
 
     private final UstMemoryAnalysisModule fModule;
 
@@ -214,6 +214,7 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
         }
 
         ImmutableList.Builder<MemoryUsageTreeModel> builder = ImmutableList.builder();
+        builder.add(new MemoryUsageTreeModel(fTraceId, -1L, -1, getTrace().getName()));
         for (int quark : tidQuarks) {
             int memoryAttribute = ss.optQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_MEMORY_ATTRIBUTE);
             int procNameQuark = ss.optQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_PROCNAME_ATTRIBUTE);
@@ -228,7 +229,7 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
                     id = ENTRY_IDS.getAndIncrement();
                     fIdToQuark.put(id, quark);
                 }
-                builder.add(new MemoryUsageTreeModel(id, -1, tid, name));
+                builder.add(new MemoryUsageTreeModel(id, fTraceId, tid, name));
             }
         }
 

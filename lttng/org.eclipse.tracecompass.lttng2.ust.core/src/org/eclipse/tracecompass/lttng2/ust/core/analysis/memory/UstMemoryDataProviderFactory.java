@@ -9,12 +9,17 @@
 
 package org.eclipse.tracecompass.lttng2.ust.core.analysis.memory;
 
+import java.util.Collection;
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
 import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderFactory;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 
 /**
  * {@link UstMemoryUsageDataProvider} factory using the data provider factory
@@ -25,9 +30,16 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  */
 public class UstMemoryDataProviderFactory implements IDataProviderFactory {
 
+    private static final @NonNull String TITLE = Objects.requireNonNull(Messages.MemoryUsageDataProvider_Title);
+
     @Override
-    public @Nullable ITmfTreeDataProvider<? extends ITmfTreeDataModel> createProvider(@NonNull ITmfTrace trace) {
-        return UstMemoryUsageDataProvider.create(trace);
+    public @Nullable ITmfTreeXYDataProvider<? extends ITmfTreeDataModel> createProvider(@NonNull ITmfTrace trace) {
+        Collection<@NonNull ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
+        if (traces.size() == 1) {
+            return UstMemoryUsageDataProvider.create(trace);
+        }
+        // handle the case where the trace is an experiment
+        return TmfTreeXYCompositeDataProvider.create(traces, TITLE, UstMemoryUsageDataProvider.ID);
     }
 
 }
