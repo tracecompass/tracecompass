@@ -19,7 +19,27 @@
 	               value="http://download.eclipse.org/tracecompass.incubator/master/repository/">
 	           </parameter>
             </command>
+            <command
+                  commandId="org.eclipse.tracecompass.rcp.incubator.ui.feedback"
+                  label="%menu.experimental.feedback"
+                  style="push" />
          </menu>
       </menuContribution>
    </extension -->
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
+            description="%command.experimental.feedback.description"
+            id="org.eclipse.tracecompass.rcp.incubator.ui.feedback"
+            name="%command.experimental.feedback">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.tracecompass.internal.rcp.incubator.ui.GiveFeedbackHandler"
+            commandId="org.eclipse.tracecompass.rcp.incubator.ui.feedback">
+      </handler>
+   </extension>
 </plugin>

@@ -36,6 +36,8 @@
       <import plugin="org.eclipse.equinox.p2.discovery" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.equinox.p2.repository" version="2.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.equinox.p2.transport.ecf" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.commands"/>
+      <import plugin="org.eclipse.swt"/>
       <import plugin="org.eclipse.equinox.p2.discovery" version="1.0.0"/>
    </requires>
 
