@@ -14,7 +14,10 @@ package org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace;
 
 import java.io.File;
 import java.io.IOException;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -156,6 +159,38 @@ public class ArchiveUtil {
         }
 
         return true;
+    }
+
+    /**
+     * Get the archive size
+     *
+     * @param archivePath
+     *            Path of the archive
+     * @return Size of the archive in byte or -1 if there is an error
+     */
+    public static long getArchiveSize(String archivePath) {
+        TarFile tarFile = getSpecifiedTarSourceFile(archivePath);
+        long archiveSize = 0;
+        if (tarFile != null) {
+            ArrayList<TarArchiveEntry> entries = Collections.list(tarFile.entries());
+            for (TarArchiveEntry tarArchiveEntry : entries) {
+                archiveSize += tarArchiveEntry.getSize();
+            }
+            closeTarFile(tarFile);
+            return archiveSize;
+        }
+
+        ZipFile zipFile = getSpecifiedZipSourceFile(archivePath);
+        if (zipFile != null) {
+            ArrayList<ZipArchiveEntry> entries = Collections.list(zipFile.getEntries());
+            for (ZipArchiveEntry zipArchiveEntry : entries) {
+                archiveSize += zipArchiveEntry.getSize();
+            }
+            closeZipFile(zipFile);
+            return archiveSize;
+        }
+
+        return -1;
     }
 
     /**

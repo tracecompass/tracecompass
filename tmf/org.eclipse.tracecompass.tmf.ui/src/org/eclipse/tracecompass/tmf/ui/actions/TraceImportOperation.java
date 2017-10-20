@@ -115,7 +115,7 @@ public class TraceImportOperation extends WorkspaceModifyOperation {
         final TraceValidateAndImportOperation importOperation = new TraceValidateAndImportOperation(
                 null, fileSystemElements, null,
                 baseSourceContainerPath, destinationContainerPath, false,
-                importOptionFlags, fDestFolder, fStartTimeRange, fEndTimeRange);
+                importOptionFlags, fDestFolder, fStartTimeRange, fEndTimeRange, null, false);
         try {
             importOperation.run(monitor);
         } catch (InvocationTargetException e) {

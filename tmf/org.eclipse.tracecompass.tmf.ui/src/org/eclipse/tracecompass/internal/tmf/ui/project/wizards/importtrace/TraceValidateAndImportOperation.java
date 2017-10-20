@@ -40,6 +40,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -73,6 +74,12 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
 
     private static final String TRACE_IMPORT_TEMP_FOLDER = ".traceImport"; //$NON-NLS-1$
 
+    /**
+     * Folder where we extract the archive when we want to keep it.
+     */
+    private static final String EXTRACTED_ARCHIVE_FOLDER = ".extractedArchive"; //$NON-NLS-1$
+    private static final @NonNull String DEFAULT_ARCHIVE_FOLDER_NAME = "extractedTrace"; //$NON-NLS-1$
+
     private String fTraceType;
     private IPath fDestinationContainerPath;
     private IPath fBaseSourceContainerPath;
@@ -84,6 +91,9 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
 
     private ITmfTimestamp fStartTimeRange;
     private ITmfTimestamp fEndTimeRange;
+
+    private @NonNull String fFolderName;
+    private boolean fKeepArchive;
 
     private IStatus fStatus;
     private ImportConflictHandler fConflictHandler;
@@ -124,9 +134,13 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
      *            Timestamp representing the start time of the range
      * @param endTimeRange
      *            Timestamp representing the end time of the range
+     * @param folderName
+     *            Archive folder name
+     * @param keepArchive
+     *            whether or not the extracted archive is kept
      */
     public TraceValidateAndImportOperation(Shell shell, List<TraceFileSystemElement> traceFileSystemElements, String traceId, IPath baseSourceContainerPath, IPath destinationContainerPath, boolean importFromArchive, int importOptionFlags,
-            TmfTraceFolder traceFolderElement, ITmfTimestamp startTimeRange, ITmfTimestamp endTimeRange) {
+            TmfTraceFolder traceFolderElement, ITmfTimestamp startTimeRange, ITmfTimestamp endTimeRange, String folderName, boolean keepArchive) {
         fTraceType = traceId;
         fBaseSourceContainerPath = baseSourceContainerPath;
         fDestinationContainerPath = destinationContainerPath;
@@ -136,6 +150,8 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
         fTraceFolderElement = traceFolderElement;
         fStartTimeRange = startTimeRange;
         fEndTimeRange = endTimeRange;
+        fFolderName = folderName != null ? folderName : DEFAULT_ARCHIVE_FOLDER_NAME;
+        fKeepArchive = keepArchive;
 
         boolean overwriteExistingResources = (importOptionFlags & ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES) != 0;
         if (overwriteExistingResources) {
@@ -227,6 +243,21 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
 
                 SubMonitor archiveMonitor = SubMonitor.convert(subMonitor.newChild(ARCHIVE_OR_DIRECTORY_PROGRESS), 2);
 
+                if (fKeepArchive) {
+                    fImportOptionFlags |= ImportTraceWizardPage.OPTION_KEEP_EXTRACTED_ARCHIVE;
+                    fImportOptionFlags |= ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
+                    IFolder extractedFolder = fTraceFolderElement.getProject().getResource().getFolder(EXTRACTED_ARCHIVE_FOLDER);
+                    if(!extractedFolder.exists()) {
+                        monitor = archiveMonitor.newChild(1);
+                        extractedFolder.create(IResource.FOLDER, true, monitor);
+                    }
+                    destTempFolder = extractedFolder.getFolder(fFolderName);
+                    if (!destTempFolder.exists()) {
+                        monitor = archiveMonitor.newChild(1);
+                        destTempFolder.create(IResource.FOLDER, true, monitor);
+                    }
+                }
+
                 // Extract selected files from source archive to temporary
                 // folder
                 extractArchiveContent(selectedFileSystemElements.iterator(), destTempFolder, archiveMonitor.newChild(1));
@@ -266,16 +297,19 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
             // wrong trace folders otherwise.
             fBaseSourceContainerPath = destTempFolder.getLocation();
             List<TraceFileSystemElement> tempFolderFileSystemElements = createElementsForFolder(destTempFolder);
+            boolean keepArchive = (fImportOptionFlags & ImportTraceWizardPage.OPTION_KEEP_EXTRACTED_ARCHIVE) != 0;
             if (!tempFolderFileSystemElements.isEmpty()) {
                 calculateSourceLocations(tempFolderFileSystemElements, baseSourceLocation);
                 // Never import extracted files as links, they would link to the
                 // temporary directory that will be deleted
-                fImportOptionFlags = fImportOptionFlags & ~ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
+                if (!keepArchive) {
+                    fImportOptionFlags = fImportOptionFlags & ~ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
+                }
                 SubMonitor importTempMonitor = subMonitor.newChild(EXTRA_IMPORT_OPERATION_PROGRESS);
                 importFileSystemElements(importTempMonitor.newChild(1), tempFolderFileSystemElements);
             }
 
-            if (destTempFolder.exists()) {
+            if (destTempFolder.exists() && !keepArchive) {
                 destTempFolder.delete(true, subMonitor.newChild(TOTAL_PROGRESS));
             }
 

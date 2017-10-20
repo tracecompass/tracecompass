@@ -140,6 +140,12 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     public static final String TRACE_TYPE_AUTO_DETECT = Messages.ImportTraceWizard_AutoDetection;
 
     /**
+     * Threshold size in byte of an archive to decide if we extract the archive in a
+     * folder instead of a temporary folder to avoid copying large archive.
+     */
+    private static final long ARCHIVE_SIZE_THRESHOLD = 400000000;
+
+    /**
      * Preserve the folder structure of the import traces.
      */
     public static final int OPTION_PRESERVE_FOLDER_STRUCTURE = 1 << 1;
@@ -167,6 +173,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
      * Filter by time range
      */
     public static final int OPTION_FILTER_TIMERANGE = 1 << 7;
+    /**
+     * Keep the extracted archive file to import using links.
+     */
+    public static final int OPTION_KEEP_EXTRACTED_ARCHIVE = 1 << 8;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -1227,8 +1237,21 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         final IPath baseSourceContainerPath = new Path(getSourceContainerPath());
         final boolean importFromArchive = getSourceArchiveFile() != null;
+        final boolean keepArchive;
         final int importOptionFlags = getImportOptionFlags();
         final IPath destinationContainerPath = getContainerFullPath();
+
+        // Get the archive name in case we decide to keep the archive later
+        final String archiveName;
+        File sourceArchiveFile = getSourceArchiveFile();
+        if (importFromArchive && sourceArchiveFile != null) {
+            archiveName = sourceArchiveFile.getName();
+            long archiveSize = ArchiveUtil.getArchiveSize(sourceArchiveFile.getAbsolutePath());
+            keepArchive = (archiveSize != -1 && archiveSize >= ARCHIVE_SIZE_THRESHOLD) ? true : false;
+        } else {
+            archiveName = null;
+            keepArchive = false;
+        }
 
         final IStatus[] operationStatus = new IStatus[1];
         operationStatus[0] = Status.OK_STATUS;
@@ -1260,7 +1283,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     fSelectionGroup.getAllCheckedListItems(passThroughFilter, subMonitor);
 
                     final TraceValidateAndImportOperation operation = new TraceValidateAndImportOperation(getContainer().getShell(), selectedFileSystemElements, traceId, baseSourceContainerPath, destinationContainerPath, importFromArchive,
-                            importOptionFlags, fTraceFolderElement, fStartTimestamp, fEndTimestamp);
+                            importOptionFlags, fTraceFolderElement, fStartTimestamp, fEndTimestamp, archiveName, keepArchive);
                     operation.run(monitor);
                     monitor.done();
                     operationStatus[0] = operation.getStatus();

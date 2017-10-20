@@ -113,11 +113,14 @@ public class HttpTraceImportOperation extends WorkspaceModifyOperation {
         FileSystemObjectImportStructureProvider provider = null;
         IFileSystemObject object = null;
 
+        String archiveFolderName = null;
         if (isArchive) {
             // If it's an archive there is only 1 element in this list
-            Pair<IFileSystemObject, FileSystemObjectImportStructureProvider> rootObjectAndProvider = ArchiveUtil.getRootObjectAndProvider(downloadedTraceList.get(0), null);
+            File downloadedTrace = downloadedTraceList.get(0);
+            Pair<IFileSystemObject, FileSystemObjectImportStructureProvider> rootObjectAndProvider = ArchiveUtil.getRootObjectAndProvider(downloadedTrace, null);
             provider = rootObjectAndProvider.getSecond();
             object = rootObjectAndProvider.getFirst();
+            archiveFolderName = downloadedTrace.getName();
         } else {
             provider = new FileSystemObjectImportStructureProvider(FileSystemStructureProvider.INSTANCE, null);
             object = provider.getIFileSystemObject(new File(tempDestinationFolderPath));
@@ -131,7 +134,7 @@ public class HttpTraceImportOperation extends WorkspaceModifyOperation {
         IPath sourceContainerPath = new Path(tempDestinationFolderPath);
         IPath destinationContainerPath = fDestinationFolder.getPath();
 
-        TraceValidateAndImportOperation validateAndImportOperation = new TraceValidateAndImportOperation(null, fileSystemElements, null, sourceContainerPath, destinationContainerPath, isArchive, importOptionFlags, fDestinationFolder, null, null);
+        TraceValidateAndImportOperation validateAndImportOperation = new TraceValidateAndImportOperation(null, fileSystemElements, null, sourceContainerPath, destinationContainerPath, isArchive, importOptionFlags, fDestinationFolder, null, null, archiveFolderName, false);
         validateAndImportOperation.run(monitor);
 
         // Clean the temporary directory
