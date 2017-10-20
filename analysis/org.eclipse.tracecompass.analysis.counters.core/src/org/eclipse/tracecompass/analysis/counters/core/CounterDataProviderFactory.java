@@ -17,6 +17,7 @@ import java.util.Objects;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.analysis.counters.core.Messages;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
 import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderFactory;
@@ -39,10 +40,10 @@ public class CounterDataProviderFactory implements IDataProviderFactory {
     public @Nullable ITmfTreeXYDataProvider<? extends ITmfTreeDataModel> createProvider(ITmfTrace trace) {
         Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
         if (traces.size() == 1) {
-            List<ITmfTreeXYDataProvider<CounterEntryModel>> dataProviders = new ArrayList<>();
+            List<ITmfTreeXYDataProvider<TmfTreeDataModel>> dataProviders = new ArrayList<>();
             for (CounterAnalysis module : TmfTraceUtils.getAnalysisModulesOfClass(trace, CounterAnalysis.class)) {
                 ITmfTrace subTrace = module.getTrace();
-                ITmfTreeXYDataProvider<CounterEntryModel> provider = CounterDataProvider.create(Objects.requireNonNull(subTrace), module);
+                ITmfTreeXYDataProvider<TmfTreeDataModel> provider = CounterDataProvider.create(Objects.requireNonNull(subTrace), module);
                 if (provider != null) {
                     dataProviders.add(provider);
                 }

@@ -12,10 +12,13 @@ package org.eclipse.tracecompass.tmf.ui.viewers.tree;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -27,6 +30,11 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
@@ -43,6 +51,7 @@ import com.google.common.primitives.Longs;
 /**
  * Abstract viewer for trees with checkboxes.
  *
+ * @since 3.2
  * @author Loic Prieur-Drevon
  * @since 3.2
  */
@@ -50,6 +59,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
 
     /** ID of the checked tree items in the map of data in {@link TmfTraceContext} */
     private static final @NonNull String CHECKED_ELEMENTS = ".CHECKED_ELEMENTS"; //$NON-NLS-1$
+    private final String fId;
 
     private static final ViewerComparator COMPARATOR = new ViewerComparator() {
         @Override
@@ -93,7 +103,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
      * @param legendColumnIndex
      *            index of the legend column (-1 if none)
      */
-    public AbstractSelectTreeViewer(Composite parent, TriStateFilteredCheckboxTree checkboxTree, int legendColumnIndex) {
+    public AbstractSelectTreeViewer(Composite parent, TriStateFilteredCheckboxTree checkboxTree, int legendColumnIndex, String id) {
         super(parent, checkboxTree.getViewer());
 
         TreeViewer treeViewer = checkboxTree.getViewer();
@@ -103,6 +113,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         }
         fCheckboxTree = checkboxTree;
         fLegendColumnIndex = legendColumnIndex;
+        fId = id;
     }
 
     /**
@@ -262,6 +273,49 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
             return legendImageProvider.getLegendImage(imageHeight, legend.getWidth(), name);
         }
         return null;
+    }
+
+    @Override
+    protected void initializeDataSource() {
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            return;
+        }
+        DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeDataProvider.class);
+    }
+
+    @Override
+    protected ITmfTreeViewerEntry updateElements(long start, long end, boolean isSelection) {
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            return null;
+        }
+
+        ITmfTreeDataProvider<@NonNull TmfTreeDataModel> provider = DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeDataProvider.class);
+        if (provider == null) {
+            return null;
+        }
+
+        TmfModelResponse<List<@NonNull TmfTreeDataModel>> tree = provider.fetchTree(new TimeQueryFilter(0l, Long.MAX_VALUE, 2), null);
+
+        List<@NonNull TmfTreeDataModel> model = tree.getModel();
+        if (model == null) {
+            return null;
+        }
+        TmfTreeViewerEntry root = new TmfTreeViewerEntry(StringUtils.EMPTY);
+
+        Map<Long, TmfTreeViewerEntry> map = new HashMap<>();
+        map.put(-1L, root);
+        for (@NonNull TmfTreeDataModel entry : model) {
+            TmfGenericTreeEntry<@NonNull TmfTreeDataModel> viewerEntry = new TmfGenericTreeEntry<>(entry);
+            map.put(entry.getId(), viewerEntry);
+
+            TmfTreeViewerEntry parent = map.get(entry.getParentId());
+            if (parent != null && !parent.getChildren().contains(viewerEntry)) {
+                parent.addChild(viewerEntry);
+            }
+        }
+        return root;
     }
 
 }

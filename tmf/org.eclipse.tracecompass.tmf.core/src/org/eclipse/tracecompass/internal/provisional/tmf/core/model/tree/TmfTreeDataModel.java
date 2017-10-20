@@ -50,4 +50,9 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
     public String getName() {
         return fName;
     }
+
+    @Override
+    public String toString() {
+        return "<name=" + fName + " id=" + fId + " parentId=" + fParentId + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    }
 }
