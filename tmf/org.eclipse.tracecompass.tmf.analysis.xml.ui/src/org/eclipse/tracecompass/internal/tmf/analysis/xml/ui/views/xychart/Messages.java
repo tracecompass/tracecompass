@@ -31,6 +31,10 @@ public class Messages extends NLS {
     public static @Nullable String XmlXYViewer_DefaultXAxis;
     /** Default Y axis text */
     public static @Nullable String XmlXYViewer_DefaultYAxis;
+    /** Tree name column name */
+    public static @Nullable String XmlTree_Name;
+    /** Tree legend column name */
+    public static @Nullable String XmlTree_Legend;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

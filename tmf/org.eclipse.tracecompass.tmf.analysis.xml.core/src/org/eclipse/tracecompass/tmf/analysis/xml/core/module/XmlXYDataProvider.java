@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,11 +28,11 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
@@ -56,6 +55,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 
 /**
  * This data provider will return a XY model (wrapped in a response) based on a
@@ -68,9 +68,14 @@ import com.google.common.collect.ImmutableMap;
 @NonNullByDefault
 @SuppressWarnings("restriction")
 public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
-        implements ITmfXYDataProvider, ITmfTreeDataProvider<TmfTreeDataModel> {
+        implements ITmfTreeXYDataProvider<TmfTreeDataModel> {
 
-    private static final String ID = "org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlXYDataProvider"; //$NON-NLS-1$
+    private static final String TITLE = Objects.requireNonNull(Messages.XmlDataProvider_DefaultXYTitle);
+    /**
+     * Extension point ID
+     * @since 2.4
+     */
+    public static final String ID = "org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlXYDataProvider"; //$NON-NLS-1$
     private static final String SPLIT_STRING = "/"; //$NON-NLS-1$
     private static final Pattern WILDCARD_PATTERN = Pattern.compile("\\*"); //$NON-NLS-1$
     private static final AtomicLong ENTRY_IDS = new AtomicLong();
@@ -80,6 +85,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
      * reused per every quark, and finds the quarks to query for the XY models.
      */
     private final BiMap<Long, Integer> fIdToQuark = HashBiMap.create();
+    private final long fTraceId = ENTRY_IDS.getAndIncrement();
     private @Nullable TmfModelResponse<List<TmfTreeDataModel>> fCached;
 
     private static class XmlXYEntry implements IXmlStateSystemContainer {
@@ -216,40 +222,30 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
     public TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         ITmfXmlStateAttribute display = fDisplay;
         XmlXYEntry entry = fXmlEntry;
-        ITmfXmlStateAttribute seriesNameAttrib = fSeriesNameAttrib;
-
         ITmfStateSystem ss = entry.getStateSystem();
-        List<Integer> quarks = entry.getQuarks();
 
-        /* Series are lazily created in the HashMap */
-        Map<Integer, double[]> tempModel = new HashMap<>();
-        Map<Integer, String> tempNames = new HashMap<>();
         long[] xValues = filter.getTimesRequested();
+        Map<Integer, double[]> map = initSeries(filter);
+        if (map.isEmpty()) {
+            return TmfCommonXAxisResponseFactory.create(TITLE, xValues, Collections.emptyMap(), true);
+        }
 
         long currentEnd = ss.getCurrentEndTime();
 
         try {
             for (int i = 0; i < xValues.length; i++) {
+                if (monitor != null && monitor.isCanceled()) {
+                    return TmfCommonXAxisResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
+                }
                 long time = xValues[i];
-                if (ss.getStartTime() <= time && time <= currentEnd) {
+                if (time > currentEnd) {
+                    break;
+                } else if (ss.getStartTime() <= time) {
                     List<@NonNull ITmfStateInterval> full = ss.queryFullState(time);
-                    for (int quark : quarks) {
-                        if (seriesNameAttrib != null) {
-                            // Use the value of the series name attribute
-                            int seriesNameQuark = seriesNameAttrib.getAttributeQuark(quark, null);
-                            Object value = full.get(seriesNameQuark).getValue();
-                            if (value != null) {
-                                tempNames.put(quark, String.valueOf(value));
-                            }
-                        }
-
-                        Object value = full.get(display.getAttributeQuark(quark, null)).getValue();
-                        double[] yValues = tempModel.get(quark);
-                        if (yValues == null) {
-                            yValues = new double[xValues.length];
-                            tempModel.put(quark, yValues);
-                        }
-                        setYValue(i, yValues, extractValue(value), entry.getType());
+                    for (Entry<Integer, double[]> series : map.entrySet()) {
+                        int attributeQuark = display.getAttributeQuark(series.getKey(), null);
+                        Object value = full.get(attributeQuark).getValue();
+                        setYValue(i, series.getValue(), extractValue(value), entry.getType());
                     }
                 }
             }
@@ -258,13 +254,28 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         }
 
         ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
-        for (Entry<Integer, double[]> tempEntry : tempModel.entrySet()) {
-            String name = tempNames.getOrDefault(tempEntry.getKey(), ss.getAttributeName(tempEntry.getKey()));
+        for (Entry<Integer, double[]> tempEntry : map.entrySet()) {
+            String name = String.valueOf(fIdToQuark.inverse().get(tempEntry.getKey()));
             ySeries.put(name, new YModel(name, tempEntry.getValue()));
         }
 
         boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
-        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.XmlDataProvider_DefaultXYTitle), xValues, ySeries.build(), complete);
+        return TmfCommonXAxisResponseFactory.create(TITLE, xValues, ySeries.build(), complete);
+    }
+
+    private Map<Integer, double[]> initSeries(TimeQueryFilter filter) {
+        if (!(filter instanceof SelectionTimeQueryFilter)) {
+            return Collections.emptyMap();
+        }
+        Map<Integer, double[]> map = new HashMap<>();
+        int length = filter.getTimesRequested().length;
+        for (Long id : ((SelectionTimeQueryFilter) filter).getSelectedItems()) {
+            Integer quark = fIdToQuark.get(id);
+            if (quark != null) {
+                map.put(quark, new double[length]);
+            }
+        }
+        return map;
     }
 
     private static void setYValue(int index, double[] y, double value, DisplayType type) {
@@ -293,31 +304,23 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
     }
 
     private static @Nullable ITmfAnalysisModuleWithStateSystems getStateSystemFromAnalyses(Set<String> analysisIds, ITmfTrace trace) {
-        List<ITmfAnalysisModuleWithStateSystems> stateSystemModules = new LinkedList<>();
+        @Nullable ITmfAnalysisModuleWithStateSystems stateSystemModule = null;
         if (analysisIds.isEmpty()) {
-            /*
-             * No analysis specified, take all state system analysis modules
-             */
-            for (ITmfAnalysisModuleWithStateSystems module : TmfTraceUtils.getAnalysisModulesOfClass(trace, ITmfAnalysisModuleWithStateSystems.class)) {
-                stateSystemModules.add(module);
-            }
+            stateSystemModule = Iterables.getFirst(TmfTraceUtils.getAnalysisModulesOfClass(trace, ITmfAnalysisModuleWithStateSystems.class), null);
         } else {
             for (String moduleId : analysisIds) {
                 ITmfAnalysisModuleWithStateSystems module = TmfTraceUtils.getAnalysisModuleOfClass(trace, ITmfAnalysisModuleWithStateSystems.class, moduleId);
                 if (module != null) {
-                    stateSystemModules.add(module);
+                    stateSystemModule = module;
+                    break;
                 }
             }
         }
 
-        /* Schedule all state systems */
-        for (ITmfAnalysisModuleWithStateSystems module : stateSystemModules) {
-            module.schedule();
-
-            return module;
+        if (stateSystemModule != null) {
+            stateSystemModule.schedule();
         }
-
-        return null;
+        return stateSystemModule;
     }
 
     /**
@@ -330,9 +333,10 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         }
 
         ITmfStateSystem ss = fXmlEntry.getStateSystem();
+        ITmfXmlStateAttribute seriesNameAttrib = fSeriesNameAttrib;
 
-        // Get the quarks before the full states to ensure that the attributes will be present in the full state
         boolean isComplete = ss.waitUntilBuilt(0);
+        // Get the quarks before the full states to ensure that the attributes will be present in the full state
         List<Integer> quarks = fXmlEntry.getQuarks();
         List<ITmfStateInterval> fullState;
         try {
@@ -342,16 +346,26 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         }
 
         ImmutableList.Builder<TmfTreeDataModel> builder = ImmutableList.builder();
+        builder.add(new TmfTreeDataModel(fTraceId, -1, getTrace().getName()));
+
         for (int quark : quarks) {
-            String seriesName = (String) fullState.get(quark).getValue();
-            if (seriesName != null && !seriesName.isEmpty()) {
+            String seriesName = ss.getAttributeName(quark);
+            if (seriesNameAttrib != null) {
+                // Use the value of the series name attribute
+                int seriesNameQuark = seriesNameAttrib.getAttributeQuark(quark, null);
+                Object value = fullState.get(seriesNameQuark).getValue();
+                if (value != null) {
+                    seriesName = String.valueOf(value);
+                }
+            }
+            if (!seriesName.isEmpty()) {
                 // Check if an ID has already been created for this quark.
                 Long id = fIdToQuark.inverse().get(quark);
                 if (id == null) {
                     id = ENTRY_IDS.getAndIncrement();
                     fIdToQuark.put(id, quark);
                 }
-                builder.add(new TmfTreeDataModel(id, -1, seriesName));
+                builder.add(new TmfTreeDataModel(id, fTraceId, seriesName));
             }
         }
 

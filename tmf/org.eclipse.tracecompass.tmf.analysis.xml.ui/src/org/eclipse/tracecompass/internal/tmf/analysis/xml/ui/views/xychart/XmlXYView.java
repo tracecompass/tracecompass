@@ -12,14 +12,24 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.xychart;
 
+import java.util.Objects;
+
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.viewers.ILegendImageProvider;
+import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.XYChartLegendImageProvider;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 import org.eclipse.tracecompass.tmf.ui.views.TmfViewFactory;
@@ -46,25 +56,21 @@ public class XmlXYView extends TmfChartView {
     public XmlXYView() {
         super(Messages.XmlXYView_DefaultTitle);
 
-        this.addPartPropertyListener(new IPropertyChangeListener() {
-            @Override
-            public void propertyChange(@Nullable PropertyChangeEvent event) {
-                if (event == null) {
-                    return;
-                }
-                if (event.getProperty().equals(TmfXmlStrings.XML_OUTPUT_DATA)) {
-                    Object newValue = event.getNewValue();
-                    if (newValue instanceof String) {
-                        fViewInfo.setViewData((String) newValue);
-                        setViewTitle();
-                        TmfXYChartViewer viewer = getChartViewer();
-                        if (viewer instanceof XmlXYViewer) {
-                            ((XmlXYViewer) viewer).viewInfoUpdated();
-                        }
+        addPartPropertyListener((@Nullable PropertyChangeEvent event) -> {
+            if (event == null) {
+                return;
+            }
+            if (event.getProperty().equals(TmfXmlStrings.XML_OUTPUT_DATA)) {
+                Object newValue = event.getNewValue();
+                if (newValue instanceof String) {
+                    fViewInfo.setViewData((String) newValue);
+                    setViewTitle();
+                    TmfXYChartViewer viewer = getChartViewer();
+                    if (viewer instanceof XmlXYViewer) {
+                        ((XmlXYViewer) viewer).viewInfoUpdated();
                     }
                 }
             }
-
         });
     }
 
@@ -79,16 +85,7 @@ public class XmlXYView extends TmfChartView {
         }
 
         String title = fViewInfo.getViewTitle(viewElement);
-        if (title == null) {
-            title = Messages.XmlXYView_DefaultTitle;
-        }
-        final String viewTitle = title;
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                setPartName(viewTitle);
-            }
-        });
+        Display.getDefault().asyncExec(() -> setPartName(title != null ? title : Messages.XmlXYView_DefaultTitle));
     }
 
     @Override
@@ -103,11 +100,35 @@ public class XmlXYView extends TmfChartView {
         }
         super.createPartControl(parent);
         setViewTitle();
+
+        TmfViewer tree = getLeftChildViewer();
+        TmfXYChartViewer chart = getChartViewer();
+        if (tree instanceof XmlTreeViewer && chart instanceof TmfFilteredXYChartViewer) {
+            ILegendImageProvider legendImageProvider = new XYChartLegendImageProvider((TmfCommonXAxisChartViewer) chart);
+            XmlTreeViewer kernelMemoryTree = (XmlTreeViewer) tree;
+            kernelMemoryTree.setTreeListener((TmfFilteredXYChartViewer) chart);
+            kernelMemoryTree.setLegendImageProvider(legendImageProvider);
+        }
     }
 
     @Override
     protected TmfXYChartViewer createChartViewer(@Nullable Composite parent) {
-        TmfXYChartSettings settings = new TmfXYChartSettings(Messages.XmlXYViewer_DefaultViewerTitle, Messages.XmlXYViewer_DefaultXAxis, Messages.XmlXYViewer_DefaultYAxis, 1);
+        TmfXYChartSettings settings = new TmfXYChartSettings(Messages.XmlXYViewer_DefaultViewerTitle,
+                Messages.XmlXYViewer_DefaultXAxis, Messages.XmlXYViewer_DefaultYAxis, 1);
         return new XmlXYViewer(parent, settings, fViewInfo);
     }
+
+    @Override
+    protected @NonNull TmfViewer createLeftChildViewer(@Nullable Composite parent) {
+        XmlTreeViewer treeViewer = new XmlTreeViewer(Objects.requireNonNull(parent), fViewInfo);
+
+        /* Initialize the viewers with the currently selected trace */
+        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
+        if (trace != null) {
+            treeViewer.traceSelected(new TmfTraceSelectedSignal(this, trace));
+        }
+
+        return treeViewer;
+    }
+
 }

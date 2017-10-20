@@ -9,10 +9,18 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.module;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.w3c.dom.Element;
 
 import com.google.common.collect.HashBasedTable;
@@ -28,29 +36,21 @@ import com.google.common.collect.Table;
  */
 public class XmlDataProviderManager {
 
-    private final Table<ITmfTrace, Element, XmlXYDataProvider> fXyProviders;
+    private static @Nullable XmlDataProviderManager INSTANCE;
 
-    private XmlDataProviderManager() {
-        fXyProviders = HashBasedTable.create();
-    }
-
-    /**
-     * initialization-on-demand holder
-     */
-    private static class LazyHolder {
-        private LazyHolder() {
-        }
-
-        public static final XmlDataProviderManager INSTANCE = new XmlDataProviderManager();
-    }
+    private static final String ID_ATTRIBUTE = "id"; //$NON-NLS-1$
+    private final Table<ITmfTrace, String, ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel>> fXyProviders = HashBasedTable.create();
 
     /**
      * Get the instance of the manager
      *
      * @return the singleton instance
      */
-    public static XmlDataProviderManager getInstance() {
-        return LazyHolder.INSTANCE;
+    public static synchronized XmlDataProviderManager getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new XmlDataProviderManager();
+        }
+        return INSTANCE;
     }
 
     /**
@@ -63,15 +63,44 @@ public class XmlDataProviderManager {
      *            the XML XY view for which we are querying a provider
      * @return the unique instance of an XY provider for the queried parameters
      */
-    public synchronized XmlXYDataProvider getXyProvider(@NonNull ITmfTrace trace, @NonNull Element viewElement) {
-        if (fXyProviders.contains(trace, viewElement)) {
-            return fXyProviders.get(trace, viewElement);
+    public synchronized ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel> getXyProvider(@NonNull ITmfTrace trace, @NonNull Element viewElement) {
+        if (!viewElement.hasAttribute(ID_ATTRIBUTE)) {
+            return null;
         }
-        @NonNull Set<@NonNull String> analysisIds = TmfXmlUtils.getViewAnalysisIds(viewElement);
-        Element entry = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.ENTRY_ELEMENT).get(0);
+        String viewId = viewElement.getAttribute(ID_ATTRIBUTE);
+        ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel> provider = fXyProviders.get(trace, viewId);
+        if (provider != null) {
+            return provider;
+        }
+        Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
+        if (traces.size() == 1) {
+            Set<@NonNull String> analysisIds = TmfXmlUtils.getViewAnalysisIds(viewElement);
+            Element entry = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.ENTRY_ELEMENT).get(0);
 
-        XmlXYDataProvider provider = XmlXYDataProvider.create(trace, analysisIds, entry);
-        fXyProviders.put(trace, viewElement, provider);
+            provider = XmlXYDataProvider.create(trace, analysisIds, entry);
+        } else {
+            provider = generateExperimentProvider(traces, viewElement);
+        }
+
+        if (provider != null) {
+            fXyProviders.put(trace, viewId, provider);
+        }
         return provider;
+    }
+
+    private static ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel> generateExperimentProvider(Collection<ITmfTrace> traces, Element viewElement) {
+        List<ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel>> providers = new ArrayList<>();
+        for (ITmfTrace child : traces) {
+            ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel> childProvider = getInstance().getXyProvider(child, viewElement);
+            if (childProvider != null) {
+                providers.add(childProvider);
+            }
+        }
+        if (providers.isEmpty()) {
+            return null;
+        } else if (providers.size() == 1) {
+            return providers.get(0);
+        }
+        return new TmfTreeXYCompositeDataProvider<>(providers, XmlXYDataProvider.ID, XmlXYDataProvider.ID);
     }
 }
