@@ -33,9 +33,8 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatus
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCounterQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
@@ -62,7 +61,7 @@ import com.google.common.primitives.Longs;
  * @since 1.1
  */
 @SuppressWarnings("restriction")
-public class CounterDataProvider extends AbstractStateSystemAnalysisDataProvider implements ITmfXYDataProvider, ITmfTreeDataProvider<CounterEntryModel> {
+public class CounterDataProvider extends AbstractStateSystemAnalysisDataProvider implements ITmfTreeXYDataProvider<CounterEntryModel> {
 
     /**
      * This data provider's extension point ID

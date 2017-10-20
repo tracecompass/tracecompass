@@ -17,31 +17,30 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatus
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeCompositeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * Represents a base implementation of {@link ITmfXYDataProvider} that support
- * experiments. Clients of this data provider must provide a list of
- * {@link ITmfXYDataProvider} for each trace in the experiment which supports
- * the provider. From the list of sub data provider, this data provider will
- * merge all responses into one.
+ * Represents a base implementation of {@link ITmfTreeXYDataProvider} that
+ * supports experiments. Clients of this data provider must provide a list of
+ * {@link ITmfTreeXYDataProvider} for each trace in the experiment which
+ * supports the provider. From the list of sub data provider, this data provider
+ * will merge all responses into one.
  *
- * @param <E>
- *            The type of {@link ITmfXYDataProvider} that this composite must
- *            encapsulate
+ * @param <M>
+ *            The type of {@link ITmfTreeDataModel} that this composite's tree
+ *            provider must return.
+ * @param <P>
+ *            The type of {@link ITmfTreeXYDataProvider} that this composite
+ *            must encapsulate
  * @author Yonni Chen
  */
-public class TmfXYCompositeDataProvider<E extends ITmfXYDataProvider, T extends ITmfTreeDataModel>
-    implements ITmfXYDataProvider, ITmfTreeDataProvider<T> {
-
-    private final List<E> fProviders;
+public class TmfTreeXYCompositeDataProvider<M extends ITmfTreeDataModel, P extends ITmfTreeXYDataProvider<M>>
+        extends TmfTreeCompositeDataProvider<M, P> implements ITmfTreeXYDataProvider<M> {
     private final String fTitle;
-    private final String fID;
 
     /**
      * Constructor
@@ -53,10 +52,9 @@ public class TmfXYCompositeDataProvider<E extends ITmfXYDataProvider, T extends 
      *            Chart's title
      * @param id the provider's ID
      */
-    public TmfXYCompositeDataProvider(List<E> providers, String title, String id) {
-        fProviders = providers;
+    public TmfTreeXYCompositeDataProvider(List<P> providers, String title, String id) {
+        super(providers, id);
         fTitle = title;
-        fID = id;
     }
 
     @Override
@@ -64,7 +62,7 @@ public class TmfXYCompositeDataProvider<E extends ITmfXYDataProvider, T extends 
         boolean isComplete = true;
         ImmutableMap.Builder<String, IYModel> series = ImmutableMap.builder();
 
-        for (E dataProvider : fProviders) {
+        for (P dataProvider : getProviders()) {
             TmfModelResponse<ITmfCommonXAxisModel> response = dataProvider.fetchXY(filter, monitor);
             isComplete &= response.getStatus() == ITmfResponse.Status.COMPLETED;
             ITmfCommonXAxisModel model = response.getModel();
@@ -77,33 +75,5 @@ public class TmfXYCompositeDataProvider<E extends ITmfXYDataProvider, T extends 
             }
         }
         return TmfCommonXAxisResponseFactory.create(fTitle, filter.getTimesRequested(), series.build(), isComplete); // $NON-NLS-1$
-    }
-
-    @Override
-    public TmfModelResponse<List<T>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        boolean isComplete = true;
-        ImmutableList.Builder<T> series = ImmutableList.builder();
-
-        for (E dataProvider : fProviders) {
-            TmfModelResponse<List<T>> response = ((ITmfTreeDataProvider<T>) dataProvider).fetchTree(filter, monitor);
-            isComplete &= response.getStatus() == ITmfResponse.Status.COMPLETED;
-            List<T> model = response.getModel();
-            if (model != null) {
-                series.addAll(model);
-            }
-
-            if (monitor != null && monitor.isCanceled()) {
-                return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
-            }
-        }
-        if (isComplete) {
-            return new TmfModelResponse<>(series.build(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
-        }
-        return new TmfModelResponse<>(series.build(), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
-    }
-
-    @Override
-    public String getId() {
-        return fID;
     }
 }

@@ -16,24 +16,25 @@ import java.util.Objects;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.analysis.counters.core.Messages;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfXYCompositeDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
 import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderFactory;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 /**
- * Factory to create instances of the {@link CompositeCounterDataProvider}. Uses the DataProviderFactory endpoint
+ * Factory to create instances of the {@link ITmfTreeXYDataProvider}.
+ * Uses the DataProviderFactory endpoint.
+ *
  * @author Loic Prieur-Drevon
  * @since 1.1
  */
 public class CounterDataProviderFactory implements IDataProviderFactory {
 
     private static final String TITLE = Objects.requireNonNull(Messages.CounterDataProvider_ChartTitle);
-    private static final String ID = "org.eclipse.tracecompass.analysis.counters.core.CounterDataProvider";
 
     @Override
-    public @Nullable ITmfTreeDataProvider<ITmfTreeDataModel> createProvider(ITmfTrace trace) {
+    public @Nullable ITmfTreeXYDataProvider<? extends ITmfTreeDataModel> createProvider(ITmfTrace trace) {
         List<CounterDataProvider> dataProviders = new ArrayList<>();
         Iterable<CounterAnalysis> modules = TmfTraceUtils.getAnalysisModulesOfClass(trace, CounterAnalysis.class);
         for (CounterAnalysis module : modules) {
@@ -45,7 +46,7 @@ public class CounterDataProviderFactory implements IDataProviderFactory {
         }
 
         if (!dataProviders.isEmpty()) {
-            return new TmfXYCompositeDataProvider(dataProviders, TITLE, ID);
+            return new TmfTreeXYCompositeDataProvider(dataProviders, TITLE, CounterDataProvider.ID);
         }
         return null;
     }

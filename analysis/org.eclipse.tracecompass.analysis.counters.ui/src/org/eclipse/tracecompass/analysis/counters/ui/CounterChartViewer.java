@@ -14,7 +14,7 @@ import org.eclipse.tracecompass.analysis.counters.core.CounterDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCounterQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfXYCompositeDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
@@ -58,7 +58,7 @@ public final class CounterChartViewer extends TmfFilteredXYChartViewer {
     @Override
     protected void initializeDataProvider() {
         ITmfTrace trace = getTrace();
-        ITmfXYDataProvider provider = DataProviderManager.getInstance().getDataProvider(trace, CounterDataProvider.ID, TmfXYCompositeDataProvider.class);
+        ITmfXYDataProvider provider = DataProviderManager.getInstance().getDataProvider(trace, CounterDataProvider.ID, TmfTreeXYCompositeDataProvider.class);
         setDataProvider(provider);
     }
 }
