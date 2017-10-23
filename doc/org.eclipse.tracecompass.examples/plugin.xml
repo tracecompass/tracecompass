@@ -11,5 +11,12 @@
             restorable="true">
       </view>
    </extension>
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.dataprovider">
+      <dataProviderFactory
+            class="org.eclipse.tracecompass.internal.examples.histogram.HistogramDataProviderFactory"
+            id="org.eclipse.tracecompass.internal.examples.histogram.HistogramDataProvider">
+      </dataProviderFactory>
+   </extension>
 
 </plugin>

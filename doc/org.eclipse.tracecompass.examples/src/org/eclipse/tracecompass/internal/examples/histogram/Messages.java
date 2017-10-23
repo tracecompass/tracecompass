@@ -18,6 +18,15 @@ public class Messages extends NLS {
      * New histogram chart title
      */
     public static @Nullable String HistogramDataProvider_Title;
+    /**
+     * New histogram tree name column name.
+     */
+    public static @Nullable String NewHistogramTree_ColumnName;
+    /**
+     * New histogram tree legend column name.
+     */
+    public static @Nullable String NewHistogramTree_Legend;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

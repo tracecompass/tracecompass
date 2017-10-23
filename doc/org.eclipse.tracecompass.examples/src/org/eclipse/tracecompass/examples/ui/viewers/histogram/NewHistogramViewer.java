@@ -16,12 +16,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.examples.histogram.HistogramDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.barcharts.TmfHistogramTooltipProvider;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
-import org.swtchart.Chart;
-import org.swtchart.IAxis;
+import org.swtchart.IAxisSet;
 import org.swtchart.LineStyle;
 
 /**
@@ -31,36 +29,27 @@ import org.swtchart.LineStyle;
  * @author Bernd Hufmann
  */
 @SuppressWarnings("restriction")
-public class NewHistogramViewer extends TmfCommonXAxisChartViewer {
+public class NewHistogramViewer extends TmfFilteredXYChartViewer {
 
     private static final int DEFAULT_SERIES_WIDTH = 1;
 
     /**
      * Creates a Histogram Viewer instance.
+     *
      * @param parent
      *            The parent composite to draw in.
+     * @param settings
+     *            See {@link TmfXYChartSettings} to know what it contains
      */
     public NewHistogramViewer(Composite parent, TmfXYChartSettings settings) {
-        super(parent, settings);
-
-        Chart swtChart = getSwtChart();
-
-        IAxis xAxis = swtChart.getAxisSet().getXAxis(0);
-        IAxis yAxis = swtChart.getAxisSet().getYAxis(0);
+        super(parent, settings, HistogramDataProvider.ID);
 
         /* Hide the grid */
-        xAxis.getGrid().setStyle(LineStyle.NONE);
-        yAxis.getGrid().setStyle(LineStyle.NONE);
+        IAxisSet axisSet = getSwtChart().getAxisSet();
+        axisSet.getXAxis(0).getGrid().setStyle(LineStyle.NONE);
+        axisSet.getYAxis(0).getGrid().setStyle(LineStyle.NONE);
 
-        /* Hide the legend */
-        swtChart.getLegend().setVisible(false);
         setTooltipProvider(new TmfHistogramTooltipProvider(this));
-    }
-
-    @Override
-    protected void initializeDataProvider() {
-        ITmfTrace trace = getTrace();
-        setDataProvider(new HistogramDataProvider(trace));
     }
 
     @Override
