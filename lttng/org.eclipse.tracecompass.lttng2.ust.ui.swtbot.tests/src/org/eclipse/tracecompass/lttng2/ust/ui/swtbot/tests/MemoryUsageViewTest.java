@@ -21,7 +21,7 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage.MemoryUsageView;
+import org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage.UstMemoryUsageView;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
@@ -40,7 +40,7 @@ import org.swtchart.ISeriesSet;
 import org.swtchart.LineStyle;
 
 /**
- * Test for the {@link MemoryUsageView} in trace compass
+ * Test for the {@link UstMemoryUsageView} in trace compass
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class MemoryUsageViewTest extends XYDataProviderBaseTest {
@@ -48,23 +48,23 @@ public class MemoryUsageViewTest extends XYDataProviderBaseTest {
     private static final int EXPECTED_NUM_SERIES = 4;
 
     private static final RGB RED = new RGB(255, 0, 0);
-    private static final RGB BLUE = new RGB(0, 0, 255);
+    private static final RGB GREEN_BLUE = new RGB(0, 255, 255);
     private static final RGB GREEN = new RGB(0, 255, 0);
     private static final RGB MAGENTA = new RGB(255, 0, 255);
 
     private static final @NonNull String TITLE = "Relative Kernel Memory Usage";
 
-    private static final @NonNull String FIRST_SERIES_NAME = "10611";
-    private static final @NonNull String SECOND_SERIES_NAME = "10618";
-    private static final @NonNull String THIRD_SERIES_NAME = "10604";
-    private static final @NonNull String FOURTH_SERIES_NAME = "10613";
+    private static final @NonNull String FIRST_SERIES_NAME = "memory:10611";
+    private static final @NonNull String SECOND_SERIES_NAME = "memory:10618";
+    private static final @NonNull String THIRD_SERIES_NAME = "memory:10604";
+    private static final @NonNull String FOURTH_SERIES_NAME = "memory:10613";
 
     /**
      * Test if Memory Usage is populated
      */
     @Test
     public void testOpenMemoryUsage() {
-        SWTBotView viewBot = fBot.viewById(MemoryUsageView.ID);
+        SWTBotView viewBot = fBot.viewById(UstMemoryUsageView.ID);
         viewBot.setFocus();
 
         // Do some basic validation
@@ -101,7 +101,7 @@ public class MemoryUsageViewTest extends XYDataProviderBaseTest {
     @Test
     public void testMemoryUsage() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         IViewPart viewSite = getSWTBotView().getViewReference().getView(true);
-        assertTrue(viewSite instanceof MemoryUsageView);
+        assertTrue(viewSite instanceof UstMemoryUsageView);
         final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewSite);
         assertNotNull(chartViewer);
         fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
@@ -122,10 +122,10 @@ public class MemoryUsageViewTest extends XYDataProviderBaseTest {
     }
 
     private void verifyChartStyle() {
-        verifySeriesStyle(FIRST_SERIES_NAME, ISeries.SeriesType.LINE, BLUE, LineStyle.SOLID, false);
-        verifySeriesStyle(SECOND_SERIES_NAME, ISeries.SeriesType.LINE, GREEN, LineStyle.SOLID, false);
-        verifySeriesStyle(THIRD_SERIES_NAME, ISeries.SeriesType.LINE, RED, LineStyle.SOLID, false);
-        verifySeriesStyle(FOURTH_SERIES_NAME, ISeries.SeriesType.LINE, MAGENTA, LineStyle.SOLID, false);
+        verifySeriesStyle(FIRST_SERIES_NAME, ISeries.SeriesType.LINE, RED, LineStyle.SOLID, false);
+        verifySeriesStyle(SECOND_SERIES_NAME, ISeries.SeriesType.LINE, MAGENTA, LineStyle.SOLID, false);
+        verifySeriesStyle(THIRD_SERIES_NAME, ISeries.SeriesType.LINE, GREEN, LineStyle.SOLID, false);
+        verifySeriesStyle(FOURTH_SERIES_NAME, ISeries.SeriesType.LINE, GREEN_BLUE, LineStyle.SOLID, false);
     }
 
     private void checkAllEntries() {
@@ -147,7 +147,7 @@ public class MemoryUsageViewTest extends XYDataProviderBaseTest {
 
     @Override
     protected String getViewID() {
-        return MemoryUsageView.ID;
+        return UstMemoryUsageView.ID;
     }
 
     @Override

@@ -1,22 +1,20 @@
 /**********************************************************************
- * Copyright (c) 2014, 2015 Ericsson
+ * Copyright (c) 2016, 2017 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *   Matthew Khouzam - Initial API and implementation
  **********************************************************************/
+package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory;
 
-package org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage;
-
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.analysis.os.linux.core.memory.MemoryUsageTreeModel;
 import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
-import org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryUsageDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -32,36 +30,52 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TreePatternFilt
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TriStateFilteredCheckboxTree;
 
 /**
- * Memory Usage View
+ * Memory usage view
  *
- * @author Matthew Khouzam
+ * @since 2.2
+ * @author Samuel Gagnon
+ * @author Mahdi Zolnouri
+ * @author Wassim Nasrallah
  */
 public class MemoryUsageView extends TmfChartView {
-
-    /** ID string */
-    public static final String ID = "org.eclipse.linuxtools.lttng2.ust.memoryusage"; //$NON-NLS-1$
+   private final String fProviderId;
+   private final TmfXYChartSettings fSettings;
 
     /**
      * Constructor
+     *
+     * @param title
+     *            the Memory view's name.
+     * @param providerId
+     *            the ID of the provider to use for this view.
+     * @param settings
+     *            See {@link TmfXYChartSettings} to know what it contains
      */
-    public MemoryUsageView() {
-        super(Messages.MemoryUsageView_Title);
+    public MemoryUsageView(String title, String providerId, TmfXYChartSettings settings) {
+        super(title);
+        fProviderId = providerId;
+        fSettings = settings;
     }
 
     @Override
     protected TmfXYChartViewer createChartViewer(Composite parent) {
-        TmfXYChartSettings settings = new TmfXYChartSettings(Messages.MemoryUsageViewer_Title, Messages.MemoryUsageViewer_XAxis, Messages.MemoryUsageViewer_YAxis, 1);
-        TmfFilteredXYChartViewer chartViewer = new TmfFilteredXYChartViewer(parent, settings, UstMemoryUsageDataProvider.ID);
-        chartViewer.getSwtChart().getAxisSet().getYAxis(0).getTick().setFormat(DataSizeWithUnitFormat.getInstance());
-        return chartViewer;
+        TmfFilteredXYChartViewer viewer = new TmfFilteredXYChartViewer(parent, fSettings, fProviderId) {
+            @Override
+            public @NonNull IYAppearance getSeriesAppearance(String seriesName) {
+                int width = seriesName.endsWith(MemoryUsageTreeModel.TOTAL_SUFFIX) ? 2 : 1;
+                return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.LINE, width);
+            }
+        };
+        viewer.getSwtChart().getAxisSet().getYAxis(0).getTick().setFormat(DataSizeWithUnitFormat.getInstance());
+        return viewer;
     }
 
     @Override
-    protected TmfViewer createLeftChildViewer(Composite parent) {
+    protected @NonNull TmfViewer createLeftChildViewer(Composite parent) {
         // Create the tree viewer with a filtered checkbox
         int treeStyle = SWT.MULTI | SWT.H_SCROLL | SWT.FULL_SELECTION;
         TriStateFilteredCheckboxTree triStateFilteredCheckboxTree = new TriStateFilteredCheckboxTree(parent, treeStyle, new TreePatternFilter(), true);
-        MemoryUsageTreeViewer fTreeViewer = new MemoryUsageTreeViewer(parent, triStateFilteredCheckboxTree);
+        MemoryUsageTreeViewer fTreeViewer = new MemoryUsageTreeViewer(parent, triStateFilteredCheckboxTree, fProviderId);
 
         /* Initialize the viewers with the currently selected trace */
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
@@ -82,9 +96,9 @@ public class MemoryUsageView extends TmfChartView {
         TmfXYChartViewer chart = getChartViewer();
         if (tree instanceof MemoryUsageTreeViewer && chart instanceof TmfFilteredXYChartViewer) {
             ILegendImageProvider legendImageProvider = new XYChartLegendImageProvider((TmfCommonXAxisChartViewer) chart);
-            MemoryUsageTreeViewer kernelMemoryTree = (MemoryUsageTreeViewer) tree;
-            kernelMemoryTree.setTreeListener((TmfFilteredXYChartViewer) chart);
-            kernelMemoryTree.setLegendImageProvider(legendImageProvider);
+            MemoryUsageTreeViewer memoryTree = (MemoryUsageTreeViewer) tree;
+            memoryTree.setTreeListener((TmfFilteredXYChartViewer) chart);
+            memoryTree.setLegendImageProvider(legendImageProvider);
         }
     }
 }

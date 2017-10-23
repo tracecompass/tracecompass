@@ -47,7 +47,7 @@ public class KernelMemoryUsageViewTest extends XYDataProviderBaseTest {
 
     private static final RGB RED = new RGB(255, 0, 0);
     private static final RGB BLUE = new RGB(0, 0, 255);
-    private static final RGB GREEN = new RGB(0, 255, 0);
+    private static final RGB PURPLE = new RGB(255, 0, 255);
 
     private static final int NUMBER_OF_POINT = 50;
     private static final int MORE_POINTS = 100;
@@ -97,7 +97,7 @@ public class KernelMemoryUsageViewTest extends XYDataProviderBaseTest {
         /*
          * Select a thread
          */
-        SWTBotTreeItem sessiondEntry = totalNode.getNode("482");
+        SWTBotTreeItem sessiondEntry = totalNode.getNode("lttng-sessiond");
         sessiondEntry.check();
         SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 2, chart, "Only total available");
 
@@ -109,13 +109,13 @@ public class KernelMemoryUsageViewTest extends XYDataProviderBaseTest {
         /*
          * Select an another thread and change zoom
          */
-        SWTBotTreeItem consumerdEntry = totalNode.getNode("496");
+        SWTBotTreeItem consumerdEntry = totalNode.getNode("lttng-consumerd");
         consumerdEntry.check();
         chartViewer.setNbPoints(MORE_POINTS);
         SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 3, chart, "Only total and sessiond available");
 
         /* Test type, style and color of series */
-        verifySeriesStyle(CONSUMERD_PID, ISeries.SeriesType.LINE, GREEN, LineStyle.SOLID, false);
+        verifySeriesStyle(CONSUMERD_PID, ISeries.SeriesType.LINE, PURPLE, LineStyle.SOLID, false);
 
         SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, CONSUMERD_PID), "resources/kernelmemory/kernel-memory-res100Selected.json", "Chart data is not valid");
     }

@@ -7,22 +7,26 @@
  * http://www.eclipse.org/legal/epl-v10.html
  **********************************************************************/
 
-package org.eclipse.tracecompass.lttng2.ust.core.analysis.memory;
+package org.eclipse.tracecompass.analysis.os.linux.core.memory;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
 
 /**
- * This class represents an entry in the tree viewer of the UST memory usage
+ * This class represents an entry in the tree viewer of the kernel memory usage
  * View. It extends {@link TmfTreeDataModel}
  *
- * @since 3.2
  * @author Yonni Chen
+ * @since 2.4
  */
 @NonNullByDefault
 @SuppressWarnings("restriction")
 public class MemoryUsageTreeModel extends TmfTreeDataModel {
 
+    /**
+     * Suffix added to the total entry's name to map to its' series' name.
+     */
+    public static final String TOTAL_SUFFIX = ":total"; //$NON-NLS-1$
     private final int fTid;
 
     /**

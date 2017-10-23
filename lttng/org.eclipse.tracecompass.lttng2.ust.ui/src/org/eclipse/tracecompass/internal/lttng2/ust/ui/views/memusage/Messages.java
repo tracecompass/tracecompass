@@ -30,9 +30,6 @@ public class Messages extends NLS {
     public static String MemoryUsageViewer_XAxis;
     /** Y axis caption */
     public static String MemoryUsageViewer_YAxis;
-    public static String MemoryUsageTree_ColumnName;
-    public static String MemoryUsageTree_Legend;
-    public static String MemoryUsageTree_ColumnProcess;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

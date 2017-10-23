@@ -22,4 +22,7 @@ Export-Package: org.eclipse.tracecompass.internal.lttng2.ust.ui;x-friends:="org.
  org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage;x-friends:="org.eclipse.tracecompass.lttng2.ust.ui.tests,org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests"
 Import-Package: com.google.common.base,
  com.google.common.collect,
+ org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage,
+ org.eclipse.tracecompass.analysis.os.linux.core.memory,
+ org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory,
  org.swtchart

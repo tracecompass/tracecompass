@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.core.memory.MemoryUsageTreeModel;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryStrings;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractStateSystemAnalysisDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
@@ -134,7 +135,6 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
                         int memoryAttribute = ss.optQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_MEMORY_ATTRIBUTE);
 
                         if (memoryAttribute != ITmfStateSystem.INVALID_ATTRIBUTE) {
-
                             double[] values = entry.getValue();
                             Object val = fullState.get(memoryAttribute).getValue();
                             values[i] = extractValue(val);
@@ -148,7 +148,7 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
 
         ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
         for (Entry<Integer, double[]> tempEntry : tempModel.entrySet()) {
-            String name = ss.getAttributeName(tempEntry.getKey());
+            String name = getTrace().getName() + ':' + ss.getAttributeName(tempEntry.getKey());
             ySeries.put(name, new YModel(name, tempEntry.getValue()));
         }
 
@@ -197,10 +197,14 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
         }
 
         // Waiting for initialization should ensure that the state system is not null.
-        fModule.waitForCompletion();
+        fModule.waitForInitialization();
         ITmfStateSystem ss = fModule.getStateSystem();
         if (ss == null) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
+        }
+        while (ss.getCurrentEndTime() < filter.getEnd() && !ss.waitUntilBuilt(200)) {
+            // Wait until the ss is build past the query end time
+            // TODO remove once tree viewers support incomplete queries.
         }
 
         // Get the quarks before the full states to ensure that the attributes will be present in the full state

@@ -1,0 +1,35 @@
+/**********************************************************************
+ * Copyright (c) 2017 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ **********************************************************************/
+
+package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory;
+
+import org.eclipse.osgi.util.NLS;
+
+/**
+ * Messages for the shared {@link MemoryUsageView}.
+ *
+ * @since 2.2
+ */
+@SuppressWarnings("javadoc")
+public class Messages {
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory.messages"; //$NON-NLS-1$
+
+    public static String MemoryUsageTree_ColumnProcess;
+    public static String MemoryUsageTree_ColumnTID;
+    public static String MemoryUsageTree_Legend;
+    public static String MemoryUsageTree_Total;
+
+    static {
+        // initialize resource bundle
+        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+    }
+
+    private Messages() {
+    }
+}

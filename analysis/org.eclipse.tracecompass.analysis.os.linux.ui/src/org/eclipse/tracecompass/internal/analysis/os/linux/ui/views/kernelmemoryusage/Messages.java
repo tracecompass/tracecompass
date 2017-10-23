@@ -14,14 +14,10 @@ import org.eclipse.osgi.util.NLS;
 public class Messages {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.kernelmemoryusage.messages"; //$NON-NLS-1$
 
-    public static String KernelMemoryUsageComposite_ColumnProcess;
-    public static String KernelMemoryUsageComposite_ColumnTID;
     public static String MemoryUsageView_title;
     public static String MemoryUsageViewer_title;
     public static String MemoryUsageViewer_xAxis;
     public static String MemoryUsageViewer_yAxis;
-    public static String KernelMemoryUsageComposite_Legend;
-    public static String KernelMemoryUsageComposite_Total;
 
     static {
         // initialize resource bundle

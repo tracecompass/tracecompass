@@ -12,7 +12,7 @@
          point="org.eclipse.ui.views">
       <view
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage.MemoryUsageView"
+            class="org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage.UstMemoryUsageView"
             icon="icons/eview16/memory-usage.png"
             id="org.eclipse.linuxtools.lttng2.ust.memoryusage"
             name="%memoryusage.view.name"

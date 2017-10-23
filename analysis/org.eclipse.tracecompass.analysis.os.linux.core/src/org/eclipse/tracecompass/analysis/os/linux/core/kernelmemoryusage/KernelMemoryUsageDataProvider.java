@@ -26,6 +26,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelThreadInformationProvider;
+import org.eclipse.tracecompass.analysis.os.linux.core.memory.MemoryUsageTreeModel;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelmemoryusage.Messages;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractStateSystemAnalysisDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
@@ -59,7 +60,7 @@ import com.google.common.collect.ImmutableMap;
 @NonNullByDefault
 @SuppressWarnings("restriction")
 public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataProvider
-    implements ITmfTreeXYDataProvider<KernelMemoryUsageTreeModel> {
+    implements ITmfTreeXYDataProvider<MemoryUsageTreeModel> {
 
     /**
      * This data provider's extension point ID
@@ -70,12 +71,11 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
      * Fake Tid used for the total entry
      * @since 2.4
      */
-    public static final int TOTAL_TID = -2;
+    private static final int TOTAL_TID = -2;
     /**
      * Suffix to add to the trace name for the total entry.
      * @since 2.4
      */
-    public static final String TOTAL_SUFFIX = ":total"; //$NON-NLS-1$
     private static final AtomicLong KERNEL_MEMORY_ENTRY_ID = new AtomicLong();
 
     private final KernelMemoryAnalysisModule fModule;
@@ -185,7 +185,7 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
 
         ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
 
-        String total = getTrace().getName() + TOTAL_SUFFIX;
+        String total = getTrace().getName() + MemoryUsageTreeModel.TOTAL_SUFFIX;
         ySeries.put(total, new YModel(total, totalKernelMemoryValues));
 
         for (Entry<Integer, double[]> entry : selectedSeries.entrySet()) {
@@ -256,7 +256,7 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
      * @since 2.4
      */
     @Override
-    public TmfModelResponse<List<KernelMemoryUsageTreeModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<List<MemoryUsageTreeModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
 
         long start = filter.getStart();
         long end = filter.getEnd();
@@ -278,11 +278,11 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
         }
 
         try {
-            List<KernelMemoryUsageTreeModel> nodes = new ArrayList<>();
+            List<MemoryUsageTreeModel> nodes = new ArrayList<>();
             List<ITmfStateInterval> memoryStates = ss.queryFullState(Long.max(start, ss.getStartTime()));
             List<Integer> threadQuarkList = ss.getSubAttributes(ITmfStateSystem.ROOT_ATTRIBUTE, false);
 
-            nodes.add(new KernelMemoryUsageTreeModel(fTotalId, -1, TOTAL_TID, getTrace().getName()));
+            nodes.add(new MemoryUsageTreeModel(fTotalId, -1, TOTAL_TID, getTrace().getName()));
             for (Integer threadQuark : threadQuarkList) {
                 ITmfStateInterval threadMemoryInterval = memoryStates.get(threadQuark);
                 if (threadMemoryInterval.getEndTime() < end) {
@@ -295,7 +295,7 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
                         id = KERNEL_MEMORY_ENTRY_ID.getAndIncrement();
                         fIdToQuark.put(id, threadQuark);
                     }
-                    nodes.add(new KernelMemoryUsageTreeModel(id, fTotalId, parseTid(tidString), procname));
+                    nodes.add(new MemoryUsageTreeModel(id, fTotalId, parseTid(tidString), procname));
                 }
             }
             return new TmfModelResponse<>(nodes, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
