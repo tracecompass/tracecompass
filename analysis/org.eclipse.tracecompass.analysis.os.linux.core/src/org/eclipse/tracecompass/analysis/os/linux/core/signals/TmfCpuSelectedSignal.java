@@ -52,6 +52,7 @@ public class TmfCpuSelectedSignal extends TmfTraceModelSignal {
      * Get the trace for which the CPUs were changed.
      *
      * @return the impacted trace
+     * @since 2.4
      */
     public ITmfTrace getTrace() {
         return fTrace;
