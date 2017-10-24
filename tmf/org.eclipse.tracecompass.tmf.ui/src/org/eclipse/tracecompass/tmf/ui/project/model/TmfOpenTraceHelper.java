@@ -18,6 +18,8 @@ package org.eclipse.tracecompass.tmf.ui.project.model;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -30,11 +32,17 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.model.TmfImportHelper;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
@@ -69,14 +77,17 @@ import org.eclipse.ui.part.FileEditorInput;
  */
 public class TmfOpenTraceHelper {
 
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(TmfOpenTraceHelper.class);
+    private static final @NonNull String LOCAL_CATEGORY = "TmfOpenTraceHelper"; //$NON-NLS-1$
+    private static final String ENDL = System.getProperty("line.separator"); //$NON-NLS-1$
+
     private TmfOpenTraceHelper() {
     }
 
-    private static final String ENDL = System.getProperty("line.separator"); //$NON-NLS-1$
 
     /**
-     * Opens a trace from a path while importing it to the destination folder.
-     * The trace is linked as a resource.
+     * Opens a trace from a path while importing it to the destination folder. The
+     * trace is linked as a resource.
      *
      * @param destinationFolder
      *            The destination trace folder
@@ -86,16 +97,15 @@ public class TmfOpenTraceHelper {
      *            the shell to use for dialogs
      * @return IStatus OK if successful
      * @throws CoreException
-     *             core exceptions if something is not well set up in the back
-     *             end
+     *             core exceptions if something is not well set up in the back end
      */
     public static IStatus openTraceFromPath(TmfTraceFolder destinationFolder, String path, Shell shell) throws CoreException {
         return openTraceFromPath(destinationFolder, path, shell, null);
     }
 
     /**
-     * Opens a trace from a path while importing it to the destination folder.
-     * The trace is linked as a resource.
+     * Opens a trace from a path while importing it to the destination folder. The
+     * trace is linked as a resource.
      *
      * @param destinationFolder
      *            The destination trace folder
@@ -107,14 +117,13 @@ public class TmfOpenTraceHelper {
      *            The trace type id, can be null
      * @return IStatus OK if successful
      * @throws CoreException
-     *             core exceptions if something is not well set up in the back
-     *             end
+     *             core exceptions if something is not well set up in the back end
      */
     public static IStatus openTraceFromPath(TmfTraceFolder destinationFolder, String path, Shell shell, String tracetypeHint) throws CoreException {
         final String pathToUse = checkTracePath(path);
         TraceTypeHelper traceTypeToSet = null;
-        try {
-          traceTypeToSet = TmfTraceTypeUIUtils.selectTraceType(pathToUse, null, tracetypeHint);
+        try (ScopeLog scopeLog = new ScopeLog(LOGGER, Level.FINE, "TmfOpenTraceHelper#openTraceFromPath", "Get trace type")) { //$NON-NLS-1$//$NON-NLS-2$
+            traceTypeToSet = TmfTraceTypeUIUtils.selectTraceType(pathToUse, null, tracetypeHint);
         } catch (TmfTraceImportException e) {
             MessageBox mb = new MessageBox(shell);
             mb.setMessage(e.getMessage());
@@ -151,9 +160,9 @@ public class TmfOpenTraceHelper {
     }
 
     /**
-     * Checks whether the parent or grandparent of given path to a file is a
-     * valid directory trace. If it is a directory trace then return the parent
-     * or grandparent path.
+     * Checks whether the parent or grandparent of given path to a file is a valid
+     * directory trace. If it is a directory trace then return the parent or
+     * grandparent path.
      *
      * @param path
      *            the path to check
@@ -201,9 +210,8 @@ public class TmfOpenTraceHelper {
     }
 
     /**
-     * Gets the display name, either "filename" or "filename(n)" if there is
-     * already a filename existing where n is the next unused integer starting
-     * from 2
+     * Gets the display name, either "filename" or "filename(n)" if there is already
+     * a filename existing where n is the next unused integer starting from 2
      *
      * @param path
      *            the file path
@@ -323,47 +331,49 @@ public class TmfOpenTraceHelper {
     }
 
     /**
-     * Open a trace (or experiment) from a project element. If the trace is already opened, its
-     * editor is activated and brought to top.
+     * Open a trace (or experiment) from a project element. If the trace is already
+     * opened, its editor is activated and brought to top.
      *
      * @param traceElement
      *            the {@link TmfTraceElement} to open
      */
     public static void openTraceFromElement(final TmfCommonProjectElement traceElement) {
-
-        final IFile file;
-        try {
-            file = traceElement.createBookmarksFile();
-        } catch (final CoreException e) {
-            Activator.getDefault().logError(NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getTypeName()) + ' ' + traceElement.getName());
-            TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
-                    NLS.bind(Messages.TmfOpenTraceHelper_ErrorElement, traceElement.getTypeName()) + ENDL + ENDL + e.getMessage());
-            return;
-        }
-
-        final IWorkbench wb = PlatformUI.getWorkbench();
-        final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
-        final IEditorPart editor = findEditor(new FileEditorInput(file), true);
-        if (editor != null) {
-            activePage.activate(editor);
-            return;
-        }
-
-        // If a trace type is not set then delegate it to the eclipse platform
-        if ((traceElement instanceof TmfTraceElement) && (traceElement.getResource() instanceof IFile) && (traceElement.getTraceType() == null)) {
-            try {
-                boolean activate = OpenStrategy.activateOnOpen();
-                // only local open is supported
-                IDE.openEditor(activePage, file, activate);
-            } catch (PartInitException e) {
+        try (FlowScopeLog flow = new FlowScopeLogBuilder(LOGGER, Level.FINE, "openTraceFromElement").setCategory(LOCAL_CATEGORY).build()) { //$NON-NLS-1$
+            final IFile file;
+            try (FlowScopeLog bmFlow = new FlowScopeLogBuilder(LOGGER, Level.FINE, "createBookmarkFile").setParentScope(flow).build()) { //$NON-NLS-1$
+                file = traceElement.createBookmarksFile();
+            } catch (final CoreException e) {
+                Activator.getDefault().logError(NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getTypeName()) + ' ' + traceElement.getName());
                 TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
-                        NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getElementPath()) + ENDL + ENDL + e.getMessage());
+                        NLS.bind(Messages.TmfOpenTraceHelper_ErrorElement, traceElement.getTypeName()) + ENDL + ENDL + e.getMessage());
+                return;
             }
-            return;
-        }
 
-        Job job = new OpenProjectElementJob(traceElement, file);
-        job.schedule();
+            final IWorkbench wb = PlatformUI.getWorkbench();
+            final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+            final IEditorPart editor = findEditor(new FileEditorInput(file), true);
+            if (editor != null) {
+                activePage.activate(editor);
+                return;
+            }
+
+            // If a trace type is not set then delegate it to the eclipse platform
+            if ((traceElement instanceof TmfTraceElement) && (traceElement.getResource() instanceof IFile) && (traceElement.getTraceType() == null)) {
+                try (FlowScopeLog bmFlow = new FlowScopeLogBuilder(LOGGER, Level.FINE, "OpenEditor").setParentScope(flow).build()) { //$NON-NLS-1$
+                    boolean activate = OpenStrategy.activateOnOpen();
+                    // only local open is supported
+                    IDE.openEditor(activePage, file, activate);
+                } catch (PartInitException e) {
+                    TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
+                            NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getElementPath()) + ENDL + ENDL + e.getMessage());
+                }
+                return;
+            }
+
+            OpenProjectElementJob job = new OpenProjectElementJob(traceElement, file);
+            job.fParentScope = flow;
+            job.schedule();
+        }
     }
 
     /**
@@ -377,6 +387,7 @@ public class TmfOpenTraceHelper {
         private final TmfCommonProjectElement fTraceElement;
         private final IFile fFile;
         private ITmfTrace fTrace = null;
+        private @Nullable FlowScopeLog fParentScope;
 
         /**
          * Constructor
@@ -396,40 +407,45 @@ public class TmfOpenTraceHelper {
         @Override
         public IStatus run(IProgressMonitor monitor) {
 
-            fTrace = openProjectElement(fTraceElement);
-            if (fTrace == null) {
+            FlowScopeLog parentScope = fParentScope;
+            FlowScopeLogBuilder flowScopeLogBuilder = new FlowScopeLogBuilder(LOGGER, Level.FINE, "OpenProjectElementJob"); //$NON-NLS-1$
+            try (FlowScopeLog log = parentScope == null ? flowScopeLogBuilder.setCategory(LOCAL_CATEGORY).build()
+                    : flowScopeLogBuilder.setParentScope(parentScope).build();) {
+                fTrace = openProjectElement(fTraceElement);
+                if (fTrace == null) {
+                    return Status.OK_STATUS;
+                }
+
+                // Get the editor id from the extension point
+                String traceEditorId = fTraceElement.getEditorId();
+                final String editorId = (traceEditorId != null) ? traceEditorId : TmfEventsEditor.ID;
+                final IEditorInput editorInput = new TmfEditorInput(fFile, fTrace);
+
+                Display.getDefault().asyncExec(() -> {
+                    try (FlowScopeLog displayLog = new FlowScopeLogBuilder(LOGGER, Level.FINE, "OpenEditor").setParentScope(log).build();) { //$NON-NLS-1$
+
+                        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+                        if (window == null) {
+                            return;
+                        }
+                        final IWorkbenchPage activePage = window.getActivePage();
+                        if (activePage == null) {
+                            return;
+                        }
+                        try {
+                            activePage.openEditor(editorInput, editorId);
+                            IDE.setDefaultEditor(fFile, editorId);
+                            // editor should dispose the trace on close
+                        } catch (final PartInitException e) {
+                            TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, fTraceElement.getTypeName()),
+                                    NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, fTraceElement.getTypeName()) + ENDL + ENDL + e.getMessage());
+                            Activator.getDefault().logError(NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, fTraceElement.getTypeName()) + ' ' + fTraceElement.getName());
+                            fTrace.dispose();
+                        }
+                    }
+                });
                 return Status.OK_STATUS;
             }
-
-            // Get the editor id from the extension point
-            String traceEditorId = fTraceElement.getEditorId();
-            final String editorId = (traceEditorId != null) ? traceEditorId : TmfEventsEditor.ID;
-            final IEditorInput editorInput = new TmfEditorInput(fFile, fTrace);
-
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-                    if (window == null) {
-                        return;
-                    }
-                    final IWorkbenchPage activePage = window.getActivePage();
-                    if (activePage == null) {
-                        return;
-                    }
-                    try {
-                        activePage.openEditor(editorInput, editorId);
-                        IDE.setDefaultEditor(fFile, editorId);
-                        // editor should dispose the trace on close
-                    } catch (final PartInitException e) {
-                        TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, fTraceElement.getTypeName()),
-                                NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, fTraceElement.getTypeName()) + ENDL + ENDL + e.getMessage());
-                        Activator.getDefault().logError(NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, fTraceElement.getTypeName()) + ' ' + fTraceElement.getName());
-                        fTrace.dispose();
-                    }
-                }
-            });
-            return Status.OK_STATUS;
         }
 
         /**
@@ -444,8 +460,8 @@ public class TmfOpenTraceHelper {
 
     /**
      * Returns the editor with the specified input. Returns null if there is no
-     * opened editor with that input. If restore is requested, the method finds
-     * and returns the editor even if it is not restored yet after a restart.
+     * opened editor with that input. If restore is requested, the method finds and
+     * returns the editor even if it is not restored yet after a restart.
      *
      * @param input
      *            the editor input
@@ -463,14 +479,14 @@ public class TmfOpenTraceHelper {
                     return editorReference.getEditor(restore);
                 }
             } catch (PartInitException e) {
+                // do nothing
             }
         }
         return null;
     }
 
     /**
-     * Reopen a trace or experiment from a project element in the provided
-     * editor
+     * Reopen a trace or experiment from a project element in the provided editor
      *
      * @param traceElement
      *            the {@link TmfTraceElement} to open
@@ -479,44 +495,45 @@ public class TmfOpenTraceHelper {
      */
     public static void reopenTraceFromElement(final TmfCommonProjectElement traceElement, final IReusableEditor editor) {
 
-        final IFile file;
-        try {
-            file = traceElement.createBookmarksFile();
-        } catch (final CoreException e) {
-            Activator.getDefault().logError(NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getTypeName()) + ' ' + traceElement.getName());
-            TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
-                    NLS.bind(Messages.TmfOpenTraceHelper_ErrorElement, traceElement.getTypeName()) + ENDL + ENDL + e.getMessage());
-            return;
-        }
+        try (FlowScopeLog flow = new FlowScopeLogBuilder(LOGGER, Level.FINE, "reopenTraceFromElement").setCategory(LOCAL_CATEGORY).build()) { //$NON-NLS-1$
+            final IFile file;
+            try (FlowScopeLog scopeLog = new FlowScopeLogBuilder(LOGGER, Level.FINE, "createBookmarks").setParentScope(flow).build()) { //$NON-NLS-1$
+                file = traceElement.createBookmarksFile();
+            } catch (final CoreException e) {
+                Activator.getDefault().logError(NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getTypeName()) + ' ' + traceElement.getName());
+                TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
+                        NLS.bind(Messages.TmfOpenTraceHelper_ErrorElement, traceElement.getTypeName()) + ENDL + ENDL + e.getMessage());
+                return;
+            }
 
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-
-                final ITmfTrace trace = openProjectElement(traceElement);
-                if (trace == null) {
-                    return;
-                }
-
-                final IEditorInput editorInput = new TmfEditorInput(file, trace);
-
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        final IWorkbench wb = PlatformUI.getWorkbench();
-                        IWorkbenchWindow activeWorkbenchWindow = wb.getActiveWorkbenchWindow();
-                        if (activeWorkbenchWindow == null) {
+            Thread thread = new Thread() {
+                @Override
+                public void run() {
+                    try (FlowScopeLog scopeLog = new FlowScopeLogBuilder(LOGGER, Level.FINE, "createThread").setParentScope(flow).build()) { //$NON-NLS-1$
+                        final ITmfTrace trace = openProjectElement(traceElement);
+                        if (trace == null) {
                             return;
                         }
 
-                        final IWorkbenchPage activePage = activeWorkbenchWindow.getActivePage();
-                        activePage.reuseEditor(editor, editorInput);
-                        activePage.activate(editor);
-                    }
-                });
-            }
-        };
-        thread.start();
-    }
+                        final IEditorInput editorInput = new TmfEditorInput(file, trace);
 
+                        Display.getDefault().asyncExec(() -> {
+                            try (FlowScopeLog innerScopeLog = new FlowScopeLogBuilder(LOGGER, Level.FINE, "OpenEditor").setParentScope(flow).build()) { //$NON-NLS-1$
+                                final IWorkbench wb = PlatformUI.getWorkbench();
+                                IWorkbenchWindow activeWorkbenchWindow = wb.getActiveWorkbenchWindow();
+                                if (activeWorkbenchWindow == null) {
+                                    return;
+                                }
+
+                                final IWorkbenchPage activePage = activeWorkbenchWindow.getActivePage();
+                                activePage.reuseEditor(editor, editorInput);
+                                activePage.activate(editor);
+                            }
+                        });
+                    }
+                }
+            };
+            thread.start();
+        }
+    }
 }
