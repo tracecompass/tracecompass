@@ -270,6 +270,13 @@
                id="org.eclipse.linuxtools.tmf.ui.navigator.viewerSorter">
          </commonSorter>
       </navigatorContent>
+      <commonFilter
+               activeByDefault="true"
+               class="org.eclipse.tracecompass.internal.tmf.ui.project.model.TmfShadowProjectFilter"
+               description="%project.model.shadowproject.filter.description"
+               id="org.eclipse.tracecompass.tmf.ui.shadowProjectFilter"
+               name="%project.model.shadowproject.filter">
+      </commonFilter>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.viewer">
@@ -284,6 +291,9 @@
             </contentExtension>
             <contentExtension
                   pattern="org.eclipse.linuxtools.internal.tmf.ui.project.model.TmfEditorLinkHelper">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.tracecompass.tmf.ui.shadowProjectFilter">
             </contentExtension>
          </includes>
       </viewerContentBinding>
