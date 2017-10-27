@@ -168,4 +168,8 @@ public class CounterViewTest extends XYDataProviderBaseTest {
         return CtfTmfTestTraceUtils.getTrace(CtfTestTrace.KERNEL_VM);
     }
 
+    @Override
+    protected void disposeTestTrace() {
+        CtfTmfTestTraceUtils.dispose(CtfTestTrace.KERNEL_VM);
+    }
 }

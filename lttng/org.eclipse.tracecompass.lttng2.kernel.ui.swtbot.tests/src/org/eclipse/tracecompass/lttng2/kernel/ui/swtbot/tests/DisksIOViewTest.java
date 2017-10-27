@@ -133,4 +133,9 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
     protected ITmfTrace getTestTrace() {
         return CtfTmfTestTraceUtils.getTrace(CtfTestTrace.SYNC_DEST);
     }
+
+    @Override
+    protected void disposeTestTrace() {
+        CtfTmfTestTraceUtils.dispose(CtfTestTrace.SYNC_DEST);
+    }
 }

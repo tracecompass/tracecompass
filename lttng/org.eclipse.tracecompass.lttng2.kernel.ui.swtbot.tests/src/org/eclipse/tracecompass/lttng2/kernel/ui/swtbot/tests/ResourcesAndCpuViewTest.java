@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -71,6 +71,7 @@ public class ResourcesAndCpuViewTest extends XYDataProviderBaseTest {
     private static final @NonNull ITmfTimestamp TRACE_END = TmfTimestamp.fromNanos(1412670967217750839L);
 
     private SWTBotView fViewBotRv;
+    private String fTraceName = null;
 
     /**
      * Before Test
@@ -222,7 +223,14 @@ public class ResourcesAndCpuViewTest extends XYDataProviderBaseTest {
 
     @Override
     protected ITmfTrace getTestTrace() {
-        return CtfTmfTestTraceUtils.getTrace(CtfTestTrace.ARM_64_BIT_HEADER);
+        ITmfTrace trace = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.ARM_64_BIT_HEADER);
+        fTraceName = trace.getName();
+        return trace;
+    }
+
+    @Override
+    protected void disposeTestTrace() {
+        CtfTmfTestTraceUtils.dispose(CtfTestTrace.ARM_64_BIT_HEADER);
     }
 
     private static void broadcast(TmfSignal signal) {
@@ -244,7 +252,7 @@ public class ResourcesAndCpuViewTest extends XYDataProviderBaseTest {
         Matcher<Tree> matcher = WidgetOfType.widgetOfType(Tree.class);
         SWTBotTree treeBot = new SWTBotTree(getSWTBotView().bot().widget(matcher));
         int count = 0;
-        for (SWTBotTreeItem bot : treeBot.getTreeItem(getTestTrace().getName()).getItems()) {
+        for (SWTBotTreeItem bot : treeBot.getTreeItem(fTraceName).getItems()) {
             final String text = bot.getText();
             if (!text.isEmpty()) {
                 count++;

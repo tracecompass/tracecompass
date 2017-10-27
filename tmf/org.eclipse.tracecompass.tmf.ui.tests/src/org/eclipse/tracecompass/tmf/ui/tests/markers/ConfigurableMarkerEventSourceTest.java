@@ -240,6 +240,8 @@ public class ConfigurableMarkerEventSourceTest {
                 validateMarker(markerList.get(i++), t + 20L, 20L, "E", String.format("E3 %d", 2), DEFAULT);
             }
         }
+
+        source.dispose();
     }
 
     private static void validateMarker(IMarkerEvent marker, long time, long duration, String category, String label, RGBA color) {

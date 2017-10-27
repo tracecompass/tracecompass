@@ -52,6 +52,8 @@ public class KernelMemoryUsageViewTest extends XYDataProviderBaseTest {
     private static final int NUMBER_OF_POINT = 50;
     private static final int MORE_POINTS = 100;
 
+    private String fTraceName = null;
+
     /**
      * Simple test to check the Kernel Memory Usage view data model
      *
@@ -79,7 +81,7 @@ public class KernelMemoryUsageViewTest extends XYDataProviderBaseTest {
         chartViewer.setNbPoints(NUMBER_OF_POINT);
 
         SWTBotTree treeBot = getSWTBotView().bot().tree();
-        SWTBotTreeItem totalNode = treeBot.getTreeItem(getTestTrace().getName());
+        SWTBotTreeItem totalNode = treeBot.getTreeItem(fTraceName);
         SWTBotUtils.waitUntil(root -> root.getItems().length >= 5, totalNode, "Did not finish loading");
 
         /*
@@ -137,6 +139,13 @@ public class KernelMemoryUsageViewTest extends XYDataProviderBaseTest {
 
     @Override
     protected ITmfTrace getTestTrace() {
-        return CtfTmfTestTraceUtils.getTrace(CtfTestTrace.ARM_64_BIT_HEADER);
+        ITmfTrace trace = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.ARM_64_BIT_HEADER);
+        fTraceName = trace.getName();
+        return trace;
+    }
+
+    @Override
+    protected void disposeTestTrace() {
+        CtfTmfTestTraceUtils.dispose(CtfTestTrace.ARM_64_BIT_HEADER);
     }
 }

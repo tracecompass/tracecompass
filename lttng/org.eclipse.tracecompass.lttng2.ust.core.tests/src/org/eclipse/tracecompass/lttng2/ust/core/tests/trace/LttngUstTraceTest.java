@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 École Polytechnique de Montréal
+ * Copyright (c) 2017 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,17 +16,15 @@ import java.io.File;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.LinuxTidAspect;
+import org.eclipse.tracecompass.lttng2.ust.core.tests.shared.LttngUstTestTraceUtils;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
-import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,17 +42,10 @@ public class LttngUstTraceTest {
 
     /**
      * Perform pre-class initialization.
-     *
-     * @throws TmfTraceException
-     *             Exceptions in trace initialization
      */
     @Before
-    public void setUp() throws TmfTraceException {
-        CtfTmfTrace ctftrace = CtfTmfTestTraceUtils.getTrace(TEST_TRACE);
-
-        LttngUstTrace trace = new LttngUstTrace();
-        trace.initTrace(null, ctftrace.getPath(), ITmfEvent.class);
-        fTrace = trace;
+    public void setUp() {
+        fTrace = LttngUstTestTraceUtils.getTrace(TEST_TRACE);
 
     }
 
@@ -74,7 +65,7 @@ public class LttngUstTraceTest {
     public void tearDown() {
         ITmfTrace trace = fTrace;
         if (trace != null) {
-            trace.dispose();
+            LttngUstTestTraceUtils.dispose(TEST_TRACE);
             File suppDir = new File(TmfTraceManager.getSupplementaryFileDir(trace));
             deleteDirectory(suppDir);
         }

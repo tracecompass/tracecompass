@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 Ericsson
+ * Copyright (c) 2014, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.callstack.LttngUstCallStackProvider;
+import org.eclipse.tracecompass.lttng2.ust.core.tests.shared.LttngUstTestTraceUtils;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
@@ -34,11 +35,10 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.callstack.CallStackStateProvider;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
@@ -66,7 +66,7 @@ public abstract class AbstractProviderTest {
 
     private static final @NonNull CtfTestTrace otherUstTrace = CtfTestTrace.HELLO_LOST;
 
-    private CtfTmfTrace fTrace = null;
+    private ITmfTrace fTrace = null;
     private ITmfStateSystem fSS = null;
     private TestLttngCallStackModule fModule;
 
@@ -105,17 +105,12 @@ public abstract class AbstractProviderTest {
 
     /**
      * Perform pre-class initialization.
-     *
-     * @throws TmfTraceException
-     *             Exception initiating the trace
      */
     @Before
-    public void setUp() throws TmfTraceException {
+    public void setUp() {
         CtfTestTrace testTrace = getTestTrace();
 
-        CtfTmfTrace ctftrace = CtfTmfTestTraceUtils.getTrace(testTrace);
-        LttngUstTrace trace = new LttngUstTrace();
-        trace.initTrace(null, ctftrace.getPath(), ITmfEvent.class);
+        LttngUstTrace trace = LttngUstTestTraceUtils.getTrace(testTrace);
         fTrace = trace;
         fModule = new TestLttngCallStackModule();
         try {
@@ -136,9 +131,10 @@ public abstract class AbstractProviderTest {
     @After
     public void tearDown() {
         fModule.dispose();
-        if (fTrace != null) {
-            fTrace.dispose();
-            File suppDir = new File(TmfTraceManager.getSupplementaryFileDir(fTrace));
+        ITmfTrace trace = fTrace;
+        if (trace != null) {
+            LttngUstTestTraceUtils.dispose(getTestTrace());
+            File suppDir = new File(TmfTraceManager.getSupplementaryFileDir(trace));
             deleteDirectory(suppDir);
         }
     }

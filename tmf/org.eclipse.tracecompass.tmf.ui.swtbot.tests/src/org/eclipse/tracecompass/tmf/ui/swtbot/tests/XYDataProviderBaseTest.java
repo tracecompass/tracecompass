@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * Copyright (c) 2017 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
+
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests;
 
 import static org.junit.Assert.assertEquals;
@@ -71,7 +80,6 @@ public abstract class XYDataProviderBaseTest {
 
     private SWTBotView fViewBot;
     private Chart fChart;
-    private static ITmfTrace fTrace;
 
     /**
      * Before Class
@@ -98,7 +106,6 @@ public abstract class XYDataProviderBaseTest {
      */
     @AfterClass
     public static void tearDown() {
-        fTrace.dispose();
         SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
         fLogger.removeAllAppenders();
     }
@@ -114,11 +121,11 @@ public abstract class XYDataProviderBaseTest {
 
         Matcher<Chart> widgetOfType = WidgetOfType.widgetOfType(Chart.class);
         fChart = fViewBot.bot().widget(widgetOfType);
-        fTrace = getTestTrace();
+        ITmfTrace trace = getTestTrace();
 
-        File file = new File(fTrace.getPath());
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, file.getAbsolutePath(), fTrace.getTraceTypeId());
-        SWTBotUtils.activateEditor(fBot, fTrace.getName());
+        File file = new File(trace.getPath());
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, file.getAbsolutePath(), trace.getTraceTypeId());
+        SWTBotUtils.activateEditor(fBot, trace.getName());
     }
 
     /**
@@ -128,6 +135,7 @@ public abstract class XYDataProviderBaseTest {
     public void after() {
         fBot.closeAllEditors();
         SWTBotUtils.closeSecondaryShells(fBot);
+        disposeTestTrace();
     }
 
     /**
@@ -306,4 +314,9 @@ public abstract class XYDataProviderBaseTest {
      * @return The trace
      */
     protected abstract ITmfTrace getTestTrace();
+
+    /**
+     * Disposes the trace on which the test was run
+     */
+    protected abstract void disposeTestTrace();
 }
