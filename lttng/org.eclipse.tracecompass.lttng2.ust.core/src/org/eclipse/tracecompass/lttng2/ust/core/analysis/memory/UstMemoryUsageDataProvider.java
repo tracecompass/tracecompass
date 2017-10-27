@@ -9,13 +9,15 @@
 
 package org.eclipse.tracecompass.lttng2.ust.core.analysis.memory;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -44,7 +46,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 /**
  * This data provider will return a XY model based on a query filter. The model
@@ -110,81 +112,89 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
 
         ITmfStateSystem ss = Objects.requireNonNull(fModule.getStateSystem(), "Statesystem should have been verified by verifyParameters"); //$NON-NLS-1$
         long[] xValues = filter.getTimesRequested();
-        Map<Integer, double[]> tempModel = initSeries(filter);
         long currentEnd = ss.getCurrentEndTime();
         boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
-        if (tempModel.isEmpty()) {
+
+        Map<Integer, IYModel> models = getYModels(ss, filter);
+        if (models.isEmpty()) {
             return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.MemoryUsageDataProvider_Title), xValues, Collections.emptyMap(), complete);
         }
 
-        /*
-         * TODO: It should only show active threads in the time range. If a tid does not
-         * have any memory value (only 1 interval in the time range with value null or
-         * 0), then its series should not be displayed. TODO: Support TID reuse
-         */
         try {
-            for (int i = 0; i < xValues.length; i++) {
+            for (ITmfStateInterval interval : ss.query2D(models.keySet(), getTimes(xValues, ss.getStartTime(), currentEnd))) {
                 if (monitor != null && monitor.isCanceled()) {
                     return TmfCommonXAxisResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
                 }
-                long time = xValues[i];
-                if (time >= ss.getStartTime() && time <= currentEnd) {
-                    List<ITmfStateInterval> fullState = ss.queryFullState(time);
-                    for (Entry<Integer, double[]> entry : tempModel.entrySet()) {
-                        int quark = entry.getKey();
-                        int memoryAttribute = ss.optQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_MEMORY_ATTRIBUTE);
 
-                        if (memoryAttribute != ITmfStateSystem.INVALID_ATTRIBUTE) {
-                            double[] values = entry.getValue();
-                            Object val = fullState.get(memoryAttribute).getValue();
-                            values[i] = extractValue(val);
-                        }
-                    }
+                IYModel model = models.get(interval.getAttribute());
+                Object value = interval.getValue();
+                if (model != null && value instanceof Number) {
+                    int from = Arrays.binarySearch(xValues, interval.getStartTime());
+                    from = (from >= 0) ? from : -1 - from;
+
+                    int to = Arrays.binarySearch(xValues, interval.getEndTime());
+                    to = (to >= 0) ? to + 1 : -1 - to;
+
+                    Arrays.fill(model.getData(), from, to, ((Number) value).doubleValue());
                 }
             }
         } catch (StateSystemDisposedException e) {
             return TmfCommonXAxisResponseFactory.createFailedResponse(e.getMessage());
         }
 
-        ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
-        for (Entry<Integer, double[]> tempEntry : tempModel.entrySet()) {
-            String name = getTrace().getName() + ':' + ss.getAttributeName(tempEntry.getKey());
-            ySeries.put(name, new YModel(name, tempEntry.getValue()));
-        }
-
-        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.MemoryUsageDataProvider_Title), xValues, ySeries.build(), complete);
+        Map<String, IYModel> map = Maps.uniqueIndex(models.values(), IYModel::getName);
+        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.MemoryUsageDataProvider_Title), xValues, map, complete);
     }
 
     /**
-     * Initialize a map of quark to primitive double array
+     * Get map of UST_MEMORY_MEMORY_ATTRIBUTE to relevant model
      *
+     * @param ss
+     *            the queried {@link ITmfStateSystem}
      * @param filter
-     *            the query object
-     * @return a Map of quarks for the entries which exist for this provider to
-     *         newly initialized primitive double arrays of the same length as the
-     *         number of requested timestamps.
+     *            the {@link TimeQueryFilter}
+     * @return a map of the UST_MEMORY_MEMORY_ATTRIBUTE attributes to the
+     *         initialized model
      */
-    private Map<Integer, double[]> initSeries(TimeQueryFilter filter) {
-        if (filter instanceof SelectionTimeQueryFilter) {
-            Collection<Long> selectedEntries = ((SelectionTimeQueryFilter) filter).getSelectedItems();
-            Map<Integer, double[]> selectedSeries = new HashMap<>();
-            int length = filter.getTimesRequested().length;
-            for (Long id : selectedEntries) {
-                Integer quark = fIdToQuark.get(id);
-                if (quark != null) {
-                    selectedSeries.put(quark, new double[length]);
+    private Map<Integer, IYModel> getYModels(ITmfStateSystem ss, TimeQueryFilter filter) {
+        if (!(filter instanceof SelectionTimeQueryFilter)) {
+            return Collections.emptyMap();
+        }
+        Collection<Long> selectedItems = ((SelectionTimeQueryFilter) filter).getSelectedItems();
+        Map<Integer, IYModel> selectedSeries = new HashMap<>();
+        int length = filter.getTimesRequested().length;
+        for (Long id : selectedItems) {
+            Integer tidQuark = fIdToQuark.get(id);
+            if (tidQuark != null) {
+                int memoryAttribute = ss.optQuarkRelative(tidQuark, UstMemoryStrings.UST_MEMORY_MEMORY_ATTRIBUTE);
+                if (memoryAttribute != ITmfStateSystem.INVALID_ATTRIBUTE) {
+                    String name = getTrace().getName() + ':' + ss.getAttributeName(tidQuark);
+                    selectedSeries.put(memoryAttribute, new YModel(name, new double[length]));
                 }
             }
-            return selectedSeries;
         }
-        return Collections.emptyMap();
+        return selectedSeries;
     }
 
-    private static long extractValue(@Nullable Object val) {
-        if (val instanceof Number) {
-            return ((Number) val).longValue();
+    /**
+     * Get a set of the time stamps from the query that intersect the state system
+     *
+     * @param xValues
+     *            queried time stamps
+     * @param start
+     *            {@link ITmfStateSystem} start time
+     * @param end
+     *            {@link ITmfStateSystem} current end time
+     * @return a set of the intersecting time stamps
+     */
+    private static Collection<Long> getTimes(long[] xValues, long start, long end) {
+        Set<Long> set = new HashSet<>();
+        for (long t : xValues) {
+            if (start <= t && t <= end) {
+                set.add(t);
+            }
         }
-        return 0;
+        return set;
     }
 
     /**
